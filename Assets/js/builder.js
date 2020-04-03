@@ -54,21 +54,25 @@ Mautic.initGrapesJS = function (object) {
     let textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
     let assetManagerConf = {
         assets: JSON.parse(textareaAssets.val()),
-        noAssets: 'No <b>assets</b> here, drag to upload',
+        noAssets: Mautic.translate('grapesjsbuilder.assetManager.noAssets'),
         upload: textareaAssets.data('upload'),
         uploadName: 'files',
         multiUpload: true,
         embedAsBase64: false,
-
-        // Text on upload input
-        uploadText: 'Drop files here or click to upload',
-        // Label for the add button
-        addBtnText: 'Add image',
-        // Default title for the asset manager modal
-        modalTitle: 'Select Image',
-
         openAssetsOnDrop: 1,
         autoAdd: true,
+    };
+
+    let presetMauticConf = {
+        'sourceEditBtnLabel': Mautic.translate('grapesjsbuilder.sourceEditBtnLabel'),
+        'sourceCancelBtnLabel': Mautic.translate('grapesjsbuilder.sourceCancelBtnLabel'),
+        'sourceEditModalTitle': Mautic.translate('grapesjsbuilder.sourceEditModalTitle'),
+        'deleteAssetConfirmText': Mautic.translate('grapesjsbuilder.deleteAssetConfirmText'),
+        'categorySectionLabel': Mautic.translate('grapesjsbuilder.categorySectionLabel'),
+        'categoryBlockLabel': Mautic.translate('grapesjsbuilder.categoryBlockLabel'),
+        'dynamicContentBlockLabel': Mautic.translate('grapesjsbuilder.dynamicContentBlockLabel'),
+        'dynamicContentBtnLabel': Mautic.translate('grapesjsbuilder.dynamicContentBtnLabel'),
+        'dynamicContentModalTitle': Mautic.translate('grapesjsbuilder.dynamicContentModalTitle'),
     };
 
     // Redefine Keyboard shortcuts due to unbind won't works with multiple keys.
@@ -140,7 +144,7 @@ Mautic.initGrapesJS = function (object) {
             plugins: ['gjs-preset-webpage', 'grapesjs-parser-postcss', 'grapesjs-preset-mautic'],
             pluginsOpts: {
                 'gjs-preset-webpage': {},
-                'grapesjs-preset-mautic': {}
+                'grapesjs-preset-mautic': presetMauticConf
             },
             keymaps: keymapsConf
         });
@@ -184,7 +188,7 @@ Mautic.initGrapesJS = function (object) {
                 plugins: ['grapesjs-mjml', 'grapesjs-parser-postcss', 'grapesjs-preset-mautic'],
                 pluginsOpts: {
                     'grapesjs-mjml': {},
-                    'grapesjs-preset-mautic': {}
+                    'grapesjs-preset-mautic': presetMauticConf
                 },
                 keymaps: keymapsConf
             });
@@ -245,7 +249,7 @@ Mautic.initGrapesJS = function (object) {
                 plugins: ['gjs-preset-newsletter', 'grapesjs-parser-postcss', 'grapesjs-preset-mautic'],
                 pluginsOpts: {
                     'gjs-preset-newsletter': {},
-                    'grapesjs-preset-mautic': {}
+                    'grapesjs-preset-mautic': presetMauticConf
                 },
                 keymaps: keymapsConf
             });
