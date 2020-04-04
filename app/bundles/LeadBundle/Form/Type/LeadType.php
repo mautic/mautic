@@ -62,8 +62,8 @@ class LeadType extends AbstractType
 
         if (!$options['isShortForm']) {
             $imageChoices = [
-                'gravatar' => 'Gravatar',
-                'custom'   => 'mautic.lead.lead.field.custom_avatar',
+                'Gravatar'                             => 'gravatar',
+                'mautic.lead.lead.field.custom_avatar' => 'custom',
             ];
 
             $cache = $options['data']->getSocialCache();

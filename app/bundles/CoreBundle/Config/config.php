@@ -373,7 +373,7 @@ return [
                 'class'     => \Mautic\CoreBundle\Templating\Helper\GravatarHelper::class,
                 'arguments' => [
                     'mautic.helper.paths',
-                    'mautic.helper.template.avatar',
+                    'mautic.helper.template.default_avatar',
                     'mautic.helper.core_parameters',
                     'request_stack',
                 ],
@@ -612,6 +612,10 @@ return [
             // System uses
             'mautic.di.env_processor.nullable' => [
                 'class' => \Mautic\CoreBundle\DependencyInjection\EnvProcessor\NullableProcessor::class,
+                'tag'   => 'container.env_var_processor',
+            ],
+            'mautic.di.env_processor.int_nullable' => [
+                'class' => \Mautic\CoreBundle\DependencyInjection\EnvProcessor\IntNullableProcessor::class,
                 'tag'   => 'container.env_var_processor',
             ],
             'mautic.cipher.openssl' => [

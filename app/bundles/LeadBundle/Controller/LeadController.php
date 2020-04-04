@@ -276,6 +276,10 @@ class LeadController extends FormController
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead.lead');
 
+        // When we change company data these changes get cached
+        // so we need to clear the entity manager
+        $model->getRepository()->clear();
+
         /** @var \Mautic\LeadBundle\Entity\Lead $lead */
         $lead = $model->getEntity($objectId);
 
@@ -734,9 +738,9 @@ class LeadController extends FormController
      */
     private function uploadAvatar(Lead $lead)
     {
-        $lead      = $this->request->files->get('lead', []);
-        $file      = $lead['custom_avatar'] ?? null;
-        $avatarDir = $this->get('mautic.helper.template.avatar')->getAvatarPath(true);
+        $leadInformation = $this->request->files->get('lead', []);
+        $file            = $leadInformation['custom_avatar'] ?? null;
+        $avatarDir       = $this->get('mautic.helper.template.avatar')->getAvatarPath(true);
 
         if (!file_exists($avatarDir)) {
             mkdir($avatarDir);

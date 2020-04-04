@@ -56,8 +56,6 @@ class DynamicContentHelper
      */
     public function getDynamicContentForLead($slot, $lead)
     {
-        $this->realTimeExecutioner->execute('dwc.decision', $slot, 'dynamicContent')->getResponseArray();
-
         // Attempt campaign slots first
         $dwcActionResponse = $this->realTimeExecutioner->execute('dwc.decision', $slot, 'dynamicContent')->getActionResponses('dwc.push_content');
         if (!empty($dwcActionResponse)) {

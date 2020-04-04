@@ -99,6 +99,11 @@ class ParameterLoader
 
         self::$defaultParameters['local_config_path'] = $paths['local_config'];
 
+        // We need this for the file manager
+        if (isset($paths['local_root'])) {
+            self::$defaultParameters['local_root'] = $paths['local_root'];
+        }
+
         return self::$defaultParameters['local_config_path'];
     }
 

@@ -14,7 +14,7 @@ namespace Mautic\CoreBundle\Templating\Helper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
-use Mautic\LeadBundle\Templating\Helper\AvatarHelper;
+use Mautic\LeadBundle\Templating\Helper\DefaultAvatarHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Templating\Helper\Helper;
 
@@ -31,9 +31,9 @@ class GravatarHelper extends Helper
     private $devHosts = [];
 
     /**
-     * @var AvatarHelper
+     * @var DefaultAvatarHelper
      */
-    private $avatarHelper;
+    private $defaultAvatarHelper;
 
     /**
      * @var RequestStack
@@ -42,15 +42,15 @@ class GravatarHelper extends Helper
 
     public function __construct(
         PathsHelper $pathsHelper,
-        AvatarHelper $avatarHelper,
+        DefaultAvatarHelper $defaultAvatarHelper,
         CoreParametersHelper $coreParametersHelper,
         RequestStack $requestStack
     ) {
-        $this->devMode      = MAUTIC_ENV === 'dev';
+        $this->devMode             = MAUTIC_ENV === 'dev';
         $pathsHelper->getSystemPath('images');
-        $this->avatarHelper = $avatarHelper;
-        $this->requestStack = $requestStack;
-        $this->devHosts     = (array) $coreParametersHelper->get('dev_hosts');
+        $this->defaultAvatarHelper = $defaultAvatarHelper;
+        $this->requestStack        = $requestStack;
+        $this->devHosts            = (array) $coreParametersHelper->get('dev_hosts');
     }
 
     /**
@@ -72,7 +72,7 @@ class GravatarHelper extends Helper
             ?
             'https://www.mautic.org/media/images/default_avatar.png'
             :
-            $this->avatarHelper->getDefaultAvatar(true);
+            $this->defaultAvatarHelper->getDefaultAvatar(true);
 
         $url = 'https://www.gravatar.com/avatar/'.md5(strtolower(trim($email))).'?s='.$size;
 

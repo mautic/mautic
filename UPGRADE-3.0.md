@@ -311,6 +311,7 @@ public function onConfigGenerate(ConfigBuilderEvent $event)
 *   Deprecated methods in the LeadDevice entity getDateOpen() and setDateOpen() were removed.
 *   Deprecated methods in the LeadEventLogRepository class getEventsByLead() and getEventsByAction() were removed.
 *   Deprecated method LeadListRepository::getLeadsByList() was removed.
+*   Methods LeadListRepository::generateSegmentExpression() and LeadListRepository::generateSegmentExpression() were removed as they were not being called from anywhere, only from each other.
 *   Deprecated method PointsChangeLogRepository::countValue() was removed.
 *   Deprecated methods in the StagesChangeLogRepository class getMostStages(), getMostLeads() and countValue() were removed.
 *   Deprecated class ChannelEvent removed.
