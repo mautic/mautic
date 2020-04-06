@@ -100,7 +100,7 @@ if (!IN_CLI) {
 
     switch ($task) {
         case '':
-            html_body("<div class='well text-center'><h3><a href='$url?task=startUpgrade&standalone=1'>Click here to start upgrade.</a></h3><br /><strong>Do not refresh or stop the process. This may take serveral minutes.</strong></div>");
+            html_body("<div class='well text-center'><h3><a href='$url?task=startUpgrade&standalone=1'>Click here to start upgrade.</a></h3><br /><strong>Do not refresh or stop the process. This may take several minutes.</strong></div>");
 
         case 'startUpgrade':
             $nextTask = 'fetchUpdates';
