@@ -4,7 +4,7 @@ namespace Mautic\EmailBundle\Tests\Event;
 
 use Mautic\EmailBundle\Event\EmailSendEvent;
 
-class EmailSendEventTest extends \PHPUnit_Framework_TestCase
+class EmailSendEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EmailSendEvent
