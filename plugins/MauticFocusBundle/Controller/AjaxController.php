@@ -13,56 +13,10 @@ namespace MauticPlugin\MauticFocusBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
-use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function getWebsiteSnapshotAction(Request $request)
-    {
-        $data = ['success' => 0];
-
-        if ($this->get('mautic.security')->isGranted('focus:items:create')) {
-            $website = InputHelper::url($request->request->get('website'));
-
-            if ($website) {
-                // Let's try to extract colors from image
-                $id = (int) $request->request->get('id');
-                if (!empty($id)) {
-                    // Tell the JS to not populate with default colors
-                    $data['ignoreDefaultColors'] = true;
-                }
-
-                $snapshotUrl = $this->get('mautic.helper.core_parameters')->get('website_snapshot_url');
-                $snapshotKey = $this->get('mautic.helper.core_parameters')->get('website_snapshot_key');
-
-                $http     = $this->get('mautic.http.connector');
-                $response = $http->get($snapshotUrl.'?url='.urlencode($website).'&key='.$snapshotKey, [], 30);
-
-                if (200 === $response->code) {
-                    $package = json_decode($response->body, true);
-                    if (isset($package['images'])) {
-                        $data['image']['desktop'] = $package['images']['desktop'];
-                        $data['image']['mobile']  = $package['images']['mobile'];
-                        $palette                  = $package['palette'];
-                        $data['colors']           = [
-                            'primaryColor'    => $palette[0],
-                            'textColor'       => FocusModel::isLightColor($palette[0]) ? '#000000' : '#ffffff',
-                            'buttonColor'     => $palette[1],
-                            'buttonTextColor' => FocusModel::isLightColor($palette[1]) ? '#000000' : '#ffffff',
-                        ];
-                        $data['success'] = 1;
-                    }
-                }
-            }
-        }
-
-        return $this->sendJsonResponse($data);
-    }
-
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
