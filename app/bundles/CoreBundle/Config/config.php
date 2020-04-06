@@ -566,6 +566,15 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.core.command.apply_update' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\ApplyUpdatesCommand::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.core_parameters',
+                    'mautic.update.step_provider',
+                ],
+            ],
         ],
         'other' => [
             'mautic.cache.warmer.middleware' => [
@@ -911,6 +920,64 @@ return [
                     'mautic.helper.core_parameters',
                     'mautic.monolog.fulltrace.formatter',
                 ],
+            ],
+
+            // Update steps
+            'mautic.update.step_provider' => [
+                'class' => \Mautic\CoreBundle\Update\StepProvider::class,
+            ],
+            'mautic.update.step.delete_cache' => [
+                'class'     => \Mautic\CoreBundle\Update\Step\DeleteCacheStep::class,
+                'arguments' => [
+                    'mautic.helper.cache',
+                    'translator',
+                ],
+                'tag' => 'mautic.update_step',
+            ],
+            'mautic.update.step.finalize' => [
+                'class'     => \Mautic\CoreBundle\Update\Step\FinalizeUpdateStep::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.paths',
+                    'session',
+                    'mautic.helper.app_version',
+                ],
+                'tag' => 'mautic.update_step',
+            ],
+            'mautic.update.step.install_new_files' => [
+                'class'     => \Mautic\CoreBundle\Update\Step\InstallNewFilesStep::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.update',
+                    'mautic.helper.paths',
+                ],
+                'tag' => 'mautic.update_step',
+            ],
+            'mautic.update.step.remove_deleted_files' => [
+                'class'     => \Mautic\CoreBundle\Update\Step\RemoveDeletedFilesStep::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.paths',
+                    'monolog.logger.mautic',
+                ],
+                'tag' => 'mautic.update_step',
+            ],
+            'mautic.update.step.update_schema' => [
+                'class'     => \Mautic\CoreBundle\Update\Step\UpdateSchemaStep::class,
+                'arguments' => [
+                    'translator',
+                    'service_container',
+                ],
+                'tag' => 'mautic.update_step',
+            ],
+            'mautic.update.step.update_translations' => [
+                'class'     => \Mautic\CoreBundle\Update\Step\UpdateTranslationsStep::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.language',
+                    'monolog.logger.mautic',
+                ],
+                'tag' => 'mautic.update_step',
             ],
         ],
         'models' => [

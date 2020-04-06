@@ -178,6 +178,31 @@ class PathsHelper
         return ParameterLoader::getLocalConfigFile($this->kernelRootDir);
     }
 
+    public function getCachePath(): string
+    {
+        return $this->getSystemPath('cache', true);
+    }
+
+    public function getRootPath(): string
+    {
+        return $this->getSystemPath('root', true);
+    }
+
+    public function getTemporaryPath(): string
+    {
+        return $this->getSystemPath('tmp', true);
+    }
+
+    public function getLogsPath(): string
+    {
+        return $this->getSystemPath('logs', true);
+    }
+
+    public function getImagePath(): string
+    {
+        return $this->getSystemPath('images', true);
+    }
+
     private function removeTrailingSlash(?string $dir): ?string
     {
         if ('/' === substr($dir, -1)) {
