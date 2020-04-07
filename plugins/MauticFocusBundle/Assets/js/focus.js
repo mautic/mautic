@@ -256,7 +256,7 @@ Mautic.launchFocusBuilder = function (forceFetch) {
             // @todo recalculate when window resize
             height: mQuery('#websiteScreenshot').height(), // 100% does not work. Needs to be specified
             overflow: "hidden", // Disable scrolling with scrolling="no" attr
-            "pointer-events": "none"
+            "pointer-events": "none", // Disable clicks in iframe
         };
 
         // Async load in iframe
