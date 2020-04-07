@@ -12,7 +12,7 @@ ini_set('display_errors', 'Off');
 date_default_timezone_set('UTC');
 
 define('MAUTIC_MINIMUM_PHP', '5.6.19');
-define('MAUTIC_MAXIMUM_PHP', '7.2.999');
+define('MAUTIC_MAXIMUM_PHP', '7.3.999');
 
 // Are we running the minimum version?
 if (version_compare(PHP_VERSION, MAUTIC_MINIMUM_PHP, 'lt')) {
@@ -100,7 +100,7 @@ if (!IN_CLI) {
 
     switch ($task) {
         case '':
-            html_body("<div class='well text-center'><h3><a href='$url?task=startUpgrade&standalone=1'>Click here to start upgrade.</a></h3><br /><strong>Do not refresh or stop the process. This may take serveral minutes.</strong></div>");
+            html_body("<div class='well text-center'><h3><a href='$url?task=startUpgrade&standalone=1'>Click here to start upgrade.</a></h3><br /><strong>Do not refresh or stop the process. This may take several minutes.</strong></div>");
 
         case 'startUpgrade':
             $nextTask = 'fetchUpdates';

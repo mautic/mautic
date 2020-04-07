@@ -58,6 +58,11 @@ class IpLookupHelper
     private $coreParametersHelper;
 
     /**
+     * @var string
+     */
+    private $realIp;
+
+    /**
      * IpLookupHelper constructor.
      *
      * @param RequestStack         $requestStack
@@ -139,6 +144,12 @@ class IpLookupHelper
             $ip = '127.0.0.1';
         }
 
+        $this->realIp = $ip;
+
+        if ($this->coreParametersHelper->getParameter('anonymize_ip')) {
+            $ip = preg_replace(['/\.\d*$/', '/[\da-f]*:[\da-f]*$/'], ['.***', '****:****'], $ip);
+        }
+
         if (empty($ipAddresses[$ip])) {
             $repo      = $this->em->getRepository('MauticCoreBundle:IpAddress');
             $ipAddress = $repo->findOneByIpAddress($ip);
@@ -146,9 +157,6 @@ class IpLookupHelper
 
             if ($ipAddress === null) {
                 $ipAddress = new IpAddress();
-                if ($this->coreParametersHelper->getParameter('anonymize_ip')) {
-                    $ip = preg_replace(['/\.\d*$/', '/[\da-f]*:[\da-f]*$/'], ['.***', '****:****'], $ip);
-                }
                 $ipAddress->setIpAddress($ip);
             }
 
@@ -185,13 +193,12 @@ class IpLookupHelper
             }
 
             $details = $ipAddress->getIpDetails();
-            if ($ipAddress->isTrackable() && empty($details['city'])) {
+            if ($ipAddress->isTrackable() && empty($details['city']) && !$this->coreParametersHelper->getParameter('anonymize_ip')) {
                 // Get the IP lookup service
 
                 // Fetch the data
                 if ($this->ipLookup) {
-                    $details = $this->ipLookup->setIpAddress($ip)
-                        ->getDetails();
+                    $details = $this->getIpDetails($ip);
 
                     $ipAddress->setIpDetails($details);
 
@@ -208,6 +215,20 @@ class IpLookupHelper
         }
 
         return $ipAddresses[$ip];
+    }
+
+    /**
+     * @param string $ip
+     *
+     * @return array
+     */
+    public function getIpDetails($ip)
+    {
+        if ($this->ipLookup) {
+            return $this->ipLookup->setIpAddress($ip)->getDetails();
+        }
+
+        return [];
     }
 
     /**
@@ -255,5 +276,13 @@ class IpLookupHelper
         }
 
         return null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRealIp()
+    {
+        return $this->realIp;
     }
 }

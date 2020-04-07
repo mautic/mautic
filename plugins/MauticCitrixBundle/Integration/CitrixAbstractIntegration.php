@@ -36,12 +36,23 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     {
         //make sure URL does not have ending /
         $keys = $this->getDecryptedApiKeys($settings);
-        if (array_key_exists('url', $keys) && substr($keys['url'], -1) === '/') {
+        if (array_key_exists('url', $keys) && '/' === substr($keys['url'], -1)) {
             $keys['url'] = substr($keys['url'], 0, -1);
             $this->encryptAndSetApiKeys($keys, $settings);
         }
 
         parent::setIntegrationSettings($settings);
+    }
+
+    /**
+     * Refresh tokens.
+     */
+    public function getRefreshTokenKeys()
+    {
+        return [
+            'refresh_token',
+            'expires_in',
+        ];
     }
 
     /**
@@ -62,8 +73,9 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     public function getRequiredKeyFields()
     {
         return [
-            'app_name'  => 'mautic.citrix.form.appname',
-            'client_id' => 'mautic.citrix.form.consumerkey',
+            'app_name'      => 'mautic.citrix.form.appname',
+            'client_id'     => 'mautic.citrix.form.clientid',
+            'client_secret' => 'mautic.citrix.form.clientsecret',
         ];
     }
 
@@ -117,7 +129,7 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
      */
     public function getAccessTokenUrl()
     {
-        return $this->getApiUrl().'/oauth/access_token';
+        return $this->getApiUrl().'/oauth/v2/token';
     }
 
     /**
@@ -127,7 +139,7 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
      */
     public function getAuthenticationUrl()
     {
-        return $this->getApiUrl().'/oauth/authorize';
+        return $this->getApiUrl().'/oauth/v2/authorize';
     }
 
     /**

@@ -31,17 +31,21 @@ class ClickthroughHelper
      * @param      $string
      * @param bool $urlDecode
      *
-     * @return mixed
+     * @return array
      */
     public static function decodeArrayFromUrl($string, $urlDecode = true)
     {
         $raw     = $urlDecode ? urldecode($string) : $string;
         $decoded = base64_decode($raw);
 
-        if (strpos(strtolower($decoded), 'a') !== 0) {
-            throw new \InvalidArgumentException(sprintf('The string %s is not a serialized array.', $decoded));
+        if (empty($decoded)) {
+            return [];
         }
 
-        return unserialize($decoded);
+        if (stripos($decoded, 'a') !== 0) {
+            throw new \InvalidArgumentException(sprintf('The string %s is not a serialized array', $decoded));
+        }
+
+        return Serializer::decode($decoded);
     }
 }

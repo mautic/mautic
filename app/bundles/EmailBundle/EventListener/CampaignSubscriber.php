@@ -296,6 +296,9 @@ class CampaignSubscriber implements EventSubscriberInterface
             'email_type'     => $type,
             'return_errors'  => true,
             'dnc_as_error'   => true,
+            'customHeaders'  => [
+                'X-EMAIL-ID' => $emailId,
+            ],
         ];
 
         // Determine if this email is transactional/marketing
@@ -339,7 +342,8 @@ class CampaignSubscriber implements EventSubscriberInterface
             foreach ($stats as $contactId => $sentCount) {
                 /** @var LeadEventLog $log */
                 $log = $event->findLogByContactId($contactId);
-                $event->fail(
+                // Pass with a note to the UI because no use retrying
+                $event->passWithError(
                     $log,
                     $this->translator->trans('mautic.email.contact_already_received_marketing_email', ['%contact%' => $credentialArray[$log->getId()]['primaryIdentifier']])
                 );

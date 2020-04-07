@@ -230,7 +230,7 @@ $view['slots']->set(
                                                                 <?php echo $field['value']; ?>
                                                             </a>
                                                         <?php else: ?>
-                                                            <?php echo $view->escape($field['value']); ?>
+                                                            <?php echo $view->escape($field['normalizedValue']); ?>
                                                         <?php endif; ?>
                                                     <?php endif; ?>
                                                 </td>
@@ -545,7 +545,7 @@ $view['slots']->set(
                     <ul class="media-list media-list-feed">
                         <?php foreach ($upcomingEvents as $event) : ?>
                         <?php
-                            $metadata = unserialize($event['metadata']);
+                            $metadata = \Mautic\CoreBundle\Helper\Serializer::decode($event['metadata']);
                             $errors   = false;
                             if (!empty($metadata['errors'])):
                                 $errors = (is_array($metadata['errors'])) ? implode('<br />', $metadata['errors']) : $metadata['errors'];

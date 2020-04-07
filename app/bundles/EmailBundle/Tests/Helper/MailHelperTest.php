@@ -674,4 +674,34 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
 
         return $mockFactory;
     }
+
+    public function testArrayOfAddressesAreRemappedIntoEmailToNameKeyValuePair()
+    {
+        $mockFactory = $this->getMockBuilder(MauticFactory::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mockFactory->method('getParameter')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['mailer_return_path', false, null],
+                        ['mailer_spool_type', false, 'memory'],
+                    ]
+                )
+            );
+
+        $swiftMailer = new \Swift_Mailer(new SmtpTransport());
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+
+        $mailer->setTo(['sombody@somewhere.com', 'sombodyelse@somewhere.com'], 'test');
+
+        $this->assertEquals(
+            [
+                'sombody@somewhere.com'     => 'test',
+                'sombodyelse@somewhere.com' => 'test',
+            ],
+            $mailer->message->getTo()
+        );
+    }
 }
