@@ -1,3 +1,5 @@
+//@ sourceURL=/plugins/MauticFocusBundle/Assets/js/focus.js
+
 Mautic.disabledFocusActions = function(opener) {
     if (typeof opener == 'undefined') {
         opener = window;
