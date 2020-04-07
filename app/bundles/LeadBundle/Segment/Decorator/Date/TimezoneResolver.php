@@ -50,7 +50,7 @@ class TimezoneResolver
         $time = 'midnight today';
 
         if ($hasTimePart) {
-          $time = 'now';
+            $time = 'now';
         }
 
         $date = new \DateTime($time, new \DateTimeZone($timezone));

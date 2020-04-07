@@ -103,7 +103,7 @@ class DateRelativeInterval implements FilterDecoratorInterface
             $format   = 'Y-m-d H:i:s';
         }
 
-        if ($operator === 'like' || $operator === 'notLike') {
+        if ('like' === $operator || 'notLike' === $operator) {
             $format .= '%';
         }
 
