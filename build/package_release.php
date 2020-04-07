@@ -26,7 +26,8 @@ $gitSourceLocation = (isset($args['b'])) ? ' ' : ' tags/';
 require_once dirname(__DIR__).'/vendor/autoload.php';
 require_once dirname(__DIR__).'/app/AppKernel.php';
 
-$appVersion = AppKernel::MAJOR_VERSION.'.'.AppKernel::MINOR_VERSION.'.'.AppKernel::PATCH_VERSION.AppKernel::EXTRA_VERSION;
+$releaseMetadata = \Mautic\CoreBundle\Release\ThisRelease::getMetadata();
+$appVersion      = $releaseMetadata->getVersion();
 
 // Use branch if applicable otherwise a version tag
 $gitSource = (!empty($args['b'])) ? $args['b'] : $appVersion;
