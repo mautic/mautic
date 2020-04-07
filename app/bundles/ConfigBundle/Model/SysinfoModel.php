@@ -40,10 +40,6 @@ class SysinfoModel
 
     /**
      * SysinfoModel constructor.
-     *
-     * @param PathsHelper          $pathsHelper
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param TranslatorInterface  $translator
      */
     public function __construct(PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper, TranslatorInterface $translator)
     {
@@ -103,16 +99,16 @@ class SysinfoModel
 
         $importantFolders = [
             $this->pathsHelper->getSystemPath('local_config'),
-            $this->coreParametersHelper->getParameter('cache_path'),
-            $this->coreParametersHelper->getParameter('log_path'),
-            $this->coreParametersHelper->getParameter('upload_dir'),
+            $this->coreParametersHelper->get('cache_path'),
+            $this->coreParametersHelper->get('log_path'),
+            $this->coreParametersHelper->get('upload_dir'),
             $this->pathsHelper->getSystemPath('images', true),
             $this->pathsHelper->getSystemPath('translations', true),
         ];
 
         // Show the spool folder only if the email queue is configured
-        if ($this->coreParametersHelper->getParameter('mailer_spool_type') == 'file') {
-            $importantFolders[] = $this->coreParametersHelper->getParameter('mailer_spool_path');
+        if ('file' == $this->coreParametersHelper->get('mailer_spool_type')) {
+            $importantFolders[] = $this->coreParametersHelper->get('mailer_spool_path');
         }
 
         foreach ($importantFolders as $folder) {
@@ -135,7 +131,7 @@ class SysinfoModel
      */
     public function getLogTail($lines = 10)
     {
-        $log = $this->coreParametersHelper->getParameter('log_path').'/mautic_'.MAUTIC_ENV.'-'.date('Y-m-d').'.php';
+        $log = $this->coreParametersHelper->get('log_path').'/mautic_'.MAUTIC_ENV.'-'.date('Y-m-d').'.php';
 
         if (!file_exists($log)) {
             return null;
@@ -160,8 +156,8 @@ class SysinfoModel
 
         fseek($f, -1, SEEK_END);
 
-        if (fread($f, 1) != "\n") {
-            $lines -= 1;
+        if ("\n" != fread($f, 1)) {
+            --$lines;
         }
 
         while (ftell($f) > 0 && $lines >= 0) {

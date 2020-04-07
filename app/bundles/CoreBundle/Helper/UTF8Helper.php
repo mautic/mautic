@@ -230,7 +230,7 @@ class UTF8Helper
                     $cc2 = (($c1 & "\x3f") | "\x80");
                     $buf .= $cc1.$cc2;
                 }
-            } elseif (($c1 & "\xc0") == "\x80") { // needs conversion
+            } elseif ("\x80" == ($c1 & "\xc0")) { // needs conversion
                 if (isset(self::$win1252ToUtf8[ord($c1)])) { //found in Windows-1252 special cases
                     $buf .= self::$win1252ToUtf8[ord($c1)];
                 } else {
@@ -286,9 +286,8 @@ class UTF8Helper
             $last = $text;
             $text = self::toUTF8(static::utf8_decode($text, $option));
         }
-        $text = self::toUTF8(static::utf8_decode($text, $option));
 
-        return $text;
+        return self::toUTF8(static::utf8_decode($text, $option));
     }
 
     public static function UTF8FixWin1252Chars($text)
@@ -341,7 +340,7 @@ class UTF8Helper
     public static function encode($encodingLabel, $text)
     {
         $encodingLabel = self::normalizeEncoding($encodingLabel);
-        if ($encodingLabel == 'ISO-8859-1') {
+        if ('ISO-8859-1' == $encodingLabel) {
             return self::toLatin1($text);
         }
 
@@ -350,14 +349,14 @@ class UTF8Helper
 
     protected static function utf8_decode($text, $option)
     {
-        if ($option == self::WITHOUT_ICONV || !function_exists('iconv')) {
+        if (self::WITHOUT_ICONV == $option || !function_exists('iconv')) {
             $o = utf8_decode(
                 str_replace(array_keys(self::$utf8ToWin1252), array_values(self::$utf8ToWin1252), self::toUTF8($text))
             );
         } else {
             $o = iconv(
                 'UTF-8',
-                'Windows-1252'.($option == self::ICONV_TRANSLIT ? '//TRANSLIT' : ($option == self::ICONV_IGNORE ? '//IGNORE' : '')),
+                'Windows-1252'.(self::ICONV_TRANSLIT == $option ? '//TRANSLIT' : (self::ICONV_IGNORE == $option ? '//IGNORE' : '')),
                 $text
             );
         }

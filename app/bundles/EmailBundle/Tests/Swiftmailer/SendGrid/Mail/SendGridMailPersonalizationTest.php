@@ -17,13 +17,14 @@ use SendGrid\Email;
 use SendGrid\Mail;
 use SendGrid\Personalization;
 
-class SendGridMailPersonalizationTest extends \PHPUnit_Framework_TestCase
+class SendGridMailPersonalizationTest extends \PHPUnit\Framework\TestCase
 {
     public function testNotMauticMessage()
     {
         $sendGridMailPersonalization = new SendGridMailPersonalization();
 
-        $message = $this->getMockBuilder(\Swift_Mime_Message::class)
+        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $message->expects($this->never())

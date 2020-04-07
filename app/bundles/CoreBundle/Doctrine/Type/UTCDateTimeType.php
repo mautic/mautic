@@ -27,14 +27,13 @@ class UTCDateTimeType extends DateTimeType
     private static $utc;
 
     /**
-     * @param \DateTime        $value
-     * @param AbstractPlatform $platform
+     * @param \DateTime $value
      *
      * @return string|null
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
-        if ($value === null) {
+        if (null === $value) {
             return null;
         }
 
@@ -55,8 +54,7 @@ class UTCDateTimeType extends DateTimeType
     }
 
     /**
-     * @param mixed            $value
-     * @param AbstractPlatform $platform
+     * @param mixed $value
      *
      * @return \DateTime|null
      *
@@ -64,7 +62,7 @@ class UTCDateTimeType extends DateTimeType
      */
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
-        if ($value === null) {
+        if (null === $value) {
             return null;
         }
 

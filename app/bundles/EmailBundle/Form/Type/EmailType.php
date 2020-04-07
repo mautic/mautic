@@ -11,66 +11,75 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Doctrine\ORM\EntityManager;
+use Mautic\AssetBundle\Form\Type\AssetListType;
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\EmojiToShortTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\DynamicContentTrait;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
+use Mautic\CoreBundle\Form\Type\ThemeListType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\EmailBundle\Entity\Email;
+use Mautic\FormBundle\Form\Type\FormListType;
+use Mautic\LeadBundle\Form\Type\LeadListType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
+use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\LocaleType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class EmailType.
- */
 class EmailType extends AbstractType
 {
     use DynamicContentTrait;
 
+    /**
+     * @var TranslatorInterface
+     */
     private $translator;
-    private $defaultTheme;
-    private $em;
-    private $request;
-
-    private $countryChoices  = [];
-    private $regionChoices   = [];
-    private $timezoneChoices = [];
-    private $stageChoices    = [];
-    private $localeChoices   = [];
 
     /**
-     * @param MauticFactory $factory
+     * @var EntityManager
      */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->translator   = $factory->getTranslator();
-        $this->defaultTheme = $factory->getParameter('theme');
-        $this->em           = $factory->getEntityManager();
-        $this->request      = $factory->getRequest();
+    private $em;
 
-        $this->countryChoices  = FormFieldHelper::getCountryChoices();
-        $this->regionChoices   = FormFieldHelper::getRegionChoices();
-        $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
-        $this->localeChoices   = FormFieldHelper::getLocaleChoices();
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
 
-        $stages = $factory->getModel('stage')->getRepository()->getSimpleList();
+    /**
+     * @var StageModel
+     */
+    private $stageModel;
 
-        foreach ($stages as $stage) {
-            $this->stageChoices[$stage['value']] = $stage['label'];
-        }
+    public function __construct(
+        TranslatorInterface $translator,
+        EntityManager $entityManager,
+        RequestStack $requestStack,
+        StageModel $stageModel
+    ) {
+        $this->translator   = $translator;
+        $this->em           = $entityManager;
+        $this->requestStack = $requestStack;
+        $this->stageModel   = $stageModel;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html', 'headers' => 'clean']));
@@ -78,7 +87,7 @@ class EmailType extends AbstractType
 
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.email.form.internal.name',
                 'label_attr' => ['class' => 'control-label'],
@@ -90,7 +99,7 @@ class EmailType extends AbstractType
         $builder->add(
             $builder->create(
                 'subject',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.email.subject',
                     'label_attr' => ['class' => 'control-label'],
@@ -101,7 +110,7 @@ class EmailType extends AbstractType
 
         $builder->add(
             'fromName',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.email.from_name',
                 'label_attr' => ['class' => 'control-label'],
@@ -116,7 +125,7 @@ class EmailType extends AbstractType
 
         $builder->add(
             'fromAddress',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.email.from_email',
                 'label_attr' => ['class' => 'control-label'],
@@ -131,7 +140,7 @@ class EmailType extends AbstractType
 
         $builder->add(
             'replyToAddress',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.email.reply_to_email',
                 'label_attr' => ['class' => 'control-label'],
@@ -146,7 +155,7 @@ class EmailType extends AbstractType
 
         $builder->add(
             'bccAddress',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.email.bcc',
                 'label_attr' => ['class' => 'control-label'],
@@ -161,7 +170,7 @@ class EmailType extends AbstractType
 
         $builder->add(
             'utmTags',
-            'utm_tags',
+            EmailUtmTagsType::class,
             [
                 'label'      => 'mautic.email.utm_tags',
                 'label_attr' => ['class' => 'control-label'],
@@ -190,7 +199,7 @@ class EmailType extends AbstractType
 
         $builder->add(
             'template',
-            'theme_list',
+            ThemeListType::class,
             [
                 'feature' => 'email',
                 'attr'    => [
@@ -201,11 +210,11 @@ class EmailType extends AbstractType
             ]
         );
 
-        $builder->add('isPublished', 'yesno_button_group');
+        $builder->add('isPublished', YesNoButtonGroupType::class);
 
         $builder->add(
             'publishUp',
-            'datetime',
+            DateTimeType::class,
             [
                 'widget'     => 'single_text',
                 'label'      => 'mautic.core.form.publishup',
@@ -221,7 +230,7 @@ class EmailType extends AbstractType
 
         $builder->add(
             'publishDown',
-            'datetime',
+            DateTimeType::class,
             [
                 'widget'     => 'single_text',
                 'label'      => 'mautic.core.form.publishdown',
@@ -238,7 +247,7 @@ class EmailType extends AbstractType
 
         $builder->add(
             'plainText',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.email.form.plaintext',
                 'label_attr' => ['class' => 'control-label'],
@@ -257,7 +266,7 @@ class EmailType extends AbstractType
         $builder->add(
             $builder->create(
                 'customHtml',
-                'textarea',
+                TextareaType::class,
                 [
                     'label'      => 'mautic.email.form.body',
                     'label_attr' => ['class' => 'control-label'],
@@ -275,7 +284,7 @@ class EmailType extends AbstractType
         $builder->add(
             $builder->create(
                 'unsubscribeForm',
-                'form_list',
+                FormListType::class,
                 [
                     'label'      => 'mautic.email.form.unsubscribeform',
                     'label_attr' => ['class' => 'control-label'],
@@ -286,7 +295,7 @@ class EmailType extends AbstractType
                     ],
                     'required'    => false,
                     'multiple'    => false,
-                    'empty_value' => '',
+                    'placeholder' => '',
                 ]
             )
                 ->addModelTransformer($transformer)
@@ -296,7 +305,7 @@ class EmailType extends AbstractType
         $builder->add(
             $builder->create(
                 'preferenceCenter',
-                'preference_center_list',
+                PreferenceCenterListType::class,
                 [
                     'label'      => 'mautic.email.form.preference_center',
                     'label_attr' => ['class' => 'control-label'],
@@ -307,7 +316,7 @@ class EmailType extends AbstractType
                     ],
                     'required'    => false,
                     'multiple'    => false,
-                    'empty_value' => '',
+                    'placeholder' => '',
                 ]
             )
                 ->addModelTransformer($transformer)
@@ -317,14 +326,14 @@ class EmailType extends AbstractType
         $builder->add(
             $builder->create(
                 'variantParent',
-                'hidden'
+                HiddenType::class
             )->addModelTransformer($transformer)
         );
 
         $builder->add(
             $builder->create(
                 'translationParent',
-                'hidden'
+                HiddenType::class
             )->addModelTransformer($transformer)
         );
 
@@ -332,7 +341,7 @@ class EmailType extends AbstractType
         $translationParent = $options['data']->getTranslationParent();
         $builder->add(
             'segmentTranslationParent',
-            'email_list',
+            EmailListType::class,
             [
                 'label'      => 'mautic.core.form.translation_parent',
                 'label_attr' => ['class' => 'control-label'],
@@ -343,7 +352,7 @@ class EmailType extends AbstractType
                 'required'       => false,
                 'multiple'       => false,
                 'email_type'     => 'list',
-                'empty_value'    => 'mautic.core.form.translation_parent.empty',
+                'placeholder'    => 'mautic.core.form.translation_parent.empty',
                 'top_level'      => 'translation',
                 'variant_parent' => ($variantParent) ? $variantParent->getId() : null,
                 'ignore_ids'     => [(int) $options['data']->getId()],
@@ -354,7 +363,7 @@ class EmailType extends AbstractType
 
         $builder->add(
             'templateTranslationParent',
-            'email_list',
+            EmailListType::class,
             [
                 'label'      => 'mautic.core.form.translation_parent',
                 'label_attr' => ['class' => 'control-label'],
@@ -364,7 +373,7 @@ class EmailType extends AbstractType
                 ],
                 'required'       => false,
                 'multiple'       => false,
-                'empty_value'    => 'mautic.core.form.translation_parent.empty',
+                'placeholder'    => 'mautic.core.form.translation_parent.empty',
                 'top_level'      => 'translation',
                 'variant_parent' => ($variantParent) ? $variantParent->getId() : null,
                 'email_type'     => 'template',
@@ -374,12 +383,12 @@ class EmailType extends AbstractType
             ]
         );
 
-        $url                     = $this->request->getSchemeAndHttpHost().$this->request->getBasePath();
-        $variantSettingsModifier = function (FormEvent $event, $isVariant) use ($url) {
+        $request                 = $this->requestStack->getCurrentRequest();
+        $variantSettingsModifier = function (FormEvent $event, $isVariant) {
             if ($isVariant) {
                 $event->getForm()->add(
                     'variantSettings',
-                    'emailvariant',
+                    VariantType::class,
                     [
                         'label' => false,
                     ]
@@ -408,7 +417,7 @@ class EmailType extends AbstractType
                     !empty($data['variantParent'])
                 );
 
-                if (isset($data['emailType']) && $data['emailType'] == 'list') {
+                if (isset($data['emailType']) && 'list' == $data['emailType']) {
                     $data['translationParent'] = isset($data['segmentTranslationParent']) ? $data['segmentTranslationParent'] : null;
                 } else {
                     $data['translationParent'] = isset($data['templateTranslationParent']) ? $data['templateTranslationParent'] : null;
@@ -421,7 +430,7 @@ class EmailType extends AbstractType
         //add category
         $builder->add(
             'category',
-            'category',
+            CategoryListType::class,
             [
                 'bundle' => 'email',
             ]
@@ -432,7 +441,7 @@ class EmailType extends AbstractType
         $builder->add(
             $builder->create(
                 'lists',
-                'leadlist_choices',
+                LeadListType::class,
                 [
                     'label'      => 'mautic.email.form.list',
                     'label_attr' => ['class' => 'control-label'],
@@ -450,7 +459,7 @@ class EmailType extends AbstractType
 
         $builder->add(
             'language',
-            'locale',
+            LocaleType::class,
             [
                 'label'      => 'mautic.core.language',
                 'label_attr' => ['class' => 'control-label'],
@@ -471,7 +480,7 @@ class EmailType extends AbstractType
         $builder->add(
             $builder->create(
                 'assetAttachments',
-                'asset_list',
+                AssetListType::class,
                 [
                     'label'      => 'mautic.email.attachments',
                     'label_attr' => ['class' => 'control-label'],
@@ -486,8 +495,8 @@ class EmailType extends AbstractType
                 ->addModelTransformer($transformer)
         );
 
-        $builder->add('sessionId', 'hidden');
-        $builder->add('emailType', 'hidden');
+        $builder->add('sessionId', HiddenType::class);
+        $builder->add('emailType', HiddenType::class);
 
         $customButtons = [
             [
@@ -496,14 +505,14 @@ class EmailType extends AbstractType
                 'attr'  => [
                     'class'   => 'btn btn-default btn-dnd btn-nospin text-primary btn-builder',
                     'icon'    => 'fa fa-cube',
-                    'onclick' => "Mautic.launchBuilder('emailform', 'email');",
+                    'onclick' => "Mautic.launchBuilder('email', 'email');",
                 ],
             ],
         ];
 
         $builder->add(
             'buttons',
-            'form_buttons',
+            FormButtonsType::class,
             [
                 'pre_extra_buttons' => $customButtons,
             ]
@@ -512,7 +521,7 @@ class EmailType extends AbstractType
         if (!empty($options['update_select'])) {
             $builder->add(
                 'updateSelect',
-                'hidden',
+                HiddenType::class,
                 [
                     'data'   => $options['update_select'],
                     'mapped' => false,
@@ -527,14 +536,11 @@ class EmailType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Mautic\EmailBundle\Entity\Email',
+                'data_class' => Email::class,
             ]
         );
 
@@ -546,17 +552,24 @@ class EmailType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['countries'] = $this->countryChoices;
-        $view->vars['regions']   = $this->regionChoices;
-        $view->vars['timezones'] = $this->timezoneChoices;
-        $view->vars['stages']    = $this->stageChoices;
-        $view->vars['locales']   = $this->localeChoices;
+        $stages       = $this->stageModel->getRepository()->getSimpleList();
+        $stageChoices = [];
+
+        foreach ($stages as $stage) {
+            $stageChoices[$stage['value']] = $stage['label'];
+        }
+
+        $view->vars['countries'] = FormFieldHelper::getCountryChoices();
+        $view->vars['regions']   = FormFieldHelper::getRegionChoices();
+        $view->vars['timezones'] = FormFieldHelper::getTimezonesChoices();
+        $view->vars['locales']   = FormFieldHelper::getLocaleChoices();
+        $view->vars['stages']    = $stageChoices;
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'emailform';
     }

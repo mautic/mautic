@@ -18,10 +18,6 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class SlotDynamicContentType extends SlotType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
     }
@@ -29,7 +25,7 @@ class SlotDynamicContentType extends SlotType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'slot_dynamiccontent';
     }

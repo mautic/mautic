@@ -18,9 +18,6 @@ use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 interface EventInterface
 {
     /**
-     * @param AbstractEventAccessor $config
-     * @param ArrayCollection       $logs
-     *
      * @return EvaluatedContacts
      */
     public function execute(AbstractEventAccessor $config, ArrayCollection $logs);

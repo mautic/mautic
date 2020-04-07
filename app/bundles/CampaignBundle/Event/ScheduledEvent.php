@@ -36,9 +36,7 @@ class ScheduledEvent extends CampaignScheduledEvent
     /**
      * ScheduledEvent constructor.
      *
-     * @param AbstractEventAccessor $config
-     * @param LeadEventLog          $log
-     * @param bool                  $isReschedule
+     * @param bool $isReschedule
      */
     public function __construct(AbstractEventAccessor $config, LeadEventLog $log, $isReschedule = false)
     {

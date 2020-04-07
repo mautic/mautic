@@ -33,11 +33,6 @@ class ContactSegmentService
      */
     private $logger;
 
-    /**
-     * @param ContactSegmentFilterFactory $contactSegmentFilterFactory
-     * @param ContactSegmentQueryBuilder  $queryBuilder
-     * @param Logger                      $logger
-     */
     public function __construct(
         ContactSegmentFilterFactory $contactSegmentFilterFactory,
         ContactSegmentQueryBuilder $queryBuilder,
@@ -49,9 +44,6 @@ class ContactSegmentService
     }
 
     /**
-     * @param LeadList $segment
-     * @param array    $batchLimiters
-     *
      * @return array
      *
      * @throws Exception\SegmentQueryException
@@ -91,7 +83,6 @@ class ContactSegmentService
     }
 
     /**
-     * @param LeadList   $segment
      * @param array|null $batchLimiters for debug purpose only
      *
      * @return array
@@ -129,9 +120,7 @@ class ContactSegmentService
     }
 
     /**
-     * @param LeadList $segment
-     * @param array    $batchLimiters
-     * @param int      $limit
+     * @param int $limit
      *
      * @return array
      *
@@ -173,9 +162,6 @@ class ContactSegmentService
     }
 
     /**
-     * @param LeadList $segment
-     * @param array    $batchLimiters
-     *
      * @return array
      *
      * @throws Exception\SegmentQueryException
@@ -194,9 +180,7 @@ class ContactSegmentService
     }
 
     /**
-     * @param LeadList $segment
-     * @param array    $batchLimiters
-     * @param null|int $limit
+     * @param int|null $limit
      *
      * @return array
      *
@@ -215,8 +199,7 @@ class ContactSegmentService
     }
 
     /**
-     * @param LeadList $segment
-     * @param          $batchLimiters
+     * @param $batchLimiters
      *
      * @return QueryBuilder
      *
@@ -238,8 +221,6 @@ class ContactSegmentService
     }
 
     /**
-     * @param LeadList $segment
-     *
      * @return QueryBuilder
      *
      * @throws Exception\SegmentQueryException
@@ -251,15 +232,12 @@ class ContactSegmentService
 
         $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segment->getId(), $segmentFilters);
         $queryBuilder = $this->contactSegmentQueryBuilder->addManuallySubscribedQuery($queryBuilder, $segment->getId());
-        $queryBuilder = $this->contactSegmentQueryBuilder->addManuallyUnsubscribedQuery($queryBuilder, $segment->getId());
 
-        return $queryBuilder;
+        return $this->contactSegmentQueryBuilder->addManuallyUnsubscribedQuery($queryBuilder, $segment->getId());
     }
 
     /**
-     * @param LeadList $segment
-     * @param array    $batchLimiters
-     * @param null|int $limit
+     * @param int|null $limit
      *
      * @return QueryBuilder
      *
@@ -293,10 +271,6 @@ class ContactSegmentService
         return $qbO;
     }
 
-    /**
-     * @param QueryBuilder $queryBuilder
-     * @param array        $batchLimiters
-     */
     private function addMinMaxLimiters(QueryBuilder $queryBuilder, array $batchLimiters)
     {
         if (!empty($batchLimiters['minId']) && !empty($batchLimiters['maxId'])) {
@@ -314,18 +288,13 @@ class ContactSegmentService
         }
     }
 
-    /**
-     * @param QueryBuilder $queryBuilder
-     */
     private function excludeVisitors(QueryBuilder $queryBuilder)
     {
         $queryBuilder->andWhere($queryBuilder->expr()->isNotNull('l.date_identified'));
     }
 
     /**
-     * @param QueryBuilder $queryBuilder
-     * @param array        $batchLimiters
-     * @param string       $leadIdColumn
+     * @param string $leadIdColumn
      */
     private function addLeadLimiter(QueryBuilder $queryBuilder, array $batchLimiters, $leadIdColumn = 'l.id')
     {
@@ -354,8 +323,7 @@ class ContactSegmentService
     }
 
     /**
-     * @param QueryBuilder $qb
-     * @param int          $segmentId
+     * @param int $segmentId
      *
      * @return mixed
      *
@@ -386,8 +354,7 @@ class ContactSegmentService
     }
 
     /**
-     * @param QueryBuilder $qb
-     * @param int          $segmentId
+     * @param int $segmentId
      *
      * @return mixed
      *

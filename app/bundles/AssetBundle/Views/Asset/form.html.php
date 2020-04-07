@@ -69,7 +69,7 @@ $view['slots']->set('mauticContent', 'asset');
 		    	<div class="col-md-6">
 		    		<div class="row">
 				    	<div class="form-group col-xs-12 preview">
-				    		<?php echo $view->render('MauticAssetBundle:Asset:preview.html.php', ['activeAsset' => $activeAsset, 'assetDownloadUrl' => $view['router']->generate(
+				    		<?php echo $view->render('MauticAssetBundle:Asset:preview.html.php', ['activeAsset' => $activeAsset, 'assetDownloadUrl' => $view['router']->url(
                                 'mautic_asset_action',
                                 ['objectAction' => 'preview', 'objectId' => $activeAsset->getId()]
                             )]); ?>

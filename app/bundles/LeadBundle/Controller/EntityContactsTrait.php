@@ -59,7 +59,7 @@ trait EntityContactsTrait
         }
 
         // Apply filters
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $this->setListFilters($sessionVar.'.contact');
         }
 
@@ -73,10 +73,10 @@ trait EntityContactsTrait
         //set limits
         $limit = $this->get('session')->get(
             'mautic.'.$sessionVar.'.contact.limit',
-            $this->get('mautic.helper.core_parameters')->getParameter('default_pagelimit')
+            $this->get('mautic.helper.core_parameters')->get('default_pagelimit')
         );
 
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -103,7 +103,7 @@ trait EntityContactsTrait
         $count = $contacts['count'];
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
+            $lastPage = (1 === $count) ? 1 : (ceil($count / $limit)) ?: 1;
             $this->get('session')->set('mautic.'.$sessionVar.'.contact.page', $lastPage);
             $returnUrl = $this->generateUrl($route, array_merge(['objectId' => $entityId, 'page' => $lastPage], $routeParameters));
 

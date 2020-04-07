@@ -15,9 +15,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class QueueRequestHelper
 {
-    /**
-     * @param Request $request
-     */
     public static function flattenRequest(Request $request)
     {
         return [
@@ -31,15 +28,10 @@ class QueueRequestHelper
         ];
     }
 
-    /**
-     * @param array $request
-     */
     public static function buildRequest(array $request)
     {
         if (!isset($request['attributes'])) {
-            throw new \InvalidArgumentException(
-                'Request does not have expected keys. Use QueueRequestHelper::flattenRequest to prepare a Request object'
-            );
+            throw new \InvalidArgumentException('Request does not have expected keys. Use QueueRequestHelper::flattenRequest to prepare a Request object');
         }
 
         return new Request(

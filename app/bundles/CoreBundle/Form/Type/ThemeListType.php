@@ -13,6 +13,7 @@ namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -28,37 +29,32 @@ class ThemeListType extends AbstractType
 
     /**
      * ThemeListType constructor.
-     *
-     * @param ThemeHelper $helper
      */
     public function __construct(ThemeHelper $helper)
     {
         $this->themeHelper = $helper;
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
-                'choices'     => function (Options $options) {
+                'choices'           => function (Options $options) {
                     $themes                     = $this->themeHelper->getInstalledThemes($options['feature']);
                     $themes['mautic_code_mode'] = 'Code Mode';
 
-                    return $themes;
+                    return array_flip($themes);
                 },
-                'expanded'    => false,
-                'multiple'    => false,
-                'label'       => 'mautic.core.form.theme',
-                'label_attr'  => ['class' => 'control-label'],
-                'empty_value' => false,
-                'required'    => false,
-                'attr'        => [
+                'expanded'          => false,
+                'multiple'          => false,
+                'label'             => 'mautic.core.form.theme',
+                'label_attr'        => ['class' => 'control-label'],
+                'placeholder'       => false,
+                'required'          => false,
+                'attr'              => [
                     'class' => 'form-control',
                 ],
-                'feature'     => 'all',
+                'feature'           => 'all',
             ]
         );
     }
@@ -66,13 +62,13 @@ class ThemeListType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'theme_list';
     }
 
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

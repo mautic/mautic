@@ -13,12 +13,17 @@ $view['slots']->set('pageTitle', $pageTitle);
 $view['slots']->set('headerTitle', $report->getName());
 $view['slots']->set('mauticContent', 'report');
 
-$showGraphsAboveTable = (!empty($report->getSettings()['showGraphsAboveTable']) === true);
+$showGraphsAboveTable = (true === !empty($report->getSettings()['showGraphsAboveTable']));
 $dataCount            = count($data);
 $columnOrder          = $report->getColumns();
 $graphOrder           = $report->getGraphs();
 $startCount           = 1;
 ?>
+<style>
+    #app-content.content-only.container {
+        overflow-x: scroll;
+    }
+</style>
 
 <div class="pa-md">
     <h3><?php echo $report->getName(); ?></h3>

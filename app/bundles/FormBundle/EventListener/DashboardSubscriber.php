@@ -15,10 +15,8 @@ use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
+use Symfony\Component\Routing\RouterInterface;
 
-/**
- * Class DashboardSubscriber.
- */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
@@ -61,28 +59,26 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $formModel;
 
     /**
-     * DashboardSubscriber constructor.
-     *
-     * @param SubmissionModel $formSubmissionModel
-     * @param FormModel       $formModel
+     * @var RouterInterface
      */
-    public function __construct(SubmissionModel $formSubmissionModel, FormModel $formModel)
+    private $router;
+
+    public function __construct(SubmissionModel $formSubmissionModel, FormModel $formModel, RouterInterface $router)
     {
         $this->formModel           = $formModel;
         $this->formSubmissionModel = $formSubmissionModel;
+        $this->router              = $router;
     }
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('form:forms:viewother');
 
-        if ($event->getType() == 'submissions.in.time') {
+        if ('submissions.in.time' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -104,7 +100,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'top.submission.referrers') {
+        if ('top.submission.referrers' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
 
@@ -150,7 +146,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'top.submitters') {
+        if ('top.submitters' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
 
@@ -203,7 +199,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'created.forms') {
+        if ('created.forms' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
 

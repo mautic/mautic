@@ -13,33 +13,35 @@ return [
     'services' => [
         'events' => [
             'mautic.notification.campaignbundle.subscriber' => [
-                'class'     => 'Mautic\NotificationBundle\EventListener\CampaignSubscriber',
+                'class'     => \Mautic\NotificationBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.helper.integration',
                     'mautic.lead.model.lead',
                     'mautic.notification.model.notification',
                     'mautic.notification.api',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.notification.campaignbundle.condition_subscriber' => [
-                'class'     => 'Mautic\NotificationBundle\EventListener\CampaignConditionSubscriber',
+                'class'     => \Mautic\NotificationBundle\EventListener\CampaignConditionSubscriber::class,
             ],
             'mautic.notification.pagebundle.subscriber' => [
-                'class'     => 'Mautic\NotificationBundle\EventListener\PageSubscriber',
+                'class'     => \Mautic\NotificationBundle\EventListener\PageSubscriber::class,
                 'arguments' => [
                     'templating.helper.assets',
                     'mautic.helper.integration',
                 ],
             ],
             'mautic.core.js.subscriber' => [
-                'class'     => 'Mautic\NotificationBundle\EventListener\BuildJsSubscriber',
+                'class'     => \Mautic\NotificationBundle\EventListener\BuildJsSubscriber::class,
                 'arguments' => [
                     'mautic.helper.notification',
                     'mautic.helper.integration',
+                    'router',
                 ],
             ],
             'mautic.notification.notificationbundle.subscriber' => [
-                'class'     => 'Mautic\NotificationBundle\EventListener\NotificationSubscriber',
+                'class'     => \Mautic\NotificationBundle\EventListener\NotificationSubscriber::class,
                 'arguments' => [
                     'mautic.core.model.auditlog',
                     'mautic.page.model.trackable',
@@ -47,16 +49,6 @@ return [
                     'mautic.asset.helper.token',
                 ],
             ],
-//            Left out until 2.9
-//            'mautic.notification.subscriber.form' => [
-//                'class'     => \Mautic\NotificationBundle\EventListener\FormSubscriber::class,
-//                'arguments' => [
-//                    'mautic.helper.integration',
-//                    'mautic.lead.model.lead',
-//                    'mautic.notification.model.notification',
-//                    'mautic.notification.api',
-//                ],
-//            ],
             'mautic.notification.subscriber.channel' => [
                 'class'     => \Mautic\NotificationBundle\EventListener\ChannelSubscriber::class,
                 'arguments' => [
@@ -66,6 +58,7 @@ return [
             'mautic.notification.stats.subscriber' => [
                 'class'     => \Mautic\NotificationBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],
@@ -74,46 +67,39 @@ return [
                 'arguments' => [
                     'doctrine.dbal.default_connection',
                     'mautic.lead.model.company_report_data',
+                    'mautic.notification.repository.stat',
                 ],
             ],
         ],
         'forms' => [
             'mautic.form.type.notification' => [
                 'class' => 'Mautic\NotificationBundle\Form\Type\NotificationType',
-                'alias' => 'notification',
             ],
             'mautic.form.type.mobile.notification' => [
                 'class' => \Mautic\NotificationBundle\Form\Type\MobileNotificationType::class,
-                'alias' => 'mobile_notification',
             ],
             'mautic.form.type.mobile.notification_details' => [
                 'class'     => \Mautic\NotificationBundle\Form\Type\MobileNotificationDetailsType::class,
                 'arguments' => [
                     'mautic.helper.integration',
                 ],
-                'alias' => 'mobile_notification_details',
             ],
             'mautic.form.type.notificationconfig' => [
                 'class' => 'Mautic\NotificationBundle\Form\Type\ConfigType',
-                'alias' => 'notificationconfig',
             ],
             'mautic.form.type.notificationsend_list' => [
                 'class'     => 'Mautic\NotificationBundle\Form\Type\NotificationSendType',
                 'arguments' => 'router',
-                'alias'     => 'notificationsend_list',
             ],
             'mautic.form.type.notification_list' => [
                 'class' => 'Mautic\NotificationBundle\Form\Type\NotificationListType',
-                'alias' => 'notification_list',
             ],
             'mautic.form.type.mobilenotificationsend_list' => [
                 'class'     => \Mautic\NotificationBundle\Form\Type\MobileNotificationSendType::class,
                 'arguments' => 'router',
-                'alias'     => 'mobilenotificationsend_list',
             ],
             'mautic.form.type.mobilenotification_list' => [
                 'class' => \Mautic\NotificationBundle\Form\Type\MobileNotificationListType::class,
-                'alias' => 'mobilenotification_list',
             ],
         ],
         'helpers' => [
@@ -121,12 +107,13 @@ return [
                 'class'     => 'Mautic\NotificationBundle\Helper\NotificationHelper',
                 'alias'     => 'notification_helper',
                 'arguments' => [
-                    'mautic.factory',
+                    'doctrine.orm.entity_manager',
                     'templating.helper.assets',
                     'mautic.helper.core_parameters',
                     'mautic.helper.integration',
                     'router',
                     'request_stack',
+                    'mautic.lead.model.dnc',
                 ],
             ],
         ],
@@ -134,7 +121,6 @@ return [
             'mautic.notification.api' => [
                 'class'     => 'Mautic\NotificationBundle\Api\OneSignalApi',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.http.connector',
                     'mautic.page.model.trackable',
                     'mautic.helper.integration',
@@ -150,9 +136,35 @@ return [
                 ],
             ],
         ],
+        'repositories' => [
+            'mautic.notification.repository.stat' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\NotificationBundle\Entity\Stat::class,
+                ],
+            ],
+        ],
         'integrations' => [
             'mautic.integration.onesignal' => [
-                'class' => \Mautic\NotificationBundle\Integration\OneSignalIntegration::class,
+                'class'     => \Mautic\NotificationBundle\Integration\OneSignalIntegration::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'mautic.helper.cache_storage',
+                    'doctrine.orm.entity_manager',
+                    'session',
+                    'request_stack',
+                    'router',
+                    'translator',
+                    'logger',
+                    'mautic.helper.encryption',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.company',
+                    'mautic.helper.paths',
+                    'mautic.core.model.notification',
+                    'mautic.lead.model.field',
+                    'mautic.plugin.model.integration_entity',
+                ],
             ],
         ],
     ],

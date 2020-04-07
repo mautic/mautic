@@ -20,25 +20,25 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
 
-class EventLoggerTest extends \PHPUnit_Framework_TestCase
+class EventLoggerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var LeadRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $ipLookupHelper;
 
     /**
-     * @var ContactTracker|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContactTracker|\PHPUnit\Framework\MockObject\MockObject
      */
     private $contactTracker;
 
     /**
-     * @var LeadEventLogRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var LeadEventLogRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $leadEventLogRepository;
 
     /**
-     * @var LeadRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $leadRepository;
 

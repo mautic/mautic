@@ -18,9 +18,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
-/**
- * LeadEventLogRepository.
- */
 class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
@@ -66,7 +63,6 @@ class LeadEventLogRepository extends CommonRepository
      * Get a lead's page event log.
      *
      * @param int|null $leadId
-     * @param array    $options
      *
      * @return array
      */
@@ -226,7 +222,7 @@ class LeadEventLogRepository extends CommonRepository
                       ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o');
 
         $join = 'innerJoin';
-        if ($all === true) {
+        if (true === $all) {
             $join = 'leftJoin';
         }
         $q->$join(
@@ -384,9 +380,7 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param int            $eventId
-     * @param \DateTime      $now
-     * @param ContactLimiter $limiter
+     * @param int $eventId
      *
      * @return ArrayCollection
      *
@@ -433,8 +427,6 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param array $ids
-     *
      * @return ArrayCollection
      *
      * @throws \Doctrine\ORM\Query\QueryException
@@ -460,9 +452,7 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param int            $campaignId
-     * @param \DateTime      $date
-     * @param ContactLimiter $limiter
+     * @param int $campaignId
      *
      * @return array
      */
@@ -503,8 +493,7 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param       $eventId
-     * @param array $contactIds
+     * @param $eventId
      *
      * @return array
      */
@@ -648,21 +637,5 @@ SQL;
                 ]
             )
             ->execute();
-    }
-
-    /**
-     * @deprecated 2.14 to be removed in 3.0
-     *
-     * @param $campaignId
-     * @param $leadId
-     */
-    public function removeScheduledEvents($campaignId, $leadId)
-    {
-        $conn = $this->_em->getConnection();
-        $conn->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', [
-            'lead_id'      => (int) $leadId,
-            'campaign_id'  => (int) $campaignId,
-            'is_scheduled' => 1,
-        ]);
     }
 }

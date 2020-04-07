@@ -15,9 +15,6 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class PointBuilderEvent.
- */
 class PointBuilderEvent extends Event
 {
     /**
@@ -30,9 +27,6 @@ class PointBuilderEvent extends Event
      */
     private $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -85,8 +79,6 @@ class PointBuilderEvent extends Event
     }
 
     /**
-     * Get actions.
-     *
      * @return array
      */
     public function getActions()
@@ -118,19 +110,14 @@ class PointBuilderEvent extends Event
     public function getActionChoices()
     {
         $choices = [];
-        $actions = $this->getActions();
         foreach ($this->actions as $k => $c) {
-            $choices[$c['group']][$k] = $c['label'];
+            $choices[$c['group']][$c['label']] = $k;
         }
 
         return $choices;
     }
 
     /**
-     * @param array $keys
-     * @param array $methods
-     * @param array $component
-     *
      * @throws InvalidArgumentException
      */
     private function verifyComponent(array $keys, array $methods, array $component)

@@ -12,6 +12,7 @@
 namespace Mautic\FormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -28,14 +29,14 @@ class FormFieldGroupType extends AbstractType
     {
         $builder->add(
             'labelAttributes',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.form.field.group.labelattr',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'     => 'form-control',
                     'tooltip'   => 'mautic.form.field.help.group.labelattr',
-                    'maxlength' => '255',
+                    'maxlength' => '191',
                 ],
                 'required' => false,
             ]
@@ -56,7 +57,7 @@ class FormFieldGroupType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'formfield_group';
     }

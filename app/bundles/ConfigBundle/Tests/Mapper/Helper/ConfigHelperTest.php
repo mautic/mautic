@@ -13,7 +13,7 @@ namespace Mautic\ConfigBundle\Tests\Mapper\Helper;
 
 use Mautic\ConfigBundle\Mapper\Helper\ConfigHelper;
 
-class ConfigHelperTest extends \PHPUnit_Framework_TestCase
+class ConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Ensure a mixed numeric/string keyed array is formatted to all string based keys

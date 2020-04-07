@@ -32,9 +32,9 @@ class StatsEvent extends Event
     /**
      * Array of columns to fetch.
      *
-     * @var null|array
+     * @var array|null
      */
-    protected $select = null;
+    protected $select;
 
     /**
      * The page where to start with.
@@ -105,12 +105,9 @@ class StatsEvent extends Event
     /**
      * StatsEvent constructor.
      *
-     * @param       $table
-     * @param int   $start
-     * @param int   $limit
-     * @param array $order
-     * @param array $where
-     * @param User  $user
+     * @param     $table
+     * @param int $start
+     * @param int $limit
      */
     public function __construct($table, $start, $limit, array $order, array $where, User $user)
     {
@@ -143,9 +140,6 @@ class StatsEvent extends Event
     /**
      * Set the source repository to fetch the results from.
      *
-     * @param CommonRepository $repository
-     * @param array            $permissions
-     *
      * @return string
      */
     public function setRepository(CommonRepository $repository, array $permissions = [])
@@ -174,8 +168,6 @@ class StatsEvent extends Event
     }
 
     /**
-     * @param array|null $select
-     *
      * @return $this
      */
     public function setSelect(array $select = null)
@@ -226,8 +218,6 @@ class StatsEvent extends Event
     }
 
     /**
-     * @param array $where
-     *
      * @return $this
      */
     public function addWhere(array $where)
@@ -239,8 +229,6 @@ class StatsEvent extends Event
 
     /**
      * Add an array of results and if so, stop propagation.
-     *
-     * @param array $results
      */
     public function setResults(array $results)
     {

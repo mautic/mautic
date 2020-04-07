@@ -43,7 +43,7 @@ class LeadEventLog implements ChannelInterface
     private $campaign;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var IpAddress
      */
     private $ipAddress;
 
@@ -58,7 +58,7 @@ class LeadEventLog implements ChannelInterface
     private $isScheduled = false;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $triggerDate;
 
@@ -102,9 +102,6 @@ class LeadEventLog implements ChannelInterface
      */
     private $failedLog;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -120,7 +117,7 @@ class LeadEventLog implements ChannelInterface
             ->addIndex(['campaign_id', 'date_triggered', 'event_id', 'non_action_path_taken'], 'campaign_stats')
             ->addUniqueConstraint(['event_id', 'lead_id', 'rotation'], 'campaign_rotation');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createManyToOne('event', 'Event')
             ->inversedBy('log')
@@ -234,8 +231,6 @@ class LeadEventLog implements ChannelInterface
     }
 
     /**
-     * @param \DateTime|null $dateTriggered
-     *
      * @return $this
      */
     public function setDateTriggered(\DateTime $dateTriggered = null)
@@ -257,8 +252,6 @@ class LeadEventLog implements ChannelInterface
     }
 
     /**
-     * @param IpAddress $ipAddress
-     *
      * @return $this
      */
     public function setIpAddress(IpAddress $ipAddress)
@@ -277,8 +270,6 @@ class LeadEventLog implements ChannelInterface
     }
 
     /**
-     * @param LeadEntity $lead
-     *
      * @return $this
      */
     public function setLead(LeadEntity $lead)
@@ -376,8 +367,6 @@ class LeadEventLog implements ChannelInterface
     }
 
     /**
-     * @param Campaign $campaign
-     *
      * @return $this
      */
     public function setCampaign(Campaign $campaign)

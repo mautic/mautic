@@ -19,17 +19,17 @@ final class OptionsDTO implements \JsonSerializable
     /**
      * @var string|null
      */
-    private $startTime = null;
+    private $startTime;
 
     /**
      * @var bool|null
      */
-    private $openTracking = null;
+    private $openTracking;
 
     /**
      * @var bool|null
      */
-    private $clickTracking = null;
+    private $clickTracking;
 
     /**
      * @return mixed
@@ -37,13 +37,13 @@ final class OptionsDTO implements \JsonSerializable
     public function jsonSerialize()
     {
         $json = [];
-        if ($this->startTime !== null) {
+        if (null !== $this->startTime) {
             $json['start_time'] = $this->startTime;
         }
-        if ($this->openTracking !== null) {
+        if (null !== $this->openTracking) {
             $json['open_tracking'] = $this->openTracking;
         }
-        if ($this->clickTracking !== null) {
+        if (null !== $this->clickTracking) {
             $json['click_tracking'] = $this->clickTracking;
         }
 
@@ -51,7 +51,7 @@ final class OptionsDTO implements \JsonSerializable
     }
 
     /**
-     * @param null|string $startTime
+     * @param string|null $startTime
      *
      * @return OptionsDTO
      */

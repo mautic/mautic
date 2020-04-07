@@ -13,9 +13,13 @@ namespace Mautic\InstallBundle\Controller;
 
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Doctrine\DBAL\DBALException;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\InstallBundle\Helper\SchemaHelper;
 use Mautic\UserBundle\Entity\User;
@@ -24,11 +28,11 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
-/**
- * InstallController.
- */
 class InstallController extends CommonController
 {
     const CHECK_STEP    = 0;
@@ -41,9 +45,6 @@ class InstallController extends CommonController
      */
     private $configurator;
 
-    /**
-     * @param FilterControllerEvent $event
-     */
     public function initialize(FilterControllerEvent $event)
     {
         $this->configurator = $this->container->get('mautic.configurator');
@@ -54,7 +55,9 @@ class InstallController extends CommonController
      *
      * @param int $index The step number to process
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
+     *
+     * @throws DBALException
      */
     public function stepAction($index = 0)
     {
@@ -64,8 +67,8 @@ class InstallController extends CommonController
             return $this->redirect($this->generateUrl('mautic_dashboard_index'));
         }
 
-        if (strpos($index, '.') !== false) {
-            list($index, $subIndex) = explode('.', $index);
+        if (false !== strpos($index, '.')) {
+            [$index, $subIndex] = explode('.', $index);
         }
 
         $params = $this->configurator->getParameters();
@@ -115,7 +118,7 @@ class InstallController extends CommonController
 
                                 if ($schemaHelper->createDatabase()) {
                                     $formData->server_version = $schemaHelper->getServerVersion();
-                                    if ($this->saveConfiguration($formData, $step, true)) {
+                                    if ($this->saveConfiguration($formData, $step)) {
                                         // Refresh to install schema with new connection information in the container
                                         return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => 1.1]));
                                     }
@@ -204,10 +207,10 @@ class InstallController extends CommonController
                 // Merge final things into the config, wipe the container, and we're done!
                 $finalConfigVars = [
                     'secret_key' => EncryptionHelper::generateKey(),
-                    'site_url'   => $this->request->getSchemeAndHttpHost().$this->request->getBaseUrl(),
+                    'site_url'   => $this->request->getSchemeAndHttpHost().$this->request->getBasePath(),
                 ];
 
-                if (!$this->saveConfiguration($finalConfigVars, null, true)) {
+                if (!$this->saveConfiguration($finalConfigVars, null)) {
                     $this->addFlash('mautic.installer.error.writing.configuration', [], 'error');
                 }
 
@@ -244,6 +247,8 @@ class InstallController extends CommonController
                     'majors'         => $this->configurator->getRequirements(),
                     'minors'         => $this->configurator->getOptionalSettings(),
                     'appRoot'        => $this->container->getParameter('kernel.root_dir'),
+                    'cacheDir'       => $this->container->getParameter('kernel.cache_dir'),
+                    'logDir'         => $this->container->getParameter('kernel.logs_dir'),
                     'configFile'     => $this->get('mautic.helper.paths')->getSystemPath('local_config'),
                     'completedSteps' => $completedSteps,
                 ],
@@ -258,7 +263,9 @@ class InstallController extends CommonController
     /**
      * Controller action for the final step.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
+     *
+     * @throws \Exception
      */
     public function finalAction()
     {
@@ -326,7 +333,7 @@ class InstallController extends CommonController
             return false;
         }
 
-        /** @var \Mautic\CoreBundle\Configurator\Configurator $configurator */
+        /** @var Configurator $configurator */
         $params = $this->configurator->getParameters();
 
         // if db_driver and mailer_from_name are present then it is assumed all the steps of the installation have been
@@ -341,8 +348,6 @@ class InstallController extends CommonController
 
     /**
      * Installs data fixtures for the application.
-     *
-     * @return array|bool Array containing the flash message data on a failure, boolean true on success
      */
     private function installDatabaseFixtures()
     {
@@ -359,9 +364,7 @@ class InstallController extends CommonController
         $fixtures = $loader->getFixtures();
 
         if (!$fixtures) {
-            throw new \InvalidArgumentException(
-                sprintf('Could not find any fixtures to load in: %s', "\n\n- ".implode("\n- ", $paths))
-            );
+            throw new \InvalidArgumentException(sprintf('Could not find any fixtures to load in: %s', "\n\n- ".implode("\n- ", $paths)));
         }
 
         $purger = new ORMPurger($entityManager);
@@ -375,7 +378,8 @@ class InstallController extends CommonController
      *
      * @param array $data
      *
-     * @return array|bool
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     private function createAdminUserStep($data)
     {
@@ -388,13 +392,13 @@ class InstallController extends CommonController
             $existingUser = null;
         }
 
-        if ($existingUser != null) {
+        if (null != $existingUser) {
             $user = $existingUser;
         } else {
             $user = new User();
         }
 
-        /** @var \Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface $encoder */
+        /** @var PasswordEncoderInterface $encoder */
         $encoder = $this->get('security.encoder_factory')->getEncoder($user);
 
         $user->setFirstName($data->firstname);
@@ -440,7 +444,7 @@ class InstallController extends CommonController
      *
      * @return bool
      */
-    protected function saveConfiguration($params, $step = null, $clearCache = false)
+    protected function saveConfiguration($params, $step = null)
     {
         if (null !== $step) {
             $params = $step->update($params);
@@ -454,9 +458,9 @@ class InstallController extends CommonController
             return false;
         }
 
-        if ($clearCache) {
-            $this->get('mautic.helper.cache')->clearContainerFile(false);
-        }
+        /** @var CacheHelper $cacheHelper */
+        $cacheHelper = $this->get('mautic.helper.cache');
+        $cacheHelper->refreshConfig();
 
         return true;
     }

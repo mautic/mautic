@@ -93,8 +93,7 @@ class SearchStringHelper
     }
 
     /**
-     * @param       $filters
-     * @param array $commands
+     * @param $filters
      */
     public static function mergeCommands(&$filters, array $commands)
     {
@@ -170,11 +169,11 @@ class SearchStringHelper
             unset($chars[$pos]);
             ++$pos;
 
-            if ($char == ':') {
+            if (':' == $char) {
                 //the string is a command
                 $command = trim(substr($string, 0, -1));
                 //does this have a negative?
-                if (strpos($command, '!') === 0) {
+                if (0 === strpos($command, '!')) {
                     $filters->{$baseName}[$keyCount]->not = 1;
                     $command                              = substr($command, 1);
                 }
@@ -186,11 +185,11 @@ class SearchStringHelper
                     $filters->{$baseName}[$keyCount]->command = $command;
                     $string                                   = '';
                 }
-            } elseif ($char == ' ') {
+            } elseif (' ' == $char) {
                 //arrived at the end of a single word that is not within a quote or parenthesis so add it as standalone
-                if ($string != ' ') {
+                if (' ' != $string) {
                     $string = trim($string);
-                    $type   = (strtolower($string) == 'or' || strtolower($string) == 'and') ? $string : '';
+                    $type   = ('or' == strtolower($string) || 'and' == strtolower($string)) ? $string : '';
                     $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, true, $type, (!empty($chars)));
                 }
                 continue;
@@ -213,16 +212,16 @@ class SearchStringHelper
                         //found the matching character (accounts for nesting)
 
                         //remove wrapping grouping chars
-                        if (strpos($string, $char) === 0 && substr($string, -1) === $c) {
+                        if (0 === strpos($string, $char) && substr($string, -1) === $c) {
                             $string = substr($string, 1, -1);
                         }
 
                         //handle characters that support nesting
                         $neededParsing = false;
-                        if ($c !== '"') {
+                        if ('"' !== $c) {
                             //check to see if the nested string needs to be parsed as well
                             foreach ($this->needsParsing as $parseMe) {
-                                if (strpos($string, $parseMe) !== false) {
+                                if (false !== strpos($string, $parseMe)) {
                                     $parsed                                    = $this->splitUpSearchString($string, 'parsed', $command);
                                     $filters->{$baseName}[$keyCount]->children = $parsed->parsed;
                                     $neededParsing                             = true;
@@ -277,18 +276,18 @@ class SearchStringHelper
 
             $strictPos = strpos($string, '+');
             $notPos    = strpos($string, '!');
-            if (($strictPos === 0 || $strictPos === 1 || $notPos === 0 || $notPos === 1)) {
-                if ($strictPos !== false && $notPos !== false) {
+            if ((0 === $strictPos || 1 === $strictPos || 0 === $notPos || 1 === $notPos)) {
+                if (false !== $strictPos && false !== $notPos) {
                     //+! or !+
                     $filters->{$baseName}[$keyCount]->strict = 1;
                     $filters->{$baseName}[$keyCount]->not    = 1;
                     $string                                  = substr($string, 2);
-                } elseif ($strictPos === 0 && $notPos === false) {
+                } elseif (0 === $strictPos && false === $notPos) {
                     //+
                     $filters->{$baseName}[$keyCount]->strict = 1;
                     $filters->{$baseName}[$keyCount]->not    = 0;
                     $string                                  = substr($string, 1);
-                } elseif ($strictPos === false && $notPos === 0) {
+                } elseif (false === $strictPos && 0 === $notPos) {
                     //!
                     $filters->{$baseName}[$keyCount]->strict = 0;
                     $filters->{$baseName}[$keyCount]->not    = 1;

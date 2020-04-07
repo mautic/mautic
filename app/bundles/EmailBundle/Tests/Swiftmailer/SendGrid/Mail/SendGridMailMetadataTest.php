@@ -17,13 +17,14 @@ use SendGrid\Mail;
 use SendGrid\MailSettings;
 use SendGrid\ReplyTo;
 
-class SendGridMailMetadataTest extends \PHPUnit_Framework_TestCase
+class SendGridMailMetadataTest extends \PHPUnit\Framework\TestCase
 {
     public function testBaseMessage()
     {
         $sendGridMailMetadata = new SendGridMailMetadata();
 
-        $message = $this->getMockBuilder(\Swift_Mime_Message::class)
+        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $message->expects($this->exactly(2))

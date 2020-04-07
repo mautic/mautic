@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-<div class="tab-pane dynamic-content-filter bdr-w-0" id="<?php echo $form->vars['id'] ?>">
+<div class="tab-pane dynamic-content-filter bdr-w-0" id="<?php echo $form->vars['id']; ?>">
     <div class="row form-group">
         <div class="col-xs-10">
             <?php echo $view['form']->label($form['content']); ?>
@@ -17,7 +17,7 @@
         <div class="col-xs-2">
             <?php if ('emailform_dynamicContent_0_filters_0' !== $id) : ?>
             <a class="remove-item remove-filter btn btn-default text-danger"><i class="fa fa-trash-o"></i></a>
-            <?php endif ?>
+            <?php endif; ?>
         </div>
     </div>
     <div class="row form-group">
@@ -37,15 +37,19 @@
                         <?php
                         foreach ($fields as $object => $field):
                             $header = $object;
-                            $icon   = ($object == 'company') ? 'fa-building' : 'fa-user';
+                            $icon   = ('company' == $object) ? 'fa-building' : 'fa-user';
                             ?>
                             <optgroup label="<?php echo $view['translator']->trans('mautic.lead.'.$header); ?>">
                                 <?php foreach ($field as $value => $params):
                                     $list      = (!empty($params['properties']['list'])) ? $params['properties']['list'] : [];
-                                    $choices   = \Mautic\LeadBundle\Helper\FormFieldHelper::parseList($list, true, ('boolean' === $params['properties']['type']));
+                                    $choices   = ('boolean' === $params['properties']['type'])
+                                        ?
+                                        \Mautic\LeadBundle\Helper\FormFieldHelper::parseBooleanList($list)
+                                        :
+                                        \Mautic\LeadBundle\Helper\FormFieldHelper::parseList($list);
                                     $list      = json_encode($choices);
                                     $callback  = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : '';
-                                    $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';
+                                    $operators = (!empty($params['operators'])) ? $view->escape(json_encode(array_flip($params['operators']))) : '{}';
                                     ?>
                                     <option value="<?php echo $view->escape($value); ?>" data-mautic="available_<?php echo $value; ?>" data-field-object="<?php echo $object; ?>" data-field-type="<?php echo $params['properties']['type']; ?>" data-field-list="<?php echo $view->escape($list); ?>" data-field-callback="<?php echo $callback; ?>" data-field-operators='<?php echo $operators; ?>' class="segment-filter fa <?php echo $icon; ?>"><?php echo $view['translator']->trans($params['label']); ?></option>
                                 <?php endforeach; ?>
@@ -60,9 +64,9 @@
     <div data-filter-container data-index="<?php echo count($form['filters']); ?>">
     <?php
     foreach ($form['filters'] as $i => $filter) {
-        $isPrototype = ($filter->vars['name'] == '__name__');
+        $isPrototype = ('__name__' == $filter->vars['name']);
         if ($isPrototype || isset($form->vars['fields'][$filter->vars['value']['object']][$filter->vars['value']['field']])) {
-            echo $view['form']->widget($filter, ['first' => ($i === 0)]);
+            echo $view['form']->widget($filter, ['first' => (0 === $i)]);
         }
     }
     ?>

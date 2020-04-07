@@ -10,7 +10,7 @@
  */
 
 $view['slots']->set('headerTitle', $view['translator']->trans('mautic.campaign.campaigns'));
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticCoreBundle:Standard:index.html.php');
 }
 

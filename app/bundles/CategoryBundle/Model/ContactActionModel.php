@@ -20,18 +20,11 @@ class ContactActionModel
      */
     private $contactModel;
 
-    /**
-     * @param LeadModel $contactModel
-     */
     public function __construct(LeadModel $contactModel)
     {
         $this->contactModel = $contactModel;
     }
 
-    /**
-     * @param array $contactIds
-     * @param array $categoryIds
-     */
     public function addContactsToCategories(array $contactIds, array $categoryIds)
     {
         $contacts = $this->contactModel->getLeadsByIds($contactIds);
@@ -45,10 +38,6 @@ class ContactActionModel
         }
     }
 
-    /**
-     * @param array $contactIds
-     * @param array $categoryIds
-     */
     public function removeContactsFromCategories(array $contactIds, array $categoryIds)
     {
         $contacts = $this->contactModel->getLeadsByIds($contactIds);

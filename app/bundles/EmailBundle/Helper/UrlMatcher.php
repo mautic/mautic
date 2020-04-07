@@ -14,8 +14,7 @@ namespace Mautic\EmailBundle\Helper;
 class UrlMatcher
 {
     /**
-     * @param array $urlsToCheckAgainst
-     * @param       $urlToFind
+     * @param $urlToFind
      *
      * @return bool
      */
@@ -51,7 +50,7 @@ class UrlMatcher
         $url = str_replace(['http://', 'https://'], '', $url);
 
         // Remove preceding //
-        if (strpos($url, '//') === 0) {
+        if (0 === strpos($url, '//')) {
             $url = str_replace('//', '', $url);
         }
 

@@ -18,7 +18,7 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\CampaignMember;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Contact;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
 
-class FetcherTest extends \PHPUnit_Framework_TestCase
+class FetcherTest extends \PHPUnit\Framework\TestCase
 {
     public function testEntitiesAreFetchedFromOrganizerResults()
     {

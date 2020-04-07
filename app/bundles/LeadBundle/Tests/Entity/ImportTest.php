@@ -207,8 +207,7 @@ class ImportTest extends StandardImportTestHelper
     /**
      * Fake the start date to the past to emulate that the import runs for a while.
      *
-     * @param Import $import
-     * @param int    $runtime in seconds
+     * @param int $runtime in seconds
      */
     protected function fakeImportStartDate(Import $import, $runtime = 600)
     {

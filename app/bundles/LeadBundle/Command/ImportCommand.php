@@ -72,7 +72,7 @@ EOT
             $import = $model->getImportToProcess();
 
             // No import waiting in the queue. Finish silently.
-            if ($import === null) {
+            if (null === $import) {
                 return 0;
             }
         }

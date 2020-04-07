@@ -22,7 +22,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
 
-class FeedbackLoopTest extends \PHPUnit_Framework_TestCase
+class FeedbackLoopTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Test that the message is processed appropriately

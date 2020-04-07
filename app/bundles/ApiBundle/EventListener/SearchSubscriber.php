@@ -14,26 +14,32 @@ namespace Mautic\ApiBundle\EventListener;
 use Mautic\ApiBundle\Model\ClientModel;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class SearchSubscriber.
- */
-class SearchSubscriber extends CommonSubscriber
+class SearchSubscriber implements EventSubscriberInterface
 {
     /**
      * @var ClientModel
      */
-    protected $apiClientModel;
+    private $apiClientModel;
 
     /**
-     * SearchSubscriber constructor.
-     *
-     * @param ClientModel $apiClientModel
+     * @var CorePermissions
      */
-    public function __construct(ClientModel $apiClientModel)
+    private $security;
+
+    /**
+     * @var TemplatingHelper
+     */
+    private $templating;
+
+    public function __construct(ClientModel $apiClientModel, CorePermissions $security, TemplatingHelper $templating)
     {
         $this->apiClientModel = $apiClientModel;
+        $this->security       = $security;
+        $this->templating     = $templating;
     }
 
     /**
@@ -47,9 +53,6 @@ class SearchSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param MauticEvents\GlobalSearchEvent $event
-     */
     public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
     {
         if ($this->security->isGranted('api:clients:view')) {
@@ -68,7 +71,7 @@ class SearchSubscriber extends CommonSubscriber
                 $clientResults = [];
                 $canEdit       = $this->security->isGranted('api:clients:edit');
                 foreach ($clients as $client) {
-                    $clientResults[] = $this->templating->renderResponse(
+                    $clientResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticApiBundle:SubscribedEvents\Search:global.html.php',
                         [
                             'client'  => $client,
@@ -77,7 +80,7 @@ class SearchSubscriber extends CommonSubscriber
                     )->getContent();
                 }
                 if (count($clients) > 5) {
-                    $clientResults[] = $this->templating->renderResponse(
+                    $clientResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticApiBundle:SubscribedEvents\Search:global.html.php',
                         [
                             'showMore'     => true,
@@ -92,13 +95,9 @@ class SearchSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param MauticEvents\CommandListEvent $event
-     */
     public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
-        $security = $this->security;
-        if ($security->isGranted('api:clients:view')) {
+        if ($this->security->isGranted('api:clients:view')) {
             $event->addCommands(
                 'mautic.api.client.header.index',
                 $this->apiClientModel->getCommandList()

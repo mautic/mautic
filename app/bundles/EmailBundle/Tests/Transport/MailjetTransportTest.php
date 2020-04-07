@@ -16,7 +16,7 @@ use Mautic\EmailBundle\Swiftmailer\Transport\MailjetTransport;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
 
-class MailjetTransportTest extends \PHPUnit_Framework_TestCase
+class MailjetTransportTest extends \PHPUnit\Framework\TestCase
 {
     public function testWebhookPayloadIsProcessed()
     {

@@ -11,9 +11,10 @@
 
 namespace Mautic\FormBundle\Model;
 
+use Doctrine\ORM\ORMException;
+use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Exception\FileUploadException;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -27,6 +28,7 @@ use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Event\Service\FieldValueTransformer;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Event\ValidationEvent;
@@ -47,22 +49,14 @@ use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-/**
- * Class SubmissionModel.
- */
 class SubmissionModel extends CommonFormModel
 {
-    /**
-     * @deprecated Remove in 2.0
-     *
-     * @var MauticFactory
-     */
-    protected $factory;
-
     /**
      * @var IpLookupHelper
      */
@@ -94,6 +88,11 @@ class SubmissionModel extends CommonFormModel
     protected $campaignModel;
 
     /**
+     * @var MembershipManager
+     */
+    protected $membershipManager;
+
+    /**
      * @var LeadFieldModel
      */
     protected $leadFieldModel;
@@ -118,7 +117,9 @@ class SubmissionModel extends CommonFormModel
      */
     private $formUploader;
 
-    /** @var DeviceTrackingServiceInterface */
+    /**
+     * @var DeviceTrackingServiceInterface
+     */
     private $deviceTrackingService;
 
     /**
@@ -131,22 +132,6 @@ class SubmissionModel extends CommonFormModel
      */
     private $dateHelper;
 
-    /**
-     * @param IpLookupHelper                 $ipLookupHelper
-     * @param TemplatingHelper               $templatingHelper
-     * @param FormModel                      $formModel
-     * @param PageModel                      $pageModel
-     * @param LeadModel                      $leadModel
-     * @param CampaignModel                  $campaignModel
-     * @param LeadFieldModel                 $leadFieldModel
-     * @param CompanyModel                   $companyModel
-     * @param FormFieldHelper                $fieldHelper
-     * @param UploadFieldValidator           $uploadFieldValidator
-     * @param FormUploader                   $formUploader
-     * @param DeviceTrackingServiceInterface $deviceTrackingService
-     * @param FieldValueTransformer          $fieldValueTransformer
-     * @param DateHelper                     $dateHelper
-     */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         TemplatingHelper $templatingHelper,
@@ -154,6 +139,7 @@ class SubmissionModel extends CommonFormModel
         PageModel $pageModel,
         LeadModel $leadModel,
         CampaignModel $campaignModel,
+        MembershipManager $membershipManager,
         LeadFieldModel $leadFieldModel,
         CompanyModel $companyModel,
         FormFieldHelper $fieldHelper,
@@ -169,6 +155,7 @@ class SubmissionModel extends CommonFormModel
         $this->pageModel              = $pageModel;
         $this->leadModel              = $leadModel;
         $this->campaignModel          = $campaignModel;
+        $this->membershipManager      = $membershipManager;
         $this->leadFieldModel         = $leadFieldModel;
         $this->companyModel           = $companyModel;
         $this->fieldHelper            = $fieldHelper;
@@ -182,7 +169,7 @@ class SubmissionModel extends CommonFormModel
     /**
      * {@inheritdoc}
      *
-     * @return \Mautic\FormBundle\Entity\SubmissionRepository
+     * @return SubmissionRepository
      */
     public function getRepository()
     {
@@ -190,15 +177,15 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * @param              $post
-     * @param              $server
-     * @param Form         $form
-     * @param Request|null $request
-     * @param bool         $returnEvent
+     * @param      $post
+     * @param      $server
+     * @param bool $returnEvent
      *
      * @return bool|array
+     *
+     * @throws ORMException
      */
-    public function saveSubmission($post, $server, Form $form, Request $request = null, $returnEvent = false)
+    public function saveSubmission($post, $server, Form $form, Request $request, $returnEvent = false)
     {
         $leadFields = $this->leadFieldModel->getFieldListWithProperties(false);
 
@@ -210,7 +197,7 @@ class SubmissionModel extends CommonFormModel
         //set the landing page the form was submitted from if applicable
         if (!empty($post['mauticpage'])) {
             $page = $this->pageModel->getEntity((int) $post['mauticpage']);
-            if ($page != null) {
+            if (null != $page) {
                 $submission->setPage($page);
             }
         }
@@ -276,9 +263,9 @@ class SubmissionModel extends CommonFormModel
                 }
             }
 
-            if ($value === '' && $f->isRequired()) {
+            if ('' === $value && $f->isRequired()) {
                 //field is required, but hidden from form because of 'ShowWhenValueExists'
-                if ($f->getShowWhenValueExists() === false && !isset($post[$alias])) {
+                if (false === $f->getShowWhenValueExists() && !isset($post[$alias])) {
                     continue;
                 }
 
@@ -324,14 +311,6 @@ class SubmissionModel extends CommonFormModel
                         $value = InputHelper::_($value, 'clean');
                     }
                 }
-
-                // @deprecated - BC support; to be removed in 3.0 - be sure to remove support in FormBuilderEvent as well
-                if (isset($params['valueConstraints']) && is_callable($params['valueConstraints'])) {
-                    $customErrors = call_user_func_array($params['valueConstraints'], [$f, $value]);
-                    if (!empty($customErrors)) {
-                        $validationErrors[$alias] = is_array($customErrors) ? implode('<br />', $customErrors) : $customErrors;
-                    }
-                }
             } elseif (!empty($value)) {
                 $filter = $this->fieldHelper->getFieldFilter($type);
                 $value  = InputHelper::_($value, $filter);
@@ -363,7 +342,7 @@ class SubmissionModel extends CommonFormModel
             $tokens["{formfield={$alias}}"] = $value;
 
             //save the result
-            if ($f->getSaveResult() !== false) {
+            if (false !== $f->getSaveResult()) {
                 $results[$alias] = $value;
             }
         }
@@ -377,22 +356,7 @@ class SubmissionModel extends CommonFormModel
             ->setResults($results)
             ->setContactFieldMatches($leadFieldMatches);
 
-        // @deprecated - BC support; to be removed in 3.0 - be sure to remove the validator option from addSubmitAction as well
-        $this->validateActionCallbacks($submissionEvent, $validationErrors, $alias);
-
-        // Create/update lead
-        $lead = null;
-        if (!empty($leadFieldMatches)) {
-            $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields);
-        }
-
-        $lead          = $this->leadModel->getCurrentLead();
-        $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
-        $trackingId    = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
-
-        //set tracking ID for stats purposes to determine unique hits
-        $submission->setTrackingId($trackingId)
-            ->setLead($lead);
+        $lead = $this->leadModel->getCurrentLead();
 
         // Remove validation errors if the field is not visible
         if ($lead && $form->usesProgressiveProfiling()) {
@@ -410,6 +374,18 @@ class SubmissionModel extends CommonFormModel
             return ['errors' => $validationErrors];
         }
 
+        // Create/update lead
+        if (!empty($leadFieldMatches)) {
+            $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields);
+        }
+
+        $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
+        $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
+
+        //set tracking ID for stats purposes to determine unique hits
+        $submission->setTrackingId($trackingId)
+            ->setLead($lead);
+
         /*
          * Process File upload and save the result to the entity
          * Upload is here to minimize a need for deleting file if there is a validation error
@@ -425,6 +401,9 @@ class SubmissionModel extends CommonFormModel
 
             return ['errors' => $validationErrors];
         }
+
+        // set results after uploader what can change file name if file name exists
+        $submissionEvent->setResults($submission->getResults());
 
         // Save the submission
         $this->saveEntity($submission);
@@ -454,14 +433,14 @@ class SubmissionModel extends CommonFormModel
             $campaigns = $this->campaignModel->getCampaignsByForm($form);
             if (!empty($campaigns)) {
                 foreach ($campaigns as $campaign) {
-                    $this->campaignModel->addLead($campaign, $lead);
+                    $this->membershipManager->addContact($lead, $campaign);
                 }
             }
         }
 
         if ($this->dispatcher->hasListeners(FormEvents::FORM_ON_SUBMIT)) {
             // Reset action config from executeFormActions()
-            $submissionEvent->setActionConfig(null, []);
+            $submissionEvent->setAction(null);
 
             // Dispatch to on submit listeners
             $this->dispatcher->dispatch(FormEvents::FORM_ON_SUBMIT, $submissionEvent);
@@ -530,7 +509,7 @@ class SubmissionModel extends CommonFormModel
                             $translator->trans('mautic.form.result.thead.referrer'),
                         ];
                         foreach ($fields as $f) {
-                            if (in_array($f->getType(), $viewOnlyFields) || $f->getSaveResult() === false) {
+                            if (in_array($f->getType(), $viewOnlyFields) || false === $f->getSaveResult()) {
                                 continue;
                             }
                             $header[] = $f->getLabel();
@@ -589,10 +568,10 @@ class SubmissionModel extends CommonFormModel
 
                 return new Response($content);
             case 'xlsx':
-                if (class_exists('PHPExcel')) {
+                if (class_exists(Spreadsheet::class)) {
                     $response = new StreamedResponse(
                         function () use ($results, $form, $translator, $name, $viewOnlyFields) {
-                            $objPHPExcel = new \PHPExcel();
+                            $objPHPExcel = new Spreadsheet();
                             $objPHPExcel->getProperties()->setTitle($name);
 
                             $objPHPExcel->createSheet();
@@ -606,7 +585,7 @@ class SubmissionModel extends CommonFormModel
                                 $translator->trans('mautic.form.result.thead.referrer'),
                             ];
                             foreach ($fields as $f) {
-                                if (in_array($f->getType(), $viewOnlyFields) || $f->getSaveResult() === false) {
+                                if (in_array($f->getType(), $viewOnlyFields) || false === $f->getSaveResult()) {
                                     continue;
                                 }
                                 $header[] = $f->getLabel();
@@ -644,7 +623,7 @@ class SubmissionModel extends CommonFormModel
                                 ++$count;
                             }
 
-                            $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+                            $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
                             $objWriter->setPreCalculateFormulas(false);
 
                             $objWriter->save('php://output');
@@ -659,7 +638,7 @@ class SubmissionModel extends CommonFormModel
 
                     return $response;
                 }
-                throw new \Exception('PHPExcel is required to export to Excel spreadsheets');
+                throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
             default:
                 return new Response();
         }
@@ -668,12 +647,10 @@ class SubmissionModel extends CommonFormModel
     /**
      * Get line chart data of submissions.
      *
-     * @param string    $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
-     * @param bool      $canViewOthers
+     * @param string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
+     * @param array  $filter
+     * @param bool   $canViewOthers
      *
      * @return array
      */
@@ -731,9 +708,7 @@ class SubmissionModel extends CommonFormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_submitted');
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -767,99 +742,33 @@ class SubmissionModel extends CommonFormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_submitted');
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
      * Execute a form submit action.
      *
-     * @param SubmissionEvent $event
-     *
      * @throws ValidationException
      */
-    protected function executeFormActions(SubmissionEvent $event)
+    protected function executeFormActions(SubmissionEvent $event): void
     {
         $actions          = $event->getSubmission()->getForm()->getActions();
         $availableActions = $this->formModel->getCustomComponents()['actions'];
 
-        // @deprecated support for callback - to be removed in 3.0
-        $args = [
-            'post'       => $event->getPost(),
-            'server'     => $event->getServer(),
-            'factory'    => $this->factory, // WHAT??
-            'submission' => $event->getSubmission(),
-            'fields'     => $event->getFields(),
-            'form'       => $event->getSubmission()->getForm(),
-            'tokens'     => $event->getTokens(),
-            'feedback'   => [],
-            'lead'       => $event->getSubmission()->getLead(),
-        ];
-
-        foreach ($actions as $action) {
-            $key = $action->getType();
-            if (!isset($availableActions[$key])) {
-                continue;
-            }
-
-            $settings = $availableActions[$key];
-            if (isset($settings['eventName'])) {
-                $event->setActionConfig($key, $action->getProperties());
-                $this->dispatcher->dispatch($settings['eventName'], $event);
-
-                // @deprecated support for callback - to be removed in 3.0
-                $args['lead']     = $event->getSubmission()->getLead();
-                $args['feedback'] = $event->getActionFeedback();
-            } elseif (isset($settings['callback'])) {
-                // @deprecated support for callback - to be removed in 3.0; be sure to remove callback support from FormBuilderEvent as well
-
-                $args['action'] = $action;
-                $args['config'] = $action->getProperties();
-
-                // Set the lead each time in case an action updates it
-                $args['lead'] = $this->leadModel->getCurrentLead();
-
-                $callback = $settings['callback'];
-                if (is_callable($callback)) {
-                    if (is_array($callback)) {
-                        $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                    } elseif (strpos($callback, '::') !== false) {
-                        $parts      = explode('::', $callback);
-                        $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-                    } else {
-                        $reflection = new \ReflectionMethod(null, $callback);
-                    }
-
-                    $pass = [];
-                    foreach ($reflection->getParameters() as $param) {
-                        if (isset($args[$param->getName()])) {
-                            $pass[] = $args[$param->getName()];
-                        } else {
-                            $pass[] = null;
-                        }
-                    }
-                    $returned               = $reflection->invokeArgs($this, $pass);
-                    $args['feedback'][$key] = $returned;
-
-                    // Set these for updated plugins to leverage
-                    if (isset($returned['callback'])) {
-                        $event->setPostSubmitCallback($key, $returned);
-                    }
-
-                    $event->setActionFeedback($key, $returned);
-                }
-            }
-        }
+        $actions->filter(function (Action $action) use ($availableActions) {
+            return array_key_exists($action->getType(), $availableActions);
+        })->map(function (Action $action) use ($event, $availableActions) {
+            $event->setAction($action);
+            $this->dispatcher->dispatch($availableActions[$action->getType()]['eventName'], $event);
+        });
     }
 
     /**
      * Create/update lead from form submit.
      *
-     * @param Form  $form
-     * @param array $leadFieldMatches
-     *
      * @return Lead
+     *
+     * @throws ORMException
      */
     protected function createLeadFromSubmit(Form $form, array $leadFieldMatches, $leadFields)
     {
@@ -1080,8 +989,7 @@ class SubmissionModel extends CommonFormModel
     /**
      * Validates a field value.
      *
-     * @param Field $field
-     * @param       $value
+     * @param $value
      *
      * @return bool|string True if valid; otherwise string with invalid reason
      */
@@ -1111,68 +1019,5 @@ class SubmissionModel extends CommonFormModel
         }
 
         return true;
-    }
-
-    /**
-     * @deprecated - added for BC; to be removed in 3.0
-     *
-     * @param Action[]        $actions
-     * @param SubmissionEvent $event
-     * @param                 $validationErrors
-     * @param                 $lastAlias        Because prior to now the last alias was used regardless
-     */
-    protected function validateActionCallbacks(SubmissionEvent $event, &$validationErrors, $lastAlias)
-    {
-        $args = [
-            'post'       => $event->getPost(),
-            'server'     => $event->getServer(),
-            'factory'    => $this->factory, // WHAT??
-            'submission' => $event->getSubmission(),
-            'fields'     => $event->getFields(),
-            'form'       => $event->getSubmission()->getForm(),
-            'tokens'     => $event->getTokens(),
-        ];
-
-        $actions          = $event->getSubmission()->getForm()->getActions();
-        $availableActions = $this->formModel->getCustomComponents()['actions'];
-
-        foreach ($actions as $action) {
-            $key = $action->getType();
-            if (!isset($availableActions[$key])) {
-                continue;
-            }
-
-            $settings       = $availableActions[$key];
-            $args['action'] = $action;
-            $args['config'] = $action->getProperties();
-            if (array_key_exists('validator', $settings)) {
-                $callback = $settings['validator'];
-                if (is_callable($callback)) {
-                    if (is_array($callback)) {
-                        $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                    } elseif (strpos($callback, '::') !== false) {
-                        $parts      = explode('::', $callback);
-                        $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-                    } else {
-                        $reflection = new \ReflectionMethod(null, $callback);
-                    }
-
-                    $pass = [];
-                    foreach ($reflection->getParameters() as $param) {
-                        if (isset($args[$param->getName()])) {
-                            $pass[] = $args[$param->getName()];
-                        } else {
-                            $pass[] = null;
-                        }
-                    }
-                    list($validated, $validatedMessage) = $reflection->invokeArgs($this, $pass);
-                    if (!$validated) {
-                        $validationErrors[$lastAlias] = $validatedMessage;
-                    }
-                }
-            }
-        }
-
-        unset($args, $actions, $availableActions);
     }
 }

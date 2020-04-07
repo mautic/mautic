@@ -29,9 +29,9 @@ class Address
             if (
                 isset($parsedAddress->host)
                 &&
-                $parsedAddress->host != '.SYNTAX-ERROR.'
+                '.SYNTAX-ERROR.' != $parsedAddress->host
                 &&
-                $parsedAddress->host != 'default.domain.name'
+                'default.domain.name' != $parsedAddress->host
             ) {
                 $email           = $parsedAddress->mailbox.'@'.$parsedAddress->host;
                 $name            = isset($parsedAddress->personal) ? $parsedAddress->personal : null;

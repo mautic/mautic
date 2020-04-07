@@ -125,7 +125,7 @@ if (!$isEmbedded) {
                                     <?php echo $entity->getSlotName(); ?>
                                 </td>
                             </tr>
-                            <?php endif ?>
+                            <?php endif; ?>
                             </tbody>
                         </table>
                     </div>

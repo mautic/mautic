@@ -105,7 +105,7 @@ require_once __DIR__.'/../../Include/lessc.inc.php';
 $compiler = new \lessc();
 $css      = $compiler->compile($less);
 
-if (empty($preview) && $app->getEnvironment() != 'dev') {
+if (empty($preview) && 'dev' != $app->getEnvironment()) {
     $css = \Minify_CSS::minify($css);
 }
 

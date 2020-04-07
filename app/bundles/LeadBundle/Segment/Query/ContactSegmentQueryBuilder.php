@@ -43,10 +43,6 @@ class ContactSegmentQueryBuilder
 
     /**
      * ContactSegmentQueryBuilder constructor.
-     *
-     * @param EntityManager            $entityManager
-     * @param RandomParameterName      $randomParameterName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(EntityManager $entityManager, RandomParameterName $randomParameterName, EventDispatcherInterface $dispatcher)
     {
@@ -101,8 +97,6 @@ class ContactSegmentQueryBuilder
     }
 
     /**
-     * @param QueryBuilder $qb
-     *
      * @return QueryBuilder
      *
      * @throws \Doctrine\DBAL\DBALException
@@ -144,9 +138,8 @@ class ContactSegmentQueryBuilder
     /**
      * Restrict the query to NEW members of segment.
      *
-     * @param QueryBuilder $queryBuilder
-     * @param              $segmentId
-     * @param              $batchRestrictions
+     * @param $segmentId
+     * @param $batchRestrictions
      *
      * @return QueryBuilder
      *
@@ -177,8 +170,7 @@ class ContactSegmentQueryBuilder
     }
 
     /**
-     * @param QueryBuilder $queryBuilder
-     * @param              $leadListId
+     * @param $leadListId
      *
      * @return QueryBuilder
      *
@@ -209,8 +201,7 @@ class ContactSegmentQueryBuilder
     }
 
     /**
-     * @param QueryBuilder $queryBuilder
-     * @param              $leadListId
+     * @param $leadListId
      *
      * @return QueryBuilder
      *
@@ -231,10 +222,6 @@ class ContactSegmentQueryBuilder
         return $queryBuilder;
     }
 
-    /**
-     * @param LeadList     $segment
-     * @param QueryBuilder $queryBuilder
-     */
     public function queryBuilderGenerated(LeadList $segment, QueryBuilder $queryBuilder)
     {
         if (!$this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_QUERYBUILDER_GENERATED)) {
@@ -256,9 +243,6 @@ class ContactSegmentQueryBuilder
     }
 
     /**
-     * @param ContactSegmentFilter $filter
-     * @param QueryBuilder         $queryBuilder
-     *
      * @throws PluginHandledFilterException
      */
     private function dispatchPluginFilteringEvent(ContactSegmentFilter $filter, QueryBuilder $queryBuilder)

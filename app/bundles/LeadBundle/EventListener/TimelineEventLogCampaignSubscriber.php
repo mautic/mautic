@@ -34,10 +34,6 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
 
     /**
      * TimelineEventLogCampaignSubscriber constructor.
-     *
-     * @param LeadEventLogRepository $eventLogRepository
-     * @param UserHelper             $userHelper
-     * @param TranslatorInterface    $translator
      */
     public function __construct(LeadEventLogRepository $eventLogRepository, UserHelper $userHelper, TranslatorInterface $translator)
     {
@@ -58,9 +54,6 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CampaignLeadChangeEvent $event
-     */
     public function onChange(CampaignLeadChangeEvent $event)
     {
         if (!$contact = $event->getLead()) {
@@ -74,9 +67,6 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param CampaignLeadChangeEvent $event
-     */
     public function onBatchChange(CampaignLeadChangeEvent $event)
     {
         if (!$contacts = $event->getLeads()) {
@@ -90,9 +80,6 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param LeadTimelineEvent $event
-     */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         $this->addEvents(
@@ -106,9 +93,8 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param Lead[]   $contacts
-     * @param Campaign $campaign
-     * @param          $action
+     * @param Lead[] $contacts
+     * @param        $action
      */
     private function writeEntries(array $contacts, Campaign $campaign, $action)
     {

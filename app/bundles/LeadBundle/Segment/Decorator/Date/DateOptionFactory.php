@@ -59,8 +59,6 @@ class DateOptionFactory
     }
 
     /**
-     * @param ContactSegmentFilterCrate $leadSegmentFilterCrate
-     *
      * @return FilterDecoratorInterface
      */
     public function getDateOption(ContactSegmentFilterCrate $leadSegmentFilterCrate)

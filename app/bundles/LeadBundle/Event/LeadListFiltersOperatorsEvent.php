@@ -32,8 +32,7 @@ class LeadListFiltersOperatorsEvent extends CommonEvent
     protected $translator;
 
     /**
-     * @param array               $operators
-     * @param TranslatorInterface $translator
+     * @param array $operators
      */
     public function __construct($operators, TranslatorInterface $translator)
     {

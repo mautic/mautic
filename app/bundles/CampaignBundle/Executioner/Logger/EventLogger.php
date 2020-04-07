@@ -93,9 +93,6 @@ class EventLogger
         $this->logs         = new ArrayCollection();
     }
 
-    /**
-     * @param LeadEventLog $log
-     */
     public function queueToPersist(LeadEventLog $log)
     {
         $this->persistQueue->add($log);
@@ -105,18 +102,13 @@ class EventLogger
         }
     }
 
-    /**
-     * @param LeadEventLog $log
-     */
     public function persistLog(LeadEventLog $log)
     {
         $this->leadEventLogRepository->saveEntity($log);
     }
 
     /**
-     * @param Event     $event
-     * @param Lead|null $contact
-     * @param bool      $isInactiveEvent
+     * @param bool $isInactiveEvent
      *
      * @return LeadEventLog
      */
@@ -200,8 +192,6 @@ class EventLogger
     }
 
     /**
-     * @param ArrayCollection $collection
-     *
      * @return $this
      */
     public function persistCollection(ArrayCollection $collection)
@@ -216,8 +206,6 @@ class EventLogger
     }
 
     /**
-     * @param ArrayCollection $collection
-     *
      * @return $this
      */
     public function clearCollection(ArrayCollection $collection)
@@ -228,8 +216,6 @@ class EventLogger
     }
 
     /**
-     * @param ArrayCollection $logs
-     *
      * @return ArrayCollection
      */
     public function extractContactsFromLogs(ArrayCollection $logs)
@@ -246,10 +232,7 @@ class EventLogger
     }
 
     /**
-     * @param Event                 $event
-     * @param AbstractEventAccessor $config
-     * @param ArrayCollection       $contacts
-     * @param bool                  $isInactiveEntry
+     * @param bool $isInactiveEntry
      *
      * @return ArrayCollection
      */
@@ -261,10 +244,7 @@ class EventLogger
     }
 
     /**
-     * @param Event                 $event
-     * @param AbstractEventAccessor $config
-     * @param ArrayCollection       $contacts
-     * @param bool                  $isInactiveEntry
+     * @param bool $isInactiveEntry
      *
      * @return ArrayCollection
      */
@@ -298,8 +278,7 @@ class EventLogger
     }
 
     /**
-     * @param array $contactIds
-     * @param int   $campaignId
+     * @param int $campaignId
      */
     public function hydrateContactRotationsForNewLogs(array $contactIds, $campaignId)
     {

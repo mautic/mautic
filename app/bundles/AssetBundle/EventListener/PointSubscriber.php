@@ -13,26 +13,19 @@ namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Event\AssetLoadEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\PointEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class PointSubscriber.
- */
-class PointSubscriber extends CommonSubscriber
+class PointSubscriber implements EventSubscriberInterface
 {
     /**
      * @var PointModel
      */
-    protected $pointModel;
+    private $pointModel;
 
-    /**
-     * PointSubscriber constructor.
-     *
-     * @param PointModel $pointModel
-     */
     public function __construct(PointModel $pointModel)
     {
         $this->pointModel = $pointModel;
@@ -49,9 +42,6 @@ class PointSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param PointBuilderEvent $event
-     */
     public function onPointBuild(PointBuilderEvent $event)
     {
         $action = [
@@ -59,7 +49,7 @@ class PointSubscriber extends CommonSubscriber
             'label'       => 'mautic.asset.point.action.download',
             'description' => 'mautic.asset.point.action.download_descr',
             'callback'    => ['\\Mautic\\AssetBundle\\Helper\\PointActionHelper', 'validateAssetDownload'],
-            'formType'    => 'pointaction_assetdownload',
+            'formType'    => PointActionAssetDownloadType::class,
         ];
 
         $event->addAction('asset.download', $action);
@@ -67,14 +57,12 @@ class PointSubscriber extends CommonSubscriber
 
     /**
      * Trigger point actions for asset download.
-     *
-     * @param AssetLoadEvent $event
      */
     public function onAssetDownload(AssetLoadEvent $event)
     {
         $asset = $event->getRecord()->getAsset();
 
-        if ($asset !== null) {
+        if (null !== $asset) {
             $this->pointModel->triggerAction('asset.download', $asset);
         }
     }
