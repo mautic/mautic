@@ -12,7 +12,7 @@
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Helper\Update\Command\Step\RemoveDeletedFilesStep;
+use Mautic\CoreBundle\Update\Step\RemoveDeletedFilesStep;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\TranslatorInterface;

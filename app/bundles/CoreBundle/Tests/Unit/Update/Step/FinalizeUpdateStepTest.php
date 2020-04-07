@@ -13,7 +13,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Helper\Update\Command\Step\FinalizeUpdateStep;
+use Mautic\CoreBundle\Update\Step\FinalizeUpdateStep;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -103,11 +103,11 @@ class FinalizeUpdateStepTest extends AbstractStepTest
 
         $this->pathsHelper->expects($this->once())
             ->method('getRootPath')
-            ->willReturn(__DIR__);
+            ->willReturn(__DIR__.'/resources');
 
         $this->pathsHelper->expects($this->once())
             ->method('getCachePath')
-            ->willReturn(__DIR__);
+            ->willReturn(__DIR__.'/resources');
 
         $this->session->expects($this->once())
             ->method('get')
@@ -122,5 +122,8 @@ class FinalizeUpdateStepTest extends AbstractStepTest
             ->with("\n\n<info>This is an example message</info>");
 
         $this->step->execute($this->progressBar, $this->input, $this->output);
+
+        $this->assertFileNotExists(__DIR__.'/resources/upgrade.php');
+        $this->assertFileNotExists(__DIR__.'/resources/lastUpdateCheck.txt');
     }
 }

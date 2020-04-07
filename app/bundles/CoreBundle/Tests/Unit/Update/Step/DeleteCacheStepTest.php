@@ -12,7 +12,7 @@
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Mautic\CoreBundle\Helper\CacheHelper;
-use Mautic\CoreBundle\Helper\Update\Command\Step\DeleteCacheStep;
+use Mautic\CoreBundle\Update\Step\DeleteCacheStep;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Translation\TranslatorInterface;
 

@@ -13,8 +13,8 @@ namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Mautic\CoreBundle\Exception\UpdateFailedException;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Helper\Update\Command\Step\InstallNewFilesStep;
 use Mautic\CoreBundle\Helper\UpdateHelper;
+use Mautic\CoreBundle\Update\Step\InstallNewFilesStep;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\TranslatorInterface;

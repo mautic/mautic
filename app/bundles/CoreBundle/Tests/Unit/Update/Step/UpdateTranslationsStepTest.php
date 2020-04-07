@@ -3,7 +3,7 @@
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Mautic\CoreBundle\Helper\LanguageHelper;
-use Mautic\CoreBundle\Helper\Update\Command\Step\UpdateTranslationsStep;
+use Mautic\CoreBundle\Update\Step\UpdateTranslationsStep;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
