@@ -93,7 +93,7 @@ class FinalizeUpdateStepTest extends AbstractStepTest
         $this->assertFileNotExists(__DIR__.'/resources/upgrade.php');
         $this->assertFileNotExists(__DIR__.'/resources/lastUpdateCheck.txt');
 
-        $this->assertEquals($updateSuccessfulKey, $this->progressBar->getMessage());
+        $this->assertEquals($updateSuccessfulKey, trim($this->progressBar->getMessage()));
     }
 
     public function testFinalizationWithPostUpgradeMessage()
