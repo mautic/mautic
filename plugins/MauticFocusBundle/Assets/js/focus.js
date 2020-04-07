@@ -253,11 +253,13 @@ Mautic.launchFocusBuilder = function (forceFetch) {
             padding: "0",
             border: "none",
             width: "100%",
-            height: mQuery('#websiteScreenshot').height()
+            // @todo recalculate when window resize
+            height: mQuery('#websiteScreenshot').height(), // 100% does not work. Needs to be specified
+            overflow: "hidden" // Disable scrolling with scrolling="no" attr
         };
 
         // Async load in iframe
-        mQuery('.preview-body').html('<iframe src="'+url+'"></iframe>');
+        mQuery('.preview-body').html('<iframe src="'+url+'" scrolling="no"></iframe>');
         mQuery('iframe').css(builderCss);
         mQuery('.btn-close-builder').prop('disabled', false);
     } else {
