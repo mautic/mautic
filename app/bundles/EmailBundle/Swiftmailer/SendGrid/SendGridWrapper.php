@@ -31,8 +31,6 @@ class SendGridWrapper
     }
 
     /**
-     * @param Mail $mail
-     *
      * @return Response
      */
     public function send(Mail $mail)

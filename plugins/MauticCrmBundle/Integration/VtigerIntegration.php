@@ -11,6 +11,8 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+
 /**
  * Class VtigerIntegration.
  */
@@ -173,10 +175,6 @@ class VtigerIntegration extends CrmAbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
-        if ($fields = parent::getAvailableLeadFields()) {
-            return $fields;
-        }
-
         $vTigerFields      = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
 
@@ -192,7 +190,7 @@ class VtigerIntegration extends CrmAbstractIntegration
                 if (!empty($vTigerObjects) && is_array($vTigerObjects)) {
                     foreach ($vTigerObjects as $object) {
                         // The object key for contacts should be 0 for some BC reasons
-                        if ($object == 'contacts') {
+                        if ('contacts' == $object) {
                             $object = 0;
                         }
 
@@ -251,7 +249,7 @@ class VtigerIntegration extends CrmAbstractIntegration
      */
     public function getFormNotes($section)
     {
-        if ($section == 'leadfield_match') {
+        if ('leadfield_match' == $section) {
             return ['mautic.vtiger.form.field_match_notes', 'info'];
         }
 
@@ -278,21 +276,21 @@ class VtigerIntegration extends CrmAbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        if ($formArea == 'features') {
+        if ('features' == $formArea) {
             $builder->add(
                 'objects',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'contacts' => 'mautic.vtiger.object.contact',
-                        'company'  => 'mautic.vtiger.object.company',
+                        'mautic.vtiger.object.contact' => 'contacts',
+                        'mautic.vtiger.object.company' => 'company',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.vtiger.form.objects_to_pull_from',
-                    'label_attr'  => ['class' => ''],
-                    'empty_value' => false,
-                    'required'    => false,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.vtiger.form.objects_to_pull_from',
+                    'label_attr'        => ['class' => ''],
+                    'placeholder'       => false,
+                    'required'          => false,
                 ]
             );
         }

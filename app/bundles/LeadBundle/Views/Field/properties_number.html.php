@@ -12,7 +12,7 @@
 use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStringTransformer;
 
 $roundMode = (isset($roundMode)) ? $roundMode : '';
-$precision = (isset($precision)) ? $precision : '';
+$scale     = (isset($scale)) ? $scale : '';
 
 $options = [
     NumberToLocalizedStringTransformer::ROUND_UP        => 'mautic.lead.field.form.number.roundup',
@@ -32,7 +32,9 @@ $options = [
                     <?php foreach ($options as $v => $l): ?>
                     <option value="<?php echo $view->escape($v); ?>"<?php if ($roundMode == $v) {
     echo ' selected="selected"';
-} ?>><?php echo $view['translator']->trans($l); ?></option>
+} ?>>
+                        <?php echo $view['translator']->trans($l); ?>
+                    </option>
                     <?php endforeach; ?>
                 </select>
 

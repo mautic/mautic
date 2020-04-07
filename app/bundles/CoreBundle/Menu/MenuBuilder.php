@@ -45,11 +45,6 @@ class MenuBuilder
 
     /**
      * MenuBuilder constructor.
-     *
-     * @param FactoryInterface         $knpFactory
-     * @param MatcherInterface         $matcher
-     * @param EventDispatcherInterface $dispatcher
-     * @param MenuHelper               $menuHelper
      */
     public function __construct(FactoryInterface $knpFactory, MatcherInterface $matcher, EventDispatcherInterface $dispatcher, MenuHelper $menuHelper)
     {
@@ -86,10 +81,10 @@ class MenuBuilder
         try {
             /** @var \Knp\Menu\ItemInterface $item */
             foreach ($menu as $item) {
-                if ($forRouteUri == 'current' && $this->matcher->isCurrent($item)) {
+                if ('current' == $forRouteUri && $this->matcher->isCurrent($item)) {
                     //current match
                     return $item;
-                } elseif ($forRouteUri != 'current' && $item->getUri() == $forRouteUri) {
+                } elseif ('current' != $forRouteUri && $item->getUri() == $forRouteUri) {
                     //route uri match
                     return $item;
                 } elseif (!empty($forRouteName) && $forRouteName == $item->getExtra('routeName')) {

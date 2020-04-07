@@ -25,6 +25,9 @@ class JsController extends CommonController
      */
     public function indexAction()
     {
+        // Don't store a visitor with this request
+        defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
+
         $dispatcher = $this->dispatcher;
         $debug      = $this->factory->getKernel()->isDebug();
         $event      = new BuildJsEvent($this->getJsHeader(), $debug);

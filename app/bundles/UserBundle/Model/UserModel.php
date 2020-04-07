@@ -13,17 +13,19 @@ namespace Mautic\UserBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserToken;
+use Mautic\UserBundle\Enum\UserTokenAuthorizator;
 use Mautic\UserBundle\Event\StatusChangeEvent;
 use Mautic\UserBundle\Event\UserEvent;
+use Mautic\UserBundle\Form\Type\UserType;
+use Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
-/**
- * Class UserModel.
- */
 class UserModel extends FormModel
 {
     /**
@@ -31,9 +33,17 @@ class UserModel extends FormModel
      */
     protected $mailHelper;
 
-    public function __construct(MailHelper $mailHelper)
-    {
-        $this->mailHelper = $mailHelper;
+    /**
+     * @var UserTokenServiceInterface
+     */
+    private $userTokenService;
+
+    public function __construct(
+        MailHelper $mailHelper,
+        UserTokenServiceInterface $userTokenService
+    ) {
+        $this->mailHelper       = $mailHelper;
+        $this->userTokenService = $userTokenService;
     }
 
     /**
@@ -98,10 +108,8 @@ class UserModel extends FormModel
     /**
      * Checks for a new password and rehashes if necessary.
      *
-     * @param User                     $entity
-     * @param PasswordEncoderInterface $encoder
-     * @param string                   $submittedPassword
-     * @param bool|false               $validate
+     * @param string     $submittedPassword
+     * @param bool|false $validate
      *
      * @return string
      */
@@ -135,7 +143,7 @@ class UserModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('user', $entity, $options);
+        return $formFactory->create(UserType::class, $entity, $options);
     }
 
     /**
@@ -143,7 +151,7 @@ class UserModel extends FormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new User();
         }
 
@@ -157,6 +165,21 @@ class UserModel extends FormModel
         }
 
         return $entity;
+    }
+
+    /**
+     * @return User
+     */
+    public function getSystemAdministrator()
+    {
+        $adminRole = $this->em->getRepository('MauticUserBundle:Role')->findOneBy(['isAdmin' => true]);
+
+        return $this->getRepository()->findOneBy(
+            [
+                'role'        => $adminRole,
+                'isPublished' => true,
+            ]
+        );
     }
 
     /**
@@ -214,13 +237,13 @@ class UserModel extends FormModel
         $results = [];
         switch ($type) {
             case 'role':
-                $results = $this->em->getRepository('MauticUserBundle:Role')->getRoleList($filter, $limit);
+                $results = $this->em->getRepository(Role::class)->getRoleList($filter, $limit);
                 break;
             case 'user':
-                $results = $this->em->getRepository('MauticUserBundle:User')->getUserList($filter, $limit);
+                $results = $this->em->getRepository(User::class)->getUserList($filter, $limit);
                 break;
             case 'position':
-                $results = $this->em->getRepository('MauticUserBundle:User')->getPositionList($filter, $limit);
+                $results = $this->em->getRepository(User::class)->getPositionList($filter, $limit);
                 break;
         }
 
@@ -230,9 +253,7 @@ class UserModel extends FormModel
     /**
      * Resets the user password and emails it.
      *
-     * @param User                     $user
-     * @param PasswordEncoderInterface $encoder
-     * @param string                   $newPassword
+     * @param string $newPassword
      */
     public function resetPassword(User $user, PasswordEncoderInterface $encoder, $newPassword)
     {
@@ -243,42 +264,50 @@ class UserModel extends FormModel
     }
 
     /**
-     * @param User $user
-     *
-     * @return string
+     * @return UserToken
      */
     protected function getResetToken(User $user)
     {
-        /** @var \DateTime $lastLogin */
-        $lastLogin = $user->getLastLogin();
+        $userToken = new UserToken();
+        $userToken->setUser($user)
+            ->setAuthorizator(UserTokenAuthorizator::RESET_PASSWORD_AUTHORIZATOR)
+            ->setExpiration((new \DateTime())->add(new \DateInterval('PT24H')))
+            ->setOneTimeOnly();
 
-        $dateTime = ($lastLogin instanceof \DateTime) ? $lastLogin->format('Y-m-d H:i:s') : null;
-
-        return hash('sha256', $user->getUsername().$user->getEmail().$dateTime);
+        return $this->userTokenService->generateSecret($userToken, 64);
     }
 
     /**
-     * @param User   $user
      * @param string $token
      *
      * @return bool
      */
     public function confirmResetToken(User $user, $token)
     {
-        $resetToken = $this->getResetToken($user);
+        $userToken = new UserToken();
+        $userToken->setUser($user)
+            ->setAuthorizator(UserTokenAuthorizator::RESET_PASSWORD_AUTHORIZATOR)
+            ->setSecret($token);
 
-        return hash_equals($token, $resetToken);
+        return $this->userTokenService->verify($userToken);
     }
 
     /**
-     * @param User $user
+     * @throws \RuntimeException
      */
     public function sendResetEmail(User $user)
     {
         $mailer = $this->mailHelper->getMailer();
 
         $resetToken = $this->getResetToken($user);
-        $resetLink  = $this->router->generate('mautic_user_passwordresetconfirm', ['token' => $resetToken], true);
+        $this->em->persist($resetToken);
+        try {
+            $this->em->flush();
+        } catch (\Exception $exception) {
+            $this->logger->addError($exception->getMessage());
+            throw new \RuntimeException();
+        }
+        $resetLink  = $this->router->generate('mautic_user_passwordresetconfirm', ['token' => $resetToken->getSecret()], true);
 
         $mailer->setTo([$user->getEmail() => $user->getName()]);
         $mailer->setSubject($this->translator->trans('mautic.user.user.passwordreset.subject'));
@@ -304,7 +333,7 @@ class UserModel extends FormModel
      */
     public function setPreference($key, $value = null, User $user = null)
     {
-        if ($user == null) {
+        if (null == $user) {
             $user = $this->userHelper->getUser();
         }
 
@@ -325,7 +354,7 @@ class UserModel extends FormModel
      */
     public function getPreference($key, $default = null, User $user = null)
     {
-        if ($user == null) {
+        if (null == $user) {
             $user = $this->userHelper->getUser();
         }
         $preferences = $user->getPreferences();

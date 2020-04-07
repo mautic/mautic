@@ -78,9 +78,6 @@ class LeadEventLog
         $this->setDateAdded(new \DateTime());
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -89,8 +86,9 @@ class LeadEventLog
             ->addIndex(['lead_id'], 'lead_id_index')
             ->addIndex(['object', 'object_id'], 'lead_object_index')
             ->addIndex(['bundle', 'object', 'action', 'object_id'], 'lead_timeline_index')
+            ->addIndex(['action'], 'lead_timeline_action_index')
             ->addIndex(['date_added'], 'lead_date_added_index')
-            ->addId()
+            ->addBigIntIdField()
             ->addNullableField('userId', Type::INTEGER, 'user_id')
             ->addNullableField('userName', Type::STRING, 'user_name')
             ->addNullableField('bundle', Type::STRING)
@@ -101,7 +99,7 @@ class LeadEventLog
             ->addNullableField('properties', Type::JSON_ARRAY);
 
         $builder->createManyToOne('lead', Lead::class)
-            ->addJoinColumn('lead_id', 'id', true, false, 'SET NULL')
+            ->addJoinColumn('lead_id', 'id', true, false, 'CASCADE')
             ->inversedBy('eventLog')
             ->build();
     }
@@ -143,8 +141,6 @@ class LeadEventLog
 
     /**
      * Set lead.
-     *
-     * @param Lead $lead
      *
      * @return LeadEventLog
      */
@@ -263,8 +259,6 @@ class LeadEventLog
 
     /**
      * Set properties.
-     *
-     * @param array $properties
      *
      * @return LeadEventLog
      */

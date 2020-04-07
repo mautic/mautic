@@ -200,9 +200,6 @@ Mautic.processModalContent = function (response, target) {
         //assume the content is to refresh main app
         Mautic.processPageContent(response);
     } else {
-        if (response.flashes) {
-            Mautic.setFlashes(response.flashes);
-        }
 
         if (response.notifications) {
             Mautic.setNotifications(response.notifications);
@@ -409,7 +406,7 @@ Mautic.showModal = function(target) {
                 }
 
                 if (mQuery(modal).attr('data-modal-moved')) {
-                    mQuery('[data-modal-placeholder').replaceWith(mQuery(modal));
+                    mQuery('[data-modal-placeholder]').replaceWith(mQuery(modal));
                     mQuery(modal).attr('data-modal-moved', undefined);
                 }
             });

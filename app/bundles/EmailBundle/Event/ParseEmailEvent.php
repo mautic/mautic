@@ -38,10 +38,6 @@ class ParseEmailEvent extends Event
      */
     private $markAsSeen = [];
 
-    /**
-     * @param array $messages
-     * @param array $applicableKeys
-     */
     public function __construct(array $messages = [], array $applicableKeys = [])
     {
         $this->messages = $messages;

@@ -13,6 +13,9 @@ $container->loadFromExtension('twig', [
     'cache'            => false,
     'debug'            => '%kernel.debug%',
     'strict_variables' => '%kernel.debug%',
+    'paths'            => [
+        '%kernel.root_dir%/bundles' => 'bundles',
+    ],
 ]);
 
 $container->loadFromExtension('framework', [

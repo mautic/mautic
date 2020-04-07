@@ -11,13 +11,11 @@
 
 namespace Mautic\PluginBundle\Controller;
 
-use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\PluginBundle\Entity\Integration;
-use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationEvent;
+use Mautic\PluginBundle\Form\Type\DetailsType;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Model\PluginModel;
 use Mautic\PluginBundle\PluginEvents;
@@ -153,7 +151,9 @@ class PluginController extends FormController
         }
 
         $session   = $this->get('session');
-        $authorize = $this->request->request->get('integration_details[in_auth]', false, true);
+
+        $integrationDetailsPost = $this->request->request->get('integration_details', [], true);
+        $authorize              = empty($integrationDetailsPost['in_auth']) ? false : true;
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper = $this->factory->getHelper('integration');
@@ -166,8 +166,8 @@ class PluginController extends FormController
         }
 
         $object = ('leadFieldsContainer' === $activeTab) ? 'lead' : 'company';
-        $limit  = $this->coreParametersHelper->getParameter('default_pagelimit');
-        $start  = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $limit  = $this->coreParametersHelper->get('default_pagelimit');
+        $start  = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -182,7 +182,7 @@ class PluginController extends FormController
         $entity = $integrationObject->getIntegrationSettings();
 
         $form = $this->createForm(
-            'integration_details',
+            DetailsType::class,
             $entity,
             [
                 'integration'        => $entity->getName(),
@@ -193,7 +193,7 @@ class PluginController extends FormController
             ]
         );
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $currentKeys            = $integrationObject->getDecryptedApiKeys($entity);
@@ -219,11 +219,11 @@ class PluginController extends FormController
                         if (in_array('public_profile', $features) || in_array('push_lead', $features)) {
                             // Ungroup the fields
                             $mauticLeadFields = [];
-                            foreach ($leadFields as $group => $groupFields) {
+                            foreach ($leadFields as $groupFields) {
                                 $mauticLeadFields = array_merge($mauticLeadFields, $groupFields);
                             }
                             $mauticCompanyFields = [];
-                            foreach ($companyFields as $group => $groupFields) {
+                            foreach ($companyFields as $groupFields) {
                                 $mauticCompanyFields = array_merge($mauticCompanyFields, $groupFields);
                             }
 
@@ -389,6 +389,8 @@ class PluginController extends FormController
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper = $this->factory->getHelper('integration');
 
+        $bundle->splitDescriptions();
+
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -416,179 +418,8 @@ class PluginController extends FormController
             return $this->accessDenied();
         }
 
-        /** @var \Mautic\PluginBundle\Model\PluginModel $model */
-        $model   = $this->getModel('plugin');
-        $plugins = $this->coreParametersHelper->getParameter('plugin.bundles');
-        $added   = $disabled   = $updated   = 0;
-
-        // Get the metadata for plugins for installation
-        $em             = $this->get('doctrine.orm.entity_manager');
-        $allMetadata    = $em->getMetadataFactory()->getAllMetadata();
-        $pluginMetadata = $pluginInstalledSchemas = $currentPluginTables = [];
-
-        $currentSchema = $em->getConnection()->getSchemaManager()->createSchema();
-
-        // Get current metadata and currently installed Tables
-
-        /** @var \Doctrine\ORM\Mapping\ClassMetadata $meta */
-        foreach ($allMetadata as $meta) {
-            $namespace = $meta->namespace;
-
-            if (strpos($namespace, 'MauticPlugin') !== false) {
-                $bundleName = preg_replace('/\\\Entity$/', '', $namespace);
-                if (!isset($pluginMetadata[$bundleName])) {
-                    $pluginMetadata[$bundleName] = [];
-                }
-                $pluginMetadata[$bundleName][$meta->getName()] = $meta;
-
-                $table = $meta->getTableName();
-
-                if (!isset($currentPluginTables[$bundleName])) {
-                    $currentPluginTables[$bundleName] = [];
-                }
-
-                if ($currentSchema->hasTable($table)) {
-                    $currentPluginTables[$bundleName][] = $currentSchema->getTable($table);
-                }
-            }
-        }
-
-        // Create a Schema just for the plugin for updating
-        foreach ($currentPluginTables as $bundleName => $tables) {
-            $pluginInstalledSchemas[$bundleName] = new Schema($tables);
-        }
-
-        $persist = [];
-
-        $installedPlugins = $model->getEntities(
-            [
-                'index' => 'bundle',
-            ]
-        );
-
-        /**
-         * @var string
-         * @var Plugin $plugin
-         */
-        foreach ($installedPlugins as $bundle => $plugin) {
-            $persistUpdate = false;
-            if (!isset($plugins[$bundle])) {
-                if (!$plugin->getIsMissing()) {
-                    //files are no longer found
-                    $plugin->setIsMissing(true);
-                    $persistUpdate = true;
-                    ++$disabled;
-                }
-            } else {
-                if ($plugin->getIsMissing()) {
-                    //was lost but now is found
-                    $plugin->setIsMissing(false);
-                    $persistUpdate = true;
-                }
-
-                $file = $plugins[$bundle]['directory'].'/Config/config.php';
-
-                //update details of the bundle
-                if (file_exists($file)) {
-                    /** @var array $details */
-                    $details = include $file;
-
-                    //compare versions to see if an update is necessary
-                    $version = isset($details['version']) ? $details['version'] : '';
-                    if (!empty($version) && version_compare($plugin->getVersion(), $version) == -1) {
-                        ++$updated;
-
-                        //call the update callback
-                        $callback = $plugins[$bundle]['bundleClass'];
-                        $metadata = (isset($pluginMetadata[$plugins[$bundle]['namespace']]))
-                            ? $pluginMetadata[$plugins[$bundle]['namespace']] : null;
-                        $installedSchema = (isset($pluginInstalledSchemas[$plugins[$bundle]['namespace']]))
-                            ? $pluginInstalledSchemas[$plugins[$bundle]['namespace']] : null;
-
-                        $callback::onPluginUpdate($plugin, $this->factory, $metadata, $installedSchema);
-
-                        unset($metadata, $installedSchema);
-
-                        $persistUpdate = true;
-                    }
-
-                    $plugin->setVersion($version);
-
-                    $plugin->setName(
-                        isset($details['name']) ? $details['name'] : $plugins[$bundle]['base']
-                    );
-
-                    if (isset($details['description'])) {
-                        $plugin->setDescription($details['description']);
-                    }
-
-                    if (isset($details['author'])) {
-                        $plugin->setAuthor($details['author']);
-                    }
-                }
-
-                unset($plugins[$bundle]);
-            }
-            if ($persistUpdate) {
-                $persist[] = $plugin;
-            }
-        }
-
-        //rest are new
-        foreach ($plugins as $plugin) {
-            ++$added;
-            $entity = new Plugin();
-            $entity->setBundle($plugin['bundle']);
-
-            $file = $plugin['directory'].'/Config/config.php';
-
-            //update details of the bundle
-            if (file_exists($file)) {
-                $details = include $file;
-
-                if (isset($details['version'])) {
-                    $entity->setVersion($details['version']);
-                }
-
-                $entity->setName(
-                    isset($details['name']) ? $details['name'] : $plugin['base']
-                );
-
-                if (isset($details['description'])) {
-                    $entity->setDescription($details['description']);
-                }
-
-                if (isset($details['author'])) {
-                    $entity->setAuthor($details['author']);
-                }
-            }
-
-            // Call the install callback
-            $callback        = $plugin['bundleClass'];
-            $metadata        = (isset($pluginMetadata[$plugin['namespace']])) ? $pluginMetadata[$plugin['namespace']] : null;
-            $installedSchema = null;
-
-            if (isset($pluginInstalledSchemas[$plugin['namespace']]) && count($pluginInstalledSchemas[$plugin['namespace']]->getTables()) !== 0) {
-                $installedSchema = true;
-            }
-
-            $callback::onPluginInstall($entity, $this->factory, $metadata, $installedSchema);
-
-            $persist[] = $entity;
-        }
-
-        if (!empty($persist)) {
-            $model->saveEntities($persist);
-        }
-
-        // Alert the user to the number of additions
         $this->addFlash(
-            'mautic.plugin.notice.reloaded',
-            [
-                '%added%'    => $added,
-                '%disabled%' => $disabled,
-                '%updated%'  => $updated,
-            ]
+            $this->get('mautic.plugin.facade.reload')->reloadPlugins()
         );
 
         $viewParameters = [

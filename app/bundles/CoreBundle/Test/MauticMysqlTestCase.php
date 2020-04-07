@@ -2,6 +2,11 @@
 
 namespace Mautic\CoreBundle\Test;
 
+use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
+use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
+use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
+use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
+
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 {
     /**
@@ -12,7 +17,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     /**
      * @throws \Exception
      */
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -33,6 +38,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $command    = "mysql -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()}$password {$connection->getDatabase()} < {$file} 2>&1 | grep -v \"Using a password\" || true";
 
         $lastLine = system($command, $status);
+
         if (0 !== $status) {
             throw new \Exception($command.' failed with status code '.$status.' and last line of "'.$lastLine.'"');
         }
@@ -68,7 +74,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     {
         $this->createDatabase();
         $this->applyMigrations();
-        $this->installDatabaseFixtures();
+        $this->installDatabaseFixtures([LeadFieldData::class, RoleData::class, LoadRoleData::class, LoadUserData::class]);
     }
 
     /**
@@ -112,5 +118,14 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         if (0 !== $status) {
             throw new \Exception($command.' failed with status code '.$status.' and last line of "'.$lastLine.'"');
         }
+
+        $f         = fopen($this->sqlDumpFile, 'r');
+        $firstLine = fgets($f);
+        if (false !== strpos($firstLine, 'Using a password')) {
+            $file = file($this->sqlDumpFile);
+            unset($file[0]);
+            file_put_contents($this->sqlDumpFile, $file);
+        }
+        fclose($f);
     }
 }

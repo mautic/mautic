@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 //Check to see if the entire page should be displayed or just main content
-if ($tmpl == 'index'):
+if ('index' == $tmpl):
     $view->extend('MauticLeadBundle:List:index.html.php');
 endif;
 $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list');
@@ -67,6 +67,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
             </thead>
             <tbody>
             <?php foreach ($items as $item): ?>
+                <?php $mauticTemplateVars['item'] = $item; ?>
                 <tr>
                     <td>
                         <?php
@@ -76,6 +77,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                                 'item'            => $item,
                                 'templateButtons' => [
                                     'edit'   => $view['security']->hasEntityAccess(true, $permissions['lead:lists:editother'], $item->getCreatedBy()),
+                                    'clone'  => $view['security']->hasEntityAccess(true, $permissions['lead:lists:editother'], $item->getCreatedBy()),
                                     'delete' => $view['security']->hasEntityAccess(true, $permissions['lead:lists:deleteother'], $item->getCreatedBy()),
                                 ],
                                 'routeBase' => 'segment',
@@ -122,6 +124,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                             <?php if ($item->isGlobal()): ?>
                                 <i class="fa fa-fw fa-globe"></i>
                             <?php endif; ?>
+                            <?php echo $view['content']->getCustomContent('segment.name', $mauticTemplateVars); ?>
                         </div>
                         <?php if ($description = $item->getDescription()): ?>
                             <div class="text-muted mt-4">
@@ -133,7 +136,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                         <a class="label label-primary" href="<?php echo $view['router']->path(
                             'mautic_contact_index',
                             ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.list').':'.$item->getAlias()]
-                        ); ?>" data-toggle="ajax"<?php echo ($leadCounts[$item->getId()] == 0) ? 'disabled=disabled' : ''; ?>>
+                        ); ?>" data-toggle="ajax"<?php echo (0 == $leadCounts[$item->getId()]) ? 'disabled=disabled' : ''; ?>>
                             <?php echo $view['translator']->transChoice(
                                 'mautic.lead.list.viewleads_count',
                                 $leadCounts[$item->getId()],

@@ -45,26 +45,13 @@ return [
         ],
     ],
     'services' => [
-        'events' => [
-            // 'mautic.dashboard.subscriber' => array(
-            //     'class' => 'Mautic\DashboardBundle\EventListener\DashboardSubscriber'
-            // ),
-        ],
         'forms' => [
             'mautic.dashboard.form.type.widget' => [
                 'class'     => 'Mautic\DashboardBundle\Form\Type\WidgetType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'widget',
-            ],
-            'mautic.dashboard.form.uplload' => [
-                'class'     => 'Mautic\DashboardBundle\Form\Type\UploadType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'dashboard_upload',
-            ],
-            'mautic.dashboard.form.filter' => [
-                'class'     => 'Mautic\DashboardBundle\Form\Type\FilterType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'dashboard_filter',
+                'arguments' => [
+                    'event_dispatcher',
+                    'mautic.security',
+                ],
             ],
         ],
         'models' => [
@@ -73,6 +60,7 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.helper.paths',
+                    'symfony.filesystem',
                 ],
             ],
         ],

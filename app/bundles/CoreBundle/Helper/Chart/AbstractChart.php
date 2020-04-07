@@ -96,7 +96,7 @@ abstract class AbstractChart
         $isTime  = in_array($unit, ['H', 'i', 's']) ? 'T' : '';
         $toUpper = ['d', 'i'];
 
-        if ($unit == 'i') {
+        if ('i' == $unit) {
             $unit = 'M';
         }
 
@@ -127,9 +127,6 @@ abstract class AbstractChart
 
     /**
      * Sets the clones of the date range and validates it.
-     *
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
      */
     public function setDateRange(\DateTime $dateFrom, \DateTime $dateTo)
     {
@@ -155,8 +152,6 @@ abstract class AbstractChart
     /**
      * Modify the date to add one current time unit to it and subtract 1 second.
      * Can be used to get the current day results.
-     *
-     * @param \DateTime $date
      */
     public function addOneUnitMinusOneSec(\DateTime &$date)
     {
@@ -228,13 +223,15 @@ abstract class AbstractChart
         if ($dayDiff <= 1) {
             $unit = 'H';
 
+            $sameDay    = $dateTo->format('d') == $dateFrom->format('d') ? 1 : 0;
+            $hourDiff   = $dateTo->diff($dateFrom)->format('%h');
             $minuteDiff = $dateTo->diff($dateFrom)->format('%i');
-            if ($minuteDiff <= 60) {
+            if ($sameDay && !intval($hourDiff) && intval($minuteDiff)) {
                 $unit = 'i';
             }
             $secondDiff = $dateTo->diff($dateFrom)->format('%s');
-            if ($minuteDiff < 1 && $secondDiff <= 60) {
-                $unit = 's';
+            if (!intval($minuteDiff) && intval($secondDiff)) {
+                $unit = 'i';
             }
         }
         if ($dayDiff > 31) {

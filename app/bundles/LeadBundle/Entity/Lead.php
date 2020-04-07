@@ -17,14 +17,12 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\NotificationBundle\Entity\PushID;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 
-/**
- * Class Lead.
- */
 class Lead extends FormEntity implements CustomFieldEntityInterface
 {
     use CustomFieldEntityTrait;
@@ -123,7 +121,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $country;
 
     /**
-     * @var \Mautic\UserBundle\Entity\User
+     * @var User
      */
     private $owner;
 
@@ -140,7 +138,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * @var int|null
      */
-    private $updatedPoints = null;
+    private $updatedPoints;
 
     /**
      * @var ArrayCollection
@@ -150,7 +148,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * @var null
      */
-    private $actualPoints = null;
+    private $actualPoints;
 
     /**
      * @var ArrayCollection
@@ -200,6 +198,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $color;
 
     /**
+     * @var LeadManipulator
+     */
+    private $manipulator;
+
+    /**
      * Sets if the IP was just created by LeadModel::getCurrentLead().
      *
      * @var bool
@@ -232,7 +235,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $tags;
 
     /**
-     * @var \Mautic\StageBundle\Entity\Stage
+     * @var Stage
      */
     private $stage;
 
@@ -247,7 +250,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $utmtags;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\FrequencyRule[]
+     * @var FrequencyRule[]
      */
     private $frequencyRules;
 
@@ -263,9 +266,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     private $channelRules = [];
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->ipAddresses      = new ArrayCollection();
@@ -279,9 +279,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         $this->companyChangeLog = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -292,12 +289,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->addLifecycleEvent('checkDateIdentified', 'prePersist')
             ->addLifecycleEvent('checkAttributionDate', 'preUpdate')
             ->addLifecycleEvent('checkAttributionDate', 'prePersist')
-            ->addIndex(['date_added'], 'lead_date_added');
+            ->addLifecycleEvent('checkDateAdded', 'prePersist')
+            ->addIndex(['date_added'], 'lead_date_added')
+            ->addIndex(['date_identified'], 'date_identified');
 
-        $builder->createField('id', 'integer')
-            ->makePrimaryKey()
-            ->generatedValue()
-            ->build();
+        $builder->addBigIntIdField();
 
         $builder->createManyToOne('owner', 'Mautic\UserBundle\Entity\User')
             ->fetchLazy()
@@ -337,9 +333,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->addInverseJoinColumn('ip_id', 'id', false)
             ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
             ->setIndexBy('ipAddress')
+            ->cascadeDetach()
             ->cascadeMerge()
             ->cascadePersist()
-            ->cascadeDetach()
             ->build();
 
         $builder->createOneToMany('pushIds', 'Mautic\NotificationBundle\Entity\PushID')
@@ -521,8 +517,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     protected function isChanged($prop, $val, $oldValue = null)
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $oldValue !== null ? $oldValue : $this->$getter();
-        if ($prop == 'owner') {
+        $current = null !== $oldValue ? $oldValue : $this->$getter();
+        if ('owner' == $prop) {
             if ($current && !$val) {
                 $this->changes['owner'] = [$current->getId(), $val];
             } elseif (!$current && $val) {
@@ -530,15 +526,21 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             } elseif ($current && $val && $current->getId() != $val->getId()) {
                 $this->changes['owner'] = [$current->getId(), $val->getId()];
             }
-        } elseif ($prop == 'ipAddresses') {
-            $this->changes['ipAddresses'] = ['', $val->getIpAddress()];
-        } elseif ($prop == 'tags') {
+        } elseif ('ipAddresses' == $prop) {
+            $this->changes['ipAddresses'] = ['', $val->getIpAddress()]; // Kept for BC. Not a good way to track changes on a collection
+
+            if (empty($this->changes['ipAddressList'])) {
+                $this->changes['ipAddressList'] = [];
+            }
+
+            $this->changes['ipAddressList'][$val->getIpAddress()] = $val;
+        } elseif ('tags' == $prop) {
             if ($val instanceof Tag) {
                 $this->changes['tags']['added'][] = $val->getTag();
             } else {
                 $this->changes['tags']['removed'][] = $val;
             }
-        } elseif ($prop == 'utmtags') {
+        } elseif ('utmtags' == $prop) {
             if ($val instanceof UtmTag) {
                 if ($val->getUtmContent()) {
                     $this->changes['utmtags'] = ['utm_content', $val->getUtmContent()];
@@ -556,7 +558,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                     $this->changes['utmtags'] = ['utm_source', $val->getUtmSource()];
                 }
             }
-        } elseif ($prop == 'frequencyRules') {
+        } elseif ('frequencyRules' == $prop) {
             if (!isset($this->changes['frequencyRules'])) {
                 $this->changes['frequencyRules'] = [];
             }
@@ -568,7 +570,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             } else {
                 $this->changes['frequencyRules']['removed'][] = $val;
             }
-        } elseif ($prop == 'stage') {
+        } elseif ('stage' == $prop) {
             if ($current && !$val) {
                 $this->changes['stage'] = [$current->getId(), $val];
             } elseif (!$current && $val) {
@@ -576,7 +578,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             } elseif ($current && $val && $current->getId() != $val->getId()) {
                 $this->changes['stage'] = [$current->getId(), $val->getId()];
             }
-        } elseif ($prop == 'points' && $current != $val) {
+        } elseif ('points' == $prop && $current != $val) {
             $this->changes['points'] = [$current, $val];
         } else {
             parent::isChanged($prop, $val);
@@ -653,8 +655,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * Add ipAddress.
      *
-     * @param IpAddress $ipAddress
-     *
      * @return Lead
      */
     public function addIpAddress(IpAddress $ipAddress)
@@ -674,8 +674,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
     /**
      * Remove ipAddress.
-     *
-     * @param IpAddress $ipAddress
      */
     public function removeIpAddress(IpAddress $ipAddress)
     {
@@ -923,15 +921,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * Creates a points change entry.
      *
-     * @param           $type
-     * @param           $name
-     * @param           $action
-     * @param           $pointChanges
-     * @param IpAddress $ip
+     * @param $type
+     * @param $name
+     * @param $action
+     * @param $pointChanges
      */
     public function addPointsChangeLogEntry($type, $name, $action, $pointChanges, IpAddress $ip)
     {
-        if ($pointChanges === 0) {
+        if (0 === $pointChanges) {
             // No need to record no change
             return;
         }
@@ -950,8 +947,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
     /**
      * Add pointsChangeLog.
-     *
-     * @param PointsChangeLog $pointsChangeLog
      *
      * @return Lead
      */
@@ -984,8 +979,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * Add StagesChangeLog.
      *
-     * @param StagesChangeLog $stageChangeLog
-     *
      * @return Lead
      */
     public function stageChangeLog(StagesChangeLog $stageChangeLog)
@@ -996,9 +989,15 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
+     * @return StagesChangeLog
+     */
+    public function getStageChangeLog()
+    {
+        return $this->stageChangeLog;
+    }
+
+    /**
      * Remove pointsChangeLog.
-     *
-     * @param PointsChangeLog $pointsChangeLog
      */
     public function removePointsChangeLog(PointsChangeLog $pointsChangeLog)
     {
@@ -1042,8 +1041,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * Add Company ChangeLog.
      *
-     * @param CompanyChangeLog $companyChangeLog
-     *
      * @return Lead
      */
     public function addCompanyChangeLog(CompanyChangeLog $companyChangeLog)
@@ -1051,6 +1048,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         $this->companyChangeLog[] = $companyChangeLog;
 
         return $this;
+    }
+
+    /**
+     * @return CompanyChangeLog
+     */
+    public function getCompanyChangeLog()
+    {
+        return $this->companyChangeLog;
     }
 
     /**
@@ -1089,8 +1094,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param PushID $pushID
-     *
      * @return $this
      */
     public function addPushID(PushID $pushID)
@@ -1100,9 +1103,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         return $this;
     }
 
-    /**
-     * @param PushID $pushID
-     */
     public function removePushID(PushID $pushID)
     {
         $this->pushIds->removeElement($pushID);
@@ -1117,8 +1117,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param LeadEventLog $eventLog
-     *
      * @return $this
      */
     public function addEventLog(LeadEventLog $log)
@@ -1129,17 +1127,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         return $this;
     }
 
-    /**
-     * @param LeadEventLog $eventLog
-     */
     public function removeEventLog(LeadEventLog $eventLog)
     {
         $this->eventLog->removeElement($eventLog);
     }
 
     /**
-     * @param DoNotContact $doNotContact
-     *
      * @return $this
      */
     public function addDoNotContactEntry(DoNotContact $doNotContact)
@@ -1149,29 +1142,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             'comments' => $doNotContact->getComments(),
         ];
 
-        // @deprecated - to be removed in 2.0
-        switch ($doNotContact->getReason()) {
-            case DoNotContact::BOUNCED:
-                $type = 'bounced';
-                break;
-            case DoNotContact::MANUAL:
-                $type = 'manual';
-                break;
-            case DoNotContact::UNSUBSCRIBED:
-            default:
-                $type = 'unsubscribed';
-                break;
-        }
-        $this->changes['dnc_status'] = [$type, $doNotContact->getComments()];
-
         $this->doNotContact[$doNotContact->getChannel()] = $doNotContact;
 
         return $this;
     }
 
-    /**
-     * @param DoNotContact $doNotContact
-     */
     public function removeDoNotContactEntry(DoNotContact $doNotContact)
     {
         $this->changes['dnc_channel_status'][$doNotContact->getChannel()] = [
@@ -1179,9 +1154,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             'old_reason' => $doNotContact->getReason(),
             'comments'   => $doNotContact->getComments(),
         ];
-
-        // @deprecated to be removed in 2.0
-        $this->changes['dnc_status'] = ['removed', $doNotContact->getComments()];
 
         $this->doNotContact->removeElement($doNotContact);
     }
@@ -1267,6 +1239,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * @return bool
      */
+    public function wasAnonymous()
+    {
+        return null == $this->dateIdentified && false === $this->isAnonymous();
+    }
+
+    /**
+     * @return bool
+     */
     protected function getFirstSocialIdentity()
     {
         if (isset($this->fields['social'])) {
@@ -1284,6 +1264,24 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         }
 
         return false;
+    }
+
+    /**
+     * @return self
+     */
+    public function setManipulator(LeadManipulator $manipulator = null)
+    {
+        $this->manipulator = $manipulator;
+
+        return $this;
+    }
+
+    /**
+     * @return LeadManipulator|null
+     */
+    public function getManipulator()
+    {
+        return $this->manipulator;
     }
 
     /**
@@ -1360,9 +1358,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         $this->lastActive                = $lastActive;
     }
 
-    /**
-     * @param array $availableSocialFields
-     */
     public function setAvailableSocialFields(array $availableSocialFields)
     {
         $this->availableSocialFields = $availableSocialFields;
@@ -1370,8 +1365,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
     /**
      * Add tag.
-     *
-     * @param Tag $tag
      *
      * @return Lead
      */
@@ -1385,8 +1378,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
     /**
      * Remove tag.
-     *
-     * @param Tag $tag
      */
     public function removeTag(Tag $tag)
     {
@@ -1443,9 +1434,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         return $this;
     }
 
-    /**
-     * @param UtmTag $utmTag
-     */
     public function removeUtmTagEntry(UtmTag $utmTag)
     {
         $this->changes['utmtags'] = ['removed', 'UtmTagID:'.$utmTag->getId()];
@@ -1503,8 +1491,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
     /**
      * Remove frequencyRule.
-     *
-     * @param FrequencyRule $frequencyRule
      */
     public function removeFrequencyRule(FrequencyRule $frequencyRule)
     {
@@ -1514,8 +1500,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
     /**
      * Add frequency rule.
-     *
-     * @param FrequencyRule $frequencyRule
      */
     public function addFrequencyRule(FrequencyRule $frequencyRule)
     {
@@ -1553,9 +1537,19 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function checkDateIdentified()
     {
-        if ($this->dateIdentified == null && $this->isAnonymous() === false) {
+        if ($this->wasAnonymous()) {
             $this->dateIdentified            = new \DateTime();
             $this->changes['dateIdentified'] = ['', $this->dateIdentified];
+        }
+    }
+
+    /**
+     * Set date added if not already set.
+     */
+    public function checkDateAdded()
+    {
+        if (null === $this->getDateAdded()) {
+            $this->setDateAdded(new \DateTime());
         }
     }
 
@@ -1703,6 +1697,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         $this->mobile = $mobile;
 
         return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLeadPhoneNumber()
+    {
+        return $this->getMobile() ?: $this->getPhone();
     }
 
     /**
@@ -1917,8 +1919,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param array $rules
-     *
      * @return $this
      */
     public function setChannelRules(array $rules)
@@ -1930,9 +1930,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
     /**
      * Used mostly when batching to generate preferred channels without hydrating associations one at a time.
-     *
-     * @param array $frequencyRules
-     * @param array $dncRules
      */
     public static function generateChannelRules(array $frequencyRules, array $dncRules)
     {

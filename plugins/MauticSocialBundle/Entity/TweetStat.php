@@ -88,9 +88,6 @@ class TweetStat
      */
     private $responseDetails = [];
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -272,9 +269,6 @@ class TweetStat
         $this->retryCount = $retryCount;
     }
 
-    /**
-     * @param mixed $retryCount
-     */
     public function retryCountUp()
     {
         $this->setRetryCount($this->getRetryCount() + 1);

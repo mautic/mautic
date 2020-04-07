@@ -24,8 +24,6 @@ interface CallbackTransportInterface
 
     /**
      * Processes the response.
-     *
-     * @param Request $request
      */
     public function processCallbackRequest(Request $request);
 }

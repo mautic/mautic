@@ -11,25 +11,32 @@
 
 namespace Mautic\ReportBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
+use DateTimeImmutable;
+use DateTimeZone;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ReportBundle\Entity\Report;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
-/**
- * Class ReportApiController.
- */
 class ReportApiController extends CommonApiController
 {
+    /**
+     * @var FormFactoryInterface
+     */
+    private $formFactory;
+
     /**
      * {@inheritdoc}
      */
     public function initialize(FilterControllerEvent $event)
     {
         $this->model            = $this->getModel('report');
-        $this->entityClass      = 'Mautic\ReportBundle\Entity\Report';
+        $this->entityClass      = Report::class;
         $this->entityNameOne    = 'report';
         $this->entityNameMulti  = 'reports';
         $this->serializerGroups = ['reportList', 'reportDetails'];
+        $this->formFactory      = $this->container->get('form.factory');
 
         parent::initialize($event);
     }
@@ -49,15 +56,46 @@ class ReportApiController extends CommonApiController
             return $this->notFound();
         }
 
-        $reportData = $this->model->getReportData($entity, $this->container->get('form.factory'), ['paginate' => false, 'ignoreGraphData' => true]);
+        $reportData = $this->model->getReportData($entity, $this->formFactory, $this->getOptionsFromRequest());
 
         // Unset keys that we don't need to send back
-        foreach (['graphs', 'contentTemplate', 'columns', 'limit'] as $key) {
+        foreach (['graphs', 'contentTemplate', 'columns'] as $key) {
             unset($reportData[$key]);
         }
 
-        $view = $this->view($reportData, Codes::HTTP_OK);
+        return $this->handleView(
+            $this->view($reportData, Response::HTTP_OK)
+        );
+    }
 
-        return $this->handleView($view);
+    /**
+     * This method is careful to add new options from the request to keep BC.
+     * It originally loaded all rows without any filter or pagination applied.
+     *
+     * @return array
+     */
+    private function getOptionsFromRequest()
+    {
+        $options = ['paginate'=> false, 'ignoreGraphData' => true];
+
+        if ($this->request->query->has('dateFrom')) {
+            $options['dateFrom'] = new DateTimeImmutable($this->request->query->get('dateFrom'), new DateTimeZone('UTC'));
+        }
+
+        if ($this->request->query->has('dateTo')) {
+            $options['dateTo']   = new DateTimeImmutable($this->request->query->get('dateTo'), new DateTimeZone('UTC'));
+        }
+
+        if ($this->request->query->has('page')) {
+            $options['page']     = $this->request->query->getInt('page');
+            $options['paginate'] = true;
+        }
+
+        if ($this->request->query->has('limit')) {
+            $options['limit']    = $this->request->query->getInt('limit');
+            $options['paginate'] = true;
+        }
+
+        return $options;
     }
 }

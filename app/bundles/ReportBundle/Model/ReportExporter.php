@@ -61,8 +61,6 @@ class ReportExporter
     }
 
     /**
-     * @param ExportOption $exportOption
-     *
      * @throws FileIOException
      */
     public function processExport(ExportOption $exportOption)
@@ -74,13 +72,34 @@ class ReportExporter
     }
 
     /**
-     * @param Scheduler $scheduler
-     *
      * @throws FileIOException
      */
     private function processReport(Scheduler $scheduler)
     {
         $report = $scheduler->getReport();
+
+        if (!is_null($scheduler->getScheduleDate())) {
+            /** @var /DateTime $dateTo */
+            $dateTo = clone $scheduler->getScheduleDate();
+            $dateTo->setTime(0, 0, 0);
+
+            $dateFrom = clone $dateTo;
+            switch ($report->getScheduleUnit()) {
+                case 'DAILY':
+                    $dateFrom->sub(new \DateInterval('P1D'));
+                    break;
+                case 'WEEKLY':
+                    $dateFrom->sub(new \DateInterval('P7D'));
+                    break;
+                case 'MONTHLY':
+                    $dateFrom->sub(new \DateInterval('P1M'));
+                    break;
+            }
+
+            $this->reportExportOptions->setDateFrom($dateFrom);
+            $this->reportExportOptions->setDateTo($dateTo->sub(new \DateInterval('PT1S')));
+        }
+
         $this->reportExportOptions->beginExport();
         while (true) {
             $data = $this->reportDataAdapter->getReportData($report, $this->reportExportOptions);
@@ -101,8 +120,6 @@ class ReportExporter
 
         $event = new ReportScheduleSendEvent($scheduler, $file);
         $this->eventDispatcher->dispatch(ReportEvents::REPORT_SCHEDULE_SEND, $event);
-
-        $this->reportFileWriter->clear($scheduler);
 
         $this->schedulerModel->reportWasScheduled($report);
     }

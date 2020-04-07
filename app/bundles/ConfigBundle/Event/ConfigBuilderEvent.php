@@ -12,12 +12,8 @@
 namespace Mautic\ConfigBundle\Event;
 
 use Mautic\CoreBundle\Helper\BundleHelper;
-use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\EventDispatcher\Event;
 
-/**
- * Class ConfigEvent.
- */
 class ConfigBuilderEvent extends Event
 {
     /**
@@ -33,11 +29,6 @@ class ConfigBuilderEvent extends Event
     ];
 
     /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
-
-    /**
      * @var BundleHelper
      */
     private $bundleHelper;
@@ -47,22 +38,13 @@ class ConfigBuilderEvent extends Event
      */
     protected $encodedFields = [];
 
-    /**
-     * ConfigBuilderEvent constructor.
-     *
-     * @param PathsHelper  $pathsHelper
-     * @param BundleHelper $bundleHelper
-     */
-    public function __construct(PathsHelper $pathsHelper, BundleHelper $bundleHelper)
+    public function __construct(BundleHelper $bundleHelper)
     {
-        $this->pathsHelper  = $pathsHelper;
         $this->bundleHelper = $bundleHelper;
     }
 
     /**
      * Set new form to the forms array.
-     *
-     * @param array $form
      *
      * @return $this
      */
@@ -116,37 +98,8 @@ class ConfigBuilderEvent extends Event
     }
 
     /**
-     * Helper method can load $parameters array from a config file.
+     * Get default parameters from config defined in bundles.
      *
-     * @param string $path (relative from the root dir)
-     *
-     * @return array
-     */
-    public function getParameters($path = null)
-    {
-        $paramsFile = $this->pathsHelper->getSystemPath('app').$path;
-
-        if (file_exists($paramsFile)) {
-            // Import the bundle configuration, $parameters is defined in this file
-            include $paramsFile;
-        }
-
-        if (!isset($parameters)) {
-            $parameters = [];
-        }
-
-        $fields     = $this->getBase64EncodedFields();
-        $checkThese = array_intersect(array_keys($parameters), $fields);
-        foreach ($checkThese as $checkMe) {
-            if (!empty($parameters[$checkMe])) {
-                $parameters[$checkMe] = base64_decode($parameters[$checkMe]);
-            }
-        }
-
-        return $parameters;
-    }
-
-    /**
      * @param $bundle
      *
      * @return array

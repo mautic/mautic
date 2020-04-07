@@ -62,14 +62,13 @@ final class ChannelEvents
     const PROCESS_MESSAGE_QUEUE_BATCH = 'mautic.process_message_queue_batch';
 
     /**
-     * The mautic.channel.on_campaign_trigger_action event is fired when the campaign action triggers.
+     * The mautic.channel.on_campaign_batch_action event is dispatched when the campaign action triggers.
      *
-     * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     * The event listener receives a Mautic\CampaignBundle\Event\PendingEvent
      *
      * @var string
      */
-    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.channel.on_campaign_trigger_action';
+    const ON_CAMPAIGN_BATCH_ACTION = 'mautic.channel.on_campaign_batch_action';
 
     /**
      * The mautic.message_pre_save event is dispatched right before a form is persisted.

@@ -20,8 +20,8 @@
 } ?>
         <li class="media">
             <div class="media-object pull-left">
-                <span class="figure featured <?php echo ($log['action'] == 'create') ? 'bg-success' : ''; ?>">
-                    <span class="fa <?php echo isset($icons[$log['bundle']]) ? $icons[$log['bundle']] : '' ?>"></span>
+                <span class="figure featured <?php echo ('create' == $log['action']) ? 'bg-success' : ''; ?>">
+                    <span class="fa <?php echo isset($icons[$log['bundle']]) ? $icons[$log['bundle']] : ''; ?>"></span>
                 </span>
             </div>
             <div class="media-body">
@@ -40,8 +40,8 @@
                 <a href="<?php echo $log['route']; ?>" data-toggle="ajax">
                     <?php echo $log['objectName']; ?>
                 </a>
-                <?php else: ?>
-                <?php echo $log['objectName']; ?>
+                <?php elseif (!empty($log['objectName'])): ?>
+                    <?php echo $log['objectName']; ?>
                 <?php endif; ?>
                 <?php echo $log['object']; ?>
                 <p class="fs-12 dark-sm"><small> <?php echo $view['date']->toFull($log['dateAdded']); ?></small></p>

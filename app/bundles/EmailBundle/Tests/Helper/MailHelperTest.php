@@ -23,7 +23,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
 
-class MailHelperTest extends \PHPUnit_Framework_TestCase
+class MailHelperTest extends \PHPUnit\Framework\TestCase
 {
     protected $contacts = [
         [
@@ -56,7 +56,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         ],
     ];
 
-    public function setUp()
+    protected function setUp()
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
     }
@@ -149,7 +149,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $from = $mailer->message->getFrom();
 
         $this->assertTrue(array_key_exists('override@nowhere.com', $from));
-        $this->assertTrue(count($from) === 1);
+        $this->assertTrue(1 === count($from));
 
         $mailer->reset();
         foreach ($this->contacts as $contact) {
@@ -161,7 +161,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $from = $mailer->message->getFrom();
 
         $this->assertTrue(array_key_exists('nobody@nowhere.com', $from));
-        $this->assertTrue(count($from) === 1);
+        $this->assertTrue(1 === count($from));
     }
 
     public function testBatchMode()
@@ -251,6 +251,38 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
 
         // Validate that the message object only has the contacts for the last "from" group to ensure we aren't sending duplicates
         $this->assertEquals(['contact3@somewhere.com' => null], $mailer->message->getTo());
+    }
+
+    public function testMailAsOwnerWithEncodedCharactersInName()
+    {
+        $mockFactory = $this->getMockFactory();
+
+        $transport   = new BatchTransport();
+        $swiftMailer = new \Swift_Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body&#39;s Business']);
+        $mailer->enableQueue();
+
+        $mailer->setSubject('Hello');
+
+        $contacts                = $this->contacts;
+        $contacts[3]['owner_id'] = 3;
+
+        foreach ($contacts as $contact) {
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->queue();
+        }
+
+        $mailer->flushQueue([]);
+
+        $fromAddresses = $transport->getFromAddresses();
+        $fromNames     = $transport->getFromNames();
+
+        $this->assertEquals(4, count($fromAddresses));
+        $this->assertEquals(4, count($fromNames));
+        $this->assertEquals(['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com', 'owner3@owner.com'], $fromAddresses);
+        $this->assertEquals([null, "No Body's Business", null, "John S'mith"], $fromNames);
     }
 
     public function testBatchIsEnabledWithBcTokenInterface()
@@ -351,7 +383,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
 
         foreach ($addresses as $address) {
             // will throw Swift_RfcComplianceException if it will find the address invalid
-            $helper::validateEmail($address);
+            $this->assertNull($helper::validateEmail($address));
         }
     }
 
@@ -467,6 +499,97 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGlobalHeadersAreSet()
+    {
+        $parameterMap = [
+            ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
+        ];
+        $mockFactory = $this->getMockFactory(true, $parameterMap);
+
+        $transport   = new SmtpTransport();
+        $swiftMailer = new \Swift_Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer->setBody('{signature}');
+        $mailer->addTo($this->contacts[0]['email']);
+        $mailer->send();
+
+        $customHeadersFounds = [];
+
+        /** @var \Swift_Mime_Headers_ParameterizedHeader[] $headers */
+        $headers = $mailer->message->getHeaders()->getAll();
+        foreach ($headers as $header) {
+            if (false !== strpos($header->getFieldName(), 'X-Mautic-Test')) {
+                $customHeadersFounds[] = $header->getFieldName();
+
+                $this->assertEquals('test', $header->getValue());
+            }
+        }
+
+        $this->assertCount(2, $customHeadersFounds);
+    }
+
+    public function testGlobalHeadersAreIgnoredIfEmailEntityIsSet()
+    {
+        $parameterMap = [
+            ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
+        ];
+        $mockFactory = $this->getMockFactory(true, $parameterMap);
+
+        $transport   = new SmtpTransport();
+        $swiftMailer = new \Swift_Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer->addTo($this->contacts[0]['email']);
+
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('{signature}');
+        $mailer->setEmail($email);
+        $mailer->send();
+
+        /** @var \Swift_Mime_Headers_ParameterizedHeader[] $headers */
+        $headers = $mailer->message->getHeaders()->getAll();
+        foreach ($headers as $header) {
+            $this->assertFalse(strpos($header->getFieldName(), 'X-Mautic-Test'), 'System headers were not supposed to be set');
+        }
+    }
+
+    public function testEmailHeadersAreSet()
+    {
+        $parameterMap = [
+            ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
+        ];
+        $mockFactory = $this->getMockFactory(true, $parameterMap);
+
+        $transport   = new SmtpTransport();
+        $swiftMailer = new \Swift_Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer->addTo($this->contacts[0]['email']);
+
+        $email = new Email();
+        $email->setSubject('Test');
+        $email->setCustomHtml('{signature}');
+        $email->setHeaders(['X-Mautic-Test3' => 'test2', 'X-Mautic-Test4' => 'test2']);
+        $mailer->setEmail($email);
+        $mailer->send();
+
+        $customHeadersFounds = [];
+
+        /** @var \Swift_Mime_Headers_ParameterizedHeader[] $headers */
+        $headers = $mailer->message->getHeaders()->getAll();
+        foreach ($headers as $header) {
+            if (false !== strpos($header->getFieldName(), 'X-Mautic-Test')) {
+                $customHeadersFounds[] = $header->getFieldName();
+
+                $this->assertEquals('test2', $header->getValue());
+            }
+        }
+
+        $this->assertCount(2, $customHeadersFounds);
+    }
+
     protected function mockEmptyMailHelper($useSmtp = true)
     {
         $mockFactory = $this->getMockFactory();
@@ -476,7 +599,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         return new MailHelper($mockFactory, $swiftMailer);
     }
 
-    protected function getMockFactory($mailIsOwner = true)
+    protected function getMockFactory($mailIsOwner = true, $parameterMap = [])
     {
         $mockLeadRepository = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
@@ -488,6 +611,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
                     [
                         [1, ['id' => 1, 'email' => 'owner1@owner.com', 'first_name' => '', 'last_name' => '', 'signature' => 'owner 1']],
                         [2, ['id' => 2, 'email' => 'owner2@owner.com', 'first_name' => '', 'last_name' => '', 'signature' => 'owner 2']],
+                        [3, ['id' => 3, 'email' => 'owner3@owner.com', 'first_name' => 'John', 'last_name' => 'S&#39;mith', 'signature' => 'owner 2']],
                     ]
                 )
             );
@@ -502,15 +626,19 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $mockFactory = $this->getMockBuilder(MauticFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $parameterMap = array_merge(
+            [
+                ['mailer_return_path', false, null],
+                ['mailer_spool_type', false, 'memory'],
+                ['mailer_is_owner', false, $mailIsOwner],
+            ],
+            $parameterMap
+        );
+
         $mockFactory->method('getParameter')
             ->will(
-                $this->returnValueMap(
-                    [
-                        ['mailer_return_path', false, null],
-                        ['mailer_spool_type', false, 'memory'],
-                        ['mailer_is_owner', false, $mailIsOwner],
-                    ]
-                )
+                $this->returnValueMap($parameterMap)
             );
         $mockFactory->method('getModel')
             ->will(
@@ -543,5 +671,35 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
             );
 
         return $mockFactory;
+    }
+
+    public function testArrayOfAddressesAreRemappedIntoEmailToNameKeyValuePair()
+    {
+        $mockFactory = $this->getMockBuilder(MauticFactory::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mockFactory->method('getParameter')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['mailer_return_path', false, null],
+                        ['mailer_spool_type', false, 'memory'],
+                    ]
+                )
+            );
+
+        $swiftMailer = new \Swift_Mailer(new SmtpTransport());
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+
+        $mailer->setTo(['sombody@somewhere.com', 'sombodyelse@somewhere.com'], 'test');
+
+        $this->assertEquals(
+            [
+                'sombody@somewhere.com'     => 'test',
+                'sombodyelse@somewhere.com' => 'test',
+            ],
+            $mailer->message->getTo()
+        );
     }
 }

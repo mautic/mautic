@@ -10,7 +10,7 @@
  */
 
 $view['slots']->set('headerTitle', $view['translator']->trans('mautic.campaign.campaigns'));
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticCoreBundle:Standard:index.html.php');
 }
 
@@ -28,7 +28,8 @@ if ($tmpl == 'index') {
                         'target'          => '#campaignTable',
                         'routeBase'       => 'campaign',
                         'templateButtons' => [
-                            'delete' => $permissions['campaign:campaigns:delete'],
+                            'delete' => $permissions['campaign:campaigns:deleteown']
+                            || $permissions['campaign:campaigns:deleteother'],
                         ],
                     ]
                 );
@@ -77,9 +78,18 @@ if ($tmpl == 'index') {
                             [
                                 'item'            => $item,
                                 'templateButtons' => [
-                                    'edit'   => $permissions['campaign:campaigns:edit'],
+                                    'edit'   => $view['security']->hasEntityAccess(
+                                        $permissions['campaign:campaigns:editown'],
+                                        $permissions['campaign:campaigns:editother'],
+                                        $item->getCreatedBy()
+                                    ),
                                     'clone'  => $permissions['campaign:campaigns:create'],
-                                    'delete' => $permissions['campaign:campaigns:delete'],
+
+                                    'delete'   => $view['security']->hasEntityAccess(
+                                        $permissions['campaign:campaigns:deleteown'],
+                                        $permissions['campaign:campaigns:deleteother'],
+                                        $item->getCreatedBy()
+                                    ),
                                 ],
                                 'routeBase' => 'campaign',
                             ]

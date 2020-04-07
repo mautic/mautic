@@ -129,7 +129,7 @@ class SubmissionApiController extends CommonApiController
             return $this->notFound();
         }
 
-        if (!$this->checkEntityAccess($form, 'view')) {
+        if (!$this->checkEntityAccess($form)) {
             return $this->accessDenied();
         }
 

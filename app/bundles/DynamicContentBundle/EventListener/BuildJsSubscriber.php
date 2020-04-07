@@ -13,38 +13,45 @@ namespace Mautic\DynamicContentBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
-use Mautic\FormBundle\Model\FormModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class BuildJsSubscriber.
- */
-class BuildJsSubscriber extends CommonSubscriber
+class BuildJsSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var
-     */
-    protected $formModel;
-
     /**
      * @var AssetsHelper
      */
-    protected $assetsHelper;
+    private $assetsHelper;
 
     /**
-     * BuildJsSubscriber constructor.
-     *
-     * @param FormModel    $formModel
-     * @param AssetsHelper $assetsHelper
+     * @var TranslatorInterface
      */
+    private $translator;
+
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
     public function __construct(
-        FormModel $formModel,
-        AssetsHelper $assetsHelper)
-    {
-        $this->formModel    = $formModel;
+        AssetsHelper $assetsHelper,
+        TranslatorInterface $translator,
+        RequestStack $requestStack,
+        RouterInterface $router
+    ) {
         $this->assetsHelper = $assetsHelper;
+        $this->translator   = $translator;
+        $this->requestStack = $requestStack;
+        $this->router       = $router;
     }
 
     /**
@@ -61,8 +68,6 @@ class BuildJsSubscriber extends CommonSubscriber
      * Adds the MauticJS definition and core
      * JS functions for use in Bundles. This
      * must retain top priority of 1000.
-     *
-     * @param BuildJsEvent $event
      */
     public function onBuildJs(BuildJsEvent $event)
     {
@@ -72,7 +77,7 @@ class BuildJsSubscriber extends CommonSubscriber
         
            // call variable if doesnt exist
             if (typeof MauticDomain == 'undefined') {
-                var MauticDomain = '{$this->request->getSchemeAndHttpHost()}';
+                var MauticDomain = '{$this->requestStack->getCurrentRequest()->getSchemeAndHttpHost()}';
             }            
             if (typeof MauticLang == 'undefined') {
                 var MauticLang = {

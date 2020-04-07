@@ -48,7 +48,6 @@ class PageHitEvent extends CommonEvent
     /**
      * PageHitEvent constructor.
      *
-     * @param Hit   $hit
      * @param       $request
      * @param       $code
      * @param array $clickthrough

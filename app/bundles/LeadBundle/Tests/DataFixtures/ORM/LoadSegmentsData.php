@@ -15,30 +15,30 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\LeadBundle\Entity\LeadList;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\ListModel;
 
-/**
- * Class LoadSegmentsData.
- */
-class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
-     * @var ContainerInterface
+     * @var ListModel
      */
-    private $container;
+    private $listModel;
+
+    /**
+     * @var LeadModel
+     */
+    private $contactModel;
 
     /**
      * {@inheritdoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function __construct(ListModel $listModel, LeadModel $contactModel)
     {
-        $this->container = $container;
+        $this->listModel    = $listModel;
+        $this->contactModel = $contactModel;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $segments = [
@@ -486,6 +486,361 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => true,
             ],
+            [ // ID 26
+                'name'    => 'Segment with relative date - today',
+                'alias'   => 'segment-with-relative-date-today',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'datetime',
+                        'object'   => 'lead',
+                        'field'    => 'date_identified',
+                        'operator' => '=',
+                        'filter'   => 'today',
+                        'display'  => null,
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'lead',
+                        'field'    => 'lastname',
+                        'operator' => '=',
+                        'filter'   => 'Date',
+                        'display'  => null,
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 27
+                'name'    => 'Segment with relative date - tomorrow',
+                'alias'   => 'segment-with-relative-date-tomorrow',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'datetime',
+                        'object'   => 'lead',
+                        'field'    => 'date_identified',
+                        'operator' => '=',
+                        'filter'   => 'tomorrow',
+                        'display'  => null,
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'lead',
+                        'field'    => 'lastname',
+                        'operator' => '=',
+                        'filter'   => 'Date',
+                        'display'  => null,
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 28
+                'name'    => 'Segment with relative date - yesterday',
+                'alias'   => 'segment-with-relative-date-yesterday',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'datetime',
+                        'object'   => 'lead',
+                        'field'    => 'date_identified',
+                        'operator' => '=',
+                        'filter'   => 'yesterday',
+                        'display'  => null,
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'lead',
+                        'field'    => 'lastname',
+                        'operator' => '=',
+                        'filter'   => 'Date',
+                        'display'  => null,
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 29
+                'name'    => 'Segment with relative date - last week',
+                'alias'   => 'segment-with-relative-date-last-week',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'datetime',
+                        'object'   => 'lead',
+                        'field'    => 'date_identified',
+                        'operator' => '=',
+                        'filter'   => 'last week',
+                        'display'  => null,
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'lead',
+                        'field'    => 'lastname',
+                        'operator' => '=',
+                        'filter'   => 'Date',
+                        'display'  => null,
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 30
+                'name'    => 'Segment with relative date - next week',
+                'alias'   => 'segment-with-relative-date-next-week',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'datetime',
+                        'object'   => 'lead',
+                        'field'    => 'date_identified',
+                        'operator' => '=',
+                        'filter'   => 'next week',
+                        'display'  => null,
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'lead',
+                        'field'    => 'lastname',
+                        'operator' => '=',
+                        'filter'   => 'Date',
+                        'display'  => null,
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 31
+                'name'    => 'Segment with relative date - this week',
+                'alias'   => 'segment-with-relative-date-this-week',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'datetime',
+                        'object'   => 'lead',
+                        'field'    => 'date_identified',
+                        'operator' => '=',
+                        'filter'   => 'this week',
+                        'display'  => null,
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'lead',
+                        'field'    => 'lastname',
+                        'operator' => '=',
+                        'filter'   => 'Date',
+                        'display'  => null,
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 32
+                'name'    => 'Segment with relative date - last month',
+                'alias'   => 'segment-with-relative-date-last-month',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'datetime',
+                        'object'   => 'lead',
+                        'field'    => 'date_identified',
+                        'operator' => '=',
+                        'filter'   => 'last month',
+                        'display'  => null,
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'lead',
+                        'field'    => 'lastname',
+                        'operator' => '=',
+                        'filter'   => 'Date',
+                        'display'  => null,
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 33
+                'name'    => 'Segment with relative date - next month',
+                'alias'   => 'segment-with-relative-date-next-month',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'datetime',
+                        'object'   => 'lead',
+                        'field'    => 'date_identified',
+                        'operator' => '=',
+                        'filter'   => 'next month',
+                        'display'  => null,
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'lead',
+                        'field'    => 'lastname',
+                        'operator' => '=',
+                        'filter'   => 'Date',
+                        'display'  => null,
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 34
+                'name'    => 'Segment with relative date - this month',
+                'alias'   => 'segment-with-relative-date-this-month',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'datetime',
+                        'object'   => 'lead',
+                        'field'    => 'date_identified',
+                        'operator' => '=',
+                        'filter'   => 'this month',
+                        'display'  => null,
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'lead',
+                        'field'    => 'lastname',
+                        'operator' => '=',
+                        'filter'   => 'Date',
+                        'display'  => null,
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 35
+                'name'    => 'Segment with relative date - last year',
+                'alias'   => 'segment-with-relative-date-last-year',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'datetime',
+                        'object'   => 'lead',
+                        'field'    => 'date_identified',
+                        'operator' => '=',
+                        'filter'   => 'last year',
+                        'display'  => null,
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'lead',
+                        'field'    => 'lastname',
+                        'operator' => '=',
+                        'filter'   => 'Date',
+                        'display'  => null,
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 36
+                'name'    => 'Segment with relative date - next year',
+                'alias'   => 'segment-with-relative-date-next-year',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'datetime',
+                        'object'   => 'lead',
+                        'field'    => 'date_identified',
+                        'operator' => '=',
+                        'filter'   => 'next year',
+                        'display'  => null,
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'lead',
+                        'field'    => 'lastname',
+                        'operator' => '=',
+                        'filter'   => 'Date',
+                        'display'  => null,
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 37
+                'name'    => 'Segment with relative date - relative plus',
+                'alias'   => 'segment-with-relative-date-relative-plus',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'datetime',
+                        'object'   => 'lead',
+                        'field'    => 'date_identified',
+                        'operator' => '=',
+                        'filter'   => '+5 days',
+                        'display'  => null,
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'lead',
+                        'field'    => 'lastname',
+                        'operator' => '=',
+                        'filter'   => 'Date',
+                        'display'  => null,
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 38
+                'name'    => 'Segment with relative date - relative minus',
+                'alias'   => 'segment-with-relative-date-relative-minus',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'datetime',
+                        'object'   => 'lead',
+                        'field'    => 'date_identified',
+                        'operator' => '=',
+                        'filter'   => '-4 days',
+                        'display'  => null,
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'lead',
+                        'field'    => 'lastname',
+                        'operator' => '=',
+                        'filter'   => 'Date',
+                        'display'  => null,
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 39
+                'name'    => 'Name is not equal (not null test)',
+                'alias'   => 'name-is-not-equal-not-null-test',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'lead',
+                        'field'    => 'firstname',
+                        'operator' => '!=',
+                        'filter'   => 'xxxxx',
+                        'display'  => null,
+                    ],
+                ],
+                'populate' => false,
+            ],
         ];
 
         foreach ($segments as $segmentConfig) {
@@ -510,18 +865,18 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
         $manager->flush();
 
         if ($listConfig['populate']) {
-            $this->container->get('mautic.lead.model.list')->rebuildListLeads($list);
+            $this->listModel->rebuildListLeads($list);
         }
 
         if (!empty($listConfig['manually_add'])) {
             foreach ($listConfig['manually_add'] as $lead) {
-                $this->container->get('mautic.lead.model.lead')->addToLists($lead, $list);
+                $this->contactModel->addToLists($lead, $list);
             }
         }
 
         if (!empty($listConfig['manually_remove'])) {
             foreach ($listConfig['manually_remove'] as $lead) {
-                $this->container->get('mautic.lead.model.lead')->removeFromLists($lead, $list);
+                $this->contactModel->removeFromLists($lead, $list);
             }
         }
     }

@@ -13,35 +13,44 @@ namespace Mautic\ReportBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\ReportBundle\Model\ReportModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class SearchSubscriber.
- */
-class SearchSubscriber extends CommonSubscriber
+class SearchSubscriber implements EventSubscriberInterface
 {
     /**
      * @var UserHelper
      */
-    protected $userHelper;
+    private $userHelper;
 
     /**
      * @var ReportModel
      */
-    protected $reportModel;
+    private $reportModel;
 
     /**
-     * SearchSubscriber constructor.
-     *
-     * @param UserHelper  $userHelper
-     * @param ReportModel $reportModel
+     * @var CorePermissions
      */
-    public function __construct(UserHelper $userHelper, ReportModel $reportModel)
-    {
+    private $security;
+
+    /**
+     * @var TemplatingHelper
+     */
+    private $templating;
+
+    public function __construct(
+        UserHelper $userHelper,
+        ReportModel $reportModel,
+        CorePermissions $security,
+        TemplatingHelper $templating
+    ) {
         $this->userHelper  = $userHelper;
         $this->reportModel = $reportModel;
+        $this->security    = $security;
+        $this->templating  = $templating;
     }
 
     /**
@@ -55,9 +64,6 @@ class SearchSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param MauticEvents\GlobalSearchEvent $event
-     */
     public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
     {
         $str = $event->getSearchString();
@@ -91,13 +97,13 @@ class SearchSubscriber extends CommonSubscriber
                 $results = [];
 
                 foreach ($items as $item) {
-                    $results[] = $this->templating->renderResponse(
+                    $results[] = $this->templating->getTemplating()->renderResponse(
                         'MauticReportBundle:SubscribedEvents\Search:global.html.php',
                         ['item' => $item]
                     )->getContent();
                 }
                 if ($count > 5) {
-                    $results[] = $this->templating->renderResponse(
+                    $results[] = $this->templating->getTemplating()->renderResponse(
                         'MauticReportBundle:SubscribedEvents\Search:global.html.php',
                         [
                             'showMore'     => true,
@@ -112,9 +118,6 @@ class SearchSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param MauticEvents\CommandListEvent $event
-     */
     public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
         if ($this->security->isGranted(['report:reports:viewown', 'report:reports:viewother'], 'MATCH_ONE')) {

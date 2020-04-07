@@ -30,8 +30,7 @@ class ScheduleIsValidValidator extends ConstraintValidator
     }
 
     /**
-     * @param Report     $report
-     * @param Constraint $constraint
+     * @param Report $report
      */
     public function validate($report, Constraint $constraint)
     {

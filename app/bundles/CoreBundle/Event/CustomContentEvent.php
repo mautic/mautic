@@ -46,9 +46,8 @@ class CustomContentEvent extends Event
     /**
      * CustomContentEvent constructor.
      *
-     * @param       $viewName
-     * @param       $context
-     * @param array $vars
+     * @param $viewName
+     * @param $context
      */
     public function __construct($viewName, $context = null, array $vars = [])
     {
@@ -79,12 +78,14 @@ class CustomContentEvent extends Event
     }
 
     /**
-     * @param       $template
-     * @param array $vars
+     * @param $template
      */
     public function addTemplate($template, array $vars = [])
     {
-        $this->templates[$template] = $vars;
+        $this->templates[] = [
+            'template' => $template,
+            'vars'     => $vars,
+        ];
     }
 
     /**

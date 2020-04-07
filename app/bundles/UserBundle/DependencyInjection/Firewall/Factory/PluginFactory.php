@@ -20,11 +20,10 @@ use Symfony\Component\DependencyInjection\Reference;
 class PluginFactory implements SecurityFactoryInterface
 {
     /**
-     * @param ContainerBuilder $container
-     * @param                  $id
-     * @param                  $config
-     * @param                  $userProvider
-     * @param                  $defaultEntryPoint
+     * @param $id
+     * @param $config
+     * @param $userProvider
+     * @param $defaultEntryPoint
      *
      * @return array
      */
@@ -58,9 +57,6 @@ class PluginFactory implements SecurityFactoryInterface
         return 'mautic_plugin_auth';
     }
 
-    /**
-     * @param NodeDefinition $node
-     */
     public function addConfiguration(NodeDefinition $node)
     {
     }

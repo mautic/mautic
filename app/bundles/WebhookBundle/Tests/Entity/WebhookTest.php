@@ -13,7 +13,7 @@ namespace Mautic\WebhookBundle\Tests\Entity;
 
 use Mautic\WebhookBundle\Entity\Webhook;
 
-class WebhookTest extends \PHPUnit_Framework_TestCase
+class WebhookTest extends \PHPUnit\Framework\TestCase
 {
     public function testWasModifiedRecentlyWithNotModifiedWebhook()
     {

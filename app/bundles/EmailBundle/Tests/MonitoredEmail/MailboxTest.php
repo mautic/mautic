@@ -9,26 +9,48 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Tests;
+namespace Mautic\EmailBundle\Tests\MonitoredEmail;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 
-/**
- * Class Mailbox.
- */
-class MailboxTest extends \PHPUnit_Framework_TestCase
+class MailboxTest extends \PHPUnit\Framework\TestCase
 {
+    public function testConstructWithDefaultConfig()
+    {
+        $expected = [
+            'host'            => '',
+            'port'            => '',
+            'password'        => '',
+            'user'            => '',
+            'encryption'      => '',
+            'use_attachments' => false,
+        ];
+
+        $parametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $pathsHelper = $this->getMockBuilder(PathsHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mailbox = new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
+
+        $this->assertEquals($expected, $mailbox->getMailboxSettings());
+    }
+
     public function testSettingsForMonitoredEmailWithoutOverride()
     {
         $config = [
             'general' => [
-                'address'    => 'foo@bar.com',
-                'host'       => 'imap.bar.com',
-                'port'       => '993',
-                'encryption' => '/ssl',
-                'user'       => 'foo@bar.com',
-                'password'   => 'topsecret',
+                'address'         => 'foo@bar.com',
+                'host'            => 'imap.bar.com',
+                'port'            => '993',
+                'encryption'      => '/ssl',
+                'user'            => 'foo@bar.com',
+                'password'        => 'topsecret',
+                'use_attachments' => true,
             ],
             'EmailBundle_bounces' => [
                 'address'           => null,
@@ -46,7 +68,7 @@ class MailboxTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $parametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->will($this->returnValue($config));
 
         $pathsHelper = $this->getMockBuilder(PathsHelper::class)
@@ -69,12 +91,13 @@ class MailboxTest extends \PHPUnit_Framework_TestCase
     {
         $config = [
             'general' => [
-                'address'    => 'foo@bar.com',
-                'host'       => 'imap.bar.com',
-                'port'       => '993',
-                'encryption' => '/ssl',
-                'user'       => 'foo@bar.com',
-                'password'   => 'topsecret',
+                'address'         => 'foo@bar.com',
+                'host'            => 'imap.bar.com',
+                'port'            => '993',
+                'encryption'      => '/ssl',
+                'user'            => 'foo@bar.com',
+                'password'        => 'topsecret',
+                'use_attachments' => true,
             ],
             'EmailBundle_bounces' => [
                 'address'           => 'bar@foo.com',
@@ -92,7 +115,7 @@ class MailboxTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $parametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->will($this->returnValue($config));
 
         $pathsHelper = $this->getMockBuilder(PathsHelper::class)
@@ -109,5 +132,65 @@ class MailboxTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('folder', $settings);
         $this->assertEquals('INBOX', $settings['folder']);
         $this->assertEquals('bar@foo.com', $settings['address']);
+    }
+
+    public function testUseAttachments()
+    {
+        // Test undefined $this->settings['use_attachments']
+        // will not invoke undefined index error or mkdir error
+        $config = [
+            'general' => [
+                'address'         => 'foo@bar.com',
+                'host'            => 'imap.bar.com',
+                'port'            => '993',
+                'encryption'      => '/ssl',
+                'user'            => 'foo@bar.com',
+                'password'        => 'topsecret',
+            ],
+        ];
+
+        $parametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $parametersHelper->expects($this->once())
+            ->method('get')
+            ->will($this->returnValue($config));
+
+        $pathsHelper = $this->getMockBuilder(PathsHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
+
+        // Test $this->settings['use_attachments'] == true
+        // dir creation is not failing
+        $config = [
+            'general' => [
+                'address'         => 'foo@bar.com',
+                'host'            => 'imap.bar.com',
+                'port'            => '993',
+                'encryption'      => '/ssl',
+                'user'            => 'foo@bar.com',
+                'password'        => 'topsecret',
+                'use_attachments' => true,
+            ],
+        ];
+
+        $parametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $parametersHelper->expects($this->once())
+            ->method('get')
+            ->will($this->returnValue($config));
+
+        $pathsHelper = $this->getMockBuilder(PathsHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $pathsHelper->expects($this->once())
+            ->method('getSystemPath')
+            ->with('tmp', true)
+            ->will($this->returnValue(__DIR__.'/../../../../cache/tmp'));
+
+        new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
     }
 }

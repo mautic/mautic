@@ -11,7 +11,7 @@
 
 namespace Mautic\DynamicContentBundle\Helper;
 
-use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
@@ -27,9 +27,9 @@ class DynamicContentHelper
     use MatchFilterForLeadTrait;
 
     /**
-     * @var EventModel
+     * @var RealTimeExecutioner
      */
-    protected $campaignEventModel;
+    protected $realTimeExecutioner;
 
     /**
      * @var ContainerAwareEventDispatcher
@@ -41,17 +41,10 @@ class DynamicContentHelper
      */
     protected $dynamicContentModel;
 
-    /**
-     * DynamicContentHelper constructor.
-     *
-     * @param DynamicContentModel      $dynamicContentModel
-     * @param EventModel               $campaignEventModel
-     * @param EventDispatcherInterface $dispatcher
-     */
-    public function __construct(DynamicContentModel $dynamicContentModel, EventModel $campaignEventModel, EventDispatcherInterface $dispatcher)
+    public function __construct(DynamicContentModel $dynamicContentModel, RealTimeExecutioner $realTimeExecutioner, EventDispatcherInterface $dispatcher)
     {
         $this->dynamicContentModel = $dynamicContentModel;
-        $this->campaignEventModel  = $campaignEventModel;
+        $this->realTimeExecutioner = $realTimeExecutioner;
         $this->dispatcher          = $dispatcher;
     }
 
@@ -63,24 +56,26 @@ class DynamicContentHelper
      */
     public function getDynamicContentForLead($slot, $lead)
     {
-        $response = $this->campaignEventModel->triggerEvent('dwc.decision', $slot, 'dwc.decision.'.$slot);
-        $content  = '';
-
-        if (is_array($response) && !empty($response['action']['dwc.push_content'])) {
-            $content = array_shift($response['action']['dwc.push_content']);
-        } else {
-            $data = $this->dynamicContentModel->getSlotContentForLead($slot, $lead);
-
-            if (!empty($data)) {
-                $content = $data['content'];
-                $dwc     = $this->dynamicContentModel->getEntity($data['id']);
-                if ($dwc instanceof DynamicContent) {
-                    $content = $this->getRealDynamicContent($slot, $lead, $dwc);
-                }
-            }
+        // Attempt campaign slots first
+        $dwcActionResponse = $this->realTimeExecutioner->execute('dwc.decision', $slot, 'dynamicContent')->getActionResponses('dwc.push_content');
+        if (!empty($dwcActionResponse)) {
+            return array_shift($dwcActionResponse);
         }
 
-        return $content;
+        // Attempt stored content second
+        $data = $this->dynamicContentModel->getSlotContentForLead($slot, $lead);
+        if (!empty($data)) {
+            $content = $data['content'];
+            $dwc     = $this->dynamicContentModel->getEntity($data['id']);
+            if ($dwc instanceof DynamicContent) {
+                $content = $this->getRealDynamicContent($slot, $lead, $dwc);
+            }
+
+            return $content;
+        }
+
+        // Finally attempt standalone DWC
+        return $this->getDynamicContentSlotForLead($slot, $lead);
     }
 
     /**
@@ -95,6 +90,7 @@ class DynamicContentHelper
         if ($lead instanceof Lead) {
             $leadArray = $this->convertLeadToArray($lead);
         }
+
         $dwcs = $this->getDwcsBySlotName($slotName, true);
         /** @var DynamicContent $dwc */
         foreach ($dwcs as $dwc) {
@@ -102,9 +98,7 @@ class DynamicContentHelper
                 continue;
             }
             if ($lead && $this->matchFilterForLead($dwc->getFilters(), $leadArray)) {
-                $slotContent = $lead ? $this->getRealDynamicContent($dwc->getSlotName(), $lead, $dwc) : '';
-
-                return $slotContent;
+                return $lead ? $this->getRealDynamicContent($dwc->getSlotName(), $lead, $dwc) : '';
             }
         }
 

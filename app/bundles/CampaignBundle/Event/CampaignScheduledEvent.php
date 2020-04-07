@@ -16,9 +16,13 @@ use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class CampaignScheduledEvent.
+ *
+ * @deprecated 2.13.0; to be removed in 3.0
  */
 class CampaignScheduledEvent extends Event
 {
+    use EventArrayTrait;
+
     /**
      * @var \Mautic\LeadBundle\Entity\Lead
      */
@@ -28,11 +32,6 @@ class CampaignScheduledEvent extends Event
      * @var array
      */
     protected $event;
-
-    /**
-     * @var array
-     */
-    protected $config;
 
     /**
      * @var array
@@ -62,14 +61,12 @@ class CampaignScheduledEvent extends Event
     /**
      * CampaignScheduledEvent constructor.
      *
-     * @param                   $args
-     * @param LeadEventLog|null $log
+     * @param $args
      */
     public function __construct(array $args, LeadEventLog $log = null)
     {
         $this->lead            = $args['lead'];
         $this->event           = $args['event'];
-        $this->config          = $args['event']['properties'];
         $this->eventDetails    = $args['eventDetails'];
         $this->systemTriggered = $args['systemTriggered'];
         $this->dateScheduled   = $args['dateScheduled'];
@@ -91,7 +88,7 @@ class CampaignScheduledEvent extends Event
      */
     public function getEvent()
     {
-        return $this->event;
+        return ($this->event instanceof \Mautic\CampaignBundle\Entity\Event) ? $this->getEventArray($this->event) : $this->event;
     }
 
     /**
@@ -99,7 +96,7 @@ class CampaignScheduledEvent extends Event
      */
     public function getConfig()
     {
-        return $this->config;
+        return $this->getEvent()['properties'];
     }
 
     /**

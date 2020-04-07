@@ -56,6 +56,11 @@ class LeadList extends FormEntity
     private $isGlobal = true;
 
     /**
+     * @var bool
+     */
+    private $isPreferenceCenter = false;
+
+    /**
      * @var ArrayCollection
      */
     private $leads;
@@ -68,15 +73,12 @@ class LeadList extends FormEntity
         $this->leads = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_lists')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadListRepository');
+            ->setCustomRepositoryClass(LeadListRepository::class);
 
         $builder->addIdColumns();
 
@@ -88,6 +90,10 @@ class LeadList extends FormEntity
             ->columnName('is_global')
             ->build();
 
+        $builder->createField('isPreferenceCenter', 'boolean')
+            ->columnName('is_preference_center')
+            ->build();
+
         $builder->createOneToMany('leads', 'ListLead')
             ->setIndexBy('id')
             ->mappedBy('list')
@@ -95,9 +101,6 @@ class LeadList extends FormEntity
             ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
@@ -130,6 +133,7 @@ class LeadList extends FormEntity
                 [
                     'filters',
                     'isGlobal',
+                    'isPreferenceCenter',
                 ]
             )
             ->build();
@@ -197,8 +201,6 @@ class LeadList extends FormEntity
 
     /**
      * Set filters.
-     *
-     * @param array $filters
      *
      * @return LeadList
      */
@@ -288,5 +290,35 @@ class LeadList extends FormEntity
     public function getLeads()
     {
         return $this->leads;
+    }
+
+    /**
+     * Clone entity with empty contact list.
+     */
+    public function __clone()
+    {
+        parent::__clone();
+
+        $this->id    = null;
+        $this->leads = new ArrayCollection();
+        $this->setIsPublished(false);
+        $this->setAlias('');
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsPreferenceCenter()
+    {
+        return $this->isPreferenceCenter;
+    }
+
+    /**
+     * @param bool $isPreferenceCenter
+     */
+    public function setIsPreferenceCenter($isPreferenceCenter)
+    {
+        $this->isChanged('isPreferenceCenter', $isPreferenceCenter);
+        $this->isPreferenceCenter = $isPreferenceCenter;
     }
 }

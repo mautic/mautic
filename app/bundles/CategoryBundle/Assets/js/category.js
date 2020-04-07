@@ -12,6 +12,6 @@ Mautic.categoryOnLoad = function (container, response) {
         mQuery(".category-select option:last").prev().before(newOption);
         newOption.prop('selected', true);
 
-        mQuery('.category-select').trigger("chosen:updated");
+        mQuery('.category-select').val(response.categoryId).trigger("chosen:updated");
     }
 };

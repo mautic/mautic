@@ -16,6 +16,7 @@ use Mautic\EmailBundle\Swiftmailer\Transport\AbstractTokenArrayTransport;
 class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Transport
 {
     private $fromAddresses = [];
+    private $fromNames     = [];
     private $metadatas     = [];
     private $validate      = false;
     private $maxRecipients;
@@ -34,13 +35,15 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
     }
 
     /**
-     * @param \Swift_Mime_Message $message
-     * @param null                $failedRecipients
+     * @param null $failedRecipients
      */
-    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         $this->message         = $message;
-        $this->fromAddresses[] = key($message->getFrom());
+        $from                  = $message->getFrom();
+        $fromEmail             = key($from);
+        $this->fromAddresses[] = $fromEmail;
+        $this->fromNames[]     = $from[$fromEmail];
         $this->metadatas[]     = $this->getMetadata();
 
         $messageArray = $this->messageToArray();
@@ -69,15 +72,15 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
     }
 
     /**
-     * @param \Swift_Message $message
-     * @param int            $toBeAdded
-     * @param string         $type
+     * @param int    $toBeAdded
+     * @param string $type
      *
      * @return int
      */
     public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
     {
-        $toCount = count($message->getTo());
+        $to      = $message->getTo();
+        $toCount = (is_array($to) || $to instanceof \Countable) ? count($to) : 0;
 
         return ('to' === $type) ? $toCount + $toBeAdded : $toCount;
     }
@@ -91,10 +94,26 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
     }
 
     /**
+     * return array.
+     */
+    public function getFromNames()
+    {
+        return $this->fromNames;
+    }
+
+    /**
      * @return array
      */
     public function getMetadatas()
     {
         return $this->metadatas;
+    }
+
+    /**
+     * @return bool
+     */
+    public function ping()
+    {
+        return true;
     }
 }

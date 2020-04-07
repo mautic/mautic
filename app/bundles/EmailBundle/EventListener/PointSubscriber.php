@@ -11,34 +11,36 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Doctrine\ORM\EntityManager;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Form\Type\EmailOpenType;
+use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\EmailBundle\Form\Type\EmailToUserType;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\PointEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class PointSubscriber.
- */
-class PointSubscriber extends CommonSubscriber
+class PointSubscriber implements EventSubscriberInterface
 {
     /**
      * @var PointModel
      */
-    protected $pointModel;
+    private $pointModel;
 
     /**
-     * PointSubscriber constructor.
-     *
-     * @param PointModel $pointModel
+     * @var EntityManager
      */
-    public function __construct(PointModel $pointModel)
+    private $entityManager;
+
+    public function __construct(PointModel $pointModel, EntityManager $entityManager)
     {
-        $this->pointModel = $pointModel;
+        $this->pointModel    = $pointModel;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -54,16 +56,13 @@ class PointSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param PointBuilderEvent $event
-     */
     public function onPointBuild(PointBuilderEvent $event)
     {
         $action = [
             'group'    => 'mautic.email.actions',
             'label'    => 'mautic.email.point.action.open',
             'callback' => ['\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'validateEmail'],
-            'formType' => 'emailopen_list',
+            'formType' => EmailOpenType::class,
         ];
 
         $event->addAction('email.open', $action);
@@ -72,22 +71,19 @@ class PointSubscriber extends CommonSubscriber
             'group'    => 'mautic.email.actions',
             'label'    => 'mautic.email.point.action.send',
             'callback' => ['\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'validateEmail'],
-            'formType' => 'emailopen_list',
+            'formType' => EmailOpenType::class,
         ];
 
         $event->addAction('email.send', $action);
     }
 
-    /**
-     * @param TriggerBuilderEvent $event
-     */
     public function onTriggerBuild(TriggerBuilderEvent $event)
     {
         $sendEvent = [
             'group'           => 'mautic.email.point.trigger',
             'label'           => 'mautic.email.point.trigger.sendemail',
             'callback'        => ['\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'sendEmail'],
-            'formType'        => 'emailsend_list',
+            'formType'        => EmailSendType::class,
             'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_email'],
             'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
         ];
@@ -108,8 +104,6 @@ class PointSubscriber extends CommonSubscriber
 
     /**
      * Trigger point actions for email open.
-     *
-     * @param EmailOpenEvent $event
      */
     public function onEmailOpen(EmailOpenEvent $event)
     {
@@ -118,13 +112,11 @@ class PointSubscriber extends CommonSubscriber
 
     /**
      * Trigger point actions for email send.
-     *
-     * @param EmailSendEvent $event
      */
     public function onEmailSend(EmailSendEvent $event)
     {
         if ($leadArray = $event->getLead()) {
-            $lead = $this->em->getReference('MauticLeadBundle:Lead', $leadArray['id']);
+            $lead = $this->entityManager->getReference(Lead::class, $leadArray['id']);
         } else {
             return;
         }

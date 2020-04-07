@@ -60,7 +60,11 @@ $templates = [
 
 $attr = $form->vars['attr'];
 
-$isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
+$isCodeMode = ('mautic_code_mode' === $email->getTemplate());
+
+if (!isset($previewUrl)) {
+    $previewUrl = '';
+}
 
 ?>
 
@@ -106,32 +110,24 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
                         <div class="row">
                             <div class="col-md-6">
                                 <?php echo $view['form']->row($form['fromName']); ?>
-                            </div>
-                            <div class="col-md-6">
                                 <?php echo $view['form']->row($form['fromAddress']); ?>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
                                 <?php echo $view['form']->row($form['replyToAddress']); ?>
-                            </div>
-
-                            <div class="col-md-6">
                                 <?php echo $view['form']->row($form['bccAddress']); ?>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="pull-left">
+                                <?php echo $view['content']->getCustomContent('email.settings.advanced', $mauticTemplateVars); ?>
+                                <div>
+                                    <div class="pull-left">
                                     <?php echo $view['form']->label($form['assetAttachments']); ?>
+                                    </div>
+                                    <div class="text-right pr-10">
+                                        <span class="label label-info" id="attachment-size"><?php echo $attachmentSize; ?></span>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <?php echo $view['form']->widget($form['assetAttachments']); ?>
                                 </div>
-                                <div class="text-right pr-10">
-                                    <span class="label label-info" id="attachment-size"><?php echo $attachmentSize; ?></span>
-                                </div>
-                                <div class="clearfix"></div>
-                                <?php echo $view['form']->widget($form['assetAttachments']); ?>
+
+                            </div>
+                            <div class="col-md-6">
+                                <?php echo $view['form']->row($form['headers']); ?>
                             </div>
                         </div>
 
@@ -163,7 +159,7 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
                                 foreach ($form['dynamicContent'] as $i => $dynamicContent) {
                                     $linkText = $dynamicContent['tokenName']->vars['value'] ?: $view['translator']->trans('mautic.core.dynamicContent').' '.($i + 1);
 
-                                    $tabHtml .= '<li class="'.($i === 0 ? ' active' : '').'"><a role="tab" data-toggle="tab" href="#'.$dynamicContent->vars['id'].'">'.$linkText.'</a></li>';
+                                    $tabHtml .= '<li class="'.(0 === $i ? ' active' : '').'"><a role="tab" data-toggle="tab" href="#'.$dynamicContent->vars['id'].'">'.$linkText.'</a></li>';
 
                                     $tabContentHtml .= $view['form']->widget($dynamicContent);
                                 }
@@ -192,15 +188,15 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
                 <?php echo $view['form']->row($form['publishUp']); ?>
                 <?php echo $view['form']->row($form['publishDown']); ?>
             <?php else: ?>
-            <div id="leadList"<?php echo ($emailType == 'template') ? ' class="hide"' : ''; ?>>
+            <div id="leadList"<?php echo ('template' == $emailType) ? ' class="hide"' : ''; ?>>
                 <?php echo $view['form']->row($form['lists']); ?>
             </div>
             <?php echo $view['form']->row($form['category']); ?>
             <?php echo $view['form']->row($form['language']); ?>
-            <div id="segmentTranslationParent"<?php echo ($emailType == 'template') ? ' class="hide"' : ''; ?>>
+            <div id="segmentTranslationParent"<?php echo ('template' == $emailType) ? ' class="hide"' : ''; ?>>
                 <?php echo $view['form']->row($form['segmentTranslationParent']); ?>
             </div>
-            <div id="templateTranslationParent"<?php echo ($emailType == 'list') ? ' class="hide"' : ''; ?>>
+            <div id="templateTranslationParent"<?php echo ('list' == $emailType) ? ' class="hide"' : ''; ?>>
                 <?php echo $view['form']->row($form['templateTranslationParent']); ?>
             </div>
             <?php endif; ?>
@@ -244,7 +240,7 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
 
 <div class="hide" id="templates">
     <?php foreach ($templates as $dataKey => $template): ?>
-        <?php $attr = ($dataKey == 'tags') ? ' data-placeholder="'.$view['translator']->trans('mautic.lead.tags.select_or_create').'" data-no-results-text="'.$view['translator']->trans('mautic.lead.tags.enter_to_create').'" data-allow-add="true" onchange="Mautic.createLeadTag(this)"' : ''; ?>
+        <?php $attr = ('tags' == $dataKey) ? ' data-placeholder="'.$view['translator']->trans('mautic.lead.tags.select_or_create').'" data-no-results-text="'.$view['translator']->trans('mautic.lead.tags.enter_to_create').'" data-allow-add="true" onchange="Mautic.createLeadTag(this)"' : ''; ?>
         <select class="form-control not-chosen <?php echo $template; ?>" name="emailform[dynamicContent][__dynamicContentIndex__][filters][__dynamicContentFilterIndex__][filters][__name__][filter]" id="emailform_dynamicContent___dynamicContentIndex___filters___dynamicContentFilterIndex___filters___name___filter"<?php echo $attr; ?>>
             <?php
             if (isset($form->vars[$dataKey])):
@@ -256,7 +252,7 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
                         endforeach;
                         echo "</optgroup>\n";
                     else:
-                        if ($dataKey == 'lists' && (isset($currentListId) && (int) $value === (int) $currentListId)) {
+                        if ('lists' == $dataKey && (isset($currentListId) && (int) $value === (int) $currentListId)) {
                             continue;
                         }
                         echo "<option value=\"$value\">$label</option>\n";
@@ -276,7 +272,9 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
     'slots'         => $slots,
     'sections'      => $sections,
     'objectId'      => $email->getSessionId(),
-]); ?>
+    'previewUrl'    => $previewUrl,
+]);
+?>
 
 <?php
 $type = $email->getEmailType();

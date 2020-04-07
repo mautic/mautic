@@ -11,25 +11,26 @@
 
 namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid\Mail;
 
-use Mautic\EmailBundle\Helper\PlainTextMassageHelper;
+use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailBase;
 use SendGrid\Content;
 use SendGrid\Email;
 
-class SendGridMailBaseTest extends \PHPUnit_Framework_TestCase
+class SendGridMailBaseTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider contentTypeProvider
      */
     public function testHtmlMessage($contentType)
     {
-        $plainTextMassageHelper = $this->getMockBuilder(PlainTextMassageHelper::class)
+        $plainTextMessageHelper = $this->getMockBuilder(PlainTextMessageHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $sendGridMailBase = new SendGridMailBase($plainTextMassageHelper);
+        $sendGridMailBase = new SendGridMailBase($plainTextMessageHelper);
 
-        $message = $this->getMockBuilder(\Swift_Mime_Message::class)
+        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $message->expects($this->once())
@@ -52,7 +53,7 @@ class SendGridMailBaseTest extends \PHPUnit_Framework_TestCase
             ->with()
             ->willReturn('HTML body');
 
-        $plainTextMassageHelper->expects($this->once())
+        $plainTextMessageHelper->expects($this->once())
             ->method('getPlainTextFromMessageNotStatic')
             ->with($message)
             ->willReturn('Plain text');
@@ -86,13 +87,14 @@ class SendGridMailBaseTest extends \PHPUnit_Framework_TestCase
 
     public function testPlainTextMessage()
     {
-        $plainTextMassageHelper = $this->getMockBuilder(PlainTextMassageHelper::class)
+        $plainTextMessageHelper = $this->getMockBuilder(PlainTextMessageHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $sendGridMailBase = new SendGridMailBase($plainTextMassageHelper);
+        $sendGridMailBase = new SendGridMailBase($plainTextMessageHelper);
 
-        $message = $this->getMockBuilder(\Swift_Mime_Message::class)
+        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $message->expects($this->once())
@@ -115,7 +117,7 @@ class SendGridMailBaseTest extends \PHPUnit_Framework_TestCase
             ->with()
             ->willReturn('Plain text');
 
-        $plainTextMassageHelper->expects($this->never())
+        $plainTextMessageHelper->expects($this->never())
             ->method('getPlainTextFromMessageNotStatic');
 
         $mail = $sendGridMailBase->getSendGridMail($message);
@@ -137,13 +139,14 @@ class SendGridMailBaseTest extends \PHPUnit_Framework_TestCase
 
     public function testEmptyPlainTextMessage()
     {
-        $plainTextMassageHelper = $this->getMockBuilder(PlainTextMassageHelper::class)
+        $plainTextMessageHelper = $this->getMockBuilder(PlainTextMessageHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $sendGridMailBase = new SendGridMailBase($plainTextMassageHelper);
+        $sendGridMailBase = new SendGridMailBase($plainTextMessageHelper);
 
-        $message = $this->getMockBuilder(\Swift_Mime_Message::class)
+        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $message->expects($this->once())
@@ -166,7 +169,7 @@ class SendGridMailBaseTest extends \PHPUnit_Framework_TestCase
             ->with()
             ->willReturn('HTML body');
 
-        $plainTextMassageHelper->expects($this->once())
+        $plainTextMessageHelper->expects($this->once())
             ->method('getPlainTextFromMessageNotStatic')
             ->with($message)
             ->willReturn('');

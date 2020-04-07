@@ -11,8 +11,8 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use DeviceDetector\DeviceDetector;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -29,30 +29,31 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\EmailValidator;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\CompanyLead;
-use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
-use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Entity\MergeRecord;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\CategoryChangeEvent;
-use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
-use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\Form\Type\LeadType;
+use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
@@ -69,15 +70,14 @@ use Symfony\Component\Intl\Intl;
  */
 class LeadModel extends FormModel
 {
-    use DefaultValueTrait, OperatorListTrait, RequestTrait;
-
-    private $currentLead       = null;
-    private $systemCurrentLead = null;
+    use DefaultValueTrait;
+    use OperatorListTrait;
+    use RequestTrait;
 
     const CHANNEL_FEATURE = 'contact_preference';
 
     /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
+     * @var \Symfony\Component\HttpFoundation\Request|null
      */
     protected $request;
 
@@ -137,11 +137,6 @@ class LeadModel extends FormModel
     protected $channelListHelper;
 
     /**
-     * @var bool
-     */
-    protected $trackByIp = false;
-
-    /**
      * @var CoreParametersHelper
      */
     protected $coreParametersHelper;
@@ -172,23 +167,40 @@ class LeadModel extends FormModel
     protected $emailValidator;
 
     /**
-     * LeadModel constructor.
-     *
-     * @param RequestStack         $requestStack
-     * @param CookieHelper         $cookieHelper
-     * @param IpLookupHelper       $ipLookupHelper
-     * @param PathsHelper          $pathsHelper
-     * @param IntegrationHelper    $integrationHelper
-     * @param FieldModel           $leadFieldModel
-     * @param ListModel            $leadListModel
-     * @param FormFactory          $formFactory
-     * @param CompanyModel         $companyModel
-     * @param CategoryModel        $categoryModel
-     * @param ChannelListHelper    $channelListHelper
-     * @param                      $trackByIp
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param UserProvider         $userProvider
+     * @var ContactTracker
      */
+    private $contactTracker;
+
+    /**
+     * @var DeviceTracker
+     */
+    private $deviceTracker;
+
+    /**
+     * @var LegacyLeadModel
+     */
+    private $legacyLeadModel;
+
+    /**
+     * @var IpAddressModel
+     */
+    private $ipAddressModel;
+
+    /**
+     * @var bool
+     */
+    private $repoSetup = false;
+
+    /**
+     * @var array
+     */
+    private $flattenedFields = [];
+
+    /**
+     * @var array
+     */
+    private $fieldsByGroup = [];
+
     public function __construct(
         RequestStack $requestStack,
         CookieHelper $cookieHelper,
@@ -201,10 +213,13 @@ class LeadModel extends FormModel
         CompanyModel $companyModel,
         CategoryModel $categoryModel,
         ChannelListHelper $channelListHelper,
-        $trackByIp,
         CoreParametersHelper $coreParametersHelper,
         EmailValidator $emailValidator,
-        UserProvider $userProvider
+        UserProvider $userProvider,
+        ContactTracker $contactTracker,
+        DeviceTracker $deviceTracker,
+        LegacyLeadModel $legacyLeadModel,
+        IpAddressModel $ipAddressModel
     ) {
         $this->request              = $requestStack->getCurrentRequest();
         $this->cookieHelper         = $cookieHelper;
@@ -217,10 +232,13 @@ class LeadModel extends FormModel
         $this->formFactory          = $formFactory;
         $this->categoryModel        = $categoryModel;
         $this->channelListHelper    = $channelListHelper;
-        $this->trackByIp            = $trackByIp;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->emailValidator       = $emailValidator;
         $this->userProvider         = $userProvider;
+        $this->contactTracker       = $contactTracker;
+        $this->deviceTracker        = $deviceTracker;
+        $this->legacyLeadModel      = $legacyLeadModel;
+        $this->ipAddressModel       = $ipAddressModel;
     }
 
     /**
@@ -230,13 +248,11 @@ class LeadModel extends FormModel
      */
     public function getRepository()
     {
-        static $repoSetup;
-
         $repo = $this->em->getRepository('MauticLeadBundle:Lead');
         $repo->setDispatcher($this->dispatcher);
 
-        if (!$repoSetup) {
-            $repoSetup = true;
+        if (!$this->repoSetup) {
+            $this->repoSetup = true;
 
             //set the point trigger model in order to get the color code for the lead
             $fields = $this->leadFieldModel->getFieldList(true, false);
@@ -245,7 +261,7 @@ class LeadModel extends FormModel
             $repo->setAvailableSocialFields($socialFields);
 
             $searchFields = [];
-            foreach ($fields as $group => $groupFields) {
+            foreach ($fields as $groupFields) {
                 $searchFields = array_merge($searchFields, array_keys($groupFields));
             }
             $repo->setAvailableSearchFields($searchFields);
@@ -381,7 +397,7 @@ class LeadModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('lead', $entity, $options);
+        return $formFactory->create(LeadType::class, $entity, $options);
     }
 
     /**
@@ -389,11 +405,11 @@ class LeadModel extends FormModel
      *
      * @param $id
      *
-     * @return null|Lead
+     * @return Lead|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Lead();
         }
 
@@ -401,7 +417,11 @@ class LeadModel extends FormModel
 
         if (null === $entity) {
             // Check if this contact was merged into another and if so, return the new contact
-            $entity = $this->getMergeRecordRepository()->findMergedContact($id);
+            if ($entity = $this->getMergeRecordRepository()->findMergedContact($id)) {
+                // Hydrate fields with custom field data
+                $fields = $this->getRepository()->getFieldValues($entity->getId());
+                $entity->setFields($fields);
+            }
         }
 
         return $entity;
@@ -489,18 +509,26 @@ class LeadModel extends FormModel
                     $entity->addUpdatedField('zipcode', $details['zipcode']);
                 }
             }
+
+            if (!$entity->getCompany() && !empty($details['organization']) && $this->coreParametersHelper->get('ip_lookup_create_organization', false)) {
+                $entity->addUpdatedField('company', $details['organization']);
+            }
         }
 
         $updatedFields = $entity->getUpdatedFields();
         if (isset($updatedFields['company'])) {
             $companyFieldMatches['company']            = $updatedFields['company'];
-            list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
+            [$company, $leadAdded, $companyEntity]     = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
             if ($leadAdded) {
                 $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             }
         }
 
+        $this->processManipulator($entity);
+
         $this->setEntityDefaultValues($entity);
+
+        $this->ipAddressModel->saveIpAddressesReferencesForContact($entity);
 
         parent::saveEntity($entity, $unlock);
 
@@ -540,20 +568,18 @@ class LeadModel extends FormModel
     /**
      * Populates custom field values for updating the lead. Also retrieves social media data.
      *
-     * @param Lead       $lead
-     * @param array      $data
      * @param bool|false $overwriteWithBlank
      * @param bool|true  $fetchSocialProfiles
      * @param bool|false $bindWithForm        Send $data through the Lead form and only use valid data (should be used with request data)
      *
      * @return array
      */
-    public function setFieldValues(Lead &$lead, array $data, $overwriteWithBlank = false, $fetchSocialProfiles = true, $bindWithForm = false)
+    public function setFieldValues(Lead $lead, array $data, $overwriteWithBlank = false, $fetchSocialProfiles = true, $bindWithForm = false)
     {
         if ($fetchSocialProfiles) {
             //@todo - add a catch to NOT do social gleaning if a lead is created via a form, etc as we do not want the user to experience the wait
             //generate the social cache
-            list($socialCache, $socialFeatureSettings) = $this->integrationHelper->getUserProfiles(
+            [$socialCache, $socialFeatureSettings] = $this->integrationHelper->getUserProfiles(
                 $lead,
                 $data,
                 true,
@@ -572,7 +598,8 @@ class LeadModel extends FormModel
             $stagesChangeLogRepo = $this->getStagesChangeLogRepository();
             $currentLeadStage    = $stagesChangeLogRepo->getCurrentLeadStage($lead->getId());
 
-            if ($data['stage'] !== $currentLeadStage) {
+            $previousId = is_object($data['stage']) ? $data['stage']->getId() : (int) $data['stage'];
+            if ($previousId !== $currentLeadStage) {
                 $stage = $this->em->getRepository('MauticStageBundle:Stage')->find($data['stage']);
                 $lead->stageChangeLogEntry(
                     $stage,
@@ -587,19 +614,18 @@ class LeadModel extends FormModel
 
         if (empty($fieldValues) || $bindWithForm) {
             // Lead is new or they haven't been populated so let's build the fields now
-            static $flatFields, $fields;
-            if (empty($flatFields)) {
-                $flatFields = $this->leadFieldModel->getEntities(
+            if (empty($this->flattenedFields)) {
+                $this->flattenedFields = $this->leadFieldModel->getEntities(
                     [
                         'filter'         => ['isPublished' => true, 'object' => 'lead'],
                         'hydration_mode' => 'HYDRATE_ARRAY',
                     ]
                 );
-                $fields = $this->organizeFieldsByGroup($flatFields);
+                $this->fieldsByGroup = $this->organizeFieldsByGroup($this->flattenedFields);
             }
 
             if (empty($fieldValues)) {
-                $fieldValues = $fields;
+                $fieldValues = $this->fieldsByGroup;
             }
         }
 
@@ -609,7 +635,7 @@ class LeadModel extends FormModel
                 new Lead(), // use empty lead to prevent binding errors
                 $this->formFactory,
                 null,
-                ['fields' => $flatFields, 'csrf_protection' => false, 'allow_extra_fields' => true]
+                ['fields' => $this->flattenedFields, 'csrf_protection' => false, 'allow_extra_fields' => true]
             );
 
             // Unset stage and owner from the form because it's already been handled
@@ -620,12 +646,12 @@ class LeadModel extends FormModel
             $form->submit($data);
 
             if ($form->getErrors()->count()) {
-                $this->logger->addDebug('LEAD: form validation failed with an error of '.(string) $form->getErrors());
+                $this->logger->addDebug('LEAD: form validation failed with an error of '.$form->getErrors());
             }
             foreach ($form as $field => $formField) {
                 if (isset($data[$field])) {
                     if ($formField->getErrors()->count()) {
-                        $this->logger->addDebug('LEAD: '.$field.' failed form validation with an error of '.(string) $formField->getErrors());
+                        $this->logger->addDebug('LEAD: '.$field.' failed form validation with an error of '.$formField->getErrors());
                         // Don't save bad data
                         unset($data[$field]);
                     } else {
@@ -637,6 +663,10 @@ class LeadModel extends FormModel
 
         //update existing values
         foreach ($fieldValues as $group => &$groupFields) {
+            if ('all' === $group) {
+                continue;
+            }
+
             foreach ($groupFields as $alias => &$field) {
                 if (!isset($field['value'])) {
                     $field['value'] = null;
@@ -729,9 +759,7 @@ class LeadModel extends FormModel
      */
     public function getOwnerList()
     {
-        $results = $this->em->getRepository('MauticUserBundle:User')->getUserList('', 0);
-
-        return $results;
+        return $this->em->getRepository('MauticUserBundle:User')->getUserList('', 0);
     }
 
     /**
@@ -744,6 +772,34 @@ class LeadModel extends FormModel
     public function getLeadsByIp($ip)
     {
         return $this->getRepository()->getLeadsByIp($ip);
+    }
+
+    /**
+     * Obtains a list of leads based a list of IDs.
+     *
+     * @return Paginator
+     */
+    public function getLeadsByIds(array $ids)
+    {
+        return $this->getEntities([
+            'filter' => [
+                'force' => [
+                    [
+                        'column' => 'l.id',
+                        'expr'   => 'in',
+                        'value'  => $ids,
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @return bool
+     */
+    public function canEditContact(Lead $contact)
+    {
+        return $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser());
     }
 
     /**
@@ -781,23 +837,25 @@ class LeadModel extends FormModel
         foreach ($fields as $field) {
             if ($field instanceof LeadField) {
                 $alias = $field->getAlias();
-                if ($field->isPublished() and $field->getObject() === 'Lead') {
-                    $group                          = $field->getGroup();
-                    $array[$group][$alias]['id']    = $field->getId();
-                    $array[$group][$alias]['group'] = $group;
-                    $array[$group][$alias]['label'] = $field->getLabel();
-                    $array[$group][$alias]['alias'] = $alias;
-                    $array[$group][$alias]['type']  = $field->getType();
+                if ($field->isPublished() and 'Lead' === $field->getObject()) {
+                    $group                                = $field->getGroup();
+                    $array[$group][$alias]['id']          = $field->getId();
+                    $array[$group][$alias]['group']       = $group;
+                    $array[$group][$alias]['label']       = $field->getLabel();
+                    $array[$group][$alias]['alias']       = $alias;
+                    $array[$group][$alias]['type']        = $field->getType();
+                    $array[$group][$alias]['properties']  = $field->getProperties();
                 }
             } else {
                 $alias = $field['alias'];
-                if ($field['isPublished'] and $field['object'] === 'lead') {
-                    $group                          = $field['group'];
-                    $array[$group][$alias]['id']    = $field['id'];
-                    $array[$group][$alias]['group'] = $group;
-                    $array[$group][$alias]['label'] = $field['label'];
-                    $array[$group][$alias]['alias'] = $alias;
-                    $array[$group][$alias]['type']  = $field['type'];
+                if ($field['isPublished'] and 'lead' === $field['object']) {
+                    $group                                = $field['group'];
+                    $array[$group][$alias]['id']          = $field['id'];
+                    $array[$group][$alias]['group']       = $group;
+                    $array[$group][$alias]['label']       = $field['label'];
+                    $array[$group][$alias]['alias']       = $alias;
+                    $array[$group][$alias]['type']        = $field['type'];
+                    $array[$group][$alias]['properties']  = $field['properties'] ?? [];
                 }
             }
         }
@@ -825,7 +883,7 @@ class LeadModel extends FormModel
     public function flattenFields($fields)
     {
         $flat = [];
-        foreach ($fields as $group => $fields) {
+        foreach ($fields as $fields) {
             foreach ($fields as $field) {
                 $flat[$field['alias']] = $field['value'];
             }
@@ -847,197 +905,40 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Get the current lead; if $returnTracking = true then array with lead, trackingId, and boolean of if trackingId
-     * was just generated or not.
-     *
-     * @param bool|false $returnTracking
-     *
-     * @return null|Lead|array
-     */
-    public function getCurrentLead($returnTracking = false)
-    {
-        $isUser = (!$this->security->isAnonymous());
-        if ($isUser || $this->systemCurrentLead || defined('IN_MAUTIC_CONSOLE')) {
-            $this->logger->addDebug('LEAD: System lead is being used');
-            if (!$isUser && null === $this->systemCurrentLead) {
-                $this->systemCurrentLead = new Lead();
-            } elseif ($isUser) {
-                $this->logger->addDebug('LEAD: In a Mautic user session');
-            }
-
-            return ($returnTracking) ? [$this->systemCurrentLead, null, false] : $this->systemCurrentLead;
-        }
-
-        if ($this->request) {
-            $this->logger->addDebug('LEAD: Tracking session for '.$this->request->getMethod().' '.$this->request->getRequestUri());
-        }
-
-        list($trackingId, $generated) = $this->getTrackingCookie();
-        $this->logger->addDebug("LEAD: Tracking ID for this contact is {$trackingId} (".(int) $generated.')');
-
-        if (empty($this->currentLead)) {
-            $ip = $this->ipLookupHelper->getIpAddress();
-            if ($this->request && !$leadId = $this->request->cookies->get($trackingId)) {
-                $leadId = ('GET' == $this->request->getMethod())
-                    ?
-                    $this->request->query->get('mtc_id')
-                    :
-                    $this->request->request->get('mtc_id');
-            }
-
-            // if no trackingId cookie set the lead is not tracked yet so create a new one
-            if (empty($leadId)) {
-                if (!$ip->isTrackable()) {
-                    // Don't save leads that are from a non-trackable IP by default
-                    $lead = $this->createNewContact($ip, false);
-                } else {
-                    $lead = null;
-                    if ($this->trackByIp) {
-                        // Try looking up the contact by it's IP address
-                        $leads = $this->getLeadsByIp($ip->getIpAddress());
-
-                        if (count($leads)) {
-                            $lead = $leads[0];
-                            $this->logger->addDebug("LEAD: Existing lead found with ID# {$lead->getId()}.");
-                        }
-                    }
-
-                    if (!$lead) {
-                        //let's create a lead
-                        $lead = $this->createNewContact($ip);
-                    }
-                }
-            } else {
-                $lead = $this->getEntity($leadId);
-
-                if ($lead === null) {
-                    // Check if this contact was merged into another
-
-                    $lead = $this->createNewContact($ip);
-                } else {
-                    $this->logger->addDebug("LEAD: Existing lead found with ID# $leadId.");
-                }
-            }
-
-            $this->currentLead = $lead;
-            if ($leadId = $lead->getId()) {
-                $this->setLeadCookie($leadId);
-            }
-        }
-
-        // Log last active
-        if (!defined('MAUTIC_LEAD_LASTACTIVE_LOGGED')) {
-            $this->getRepository()->updateLastActive($this->currentLead->getId());
-            define('MAUTIC_LEAD_LASTACTIVE_LOGGED', 1);
-        }
-
-        return ($returnTracking) ? [$this->currentLead, $trackingId, $generated] : $this->currentLead;
-    }
-
-    /**
-     * Get the lead from request (ct/clickthrough) and handles auto merging of lead data from request parameters.
-     *
-     * @deprecated - here till all lead methods are converted to contact methods; preferably use getContactFromRequest instead
-     *
-     * @param array $queryFields
-     *
-     * @return array|Lead|null
-     */
-    public function getLeadFromRequest(array $queryFields = [])
-    {
-        return $this->getContactFromRequest($queryFields);
-    }
-
-    /**
      * Get the contat from request (ct/clickthrough) and handles auto merging of contact data from request parameters.
      *
      * @param array $queryFields
      *
      * @return array|Lead|null
      */
-    public function getContactFromRequest($queryFields = [], $trackByFingerprint = false)
+    public function getContactFromRequest($queryFields = [])
     {
-        $lead = null;
+        // @todo Instantiate here until we can remove circular dependency on LeadModel in order to make it a service
+        $requestStack = new RequestStack();
+        $requestStack->push($this->request);
+        $contactRequestHelper = new ContactRequestHelper(
+            $this,
+            $this->contactTracker,
+            $this->coreParametersHelper,
+            $this->ipLookupHelper,
+            $requestStack,
+            $this->logger,
+            $this->dispatcher
+        );
 
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
-
-        // Check for a lead requested through clickthrough query parameter
-        if (isset($queryFields['ct'])) {
-            $clickthrough = $queryFields['ct'];
-        } elseif ($clickthrough = $this->request->get('ct', [])) {
-            $clickthrough = $this->decodeArrayFromUrl($clickthrough);
-        }
-
-        if (is_array($clickthrough) && !empty($clickthrough['lead'])) {
-            $lead = $this->getEntity($clickthrough['lead']);
-            // identify contact from link
-            if ($this->coreParametersHelper->getParameter('track_by_tracking_url') && !isset($queryFields['email']) && $lead && $email = $lead->getEmail()) {
-                $queryFields['email'] = $email;
-            }
-            $this->logger->addDebug("LEAD: Contact ID# {$clickthrough['lead']} tracked through clickthrough query.");
-        }
-
-        // First determine if this request is already tracked as a specific lead
-        list($trackingId, $generated) = $this->getTrackingCookie();
-
-        if (!$leadId = $this->request->cookies->get($trackingId)) {
-            $leadId = ('GET' == $this->request->getMethod())
-                ?
-                $this->request->query->get('mtc_id')
-                :
-                $this->request->request->get('mtc_id');
-        }
-
-        if ($leadId && $lead = $this->getEntity($leadId)) {
-            $this->logger->addDebug("LEAD: Contact ID# {$leadId} tracked through tracking ID ($trackingId}.");
-        }
-
-        // Search for lead by fingerprint
-        if (empty($lead) && !empty($queryFields['fingerprint']) && $trackByFingerprint) {
-            $deviceRepo = $this->getDeviceRepository();
-            $device     = $deviceRepo->getDeviceByFingerprint($queryFields['fingerprint']);
-            if ($device) {
-                $lead = $this->getEntity($device['lead_id']);
-            }
-        }
-
-        if (empty($lead)) {
-            // No lead found so generate one
-            $lead = $this->getCurrentLead();
-        }
-
-        list($lead, $inQuery) = $this->checkForDuplicateContact($queryFields, $lead, true, true);
-
-        if ($lead) {
-            $leadIpAddresses = $lead->getIpAddresses();
-            if (!$leadIpAddresses->contains($ipAddress)) {
-                $lead->addIpAddress($ipAddress);
-            }
-
-            $this->setFieldValues($lead, $inQuery, false, true, true);
-
-            if (isset($queryFields['tags'])) {
-                $this->modifyTags($lead, $queryFields['tags']);
-            }
-
-            $this->setCurrentLead($lead);
-        }
-
-        return $lead;
+        return $contactRequestHelper->getContactFromQuery($queryFields);
     }
 
     /**
-     * @param array     $queryFields
-     * @param Lead|null $lead
-     * @param bool      $returnWithQueryFields
+     * @param bool $returnWithQueryFields
      *
      * @return array|Lead
      */
     public function checkForDuplicateContact(array $queryFields, Lead $lead = null, $returnWithQueryFields = false, $onlyPubliclyUpdateable = false)
     {
         // Search for lead by request and/or update lead fields if some data were sent in the URL query
-        if (null == $this->availableLeadFields) {
-            $filter = ['isPublished' => true];
+        if (empty($this->availableLeadFields)) {
+            $filter = ['isPublished' => true, 'object' => 'lead'];
 
             if ($onlyPubliclyUpdateable) {
                 $filter['isPubliclyUpdatable'] = true;
@@ -1050,130 +951,65 @@ class LeadModel extends FormModel
             );
         }
 
-        $uniqueLeadFields    = $this->leadFieldModel->getUniqueIdentifierFields();
-        $uniqueLeadFieldData = [];
-        $inQuery             = array_intersect_key($queryFields, $this->availableLeadFields);
+        if (is_null($lead)) {
+            $lead = new Lead();
+        }
+
+        $uniqueFields    = $this->leadFieldModel->getUniqueIdentifierFields();
+        $uniqueFieldData = [];
+        $inQuery         = array_intersect_key($queryFields, $this->availableLeadFields);
+        $values          = $onlyPubliclyUpdateable ? $inQuery : $queryFields;
+
+        // Run values through setFieldValues to clean them first
+        $this->setFieldValues($lead, $values, false, false);
+        $cleanFields = $lead->getFields();
+
         foreach ($inQuery as $k => $v) {
             if (empty($queryFields[$k])) {
                 unset($inQuery[$k]);
             }
+        }
 
-            if (array_key_exists($k, $uniqueLeadFields)) {
-                $uniqueLeadFieldData[$k] = $v;
+        foreach ($cleanFields as $group) {
+            foreach ($group as $key => $field) {
+                if (array_key_exists($key, $uniqueFields) && !empty($field['value'])) {
+                    $uniqueFieldData[$key] = $field['value'];
+                }
             }
         }
 
         // Check for leads using unique identifier
-        if (count($uniqueLeadFieldData)) {
-            $existingLeads = $this->getRepository()->getLeadsByUniqueFields($uniqueLeadFieldData, ($lead) ? $lead->getId() : null);
+        if (count($uniqueFieldData)) {
+            $existingLeads = $this->getRepository()->getLeadsByUniqueFields($uniqueFieldData, ($lead) ? $lead->getId() : null);
 
             if (!empty($existingLeads)) {
                 $this->logger->addDebug("LEAD: Existing contact ID# {$existingLeads[0]->getId()} found through query identifiers.");
                 // Merge with existing lead or use the one found
-                $lead = ($lead) ? $this->mergeLeads($lead, $existingLeads[0]) : $existingLeads[0];
+                $lead = ($lead->getId()) ? $this->mergeLeads($lead, $existingLeads[0]) : $existingLeads[0];
             }
-        }
-
-        if (null === $lead) {
-            $lead = new Lead();
         }
 
         return $returnWithQueryFields ? [$lead, $inQuery] : $lead;
     }
 
     /**
-     * Sets current lead.
-     *
-     * @param Lead $lead
-     */
-    public function setCurrentLead(Lead $lead)
-    {
-        $this->logger->addDebug("LEAD: {$lead->getId()} set as current lead.");
-
-        $isUser = (!$this->security->isAnonymous());
-        if ($isUser || $this->systemCurrentLead || defined('IN_MAUTIC_CONSOLE')) {
-            if ($isUser) {
-                $this->logger->addDebug('LEAD: In a Mautic user session');
-            }
-
-            // Overwrite system current lead
-            return $this->setSystemCurrentLead($lead);
-        }
-
-        $oldLead = (is_null($this->currentLead)) ? null : $this->currentLead;
-
-        $fields = $lead->getFields();
-        if (empty($fields)) {
-            $lead->setFields($this->getLeadDetails($lead));
-        }
-
-        $this->currentLead = $lead;
-
-        // Set last active
-        $this->currentLead->setLastActive(new \DateTime());
-
-        if ($lead->getId()) {
-            // Update tracking cookies if the lead is different
-            if ($oldLead && $oldLead->getId() != $lead->getId()) {
-                list($newTrackingId, $oldTrackingId) = $this->getTrackingCookie(true);
-                $this->logger->addDebug(
-                    "LEAD: Tracking code changed from $oldTrackingId for contact ID# {$oldLead->getId()} to $newTrackingId for contact ID# {$lead->getId()}"
-                );
-
-                //set the tracking cookies
-                $this->setLeadCookie($lead->getId());
-
-                if ($oldTrackingId && $oldLead) {
-                    if ($this->dispatcher->hasListeners(LeadEvents::CURRENT_LEAD_CHANGED)) {
-                        $event = new LeadChangeEvent($oldLead, $oldTrackingId, $lead, $newTrackingId);
-                        $this->dispatcher->dispatch(LeadEvents::CURRENT_LEAD_CHANGED, $event);
-                    }
-                }
-            } elseif (!$oldLead) {
-                // New lead, set the tracking cookie
-                $this->setLeadCookie($lead->getId());
-            }
-        }
-    }
-
-    /**
-     * Used by system processes that hook into events that use getCurrentLead().
-     *
-     * @param Lead $lead
-     */
-    public function setSystemCurrentLead(Lead $lead = null)
-    {
-        $this->logger->addDebug("LEAD: {$lead->getId()} set as system lead.");
-
-        $fields = $lead->getFields();
-        if (empty($fields)) {
-            $lead->setFields($this->getLeadDetails($lead));
-        }
-
-        $this->systemCurrentLead = $lead;
-    }
-
-    /**
      * Get a list of segments this lead belongs to.
      *
-     * @param Lead $lead
      * @param bool $forLists
      * @param bool $arrayHydration
      * @param bool $isPublic
      *
      * @return mixed
      */
-    public function getLists(Lead $lead, $forLists = false, $arrayHydration = false, $isPublic = false)
+    public function getLists(Lead $lead, $forLists = false, $arrayHydration = false, $isPublic = false, $isPreferenceCenter = false)
     {
-        $repo = $this->em->getRepository('MauticLeadBundle:LeadList');
+        $repo = $this->em->getRepository(LeadList::class);
 
-        return $repo->getLeadLists($lead->getId(), $forLists, $arrayHydration, $isPublic);
+        return $repo->getLeadLists($lead->getId(), $forLists, $arrayHydration, $isPublic, $isPreferenceCenter);
     }
 
     /**
      * Get a list of companies this contact belongs to.
-     *
-     * @param Lead $lead
      *
      * @return mixed
      */
@@ -1182,76 +1018,6 @@ class LeadModel extends FormModel
         $repo = $this->em->getRepository('MauticLeadBundle:CompanyLead');
 
         return $repo->getCompaniesByLeadId($lead->getId());
-    }
-
-    /**
-     * Get or generate the tracking ID for the current session.
-     *
-     * @param bool|false $forceRegeneration
-     *
-     * @return array
-     */
-    public function getTrackingCookie($forceRegeneration = false)
-    {
-        if (!$this->request) {
-            return [null, false];
-        }
-
-        if ($forceRegeneration) {
-            $this->leadTrackingCookieGenerated = true;
-
-            $oldTrackingId        = $this->request->cookies->get('mautic_session_id');
-            $this->leadTrackingId = hash('sha1', uniqid(mt_rand()));
-
-            //create a tracking cookie with a expire of two years
-            $this->cookieHelper->setCookie('mautic_session_id', $this->leadTrackingId, 31536000);
-
-            return [$this->leadTrackingId, $oldTrackingId];
-        }
-
-        if (empty($this->leadTrackingId)) {
-            //check for the tracking cookie or sid from query
-            if ($this->request && !$this->leadTrackingId = $this->request->cookies->get('mautic_session_id')) {
-                $this->leadTrackingId = ('GET' == $this->request->getMethod())
-                    ?
-                    $this->request->query->get('mtc_sid')
-                    :
-                    $this->request->request->get('mtc_sid');
-            }
-            $this->leadTrackingCookieGenerated = false;
-            if (empty($this->leadTrackingId)) {
-                $this->leadTrackingId              = hash('sha1', uniqid(mt_rand()));
-                $this->leadTrackingCookieGenerated = true;
-            }
-
-            //create a tracking cookie with a expire of two years
-            $this->cookieHelper->setCookie('mautic_session_id', $this->leadTrackingId, 31536000);
-        }
-
-        return [$this->leadTrackingId, $this->leadTrackingCookieGenerated];
-    }
-
-    /**
-     * Sets the leadId for the current session.
-     *
-     * @param $leadId
-     */
-    public function setLeadCookie($leadId)
-    {
-        if (!$this->request) {
-            return;
-        }
-
-        // Remove the old if set
-        $oldTrackingId                = $this->request->cookies->get('mautic_session_id');
-        list($trackingId, $generated) = $this->getTrackingCookie();
-
-        if ($generated && $oldTrackingId) {
-            $this->cookieHelper->setCookie($oldTrackingId, null, -3600);
-        }
-
-        // Create a cookie with a expire of two years
-        $this->cookieHelper->setCookie($trackingId, $leadId, 31536000);
     }
 
     /**
@@ -1325,116 +1091,8 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Merge two leads; if a conflict of data occurs, the newest lead will get precedence.
-     *
-     * @param Lead $lead
-     * @param Lead $lead2
-     * @param bool $autoMode If true, the newest lead will be merged into the oldes then deleted; otherwise, $lead will be merged into $lead2 then deleted
-     *
-     * @return Lead
-     */
-    public function mergeLeads(Lead $lead, Lead $lead2, $autoMode = true)
-    {
-        $this->logger->debug('LEAD: Merging leads');
-
-        $leadId  = $lead->getId();
-        $lead2Id = $lead2->getId();
-
-        //if they are the same lead, then just return one
-        if ($leadId === $lead2Id) {
-            $this->logger->debug('LEAD: Leads are the same');
-
-            return $lead;
-        }
-
-        if ($autoMode) {
-            //which lead is the oldest?
-            $mergeWith = ($lead->getDateAdded() < $lead2->getDateAdded()) ? $lead : $lead2;
-            $mergeFrom = ($mergeWith->getId() === $leadId) ? $lead2 : $lead;
-        } else {
-            $mergeWith = $lead2;
-            $mergeFrom = $lead;
-        }
-        $this->logger->debug('LEAD: Lead ID# '.$mergeFrom->getId().' will be merged into ID# '.$mergeWith->getId());
-
-        //dispatch pre merge event
-        $event = new LeadMergeEvent($mergeWith, $mergeFrom);
-        if ($this->dispatcher->hasListeners(LeadEvents::LEAD_PRE_MERGE)) {
-            $this->dispatcher->dispatch(LeadEvents::LEAD_PRE_MERGE, $event);
-        }
-
-        //merge IP addresses
-        $ipAddresses = $mergeFrom->getIpAddresses();
-        foreach ($ipAddresses as $ip) {
-            $mergeWith->addIpAddress($ip);
-
-            $this->logger->debug('LEAD: Associating with IP '.$ip->getIpAddress());
-        }
-
-        //merge fields
-        $mergeFromFields = $mergeFrom->getFields();
-        foreach ($mergeFromFields as $group => $groupFields) {
-            foreach ($groupFields as $alias => $details) {
-                //overwrite old lead's data with new lead's if new lead's is not empty
-                if (!empty($details['value'])) {
-                    $mergeWith->addUpdatedField($alias, $details['value']);
-
-                    $this->logger->debug('LEAD: Updated '.$alias.' = '.$details['value']);
-                }
-            }
-        }
-
-        //merge owner
-        $oldOwner = $mergeWith->getOwner();
-        $newOwner = $mergeFrom->getOwner();
-
-        if ($oldOwner === null && $newOwner !== null) {
-            $mergeWith->setOwner($newOwner);
-
-            $this->logger->debug('LEAD: New owner is '.$newOwner->getId());
-        }
-
-        //sum points
-        $mergeWithPoints = $mergeWith->getPoints();
-        $mergeFromPoints = $mergeFrom->getPoints();
-        $mergeWith->setPoints($mergeWithPoints + $mergeFromPoints);
-        $this->logger->debug('LEAD: Adding '.$mergeFromPoints.' points to lead');
-
-        //merge tags
-        $mergeFromTags = $mergeFrom->getTags();
-        $addTags       = $mergeFromTags->getKeys();
-        $this->modifyTags($mergeWith, $addTags, null, false);
-
-        //save the updated lead
-        $this->saveEntity($mergeWith, false);
-
-        // Update merge records for the lead about to be deleted
-        $this->getMergeRecordRepository()->moveMergeRecord($mergeFrom->getId(), $mergeWith->getId());
-
-        // Create an entry this contact was merged
-        $mergeRecord = new MergeRecord();
-        $mergeRecord->setContact($mergeWith)
-            ->setDateAdded()
-            ->setName($mergeFrom->getPrimaryIdentifier())
-            ->setMergedId($mergeFrom->getId());
-        $this->getMergeRecordRepository()->saveEntity($mergeRecord);
-
-        //post merge events
-        if ($this->dispatcher->hasListeners(LeadEvents::LEAD_POST_MERGE)) {
-            $this->dispatcher->dispatch(LeadEvents::LEAD_POST_MERGE, $event);
-        }
-
-        //delete the old
-        $this->deleteEntity($mergeFrom);
-
-        //return the merged lead
-        return $mergeWith;
-    }
-
-    /**
      * @depreacated 2.6.0 to be removed in 3.0; use getFrequencyRules() instead
      *
-     * @param Lead $lead
      * @param null $channel
      *
      * @return mixed
@@ -1445,7 +1103,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param Lead   $lead
      * @param string $channel
      *
      * @return mixed
@@ -1470,7 +1127,6 @@ class LeadModel extends FormModel
     /**
      * Set frequency rules for lead per channel.
      *
-     * @param Lead $lead
      * @param null $data
      * @param null $leadLists
      *
@@ -1484,8 +1140,8 @@ class LeadModel extends FormModel
         $channels       = $this->getPreferenceChannels();
 
         foreach ($channels as $ch) {
-            if (empty($data['preferred_channel'])) {
-                $data['preferred_channel'] = $ch;
+            if (empty($data['lead_channels']['preferred_channel'])) {
+                $data['lead_channels']['preferred_channel'] = $ch;
             }
 
             $frequencyRule = (isset($frequencyRules[$ch])) ? $frequencyRules[$ch] : new FrequencyRule();
@@ -1493,19 +1149,19 @@ class LeadModel extends FormModel
             $frequencyRule->setLead($lead);
             $frequencyRule->setDateAdded(new \DateTime());
 
-            if (!empty($data['frequency_number_'.$ch]) && !empty($data['frequency_time_'.$ch])) {
-                $frequencyRule->setFrequencyNumber($data['frequency_number_'.$ch]);
-                $frequencyRule->setFrequencyTime($data['frequency_time_'.$ch]);
+            if (!empty($data['lead_channels']['frequency_number_'.$ch]) && !empty($data['lead_channels']['frequency_time_'.$ch])) {
+                $frequencyRule->setFrequencyNumber($data['lead_channels']['frequency_number_'.$ch]);
+                $frequencyRule->setFrequencyTime($data['lead_channels']['frequency_time_'.$ch]);
             } else {
                 $frequencyRule->setFrequencyNumber(null);
                 $frequencyRule->setFrequencyTime(null);
             }
 
-            $frequencyRule->setPauseFromDate(!empty($data['contact_pause_start_date_'.$ch]) ? $data['contact_pause_start_date_'.$ch] : null);
-            $frequencyRule->setPauseToDate(!empty($data['contact_pause_end_date_'.$ch]) ? $data['contact_pause_end_date_'.$ch] : null);
+            $frequencyRule->setPauseFromDate(!empty($data['lead_channels']['contact_pause_start_date_'.$ch]) ? $data['lead_channels']['contact_pause_start_date_'.$ch] : null);
+            $frequencyRule->setPauseToDate(!empty($data['lead_channels']['contact_pause_end_date_'.$ch]) ? $data['lead_channels']['contact_pause_end_date_'.$ch] : null);
 
             $frequencyRule->setLead($lead);
-            $frequencyRule->setPreferredChannel($data['preferred_channel'] === $ch);
+            $frequencyRule->setPreferredChannel($data['lead_channels']['preferred_channel'] === $ch);
 
             if ($persist) {
                 $entities[$ch] = $frequencyRule;
@@ -1550,7 +1206,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param Lead $lead
      * @param $categories
      * @param bool $manuallyAdded
      *
@@ -1615,8 +1270,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return array
      */
     public function getLeadCategories(Lead $lead)
@@ -1642,28 +1295,8 @@ class LeadModel extends FormModel
      * @return bool|null
      *
      * @throws \Exception
-     *
-     * @deprecated 2.10.0 To be removed in 3.0. Use `import` instead
      */
-    public function importLead($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null)
-    {
-        return $this->import($fields, $data, $owner, $list, $tags, $persist, $eventLog);
-    }
-
-    /**
-     * @param array        $fields
-     * @param array        $data
-     * @param null         $owner
-     * @param null         $list
-     * @param null         $tags
-     * @param bool         $persist
-     * @param LeadEventLog $eventLog
-     *
-     * @return bool|null
-     *
-     * @throws \Exception
-     */
-    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null)
+    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null, $importId = null)
     {
         $fields    = array_flip($fields);
         $fieldData = [];
@@ -1671,7 +1304,7 @@ class LeadModel extends FormModel
         // Extract company data and import separately
         // Modifies the data array
         $company                           = null;
-        list($companyFields, $companyData) = $this->companyModel->extractCompanyDataFromImport($fields, $data);
+        [$companyFields, $companyData]     = $this->companyModel->extractCompanyDataFromImport($fields, $data);
 
         if (!empty($companyData)) {
             $companyFields = array_flip($companyFields);
@@ -1688,7 +1321,7 @@ class LeadModel extends FormModel
 
         foreach ($fields as $leadField => $importField) {
             // Prevent overwriting existing data with empty data
-            if (array_key_exists($importField, $data) && !is_null($data[$importField]) && $data[$importField] != '') {
+            if (array_key_exists($importField, $data) && !is_null($data[$importField]) && '' != $data[$importField]) {
                 $fieldData[$leadField] = InputHelper::_($data[$importField], 'string');
             }
         }
@@ -1723,7 +1356,7 @@ class LeadModel extends FormModel
         if (!empty($fields['createdByUser']) && !empty($data[$fields['createdByUser']])) {
             $userRepo      = $this->em->getRepository('MauticUserBundle:User');
             $createdByUser = $userRepo->findByIdentifier($data[$fields['createdByUser']]);
-            if ($createdByUser !== null) {
+            if (null !== $createdByUser) {
                 $lead->setCreatedBy($createdByUser);
             }
         }
@@ -1732,7 +1365,7 @@ class LeadModel extends FormModel
         if (!empty($fields['modifiedByUser']) && !empty($data[$fields['modifiedByUser']])) {
             $userRepo       = $this->em->getRepository('MauticUserBundle:User');
             $modifiedByUser = $userRepo->findByIdentifier($data[$fields['modifiedByUser']]);
-            if ($modifiedByUser !== null) {
+            if (null !== $modifiedByUser) {
                 $lead->setModifiedBy($modifiedByUser);
             }
         }
@@ -1741,14 +1374,17 @@ class LeadModel extends FormModel
         if (!empty($fields['ip']) && !empty($data[$fields['ip']])) {
             $addresses = explode(',', $data[$fields['ip']]);
             foreach ($addresses as $address) {
-                $ipAddress = new IpAddress();
-                $ipAddress->setIpAddress(trim($address));
+                $address = trim($address);
+                if (!$ipAddress = $this->ipAddressModel->findOneByIpAddress($address)) {
+                    $ipAddress = new IpAddress();
+                    $ipAddress->setIpAddress($address);
+                }
                 $lead->addIpAddress($ipAddress);
             }
         }
         unset($fieldData['ip']);
 
-        if (!empty($fields['points']) && !empty($data[$fields['points']]) && $lead->getId() === null) {
+        if (!empty($fields['points']) && !empty($data[$fields['points']]) && null === $lead->getId()) {
             // Add points only for new leads
             $lead->setPoints($data[$fields['points']]);
 
@@ -1803,18 +1439,23 @@ class LeadModel extends FormModel
         unset($fieldData['stage']);
 
         // Set unsubscribe status
-        if (!empty($fields['doNotEmail']) && !empty($data[$fields['doNotEmail']]) && (!empty($fields['email']) && !empty($data[$fields['email']]))) {
-            $doNotEmail = filter_var($data[$fields['doNotEmail']], FILTER_VALIDATE_BOOLEAN);
-            if ($doNotEmail) {
+        if (!empty($fields['doNotEmail']) && isset($data[$fields['doNotEmail']]) && (!empty($fields['email']) && !empty($data[$fields['email']]))) {
+            $doNotEmail = filter_var($data[$fields['doNotEmail']], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if (null !== $doNotEmail) {
                 $reason = $this->translator->trans('mautic.lead.import.by.user', [
                     '%user%' => $this->userHelper->getUser()->getUsername(),
                 ]);
 
                 // The email must be set for successful unsubscribtion
                 $lead->addUpdatedField('email', $data[$fields['email']]);
-                $this->addDncForLead($lead, 'email', $reason, DoNotContact::MANUAL);
+                if ($doNotEmail) {
+                    $this->addDncForLead($lead, 'email', $reason, DNC::MANUAL);
+                } else {
+                    $this->removeDncForLead($lead, 'email');
+                }
             }
         }
+
         unset($fieldData['doNotEmail']);
 
         if (!empty($fields['ownerusername']) && !empty($data[$fields['ownerusername']])) {
@@ -1829,11 +1470,11 @@ class LeadModel extends FormModel
         }
         unset($fieldData['ownerusername']);
 
-        if ($owner !== null) {
+        if (null !== $owner) {
             $lead->setOwner($this->em->getReference('MauticUserBundle:User', $owner));
         }
 
-        if ($tags !== null) {
+        if (null !== $tags) {
             $this->modifyTags($lead, $tags, null, false);
         }
 
@@ -1885,7 +1526,7 @@ class LeadModel extends FormModel
 
                 // Skip if the value is in the CSV row
                 continue;
-            } elseif ($leadField['defaultValue']) {
+            } elseif ($lead->isNew() && $leadField['defaultValue']) {
                 // Fill in the default value if any
                 $fieldData[$leadField['alias']] = ('multiselect' === $leadField['type']) ? [$leadField['defaultValue']] : $leadField['defaultValue'];
             }
@@ -1907,18 +1548,27 @@ class LeadModel extends FormModel
         if ($eventLog) {
             $action = $merged ? 'updated' : 'inserted';
             $eventLog->setAction($action);
-            $lead->addEventLog($eventLog);
         }
 
         if ($persist) {
+            $lead->setManipulator(new LeadManipulator(
+                'lead',
+                'import',
+                $importId,
+                $this->userHelper->getUser()->getName()
+            ));
             $this->saveEntity($lead);
 
-            if ($list !== null) {
+            if (null !== $list) {
                 $this->addToLists($lead, [$list]);
             }
 
-            if ($company !== null) {
+            if (null !== $company) {
                 $this->companyModel->addLeadToCompany($company, $lead);
+            }
+
+            if ($eventLog) {
+                $lead->addEventLog($eventLog);
             }
         }
 
@@ -1928,8 +1578,6 @@ class LeadModel extends FormModel
     /**
      * Update a leads tags.
      *
-     * @param Lead       $lead
-     * @param array      $tags
      * @param bool|false $removeOrphans
      */
     public function setTags(Lead $lead, array $tags, $removeOrphans = false)
@@ -1938,7 +1586,7 @@ class LeadModel extends FormModel
         $currentTags  = $lead->getTags();
         $leadModified = $tagsDeleted = false;
 
-        foreach ($currentTags as $tagName => $tag) {
+        foreach ($currentTags as $tag) {
             if (!in_array($tag->getId(), $tags)) {
                 // Tag has been removed
                 $lead->removeTag($tag);
@@ -1978,9 +1626,6 @@ class LeadModel extends FormModel
 
     /**
      * Update a leads UTM tags.
-     *
-     * @param Lead   $lead
-     * @param UtmTag $utmTags
      */
     public function setUtmTags(Lead $lead, UtmTag $utmTags)
     {
@@ -1992,14 +1637,13 @@ class LeadModel extends FormModel
     /**
      * Add leads UTM tags via API.
      *
-     * @param Lead  $lead
      * @param array $params
      */
     public function addUTMTags(Lead $lead, $params)
     {
         // known "synonym" fields expected
-        $synonyms = ['useragent' => 'user_agent',
-                    'remotehost' => 'remote_host', ];
+        $synonyms = ['useragent'  => 'user_agent',
+                     'remotehost' => 'remote_host', ];
 
         // convert 'query' option to an array if necessary
         if (isset($params['query']) && !is_array($params['query'])) {
@@ -2015,7 +1659,7 @@ class LeadModel extends FormModel
 
         // Fix up known synonym/mismatch field names
         foreach ($synonyms as $expected => $replace) {
-            if (key_exists($expected, $params) && !isset($params[$replace])) {
+            if (array_key_exists($expected, $params) && !isset($params[$replace])) {
                 // add expected key name
                 $params[$replace] = $params[$expected];
             }
@@ -2045,26 +1689,8 @@ class LeadModel extends FormModel
         }
 
         // create device
-        if (key_exists('useragent', $params) && !empty($params['useragent'])) {
-            //device granularity
-            $dd = new DeviceDetector($params['useragent']);
-            $dd->parse();
-
-            $deviceRepo = $this->getDeviceRepository();
-            $device     = $deviceRepo->getDevice($lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
-
-            // Only if it does not exist already
-            if (empty($device)) {
-                $device = new LeadDevice();
-                $device->setClientInfo($dd->getClient());
-                $device->setDevice($dd->getDeviceName());
-                $device->setDeviceBrand($dd->getBrand());
-                $device->setDeviceModel($dd->getModel());
-                $device->setDeviceOs($dd->getOs());
-                $device->setDateAdded($lastActive);
-                $device->setLead($lead);
-                $this->getDeviceRepository()->saveEntity($device);
-            }
+        if (!empty($params['useragent'])) {
+            $this->deviceTracker->createDeviceFromUserAgent($lead, $params['useragent']);
         }
 
         // add the lead
@@ -2079,8 +1705,7 @@ class LeadModel extends FormModel
     /**
      * Removes a UtmTag set from a Lead.
      *
-     * @param Lead $lead
-     * @param int  $utmId
+     * @param int $utmId
      */
     public function removeUtmTags(Lead $lead, $utmId)
     {
@@ -2100,10 +1725,9 @@ class LeadModel extends FormModel
     /**
      * Modify tags with support to remove via a prefixed minus sign.
      *
-     * @param Lead $lead
-     * @param      $tags
-     * @param      $removeTags
-     * @param      $persist
+     * @param $tags
+     * @param $removeTags
+     * @param $persist
      * @param bool True if tags modified
      *
      * @return bool
@@ -2123,14 +1747,21 @@ class LeadModel extends FormModel
             $tags = explode(',', $tags);
         }
 
+        if (empty($tags) && empty($removeTags)) {
+            return false;
+        }
+
         $this->logger->debug('CONTACT: Adding '.implode(', ', $tags).' to contact ID# '.$lead->getId());
 
-        array_walk($tags, create_function('&$val', '$val = trim($val); \Mautic\CoreBundle\Helper\InputHelper::clean($val);'));
+        array_walk($tags, function (&$val) {
+            $val = trim($val);
+            InputHelper::clean($val);
+        });
 
         // See which tags already exist
         $foundTags = $this->getTagRepository()->getTagsByName($tags);
         foreach ($tags as $tag) {
-            if (strpos($tag, '-') === 0) {
+            if (0 === strpos($tag, '-')) {
                 // Tag to be removed
                 $tag = substr($tag, 1);
 
@@ -2160,7 +1791,10 @@ class LeadModel extends FormModel
         if (!empty($removeTags)) {
             $this->logger->debug('CONTACT: Removing '.implode(', ', $removeTags).' for contact ID# '.$lead->getId());
 
-            array_walk($removeTags, create_function('&$val', '$val = trim($val); \Mautic\CoreBundle\Helper\InputHelper::clean($val);'));
+            array_walk($removeTags, function (&$val) {
+                $val = trim($val);
+                InputHelper::clean($val);
+            });
 
             // See which tags really exist
             $foundRemoveTags = $this->getTagRepository()->getTagsByName($removeTags);
@@ -2186,7 +1820,6 @@ class LeadModel extends FormModel
     /**
      * Modify companies for lead.
      *
-     * @param Lead $lead
      * @param $companies
      */
     public function modifyCompanies(Lead $lead, $companies)
@@ -2194,8 +1827,8 @@ class LeadModel extends FormModel
         // See which companies belong to the lead already
         $leadCompanies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
 
-        foreach ($leadCompanies as $key => $leadCompany) {
-            if (array_search($leadCompany['company_id'], $companies) === false) {
+        foreach ($leadCompanies as $leadCompany) {
+            if (false === array_search($leadCompany['company_id'], $companies)) {
                 $this->companyModel->removeLeadFromCompany([$leadCompany['company_id']], $lead);
             }
         }
@@ -2257,7 +1890,7 @@ class LeadModel extends FormModel
             'expression' => 'isNotNull',
         ];
 
-        if ($flag == 'top') {
+        if ('top' == $flag) {
             $topLists = $this->leadListModel->getTopLists(6, $dateFrom, $dateTo);
             if ($topLists) {
                 foreach ($topLists as $list) {
@@ -2269,7 +1902,7 @@ class LeadModel extends FormModel
                     $chart->setDataset($list['name'].': '.$allLeadsT, $all);
                 }
             }
-        } elseif ($flag == 'topIdentifiedVsAnonymous') {
+        } elseif ('topIdentifiedVsAnonymous' == $flag) {
             $topLists = $this->leadListModel->getTopLists(3, $dateFrom, $dateTo);
             if ($topLists) {
                 foreach ($topLists as $list) {
@@ -2287,13 +1920,13 @@ class LeadModel extends FormModel
                     $chart->setDataset($list['name'].': '.$anonymousT, $anonymous);
                 }
             }
-        } elseif ($flag == 'identified') {
+        } elseif ('identified' == $flag) {
             $identified = $query->fetchTimeData('leads', 'date_added', $identifiedFilter);
             $chart->setDataset($identifiedT, $identified);
-        } elseif ($flag == 'anonymous') {
+        } elseif ('anonymous' == $flag) {
             $anonymous = $query->fetchTimeData('leads', 'date_added', $anonymousFilter);
             $chart->setDataset($anonymousT, $anonymous);
-        } elseif ($flag == 'identifiedVsAnonymous') {
+        } elseif ('identifiedVsAnonymous' == $flag) {
             $identified = $query->fetchTimeData('leads', 'date_added', $identifiedFilter);
             $anonymous  = $query->fetchTimeData('leads', 'date_added', $anonymousFilter);
             $chart->setDataset($identifiedT, $identified);
@@ -2402,9 +2035,7 @@ class LeadModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -2432,9 +2063,7 @@ class LeadModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -2489,12 +2118,10 @@ class LeadModel extends FormModel
     /**
      * Get timeline/engagement data.
      *
-     * @param Lead|null  $lead
-     * @param null       $filters
-     * @param array|null $orderBy
-     * @param int        $page
-     * @param int        $limit
-     * @param bool       $forTimeline
+     * @param null $filters
+     * @param int  $page
+     * @param int  $limit
+     * @param bool $forTimeline
      *
      * @return array
      */
@@ -2502,7 +2129,7 @@ class LeadModel extends FormModel
     {
         $event = $this->dispatcher->dispatch(
             LeadEvents::TIMELINE_ON_GENERATE,
-            new LeadTimelineEvent($lead, $filters, $orderBy, $page, $limit, $forTimeline, $this->coreParametersHelper->getParameter('site_url'))
+            new LeadTimelineEvent($lead, $filters, $orderBy, $page, $limit, $forTimeline, $this->coreParametersHelper->get('site_url'))
         );
 
         $payload = [
@@ -2535,11 +2162,7 @@ class LeadModel extends FormModel
     /**
      * Get engagement counts by time unit.
      *
-     * @param Lead            $lead
-     * @param \DateTime|null  $dateFrom
-     * @param \DateTime|null  $dateTo
-     * @param string          $unit
-     * @param ChartQuery|null $chartQuery
+     * @param string $unit
      *
      * @return array
      */
@@ -2554,8 +2177,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param Lead $lead
-     * @param      $company
+     * @param $company
      *
      * @return bool
      */
@@ -2567,7 +2189,7 @@ class LeadModel extends FormModel
         }
 
         // company does not exist anymore
-        if ($company === null) {
+        if (null === $company) {
             return false;
         }
 
@@ -2585,8 +2207,6 @@ class LeadModel extends FormModel
     /**
      * Get contact channels.
      *
-     * @param Lead $lead
-     *
      * @return array
      */
     public function getContactChannels(Lead $lead)
@@ -2595,7 +2215,7 @@ class LeadModel extends FormModel
 
         $channels = [];
         foreach ($allChannels as $channel) {
-            if ($this->isContactable($lead, $channel) === DoNotContact::IS_CONTACTABLE) {
+            if (DNC::IS_CONTACTABLE === $this->isContactable($lead, $channel)) {
                 $channels[$channel] = $channel;
             }
         }
@@ -2606,8 +2226,6 @@ class LeadModel extends FormModel
     /**
      * Get contact channels.
      *
-     * @param Lead $lead
-     *
      * @return array
      */
     public function getDoNotContactChannels(Lead $lead)
@@ -2616,7 +2234,7 @@ class LeadModel extends FormModel
 
         $channels = [];
         foreach ($allChannels as $channel) {
-            if ($this->isContactable($lead, $channel) !== DoNotContact::IS_CONTACTABLE) {
+            if (DNC::IS_CONTACTABLE !== $this->isContactable($lead, $channel)) {
                 $channels[$channel] = $channel;
             }
         }
@@ -2646,8 +2264,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return array
      */
     public function getPreferredChannel(Lead $lead)
@@ -2714,7 +2330,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param Lead $lead
      * @param $score
      *
      * @return bool
@@ -2744,8 +2359,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param Lead $lead
-     * @param      $ownerId
+     * @param $ownerId
      */
     public function updateLeadOwner(Lead $lead, $ownerId)
     {
@@ -2755,10 +2369,64 @@ class LeadModel extends FormModel
         parent::saveEntity($lead);
     }
 
+    private function processManipulator(Lead $lead)
+    {
+        if ($lead->isNewlyCreated() || $lead->wasAnonymous()) {
+            // Only store an entry once for created and once for identified, not every time the lead is saved
+            $manipulator = $lead->getManipulator();
+            if (null !== $manipulator) {
+                $manipulationLog = new LeadEventLog();
+                $manipulationLog->setLead($lead)
+                    ->setBundle($manipulator->getBundleName())
+                    ->setObject($manipulator->getObjectName())
+                    ->setObjectId($manipulator->getObjectId());
+                if ($lead->isAnonymous()) {
+                    $manipulationLog->setAction('created_contact');
+                } else {
+                    $manipulationLog->setAction('identified_contact');
+                }
+                $description = $manipulator->getObjectDescription();
+                $manipulationLog->setProperties(['object_description' => $description]);
+
+                $lead->addEventLog($manipulationLog);
+                $lead->setManipulator(null);
+            }
+        }
+    }
+
+    /**
+     * @param bool $persist
+     *
+     * @return Lead
+     */
+    protected function createNewContact(IpAddress $ip, $persist = true)
+    {
+        //let's create a lead
+        $lead = new Lead();
+        $lead->addIpAddress($ip);
+        $lead->setNewlyCreated(true);
+
+        if ($persist && !defined('MAUTIC_NON_TRACKABLE_REQUEST')) {
+            // Set to prevent loops
+            $this->contactTracker->setTrackedContact($lead);
+
+            // Note ignoring a lead manipulator object here on purpose to not falsely record entries
+            $this->saveEntity($lead, false);
+
+            $fields = $this->getLeadDetails($lead);
+            $lead->setFields($fields);
+        }
+
+        if ($leadId = $lead->getId()) {
+            $this->logger->addDebug("LEAD: New lead created with ID# $leadId.");
+        }
+
+        return $lead;
+    }
+
     /**
      * @deprecated 2.12.0 to be removed in 3.0; use Mautic\LeadBundle\Model\DoNotContact instead
      *
-     * @param Lead   $lead
      * @param string $channel
      *
      * @return int
@@ -2781,16 +2449,16 @@ class LeadModel extends FormModel
 
         // If the lead has no entries in the DNC table, we're good to go
         if (empty($dncEntries)) {
-            return DoNotContact::IS_CONTACTABLE;
+            return DNC::IS_CONTACTABLE;
         }
 
         foreach ($dncEntries as $dnc) {
-            if ($dnc->getReason() !== DoNotContact::IS_CONTACTABLE) {
+            if (DNC::IS_CONTACTABLE !== $dnc->getReason()) {
                 return $dnc->getReason();
             }
         }
 
-        return DoNotContact::IS_CONTACTABLE;
+        return DNC::IS_CONTACTABLE;
     }
 
     /**
@@ -2798,7 +2466,6 @@ class LeadModel extends FormModel
      *
      * @deprecated 2.12.0 to be removed in 3.0; use Mautic\LeadBundle\Model\DoNotContact instead
      *
-     * @param Lead      $lead
      * @param string    $channel
      * @param bool|true $persist
      *
@@ -2806,7 +2473,7 @@ class LeadModel extends FormModel
      */
     public function removeDncForLead(Lead $lead, $channel, $persist = true)
     {
-        /** @var DoNotContact $dnc */
+        /** @var DNC $dnc */
         foreach ($lead->getDoNotContact() as $dnc) {
             if ($dnc->getChannel() === $channel) {
                 $lead->removeDoNotContactEntry($dnc);
@@ -2827,7 +2494,6 @@ class LeadModel extends FormModel
      *
      * @deprecated 2.12.0 to be removed in 3.0; use Mautic\LeadBundle\Model\DoNotContact instead
      *
-     * @param Lead         $lead
      * @param string|array $channel            If an array with an ID, use the structure ['email' => 123]
      * @param string       $comments
      * @param int          $reason             Must be a class constant from the DoNotContact class
@@ -2835,17 +2501,17 @@ class LeadModel extends FormModel
      * @param bool         $checkCurrentStatus
      * @param bool         $override
      *
-     * @return bool|DoNotContact If a DNC entry is added or updated, returns the DoNotContact object. If a DNC is already present
-     *                           and has the specified reason, nothing is done and this returns false
+     * @return bool|DNC If a DNC entry is added or updated, returns the DNC object. If a DNC is already present
+     *                  and has the specified reason, nothing is done and this returns false
      */
-    public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $persist = true, $checkCurrentStatus = true, $override = false)
+    public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DNC::BOUNCED, $persist = true, $checkCurrentStatus = true, $override = false)
     {
         // if !$checkCurrentStatus, assume is contactable due to already being valided
-        $isContactable = ($checkCurrentStatus) ? $this->isContactable($lead, $channel) : DoNotContact::IS_CONTACTABLE;
+        $isContactable = ($checkCurrentStatus) ? $this->isContactable($lead, $channel) : DNC::IS_CONTACTABLE;
 
         // If they don't have a DNC entry yet
-        if ($isContactable === DoNotContact::IS_CONTACTABLE) {
-            $dnc = new DoNotContact();
+        if (DNC::IS_CONTACTABLE === $isContactable) {
+            $dnc = new DNC();
 
             if (is_array($channel)) {
                 $channelId = reset($channel);
@@ -2871,10 +2537,10 @@ class LeadModel extends FormModel
         }
         // Or if the given reason is different than the stated reason
         elseif ($isContactable !== $reason) {
-            /** @var DoNotContact $dnc */
+            /** @var DNC $dnc */
             foreach ($lead->getDoNotContact() as $dnc) {
                 // Only update if the contact did not unsubscribe themselves
-                if (!$override && $dnc->getReason() !== DoNotContact::UNSUBSCRIBED) {
+                if (!$override && DNC::UNSUBSCRIBED !== $dnc->getReason()) {
                     $override = true;
                 }
                 if ($dnc->getChannel() === $channel && $override) {
@@ -2905,31 +2571,60 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param IpAddress $ip
-     * @param bool      $persist
+     * Get the current lead; if $returnTracking = true then array with lead, trackingId, and boolean of if trackingId
+     * was just generated or not.
+     *
+     * @deprecated 2.13.0 to be removed in 3.0
+     *
+     * @param bool|false $returnTracking
+     *
+     * @return Lead|array|null
+     */
+    public function getCurrentLead($returnTracking = false)
+    {
+        @trigger_error('getCurrentLead is deprecated and will be removed in 3.0; Use the ContactTracker::getContact instead', E_USER_DEPRECATED);
+
+        $trackedContact = $this->contactTracker->getContact();
+        $trackingId     = $this->contactTracker->getTrackingId();
+
+        return ($returnTracking) ? [$trackedContact, $trackingId, false] : $trackedContact;
+    }
+
+    /**
+     * Sets current lead.
+     *
+     * @deprecated 2.13.0 to be removed in 3.0; use ContactTracker::getContact instead
+     */
+    public function setCurrentLead(Lead $lead)
+    {
+        @trigger_error('setCurrentLead is deprecated and will be removed in 3.0; Use the ContactTracker::setTrackedContact instead', E_USER_DEPRECATED);
+
+        $this->contactTracker->setTrackedContact($lead);
+    }
+
+    /**
+     * Used by system processes that hook into events that use getCurrentLead().
+     *
+     * @param Lead $lead
+     */
+    public function setSystemCurrentLead(Lead $lead = null)
+    {
+        @trigger_error('setSystemCurrentLead is deprecated and will be removed in 3.0; Use the ContactTracker::setSystemContac instead', E_USER_DEPRECATED);
+
+        $this->contactTracker->setSystemContact($lead);
+    }
+
+    /**
+     * Merge two leads; if a conflict of data occurs, the newest lead will get precedence.
+     *
+     * @deprecated 2.13.0; to be removed in 3.0. Use \Mautic\LeadBundle\Deduplicate\ContactMerger instead
+     *
+     * @param bool $autoMode If true, the newest lead will be merged into the oldes then deleted; otherwise, $lead will be merged into $lead2 then deleted
      *
      * @return Lead
      */
-    protected function createNewContact(IpAddress $ip, $persist = true)
+    public function mergeLeads(Lead $lead, Lead $lead2, $autoMode = true)
     {
-        //let's create a lead
-        $lead = new Lead();
-        $lead->addIpAddress($ip);
-        $lead->setNewlyCreated(true);
-
-        if ($persist) {
-            // Set to prevent loops
-            $this->currentLead = $lead;
-            $this->saveEntity($lead, false);
-
-            $fields = $this->getLeadDetails($lead);
-            $lead->setFields($fields);
-        }
-
-        if ($leadId = $lead->getId()) {
-            $this->logger->addDebug("LEAD: New lead created with ID# $leadId.");
-        }
-
-        return $lead;
+        return $this->legacyLeadModel->mergeLeads($lead, $lead2, $autoMode);
     }
 }

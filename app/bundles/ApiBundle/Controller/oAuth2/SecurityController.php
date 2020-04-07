@@ -15,16 +15,11 @@ use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception as Exception;
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\Security;
 
-/**
- * Class SecurityController.
- */
 class SecurityController extends CommonController
 {
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function loginAction(Request $request)
@@ -32,11 +27,11 @@ class SecurityController extends CommonController
         $session = $request->getSession();
 
         //get the login error if there is one
-        if ($request->attributes->has(SecurityContext::AUTHENTICATION_ERROR)) {
-            $error = $request->attributes->get(SecurityContext::AUTHENTICATION_ERROR);
+        if ($request->attributes->has(Security::AUTHENTICATION_ERROR)) {
+            $error = $request->attributes->get(Security::AUTHENTICATION_ERROR);
         } else {
-            $error = $session->get(SecurityContext::AUTHENTICATION_ERROR);
-            $session->remove(SecurityContext::AUTHENTICATION_ERROR);
+            $error = $session->get(Security::AUTHENTICATION_ERROR);
+            $session->remove(Security::AUTHENTICATION_ERROR);
         }
         if (!empty($error)) {
             if (($error instanceof Exception\BadCredentialsException)) {
@@ -56,7 +51,7 @@ class SecurityController extends CommonController
         return $this->render(
             'MauticApiBundle:Security:login.html.php',
             [
-                'last_username' => $session->get(SecurityContext::LAST_USERNAME),
+                'last_username' => $session->get(Security::LAST_USERNAME),
                 'route'         => 'mautic_oauth2_server_auth_login_check',
             ]
         );

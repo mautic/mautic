@@ -15,7 +15,7 @@
  */
 
 $leadId = isset($lead) ? $lead->getId() : null;
-if (isset($tmpl) && $tmpl == 'index') {
+if (isset($tmpl) && 'index' == $tmpl) {
     $view->extend('MauticLeadBundle:Timeline:plugin_index.html.php');
 }
 
@@ -103,7 +103,7 @@ $baseUrl = isset($lead) ? $view['router']->path(
 
     <?php foreach ($events['events'] as $counter => $event): ?>
         <?php
-        $counter += 1; // prevent 0
+        ++$counter; // prevent 0
         $icon       = (isset($event['icon'])) ? $event['icon'] : 'fa-history';
         $eventLabel = (isset($event['eventLabel'])) ? $event['eventLabel'] : $event['eventType'];
         if (is_array($eventLabel)):
@@ -121,7 +121,7 @@ $baseUrl = isset($lead) ? $view['router']->path(
         $details = preg_replace('/a\s+href/', 'a target="_new" href', $details);
         $details = preg_replace('/data-toggle="ajax"/', '', $details);
 
-        $rowStripe = ($counter % 2 === 0) ? ' timeline-row-highlighted' : '';
+        $rowStripe = (0 === $counter % 2) ? ' timeline-row-highlighted' : '';
         ?>
         <div class="timeline-row<?php echo $rowStripe; ?><?php if (!empty($event['featured'])) {
             echo ' timeline-featured';
@@ -142,7 +142,7 @@ $baseUrl = isset($lead) ? $view['router']->path(
             echo ' disabled';
         } ?>" data-toggle="tooltip"
                        title="<?php echo $view['translator']->trans('mautic.lead.timeline.toggle_details'); ?>">
-                        <span class="fa fa-fw <?php echo $icon ?>"></span>
+                        <span class="fa fa-fw <?php echo $icon; ?>"></span>
                     </a>
                 </span>
 
@@ -176,7 +176,7 @@ $baseUrl = isset($lead) ? $view['router']->path(
 
             <?php if (!empty($details)): ?>
                 <div class="timeline-details hide" id="timeline-details-<?php echo $counter; ?>">
-                    <?php echo $details ?>
+                    <?php echo $details; ?>
                 </div>
             <?php endif; ?>
         </div>

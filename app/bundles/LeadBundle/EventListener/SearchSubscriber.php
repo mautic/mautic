@@ -12,27 +12,26 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\EntityManager;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class SearchSubscriber.
- */
-class SearchSubscriber extends CommonSubscriber
+class SearchSubscriber implements EventSubscriberInterface
 {
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
      * @var LeadRepository
@@ -45,16 +44,33 @@ class SearchSubscriber extends CommonSubscriber
     private $emailRepository;
 
     /**
-     * SearchSubscriber constructor.
-     *
-     * @param LeadModel     $leadModel
-     * @param EntityManager $entityManager
+     * @var TranslatorInterface
      */
-    public function __construct(LeadModel $leadModel, EntityManager $entityManager)
-    {
+    private $translator;
+
+    /**
+     * @var CorePermissions
+     */
+    private $security;
+
+    /**
+     * @var TemplatingHelper
+     */
+    private $templating;
+
+    public function __construct(
+        LeadModel $leadModel,
+        EmailRepository $emailRepository,
+        TranslatorInterface $translator,
+        CorePermissions $security,
+        TemplatingHelper $templating
+    ) {
         $this->leadModel       = $leadModel;
         $this->leadRepo        = $leadModel->getRepository();
-        $this->emailRepository = $entityManager->getRepository(Email::class);
+        $this->emailRepository = $emailRepository;
+        $this->translator      = $translator;
+        $this->security        = $security;
+        $this->templating      = $templating;
     }
 
     /**
@@ -69,9 +85,6 @@ class SearchSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param MauticEvents\GlobalSearchEvent $event
-     */
     public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
     {
         $str = $event->getSearchString();
@@ -84,7 +97,7 @@ class SearchSubscriber extends CommonSubscriber
         $filter    = ['string' => $str, 'force' => ''];
 
         //only show results that are not anonymous so as to not clutter up things
-        if (strpos($str, "$anonymous") === false) {
+        if (false === strpos($str, "$anonymous")) {
             $filter['force'] = " !$anonymous";
         }
 
@@ -113,14 +126,14 @@ class SearchSubscriber extends CommonSubscriber
                 $leadResults = [];
 
                 foreach ($leads as $lead) {
-                    $leadResults[] = $this->templating->renderResponse(
+                    $leadResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticLeadBundle:SubscribedEvents\Search:global.html.php',
                         ['lead' => $lead]
                     )->getContent();
                 }
 
                 if ($results['count'] > 5) {
-                    $leadResults[] = $this->templating->renderResponse(
+                    $leadResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticLeadBundle:SubscribedEvents\Search:global.html.php',
                         [
                             'showMore'     => true,
@@ -135,9 +148,6 @@ class SearchSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param MauticEvents\CommandListEvent $event
-     */
     public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
         if ($this->security->isGranted(['lead:leads:viewown', 'lead:leads:viewother'], 'MATCH_ONE')) {
@@ -149,8 +159,6 @@ class SearchSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param LeadBuildSearchEvent $event
-     *
      * @throws \InvalidArgumentException
      */
     public function onBuildSearchCommands(LeadBuildSearchEvent $event)
@@ -172,6 +180,19 @@ class SearchSubscriber extends CommonSubscriber
             case $this->translator->trans('mautic.lead.lead.searchcommand.email_pending', [], null, 'en_US'):
                     $this->buildEmailPendingQuery($event);
                 break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.page_source'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.page_source', [], null, 'en_US'):
+            $this->buildPageHitSourceQuery($event);
+                break;
+
+            case $this->translator->trans('mautic.lead.lead.searchcommand.page_source_id'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.page_source_id', [], null, 'en_US'):
+            $this->buildPageHitSourceIdQuery($event);
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.page_id'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.page_id', [], null, 'en_US'):
+                $this->buildPageHitIdQuery($event);
+                break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.sms_sent'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.sms_sent', [], null, 'en_US'):
                     $this->buildSmsSentQuery($event);
@@ -187,9 +208,6 @@ class SearchSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param LeadBuildSearchEvent $event
-     */
     private function buildEmailPendingQuery(LeadBuildSearchEvent $event)
     {
         $q       = $event->getQueryBuilder();
@@ -234,9 +252,59 @@ class SearchSubscriber extends CommonSubscriber
         $this->buildJoinQuery($event, $tables, $config);
     }
 
-    /**
-     * @param LeadBuildSearchEvent $event
-     */
+    private function buildPageHitSourceQuery(LeadBuildSearchEvent $event)
+    {
+        $tables = [
+            [
+                'from_alias' => 'l',
+                'table'      => 'page_hits',
+                'alias'      => 'ph',
+                'condition'  => 'l.id = ph.lead_id',
+            ],
+        ];
+
+        $config = [
+            'column' => 'ph.source',
+        ];
+
+        $this->buildJoinQuery($event, $tables, $config);
+    }
+
+    private function buildPageHitSourceIdQuery(LeadBuildSearchEvent $event)
+    {
+        $tables = [
+            [
+                'from_alias' => 'l',
+                'table'      => 'page_hits',
+                'alias'      => 'ph',
+                'condition'  => 'l.id = ph.lead_id',
+            ],
+        ];
+
+        $config = [
+            'column' => 'ph.source_id',
+        ];
+
+        $this->buildJoinQuery($event, $tables, $config);
+    }
+
+    private function buildPageHitIdQuery(LeadBuildSearchEvent $event)
+    {
+        $tables = [
+            [
+                'from_alias' => 'l',
+                'table'      => 'page_hits',
+                'alias'      => 'ph',
+                'condition'  => 'l.id = ph.lead_id',
+            ],
+        ];
+
+        $config = [
+            'column' => 'ph.redirect_id',
+        ];
+        $this->buildJoinQuery($event, $tables, $config);
+    }
+
     private function buildEmailQueuedQuery(LeadBuildSearchEvent $event)
     {
         $tables = [
@@ -259,9 +327,6 @@ class SearchSubscriber extends CommonSubscriber
         $this->buildJoinQuery($event, $tables, $config);
     }
 
-    /**
-     * @param LeadBuildSearchEvent $event
-     */
     private function buildEmailSentQuery(LeadBuildSearchEvent $event)
     {
         $tables = [
@@ -280,9 +345,6 @@ class SearchSubscriber extends CommonSubscriber
         $this->buildJoinQuery($event, $tables, $config);
     }
 
-    /**
-     * @param LeadBuildSearchEvent $event
-     */
     private function buildEmailReadQuery(LeadBuildSearchEvent $event)
     {
         $tables = [
@@ -304,9 +366,6 @@ class SearchSubscriber extends CommonSubscriber
         $this->buildJoinQuery($event, $tables, $config);
     }
 
-    /**
-     * @param LeadBuildSearchEvent $event
-     */
     private function buildSmsSentQuery(LeadBuildSearchEvent $event)
     {
         $tables = [
@@ -325,25 +384,18 @@ class SearchSubscriber extends CommonSubscriber
         $this->buildJoinQuery($event, $tables, $config);
     }
 
-    /**
-     * @param LeadBuildSearchEvent $event
-     */
     private function buildWebSentQuery(LeadBuildSearchEvent $event)
     {
         $this->buildNotificationSentQuery($event);
     }
 
-    /**
-     * @param LeadBuildSearchEvent $event
-     */
     private function buildMobileSentQuery(LeadBuildSearchEvent $event)
     {
         $this->buildNotificationSentQuery($event, true);
     }
 
     /**
-     * @param LeadBuildSearchEvent $event
-     * @param bool                 $isMobile
+     * @param bool $isMobile
      */
     private function buildNotificationSentQuery(LeadBuildSearchEvent $event, $isMobile = false)
     {
@@ -372,11 +424,6 @@ class SearchSubscriber extends CommonSubscriber
         $this->buildJoinQuery($event, $tables, $config);
     }
 
-    /**
-     * @param LeadBuildSearchEvent $event
-     * @param array                $tables
-     * @param array                $config
-     */
     private function buildJoinQuery(LeadBuildSearchEvent $event, array $tables, array $config)
     {
         if (!isset($config['column']) || 0 === count($tables)) {

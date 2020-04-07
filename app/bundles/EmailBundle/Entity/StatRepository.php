@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Entity;
 
+use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -47,7 +48,134 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param      $emailId
+     * @param int $contactId
+     * @param int $emailId
+     *
+     * @return array
+     */
+    public function getUniqueClickedLinksPerContactAndEmail($contactId, $emailId)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('distinct ph.url, ph.date_hit')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
+            ->where('ph.email_id = :emailId')
+            ->andWhere('ph.lead_id = :leadId')
+            ->setParameter('leadId', $contactId)
+            ->setParameter('emailId', $emailId);
+
+        $result = $q->execute()->fetchAll();
+
+        if ($result) {
+            foreach ($result as $row) {
+                $data[$row['date_hit']] = $row['url'];
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param int      $limit
+     * @param int|null $createdByUserId
+     * @param int|null $companyId
+     * @param int|null $campaignId
+     * @param int|null $segmentId
+     *
+     * @return array
+     */
+    public function getSentEmailToContactData(
+        $limit,
+        \DateTime $dateFrom,
+        \DateTime $dateTo,
+        $createdByUserId = null,
+        $companyId = null,
+        $campaignId = null,
+        $segmentId = null
+    ) {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('s.id, s.lead_id, s.email_address, s.is_read, s.email_id, s.date_sent, s.date_read')
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'emails', 'e', 's.email_id = e.id')
+            ->addSelect('e.name AS email_name')
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'page_hits', 'ph', 'ph.source = "email" and ph.source_id = s.email_id and ph.lead_id = s.lead_id')
+            ->addSelect('COUNT(ph.id) AS link_hits');
+
+        if (null !== $createdByUserId) {
+            $q->andWhere('e.created_by = :userId')
+                ->setParameter('userId', $createdByUserId);
+        }
+
+        $q->andWhere('s.date_sent BETWEEN :dateFrom AND :dateTo')
+            ->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'))
+            ->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
+
+        $companyJoinOnExpr = $q->expr()->andX(
+            $q->expr()->eq('s.lead_id', 'cl.lead_id')
+        );
+        if (null === $companyId) {
+            // Must force a one to one relationship
+            $companyJoinOnExpr->add(
+                $q->expr()->eq('cl.is_primary', 1)
+            );
+        }
+
+        $q->leftJoin('s', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', $companyJoinOnExpr)
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'companies', 'c', 'cl.company_id = c.id')
+            ->addSelect('c.id AS company_id')
+            ->addSelect('c.companyname AS company_name');
+
+        if (null !== $companyId) {
+            $q->andWhere('cl.company_id = :companyId')
+                ->setParameter('companyId', $companyId);
+        }
+
+        $q->leftJoin('s', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 's.source = "campaign.event" and s.source_id = ce.id')
+            ->leftJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'campaign', 'ce.campaign_id = campaign.id')
+            ->addSelect('campaign.id AS campaign_id')
+            ->addSelect('campaign.name AS campaign_name');
+
+        if (null !== $campaignId) {
+            $q->andWhere('ce.campaign_id = :campaignId')
+                ->setParameter('campaignId', $campaignId);
+        }
+
+        $q->leftJoin('s', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 's.list_id = ll.id')
+            ->addSelect('ll.id AS segment_id')
+            ->addSelect('ll.name AS segment_name');
+
+        if (null !== $segmentId) {
+            $sb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $sb->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
+                ->where(
+                    $sb->expr()->andX(
+                        $sb->expr()->eq('lll.leadlist_id', ':segmentId'),
+                        $sb->expr()->eq('lll.lead_id', 'ph.lead_id'),
+                        $sb->expr()->eq('lll.manually_removed', 0)
+                    )
+                );
+
+            // Filter for both broadcasts and campaign related segments
+            $q->andWhere(
+                $q->expr()->orX(
+                    $q->expr()->eq('s.list_id', ':segmentId'),
+                    $q->expr()->andX(
+                        $q->expr()->isNull('s.list_id'),
+                        sprintf('EXISTS (%s)', $sb->getSQL())
+                    )
+                )
+            )
+                ->setParameter('segmentId', $segmentId);
+        }
+
+        $q->setMaxResults($limit);
+        $q->groupBy('s.id');
+        $q->orderBy('s.id', 'DESC');
+
+        return $q->execute()->fetchAll();
+    }
+
+    /**
      * @param null $listId
      *
      * @return array
@@ -84,10 +212,9 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param null            $emailIds
-     * @param null            $listId
-     * @param ChartQuery|null $chartQuery
-     * @param bool            $combined
+     * @param null $emailIds
+     * @param null $listId
+     * @param bool $combined
      *
      * @return array|int
      */
@@ -97,10 +224,9 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param null            $emailIds
-     * @param null            $listId
-     * @param ChartQuery|null $chartQuery
-     * @param bool            $combined
+     * @param null $emailIds
+     * @param null $listId
+     * @param bool $combined
      *
      * @return array|int
      */
@@ -110,10 +236,9 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param null            $emailIds
-     * @param null            $listId
-     * @param ChartQuery|null $chartQuery
-     * @param bool            $combined
+     * @param null $emailIds
+     * @param null $listId
+     * @param bool $combined
      *
      * @return array|int
      */
@@ -123,11 +248,10 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param                 $column
-     * @param null            $emailIds
-     * @param null            $listId
-     * @param ChartQuery|null $chartQuery
-     * @param bool            $combined
+     * @param      $column
+     * @param null $emailIds
+     * @param null $listId
+     * @param bool $combined
      *
      * @return array|int
      */
@@ -178,7 +302,7 @@ class StatRepository extends CommonRepository
             }
         }
 
-        if ($column === 'is_sent') {
+        if ('is_sent' === $column) {
             $q->andWhere('s.is_failed = :false')
                 ->setParameter('false', false, 'boolean');
         } else {
@@ -225,7 +349,7 @@ class StatRepository extends CommonRepository
                 )
             )->setParameter('false', false, 'boolean');
 
-        if ($fromDate !== null) {
+        if (null !== $fromDate) {
             //make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $sq->andWhere(
@@ -247,7 +371,7 @@ class StatRepository extends CommonRepository
         }
 
         foreach ($totalCounts as $t) {
-            if ($t['email_id'] != null) {
+            if (null != $t['email_id']) {
                 $return[$t['email_id']]['totalCount'] = (int) $t['the_count'];
             }
         }
@@ -294,16 +418,13 @@ class StatRepository extends CommonRepository
             $q->andWhere('s.list_id = '.(int) $listId);
         }
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
      * Get a lead's email stat.
      *
-     * @param int   $leadId
-     * @param array $options
+     * @param int $leadId
      *
      * @return array
      *
@@ -340,23 +461,13 @@ class StatRepository extends CommonRepository
                 $query->andWhere(
                     $query->expr()->eq('s.is_read', 1)
                 );
-            } elseif ('sent' == $state) {
-                // Get only those that have not been read yet
-                $query->andWhere(
-                    $query->expr()->eq('s.is_read', 0)
-                );
-                $query->andWhere(
-                    $query->expr()->eq('s.is_failed', 0)
-                );
             } elseif ('failed' == $state) {
                 $query->andWhere(
                     $query->expr()->eq('s.is_failed', 1)
                 );
-                $state = 'sent';
             }
-        } else {
-            $state = 'sent';
         }
+        $state = 'sent';
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
@@ -433,9 +544,7 @@ class StatRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
+        return $query->execute()->fetchAll();
     }
 
     /**
@@ -457,7 +566,7 @@ class StatRepository extends CommonRepository
                 )
             )->setParameter('false', false, 'boolean');
 
-        if ($fromDate !== null) {
+        if (null !== $fromDate) {
             //make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $q->andWhere(
@@ -500,8 +609,18 @@ class StatRepository extends CommonRepository
      */
     public function deleteStat($id)
     {
-        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_stats', ['id' => (int) $id]);
-        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_stats_devices', ['stat_id' => (int) $id]);
+        $this->getEntityManager()->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_stats', ['id' => (int) $id]);
+    }
+
+    public function deleteStats(array $ids)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $qb->delete(MAUTIC_TABLE_PREFIX.'email_stats')
+            ->where(
+                $qb->expr()->in('id', $ids)
+            )
+            ->execute();
     }
 
     /**
@@ -537,14 +656,39 @@ class StatRepository extends CommonRepository
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
         $query->select('id, lead_id')
-        ->where('s.email_id = :email')
-        ->andWhere('s.lead_id in (:contacts)')
+            ->where('s.email_id = :email')
+            ->andWhere('s.lead_id in (:contacts)')
             ->andWhere('is_failed = 0')
-        ->setParameter(':email', $emailId)
-        ->setParameter(':contacts', $contacts);
+            ->setParameter(':email', $emailId)
+            ->setParameter(':contacts', $contacts);
 
-        $results = $query->execute()->fetch();
+        return $query->execute()->fetch();
+    }
 
-        return $results;
+    /**
+     * @param $emailId
+     *
+     * @return array Formatted as [contactId => sentCount]
+     */
+    public function getSentCountForContacts(array $contacts, $emailId)
+    {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
+        $query->select('count(s.id) as sent_count, s.lead_id')
+            ->where('s.email_id = :email')
+            ->andWhere('s.lead_id in (:contacts)')
+            ->andWhere('s.is_failed = 0')
+            ->setParameter(':email', $emailId)
+            ->setParameter(':contacts', $contacts, Connection::PARAM_INT_ARRAY)
+            ->groupBy('s.lead_id');
+
+        $results = $query->execute()->fetchAll();
+
+        $contacts = [];
+        foreach ($results as $result) {
+            $contacts[$result['lead_id']] = $result['sent_count'];
+        }
+
+        return $contacts;
     }
 }

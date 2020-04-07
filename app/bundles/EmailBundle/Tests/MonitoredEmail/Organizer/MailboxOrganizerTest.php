@@ -17,7 +17,7 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer;
 use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer;
 
-class MailboxOrganizerTest extends \PHPUnit_Framework_TestCase
+class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
 {
     protected $mailboxes = [
        'EmailBundle_bounces' => [

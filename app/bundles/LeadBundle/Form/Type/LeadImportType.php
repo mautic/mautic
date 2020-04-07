@@ -11,24 +11,21 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Validator\Constraints\FileEncoding as EncodingValidation;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\File;
 
-/**
- * Class LeadImportType.
- */
 class LeadImportType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
             'file',
-            'file',
+            FileType::class,
             [
                 'label' => 'mautic.lead.import.file',
                 'attr'  => [
@@ -40,6 +37,12 @@ class LeadImportType extends AbstractType
                         [
                             'mimeTypes'        => ['text/csv', 'text/plain'],
                             'mimeTypesMessage' => 'mautic.core.invalid_file_type',
+                        ]
+                    ),
+                    new EncodingValidation(
+                        [
+                            'encodingFormat'        => ['UTF-8'],
+                            'encodingFormatMessage' => 'mautic.core.invalid_file_encoding',
                         ]
                     ),
                 ],
@@ -56,7 +59,7 @@ class LeadImportType extends AbstractType
         $default = (empty($options['data']['delimiter'])) ? ',' : htmlspecialchars($options['data']['delimiter']);
         $builder->add(
             'delimiter',
-            'text',
+            TextType::class,
             [
                 'label' => 'mautic.lead.import.delimiter',
                 'attr'  => [
@@ -70,7 +73,7 @@ class LeadImportType extends AbstractType
         $default = (empty($options['data']['enclosure'])) ? '&quot;' : htmlspecialchars($options['data']['enclosure']);
         $builder->add(
             'enclosure',
-            'text',
+            TextType::class,
             [
                 'label' => 'mautic.lead.import.enclosure',
                 'attr'  => [
@@ -84,7 +87,7 @@ class LeadImportType extends AbstractType
         $default = (empty($options['data']['escape'])) ? '\\' : $options['data']['escape'];
         $builder->add(
             'escape',
-            'text',
+            TextType::class,
             [
                 'label' => 'mautic.lead.import.escape',
                 'attr'  => [
@@ -98,7 +101,7 @@ class LeadImportType extends AbstractType
         $default = (empty($options['data']['batchlimit'])) ? 100 : (int) $options['data']['batchlimit'];
         $builder->add(
             'batchlimit',
-            'text',
+            TextType::class,
             [
                 'label' => 'mautic.lead.import.batchlimit',
                 'attr'  => [
@@ -112,7 +115,7 @@ class LeadImportType extends AbstractType
 
         $builder->add(
             'start',
-            'submit',
+            SubmitType::class,
             [
                 'attr' => [
                     'class'   => 'btn btn-primary',
@@ -131,7 +134,7 @@ class LeadImportType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'lead_import';
     }

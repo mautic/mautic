@@ -32,7 +32,7 @@ class TrackableRepository extends CommonRepository
         $q          = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $tableAlias = $this->getTableAlias();
 
-        return $q->select('r.redirect_id, r.url, '.$tableAlias.'.hits, '.$tableAlias.'.unique_hits')
+        return $q->select('r.redirect_id, r.url, r.id, '.$tableAlias.'.hits, '.$tableAlias.'.unique_hits')
             ->from(MAUTIC_TABLE_PREFIX.'page_redirects', 'r')
             ->innerJoin('r', MAUTIC_TABLE_PREFIX.'channel_url_trackables', $tableAlias,
                 $q->expr()->andX(
@@ -80,9 +80,8 @@ class TrackableRepository extends CommonRepository
     /**
      * Get an array of Trackable entities by Redirect URLs.
      *
-     * @param array $urls
-     * @param       $channel
-     * @param       $channelId
+     * @param $channel
+     * @param $channelId
      *
      * @return array
      */
@@ -139,10 +138,9 @@ class TrackableRepository extends CommonRepository
     /**
      * Get hit count.
      *
-     * @param                 $channel
-     * @param                 $channelIds
-     * @param                 $listId
-     * @param ChartQuery|null $chartQuery
+     * @param $channel
+     * @param $channelIds
+     * @param $listId
      *
      * @return array|int
      */

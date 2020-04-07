@@ -27,14 +27,13 @@ class UTCDateTimeType extends DateTimeType
     private static $utc;
 
     /**
-     * @param \DateTime        $value
-     * @param AbstractPlatform $platform
+     * @param \DateTime $value
      *
      * @return string|null
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
-        if ($value === null) {
+        if (null === $value) {
             return null;
         }
 
@@ -45,18 +44,17 @@ class UTCDateTimeType extends DateTimeType
         if (!is_object($value)) {
             $dateHelper = new DateTimeHelper($value);
             $value      = $dateHelper->getDateTime();
+        } else {
+            $value = clone $value;
         }
 
-        $tz          = $value->getTimeZone();
-        $utcDatetime = new \DateTime($value->format($platform->getDateTimeFormatString()), $tz);
-        $utcDatetime->setTimezone(self::$utc);
+        $value->setTimezone(self::$utc);
 
-        return $utcDatetime->format($platform->getDateTimeFormatString());
+        return parent::convertToDatabaseValue($value, $platform);
     }
 
     /**
-     * @param mixed            $value
-     * @param AbstractPlatform $platform
+     * @param mixed $value
      *
      * @return \DateTime|null
      *
@@ -64,7 +62,7 @@ class UTCDateTimeType extends DateTimeType
      */
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
-        if ($value === null) {
+        if (null === $value) {
             return null;
         }
 
@@ -72,19 +70,16 @@ class UTCDateTimeType extends DateTimeType
             self::$utc = new \DateTimeZone('UTC');
         }
 
-        $val = \DateTime::createFromFormat(
-            $platform->getDateTimeFormatString(),
-            $value,
-            self::$utc
-        );
-        if (!$val) {
-            throw ConversionException::conversionFailed($value, $this->getName());
-        }
+        // Set to UTC before converting to DateTime
+        $timezone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
 
-        //set to local timezone
-        $tz = new \DateTimeZone(date_default_timezone_get());
-        $val->setTimezone($tz);
+        $value = parent::convertToPHPValue($value, $platform);
 
-        return $val;
+        // Set to local timezone
+        date_default_timezone_set($timezone);
+        $value->setTimezone(new \DateTimeZone($timezone));
+
+        return $value;
     }
 }

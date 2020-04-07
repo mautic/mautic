@@ -38,6 +38,11 @@ class Form extends FormEntity
     /**
      * @var string
      */
+    private $formAttributes;
+
+    /**
+     * @var string
+     */
     private $description;
 
     /**
@@ -119,11 +124,16 @@ class Form extends FormEntity
     private $formType;
 
     /**
+     * @var bool
+     */
+    private $noIndex;
+
+    /**
      * This var is used to cache the result once gained from the loop.
      *
      * @var bool
      */
-    private $usesProgressiveProfiling = null;
+    private $usesProgressiveProfiling;
 
     public function __clone()
     {
@@ -142,9 +152,6 @@ class Form extends FormEntity
         $this->submissions = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -155,6 +162,8 @@ class Form extends FormEntity
         $builder->addIdColumns();
 
         $builder->addField('alias', 'string');
+
+        $builder->addNullableField('formAttributes', 'string', 'form_attr');
 
         $builder->addCategory();
 
@@ -211,11 +220,13 @@ class Form extends FormEntity
             ->build();
 
         $builder->addNullableField('formType', 'string', 'form_type');
+
+        $builder->createField('noIndex', 'boolean')
+            ->columnName('no_index')
+            ->nullable()
+            ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank([
@@ -244,8 +255,6 @@ class Form extends FormEntity
     }
 
     /**
-     * @param \Symfony\Component\Form\Form $form
-     *
      * @return array
      */
     public static function determineValidationGroups(\Symfony\Component\Form\Form $form)
@@ -255,9 +264,9 @@ class Form extends FormEntity
 
         $postAction = $data->getPostAction();
 
-        if ($postAction == 'message') {
+        if ('message' == $postAction) {
             $groups[] = 'messageRequired';
-        } elseif ($postAction == 'redirect') {
+        } elseif ('redirect' == $postAction) {
             $groups[] = 'urlRequired';
         }
 
@@ -294,6 +303,8 @@ class Form extends FormEntity
                     'formType',
                     'postAction',
                     'postActionProperty',
+                    'noIndex',
+                    'formAttributes',
                 ]
             )
             ->build();
@@ -305,7 +316,7 @@ class Form extends FormEntity
      */
     protected function isChanged($prop, $val)
     {
-        if ($prop == 'actions' || $prop == 'fields') {
+        if ('actions' == $prop || 'fields' == $prop) {
             //changes are already computed so just add them
             $this->changes[$prop][$val[0]] = $val[1];
         } else {
@@ -524,8 +535,7 @@ class Form extends FormEntity
     /**
      * Add a field.
      *
-     * @param       $key
-     * @param Field $field
+     * @param $key
      *
      * @return Form
      */
@@ -542,8 +552,7 @@ class Form extends FormEntity
     /**
      * Remove a field.
      *
-     * @param       $key
-     * @param Field $field
+     * @param $key
      */
     public function removeField($key, Field $field)
     {
@@ -610,8 +619,6 @@ class Form extends FormEntity
     /**
      * Add submissions.
      *
-     * @param Submission $submissions
-     *
      * @return Form
      */
     public function addSubmission(Submission $submissions)
@@ -623,8 +630,6 @@ class Form extends FormEntity
 
     /**
      * Remove submissions.
-     *
-     * @param Submission $submissions
      */
     public function removeSubmission(Submission $submissions)
     {
@@ -644,8 +649,7 @@ class Form extends FormEntity
     /**
      * Add actions.
      *
-     * @param        $key
-     * @param Action $action
+     * @param $key
      *
      * @return Form
      */
@@ -661,8 +665,6 @@ class Form extends FormEntity
 
     /**
      * Remove action.
-     *
-     * @param Action $action
      */
     public function removeAction(Action $action)
     {
@@ -680,7 +682,7 @@ class Form extends FormEntity
     /**
      * Get actions.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection|Action[]
      */
     public function getActions()
     {
@@ -772,11 +774,53 @@ class Form extends FormEntity
     }
 
     /**
+     * Set noIndex.
+     *
+     * @param bool $noIndex
+     */
+    public function setNoIndex($noIndex)
+    {
+        $this->isChanged('noIndex', $noIndex);
+        $this->noIndex = $noIndex;
+    }
+
+    /**
+     * Get noIndex.
+     *
+     * @return bool
+     */
+    public function getNoIndex()
+    {
+        return $this->noIndex;
+    }
+
+    /**
+     * @param string $formAttributes
+     *
+     * @return Form
+     */
+    public function setFormAttributes($formAttributes)
+    {
+        $this->isChanged('formAttributes', $formAttributes);
+        $this->formAttributes = $formAttributes;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormAttributes()
+    {
+        return $this->formAttributes;
+    }
+
+    /**
      * @return bool
      */
     public function isStandalone()
     {
-        return $this->formType != 'campaign';
+        return 'campaign' != $this->formType;
     }
 
     /**
@@ -802,15 +846,15 @@ class Form extends FormEntity
      */
     public function usesProgressiveProfiling()
     {
-        if ($this->usesProgressiveProfiling !== null) {
+        if (null !== $this->usesProgressiveProfiling) {
             return $this->usesProgressiveProfiling;
         }
 
         // Progressive profiling must be turned off in the kiosk mode
-        if ($this->getInKioskMode() === false) {
+        if (false === $this->getInKioskMode()) {
             // Search for a field with a progressive profiling setting on
             foreach ($this->fields->toArray() as $field) {
-                if ($field->getShowWhenValueExists() === false || $field->getShowAfterXSubmissions() > 0) {
+                if (false === $field->getShowWhenValueExists() || $field->getShowAfterXSubmissions() > 0) {
                     $this->usesProgressiveProfiling = true;
 
                     return $this->usesProgressiveProfiling;

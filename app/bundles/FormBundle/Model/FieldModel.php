@@ -13,6 +13,7 @@ namespace Mautic\FormBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Symfony\Component\HttpFoundation\Session\Session;
 
@@ -33,17 +34,12 @@ class FieldModel extends CommonFormModel
 
     /**
      * FieldModel constructor.
-     *
-     * @param LeadFieldModel $leadFieldModel
      */
     public function __construct(LeadFieldModel $leadFieldModel)
     {
         $this->leadFieldModel = $leadFieldModel;
     }
 
-    /**
-     * @param Session $session
-     */
     public function setSession(Session $session)
     {
         $this->session = $session;
@@ -84,7 +80,7 @@ class FieldModel extends CommonFormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('formfield', $entity, $options);
+        return $formFactory->create(FieldType::class, $entity, $options);
     }
 
     public function getObjectFields($object = 'lead')
@@ -97,7 +93,7 @@ class FieldModel extends CommonFormModel
                 $choices[$field['group_label']] = [];
             }
 
-            $choices[$field['group_label']][$alias] = $field['label'];
+            $choices[$field['group_label']][$field['label']] = $alias;
         }
 
         return [$fields, $choices];
@@ -126,7 +122,7 @@ class FieldModel extends CommonFormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Field();
         }
 

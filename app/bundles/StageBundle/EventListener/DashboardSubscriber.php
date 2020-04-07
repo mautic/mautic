@@ -15,9 +15,6 @@ use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Mautic\StageBundle\Model\StageModel;
 
-/**
- * Class DashboardSubscriber.
- */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
@@ -51,11 +48,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     protected $stageModel;
 
-    /**
-     * DashboardSubscriber constructor.
-     *
-     * @param StageModel $stageModel
-     */
     public function __construct(StageModel $stageModel)
     {
         $this->stageModel = $stageModel;
@@ -63,15 +55,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('stage:stages:viewother');
 
-        if ($event->getType() == 'stages.in.time') {
+        if ('stages.in.time' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 

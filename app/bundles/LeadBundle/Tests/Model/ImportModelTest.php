@@ -15,6 +15,8 @@ use Doctrine\ORM\ORMException;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Exception\ImportDelayedException;
+use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Tests\StandardImportTestHelper;
@@ -146,10 +148,10 @@ class ImportModelTest extends StandardImportTestHelper
         $this->assertTrue($result);
     }
 
-    public function testStartImportWhenParallelLimitHit()
+    public function testBeginImportWhenParallelLimitHit()
     {
         $model = $this->getMockBuilder(ImportModel::class)
-            ->setMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'getParallelImportLimit', 'logDebug'])
+            ->setMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'getParallelImportLimit'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -160,9 +162,6 @@ class ImportModelTest extends StandardImportTestHelper
             ->method('getParallelImportLimit')
             ->will($this->returnValue(1));
 
-        $model->expects($this->once())
-            ->method('logDebug');
-
         $model->setTranslator($this->getTranslatorMock());
 
         $entity = $this->initImportEntity(['canProceed']);
@@ -170,16 +169,22 @@ class ImportModelTest extends StandardImportTestHelper
         $entity->method('canProceed')
             ->will($this->returnValue(true));
 
-        $result = $model->startImport($entity, new Progress());
+        try {
+            $model->beginImport($entity, new Progress());
+            $this->fail();
+        } catch (ImportDelayedException $e) {
+            // This is expected
+        }
 
-        $this->assertFalse($result);
         $this->assertEquals(0, $entity->getProgressPercentage());
         $this->assertSame(0, $entity->getInsertedCount());
         $this->assertSame(0, $entity->getIgnoredCount());
         $this->assertSame(Import::DELAYED, $entity->getStatus());
+
+        $model->expects($this->never())->method('saveEntity');
     }
 
-    public function testStartImportWhenDatabaseException()
+    public function testBeginImportWhenDatabaseException()
     {
         $model = $this->getMockBuilder(ImportModel::class)
             ->setMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'logDebug', 'process'])
@@ -189,9 +194,6 @@ class ImportModelTest extends StandardImportTestHelper
         $model->expects($this->once())
             ->method('checkParallelImportLimit')
             ->will($this->returnValue(true));
-
-        $model->expects($this->exactly(2))
-            ->method('logDebug');
 
         $model->expects($this->once())
             ->method('process')
@@ -204,13 +206,19 @@ class ImportModelTest extends StandardImportTestHelper
         $entity->method('canProceed')
             ->will($this->returnValue(true));
 
-        $result = $model->startImport($entity, new Progress());
+        try {
+            $model->beginImport($entity, new Progress());
+            $this->fail();
+        } catch (ImportFailedException $e) {
+            // This is expected
+        }
 
-        $this->assertFalse($result);
         $this->assertEquals(0, $entity->getProgressPercentage());
         $this->assertSame(0, $entity->getInsertedCount());
         $this->assertSame(0, $entity->getIgnoredCount());
         $this->assertSame(Import::DELAYED, $entity->getStatus());
+
+        $model->expects($this->never())->method('saveEntity');
     }
 
     public function testIsEmptyCsvRow()

@@ -31,9 +31,6 @@ class ReportGraphEvent extends AbstractReportEvent
 
     /**
      * Constructor.
-     *
-     * @param Report $report
-     * @param array  $graphs
      */
     public function __construct(Report $report, array $graphs, QueryBuilder $queryBuilder)
     {
@@ -123,5 +120,10 @@ class ReportGraphEvent extends AbstractReportEvent
     public function getQueryBuilder()
     {
         return $this->queryBuilder;
+    }
+
+    public function setQueryBuilder(QueryBuilder $queryBuilder)
+    {
+        $this->queryBuilder = $queryBuilder;
     }
 }

@@ -11,60 +11,65 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class LeadFieldsType.
- */
 class LeadFieldsType extends AbstractType
 {
-    private $model;
-
     /**
-     * @param MauticFactory $factory
+     * @var FieldModel
      */
-    public function __construct(MauticFactory $factory)
+    protected $fieldModel;
+
+    public function __construct(FieldModel $fieldModel)
     {
-        $this->model = $factory->getModel('lead.field');
+        $this->fieldModel = $fieldModel;
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        /** @var \Mautic\LeadBundle\Model\FieldModel $model */
-        $model = $this->model;
         $resolver->setDefaults([
-            'choices' => function (Options $options) use ($model) {
-                $fieldList = $model->getFieldList();
+            'choices'           => function (Options $options) {
+                $fieldList = array_flip($this->fieldModel->getFieldList());
                 if ($options['with_tags']) {
-                    $fieldList['Core']['tags'] = 'mautic.lead.field.tags';
+                    $fieldList['Core']['mautic.lead.field.tags'] = 'tags';
+                }
+                if ($options['with_company_fields']) {
+                    $fieldList['Company'] = array_flip($this->fieldModel->getFieldList(false, true, ['isPublished' => true, 'object' => 'company']));
+                }
+                if ($options['with_utm']) {
+                    $fieldList['UTM']['mautic.lead.field.utmcampaign'] = 'utm_campaign';
+                    $fieldList['UTM']['mautic.lead.field.utmcontent']  = 'utm_content';
+                    $fieldList['UTM']['mautic.lead.field.utmmedium']   = 'utm_medium';
+                    $fieldList['UTM']['mautic.lead.field.umtsource']   = 'utm_source';
+                    $fieldList['UTM']['mautic.lead.field.utmterm']     = 'utm_term';
                 }
 
                 return $fieldList;
             },
-            'global_only' => false,
-            'required'    => false,
-            'with_tags'   => false,
+            'global_only'           => false,
+            'required'              => false,
+            'with_company_fields'   => false,
+            'with_tags'             => false,
+            'with_utm'              => false,
         ]);
     }
 
     /**
-     * @return null|string|\Symfony\Component\Form\FormTypeInterface
+     * @return string|\Symfony\Component\Form\FormTypeInterface|null
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'leadfields_choices';
     }

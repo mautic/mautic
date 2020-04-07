@@ -71,9 +71,6 @@ class Stat
      */
     private $tokens = [];
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -83,7 +80,7 @@ class Stat
             ->addIndex(['dynamic_content_id', 'lead_id'], 'stat_dynamic_content_search')
             ->addIndex(['source', 'source_id'], 'stat_dynamic_content_source_search');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createManyToOne('dynamicContent', 'DynamicContent')
             ->inversedBy('stats')
@@ -186,9 +183,6 @@ class Stat
         return $this->dynamicContent;
     }
 
-    /**
-     * @param DynamicContent $dynamicContent
-     */
     public function setDynamicContent(DynamicContent $dynamicContent)
     {
         $this->dynamicContent = $dynamicContent;

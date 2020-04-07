@@ -45,18 +45,23 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $entity = null;
         }
 
-        if ($entity != null) {
-            $fieldValues = $this->getFieldValues($id, true, 'company');
-            $entity->setFields($fieldValues);
+        if (null === $entity) {
+            return $entity;
         }
+
+        if ($entity->getFields()) {
+            // Pulled from Doctrine memory so don't make unnecessary queries as this has already happened
+            return $entity;
+        }
+
+        $fieldValues = $this->getFieldValues($id, true, 'company');
+        $entity->setFields($fieldValues);
 
         return $entity;
     }
 
     /**
      * Get a list of leads.
-     *
-     * @param array $args
      *
      * @return array
      */
@@ -70,10 +75,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      */
     public function getEntitiesDbalQueryBuilder()
     {
-        $dq = $this->getEntityManager()->getConnection()->createQueryBuilder()
+        return $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'companies', $this->getTableAlias());
-
-        return $dq;
     }
 
     /**
@@ -103,7 +106,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * Get companies by lead.
      *
-     * @param   $leadId
+     * @param $leadId
      *
      * @return array
      */
@@ -121,9 +124,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         if ($companyId) {
             $q->andWhere('comp.id = :companyId')->setParameter('companyId', $companyId);
         }
-        $results = $q->execute()->fetchAll();
 
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -229,10 +231,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         }
 
         $q->where(
-            $q->expr()->in('cl.company_id', $companyIds),
-            $q->expr()->eq('cl.manually_removed', ':false')
+            $q->expr()->in('cl.company_id', $companyIds)
         )
-            ->setParameter('false', false, 'boolean')
             ->groupBy('cl.company_id');
 
         $result = $q->execute()->fetchAll();
@@ -297,8 +297,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     }
 
     /**
-     * @param array $contacts
-     *
      * @return array
      */
     public function getCompaniesForContacts(array $contacts)
@@ -313,7 +311,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             ->join('c', MAUTIC_TABLE_PREFIX.'companies_leads', 'l', 'l.company_id = c.id')
             ->where(
                 $qb->expr()->andX(
-                    $qb->expr()->eq('l.manually_removed', 0),
                     $qb->expr()->in('l.lead_id', $contacts)
                 )
             )
@@ -354,9 +351,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 )
             );
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
+        return $query->execute()->fetchAll();
     }
 
     /**
@@ -371,16 +366,12 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         $query->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
+        return $query->execute()->fetchAll();
     }
 
     /**
-     * @param CompositeExpression|null $expr
-     * @param array                    $parameters
-     * @param null                     $labelColumn
-     * @param string                   $valueColumn
+     * @param null   $labelColumn
+     * @param string $valueColumn
      *
      * @return array
      */
@@ -399,7 +390,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         $reflection = new \ReflectionClass(new $class());
 
         // Get the label column if necessary
-        if ($labelColumn == null) {
+        if (null == $labelColumn) {
             if ($reflection->hasMethod('getTitle')) {
                 $labelColumn = 'title';
             } else {
@@ -411,14 +402,14 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         case
         when (comp.companycountry is not null and comp.companycity is not null) then concat(comp.companyname, " <small>", companycity,", ", companycountry, "</small>")
         when (comp.companycountry is not null) then concat(comp.companyname, " <small>", comp.companycountry, "</small>")
-        when (comp.companycity is not null) then concat(comp.companycity, " <small>", comp.companycity, "</small>")
+        when (comp.companycity is not null) then concat(comp.companyname, " <small>", comp.companycity, "</small>")
         else comp.companyname
         end
         as label')
             ->from($tableName, $alias)
             ->orderBy($prefix.$labelColumn);
 
-        if ($expr !== null && $expr->count()) {
+        if (null !== $expr && $expr->count()) {
             $q->where($expr);
         }
 

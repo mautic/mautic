@@ -48,7 +48,7 @@ Mautic.campaignOnLoad = function (container, response) {
             var thisSelect = mQuery(event.target).attr('id');
             Mautic.campaignBuilderUpdateEventListTooltips(thisSelect, false);
 
-            mQuery('#'+thisSelect+'_chosen .chosen-search input').on('keydown.toolip', function () {
+            mQuery('#'+thisSelect+'_chosen .chosen-search input').on('keydown.tooltip', function () {
                 // Destroy tooltips that are filtered out
                 Mautic.campaignBuilderUpdateEventListTooltips(thisSelect, true);
             }).on('keyup.tooltip', function() {
@@ -64,7 +64,7 @@ Mautic.campaignOnLoad = function (container, response) {
             var thisSelect = mQuery(event.target).attr('id');
             Mautic.campaignBuilderUpdateEventListTooltips(thisSelect, true);
 
-            mQuery('#'+thisSelect+'_chosen .chosen-search input').off('keyup.toolip')
+            mQuery('#'+thisSelect+'_chosen .chosen-search input').off('keyup.tooltip')
                 .off('keydown.tooltip');
         });
 
@@ -121,8 +121,7 @@ Mautic.campaignOnLoad = function (container, response) {
  * @param theSelect
  * @param destroy
  */
-Mautic.campaignBuilderUpdateEventListTooltips = function(theSelect, destroy)
-{
+Mautic.campaignBuilderUpdateEventListTooltips = function(theSelect, destroy) {
     mQuery('#'+theSelect+' option').each(function () {
         if (mQuery(this).attr('id')) {
             // Initiate a tooltip on each option since chosen doesn't copy over the data attributes
@@ -152,7 +151,27 @@ Mautic.campaignOnUnload = function(container) {
  * @param response
  */
 Mautic.campaignEventOnLoad = function (container, response) {
-    //new action created so append it to the form
+    if (mQuery('#campaignevent_triggerHour').length) {
+        Mautic.campaignEventShowHideIntervalSettings();
+        Mautic.campaignEventUpdateIntervalHours();
+        mQuery('#campaignevent_triggerHour').on('change', Mautic.campaignEventUpdateIntervalHours);
+        mQuery('#campaignevent_triggerRestrictedStartHour').on('change', Mautic.campaignEventUpdateIntervalHours);
+        mQuery('#campaignevent_triggerRestrictedStopHour').on('change', Mautic.campaignEventUpdateIntervalHours);
+        mQuery('#campaignevent_triggerIntervalUnit').on('change', Mautic.campaignEventShowHideIntervalSettings);
+        mQuery('#campaignevent_triggerRestrictedDaysOfWeek_0').on('change', Mautic.campaignEventSelectDOW);
+        mQuery('#campaignevent_triggerRestrictedDaysOfWeek_1').on('change', Mautic.campaignEventSelectDOW);
+        mQuery('#campaignevent_triggerRestrictedDaysOfWeek_2').on('change', Mautic.campaignEventSelectDOW);
+        mQuery('#campaignevent_triggerRestrictedDaysOfWeek_3').on('change', Mautic.campaignEventSelectDOW);
+        mQuery('#campaignevent_triggerRestrictedDaysOfWeek_4').on('change', Mautic.campaignEventSelectDOW);
+        mQuery('#campaignevent_triggerRestrictedDaysOfWeek_7').on('change', Mautic.campaignEventSelectDOW);
+    }
+
+    if (!response.hasOwnProperty('eventId')) {
+        // There's nothing for us to do, so bail
+        return;
+    }
+
+    // New action created so append it to the form
     var domEventId = 'CampaignEvent_' + response.eventId;
     var eventId = '#' + domEventId;
 
@@ -163,15 +182,15 @@ Mautic.campaignEventOnLoad = function (container, response) {
         Mautic.campaignBuilderInstance.detach(Mautic.campaignBuilderLastConnection);
     }
     Mautic.campaignBuilderConnectionRequiresUpdate = false;
-
     Mautic.campaignBuilderUpdateLabel(domEventId);
+    Mautic.campaignBuilderCanvasEvents[response.event.id] = response.event;
 
     if (response.deleted) {
         Mautic.campaignBuilderInstance.remove(document.getElementById(domEventId));
         delete Mautic.campaignBuilderEventPositions[domEventId];
-
+        delete Mautic.campaignBuilderCanvasEvents[response.event.id];
     } else if (response.updateHtml) {
-        mQuery(eventId + " .campaign-event-content").html(response.updateHtml);
+        mQuery(eventId + " .campaign-event-content").replaceWith(response.updateHtml);
     } else if (response.eventHtml) {
         var newHtml = response.eventHtml;
 
@@ -188,12 +207,7 @@ Mautic.campaignEventOnLoad = function (container, response) {
 
         mQuery(eventId).css({'left': x + 'px', 'top': y + 'px'});
 
-        if (response.eventType == 'decision' || response.eventType == 'condition') {
-            Mautic.campaignBuilderRegisterAnchors(['top', 'yes', 'no'], eventId);
-        } else {
-            Mautic.campaignBuilderRegisterAnchors(['top', 'bottom'], eventId);
-        }
-
+        Mautic.campaignBuilderRegisterAnchors(Mautic.getAnchorsForEvent(response.event), eventId);
         Mautic.campaignBuilderInstance.draggable(domEventId, Mautic.campaignDragOptions);
 
         //activate new stuff
@@ -234,6 +248,87 @@ Mautic.campaignEventOnLoad = function (container, response) {
     }
 
     Mautic.campaignBuilderInstance.repaintEverything();
+};
+
+/**
+ * Update the trigger hour based on the interval unit selected
+ */
+Mautic.campaignEventUpdateIntervalHours = function () {
+    var hour = mQuery('#campaignevent_triggerHour').val();
+    var start = mQuery('#campaignevent_triggerRestrictedStartHour').val();
+    var stop = mQuery('#campaignevent_triggerRestrictedStopHour').val();
+
+    if (hour) {
+        mQuery('#campaignevent_triggerRestrictedStartHour').val('');
+        mQuery('#campaignevent_triggerRestrictedStopHour').val('');
+        mQuery('#campaignevent_triggerRestrictedStartHour').prop('disabled', true);
+        mQuery('#campaignevent_triggerRestrictedStopHour').prop('disabled', true);
+    } else if (start || stop) {
+        mQuery('#campaignevent_triggerHour').val('');
+        mQuery('#campaignevent_triggerHour').prop('disabled', true);
+    } else {
+        mQuery('#campaignevent_triggerHour').val('');
+        mQuery('#campaignevent_triggerRestrictedStartHour').val('');
+        mQuery('#campaignevent_triggerRestrictedStopHour').val('');
+        mQuery('#campaignevent_triggerHour').prop('disabled', false);
+        mQuery('#campaignevent_triggerRestrictedStartHour').prop('disabled', false);
+        mQuery('#campaignevent_triggerRestrictedStopHour').prop('disabled', false);
+    }
+};
+
+/**
+ * Show/hide interval settings
+ */
+Mautic.campaignEventShowHideIntervalSettings = function() {
+    var unit = mQuery('#campaignevent_triggerIntervalUnit').val();
+    if (unit === 'i' || unit === 'h') {
+        mQuery('#interval_settings').addClass('hide');
+    } else {
+        mQuery('#interval_settings').removeClass('hide');
+    }
+};
+
+/**
+ * Update DOW for weekday selection
+ */
+Mautic.campaignEventSelectDOW = function() {
+    if (mQuery('#campaignevent_triggerRestrictedDaysOfWeek_7').prop('checked')) {
+        mQuery('#campaignevent_triggerRestrictedDaysOfWeek_0').prop('checked', true);
+        mQuery('#campaignevent_triggerRestrictedDaysOfWeek_1').prop('checked', true);
+        mQuery('#campaignevent_triggerRestrictedDaysOfWeek_2').prop('checked', true);
+        mQuery('#campaignevent_triggerRestrictedDaysOfWeek_3').prop('checked', true);
+        mQuery('#campaignevent_triggerRestrictedDaysOfWeek_4').prop('checked', true);
+    }
+
+    mQuery('#campaignevent_triggerRestrictedDaysOfWeek_7').prop('checked', false);
+};
+
+/**
+ * Determine anchors to set up for the given event.
+ *
+ * This inspects the `connectionRestrictions` property
+ * within the event's settings that were passed when
+ * registering the event in your bundle's CampaignEventListener.
+ *
+ * @param event
+ */
+Mautic.getAnchorsForEvent = function (event) {
+    var restrictions = Mautic.campaignBuilderConnectionRestrictions[event.type].target;
+
+    // If all connections are restricted, only anchor the top
+    if (
+        restrictions.decision.length === 1 && restrictions.decision[0] === "none" &&
+        restrictions.action.length === 1 && restrictions.action[0] === "none" &&
+        restrictions.condition.length === 1 && restrictions.condition[0] === "none"
+    ) {
+        return ['top'];
+    }
+
+    if (event.eventType === 'decision' || event.eventType === 'condition') {
+        return ['top', 'yes', 'no'];
+    }
+
+    return ['top', 'bottom'];
 };
 
 /**
@@ -450,13 +545,13 @@ Mautic.campaignBuilderConnectionsMap = {
     'action': {
         'top': {
             'source': ['leadsource'],
-            'action': [],
+            'action': ['bottom'],
             'condition': ['yes', 'no'],
             'decision': ['yes', 'no']
         },
         'bottom': {
             'source': [],
-            'action': [],
+            'action': ['top'],
             'condition': ['top'],
             'decision': ['top']
         }
@@ -731,16 +826,14 @@ Mautic.prepareCampaignCanvas = function() {
             callback();
         });
 
-        mQuery("#CampaignCanvas div.list-campaign-event").each(function () {
-            Mautic.campaignBuilderRegisterAnchors(['top'], this);
+        mQuery("#CampaignCanvas div[data-event-id]").each(function () {
+            var event = Mautic.campaignBuilderCanvasEvents[mQuery(this).data('eventId')];
+
+            Mautic.campaignBuilderRegisterAnchors(Mautic.getAnchorsForEvent(event), this);
         });
 
-        mQuery("#CampaignCanvas div.list-campaign-event.list-campaign-action, #CampaignCanvas div.list-campaign-event.list-campaign-source").not('#CampaignEvent_newsource').not('#CampaignEvent_newsource_hide').each(function () {
+        mQuery("#CampaignCanvas div.list-campaign-event.list-campaign-source").not('#CampaignEvent_newsource').not('#CampaignEvent_newsource_hide').each(function () {
             Mautic.campaignBuilderRegisterAnchors(['bottom'], this);
-        });
-
-        mQuery("#CampaignCanvas div.list-campaign-decision, #CampaignCanvas div.list-campaign-condition").each(function () {
-            Mautic.campaignBuilderRegisterAnchors(['yes', 'no'], this);
         });
 
         mQuery("#CampaignCanvas div.list-campaign-leadsource").not('#CampaignEvent_newsource').not('#CampaignEvent_newsource_hide').each(function () {
@@ -1113,44 +1206,49 @@ Mautic.campaignBuilderReconnectEndpoints = function () {
         return;
     }
 
-    // Reposition events
-    var sourceFound = false;
-    mQuery.each(Mautic.campaignBuilderCanvasSettings.nodes, function (key, node) {
-        if (typeof Mautic.campaignBuilderCanvasSources[node.id] !== 'undefined') {
-            sourceFound = true;
-        }
+    if (typeof Mautic.campaignBuilderCanvasSettings.nodes !== 'undefined') {
+        // Reposition events
+        var sourceFound = false;
+        mQuery.each(Mautic.campaignBuilderCanvasSettings.nodes, function (key, node) {
+            if (typeof Mautic.campaignBuilderCanvasSources[node.id] !== 'undefined') {
+                sourceFound = true;
+            }
 
-        mQuery('#CampaignEvent_' + node.id).css({
-            position: 'absolute',
-            left: node.positionX + 'px',
-            top: node.positionY + 'px'
+            mQuery('#CampaignEvent_' + node.id).css({
+                position: 'absolute',
+                left: node.positionX + 'px',
+                top: node.positionY + 'px'
+            });
+
+            Mautic.campaignBuilderEventPositions['CampaignEvent_' + node.id] = {
+                left: parseInt(node.positionX),
+                top: parseInt(node.positionY)
+            };
         });
+    }
 
-        Mautic.campaignBuilderEventPositions['CampaignEvent_' + node.id] = {
-            left: parseInt(node.positionX),
-            top: parseInt(node.positionY)
-        };
-    });
+    if (typeof Mautic.campaignBuilderCanvasSettings.connections !== 'undefined') {
 
-    // Recreate jsPlumb connections and labels
-    mQuery.each(Mautic.campaignBuilderCanvasSettings.connections, function (key, connection) {
-        if (typeof Mautic.campaignBuilderCanvasEvents[connection.targetId] !== 'undefined') {
-            var targetEvent = Mautic.campaignBuilderCanvasEvents[connection.targetId];
-        } else if (typeof Mautic.campaignBuilderCanvasSources[connection.targetId] !== 'undefined') {
-            var targetEvent = Mautic.campaignBuilderCanvasSources[connection.targetId];
-        }
+        // Recreate jsPlumb connections and labels
+        mQuery.each(Mautic.campaignBuilderCanvasSettings.connections, function (key, connection) {
+            if (typeof Mautic.campaignBuilderCanvasEvents[connection.targetId] !== 'undefined') {
+                var targetEvent = Mautic.campaignBuilderCanvasEvents[connection.targetId];
+            } else if (typeof Mautic.campaignBuilderCanvasSources[connection.targetId] !== 'undefined') {
+                var targetEvent = Mautic.campaignBuilderCanvasSources[connection.targetId];
+            }
 
-        if (targetEvent && targetEvent.label) {
-            Mautic.campaignBuilderLabels["CampaignEvent_"+connection.targetId] = targetEvent.label;
-        }
+            if (targetEvent && targetEvent.label) {
+                Mautic.campaignBuilderLabels["CampaignEvent_" + connection.targetId] = targetEvent.label;
+            }
 
-        Mautic.campaignBuilderInstance.connect({
-            uuids: [
-                "CampaignEvent_" + connection.sourceId + '_' + connection.anchors.source,
-                "CampaignEvent_" + connection.targetId + '_' + connection.anchors.target
-            ]
+            Mautic.campaignBuilderInstance.connect({
+                uuids: [
+                    "CampaignEvent_" + connection.sourceId + '_' + connection.anchors.source,
+                    "CampaignEvent_" + connection.targetId + '_' + connection.anchors.target
+                ]
+            });
         });
-    });
+    }
 
     if (!sourceFound) {
         var topOffset = 25;
@@ -1770,21 +1868,23 @@ Mautic.campaignBuilderValidateConnection = function (epDetails, targetType, targ
  */
 Mautic.updateScheduledCampaignEvent = function(eventId, contactId) {
     // Convert scheduled date/time to an input
-    mQuery('#timeline-campaign-event-'+eventId+' .btn-edit').prop('disabled', true).addClass('disabled');
+    mQuery('#timeline-campaign-event-'+eventId+' .btn-reschedule').addClass('disabled');
 
     var converting = false;
     var eventWrapper = '#timeline-campaign-event-'+eventId;
     var eventSpan = '.timeline-campaign-event-date-'+eventId;
     var eventText = '#timeline-campaign-event-text-'+eventId;
+    var saveButton = '#timeline-campaign-event-save-' + eventId;
     var originalDate = mQuery(eventWrapper+' '+eventSpan).first().text();
     var revertInput = function(input) {
         converting = true;
         mQuery(input).datetimepicker('destroy');
         mQuery(eventSpan).text(originalDate);
-        mQuery(eventWrapper+' .btn').prop('disabled', false).removeClass('disabled');
+        mQuery(eventWrapper+' .btn-reschedule').removeClass('disabled');
     };
 
     var date = mQuery(eventSpan).attr('data-date');
+    mQuery(saveButton).show();
     var input = mQuery('<input type="text" id="timeline-reschedule"/>')
         .css('height', '20px')
         .css('color', '#000000')
@@ -1804,8 +1904,8 @@ Mautic.updateScheduledCampaignEvent = function(eventId, contactId) {
                         originalDate: date
                     }, function (response) {
                         mQuery(eventSpan).text(response.formattedDate);
-                        mQuery(eventSpan).attr('data-data', response.date);
-                        mQuery(eventWrapper+' .btn').prop('disabled', false).removeClass('disabled');
+                        mQuery(eventSpan).attr('data-date', response.date);
+                        mQuery(eventWrapper+' .btn-reschedule').removeClass('disabled');
 
                         if (response.success) {
                             mQuery(eventText).removeClass('text-warning').addClass('text-info');
@@ -1813,21 +1913,63 @@ Mautic.updateScheduledCampaignEvent = function(eventId, contactId) {
                             mQuery('.fa.timeline-campaign-event-cancelled-'+eventId).remove();
                             mQuery('.timeline-campaign-event-scheduled-'+eventId).removeClass('hide');
                             mQuery('.timeline-campaign-event-cancelled-'+eventId).addClass('hide');
+                            mQuery(saveButton).hide();
                         }
                     }, false
                 );
             } else if (code == 27) {
                 e.preventDefault();
                 revertInput(input);
+                mQuery(saveButton).hide();
             }
         })
         .on('blur', function (e) {
             if (!converting) {
                 revertInput(input);
             }
+            mQuery(saveButton).hide();
         });
     mQuery('#timeline-campaign-event-'+eventId+' '+eventSpan).html(input);
     Mautic.activateDateTimeInputs('#timeline-reschedule');
+    mQuery('#timeline-reschedule').focus();
+};
+
+/**
+ *
+ * @param eventId
+ * @param contactId
+ */
+Mautic.saveScheduledCampaignEvent = function (eventId, contactId) {
+    var saveButton = '#timeline-campaign-event-save-' + eventId;
+    mQuery(saveButton).addClass('disabled');
+
+    // Convert scheduled date/time to an input
+    var eventWrapper = '#timeline-campaign-event-' + eventId;
+    var eventSpan = '.timeline-campaign-event-date-' + eventId;
+    var eventText = '#timeline-campaign-event-text-' + eventId;
+
+    var date = mQuery(eventSpan).attr('data-date');
+    Mautic.ajaxActionRequest('campaign:updateScheduledCampaignEvent',
+        {
+            eventId: eventId,
+            contactId: contactId,
+            date: mQuery('#timeline-reschedule').val(),
+            originalDate: date
+        }, function (response) {
+            mQuery(eventSpan).text(response.formattedDate);
+            mQuery(eventSpan).attr('data-date', response.date);
+
+            if (response.success) {
+                mQuery(eventText).removeClass('text-warning').addClass('text-info');
+                mQuery(eventSpan).css('textDecoration', 'inherit');
+                mQuery('.fa.timeline-campaign-event-cancelled-' + eventId).remove();
+                mQuery('.timeline-campaign-event-scheduled-' + eventId).removeClass('hide');
+                mQuery('.timeline-campaign-event-cancelled-' + eventId).addClass('hide');
+            }
+
+            mQuery(saveButton).removeClass('disabled').hide();
+            mQuery(eventWrapper + ' .btn-reschedule').removeClass('disabled');
+        }, false);
 };
 
 /**
@@ -1856,3 +1998,54 @@ Mautic.cancelScheduledCampaignEvent = function(eventId, contactId) {
         }, false
     );
 };
+
+/**
+ * Update the "Jump to Event" select list to be available events.
+ */
+Mautic.updateJumpToEventOptions = function() {
+    var jumpToEventSelectNode = mQuery("#campaignevent_properties_jumpToEvent");
+
+    jumpToEventSelectNode.children().remove();
+
+    for (var eventId in Mautic.campaignBuilderCanvasEvents) {
+        var event = Mautic.campaignBuilderCanvasEvents[eventId];
+
+        if (event.type !== 'campaign.jump_to_event' && event.eventType !== 'decision') {
+            var opt = mQuery("<option />")
+                .attr("value", event.id)
+                .text(event.name)
+
+            if (event.id == jumpToEventSelectNode.data("selected")) {
+                opt.attr("selected", "selected");
+            }
+
+            jumpToEventSelectNode.append(opt);
+        }
+    }
+
+    jumpToEventSelectNode.trigger("chosen:updated");
+};
+
+Mautic.highlightJumpTarget = function(event, el) {
+    var element = mQuery(el);
+    var parentEventElement = element.parent().parent();
+    var highlightedAlready = parentEventElement.data('highlighted');
+    var jumpTargetID = '#CampaignEvent_' + element.data('jumpTarget');
+    var jumpTarget = mQuery(jumpTargetID);
+    var overlay = mQuery('#EventJumpOverlay');
+
+    if (highlightedAlready) {
+        parentEventElement.data('highlighted', false);
+        overlay.hide();
+        parentEventElement.css("z-index", 1010);
+        jumpTarget.css("z-index", 1010);
+    } else {
+        parentEventElement.data('highlighted', true);
+        overlay.show();
+        parentEventElement.css("z-index", 2010);
+        jumpTarget.css("z-index", 2010);
+    }
+};
+
+
+

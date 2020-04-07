@@ -14,64 +14,62 @@ namespace Mautic\CoreBundle\Form\DataTransformer;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Symfony\Component\Form\DataTransformerInterface;
 
-/**
- * Class SortableListTransformer.
- */
 class SortableListTransformer implements DataTransformerInterface
 {
-    /**
-     * @var bool
-     */
-    private $removeEmpty = true;
-
     /**
      * @var bool
      */
     private $withLabels = true;
 
     /**
-     * SortableListTransformer constructor.
-     *
-     * @param bool $removeEmpty
+     * @var bool
      */
-    public function __construct($removeEmpty = true, $withLabels = true)
+    private $useKeyValuePairs = false;
+
+    /**
+     * @param bool $withLabels
+     * @param bool $atRootLevel
+     */
+    public function __construct($withLabels = true, $useKeyValuePairs = false)
     {
-        $this->removeEmpty = $removeEmpty;
-        $this->withLabels  = $withLabels;
+        $this->withLabels       = $withLabels;
+        $this->useKeyValuePairs = $useKeyValuePairs;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array
      */
     public function transform($array)
     {
+        if ($this->useKeyValuePairs) {
+            return $this->transformKeyValuePair($array);
+        }
+
         return $this->formatList($array);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array
      */
     public function reverseTransform($array)
     {
+        if ($this->useKeyValuePairs) {
+            return $this->reverseTransformKeyValuePair($array);
+        }
+
         return $this->formatList($array);
     }
 
     /**
      * @param $array
-     *
-     * @return mixed
      */
     private function formatList($array)
     {
-        if ($array === null || !isset($array['list'])) {
+        if (null === $array || !isset($array['list'])) {
             return ['list' => []];
         }
 
-        $array['list'] = AbstractFormFieldHelper::parseList($array['list'], $this->removeEmpty);
+        $array['list'] = AbstractFormFieldHelper::parseList($array['list']);
 
         if (!$this->withLabels) {
             $array['list'] = array_keys($array['list']);
@@ -81,5 +79,51 @@ class SortableListTransformer implements DataTransformerInterface
         $array['list'] = AbstractFormFieldHelper::formatList($format, $array['list']);
 
         return $array;
+    }
+
+    /**
+     * @param $array
+     *
+     * @return array
+     */
+    private function transformKeyValuePair($array)
+    {
+        if (null === $array) {
+            return ['list' => []];
+        }
+
+        $formattedArray = [];
+
+        foreach ($array as $label => $value) {
+            $formattedArray[] = [
+                'label' => $label,
+                'value' => $value,
+            ];
+        }
+
+        return ['list' => $formattedArray];
+    }
+
+    /**
+     * @param $array
+     *
+     * @return array
+     */
+    private function reverseTransformKeyValuePair($array)
+    {
+        if (null === $array || !isset($array['list'])) {
+            return [];
+        }
+
+        $pairs = [];
+        foreach ($array['list'] as $pair) {
+            if (!isset($pair['label'])) {
+                continue;
+            }
+
+            $pairs[$pair['label']] = $pair['value'];
+        }
+
+        return $pairs;
     }
 }

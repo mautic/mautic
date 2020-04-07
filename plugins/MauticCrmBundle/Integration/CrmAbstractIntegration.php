@@ -11,30 +11,24 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
-use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticCrmBundle\Api\CrmApi;
 
-/**
- * Class CrmAbstractIntegration.
- */
 abstract class CrmAbstractIntegration extends AbstractIntegration
 {
     protected $auth;
     protected $helper;
 
-    /**
-     * @param Integration $settings
-     */
     public function setIntegrationSettings(Integration $settings)
     {
         //make sure URL does not have ending /
         $keys = $this->getDecryptedApiKeys($settings);
-        if (isset($keys['url']) && substr($keys['url'], -1) == '/') {
+        if (isset($keys['url']) && '/' == substr($keys['url'], -1)) {
             $keys['url'] = substr($keys['url'], 0, -1);
             $this->encryptAndSetApiKeys($keys, $settings);
         }
@@ -108,9 +102,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             if ($this->isAuthorized()) {
                 $result = $this->getApiHelper()->getLeads($query);
 
-                $executed = $this->amendLeadDataBeforeMauticPopulate($result);
-
-                return $executed;
+                return $this->amendLeadDataBeforeMauticPopulate($result, $object);
             }
         } catch (\Exception $e) {
             $this->logIntegrationError($e);
@@ -195,9 +187,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param \DateTime|null $startDate
-     * @param \DateTime|null $endDate
-     * @param                $leadId
+     * @param $leadId
      *
      * @return array
      */
@@ -277,7 +267,13 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 ++$page;
 
                 // Lots of entities will be loaded into memory while compiling these events so let's prevent memory overload by clearing the EM
-                $this->em->clear();
+                $entityToNotDetach = ['Mautic\PluginBundle\Entity\Integration', 'Mautic\PluginBundle\Entity\Plugin'];
+                $loadedEntities    = $this->em->getUnitOfWork()->getIdentityMap();
+                foreach ($loadedEntities as $name => $loadedEntity) {
+                    if (!in_array($name, $entityToNotDetach)) {
+                        $this->em->clear($name);
+                    }
+                }
             }
 
             $leadActivity[$leadId] = [
@@ -294,7 +290,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      * @param      $data
      * @param null $object
      *
-     * @return Company|void
+     * @return Company|null
      */
     public function getMauticCompany($data, $object = null)
     {
@@ -305,42 +301,50 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             // Assume JSON
             $data = json_decode($data, true);
         }
-        $config = $this->mergeConfigToFeatureSettings([]);
-
+        $config        = $this->mergeConfigToFeatureSettings([]);
         $matchedFields = $this->populateMauticLeadData($data, $config, 'company');
 
-        // Find unique identifier fields used by the integration
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $companyModel = $this->factory->getModel('lead.company');
+        $companyFieldTypes = $this->fieldModel->getFieldListWithProperties('company');
+        foreach ($matchedFields as $companyField => $value) {
+            if (isset($companyFieldTypes[$companyField]['type'])) {
+                switch ($companyFieldTypes[$companyField]['type']) {
+                    case 'text':
+                        $matchedFields[$companyField] = substr($value, 0, 255);
+                        break;
+                    case 'date':
+                        $date                         = new \DateTime($value);
+                        $matchedFields[$companyField] = $date->format('Y-m-d');
+                        break;
+                    case 'datetime':
+                        $date                         = new \DateTime($value);
+                        $matchedFields[$companyField] = $date->format('Y-m-d H:i:s');
+                        break;
+                }
+            }
+        }
 
         // Default to new company
         $company         = new Company();
-        $existingCompany = IdentifyCompanyHelper::identifyLeadsCompany($matchedFields, null, $companyModel);
-        if ($existingCompany[2]) {
+        $existingCompany = IdentifyCompanyHelper::identifyLeadsCompany($matchedFields, null, $this->companyModel);
+        if (!empty($existingCompany[2])) {
             $company = $existingCompany[2];
         }
 
-        $companyFieldTypes = $this->fieldModel->getFieldListWithProperties('company');
-
-        foreach ($matchedFields as $companyField => $value) {
-            if (isset($companyFieldTypes[$companyField]['type']) && $companyFieldTypes[$companyField]['type'] == 'text') {
-                $matchedFields[$companyField] = substr($value, 0, 255);
-            }
-        }
-
-        if (!$company->isNew()) {
+        if (!empty($existingCompany[2])) {
             $fieldsToUpdate = $this->getPriorityFieldsForMautic($config, $object, 'mautic_company');
             $fieldsToUpdate = array_intersect_key($config['companyFields'], $fieldsToUpdate);
             $matchedFields  = array_intersect_key($matchedFields, array_flip($fieldsToUpdate));
-            if (!isset($matchedFields['companyname'])) {
-                if (isset($matchedFields['companywebsite'])) {
-                    $matchedFields['companyname'] = $matchedFields['companywebsite'];
-                }
+        } else {
+            $matchedFields = $this->hydrateCompanyName($matchedFields);
+
+            // If we don't have an company name, don't create the company because it'll result in what looks like an "empty" company
+            if (empty($matchedFields['companyname'])) {
+                return null;
             }
-            $companyModel->setFieldValues($company, $matchedFields, false, false);
         }
 
-        $companyModel->saveEntity($company, false);
+        $this->companyModel->setFieldValues($company, $matchedFields, false);
+        $this->companyModel->saveEntity($company, false);
 
         return $company;
     }
@@ -384,7 +388,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             if (array_key_exists($leadField, $uniqueLeadFields) && !empty($value)) {
                 $uniqueLeadFieldData[$leadField] = $value;
             }
-            if (isset($leadFieldTypes[$leadField]['type']) && $leadFieldTypes[$leadField]['type'] == 'text') {
+            if (isset($leadFieldTypes[$leadField]['type']) && 'text' == $leadFieldTypes[$leadField]['type']) {
                 $matchedFields[$leadField] = substr($value, 0, 255);
             }
         }
@@ -420,7 +424,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
             $fieldsToUpdateInMautic = array_intersect_key($leadFields, $fieldsToUpdateInMautic);
             $matchedFields          = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
-            if ((isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && $config['updateBlanks'][0] == 'updateBlanks')) {
+            if ((isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && 'updateBlanks' == $config['updateBlanks'][0])) {
                 $matchedFields = $this->getBlankFieldsToUpdateInMautic($matchedFields, $lead->getFields(true), $leadFields, $data, $object);
             }
         }
@@ -451,7 +455,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         // Update the owner if it matches (needs to be set by the integration) when fetching the data
         if (isset($data['owner_email']) && isset($config['updateOwner']) && isset($config['updateOwner'][0])
-            && $config['updateOwner'][0] == 'updateOwner'
+            && 'updateOwner' == $config['updateOwner'][0]
         ) {
             if ($mauticUser = $this->em->getRepository('MauticUserBundle:User')->findOneBy(['email' => $data['owner_email']])) {
                 $lead->setOwner($mauticUser);
@@ -460,6 +464,12 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         if ($persist && !empty($lead->getChanges(true))) {
             // Only persist if instructed to do so as it could be that calling code needs to manipulate the lead prior to executing event listeners
+            $lead->setManipulator(new LeadManipulator(
+                'plugin',
+                $this->getName(),
+                null,
+                $this->getDisplayName()
+            ));
             $leadModel->saveEntity($lead, false);
         }
 
@@ -511,7 +521,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param array  $config
      * @param        $direction
      * @param string $priorityObject
      *
@@ -530,12 +539,22 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     protected function cleanPriorityFields($fieldsToUpdate, $objects = null)
     {
+        if (!isset($fieldsToUpdate['leadFields'])) {
+            return $fieldsToUpdate;
+        }
+
+        if (null === $objects || is_array($objects)) {
+            return $fieldsToUpdate['leadFields'];
+        }
+
+        if (isset($fieldsToUpdate['leadFields'][$objects])) {
+            return $fieldsToUpdate['leadFields'][$objects];
+        }
+
         return $fieldsToUpdate;
     }
 
     /**
-     * @param array $params
-     *
      * @return array
      */
     protected function getSyncTimeframeDates(array $params)
@@ -549,9 +568,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param $fields
-     * @param $sfRecord
-     * @param $config
      * @param $objectFields
      */
     public function getBlankFieldsToUpdateInMautic($matchedFields, $leadFieldValues, $objectFields, $integrationData, $object = 'Lead')
@@ -575,7 +591,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     {
         //check if update blank fields is selected
         if (isset($config['updateBlanks']) && isset($config['updateBlanks'][0])
-            && $config['updateBlanks'][0] == 'updateBlanks'
+            && 'updateBlanks' == $config['updateBlanks'][0]
             && !empty($sfRecord)
             && isset($objectFields['required']['fields'])
         ) {
@@ -616,5 +632,30 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $fieldMappings['create'] = $leadFields;
 
         return $fieldMappings;
+    }
+
+    /**
+     * @return array
+     */
+    private function hydrateCompanyName(array $matchedFields)
+    {
+        if (!empty($matchedFields['companyname'])) {
+            return $matchedFields;
+        }
+
+        if (!empty($matchedFields['companywebsite'])) {
+            $matchedFields['companyname'] = $matchedFields['companywebsite'];
+
+            return $matchedFields;
+        }
+
+        // We need something as company name so save whatever we have
+        if ($firstMatchedField = reset($matchedFields)) {
+            $matchedFields['companyname'] = $firstMatchedField;
+
+            return $matchedFields;
+        }
+
+        return $matchedFields;
     }
 }

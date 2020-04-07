@@ -35,7 +35,11 @@ $template = $form['template']->vars['data'];
 $attr                               = $form->vars['attr'];
 $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
 
-$isCodeMode = ($activePage->getTemplate() === 'mautic_code_mode');
+$isCodeMode = ('mautic_code_mode' === $activePage->getTemplate());
+
+if (!isset($previewUrl)) {
+    $previewUrl = '';
+}
 
 ?>
 
@@ -105,8 +109,8 @@ $isCodeMode = ($activePage->getTemplate() === 'mautic_code_mode');
             echo $view['form']->row($form['redirectType']);
             echo $view['form']->row($form['redirectUrl']);
             endif;
+            echo $view['form']->row($form['noIndex']);
             ?>
-
             <div class="template-fields<?php echo (!$template) ? ' hide"' : ''; ?>">
                 <?php echo $view['form']->row($form['metaDescription']); ?>
             </div>
@@ -128,4 +132,5 @@ $isCodeMode = ($activePage->getTemplate() === 'mautic_code_mode');
     'slots'         => $slots,
     'sections'      => $sections,
     'objectId'      => $activePage->getSessionId(),
+    'previewUrl'    => $previewUrl,
 ]); ?>

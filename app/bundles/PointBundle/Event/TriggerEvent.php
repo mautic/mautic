@@ -14,9 +14,6 @@ namespace Mautic\PointBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PointBundle\Entity\Trigger;
 
-/**
- * Class TriggerEvent.
- */
 class TriggerEvent extends CommonEvent
 {
     /**
@@ -30,8 +27,7 @@ class TriggerEvent extends CommonEvent
     protected $isNew;
 
     /**
-     * @param Trigger $trigger
-     * @param bool    $isNew
+     * @param bool $isNew
      */
     public function __construct(Trigger &$trigger, $isNew = false)
     {
@@ -40,8 +36,6 @@ class TriggerEvent extends CommonEvent
     }
 
     /**
-     * Returns the Trigger entity.
-     *
      * @return Trigger
      */
     public function getTrigger()
@@ -49,11 +43,6 @@ class TriggerEvent extends CommonEvent
         return $this->entity;
     }
 
-    /**
-     * Sets the Trigger entity.
-     *
-     * @param Trigger $trigger
-     */
     public function setTrigger(Trigger $trigger)
     {
         $this->entity = $trigger;

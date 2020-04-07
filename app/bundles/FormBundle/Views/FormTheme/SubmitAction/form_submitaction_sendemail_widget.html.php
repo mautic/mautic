@@ -16,6 +16,7 @@
     </div>
     <div class="col-sm-4">
         <?php echo $view['form']->row($form['immediately']); ?>
+        <?php echo $view['form']->row($form['set_replyto']); ?>
     </div>
 </div>
 

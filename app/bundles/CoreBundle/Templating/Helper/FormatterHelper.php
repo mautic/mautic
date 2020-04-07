@@ -11,39 +11,24 @@
 
 namespace Mautic\CoreBundle\Templating\Helper;
 
-use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\Serializer;
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class FormatHelper.
- */
 class FormatterHelper extends Helper
 {
-    /**
-     * @var AppVersion
-     */
-    private $appVersion;
-
     /**
      * @var DateHelper
      */
     private $dateHelper;
-
     /**
      * @var TranslatorInterface
      */
     private $translator;
 
-    /**
-     * @param AppVersion          $appVersion
-     * @param DateHelper          $dateHelper
-     * @param TranslatorInterface $translator
-     */
-    public function __construct(AppVersion $appVersion, DateHelper $dateHelper, TranslatorInterface $translator)
+    public function __construct(DateHelper $dateHelper, TranslatorInterface $translator)
     {
-        $this->appVersion = $appVersion;
         $this->dateHelper = $dateHelper;
         $this->translator = $translator;
     }
@@ -60,7 +45,7 @@ class FormatterHelper extends Helper
      */
     public function _($val, $type = 'html', $textOnly = false, $round = 1)
     {
-        if (empty($val) && $type !== 'bool') {
+        if (empty($val) && 'bool' !== $type) {
             return $val;
         }
 
@@ -68,21 +53,21 @@ class FormatterHelper extends Helper
             case 'array':
                 if (!is_array($val)) {
                     //assume that it's serialized
-                    $unserialized = unserialize($val);
+                    $unserialized = Serializer::decode($val);
                     if ($unserialized) {
                         $val = $unserialized;
                     }
                 }
 
                 $stringParts = [];
-                foreach ($val as $k => $v) {
+                foreach ($val as $v) {
                     if (is_array($v)) {
                         $stringParts = $this->_($v, 'array', $textOnly, $round + 1);
                     } else {
                         $stringParts[] = $v;
                     }
                 }
-                if ($round === 1) {
+                if (1 === $round) {
                     $string = implode('; ', $stringParts);
                 } else {
                     $string = implode(', ', $stringParts);
@@ -152,22 +137,48 @@ class FormatterHelper extends Helper
     }
 
     /**
+     * @param string $delimeter
+     *
+     * @return string
+     */
+    public function simpleArrayToHtml(array $array, $delimeter = '<br />')
+    {
+        $pairs = [];
+        foreach ($array as $key => $value) {
+            $pairs[] = "$key: $value";
+        }
+
+        return implode($delimeter, $pairs);
+    }
+
+    /**
+     * Takes a simple csv list like 1,2,3,4 and returns as an array.
+     *
+     * @param $csv
+     *
+     * @return array
+     */
+    public function simpleCsvToArray($csv, $type = null)
+    {
+        if (!$csv) {
+            return [];
+        }
+
+        return array_map(
+            function ($value) use ($type) {
+                $value = trim($value);
+
+                return $this->_($value, $type);
+            },
+            explode(',', $csv)
+        );
+    }
+
+    /**
      * @return string
      */
     public function getName()
     {
         return 'formatter';
-    }
-
-    /**
-     * @return string
-     *
-     * @deprecated - Use VersionHelper or AppVersion class
-     *
-     * @todo Remove this method and $this->appVersion in Mautic 3.0
-     */
-    public function getVersion()
-    {
-        return $this->appVersion->getVersion();
     }
 }

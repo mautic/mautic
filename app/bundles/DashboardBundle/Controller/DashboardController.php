@@ -11,16 +11,19 @@
 
 namespace Mautic\DashboardBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\DashboardBundle\Entity\Widget;
+use Mautic\DashboardBundle\Form\Type\UploadType;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Class DashboardController.
  */
-class DashboardController extends FormController
+class DashboardController extends AbstractFormController
 {
     /**
      * Generates the default view.
@@ -48,12 +51,12 @@ class DashboardController extends FormController
             $session = $this->get('session');
             if (!empty($dateRangeFilter['date_from'])) {
                 $from = new \DateTime($dateRangeFilter['date_from']);
-                $session->set('mautic.dashboard.date.from', $from->format($mysqlFormat));
+                $session->set('mautic.daterange.form.from', $from->format($mysqlFormat));
             }
 
             if (!empty($dateRangeFilter['date_to'])) {
                 $to = new \DateTime($dateRangeFilter['date_to']);
-                $session->set('mautic.dashboard.date.to', $to->format($mysqlFormat));
+                $session->set('mautic.daterange.form.to', $to->format($mysqlFormat));
             }
 
             $model->clearDashboardCache();
@@ -65,7 +68,7 @@ class DashboardController extends FormController
         // Set the final date range to the form
         $dateRangeFilter['date_from'] = $filter['dateFrom']->format($humanFormat);
         $dateRangeFilter['date_to']   = $filter['dateTo']->format($humanFormat);
-        $dateRangeForm                = $this->get('form.factory')->create('daterange', $dateRangeFilter, ['action' => $action]);
+        $dateRangeForm                = $this->get('form.factory')->create(DateRangeType::class, $dateRangeFilter, ['action' => $action]);
 
         $model->populateWidgetsContent($widgets, $filter);
 
@@ -103,7 +106,7 @@ class DashboardController extends FormController
         $valid      = false;
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $closeModal = true;
@@ -136,9 +139,7 @@ class DashboardController extends FormController
                 $passthroughVars['widgetHeight'] = $widget->getHeight();
             }
 
-            $response = new JsonResponse($passthroughVars);
-
-            return $response;
+            return new JsonResponse($passthroughVars);
         } else {
             return $this->delegateView([
                 'viewParameters' => [
@@ -167,7 +168,7 @@ class DashboardController extends FormController
         $closeModal = false;
         $valid      = false;
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $closeModal = true;
@@ -200,9 +201,7 @@ class DashboardController extends FormController
                 $passthroughVars['widgetHeight'] = $widget->getHeight();
             }
 
-            $response = new JsonResponse($passthroughVars);
-
-            return $response;
+            return new JsonResponse($passthroughVars);
         } else {
             return $this->delegateView([
                 'viewParameters' => [
@@ -239,7 +238,7 @@ class DashboardController extends FormController
         /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
         $model  = $this->getModel('dashboard');
         $entity = $model->getEntity($objectId);
-        if ($entity === null) {
+        if (null === $entity) {
             $flashes[] = [
                 'type'    => 'error',
                 'msg'     => 'mautic.api.client.error.notfound',
@@ -269,61 +268,58 @@ class DashboardController extends FormController
     }
 
     /**
-     * Exports the widgets of current user into a json file.
+     * Saves the widgets of current user into a json and stores it for later as a file.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function saveAction()
+    {
+        // Accept only AJAX POST requests because those are check for CSRF tokens
+        if ('POST' !== $this->request->getMethod() || !$this->request->isXmlHttpRequest()) {
+            return $this->accessDenied();
+        }
+
+        $name = $this->getNameFromRequest();
+        try {
+            $this->getModel('dashboard')->saveSnapshot($name);
+            $type = 'notice';
+            $msg  = $this->translator->trans('mautic.dashboard.notice.save', [
+                '%name%'    => $name,
+                '%viewUrl%' => $this->generateUrl(
+                    'mautic_dashboard_action',
+                    [
+                        'objectAction' => 'import',
+                    ]
+                ),
+            ], 'flashes');
+        } catch (IOException $e) {
+            $type = 'error';
+            $msg  = $this->translator->trans('mautic.dashboard.error.save', [
+                '%msg%' => $e->getMessage(),
+            ], 'flashes');
+        }
+
+        return $this->postActionRedirect(
+            [
+                'flashes' => [
+                    [
+                        'type' => $type,
+                        'msg'  => $msg,
+                    ],
+                ],
+            ]
+        );
+    }
+
+    /**
+     * Exports the widgets of current user into a json file and downloads it.
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function exportAction()
     {
-        /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
-        $model            = $this->getModel('dashboard');
-        $widgetsPaginator = $model->getWidgets();
-        $usersName        = $this->user->getName();
-        $dateTime         = new \DateTime();
-        $dateStamp        = $dateTime->format('Y-m-d H:i:s');
-        $name             = $this->request->get(
-            'name',
-            'dashboard-of-'.str_replace(' ', '-', $usersName).'-'.$dateStamp
-        );
-
-        $description = $this->get('translator')->trans(
-            'mautic.dashboard.generated_by',
-            [
-                '%name%' => $usersName,
-                '%date%' => $dateStamp,
-            ]
-        );
-
-        $dashboard = [
-            'name'        => $name,
-            'description' => $description,
-            'widgets'     => [],
-        ];
-
-        foreach ($widgetsPaginator as $widget) {
-            $dashboard['widgets'][] = [
-                'name'     => $widget->getName(),
-                'width'    => $widget->getWidth(),
-                'height'   => $widget->getHeight(),
-                'ordering' => $widget->getOrdering(),
-                'type'     => $widget->getType(),
-                'params'   => $widget->getParams(),
-                'template' => $widget->getTemplate(),
-            ];
-        }
-
-        // Make the filename safe
-        $filename = InputHelper::alphanum($name, false, '_').'.json';
-
-        if ($this->request->get('save', false)) {
-            // Save to the user's folder
-            $dir = $this->factory->getSystemPath('dashboard.user');
-            file_put_contents($dir.'/'.$filename, json_encode($dashboard));
-
-            return $this->redirect($this->get('router')->generate('mautic_dashboard_action', ['objectAction' => 'import']));
-        }
-
-        $response = new JsonResponse($dashboard);
+        $filename = InputHelper::filename($this->getNameFromRequest(), 'json');
+        $response = new JsonResponse($this->getModel('dashboard')->toArray($filename));
         $response->setEncodingOptions($response->getEncodingOptions() | JSON_PRETTY_PRINT);
         $response->headers->set('Content-Type', 'application/force-download');
         $response->headers->set('Content-Type', 'application/octet-stream');
@@ -348,7 +344,7 @@ class DashboardController extends FormController
         $type  = array_shift($parts);
         $name  = implode('.', $parts);
 
-        $dir  = $this->factory->getSystemPath("dashboard.$type");
+        $dir  = $this->container->get('mautic.helper.paths')->getSystemPath("dashboard.$type");
         $path = $dir.'/'.$name.'.json';
 
         if (file_exists($path) && is_writable($path)) {
@@ -375,40 +371,42 @@ class DashboardController extends FormController
         $type  = array_shift($parts);
         $name  = implode('.', $parts);
 
-        $dir  = $this->factory->getSystemPath("dashboard.$type");
+        $dir  = $this->container->get('mautic.helper.paths')->getSystemPath("dashboard.$type");
         $path = $dir.'/'.$name.'.json';
 
-        if (file_exists($path) && is_writable($path)) {
-            $widgets = json_decode(file_get_contents($path), true);
-            if (isset($widgets['widgets'])) {
-                $widgets = $widgets['widgets'];
+        if (!file_exists($path) || !is_readable($path)) {
+            $this->addFlash('mautic.dashboard.upload.filenotfound', [], 'error', 'validators');
+
+            return $this->redirect($this->generateUrl('mautic_dashboard_action', ['objectAction' => 'import']));
+        }
+
+        $widgets = json_decode(file_get_contents($path), true);
+        if (isset($widgets['widgets'])) {
+            $widgets = $widgets['widgets'];
+        }
+
+        if ($widgets) {
+            /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
+            $model = $this->getModel('dashboard');
+
+            $model->clearDashboardCache();
+
+            $currentWidgets = $model->getWidgets();
+
+            if (count($currentWidgets)) {
+                foreach ($currentWidgets as $widget) {
+                    $model->deleteEntity($widget);
+                }
             }
 
-            if ($widgets) {
-                /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
-                $model = $this->getModel('dashboard');
-
-                $model->clearDashboardCache();
-
-                $currentWidgets = $model->getWidgets();
-
-                if (count($currentWidgets)) {
-                    foreach ($currentWidgets as $widget) {
-                        $model->deleteEntity($widget);
-                    }
-                }
-
-                $filter = $model->getDefaultFilter();
-                foreach ($widgets as $widget) {
-                    $widget = $model->populateWidgetEntity($widget, $filter);
-                    $model->saveEntity($widget);
-                }
-
-                return $this->redirect($this->get('router')->generate('mautic_dashboard_index'));
+            $filter = $model->getDefaultFilter();
+            foreach ($widgets as $widget) {
+                $widget = $model->populateWidgetEntity($widget, $filter);
+                $model->saveEntity($widget);
             }
         }
 
-        return $this->redirect($this->generateUrl('mautic_dashboard_action', ['objectAction' => 'import']));
+        return $this->redirect($this->get('router')->generate('mautic_dashboard_index'));
     }
 
     /**
@@ -422,20 +420,20 @@ class DashboardController extends FormController
         $model = $this->getModel('dashboard');
 
         $directories = [
-            'user'   => $this->factory->getSystemPath('dashboard.user'),
-            'global' => $this->factory->getSystemPath('dashboard.global'),
+            'user'   => $this->container->get('mautic.helper.paths')->getSystemPath('dashboard.user'),
+            'global' => $this->container->get('mautic.helper.paths')->getSystemPath('dashboard.global'),
         ];
 
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'import']);
-        $form   = $this->get('form.factory')->create('dashboard_upload', [], ['action' => $action]);
+        $form   = $this->get('form.factory')->create(UploadType::class, [], ['action' => $action]);
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             if (isset($form) && !$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     $fileData = $form['file']->getData();
                     if (!empty($fileData)) {
                         $extension = pathinfo($fileData->getClientOriginalName(), PATHINFO_EXTENSION);
-                        if ($extension === 'json') {
+                        if ('json' === $extension) {
                             $fileData->move($directories['user'], $fileData->getClientOriginalName());
                         } else {
                             $form->addError(
@@ -455,16 +453,20 @@ class DashboardController extends FormController
             }
         }
 
-        $dashboardFiles = [];
+        $dashboardFiles = ['user' => [], 'gobal' => []];
         $dashboards     = [];
 
-        // User specific layouts
-        chdir($directories['user']);
-        $dashboardFiles['user'] = glob('*.json');
+        if (is_readable($directories['user'])) {
+            // User specific layouts
+            chdir($directories['user']);
+            $dashboardFiles['user'] = glob('*.json');
+        }
 
-        // Global dashboards
-        chdir($directories['global']);
-        $dashboardFiles['global'] = glob('*.json');
+        if (is_readable($directories['global'])) {
+            // Global dashboards
+            chdir($directories['global']);
+            $dashboardFiles['global'] = glob('*.json');
+        }
 
         foreach ($dashboardFiles as $type => $dirDashboardFiles) {
             $tempDashboard = [];
@@ -527,5 +529,15 @@ class DashboardController extends FormController
                 ],
             ]
         );
+    }
+
+    /**
+     * Gets name from request and defaults it to the timestamp if not provided.
+     *
+     * @return string
+     */
+    private function getNameFromRequest()
+    {
+        return $this->request->get('name', (new \DateTime())->format('Y-m-dTH:i:s'));
     }
 }

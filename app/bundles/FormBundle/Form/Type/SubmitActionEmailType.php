@@ -44,9 +44,6 @@ class SubmitActionEmailType extends AbstractType
 
     /**
      * SubmitActionEmailType constructor.
-     *
-     * @param TranslatorInterface  $translator
-     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
     {
@@ -66,7 +63,7 @@ class SubmitActionEmailType extends AbstractType
             );
         $builder->add(
             'subject',
-          TextType::class,
+            TextType::class,
             [
                 'label'      => 'mautic.form.action.sendemail.subject',
                 'label_attr' => ['class' => 'control-label'],
@@ -89,7 +86,7 @@ class SubmitActionEmailType extends AbstractType
 
         $builder->add(
             'message',
-          TextareaType::class,
+            TextareaType::class,
             [
                 'label'      => 'mautic.form.action.sendemail.message',
                 'label_attr' => ['class' => 'control-label'],
@@ -99,8 +96,8 @@ class SubmitActionEmailType extends AbstractType
             ]
         );
 
-        if ($this->coreParametersHelper->getParameter('mailer_spool_type') == 'file') {
-            $default = (isset($options['data']['immediately'])) ? $options['data']['immediately'] : false;
+        if ('file' == $this->coreParametersHelper->get('mailer_spool_type')) {
+            $default = isset($options['data']['immediately']) ? $options['data']['immediately'] : false;
             $builder->add(
                 'immediately',
                 YesNoButtonGroupType::class,
@@ -108,7 +105,7 @@ class SubmitActionEmailType extends AbstractType
                     'label' => 'mautic.form.action.sendemail.immediately',
                     'data'  => $default,
                     'attr'  => [
-                        'tooltip'    => 'mautic.form.action.sendemail.immediately.desc',
+                        'tooltip' => 'mautic.form.action.sendemail.immediately.desc',
                     ],
                 ]
             );
@@ -117,34 +114,47 @@ class SubmitActionEmailType extends AbstractType
                 'immediately',
                 HiddenType::class,
                 [
-                    'data'  => false,
+                    'data' => false,
                 ]
             );
         }
 
-        $default = (isset($options['data']['copy_lead'])) ? $options['data']['copy_lead'] : true;
+        $default = isset($options['data']['copy_lead']) ? $options['data']['copy_lead'] : false;
         $builder->add(
             'copy_lead',
-          YesNoButtonGroupType::class,
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.form.action.sendemail.copytolead',
                 'data'  => $default,
             ]
         );
 
-        $default = (isset($options['data']['email_to_owner'])) ? $options['data']['email_to_owner'] : false;
+        $default = isset($options['data']['set_replyto']) ? $options['data']['set_replyto'] : true;
         $builder->add(
-          'email_to_owner',
-          YesNoButtonGroupType::class,
-          [
-            'label' => 'mautic.form.action.sendemail.emailtoowner',
-            'data'  => $default,
-          ]
+            'set_replyto',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.form.action.sendemail.setreplyto',
+                'data'  => $default,
+                'attr'  => [
+                    'tooltip' => 'mautic.form.action.sendemail.setreplyto_tooltip',
+                ],
+            ]
+        );
+
+        $default = isset($options['data']['email_to_owner']) ? $options['data']['email_to_owner'] : false;
+        $builder->add(
+            'email_to_owner',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.form.action.sendemail.emailtoowner',
+                'data'  => $default,
+            ]
         );
 
         $builder->add(
             'templates',
-          EmailListType::class,
+            EmailListType::class,
             [
                 'label'      => 'mautic.lead.email.template',
                 'label_attr' => ['class' => 'control-label'],
@@ -153,7 +163,7 @@ class SubmitActionEmailType extends AbstractType
                     'class'    => 'form-control',
                     'onchange' => 'Mautic.getLeadEmailContent(this)',
                 ],
-                'multiple' => false,
+                'multiple'   => false,
             ]
         );
 
@@ -163,16 +173,11 @@ class SubmitActionEmailType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'form_submitaction_sendemail';
     }
 
-    /**
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['formFields'] = $this->getFormFields($options['attr']['data-formid']);
