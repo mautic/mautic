@@ -47,11 +47,6 @@ final class InstallNewFilesStep implements StepInterface
     private $input;
 
     /**
-     * @var OutputInterface
-     */
-    private $output;
-
-    /**
      * InstallNewFilesStep constructor.
      */
     public function __construct(TranslatorInterface $translator, UpdateHelper $updateHelper, PathsHelper $pathsHelper)
@@ -78,7 +73,6 @@ final class InstallNewFilesStep implements StepInterface
     {
         $this->progressBar = $progressBar;
         $this->input       = $input;
-        $this->output      = $output;
 
         $zipFile = $this->getZipPackage();
 

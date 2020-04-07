@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Update;
+namespace Mautic\CoreBundle\Tests\Unit\Update;
 
 use Mautic\CoreBundle\Update\Step\StepInterface;
 use Mautic\CoreBundle\Update\StepProvider;

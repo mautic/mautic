@@ -1,2 +1,3 @@
 <?php
+
 include 'paths.php';
