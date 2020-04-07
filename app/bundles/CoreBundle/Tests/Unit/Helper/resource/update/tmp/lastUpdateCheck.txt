@@ -1,1 +1,0 @@
-{"error":false,"message":"mautic.core.updater.update.available","version":"10.0.1","announcement":"https:\/\/mautic.org","package":"https:\/\/mautic.org\/10.0.1\/upgrade.zip","stability":"stable","checkedTime":1582468008}

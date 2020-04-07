@@ -88,6 +88,14 @@ class UpdateHelperTest extends TestCase
         $this->helper = new UpdateHelper($this->pathsHelper, $this->logger, $this->coreParametersHelper, $this->client, $this->releaseParser);
     }
 
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        // Cleanup the files
+        @unlink(__DIR__.'/resource/update/tmp/lastUpdateCheck.txt');
+    }
+
     public function testUpdatePackageFetchedAndSaved()
     {
         $this->response->expects($this->once())
