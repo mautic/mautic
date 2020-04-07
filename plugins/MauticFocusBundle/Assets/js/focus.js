@@ -253,11 +253,12 @@ Mautic.launchFocusBuilder = function (forceFetch) {
             padding: "0",
             border: "none",
             width: "100%",
-            height: "100%"
+            height: mQuery('#websiteScreenshot').height()
         };
 
         // Async load in iframe
-        mQuery('.preview-body').html('<iframe src="'+url+'"></iframe>').css(builderCss);
+        mQuery('.preview-body').html('<iframe src="'+url+'"></iframe>');
+        mQuery('iframe').css(builderCss);
         mQuery('.btn-close-builder').prop('disabled', false);
     } else {
         mQuery('.btn-close-builder').prop('disabled', false);
