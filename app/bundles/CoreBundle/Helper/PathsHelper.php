@@ -84,15 +84,66 @@ class PathsHelper
         $this->kernelLogsDir          = $this->removeTrailingSlash($logsDir);
         $this->kernelRootDir          = $this->removeTrailingSlash($rootDir);
 
-        /** @var array $paths */
-        $root = $rootDir;
+        $root  = $rootDir;
+        $paths = [];
         include $root.'/config/paths_helper.php';
 
-        if (!isset($paths)) {
-            throw new \Exception('$paths not found');
-        }
-
         $this->paths = $paths;
+    }
+
+    public function getLocalConfigurationFile(): string
+    {
+        return ParameterLoader::getLocalConfigFile($this->kernelRootDir);
+    }
+
+    public function getCachePath(): string
+    {
+        return $this->getSystemPath('cache', true);
+    }
+
+    public function getRootPath(): string
+    {
+        return $this->getSystemPath('root', true);
+    }
+
+    public function getTemporaryPath(): string
+    {
+        return $this->getSystemPath('tmp', true);
+    }
+
+    public function getLogsPath(): string
+    {
+        return $this->getSystemPath('logs', true);
+    }
+
+    public function getImagePath(): string
+    {
+        return $this->getSystemPath('images', true);
+    }
+
+    public function getTranslationsPath(): string
+    {
+        return $this->getSystemPath('translations', true);
+    }
+
+    public function getThemesPath(): string
+    {
+        return $this->getSystemPath('themes', true);
+    }
+
+    public function getAssetsPath(): string
+    {
+        return $this->getSystemPath('assets', true);
+    }
+
+    public function getCoreBundlesPath(): string
+    {
+        return $this->getSystemPath('bundles', true);
+    }
+
+    public function getPluginsPath(): string
+    {
+        return $this->getSystemPath('plugins', true);
     }
 
     /**
@@ -171,36 +222,6 @@ class PathsHelper
         }
 
         return $path;
-    }
-
-    public function getLocalConfigurationFile(): string
-    {
-        return ParameterLoader::getLocalConfigFile($this->kernelRootDir);
-    }
-
-    public function getCachePath(): string
-    {
-        return $this->getSystemPath('cache', true);
-    }
-
-    public function getRootPath(): string
-    {
-        return $this->getSystemPath('root', true);
-    }
-
-    public function getTemporaryPath(): string
-    {
-        return $this->getSystemPath('tmp', true);
-    }
-
-    public function getLogsPath(): string
-    {
-        return $this->getSystemPath('logs', true);
-    }
-
-    public function getImagePath(): string
-    {
-        return $this->getSystemPath('images', true);
     }
 
     private function removeTrailingSlash(?string $dir): ?string
