@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Controller;
 
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -20,11 +21,10 @@ class EmailGraphStatsController extends Controller
     /**
      * Loads a specific form into the detailed panel.
      *
-     * @param Request $request
-     * @param int     $objectId
-     * @param bool    $isVariant
-     * @param string  $dateFrom
-     * @param string  $dateTo
+     * @param int    $objectId
+     * @param bool   $isVariant
+     * @param string $dateFrom
+     * @param string $dateTo
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
@@ -39,7 +39,7 @@ class EmailGraphStatsController extends Controller
         // Init the date range filter form
         $dateRangeValues = ['date_from' => $dateFrom, 'date_to' => $dateTo];
         $action          = $this->generateUrl('mautic_email_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
+        $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
         if (null === $email || !$this->get('mautic.security')->hasEntityAccess(
                 'email:emails:viewown',
@@ -65,7 +65,7 @@ class EmailGraphStatsController extends Controller
         $dateFromObject = new \DateTime($dateFrom);
         $dateToObject   = new \DateTime($dateTo);
 
-        if ($email->getEmailType() === 'template') {
+        if ('template' === $email->getEmailType()) {
             $stats = $model->getEmailGeneralStats(
                 $email,
                 $includeVariants,

@@ -48,16 +48,12 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
     protected $integrationHelper;
 
     /**
-     * @var null|requestStack
+     * @var requestStack|null
      */
     protected $requestStack;
 
     /**
-     * @param IntegrationHelper        $integrationHelper
-     * @param EventDispatcherInterface $dispatcher
-     * @param RequestStack             $requestStack
-     * @param UserProviderInterface    $userProvider
-     * @param                          $providerKey
+     * @param $providerKey
      */
     public function __construct(
         IntegrationHelper $integrationHelper,
@@ -74,8 +70,6 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
     }
 
     /**
-     * @param TokenInterface $token
-     *
      * @return Response|PluginToken
      */
     public function authenticate(TokenInterface $token)
@@ -144,8 +138,6 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
     }
 
     /**
-     * @param TokenInterface $token
-     *
      * @return mixed
      */
     public function supports(TokenInterface $token)

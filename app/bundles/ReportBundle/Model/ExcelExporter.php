@@ -12,6 +12,9 @@
 namespace Mautic\ReportBundle\Model;
 
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use PhpOffice\PhpSpreadsheet\Exception;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 /**
  * Class CsvExporter.
@@ -29,15 +32,14 @@ class ExcelExporter
     }
 
     /**
-     * @param array  $reportData
      * @param string $name
      *
      * @throws \Exception
      */
     public function export(array $reportData, $name)
     {
-        if (!class_exists('PHPExcel')) {
-            throw new \Exception('PHPExcel is required to export to Excel spreadsheets');
+        if (!class_exists(Spreadsheet::class)) {
+            throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
         }
 
         if (!array_key_exists('data', $reportData) || !array_key_exists('columns', $reportData)) {
@@ -45,7 +47,7 @@ class ExcelExporter
         }
 
         try {
-            $objPHPExcel = new \PHPExcel();
+            $objPHPExcel = new Spreadsheet();
             $objPHPExcel->getProperties()->setTitle($name);
 
             $objPHPExcel->createSheet();
@@ -56,14 +58,19 @@ class ExcelExporter
             foreach ($reportData['data'] as $count => $data) {
                 $row = [];
                 foreach ($data as $k => $v) {
-                    if ($count === 0) {
+                    if (0 === $count) {
                         //set the header
-                        $header[] = $k;
+                        foreach ($reportData['columns'] as $c) {
+                            if ($c['alias'] == $k) {
+                                $header[] = $c['label'];
+                                break;
+                            }
+                        }
                     }
                     $row[] = htmlspecialchars_decode($this->formatterHelper->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true), ENT_QUOTES);
                 }
 
-                if ($count === 0) {
+                if (0 === $count) {
                     //write the column names row
                     $objPHPExcel->getActiveSheet()->fromArray($header);
                 }
@@ -74,12 +81,12 @@ class ExcelExporter
                 unset($row, $reportData['data'][$count]);
             }
 
-            $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+            $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
             $objWriter->setPreCalculateFormulas(false);
 
             $objWriter->save('php://output');
-        } catch (\PHPExcel_Exception $e) {
-            throw new \Exception('PHPExcel Error', 0, $e);
+        } catch (Exception $e) {
+            throw new \Exception('PHPSpreadsheet Error', 0, $e);
         }
     }
 }

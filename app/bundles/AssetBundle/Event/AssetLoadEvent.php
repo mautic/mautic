@@ -24,9 +24,6 @@ class AssetLoadEvent extends CommonEvent
      */
     protected $unique;
 
-    /**
-     * @param Download $download
-     */
     public function __construct(Download $download, $isUnique)
     {
         $this->entity = $download;

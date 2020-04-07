@@ -28,8 +28,6 @@ class EventHelper
     {
         static $initiated = [];
 
-        $stagesChange = 0;
-
-        return $stagesChange;
+        return 0;
     }
 }

@@ -53,12 +53,6 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
 
     /**
      * ContactTrackingService constructor.
-     *
-     * @param CookieHelper          $cookieHelper
-     * @param LeadDeviceRepository  $leadDeviceRepository
-     * @param LeadRepository        $leadRepository
-     * @param MergeRecordRepository $mergeRecordRepository
-     * @param RequestStack          $requestStack
      */
     public function __construct(
         CookieHelper $cookieHelper,
@@ -79,29 +73,29 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
      */
     public function getTrackedLead()
     {
-        if ($this->request === null) {
+        if (null === $this->request) {
             return null;
         }
 
         $trackingId = $this->getTrackedIdentifier();
-        if ($trackingId === null) {
+        if (null === $trackingId) {
             return null;
         }
 
         $leadId = $this->cookieHelper->getCookie($trackingId, null);
-        if ($leadId === null) {
+        if (null === $leadId) {
             $leadId = $this->request->get('mtc_id', null);
-            if ($leadId === null) {
+            if (null === $leadId) {
                 return null;
             }
         }
 
         $lead = $this->leadRepository->getEntity($leadId);
-        if ($lead === null) {
+        if (null === $lead) {
             // Check if this contact was merged into another and if so, return the new contact
             $lead = $this->mergeRecordRepository->findMergedContact($leadId);
 
-            if ($lead === null) {
+            if (null === $lead) {
                 return null;
             }
 

@@ -16,7 +16,7 @@ use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
 /**
  * Class MessageHelperTest.
  */
-class PlainTextMessageHelperTest extends \PHPUnit_Framework_TestCase
+class PlainTextMessageHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetPlainTextMessage()
     {

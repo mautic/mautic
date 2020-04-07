@@ -209,7 +209,7 @@ Mautic.formatCode = function() {
  */
 Mautic.openMediaManager = function() {
     Mautic.openServerBrowser(
-        mauticBasePath + '/' + mauticAssetPrefix + 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/index.html?type=Images',
+        mauticBasePath + '/elfinder',
         screen.width * 0.7,
         screen.height * 0.7
     );
@@ -522,7 +522,7 @@ Mautic.sendBuilderContentToTextarea = function(callback, keepBuilderContent) {
         // prevent from being able to close builder
         console.error(error);
     }
-}
+};
 
 Mautic.sanitizeHtmlAndStoreToTextarea = function(html) {
     var cleanHtml = Mautic.sanitizeHtmlBeforeSave(html);
@@ -860,7 +860,7 @@ Mautic.initSections = function() {
         iframeFix: true,
         connectToSortable: 'body',
         revert: 'invalid',
-        iframeOffset: iframe.offset(),
+        iframeOffset: iframe.jQuery2Offset(),
         helper: function(e, ui) {
             // Fix body overflow that messes sortable up
             bodyOverflow.overflowX = mQuery('body', parent.document).css('overflow-x');
@@ -1017,7 +1017,7 @@ Mautic.initSlots = function(slotContainers) {
         iframeFix: true,
         connectToSortable: '[data-slot-container]',
         revert: 'invalid',
-        iframeOffset: iframe.offset(),
+        iframeOffset: iframe.jQuery2Offset(),
         helper: function(e, ui) {
             // fix for Uncaught TypeError: Cannot read property 'document' of null
             // Fix body overflow that messes sortable up
@@ -1168,6 +1168,18 @@ Mautic.isSlotInitiated = function(slot) {
     }) !== 'undefined';
 };
 
+Mautic.isCodeMode = function() {
+    return mQuery('a[data-theme=mautic_code_mode]').first().hasClass('hide');
+};
+
+window.document.fileManagerInsertImageCallback = function(selector, url) {
+    if (Mautic.isCodeMode()) {
+        Mautic.insertTextAtCMCursor(url);
+    } else {
+        mQuery(selector).froalaEditor('image.insert', url);
+    }
+};
+
 Mautic.initSlotListeners = function() {
     Mautic.activateGlobalFroalaOptions();
     Mautic.builderSlots = [];
@@ -1232,7 +1244,15 @@ Mautic.initSlotListeners = function() {
                 focus.remove();
             });
             cloneLink.click(function(e) {
-                slot.clone().insertAfter(slot);
+                if (type == 'dynamicContent') {
+                    var maxId = Mautic.getDynamicContentMaxId();
+
+                    slot.clone().attr('data-param-dec-id', maxId + 1).insertAfter(slot);
+                    Mautic.createNewDynamicContentItem(parent.mQuery);
+                } else {
+                    slot.clone().insertAfter(slot);
+                }
+
                 Mautic.initSlots(slot.closest('[data-slot-container="1"]'));
             });
 
@@ -1469,10 +1489,8 @@ Mautic.initSlotListeners = function() {
             });
         } else if (type === 'dynamicContent') {
             if (slot.html().match(/__dynamicContent__/)) {
-                var decs = mQuery('[data-slot="dynamicContent"]');
-                var ids = mQuery.map(decs, function(e){return mQuery(e).attr('data-param-dec-id');})
-                var maxId = Math.max.apply(Math, ids);
-                if (isNaN(maxId) || Number.NEGATIVE_INFINITY == maxId) maxId = 0;
+                var maxId = Mautic.getDynamicContentMaxId();
+
                 slot.attr('data-param-dec-id', maxId + 1);
                 slot.html('Dynamic Content');
                 Mautic.createNewDynamicContentItem(parent.mQuery);
@@ -1527,7 +1545,7 @@ Mautic.initSlotListeners = function() {
             params.slot.find('label.label3').text(params.field.val());
         } else if ('label-text4' === fieldParam) {
             params.slot.find('label.label4').text(params.field.val());
-        } else if ('glink' === fieldParam || 'flink' === fieldParam || 'tlink' === fieldParam) {
+        } else if ('flink' === fieldParam || 'tlink' === fieldParam) {
             params.slot.find('#'+fieldParam).attr('href', params.field.val());
         } else if (fieldParam === 'href') {
             params.slot.find('a').eq(0).attr('href', params.field.val());
@@ -1979,6 +1997,15 @@ Mautic.getPredefinedLinks = function(callback) {
         }
         return callback(linkList);
     });
+};
+
+Mautic.getDynamicContentMaxId = function() {
+    var decs = mQuery('[data-slot="dynamicContent"]');
+    var ids = mQuery.map(decs, function(e){return mQuery(e).attr('data-param-dec-id');});
+    var maxId = Math.max.apply(Math, ids);
+    if (isNaN(maxId) || Number.NEGATIVE_INFINITY === maxId) maxId = 0;
+
+    return maxId;
 };
 
 // Init inside the builder's iframe

@@ -149,9 +149,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $this->variantChildren     = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -224,9 +221,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         self::addVariantMetadata($builder, self::class);
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('title', new NotBlank([
@@ -711,7 +705,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
 
-        if ($prop == 'translationParent' || $prop == 'variantParent' || $prop == 'category') {
+        if ('translationParent' == $prop || 'variantParent' == $prop || 'category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {

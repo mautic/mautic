@@ -52,6 +52,7 @@ if (!isset($inBuilder)) {
                             <div class="col-md-6">
                                 <?php
                                 echo $view['form']->row($form['name']);
+                                echo $view['form']->row($form['formAttributes']);
                                 echo $view['form']->row($form['description']);
                                 ?>
                             </div>
@@ -70,7 +71,7 @@ if (!isset($inBuilder)) {
                                 <div class="available-fields mb-md col-sm-4">
                                     <select class="chosen form-builder-new-component" data-placeholder="<?php echo $view['translator']->trans('mautic.form.form.component.fields'); ?>">
                                         <option value=""></option>
-                                        <?php foreach ($fields as $fieldType => $field): ?>
+                                        <?php foreach ($fields as $field => $fieldType): ?>
 
                                             <option data-toggle="ajaxmodal"
                                                     data-target="#formComponentModal"
@@ -108,6 +109,7 @@ if (!isset($inBuilder)) {
                                             'inForm'        => true,
                                             'id'            => $field['id'],
                                             'formId'        => $formId,
+                                            'formName'      => $activeForm->generateFormName(),
                                             'contactFields' => $contactFields,
                                             'companyFields' => $companyFields,
                                             'inBuilder'     => $inBuilder,
@@ -208,7 +210,7 @@ if (!isset($inBuilder)) {
 
 echo $view['form']->end($form);
 
-if ($activeForm->getFormType() === null || !empty($forceTypeSelection)):
+if (null === $activeForm->getFormType() || !empty($forceTypeSelection)):
     echo $view->render(
         'MauticCoreBundle:Helper:form_selecttype.html.php',
         [

@@ -12,7 +12,7 @@
 
 <div class="media pt-sm pb-sm pr-md pl-md nm bdr-b notification" id="notification<?php echo $n['id']; ?>">
     <span class="pull-left mt-xs" style="width:36px">
-        <?php if (strpos($n['iconClass'], 'img:') === 0): ?>
+        <?php if (0 === strpos($n['iconClass'], 'img:')): ?>
         <span class="img-wrapper img-rounded">
             <img class="media-object" src="<?php echo substr($n['iconClass'], 4); ?>" />
         </span>

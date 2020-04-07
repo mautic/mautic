@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Tests\EventListener;
+namespace Mautic\SmsBundle\Tests\EventListener;
 
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
@@ -18,10 +18,10 @@ use Mautic\EmailBundle\EventListener\TrackingSubscriber;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 
-class TrackingSubscriberTest extends \PHPUnit_Framework_TestCase
+class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|StatRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject|StatRepository
      */
     private $statRepository;
 

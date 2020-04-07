@@ -11,80 +11,82 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Form\Type\UserListType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class LeadImportFieldType.
- */
 class LeadImportFieldType extends AbstractType
 {
-    private $factory;
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
 
     /**
-     * @param MauticFactory $factory
+     * @var EntityManager
      */
-    public function __construct(MauticFactory $factory)
+    private $entityManager;
+
+    public function __construct(TranslatorInterface $translator, EntityManager $entityManager)
     {
-        $this->factory = $factory;
+        $this->translator    = $translator;
+        $this->entityManager = $entityManager;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $specialFields = [
-            'dateAdded'      => 'mautic.lead.import.label.dateAdded',
-            'createdByUser'  => 'mautic.lead.import.label.createdByUser',
-            'dateModified'   => 'mautic.lead.import.label.dateModified',
-            'modifiedByUser' => 'mautic.lead.import.label.modifiedByUser',
-            'lastActive'     => 'mautic.lead.import.label.lastActive',
-            'dateIdentified' => 'mautic.lead.import.label.dateIdentified',
-            'ip'             => 'mautic.lead.import.label.ip',
-            'points'         => 'mautic.lead.import.label.points',
-            'stage'          => 'mautic.lead.import.label.stage',
-            'doNotEmail'     => 'mautic.lead.import.label.doNotEmail',
-            'ownerusername'  => 'mautic.lead.import.label.ownerusername',
+            'mautic.lead.import.label.dateAdded'      => 'dateAdded',
+            'mautic.lead.import.label.createdByUser'  => 'createdByUser',
+            'mautic.lead.import.label.dateModified'   => 'dateModified',
+            'mautic.lead.import.label.modifiedByUser' => 'modifiedByUser',
+            'mautic.lead.import.label.lastActive'     => 'lastActive',
+            'mautic.lead.import.label.dateIdentified' => 'dateIdentified',
+            'mautic.lead.import.label.ip'             => 'ip',
+            'mautic.lead.import.label.points'         => 'points',
+            'mautic.lead.import.label.stage'          => 'stage',
+            'mautic.lead.import.label.doNotEmail'     => 'doNotEmail',
+            'mautic.lead.import.label.ownerusername'  => 'ownerusername',
         ];
 
         $importChoiceFields = [
-            'mautic.lead.contact'        => $options['lead_fields'],
-            'mautic.lead.company'        => $options['company_fields'],
+            'mautic.lead.contact'        => array_flip($options['lead_fields']),
+            'mautic.lead.company'        => array_flip($options['company_fields']),
             'mautic.lead.special_fields' => $specialFields,
         ];
 
-        if ($options['object'] !== 'lead') {
+        if ('lead' !== $options['object']) {
             unset($importChoiceFields['mautic.lead.contact']);
         }
 
         foreach ($options['import_fields'] as $field => $label) {
             $builder->add(
                 $field,
-                'choice',
+                ChoiceType::class,
                 [
-                    'choices'    => $importChoiceFields,
-                    'label'      => $label,
-                    'required'   => false,
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => ['class' => 'form-control'],
-                    'data'       => $this->getDefaultValue($field, $options['import_fields']),
+                    'choices'           => $importChoiceFields,
+                    'label'             => $label,
+                    'required'          => false,
+                    'label_attr'        => ['class' => 'control-label'],
+                    'attr'              => ['class' => 'form-control'],
+                    'data'              => $this->getDefaultValue($field, $options['import_fields']),
                 ]
             );
         }
 
-        $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer(
-            $this->factory->getEntityManager(),
-            'MauticUserBundle:User'
-        );
+        $transformer = new IdToEntityModelTransformer($this->entityManager, User::class);
 
         $builder->add(
             $builder->create(
                 'owner',
-                'user_list',
+                UserListType::class,
                 [
                     'label'      => 'mautic.lead.lead.field.owner',
                     'label_attr' => ['class' => 'control-label'],
@@ -98,11 +100,11 @@ class LeadImportFieldType extends AbstractType
                 ->addModelTransformer($transformer)
         );
 
-        if ($options['object'] === 'lead') {
+        if ('lead' === $options['object']) {
             $builder->add(
                 $builder->create(
                     'list',
-                    'leadlist_choices',
+                    LeadListType::class,
                     [
                         'label'      => 'mautic.lead.lead.field.list',
                         'label_attr' => ['class' => 'control-label'],
@@ -117,15 +119,15 @@ class LeadImportFieldType extends AbstractType
 
             $builder->add(
                 'tags',
-                'lead_tag',
+                TagType::class,
                 [
                     'label'      => 'mautic.lead.tags',
                     'required'   => false,
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'                => 'form-control',
-                        'data-placeholder'     => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
-                        'data-no-results-text' => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
+                        'data-placeholder'     => $this->translator->trans('mautic.lead.tags.select_or_create'),
+                        'data-no-results-text' => $this->translator->trans('mautic.lead.tags.enter_to_create'),
                         'data-allow-add'       => 'true',
                         'onchange'             => 'Mautic.createLeadTag(this)',
                     ],
@@ -159,13 +161,10 @@ class LeadImportFieldType extends AbstractType
             );
         }
 
-        $builder->add('buttons', 'form_buttons', $buttons);
+        $builder->add('buttons', FormButtonsType::class, $buttons);
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['lead_fields', 'import_fields', 'company_fields', 'object']);
         $resolver->setDefaults(['line_count_limit' => 0]);
@@ -174,14 +173,13 @@ class LeadImportFieldType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'lead_field_import';
     }
 
     /**
      * @param string $fieldName
-     * @param array  $importFields
      *
      * @return string
      */

@@ -20,7 +20,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\NullLogger;
 
-class PreferenceBuilderTest extends \PHPUnit_Framework_TestCase
+class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testChannelsArePrioritized()
     {

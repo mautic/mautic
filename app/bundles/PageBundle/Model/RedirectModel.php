@@ -29,8 +29,6 @@ class RedirectModel extends FormModel
 
     /**
      * RedirectModel constructor.
-     *
-     * @param UrlHelper $urlHelper
      */
     public function __construct(UrlHelper $urlHelper)
     {
@@ -50,7 +48,7 @@ class RedirectModel extends FormModel
     /**
      * @param $identifier
      *
-     * @return null|Redirect
+     * @return Redirect|null
      */
     public function getRedirectById($identifier)
     {
@@ -60,10 +58,9 @@ class RedirectModel extends FormModel
     /**
      * Generate a Mautic redirect/passthrough URL.
      *
-     * @param Redirect $redirect
-     * @param array    $clickthrough
-     * @param bool     $shortenUrl
-     * @param array    $utmTags
+     * @param array $clickthrough
+     * @param bool  $shortenUrl
+     * @param array $utmTags
      *
      * @return string
      */
@@ -129,14 +126,14 @@ class RedirectModel extends FormModel
     public function getRedirectByUrl($url)
     {
         // Ensure the URL saved to the database does not have encoded ampersands
-        while (strpos($url, '&amp;') !== false) {
+        while (false !== strpos($url, '&amp;')) {
             $url = str_replace('&amp;', '&', $url);
         }
 
         $repo     = $this->getRepository();
         $redirect = $repo->findOneBy(['url' => $url]);
 
-        if ($redirect == null) {
+        if (null == $redirect) {
             $redirect = $this->createRedirectEntity($url);
         }
 
@@ -145,8 +142,6 @@ class RedirectModel extends FormModel
 
     /**
      * Get Redirect entities by an array of URLs.
-     *
-     * @param array $urls
      *
      * @return array
      */

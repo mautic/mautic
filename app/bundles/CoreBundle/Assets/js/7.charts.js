@@ -53,7 +53,7 @@ Mautic.renderCharts = function(scope) {
  * @param mQuery element canvas
  */
 Mautic.renderLineChart = function(canvas) {
-    var data = mQuery.parseJSON(canvas.text());
+    var data = JSON.parse(canvas.text());
     if (!data.labels.length || !data.datasets.length) return;
     var chart = new Chart(canvas, {
         type: 'line',
@@ -79,7 +79,7 @@ Mautic.renderLineChart = function(canvas) {
  * @param mQuery element canvas
  */
 Mautic.renderPieChart = function(canvas) {
-    var data = mQuery.parseJSON(canvas.text());
+    var data = JSON.parse(canvas.text());
     var options = {borderWidth: 1};
     var disableLegend = canvas.attr('data-disable-legend');
     if (typeof disableLegend !== 'undefined' && disableLegend !== false) {
@@ -102,7 +102,7 @@ Mautic.renderPieChart = function(canvas) {
  * @param mQuery element canvas
  */
 Mautic.renderBarChart = function(canvas) {
-    var data = mQuery.parseJSON(canvas.text());
+    var data = JSON.parse(canvas.text());
     var chart = new Chart(canvas, {
         type: 'bar',
         data: data,
@@ -125,7 +125,7 @@ Mautic.renderBarChart = function(canvas) {
 Mautic.renderLifechartBarChart = function(canvas) {
     var canvasWidth = mQuery(canvas).parent().width();
     var barWidth    = (canvasWidth < 300) ? 5 : 25;
-    var data = mQuery.parseJSON(canvas.text());
+    var data = JSON.parse(canvas.text());
     var chart = new Chart(canvas, {
         type: 'bar',
         data: data,
@@ -148,7 +148,7 @@ Mautic.renderLifechartBarChart = function(canvas) {
  * @param mQuery element canvas
  */
 Mautic.renderSimpleBarChart = function(canvas) {
-    var data = mQuery.parseJSON(canvas.text());
+    var data = JSON.parse(canvas.text());
     var chart = new Chart(canvas, {
         type: 'bar',
         data: data,
@@ -181,7 +181,7 @@ Mautic.renderSimpleBarChart = function(canvas) {
  * @param mQuery element canvas
  */
 Mautic.renderHorizontalBarChart = function(canvas) {
-    var data = mQuery.parseJSON(canvas.text());
+    var data = JSON.parse(canvas.text());
     var chart = new Chart(canvas, {
         type: 'horizontalBar',
         data: data,
@@ -260,7 +260,7 @@ Mautic.renderMap = function(wrapper) {
         var data = wrapper.data('map-data');
         if (typeof data === 'undefined' || !data.length) {
             try {
-                data = mQuery.parseJSON(wrapper.text());
+                data = JSON.parse(wrapper.text());
                 wrapper.data('map-data', data);
             } catch (error) {
 

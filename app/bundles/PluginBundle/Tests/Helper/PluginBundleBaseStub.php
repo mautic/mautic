@@ -22,10 +22,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 abstract class PluginBundleBaseStub extends Bundle
 {
     /**
-     * @param Plugin        $plugin
-     * @param MauticFactory $factory
-     * @param null          $metadata
-     * @param null          $installedSchema
+     * @param null $metadata
+     * @param null $installedSchema
      *
      * @throws \Exception
      */
@@ -36,10 +34,8 @@ abstract class PluginBundleBaseStub extends Bundle
     /**
      * Called by PluginController::reloadAction when the addon version does not match what's installed.
      *
-     * @param Plugin        $plugin
-     * @param MauticFactory $factory
-     * @param null          $metadata
-     * @param Schema        $installedSchema
+     * @param null   $metadata
+     * @param Schema $installedSchema
      *
      * @throws \Exception
      */

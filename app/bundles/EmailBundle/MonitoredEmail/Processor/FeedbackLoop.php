@@ -49,11 +49,6 @@ class FeedbackLoop implements ProcessorInterface
 
     /**
      * FeedbackLoop constructor.
-     *
-     * @param ContactFinder       $contactFinder
-     * @param LeadModel           $leadModel
-     * @param TranslatorInterface $translator
-     * @param LoggerInterface     $logger
      */
     public function __construct(
         ContactFinder $contactFinder,

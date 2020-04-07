@@ -19,7 +19,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\NullLogger;
 
-class IntervalTest extends \PHPUnit_Framework_TestCase
+class IntervalTest extends \PHPUnit\Framework\TestCase
 {
     public function testRescheduledToDueBeingBeforeSpecificHourRestriction()
     {
@@ -670,7 +670,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
     private function getInterval()
     {
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $coreParametersHelper->method('getParameter')
+        $coreParametersHelper->method('get')
             ->willReturnCallback(
                 function ($param, $default) {
                     return 'America/New_York';

@@ -16,8 +16,6 @@ use Symfony\Component\Form\Form;
 trait FormErrorMessagesTrait
 {
     /**
-     * @param array $formErrors
-     *
      * @return string
      */
     public function getFormErrorMessage(array $formErrors)
@@ -50,8 +48,6 @@ trait FormErrorMessagesTrait
     }
 
     /**
-     * @param Form $form
-     *
      * @return array
      */
     public function getFormErrorMessages(Form $form)

@@ -23,7 +23,6 @@ class AuditLogRepository extends CommonRepository
     use TimelineTrait;
 
     /**
-     * @param Lead  $lead
      * @param array $filters
      *
      * @return int
@@ -55,11 +54,9 @@ class AuditLogRepository extends CommonRepository
     }
 
     /**
-     * @param Lead       $lead
-     * @param array      $filters
-     * @param array|null $orderBy
-     * @param int        $page
-     * @param int        $limit
+     * @param array $filters
+     * @param int   $page
+     * @param int   $limit
      *
      * @return array
      */
@@ -209,9 +206,6 @@ class AuditLogRepository extends CommonRepository
     }
 
     /**
-     * @param Lead|null $lead
-     * @param array     $options
-     *
      * @return array
      */
     public function getLeadIpLogs(Lead $lead = null, array $options = [])
@@ -238,7 +232,7 @@ class AuditLogRepository extends CommonRepository
             $sqb->andWhere(
                 $sqb->expr()->andX(
                     $sqb->expr()->eq('l.object_id', $lead->getId()),
-                    $sqb->expr()->gte('l.date_added', $sqb->expr()->literal($dt->getUtcTimestamp()))
+                    $sqb->expr()->gte('l.date_added', $sqb->expr()->literal($dt->getString('Y-m-d H:i:s')))
                 )
             );
         }

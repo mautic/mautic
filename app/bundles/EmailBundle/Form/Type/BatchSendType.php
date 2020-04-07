@@ -12,23 +12,17 @@
 namespace Mautic\EmailBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class LeadImportType.
- */
 class BatchSendType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $default = (empty($options['data']['batchlimit'])) ? 100 : (int) $options['data']['batchlimit'];
         $builder->add(
             'batchlimit',
-            'text',
+            TextType::class,
             [
                 'label'       => false,
                 'attr'        => ['class' => 'form-control'],
@@ -49,7 +43,7 @@ class BatchSendType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'batch_send';
     }

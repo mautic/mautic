@@ -11,7 +11,7 @@
 ?>
 
 <div>
-<?php echo $view->render('MauticAssetBundle:Asset:preview.html.php', ['activeAsset' => $event['extra']['asset'], 'assetDownloadUrl' => $view['router']->generate(
+<?php echo $view->render('MauticAssetBundle:Asset:preview.html.php', ['activeAsset' => $event['extra']['asset'], 'assetDownloadUrl' => $view['router']->url(
     'mautic_asset_action',
     ['objectAction' => 'preview', 'objectId' => $event['extra']['asset']->getId()]
 )]); ?>

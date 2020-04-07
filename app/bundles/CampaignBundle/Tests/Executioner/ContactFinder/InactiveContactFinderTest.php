@@ -12,7 +12,6 @@
 namespace Mautic\CampaignBundle\Tests\Executioner\ContactFinder;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadRepository as CampaignLeadRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder;
@@ -22,36 +21,22 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Psr\Log\NullLogger;
 
-class InactiveContactFinderTest extends \PHPUnit_Framework_TestCase
+class InactiveContactFinderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|LeadRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject|LeadRepository
      */
     private $leadRepository;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|CampaignRepository
-     */
-    private $campaignRepository;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|CampaignLeadRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject|CampaignLeadRepository
      */
     private $campaignLeadRepository;
 
     protected function setUp()
     {
-        $this->leadRepository = $this->getMockBuilder(LeadRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->campaignRepository = $this->getMockBuilder(CampaignRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->campaignLeadRepository = $this->getMockBuilder(CampaignLeadRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->leadRepository         = $this->createMock(LeadRepository::class);
+        $this->campaignLeadRepository = $this->createMock(CampaignLeadRepository::class);
     }
 
     public function testNoContactsFoundExceptionIsThrown()
@@ -116,7 +101,6 @@ class InactiveContactFinderTest extends \PHPUnit_Framework_TestCase
     {
         return new InactiveContactFinder(
             $this->leadRepository,
-            $this->campaignRepository,
             $this->campaignLeadRepository,
             new NullLogger()
         );

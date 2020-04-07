@@ -14,34 +14,20 @@ namespace Mautic\CoreBundle\EventListener;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Form\Type\ConfigType;
 use Mautic\CoreBundle\Helper\LanguageHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ConfigSubscriber.
- */
-class ConfigSubscriber extends CommonSubscriber
+class ConfigSubscriber implements EventSubscriberInterface
 {
     /**
      * @var LanguageHelper
      */
-    protected $languageHelper;
+    private $languageHelper;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
-     * ConfigSubscriber constructor.
-     *
-     * @param LanguageHelper       $languageHelper
-     * @param CoreParametersHelper $coreParametersHelper
-     */
-    public function __construct(LanguageHelper $languageHelper, CoreParametersHelper $coreParametersHelper)
+    public function __construct(LanguageHelper $languageHelper)
     {
-        $this->languageHelper       = $languageHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
+        $this->languageHelper = $languageHelper;
     }
 
     /**
@@ -62,6 +48,7 @@ class ConfigSubscriber extends CommonSubscriber
         unset($coreParams['theme_import_allowed_extensions']);
         $event->addForm([
             'bundle'     => 'CoreBundle',
+            'formType'   => ConfigType::class,
             'formAlias'  => 'coreconfig',
             'formTheme'  => 'MauticCoreBundle:FormTheme\Config',
             'parameters' => $coreParams,
@@ -76,9 +63,7 @@ class ConfigSubscriber extends CommonSubscriber
         $event->unsetIfEmpty('transifex_password');
 
         // Check if the selected locale has been downloaded already, fetch it if not
-        $installedLanguages = $this->coreParametersHelper->getParameter('supported_languages');
-
-        if (!array_key_exists($values['coreconfig']['locale'], $installedLanguages)) {
+        if (!array_key_exists($values['coreconfig']['locale'], $this->languageHelper->getSupportedLanguages())) {
             $fetchLanguage = $this->languageHelper->extractLanguagePackage($values['coreconfig']['locale']);
 
             // If there is an error, fall back to 'en_US' as it is our system default

@@ -14,7 +14,7 @@ namespace Mautic\StageBundle\Form\Type;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class StageActionType.
@@ -45,10 +45,10 @@ class StageActionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'formType'        => 'genericstage_settings',
+            'formType'        => GenericStageActionType::class,
             'formTypeOptions' => [],
         ]);
     }
@@ -56,7 +56,7 @@ class StageActionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'stageaction';
     }

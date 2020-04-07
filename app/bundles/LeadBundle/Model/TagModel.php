@@ -50,7 +50,7 @@ class TagModel extends FormModel
      *
      * @param int $id
      *
-     * @return null|object
+     * @return object|null
      */
     public function getEntity($id = null)
     {

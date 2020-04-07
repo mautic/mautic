@@ -82,7 +82,7 @@ $container->loadFromExtension('doctrine', [
                 'dbname'   => getenv('DB_NAME') ?: '%mautic.db_name%',
                 'user'     => getenv('DB_USER') ?: '%mautic.db_user%',
                 'password' => getenv('DB_PASSWD') ?: '%mautic.db_password%',
-                'charset'  => 'UTF8',
+                'charset'  => 'utf8mb4',
                 // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
                 'mapping_types' => [
                     'enum'  => 'string',
@@ -129,8 +129,10 @@ $container->loadFromExtension('monolog', [
     ],
 ]);
 
-$container->loadFromExtension('liip_functional_test', [
-    'cache_sqlite_db' => true,
+$container->loadFromExtension('liip_test_fixtures', [
+    'cache_db' => [
+        'sqlite' => 'liip_functional_test.services_database_backup.sqlite',
+    ],
 ]);
 
 // Enable api by default

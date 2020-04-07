@@ -125,27 +125,33 @@ return [
     'services' => [
         'events' => [
             'mautic.user.subscriber' => [
-                'class'     => 'Mautic\UserBundle\EventListener\UserSubscriber',
+                'class'     => \Mautic\UserBundle\EventListener\UserSubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                 ],
             ],
             'mautic.user.search.subscriber' => [
-                'class'     => 'Mautic\UserBundle\EventListener\SearchSubscriber',
+                'class'     => \Mautic\UserBundle\EventListener\SearchSubscriber::class,
                 'arguments' => [
                     'mautic.user.model.user',
                     'mautic.user.model.role',
+                    'mautic.security',
+                    'mautic.helper.templating',
                 ],
             ],
             'mautic.user.config.subscriber' => [
-                'class' => 'Mautic\UserBundle\EventListener\ConfigSubscriber',
+                'class' => \Mautic\UserBundle\EventListener\ConfigSubscriber::class,
             ],
             'mautic.user.route.subscriber' => [
-                'class' => 'Mautic\UserBundle\EventListener\RouteSubscriber',
+                'class'     => \Mautic\UserBundle\EventListener\SAMLSubscriber::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'router',
+                ],
             ],
             'mautic.user.security_subscriber' => [
-                'class'     => 'Mautic\UserBundle\EventListener\SecuritySubscriber',
+                'class'     => \Mautic\UserBundle\EventListener\SecuritySubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
@@ -154,49 +160,38 @@ return [
         ],
         'forms' => [
             'mautic.form.type.user' => [
-                'class'     => 'Mautic\UserBundle\Form\Type\UserType',
+                'class'     => \Mautic\UserBundle\Form\Type\UserType::class,
                 'arguments' => [
                     'translator',
-                    'doctrine.orm.entity_manager',
                     'mautic.user.model.user',
                     'mautic.helper.language',
-                    'mautic.helper.core_parameters',
                 ],
-                'alias' => 'user',
             ],
             'mautic.form.type.role' => [
-                'class' => 'Mautic\UserBundle\Form\Type\RoleType',
-                'alias' => 'role',
+                'class' => \Mautic\UserBundle\Form\Type\RoleType::class,
             ],
             'mautic.form.type.permissions' => [
-                'class' => 'Mautic\UserBundle\Form\Type\PermissionsType',
-                'alias' => 'permissions',
+                'class' => \Mautic\UserBundle\Form\Type\PermissionsType::class,
             ],
             'mautic.form.type.permissionlist' => [
-                'class' => 'Mautic\UserBundle\Form\Type\PermissionListType',
-                'alias' => 'permissionlist',
+                'class' => \Mautic\UserBundle\Form\Type\PermissionListType::class,
             ],
             'mautic.form.type.passwordreset' => [
-                'class' => 'Mautic\UserBundle\Form\Type\PasswordResetType',
-                'alias' => 'passwordreset',
+                'class' => \Mautic\UserBundle\Form\Type\PasswordResetType::class,
             ],
             'mautic.form.type.passwordresetconfirm' => [
-                'class' => 'Mautic\UserBundle\Form\Type\PasswordResetConfirmType',
-                'alias' => 'passwordresetconfirm',
+                'class' => \Mautic\UserBundle\Form\Type\PasswordResetConfirmType::class,
             ],
             'mautic.form.type.user_list' => [
-                'class'     => 'Mautic\UserBundle\Form\Type\UserListType',
+                'class'     => \Mautic\UserBundle\Form\Type\UserListType::class,
                 'arguments' => 'mautic.user.model.user',
-                'alias'     => 'user_list',
             ],
             'mautic.form.type.role_list' => [
-                'class'     => 'Mautic\UserBundle\Form\Type\RoleListType',
+                'class'     => \Mautic\UserBundle\Form\Type\RoleListType::class,
                 'arguments' => 'mautic.user.model.role',
-                'alias'     => 'role_list',
             ],
             'mautic.form.type.userconfig' => [
-                'class'     => 'Mautic\UserBundle\Form\Type\ConfigType',
-                'alias'     => 'userconfig',
+                'class'     => \Mautic\UserBundle\Form\Type\ConfigType::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'translator',
@@ -274,10 +269,9 @@ return [
                 'public' => false,
             ],
             'mautic.security.authentication_handler' => [
-                'class'     => 'Mautic\UserBundle\Security\Authentication\AuthenticationHandler',
+                'class'     => \Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class,
                 'arguments' => [
                     'router',
-                    'session',
                 ],
             ],
             'mautic.security.logout_handler' => [
@@ -288,18 +282,59 @@ return [
                     'mautic.helper.user',
                 ],
             ],
+
+            // SAML
+            'mautic.security.saml.credential_store' => [
+                'class'     => \Mautic\UserBundle\Security\SAML\Store\CredentialsStore::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    '%mautic.saml_idp_entity_id%',
+                ],
+                'tag'       => 'lightsaml.own_credential_store',
+            ],
+
+            'mautic.security.saml.trust_store' => [
+                'class'     => \Mautic\UserBundle\Security\SAML\Store\TrustOptionsStore::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    '%mautic.saml_idp_entity_id%',
+                ],
+                'tag'       => 'lightsaml.trust_options_store',
+            ],
+
+            'mautic.security.saml.entity_descriptor_store' => [
+                'class'     => \Mautic\UserBundle\Security\SAML\Store\EntityDescriptorStore::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+                'tag'       => 'lightsaml.idp_entity_store',
+            ],
+
             'mautic.security.saml.id_store' => [
-                'class'     => 'Mautic\UserBundle\Security\Store\IdStore',
+                'class'     => \Mautic\UserBundle\Security\SAML\Store\IdStore::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'lightsaml.system.time_provider',
                 ],
             ],
+
+            'mautic.security.saml.username_mapper' => [
+                'class'     => \Mautic\UserBundle\Security\SAML\User\UserMapper::class,
+                'arguments' => [
+                    [
+                        'email'     => '%mautic.saml_idp_email_attribute%',
+                        'username'  => '%mautic.saml_idp_username_attribute%',
+                        'firstname' => '%mautic.saml_idp_firstname_attribute%',
+                        'lastname'  => '%mautic.saml_idp_lastname_attribute%',
+                    ],
+                ],
+            ],
+
             'mautic.security.saml.user_creator' => [
-                'class'     => 'Mautic\UserBundle\Security\User\UserCreator',
+                'class'     => \Mautic\UserBundle\Security\SAML\User\UserCreator::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
-                    'lightsaml_sp.username_mapper.simple',
+                    'mautic.security.saml.username_mapper',
                     'mautic.user.model.user',
                     'security.encoder_factory',
                     '%mautic.saml_idp_default_role%',
@@ -332,6 +367,18 @@ return [
                 'arguments' => [
                     \Mautic\UserBundle\Entity\UserToken::class,
                 ],
+            ],
+        ],
+        'fixtures' => [
+            'mautic.user.fixture.role' => [
+                'class'     => \Mautic\UserBundle\DataFixtures\ORM\LoadRoleData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['mautic.user.model.role'],
+            ],
+            'mautic.user.fixture.user' => [
+                'class'     => \Mautic\UserBundle\DataFixtures\ORM\LoadUserData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['security.encoder_factory'],
             ],
         ],
     ],

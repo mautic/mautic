@@ -39,11 +39,6 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
 
     /**
      * TimelineEventLogSegmentSubscriber constructor.
-     *
-     * @param LeadEventLogRepository $eventLogRepository
-     * @param UserHelper             $userHelper
-     * @param TranslatorInterface    $translator
-     * @param EntityManagerInterface $em
      */
     public function __construct(
         LeadEventLogRepository $eventLogRepository,
@@ -69,9 +64,6 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ListChangeEvent $event
-     */
     public function onChange(ListChangeEvent $event)
     {
         if (!$contact = $event->getLead()) {
@@ -85,9 +77,6 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param LeadTimelineEvent $event
-     */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         $this->addEvents(
@@ -100,9 +89,6 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param ListChangeEvent $event
-     */
     public function onBatchChange(ListChangeEvent $event)
     {
         if (!$contacts = $event->getLeads()) {
@@ -117,9 +103,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array    $contacts
-     * @param LeadList $segment
-     * @param          $action
+     * @param $action
      */
     private function writeEntries(array $contacts, LeadList $segment, $action)
     {

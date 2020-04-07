@@ -14,7 +14,7 @@ namespace Mautic\ReportBundle\Tests\Model;
 use Mautic\ReportBundle\Model\ExportResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class ExportResponseTest extends \PHPUnit_Framework_TestCase
+class ExportResponseTest extends \PHPUnit\Framework\TestCase
 {
     public function testResponse()
     {

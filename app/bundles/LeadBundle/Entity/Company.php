@@ -134,9 +134,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface
         $this->socialCache = $cache;
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -228,7 +225,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
-        if ($prop == 'owner') {
+        if ('owner' == $prop) {
             if ($current && !$val) {
                 $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $val];
             } elseif (!$current && $val) {

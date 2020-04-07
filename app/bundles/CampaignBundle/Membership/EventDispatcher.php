@@ -26,8 +26,6 @@ class EventDispatcher
 
     /**
      * EventDispatcher constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
@@ -35,9 +33,7 @@ class EventDispatcher
     }
 
     /**
-     * @param Lead     $contact
-     * @param Campaign $campaign
-     * @param string   $action
+     * @param string $action
      */
     public function dispatchMembershipChange(Lead $contact, Campaign $campaign, $action)
     {
@@ -48,9 +44,7 @@ class EventDispatcher
     }
 
     /**
-     * @param array    $contacts
-     * @param Campaign $campaign
-     * @param          $action
+     * @param $action
      */
     public function dispatchBatchMembershipChange(array $contacts, Campaign $campaign, $action)
     {

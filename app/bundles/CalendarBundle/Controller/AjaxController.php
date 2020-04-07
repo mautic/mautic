@@ -23,8 +23,6 @@ class AjaxController extends CommonAjaxController
     /**
      * Generates the calendar data.
      *
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function generateDataAction(Request $request)
@@ -51,8 +49,6 @@ class AjaxController extends CommonAjaxController
     /**
      * Updates an event on dragging the event around the calendar.
      *
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function updateEventAction(Request $request)
@@ -71,7 +67,7 @@ class AjaxController extends CommonAjaxController
         $entity = $event->getEntity();
 
         //not found
-        if ($entity === null) {
+        if (null === $entity) {
             $this->addFlash('mautic.core.error.notfound', 'error');
         } elseif (!$event->hasAccess()) {
             $this->addFlash('mautic.core.error.accessdenied', 'error');
@@ -90,7 +86,7 @@ class AjaxController extends CommonAjaxController
                     ),
                 ]
             );
-        } elseif ($this->request->getMethod() == 'POST') {
+        } elseif ('POST' == $this->request->getMethod()) {
             $entity->$setter($dateValue);
             $model->saveEntity($entity);
             $response['success'] = true;
@@ -128,7 +124,7 @@ class AjaxController extends CommonAjaxController
         foreach ($events as $key => $event) {
             //make sure the user has view access to the entities
             foreach ($event as $eventKey => $eventValue) {
-                if (substr($eventKey, -3) === '_id') {
+                if ('_id' === substr($eventKey, -3)) {
                     $modelName = substr($eventKey, 0, -3);
                     if ($modelFactory->hasModel($modelName)) {
                         $model = $modelFactory->getModel($modelName);

@@ -91,7 +91,7 @@ $toolbarButtons = [
     ],
 ];
 
-if ($indexMode == 'list') {
+if ('list' == $indexMode) {
     $toolbarButtons[] = [
         'attr' => [
             'class'          => 'hidden-xs btn btn-default btn-sm btn-nospin'.(($anonymousShowing) ? ' btn-primary' : ''),

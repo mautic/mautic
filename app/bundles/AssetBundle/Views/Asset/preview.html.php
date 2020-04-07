@@ -14,13 +14,13 @@
 <div class="text-center">
     <?php if ($activeAsset->isImage()): ?>
         <img src="<?php echo $assetDownloadUrl.'?stream=1'; ?>" alt="<?php echo $activeAsset->getTitle(); ?>" class="img-thumbnail" />
-    <?php elseif (strtolower($activeAsset->getFileType()) == 'pdf') : ?>
+    <?php elseif ('pdf' == strtolower($activeAsset->getFileType())) : ?>
         <iframe src="<?php echo $assetDownloadUrl.'?stream=1'; ?>#view=FitH" class="col-sm-12"></iframe>
-    <?php elseif (strpos($activeAsset->getMime(), 'video') === 0 || in_array($activeAsset->getExtension(), ['mpg', 'mpeg', 'mp4', 'webm'])): ?>
+    <?php elseif (0 === strpos($activeAsset->getMime(), 'video') || in_array($activeAsset->getExtension(), ['mpg', 'mpeg', 'mp4', 'webm'])): ?>
         <video src="<?php echo $assetDownloadUrl.'?stream=1'; ?>" controls>
             <?php echo $view['translator']->trans('mautic.asset.no_video_support'); ?>
         </video>
-    <?php elseif (strpos($activeAsset->getMime(), 'audio') === 0 || in_array($activeAsset->getExtension(), ['mp3', 'ogg', 'wav'])): ?>
+    <?php elseif (0 === strpos($activeAsset->getMime(), 'audio') || in_array($activeAsset->getExtension(), ['mp3', 'ogg', 'wav'])): ?>
         <audio controls>
             <source src="<?php echo $assetDownloadUrl.'?stream=1'; ?>" type="<?php echo $activeAsset->getMime(); ?>">
             <?php echo $view['translator']->trans('mautic.asset.no_audio_support'); ?>

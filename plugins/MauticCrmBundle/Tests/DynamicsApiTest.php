@@ -6,12 +6,13 @@
  * Time: 7:43 AM.
  */
 
-namespace MauticCrmBundle\Api;
+namespace MauticPlugin\MauticCrmBundle\Tests;
 
+use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Api\DynamicsApi;
 use MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration;
 
-class DynamicsApiTest extends \PHPUnit_Framework_TestCase
+class DynamicsApiTest extends AbstractIntegrationTestCase
 {
     /** @var DynamicsApi */
     private $api;
@@ -23,32 +24,29 @@ class DynamicsApiTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->integration = new DynamicsIntegration();
+        $this->integration = new DynamicsIntegration(
+            $this->dispatcher,
+            $this->cache,
+            $this->em,
+            $this->session,
+            $this->request,
+            $this->router,
+            $this->translator,
+            $this->logger,
+            $this->encryptionHelper,
+            $this->leadModel,
+            $this->companyModel,
+            $this->pathsHelper,
+            $this->notificationModel,
+            $this->fieldModel,
+            $this->integrationEntityModel
+        );
+
         $this->api         = new DynamicsApi($this->integration);
     }
 
     public function testIntegration()
     {
         $this->assertSame('Dynamics', $this->integration->getName());
-    }
-
-    public function testGetLeads()
-    {
-    }
-
-    public function testGetLeadFields()
-    {
-    }
-
-    public function testCompanies()
-    {
-    }
-
-    public function testCreateLead()
-    {
-    }
-
-    public function testRequest()
-    {
     }
 }

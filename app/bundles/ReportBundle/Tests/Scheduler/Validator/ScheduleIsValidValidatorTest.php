@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ReportBundle\Tests\Validator;
+namespace Mautic\ReportBundle\Tests\Scheduler\Validator;
 
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-class ScheduleIsValidValidatorTest extends \PHPUnit_Framework_TestCase
+class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
 {
     public function testNoSchedule()
     {

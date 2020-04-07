@@ -265,7 +265,7 @@ Mautic.initializeFormFieldVisibilitySwitcher = function (formName)
 {
     Mautic.switchFormFieldVisibilty(formName);
 
-    mQuery('form[name="'+formName+'"]').change(function() {
+    mQuery('form[name="'+formName+'"]').on('change', function() {
         Mautic.switchFormFieldVisibilty(formName);
     });
 };
@@ -330,7 +330,7 @@ Mautic.switchFormFieldVisibilty = function (formName) {
     // find all fields to show
     form.find('[data-show-on]').each(function(index, el) {
         var field = mQuery(el);
-        var showOn = jQuery.parseJSON(field.attr('data-show-on'));
+        var showOn = JSON.parse(field.attr('data-show-on'));
 
         mQuery.each(showOn, function(fieldId, condition) {
             var fieldParts = getFieldParts(fieldId);
@@ -345,7 +345,7 @@ Mautic.switchFormFieldVisibilty = function (formName) {
     // find all fields to hide
     form.find('[data-hide-on]').each(function(index, el) {
         var field  = mQuery(el);
-        var hideOn = jQuery.parseJSON(field.attr('data-hide-on'));
+        var hideOn = JSON.parse(field.attr('data-hide-on'));
 
         if (typeof hideOn.display_priority !== 'undefined') {
             fieldsPriority[field.attr('id')] = 'hide';

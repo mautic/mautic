@@ -21,12 +21,12 @@ use Mautic\CoreBundle\Entity\DeprecatedInterface;
  */
 class DoctrineEventsSubscriber implements EventSubscriber
 {
-    protected $tablePrefix;
+    private $tablePrefix;
 
     /**
      * @var
      */
-    protected $deprecatedEntityTables = [];
+    private $deprecatedEntityTables = [];
 
     /**
      * DoctrineEventsSubscriber constructor.
@@ -49,9 +49,6 @@ class DoctrineEventsSubscriber implements EventSubscriber
         ];
     }
 
-    /**
-     * @param LoadClassMetadataEventArgs $args
-     */
     public function loadClassMetadata(LoadClassMetadataEventArgs $args)
     {
         //in the installer
@@ -97,7 +94,7 @@ class DoctrineEventsSubscriber implements EventSubscriber
             );
 
             foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {
-                if ($mapping['type'] == \Doctrine\ORM\Mapping\ClassMetadataInfo::MANY_TO_MANY
+                if (\Doctrine\ORM\Mapping\ClassMetadataInfo::MANY_TO_MANY == $mapping['type']
                     && isset($classMetadata->associationMappings[$fieldName]['joinTable']['name'])
                 ) {
                     $mappedTableName                                                     = $classMetadata->associationMappings[$fieldName]['joinTable']['name'];
@@ -132,9 +129,6 @@ class DoctrineEventsSubscriber implements EventSubscriber
         }
     }
 
-    /**
-     * @param GenerateSchemaEventArgs $args
-     */
     public function postGenerateSchema(GenerateSchemaEventArgs $args)
     {
         $schema = $args->getSchema();

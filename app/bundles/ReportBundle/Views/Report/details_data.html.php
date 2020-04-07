@@ -8,11 +8,11 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticReportBundle:Report:details.html.php');
 }
 
-$showGraphsAboveTable = (!empty($report->getSettings()['showGraphsAboveTable']) === true);
+$showGraphsAboveTable = (true === !empty($report->getSettings()['showGraphsAboveTable']));
 $dataCount            = count($data);
 $columnOrder          = $report->getColumns();
 $graphOrder           = $report->getGraphs();
@@ -66,7 +66,7 @@ $graphContent = $view->render(
                                 if (isset($columns[$key])):
                                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                                         'sessionVar' => 'report.'.$report->getId(),
-                                        'orderBy'    => strpos($key, 'channel.') === 0 ? str_replace('.', '_', $key) : $key,
+                                        'orderBy'    => 0 === strpos($key, 'channel.') ? str_replace('.', '_', $key) : $key,
                                         'text'       => $columns[$key]['label'],
                                         'class'      => 'col-report-'.$columns[$key]['type'],
                                         'dataToggle' => in_array($columns[$key]['type'], ['date', 'datetime']) ? 'date' : '',
@@ -125,7 +125,7 @@ $graphContent = $view->render(
                                                 $cellVal  = $row[$columns[$key]['alias']];
 
                                                 // For grouping by datetime fields, so we don't get the timestamp on them
-                                                if ($cellType === 'datetime' && strlen($cellVal) === 10) {
+                                                if ('datetime' === $cellType && 10 === strlen($cellVal)) {
                                                     $cellType = 'date';
                                                 }
                                                 ?>

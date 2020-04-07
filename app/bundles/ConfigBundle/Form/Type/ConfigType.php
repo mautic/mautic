@@ -12,15 +12,13 @@
 namespace Mautic\ConfigBundle\Form\Type;
 
 use Mautic\ConfigBundle\Form\Helper\RestrictionHelper;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class ConfigType.
- */
 class ConfigType extends AbstractType
 {
     /**
@@ -28,11 +26,6 @@ class ConfigType extends AbstractType
      */
     private $restrictionHelper;
 
-    /**
-     * ConfigType constructor.
-     *
-     * @param RestrictionHelper $restrictionHelper
-     */
     public function __construct(RestrictionHelper $restrictionHelper)
     {
         $this->restrictionHelper = $restrictionHelper;
@@ -52,7 +45,7 @@ class ConfigType extends AbstractType
                 }
                 $builder->add(
                     $config['formAlias'],
-                    $config['formAlias'],
+                    $config['formType'],
                     [
                         'data' => $config['parameters'],
                     ]
@@ -65,7 +58,7 @@ class ConfigType extends AbstractType
             function (FormEvent $event) {
                 $form = $event->getForm();
 
-                foreach ($form as $config => $configForm) {
+                foreach ($form as $configForm) {
                     foreach ($configForm as $child) {
                         $this->restrictionHelper->applyRestrictions($child, $configForm);
                     }
@@ -75,7 +68,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'buttons',
-            'form_buttons',
+            FormButtonsType::class,
             [
                 'apply_onclick' => 'Mautic.activateBackdrop()',
                 'save_onclick'  => 'Mautic.activateBackdrop()',
@@ -90,14 +83,11 @@ class ConfigType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'config';
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

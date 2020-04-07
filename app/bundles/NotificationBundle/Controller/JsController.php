@@ -24,7 +24,7 @@ class JsController extends CommonController
      */
     public function manifestAction()
     {
-        $gcmSenderId = $this->get('mautic.helper.core_parameters')->getParameter('gcm_sender_id', '446150739532');
+        $gcmSenderId = $this->get('mautic.helper.core_parameters')->get('gcm_sender_id', '446150739532');
         $data        = [
             'start_url'             => '/',
             'gcm_sender_id'         => $gcmSenderId,

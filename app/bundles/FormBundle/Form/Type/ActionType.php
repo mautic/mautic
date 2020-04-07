@@ -12,9 +12,13 @@
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class ActionType.
@@ -28,19 +32,27 @@ class ActionType extends AbstractType
     {
         $masks = ['description' => 'html'];
 
-        $builder->add('name', 'text', [
-            'label'      => 'mautic.core.name',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
-            'required'   => false,
-        ]);
+        $builder->add(
+            'name',
+            TextType::class,
+            [
+                'label'      => 'mautic.core.name',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
+            ]
+        );
 
-        $builder->add('description', 'textarea', [
-            'label'      => 'mautic.core.description',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control editor'],
-            'required'   => false,
-        ]);
+        $builder->add(
+            'description',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.core.description',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control editor'],
+                'required'   => false,
+            ]
+        );
 
         $properties      = (!empty($options['data']['properties'])) ? $options['data']['properties'] : null;
         $formType        = $options['settings']['formType'];
@@ -49,7 +61,8 @@ class ActionType extends AbstractType
             'data'  => $properties,
             'attr'  => [
                 'data-formid' => $options['formId'], //sneaky way of feeding the formId without requiring the option
-            ], ];
+            ],
+        ];
         if (isset($options['settings']['formTypeCleanMasks'])) {
             $masks['properties'] = $options['settings']['formTypeCleanMasks'];
         }
@@ -62,7 +75,7 @@ class ActionType extends AbstractType
         }
         $builder->add('properties', $formType, $formTypeOptions);
 
-        $builder->add('type', 'hidden');
+        $builder->add('type', HiddenType::class);
 
         $update = !empty($properties);
         if (!empty($update)) {
@@ -73,16 +86,24 @@ class ActionType extends AbstractType
             $btnIcon  = 'fa fa-plus';
         }
 
-        $builder->add('buttons', 'form_buttons', [
-            'save_text'       => $btnValue,
-            'save_icon'       => $btnIcon,
-            'apply_text'      => false,
-            'container_class' => 'bottom-form-buttons',
-        ]);
+        $builder->add(
+            'buttons',
+            FormButtonsType::class,
+            [
+                'save_text'       => $btnValue,
+                'save_icon'       => $btnIcon,
+                'apply_text'      => false,
+                'container_class' => 'bottom-form-buttons',
+            ]
+        );
 
-        $builder->add('formId', 'hidden', [
-            'mapped' => false,
-        ]);
+        $builder->add(
+            'formId',
+            HiddenType::class,
+            [
+                'mapped' => false,
+            ]
+        );
 
         $builder->addEventSubscriber(new CleanFormSubscriber($masks));
 
@@ -94,19 +115,15 @@ class ActionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
-            'settings' => false,
-        ]);
-
         $resolver->setRequired(['settings', 'formId']);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'formaction';
     }

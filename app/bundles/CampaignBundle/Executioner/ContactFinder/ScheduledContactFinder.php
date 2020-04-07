@@ -31,9 +31,6 @@ class ScheduledContactFinder
 
     /**
      * ScheduledContactFinder constructor.
-     *
-     * @param LeadRepository  $leadRepository
-     * @param LoggerInterface $logger
      */
     public function __construct(LeadRepository $leadRepository, LoggerInterface $logger)
     {
@@ -43,8 +40,6 @@ class ScheduledContactFinder
 
     /**
      * Hydrate contacts with custom field value, companies, etc.
-     *
-     * @param ArrayCollection $logs
      */
     public function hydrateContacts(ArrayCollection $logs)
     {

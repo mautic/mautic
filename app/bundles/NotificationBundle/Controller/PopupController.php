@@ -21,13 +21,13 @@ class PopupController extends CommonController
     public function indexAction()
     {
         /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
-        $assetsHelper = $this->factory->getHelper('template.assets');
+        $assetsHelper = $this->container->get('templating.helper.assets');
         $assetsHelper->addStylesheet('/app/bundles/NotificationBundle/Assets/css/popup/popup.css');
 
         $response = $this->render(
             'MauticNotificationBundle:Popup:index.html.php',
             [
-                'siteUrl' => $this->coreParametersHelper->getParameter('site_url'),
+                'siteUrl' => $this->coreParametersHelper->get('site_url'),
             ]
         );
 
