@@ -257,11 +257,15 @@ Mautic.launchFocusBuilder = function (forceFetch) {
             // @todo recalculate when window resize
             builderCss.width = "100%";
             builderCss.height = mQuery('#websiteScreenshot').height(); // 100% does not work. Needs to be specified
+        } else {
+            builderCss.width = '230px';
+            builderCss.height = '392px';
+            builderCss.border = '1px gray solid';
         }
 
-        // Async load in iframe
+        // Async load in new iframe
         mQuery('.preview-body').html('<iframe src="'+url+'" scrolling="no"></iframe>');
-        mQuery('iframe').css(builderCss);
+        mQuery('.preview-body iframe').css(builderCss);
 
         mQuery('.btn-close-builder').prop('disabled', false);
     } else {
