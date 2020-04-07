@@ -107,25 +107,35 @@ Mautic.launchBuilder = function (formName, actionName) {
 
     applyBtn.off('click').on('click', function(e) {
         Mautic.activateButtonLoadingIndicator(applyBtn);
-        Mautic.sendBuilderContentToTextarea(function() {
-            // Trigger slot:destroy event
-            if(typeof document.getElementById('builder-template-content').contentWindow.Mautic !== 'undefined') {
-                document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
-            }
-            // Clear the customize forms
-            mQuery('#slot-form-container, #section-form-container').html('');
-            Mautic.inBuilderSubmissionOn(form);
-            var bgApplyBtn = mQuery('.btn-apply');
-            if (0 === bgApplyBtn.length && ("1" === Mautic.getUrlParameter('contentOnly') || Mautic.isInBuilder)) {
-                var frm = mQuery('.btn-save').closest('form');
-                Mautic.inBuilderSubmissionOn(frm);
-                frm.submit();
+        try {
+            Mautic.sendBuilderContentToTextarea(function () {
+                // Trigger slot:destroy event
+                if (typeof document.getElementById('builder-template-content').contentWindow.Mautic !== 'undefined') {
+                    document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
+                }
+                // Clear the customize forms
+                mQuery('#slot-form-container, #section-form-container').html('');
+                Mautic.inBuilderSubmissionOn(form);
+                var bgApplyBtn = mQuery('.btn-apply');
+                if (0 === bgApplyBtn.length && ("1" === Mautic.getUrlParameter('contentOnly') || Mautic.isInBuilder)) {
+                    var frm = mQuery('.btn-save').closest('form');
+                    Mautic.inBuilderSubmissionOn(frm);
+                    frm.submit();
+                    Mautic.inBuilderSubmissionOff();
+                } else {
+                    bgApplyBtn.trigger('click');
+                }
                 Mautic.inBuilderSubmissionOff();
-            } else {
-                bgApplyBtn.trigger('click');
+            }, true);
+        } catch (error) {
+            Mautic.removeButtonLoadingIndicator(applyBtn);
+            if (/SYNTAX ERROR/.test(error.message.toUpperCase())) {
+                var errorMessage = 'Syntax error. Please check your HTML code.';
+                alert(errorMessage);
+                console.error(errorMessage);
             }
-            Mautic.inBuilderSubmissionOff();
-        }, true);
+            console.error(error.message);
+        }
     });
 
     // Blur and focus the focussed inputs to fix the browser autocomplete bug on scroll
@@ -481,8 +491,17 @@ Mautic.closeBuilder = function(model) {
         }, false);
 
     } catch (error) {
+        overlay.addClass('hide');
+        closeBtn.prop('disabled', false);
+
+        if (/SYNTAX ERROR/.test(error.message.toUpperCase())) {
+            var errorMessage = 'Syntax error. Please check your HTML code.';
+            alert(errorMessage);
+            console.error(errorMessage);
+        }
+
         // prevent from being able to close builder
-        console.error(error);
+        console.error(error.message);
     }
 };
 
@@ -494,33 +513,28 @@ Mautic.closeBuilder = function(model) {
  */
 Mautic.sendBuilderContentToTextarea = function(callback, keepBuilderContent) {
     var customHtml;
-    try {
-        if (Mautic.codeMode) {
-            customHtml = Mautic.builderCodeMirror.getValue();
+    if (Mautic.codeMode) {
+        customHtml = Mautic.builderCodeMirror.getValue();
 
-            // Convert dynamic slot definitions into tokens
-            customHtml = Mautic.convertDynamicContentSlotsToTokens(customHtml);
+        // Convert dynamic slot definitions into tokens
+        customHtml = Mautic.convertDynamicContentSlotsToTokens(customHtml);
 
-            // Store the HTML content to the HTML textarea
-            mQuery('.builder-html').val(customHtml);
-            callback();
-        } else {
-            var builderHtml = mQuery('iframe#builder-template-content').contents();
+        // Store the HTML content to the HTML textarea
+        mQuery('.builder-html').val(customHtml);
+        callback();
+    } else {
+        var builderHtml = mQuery('iframe#builder-template-content').contents();
 
-            if (keepBuilderContent) {
-                // The content has to be cloned so the sanitization won't affect the HTML in the builder
-                Mautic.cloneHtmlContent(builderHtml, function(themeHtml) {
-                    Mautic.sanitizeHtmlAndStoreToTextarea(themeHtml);
-                    callback();
-                });
-            } else {
-                Mautic.sanitizeHtmlAndStoreToTextarea(builderHtml);
+        if (keepBuilderContent) {
+            // The content has to be cloned so the sanitization won't affect the HTML in the builder
+            Mautic.cloneHtmlContent(builderHtml, function(themeHtml) {
+                Mautic.sanitizeHtmlAndStoreToTextarea(themeHtml);
                 callback();
-            }
+            });
+        } else {
+            Mautic.sanitizeHtmlAndStoreToTextarea(builderHtml);
+            callback();
         }
-    } catch (error) {
-        // prevent from being able to close builder
-        console.error(error);
     }
 };
 
