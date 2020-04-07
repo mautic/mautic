@@ -242,13 +242,8 @@ Mautic.launchFocusBuilder = function (forceFetch) {
         mQuery('.btn-close-builder').prop('disabled', false);
         mQuery('#websiteUrlPlaceholderInput').prop('disabled', false);
     } else if (forceFetch) {
-        // Fetch image
-        var data = {
-            id: mQuery('#focus_unlockId').val(),
-            website: url
-        }
 
-        var builderCss = {
+        let builderCss = {
             margin: "0",
             padding: "0",
             border: "none",
