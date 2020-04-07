@@ -110,7 +110,7 @@ $firewalls = [
         ],
         'remember_me' => [
             'secret'   => '%mautic.rememberme_key%',
-            'lifetime' => '%mautic.rememberme_lifetime%',
+            'lifetime' => intval('%mautic.rememberme_lifetime%'),
             'path'     => '%mautic.rememberme_path%',
             'domain'   => '%mautic.rememberme_domain%',
         ],
