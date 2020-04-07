@@ -70,7 +70,7 @@ final class FinalizeUpdateStep implements StepInterface
 
         // Update successful
         $progressBar->setMessage(
-            $this->translator->trans('mautic.core.update.update_successful', ['%version%' => $this->appVersion->getVersion()])
+            $this->translator->trans('mautic.core.update.update_successful', ['%version%' => $this->appVersion->getVersion()])."\n\n"
         );
         $progressBar->finish();
 
