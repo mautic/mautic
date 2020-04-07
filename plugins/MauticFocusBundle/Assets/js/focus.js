@@ -6,8 +6,8 @@ Mautic.disabledFocusActions = function(opener) {
 
     var disabled = email === '' || email === null;
 
-    opener.mQuery('#campaignevent_properties_editFocusButton').prop('disabled', disabled);
-    opener.mQuery('#campaignevent_properties_previewFocusButton').prop('disabled', disabled);
+    // opener.mQuery('#campaignevent_properties_editFocusButton').prop('disabled', disabled);
+    // opener.mQuery('#campaignevent_properties_previewFocusButton').prop('disabled', disabled);
 };
 
 Mautic.standardFocusUrl = function(options) {
@@ -258,6 +258,7 @@ Mautic.launchFocusBuilder = function (forceFetch) {
 
         // Async load in iframe
         mQuery('.preview-body').html('<iframe src="'+url+'"></iframe>').css(builderCss);
+        mQuery('.btn-close-builder').prop('disabled', false);
     } else {
         mQuery('.btn-close-builder').prop('disabled', false);
 
