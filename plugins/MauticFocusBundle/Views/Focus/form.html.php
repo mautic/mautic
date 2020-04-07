@@ -98,7 +98,7 @@ echo $view['form']->start($form);
                 </div>
                 <figure id="websiteScreenshot">
                     <div class="screenshot-container text-center">
-                        <div class="preview-body text-left"></div>
+                        <div class="preview-body center"></div>
                         <canvas id="websiteCanvas">
                             Your browser does not support the canvas element.
                         </canvas>
