@@ -29,10 +29,6 @@ Mautic.standardFocusUrl = function(options) {
 };
 
 Mautic.focusOnLoad = function () {
-    if (typeof Mautic.loadedPreviewImage !== 'undefined') {
-        delete Mautic.loadedPreviewImage;
-    }
-
     if (mQuery('.builder').length) {
         // Activate droppers
         mQuery('.btn-dropper').each(function () {
@@ -218,10 +214,6 @@ Mautic.focusOnLoad = function () {
 };
 
 Mautic.focusOnUnload = function () {
-    if (typeof Mautic.loadedPreviewImage != 'undefined') {
-        delete Mautic.loadedPreviewImage;
-    }
-
     if (typeof Mautic.focusStatsChart != 'undefined') {
         Mautic.focusStatsChart.destroy();
     }
@@ -233,21 +225,6 @@ Mautic.launchFocusBuilder = function (forceFetch) {
 
     // Prevent preview updates till the website snapshot is loaded
     Mautic.ignoreMauticFocusPreviewUpdate = true;
-
-    if (!mQuery('#builder-overlay').length) {
-        var builderCss = {
-            margin: "0",
-            padding: "0",
-            border: "none",
-            width: "100%",
-            height: "100%"
-        };
-
-        var spinnerLeft = (mQuery(document).width() - 300) / 2;
-        var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:50%; left:' + spinnerLeft + 'px"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
-    } else {
-        mQuery('#builder-overlay').removeClass('hide');
-    }
 
     // Disable the close button until everything is loaded
     mQuery('.btn-close-builder').prop('disabled', true);
@@ -262,21 +239,26 @@ Mautic.launchFocusBuilder = function (forceFetch) {
             Mautic.setFocusDefaultColors();
         }
         mQuery('.website-placeholder').removeClass('hide');
-        mQuery('#builder-overlay').addClass('hide');
         mQuery('.btn-close-builder').prop('disabled', false);
         mQuery('#websiteUrlPlaceholderInput').prop('disabled', false);
-    } else if (forceFetch || typeof Mautic.loadedPreviewImage == 'undefined' || Mautic.loadedPreviewImage != url) {
-        Mautic.loadedPreviewImage = url;
-
+    } else if (forceFetch) {
         // Fetch image
         var data = {
             id: mQuery('#focus_unlockId').val(),
             website: url
         }
 
-        mQuery('.preview-body').html('<iframe src="'+url+'" width="'+width+'" height="'+height+'"></iframe>');
+        var builderCss = {
+            margin: "0",
+            padding: "0",
+            border: "none",
+            width: "100%",
+            height: "100%"
+        };
+
+        // Async load in iframe
+        mQuery('.preview-body').html('<iframe src="'+url+'"></iframe>').css(builderCss);
     } else {
-        mQuery('#builder-overlay').addClass('hide');
         mQuery('.btn-close-builder').prop('disabled', false);
 
         Mautic.ignoreMauticFocusPreviewUpdate = false;
@@ -297,9 +279,6 @@ Mautic.closeFocusBuilder = function (el) {
 
     Mautic.stopIconSpinPostEvent();
 
-    // Kill the overlay
-    mQuery('#builder-overlay').remove();
-
     // Hide builder
     mQuery('.builder').removeClass('builder-active').addClass('hide');
 
@@ -307,32 +286,31 @@ Mautic.closeFocusBuilder = function (el) {
 };
 
 Mautic.focusUpdatePreview = function () {
-    mQuery('.preview-body').html('');
     // Generate a preview
-    var data = mQuery('form[name=focus]').formToArray();
-    Mautic.ajaxActionRequest('plugin:focus:generatePreview', data, function (response) {
-        var container = mQuery('<div />').html(response.style);
-        var innerContainer = mQuery('<div />').html(response.html);
-
-        if (mQuery('.btn-viewport').data('viewport') == 'mobile') {
-            innerContainer.addClass('mf-responsive');
-        } else {
-            innerContainer.removeClass('mf-responsive');
-        }
-
-        container.append(innerContainer);
-
-        mQuery('.preview-body').html(container);
-
-        if (!mQuery('.mf-bar').length && mQuery('.builder-content').length) {
-            mQuery('.builder-content').on('click', function () {
-                Mautic.closeFocusModal(mQuery('#focus_style').val());
-            });
-            mQuery('.mautic-focus').on('click', function (e) {
-                e.stopPropagation();
-            });
-        }
-    });
+    // var data = mQuery('form[name=focus]').formToArray();
+    // Mautic.ajaxActionRequest('plugin:focus:generatePreview', data, function (response) {
+    //     var container = mQuery('<div />').html(response.style);
+    //     var innerContainer = mQuery('<div />').html(response.html);
+    //
+    //     if (mQuery('.btn-viewport').data('viewport') == 'mobile') {
+    //         innerContainer.addClass('mf-responsive');
+    //     } else {
+    //         innerContainer.removeClass('mf-responsive');
+    //     }
+    //
+    //     container.append(innerContainer);
+    //
+    //     mQuery('.preview-body').html(container);
+    //
+    //     if (!mQuery('.mf-bar').length && mQuery('.builder-content').length) {
+    //         mQuery('.builder-content').on('click', function () {
+    //             Mautic.closeFocusModal(mQuery('#focus_style').val());
+    //         });
+    //         mQuery('.mautic-focus').on('click', function (e) {
+    //             e.stopPropagation();
+    //         });
+    //     }
+    // });
 };
 
 Mautic.setFocusDefaultColors = function () {
