@@ -81,7 +81,7 @@ echo $view['form']->start($form);
                                 <?php echo $view['translator']->trans('mautic.focus.website_placeholder'); ?>
                             </p>
                             <div class="input-group">
-                                <input id="websiteUrlPlaceholderInput" disabled type="text" class="form-control" placeholder="https://example.com"/>
+                                <input id="websiteUrlPlaceholderInput" disabled type="text" class="form-control" placeholder="https://example.com/" value="https://ihned.cz">
                                 <span class="input-group-btn">
                                 <button class="btn btn-default btn-fetch" type="button"><?php echo $view['translator']->trans(
                                         'mautic.focus.fetch_snapshot'
