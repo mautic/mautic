@@ -110,6 +110,9 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->input  = $input;
+        $this->output = $output;
+
         $options = $input->getOptions();
 
         // Set the locale for the translator
@@ -127,10 +130,11 @@ EOT
                 $returnCode = $this->startUpgrade();
 
                 $output->writeln(
-                    "\n\n<info>".$this->translator->trans('mautic.core.command.update.finalize_instructions').'</info>'
+                    "\n\n<warning>".$this->translator->trans('mautic.core.command.update.finalize_instructions').'</warning>'
                 );
 
-                return $returnCode;
+                // Must hard exit here to prevent Symfony from trying to use the kernel while in the same PHP process
+                exit($returnCode);
             }
 
             return $this->finishUpgrade();
@@ -151,7 +155,7 @@ EOT
         if (!$this->input->getOption('force')) {
             /** @var SymfonyQuestionHelper $helper */
             $helper   = $this->getHelperSet()->get('question');
-            $question = new ConfirmationQuestion($this->translator->trans('mautic.core.update.confirm_application_update'), false);
+            $question = new ConfirmationQuestion($this->translator->trans('mautic.core.update.confirm_application_update').' ', false);
 
             if (!$helper->ask($this->input, $this->output, $question)) {
                 throw new UpdateFailedException($this->translator->trans('mautic.core.update.aborted'));
