@@ -23,6 +23,7 @@
   right: 0;
   left: 0;
   margin: auto;
+  z-index: 0;
 }
 .focus-builder #websiteScreenshot .screenshot-container {
   overflow: hidden;

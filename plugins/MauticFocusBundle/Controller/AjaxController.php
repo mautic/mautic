@@ -32,6 +32,7 @@ class AjaxController extends CommonAjaxController
                 $model            = $this->getModel('focus');
                 $focusArray['id'] = 'preview';
                 $data['html']     = $model->getContent($focusArray, true);
+                $data['style']    = $focusArray['style']; // Required by JS in response
             }
         }
 
