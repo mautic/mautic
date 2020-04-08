@@ -1030,17 +1030,17 @@ Mautic.activateFieldTypeahead = function (field, target, options, action) {
             minLength: 0
         });
     } else {
-        var fieldTypeahead = Mautic.activateTypeahead(fieldId, {
+        var typeAheadOptions = {
             prefetch: true,
             remote: true,
             action: action + "&field=" + target
-        });
+        };
 
         if (('undefined' !== typeof options) && ('undefined' !== typeof options.limit)) {
             typeAheadOptions.limit = options.limit;
         }
 
-        var fieldTypeahead = Mautic.activateTypeahead('#' + field, typeAheadOptions);
+        var fieldTypeahead = Mautic.activateTypeahead(fieldId, typeAheadOptions);
     }
 
     var callback = function (event, datum) {
