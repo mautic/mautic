@@ -99,14 +99,14 @@ echo $view['form']->start($form);
                     </div>
                 </div>
 <!--                Website preview block-->
-                <figure id="websiteScreenshot">
+                <div id="websiteScreenshot">
                     <div class="screenshot-container text-center">
                         <div class="preview-body center"></div>
                         <canvas id="websiteCanvas">
                             Your browser does not support the canvas element.
                         </canvas>
                     </div>
-                </figure>
+                </div>
             </div>
         </div>
 
