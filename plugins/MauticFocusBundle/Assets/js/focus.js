@@ -417,7 +417,6 @@ Mautic.focusUpdatePreview = function () {
 
         container.append(innerContainer);
 
-        // @todo this is rewriting iframe
         mQuery('.preview-body').html(container);
 
         if (!mQuery('.mf-bar').length && mQuery('.builder-content').length) {
@@ -537,5 +536,6 @@ Mautic.focusCreateIframe = function (url) {
         alert(err.toString());
     } finally {
         mQuery('.website-placeholder').hide();
+        Mautic.focusUpdatePreview();
     }
 }
