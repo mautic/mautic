@@ -8,8 +8,8 @@ Mautic.disabledFocusActions = function(opener) {
 
     var disabled = email === '' || email === null;
 
-    // opener.mQuery('#campaignevent_properties_editFocusButton').prop('disabled', disabled);
-    // opener.mQuery('#campaignevent_properties_previewFocusButton').prop('disabled', disabled);
+    opener.mQuery('#campaignevent_properties_editFocusButton').prop('disabled', disabled);
+    opener.mQuery('#campaignevent_properties_previewFocusButton').prop('disabled', disabled);
 };
 
 Mautic.standardFocusUrl = function(options) {
@@ -216,6 +216,7 @@ Mautic.focusOnLoad = function () {
 };
 
 Mautic.focusOnUnload = function () {
+    // @todo Mautic.focusStatsChart used only here
     if (typeof Mautic.focusStatsChart != 'undefined') {
         Mautic.focusStatsChart.destroy();
     }
@@ -227,6 +228,21 @@ Mautic.launchFocusBuilder = function (forceFetch) {
 
     // Prevent preview updates till the website snapshot is loaded
     Mautic.ignoreMauticFocusPreviewUpdate = true;
+
+    if (!mQuery('#builder-overlay').length) {
+        var builderCss = {
+            margin: "0",
+            padding: "0",
+            border: "none",
+            width: "100%",
+            height: "100%"
+        };
+
+        var spinnerLeft = (mQuery(document).width() - 300) / 2;
+        var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:50%; left:' + spinnerLeft + 'px"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
+    } else {
+        mQuery('#builder-overlay').removeClass('hide');
+    }
 
     // Disable the close button until everything is loaded
     mQuery('.btn-close-builder').prop('disabled', true);
@@ -241,36 +257,143 @@ Mautic.launchFocusBuilder = function (forceFetch) {
             Mautic.setFocusDefaultColors();
         }
         mQuery('.website-placeholder').removeClass('hide');
+        mQuery('#builder-overlay').addClass('hide');
         mQuery('.btn-close-builder').prop('disabled', false);
         mQuery('#websiteUrlPlaceholderInput').prop('disabled', false);
-    } else if (forceFetch) {
+    } else if (forceFetch || typeof Mautic.loadedPreviewImage == 'undefined' || Mautic.loadedPreviewImage != url) {
+        Mautic.loadedPreviewImage = url;
 
-        let builderCss = {
-            margin: "0",
-            padding: "0",
-            border: "none",
-            overflow: "hidden", // Disable scrolling with scrolling="no" attr
-            "pointer-events": "none", // Disable clicks in iframe
-        };
-
-        let viewport = mQuery('.btn-viewport').data('viewport');
-
-        if (viewport === 'desktop') {
-            // @todo recalculate when window resize
-            builderCss.width = "100%";
-            builderCss.height = mQuery('#websiteScreenshot').height(); // 100% does not work. Needs to be specified
-        } else {
-            builderCss.width = '230px';
-            builderCss.height = '392px';
-            builderCss.border = '1px gray solid';
+        // Fetch image
+        var data = {
+            id: mQuery('#focus_unlockId').val(),
+            website: url
         }
 
-        // Async load in new iframe
-        mQuery('.preview-body').html('<iframe src="'+url+'" scrolling="no"></iframe>');
-        mQuery('.preview-body iframe').css(builderCss);
+        mQuery('.preview-body').html('');
+        Mautic.ajaxActionRequest('plugin:focus:getWebsiteSnapshot', data, function (response) {
+            mQuery('#builder-overlay').addClass('hide');
+            mQuery('.btn-close-builder').prop('disabled', false);
 
-        mQuery('.btn-close-builder').prop('disabled', false);
+            if (response.image) {
+                // Enable droppers
+                mQuery('.btn-dropper').removeClass('disabled');
+                mQuery('#websiteUrlPlaceholderInput').prop('disabled', true);
+
+                var canvas = document.getElementById('websiteCanvas');
+                var context = canvas.getContext('2d');
+                var img = new Image();
+                img.onload = function () {
+                    mQuery('#websiteScreenshot').removeClass('css-device css-device--mobile');
+
+                    // Get the width of the
+                    var useWidth = mQuery('.website-preview').width();
+
+                    if (useWidth > img.width) {
+                        useWidth = img.width;
+                    }
+
+                    // Get height proportionate to image width used
+                    var ratio = useWidth / img.width;
+                    var useHeight = img.height * ratio;
+
+                    mQuery('#websiteCanvas').attr({width: useWidth, height: useHeight})
+                    context.drawImage(this, 0, 0, useWidth, useHeight);
+
+                    function findPos(obj) {
+                        var current_left = 0, current_top = 0;
+                        if (obj.offsetParent) {
+                            do {
+                                current_left += obj.offsetLeft;
+                                current_top += obj.offsetTop;
+                            } while (obj = obj.offsetParent);
+                            return {x: current_left, y: current_top};
+                        }
+                        return undefined;
+                    }
+
+                    function rgbToHex(r, g, b) {
+                        if (r > 255 || g > 255 || b > 255)
+                            throw "Invalid color component";
+                        return ((r << 16) | (g << 8) | b).toString(16);
+                    }
+
+                    mQuery('#websiteCanvas').off('click.canvas');
+                    mQuery('#websiteCanvas').on('click.canvas', function (e) {
+                        // Check that a dropper is active
+                        if (mQuery('button.btn-dropper.active').length) {
+                            var dropper = mQuery('button.btn-dropper.active').data('dropper');
+
+                            var position = findPos(this);
+                            var x = e.pageX - position.x;
+                            var y = e.pageY - position.y;
+                            var canvas = this.getContext('2d');
+                            var p = canvas.getImageData(x, y, 1, 1).data;
+                            var hex = "#" + ("000000" + rgbToHex(p[0], p[1], p[2])).slice(-6);
+
+                            mQuery('#' + dropper).minicolors('value', hex);
+                        }
+                    });
+
+                    if (mQuery('.btn-viewport').data('viewport') == 'mobile') {
+                        mQuery('#websiteScreenshot').addClass('css-device css-device--mobile');
+                    }
+                };
+
+                img.src = (mQuery('.btn-viewport').data('viewport') == 'mobile') ? response.image.mobile : response.image.desktop;
+
+                if (forceFetch) {
+                    // Only override colors if fetch button is clicked
+                    if (response.colors) {
+                        if ('bar' != mQuery('#focus_style').val() && response.colors.textColor == '#ffffff') {
+                            response.colors.textColor = '#000000';
+                        }
+                        mQuery('#focus_properties_colors_primary').minicolors('value', response.colors.primaryColor);
+                        mQuery('#focus_properties_colors_text').minicolors('value', response.colors.textColor);
+                        mQuery('#focus_properties_colors_button').minicolors('value', response.colors.buttonColor);
+                        mQuery('#focus_properties_colors_button_text').minicolors('value', response.colors.buttonTextColor);
+                    } else if (!response.ignoreDefaultColors) {
+                        Mautic.setFocusDefaultColors();
+                    }
+
+                    if (response.palette) {
+                        // Wipe them out
+                        mQuery('.site-color-list').html('').removeClass('hide');
+
+                        var colorTypes = ['primary', 'text', 'button', 'button_text'];
+                        response.palette.push('#ffffff');
+                        response.palette.push('#000000');
+                        mQuery.each(response.palette, function (index, value) {
+                            mQuery.each(colorTypes, function (ctIndex, ctValue) {
+                                mQuery('<span class="label label-site-color" />')
+                                    .css('backgroundColor', value)
+                                    .css('border', '1px solid #cccccc')
+                                    .on('click', function () {
+                                        mQuery('#focus_properties_colors_' + ctValue).minicolors('value', value);
+                                    })
+                                    .appendTo('#' + ctValue + '_site_colors');
+                            });
+                        });
+                    }
+                }
+
+                Mautic.ignoreMauticFocusPreviewUpdate = false;
+                Mautic.focusUpdatePreview();
+            } else {
+                mQuery('.website-placeholder').removeClass('hide');
+                mQuery('#websiteUrlPlaceholderInput').prop('disabled', false);
+
+                // Disable droppers
+                mQuery('.btn-dropper').addClass('disabled');
+
+                // Async load in new iframe
+                // mQuery('.preview-body').html('<iframe src="'+url+'" scrolling="no"></iframe>');
+                // mQuery('.preview-body iframe').css(builderCss);
+
+                Mautic.ignoreMauticFocusPreviewUpdate = false;
+            }
+        });
     } else {
+        mQuery('#builder-overlay').addClass('hide');
         mQuery('.btn-close-builder').prop('disabled', false);
 
         Mautic.ignoreMauticFocusPreviewUpdate = false;
@@ -280,25 +403,34 @@ Mautic.launchFocusBuilder = function (forceFetch) {
     }
 };
 
-Mautic.closeFocusBuilder = function (el) {
-    // Kill preview updates
-    if (typeof Mautic.ajaxActionXhr != 'undefined' && typeof Mautic.ajaxActionXhr['plugin:focus:generatePreview'] != 'undefined') {
-        Mautic.ajaxActionXhr['plugin:focus:generatePreview'].abort();
-        delete Mautic.ajaxActionXhr['plugin:focus:generatePreview'];
-    }
-
-    mQuery('#websiteUrlPlaceholderInput').prop('disabled', true);
-
-    Mautic.stopIconSpinPostEvent();
-
-    // Hide builder
-    mQuery('.builder').removeClass('builder-active').addClass('hide');
-
-    mQuery('body').css('overflow-y', '');
-};
-
 // Called when you  click on the show builder button
 Mautic.focusUpdatePreview = function () {
+    mQuery('.preview-body').html('');
+    // Generate a preview
+    var data = mQuery('form[name=focus]').formToArray();
+    Mautic.ajaxActionRequest('plugin:focus:generatePreview', data, function (response) {
+        var container = mQuery('<div />').html(response.style);
+        var innerContainer = mQuery('<div />').html(response.html);
+
+        if (mQuery('.btn-viewport').data('viewport') == 'mobile') {
+            innerContainer.addClass('mf-responsive');
+        } else {
+            innerContainer.removeClass('mf-responsive');
+        }
+
+        container.append(innerContainer);
+
+        mQuery('.preview-body').html(container);
+
+        if (!mQuery('.mf-bar').length && mQuery('.builder-content').length) {
+            mQuery('.builder-content').on('click', function () {
+                Mautic.closeFocusModal(mQuery('#focus_style').val());
+            });
+            mQuery('.mautic-focus').on('click', function (e) {
+                e.stopPropagation();
+            });
+        }
+    });
 };
 
 Mautic.setFocusDefaultColors = function () {
@@ -345,3 +477,20 @@ Mautic.closeFocusModal = function (style) {
         mQuery('.mf-' + style + '-overlay').remove();
     }
 }
+
+Mautic.closeFocusBuilder = function (el) {
+    // Kill preview updates
+    if (typeof Mautic.ajaxActionXhr != 'undefined' && typeof Mautic.ajaxActionXhr['plugin:focus:generatePreview'] != 'undefined') {
+        Mautic.ajaxActionXhr['plugin:focus:generatePreview'].abort();
+        delete Mautic.ajaxActionXhr['plugin:focus:generatePreview'];
+    }
+
+    mQuery('#websiteUrlPlaceholderInput').prop('disabled', true);
+
+    Mautic.stopIconSpinPostEvent();
+
+    // Hide builder
+    mQuery('.builder').removeClass('builder-active').addClass('hide');
+
+    mQuery('body').css('overflow-y', '');
+};
