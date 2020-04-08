@@ -36,7 +36,6 @@ class NotificationSendEvent extends CommonEvent
 
     /**
      * @param string $message
-     * @param Lead   $lead
      */
     public function __construct($message, $heading, Lead $lead)
     {
@@ -77,10 +76,12 @@ class NotificationSendEvent extends CommonEvent
     public function setHeading($heading)
     {
         $this->heading = $heading;
+
+        return $this;
     }
 
     /**
-     * @return array
+     * @return Lead
      */
     public function getLead()
     {

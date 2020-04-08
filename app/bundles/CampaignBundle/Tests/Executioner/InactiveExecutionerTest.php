@@ -23,31 +23,32 @@ use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\NullLogger;
+use Symfony\Component\Console\Output\BufferedOutput;
 
-class InactiveExecutionerTest extends \PHPUnit_Framework_TestCase
+class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|InactiveContactFinder
+     * @var \PHPUnit\Framework\MockObject\MockObject|InactiveContactFinder
      */
     private $inactiveContactFinder;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Translator
+     * @var \PHPUnit\Framework\MockObject\MockObject|Translator
      */
     private $translator;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventScheduler
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventScheduler
      */
     private $eventScheduler;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|InactiveHelper
+     * @var \PHPUnit\Framework\MockObject\MockObject|InactiveHelper
      */
     private $inactiveHelper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventExecutioner
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventExecutioner
      */
     private $eventExecutioner;
 
@@ -86,7 +87,7 @@ class InactiveExecutionerTest extends \PHPUnit_Framework_TestCase
             ->method('getContactCount');
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
-        $counter = $this->getExecutioner()->execute($campaign, $limiter);
+        $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
 
         $this->assertEquals(0, $counter->getEvaluated());
     }
@@ -104,7 +105,7 @@ class InactiveExecutionerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(0);
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
-        $counter = $this->getExecutioner()->execute($campaign, $limiter);
+        $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
 
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
@@ -141,7 +142,7 @@ class InactiveExecutionerTest extends \PHPUnit_Framework_TestCase
             ->method('getSortedExecutionDates')
             ->willReturn([]);
 
-        $this->getExecutioner()->execute($campaign, $limiter);
+        $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
     }
 
     public function testValidationExecutesNothingIfCampaignUnpublished()
@@ -165,7 +166,7 @@ class InactiveExecutionerTest extends \PHPUnit_Framework_TestCase
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
-        $counter = $this->getExecutioner()->validate(1, $limiter);
+        $counter = $this->getExecutioner()->validate(1, $limiter, new BufferedOutput());
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
 
@@ -208,7 +209,7 @@ class InactiveExecutionerTest extends \PHPUnit_Framework_TestCase
             ->method('getSortedExecutionDates')
             ->willReturn([]);
 
-        $this->getExecutioner()->validate(1, $limiter);
+        $this->getExecutioner()->validate(1, $limiter, new BufferedOutput());
     }
 
     private function getExecutioner()

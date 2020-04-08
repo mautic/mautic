@@ -11,7 +11,6 @@
 
 namespace Mautic\PageBundle\Entity;
 
-use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -44,7 +43,7 @@ class HitRepository extends CommonRepository
         $expr = $q2->expr()->andX();
 
         // If we know the lead, use that to determine uniqueness
-        if ($lead !== null && $lead->getId()) {
+        if (null !== $lead && $lead->getId()) {
             $expr->add(
                 $q2->expr()->eq('h.lead_id', $lead->getId())
             );
@@ -77,7 +76,6 @@ class HitRepository extends CommonRepository
      * Get a lead's page hits.
      *
      * @param int|null $leadId
-     * @param array    $options
      *
      * @return array
      */
@@ -119,7 +117,7 @@ class HitRepository extends CommonRepository
         $query->select('count(distinct(h.trackingId)) as "hitCount"');
         $query->andWhere($query->expr()->eq('h.source', $query->expr()->literal($source)));
 
-        if ($sourceId != null) {
+        if (null != $sourceId) {
             if (is_array($sourceId)) {
                 $query->andWhere($query->expr()->in('h.sourceId', ':sourceIds'))
                     ->setParameter('sourceIds', $sourceId);
@@ -128,7 +126,7 @@ class HitRepository extends CommonRepository
             }
         }
 
-        if ($fromDate != null) {
+        if (null != $fromDate) {
             $query->andwhere($query->expr()->gte('h.dateHit', ':date'))
                 ->setParameter('date', $fromDate);
         }
@@ -160,7 +158,7 @@ class HitRepository extends CommonRepository
             ->where($q->expr()->in('h.email_id', $emailIds))
             ->groupBy('h.email_id');
 
-        if ($fromDate != null) {
+        if (null != $fromDate) {
             $dateHelper = new DateTimeHelper($fromDate);
             $q->andwhere($q->expr()->gte('h.date_hit', ':date'))
                 ->setParameter('date', $dateHelper->toUtcString());
@@ -318,7 +316,7 @@ class HitRepository extends CommonRepository
             $q->expr()->isNull('h.date_left')
         );
 
-        if ($fromDate !== null) {
+        if (null !== $fromDate) {
             //make sure the date is UTC
             $dt = new DateTimeHelper($fromDate, 'Y-m-d H:i:s', 'local');
             $expr->add(
@@ -379,9 +377,6 @@ class HitRepository extends CommonRepository
     /**
      * Get the dwell times for bunch of pages.
      *
-     * @param array $pageIds
-     * @param array $options
-     *
      * @return array
      */
     public function getDwellTimesForPages(array $pageIds, array $options)
@@ -397,7 +392,7 @@ class HitRepository extends CommonRepository
                 )
             );
 
-        if (isset($options['fromDate']) && $options['fromDate'] !== null) {
+        if (isset($options['fromDate']) && null !== $options['fromDate']) {
             //make sure the date is UTC
             $dt = new DateTimeHelper($options['fromDate']);
             $q->andWhere(
@@ -434,7 +429,6 @@ class HitRepository extends CommonRepository
      * Get the dwell times for bunch of URLs.
      *
      * @param string $url
-     * @param array  $options
      *
      * @return array
      */

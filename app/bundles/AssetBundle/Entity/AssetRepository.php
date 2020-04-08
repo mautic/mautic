@@ -11,6 +11,8 @@
 
 namespace Mautic\AssetBundle\Entity;
 
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -21,8 +23,6 @@ class AssetRepository extends CommonRepository
 {
     /**
      * Get a list of entities.
-     *
-     * @param array $args
      *
      * @return Paginator
      */
@@ -68,9 +68,7 @@ class AssetRepository extends CommonRepository
                 ->setMaxResults($limit);
         }
 
-        $results = $q->getQuery()->getArrayResult();
-
-        return $results;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**
@@ -175,8 +173,6 @@ class AssetRepository extends CommonRepository
     /**
      * Gets the sum size of assets.
      *
-     * @param array $assets
-     *
      * @return int
      */
     public function getAssetSize(array $assets)
@@ -210,5 +206,25 @@ class AssetRepository extends CommonRepository
         }
 
         $q->execute();
+    }
+
+    /**
+     * @param int $categoryId
+     *
+     * @return Asset
+     *
+     * @throws NoResultException
+     * @throws NonUniqueResultException
+     */
+    public function getLatestAssetForCategory($categoryId)
+    {
+        $q = $this->createQueryBuilder($this->getTableAlias());
+        $q->where($this->getTableAlias().'.category = :categoryId');
+        $q->andWhere($this->getTableAlias().'.isPublished = TRUE');
+        $q->setParameter('categoryId', $categoryId);
+        $q->orderBy($this->getTableAlias().'.dateAdded', 'DESC');
+        $q->setMaxResults(1);
+
+        return $q->getQuery()->getSingleResult();
     }
 }

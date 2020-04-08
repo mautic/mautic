@@ -72,9 +72,6 @@ class DoNotContact
 
     private $channelId;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -145,8 +142,6 @@ class DoNotContact
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return DoNotContact
      */
     public function setLead(Lead $lead)
@@ -165,8 +160,6 @@ class DoNotContact
     }
 
     /**
-     * @param \DateTime $dateAdded
-     *
      * @return DoNotContact
      */
     public function setDateAdded(\DateTime $dateAdded)

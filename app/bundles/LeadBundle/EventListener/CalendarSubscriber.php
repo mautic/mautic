@@ -11,16 +11,38 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\DBAL\Connection;
 use Mautic\CalendarBundle\CalendarEvents;
 use Mautic\CalendarBundle\Event\CalendarGeneratorEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class CalendarSubscriber.
- */
-class CalendarSubscriber extends CommonSubscriber
+class CalendarSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var Connection
+     */
+    private $connection;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    public function __construct(Connection $connection, TranslatorInterface $translator, RouterInterface $router)
+    {
+        $this->connection = $connection;
+        $this->translator = $translator;
+        $this->router     = $router;
+    }
+
     /**
      * @return array
      */
@@ -33,15 +55,13 @@ class CalendarSubscriber extends CommonSubscriber
 
     /**
      * Adds events to the calendar.
-     *
-     * @param CalendarGeneratorEvent $event
      */
     public function onCalendarGenerate(CalendarGeneratorEvent $event)
     {
         $dates = $event->getDates();
 
         // Lead Notes
-        $query = $this->em->getConnection()->createQueryBuilder();
+        $query = $this->connection->createQueryBuilder();
         $query->select('ln.lead_id, l.firstname, l.lastname, ln.date_time AS start, ln.text AS description, ln.type')
             ->from(MAUTIC_TABLE_PREFIX.'lead_notes', 'ln')
             ->leftJoin('ln', MAUTIC_TABLE_PREFIX.'leads', 'l', 'ln.lead_id = l.id')

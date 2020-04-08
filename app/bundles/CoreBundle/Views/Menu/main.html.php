@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($item->hasChildren() && $options['depth'] !== 0 && $item->getDisplayChildren()) {
+if ($item->hasChildren() && 0 !== $options['depth'] && $item->getDisplayChildren()) {
     /* Top menu level start */
     if ($item->isRoot()) {
         echo '<ul class="nav mt-10" data-toggle="menu">'."\n";
@@ -60,7 +60,7 @@ if ($item->hasChildren() && $options['depth'] !== 0 && $item->getDisplayChildren
         if (!isset($labelAttributes['class'])) {
             $labelAttributes['class'] = 'nav-item-name';
         }
-        $labelPull = $extras['depth'] === 0 ? ' pull-left' : '';
+        $labelPull = empty($extras['depth']) ? ' pull-left' : '';
         $labelAttributes['class'] .= ' text'.$labelPull;
 
         echo "<span{$view['menu']->parseAttributes($labelAttributes)}>{$view['translator']->trans($child->getLabel())}</span>";

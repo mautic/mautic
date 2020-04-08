@@ -78,9 +78,7 @@ class CampaignExecutionEvent extends Event
     /**
      * CampaignExecutionEvent constructor.
      *
-     * @param array             $args
-     * @param bool              $result
-     * @param LeadEventLog|null $log
+     * @param bool $result
      */
     public function __construct(array $args, $result, LeadEventLog $log = null)
     {
@@ -202,8 +200,6 @@ class CampaignExecutionEvent extends Event
     /**
      * Set a custom log entry to override auto-handling of the log entry.
      *
-     * @param LeadEventLog $log
-     *
      * @return $this
      */
     public function setLogEntry(LeadEventLog $log)
@@ -233,8 +229,8 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @param      $channel
-     * @param null $channelId
+     * @param string          $channel
+     * @param string|int|null $channelId
      *
      * @return $this
      */

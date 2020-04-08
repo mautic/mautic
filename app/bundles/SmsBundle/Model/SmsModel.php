@@ -19,7 +19,6 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -28,6 +27,7 @@ use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Event\SmsEvent;
 use Mautic\SmsBundle\Event\SmsSendEvent;
+use Mautic\SmsBundle\Form\Type\SmsType;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\Event;
@@ -61,11 +61,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * SmsModel constructor.
-     *
-     * @param TrackableModel    $pageTrackableModel
-     * @param LeadModel         $leadModel
-     * @param MessageQueueModel $messageQueueModel
-     * @param TransportChain    $transport
      */
     public function __construct(TrackableModel $pageTrackableModel, LeadModel $leadModel, MessageQueueModel $messageQueueModel, TransportChain $transport)
     {
@@ -113,7 +108,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     {
         //iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
-        foreach ($entities as $k => $entity) {
+        $i         = 0;
+        foreach ($entities as $entity) {
             $isNew = ($entity->getId()) ? false : true;
 
             //set some defaults
@@ -129,7 +125,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                 $this->dispatchEvent('post_save', $entity, $isNew, $event);
             }
 
-            if ((($k + 1) % $batchSize) === 0) {
+            if (0 === ++$i % $batchSize) {
                 $this->em->flush();
             }
         }
@@ -158,7 +154,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             $options['action'] = $action;
         }
 
-        return $formFactory->create('sms', $entity, $options);
+        return $formFactory->create(SmsType::class, $entity, $options);
     }
 
     /**
@@ -166,11 +162,11 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param $id
      *
-     * @return null|Sms
+     * @return Sms|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             $entity = new Sms();
         } else {
             $entity = parent::getEntity($id);
@@ -180,7 +176,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param Sms   $sms
      * @param       $sendTo
      * @param array $options
      *
@@ -268,8 +263,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             if (count($contacts)) {
                 /** @var Lead $lead */
                 foreach ($contacts as $lead) {
-                    $leadId = $lead->getId();
-
+                    $leadId          = $lead->getId();
+                    $stat            = $this->createStatEntry($sms, $lead, $channel, false);
                     $leadPhoneNumber = $lead->getLeadPhoneNumber();
 
                     if (empty($leadPhoneNumber)) {
@@ -290,7 +285,14 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                         new TokenReplacementEvent(
                             $smsEvent->getContent(),
                             $lead,
-                            ['channel' => ['sms', $sms->getId()]]
+                            [
+                                'channel' => [
+                                    'sms',          // Keep BC pre 2.14.1
+                                    $sms->getId(),  // Keep BC pre 2.14.1
+                                    'sms' => $sms->getId(),
+                                ],
+                                'stat'    => $stat->getTrackingHash(),
+                            ]
                         )
                     );
 
@@ -307,9 +309,10 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
 
                     if (true !== $metadata) {
                         $sendResult['status'] = $metadata;
+                        unset($stat);
                     } else {
                         $sendResult['sent'] = true;
-                        $stats[]            = $this->createStatEntry($sms, $lead, $channel, false);
+                        $stats[]            = $stat;
                         ++$sentCount;
                     }
 
@@ -323,6 +326,11 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
         if ($sentCount) {
             $this->getRepository()->upCount($sms->getId(), 'sent', $sentCount);
             $this->getStatRepository()->saveEntities($stats);
+            // send statId to results
+            $stat = reset($stats);
+            if ($stat instanceof Stat) {
+                $results[$stat->getLead()->getId()]['statId'] = $stat->getId();
+            }
             $this->em->clear(Stat::class);
         }
 
@@ -330,8 +338,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param Sms  $sms
-     * @param Lead $lead
      * @param null $source
      * @param bool $persist
      *
@@ -348,6 +354,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             $source = $source[0];
         }
         $stat->setSource($source);
+        $stat->setTrackingHash(str_replace('.', '', uniqid('', true)));
 
         if ($persist) {
             $this->getStatRepository()->saveEntity($stat);
@@ -405,8 +412,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Joins the page table and limits created_by to currently logged in user.
-     *
-     * @param QueryBuilder $q
      */
     public function limitQueryToCreator(QueryBuilder &$q)
     {
@@ -418,12 +423,10 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get line chart data of hits.
      *
-     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
-     * @param bool      $canViewOthers
+     * @param char   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
+     * @param array  $filter
+     * @param bool   $canViewOthers
      *
      * @return array
      */
@@ -439,7 +442,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
-        if (!$flag || $flag === 'total_and_unique') {
+        if (!$flag || 'total_and_unique' === $flag) {
             $q = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
 
             if (!$canViewOthers) {
@@ -508,6 +511,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
         $results = [];
         switch ($type) {
             case 'sms':
+            case SmsType::class:
                 $entities = $this->getRepository()->getSmsList(
                     $filter,
                     $limit,

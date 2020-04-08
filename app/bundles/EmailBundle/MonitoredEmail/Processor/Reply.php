@@ -59,12 +59,6 @@ class Reply implements ProcessorInterface
 
     /**
      * Reply constructor.
-     *
-     * @param StatRepository           $statRepository
-     * @param ContactFinder            $contactFinder
-     * @param LeadModel                $leadModel
-     * @param EventDispatcherInterface $dispatcher
-     * @param LoggerInterface          $logger
      */
     public function __construct(
         StatRepository $statRepository,
@@ -80,10 +74,6 @@ class Reply implements ProcessorInterface
         $this->logger        = $logger;
     }
 
-    /**
-     * @param $mailId
-     * @param $refid
-     */
     public function process(Message $message)
     {
         $this->message = $message;
@@ -112,6 +102,7 @@ class Reply implements ProcessorInterface
         // A stat has been found so let's compare to the From address for the contact to prevent false positives
         $contactEmail = $this->cleanEmail($stat->getLead()->getEmail());
         $fromEmail    = $this->cleanEmail($repliedEmail->getFromAddress());
+
         if ($contactEmail !== $fromEmail) {
             // We can't reliably assume this email was from the originating contact
             $this->logger->debug('MONITORED EMAIL: '.$contactEmail.' != '.$fromEmail.' so cannot confirm match');
@@ -133,9 +124,6 @@ class Reply implements ProcessorInterface
         $this->leadModel->clearEntities();
     }
 
-    /**
-     * @param Stat $stat
-     */
     protected function createReply(Stat $stat)
     {
         $replies = $stat->getReplies()->filter(

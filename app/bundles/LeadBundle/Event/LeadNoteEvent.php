@@ -21,8 +21,7 @@ use Mautic\LeadBundle\Entity\LeadNote;
 class LeadNoteEvent extends CommonEvent
 {
     /**
-     * @param LeadNote $note
-     * @param bool     $isNew
+     * @param bool $isNew
      */
     public function __construct(LeadNote $note, $isNew = false)
     {
@@ -42,8 +41,6 @@ class LeadNoteEvent extends CommonEvent
 
     /**
      * Sets the LeadNote entity.
-     *
-     * @param LeadNote $note
      */
     public function setLeadNote(LeadNote $note)
     {

@@ -12,6 +12,9 @@
 namespace Mautic\FormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -31,7 +34,7 @@ class SubmitActionRepostType extends AbstractType
     {
         $builder->add(
             'post_url',
-            'url',
+            UrlType::class,
             [
                 'label'      => 'mautic.form.action.repost.post_url',
                 'label_attr' => ['class' => 'control-label'],
@@ -56,7 +59,7 @@ class SubmitActionRepostType extends AbstractType
 
         $builder->add(
             'authorization_header',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.form.action.repost.authorization_header',
                 'label_attr' => ['class' => 'control-label'],
@@ -71,7 +74,7 @@ class SubmitActionRepostType extends AbstractType
 
         $builder->add(
             'failure_email',
-            'email',
+            EmailType::class,
             [
                 'label'      => 'mautic.form.action.repost.failure_email',
                 'label_attr' => ['class' => 'control-label'],
@@ -94,7 +97,7 @@ class SubmitActionRepostType extends AbstractType
         foreach ($fields as $alias => $label) {
             $builder->add(
                 $alias,
-                'text',
+                TextType::class,
                 [
                     'label'      => $label." ($alias)",
                     'label_attr' => ['class' => 'control-label'],

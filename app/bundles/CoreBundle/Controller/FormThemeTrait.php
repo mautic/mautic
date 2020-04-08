@@ -19,7 +19,6 @@ trait FormThemeTrait
     /**
      * Sets a specific theme for the form.
      *
-     * @param Form   $form
      * @param string $template
      * @param mixed  $themes
      *

@@ -30,7 +30,7 @@ abstract class DateYearAbstract extends DateOptionAbstract
      */
     protected function getValueForBetweenRange(DateTimeHelper $dateTimeHelper)
     {
-        return $dateTimeHelper->toUtcString('Y-%');
+        return $dateTimeHelper->toLocalString('Y-%');
     }
 
     /**
@@ -38,6 +38,6 @@ abstract class DateYearAbstract extends DateOptionAbstract
      */
     protected function getOperatorForBetweenRange(ContactSegmentFilterCrate $leadSegmentFilterCrate)
     {
-        return $leadSegmentFilterCrate->getOperator() === '!=' ? 'notLike' : 'like';
+        return '!=' === $leadSegmentFilterCrate->getOperator() ? 'notLike' : 'like';
     }
 }

@@ -20,9 +20,8 @@ use Mautic\LeadBundle\Model\CompanyModel;
 class IdentifyCompanyHelper
 {
     /**
-     * @param array        $parameters
-     * @param mixed        $lead
-     * @param CompanyModel $companyModel
+     * @param array $parameters
+     * @param mixed $lead
      *
      * @return array
      */
@@ -60,9 +59,6 @@ class IdentifyCompanyHelper
     }
 
     /**
-     * @param array        $parameters
-     * @param CompanyModel $companyModel
-     *
      * @return array
      */
     public static function findCompany(array $parameters, CompanyModel $companyModel)
@@ -75,6 +71,10 @@ class IdentifyCompanyHelper
             $companyName = filter_var($parameters['company']);
         } elseif (isset($parameters['companyname'])) {
             $companyName = filter_var($parameters['companyname']);
+        }
+
+        if (isset($parameters['email']) || isset($parameters['companyemail'])) {
+            $companyDomain = isset($parameters['email']) ? self::domainExists($parameters['email']) : self::domainExists($parameters['companyemail']);
         }
 
         if (empty($parameters['companywebsite']) && !empty($parameters['companyemail'])) {
@@ -146,8 +146,6 @@ class IdentifyCompanyHelper
 
     /**
      * @param string $field
-     * @param array  $parameters
-     * @param array  $filter
      */
     private static function setCompanyFilter($field, array &$parameters, array &$filter)
     {

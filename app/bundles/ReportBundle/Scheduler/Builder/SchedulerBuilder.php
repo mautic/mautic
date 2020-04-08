@@ -30,8 +30,6 @@ class SchedulerBuilder
     }
 
     /**
-     * @param SchedulerInterface $scheduler
-     *
      * @return \Recurr\Recurrence[]|\Recurr\RecurrenceCollection
      *
      * @throws InvalidSchedulerException
@@ -43,8 +41,7 @@ class SchedulerBuilder
     }
 
     /**
-     * @param SchedulerInterface $scheduler
-     * @param int                $count
+     * @param int $count
      *
      * @return \Recurr\Recurrence[]|\Recurr\RecurrenceCollection
      *

@@ -60,6 +60,12 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'field'         => 'date_read',
         ];
 
+        $this->translations['lead_email_sent_date'] = [
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'email_stats',
+            'field'         => 'date_sent',
+        ];
+
         $this->translations['hit_url_date'] = [
             'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'page_hits',
@@ -75,6 +81,10 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
         ];
 
         $this->translations['dnc_unsubscribed'] = [
+            'type' => DoNotContactFilterQueryBuilder::getServiceId(),
+        ];
+
+        $this->translations['dnc_manual_email'] = [
             'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
 
@@ -216,6 +226,19 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
         $this->translations['utm_term'] = [
             'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'lead_utmtags',
+        ];
+
+        $this->translations['campaign'] = [
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'campaign_leads',
+            'field'         => 'campaign_id',
+            'where'         => 'campaign_leads.manually_removed = 0',
+        ];
+
+        $this->translations['lead_asset_download'] = [
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'asset_downloads',
+            'field'         => 'asset_id',
         ];
 
         parent::__construct($this->translations);

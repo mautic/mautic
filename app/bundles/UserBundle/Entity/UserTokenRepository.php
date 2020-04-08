@@ -31,12 +31,10 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
             ->setMaxResults(1)
             ->getQuery()->execute();
 
-        return count($tokens) === 0;
+        return 0 === count($tokens);
     }
 
     /**
-     * @param UserToken $token
-     *
      * @return bool
      */
     public function verify(UserToken $token)
@@ -50,8 +48,8 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
             ->setParameter('now', new \DateTime())
             ->setMaxResults(1)
             ->getQuery()->execute();
-        $verified = (count($userTokens) !== 0);
-        if ($verified === false) {
+        $verified = (0 !== count($userTokens));
+        if (false === $verified) {
             return false;
         }
         $userToken = reset($userTokens);
@@ -60,5 +58,25 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
         }
 
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function deleteExpired($isDryRun = false)
+    {
+        $qb = $this->createQueryBuilder('ut');
+
+        if ($isDryRun) {
+            $qb->select('count(ut.id) as records');
+        } else {
+            $qb->delete(UserToken::class, 'ut');
+        }
+
+        return (int) $qb
+            ->where('ut.expiration <= :current_datetime')
+            ->setParameter(':current_datetime', new \DateTime())
+            ->getQuery()
+            ->execute();
     }
 }

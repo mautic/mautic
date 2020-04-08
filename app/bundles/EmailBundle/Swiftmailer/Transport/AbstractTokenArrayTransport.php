@@ -85,9 +85,15 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
     }
 
     /**
+     * @return bool
+     */
+    public function ping()
+    {
+        return true;
+    }
+
+    /**
      * Register a plugin in the Transport.
-     *
-     * @param \Swift_Events_EventListener $plugin
      */
     public function registerPlugin(\Swift_Events_EventListener $plugin)
     {
@@ -99,7 +105,7 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
      */
     protected function getDispatcher()
     {
-        if ($this->dispatcher == null) {
+        if (null == $this->dispatcher) {
             $this->dispatcher = new \Swift_Events_SimpleEventDispatcher();
         }
 
@@ -107,14 +113,13 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
     }
 
     /**
-     * @param \Swift_Mime_Message $message
-     * @param null                $failedRecipients
+     * @param null $failedRecipients
      *
      * @return int
      *
      * @throws \Exception
      */
-    abstract public function send(\Swift_Mime_Message $message, &$failedRecipients = null);
+    abstract public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null);
 
     /**
      * Get the metadata from a MauticMessage.
@@ -271,7 +276,7 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
         $headers            = $this->message->getHeaders()->getAll();
         /** @var \Swift_Mime_Header $header */
         foreach ($headers as $header) {
-            if ($header->getFieldType() == \Swift_Mime_Header::TYPE_TEXT && !in_array($header->getFieldName(), $this->standardHeaderKeys)) {
+            if (\Swift_Mime_Header::TYPE_TEXT == $header->getFieldType() && !in_array($header->getFieldName(), $this->standardHeaderKeys)) {
                 $message['headers'][$header->getFieldName()] = $header->getFieldBodyModel();
             }
         }
@@ -280,8 +285,6 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
     }
 
     /**
-     * @param MauticFactory $factory
-     *
      * @deprecated 2.13.0 to be removed in 3.0; register transport as a service and pass dependencies
      */
     public function setMauticFactory(MauticFactory $factory)

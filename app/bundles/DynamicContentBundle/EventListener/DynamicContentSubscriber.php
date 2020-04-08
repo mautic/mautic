@@ -15,12 +15,13 @@ use DOMDocument;
 use DOMXPath;
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Event as Events;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
+use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -32,43 +33,41 @@ use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class DynamicContentSubscriber.
- */
-class DynamicContentSubscriber extends CommonSubscriber
+class DynamicContentSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
 
     /**
      * @var TrackableModel
      */
-    protected $trackableModel;
+    private $trackableModel;
 
     /**
      * @var PageTokenHelper
      */
-    protected $pageTokenHelper;
+    private $pageTokenHelper;
 
     /**
      * @var AssetTokenHelper
      */
-    protected $assetTokenHelper;
+    private $assetTokenHelper;
 
     /**
      * @var FormTokenHelper
      */
-    protected $formTokenHelper;
+    private $formTokenHelper;
 
     /**
      * @var FocusTokenHelper
      */
-    protected $focusTokenHelper;
+    private $focusTokenHelper;
 
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
     /**
      * @var LeadModel
@@ -81,17 +80,15 @@ class DynamicContentSubscriber extends CommonSubscriber
     private $dynamicContentHelper;
 
     /**
-     * DynamicContentSubscriber constructor.
-     *
-     * @param TrackableModel       $trackableModel
-     * @param PageTokenHelper      $pageTokenHelper
-     * @param AssetTokenHelper     $assetTokenHelper
-     * @param FormTokenHelper      $formTokenHelper
-     * @param FocusTokenHelper     $focusTokenHelper
-     * @param AuditLogModel        $auditLogModel
-     * @param LeadModel            $leadModel
-     * @param DynamicContentHelper $dynamicContentHelper
+     * @var DynamicContentModel
      */
+    private $dynamicContentModel;
+
+    /**
+     * @var CorePermissions
+     */
+    private $security;
+
     public function __construct(
         TrackableModel $trackableModel,
         PageTokenHelper $pageTokenHelper,
@@ -100,7 +97,9 @@ class DynamicContentSubscriber extends CommonSubscriber
         FocusTokenHelper $focusTokenHelper,
         AuditLogModel $auditLogModel,
         LeadModel $leadModel,
-        DynamicContentHelper $dynamicContentHelper
+        DynamicContentHelper $dynamicContentHelper,
+        DynamicContentModel $dynamicContentModel,
+        CorePermissions $security
     ) {
         $this->trackableModel       = $trackableModel;
         $this->pageTokenHelper      = $pageTokenHelper;
@@ -110,6 +109,8 @@ class DynamicContentSubscriber extends CommonSubscriber
         $this->auditLogModel        = $auditLogModel;
         $this->leadModel            = $leadModel;
         $this->dynamicContentHelper = $dynamicContentHelper;
+        $this->dynamicContentModel  = $dynamicContentModel;
+        $this->security             = $security;
     }
 
     /**
@@ -127,8 +128,6 @@ class DynamicContentSubscriber extends CommonSubscriber
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param Events\DynamicContentEvent $event
      */
     public function onPostSave(Events\DynamicContentEvent $event)
     {
@@ -147,8 +146,6 @@ class DynamicContentSubscriber extends CommonSubscriber
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param Events\DynamicContentEvent $event
      */
     public function onDelete(Events\DynamicContentEvent $event)
     {
@@ -163,9 +160,6 @@ class DynamicContentSubscriber extends CommonSubscriber
         $this->auditLogModel->writeToLog($log);
     }
 
-    /**
-     * @param MauticEvents\TokenReplacementEvent $event
-     */
     public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event)
     {
         /** @var Lead $lead */
@@ -189,12 +183,18 @@ class DynamicContentSubscriber extends CommonSubscriber
                 $clickthrough['dynamic_content_id']
             );
 
+            $dwc     =  $this->dynamicContentModel->getEntity($clickthrough['dynamic_content_id']);
+            $utmTags = [];
+            if ($dwc && $dwc instanceof DynamicContent) {
+                $utmTags = $dwc->getUtmTags();
+            }
+
             /**
              * @var string
              * @var Trackable $trackable
              */
             foreach ($trackables as $token => $trackable) {
-                $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $clickthrough);
+                $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $clickthrough, false, $utmTags);
             }
 
             $content = str_replace(array_keys($tokens), array_values($tokens), $content);
@@ -203,9 +203,6 @@ class DynamicContentSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param PageDisplayEvent $event
-     */
     public function decodeTokens(PageDisplayEvent $event)
     {
         $lead = $this->security->isAnonymous() ? $this->leadModel->getCurrentLead() : null;
@@ -213,7 +210,11 @@ class DynamicContentSubscriber extends CommonSubscriber
             return;
         }
 
-        $content   = $event->getContent();
+        $content = $event->getContent();
+        if (empty($content)) {
+            return;
+        }
+
         $tokens    = $this->dynamicContentHelper->findDwcTokens($content, $lead);
         $leadArray = [];
         if ($lead instanceof Lead) {
@@ -245,7 +246,7 @@ class DynamicContentSubscriber extends CommonSubscriber
             }
 
             $newnode = $dom->createDocumentFragment();
-            $newnode->appendXML(mb_convert_encoding($slotContent, 'HTML-ENTITIES', 'UTF-8'));
+            $newnode->appendXML('<![CDATA['.mb_convert_encoding($slotContent, 'HTML-ENTITIES', 'UTF-8').']]>');
             $slot->parentNode->replaceChild($newnode, $slot);
         }
 

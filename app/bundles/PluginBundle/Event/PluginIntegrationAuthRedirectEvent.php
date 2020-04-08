@@ -11,7 +11,7 @@
 
 namespace Mautic\PluginBundle\Event;
 
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
 /**
  * Class PluginIntegrationAuthRedirectEvent.
@@ -23,13 +23,7 @@ class PluginIntegrationAuthRedirectEvent extends AbstractPluginIntegrationEvent
      */
     private $authUrl;
 
-    /**
-     * PluginIntegrationAuthRedirectEvent constructor.
-     *
-     * @param AbstractIntegration $integration
-     * @param                     $authUrl
-     */
-    public function __construct(AbstractIntegration $integration, $authUrl)
+    public function __construct(UnifiedIntegrationInterface $integration, $authUrl)
     {
         $this->integration = $integration;
         $this->authUrl     = $authUrl;

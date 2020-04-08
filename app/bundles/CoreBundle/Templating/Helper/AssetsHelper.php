@@ -70,8 +70,6 @@ class AssetsHelper
 
     /**
      * AssetsHelper constructor.
-     *
-     * @param Packages $packages
      */
     public function __construct(Packages $packages)
     {
@@ -89,9 +87,9 @@ class AssetsHelper
     {
         $prefix = $this->pathsHelper->getSystemPath('asset_prefix');
         if (!empty($prefix)) {
-            if ($includeEndingSlash && substr($prefix, -1) != '/') {
+            if ($includeEndingSlash && '/' != substr($prefix, -1)) {
                 $prefix .= '/';
-            } elseif (!$includeEndingSlash && substr($prefix, -1) == '/') {
+            } elseif (!$includeEndingSlash && '/' == substr($prefix, -1)) {
                 $prefix = substr($prefix, 0, -1);
             }
         }
@@ -113,13 +111,13 @@ class AssetsHelper
     public function getUrl($path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false)
     {
         // if we have http in the url it is absolute and we can just return it
-        if (strpos($path, 'http') === 0) {
+        if (0 === strpos($path, 'http')) {
             return $path;
         }
 
         // otherwise build the complete path
         if (!$ignorePrefix) {
-            $assetPrefix = $this->getAssetPrefix(strpos($path, '/') !== 0);
+            $assetPrefix = $this->getAssetPrefix(0 !== strpos($path, '/'));
             $path        = $assetPrefix.$path;
         }
 
@@ -183,7 +181,7 @@ class AssetsHelper
         $addScripts = function ($s) use ($location, &$assets, $async, $name) {
             $name = $name ?: 'script_'.hash('sha1', uniqid(mt_rand()));
 
-            if ($location == 'head') {
+            if ('head' == $location) {
                 //special place for these so that declarations and scripts can be mingled
                 $assets['headDeclarations'][$name] = ['script' => [$s, $async]];
             } else {
@@ -218,7 +216,7 @@ class AssetsHelper
      */
     public function addScriptDeclaration($script, $location = 'head')
     {
-        if ($location == 'head') {
+        if ('head' == $location) {
             //special place for these so that declarations and scripts can be mingled
             $this->assets[$this->context]['headDeclarations'][] = ['declaration' => $script];
         } else {
@@ -294,7 +292,7 @@ class AssetsHelper
      */
     public function addCustomDeclaration($declaration, $location = 'head')
     {
-        if ($location == 'head') {
+        if ('head' == $location) {
             $this->assets[$this->context]['headDeclarations'][] = ['custom' => $declaration];
         } else {
             if (!isset($this->assets[$this->context]['customDeclarations'][$location])) {
@@ -406,10 +404,10 @@ class AssetsHelper
                         break;
                     case 'custom':
                     case 'declaration':
-                        if ($type == 'custom' && $scriptOpen) {
+                        if ('custom' == $type && $scriptOpen) {
                             $headOutput .= "\n</script>";
                             $scriptOpen = false;
-                        } elseif ($type == 'declaration' && !$scriptOpen) {
+                        } elseif ('declaration' == $type && !$scriptOpen) {
                             $headOutput .= "\n<script data-source=\"mautic\">";
                             $scriptOpen = true;
                         }
@@ -559,8 +557,7 @@ class AssetsHelper
      * Turn all URLs in clickable links.
      *
      * @param string $text
-     * @param array  $protocols  http/https, ftp, mail, twitter
-     * @param array  $attributes
+     * @param array  $protocols http/https, ftp, mail, twitter
      *
      * @return string
      */
@@ -608,7 +605,7 @@ class AssetsHelper
                         $match[0] = $this->escape($match[0]);
                         $match[1] = $this->escape($match[1]);
 
-                        return '<'.array_push($links, "<a $attr href=\"https://twitter.com/".($match[0][0] == '@' ? '' : 'search/%23').$match[1]."\">{$match[0]}</a>").'>';
+                        return '<'.array_push($links, "<a $attr href=\"https://twitter.com/".('@' == $match[0][0] ? '' : 'search/%23').$match[1]."\">{$match[0]}</a>").'>';
                     }, $text);
                     break;
                 default:
@@ -693,9 +690,6 @@ class AssetsHelper
     {
     }
 
-    /**
-     * @param AssetGenerationHelper $helper
-     */
     public function setAssetHelper(AssetGenerationHelper $helper)
     {
         $this->assetHelper = $helper;
@@ -706,16 +700,13 @@ class AssetsHelper
      */
     public function setSiteUrl($siteUrl)
     {
-        if (substr($siteUrl, -1) === '/') {
+        if ('/' === substr($siteUrl, -1)) {
             $siteUrl = substr($siteUrl, 0, -1);
         }
 
         $this->siteUrl = $siteUrl;
     }
 
-    /**
-     * @param PathsHelper $pathsHelper
-     */
     public function setPathsHelper(PathsHelper $pathsHelper)
     {
         $this->pathsHelper = $pathsHelper;

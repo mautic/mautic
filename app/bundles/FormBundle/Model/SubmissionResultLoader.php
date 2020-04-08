@@ -31,7 +31,7 @@ class SubmissionResultLoader
     /**
      * @param int $id
      *
-     * @return null|Submission
+     * @return Submission|null
      */
     public function getSubmissionWithResult($id)
     {

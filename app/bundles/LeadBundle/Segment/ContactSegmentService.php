@@ -33,11 +33,6 @@ class ContactSegmentService
      */
     private $logger;
 
-    /**
-     * @param ContactSegmentFilterFactory $contactSegmentFilterFactory
-     * @param ContactSegmentQueryBuilder  $queryBuilder
-     * @param Logger                      $logger
-     */
     public function __construct(
         ContactSegmentFilterFactory $contactSegmentFilterFactory,
         ContactSegmentQueryBuilder $queryBuilder,
@@ -49,9 +44,6 @@ class ContactSegmentService
     }
 
     /**
-     * @param LeadList $segment
-     * @param array    $batchLimiters
-     *
      * @return array
      *
      * @throws Exception\SegmentQueryException
@@ -64,16 +56,18 @@ class ContactSegmentService
         if (!count($segmentFilters)) {
             $this->logger->debug('Segment QB: Segment has no filters', ['segmentId' => $segment->getId()]);
 
-            return [$segment->getId() => [
-                'count' => '0',
-                'maxId' => '0',
-            ],
+            return [
+                $segment->getId() => [
+                    'count' => '0',
+                    'maxId' => '0',
+                ],
             ];
         }
 
         $qb = $this->getNewSegmentContactsQuery($segment, $batchLimiters);
 
         $this->addMinMaxLimiters($qb, $batchLimiters);
+        $this->addLeadLimiter($qb, $batchLimiters);
 
         if (!empty($batchLimiters['excludeVisitors'])) {
             $this->excludeVisitors($qb);
@@ -89,7 +83,6 @@ class ContactSegmentService
     }
 
     /**
-     * @param LeadList   $segment
      * @param array|null $batchLimiters for debug purpose only
      *
      * @return array
@@ -103,10 +96,11 @@ class ContactSegmentService
         if (!count($segmentFilters)) {
             $this->logger->debug('Segment QB: Segment has no filters', ['segmentId' => $segment->getId()]);
 
-            return [$segment->getId() => [
-                'count' => '0',
-                'maxId' => '0',
-            ],
+            return [
+                $segment->getId() => [
+                    'count' => '0',
+                    'maxId' => '0',
+                ],
             ];
         }
 
@@ -126,9 +120,7 @@ class ContactSegmentService
     }
 
     /**
-     * @param LeadList $segment
-     * @param array    $batchLimiters
-     * @param int      $limit
+     * @param int $limit
      *
      * @return array
      *
@@ -148,6 +140,7 @@ class ContactSegmentService
         $queryBuilder->setMaxResults($limit);
 
         $this->addMinMaxLimiters($queryBuilder, $batchLimiters);
+        $this->addLeadLimiter($queryBuilder, $batchLimiters);
 
         if (!empty($batchLimiters['dateTime'])) {
             // Only leads in the list at the time of count
@@ -169,16 +162,14 @@ class ContactSegmentService
     }
 
     /**
-     * @param LeadList $segment
-     *
      * @return array
      *
      * @throws Exception\SegmentQueryException
-     * @throws \Exception
+     * @throws \Doctrine\DBAL\DBALException
      */
-    public function getOrphanedLeadListLeadsCount(LeadList $segment)
+    public function getOrphanedLeadListLeadsCount(LeadList $segment, array $batchLimiters = [])
     {
-        $queryBuilder = $this->getOrphanedLeadListLeadsQueryBuilder($segment);
+        $queryBuilder = $this->getOrphanedLeadListLeadsQueryBuilder($segment, $batchLimiters);
         $queryBuilder = $this->contactSegmentQueryBuilder->wrapInCount($queryBuilder);
 
         $this->logger->debug('Segment QB: Orphan Leads Count SQL: '.$queryBuilder->getDebugOutput(), ['segmentId' => $segment->getId()]);
@@ -189,16 +180,16 @@ class ContactSegmentService
     }
 
     /**
-     * @param LeadList $segment
+     * @param int|null $limit
      *
      * @return array
      *
      * @throws Exception\SegmentQueryException
-     * @throws \Exception
+     * @throws \Doctrine\DBAL\DBALException
      */
-    public function getOrphanedLeadListLeads(LeadList $segment)
+    public function getOrphanedLeadListLeads(LeadList $segment, array $batchLimiters = [], $limit = null)
     {
-        $queryBuilder = $this->getOrphanedLeadListLeadsQueryBuilder($segment);
+        $queryBuilder = $this->getOrphanedLeadListLeadsQueryBuilder($segment, $batchLimiters, $limit);
 
         $this->logger->debug('Segment QB: Orphan Leads SQL: '.$queryBuilder->getDebugOutput(), ['segmentId' => $segment->getId()]);
 
@@ -208,8 +199,7 @@ class ContactSegmentService
     }
 
     /**
-     * @param LeadList $segment
-     * @param          $batchLimiters
+     * @param $batchLimiters
      *
      * @return QueryBuilder
      *
@@ -218,8 +208,10 @@ class ContactSegmentService
      */
     private function getNewSegmentContactsQuery(LeadList $segment, $batchLimiters)
     {
-        $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segment->getId(),
-            $this->contactSegmentFilterFactory->getSegmentFilters($segment));
+        $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder(
+            $segment->getId(),
+            $this->contactSegmentFilterFactory->getSegmentFilters($segment)
+        );
 
         $queryBuilder = $this->contactSegmentQueryBuilder->addNewContactsRestrictions($queryBuilder, $segment->getId(), $batchLimiters);
 
@@ -229,8 +221,6 @@ class ContactSegmentService
     }
 
     /**
-     * @param LeadList $segment
-     *
      * @return QueryBuilder
      *
      * @throws Exception\SegmentQueryException
@@ -242,24 +232,24 @@ class ContactSegmentService
 
         $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segment->getId(), $segmentFilters);
         $queryBuilder = $this->contactSegmentQueryBuilder->addManuallySubscribedQuery($queryBuilder, $segment->getId());
-        $queryBuilder = $this->contactSegmentQueryBuilder->addManuallyUnsubscribedQuery($queryBuilder, $segment->getId());
 
-        return $queryBuilder;
+        return $this->contactSegmentQueryBuilder->addManuallyUnsubscribedQuery($queryBuilder, $segment->getId());
     }
 
     /**
-     * @param LeadList $segment
+     * @param int|null $limit
      *
      * @return QueryBuilder
      *
      * @throws Exception\SegmentQueryException
-     * @throws \Exception
+     * @throws \Doctrine\DBAL\DBALException
      */
-    private function getOrphanedLeadListLeadsQueryBuilder(LeadList $segment)
+    private function getOrphanedLeadListLeadsQueryBuilder(LeadList $segment, array $batchLimiters = [], $limit = null)
     {
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
 
         $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segment->getId(), $segmentFilters);
+        $this->addLeadLimiter($queryBuilder, $batchLimiters);
 
         $this->contactSegmentQueryBuilder->queryBuilderGenerated($segment, $queryBuilder);
 
@@ -272,14 +262,15 @@ class ContactSegmentService
         $qbO->andWhere($qbO->expr()->isNull('members.id'));
         $qbO->andWhere($qbO->expr()->eq('orp.manually_added', $qbO->expr()->literal(0)));
         $qbO->setParameter(':orpsegid', $segment->getId());
+        $this->addLeadLimiter($qbO, $batchLimiters, 'orp.lead_id');
+
+        if ($limit) {
+            $qbO->setMaxResults((int) $limit);
+        }
 
         return $qbO;
     }
 
-    /**
-     * @param QueryBuilder $queryBuilder
-     * @param array        $batchLimiters
-     */
     private function addMinMaxLimiters(QueryBuilder $queryBuilder, array $batchLimiters)
     {
         if (!empty($batchLimiters['minId']) && !empty($batchLimiters['maxId'])) {
@@ -297,12 +288,22 @@ class ContactSegmentService
         }
     }
 
-    /**
-     * @param QueryBuilder $queryBuilder
-     */
     private function excludeVisitors(QueryBuilder $queryBuilder)
     {
         $queryBuilder->andWhere($queryBuilder->expr()->isNotNull('l.date_identified'));
+    }
+
+    /**
+     * @param string $leadIdColumn
+     */
+    private function addLeadLimiter(QueryBuilder $queryBuilder, array $batchLimiters, $leadIdColumn = 'l.id')
+    {
+        if (empty($batchLimiters['lead_id'])) {
+            return;
+        }
+
+        $queryBuilder->andWhere($leadIdColumn.' = :leadId')
+            ->setParameter('leadId', $batchLimiters['lead_id']);
     }
 
     /***** DEBUG *****/
@@ -322,8 +323,7 @@ class ContactSegmentService
     }
 
     /**
-     * @param QueryBuilder $qb
-     * @param int          $segmentId
+     * @param int $segmentId
      *
      * @return mixed
      *
@@ -332,7 +332,7 @@ class ContactSegmentService
     private function timedFetch(QueryBuilder $qb, $segmentId)
     {
         try {
-            $start  = microtime(true);
+            $start = microtime(true);
 
             $result = $qb->execute()->fetch(\PDO::FETCH_ASSOC);
 
@@ -340,9 +340,13 @@ class ContactSegmentService
 
             $this->logger->debug('Segment QB: Query took: '.$this->formatPeriod($end).', Result count: '.count($result), ['segmentId' => $segmentId]);
         } catch (\Exception $e) {
-            $this->logger->error('Segment QB: Query Exception: '.$e->getMessage(), [
-                'query' => $qb->getSQL(), 'parameters' => $qb->getParameters(),
-            ]);
+            $this->logger->error(
+                'Segment QB: Query Exception: '.$e->getMessage(),
+                [
+                    'query'      => $qb->getSQL(),
+                    'parameters' => $qb->getParameters(),
+                ]
+            );
             throw $e;
         }
 
@@ -350,8 +354,7 @@ class ContactSegmentService
     }
 
     /**
-     * @param QueryBuilder $qb
-     * @param int          $segmentId
+     * @param int $segmentId
      *
      * @return mixed
      *
@@ -365,11 +368,18 @@ class ContactSegmentService
 
             $end = microtime(true) - $start;
 
-            $this->logger->debug('Segment QB: Query took: '.$this->formatPeriod($end).'ms. Result count: '.count($result), ['segmentId' => $segmentId]);
+            $this->logger->debug(
+                'Segment QB: Query took: '.$this->formatPeriod($end).'ms. Result count: '.count($result),
+                ['segmentId' => $segmentId]
+            );
         } catch (\Exception $e) {
-            $this->logger->error('Segment QB: Query Exception: '.$e->getMessage(), [
-                'query' => $qb->getSQL(), 'parameters' => $qb->getParameters(),
-            ]);
+            $this->logger->error(
+                'Segment QB: Query Exception: '.$e->getMessage(),
+                [
+                    'query'      => $qb->getSQL(),
+                    'parameters' => $qb->getParameters(),
+                ]
+            );
             throw $e;
         }
 

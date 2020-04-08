@@ -44,7 +44,6 @@ class PluginToken extends AbstractToken
      * @param null                                                        $authenticatingService
      * @param string                                                      $user
      * @param string                                                      $credentials
-     * @param array                                                       $roles
      * @param Response                                                    $response
      */
     public function __construct(

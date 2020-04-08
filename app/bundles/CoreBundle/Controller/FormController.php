@@ -51,7 +51,7 @@ class FormController extends AbstractStandardFormController
     ) {
         $this->deprecatedModelName      = $modelName;
         $this->deprecatedPermissionBase = $permissionBase;
-        if (strpos($sessionBase, 'mautic.') !== 0) {
+        if (0 !== strpos($sessionBase, 'mautic.')) {
             $sessionBase = 'mautic.'.$sessionBase;
         }
         $this->deprecatedSessionBase     = $sessionBase;
@@ -63,8 +63,7 @@ class FormController extends AbstractStandardFormController
     }
 
     /**
-     * @param array $args
-     * @param       $action
+     * @param $action
      *
      * @return array
      */

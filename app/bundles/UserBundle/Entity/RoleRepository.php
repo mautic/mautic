@@ -22,8 +22,6 @@ class RoleRepository extends CommonRepository
     /**
      * Get a list of roles.
      *
-     * @param array $args
-     *
      * @return Paginator
      */
     public function getEntities(array $args = [])

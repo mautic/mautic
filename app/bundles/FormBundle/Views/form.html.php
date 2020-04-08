@@ -13,6 +13,8 @@
     <head>
         <title><?php echo $name; ?></title>
 
+        <?php echo $metaRobots; ?>
+
         <?php echo $view['analytics']->getCode(); ?>
 
         <?php if (isset($stylesheets) && is_array($stylesheets)) : ?>

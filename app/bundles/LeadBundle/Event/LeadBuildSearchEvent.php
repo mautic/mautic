@@ -70,11 +70,10 @@ class LeadBuildSearchEvent extends CommonEvent
     protected $parameters;
 
     /**
-     * @param string       $string
-     * @param string       $command
-     * @param string       $alias
-     * @param string       $negate
-     * @param QueryBuilder $queryBuilder
+     * @param string $string
+     * @param string $command
+     * @param string $alias
+     * @param string $negate
      */
     public function __construct($string, $command, $alias, $negate, QueryBuilder $queryBuilder)
     {

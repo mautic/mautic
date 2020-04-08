@@ -100,6 +100,14 @@ $showActions = count($activeFormActions);
                                 'MauticCoreBundle:Helper:details.html.php',
                                 ['entity' => $activeForm]
                             ); ?>
+                            <tr>
+                                <td width="20%">
+                                    <span class="fw-b"><?php echo $view['translator']->trans('mautic.form.stats.submission_counts'); ?></span>
+                                </td>
+                                <td>
+                                    <?php echo $submissionCounts['unique'].' / '.$submissionCounts['total']; ?>
+                                </td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -197,7 +205,7 @@ $showActions = count($activeFormActions);
                                             default:
                                                 $icon = '';
                                         } ?>
-                                        <?php if ($icon != ''): ?>
+                                        <?php if ('' != $icon): ?>
                                             <div class="col-md-1 va-m">
                                                 <h3><span class="fa <?php echo $icon; ?> text-white dark-xs"></span>
                                                 </h3>
@@ -225,7 +233,7 @@ $showActions = count($activeFormActions);
             <div class="tab-pane fade<?php if (!$showActions) {
                                             echo ' active in';
                                         } ?> bdr-w-0" id="fields-container">
-                <h5 class="fw-sb mb-xs">Form Field</h5>
+                <h5 class="fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.form.field'); ?></h5>
                 <ul class="list-group mb-xs">
                     <?php /** @var \Mautic\FormBundle\Entity\Field $field */
                     foreach ($activeFormFields as $field) : ?>

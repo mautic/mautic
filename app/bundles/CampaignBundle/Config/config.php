@@ -88,16 +88,9 @@ return [
                 'controller' => 'MauticCampaignBundle:Api\CampaignApi:removeLead',
                 'method'     => 'POST',
             ],
-
-            // @deprecated 2.6.0 to be removed 3.0
-            'bc_mautic_api_campaignaddcontact'        => [
-                'path'       => '/campaigns/{id}/contact/add/{leadId}',
-                'controller' => 'MauticCampaignBundle:Api\CampaignApi:addLead',
-                'method'     => 'POST',
-            ],
-            'bc_mautic_api_campaignremovecontact'     => [
-                'path'       => '/campaigns/{id}/contact/remove/{leadId}',
-                'controller' => 'MauticCampaignBundle:Api\CampaignApi:removeLead',
+            'mautic_api_contact_clone_campaign' => [
+                'path'       => '/campaigns/clone/{campaignId}',
+                'controller' => 'MauticCampaignBundle:Api\CampaignApi:cloneCampaign',
                 'method'     => 'POST',
             ],
         ],
@@ -118,8 +111,8 @@ return [
         'campaign' => null,
     ],
 
-    'services'   => [
-        'events'       => [
+    'services' => [
+        'events' => [
             'mautic.campaign.subscriber'                => [
                 'class'     => \Mautic\CampaignBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
@@ -128,37 +121,51 @@ return [
                 ],
             ],
             'mautic.campaign.leadbundle.subscriber'     => [
-                'class'     => 'Mautic\CampaignBundle\EventListener\LeadSubscriber',
+                'class'     => \Mautic\CampaignBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
+                    'mautic.campaign.membership.manager',
+                    'mautic.campaign.event_collector',
                     'mautic.campaign.model.campaign',
                     'mautic.lead.model.lead',
+                    'translator',
+                    'doctrine.orm.entity_manager',
+                    'router',
+                    'mautic.security',
                 ],
             ],
             'mautic.campaign.calendarbundle.subscriber' => [
-                'class' => 'Mautic\CampaignBundle\EventListener\CalendarSubscriber',
+                'class'     => \Mautic\CampaignBundle\EventListener\CalendarSubscriber::class,
+                'arguments' => [
+                    'doctrine.dbal.default_connection',
+                    'translator',
+                    'router',
+                ],
             ],
             'mautic.campaign.pointbundle.subscriber'    => [
-                'class' => 'Mautic\CampaignBundle\EventListener\PointSubscriber',
+                'class' => \Mautic\CampaignBundle\EventListener\PointSubscriber::class,
             ],
             'mautic.campaign.search.subscriber'         => [
-                'class'     => 'Mautic\CampaignBundle\EventListener\SearchSubscriber',
+                'class'     => \Mautic\CampaignBundle\EventListener\SearchSubscriber::class,
                 'arguments' => [
                     'mautic.campaign.model.campaign',
+                    'mautic.security',
+                    'mautic.helper.templating',
                 ],
             ],
             'mautic.campaign.dashboard.subscriber'      => [
-                'class'     => 'Mautic\CampaignBundle\EventListener\DashboardSubscriber',
+                'class'     => \Mautic\CampaignBundle\EventListener\DashboardSubscriber::class,
                 'arguments' => [
                     'mautic.campaign.model.campaign',
                     'mautic.campaign.model.event',
                 ],
             ],
             'mautic.campaignconfigbundle.subscriber'    => [
-                'class' => 'Mautic\CampaignBundle\EventListener\ConfigSubscriber',
+                'class' => \Mautic\CampaignBundle\EventListener\ConfigSubscriber::class,
             ],
             'mautic.campaign.stats.subscriber'          => [
                 'class'     => \Mautic\CampaignBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],
@@ -187,58 +194,48 @@ return [
         'forms'        => [
             'mautic.campaign.type.form'                 => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'campaign',
+                'arguments' => 'mautic.security',
             ],
             'mautic.campaignrange.type.action'          => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\EventType',
-                'alias' => 'campaignevent',
             ],
             'mautic.campaign.type.campaignlist'         => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignListType',
                 'arguments' => [
                     'mautic.campaign.model.campaign',
                     'translator',
+                    'mautic.security',
                 ],
-                'alias'     => 'campaign_list',
             ],
             'mautic.campaign.type.trigger.leadchange'   => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\CampaignEventLeadChangeType',
-                'alias' => 'campaignevent_leadchange',
             ],
             'mautic.campaign.type.action.addremovelead' => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\CampaignEventAddRemoveLeadType',
-                'alias' => 'campaignevent_addremovelead',
             ],
             'mautic.campaign.type.action.jump_to_event' => [
                 'class' => \Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType::class,
-                'alias' => 'campaignevent_jump_to_event',
             ],
             'mautic.campaign.type.canvassettings'       => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\EventCanvasSettingsType',
-                'alias' => 'campaignevent_canvassettings',
             ],
             'mautic.campaign.type.leadsource'           => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignLeadSourceType',
                 'arguments' => 'mautic.factory',
-                'alias'     => 'campaign_leadsource',
             ],
             'mautic.form.type.campaignconfig'           => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\ConfigType',
                 'arguments' => 'translator',
-                'alias'     => 'campaignconfig',
             ],
         ],
-        'models'       => [
-            'mautic.campaign.model.campaign'  => [
+        'models' => [
+            'mautic.campaign.model.campaign' => [
                 'class'     => \Mautic\CampaignBundle\Model\CampaignModel::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.lead.model.list',
                     'mautic.form.model.form',
                     'mautic.campaign.event_collector',
-                    'mautic.campaign.helper.removed_contact_tracker',
-                    'mautic.campaign.membership.manager',
                     'mautic.campaign.membership.builder',
                 ],
             ],
@@ -268,6 +265,7 @@ return [
                     'mautic.campaign.model.event',
                     'mautic.campaign.model.campaign',
                     'mautic.helper.ip_lookup',
+                    'mautic.campaign.scheduler',
                 ],
             ],
         ],
@@ -321,7 +319,6 @@ return [
                 'class'     => \Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder::class,
                 'arguments' => [
                     'mautic.lead.repository.lead',
-                    'mautic.campaign.repository.campaign',
                     'mautic.campaign.repository.lead',
                     'monolog.logger.mautic',
                 ],
@@ -375,6 +372,7 @@ return [
                 'class'     => \Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval::class,
                 'arguments' => [
                     'monolog.logger.mautic',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.campaign.scheduler'               => [
@@ -455,6 +453,7 @@ return [
                     'mautic.campaign.event_collector',
                     'mautic.campaign.scheduler',
                     'mautic.tracker.contact',
+                    'mautic.campaign.repository.lead',
                 ],
             ],
             'mautic.campaign.executioner.inactive'     => [
@@ -542,7 +541,6 @@ return [
                     'mautic.campaign.membership.manager',
                     'mautic.campaign.repository.lead',
                     'mautic.lead.repository.lead',
-                    'event_dispatcher',
                     'translator',
                 ],
             ],
@@ -590,6 +588,13 @@ return [
                     'mautic.helper.template.formatter',
                 ],
                 'tag' => 'console.command',
+            ],
+        ],
+        'fixtures' => [
+            'mautic.campaign.fixture.campaign' => [
+                'class'    => \Mautic\CampaignBundle\Tests\DataFixtures\Orm\CampaignData::class,
+                'tag'      => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'optional' => true,
             ],
         ],
     ],

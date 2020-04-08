@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticStageBundle:Stage:index.html.php');
 }
 ?>
@@ -90,12 +90,16 @@ if ($tmpl == 'index') {
                                 'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                 ['item' => $item, 'model' => 'stage']
                             ); ?>
-                            <a href="<?php echo $view['router']->generate(
+                            <?php if ($permissions['stage:stages:edit']): ?>
+                            <a href="<?php echo $view['router']->url(
                                 'mautic_stage_action',
                                 ['objectAction' => 'edit', 'objectId' => $item->getId()]
                             ); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                             </a>
+                            <?php else: ?>
+                                <?php echo $item->getName(); ?>
+                            <?php endif; ?>
                         </div>
                         <?php if ($description = $item->getDescription()): ?>
                             <div class="text-muted mt-4">
@@ -128,7 +132,7 @@ if ($tmpl == 'index') {
                 'page'       => $page,
                 'limit'      => $limit,
                 'menuLinkId' => 'mautic_stage_index',
-                'baseUrl'    => $view['router']->generate('mautic_stage_index'),
+                'baseUrl'    => $view['router']->url('mautic_stage_index'),
                 'sessionVar' => 'stage',
             ]
         ); ?>

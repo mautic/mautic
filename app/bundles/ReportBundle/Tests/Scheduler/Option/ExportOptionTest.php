@@ -9,11 +9,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ReportBundle\Tests\Option;
+namespace Mautic\ReportBundle\Tests\Scheduler\Option;
 
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 
-class ExportOptionTest extends \PHPUnit_Framework_TestCase
+class ExportOptionTest extends \PHPUnit\Framework\TestCase
 {
     public function testReportId()
     {

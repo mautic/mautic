@@ -11,10 +11,14 @@
 
 namespace Mautic\FormBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\FormBundle\Entity\FormRepository;
+use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class PointActionFormSubmitType.
@@ -22,20 +26,21 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class FormListType extends AbstractType
 {
     private $viewOther;
-    private $repo;
 
     /**
-     * @param MauticFactory $factory
+     * @var FormRepository
      */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->viewOther = $factory->getSecurity()->isGranted('form:forms:viewother');
-        $this->repo      = $factory->getModel('form')->getRepository();
+    private $repo;
 
-        $this->repo->setCurrentUser($factory->getUser());
+    public function __construct(CorePermissions $security, FormModel $model, UserHelper $userHelper)
+    {
+        $this->viewOther = $security->isGranted('form:forms:viewother');
+        $this->repo      = $model->getRepository();
+
+        $this->repo->setCurrentUser($userHelper->getUser());
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $viewOther = $this->viewOther;
         $repo      = $this->repo;
@@ -52,36 +57,36 @@ class FormListType extends AbstractType
 
                 $forms = $repo->getFormList('', 0, 0, $viewOther, $options['form_type']);
                 foreach ($forms as $form) {
-                    $choices[$form['id']] = $form['name'];
+                    $choices[$form['name']] = $form['id'];
                 }
 
                 //sort by language
-                asort($choices);
+                ksort($choices);
 
                 return $choices;
             },
-            'expanded'    => false,
-            'multiple'    => true,
-            'empty_value' => false,
-            'form_type'   => null,
+            'expanded'          => false,
+            'multiple'          => true,
+            'placeholder'       => false,
+            'form_type'         => null,
         ]);
 
-        $resolver->setOptional(['form_type']);
+        $resolver->setDefined(['form_type']);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'form_list';
     }
 
     /**
-     * @return null|string|\Symfony\Component\Form\FormTypeInterface
+     * @return string|\Symfony\Component\Form\FormTypeInterface|null
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

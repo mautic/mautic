@@ -14,7 +14,7 @@ namespace Mautic\LeadBundle\Tests\Helper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 
-class IdentifyCompanyHelperTest extends \PHPUnit_Framework_TestCase
+class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testDomainExistsRealDomain()
     {
@@ -58,6 +58,10 @@ class IdentifyCompanyHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $model->expects($this->once())
+            ->method('getEntities')
+            ->willReturn([]);
+
         $helper     = new IdentifyCompanyHelper();
         $reflection = new \ReflectionClass(IdentifyCompanyHelper::class);
         $method     = $reflection->getMethod('findCompany');
@@ -87,6 +91,10 @@ class IdentifyCompanyHelperTest extends \PHPUnit_Framework_TestCase
         $model = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $model->expects($this->once())
+            ->method('getEntities')
+            ->willReturn([]);
 
         $helper     = new IdentifyCompanyHelper();
         $reflection = new \ReflectionClass(IdentifyCompanyHelper::class);
@@ -118,6 +126,10 @@ class IdentifyCompanyHelperTest extends \PHPUnit_Framework_TestCase
         $model = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $model->expects($this->once())
+            ->method('getEntities')
+            ->willReturn([]);
 
         $helper     = new IdentifyCompanyHelper();
         $reflection = new \ReflectionClass(IdentifyCompanyHelper::class);

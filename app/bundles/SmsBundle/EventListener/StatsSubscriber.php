@@ -13,19 +13,14 @@ namespace Mautic\SmsBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\EventListener\CommonStatsSubscriber;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\SmsBundle\Entity\Stat;
 
-/**
- * Class StatsSubscriber.
- */
 class StatsSubscriber extends CommonStatsSubscriber
 {
-    /**
-     * StatsSubscriber constructor.
-     *
-     * @param EntityManager $em
-     */
-    public function __construct(EntityManager $em)
+    public function __construct(CorePermissions $security, EntityManager $entityManager)
     {
-        $this->addContactRestrictedRepositories($em, 'MauticSmsBundle:Stat');
+        parent::__construct($security, $entityManager);
+        $this->addContactRestrictedRepositories([Stat::class]);
     }
 }

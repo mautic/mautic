@@ -11,11 +11,17 @@
 
 namespace Mautic\PluginBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\PluginBundle\Entity\Integration;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class DetailsType.
@@ -27,7 +33,7 @@ class DetailsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('isPublished', 'yesno_button_group');
+        $builder->add('isPublished', YesNoButtonGroupType::class);
 
         $keys          = $options['integration_object']->getRequiredKeyFields();
         $decryptedKeys = $options['integration_object']->decryptApiKeys($options['data']->getApiKeys());
@@ -39,7 +45,7 @@ class DetailsType extends AbstractType
             }
         }
 
-        $builder->add('apiKeys', 'integration_keys', [
+        $builder->add('apiKeys', KeysType::class, [
             'label'              => false,
             'integration_keys'   => $keys,
             'data'               => $decryptedKeys,
@@ -50,7 +56,7 @@ class DetailsType extends AbstractType
             $data = $event->getData();
             $form = $event->getForm();
 
-            $form->add('apiKeys', 'integration_keys', [
+            $form->add('apiKeys', KeysType::class, [
                 'label'              => false,
                 'integration_keys'   => $keys,
                 'data'               => $decryptedKeys,
@@ -63,7 +69,7 @@ class DetailsType extends AbstractType
             $disabled = false;
             $label    = ($options['integration_object']->isAuthorized()) ? 'reauthorize' : 'authorize';
 
-            $builder->add('authButton', 'standalone_button', [
+            $builder->add('authButton', StandAloneButtonType::class, [
                 'attr' => [
                     'class'   => 'btn btn-success btn-lg',
                     'onclick' => 'Mautic.initiateIntegrationAuthorization()',
@@ -78,24 +84,24 @@ class DetailsType extends AbstractType
         $tooltips = $options['integration_object']->getSupportedFeatureTooltips();
         if (!empty($features)) {
             // Check to see if the integration is a new entry and thus not configured
-            $configured      = $options['data']->getId() !== null;
+            $configured      = null !== $options['data']->getId();
             $enabledFeatures = $options['data']->getSupportedFeatures();
             $data            = ($configured) ? $enabledFeatures : $features;
 
             $choices = [];
             foreach ($features as $f) {
-                $choices[$f] = 'mautic.integration.form.feature.'.$f;
+                $choices['mautic.integration.form.feature.'.$f] = $f;
             }
 
-            $builder->add('supportedFeatures', 'choice', [
-                'choices'     => $choices,
-                'expanded'    => true,
-                'label_attr'  => ['class' => 'control-label'],
-                'multiple'    => true,
-                'label'       => 'mautic.integration.form.features',
-                'required'    => false,
-                'data'        => $data,
-                'choice_attr' => function ($val, $key, $index) use ($tooltips) {
+            $builder->add('supportedFeatures', ChoiceType::class, [
+                'choices'           => $choices,
+                'expanded'          => true,
+                'label_attr'        => ['class' => 'control-label'],
+                'multiple'          => true,
+                'label'             => 'mautic.integration.form.features',
+                'required'          => false,
+                'data'              => $data,
+                'choice_attr'       => function ($val, $key, $index) use ($tooltips) {
                     if (array_key_exists($val, $tooltips)) {
                         return [
                             'data-toggle' => 'tooltip',
@@ -108,7 +114,7 @@ class DetailsType extends AbstractType
             ]);
         }
 
-        $builder->add('featureSettings', 'integration_featuresettings', [
+        $builder->add('featureSettings', FeatureSettingsType::class, [
             'label'              => 'mautic.integration.form.feature.settings',
             'required'           => true,
             'data'               => $options['data']->getFeatureSettings(),
@@ -119,11 +125,11 @@ class DetailsType extends AbstractType
             'company_fields'     => $options['company_fields'],
         ]);
 
-        $builder->add('name', 'hidden', ['data' => $options['integration']]);
+        $builder->add('name', HiddenType::class, ['data' => $options['integration']]);
 
-        $builder->add('in_auth', 'hidden', ['mapped' => false]);
+        $builder->add('in_auth', HiddenType::class, ['mapped' => false]);
 
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('buttons', FormButtonsType::class);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
@@ -135,10 +141,10 @@ class DetailsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => 'Mautic\PluginBundle\Entity\Integration',
+            'data_class' => Integration::class,
         ]);
 
         $resolver->setRequired(['integration', 'integration_object', 'lead_fields', 'company_fields']);
@@ -147,7 +153,7 @@ class DetailsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'integration_details';
     }

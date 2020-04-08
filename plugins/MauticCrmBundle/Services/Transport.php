@@ -13,8 +13,6 @@ class Transport implements TransportInterface
 
     /**
      * TransportService constructor.
-     *
-     * @param Client $client
      */
     public function __construct(Client $client)
     {

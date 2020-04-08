@@ -72,11 +72,6 @@ class LegacyEventDispatcher
 
     /**
      * LegacyEventDispatcher constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
-     * @param EventScheduler           $scheduler
-     * @param LoggerInterface          $logger
-     * @param MauticFactory            $factory
      */
     public function __construct(
         EventDispatcherInterface $dispatcher,
@@ -95,12 +90,7 @@ class LegacyEventDispatcher
     }
 
     /**
-     * @param AbstractEventAccessor $config
-     * @param ArrayCollection       $logs
-     * @param                       $wasBatchProcessed
-     * @param PendingEvent          $pendingEvent
-     *
-     * @throws \ReflectionException
+     * @param $wasBatchProcessed
      */
     public function dispatchCustomEvent(
         AbstractEventAccessor $config,
@@ -174,10 +164,6 @@ class LegacyEventDispatcher
 
     /**
      * Execute the new ON_EVENT_FAILED and ON_EVENT_EXECUTED events for logs processed by BC code.
-     *
-     * @param AbstractEventAccessor $config
-     * @param ArrayCollection       $success
-     * @param ArrayCollection       $failures
      */
     public function dispatchExecutionEvents(AbstractEventAccessor $config, ArrayCollection $success, ArrayCollection $failures)
     {
@@ -190,9 +176,6 @@ class LegacyEventDispatcher
         }
     }
 
-    /**
-     * @param DecisionEvent $decisionEvent
-     */
     public function dispatchDecisionEvent(DecisionEvent $decisionEvent)
     {
         if ($this->dispatcher->hasListeners(CampaignEvents::ON_EVENT_DECISION_TRIGGER)) {
@@ -219,9 +202,7 @@ class LegacyEventDispatcher
     }
 
     /**
-     * @param              $eventName
-     * @param array        $settings
-     * @param LeadEventLog $log
+     * @param $eventName
      *
      * @return bool
      */
@@ -248,19 +229,11 @@ class LegacyEventDispatcher
                 ->setChannelId($campaignEvent->getChannelId());
         }
 
-        $result = $campaignEvent->getResult();
-
-        return $result;
+        return $campaignEvent->getResult();
     }
 
     /**
-     * @param array        $settings
-     * @param array        $eventArray
-     * @param LeadEventLog $log
-     *
      * @return mixed
-     *
-     * @throws \ReflectionException
      */
     private function dispatchCallback(array $settings, LeadEventLog $log)
     {
@@ -277,31 +250,33 @@ class LegacyEventDispatcher
             'config'          => $eventArray['properties'],
         ];
 
-        if (is_array($settings['callback'])) {
-            $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
-        } elseif (strpos($settings['callback'], '::') !== false) {
-            $parts      = explode('::', $settings['callback']);
-            $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-        } else {
-            $reflection = new \ReflectionMethod(null, $settings['callback']);
-        }
-
-        $pass = [];
-        foreach ($reflection->getParameters() as $param) {
-            if (isset($args[$param->getName()])) {
-                $pass[] = $args[$param->getName()];
+        try {
+            if (is_array($settings['callback'])) {
+                $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
+            } elseif (false !== strpos($settings['callback'], '::')) {
+                $parts      = explode('::', $settings['callback']);
+                $reflection = new \ReflectionMethod($parts[0], $parts[1]);
             } else {
-                $pass[] = null;
+                $reflection = new \ReflectionMethod(null, $settings['callback']);
             }
-        }
 
-        return $reflection->invokeArgs($this, $pass);
+            $pass = [];
+            foreach ($reflection->getParameters() as $param) {
+                if (isset($args[$param->getName()])) {
+                    $pass[] = $args[$param->getName()];
+                } else {
+                    $pass[] = null;
+                }
+            }
+
+            return $reflection->invokeArgs($this, $pass);
+        } catch (\ReflectionException $exception) {
+            return false;
+        }
     }
 
     /**
-     * @param AbstractEventAccessor $config
-     * @param LeadEventLog          $log
-     * @param                       $result
+     * @param $result
      */
     private function dispatchExecutionEvent(AbstractEventAccessor $config, LeadEventLog $log, $result)
     {
@@ -324,10 +299,6 @@ class LegacyEventDispatcher
         );
     }
 
-    /**
-     * @param AbstractEventAccessor $config
-     * @param LeadEventLog          $log
-     */
     private function dispatchExecutedEvent(AbstractEventAccessor $config, LeadEventLog $log)
     {
         $this->dispatcher->dispatch(
@@ -343,10 +314,6 @@ class LegacyEventDispatcher
         );
     }
 
-    /**
-     * @param AbstractEventAccessor $config
-     * @param LeadEventLog          $log
-     */
     private function dispatchFailedEvent(AbstractEventAccessor $config, LeadEventLog $log)
     {
         $this->dispatcher->dispatch(
@@ -370,8 +337,7 @@ class LegacyEventDispatcher
     }
 
     /**
-     * @param              $result
-     * @param LeadEventLog $log
+     * @param $result
      */
     private function processFailedLog($result, LeadEventLog $log, PendingEvent $pendingEvent)
     {

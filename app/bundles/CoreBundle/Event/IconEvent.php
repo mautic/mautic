@@ -29,9 +29,6 @@ class IconEvent extends Event
      */
     protected $security;
 
-    /**
-     * @param CorePermissions $security
-     */
     public function __construct(CorePermissions $security)
     {
         $this->security = $security;
@@ -64,9 +61,6 @@ class IconEvent extends Event
         return $this->icons;
     }
 
-    /**
-     * @param array $icons
-     */
     public function setIcons(array $icons)
     {
         $this->icons = $icons;

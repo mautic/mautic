@@ -23,6 +23,7 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\Entity\Stat;
 use Mautic\DynamicContentBundle\Event\DynamicContentEvent;
+use Mautic\DynamicContentBundle\Form\Type\DynamicContentType;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -83,11 +84,11 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param null $id
      *
-     * @return null|DynamicContent
+     * @return DynamicContent|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new DynamicContent();
         }
 
@@ -116,13 +117,11 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
             $options['action'] = $action;
         }
 
-        return $formFactory->create('dwc', $entity, $options);
+        return $formFactory->create(DynamicContentType::class, $entity, $options);
     }
 
     /**
-     * @param DynamicContent $dwc
-     * @param Lead           $lead
-     * @param                $slot
+     * @param $slot
      */
     public function setSlotContentForLead(DynamicContent $dwc, Lead $lead, $slot)
     {
@@ -170,13 +169,24 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param DynamicContent $dynamicContent
-     * @param Lead|array     $lead
-     * @param string         $source
+     * @param Lead|array $lead
+     * @param string     $source
      */
     public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null)
     {
+        if (empty($lead)) {
+            return;
+        }
+
+        if ($lead instanceof Lead && !$lead->getId()) {
+            return;
+        }
+
         if (is_array($lead)) {
+            if (empty($lead['id'])) {
+                return;
+            }
+
             $lead = $this->em->getReference('MauticLeadBundle:Lead', $lead['id']);
         }
 
@@ -238,8 +248,6 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Joins the page table and limits created_by to currently logged in user.
-     *
-     * @param QueryBuilder $q
      */
     public function limitQueryToCreator(QueryBuilder &$q)
     {
@@ -251,12 +259,10 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get line chart data of hits.
      *
-     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
-     * @param bool      $canViewOthers
+     * @param char   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
+     * @param array  $filter
+     * @param bool   $canViewOthers
      *
      * @return array
      */
@@ -272,7 +278,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
-        if (!$flag || $flag === 'total_and_unique') {
+        if (!$flag || 'total_and_unique' === $flag) {
             $q = $query->prepareTimeDataQuery('dynamic_content_stats', 'date_sent', $filter);
 
             if (!$canViewOthers) {
@@ -283,7 +289,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
             $chart->setDataset($this->translator->trans('mautic.dynamicContent.show.total.views'), $data);
         }
 
-        if ($flag === 'unique' || $flag === 'total_and_unique') {
+        if ('unique' === $flag || 'total_and_unique' === $flag) {
             $q = $query->prepareTimeDataQuery('dynamic_content_stats', 'date_sent', $filter);
             $q->groupBy('t.lead_id, t.date_sent');
 

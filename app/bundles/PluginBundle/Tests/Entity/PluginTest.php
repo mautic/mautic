@@ -13,7 +13,7 @@ namespace Mautic\PluginBundle\Tests\Entity;
 
 use Mautic\PluginBundle\Entity\Plugin;
 
-class PluginTest extends \PHPUnit_Framework_TestCase
+class PluginTest extends \PHPUnit\Framework\TestCase
 {
     public function testEmptyDescription()
     {

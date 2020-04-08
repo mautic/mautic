@@ -57,13 +57,6 @@ class UserProvider implements UserProviderInterface
      */
     protected $encoder;
 
-    /**
-     * @param UserRepository           $userRepository
-     * @param PermissionRepository     $permissionRepository
-     * @param Session                  $session
-     * @param EventDispatcherInterface $dispatcher
-     * @param EncoderFactory           $encoder
-     */
     public function __construct(
         UserRepository $userRepository,
         PermissionRepository $permissionRepository,
@@ -122,12 +115,7 @@ class UserProvider implements UserProviderInterface
     {
         $class = get_class($user);
         if (!$this->supportsClass($class)) {
-            throw new UnsupportedUserException(
-                sprintf(
-                    'Instances of "%s" are not supported.',
-                    $class
-                )
-            );
+            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $class));
         }
 
         return $this->loadUserByUsername($user->getUsername());
@@ -145,7 +133,6 @@ class UserProvider implements UserProviderInterface
     /**
      * Create/update user from authentication plugins.
      *
-     * @param User      $user
      * @param bool|true $createIfNotExists
      *
      * @return User
@@ -210,8 +197,6 @@ class UserProvider implements UserProviderInterface
     }
 
     /**
-     * @param User $user
-     *
      * @return User
      */
     public function findUser(User $user)
@@ -224,9 +209,7 @@ class UserProvider implements UserProviderInterface
         } catch (UsernameNotFoundException $exception) {
             // Try by email
             try {
-                $user = $this->loadUserByUsername($user->getEmail());
-
-                return $user;
+                return $this->loadUserByUsername($user->getEmail());
             } catch (UsernameNotFoundException $exception) {
             }
         }

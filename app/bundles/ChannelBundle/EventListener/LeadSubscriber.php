@@ -11,15 +11,40 @@
 
 namespace Mautic\ChannelBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class LeadSubscriber.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    /**
+     * @var MessageQueueRepository
+     */
+    private $messageQueueRepository;
+
+    public function __construct(
+        TranslatorInterface $translator,
+        RouterInterface $router,
+        MessageQueueRepository $messageQueueRepository
+    ) {
+        $this->translator             = $translator;
+        $this->router                 = $router;
+        $this->messageQueueRepository = $messageQueueRepository;
+    }
+
     /**
      * @return array
      */
@@ -32,19 +57,13 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         $this->addChannelMessageEvents($event);
     }
 
-    /**
-     * @param LeadTimelineEvent $event
-     * @param                   $state
-     */
-    protected function addChannelMessageEvents(LeadTimelineEvent $event)
+    private function addChannelMessageEvents(LeadTimelineEvent $event)
     {
         $eventTypeKey  = 'message.queue';
         $eventTypeName = $this->translator->trans('mautic.message.queue');
@@ -59,9 +78,7 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepository */
-        $messageQueueRepository = $this->em->getRepository('MauticChannelBundle:MessageQueue');
-        $logs                   = $messageQueueRepository->getLeadTimelineEvents($event->getLeadId(), $event->getQueryOptions());
+        $logs = $this->messageQueueRepository->getLeadTimelineEvents($event->getLeadId(), $event->getQueryOptions());
 
         // Add to counter
         $event->addToCounter($eventTypeKey, $logs);

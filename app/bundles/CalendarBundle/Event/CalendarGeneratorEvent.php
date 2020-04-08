@@ -28,9 +28,6 @@ class CalendarGeneratorEvent extends Event
      */
     private $events = [];
 
-    /**
-     * @param array $dates
-     */
     public function __construct(array $dates)
     {
         $this->dates = $dates;
@@ -38,8 +35,6 @@ class CalendarGeneratorEvent extends Event
 
     /**
      * Adds an array of events to the container.
-     *
-     * @param array $events
      */
     public function addEvents(array $events)
     {

@@ -52,9 +52,6 @@ class AccessToken extends BaseAccessToken
      */
     protected $scope;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -101,8 +98,6 @@ class AccessToken extends BaseAccessToken
 
     /**
      * Set client.
-     *
-     * @param ClientInterface $client
      *
      * @return AccessToken
      */

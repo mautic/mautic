@@ -55,9 +55,6 @@ class Stat
      */
     private $lead;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -180,8 +177,6 @@ class Stat
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return Stat
      */
     public function setLead(Lead $lead)

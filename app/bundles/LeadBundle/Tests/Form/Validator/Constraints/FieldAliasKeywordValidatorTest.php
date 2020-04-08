@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\Tests\Form\Validator\Constraints;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\UnitOfWork;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeyword;
 use Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator;
@@ -18,11 +20,13 @@ use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class FieldAliasKeywordValidatorTest extends \PHPUnit_Framework_TestCase
+class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
 {
     private $listModelMock;
     private $fieldAliasHelperlMock;
     private $executionContextMock;
+    private $entityManagerMock;
+    private $unitOfWorkMock;
     private $validator;
 
     protected function setUp()
@@ -32,6 +36,12 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit_Framework_TestCase
         $this->fieldAliasHelperlMock = $this->createMock(FieldAliasHelper::class);
         $this->listModelMock         = $this->createMock(ListModel::class);
         $this->executionContextMock  = $this->createMock(ExecutionContextInterface::class);
+        $this->entityManagerMock     = $this->createMock(EntityManager::class);
+        $this->unitOfWorkMock        = $this->createMock(UnitOfWork::class);
+
+        $this->entityManagerMock
+            ->method('getUnitOfWork')
+            ->willReturn($this->unitOfWorkMock);
 
         $this->listModelMock->method('getChoiceFields')
             ->willReturn(
@@ -53,12 +63,18 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $this->validator = new FieldAliasKeywordValidator($this->listModelMock, $this->fieldAliasHelperlMock);
+        $this->validator = new FieldAliasKeywordValidator($this->listModelMock, $this->fieldAliasHelperlMock, $this->entityManagerMock);
         $this->validator->initialize($this->executionContextMock);
     }
 
-    public function testValidationFailure()
+    public function testAddValidationFailure()
     {
+        $originalField = [];
+
+        $this->unitOfWorkMock
+            ->method('getOriginalEntityData')
+            ->willReturn($originalField);
+
         $field = new LeadField();
         $field->setObject('lead');
         $field->setAlias('date_added');
@@ -68,11 +84,74 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit_Framework_TestCase
         $this->validator->validate($field, new FieldAliasKeyword());
     }
 
-    public function testValidationSuccess()
+    public function testAddValidationSuccess()
     {
+        $originalField = [];
+
+        $this->unitOfWorkMock
+            ->method('getOriginalEntityData')
+            ->willReturn($originalField);
+
         $field = new LeadField();
         $field->setObject('lead');
         $field->setAlias('not_keyword');
+
+        $this->executionContextMock->expects($this->never())->method('addViolation');
+
+        $this->validator->validate($field, new FieldAliasKeyword());
+    }
+
+    public function testEditValidationFailure()
+    {
+        $originalField = [
+            'alias' => 'old_alias',
+        ];
+
+        $this->unitOfWorkMock
+            ->method('getOriginalEntityData')
+            ->willReturn($originalField);
+
+        $field = new LeadField();
+        $field->setObject('lead');
+        $field->setAlias('date_added');
+
+        $this->executionContextMock->expects($this->once())->method('addViolation')->with('mautic.lead.field.keyword.invalid');
+
+        $this->validator->validate($field, new FieldAliasKeyword());
+    }
+
+    public function testEditValidationSuccess()
+    {
+        $originalField = [
+            'alias' => 'old_alias',
+        ];
+
+        $this->unitOfWorkMock
+            ->method('getOriginalEntityData')
+            ->willReturn($originalField);
+
+        $field = new LeadField();
+        $field->setObject('lead');
+        $field->setAlias('not_keyword');
+
+        $this->executionContextMock->expects($this->never())->method('addViolation');
+
+        $this->validator->validate($field, new FieldAliasKeyword());
+    }
+
+    public function testEditWithoutChangesValidationSuccess()
+    {
+        $originalField = [
+            'alias' => 'date_added',
+        ];
+
+        $this->unitOfWorkMock
+            ->method('getOriginalEntityData')
+            ->willReturn($originalField);
+
+        $field = new LeadField();
+        $field->setObject('lead');
+        $field->setAlias('date_added');
 
         $this->executionContextMock->expects($this->never())->method('addViolation');
 

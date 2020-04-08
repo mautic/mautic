@@ -19,7 +19,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Translation\Translator;
 
-abstract class CommonMocks extends \PHPUnit_Framework_TestCase
+abstract class CommonMocks extends \PHPUnit\Framework\TestCase
 {
     /**
      * @return Translator

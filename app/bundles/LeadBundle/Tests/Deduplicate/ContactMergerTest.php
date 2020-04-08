@@ -24,30 +24,30 @@ use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class ContactMergerTest extends \PHPUnit_Framework_TestCase
+class ContactMergerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|LeadModel
+     * @var \PHPUnit\Framework\MockObject\MockObject|LeadModel
      */
     private $leadModel;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|MergeRecordRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject|MergeRecordRepository
      */
     private $leadRepo;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|MergeRecordRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject|MergeRecordRepository
      */
     private $mergeRecordRepo;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcher
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcher
      */
     private $dispatcher;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Logger
+     * @var \PHPUnit\Framework\MockObject\MockObject|Logger
      */
     private $logger;
 
@@ -93,22 +93,53 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($latestDateTime, $winner->getLastActive());
         $this->assertEquals($oldestDateTime, $winner->getDateIdentified());
+
+        // Test with null date identified loser
+        $winner->setDateIdentified($latestDateTime);
+        $loser->setDateIdentified(null);
+
+        $this->getMerger()->mergeTimestamps($winner, $loser);
+
+        $this->assertEquals($latestDateTime, $winner->getDateIdentified());
+
+        // Test with null date identified winner
+        $winner->setDateIdentified(null);
+        $loser->setDateIdentified($latestDateTime);
+
+        $this->getMerger()->mergeTimestamps($winner, $loser);
+
+        $this->assertEquals($latestDateTime, $winner->getDateIdentified());
     }
 
     public function testMergeIpAddresses()
     {
         $winner = new Lead();
-        $winner->addIpAddress((new IpAddress())->setIpAddress('1.2.3.4'));
-        $winner->addIpAddress((new IpAddress())->setIpAddress('4.3.2.1'));
+        $winner->addIpAddress((new IpAddress('1.2.3.4'))->setIpDetails('from winner'));
+        $winner->addIpAddress((new IpAddress('4.3.2.1'))->setIpDetails('from winner'));
+        $winner->addIpAddress((new IpAddress('5.6.7.8'))->setIpDetails('from winner'));
 
-        $loser  = new Lead();
-        $loser->addIpAddress((new IpAddress())->setIpAddress('5.6.7.8'));
-        $loser->addIpAddress((new IpAddress())->setIpAddress('8.7.6.5'));
+        $loser = new Lead();
+        $loser->addIpAddress((new IpAddress('5.6.7.8'))->setIpDetails('from loser'));
+        $loser->addIpAddress((new IpAddress('8.7.6.5'))->setIpDetails('from loser'));
 
         $this->getMerger()->mergeIpAddressHistory($winner, $loser);
 
         $ipAddresses = $winner->getIpAddresses();
         $this->assertCount(4, $ipAddresses);
+
+        $ipAddressArray = $ipAddresses->toArray();
+
+        $expectedIpAddressArray = [
+            '1.2.3.4' => 'from winner',
+            '4.3.2.1' => 'from winner',
+            '5.6.7.8' => 'from winner',
+            '8.7.6.5' => 'from loser',
+        ];
+
+        foreach ($expectedIpAddressArray as $ipAddress => $ipId) {
+            $this->assertSame($ipAddress, $ipAddressArray[$ipAddress]->getIpAddress());
+            $this->assertSame($ipId, $ipAddressArray[$ipAddress]->getIpDetails());
+        }
     }
 
     public function testMergeFieldDataWithLoserAsNewlyUpdated()

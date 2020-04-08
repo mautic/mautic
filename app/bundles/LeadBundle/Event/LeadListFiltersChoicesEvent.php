@@ -40,9 +40,8 @@ class LeadListFiltersChoicesEvent extends CommonEvent
     protected $translator;
 
     /**
-     * @param array               $choices
-     * @param array               $operators
-     * @param TranslatorInterface $translator
+     * @param array $choices
+     * @param array $operators
      */
     public function __construct($choices, $operators, TranslatorInterface $translator)
     {
@@ -85,6 +84,10 @@ class LeadListFiltersChoicesEvent extends CommonEvent
      */
     public function addChoice($object, $choiceKey, $choiceConfig)
     {
+        if (!isset($this->choices[$object])) {
+            $this->choices[$object] = [];
+        }
+
         if (!array_key_exists($choiceKey, $this->choices[$object])) {
             $this->choices[$object][$choiceKey] = $choiceConfig;
         }

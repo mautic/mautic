@@ -53,12 +53,12 @@ class MailHelper
     /**
      * @var \Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine
      */
-    protected $templating = null;
+    protected $templating;
 
     /**
      * @var null
      */
-    protected $dispatcher = null;
+    protected $dispatcher;
 
     /**
      * @var \Swift_Plugins_Loggers_ArrayLogger
@@ -93,7 +93,7 @@ class MailHelper
     /**
      * @var array|Lead
      */
-    protected $lead = null;
+    protected $lead;
 
     /**
      * @var bool
@@ -103,7 +103,7 @@ class MailHelper
     /**
      * @var null
      */
-    protected $idHash = null;
+    protected $idHash;
 
     /**
      * @var bool
@@ -123,7 +123,7 @@ class MailHelper
     /**
      * @var Email|null
      */
-    protected $email = null;
+    protected $email;
 
     /**
      * @var array
@@ -197,11 +197,6 @@ class MailHelper
     /**
      * @var array
      */
-    private $systemHeaders = [];
-
-    /**
-     * @var array
-     */
     protected $body = [
         'content'     => '',
         'contentType' => 'text/html',
@@ -254,9 +249,8 @@ class MailHelper
     private $copies = [];
 
     /**
-     * @param MauticFactory $factory
-     * @param               $mailer
-     * @param null          $from
+     * @param      $mailer
+     * @param null $from
      */
     public function __construct(MauticFactory $factory, \Swift_Mailer $mailer, $from = null)
     {
@@ -280,7 +274,7 @@ class MailHelper
         $this->returnPath = $factory->getParameter('mailer_return_path');
 
         // Check if batching is supported by the transport
-        if ($this->factory->getParameter('mailer_spool_type') == 'memory' && $this->transport instanceof TokenTransportInterface) {
+        if ('memory' == $this->factory->getParameter('mailer_spool_type') && $this->transport instanceof TokenTransportInterface) {
             $this->tokenizationEnabled = true;
         }
 
@@ -316,12 +310,10 @@ class MailHelper
     public function getSampleMailer($cleanSlate = true)
     {
         $queueMode = $this->factory->getParameter('mailer_spool_type');
-        if ($queueMode != 'file') {
+        if ('file' != $queueMode) {
             return $this->getMailer($cleanSlate);
         }
-        // @todo - need a creative way to pass this service to this helper when factory use is removed
-        // the service is only available when queue mode is enabled so likely we'll need to use a cache compiler
-        // pass to ensure it is set regardless
+
         $transport  = $this->factory->get('swiftmailer.transport.real');
         $mailer     = new \Swift_Mailer($transport);
         $mailHelper = new self($this->factory, $mailer, $this->from);
@@ -435,6 +427,13 @@ class MailHelper
             try {
                 if (!$this->transport->isStarted()) {
                     $this->transportStartTime = time();
+                }
+
+                $failures = null;
+
+                if ($this->factory->getParameter('mailer_convert_embed_images')) {
+                    $convertedContent = $this->convertEmbedImages($this->message->getBody());
+                    $this->message->setBody($convertedContent);
                 }
 
                 $this->mailer->send($this->message, $failures);
@@ -658,6 +657,7 @@ class MailHelper
         $this->fatal            = false;
         $this->idHashState      = true;
         $this->useGlobalFrom    = false;
+        $this->checkIfTransportNeedsRestart(true);
 
         $this->logger->clear();
 
@@ -666,7 +666,7 @@ class MailHelper
             $this->queueEnabled        = false;
             $this->from                = $this->systemFrom;
             $this->headers             = [];
-            $this->systemHeaders       = [];
+            [];
             $this->source              = [];
             $this->assets              = [];
             $this->globalTokens        = [];
@@ -690,9 +690,8 @@ class MailHelper
      * Search and replace tokens
      * Adapted from \Swift_Plugins_DecoratorPlugin.
      *
-     * @param array          $search
-     * @param array          $replace
-     * @param \Swift_Message $message
+     * @param array $search
+     * @param array $replace
      */
     public static function searchReplaceTokens($search, $replace, \Swift_Message &$message)
     {
@@ -717,6 +716,12 @@ class MailHelper
         /** @var \Swift_Mime_Header $header */
         foreach ($message->getHeaders()->getAll() as $header) {
             $headerBody = $header->getFieldBodyModel();
+            if ($headerBody instanceof \DateTimeInterface) {
+                // It's not possible to replace tokens in \DateTime objects
+                // because they can't contain tokens
+                continue;
+            }
+
             $updated    = false;
             if (is_array($headerBody)) {
                 $bodyReplaced = [];
@@ -742,12 +747,12 @@ class MailHelper
 
         // Parts (plaintext)
         $children = (array) $message->getChildren();
-        /** @var \Swift_Mime_MimeEntity $child */
+        /** @var \Swift_Mime_SimpleMimeEntity $child */
         foreach ($children as $child) {
             $childType  = $child->getContentType();
             list($type) = sscanf($childType, '%[^/]/%s');
 
-            if ($type == 'text') {
+            if ('text' == $type) {
                 $childBody = $child->getBody();
 
                 $bodyReplaced = str_ireplace($search, $replace, $childBody);
@@ -777,9 +782,7 @@ class MailHelper
     public function getMessageInstance()
     {
         try {
-            $message = ($this->tokenizationEnabled) ? MauticMessage::newInstance() : \Swift_Message::newInstance();
-
-            return $message;
+            return $this->tokenizationEnabled ? MauticMessage::newInstance() : (new \Swift_Message());
         } catch (\Exception $e) {
             $this->logError($e);
 
@@ -801,7 +804,8 @@ class MailHelper
             // Stash attachment to be processed by the transport
             $this->message->addAttachment($filePath, $fileName, $contentType, $inline);
         } else {
-            if (file_exists($filePath) && is_readable($filePath)) {
+            // filePath can contain the value of a local file path or the value of an URL where the file can be found
+            if (filter_var($filePath, FILTER_VALIDATE_URL) || (file_exists($filePath) && is_readable($filePath))) {
                 try {
                     $attachment = \Swift_Attachment::fromPath($filePath);
 
@@ -835,7 +839,7 @@ class MailHelper
         if (!$asset instanceof Asset) {
             $asset = $model->getEntity($asset);
 
-            if ($asset == null) {
+            if (null == $asset) {
                 return;
             }
         }
@@ -858,7 +862,7 @@ class MailHelper
      */
     public function setTemplate($template, $vars = [], $returnContent = false, $charset = null)
     {
-        if ($this->templating == null) {
+        if (null == $this->templating) {
             $this->templating = $this->factory->getTemplating();
         }
 
@@ -927,10 +931,10 @@ class MailHelper
         if ($this->plainTextSet) {
             $children = (array) $this->message->getChildren();
 
-            /** @var \Swift_Mime_MimeEntity $child */
+            /** @var \Swift_Mime_SimpleMimeEntity $child */
             foreach ($children as $child) {
                 $childType = $child->getContentType();
-                if ($childType == 'text/plain' && $child instanceof \Swift_MimePart) {
+                if ('text/plain' == $childType && $child instanceof \Swift_MimePart) {
                     $child->setBody($this->plainText);
 
                     break;
@@ -947,27 +951,13 @@ class MailHelper
      * @param string $contentType
      * @param null   $charset
      * @param bool   $ignoreTrackingPixel
-     * @param bool   $ignoreEmbedImageConversion
      */
-    public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false, $ignoreEmbedImageConversion = false)
+    public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false)
     {
-        if (!$ignoreEmbedImageConversion && $this->factory->getParameter('mailer_convert_embed_images')) {
-            $matches = [];
-            if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
-                $replaces = [];
-                foreach ($matches[1] as $match) {
-                    if (strpos($match, 'cid:') === false) {
-                        $replaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
-                    }
-                }
-                $content = strtr($content, $replaces);
-            }
-        }
-
         if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
             // Append tracking pixel
             $trackingImg = '<img height="1" width="1" src="{tracking_pixel}" alt="" />';
-            if (strpos($content, '</body>') !== false) {
+            if (false !== strpos($content, '</body>')) {
                 $content = str_replace('</body>', $trackingImg.'</body>', $content);
             } else {
                 $content .= $trackingImg;
@@ -982,6 +972,27 @@ class MailHelper
             'contentType' => $contentType,
             'charset'     => $charset,
         ];
+    }
+
+    /**
+     * @param string $content
+     *
+     * @return string
+     */
+    private function convertEmbedImages($content)
+    {
+        $matches = [];
+        if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
+            $replaces = [];
+            foreach ($matches[1] as $match) {
+                if (false === strpos($match, 'cid:')) {
+                    $replaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
+                }
+            }
+            $content = strtr($content, $replaces);
+        }
+
+        return $content;
     }
 
     /**
@@ -1014,9 +1025,17 @@ class MailHelper
      */
     public function setTo($addresses, $name = null)
     {
+        $name = $this->cleanName($name);
+
         if (!is_array($addresses)) {
-            $name      = $this->cleanName($name);
             $addresses = [$addresses => $name];
+        } elseif (0 === array_keys($addresses)[0]) {
+            // We need an array of $email => $name pairs
+            $addresses = array_reduce($addresses, function ($address, $item) use ($name) {
+                $address[$item] = $name;
+
+                return $address;
+            }, []);
         }
 
         $this->checkBatchMaxRecipients(count($addresses));
@@ -1253,7 +1272,7 @@ class MailHelper
      */
     public function setIdHash($idHash = null, $statToBeGenerated = true)
     {
-        if ($idHash === null) {
+        if (null === $idHash) {
             $idHash = str_replace('.', '', uniqid('', true));
         }
 
@@ -1277,7 +1296,6 @@ class MailHelper
 
     /**
      * @param array|Lead $lead
-     * @param bool       $internalSend Set to true if the email is not being sent to this lead
      */
     public function setLead($lead, $interalSend = false)
     {
@@ -1320,7 +1338,6 @@ class MailHelper
     }
 
     /**
-     * @param Email $email
      * @param bool  $allowBcc            Honor BCC if set in email
      * @param array $slots               Slots configured in theme
      * @param array $assetAttachments    Assets to send
@@ -1438,8 +1455,7 @@ class MailHelper
     /**
      * Set custom headers.
      *
-     * @param array $headers
-     * @param bool  $merge
+     * @param bool $merge
      */
     public function setCustomHeaders(array $headers, $merge = true)
     {
@@ -1471,8 +1487,10 @@ class MailHelper
         $listUnsubscribeHeader = $this->getUnsubscribeHeader();
         if ($listUnsubscribeHeader) {
             if (!empty($headers['List-Unsubscribe'])) {
-                // Ensure Mautic's is always part of this header
-                $headers['List-Unsubscribe'] .= ','.$listUnsubscribeHeader;
+                if (false === strpos($headers['List-Unsubscribe'], $listUnsubscribeHeader)) {
+                    // Ensure Mautic's is always part of this header
+                    $headers['List-Unsubscribe'] .= ','.$listUnsubscribeHeader;
+                }
             } else {
                 $headers['List-Unsubscribe'] = $listUnsubscribeHeader;
             }
@@ -1501,8 +1519,6 @@ class MailHelper
 
     /**
      * Append tokens.
-     *
-     * @param array $tokens
      */
     public function addTokens(array $tokens)
     {
@@ -1511,8 +1527,6 @@ class MailHelper
 
     /**
      * Set tokens.
-     *
-     * @param array $tokens
      */
     public function setTokens(array $tokens)
     {
@@ -1559,7 +1573,7 @@ class MailHelper
      */
     public function parsePlainText($content = null)
     {
-        if ($content == null) {
+        if (null == $content) {
             if (!$content = $this->message->getBody()) {
                 $content = $this->body['content'];
             }
@@ -1571,22 +1585,6 @@ class MailHelper
         ]);
 
         $this->plainText = $parser->setHtml($content)->getText();
-    }
-
-    /**
-     * Tell the mailer to use batching/tokenized emails if available.  It's up to the function calling to execute flushQueue to send the mail.
-     *
-     * @deprecated 2.1.1 - to be removed in 3.0; use enableQueue() instead
-     *
-     * @param bool $tokenizationEnabled
-     *
-     * @return bool Returns true if batching/tokenization is supported by the mailer
-     */
-    public function useMailerTokenization($tokenizationEnabled = true)
-    {
-        @trigger_error('useMailerTokenization() is now deprecated. Use enableQueue() instead.', E_USER_DEPRECATED);
-
-        $this->enableQueue($tokenizationEnabled);
     }
 
     /**
@@ -1608,7 +1606,7 @@ class MailHelper
      */
     public function dispatchSendEvent()
     {
-        if ($this->dispatcher == null) {
+        if (null == $this->dispatcher) {
             $this->dispatcher = $this->factory->getDispatcher();
         }
 
@@ -1630,19 +1628,21 @@ class MailHelper
     protected function logError($error, $context = null)
     {
         if ($error instanceof \Exception) {
-            $errorMessage = $error->getMessage();
-            $error        = ('dev' === MAUTIC_ENV) ? (string) $error : $errorMessage;
+            $exceptionContext = ['exception' => $error];
+            $errorMessage     = $error->getMessage();
+            $error            = ('dev' === MAUTIC_ENV) ? (string) $error : $errorMessage;
 
             // Clean up the error message
             $errorMessage = trim(preg_replace('/(.*?)Log data:(.*)$/is', '$1', $errorMessage));
 
             $this->fatal = true;
         } else {
-            $errorMessage = trim($error);
+            $exceptionContext = [];
+            $errorMessage     = trim($error);
         }
 
         $logDump = $this->logger->dump();
-        if (!empty($logDump) && strpos($error, $logDump) === false) {
+        if (!empty($logDump) && false === strpos($error, $logDump)) {
             $error .= " Log data: $logDump";
         }
 
@@ -1658,7 +1658,7 @@ class MailHelper
 
         $this->logger->clear();
 
-        $this->factory->getLogger()->log('error', '[MAIL ERROR] '.$error);
+        $this->factory->getLogger()->log('error', '[MAIL ERROR] '.$error, $exceptionContext);
     }
 
     /**
@@ -1785,12 +1785,12 @@ class MailHelper
     /**
      * @param $url
      *
-     * @return \Mautic\PageBundle\Entity\Redirect|null|object
+     * @return \Mautic\PageBundle\Entity\Redirect|object|null
      */
     public function getTrackableLink($url)
     {
         // Ensure a valid URL and that it has not already been found
-        if (substr($url, 0, 4) !== 'http' && substr($url, 0, 3) !== 'ftp') {
+        if ('http' !== substr($url, 0, 4) && 'ftp' !== substr($url, 0, 3)) {
             return null;
         }
 
@@ -1870,7 +1870,7 @@ class MailHelper
         // Save a copy of the email - use email ID if available simply to prevent from having to rehash over and over
         $id = (null !== $this->email) ? $this->email->getId() : md5($this->subject.$this->body['content']);
         if (!isset($this->copies[$id])) {
-            $hash = (strlen($id) !== 32) ? md5($this->subject.$this->body['content']) : $id;
+            $hash = (32 !== strlen($id)) ? md5($this->subject.$this->body['content']) : $id;
 
             $copy        = $emailModel->getCopyRepository()->findByHash($hash);
             $copyCreated = false;
@@ -2023,7 +2023,7 @@ class MailHelper
      *
      * @param $name
      *
-     * @return null|string
+     * @return string|null
      */
     protected function cleanName($name)
     {
@@ -2118,11 +2118,15 @@ class MailHelper
                 }
             }
         }
+
+        if (array_key_exists('List-Unsubscribe', $headers)) {
+            unset($headers['List-Unsubscribe']);
+            $this->setCustomHeaders($headers, false);
+        }
     }
 
     /**
-     * @param       $name
-     * @param array $tokens
+     * @param $name
      *
      * @return array
      */
@@ -2154,23 +2158,17 @@ class MailHelper
     {
         $invalidChar = strpbrk($address, '\'^&*%');
 
-        if ($invalidChar !== false) {
-            throw new \Swift_RfcComplianceException(
-                'Email address ['.$address.
-                '] contains this invalid character: '.substr($invalidChar, 0, 1)
-            );
+        if (false !== $invalidChar) {
+            throw new \Swift_RfcComplianceException('Email address ['.$address.'] contains this invalid character: '.substr($invalidChar, 0, 1));
         }
 
         if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
-            throw new \Swift_RfcComplianceException(
-                'Email address ['.$address.'] is invalid'
-            );
+            throw new \Swift_RfcComplianceException('Email address ['.$address.'] is invalid');
         }
     }
 
     /**
-     * @param       $overrideFrom
-     * @param array $systemFrom
+     * @param $overrideFrom
      */
     private function setDefaultFrom($overrideFrom, array $systemFrom)
     {

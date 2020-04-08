@@ -83,7 +83,8 @@ Mautic.launchBuilder = function (formName, actionName) {
             'categorylist',
             'preferredchannel',
             'channelfrequency',
-            'saveprefsbutton'
+            'saveprefsbutton',
+            'successmessage'
         ];
         mQuery.each(slots, function(i, s){
             if (isPrefCenterEnabled) {
@@ -106,23 +107,35 @@ Mautic.launchBuilder = function (formName, actionName) {
 
     applyBtn.off('click').on('click', function(e) {
         Mautic.activateButtonLoadingIndicator(applyBtn);
-        Mautic.sendBuilderContentToTextarea(function() {
-            // Trigger slot:destroy event
-            document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
-            // Clear the customize forms
-            mQuery('#slot-form-container, #section-form-container').html('');
-            Mautic.inBuilderSubmissionOn(form);
-            var bgApplyBtn = mQuery('.btn-apply');
-            if (0 === bgApplyBtn.length && ("1" === Mautic.getUrlParameter('contentOnly') || Mautic.isInBuilder)) {
-                var frm = mQuery('.btn-save').closest('form');
-                Mautic.inBuilderSubmissionOn(frm);
-                frm.submit();
+        try {
+            Mautic.sendBuilderContentToTextarea(function () {
+                // Trigger slot:destroy event
+                if (typeof document.getElementById('builder-template-content').contentWindow.Mautic !== 'undefined') {
+                    document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
+                }
+                // Clear the customize forms
+                mQuery('#slot-form-container, #section-form-container').html('');
+                Mautic.inBuilderSubmissionOn(form);
+                var bgApplyBtn = mQuery('.btn-apply');
+                if (0 === bgApplyBtn.length && ("1" === Mautic.getUrlParameter('contentOnly') || Mautic.isInBuilder)) {
+                    var frm = mQuery('.btn-save').closest('form');
+                    Mautic.inBuilderSubmissionOn(frm);
+                    frm.submit();
+                    Mautic.inBuilderSubmissionOff();
+                } else {
+                    bgApplyBtn.trigger('click');
+                }
                 Mautic.inBuilderSubmissionOff();
-            } else {
-                bgApplyBtn.trigger('click');
+            }, true);
+        } catch (error) {
+            Mautic.removeButtonLoadingIndicator(applyBtn);
+            if (/SYNTAX ERROR/.test(error.message.toUpperCase())) {
+                var errorMessage = 'Syntax error. Please check your HTML code.';
+                alert(errorMessage);
+                console.error(errorMessage);
             }
-            Mautic.inBuilderSubmissionOff();
-        }, true);
+            console.error(error.message);
+        }
     });
 
     // Blur and focus the focussed inputs to fix the browser autocomplete bug on scroll
@@ -206,7 +219,7 @@ Mautic.formatCode = function() {
  */
 Mautic.openMediaManager = function() {
     Mautic.openServerBrowser(
-        mauticBasePath + '/' + mauticAssetPrefix + 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/index.html?type=Images',
+        mauticBasePath + '/elfinder',
         screen.width * 0.7,
         screen.height * 0.7
     );
@@ -457,7 +470,9 @@ Mautic.closeBuilder = function(model) {
                 delete Mautic.codeMode;
             } else {
                 // Trigger slot:destroy event
-                document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
+                if(typeof document.getElementById('builder-template-content').contentWindow.Mautic !== 'undefined') {
+                    document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
+                }
 
                 // Clear the customize forms
                 mQuery('#slot-form-container, #section-form-container').html('');
@@ -476,8 +491,17 @@ Mautic.closeBuilder = function(model) {
         }, false);
 
     } catch (error) {
+        overlay.addClass('hide');
+        closeBtn.prop('disabled', false);
+
+        if (/SYNTAX ERROR/.test(error.message.toUpperCase())) {
+            var errorMessage = 'Syntax error. Please check your HTML code.';
+            alert(errorMessage);
+            console.error(errorMessage);
+        }
+
         // prevent from being able to close builder
-        console.error(error);
+        console.error(error.message);
     }
 };
 
@@ -489,35 +513,30 @@ Mautic.closeBuilder = function(model) {
  */
 Mautic.sendBuilderContentToTextarea = function(callback, keepBuilderContent) {
     var customHtml;
-    try {
-        if (Mautic.codeMode) {
-            customHtml = Mautic.builderCodeMirror.getValue();
+    if (Mautic.codeMode) {
+        customHtml = Mautic.builderCodeMirror.getValue();
 
-            // Convert dynamic slot definitions into tokens
-            customHtml = Mautic.convertDynamicContentSlotsToTokens(customHtml);
+        // Convert dynamic slot definitions into tokens
+        customHtml = Mautic.convertDynamicContentSlotsToTokens(customHtml);
 
-            // Store the HTML content to the HTML textarea
-            mQuery('.builder-html').val(customHtml);
-            callback();
-        } else {
-            var builderHtml = mQuery('iframe#builder-template-content').contents();
+        // Store the HTML content to the HTML textarea
+        mQuery('.builder-html').val(customHtml);
+        callback();
+    } else {
+        var builderHtml = mQuery('iframe#builder-template-content').contents();
 
-            if (keepBuilderContent) {
-                // The content has to be cloned so the sanitization won't affect the HTML in the builder
-                Mautic.cloneHtmlContent(builderHtml, function(themeHtml) {
-                    Mautic.sanitizeHtmlAndStoreToTextarea(themeHtml);
-                    callback();
-                });
-            } else {
-                Mautic.sanitizeHtmlAndStoreToTextarea(builderHtml);
+        if (keepBuilderContent) {
+            // The content has to be cloned so the sanitization won't affect the HTML in the builder
+            Mautic.cloneHtmlContent(builderHtml, function(themeHtml) {
+                Mautic.sanitizeHtmlAndStoreToTextarea(themeHtml);
                 callback();
-            }
+            });
+        } else {
+            Mautic.sanitizeHtmlAndStoreToTextarea(builderHtml);
+            callback();
         }
-    } catch (error) {
-        // prevent from being able to close builder
-        console.error(error);
     }
-}
+};
 
 Mautic.sanitizeHtmlAndStoreToTextarea = function(html) {
     var cleanHtml = Mautic.sanitizeHtmlBeforeSave(html);
@@ -554,7 +573,8 @@ Mautic.sanitizeHtmlBeforeSave = function(htmlContent) {
     // Remove the slot focus highlight
     htmlContent.find('[data-slot-focus], [data-section-focus]').remove();
 
-    var customHtml = Mautic.domToString(htmlContent);
+    // Replace all url("${URL}") with url('${URL}')
+    var customHtml = Mautic.domToString(htmlContent).replace(/url\(&quot;(.+)&quot;\)/g, 'url(\'$1\')');
 
     // Convert dynamic slot definitions into tokens
     return Mautic.convertDynamicContentSlotsToTokens(customHtml);
@@ -743,6 +763,21 @@ Mautic.initSectionListeners = function() {
                 sectionForm.find('#builder_section_wrapper-background-color').val(Mautic.rgb2hex(sectionWrapper.css('backgroundColor')));
             }
 
+            // Prefill The Background Image
+            if (bgImage = sectionWrapper.css('background-image')) {
+                sectionForm.find('#builder_section_wrapper-background-image').val(bgImage.replace(/url\((?:'|")(.+)(?:'|")\)/g, '$1'));
+            }
+
+            // Prefill The Background Size
+            if (bgSize = sectionWrapper.css('background-size')) {
+                sectionForm.find('#builder_section_wrapper-background-size').val(bgSize || 'auto auto');
+            }
+
+            // Prefill The Background Repeat
+            if (bgRepeat = sectionWrapper.css('background-repeat')) {
+                sectionForm.find('#builder_section_wrapper-background-repeat').val(bgRepeat);
+            }
+
             // Initialize the color picker
             sectionFormContainer.find('input[data-toggle="color"]').each(function() {
                 parent.Mautic.activateColorPicker(this);
@@ -751,10 +786,22 @@ Mautic.initSectionListeners = function() {
             // Handle color change events
             sectionForm.on('keyup paste change touchmove', function(e) {
                 var field = mQuery(e.target);
-                if (section.length && field.attr('id') === 'builder_section_content-background-color') {
-                    Mautic.sectionBackgroundChanged(section, field.val());
-                } else if (field.attr('id') === 'builder_section_wrapper-background-color') {
-                    Mautic.sectionBackgroundChanged(sectionWrapper, field.val());
+                switch (field.attr('id')) {
+                    case 'builder_section_content-background-color':
+                        Mautic.sectionBackgroundChanged(section, field.val());
+                        break;
+                    case 'builder_section_wrapper-background-color':
+                        Mautic.sectionBackgroundChanged(sectionWrapper, field.val());
+                        break;
+                    case 'builder_section_wrapper-background-image':
+                        Mautic.sectionBackgroundImageChanged(sectionWrapper, field.val());
+                        break;
+                    case 'builder_section_wrapper-background-repeat':
+                        sectionWrapper.css('background-repeat', field.val());
+                        break;
+                    case 'builder_section_wrapper-background-size':
+                        Mautic.sectionBackgroundSize(sectionWrapper, field.val());
+                        break;
                 }
             });
 
@@ -770,7 +817,7 @@ Mautic.initSectionListeners = function() {
             });
         });
     });
-}
+};
 
 Mautic.initSections = function() {
     Mautic.initSectionListeners();
@@ -827,7 +874,7 @@ Mautic.initSections = function() {
         iframeFix: true,
         connectToSortable: 'body',
         revert: 'invalid',
-        iframeOffset: iframe.offset(),
+        iframeOffset: iframe.jQuery2Offset(),
         helper: function(e, ui) {
             // Fix body overflow that messes sortable up
             bodyOverflow.overflowX = mQuery('body', parent.document).css('overflow-x');
@@ -882,12 +929,33 @@ Mautic.sectionBackgroundChanged = function(element, color) {
     });
 };
 
+Mautic.sectionBackgroundImageChanged = function (element, imageUrl) {
+    var regWrappedInUrl = /url\(.+\)/g;
+    var match = regWrappedInUrl.exec(imageUrl);
+
+    if (!imageUrl || imageUrl === 'none') {
+        element.css('background-image', imageUrl);
+    } else if (match) {
+        element.css('background-image', imageUrl);
+    } else {
+        element.css('background-image', "url(" + imageUrl + ")");
+    }
+};
+
+Mautic.sectionBackgroundSize = function (element, size) {
+    if (!size) {
+        size = 'auto auto';
+    }
+
+    element.css('background-size', size);
+};
+
 Mautic.rgb2hex = function(orig) {
     var rgb = orig.replace(/\s/g,'').match(/^rgba?\((\d+),(\d+),(\d+)/i);
     return (rgb && rgb.length === 4) ? "#" +
-    ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
-    ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
-    ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : orig;
+        ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
+        ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
+        ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : orig;
 };
 
 Mautic.initSlots = function(slotContainers) {
@@ -963,7 +1031,7 @@ Mautic.initSlots = function(slotContainers) {
         iframeFix: true,
         connectToSortable: '[data-slot-container]',
         revert: 'invalid',
-        iframeOffset: iframe.offset(),
+        iframeOffset: iframe.jQuery2Offset(),
         helper: function(e, ui) {
             // fix for Uncaught TypeError: Cannot read property 'document' of null
             // Fix body overflow that messes sortable up
@@ -1114,6 +1182,18 @@ Mautic.isSlotInitiated = function(slot) {
     }) !== 'undefined';
 };
 
+Mautic.isCodeMode = function() {
+    return mQuery('a[data-theme=mautic_code_mode]').first().hasClass('hide');
+};
+
+window.document.fileManagerInsertImageCallback = function(selector, url) {
+    if (Mautic.isCodeMode()) {
+        Mautic.insertTextAtCMCursor(url);
+    } else {
+        mQuery(selector).froalaEditor('image.insert', url);
+    }
+};
+
 Mautic.initSlotListeners = function() {
     Mautic.activateGlobalFroalaOptions();
     Mautic.builderSlots = [];
@@ -1151,6 +1231,12 @@ Mautic.initSlotListeners = function() {
                 return;
             }
 
+            if(slot.html() == '') {
+                slot.addClass('empty');
+            }else{
+                slot.removeClass('empty');
+            }
+
             slot.append(focus);
             deleteLink.click(function(e) {
                 // if slot is DEC, delete it from the outside form
@@ -1171,8 +1257,16 @@ Mautic.initSlotListeners = function() {
                 slot.remove();
                 focus.remove();
             });
-            cloneLink.click(function(e) {   
-                slot.clone().insertAfter(slot);
+            cloneLink.click(function(e) {
+                if (type == 'dynamicContent') {
+                    var maxId = Mautic.getDynamicContentMaxId();
+
+                    slot.clone().attr('data-param-dec-id', maxId + 1).insertAfter(slot);
+                    Mautic.createNewDynamicContentItem(parent.mQuery);
+                } else {
+                    slot.clone().insertAfter(slot);
+                }
+
                 Mautic.initSlots(slot.closest('[data-slot-container="1"]'));
             });
 
@@ -1341,12 +1435,6 @@ Mautic.initSlotListeners = function() {
 
                 var builderEl = parent.mQuery('.builder');
 
-                if (builderEl.length && builderEl.hasClass('email-builder')) {
-                    buttons = parent.mQuery.grep(buttons, function (value) {
-                        return value != 'insertGatedVideo';
-                    });
-                }
-
                 var froalaOptions = {
                     toolbarButtons: buttons,
                     toolbarButtonsMD: buttons,
@@ -1356,6 +1444,13 @@ Mautic.initSlotListeners = function() {
                     linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
                     imageEditButtons: ['imageReplace', 'imageAlign', 'imageRemove', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
                 };
+
+                if (builderEl.length && builderEl.hasClass('email-builder')) {
+                    buttons = parent.mQuery.grep(buttons, function (value) {
+                        return value != 'insertGatedVideo';
+                    });
+                    froalaOptions.imageOutputSize = true;
+                }
 
                 // prevent overriding variant content in editor
                 if (focusType !== 'dynamicContent') {
@@ -1408,10 +1503,8 @@ Mautic.initSlotListeners = function() {
             });
         } else if (type === 'dynamicContent') {
             if (slot.html().match(/__dynamicContent__/)) {
-                var decs = mQuery('[data-slot="dynamicContent"]');
-                var ids = mQuery.map(decs, function(e){return mQuery(e).attr('data-param-dec-id');})
-                var maxId = Math.max.apply(Math, ids);
-                if (isNaN(maxId) || Number.NEGATIVE_INFINITY == maxId) maxId = 0;
+                var maxId = Mautic.getDynamicContentMaxId();
+
                 slot.attr('data-param-dec-id', maxId + 1);
                 slot.html('Dynamic Content');
                 Mautic.createNewDynamicContentItem(parent.mQuery);
@@ -1466,7 +1559,7 @@ Mautic.initSlotListeners = function() {
             params.slot.find('label.label3').text(params.field.val());
         } else if ('label-text4' === fieldParam) {
             params.slot.find('label.label4').text(params.field.val());
-        } else if ('glink' === fieldParam || 'flink' === fieldParam || 'tlink' === fieldParam) {
+        } else if ('flink' === fieldParam || 'tlink' === fieldParam) {
             params.slot.find('#'+fieldParam).attr('href', params.field.val());
         } else if (fieldParam === 'href') {
             params.slot.find('a').eq(0).attr('href', params.field.val());
@@ -1776,7 +1869,8 @@ Mautic.prepareBuilderIframe = function(themeHtml, btnCloseBuilder, applyBtn) {
             'categorylist',
             'preferredchannel',
             'channelfrequency',
-            'saveprefsbutton'
+            'saveprefsbutton',
+            'successmessage'
         ];
         mQuery.each(slots, function (i, s) {
             // delete existing tokens
@@ -1917,6 +2011,15 @@ Mautic.getPredefinedLinks = function(callback) {
         }
         return callback(linkList);
     });
+};
+
+Mautic.getDynamicContentMaxId = function() {
+    var decs = mQuery('[data-slot="dynamicContent"]');
+    var ids = mQuery.map(decs, function(e){return mQuery(e).attr('data-param-dec-id');});
+    var maxId = Math.max.apply(Math, ids);
+    if (isNaN(maxId) || Number.NEGATIVE_INFINITY === maxId) maxId = 0;
+
+    return maxId;
 };
 
 // Init inside the builder's iframe

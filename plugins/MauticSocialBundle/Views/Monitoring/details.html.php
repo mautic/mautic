@@ -17,9 +17,9 @@ if (!$isEmbedded) {
     $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', [
         'item'            => $activeMonitoring,
         'templateButtons' => [
-            'edit'   => $view['security']->isGranted('plugin:mauticSocial:monitoring:edit'),
-            'delete' => $view['security']->isGranted('plugin:mauticSocial:monitoring:delete'),
-            'close'  => $view['security']->isGranted('plugin:mauticSocial:monitoring:view'),
+            'edit'   => $view['security']->isGranted('mauticSocial:monitoring:edit'),
+            'delete' => $view['security']->isGranted('mauticSocial:monitoring:delete'),
+            'close'  => $view['security']->isGranted('mauticSocial:monitoring:view'),
         ],
         'routeBase'  => 'social',
         'langVar'    => 'monitoring',

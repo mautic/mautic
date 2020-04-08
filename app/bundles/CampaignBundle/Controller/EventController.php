@@ -12,6 +12,8 @@
 namespace Mautic\CampaignBundle\Controller;
 
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\EventCollector\EventCollector;
+use Mautic\CampaignBundle\Form\Type\EventType;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -34,7 +36,7 @@ class EventController extends CommonFormController
         $valid   = $cancelled   = false;
         $method  = $this->request->getMethod();
         $session = $this->get('session');
-        if ($method == 'POST') {
+        if ('POST' == $method) {
             $event                = $this->request->request->get('campaignevent');
             $type                 = $event['type'];
             $eventType            = $event['eventType'];
@@ -74,10 +76,13 @@ class EventController extends CommonFormController
             return $this->modalAccessDenied();
         }
 
+        /** @var EventCollector $eventCollector */
+        $eventCollector = $this->get('mautic.campaign.event_collector');
+
         //fire the builder event
-        $events = $this->getModel('campaign')->getEvents();
+        $events = $eventCollector->getEventsArray();
         $form   = $this->get('form.factory')->create(
-            'campaignevent',
+            EventType::class,
             $event,
             [
                 'action'   => $this->generateUrl('mautic_campaignevent_action', ['objectAction' => 'new']),
@@ -89,7 +94,7 @@ class EventController extends CommonFormController
         $form->get('campaignId')->setData($campaignId);
 
         //Check for a submitted form and process it
-        if ($method == 'POST') {
+        if ('POST' == $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
@@ -161,9 +166,9 @@ class EventController extends CommonFormController
             $passthroughVars['eventType'] = $eventType;
 
             $translator = $this->translator;
-            if ($event['triggerMode'] == 'interval') {
+            if ('interval' == $event['triggerMode']) {
                 $label = 'mautic.campaign.connection.trigger.interval.label';
-                if ($anchorName == 'no') {
+                if ('no' == $anchorName) {
                     $label .= '_inaction';
                 }
                 $passthroughVars['label'] = $translator->trans(
@@ -176,11 +181,11 @@ class EventController extends CommonFormController
                         ),
                     ]
                 );
-            } elseif ($event['triggerMode'] == 'date') {
+            } elseif ('date' == $event['triggerMode']) {
                 /** @var \Mautic\CoreBundle\Templating\Helper\DateHelper $dh */
                 $dh    = $this->factory->getHelper('template.date');
                 $label = 'mautic.campaign.connection.trigger.date.label';
-                if ($anchorName == 'no') {
+                if ('no' == $anchorName) {
                     $label .= '_inaction';
                 }
                 $passthroughVars['label'] = $translator->trans(
@@ -197,9 +202,8 @@ class EventController extends CommonFormController
         if ($closeModal) {
             //just close the modal
             $passthroughVars['closeModal'] = 1;
-            $response                      = new JsonResponse($passthroughVars);
 
-            return $response;
+            return new JsonResponse($passthroughVars);
         } else {
             return $this->ajaxAction(
                 [
@@ -218,19 +222,20 @@ class EventController extends CommonFormController
      */
     public function editAction($objectId)
     {
-        $session    = $this->get('session');
-        $valid      = $cancelled = false;
-        $method     = $this->request->getMethod();
-        $campaignId = $method === 'POST'
-            ? $this->request->request->get('campaignevent[campaignId]', '', true)
+        $session       = $this->get('session');
+        $valid         = $cancelled = false;
+        $method        = $this->request->getMethod();
+        $campaignEvent = $this->request->request->get('campaignevent', []);
+        $campaignId    = 'POST' === $method
+            ? ($campaignEvent['campaignId'] ?? '')
             : $this->request->query->get('campaignId');
         $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified', []);
         $event          = array_key_exists($objectId, $modifiedEvents) ? $modifiedEvents[$objectId] : [];
 
-        if ($method === 'POST') {
+        if ('POST' === $method) {
             $event = array_merge($event, [
-                'anchor'          => $this->request->request->get('campaignevent[anchor]', '', true),
-                'anchorEventType' => $this->request->request->get('campaignevent[anchorEventType]', '', true),
+                'anchor'          => $campaignEvent['anchor'] ?? '',
+                'anchorEventType' => $campaignEvent['anchorEventType'] ?? '',
             ]);
         } else {
             if (!isset($event['anchor'])) {
@@ -275,11 +280,14 @@ class EventController extends CommonFormController
          * the supported events for this type because we already made
          * sure that we're accessing a supported event type above.
          *
-         * ->getEvents() returns translated labels & descriptions
+         * Method getEventsArray() returns translated labels & descriptions
          */
-        $supportedEvents = $this->getModel('campaign')->getEvents()[$event['eventType']];
+
+        /** @var EventCollector $eventCollector */
+        $eventCollector  = $this->get('mautic.campaign.event_collector');
+        $supportedEvents = $eventCollector->getEventsArray()[$event['eventType']];
         $form            = $this->get('form.factory')->create(
-            'campaignevent',
+            EventType::class,
             $event,
             [
                 'action'   => $this->generateUrl('mautic_campaignevent_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
@@ -291,7 +299,7 @@ class EventController extends CommonFormController
         $form->get('campaignId')->setData($campaignId);
 
         // Check for a submitted form and process it
-        if ($method === 'POST') {
+        if ('POST' === $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $formData = $form->getData();
@@ -365,10 +373,10 @@ class EventController extends CommonFormController
                 ),
             ]);
 
-            if ($event['triggerMode'] === Event::TRIGGER_MODE_INTERVAL) {
+            if (Event::TRIGGER_MODE_INTERVAL === $event['triggerMode']) {
                 $label = 'mautic.campaign.connection.trigger.interval.label';
 
-                if ($event['anchor'] === Event::PATH_INACTION) {
+                if (Event::PATH_INACTION === $event['anchor']) {
                     $label .= '_inaction';
                 }
 
@@ -384,10 +392,10 @@ class EventController extends CommonFormController
                 );
             }
 
-            if ($event['triggerMode'] === Event::TRIGGER_MODE_DATE) {
+            if (Event::TRIGGER_MODE_DATE === $event['triggerMode']) {
                 $label = 'mautic.campaign.connection.trigger.date.label';
 
-                if ($event['anchor'] === Event::PATH_INACTION) {
+                if (Event::PATH_INACTION === $event['anchor']) {
                     $label .= '_inaction';
                 }
 
@@ -413,7 +421,7 @@ class EventController extends CommonFormController
     /**
      * Deletes the entity.
      *
-     * @param   $objectId
+     * @param $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -439,14 +447,16 @@ class EventController extends CommonFormController
 
         $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
 
-        if ($this->request->getMethod() == 'POST' && $event !== null) {
-            $events            = $this->getModel('campaign')->getEvents();
+        if ('POST' == $this->request->getMethod() && null !== $event) {
+            /** @var EventCollector $eventCollector */
+            $eventCollector    = $this->get('mautic.campaign.event_collector');
+            $events            = $eventCollector->getEventsArray();
             $event['settings'] = $events[$event['eventType']][$event['type']];
 
             // Add the field to the delete list
             if (!in_array($objectId, $deletedEvents)) {
                 //If event is new don't add to deleted list
-                if (strpos($objectId, 'new') === false) {
+                if (false === strpos($objectId, 'new')) {
                     $deletedEvents[] = $objectId;
                     $session->set('mautic.campaign.'.$campaignId.'.events.deleted', $deletedEvents);
                 }
@@ -470,15 +480,13 @@ class EventController extends CommonFormController
             $dataArray = ['success' => 0];
         }
 
-        $response = new JsonResponse($dataArray);
-
-        return $response;
+        return new JsonResponse($dataArray);
     }
 
     /**
      * Undeletes the entity.
      *
-     * @param   $objectId
+     * @param $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -504,8 +512,10 @@ class EventController extends CommonFormController
 
         $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
 
-        if ($this->request->getMethod() == 'POST' && $event !== null) {
-            $events            = $this->getModel('campaign')->getEvents();
+        if ('POST' == $this->request->getMethod() && null !== $event) {
+            /** @var EventCollector $eventCollector */
+            $eventCollector    = $this->get('mautic.campaign.event_collector');
+            $events            = $eventCollector->getEventsArray();
             $event['settings'] = $events[$event['eventType']][$event['type']];
 
             //add the field to the delete list
@@ -541,8 +551,6 @@ class EventController extends CommonFormController
             $dataArray = ['success' => 0];
         }
 
-        $response = new JsonResponse($dataArray);
-
-        return $response;
+        return new JsonResponse($dataArray);
     }
 }

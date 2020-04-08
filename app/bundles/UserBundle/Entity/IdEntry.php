@@ -25,9 +25,6 @@ class IdEntry
      */
     protected $expiryTimestamp;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -81,8 +78,6 @@ class IdEntry
     }
 
     /**
-     * @param \DateTime $expiryTime
-     *
      * @return IdEntry
      */
     public function setExpiryTime(\DateTime $expiryTime)

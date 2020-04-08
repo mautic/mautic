@@ -73,9 +73,6 @@ class Stat
      */
     private $tokens = [];
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -86,7 +83,7 @@ class Stat
             ->addIndex(['tracking_hash'], 'stat_sms_hash_search')
             ->addIndex(['source', 'source_id'], 'stat_sms_source_search');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createManyToOne('sms', 'Sms')
             ->inversedBy('stats')
@@ -164,8 +161,6 @@ class Stat
     }
 
     /**
-     * @param Sms $sms
-     *
      * @return Stat
      */
     public function setSms(Sms $sms)
@@ -184,8 +179,6 @@ class Stat
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return Stat
      */
     public function setLead(Lead $lead)
@@ -204,8 +197,6 @@ class Stat
     }
 
     /**
-     * @param LeadList $list
-     *
      * @return Stat
      */
     public function setList(LeadList $list)
@@ -224,8 +215,6 @@ class Stat
     }
 
     /**
-     * @param IpAddress $ipAddress
-     *
      * @return Stat
      */
     public function setIpAddress(IpAddress $ipAddress)
@@ -324,8 +313,6 @@ class Stat
     }
 
     /**
-     * @param array $tokens
-     *
      * @return Stat
      */
     public function setTokens(array $tokens)

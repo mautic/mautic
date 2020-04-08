@@ -57,11 +57,6 @@ class ContactMerger
 
     /**
      * ContactMerger constructor.
-     *
-     * @param LeadModel                $leadModel
-     * @param MergeRecordRepository    $repo
-     * @param EventDispatcherInterface $dispatcher
-     * @param LoggerInterface          $logger
      */
     public function __construct(LeadModel $leadModel, MergeRecordRepository $repo, EventDispatcherInterface $dispatcher, LoggerInterface $logger)
     {
@@ -72,9 +67,6 @@ class ContactMerger
     }
 
     /**
-     * @param Lead $winner
-     * @param Lead $loser
-     *
      * @return Lead
      *
      * @throws SameContactException
@@ -115,9 +107,6 @@ class ContactMerger
     /**
      * Merge timestamps.
      *
-     * @param Lead $winner
-     * @param Lead $loser
-     *
      * @return $this
      */
     public function mergeTimestamps(Lead $winner, Lead $loser)
@@ -127,8 +116,13 @@ class ContactMerger
             $winner->setLastActive($loser->getLastActive());
         }
 
-        // The winner should keep the oldest date identified timestamp
-        if ($loser->getDateIdentified() < $winner->getDateIdentified()) {
+        /*
+         * The winner should keep the oldest date identified timestamp
+         * as long as the loser's date identified is not null.
+         * Alternatively, if the winner's date identified is null,
+         * use the loser's date identified (doesn't matter if it is null).
+         */
+        if ((null !== $loser->getDateIdentified() && $loser->getDateIdentified() < $winner->getDateIdentified()) || null === $winner->getDateIdentified()) {
             $winner->setDateIdentified($loser->getDateIdentified());
         }
 
@@ -137,9 +131,6 @@ class ContactMerger
 
     /**
      * Merge IP history into the winner.
-     *
-     * @param Lead $winner
-     * @param Lead $loser
      *
      * @return $this
      */
@@ -158,9 +149,6 @@ class ContactMerger
 
     /**
      * Merge custom field data into winner.
-     *
-     * @param Lead $winner
-     * @param Lead $loser
      *
      * @return $this
      */
@@ -209,9 +197,6 @@ class ContactMerger
     /**
      * Merge owners if the winner isn't already assigned an owner.
      *
-     * @param Lead $winner
-     * @param Lead $loser
-     *
      * @return $this
      */
     public function mergeOwners(Lead $winner, Lead $loser)
@@ -219,7 +204,7 @@ class ContactMerger
         $oldOwner = $winner->getOwner();
         $newOwner = $loser->getOwner();
 
-        if ($oldOwner === null && $newOwner !== null) {
+        if (null === $oldOwner && null !== $newOwner) {
             $winner->setOwner($newOwner);
 
             $this->logger->debug("CONTACT: New owner of {$winner->getId()} is {$newOwner->getId()}");
@@ -230,9 +215,6 @@ class ContactMerger
 
     /**
      * Sum points from both contacts.
-     *
-     * @param Lead $winner
-     * @param Lead $loser
      *
      * @return $this
      */
@@ -253,9 +235,6 @@ class ContactMerger
     /**
      * Merge tags from loser into winner.
      *
-     * @param Lead $winner
-     * @param Lead $loser
-     *
      * @return $this
      */
     public function mergeTags(Lead $winner, Lead $loser)
@@ -270,9 +249,6 @@ class ContactMerger
 
     /**
      * Merge past merge records into the winner.
-     *
-     * @param Lead $winner
-     * @param Lead $loser
      *
      * @return $this
      */

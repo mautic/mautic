@@ -95,8 +95,7 @@ class ReportDataResult
 
         $row = $this->data[0];
         foreach ($row as $k => $v) {
-            $dataColumn = $data['dataColumns'][$k];
-
+            $dataColumn      = $data['dataColumns'][$k];
             $this->headers[] = $data['columns'][$dataColumn]['label'];
         }
     }
@@ -112,9 +111,12 @@ class ReportDataResult
 
         $row = $this->data[0];
         foreach ($row as $k => $v) {
-            $dataColumn = $data['dataColumns'][$k];
-
-            $this->types[$k] = $data['columns'][$dataColumn]['type'];
+            if (isset($data['aggregatorColumns']) && array_key_exists($k, $data['aggregatorColumns'])) {
+                $this->types[$k] = 'int';
+            } else {
+                $dataColumn      = $data['dataColumns'][$k];
+                $this->types[$k] = $data['columns'][$dataColumn]['type'];
+            }
         }
     }
 }

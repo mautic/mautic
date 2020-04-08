@@ -9,20 +9,18 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Tests\Transport;
+namespace Mautic\EmailBundle\Tests\Swiftmailer\Momentum\Callback;
 
 use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Callback\MomentumCallback;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
 
-class MomentumTransportTest extends \PHPUnit_Framework_TestCase
+class MomentumCallbackTest extends \PHPUnit\Framework\TestCase
 {
     public function testWebhookPayloadIsProcessed()
     {
-        $transportCallback = $this->getMockBuilder(TransportCallback::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $transportCallback = $this->createMock(TransportCallback::class);
 
         $transportCallback->expects($this->exactly(6))
             ->method('addFailureByHashId')
@@ -38,11 +36,7 @@ class MomentumTransportTest extends \PHPUnit_Framework_TestCase
 
         $transportCallback->expects($this->once())
             ->method('addFailureByAddress')
-            ->with(
-                'bounce@example.com',
-                'MAIL REFUSED - IP (17.99.99.99) is in black list',
-                DoNotContact::BOUNCED
-            );
+            ->with('bounce@example.com', 'MAIL REFUSED - IP (17.99.99.99) is in black list', DoNotContact::BOUNCED);
 
         $momentumCallback = new MomentumCallback($transportCallback);
 

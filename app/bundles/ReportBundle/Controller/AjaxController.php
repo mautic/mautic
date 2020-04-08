@@ -22,8 +22,6 @@ class AjaxController extends CommonAjaxController
     /**
      * Get updated data for context.
      *
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function getSourceDataAction(Request $request)

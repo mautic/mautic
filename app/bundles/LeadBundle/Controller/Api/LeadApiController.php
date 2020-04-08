@@ -11,9 +11,8 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
-use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
@@ -22,6 +21,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -37,9 +37,6 @@ class LeadApiController extends CommonApiController
 
     const MODEL_ID = 'lead.lead';
 
-    /**
-     * @param FilterControllerEvent $event
-     */
     public function initialize(FilterControllerEvent $event)
     {
         $this->model            = $this->getModel(self::MODEL_ID);
@@ -49,24 +46,6 @@ class LeadApiController extends CommonApiController
         $this->serializerGroups = ['leadDetails', 'frequencyRulesList', 'doNotContactList', 'userList', 'stageList', 'publishDetails', 'ipAddress', 'tagList', 'utmtagsList'];
 
         parent::initialize($event);
-    }
-
-    /**
-     * Get existing duplicated contact based on unique fields and the request data.
-     *
-     * @param array $parameters
-     * @param null  $id
-     *
-     * @return null|Lead
-     *
-     * @deprecated since 2.12.2, to be removed in 3.0.0. Use $model->checkForDuplicateContact directly instead
-     */
-    protected function getExistingLead(array $parameters, $id = null)
-    {
-        $model   = $this->getModel(self::MODEL_ID);
-        $contact = $id ? $model->getEntity($id) : null;
-
-        return $model->checkForDuplicateContact($parameters, $contact);
     }
 
     /**
@@ -88,9 +67,9 @@ class LeadApiController extends CommonApiController
         $limit   = $this->request->query->get('limit', null);
         $start   = $this->request->query->get('start', null);
         $users   = $this->model->getLookupResults('user', $filter, $limit, $start);
-        $view    = $this->view($users, Codes::HTTP_OK);
-        $context = SerializationContext::create()->setGroups(['userList']);
-        $view->setSerializationContext($context);
+        $view    = $this->view($users, Response::HTTP_OK);
+        $context = $view->getContext()->setGroups(['userList']);
+        $view->setContext($context);
 
         return $this->handleView($view);
     }
@@ -121,9 +100,9 @@ class LeadApiController extends CommonApiController
             ]
         );
 
-        $view    = $this->view($fields, Codes::HTTP_OK);
-        $context = SerializationContext::create()->setGroups(['leadFieldList']);
-        $view->setSerializationContext($context);
+        $view    = $this->view($fields, Response::HTTP_OK);
+        $context = $view->getContext()->setGroups(['leadFieldList']);
+        $view->setContext($context);
 
         return $this->handleView($view);
     }
@@ -139,7 +118,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
@@ -150,7 +129,7 @@ class LeadApiController extends CommonApiController
         $results = $this->getModel('lead.note')->getEntities(
             [
                 'start'  => $this->request->query->get('start', 0),
-                'limit'  => $this->request->query->get('limit', $this->coreParametersHelper->getParameter('default_pagelimit')),
+                'limit'  => $this->request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
                 'filter' => [
                     'string' => $this->request->query->get('search', ''),
                     'force'  => [
@@ -166,18 +145,18 @@ class LeadApiController extends CommonApiController
             ]
         );
 
-        list($notes, $count) = $this->prepareEntitiesForView($results);
+        [$notes, $count] = $this->prepareEntitiesForView($results);
 
         $view = $this->view(
             [
                 'total' => $count,
                 'notes' => $notes,
             ],
-            Codes::HTTP_OK
+            Response::HTTP_OK
         );
 
-        $context = SerializationContext::create()->setGroups(['leadNoteDetails']);
-        $view->setSerializationContext($context);
+        $context = $view->getContext()->setGroups(['leadNoteDetails']);
+        $view->setContext($context);
 
         return $this->handleView($view);
     }
@@ -193,7 +172,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
@@ -204,7 +183,7 @@ class LeadApiController extends CommonApiController
         $results = $this->getModel('lead.device')->getEntities(
             [
                 'start'  => $this->request->query->get('start', 0),
-                'limit'  => $this->request->query->get('limit', $this->coreParametersHelper->getParameter('default_pagelimit')),
+                'limit'  => $this->request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
                 'filter' => [
                     'string' => $this->request->query->get('search', ''),
                     'force'  => [
@@ -220,18 +199,18 @@ class LeadApiController extends CommonApiController
             ]
         );
 
-        list($devices, $count) = $this->prepareEntitiesForView($results);
+        [$devices, $count] = $this->prepareEntitiesForView($results);
 
         $view = $this->view(
             [
                 'total'   => $count,
                 'devices' => $devices,
             ],
-            Codes::HTTP_OK
+            Response::HTTP_OK
         );
 
-        $context = SerializationContext::create()->setGroups(['leadDeviceDetails']);
-        $view->setSerializationContext($context);
+        $context = $view->getContext()->setGroups(['leadDeviceDetails']);
+        $view->setContext($context);
 
         return $this->handleView($view);
     }
@@ -246,7 +225,7 @@ class LeadApiController extends CommonApiController
     public function getListsAction($id)
     {
         $entity = $this->model->getEntity($id);
-        if ($entity !== null) {
+        if (null !== $entity) {
             if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
                 return $this->accessDenied();
             }
@@ -267,7 +246,7 @@ class LeadApiController extends CommonApiController
                     'total' => count($lists),
                     'lists' => $lists,
                 ],
-                Codes::HTTP_OK
+                Response::HTTP_OK
             );
 
             return $this->handleView($view);
@@ -287,7 +266,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
@@ -302,7 +281,7 @@ class LeadApiController extends CommonApiController
                 'total'     => count($companies),
                 'companies' => $companies,
             ],
-            Codes::HTTP_OK
+            Response::HTTP_OK
         );
 
         return $this->handleView($view);
@@ -318,7 +297,7 @@ class LeadApiController extends CommonApiController
     public function getCampaignsAction($id)
     {
         $entity = $this->model->getEntity($id);
-        if ($entity !== null) {
+        if (null !== $entity) {
             if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
                 return $this->accessDenied();
             }
@@ -346,7 +325,7 @@ class LeadApiController extends CommonApiController
                     'total'     => count($campaigns),
                     'campaigns' => $campaigns,
                 ],
-                Codes::HTTP_OK
+                Response::HTTP_OK
             );
 
             return $this->handleView($view);
@@ -366,11 +345,11 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
-        if (!$this->checkEntityAccess($entity, 'view')) {
+        if (!$this->checkEntityAccess($entity)) {
             return $this->accessDenied();
         }
 
@@ -396,11 +375,11 @@ class LeadApiController extends CommonApiController
         $page    = (int) $this->request->get('page', 1);
         $order   = InputHelper::clean($this->request->get('order', ['timestamp', 'DESC']));
 
-        list($events, $serializerGroups) = $this->model->getEngagements($lead, $filters, $order, $page, $limit, false);
+        [$events, $serializerGroups] = $this->model->getEngagements($lead, $filters, $order, $page, $limit, false);
 
         $view    = $this->view($events);
-        $context = SerializationContext::create()->setGroups($serializerGroups);
-        $view->setSerializationContext($context);
+        $context = $view->getContext()->setGroups($serializerGroups);
+        $view->setContext($context);
 
         return $this->handleView($view);
     }
@@ -417,7 +396,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity((int) $id);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
@@ -427,7 +406,7 @@ class LeadApiController extends CommonApiController
 
         $channelId = (int) $this->request->request->get('channelId');
         if ($channelId) {
-            $channel = [$channel, $channelId];
+            $channel = [$channel => $channelId];
         }
         $reason   = (int) $this->request->request->get('reason');
         $comments = InputHelper::clean($this->request->request->get('comments'));
@@ -450,7 +429,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity((int) $id);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
@@ -482,7 +461,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity((int) $id);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
@@ -493,7 +472,7 @@ class LeadApiController extends CommonApiController
         // calls add/remove method as appropriate
         $result = $this->model->$method($entity, $data);
 
-        if ($result === false) {
+        if (false === $result) {
             return $this->badRequest();
         }
 
@@ -537,38 +516,7 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * Obtains a list of contact events.
-     *
-     * @deprecated 2.10.0 to be removed in 3.0
-     *
-     * @param $id
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function getEventsAction($id)
-    {
-        $entity = $this->model->getEntity($id);
-
-        if ($entity === null) {
-            return $this->notFound();
-        }
-
-        if (!$this->checkEntityAccess($entity, 'view')) {
-            return $this->accessDenied();
-        }
-
-        $filters = $this->sanitizeEventFilter(InputHelper::clean($this->request->get('filters', [])));
-        $order   = InputHelper::clean($this->request->get('order', ['timestamp', 'DESC']));
-        $page    = (int) $this->request->get('page', 1);
-        $events  = $this->model->getEngagements($entity, $filters, $order, $page);
-
-        return $this->handleView($this->view($events));
-    }
-
-    /**
      * Creates new entity from provided params.
-     *
-     * @param array $params
      *
      * @return object
      */
@@ -651,12 +599,21 @@ class LeadApiController extends CommonApiController
             unset($this->entityRequestParameters['lastActive']);
         }
 
+        // Batch DNC settings
         if (!empty($parameters['doNotContact']) && is_array($parameters['doNotContact'])) {
             foreach ($parameters['doNotContact'] as $dnc) {
                 $channel  = !empty($dnc['channel']) ? $dnc['channel'] : 'email';
                 $comments = !empty($dnc['comments']) ? $dnc['comments'] : '';
-                $reason   = !empty($dnc['reason']) ? $dnc['reason'] : DoNotContact::MANUAL;
-                $this->model->addDncForLead($entity, $channel, $comments, $reason, false);
+
+                $reason = (int) ArrayHelper::getValue('reason', $dnc, DoNotContact::MANUAL);
+
+                if (DoNotContact::IS_CONTACTABLE === $reason) {
+                    // Remove DNC record
+                    $this->model->removeDncForLead($entity, $channel, false);
+                } else {
+                    // Add DNC record
+                    $this->model->addDncForLead($entity, $channel, $comments, $reason, false);
+                }
             }
             unset($parameters['doNotContact']);
         }
@@ -673,13 +630,14 @@ class LeadApiController extends CommonApiController
                     $msg = $this->translator->trans('mautic.core.error.badrequest', [], 'flashes');
                 }
 
-                return $this->returnError($msg, Codes::HTTP_BAD_REQUEST, $formErrors);
+                return $this->returnError($msg, Response::HTTP_BAD_REQUEST, $formErrors);
             }
 
             unset($parameters['frequencyRules']);
         }
 
-        $this->setCustomFieldValues($entity, $form, $parameters, 'POST' === $this->request->getMethod());
+        $isPostOrPatch = 'POST' === $this->request->getMethod() || 'PATCH' === $this->request->getMethod();
+        $this->setCustomFieldValues($entity, $form, $parameters, $isPostOrPatch);
     }
 
     /**
@@ -697,7 +655,6 @@ class LeadApiController extends CommonApiController
     /**
      * Helper method to be used in FrequencyRuleTrait.
      *
-     * @param Form  $form
      * @param array $data
      *
      * @return bool

@@ -39,8 +39,7 @@ class MenuEvent extends Event
     /**
      * MenuEvent constructor.
      *
-     * @param MenuHelper $menuHelper
-     * @param string     $type
+     * @param string $type
      */
     public function __construct(MenuHelper $menuHelper, $type = 'main')
     {
@@ -48,9 +47,6 @@ class MenuEvent extends Event
         $this->type   = $type;
     }
 
-    /**
-     * @param array $menuItems
-     */
     public function setMenuItems(array $menuItems)
     {
         $this->menuItems = $menuItems;
@@ -58,15 +54,13 @@ class MenuEvent extends Event
 
     /**
      * Add items to the menu.
-     *
-     * @param array $menuItems
      */
     public function addMenuItems(array $menuItems)
     {
         $defaultPriority = isset($menuItems['priority']) ? $menuItems['priority'] : 9999;
         $items           = isset($menuItems['items']) ? $menuItems['items'] : $menuItems;
 
-        $isRoot = isset($items['name']) && ($items['name'] == 'root' || $items['name'] == $items['name']);
+        $isRoot = isset($items['name']) && ('root' == $items['name'] || $items['name'] == $items['name']);
         if (!$isRoot) {
             $this->helper->createMenuStructure($items, 0, $defaultPriority, $this->type);
 

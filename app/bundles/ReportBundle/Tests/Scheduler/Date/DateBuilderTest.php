@@ -11,7 +11,7 @@ use Mautic\ReportBundle\Scheduler\Exception\NoScheduleException;
 use Mautic\ReportBundle\Scheduler\Exception\NotSupportedScheduleTypeException;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
 
-class DateBuilderTest extends \PHPUnit_Framework_TestCase
+class DateBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetNextEvent()
     {

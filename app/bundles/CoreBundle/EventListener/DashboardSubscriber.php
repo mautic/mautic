@@ -13,13 +13,15 @@ namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\IconEvent;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class DashboardSubscriber.
- */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
@@ -44,23 +46,56 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $auditLogModel;
 
     /**
-     * DashboardSubscriber constructor.
-     *
-     * @param AuditLogModel $auditLogModel
+     * @var TranslatorInterface
      */
-    public function __construct(AuditLogModel $auditLogModel)
-    {
+    protected $translator;
+
+    /**
+     * @var RouterInterface
+     */
+    protected $router;
+
+    /**
+     * @var CorePermissions
+     */
+    protected $security;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $dispatcher;
+
+    /**
+     * @var ModelFactory
+     */
+    protected $modelFactory;
+
+    /**
+     * @param AuditLogModel   $router
+     * @param CorePermissions $dispatcher
+     */
+    public function __construct(
+        AuditLogModel $auditLogModel,
+        TranslatorInterface $translator,
+        RouterInterface $router,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        ModelFactory $modelFactory
+    ) {
         $this->auditLogModel = $auditLogModel;
+        $this->translator    = $translator;
+        $this->router        = $router;
+        $this->security      = $security;
+        $this->dispatcher    = $dispatcher;
+        $this->modelFactory  = $modelFactory;
     }
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
-        if ($event->getType() == 'recent.activity') {
+        if ('recent.activity' == $event->getType()) {
             if (!$event->isCached()) {
                 $height = $event->getWidget()->getHeight();
                 $limit  = round(($height - 80) / 75);
@@ -70,12 +105,12 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 foreach ($logs as $key => &$log) {
                     if (!empty($log['bundle']) && !empty($log['object']) && !empty($log['objectId'])) {
                         try {
-                            $model = $this->factory->getModel($log['bundle'].'.'.$log['object']);
+                            $model = $this->modelFactory->getModel($log['bundle'].'.'.$log['object']);
                             $item  = $model->getEntity($log['objectId']);
                             if (method_exists($item, $model->getNameGetter())) {
                                 $log['objectName'] = $item->{$model->getNameGetter()}();
 
-                                if ($log['bundle'] == 'lead' && $log['objectName'] == 'mautic.lead.lead.anonymous') {
+                                if ('lead' == $log['bundle'] && 'mautic.lead.lead.anonymous' == $log['objectName']) {
                                     $log['objectName'] = $this->translator->trans('mautic.lead.lead.anonymous');
                                 }
                             } else {
@@ -83,7 +118,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                             }
 
                             $routeName = 'mautic_'.$log['bundle'].'_action';
-                            if ($this->router->getRouteCollection()->get($routeName) !== null) {
+                            if (null !== $this->router->getRouteCollection()->get($routeName)) {
                                 $log['route'] = $this->router->generate(
                                     'mautic_'.$log['bundle'].'_action',
                                     ['objectAction' => 'view', 'objectId' => $log['objectId']]

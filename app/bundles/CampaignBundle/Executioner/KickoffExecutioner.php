@@ -76,11 +76,6 @@ class KickoffExecutioner implements ExecutionerInterface
     private $progressBar;
 
     /**
-     * @var int
-     */
-    private $batchCounter = 0;
-
-    /**
      * @var ArrayCollection
      */
     private $rootEvents;
@@ -92,12 +87,6 @@ class KickoffExecutioner implements ExecutionerInterface
 
     /**
      * KickoffExecutioner constructor.
-     *
-     * @param LoggerInterface      $logger
-     * @param KickoffContactFinder $kickoffContactFinder
-     * @param TranslatorInterface  $translator
-     * @param EventExecutioner     $executioner
-     * @param EventScheduler       $scheduler
      */
     public function __construct(
         LoggerInterface $logger,
@@ -114,10 +103,6 @@ class KickoffExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @param Campaign             $campaign
-     * @param ContactLimiter       $limiter
-     * @param OutputInterface|null $output
-     *
      * @return Counter
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
@@ -142,7 +127,6 @@ class KickoffExecutioner implements ExecutionerInterface
         } finally {
             if ($this->progressBar) {
                 $this->progressBar->finish();
-                $this->output->writeln("\n");
             }
         }
 
@@ -157,27 +141,31 @@ class KickoffExecutioner implements ExecutionerInterface
         $this->logger->debug('CAMPAIGN: Triggering kickoff events');
 
         $this->progressBar  = null;
-        $this->batchCounter = 0;
 
         $this->rootEvents = $this->campaign->getRootEvents();
         $totalRootEvents  = $this->rootEvents->count();
-        $this->logger->debug('CAMPAIGN: Processing the following events: '.implode(', ', $this->rootEvents->getKeys()));
-
-        $totalContacts      = $this->kickoffContactFinder->getContactCount($this->campaign->getId(), $this->rootEvents->getKeys(), $this->limiter);
-        $totalKickoffEvents = $totalRootEvents * $totalContacts;
-
-        $this->output->writeln(
-            $this->translator->trans(
-                'mautic.campaign.trigger.event_count',
-                [
-                    '%events%' => $totalKickoffEvents,
-                    '%batch%'  => $this->limiter->getBatchLimit(),
-                ]
-            )
-        );
-
-        if (!$totalKickoffEvents) {
+        if (!$totalRootEvents) {
             throw new NoEventsFoundException();
+        }
+        $this->logger->debug('CAMPAIGN: Processing the following events: '.implode(', ', $this->rootEvents->getKeys()));
+        $totalKickoffEvents = 0;
+        if (!($this->output instanceof NullOutput)) {
+            $totalContacts      = $this->kickoffContactFinder->getContactCount($this->campaign->getId(), $this->rootEvents->getKeys(), $this->limiter);
+            $totalKickoffEvents = $totalRootEvents * $totalContacts;
+
+            $this->output->writeln(
+                $this->translator->trans(
+                    'mautic.campaign.trigger.event_count',
+                    [
+                        '%events%' => $totalKickoffEvents,
+                        '%batch%'  => $this->limiter->getBatchLimit(),
+                    ]
+                )
+            );
+
+            if (!$totalKickoffEvents) {
+                throw new NoEventsFoundException();
+            }
         }
 
         $this->progressBar = ProgressBarHelper::init($this->output, $totalKickoffEvents);
@@ -199,7 +187,7 @@ class KickoffExecutioner implements ExecutionerInterface
 
         // Loop over contacts until the entire campaign is executed
         $contacts = $this->kickoffContactFinder->getContacts($this->campaign->getId(), $this->limiter);
-        while ($contacts->count()) {
+        while ($contacts && $contacts->count()) {
             $batchMinContactId = max($contacts->getKeys()) + 1;
             $rootEvents        = clone $this->rootEvents;
 
@@ -208,21 +196,24 @@ class KickoffExecutioner implements ExecutionerInterface
                 $this->progressBar->advance($contacts->count());
                 $this->counter->advanceEvaluated($contacts->count());
 
-                // Check if the event should be scheduled (let the schedulers do the debug logging)
-                $executionDate = $this->scheduler->getExecutionDateTime($event, $now);
-                $this->logger->debug(
-                    'CAMPAIGN: Event ID# '.$event->getId().
-                    ' to be executed on '.$executionDate->format('Y-m-d H:i:s').
-                    ' compared to '.$now->format('Y-m-d H:i:s')
-                );
+                try {
+                    // Get the date the event would be executed on as if it was based on days only
+                    $executionDate = $this->scheduler->getExecutionDateTime($event, $now);
+                    $this->logger->debug(
+                        'CAMPAIGN: Event ID# '.$event->getId().
+                        ' to be executed on '.$executionDate->format('Y-m-d H:i:s e').
+                        ' compared to '.$now->format('Y-m-d H:i:s e')
+                    );
 
-                if ($this->scheduler->shouldSchedule($executionDate, $now)) {
+                    // Adjust the hour based on contact timezone if applicable
+                    $this->scheduler->validateAndScheduleEventForContacts($event, $executionDate, $contacts, $now);
+
                     $this->counter->advanceTotalScheduled($contacts->count());
-                    $this->scheduler->schedule($event, $executionDate, $contacts);
-
                     $rootEvents->remove($key);
 
                     continue;
+                } catch (NotSchedulableException $exception) {
+                    // Execute the event
                 }
             }
 
