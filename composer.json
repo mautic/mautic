@@ -9,7 +9,7 @@
             "MauticPlugin\\": "plugins/",
             "Mautic\\Middleware\\": "app/middlewares/"
         },
-        "files": [	
+        "files": [
             "app/AppKernel.php",
             "app/AppCache.php"
         ]
