@@ -67,8 +67,7 @@ class IntegrationSyncSettingsObjectFieldType extends AbstractType
             throw new InvalidFormOptionException('field "'.$field->getName().'" must allow at least 1 direction for sync');
         }
 
-        reset($choices);
-        $defaultChoice = key($choices);
+        $defaultChoice = $choices[array_key_first($choices)];
 
         $builder->add(
             'syncDirection',
