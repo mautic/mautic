@@ -23,19 +23,11 @@ class PreferenceChannelsType extends AbstractType
      */
     private $leadModel;
 
-    /**
-     * ModifyDNCActionType constructor.
-     *
-     * @param LeadModel $leadModel
-     */
     public function __construct(LeadModel $leadModel)
     {
         $this->leadModel = $leadModel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $model = $this->leadModel;
@@ -45,7 +37,7 @@ class PreferenceChannelsType extends AbstractType
                 'choices'     => function (Options $options) use ($model) {
                     return array_flip($model->getPreferenceChannels());
                 },
-                'empty_value' => '',
+                'placeholder' => '',
                 'attr'        => ['class' => 'form-control'],
                 'label_attr'  => ['class' => 'control-label'],
                 'multiple'    => false,
@@ -55,9 +47,6 @@ class PreferenceChannelsType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
         return 'choice';

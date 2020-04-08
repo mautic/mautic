@@ -23,7 +23,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class ReplyTest extends \PHPUnit_Framework_TestCase
+class ReplyTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Test that the message is processed appropriately

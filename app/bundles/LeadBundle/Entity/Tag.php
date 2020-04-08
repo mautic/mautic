@@ -37,9 +37,6 @@ class Tag
         $this->tag = $this->validateTag($tag);
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadMetadata(ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -51,9 +48,6 @@ class Tag
         $builder->addField('tag', Type::STRING);
     }
 
-    /**
-     * @param ApiMetadataDriver $metadata
-     */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
         $metadata->setGroupPrefix('tag')

@@ -28,7 +28,7 @@ class IntegrationCampaignParts
      */
     public function __construct($field)
     {
-        if (strpos($field, '::') !== false) {
+        if (false !== strpos($field, '::')) {
             list($integrationName, $campaignId) = explode('::', $field);
         } else {
             // Assuming this is a Salesforce integration for BC with pre 2.11.0

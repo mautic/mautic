@@ -1,8 +1,8 @@
 // Mautic hack: reverted https://github.com/ichord/At.js/pull/423
 
 /**
- * at.js - 1.5.1
- * Copyright (c) 2016 chord.luo <chord.luo@gmail.com>;
+ * at.js - 1.5.4
+ * Copyright (c) 2018 chord.luo <chord.luo@gmail.com>;
  * Homepage: http://ichord.github.com/At.js
  * License: MIT
  */
@@ -90,7 +90,7 @@
       });
     },
     tplEval: function(tpl, map) {
-      var error, template;
+      var error, error1, template;
       template = tpl;
       try {
         if (typeof tpl !== 'string') {
@@ -144,7 +144,7 @@
     };
 
     App.prototype.setupRootElement = function(iframe, asRoot) {
-      var error;
+      var error, error1;
       if (asRoot == null) {
         asRoot = false;
       }
@@ -275,6 +275,9 @@
 
     App.prototype.dispatch = function(e) {
       var _, c, ref, results;
+      if (void 0 === e) {
+        return;
+      }
       ref = this.controllers;
       results = [];
       for (_ in ref) {
@@ -410,7 +413,7 @@
     };
 
     Controller.prototype.callDefault = function() {
-      var args, error, funcName;
+      var args, error, error1, funcName;
       funcName = arguments[0], args = 2 <= arguments.length ? slice.call(arguments, 1) : [];
       try {
         return DEFAULT_CALLBACKS[funcName].apply(this, args);
@@ -436,7 +439,7 @@
     };
 
     Controller.prototype.getOpt = function(at, default_value) {
-      var e;
+      var e, error1;
       try {
         return this.setting[at];
       } catch (error1) {
@@ -600,8 +603,8 @@
     TextareaController.prototype.rect = function() {
       var c, iframeOffset, scaleBottom;
       if (!(c = this.$inputor.caret('offset', this.pos - 1, {
-            iframe: this.app.iframe
-          }))) {
+        iframe: this.app.iframe
+      }))) {
         return;
       }
       if (this.app.iframe && !this.app.iframeAsRoot) {
@@ -811,7 +814,7 @@
     EditableController.prototype.rect = function() {
       var $iframe, iframeOffset, rect;
       rect = this.query.el.offset();
-      if (!rect) {
+      if (!(rect && this.query.el[0].getClientRects().length)) {
         return;
       }
       if (this.app.iframe && !this.app.iframeAsRoot) {
@@ -828,26 +831,25 @@
       if (!this.$inputor.is(':focus')) {
         this.$inputor.focus();
       }
-      overrides = this.getOpt("functionOverrides");
+      overrides = this.getOpt('functionOverrides');
       if (overrides.insert) {
-        return overrides.insert.bind(this)(content, $li);
-      } else {
-        suffix = (suffix = this.getOpt('suffix')) === "" ? suffix : suffix || "\u00A0";
-        data = $li.data('item-data');
-        this.query.el.removeClass('atwho-query').addClass('atwho-inserted').html(content).attr('data-atwho-at-query', "" + data['atwho-at'] + this.query.text);
-        if (range = this._getRange()) {
-          if (this.query.el.length) {
-            range.setEndAfter(this.query.el[0]);
-          }
-          range.collapse(false);
-          range.insertNode(suffixNode = this.app.document.createTextNode("" + suffix));
-          this._setRange('after', suffixNode, range);
-        }
-        if (!this.$inputor.is(':focus')) {
-          this.$inputor.focus();
-        }
-        return this.$inputor.change();
+        return overrides.insert.call(this, content, $li);
       }
+      suffix = (suffix = this.getOpt('suffix')) === "" ? suffix : suffix || "\u00A0";
+      data = $li.data('item-data');
+      this.query.el.removeClass('atwho-query').addClass('atwho-inserted').html(content).attr('data-atwho-at-query', "" + data['atwho-at'] + this.query.text);
+      if (range = this._getRange()) {
+        if (this.query.el.length) {
+          range.setEndAfter(this.query.el[0]);
+        }
+        range.collapse(false);
+        range.insertNode(suffixNode = this.app.document.createTextNode("\u200D" + suffix));
+        this._setRange('after', suffixNode, range);
+      }
+      if (!this.$inputor.is(':focus')) {
+        this.$inputor.focus();
+      }
+      return this.$inputor.change();
     };
 
     return EditableController;
@@ -1025,7 +1027,7 @@
       cur = this.$el.find('.cur').removeClass('cur');
       next = cur.next();
       if (!next.length) {
-        next = this.$el.find('li:first');
+        next = this.$el.find('li').first();
       }
       next.addClass('cur');
       nextEl = next[0];
@@ -1038,7 +1040,7 @@
       cur = this.$el.find('.cur').removeClass('cur');
       prev = cur.prev();
       if (!prev.length) {
-        prev = this.$el.find('li:last');
+        prev = this.$el.find('li').last();
       }
       prev.addClass('cur');
       prevEl = prev[0];
@@ -1114,7 +1116,7 @@
       }
       this.show();
       if (this.context.getOpt('highlightFirst')) {
-        return $ul.find("li:first").addClass("cur");
+        return $ul.find("li").first().addClass("cur");
       }
     };
 

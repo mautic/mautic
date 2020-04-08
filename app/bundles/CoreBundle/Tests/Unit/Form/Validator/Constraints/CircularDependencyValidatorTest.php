@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\CoreBundle\Tests\Form\Validator\Constraints;
+namespace Mautic\CoreBundle\Tests\Unit\Form\Validator\Constraints;
 
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator;
@@ -10,28 +10,25 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Context\ExecutionContext;
 
-/**
- * Exercises CircularDependencyValidator.
- */
-class CircularDependencyValidatorTest extends \PHPUnit_Framework_TestCase
+class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ListModel
+     * @var \PHPUnit\Framework\MockObject\MockObject|ListModel
      */
     private $mockListModel;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ExecutionContext
+     * @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContext
      */
     private $context;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|RequestStack
+     * @var \PHPUnit\Framework\MockObject\MockObject|RequestStack
      */
     private $requestStack;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Request
+     * @var \PHPUnit\Framework\MockObject\MockObject|Request
      */
     private $request;
 
@@ -116,8 +113,6 @@ class CircularDependencyValidatorTest extends \PHPUnit_Framework_TestCase
                 'operator' => '=',
             ],
         ];
-
-        $mockEntity = $this->createMock(LeadList::class);
 
         $mockEntity1 = $this->createMock(LeadList::class);
         $mockEntity1->expects($this->any())

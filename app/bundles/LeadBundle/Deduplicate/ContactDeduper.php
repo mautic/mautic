@@ -47,10 +47,6 @@ class ContactDeduper
 
     /**
      * DedupModel constructor.
-     *
-     * @param FieldModel     $fieldModel
-     * @param ContactMerger  $contactMerger
-     * @param LeadRepository $leadRepository
      */
     public function __construct(FieldModel $fieldModel, ContactMerger $contactMerger, LeadRepository $leadRepository)
     {
@@ -60,8 +56,7 @@ class ContactDeduper
     }
 
     /**
-     * @param bool                 $mergeNewerIntoOlder
-     * @param OutputInterface|null $output
+     * @param bool $mergeNewerIntoOlder
      *
      * @return int
      */
@@ -115,8 +110,6 @@ class ContactDeduper
     }
 
     /**
-     * @param array $queryFields
-     *
      * @return Lead[]
      */
     public function checkForDuplicateContacts(array $queryFields)
@@ -137,8 +130,6 @@ class ContactDeduper
     }
 
     /**
-     * @param array $queryFields
-     *
      * @return array
      */
     public function getUniqueData(array $queryFields)

@@ -15,9 +15,6 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class UpdateCompanyActionType.
- */
 class UpdateCompanyActionType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
@@ -27,21 +24,13 @@ class UpdateCompanyActionType extends AbstractType
      */
     protected $fieldModel;
 
-    /**
-     * @param FieldModel $fieldModel
-     */
     public function __construct(FieldModel $fieldModel)
     {
         $this->fieldModel = $fieldModel;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
         $leadFields = $this->fieldModel->getEntities(
             [
                 'force' => [
@@ -64,7 +53,7 @@ class UpdateCompanyActionType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'updatecompany_action';
     }

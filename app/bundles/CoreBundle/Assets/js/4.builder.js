@@ -209,7 +209,7 @@ Mautic.formatCode = function() {
  */
 Mautic.openMediaManager = function() {
     Mautic.openServerBrowser(
-        mauticBasePath + '/' + mauticAssetPrefix + 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/index.html?type=Images',
+        mauticBasePath + '/elfinder',
         screen.width * 0.7,
         screen.height * 0.7
     );
@@ -860,7 +860,7 @@ Mautic.initSections = function() {
         iframeFix: true,
         connectToSortable: 'body',
         revert: 'invalid',
-        iframeOffset: iframe.offset(),
+        iframeOffset: iframe.jQuery2Offset(),
         helper: function(e, ui) {
             // Fix body overflow that messes sortable up
             bodyOverflow.overflowX = mQuery('body', parent.document).css('overflow-x');
@@ -1017,7 +1017,7 @@ Mautic.initSlots = function(slotContainers) {
         iframeFix: true,
         connectToSortable: '[data-slot-container]',
         revert: 'invalid',
-        iframeOffset: iframe.offset(),
+        iframeOffset: iframe.jQuery2Offset(),
         helper: function(e, ui) {
             // fix for Uncaught TypeError: Cannot read property 'document' of null
             // Fix body overflow that messes sortable up
@@ -1166,6 +1166,18 @@ Mautic.isSlotInitiated = function(slot) {
     return typeof Mautic.builderSlots.find(function(params) {
         return slot.is(params.slot);
     }) !== 'undefined';
+};
+
+Mautic.isCodeMode = function() {
+    return mQuery('a[data-theme=mautic_code_mode]').first().hasClass('hide');
+};
+
+window.document.fileManagerInsertImageCallback = function(selector, url) {
+    if (Mautic.isCodeMode()) {
+        Mautic.insertTextAtCMCursor(url);
+    } else {
+        mQuery(selector).froalaEditor('image.insert', url);
+    }
 };
 
 Mautic.initSlotListeners = function() {
@@ -1533,7 +1545,7 @@ Mautic.initSlotListeners = function() {
             params.slot.find('label.label3').text(params.field.val());
         } else if ('label-text4' === fieldParam) {
             params.slot.find('label.label4').text(params.field.val());
-        } else if ('glink' === fieldParam || 'flink' === fieldParam || 'tlink' === fieldParam) {
+        } else if ('flink' === fieldParam || 'tlink' === fieldParam) {
             params.slot.find('#'+fieldParam).attr('href', params.field.val());
         } else if (fieldParam === 'href') {
             params.slot.find('a').eq(0).attr('href', params.field.val());

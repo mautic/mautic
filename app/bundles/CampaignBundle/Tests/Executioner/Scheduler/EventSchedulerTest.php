@@ -25,15 +25,15 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class EventSchedulerTest extends \PHPUnit_Framework_TestCase
+class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $logger;
 
     /**
-     * @var EventLogger|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventLogger|\PHPUnit\Framework\MockObject\MockObject
      */
     private $eventLogger;
 
@@ -48,17 +48,17 @@ class EventSchedulerTest extends \PHPUnit_Framework_TestCase
     private $dateTimeScheduler;
 
     /**
-     * @var EventCollector|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventCollector|\PHPUnit\Framework\MockObject\MockObject
      */
     private $eventCollector;
 
     /**
-     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $dispatcher;
 
     /**
-     * @var CoreParametersHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $coreParamtersHelper;
 
@@ -66,7 +66,7 @@ class EventSchedulerTest extends \PHPUnit_Framework_TestCase
     {
         $this->logger              = new NullLogger();
         $this->coreParamtersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->coreParamtersHelper->method('getParameter')
+        $this->coreParamtersHelper->method('get')
             ->willReturnCallback(
                 function ($param, $default) {
                     return 'America/New_York';

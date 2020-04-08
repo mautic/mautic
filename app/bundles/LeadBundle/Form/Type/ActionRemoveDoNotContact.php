@@ -12,25 +12,13 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class FormSubmitActionRemoveDoNotContact.
- */
 class ActionRemoveDoNotContact extends AbstractType
 {
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-    }
-
-    /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'lead_action_removedonotcontact';
     }

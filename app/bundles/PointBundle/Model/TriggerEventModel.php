@@ -13,17 +13,16 @@ namespace Mautic\PointBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\PointBundle\Entity\TriggerEvent;
+use Mautic\PointBundle\Entity\TriggerEventRepository;
+use Mautic\PointBundle\Form\Type\TriggerEventType;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class TriggerEventModel.
- */
 class TriggerEventModel extends CommonFormModel
 {
     /**
      * {@inheritdoc}
      *
-     * @return \Mautic\PointBundle\Entity\TriggerEventRepository
+     * @return TriggerEventRepository
      */
     public function getRepository()
     {
@@ -45,7 +44,7 @@ class TriggerEventModel extends CommonFormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new TriggerEvent();
         }
 
@@ -67,7 +66,7 @@ class TriggerEventModel extends CommonFormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('pointtriggerevent', $entity, $options);
+        return $formFactory->create(TriggerEventType::class, $entity, $options);
     }
 
     /**

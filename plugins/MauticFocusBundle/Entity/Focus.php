@@ -104,9 +104,6 @@ class Focus extends FormEntity
      */
     private $cache;
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint(
@@ -140,9 +137,6 @@ class Focus extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -268,8 +262,6 @@ class Focus extends FormEntity
     }
 
     /**
-     * @param mixed $setHtml
-     *
      * @return Focus
      */
     public function setEditor($editor)
@@ -290,8 +282,6 @@ class Focus extends FormEntity
     }
 
     /**
-     * @param mixed $setHtml
-     *
      * @return Focus
      */
     public function setHtml($html)
@@ -312,8 +302,6 @@ class Focus extends FormEntity
     }
 
     /**
-     * @param mixed $html
-     *
      * @return Focus
      */
     public function setHtmlMode($htmlMode)

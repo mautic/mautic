@@ -64,9 +64,6 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
      * @return bool
      */
     protected function checkRunStatus(InputInterface $input, OutputInterface $output, $moderationKey = '')
@@ -148,7 +145,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     private function checkStatus($force = false, $lockMode = null)
     {
         // getmypid may be disabled and posix_getpgid is not available on Windows machines
-        if ((is_null($lockMode) || $lockMode === 'pid') && function_exists('getmypid') && function_exists('posix_getpgid')) {
+        if ((is_null($lockMode) || 'pid' === $lockMode) && function_exists('getmypid') && function_exists('posix_getpgid')) {
             $disabled = explode(',', ini_get('disable_functions'));
             if (!in_array('getmypid', $disabled) && !in_array('posix_getpgid', $disabled)) {
                 $this->moderationMode = self::MODE_PID;
@@ -183,7 +180,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
 
                 return true;
             }
-        } elseif ($lockMode === self::MODE_FLOCK && !$force) {
+        } elseif (self::MODE_FLOCK === $lockMode && !$force) {
             $this->moderationMode = self::MODE_FLOCK;
             $error                = null;
             // Silence error reporting

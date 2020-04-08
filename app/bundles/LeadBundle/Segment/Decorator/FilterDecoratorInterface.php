@@ -18,16 +18,12 @@ interface FilterDecoratorInterface
     /**
      * Returns filter's field (usually a column name in DB).
      *
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
-     * @return null|string
+     * @return string|null
      */
     public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate);
 
     /**
      * Returns DB table.
-     *
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
      *
      * @return string
      */
@@ -36,8 +32,6 @@ interface FilterDecoratorInterface
     /**
      * Returns a string operator (like, eq, neq, ...).
      *
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string
      */
     public function getOperator(ContactSegmentFilterCrate $contactSegmentFilterCrate);
@@ -45,8 +39,7 @@ interface FilterDecoratorInterface
     /**
      * Returns an argument for QueryBuilder (usually ':arg' in case that $argument is equal to 'arg' string.
      *
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     * @param array|string              $argument
+     * @param array|string $argument
      *
      * @return array|string
      */
@@ -55,16 +48,12 @@ interface FilterDecoratorInterface
     /**
      * Returns formatted value for QueryBuilder ('%value%' for 'like', '%value' for 'Ends with', SQL-formatted date etc.).
      *
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
-     * @return array|bool|float|null|string
+     * @return array|bool|float|string|null
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate);
 
     /**
      * Returns QueryBuilder's service name from the container.
-     *
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
      *
      * @return string
      */
@@ -74,8 +63,6 @@ interface FilterDecoratorInterface
      * Returns a name of aggregation function for SQL (SUM, COUNT etc.)
      * Returns false if no aggregation function is needed.
      *
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string|bool if no func needed
      */
     public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate);
@@ -84,9 +71,7 @@ interface FilterDecoratorInterface
      * Returns a special where condition which is needed to be added to QueryBuilder (like email_stats.is_read = 1 for 'Read emails')
      * Returns null if no special condition is needed.
      *
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
-     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|null|string
+     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string|null
      */
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate);
 }

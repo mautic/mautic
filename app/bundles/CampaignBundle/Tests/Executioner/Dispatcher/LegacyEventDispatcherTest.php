@@ -26,33 +26,34 @@ use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\MockObject\MockBuilder;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class LegacyEventDispatcherTest extends \PHPUnit_Framework_TestCase
+class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockBuilder|EventDispatcherInterface
+     * @var MockBuilder|EventDispatcherInterface
      */
     private $dispatcher;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockBuilder|EventScheduler
+     * @var MockBuilder|EventScheduler
      */
     private $scheduler;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockBuilder|LeadModel
+     * @var MockBuilder|LeadModel
      */
     private $leadModel;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockBuilder|NotificationHelper
+     * @var MockBuilder|NotificationHelper
      */
     private $notificationHelper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockBuilder|MauticFactory
+     * @var MockBuilder|MauticFactory
      */
     private $mauticFactory;
 

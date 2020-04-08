@@ -18,7 +18,7 @@ use Mautic\UserBundle\Event\LoginEvent;
 use Mautic\UserBundle\EventListener\SecuritySubscriber;
 use Mautic\UserBundle\UserEvents;
 
-class SecuritySubscriberTest extends \PHPUnit_Framework_TestCase
+class SecuritySubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetSubscribedEvents()
     {

@@ -13,19 +13,28 @@ namespace Mautic\PluginBundle\EventListener;
 
 use DOMDocument;
 use Joomla\Http\Response;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\PluginEvents;
+use Monolog\Logger;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Class IntegrationSubscriber.
- *
  * This class can provide useful debugging information for API requests and responses.
  * The information is displayed when a command is executed from the console and the -vv flag is passed to it.
  */
-class IntegrationSubscriber extends CommonSubscriber
+class IntegrationSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var Logger
+     */
+    private $logger;
+
+    public function __construct(Logger $logger)
+    {
+        $this->logger = $logger;
+    }
+
     /**
      * @return array
      */

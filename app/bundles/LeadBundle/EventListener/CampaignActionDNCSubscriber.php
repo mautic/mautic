@@ -36,9 +36,6 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
 
     /**
      * CampaignActionDNCSubscriber constructor.
-     *
-     * @param DoNotContact $doNotContact
-     * @param LeadModel    $leadModel
      */
     public function __construct(DoNotContact $doNotContact, LeadModel $leadModel)
     {
@@ -58,9 +55,6 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function configureAction(CampaignBuilderEvent $event)
     {
         $event->addAction(
@@ -84,9 +78,6 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param PendingEvent $event
-     */
     public function addDoNotContact(PendingEvent $event)
     {
         $config          = $event->getEvent()->getProperties();
@@ -112,9 +103,6 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
         $event->passAll();
     }
 
-    /**
-     * @param PendingEvent $event
-     */
     public function removeDoNotContact(PendingEvent $event)
     {
         $config          = $event->getEvent()->getProperties();

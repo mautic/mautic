@@ -35,9 +35,8 @@ interface TokenTransportInterface
     /**
      * Get the count for the max number of recipients per batch.
      *
-     * @param \Swift_Message $message
-     * @param int            $toBeAdded Number of emails about to be added
-     * @param string         $type      Type of emails being added (to, cc, bcc)
+     * @param int    $toBeAdded Number of emails about to be added
+     * @param string $type      Type of emails being added (to, cc, bcc)
      *
      * @return int
      */

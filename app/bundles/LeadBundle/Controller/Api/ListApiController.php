@@ -11,16 +11,12 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
-use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
+use Mautic\LeadBundle\Entity\LeadList;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
-/**
- * Class ListApiController.
- */
 class ListApiController extends CommonApiController
 {
     use LeadAccessTrait;
@@ -28,7 +24,7 @@ class ListApiController extends CommonApiController
     public function initialize(FilterControllerEvent $event)
     {
         $this->model            = $this->getModel('lead.list');
-        $this->entityClass      = 'Mautic\LeadBundle\Entity\LeadList';
+        $this->entityClass      = LeadList::class;
         $this->entityNameOne    = 'list';
         $this->entityNameMulti  = 'lists';
         $this->serializerGroups = ['leadListDetails', 'userList', 'publishDetails', 'ipAddress'];
@@ -44,9 +40,9 @@ class ListApiController extends CommonApiController
     public function getListsAction()
     {
         $lists   = $this->getModel('lead.list')->getUserLists();
-        $view    = $this->view($lists, Codes::HTTP_OK);
-        $context = SerializationContext::create()->setGroups(['leadListList']);
-        $view->setSerializationContext($context);
+        $view    = $this->view($lists, Response::HTTP_OK);
+        $context = $view->getContext()->setGroups(['leadListList']);
+        $view->setContext($context);
 
         return $this->handleView($view);
     }
@@ -82,7 +78,7 @@ class ListApiController extends CommonApiController
 
         $this->getModel('lead')->addToLists($leadId, $entity);
 
-        $view = $this->view(['success' => 1], Codes::HTTP_OK);
+        $view = $this->view(['success' => 1], Response::HTTP_OK);
 
         return $this->handleView($view);
     }
@@ -100,7 +96,7 @@ class ListApiController extends CommonApiController
     {
         $contactIds = $this->request->request->get('ids');
         if (null === $contactIds) {
-            return $this->returnError('mautic.core.error.badrequest', Codes::HTTP_BAD_REQUEST);
+            return $this->returnError('mautic.core.error.badrequest', Response::HTTP_BAD_REQUEST);
         }
 
         $entity = $this->model->getEntity($id);
@@ -127,7 +123,7 @@ class ListApiController extends CommonApiController
             }
         }
 
-        $view = $this->view(['success' => 1, 'details' => $responseDetail], Codes::HTTP_OK);
+        $view = $this->view(['success' => 1, 'details' => $responseDetail], Response::HTTP_OK);
 
         return $this->handleView($view);
     }
@@ -163,7 +159,7 @@ class ListApiController extends CommonApiController
 
         $this->getModel('lead')->removeFromLists($leadId, $entity);
 
-        $view = $this->view(['success' => 1], Codes::HTTP_OK);
+        $view = $this->view(['success' => 1], Response::HTTP_OK);
 
         return $this->handleView($view);
     }
@@ -178,9 +174,9 @@ class ListApiController extends CommonApiController
      */
     protected function checkEntityAccess($entity, $action = 'view')
     {
-        if ($action == 'create' || $action == 'edit' || $action == 'view') {
+        if ('create' == $action || 'edit' == $action || 'view' == $action) {
             return $this->security->isGranted('lead:leads:viewown');
-        } elseif ($action == 'delete') {
+        } elseif ('delete' == $action) {
             return $this->factory->getSecurity()->hasEntityAccess(
                 true, 'lead:lists:deleteother', $entity->getCreatedBy()
             );

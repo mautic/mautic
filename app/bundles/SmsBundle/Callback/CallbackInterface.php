@@ -29,8 +29,6 @@ interface CallbackInterface
     /**
      * Return all contacts that match whatever identifiers the service provides (likely number).
      *
-     * @param Request $request
-     *
      * @return ArrayCollection
      *
      * @throws NumberNotFoundException
@@ -41,8 +39,6 @@ interface CallbackInterface
 
     /**
      * Extract the message in the reply from the request.
-     *
-     * @param Request $request
      *
      * @return string
      *

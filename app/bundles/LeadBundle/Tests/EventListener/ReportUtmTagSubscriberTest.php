@@ -21,7 +21,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class ReportUtmTagSubscriberTest extends \PHPUnit_Framework_TestCase
+class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testNotRelevantContextBuilder()
     {
@@ -139,7 +139,7 @@ class ReportUtmTagSubscriberTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $reportBuilderEvent->getTables()); //Different order of keys on PHP 5.6.
+        $this->assertSame($expected, $reportBuilderEvent->getTables());
     }
 
     public function testReportGenerateNoJoinedTables()
@@ -194,7 +194,7 @@ class ReportUtmTagSubscriberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return ReportGeneratorEvent|\PHPUnit_Framework_MockObject_MockObject
+     * @return ReportGeneratorEvent|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getReportGeneratorEventMock()
     {
@@ -209,7 +209,7 @@ class ReportUtmTagSubscriberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return QueryBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @return QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getQueryBuilderMock()
     {

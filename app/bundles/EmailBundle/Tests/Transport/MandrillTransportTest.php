@@ -17,7 +17,7 @@ use Mautic\EmailBundle\Swiftmailer\Transport\MandrillTransport;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
 
-class MandrillTransportTest extends \PHPUnit_Framework_TestCase
+class MandrillTransportTest extends \PHPUnit\Framework\TestCase
 {
     public function testWebhookPayloadIsProcessed()
     {

@@ -90,7 +90,7 @@ class LogRepository extends CommonRepository
         if (isset($result['thecount'])) {
             $allCount = (int) $result['thecount'];
         } else {
-            return;
+            return null;
         }
 
         // Count successful responses
@@ -111,6 +111,6 @@ class LogRepository extends CommonRepository
             return $successCount / $allCount;
         }
 
-        return;
+        return null;
     }
 }

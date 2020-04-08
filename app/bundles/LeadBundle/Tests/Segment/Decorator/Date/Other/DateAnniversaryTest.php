@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateAnniversary;
 use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
-class DateAnniversaryTest extends \PHPUnit_Framework_TestCase
+class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateAnniversary::getOperator
@@ -46,14 +46,22 @@ class DateAnniversaryTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetParameterValue()
     {
+        /**
+         * Today in '%-m-d' format.
+         *
+         * @var string
+         */
+        $expectedResult = '%'.(new \DateTime(null, new \DateTimeZone('UTC')))->format('-m-d');
+
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
-        $date = new DateTimeHelper('2018-03-02', null, 'local');
-
         $timezoneResolver->method('getDefaultDate')
-            ->with()
-            ->willReturn($date);
+            ->with(false)
+            ->willReturn(
+                new DateTimeHelper(
+                    new \DateTime('midnight today', new \DateTimeZone('UTC')), null, 'UTC')
+            );
 
         $filter        = [
             'operator' => '=',
@@ -65,6 +73,6 @@ class DateAnniversaryTest extends \PHPUnit_Framework_TestCase
 
         $filterDecorator = new DateAnniversary($dateDecorator, $dateOptionParameters);
 
-        $this->assertEquals('%-03-02', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+        $this->assertEquals($expectedResult, $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 }

@@ -47,10 +47,6 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Component\EventDispat
 
     /**
      * PendingEvent constructor.
-     *
-     * @param AbstractEventAccessor $config
-     * @param Event                 $event
-     * @param ArrayCollection       $logs
      */
     public function __construct(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
     {

@@ -22,13 +22,12 @@ class Serializer
      * PHP does not recommend untrusted user input even with ['allowed_classes' => false]
      *
      * @param string $serializedString
-     * @param array  $options
      *
      * @return mixed
      */
     public static function decode($serializedString, array $options = ['allowed_classes' => false])
     {
-        if (preg_match('/(^|;|{|})O:\+?[0-9]+:"/', $serializedString) === 1) {
+        if (1 === preg_match('/(^|;|{|})O:\+?[0-9]+:"/', $serializedString)) {
             throw new \InvalidArgumentException(sprintf('The string %s contains an object.', $serializedString));
         }
 

@@ -12,7 +12,7 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
-use Mautic\CoreBundle\Translation\Translator;
+use Symfony\Component\Routing\RouterInterface;
 
 trait BuilderControllerTrait
 {
@@ -23,8 +23,8 @@ trait BuilderControllerTrait
     {
         /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
         $assetsHelper = $this->get('templating.helper.assets');
-        /** @var \Symfony\Bundle\FrameworkBundle\Templating\Helper\RouterHelper $routerHelper */
-        $routerHelper = $this->get('templating.helper.router');
+        /** @var RouterInterface $routerHelper */
+        $routerHelper = $this->get('router');
         $translator   = $this->get('templating.helper.translator');
         $assetsHelper
             ->setContext(AssetsHelper::CONTEXT_BUILDER)

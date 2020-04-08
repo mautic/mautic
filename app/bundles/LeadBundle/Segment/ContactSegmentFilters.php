@@ -27,8 +27,6 @@ class ContactSegmentFilters implements \Iterator, \Countable
     private $contactSegmentFilters = [];
 
     /**
-     * @param ContactSegmentFilter $contactSegmentFilter
-     *
      * @return $this
      */
     public function addContactSegmentFilter(ContactSegmentFilter $contactSegmentFilter)

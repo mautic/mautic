@@ -11,6 +11,7 @@
 
 namespace Mautic\PointBundle\Model;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
@@ -20,23 +21,14 @@ use Mautic\PointBundle\Entity\LeadTriggerLog;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Event as Events;
+use Mautic\PointBundle\Form\Type\TriggerType;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class TriggerModel.
- */
 class TriggerModel extends CommonFormModel
 {
     protected $triggers = [];
-
-    /**
-     * @deprecated Remove in 2.0
-     *
-     * @var MauticFactory
-     */
-    protected $factory;
 
     /**
      * @var IpLookupHelper
@@ -54,17 +46,18 @@ class TriggerModel extends CommonFormModel
     protected $pointTriggerEventModel;
 
     /**
-     * EventModel constructor.
+     * @deprecated https://github.com/mautic/mautic/issues/8229
      *
-     * @param IpLookupHelper    $ipLookupHelper
-     * @param LeadModel         $leadModel
-     * @param TriggerEventModel $pointTriggerEventModel
+     * @var MauticFactory
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, TriggerEventModel $pointTriggerEventModel)
+    protected $mauticFactory;
+
+    public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, TriggerEventModel $pointTriggerEventModel, MauticFactory $mauticFactory)
     {
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->leadModel              = $leadModel;
         $this->pointTriggerEventModel = $pointTriggerEventModel;
+        $this->mauticFactory          = $mauticFactory;
     }
 
     /**
@@ -74,7 +67,7 @@ class TriggerModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticPointBundle:Trigger');
+        return $this->em->getRepository(Trigger::class);
     }
 
     /**
@@ -84,7 +77,7 @@ class TriggerModel extends CommonFormModel
      */
     public function getEventRepository()
     {
-        return $this->em->getRepository('MauticPointBundle:TriggerEvent');
+        return $this->em->getRepository(TriggerEvent::class);
     }
 
     /**
@@ -110,7 +103,7 @@ class TriggerModel extends CommonFormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('pointtrigger', $entity, $options);
+        return $formFactory->create(TriggerType::class, $entity, $options);
     }
 
     /**
@@ -189,7 +182,7 @@ class TriggerModel extends CommonFormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Trigger();
         }
 
@@ -238,8 +231,7 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
-     * @param Trigger $entity
-     * @param array   $sessionEvents
+     * @param array $sessionEvents
      */
     public function setEvents(Trigger $entity, $sessionEvents)
     {
@@ -275,7 +267,7 @@ class TriggerModel extends CommonFormModel
     /**
      * Gets array of custom events from bundles subscribed PointEvents::TRIGGER_ON_BUILD.
      *
-     * @return mixed
+     * @return mixed[]
      */
     public function getEvents()
     {
@@ -311,8 +303,7 @@ class TriggerModel extends CommonFormModel
     /**
      * Triggers a specific event.
      *
-     * @param array $event
-     * @param Lead  $lead
+     * @param array $event triggerEvent converted to array
      * @param bool  $force
      *
      * @return bool Was event triggered
@@ -324,7 +315,7 @@ class TriggerModel extends CommonFormModel
             return false;
         }
 
-        if ($lead == null) {
+        if (null === $lead) {
             $lead = $this->leadModel->getCurrentLead();
         }
 
@@ -355,16 +346,15 @@ class TriggerModel extends CommonFormModel
             $triggerEvent = $this->getEventRepository()->find($event['id']);
 
             $triggerExecutedEvent = new Events\TriggerExecutedEvent($triggerEvent, $lead);
-            $event                = $this->dispatcher->dispatch($settings['eventName'], $triggerExecutedEvent);
 
-            return $event->getResult();
+            $this->dispatcher->dispatch($settings['eventName'], $triggerExecutedEvent);
+
+            return $triggerExecutedEvent->getResult();
         }
     }
 
     /**
-     * @param       $event
-     * @param Lead  $lead
-     * @param array $settings
+     * @param $event
      *
      * @return bool
      */
@@ -373,13 +363,13 @@ class TriggerModel extends CommonFormModel
         $args = [
           'event'   => $event,
           'lead'    => $lead,
-          'factory' => $this->factory, // WHAT??
+          'factory' => $this->mauticFactory,
           'config'  => $event['properties'],
         ];
 
         if (is_array($settings['callback'])) {
             $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
-        } elseif (strpos($settings['callback'], '::') !== false) {
+        } elseif (false !== strpos($settings['callback'], '::')) {
             $parts      = explode('::', $settings['callback']);
             $reflection = new \ReflectionMethod($parts[0], $parts[1]);
         } else {
@@ -400,8 +390,6 @@ class TriggerModel extends CommonFormModel
 
     /**
      * Trigger events for the current lead.
-     *
-     * @param Lead $lead
      */
     public function triggerEvents(Lead $lead)
     {

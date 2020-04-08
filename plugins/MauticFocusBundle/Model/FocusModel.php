@@ -25,6 +25,7 @@ use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
+use MauticPlugin\MauticFocusBundle\Form\Type\FocusType;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -65,13 +66,6 @@ class FocusModel extends FormModel
 
     /**
      * FocusModel constructor.
-     *
-     * @param \Mautic\FormBundle\Model\FormModel $formModel
-     * @param TrackableModel                     $trackableModel
-     * @param TemplatingHelper                   $templating
-     * @param EventDispatcherInterface           $dispatcher
-     * @param LeadModel                          $leadModel
-     * @param FieldModel                         $leadFieldModel
      */
     public function __construct(\Mautic\FormBundle\Model\FormModel $formModel, TrackableModel $trackableModel, TemplatingHelper $templating, EventDispatcherInterface $dispatcher, LeadModel $leadModel, FieldModel $leadFieldModel)
     {
@@ -96,7 +90,7 @@ class FocusModel extends FormModel
      */
     public function getPermissionBase()
     {
-        return 'plugin:focus:items';
+        return 'focus:items';
     }
 
     /**
@@ -119,7 +113,7 @@ class FocusModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('focus', $entity, $options);
+        return $formFactory->create(FocusType::class, $entity, $options);
     }
 
     /**
@@ -151,7 +145,7 @@ class FocusModel extends FormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Focus();
         }
 
@@ -176,9 +170,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @param Focus $focus
-     * @param bool  $preview
-     *
      * @return string
      */
     public function generateJavascript(Focus $focus, $isPreview = false, $byPassCache = false)
@@ -189,7 +180,7 @@ class FocusModel extends FormModel
             $focusArray = $focus->toArray();
 
             $url = '';
-            if ($focusArray['type'] == 'link' && !empty($focusArray['properties']['content']['link_url'])) {
+            if ('link' == $focusArray['type'] && !empty($focusArray['properties']['content']['link_url'])) {
                 $trackable = $this->trackableModel->getTrackableByUrl(
                     $focusArray['properties']['content']['link_url'],
                     'focus',
@@ -243,7 +234,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @param array  $focus
      * @param bool   $isPreview
      * @param string $url
      *
@@ -322,10 +312,9 @@ class FocusModel extends FormModel
     /**
      * Add a stat entry.
      *
-     * @param Focus $focus
-     * @param       $type
-     * @param null  $data
-     * @param null  $lead
+     * @param      $type
+     * @param null $data
+     * @param null $lead
      *
      * @return Stat
      */
@@ -419,12 +408,9 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @param Focus          $focus
-     * @param                $unit
-     * @param \DateTime|null $dateFrom
-     * @param \DateTime|null $dateTo
-     * @param null           $dateFormat
-     * @param bool           $canViewOthers
+     * @param      $unit
+     * @param null $dateFormat
+     * @param bool $canViewOthers
      *
      * @return array
      */
@@ -440,8 +426,8 @@ class FocusModel extends FormModel
         $data = $query->loadAndBuildTimeData($q);
         $chart->setDataset($this->translator->trans('mautic.focus.graph.views'), $data);
 
-        if ($focus->getType() != 'notification') {
-            if ($focus->getType() == 'link') {
+        if ('notification' != $focus->getType()) {
+            if ('link' == $focus->getType()) {
                 $q = $query->prepareTimeDataQuery('focus_stats', 'date_added', ['type' => Stat::TYPE_CLICK, 'focus_id' => $focus->getId()]);
                 if (!$canViewOthers) {
                     $this->limitQueryToCreator($q);
@@ -463,8 +449,6 @@ class FocusModel extends FormModel
 
     /**
      * Joins the email table and limits created_by to currently logged in user.
-     *
-     * @param QueryBuilder $q
      */
     public function limitQueryToCreator(QueryBuilder $q)
     {

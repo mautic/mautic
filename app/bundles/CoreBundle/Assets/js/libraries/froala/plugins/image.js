@@ -691,7 +691,7 @@
           return false;
         }
 
-        var resp = $.parseJSON(response);
+        var resp = JSON.parse(response);
         if (resp.link) {
           return resp;
         } else {

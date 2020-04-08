@@ -14,9 +14,6 @@ namespace Mautic\PointBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class LeadTriggerLog.
- */
 class LeadTriggerLog
 {
     /**
@@ -39,15 +36,12 @@ class LeadTriggerLog
      **/
     private $dateFired;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('point_lead_event_log')
-            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\LeadTriggerLogRepository');
+            ->setCustomRepositoryClass(LeadTriggerLogRepository::class);
 
         $builder->createManyToOne('event', 'TriggerEvent')
             ->isPrimaryKey()

@@ -40,25 +40,17 @@ class ProcessBounceSubscriber implements EventSubscriberInterface
 
     /**
      * EmailBounceSubscriber constructor.
-     *
-     * @param Bounce $bouncer
      */
     public function __construct(Bounce $bouncer)
     {
         $this->bouncer = $bouncer;
     }
 
-    /**
-     * @param MonitoredEmailEvent $event
-     */
     public function onEmailConfig(MonitoredEmailEvent $event)
     {
         $event->addFolder(self::BUNDLE, self::FOLDER_KEY, 'mautic.email.config.monitored_email.bounce_folder');
     }
 
-    /**
-     * @param ParseEmailEvent $event
-     */
     public function onEmailParse(ParseEmailEvent $event)
     {
         if ($event->isApplicable(self::BUNDLE, self::FOLDER_KEY)) {

@@ -13,7 +13,7 @@ $view['slots']->set('pageTitle', $pageTitle);
 $view['slots']->set('headerTitle', $report->getName());
 $view['slots']->set('mauticContent', 'report');
 
-$showGraphsAboveTable = (!empty($report->getSettings()['showGraphsAboveTable']) === true);
+$showGraphsAboveTable = (true === !empty($report->getSettings()['showGraphsAboveTable']));
 $dataCount            = count($data);
 $columnOrder          = $report->getColumns();
 $graphOrder           = $report->getGraphs();

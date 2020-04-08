@@ -13,27 +13,30 @@ namespace Mautic\FormBundle\EventListener;
 
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberUtil;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Form\Type\TelType;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\Form\Type\FormFieldEmailType;
 use Mautic\FormBundle\FormEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class FormValidationSubscriber extends CommonSubscriber
+class FormValidationSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
     /**
      * @var CoreParametersHelper
      */
     private $coreParametersHelper;
 
-    /**
-     * FormValidationSubscriber constructor.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
-     */
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
     {
+        $this->translator           = $translator;
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
@@ -50,8 +53,6 @@ class FormValidationSubscriber extends CommonSubscriber
 
     /**
      * Add a simple email form.
-     *
-     * @param Events\FormBuilderEvent $event
      */
     public function onFormBuilder(Events\FormBuilderEvent $event)
     {
@@ -59,7 +60,7 @@ class FormValidationSubscriber extends CommonSubscriber
             'phone.validation',
             [
                 'eventName' => FormEvents::ON_FORM_VALIDATE,
-                'fieldType' => 'tel',
+                'fieldType' => TelType::class,
                 'formType'  => \Mautic\FormBundle\Form\Type\FormFieldTelType::class,
             ]
         );
@@ -77,9 +78,7 @@ class FormValidationSubscriber extends CommonSubscriber
     }
 
     /**
-     * Custom validation     *.
-     *
-     *@param Events\ValidationEvent $event
+     * Custom validation.
      */
     public function onFormValidate(Events\ValidationEvent $event)
     {
@@ -91,14 +90,11 @@ class FormValidationSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param Events\ValidationEvent $event
-     */
     private function fieldEmailValidation(Events\ValidationEvent $event)
     {
         $field = $event->getField();
         $value = $event->getValue();
-        if ($field->getType() === 'email' && !empty($field->getValidation()['donotsubmit'])) {
+        if ('email' === $field->getType() && !empty($field->getValidation()['donotsubmit'])) {
             // Check the domains using shell wildcard patterns
             $donotSubmitFilter = function ($doNotSubmitArray) use ($value) {
                 return fnmatch($doNotSubmitArray, $value, FNM_CASEFOLD);
@@ -110,15 +106,12 @@ class FormValidationSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param Events\ValidationEvent $event
-     */
     private function fieldTelValidation(Events\ValidationEvent $event)
     {
         $field = $event->getField();
         $value = $event->getValue();
 
-        if ($field->getType() === 'tel' && !empty($field->getValidation()['international'])) {
+        if ('tel' === $field->getType() && !empty($field->getValidation()['international'])) {
             $phoneUtil = PhoneNumberUtil::getInstance();
             try {
                 $phoneUtil->parse($value, PhoneNumberUtil::UNKNOWN_REGION);

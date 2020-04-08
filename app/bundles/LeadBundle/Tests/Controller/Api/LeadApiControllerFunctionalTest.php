@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Response;
@@ -43,11 +42,11 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
 
         // Assert status codes
-        $this->assertEquals(Codes::HTTP_CREATED, $response['statusCodes'][0]);
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0]);
         $contactId1 = $response['contacts'][0]['id'];
-        $this->assertEquals(Codes::HTTP_CREATED, $response['statusCodes'][1]);
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][1]);
         $contactId2 = $response['contacts'][1]['id'];
-        $this->assertEquals(Codes::HTTP_CREATED, $response['statusCodes'][2]);
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][2]);
         $contactId3 = $response['contacts'][2]['id'];
 
         // Assert email
@@ -90,11 +89,11 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertEquals(Codes::HTTP_OK, $response['statusCodes'][0]);
+        $this->assertEquals(Response::HTTP_OK, $response['statusCodes'][0]);
         $this->assertEquals($contactId1, $response['contacts'][0]['id']);
-        $this->assertEquals(Codes::HTTP_OK, $response['statusCodes'][1]);
+        $this->assertEquals(Response::HTTP_OK, $response['statusCodes'][1]);
         $this->assertEquals($contactId2, $response['contacts'][1]['id']);
-        $this->assertEquals(Codes::HTTP_OK, $response['statusCodes'][2]);
+        $this->assertEquals(Response::HTTP_OK, $response['statusCodes'][2]);
         $this->assertEquals($contactId3, $response['contacts'][2]['id']);
 
         // Assert email
@@ -123,6 +122,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $payload = [
             'email'     => 'apiemail1@email.com',
             'firstname' => 'API Update',
+            'lastname'  => 'customlastname',
             'points'    => 4,
             'tags'      => ['apitest', 'testapi'],
         ];
@@ -134,17 +134,37 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertEquals($payload['email'], $response['contact']['fields']['all']['email']);
         $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
+        $this->assertEquals($payload['lastname'], $response['contact']['fields']['all']['lastname']);
         $this->assertEquals(4, $response['contact']['points']);
         $this->assertEquals(2, count($response['contact']['tags']));
 
+        // without overwriteWithBlank lastname is not set empty
+        $payload['lastname'] = '';
+
         // Lets try to create the same contact to see that the values are not re-setted
-        $this->client->request('POST', '/api/contacts/new', ['email' => 'apiemail1@email.com']);
+        $this->client->request('POST', '/api/contacts/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
         $this->assertEquals($contactId, $response['contact']['id']);
         $this->assertEquals($payload['email'], $response['contact']['fields']['all']['email']);
         $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
+        $this->assertNotEmpty($response['contact']['fields']['all']['lastname']);
+        $this->assertEquals(4, $response['contact']['points']);
+        $this->assertEquals(2, count($response['contact']['tags']));
+
+        // with overwriteWithBlank lastname is empty
+        $payload['overwriteWithBlank'] = true;
+
+        // Lets try to create the same contact to see that the values are not re-setted
+        $this->client->request('POST', '/api/contacts/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals($contactId, $response['contact']['id']);
+        $this->assertEquals($payload['email'], $response['contact']['fields']['all']['email']);
+        $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
+        $this->assertEmpty($response['contact']['fields']['all']['lastname']);
         $this->assertEquals(4, $response['contact']['points']);
         $this->assertEquals(2, count($response['contact']['tags']));
     }
@@ -198,7 +218,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(null, $response['contacts'][0]['doNotContact'][0]['reason']);
+        $this->assertEmpty($response['contacts'][0]['doNotContact']);
 
         // Remove contact
         $this->client->request('DELETE', "/api/contacts/$contactId/delete");

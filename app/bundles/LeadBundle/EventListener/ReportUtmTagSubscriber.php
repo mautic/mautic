@@ -11,14 +11,14 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ReportUtmTagSubscriber extends CommonSubscriber
+class ReportUtmTagSubscriber implements EventSubscriberInterface
 {
     const UTM_TAG = 'lead.utmTag';
 
@@ -32,10 +32,6 @@ class ReportUtmTagSubscriber extends CommonSubscriber
      */
     private $companyReportData;
 
-    /**
-     * @param FieldsBuilder     $fieldsBuilder
-     * @param CompanyReportData $companyReportData
-     */
     public function __construct(
         FieldsBuilder $fieldsBuilder,
         CompanyReportData $companyReportData
@@ -57,8 +53,6 @@ class ReportUtmTagSubscriber extends CommonSubscriber
 
     /**
      * Add available tables and columns to the report builder lookup.
-     *
-     * @param ReportBuilderEvent $event
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
@@ -101,8 +95,6 @@ class ReportUtmTagSubscriber extends CommonSubscriber
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGeneratorEvent $event
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {

@@ -12,7 +12,6 @@
 namespace Mautic\PluginBundle\Helper;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -21,18 +20,15 @@ use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Mautic\PluginBundle\Model\PluginModel;
-use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpKernel\Kernel;
 
-/**
- * Class IntegrationHelper.
- */
 class IntegrationHelper
 {
     /**
-     * @var Container
+     * @var ContainerInterface
      */
     private $container;
 
@@ -66,13 +62,6 @@ class IntegrationHelper
      */
     protected $pluginModel;
 
-    /**
-     * @deprecated 2.8.2 To be removed in 3.0
-     *
-     * @var MauticFactory
-     */
-    protected $factory;
-
     private $integrations = [];
 
     private $available = [];
@@ -81,27 +70,22 @@ class IntegrationHelper
 
     private $byPlugin = [];
 
-    /**
-     * IntegrationHelper constructor.
-     *
-     * @param Kernel               $kernel
-     * @param EntityManager        $em
-     * @param PathsHelper          $pathsHelper
-     * @param BundleHelper         $bundleHelper
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param TemplatingHelper     $templatingHelper
-     * @param PluginModel          $pluginModel
-     */
-    public function __construct(Kernel $kernel, EntityManager $em, PathsHelper $pathsHelper, BundleHelper $bundleHelper, CoreParametersHelper $coreParametersHelper, TemplatingHelper $templatingHelper, PluginModel $pluginModel)
-    {
-        $this->container            = $kernel->getContainer();
+    public function __construct(
+        ContainerInterface $container,
+        EntityManager $em,
+        PathsHelper $pathsHelper,
+        BundleHelper $bundleHelper,
+        CoreParametersHelper $coreParametersHelper,
+        TemplatingHelper $templatingHelper,
+        PluginModel $pluginModel
+    ) {
+        $this->container            = $container;
         $this->em                   = $em;
         $this->pathsHelper          = $pathsHelper;
         $this->bundleHelper         = $bundleHelper;
         $this->pluginModel          = $pluginModel;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->templatingHelper     = $templatingHelper;
-        $this->factory              = $this->container->get('mautic.factory');
     }
 
     /**
@@ -110,10 +94,12 @@ class IntegrationHelper
      * @param array|string $specificIntegrations
      * @param array        $withFeatures
      * @param bool         $alphabetical
-     * @param null|int     $pluginFilter
+     * @param int|null     $pluginFilter
      * @param bool|false   $publishedOnly
      *
      * @return mixed
+     *
+     * @throws \Doctrine\ORM\ORMException
      */
     public function getIntegrationObjects($specificIntegrations = null, $withFeatures = null, $alphabetical = false, $pluginFilter = null, $publishedOnly = false)
     {
@@ -178,30 +164,6 @@ class IntegrationHelper
                                 $newIntegrations[] = $newIntegration;
 
                                 unset($newIntegration);
-                            } else {
-                                /**
-                                 * @deprecated: 2.8.2 To be removed in 3.0
-                                 *            This keeps BC for 3rd party plugins
-                                 */
-                                $class    = '\\MauticPlugin\\'.$pluginNamespace.'\\Integration\\'.$integrationName.'Integration';
-                                $refClass = new \ReflectionClass($class);
-
-                                if ($refClass->isInstantiable()) {
-                                    $this->integrations[$integrationName] = new $class($this->factory);
-                                    $features                             = $this->integrations[$integrationName]->getSupportedFeatures();
-
-                                    $newIntegration->setSupportedFeatures($features);
-
-                                    // Go ahead and stash it since it's built already
-                                    $this->integrations[$integrationName]->setIntegrationSettings($newIntegration);
-
-                                    $newIntegrations[] = $newIntegration;
-
-                                    unset($newIntegration);
-                                } else {
-                                    // Something is bad so ignore
-                                    continue;
-                                }
                             }
                         }
 
@@ -233,7 +195,7 @@ class IntegrationHelper
             foreach ($this->bundleHelper->getMauticBundles() as $coreBundle) {
                 if (
                     // Skip plugin bundles
-                    strpos($coreBundle['directory'], 'app/bundles') !== false
+                    false !== strpos($coreBundle['directory'], 'app/bundles')
                     // Skip core bundles without an Integration directory
                     && is_dir($coreBundle['directory'].'/Integration')
                 ) {
@@ -287,11 +249,11 @@ class IntegrationHelper
         }
 
         // Ensure appropriate formats
-        if ($specificIntegrations !== null && !is_array($specificIntegrations)) {
+        if (null !== $specificIntegrations && !is_array($specificIntegrations)) {
             $specificIntegrations = [$specificIntegrations];
         }
 
-        if ($withFeatures !== null && !is_array($withFeatures)) {
+        if (null !== $withFeatures && !is_array($withFeatures)) {
             $withFeatures = [$withFeatures];
         }
 
@@ -334,37 +296,16 @@ class IntegrationHelper
                 if ($this->container->has($integrationContainerKey)) {
                     $this->integrations[$integrationName] = $this->container->get($integrationContainerKey);
                     $this->integrations[$integrationName]->setIntegrationSettings($integration['settings']);
-                } else {
-                    /**
-                     * @deprecated: 2.8.2 To be removed in 3.0
-                     *            This keeps BC for 3rd party plugins
-                     */
-                    $rootNamespace = $integration['isPlugin'] ? '\\MauticPlugin\\' : '\\Mautic\\';
-                    $class         = $rootNamespace.$integration['namespace'].'\\Integration\\'.$integrationName.'Integration';
-                    $refClass      = new \ReflectionClass($class);
-
-                    if ($refClass->isInstantiable()) {
-                        $this->integrations[$integrationName] = new $class($this->factory);
-
-                        $this->integrations[$integrationName]->setIntegrationSettings($integration['settings']);
-                    } else {
-                        // Something is bad so ignore
-                        continue;
-                    }
                 }
             }
 
-            $returnServices[$integrationName] = $this->integrations[$integrationName];
-        }
-
-        foreach ($returnServices as $key => $value) {
-            if (!isset($value)) {
-                unset($returnServices[$key]);
+            if (isset($this->integrations[$integrationName])) {
+                $returnServices[$integrationName] = $this->integrations[$integrationName];
             }
         }
 
         foreach ($returnServices as $key => $value) {
-            if (!isset($value)) {
+            if (!$value) {
                 unset($returnServices[$key]);
             }
         }
@@ -418,7 +359,7 @@ class IntegrationHelper
     public function getIntegrationCount($plugin)
     {
         if (!is_array($plugin)) {
-            $plugins = $this->coreParametersHelper->getParameter('plugin.bundles');
+            $plugins = $this->coreParametersHelper->get('plugin.bundles');
             if (array_key_exists($plugin, $plugins)) {
                 $plugin = $plugins[$plugin];
             } else {
@@ -468,7 +409,6 @@ class IntegrationHelper
                 ],
                 'flickr' => "/flickr.com\/photos\/(.*?)($|\/)/",
                 'skype'  => "/skype:(.*?)($|\?)/",
-                'google' => "/plus.google.com\/(.*?)($|\/)/",
             ];
         } else {
             //populate placeholder
@@ -482,7 +422,6 @@ class IntegrationHelper
                 'youtube'    => 'https://youtube.com/user/%handle%',
                 'flickr'     => 'https://flickr.com/photos/%handle%',
                 'skype'      => 'skype:%handle%?call',
-                'googleplus' => 'https://plus.google.com/%handle%',
             ];
         }
     }
@@ -659,7 +598,7 @@ class IntegrationHelper
                 foreach ($identifierField as $idf) {
                     $value = (is_array($fields[$f]) && isset($fields[$f]['value'])) ? $fields[$f]['value'] : $fields[$f];
 
-                    if (!in_array($value, $identifier) && strpos($f, $idf) !== false) {
+                    if (!in_array($value, $identifier) && false !== strpos($f, $idf)) {
                         $identifier[$f] = $value;
                         if (count($identifier) === count($identifierField)) {
                             //found enough matches so break
@@ -668,7 +607,7 @@ class IntegrationHelper
                         }
                     }
                 }
-            } elseif ($identifierField === $f || strpos($f, $identifierField) !== false) {
+            } elseif ($identifierField === $f || false !== strpos($f, $identifierField)) {
                 $matchFound = true;
                 $identifier = (is_array($fields[$f])) ? $fields[$f]['value'] : $fields[$f];
             }
@@ -676,9 +615,9 @@ class IntegrationHelper
 
         $groups = ['core', 'social', 'professional', 'personal'];
         $keys   = array_keys($fields);
-        if (count(array_intersect($groups, $keys)) !== 0 && count($keys) <= 4) {
+        if (0 !== count(array_intersect($groups, $keys)) && count($keys) <= 4) {
             //fields are group
-            foreach ($fields as $group => $groupFields) {
+            foreach ($fields as $groupFields) {
                 $availableFields = array_keys($groupFields);
                 foreach ($availableFields as $f) {
                     $findMatch($f, $groupFields);
@@ -722,7 +661,7 @@ class IntegrationHelper
         } elseif ($integration instanceof Plugin) {
             // A bundle so check for an icon
             $icon = $pluginPath.'/'.$integration->getBundle().'/Assets/img/icon.png';
-        } elseif ($integration instanceof AbstractIntegration) {
+        } elseif ($integration instanceof UnifiedIntegrationInterface) {
             return $integration->getIcon();
         }
 

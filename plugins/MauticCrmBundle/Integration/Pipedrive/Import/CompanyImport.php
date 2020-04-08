@@ -17,9 +17,6 @@ class CompanyImport extends AbstractImport
 
     /**
      * CompanyImport constructor.
-     *
-     * @param EntityManager $em
-     * @param CompanyModel  $companyModel
      */
     public function __construct(EntityManager $em, CompanyModel $companyModel)
     {
@@ -29,8 +26,6 @@ class CompanyImport extends AbstractImport
     }
 
     /**
-     * @param array $data
-     *
      * @return bool
      *
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -53,7 +48,7 @@ class CompanyImport extends AbstractImport
         // prevent listeners from exporting
         $company->setEventData('pipedrive.webhook', 1);
 
-        $data       = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields(SELF::ORGANIZATION_ENTITY_TYPE));
+        $data       = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields(self::ORGANIZATION_ENTITY_TYPE));
         $mappedData = $this->getMappedCompanyData($data);
 
         // find company exists
@@ -81,8 +76,6 @@ class CompanyImport extends AbstractImport
     }
 
     /**
-     * @param array $data
-     *
      * @return bool
      *
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -106,7 +99,7 @@ class CompanyImport extends AbstractImport
         // prevent listeners from exporting
         $company->setEventData('pipedrive.webhook', 1);
 
-        $data    = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields(SELF::ORGANIZATION_ENTITY_TYPE));
+        $data    = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields(self::ORGANIZATION_ENTITY_TYPE));
         if ($data['owner_id']) {
             $this->addOwnerToCompany($data['owner_id'], $company);
         }
@@ -124,8 +117,6 @@ class CompanyImport extends AbstractImport
     }
 
     /**
-     * @param array $data
-     *
      * @throws \Exception
      */
     public function delete(array $data = [])
@@ -178,8 +169,7 @@ class CompanyImport extends AbstractImport
     }
 
     /**
-     * @param         $integrationOwnerId
-     * @param Company $company
+     * @param $integrationOwnerId
      */
     private function addOwnerToCompany($integrationOwnerId, Company $company)
     {

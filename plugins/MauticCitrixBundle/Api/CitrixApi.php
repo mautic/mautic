@@ -15,8 +15,6 @@ class CitrixApi
 
     /**
      * CitrixApi constructor.
-     *
-     * @param CitrixAbstractIntegration $integration
      */
     public function __construct(CitrixAbstractIntegration $integration)
     {
@@ -25,7 +23,6 @@ class CitrixApi
 
     /**
      * @param string $operation
-     * @param array  $settings
      * @param string $route
      * @param bool   $refreshToken
      *
@@ -106,14 +103,12 @@ class CitrixApi
     }
 
     /**
-     * @param Response $request
-     *
      * @return bool
      */
     private function isInvalidTokenFromReponse(Response $request)
     {
         $responseData = $this->integration->parseCallbackResponse($request->body);
-        if (isset($responseData['int_err_code']) && $responseData['int_err_code'] == 'InvalidToken') {
+        if (isset($responseData['int_err_code']) && 'InvalidToken' == $responseData['int_err_code']) {
             return true;
         }
 

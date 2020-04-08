@@ -12,7 +12,8 @@
 namespace Mautic\FormBundle\Model;
 
 use DOMDocument;
-use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
+use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
+use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
@@ -22,6 +23,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\FormEvent;
+use Mautic\FormBundle\Form\Type\FormType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
@@ -39,7 +41,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class FormModel extends CommonFormModel
 {
     /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
+     * @var \Symfony\Component\HttpFoundation\Request|null
      */
     protected $request;
 
@@ -52,11 +54,6 @@ class FormModel extends CommonFormModel
      * @var ThemeHelper
      */
     protected $themeHelper;
-
-    /**
-     * @var SchemaHelperFactory
-     */
-    protected $schemaHelperFactory;
 
     /**
      * @var ActionModel
@@ -89,41 +86,42 @@ class FormModel extends CommonFormModel
     private $formUploader;
 
     /**
+     * @var ColumnSchemaHelper
+     */
+    private $columnSchemaHelper;
+
+    /**
+     * @var TableSchemaHelper
+     */
+    private $tableSchemaHelper;
+
+    /**
      * FormModel constructor.
-     *
-     * @param RequestStack        $requestStack
-     * @param TemplatingHelper    $templatingHelper
-     * @param ThemeHelper         $themeHelper
-     * @param SchemaHelperFactory $schemaHelperFactory
-     * @param ActionModel         $formActionModel
-     * @param FieldModel          $formFieldModel
-     * @param LeadModel           $leadModel
-     * @param FormFieldHelper     $fieldHelper
-     * @param LeadFieldModel      $leadFieldModel
-     * @param FormUploader        $formUploader
      */
     public function __construct(
         RequestStack $requestStack,
         TemplatingHelper $templatingHelper,
         ThemeHelper $themeHelper,
-        SchemaHelperFactory $schemaHelperFactory,
         ActionModel $formActionModel,
         FieldModel $formFieldModel,
         LeadModel $leadModel,
         FormFieldHelper $fieldHelper,
         LeadFieldModel $leadFieldModel,
-        FormUploader $formUploader
+        FormUploader $formUploader,
+        ColumnSchemaHelper $columnSchemaHelper,
+        TableSchemaHelper $tableSchemaHelper
     ) {
         $this->request             = $requestStack->getCurrentRequest();
         $this->templatingHelper    = $templatingHelper;
         $this->themeHelper         = $themeHelper;
-        $this->schemaHelperFactory = $schemaHelperFactory;
         $this->formActionModel     = $formActionModel;
         $this->formFieldModel      = $formFieldModel;
         $this->leadModel           = $leadModel;
         $this->fieldHelper         = $fieldHelper;
         $this->leadFieldModel      = $leadFieldModel;
         $this->formUploader        = $formUploader;
+        $this->columnSchemaHelper  = $columnSchemaHelper;
+        $this->tableSchemaHelper   = $tableSchemaHelper;
     }
 
     /**
@@ -165,7 +163,7 @@ class FormModel extends CommonFormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('mauticform', $entity, $options);
+        return $formFactory->create(FormType::class, $entity, $options);
     }
 
     /**
@@ -175,7 +173,7 @@ class FormModel extends CommonFormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Form();
         }
 
@@ -235,8 +233,7 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * @param Form $entity
-     * @param      $sessionFields
+     * @param $sessionFields
      */
     public function setFields(Form $entity, $sessionFields)
     {
@@ -285,8 +282,7 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * @param Form $entity
-     * @param      $sessionFields
+     * @param $sessionFields
      */
     public function deleteFields(Form $entity, $sessionFields)
     {
@@ -321,8 +317,7 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * @param Form $entity
-     * @param      $sessionActions
+     * @param $sessionActions
      */
     public function setActions(Form $entity, $sessionActions)
     {
@@ -332,7 +327,7 @@ class FormModel extends CommonFormModel
 
         //match sessionId with field Id to update mapped fields
         $fieldIds = [];
-        foreach ($savedFields as $id => $field) {
+        foreach ($savedFields as $field) {
             $fieldIds[$field->getSessionId()] = $field->getId();
         }
 
@@ -347,10 +342,10 @@ class FormModel extends CommonFormModel
 
                 $func = 'set'.ucfirst($f);
 
-                if ($f == 'properties') {
+                if ('properties' == $f) {
                     if (isset($v['mappedFields'])) {
                         foreach ($v['mappedFields'] as $pk => $pv) {
-                            if (strpos($pv, 'new') !== false) {
+                            if (false !== strpos($pv, 'new')) {
                                 $v['mappedFields'][$pk] = $fieldIds[$pv];
                             }
                         }
@@ -374,7 +369,6 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * @param Form  $entity
      * @param array $actions
      */
     public function deleteActions(Form $entity, $actions)
@@ -425,7 +419,6 @@ class FormModel extends CommonFormModel
     /**
      * Obtains the content.
      *
-     * @param Form      $form
      * @param bool|true $withScript
      * @param bool|true $useCache
      *
@@ -447,7 +440,6 @@ class FormModel extends CommonFormModel
     /**
      * Obtains the cached HTML of a form and generates it if missing.
      *
-     * @param Form      $form
      * @param bool|true $useCache
      *
      * @return string
@@ -472,9 +464,8 @@ class FormModel extends CommonFormModel
     /**
      * Get results for a form and lead.
      *
-     * @param Form $form
-     * @param int  $leadId
-     * @param int  $limit
+     * @param int $leadId
+     * @param int $limit
      *
      * @return array
      */
@@ -492,7 +483,6 @@ class FormModel extends CommonFormModel
     /**
      * Generate the form's html.
      *
-     * @param Form $entity
      * @param bool $persist
      *
      * @return string
@@ -603,18 +593,16 @@ class FormModel extends CommonFormModel
     /**
      * Creates the table structure for form results.
      *
-     * @param Form $entity
      * @param bool $isNew
      * @param bool $dropExisting
      */
     public function createTableSchema(Form $entity, $isNew = false, $dropExisting = false)
     {
         //create the field as its own column in the leads table
-        $schemaHelper = $this->schemaHelperFactory->getSchemaHelper('table');
         $name         = 'form_results_'.$entity->getId().'_'.$entity->getAlias();
         $columns      = $this->generateFieldColumns($entity);
-        if ($isNew || (!$isNew && !$schemaHelper->checkTableExists($name))) {
-            $schemaHelper->addTable([
+        if ($isNew || (!$isNew && !$this->tableSchemaHelper->checkTableExists($name))) {
+            $this->tableSchemaHelper->addTable([
                 'name'    => $name,
                 'columns' => $columns,
                 'options' => [
@@ -622,16 +610,16 @@ class FormModel extends CommonFormModel
                     'uniqueIndex' => ['submission_id', 'form_id'],
                 ],
             ], true, $dropExisting);
-            $schemaHelper->executeChanges();
+            $this->tableSchemaHelper->executeChanges();
         } else {
             //check to make sure columns exist
-            $schemaHelper = $this->schemaHelperFactory->getSchemaHelper('column', $name);
+            $columnSchemaHelper = $this->columnSchemaHelper->setName($name);
             foreach ($columns as $c) {
-                if (!$schemaHelper->checkColumnExists($c['name'])) {
-                    $schemaHelper->addColumn($c, false);
+                if (!$columnSchemaHelper->checkColumnExists($c['name'])) {
+                    $columnSchemaHelper->addColumn($c, false);
                 }
             }
-            $schemaHelper->executeChanges();
+            $columnSchemaHelper->executeChanges();
         }
     }
 
@@ -645,9 +633,8 @@ class FormModel extends CommonFormModel
 
         if (!$entity->getId()) {
             //delete the associated results table
-            $schemaHelper = $this->schemaHelperFactory->getSchemaHelper('table');
-            $schemaHelper->deleteTable('form_results_'.$entity->deletedId.'_'.$entity->getAlias());
-            $schemaHelper->executeChanges();
+            $this->tableSchemaHelper->deleteTable('form_results_'.$entity->deletedId.'_'.$entity->getAlias());
+            $this->tableSchemaHelper->executeChanges();
         }
         parent::deleteEntity($entity);
     }
@@ -658,14 +645,13 @@ class FormModel extends CommonFormModel
     public function deleteEntities($ids)
     {
         $entities     = parent::deleteEntities($ids);
-        $schemaHelper = $this->schemaHelperFactory->getSchemaHelper('table');
         foreach ($entities as $id => $entity) {
             /* @var Form $entity */
             //delete the associated results table
-            $schemaHelper->deleteTable('form_results_'.$id.'_'.$entity->getAlias());
+            $this->tableSchemaHelper->deleteTable('form_results_'.$id.'_'.$entity->getAlias());
             $this->deleteFormFiles($entity);
         }
-        $schemaHelper->executeChanges();
+        $this->tableSchemaHelper->executeChanges();
 
         return $entities;
     }
@@ -677,8 +663,6 @@ class FormModel extends CommonFormModel
 
     /**
      * Generate an array of columns from fields.
-     *
-     * @param Form $form
      *
      * @return array
      */
@@ -698,7 +682,7 @@ class FormModel extends CommonFormModel
         ];
         $ignoreTypes = $this->getCustomComponents()['viewOnlyFields'];
         foreach ($fields as $f) {
-            if (!in_array($f->getType(), $ignoreTypes) && $f->getSaveResult() !== false) {
+            if (!in_array($f->getType(), $ignoreTypes) && false !== $f->getSaveResult()) {
                 $columns[] = [
                     'name'    => $f->getAlias(),
                     'type'    => 'text',
@@ -746,8 +730,6 @@ class FormModel extends CommonFormModel
     /**
      * Get the document write javascript for the form.
      *
-     * @param Form $form
-     *
      * @return string
      */
     public function getAutomaticJavascript(Form $form)
@@ -779,8 +761,6 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * @param Form $form
-     *
      * @return string
      */
     public function getFormScript(Form $form)
@@ -832,8 +812,7 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * @param Form $form
-     * @param      $formHtml
+     * @param $formHtml
      */
     public function populateValuesWithLead(Form $form, &$formHtml)
     {
@@ -865,7 +844,7 @@ class FormModel extends CommonFormModel
         foreach ($autoFillFields as $field) {
             $value = $lead->getFieldValue($field->getLeadField());
             // just skip string empty field
-            if ($value !== '') {
+            if ('' !== $value) {
                 $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
             }
         }
@@ -936,7 +915,7 @@ class FormModel extends CommonFormModel
             ],
         ];
 
-        return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];
+        return (null === $operator) ? $operatorOptions : $operatorOptions[$operator];
     }
 
     /**
@@ -966,9 +945,7 @@ class FormModel extends CommonFormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -1094,8 +1071,6 @@ class FormModel extends CommonFormModel
 
     /**
      * Finds out whether the.
-     *
-     * @param Field $field
      */
     private function addLeadFieldOptions(Field $formField)
     {

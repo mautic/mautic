@@ -18,7 +18,7 @@ use Doctrine\ORM\QueryBuilder;
 use Mautic\ReportBundle\Entity\SchedulerRepository;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 
-class SchedulerRepositoryTest extends \PHPUnit_Framework_TestCase
+class SchedulerRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetScheduledReportsForExportNoID()
     {
@@ -47,7 +47,7 @@ class SchedulerRepositoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return QueryBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @return QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getQueryBuilderMock()
     {

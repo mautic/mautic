@@ -29,71 +29,76 @@ return [
     'services' => [
         'events' => [
             'mautic.citrix.formbundle.subscriber' => [
-                'class'     => 'MauticPlugin\MauticCitrixBundle\EventListener\FormSubscriber',
+                'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\FormSubscriber::class,
                 'arguments' => [
                     'mautic.citrix.model.citrix',
                     'mautic.form.model.form',
                     'mautic.form.model.submission',
+                    'translator',
+                    'doctrine.orm.entity_manager',
+                    'mautic.helper.templating',
                 ],
                 'methodCalls' => [
                     'setEmailModel' => ['mautic.email.model.email'],
                 ],
             ],
             'mautic.citrix.leadbundle.subscriber' => [
-                'class'     => 'MauticPlugin\MauticCitrixBundle\EventListener\LeadSubscriber',
+                'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
                     'mautic.citrix.model.citrix',
+                    'translator',
                 ],
             ],
             'mautic.citrix.campaignbundle.subscriber' => [
-                'class'     => 'MauticPlugin\MauticCitrixBundle\EventListener\CampaignSubscriber',
+                'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.citrix.model.citrix',
+                    'translator',
+                    'mautic.helper.templating',
                 ],
                 'methodCalls' => [
                     'setEmailModel' => ['mautic.email.model.email'],
                 ],
             ],
             'mautic.citrix.emailbundle.subscriber' => [
-                'class'     => 'MauticPlugin\MauticCitrixBundle\EventListener\EmailSubscriber',
+                'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\EmailSubscriber::class,
                 'arguments' => [
                     'mautic.citrix.model.citrix',
+                    'translator',
+                    'event_dispatcher',
+                    'mautic.helper.templating',
                 ],
             ],
             'mautic.citrix.stats.subscriber' => [
                 'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],
             'mautic.citrix.integration.request' => [
                 'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\IntegrationRequestSubscriber::class,
-                'arguments' => [],
             ],
         ],
         'forms' => [
             'mautic.form.type.fieldslist.citrixlist' => [
-                'class' => 'MauticPlugin\MauticCitrixBundle\Form\Type\CitrixListType',
-                'alias' => 'citrix_list',
+                'class' => \MauticPlugin\MauticCitrixBundle\Form\Type\CitrixListType::class,
             ],
             'mautic.form.type.citrix.submitaction' => [
-                'class'     => 'MauticPlugin\MauticCitrixBundle\Form\Type\CitrixActionType',
-                'alias'     => 'citrix_submit_action',
+                'class'     => \MauticPlugin\MauticCitrixBundle\Form\Type\CitrixActionType::class,
                 'arguments' => [
                     'mautic.form.model.field',
                 ],
             ],
             'mautic.form.type.citrix.campaignevent' => [
-                'class'     => 'MauticPlugin\MauticCitrixBundle\Form\Type\CitrixCampaignEventType',
-                'alias'     => 'citrix_campaign_event',
+                'class'     => \MauticPlugin\MauticCitrixBundle\Form\Type\CitrixCampaignEventType::class,
                 'arguments' => [
                     'mautic.citrix.model.citrix',
                     'translator',
                 ],
             ],
             'mautic.form.type.citrix.campaignaction' => [
-                'class'     => 'MauticPlugin\MauticCitrixBundle\Form\Type\CitrixCampaignActionType',
-                'alias'     => 'citrix_campaign_action',
+                'class'     => \MauticPlugin\MauticCitrixBundle\Form\Type\CitrixCampaignActionType::class,
                 'arguments' => [
                     'translator',
                 ],
@@ -101,32 +106,100 @@ return [
         ],
         'models' => [
             'mautic.citrix.model.citrix' => [
-                'class'     => 'MauticPlugin\MauticCitrixBundle\Model\CitrixModel',
+                'class'     => \MauticPlugin\MauticCitrixBundle\Model\CitrixModel::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.campaign.model.event',
                 ],
             ],
         ],
+        'fixtures' => [
+            'mautic.citrix.fixture.load_citrix_data' => [
+                'class'     => MauticPlugin\MauticCitrixBundle\Tests\DataFixtures\ORM\LoadCitrixData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['doctrine.orm.entity_manager'],
+                'optional'  => true,
+            ],
+        ],
         'integrations' => [
             'mautic.integration.gotoassist' => [
                 'class'     => \MauticPlugin\MauticCitrixBundle\Integration\GotoassistIntegration::class,
                 'arguments' => [
+                    'event_dispatcher',
+                    'mautic.helper.cache_storage',
+                    'doctrine.orm.entity_manager',
+                    'session',
+                    'request_stack',
+                    'router',
+                    'translator',
+                    'logger',
+                    'mautic.helper.encryption',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.company',
+                    'mautic.helper.paths',
+                    'mautic.core.model.notification',
+                    'mautic.lead.model.field',
+                    'mautic.plugin.model.integration_entity',
                 ],
             ],
             'mautic.integration.gotomeeting' => [
                 'class'     => \MauticPlugin\MauticCitrixBundle\Integration\GotomeetingIntegration::class,
                 'arguments' => [
+                    'event_dispatcher',
+                    'mautic.helper.cache_storage',
+                    'doctrine.orm.entity_manager',
+                    'session',
+                    'request_stack',
+                    'router',
+                    'translator',
+                    'logger',
+                    'mautic.helper.encryption',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.company',
+                    'mautic.helper.paths',
+                    'mautic.core.model.notification',
+                    'mautic.lead.model.field',
+                    'mautic.plugin.model.integration_entity',
                 ],
             ],
             'mautic.integration.gototraining' => [
                 'class'     => \MauticPlugin\MauticCitrixBundle\Integration\GototrainingIntegration::class,
                 'arguments' => [
+                    'event_dispatcher',
+                    'mautic.helper.cache_storage',
+                    'doctrine.orm.entity_manager',
+                    'session',
+                    'request_stack',
+                    'router',
+                    'translator',
+                    'logger',
+                    'mautic.helper.encryption',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.company',
+                    'mautic.helper.paths',
+                    'mautic.core.model.notification',
+                    'mautic.lead.model.field',
+                    'mautic.plugin.model.integration_entity',
                 ],
             ],
             'mautic.integration.gotowebinar' => [
                 'class'     => \MauticPlugin\MauticCitrixBundle\Integration\GotowebinarIntegration::class,
                 'arguments' => [
+                    'event_dispatcher',
+                    'mautic.helper.cache_storage',
+                    'doctrine.orm.entity_manager',
+                    'session',
+                    'request_stack',
+                    'router',
+                    'translator',
+                    'logger',
+                    'mautic.helper.encryption',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.company',
+                    'mautic.helper.paths',
+                    'mautic.core.model.notification',
+                    'mautic.lead.model.field',
+                    'mautic.plugin.model.integration_entity',
                 ],
             ],
         ],

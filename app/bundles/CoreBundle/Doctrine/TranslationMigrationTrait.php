@@ -20,8 +20,6 @@ trait TranslationMigrationTrait
 {
     /**
      * Add translation parent/child relationship columns.
-     *
-     * @param Schema $schema
      */
     protected function addTranslationSchema(Schema $schema, $tableName, $languageColumnName = 'lang')
     {
@@ -53,7 +51,7 @@ trait TranslationMigrationTrait
         }
 
         if ($languageColumnName && !$table->hasColumn($languageColumnName)) {
-            $this->addSql("ALTER TABLE $tableName ADD COLUMN `lang` varchar(255) NULL");
+            $this->addSql("ALTER TABLE $tableName ADD COLUMN `lang` varchar(191) NULL");
         }
     }
 }

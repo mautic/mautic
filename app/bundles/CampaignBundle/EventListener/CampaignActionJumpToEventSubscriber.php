@@ -44,9 +44,6 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
 
     /**
      * CampaignActionJumpToEvent constructor.
-     *
-     * @param EventRepository  $eventRepository
-     * @param EventExecutioner $eventExecutioner
      */
     public function __construct(EventRepository $eventRepository, EventExecutioner $eventExecutioner, TranslatorInterface $translator)
     {
@@ -69,8 +66,6 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
 
     /**
      * Add event triggers and actions.
-     *
-     * @param CampaignBuilderEvent $event
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
@@ -94,8 +89,6 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
     /**
      * Process campaign.jump_to_event actions.
      *
-     * @param PendingEvent $campaignEvent
-     *
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
@@ -106,7 +99,7 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
         $event      = $campaignEvent->getEvent();
         $jumpTarget = $this->getJumpTargetForEvent($event, 'e.id');
 
-        if ($jumpTarget === null) {
+        if (null === $jumpTarget) {
             // Target event has been removed.
             $pending  = $campaignEvent->getPending();
             $contacts = $campaignEvent->getContacts();
@@ -129,8 +122,6 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
      * This block specifically handles the campaign.jump_to_event properties
      * to ensure that it has the actual ID and not the temp_id as the
      * target for the jump.
-     *
-     * @param CampaignEvent $campaignEvent
      */
     public function processCampaignEventsAfterSave(CampaignEvent $campaignEvent)
     {
@@ -139,13 +130,13 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
         $toSave   = [];
 
         foreach ($events as $event) {
-            if ($event->getType() !== self::EVENT_NAME) {
+            if (self::EVENT_NAME !== $event->getType()) {
                 continue;
             }
 
             $jumpTarget = $this->getJumpTargetForEvent($event);
 
-            if ($jumpTarget !== null) {
+            if (null !== $jumpTarget) {
                 $event->setProperties(array_merge(
                     $event->getProperties(),
                     [
@@ -165,10 +156,9 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
     /**
      * Inspect a jump event and get its target.
      *
-     * @param Event $event
      * @param mixed $column
      *
-     * @return null|Event
+     * @return Event|null
      */
     private function getJumpTargetForEvent(Event $event, $column = 'e.tempId')
     {

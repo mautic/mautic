@@ -11,48 +11,47 @@
 
 namespace Mautic\CampaignBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class CampaignType.
  */
 class CampaignType extends AbstractType
 {
-    private $security;
-    private $translator;
-    private $em;
-
     /**
-     * @param MauticFactory $factory
+     * @var CorePermissions
      */
-    public function __construct(MauticFactory $factory)
+    private $security;
+
+    public function __construct(CorePermissions $security)
     {
-        $this->translator = $factory->getTranslator();
-        $this->security   = $factory->getSecurity();
-        $this->em         = $factory->getEntityManager();
+        $this->security   = $security;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('campaign', $options));
 
-        $builder->add('name', 'text', [
+        $builder->add('name', TextType::class, [
             'label'      => 'mautic.core.name',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
         ]);
 
-        $builder->add('description', 'textarea', [
+        $builder->add('description', TextareaType::class, [
             'label'      => 'mautic.core.description',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control editor'],
@@ -60,7 +59,7 @@ class CampaignType extends AbstractType
         ]);
 
         $builder->add('allowRestart',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.campaign.allow_restart',
                 'attr'  => [
@@ -70,7 +69,7 @@ class CampaignType extends AbstractType
         );
 
         //add category
-        $builder->add('category', 'category', [
+        $builder->add('category', CategoryListType::class, [
             'bundle' => 'campaign',
         ]);
 
@@ -85,12 +84,14 @@ class CampaignType extends AbstractType
             $data     = false;
         }
 
-        $builder->add('isPublished', 'yesno_button_group', [
-            'read_only' => $readonly,
-            'data'      => $data,
+        $builder->add('isPublished', YesNoButtonGroupType::class, [
+            'data' => $data,
+            'attr' => [
+                'readonly' => $readonly,
+            ],
         ]);
 
-        $builder->add('publishUp', 'datetime', [
+        $builder->add('publishUp', DateTimeType::class, [
             'widget'     => 'single_text',
             'label'      => 'mautic.core.form.publishup',
             'label_attr' => ['class' => 'control-label'],
@@ -102,7 +103,7 @@ class CampaignType extends AbstractType
             'required' => false,
         ]);
 
-        $builder->add('publishDown', 'datetime', [
+        $builder->add('publishDown', DateTimeType::class, [
             'widget'     => 'single_text',
             'label'      => 'mautic.core.form.publishdown',
             'label_attr' => ['class' => 'control-label'],
@@ -114,7 +115,7 @@ class CampaignType extends AbstractType
             'required' => false,
         ]);
 
-        $builder->add('sessionId', 'hidden', [
+        $builder->add('sessionId', HiddenType::class, [
             'mapped' => false,
         ]);
 
@@ -122,7 +123,7 @@ class CampaignType extends AbstractType
             $builder->setAction($options['action']);
         }
 
-        $builder->add('buttons', 'form_buttons', [
+        $builder->add('buttons', FormButtonsType::class, [
             'pre_extra_buttons' => [
                 [
                     'name'  => 'builder',
@@ -137,20 +138,14 @@ class CampaignType extends AbstractType
         ]);
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'data_class' => 'Mautic\CampaignBundle\Entity\Campaign',
         ]);
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaign';
     }

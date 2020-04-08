@@ -37,10 +37,6 @@ class TransportCallback
 
     /**
      * TransportCallback constructor.
-     *
-     * @param DoNotContact   $dncModel
-     * @param ContactFinder  $finder
-     * @param StatRepository $statRepository
      */
     public function __construct(DoNotContact $dncModel, ContactFinder $finder, StatRepository $statRepository)
     {
@@ -101,8 +97,7 @@ class TransportCallback
     }
 
     /**
-     * @param Stat $stat
-     * @param      $comments
+     * @param $comments
      */
     private function updateStatDetails(Stat $stat, $comments, $dncReason)
     {

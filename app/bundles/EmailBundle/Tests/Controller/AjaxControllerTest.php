@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class AjaxControllerTest extends \PHPUnit_Framework_TestCase
+class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 {
     private $sessionMock;
     private $modelFactoryMock;

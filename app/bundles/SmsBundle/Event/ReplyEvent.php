@@ -35,7 +35,6 @@ class ReplyEvent extends Event
     /**
      * ReplyEvent constructor.
      *
-     * @param Lead   $contact
      * @param string $message
      */
     public function __construct(Lead $contact, $message)
@@ -60,16 +59,13 @@ class ReplyEvent extends Event
         return $this->message;
     }
 
-    /**
-     * @param Response $response
-     */
     public function setResponse(Response $response)
     {
         $this->response = $response;
     }
 
     /**
-     * @return null|Response
+     * @return Response|null
      */
     public function getResponse()
     {

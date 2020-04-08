@@ -91,13 +91,10 @@ class AuthenticationEvent extends Event
     protected $failedAuthMessage;
 
     /**
-     * @param                       $user
-     * @param TokenInterface        $token
-     * @param UserProviderInterface $userProvider
-     * @param Request               $request
-     * @param bool                  $loginCheck            Event executed from the mautic_sso_login_check route typically used as the SSO callback
-     * @param string                $authenticatingService Service Service requesting authentication
-     * @param null                  $integrations
+     * @param        $user
+     * @param bool   $loginCheck            Event executed from the mautic_sso_login_check route typically used as the SSO callback
+     * @param string $authenticatingService Service Service requesting authentication
+     * @param null   $integrations
      */
     public function __construct(
         $user,
@@ -145,7 +142,6 @@ class AuthenticationEvent extends Event
     /**
      * Set the user to be used after authentication.
      *
-     * @param User      $user
      * @param bool|true $saveUser
      * @param bool|true $createIfNotExists If true, the user will be created if it does not exist
      */
@@ -169,8 +165,7 @@ class AuthenticationEvent extends Event
     }
 
     /**
-     * @param                $service
-     * @param TokenInterface $token
+     * @param $service
      */
     public function setToken($service, TokenInterface $token)
     {
@@ -205,7 +200,6 @@ class AuthenticationEvent extends Event
      * Set if this user is successfully authenticated.
      *
      * @param string    $service           Service that authenticated the user; if using a Integration, it should match that of AbstractIntegration::getName();
-     * @param User|null $user
      * @param bool|true $createIfNotExists
      */
     public function setIsAuthenticated($service, User $user = null, $createIfNotExists = true)
@@ -285,8 +279,6 @@ class AuthenticationEvent extends Event
 
     /**
      * Set a response such as a redirect.
-     *
-     * @param Response $response
      */
     public function setResponse(Response $response)
     {

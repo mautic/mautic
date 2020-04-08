@@ -34,9 +34,6 @@ class ConfigType extends AbstractType
 
     /**
      * ConfigType constructor.
-     *
-     * @param TransportChain      $transportChain
-     * @param TranslatorInterface $translator
      */
     public function __construct(TransportChain $transportChain, TranslatorInterface $translator)
     {
@@ -44,16 +41,12 @@ class ConfigType extends AbstractType
         $this->translator     = $translator;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $choices    = [];
         $transports = $this->transportChain->getEnabledTransports();
         foreach ($transports as $transportServiceId=>$transport) {
-            $choices[$transportServiceId] = $this->translator->trans($transportServiceId);
+            $choices[$this->translator->trans($transportServiceId)] = $transportServiceId;
         }
 
         $builder->add('sms_transport', ChoiceType::class, [
@@ -63,14 +56,14 @@ class ConfigType extends AbstractType
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.sms.config.select_default_transport',
             ],
-            'choices'   => $choices,
-        ]);
+            'choices'           => $choices,
+            ]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'smsconfig';
     }

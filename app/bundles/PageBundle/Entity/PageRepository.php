@@ -84,10 +84,10 @@ class PageRepository extends CommonRepository
                 ->setParameter('id', $this->currentUser->getId());
         }
 
-        if ($topLevel == 'translation') {
+        if ('translation' == $topLevel) {
             //only get top level pages
             $q->andWhere($q->expr()->isNull('p.translationParent'));
-        } elseif ($topLevel == 'variant') {
+        } elseif ('variant' == $topLevel) {
             $q->andWhere($q->expr()->isNull('p.variantParent'));
         }
 
