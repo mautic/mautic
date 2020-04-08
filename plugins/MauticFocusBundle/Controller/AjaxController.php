@@ -13,14 +13,13 @@ namespace MauticPlugin\MauticFocusBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function generatePreviewAction(Request $request)
+    protected function generatePreviewAction(Request $request): JsonResponse
     {
         $data  = ['html' => '', 'style' => ''];
         $focus = $request->request->all();
@@ -29,7 +28,7 @@ class AjaxController extends CommonAjaxController
             $focusArray = InputHelper::_($focus['focus']);
 
             if (!empty($focusArray['style']) && !empty($focusArray['type'])) {
-                /** @var \MauticPlugin\MauticFocusBundle\Model\FocusModel $model */
+                /** @var FocusModel $model */
                 $model            = $this->getModel('focus');
                 $focusArray['id'] = 'preview';
                 $data['html']     = $model->getContent($focusArray, true);
