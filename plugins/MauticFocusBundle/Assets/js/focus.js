@@ -380,7 +380,7 @@ Mautic.launchFocusBuilder = function (forceFetch) {
                 // Disable droppers
                 mQuery('.btn-dropper').addClass('disabled');
 
-                Mautic.focusCreateIframe();
+                Mautic.focusCreateIframe(url);
 
                 Mautic.ignoreMauticFocusPreviewUpdate = false;
             }
@@ -504,7 +504,7 @@ Mautic.focusInitViewportSwitcher = function () {
 /**
  * Create IFRAME with proper sizing
  */
-Mautic.focusCreateIframe = function () {
+Mautic.focusCreateIframe = function (url) {
 
     let builderCss = {
         margin: "0",
