@@ -11,9 +11,9 @@
 
 namespace Mautic\WebhookBundle\Controller;
 
-use Joomla\Http\Http;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\WebhookBundle\Http\Client;
 use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
@@ -37,30 +37,20 @@ class AjaxController extends CommonAjaxController
 
         // get the selected types
         $selectedTypes = InputHelper::cleanArray($request->request->get('types'));
-
-        $payloadPaths = $this->getPayloadPaths($selectedTypes);
-        $payloads     = $this->loadPayloads($payloadPaths);
-
-        $now = new \DateTime();
+        $payloadPaths  = $this->getPayloadPaths($selectedTypes);
+        $payloads      = $this->loadPayloads($payloadPaths);
+        $now           = new \DateTime();
 
         $payloads['timestamp'] = $now->format('c');
-        $jsonPayloads          = json_encode($payloads);
 
         // generate a base64 encoded HMAC-SHA256 signature of the payload
         $secret    = InputHelper::string($request->request->get('secret'));
-        $signature = base64_encode(hash_hmac('sha256', $jsonPayloads, $secret, true));
 
-        // Set up custom headers
-        $headers = [
-            'Content-Type'      => 'application/json',
-            'Webhook-Signature' => $signature,
-        ];
-
-        // instantiate new http class
-        $http = new Http();
+        /** @var Client $client */
+        $client = $this->get('mautic.webhook.http.client');
 
         // set the response
-        $response = $http->post($url, $jsonPayloads, $headers);
+        $response = $client->post($url, $payloads, $secret);
 
         // default to an error message
         $dataArray = [
@@ -71,7 +61,7 @@ class AjaxController extends CommonAjaxController
         ];
 
         // if we get a 2xx response convert to success message
-        if (2 == substr($response->code, 0, 1)) {
+        if (2 == substr($response->getStatusCode(), 0, 1)) {
             $dataArray['html'] =
                 '<div class="has-success"><span class="help-block">'
                 .$this->translator->trans('mautic.webhook.label.success')

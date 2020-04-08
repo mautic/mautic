@@ -105,6 +105,13 @@ return [
                     'mautic.http.connector',
                 ],
             ],
+            'mautic.webhook.http.client' => [
+                'class'     => \Mautic\WebhookBundle\Http\Client::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.guzzle.client',
+                ],
+            ],
         ],
     ],
 
