@@ -456,7 +456,6 @@ class FieldType extends AbstractType
         $StateChoices = [
             'state'   => FormFieldHelper::getRegionChoices(),
         ];
-
         $viewOnly = $this->formModel->getCustomComponents()['viewOnlyFields'];
 
         $choices               = ['' => ''];
@@ -464,7 +463,6 @@ class FieldType extends AbstractType
         $dependentoptions      = [];
         $getDependentvalue     = [];
         $setDependentvalue     = ['' => ''];
-        $setLeadDependentvalue = ['' => ''];
         $setValue              = [];
 
         if (!empty($options['data']['dependent'])) {
@@ -582,7 +580,7 @@ class FieldType extends AbstractType
             // Dependent Option Convert to Json
             if (!empty($f['leadField']) && (!empty($f['properties']['syncList']) && $f['properties']['syncList'] == '1')) {
                 if ($f['leadField'] == 'state') {
-                    $dependentoptions[$f['alias']] = $StateChoices['state']['state'];
+                    $dependentoptions[$f['alias']] = $StateChoices['state'];
                 } elseif ($f['leadField'] == 'country') {
                     foreach ($CountyChoices as $ListsType => $ListsChoices) {
                         $dependentoptions[$f['alias']] = $ListsChoices;
@@ -648,82 +646,6 @@ class FieldType extends AbstractType
             $builder->add('properties', $customParams['formType'], $formTypeOptions);
         } else {
             switch ($type) {
-                case 'select':
-                case 'country':
-                    $builder->add(
-                        'properties',
-                        'formfield_select',
-                        [
-                            'field_type' => $type,
-                            'label'      => false,
-                            'parentData' => $options['data'],
-                            'data'       => $propertiesData,
-                        ]
-                    );
-                    // Dependent Fields Configuration Start - 03-31-2020
-                    $builder->add(
-                        'dependent',
-                        'yesno_button_group',
-                        [
-                            'attr'       => [
-                                'class'     => 'form-control',
-                            ],
-                            'label' => 'Does this field depend on the entered value from another field?',
-                            'data'  => $dependentsData,
-                        ]
-                    );
-                    $builder->add(
-                        'dependentLabel',
-                        'choice',
-                        [
-                            'choices'     => $choices,
-                            'multiple'    => false,
-                            'label'       => 'Dependent Field Mapping',
-                            'label_attr'  => ['class' => 'control-label'],
-                            'empty_value' => 'mautic.core.select',
-                            'attr'        => [
-                                'class'              => 'form-control',
-                                'data-show-on'       => '{"formfield_dependent_0": ""}',
-                                'onchange'           => 'Mautic.dependentupdateFormFieldValues(this);',
-                                'data-field-options' => json_encode($dependentoptions),
-                            ],
-                            'required' => false,
-                            'data'     => $dependentsLabel,
-                        ]
-                    );
-                    $builder->add(
-                        'dependentOperator',
-                        'choice',
-                        [
-                            'choices'     => ['equals'=>'equals', 'in'=>'including'],
-                            'multiple'    => false,
-                            'label'       => 'Operator',
-                            'attr'        => [
-                                'class'        => 'form-control',
-                                'data-show-on' => '{"formfield_dependent_0": ""}',
-                                'onchange'     => 'Mautic.getDependentOperator(this);',
-                            ],
-                            'required' => false,
-                            'data'     => $dependentOperator,
-                        ]
-                    );
-                    $builder->add(
-                        'dependentValue',
-                        'choice',
-                        [
-                            'choices'     => $setDependentvalue,
-                            'multiple'    => true,
-                            'label'       => 'Enter Dependent Value',
-                            'attr'        => [
-                                'class'        => 'form-control',
-                                'data-show-on' => '{"formfield_dependent_0": ""}',
-                            ],
-                            'required' => false,
-                            'data'     => $dependentsValue,
-                        ]
-                    );
-                    // Dependent Fields Configuration End - 03-31-2020
-                    break;
                 case 'checkboxgrp':
                 case 'radiogrp':
                     $builder->add(
@@ -734,69 +656,6 @@ class FieldType extends AbstractType
                             'data'  => $propertiesData,
                         ]
                     );
-                    // Dependent Fields Configuration Start - 03-31-2020
-                    $builder->add(
-                        'dependent',
-                        'yesno_button_group',
-                        [
-                            'attr'       => [
-                                'class'     => 'form-control',
-                            ],
-                            'label' => 'Does this field depend on the entered value from another field?',
-                            'data'  => $dependentsData,
-                        ]
-                    );
-                    $builder->add(
-                        'dependentLabel',
-                        'choice',
-                        [
-                            'choices'     => $choices,
-                            'multiple'    => false,
-                            'label'       => 'Dependent Field Mapping',
-                            'label_attr'  => ['class' => 'control-label'],
-                            'empty_value' => 'mautic.core.select',
-                            'attr'        => [
-                                'class'              => 'form-control',
-                                'data-show-on'       => '{"formfield_dependent_0": ""}',
-                                'onchange'           => 'Mautic.dependentupdateFormFieldValues(this);',
-                                'data-field-options' => json_encode($dependentoptions),
-                            ],
-                            'required' => false,
-                            'data'     => $dependentsLabel,
-                        ]
-                    );
-                    $builder->add(
-                        'dependentOperator',
-                        'choice',
-                        [
-                            'choices'     => ['equals'=>'equals', 'in'=>'including'],
-                            'multiple'    => false,
-                            'label'       => 'Operator',
-                            'attr'        => [
-                                'class'        => 'form-control',
-                                'data-show-on' => '{"formfield_dependent_0": ""}',
-                                'onchange'     => 'Mautic.getDependentOperator(this);',
-                            ],
-                            'required' => false,
-                            'data'     => $dependentOperator,
-                        ]
-                    );
-                    $builder->add(
-                        'dependentValue',
-                        'choice',
-                        [
-                            'choices'     => $setDependentvalue,
-                            'multiple'    => true,
-                            'label'       => 'Enter Dependent Value',
-                            'attr'        => [
-                                'class'        => 'form-control',
-                                'data-show-on' => '{"formfield_dependent_0": ""}',
-                            ],
-                            'required' => false,
-                            'data'     => $dependentsValue,
-                        ]
-                    );
-                    // Dependent Fields Configuration End - 03-31-2020
                     break;
                 case 'freetext':
                     $builder->add(
@@ -809,69 +668,6 @@ class FieldType extends AbstractType
                             'data'     => $propertiesData,
                         ]
                     );
-                    // Dependent Fields Configuration Start - 03-31-2020
-                    $builder->add(
-                        'dependent',
-                        'yesno_button_group',
-                        [
-                            'attr'       => [
-                                'class'     => 'form-control',
-                            ],
-                            'label' => 'Does this field depend on the entered value from another field?',
-                            'data'  => $dependentsData,
-                        ]
-                    );
-                    $builder->add(
-                        'dependentLabel',
-                        'choice',
-                        [
-                            'choices'     => $choices,
-                            'multiple'    => false,
-                            'label'       => 'Dependent Field Mapping',
-                            'label_attr'  => ['class' => 'control-label'],
-                            'empty_value' => 'mautic.core.select',
-                            'attr'        => [
-                                'class'              => 'form-control',
-                                'data-show-on'       => '{"formfield_dependent_0": ""}',
-                                'onchange'           => 'Mautic.dependentupdateFormFieldValues(this);',
-                                'data-field-options' => json_encode($dependentoptions),
-                            ],
-                            'required' => false,
-                            'data'     => $dependentsLabel,
-                        ]
-                    );
-                    $builder->add(
-                        'dependentOperator',
-                        'choice',
-                        [
-                            'choices'     => ['equals'=>'equals', 'in'=>'including'],
-                            'multiple'    => false,
-                            'label'       => 'Operator',
-                            'attr'        => [
-                                'class'        => 'form-control',
-                                'data-show-on' => '{"formfield_dependent_0": ""}',
-                                'onchange'     => 'Mautic.getDependentOperator(this);',
-                            ],
-                            'required' => false,
-                            'data'     => $dependentOperator,
-                        ]
-                    );
-                    $builder->add(
-                        'dependentValue',
-                        'choice',
-                        [
-                            'choices'     => $setDependentvalue,
-                            'multiple'    => true,
-                            'label'       => 'Enter Dependent Value',
-                            'attr'        => [
-                                'class'        => 'form-control',
-                                'data-show-on' => '{"formfield_dependent_0": ""}',
-                            ],
-                            'required' => false,
-                            'data'     => $dependentsValue,
-                        ]
-                    );
-                    // Dependent Fields Configuration End - 03-31-2020
                     break;
                 case 'freehtml':
                     $builder->add(
@@ -899,69 +695,6 @@ class FieldType extends AbstractType
                             'data'  => $propertiesData,
                         ]
                     );
-                    // Dependent Fields Configuration Start - 03-31-2020
-                    $builder->add(
-                        'dependent',
-                        'yesno_button_group',
-                        [
-                            'attr'       => [
-                                'class'     => 'form-control',
-                            ],
-                            'label' => 'Does this field depend on the entered value from another field?',
-                            'data'  => $dependentsData,
-                        ]
-                    );
-                    $builder->add(
-                        'dependentLabel',
-                        'choice',
-                        [
-                            'choices'     => $choices,
-                            'multiple'    => false,
-                            'label'       => 'Dependent Field Mapping',
-                            'label_attr'  => ['class' => 'control-label'],
-                            'empty_value' => 'mautic.core.select',
-                            'attr'        => [
-                                'class'              => 'form-control',
-                                'data-show-on'       => '{"formfield_dependent_0": ""}',
-                                'onchange'           => 'Mautic.dependentupdateFormFieldValues(this);',
-                                'data-field-options' => json_encode($dependentoptions),
-                            ],
-                            'required' => false,
-                            'data'     => $dependentsLabel,
-                        ]
-                    );
-                    $builder->add(
-                        'dependentOperator',
-                        'choice',
-                        [
-                            'choices'     => ['equals'=>'equals', 'in'=>'including'],
-                            'multiple'    => false,
-                            'label'       => 'Operator',
-                            'attr'        => [
-                                'class'        => 'form-control',
-                                'data-show-on' => '{"formfield_dependent_0": ""}',
-                                'onchange'     => 'Mautic.getDependentOperator(this);',
-                            ],
-                            'required' => false,
-                            'data'     => $dependentOperator,
-                        ]
-                    );
-                    $builder->add(
-                        'dependentValue',
-                        'choice',
-                        [
-                            'choices'     => $setDependentvalue,
-                            'multiple'    => true,
-                            'label'       => 'Enter Dependent Value',
-                            'attr'        => [
-                                'class'        => 'form-control',
-                                'data-show-on' => '{"formfield_dependent_0": ""}',
-                            ],
-                            'required' => false,
-                            'data'     => $dependentsValue,
-                        ]
-                    );
-                    // Dependent Fields Configuration End - 03-31-2020
                     break;
                 case 'captcha':
                     $builder->add(
@@ -995,13 +728,39 @@ class FieldType extends AbstractType
                             'data'  => $propertiesData,
                         ]
                     );
+                    break;
+            }
+
+            switch ($type) {
+                case 'freetext':
+                case 'checkboxgrp':
+                case 'radiogrp':
+                case 'select':
+                case 'country':
+                case 'date':
+                case 'email':
+                case 'number':
+                case 'text':
+                case 'url':
+                case 'tel':
+                case 'file':
+                    $builder->add(
+                        'properties',
+                        'formfield_select',
+                        [
+                            'field_type' => $type,
+                            'label'      => false,
+                            'parentData' => $options['data'],
+                            'data'       => $propertiesData,
+                        ]
+                    );
                     // Dependent Fields Configuration Start - 03-31-2020
                     $builder->add(
                         'dependent',
                         'yesno_button_group',
                         [
-                            'attr'       => [
-                                'class'     => 'form-control',
+                            'attr'  => [
+                                'class' => 'form-control',
                             ],
                             'label' => 'Does this field depend on the entered value from another field?',
                             'data'  => $dependentsData,
@@ -1022,18 +781,18 @@ class FieldType extends AbstractType
                                 'onchange'           => 'Mautic.dependentupdateFormFieldValues(this);',
                                 'data-field-options' => json_encode($dependentoptions),
                             ],
-                            'required' => false,
-                            'data'     => $dependentsLabel,
+                            'required'    => false,
+                            'data'        => $dependentsLabel,
                         ]
                     );
                     $builder->add(
                         'dependentOperator',
                         'choice',
                         [
-                            'choices'     => ['equals'=>'equals', 'in'=>'including'],
-                            'multiple'    => false,
-                            'label'       => 'Operator',
-                            'attr'        => [
+                            'choices'  => ['equals' => 'equals', 'in' => 'including'],
+                            'multiple' => false,
+                            'label'    => 'Operator',
+                            'attr'     => [
                                 'class'        => 'form-control',
                                 'data-show-on' => '{"formfield_dependent_0": ""}',
                                 'onchange'     => 'Mautic.getDependentOperator(this);',
@@ -1046,10 +805,10 @@ class FieldType extends AbstractType
                         'dependentValue',
                         'choice',
                         [
-                            'choices'     => $setDependentvalue,
-                            'multiple'    => true,
-                            'label'       => 'Enter Dependent Value',
-                            'attr'        => [
+                            'choices'  => $setDependentvalue,
+                            'multiple' => true,
+                            'label'    => 'Enter Dependent Value',
+                            'attr'     => [
                                 'class'        => 'form-control',
                                 'data-show-on' => '{"formfield_dependent_0": ""}',
                             ],
@@ -1057,7 +816,6 @@ class FieldType extends AbstractType
                             'data'     => $dependentsValue,
                         ]
                     );
-                    // Dependent Fields Configuration End - 03-31-2020
                     break;
             }
         }
