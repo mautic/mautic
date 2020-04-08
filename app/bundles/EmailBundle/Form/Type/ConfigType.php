@@ -86,7 +86,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'do_not_contact_text',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.email.config.do_not_contact_text',
                 'label_attr' => ['class' => 'control-label'],
@@ -801,7 +801,7 @@ class ConfigType extends AbstractType
         );
         $builder->add(
             'show_contact_dnc',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.show.contact.dnc',
                 'label_attr' => ['class' => 'control-label'],
