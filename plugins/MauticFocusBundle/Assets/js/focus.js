@@ -12,8 +12,12 @@ Mautic.disabledFocusActions = function(opener) {
     opener.mQuery('#campaignevent_properties_previewFocusButton').prop('disabled', disabled);
 };
 
+/**
+ * @todo Remove as unused
+ * @param options
+ * @returns {*}
+ */
 Mautic.standardFocusUrl = function(options) {
-    // @todo Remove as unused
     if (!options) {
         return;
     }
@@ -34,7 +38,7 @@ Mautic.standardFocusUrl = function(options) {
 Mautic.focusOnLoad = function () {
     if (mQuery('.builder').length) {
         // Activate droppers
-        mQuery('.btn-dropper').each(function () {
+        mQuery('.btn-dropper').each(function  () {
             mQuery(this).click(function () {
                 if (mQuery(this).hasClass('active')) {
                     // Deactivate
@@ -396,29 +400,29 @@ Mautic.focusUpdatePreview = function () {
     mQuery('.preview-body').html('');
     // Generate a preview
     var data = mQuery('form[name=focus]').formToArray();
-    Mautic.ajaxActionRequest('plugin:focus:generatePreview', data, function (response) {
-        var container = mQuery('<div />').html(response.style);
-        var innerContainer = mQuery('<div />').html(response.html);
-
-        if (mQuery('.btn-viewport').data('viewport') == 'mobile') {
-            innerContainer.addClass('mf-responsive');
-        } else {
-            innerContainer.removeClass('mf-responsive');
-        }
-
-        container.append(innerContainer);
-
-        mQuery('.preview-body').html(container);
-
-        if (!mQuery('.mf-bar').length && mQuery('.builder-content').length) {
-            mQuery('.builder-content').on('click', function () {
-                Mautic.closeFocusModal(mQuery('#focus_style').val());
-            });
-            mQuery('.mautic-focus').on('click', function (e) {
-                e.stopPropagation();
-            });
-        }
-    });
+    // Mautic.ajaxActionRequest('plugin:focus:generatePreview', data, function (response) {
+    //     var container = mQuery('<div />').html(response.style);
+    //     var innerContainer = mQuery('<div />').html(response.html);
+    //
+    //     if (mQuery('.btn-viewport').data('viewport') == 'mobile') {
+    //         innerContainer.addClass('mf-responsive');
+    //     } else {
+    //         innerContainer.removeClass('mf-responsive');
+    //     }
+    //
+    //     container.append(innerContainer);
+    //
+    //     mQuery('.preview-body').html(container);
+    //
+    //     if (!mQuery('.mf-bar').length && mQuery('.builder-content').length) {
+    //         mQuery('.builder-content').on('click', function () {
+    //             Mautic.closeFocusModal(mQuery('#focus_style').val());
+    //         });
+    //         mQuery('.mautic-focus').on('click', function (e) {
+    //             e.stopPropagation();
+    //         });
+    //     }
+    // });
 };
 
 Mautic.setFocusDefaultColors = function () {
