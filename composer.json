@@ -10,8 +10,8 @@
             "Mautic\\Middleware\\": "app/middlewares/"
         },
         "files": [	
-            "app/AppKernel.php",	
-            "app/AppCache.php"	
+            "app/AppKernel.php",
+            "app/AppCache.php"
         ]
     },
     "require": {
