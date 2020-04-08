@@ -106,7 +106,7 @@ $dependentTabError = (isset($form['dependent']) && ($view['form']->containsError
 			<?php if ($showDependent): ?>
             <li role="presentation">
                 <a<?php if ($dependentTabError): echo ' class="text-danger" '; endif; ?> href="#dependent" aria-controls="dependent" role="tab" data-toggle="tab">
-                    <?php echo 'Dependency'; ?>
+                    <?php echo $view['translator']->trans('mautic.form.field.form.dependency'); ?>
                     <?php if ($dependentTabError): ?>
                         <i class="fa fa-warning"></i>
                     <?php endif; ?>

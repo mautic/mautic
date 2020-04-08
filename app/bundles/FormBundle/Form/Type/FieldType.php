@@ -448,7 +448,6 @@ class FieldType extends AbstractType
         $fields      = $this->fieldModel->getSessionFields($options['data']['formId']);
         $objectForm  = 'Lead';
         $Leadfields  = $this->fieldModel->getObjectFields($objectForm);
-        $coreFields  = [];
 
         $CountyChoices = [
             'country'  => FormFieldHelper::getCountryChoices(),
@@ -505,16 +504,6 @@ class FieldType extends AbstractType
             $dependentOperator = (isset($options['data']['dependentOperator'])) ? $options['data']['dependentOperator'] : '';
         } else {
             $dependentOperator = (isset($options['data']['properties']['dependentOperator'])) ? $options['data']['properties']['dependentOperator'] : '';
-        }
-
-        if (!empty($dependentOperator)) {
-            if ($dependentOperator == 'in') {
-                $dependentOperatorValue = true;
-            } else {
-                $dependentOperatorValue = false;
-            }
-        } else {
-            $dependentOperatorValue = false;
         }
 
         if (!empty($options['data']['dependentLabel'])) {
@@ -646,6 +635,19 @@ class FieldType extends AbstractType
             $builder->add('properties', $customParams['formType'], $formTypeOptions);
         } else {
             switch ($type) {
+                case 'select':
+                case 'country':
+                    $builder->add(
+                        'properties',
+                        'formfield_select',
+                        [
+                            'field_type' => $type,
+                            'label'      => false,
+                            'parentData' => $options['data'],
+                            'data'       => $propertiesData,
+                        ]
+                    );
+                break;
                 case 'checkboxgrp':
                 case 'radiogrp':
                     $builder->add(
@@ -745,24 +747,13 @@ class FieldType extends AbstractType
                 case 'tel':
                 case 'file':
                     $builder->add(
-                        'properties',
-                        'formfield_select',
-                        [
-                            'field_type' => $type,
-                            'label'      => false,
-                            'parentData' => $options['data'],
-                            'data'       => $propertiesData,
-                        ]
-                    );
-                    // Dependent Fields Configuration Start - 03-31-2020
-                    $builder->add(
                         'dependent',
                         'yesno_button_group',
                         [
                             'attr'  => [
                                 'class' => 'form-control',
                             ],
-                            'label' => 'Does this field depend on the entered value from another field?',
+                            'label' => 'mautic.form.field.form.dependency.label',
                             'data'  => $dependentsData,
                         ]
                     );
@@ -772,7 +763,7 @@ class FieldType extends AbstractType
                         [
                             'choices'     => $choices,
                             'multiple'    => false,
-                            'label'       => 'Dependent Field Mapping',
+                            'label'       => 'mautic.form.field.form.dependent.field.mapping',
                             'label_attr'  => ['class' => 'control-label'],
                             'empty_value' => 'mautic.core.select',
                             'attr'        => [
@@ -791,7 +782,7 @@ class FieldType extends AbstractType
                         [
                             'choices'  => ['equals' => 'equals', 'in' => 'including'],
                             'multiple' => false,
-                            'label'    => 'Operator',
+                            'label'    => 'mautic.lead.lead.submitaction.operator',
                             'attr'     => [
                                 'class'        => 'form-control',
                                 'data-show-on' => '{"formfield_dependent_0": ""}',
@@ -807,7 +798,7 @@ class FieldType extends AbstractType
                         [
                             'choices'  => $setDependentvalue,
                             'multiple' => true,
-                            'label'    => 'Enter Dependent Value',
+                            'label'    => 'mautic.core.value',
                             'attr'     => [
                                 'class'        => 'form-control',
                                 'data-show-on' => '{"formfield_dependent_0": ""}',
