@@ -43,16 +43,6 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
      */
     private $cachedTypeOperatorsChoices = [];
 
-    /**
-     * @var array
-     */
-    private $cachedTypeChoices = [];
-
-    /**
-     * @var array
-     */
-    private $cachedAliasChoices = [];
-
     public function __construct(
         EventDispatcherInterface $dispatcher,
         FilterOperatorProviderInterface $filterOperatorProvider
