@@ -515,15 +515,15 @@ Mautic.focusCreateIframe = function (url) {
     };
 
     if (mQuery('.btn-viewport').data('viewport') === 'mobile') {
-        builderCss.width = "100%";
-        builderCss.height = mQuery('#websiteScreenshot').height(); // 100% does not work. Needs to be specified
-    } else {
         builderCss.width = '230px';
         builderCss.height = '392px';
         builderCss.border = '1px gray solid';
+    } else {
+        builderCss.width = "100%";
+        builderCss.height = mQuery('#websiteScreenshot').height(); // 100% does not work. Needs to be specified
     }
 
-    // doesn't catch empty iframe
+    // Not catching empty iframe
     try {
         mQuery('.preview-body').html('<iframe src="'+url+'" scrolling="no"></iframe>');
         mQuery('.preview-body iframe').css(builderCss);
