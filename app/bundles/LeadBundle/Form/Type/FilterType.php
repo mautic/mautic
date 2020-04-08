@@ -22,23 +22,11 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class FilterType extends AbstractType
 {
     use FilterTrait;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
 
     /**
      * @var FormAdjustmentsProviderInterface
@@ -51,13 +39,9 @@ class FilterType extends AbstractType
     private $listModel;
 
     public function __construct(
-        TranslatorInterface $translator,
-        RequestStack $requestStack,
         FormAdjustmentsProviderInterface $formAdjustmentsProvider,
         ListModel $listModel
     ) {
-        $this->translator              = $translator;
-        $this->requestStack            = $requestStack;
         $this->formAdjustmentsProvider = $formAdjustmentsProvider;
         $this->listModel               = $listModel;
     }
@@ -83,7 +67,6 @@ class FilterType extends AbstractType
         );
 
         $formModifier = function (FormEvent $event) use ($fieldChoices) {
-            // $segmentId = $this->requestStack->getCurrentRequest()->attributes->get('objectId', false);
             $data        = $event->getData();
             $form        = $event->getForm();
             $fieldAlias  = $data['field'];

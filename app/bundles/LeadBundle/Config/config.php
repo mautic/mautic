@@ -597,10 +597,8 @@ return [
                 'arguments' => ['mautic.lead.model.list'],
             ],
             'mautic.form.type.leadlist_filter' => [
-                'class'       => \Mautic\LeadBundle\Form\Type\FilterType::class,
-                'arguments'   => [
-                    'translator',
-                    'request_stack',
+                'class'     => \Mautic\LeadBundle\Form\Type\FilterType::class,
+                'arguments' => [
                     'mautic.lead.provider.formAdjustments',
                     'mautic.lead.model.list',
                 ],
