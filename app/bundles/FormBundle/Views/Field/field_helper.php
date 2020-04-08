@@ -50,15 +50,20 @@ if (in_array($field['type'], ['checkboxgrp', 'radiogrp', 'textarea'])) {
     $value = (isset($field['defaultValue'])) ? ' value="'.$field['defaultValue'].'"' : ' value=""';
 }
 
+$inputChange = '';
 if (empty($ignoreId)) {
     $inputId = 'id="mauticform_input'.$formName.'_'.$field['alias'].'"';
+    // Dependent Fields Configuration Start - 03-31-2020
+    $inputChange .= 'mauticform_denpdents_'.$field['alias'];
+    // Dependent Fields Configuration End - 03-31-2020
     $labelId = 'id="mauticform_label'.$formName.'_'.$field['alias'].'" for="mauticform_input'.$formName.'_'.$field['alias'].'"';
 } else {
     $inputId = $labelId = '';
 }
 
-$inputAttr = $inputId.$name.$value;
-$labelAttr = $labelId;
+$inputAttr     = $inputId.$name.$value;
+$inputonChange = $inputChange;
+$labelAttr     = $labelId;
 
 if (!empty($properties['placeholder'])) {
     $inputAttr .= ' placeholder="'.$properties['placeholder'].'"';
@@ -85,8 +90,16 @@ if (!empty($inForm)) {
     $appendAttribute($inputAttr, 'class', $defaultInputClass);
 }
 
-// Container
-$containerAttr = 'id="mauticform'.$formName.'_'.$id.'" '.htmlspecialchars_decode($field['containerAttributes']);
+// Dependent Fields Configuration Start - 03-31-2020
+if (!empty($properties['dependent'])) {
+    // Container
+    $containerAttr = 'id="mauticform'.$formName.'_'.$id.'" wrapper-list="main" '.htmlspecialchars_decode($field['containerAttributes']);
+} else {
+    // Container
+    $containerAttr = 'id="mauticform'.$formName.'_'.$id.'" '.htmlspecialchars_decode($field['containerAttributes']);
+}
+// Dependent Fields Configuration End - 03-31-2020
+
 if (!isset($containerClass)) {
     $containerClass = $containerType;
 }

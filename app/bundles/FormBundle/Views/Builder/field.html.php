@@ -11,6 +11,14 @@
 $template       = '<div class="col-md-6">{content}</div>';
 $toggleTemplate = '<div class="col-md-3">{content}</div>';
 $properties     = (isset($form['properties'])) ? $form['properties'] : [];
+
+// Dependent Fields Configuration Start - 03-31-2020
+$showDependent         = (isset($form['dependent'])) ? $form['dependent'] : [];
+$showDependentValue    = (isset($form['dependentValue'])) ? $form['dependentValue'] : [];
+$showDependentOperator = (isset($form['dependentOperator'])) ? $form['dependentOperator'] : [];
+$showDependentLabel    = (isset($form['dependentLabel'])) ? $form['dependentLabel'] : [];
+// Dependent Fields Configuration End - 03-31-2020
+
 $validation     = (isset($form['validation'])) ? $form['validation'] : [];
 
 $showAttributes = isset($form['labelAttributes']) || isset($form['inputAttributes']) || isset($form['containerAttributes']) || isset($properties['labelAttributes']) || isset($form['alias']);
@@ -44,6 +52,9 @@ endif;
 // Check for validation errors to show on tabs
 $generalTabError    = (isset($form['label']) && ($view['form']->containsErrors($form['label'])));
 $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErrors($form['properties'])));
+// Dependent Fields Configuration Start - 03-31-2020
+$dependentTabError = (isset($form['dependent']) && ($view['form']->containsErrors($form['dependent'])));
+// Dependent Fields Configuration End - 03-31-2020
 ?>
 
 
@@ -91,7 +102,18 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                 </a>
             </li>
             <?php endif; ?>
-
+			<!-- Dependent Fields Configuration Start - 03-31-2020 -->
+			<?php if ($showDependent): ?>
+            <li role="presentation">
+                <a<?php if ($dependentTabError): echo ' class="text-danger" '; endif; ?> href="#dependent" aria-controls="dependent" role="tab" data-toggle="tab">
+                    <?php echo 'Dependency'; ?>
+                    <?php if ($dependentTabError): ?>
+                        <i class="fa fa-warning"></i>
+                    <?php endif; ?>
+                </a>
+            </li>
+            <?php endif; ?>
+			<!-- // Dependent Fields Configuration End - 03-31-2020  -->
             <?php if ($showAttributes): ?>
             <li role="presentation">
                 <a href="#attributes" aria-controls="attributes" role="tab" data-toggle="tab">
@@ -256,7 +278,35 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                 </div>
             </div>
             <?php endif; ?>
-
+			
+			<!-- // Dependent Fields Configuration Start - 03-31-2020 -->
+			<?php if ($showDependent): ?>
+				<div role="tabpanel" class="tab-pane" id="dependent">
+					<div class="row">
+						<div class="col-md-12">
+							<?php echo $view['form']->row($form['dependent']); ?>		
+						</div>
+					</div>
+					<div class="row">							
+						<?php if ($showDependentLabel): ?>
+							<div class="col-md-5">
+								<?php echo $view['form']->row($form['dependentLabel']); ?>	
+							</div>
+						<?php endif; ?>	
+						<?php if ($showDependentOperator): ?>	
+							<div class="col-md-3">
+								<?php echo $view['form']->row($form['dependentOperator']); ?>								
+							</div>
+						<?php endif; ?>
+						<?php if ($showDependentValue): ?>							
+							<div class="col-md-4">
+								<?php echo $view['form']->row($form['dependentValue']); ?>	
+							</div>							
+						<?php endif; ?>
+					</div>						
+				</div>
+            <?php endif; ?>
+			<!-- // Dependent Fields Configuration End - 03-31-2020  -->
 
             <?php if ($showAttributes): ?>
             <div role="tabpanel" class="tab-pane" id="attributes">

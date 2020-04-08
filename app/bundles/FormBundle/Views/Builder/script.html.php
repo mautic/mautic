@@ -28,6 +28,10 @@ $scriptSrc = str_replace('/index_dev.php', '', $scriptSrc);
         var MauticDomain = '<?php echo str_replace('/index_dev.php', '', $view['assets']->getBaseUrl()); ?>';
         var MauticLang   = {
             'submittingMessage': "<?php echo $view['translator']->trans('mautic.form.submission.pleasewait'); ?>"
+			
+			// Dependent Fields Configuration Start - 03-31-2020
+			location.reload();	
+			// Dependent Fields Configuration End - 03-31-2020
         }
     }
 </script>

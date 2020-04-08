@@ -77,4 +77,51 @@ if (!isset($inBuilder)) {
             <?php endif; ?>
         </div>
     <?php endif; ?>
+	
+	<!-- // Dependent Fields Configuration Start - 03-31-2020 -->
+	<?php 
+        if (isset($field['properties']['dependent']) && isset($field['properties']['dependentValue']) && isset($field['properties']['dependentLabel'])) {
+            ?>
+		<div class="panel-footer">
+			<i class="fa fa-list" style="margin-left: 15px;" aria-hidden="true"></i> 
+			<?php if ($field['properties']['dependentLabel']) {
+                ?>
+				<span class="inline-spacer">	
+					<?php echo str_replace('_', ' ', $field['properties']['dependentLabel']).'...'; ?>
+				</span>				
+			<?php
+            } ?>
+			<?php if ($field['properties']['dependentOperator']) {
+                ?>
+				<i class="fa fa-angle-double-right" aria-hidden="true"></i>	
+				<span class="inline-spacer"><?php if ($field['properties']['dependentOperator'] == 'in') {
+                    echo 'Including';
+                } else {
+                    echo 'Equals';
+                } ?></span>
+			<?php
+            } ?>
+			<?php if (isset($field['properties']['dependentValue'])) {
+                ?>
+				<i class="fa fa-angle-double-right" aria-hidden="true"></i>
+				<?php 
+                    if (isset($field['properties']['dependentValue'])) {
+                        $counter      =1;
+                        $includeValue = '';
+                        foreach ($field['properties']['dependentValue'] as $includes) {
+                            if ($counter == count($field['properties']['dependentValue'])) {
+                                $includeValue .= $includes;
+                            } else {
+                                $includeValue .= $includes.', ';
+                            }
+                            ++$counter;
+                        }
+                    } ?>
+				<span class="inline-spacer"><?php echo $includeValue; ?></span>
+			<?php
+            } ?>
+		</div>
+	<?php
+        } ?>
+	<!-- // Dependent Fields Configuration End - 03-31-2020  -->
 </div>

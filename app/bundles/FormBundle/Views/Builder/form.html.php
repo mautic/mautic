@@ -111,3 +111,65 @@ if (!isset($lead)) {
         <?php echo (isset($formExtra)) ? $formExtra : ''; ?>
 </form>
 </div>
+<!-- // Dependent Fields Configuration Start - 03-31-2020 -->
+<?php	
+    $onChangeElements=[];
+    $elementTypes    =[];
+    $elementIndexes  =[];
+    foreach ($fields as $fieldId => $d):
+        $dependentSet = $d->getProperties();
+        $alias        = [$d->getAlias()];
+        $type         = $d->getType();
+        if ($type == 'radiogrp') {
+            if (!empty($dependentSet['optionlist'])) {
+                if (!empty($dependentSet['optionlist']['list'])) {
+                    foreach ($dependentSet['optionlist']['list'] as $key => $value) {
+                        $elementIndexes[$value['value']]=$value['value'].$key;
+                    }
+                }
+            }
+        }
+        $elementTypes[$alias[0]]=$type;
+
+        if (!empty($dependentSet)) {
+            if (!empty($dependentSet['dependent'])) {
+                $field_value    = $dependentSet['dependentValue'];
+                $field_operator = $dependentSet['dependentOperator'];
+                $field_id       = 'mauticform'.$formName.'_'.$dependentSet['dependentLabel'];
+                $div_id         = 'mauticform'.$formName.'_'.$alias[0];
+                echo '<script type="text/javascript">';
+                echo "document.getElementById('mauticform".$formName.'_'.$alias[0]."').setAttribute('style', 'display:none;');";
+                $onChangeElements[$field_id][]=['div_id'=>$div_id, 'value'=>$field_value, 'field'=>'mauticform'.$formName.'_'.$alias[0], 'operator'=>$field_operator];
+                echo '</script>';
+            }
+        }
+    endforeach;
+    if (!empty($onChangeElements)) {
+        foreach ($onChangeElements as $key=>$onChangeElement) {
+            echo '<script type="text/javascript">';
+            echo 'document.getElementById("'.$key.'").onchange = function(evt) {';
+            foreach ($onChangeElement as $element) {
+                if (is_array($element['value'])) {
+                    $counter      =1;
+                    $includeValue = '';
+                    foreach ($element['value'] as $index => $include) {
+                        if ($counter == count($element['value'])) {
+                            $includeValue .= "evt.target.value == '".$include."'";
+                        } else {
+                            $includeValue .= "evt.target.value == '".$include."' || ";
+                        }
+                        ++$counter;
+                    }
+                    echo 'if ('.$includeValue.')  {';
+                    echo "document.getElementById('".$element['div_id']."').setAttribute('style', 'display:block;');";
+                    echo '} else {';
+                    echo "document.getElementById('".$element['div_id']."').setAttribute('style', 'display:none;');";
+                    echo '}';
+                }
+            }
+            echo '}';
+            echo '</script>';
+        }
+    }
+?>
+<!-- // Dependent Fields Configuration End - 03-31-2020 -->

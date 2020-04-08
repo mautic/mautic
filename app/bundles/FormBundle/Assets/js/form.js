@@ -321,3 +321,39 @@ Mautic.selectFormType = function(formType) {
     mQuery('.form-type-modal').remove();
     mQuery('.form-type-modal-backdrop').remove();
 };
+
+
+// Dependent fields start
+Mautic.dependentupdateFormFieldValues = function (field) {
+    field = mQuery(field);
+    var fieldValue = field.val();
+    var options = jQuery.parseJSON(field.attr('data-field-options'));
+    var valueField = mQuery('#formfield_dependentValue');
+    mQuery('#formfield_dependentValue_chosen').remove();
+    var valueFieldAttrs = {
+        'class': valueField.attr('class'),
+        'id': valueField.attr('id'),
+        'name': valueField.attr('name'),
+        'autocomplete': valueField.attr('autocomplete'),
+        'value': valueField.attr('value')
+    };
+    if (typeof options[fieldValue] !== 'undefined' && !mQuery.isEmptyObject(options[fieldValue])) {
+        var newValueField = mQuery('<select/>').attr('class', 'form-control dependent_chosen').attr('id', valueFieldAttrs['id']).attr('name', valueFieldAttrs['name']).attr('autocomplete', valueFieldAttrs['autocomplete']).attr('multiple', 'multiple').attr('value', valueFieldAttrs['value']);
+        mQuery.each(options[fieldValue], function (key, optionVal) {
+            var option = mQuery("<option></option>").attr('value', optionVal).text(optionVal);
+            newValueField.append(option);
+        });
+        valueField.replaceWith(newValueField);
+        mQuery('.dependent_chosen').chosen();
+    }
+    else {
+        var newValueField = mQuery('<input/>').attr('type', 'text').attr('class', valueFieldAttrs['class']).attr('id', valueFieldAttrs['id']).attr('name', valueFieldAttrs['name']).attr('autocomplete', valueFieldAttrs['autocomplete']).attr('value', valueFieldAttrs['value']);
+        valueField.replaceWith(newValueField);
+    }
+};
+Mautic.getDependentOperator = function (field) {
+    field = mQuery(field);
+    var fieldValue = field.val();
+    if (fieldValue == 'in') { mQuery('.dependent_chosen').chosen(); }
+    else { mQuery('.dependent_chosen').chosen({maximumSelectionLength: 1}); }
+};

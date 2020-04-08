@@ -66,13 +66,23 @@ class FieldModel extends CommonFormModel
         $usedLeadFields   = $this->session->get('mautic.form.'.$entity['formId'].'.fields.leadfields', []);
         $testLeadFields   = array_flip($usedLeadFields);
         $currentLeadField = (isset($entity['leadField'])) ? $entity['leadField'] : null;
-        if (!empty($currentLeadField) && isset($testLeadFields[$currentLeadField])) {
-            unset($testLeadFields[$currentLeadField]);
-        }
+        // Dependent Fields Configuration Start - 03-31-2020 (HIDE THE FOLLOWING CODE)
+        /*
+             if (!empty($currentLeadField) && isset($testLeadFields[$currentLeadField])) {
+                 unset($testLeadFields[$currentLeadField]);
+             }
 
+             foreach ($choices as &$group) {
+                 $group = array_diff_key($group, $testLeadFields);
+             }
+        */
+        // Dependent Fields Configuration End - 03-31-2020
+
+        // Dependent Fields Configuration Start - 03-31-2020 (ADD THE FOLLOWING CODE)
         foreach ($choices as &$group) {
-            $group = array_diff_key($group, $testLeadFields);
+            $group = array_diff_key($group, $usedLeadFields);
         }
+        // Dependent Fields Configuration End - 03-31-2020
 
         $options['leadFields']['lead']          = $choices;
         $options['leadFieldProperties']['lead'] = $fields;

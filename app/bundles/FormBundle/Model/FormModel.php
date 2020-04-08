@@ -243,6 +243,7 @@ class FormModel extends CommonFormModel
         $order          = 1;
         $existingFields = $entity->getFields()->toArray();
         $formName       = $entity->generateFormName();
+        $setdependent   = [];
         foreach ($sessionFields as $key => $properties) {
             $isNew = (!empty($properties['id']) && isset($existingFields[$properties['id']])) ? false : true;
             $field = !$isNew ? $existingFields[$properties['id']] : new Field();
@@ -275,6 +276,33 @@ class FormModel extends CommonFormModel
             $field->setSessionId($key);
             $field->setOrder($order);
             ++$order;
+            // Dependent Fields Configuration Start - 03-31-2020
+            $depenselect   = $field->getType();
+            $getproperties = $field->getProperties();
+            if (!empty($getproperties)) {
+                if (!empty($properties['dependent'])) {
+                    if (!empty($properties['properties']['list'])) {
+                        $setdependent['syncList'] = $properties['properties']['syncList'];
+                        $setdependent['list']     = $properties['properties']['list'];
+                        if (!empty($properties['properties']['empty_value'])) {
+                            $setdependent['empty_value'] = $properties['properties']['empty_value'];
+                        }
+                        if (!empty($properties['properties']['multiple'])) {
+                            $setdependent['multiple'] = $properties['properties']['multiple'];
+                        }
+                    }
+                    if (!empty($properties['properties']['optionlist'])) {
+                        $setdependent['syncList']   = $properties['properties']['syncList'];
+                        $setdependent['optionlist'] = $properties['properties']['optionlist'];
+                    }
+                    $setdependent['dependent']         = $properties['dependent'];
+                    $setdependent['dependentValue']    = $properties['dependentValue'];
+                    $setdependent['dependentOperator'] = $properties['dependentOperator'];
+                    $setdependent['dependentLabel']    = $properties['dependentLabel'];
+                    $field->setProperties($setdependent);
+                }
+            }
+            // Dependent Fields Configuration End - 03-31-2020
             $entity->addField($properties['id'], $field);
         }
 
@@ -436,7 +464,15 @@ class FormModel extends CommonFormModel
         $html = $this->getFormHtml($form, $useCache);
 
         if ($withScript) {
+            // Dependent Fields Configuration Start - 03-31-2020 (HIDE THE FOLLOWING CODE)
+            /*
             $html = $this->getFormScript($form)."\n\n".$this->removeScriptTag($html);
+            */
+            // Dependent Fields Configuration End - 03-31-2020
+
+            // Dependent Fields Configuration Start - 03-31-2020 (ADD THE FOLLOWING CODE)
+            $html = $this->removeScriptTag($html).''.$this->getFormScript($form)."\n\n";
+        // Dependent Fields Configuration End - 03-31-2020
         } else {
             $html = $this->removeScriptTag($html);
         }

@@ -31,6 +31,8 @@ class FieldType extends AbstractType
      */
     private $translator;
 
+    private $factory;
+
     /**
      * FieldType constructor.
      *
@@ -440,7 +442,207 @@ class FieldType extends AbstractType
         );
 
         // Put properties last so that the other values are available to form events
+
         $propertiesData = (isset($options['data']['properties'])) ? $options['data']['properties'] : [];
+        // Dependent Fields Configuration Start - 03-31-2020
+        $fields      = $this->fieldModel->getSessionFields($options['data']['formId']);
+        $objectForm  = 'Lead';
+        $Leadfields  = $this->fieldModel->getObjectFields($objectForm);
+        $coreFields  = [];
+
+        $CountyChoices = [
+            'country'  => FormFieldHelper::getCountryChoices(),
+        ];
+        $StateChoices = [
+            'state'   => FormFieldHelper::getRegionChoices(),
+        ];
+
+        $viewOnly = $this->formModel->getCustomComponents()['viewOnlyFields'];
+
+        $choices               = ['' => ''];
+        $dependentlist         = [];
+        $dependentoptions      = [];
+        $getDependentvalue     = [];
+        $setDependentvalue     = ['' => ''];
+        $setLeadDependentvalue = ['' => ''];
+        $setValue              = [];
+
+        if (!empty($options['data']['dependent'])) {
+            $dependentsData = (isset($options['data']['dependent'])) ? $options['data']['dependent'] : '';
+        } else {
+            $dependentsData = (isset($options['data']['properties']['dependent'])) ? $options['data']['properties']['dependent'] : [];
+        }
+
+        if (!empty($options['data']['properties']['dependentValue'])) {
+            $getValue = (isset($options['data']['properties']['dependentValue'])) ? $options['data']['properties']['dependentValue'] : '';
+            if (is_array($getValue)) {
+                if (!empty($getValue)) {
+                    foreach ($getValue as $setValues) {
+                        $setValue[$setValues] = $setValues;
+                    }
+                    $dependentsValue = $setValue;
+                }
+            } else {
+                $setValue[$getValue] = $getValue;
+                $dependentsValue     = $setValue;
+            }
+        } else {
+            $getValue = (isset($options['data']['dependentValue'])) ? $options['data']['dependentValue'] : '';
+            if (is_array($getValue)) {
+                if (!empty($getValue)) {
+                    foreach ($getValue as $setValues) {
+                        $setValue[$setValues] = $setValues;
+                    }
+                    $dependentsValue = $setValue;
+                }
+            } else {
+                $setValue[$getValue] = $getValue;
+                $dependentsValue     = $setValue;
+            }
+            if (!empty($options['data']['dependentLabel'])) {
+                $setDependentvalue[$options['data']['dependentLabel']] = $dependentsValue;
+            }
+        }
+        if (!empty($options['data']['dependentOperator'])) {
+            $dependentOperator = (isset($options['data']['dependentOperator'])) ? $options['data']['dependentOperator'] : '';
+        } else {
+            $dependentOperator = (isset($options['data']['properties']['dependentOperator'])) ? $options['data']['properties']['dependentOperator'] : '';
+        }
+
+        if (!empty($dependentOperator)) {
+            if ($dependentOperator == 'in') {
+                $dependentOperatorValue = true;
+            } else {
+                $dependentOperatorValue = false;
+            }
+        } else {
+            $dependentOperatorValue = false;
+        }
+
+        if (!empty($options['data']['dependentLabel'])) {
+            $dependentsLabel = (isset($options['data']['dependentLabel'])) ? $options['data']['dependentLabel'] : '';
+            foreach ($fields as $dL) {
+                if ($dL['alias'] == $dependentsLabel) {
+                    if (!empty($dL['properties']['list']['list'])) {
+                        $getDependentvalue = $dL['properties']['list']['list'];
+                    } elseif (!empty($dL['properties']['optionlist']['list'])) {
+                        $getDependentvalue =$dL['properties']['optionlist']['list'];
+                    }
+                    if (!empty($getDependentvalue)) {
+                        foreach ($getDependentvalue as $setDependentvalues) {
+                            if (isset($setDependentvalues['value']) && isset($setDependentvalues['label'])) {
+                                $setDependentvalue[$setDependentvalues['value']] = $setDependentvalues['label'];
+                            } elseif (is_array($setDependentvalues)) {
+                                foreach ($setDependentvalues as $optgroup => $setDependentvalues) {
+                                    $setDependentvalue[$setDependentvalues] = $setDependentvalues;
+                                }
+                            } elseif (!is_array($setDependentvalues)) {
+                                $setDependentvalue[$setDependentvalues] = $setDependentvalues;
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            $dependentsLabel = (isset($options['data']['properties']['dependentLabel'])) ? $options['data']['properties']['dependentLabel'] : '';
+            foreach ($fields as $dL) {
+                if ($dL['alias'] == $dependentsLabel) {
+                    if (!empty($dL['properties']['list']['list'])) {
+                        $getDependentvalue = $dL['properties']['list']['list'];
+                    } elseif (!empty($dL['properties']['optionlist']['list'])) {
+                        $getDependentvalue =$dL['properties']['optionlist']['list'];
+                    }
+                    if (!empty($getDependentvalue)) {
+                        foreach ($getDependentvalue as $setDependentvalues) {
+                            if (isset($setDependentvalues['value']) && isset($setDependentvalues['label'])) {
+                                $setDependentvalue[$setDependentvalues['value']] = $setDependentvalues['label'];
+                            } elseif (is_array($setDependentvalues)) {
+                                foreach ($setDependentvalues as $optgroup => $setDependentvalues) {
+                                    $setDependentvalue[$setDependentvalues] = $setDependentvalues;
+                                }
+                            } elseif (!is_array($setDependentvalues)) {
+                                $setDependentvalue[$setDependentvalues] = $setDependentvalues;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        foreach ($fields as $f) {
+            if (in_array(
+                $f['type'],
+                    array_merge(
+                        ['button', 'captcha', 'date', 'email', 'number', 'text', 'url', 'tel']
+                    ),
+                    true
+                )) {
+                continue;
+            }
+            // Dependent Option Convert to Json
+            if (!empty($f['leadField']) && (!empty($f['properties']['syncList']) && $f['properties']['syncList'] == '1')) {
+                if ($f['leadField'] == 'state') {
+                    $dependentoptions[$f['alias']] = $StateChoices['state']['state'];
+                } elseif ($f['leadField'] == 'country') {
+                    foreach ($CountyChoices as $ListsType => $ListsChoices) {
+                        $dependentoptions[$f['alias']] = $ListsChoices;
+                    }
+                } else {
+                    foreach ($Leadfields[0] as $EditCorefield) {
+                        if ($EditCorefield['alias'] == $f['leadField']) {
+                            if (!empty($EditCorefield['properties']['list'])) {
+                                $EditCoredependentlist = $EditCorefield['properties']['list'];
+                            } elseif (!empty($EditCorefield['properties']['optionlist'])) {
+                                $EditCoredependentlist = $EditCorefield['properties']['optionlist'];
+                            }
+                            if (!empty($EditCoredependentlist)) {
+                                $dependentoptions[$f['alias']] = [];
+                                foreach ($EditCoredependentlist as $EditCoredependentlists) {
+                                    if (is_array($EditCoredependentlists) && isset($EditCoredependentlists['value']) && isset($EditCoredependentlists['label'])) {
+                                        $dependentoptions[$f['alias']][$EditCoredependentlists['value']] = $EditCoredependentlists['label'];
+                                    //$setDependentvalue[$EditCoredependentlists['value']] = $EditCoredependentlists['label'];
+                                    } elseif (is_array($EditCoredependentlists)) {
+                                        foreach ($EditCoredependentlists as $optgroup => $EditCoredependentlists) {
+                                            $dependentoptions[$f['alias']][$EditCoredependentlists] = $EditCoredependentlists;
+                                        }
+                                    } elseif (!is_array($EditCoredependentlists)) {
+                                        $dependentoptions[$f['alias']][$EditCoredependentlists] = $EditCoredependentlists;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (empty($f['leadField']) && empty($f['properties']['syncList'])) {
+                    if (!empty($f['properties']['list']['list'])) {
+                        $dependentlist        = $f['properties']['list']['list'];
+                        $choices[$f['alias']] = $f['label'];
+                    } elseif (!empty($f['properties']['optionlist']['list'])) {
+                        $dependentlist =$f['properties']['optionlist']['list'];
+                    }
+                    if (!empty($dependentlist)) {
+                        $dependentoptions[$f['alias']] = [];
+                        foreach ($dependentlist as $dependentoption) {
+                            if (is_array($dependentoption) && isset($dependentoption['value']) && isset($dependentoption['label'])) {
+                                $dependentoptions[$f['alias']][$dependentoption['value']] = $dependentoption['label'];
+                            //$setDependentvalue[$dependentoption['value']] = $dependentoption['label'];
+                            } elseif (is_array($dependentoption)) {
+                                foreach ($dependentoption as $optgroup => $dependentoption) {
+                                    $dependentoptions[$f['alias']][$dependentoption] = $dependentoption;
+                                }
+                            } elseif (!is_array($dependentoption)) {
+                                $dependentoptions[$f['alias']][$dependentoption] = $dependentoption;
+                                //$setDependentvalue[$dependentoption['value']] = $dependentoption['label'];
+                            }
+                        }
+                    }
+                }
+            }
+            $choices[$f['alias']] = $f['label'];
+        }
+        // Dependent Fields Configuration End - 03-31-2020
+
         if (!empty($options['customParameters'])) {
             $formTypeOptions = array_merge($formTypeOptions, ['data' => $propertiesData]);
             $builder->add('properties', $customParams['formType'], $formTypeOptions);
@@ -458,6 +660,69 @@ class FieldType extends AbstractType
                             'data'       => $propertiesData,
                         ]
                     );
+                    // Dependent Fields Configuration Start - 03-31-2020
+                    $builder->add(
+                        'dependent',
+                        'yesno_button_group',
+                        [
+                            'attr'       => [
+                                'class'     => 'form-control',
+                            ],
+                            'label' => 'Does this field depend on the entered value from another field?',
+                            'data'  => $dependentsData,
+                        ]
+                    );
+                    $builder->add(
+                        'dependentLabel',
+                        'choice',
+                        [
+                            'choices'     => $choices,
+                            'multiple'    => false,
+                            'label'       => 'Dependent Field Mapping',
+                            'label_attr'  => ['class' => 'control-label'],
+                            'empty_value' => 'mautic.core.select',
+                            'attr'        => [
+                                'class'              => 'form-control',
+                                'data-show-on'       => '{"formfield_dependent_0": ""}',
+                                'onchange'           => 'Mautic.dependentupdateFormFieldValues(this);',
+                                'data-field-options' => json_encode($dependentoptions),
+                            ],
+                            'required' => false,
+                            'data'     => $dependentsLabel,
+                        ]
+                    );
+                    $builder->add(
+                        'dependentOperator',
+                        'choice',
+                        [
+                            'choices'     => ['equals'=>'equals', 'in'=>'including'],
+                            'multiple'    => false,
+                            'label'       => 'Operator',
+                            'attr'        => [
+                                'class'        => 'form-control',
+                                'data-show-on' => '{"formfield_dependent_0": ""}',
+                                'onchange'     => 'Mautic.getDependentOperator(this);',
+                            ],
+                            'required' => false,
+                            'data'     => $dependentOperator,
+                        ]
+                    );
+                    $builder->add(
+                        'dependentValue',
+                        'choice',
+                        [
+                            'choices'     => $setDependentvalue,
+                            'multiple'    => true,
+                            'label'       => 'Enter Dependent Value',
+                            'attr'        => [
+                                'class'        => 'form-control',
+                                'data-show-on' => '{"formfield_dependent_0": ""}',
+                            ],
+                            'required' => false,
+                            'data'     => $dependentsValue,
+                        ]
+                    );
+                    // Dependent Fields Configuration End - 03-31-2020
                     break;
                 case 'checkboxgrp':
                 case 'radiogrp':
@@ -469,6 +734,69 @@ class FieldType extends AbstractType
                             'data'  => $propertiesData,
                         ]
                     );
+                    // Dependent Fields Configuration Start - 03-31-2020
+                    $builder->add(
+                        'dependent',
+                        'yesno_button_group',
+                        [
+                            'attr'       => [
+                                'class'     => 'form-control',
+                            ],
+                            'label' => 'Does this field depend on the entered value from another field?',
+                            'data'  => $dependentsData,
+                        ]
+                    );
+                    $builder->add(
+                        'dependentLabel',
+                        'choice',
+                        [
+                            'choices'     => $choices,
+                            'multiple'    => false,
+                            'label'       => 'Dependent Field Mapping',
+                            'label_attr'  => ['class' => 'control-label'],
+                            'empty_value' => 'mautic.core.select',
+                            'attr'        => [
+                                'class'              => 'form-control',
+                                'data-show-on'       => '{"formfield_dependent_0": ""}',
+                                'onchange'           => 'Mautic.dependentupdateFormFieldValues(this);',
+                                'data-field-options' => json_encode($dependentoptions),
+                            ],
+                            'required' => false,
+                            'data'     => $dependentsLabel,
+                        ]
+                    );
+                    $builder->add(
+                        'dependentOperator',
+                        'choice',
+                        [
+                            'choices'     => ['equals'=>'equals', 'in'=>'including'],
+                            'multiple'    => false,
+                            'label'       => 'Operator',
+                            'attr'        => [
+                                'class'        => 'form-control',
+                                'data-show-on' => '{"formfield_dependent_0": ""}',
+                                'onchange'     => 'Mautic.getDependentOperator(this);',
+                            ],
+                            'required' => false,
+                            'data'     => $dependentOperator,
+                        ]
+                    );
+                    $builder->add(
+                        'dependentValue',
+                        'choice',
+                        [
+                            'choices'     => $setDependentvalue,
+                            'multiple'    => true,
+                            'label'       => 'Enter Dependent Value',
+                            'attr'        => [
+                                'class'        => 'form-control',
+                                'data-show-on' => '{"formfield_dependent_0": ""}',
+                            ],
+                            'required' => false,
+                            'data'     => $dependentsValue,
+                        ]
+                    );
+                    // Dependent Fields Configuration End - 03-31-2020
                     break;
                 case 'freetext':
                     $builder->add(
@@ -481,6 +809,69 @@ class FieldType extends AbstractType
                             'data'     => $propertiesData,
                         ]
                     );
+                    // Dependent Fields Configuration Start - 03-31-2020
+                    $builder->add(
+                        'dependent',
+                        'yesno_button_group',
+                        [
+                            'attr'       => [
+                                'class'     => 'form-control',
+                            ],
+                            'label' => 'Does this field depend on the entered value from another field?',
+                            'data'  => $dependentsData,
+                        ]
+                    );
+                    $builder->add(
+                        'dependentLabel',
+                        'choice',
+                        [
+                            'choices'     => $choices,
+                            'multiple'    => false,
+                            'label'       => 'Dependent Field Mapping',
+                            'label_attr'  => ['class' => 'control-label'],
+                            'empty_value' => 'mautic.core.select',
+                            'attr'        => [
+                                'class'              => 'form-control',
+                                'data-show-on'       => '{"formfield_dependent_0": ""}',
+                                'onchange'           => 'Mautic.dependentupdateFormFieldValues(this);',
+                                'data-field-options' => json_encode($dependentoptions),
+                            ],
+                            'required' => false,
+                            'data'     => $dependentsLabel,
+                        ]
+                    );
+                    $builder->add(
+                        'dependentOperator',
+                        'choice',
+                        [
+                            'choices'     => ['equals'=>'equals', 'in'=>'including'],
+                            'multiple'    => false,
+                            'label'       => 'Operator',
+                            'attr'        => [
+                                'class'        => 'form-control',
+                                'data-show-on' => '{"formfield_dependent_0": ""}',
+                                'onchange'     => 'Mautic.getDependentOperator(this);',
+                            ],
+                            'required' => false,
+                            'data'     => $dependentOperator,
+                        ]
+                    );
+                    $builder->add(
+                        'dependentValue',
+                        'choice',
+                        [
+                            'choices'     => $setDependentvalue,
+                            'multiple'    => true,
+                            'label'       => 'Enter Dependent Value',
+                            'attr'        => [
+                                'class'        => 'form-control',
+                                'data-show-on' => '{"formfield_dependent_0": ""}',
+                            ],
+                            'required' => false,
+                            'data'     => $dependentsValue,
+                        ]
+                    );
+                    // Dependent Fields Configuration End - 03-31-2020
                     break;
                 case 'freehtml':
                     $builder->add(
@@ -508,6 +899,69 @@ class FieldType extends AbstractType
                             'data'  => $propertiesData,
                         ]
                     );
+                    // Dependent Fields Configuration Start - 03-31-2020
+                    $builder->add(
+                        'dependent',
+                        'yesno_button_group',
+                        [
+                            'attr'       => [
+                                'class'     => 'form-control',
+                            ],
+                            'label' => 'Does this field depend on the entered value from another field?',
+                            'data'  => $dependentsData,
+                        ]
+                    );
+                    $builder->add(
+                        'dependentLabel',
+                        'choice',
+                        [
+                            'choices'     => $choices,
+                            'multiple'    => false,
+                            'label'       => 'Dependent Field Mapping',
+                            'label_attr'  => ['class' => 'control-label'],
+                            'empty_value' => 'mautic.core.select',
+                            'attr'        => [
+                                'class'              => 'form-control',
+                                'data-show-on'       => '{"formfield_dependent_0": ""}',
+                                'onchange'           => 'Mautic.dependentupdateFormFieldValues(this);',
+                                'data-field-options' => json_encode($dependentoptions),
+                            ],
+                            'required' => false,
+                            'data'     => $dependentsLabel,
+                        ]
+                    );
+                    $builder->add(
+                        'dependentOperator',
+                        'choice',
+                        [
+                            'choices'     => ['equals'=>'equals', 'in'=>'including'],
+                            'multiple'    => false,
+                            'label'       => 'Operator',
+                            'attr'        => [
+                                'class'        => 'form-control',
+                                'data-show-on' => '{"formfield_dependent_0": ""}',
+                                'onchange'     => 'Mautic.getDependentOperator(this);',
+                            ],
+                            'required' => false,
+                            'data'     => $dependentOperator,
+                        ]
+                    );
+                    $builder->add(
+                        'dependentValue',
+                        'choice',
+                        [
+                            'choices'     => $setDependentvalue,
+                            'multiple'    => true,
+                            'label'       => 'Enter Dependent Value',
+                            'attr'        => [
+                                'class'        => 'form-control',
+                                'data-show-on' => '{"formfield_dependent_0": ""}',
+                            ],
+                            'required' => false,
+                            'data'     => $dependentsValue,
+                        ]
+                    );
+                    // Dependent Fields Configuration End - 03-31-2020
                     break;
                 case 'captcha':
                     $builder->add(
@@ -541,6 +995,69 @@ class FieldType extends AbstractType
                             'data'  => $propertiesData,
                         ]
                     );
+                    // Dependent Fields Configuration Start - 03-31-2020
+                    $builder->add(
+                        'dependent',
+                        'yesno_button_group',
+                        [
+                            'attr'       => [
+                                'class'     => 'form-control',
+                            ],
+                            'label' => 'Does this field depend on the entered value from another field?',
+                            'data'  => $dependentsData,
+                        ]
+                    );
+                    $builder->add(
+                        'dependentLabel',
+                        'choice',
+                        [
+                            'choices'     => $choices,
+                            'multiple'    => false,
+                            'label'       => 'Dependent Field Mapping',
+                            'label_attr'  => ['class' => 'control-label'],
+                            'empty_value' => 'mautic.core.select',
+                            'attr'        => [
+                                'class'              => 'form-control',
+                                'data-show-on'       => '{"formfield_dependent_0": ""}',
+                                'onchange'           => 'Mautic.dependentupdateFormFieldValues(this);',
+                                'data-field-options' => json_encode($dependentoptions),
+                            ],
+                            'required' => false,
+                            'data'     => $dependentsLabel,
+                        ]
+                    );
+                    $builder->add(
+                        'dependentOperator',
+                        'choice',
+                        [
+                            'choices'     => ['equals'=>'equals', 'in'=>'including'],
+                            'multiple'    => false,
+                            'label'       => 'Operator',
+                            'attr'        => [
+                                'class'        => 'form-control',
+                                'data-show-on' => '{"formfield_dependent_0": ""}',
+                                'onchange'     => 'Mautic.getDependentOperator(this);',
+                            ],
+                            'required' => false,
+                            'data'     => $dependentOperator,
+                        ]
+                    );
+                    $builder->add(
+                        'dependentValue',
+                        'choice',
+                        [
+                            'choices'     => $setDependentvalue,
+                            'multiple'    => true,
+                            'label'       => 'Enter Dependent Value',
+                            'attr'        => [
+                                'class'        => 'form-control',
+                                'data-show-on' => '{"formfield_dependent_0": ""}',
+                            ],
+                            'required' => false,
+                            'data'     => $dependentsValue,
+                        ]
+                    );
+                    // Dependent Fields Configuration End - 03-31-2020
                     break;
             }
         }

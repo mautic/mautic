@@ -30,10 +30,12 @@ HTML;
 
 $emptyOption = '';
 if ((!empty($properties['empty_value']) || empty($field['defaultValue']) && empty($properties['multiple']))):
+    if (!empty($properties['empty_value'])):
     $emptyOption = <<<HTML
 
                     <option value="">{$properties['empty_value']}</option>
 HTML;
+endif;
 endif;
 
 $optionBuilder = function (array $list, $emptyOptionHtml = '') use (&$optionBuilder, $field, $view) {
