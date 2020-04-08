@@ -67,6 +67,7 @@ echo $view['form']->start($form);
     <div class="hide builder focus-builder">
         <div class="builder-content">
             <div class="website-preview">
+<!--                Form to get preview URL-->
                 <div class="website-placeholder hide well well-lg col-md-6 col-md-offset-3 mt-lg">
                     <div class="row">
                         <div class="mautibot-image col-xs-3 text-center">
@@ -91,11 +92,13 @@ echo $view['form']->start($form);
                         </div>
                     </div>
                 </div>
+<!--                Viewport switcher-->
                 <div class="viewport-switcher text-center bdr-t-sm bdr-b-sm bdr-r-sm">
                     <div class="btn btn-sm btn-success btn-nospin btn-viewport" data-viewport="desktop">
                         <i class="fa fa-mobile-phone fa-3x"></i>
                     </div>
                 </div>
+<!--                Website preview block-->
                 <figure id="websiteScreenshot">
                     <div class="screenshot-container text-center">
                         <div class="preview-body center"></div>
@@ -106,6 +109,8 @@ echo $view['form']->start($form);
                 </figure>
             </div>
         </div>
+
+<!--        Builder-->
         <div class="builder-panel builder-panel-focus">
             <div class="builder-panel-top">
                 <p>
