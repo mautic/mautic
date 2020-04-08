@@ -13,6 +13,7 @@ Mautic.disabledFocusActions = function(opener) {
 };
 
 Mautic.standardFocusUrl = function(options) {
+    // @todo Remove as unused
     if (!options) {
         return;
     }
@@ -188,17 +189,7 @@ Mautic.focusOnLoad = function () {
             }
         });
 
-        mQuery('.btn-viewport').on('click', function () {
-            if (mQuery(this).data('viewport') == 'mobile') {
-                mQuery('.btn-viewport i').removeClass('fa-desktop fa-2x').addClass('fa-mobile-phone fa-3x');
-                mQuery(this).data('viewport', 'desktop');
-                Mautic.launchFocusBuilder(true);
-            } else {
-                mQuery('.btn-viewport i').removeClass('fa-mobile-phone fa-3x').addClass('fa-desktop fa-2x');
-                mQuery(this).data('viewport', 'mobile');
-                Mautic.launchFocusBuilder(true);
-            }
-        });
+        Mautic.focusInitViewportSwitcher();
 
         mQuery('#focus_editor').on('froalaEditor.contentChanged', function (e, editor) {
             var content = editor.html.get();
@@ -260,7 +251,7 @@ Mautic.launchFocusBuilder = function (forceFetch) {
         mQuery('#builder-overlay').addClass('hide');
         mQuery('.btn-close-builder').prop('disabled', false);
         mQuery('#websiteUrlPlaceholderInput').prop('disabled', false);
-    } else if (forceFetch || typeof Mautic.loadedPreviewImage == 'undefined' || Mautic.loadedPreviewImage != url) {
+    } else if (forceFetch) {
         Mautic.loadedPreviewImage = url;
 
         // Fetch image
@@ -270,11 +261,11 @@ Mautic.launchFocusBuilder = function (forceFetch) {
         }
 
         mQuery('.preview-body').html('');
-        Mautic.ajaxActionRequest('plugin:focus:getWebsiteSnapshot', data, function (response) {
+
             mQuery('#builder-overlay').addClass('hide');
             mQuery('.btn-close-builder').prop('disabled', false);
 
-            if (response.image) {
+            if (false) { // @todo no response available from mautic api providing preview image and such stuff
                 // Enable droppers
                 mQuery('.btn-dropper').removeClass('disabled');
                 mQuery('#websiteUrlPlaceholderInput').prop('disabled', true);
@@ -385,13 +376,10 @@ Mautic.launchFocusBuilder = function (forceFetch) {
                 // Disable droppers
                 mQuery('.btn-dropper').addClass('disabled');
 
-                // Async load in new iframe
-                // mQuery('.preview-body').html('<iframe src="'+url+'" scrolling="no"></iframe>');
-                // mQuery('.preview-body iframe').css(builderCss);
+                Mautic.focusCreateIframe();
 
                 Mautic.ignoreMauticFocusPreviewUpdate = false;
             }
-        });
     } else {
         mQuery('#builder-overlay').addClass('hide');
         mQuery('.btn-close-builder').prop('disabled', false);
@@ -494,3 +482,43 @@ Mautic.closeFocusBuilder = function (el) {
 
     mQuery('body').css('overflow-y', '');
 };
+
+Mautic.focusInitViewportSwitcher = function () {
+    mQuery('.btn-viewport').on('click', function () {
+        if (mQuery(this).data('viewport') == 'mobile') {
+            mQuery('.btn-viewport i').removeClass('fa-desktop fa-2x').addClass('fa-mobile-phone fa-3x');
+            mQuery(this).data('viewport', 'desktop');
+            Mautic.launchFocusBuilder(true);
+        } else {
+            mQuery('.btn-viewport i').removeClass('fa-mobile-phone fa-3x').addClass('fa-desktop fa-2x');
+            mQuery(this).data('viewport', 'mobile');
+            Mautic.launchFocusBuilder(true);
+        }
+    });
+}
+
+/**
+ * Create IFRAME with proper sizing
+ */
+Mautic.focusCreateIframe = function () {
+
+    let builderCss = {
+        margin: "0",
+        padding: "0",
+        border: "none",
+        overflow: "hidden", // Disable scrolling with scrolling="no" attr
+        "pointer-events": "none", // Disable clicks in iframe
+    };
+
+    if (mQuery('.btn-viewport').data('viewport') === 'mobile') {
+        builderCss.width = "100%";
+        builderCss.height = mQuery('#websiteScreenshot').height(); // 100% does not work. Needs to be specified
+    } else {
+        builderCss.width = '230px';
+        builderCss.height = '392px';
+        builderCss.border = '1px gray solid';
+    }
+
+    mQuery('.preview-body').html('<iframe src="'+url+'" scrolling="no"></iframe>');
+    mQuery('.preview-body iframe').css(builderCss);
+}
