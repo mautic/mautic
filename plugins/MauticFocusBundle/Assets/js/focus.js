@@ -523,6 +523,13 @@ Mautic.focusCreateIframe = function (url) {
         builderCss.border = '1px gray solid';
     }
 
-    mQuery('.preview-body').html('<iframe src="'+url+'" scrolling="no"></iframe>');
-    mQuery('.preview-body iframe').css(builderCss);
+    // doesn't catch empty iframe
+    try {
+        mQuery('.preview-body').html('<iframe src="'+url+'" scrolling="no"></iframe>');
+        mQuery('.preview-body iframe').css(builderCss);
+    } catch(err) {
+        alert(err.toString());
+    } finally {
+        mQuery('.website-placeholder').hide();
+    }
 }
