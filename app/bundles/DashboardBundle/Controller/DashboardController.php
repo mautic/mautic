@@ -56,7 +56,7 @@ class DashboardController extends AbstractFormController
 
             if (!empty($dateRangeFilter['date_to'])) {
                 $to = new \DateTime($dateRangeFilter['date_to']);
-                $session->set('mautic.daterange.form.to', $to->format($mysqlFormat));
+                $session->set('mautic.daterange.form.to', $to->format($mysqlFormat.' 23:59:59'));
             }
 
             $model->clearDashboardCache();
