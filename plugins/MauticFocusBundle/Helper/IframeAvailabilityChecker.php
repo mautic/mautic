@@ -10,6 +10,7 @@
 
 namespace MauticPlugin\MauticFocusBundle\Helper;
 
+use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -54,15 +55,21 @@ class IframeAvailabilityChecker
 
             $httpResponse = $client->request(Request::METHOD_GET, $url);
 
-            $blockingHeader = $this->checkHeaders($httpResponse->getHeaders(false));
-            if ('' !== $blockingHeader) {
-                $responseContent['errorMessage'] = $this->translator->trans(
-                    'mautic.focus.blocking.iframe.header',
-                    [
-                        '%url%'    => $url,
-                        '%header%' => $blockingHeader,
-                    ]
-                );
+            try {
+                $blockingHeader = $this->checkHeaders($httpResponse->getHeaders(false));
+
+                if ('' !== $blockingHeader) {
+                    $responseContent['errorMessage'] = $this->translator->trans(
+                        'mautic.focus.blocking.iframe.header',
+                        [
+                            '%url%'    => $url,
+                            '%header%' => $blockingHeader,
+                        ]
+                    );
+                }
+            } catch (TransportException $e) {
+                // Transport exception with SSL cert for example
+                $responseContent['errorMessage'] = $e->getMessage();
             }
         }
 
