@@ -38,7 +38,7 @@ class IframeAvailabilityChecker
         $responseContent                 = [];
         $responseContent['errorMessage'] = $this->checkHeaders($httpResponse->getHeaders(false));
 
-        if (Response::HTTP_OK === $statusCode) {
+        if (Response::HTTP_OK === $statusCode && '' === $responseContent['errorMessage']) {
             $responseContent['status'] = 1;
         } else {
             $responseContent['status'] = 0;
