@@ -92,6 +92,11 @@ class Field
     private $validation = [];
 
     /**
+     * @var array
+     */
+    private $conditions = [];
+
+    /**
      * @var Form
      */
     private $form;
@@ -220,6 +225,10 @@ class Field
             ->nullable()
             ->build();
 
+        $builder->createField('conditions', 'json_array')
+            ->nullable()
+            ->build();
+
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('fields')
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
@@ -264,6 +273,7 @@ class Field
                     'order',
                     'properties',
                     'validation',
+                    'conditions',
                     'labelAttributes',
                     'inputAttributes',
                     'containerAttributes',
@@ -909,5 +919,26 @@ class Field
     public function isFileType()
     {
         return $this->type === 'file';
+    }
+
+    /**
+     * @return array
+     */
+    public function getConditions()
+    {
+        return $this->conditions;
+    }
+
+    /**
+     * @param array $conditions
+     *
+     * @return Field
+     */
+    public function setConditions($conditions)
+    {
+        $this->isChanged('conditions', $conditions);
+        $this->conditions = $conditions;
+
+        return $this;
     }
 }
