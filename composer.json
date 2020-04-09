@@ -1,7 +1,7 @@
 {
     "name": "mautic/core",
     "license": "GPL-3.0",
-    "type": "project",
+    "type": "mautic-core",
     "description": "Mautic Open Source Distribution",
     "autoload": {
         "psr-4": {
