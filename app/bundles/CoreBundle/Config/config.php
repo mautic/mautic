@@ -372,7 +372,6 @@ return [
             'mautic.helper.template.gravatar' => [
                 'class'     => \Mautic\CoreBundle\Templating\Helper\GravatarHelper::class,
                 'arguments' => [
-                    'mautic.helper.paths',
                     'mautic.helper.template.default_avatar',
                     'mautic.helper.core_parameters',
                     'request_stack',
