@@ -530,8 +530,8 @@ Mautic.focusCreateIframe = function (url) {
     };
 
     if (mQuery('.btn-viewport').data('viewport') === 'mobile') {
-        builderCss.width = '230px';
-        builderCss.height = '392px';
+        builderCss.width = '320px';
+        builderCss.height = '568px';
         builderCss.border = '1px gray solid';
     } else {
         builderCss.width = "100%";
