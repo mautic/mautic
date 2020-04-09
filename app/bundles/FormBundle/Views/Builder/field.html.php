@@ -113,7 +113,7 @@ $conditionsTabError = (isset($form['conditions']) && ($view['form']->containsErr
             <?php if ($showConditions): ?>
                 <li role="presentation">
                     <a<?php if ($conditionsTabError): echo ' class="text-danger" '; endif; ?> href="#conditions" aria-controls="conditions" role="tab" data-toggle="tab">
-                        <?php echo $view['translator']->trans('mautic.form.field.form.conditions'); ?>
+                        <?php echo $view['translator']->trans('mautic.form.field.form.condition'); ?>
                         <?php if ($conditionsTabError): ?>
                             <i class="fa fa-warning"></i>
                         <?php endif; ?>
@@ -286,11 +286,14 @@ $conditionsTabError = (isset($form['conditions']) && ($view['form']->containsErr
             <?php if ($showConditions): ?>
                 <div role="tabpanel" class="tab-pane" id="conditions">
                     <div class="row">
-                        <div class="col-md-6">
-                            <?php echo $view['form']->row($form['conditions']['dependentLabel']); ?>
+                        <div class="col-md-3">
+                            <?php echo $view['form']->row($form['conditions']['enabled']); ?>
                         </div>
-                        <div class="col-md-6">
-                            <?php echo $view['form']->row($form['conditions']['dependentValue']); ?>
+                        <div class="col-md-4">
+                            <?php echo $view['form']->row($form['conditions']['field']); ?>
+                        </div>
+                        <div class="col-md-5">
+                            <?php echo $view['form']->row($form['conditions']['value']); ?>
                         </div>
                     </div>
                 </div>

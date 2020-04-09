@@ -321,3 +321,23 @@ Mautic.selectFormType = function(formType) {
     mQuery('.form-type-modal').remove();
     mQuery('.form-type-modal-backdrop').remove();
 };
+
+Mautic.updateConditionalFieldValues = function(formId, fieldAlias) {
+
+    Mautic.ajaxActionRequest('form:updateConditionFieldValues', {'formId': formId, 'fieldAlias': fieldAlias}, function(response) {
+        if (response.fields) {
+            var select = mQuery('#formfield_conditions_value');
+            select.find('option').remove();
+            var fieldOptions = {};
+            mQuery.each(response.fields, function(key, field) {
+                var option = mQuery('<option></option>')
+                    .attr('value', field.alias)
+                    .text(field.label);
+                select.append(option);
+                fieldOptions[field.alias] = field.options;
+            });
+            select.attr('data-field-options', JSON.stringify(fieldOptions));
+            select.trigger('chosen:updated');
+        }
+    });
+}

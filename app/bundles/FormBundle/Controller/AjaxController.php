@@ -13,6 +13,10 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\FormBundle\ConditionalField\ConditionalFieldFactory;
+use Mautic\FormBundle\ConditionalField\FieldsMatching\FieldsMatchingFactory;
+use Mautic\FormBundle\Model\FieldModel;
+use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -56,6 +60,32 @@ class AjaxController extends CommonAjaxController
     protected function reorderActionsAction(Request $request)
     {
         return $this->reorderFieldsAction($request, 'actions');
+    }
+
+    /**
+     * @param Request $request
+     * @param string  $name
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function updateConditionFieldValuesAction(Request $request)
+    {
+        $dataArray    = ['success' => 0];
+        $formId       = InputHelper::clean($request->request->get('formId'));
+        $fieldAlias   = InputHelper::clean($request->request->get('fieldAlias'));
+        /** @var FormModel $formModel */
+        $formModel = $this->getModel('form');
+        /** @var FieldModel $fieldModel */
+        $fieldModel    = $this->getModel('form.field');
+        $contactFields = $fieldModel->getObjectFields('Lead');
+        $fields        = $fieldModel->getSessionFields($formId);
+        $field         = $fieldModel->getEntity(77)->convertToArray();
+
+        $conditionalFieldFactory = new ConditionalFieldFactory();
+        $fieldsMatchingFactory   = $conditionalFieldFactory->getFieldsMatchingFactory($fields, $contactFields);
+        $dataArray['fields']     = $fieldsMatchingFactory->getOptionsForField($field);
+
+        return $this->sendJsonResponse($dataArray);
     }
 
     /**
