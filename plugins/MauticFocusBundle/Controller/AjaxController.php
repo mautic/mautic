@@ -34,7 +34,7 @@ class AjaxController extends CommonAjaxController
         /** @var IframeAvailabilityChecker $availabilityChecker */
         $availabilityChecker = $this->get('mautic.focus.helper.iframe_availability_checker');
 
-        return $availabilityChecker->check($url);
+        return $availabilityChecker->check($url, $request->getScheme());
     }
 
     protected function generatePreviewAction(Request $request): JsonResponse

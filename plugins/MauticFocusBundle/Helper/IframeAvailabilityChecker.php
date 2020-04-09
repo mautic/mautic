@@ -20,43 +20,45 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class IframeAvailabilityChecker
 {
-    public function check(string $url): JsonResponse
+    public function check(string $url, string $currentScheme): JsonResponse
     {
-        $client = HttpClient::create(['headers' => [
-            'User-Agent' => 'Mautic',
-        ]]);
+        $response        = new JsonResponse();
+        $responseContent = [];
 
-        $httpResponse = $client->request(
-            Request::METHOD_GET,
-            $url,
-            [
-                // Empty array of headers to send
-            ]
-        );
+        if ($this->checkProtocolMismatch($url, $currentScheme)) {
+            $responseContent['errorMessage'] = "Protocol mismatch. Please use '{$currentScheme}://'";
+        } else {
+            $client = HttpClient::create([
+                'headers' => [
+                    'User-Agent' => 'Mautic',
+                ],
+            ]);
 
-        $statusCode                      = $httpResponse->getStatusCode();
-        $responseContent                 = [];
-        $responseContent['errorMessage'] = $this->checkHeaders($httpResponse->getHeaders(false));
+            $httpResponse = $client->request(Request::METHOD_GET, $url);
 
-        if (Response::HTTP_OK === $statusCode && '' === $responseContent['errorMessage']) {
+            $responseContent['errorMessage'] = $this->checkHeaders($httpResponse->getHeaders(false));
+        }
+
+        if ('' === $responseContent['errorMessage'] && Response::HTTP_OK === $httpResponse->getStatusCode()) {
             $responseContent['status'] = 1;
         } else {
             $responseContent['status'] = 0;
         }
 
-        $response = new JsonResponse();
-        $response->setStatusCode($statusCode);
         $response->setData($responseContent);
 
         return $response;
     }
 
-    private function checkProtocol()
+    /**
+     * Iframe doesn't allow cross protocol requests.
+     */
+    private function checkProtocolMismatch(string $url, string $currentScheme): bool
     {
-        // http://google.com from https
-        // Mixed Content: The page at 'https://cloud3.local/index_dev.php/s/focus/new' was loaded over HTTPS,
-        // but requested an insecure frame 'http://lukas.drahy.net/'. This request has been blocked; the content
+        // Mixed Content: The page at 'https://example.com' was loaded over HTTPS,
+        // but requested an insecure frame 'http://target-example.com/'. This request has been blocked; the content
         // must be served over HTTPS.
+        return 0 !== strpos($url, $currentScheme.':');
     }
 
     /**
