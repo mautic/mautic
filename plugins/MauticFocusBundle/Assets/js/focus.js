@@ -266,8 +266,17 @@ Mautic.launchFocusBuilder = function (forceFetch) {
 
         mQuery('.preview-body').html('');
 
+        Mautic.ajaxActionRequest('plugin:focus:checkIframeAvailability', data, function (response) {
+            if (response.errorMessage.length) {
+                alert(response.errorMessage);
+                mQuery('#builder-overlay').addClass('hide');
+                mQuery('.website-placeholder').removeClass('hide');
+                return;
+            }
+
             mQuery('#builder-overlay').addClass('hide');
             mQuery('.btn-close-builder').prop('disabled', false);
+
 
             if (false) { // @todo no response available from mautic api providing preview image and such stuff
                 // Enable droppers
@@ -384,6 +393,7 @@ Mautic.launchFocusBuilder = function (forceFetch) {
 
                 Mautic.ignoreMauticFocusPreviewUpdate = false;
             }
+        });
     } else {
         mQuery('#builder-overlay').addClass('hide');
         mQuery('.btn-close-builder').prop('disabled', false);
