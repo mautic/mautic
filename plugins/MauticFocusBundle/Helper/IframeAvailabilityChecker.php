@@ -14,19 +14,37 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Check if URL can be displayed via IFRAME.
  */
 class IframeAvailabilityChecker
 {
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
     public function check(string $url, string $currentScheme): JsonResponse
     {
         $response        = new JsonResponse();
-        $responseContent = [];
+        $responseContent = [
+            'status'       => 0,
+            'errorMessage' => '',
+        ];
 
         if ($this->checkProtocolMismatch($url, $currentScheme)) {
-            $responseContent['errorMessage'] = "Protocol mismatch. Please use '{$currentScheme}://'";
+            $responseContent['errorMessage'] = $this->translator->trans(
+                'mautic.focus.protocol.mismatch',
+                [
+                    '%currentScheme%' => $currentScheme,
+                ]);
         } else {
             $client = HttpClient::create([
                 'headers' => [
@@ -36,13 +54,20 @@ class IframeAvailabilityChecker
 
             $httpResponse = $client->request(Request::METHOD_GET, $url);
 
-            $responseContent['errorMessage'] = $this->checkHeaders($httpResponse->getHeaders(false));
+            $blockingHeader = $this->checkHeaders($httpResponse->getHeaders(false));
+            if ('' !== $blockingHeader) {
+                $responseContent['errorMessage'] = $this->translator->trans(
+                    'mautic.focus.blocking.iframe.header',
+                    [
+                        '%url%'    => $url,
+                        '%header%' => $blockingHeader,
+                    ]
+                );
+            }
         }
 
         if ('' === $responseContent['errorMessage'] && Response::HTTP_OK === $httpResponse->getStatusCode()) {
             $responseContent['status'] = 1;
-        } else {
-            $responseContent['status'] = 0;
         }
 
         $response->setData($responseContent);
@@ -64,7 +89,7 @@ class IframeAvailabilityChecker
     /**
      * @param array $headers Content of Symfony\Contracts\HttpClient\ResponseInterface::getHeaders()
      *
-     * @return string Error message if problem found
+     * @return string Blocking header if problem found
      */
     private function checkHeaders(array $headers): string
     {
@@ -72,7 +97,7 @@ class IframeAvailabilityChecker
 
         if ($this->headerContains($headers, 'x-frame-options')) {
             // @see https://stackoverflow.com/questions/31944552/iframe-refuses-to-display
-            return 'x-frame-options: SAMEORIGIN';
+            $return = 'x-frame-options: SAMEORIGIN';
         }
 
         if ($this->headerContains($headers, 'Content-Security-Policy', "frame-ancestors 'self'")) {
@@ -80,7 +105,7 @@ class IframeAvailabilityChecker
             // Refused to display 'https://www.seznam.cz/' in a frame because an ancestor violates the following
             // Content Security Policy directive: "frame-ancestors 'self'".
             // @see https://stackoverflow.com/questions/31944552/iframe-refuses-to-display
-            return 'Content-Security-Policy';
+            $return = 'Content-Security-Policy';
         }
 
         return $return;
