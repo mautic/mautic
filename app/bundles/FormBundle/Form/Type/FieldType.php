@@ -545,6 +545,17 @@ class FieldType extends AbstractType
             }
         }
 
+        // Put conditions last so that the other values are available to form events
+        $conditionsData = (isset($options['data']['conditions'])) ? $options['data']['conditions'] : [];
+        $builder->add(
+            'conditions',
+            FormFieldConditionsType::class,
+            [
+                'label' => false,
+                'data'  => $conditionsData,
+            ]
+        );
+
         $builder->addEventSubscriber(new CleanFormSubscriber($cleanMasks));
 
         if (!empty($options['action'])) {

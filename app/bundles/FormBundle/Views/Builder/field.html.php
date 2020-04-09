@@ -15,6 +15,7 @@ $validation     = (isset($form['validation'])) ? $form['validation'] : [];
 
 $showAttributes = isset($form['labelAttributes']) || isset($form['inputAttributes']) || isset($form['containerAttributes']) || isset($properties['labelAttributes']) || isset($form['alias']);
 $showBehavior   = isset($form['showWhenValueExists']) || isset($properties['showWhenValueExists']);
+$showConditions = (isset($form['conditions'])) ? $form['conditions'] : [];
 
 $placeholder = '';
 if (isset($properties['placeholder'])):
@@ -44,6 +45,7 @@ endif;
 // Check for validation errors to show on tabs
 $generalTabError    = (isset($form['label']) && ($view['form']->containsErrors($form['label'])));
 $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErrors($form['properties'])));
+$conditionsTabError = (isset($form['conditions']) && ($view['form']->containsErrors($form['conditions'])));
 ?>
 
 
@@ -106,6 +108,17 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                     <?php echo $view['translator']->trans('mautic.form.field.section.progressive.profiling'); ?>
                 </a>
             </li>
+            <?php endif; ?>
+
+            <?php if ($showConditions): ?>
+                <li role="presentation">
+                    <a<?php if ($conditionsTabError): echo ' class="text-danger" '; endif; ?> href="#conditions" aria-controls="conditions" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.form.field.form.conditions'); ?>
+                        <?php if ($conditionsTabError): ?>
+                            <i class="fa fa-warning"></i>
+                        <?php endif; ?>
+                    </a>
+                </li>
             <?php endif; ?>
         </ul>
 
@@ -268,6 +281,19 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                     <?php echo $customAttributes; ?>
                 </div>
             </div>
+            <?php endif; ?>
+
+            <?php if ($showConditions): ?>
+                <div role="tabpanel" class="tab-pane" id="conditions">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <?php echo $view['form']->row($form['conditions']['dependentLabel']); ?>
+                        </div>
+                        <div class="col-md-6">
+                            <?php echo $view['form']->row($form['conditions']['dependentValue']); ?>
+                        </div>
+                    </div>
+                </div>
             <?php endif; ?>
 
             <?php if ($showBehavior): ?>
