@@ -61,7 +61,7 @@
         "sensio/distribution-bundle": "~5.0",
 
         "symfony/twig-bundle": "~2.8",
-        "symfony/twig-bridge": "2.8",
+        "symfony/twig-bridge": "~2.8",
 
         "doctrine/dbal": "~2.5.4",
         "doctrine/common": "~2.5.3",
