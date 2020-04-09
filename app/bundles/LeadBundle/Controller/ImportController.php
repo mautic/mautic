@@ -286,7 +286,7 @@ class ImportController extends FormController
                                 $errorParameters = [];
                                 try {
                                     // Create the import dir recursively
-                                    $fs->mkdir($importDir, 0755);
+                                    $fs->mkdir($importDir);
 
                                     $fileData->move($importDir, $fileName);
 
