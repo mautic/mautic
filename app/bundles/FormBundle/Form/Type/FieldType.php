@@ -545,17 +545,14 @@ class FieldType extends AbstractType
             }
         }
 
-        // Put conditions last so that the other values are available to form events
-        $conditionsData                   = (isset($options['data']['conditions'])) ? $options['data']['conditions'] : [];
-        $conditionsData['fields']         = $this->fieldModel->getSessionFields($options['data']['formId']);
-        $conditionsData['contactFields']  = $this->fieldModel->getObjectFields('Lead');
-        $conditionsData['formId']         = $options['data']['formId'];
         $builder->add(
             'conditions',
-            FormFieldConditionsType::class,
+            FormFieldConditionType::class,
             [
-                'label' => false,
-                'data'  => $conditionsData,
+                'label'      => false,
+                'data'       => isset($options['data']['conditions']) ? $options['data']['conditions'] : [],
+                'formId'     => $options['data']['formId'],
+                'fieldAlias' => isset($options['data']['alias']) ? $options['data']['alias'] : '',
             ]
         );
 

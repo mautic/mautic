@@ -364,6 +364,13 @@ return [
                     'setFormModel'  => ['mautic.form.model.form'],
                 ],
             ],
+            'mautic.form.type.field.conditional' => [
+                'class'       => \Mautic\FormBundle\Form\Type\FormFieldConditionType::class,
+                'arguments'   => [
+                    'mautic.form.model.field',
+                    'mautic.form.conditional.properties.processor',
+                ],
+            ],
         ],
         'models' => [
             'mautic.form.model.action' => [
@@ -443,6 +450,19 @@ return [
                 'class'     => \Mautic\FormBundle\Event\Service\FieldValueTransformer::class,
                 'arguments' => [
                     'router',
+                ],
+            ],
+            'mautic.form.conditional.field.matching.factory' => [
+                'class'     => \Mautic\FormBundle\ConditionalField\FieldsMatching\FieldsMatchingFactory::class,
+                'arguments' => [
+                    'mautic.form.model.field',
+                    'mautic.form.conditional.properties.processor',
+                ],
+            ],
+            'mautic.form.conditional.properties.processor' => [
+                'class'     => \Mautic\FormBundle\ConditionalField\PropertiesProcessor::class,
+                'arguments' => [
+                    'mautic.form.model.field',
                 ],
             ],
         ],

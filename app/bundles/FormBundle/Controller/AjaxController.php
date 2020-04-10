@@ -13,10 +13,9 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\FormBundle\ConditionalField\ConditionalFieldFactory;
-use Mautic\FormBundle\ConditionalField\FieldsMatching\FieldsMatchingFactory;
+use Mautic\FormBundle\ConditionalField\PropertiesProcessor;
+use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Model\FieldModel;
-use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -70,20 +69,21 @@ class AjaxController extends CommonAjaxController
      */
     protected function updateConditionFieldValuesAction(Request $request)
     {
-        $dataArray    = ['success' => 0];
-        $formId       = InputHelper::clean($request->request->get('formId'));
-        $fieldAlias   = InputHelper::clean($request->request->get('fieldAlias'));
-        /** @var FormModel $formModel */
-        $formModel = $this->getModel('form');
-        /** @var FieldModel $fieldModel */
-        $fieldModel    = $this->getModel('form.field');
-        $contactFields = $fieldModel->getObjectFields('Lead');
-        $fields        = $fieldModel->getSessionFields($formId);
-        $field         = $fieldModel->getEntity(77)->convertToArray();
+        $dataArray  = ['success' => 0];
+        $fieldAlias = InputHelper::clean($request->request->get('fieldAlias'));
 
-        $conditionalFieldFactory = new ConditionalFieldFactory();
-        $fieldsMatchingFactory   = $conditionalFieldFactory->getFieldsMatchingFactory($fields, $contactFields);
-        $dataArray['fields']     = $fieldsMatchingFactory->getOptionsForField($field);
+        if ($fieldAlias) {
+            /** @var FieldModel $fieldModel */
+            $fieldModel = $this->getModel('form.field');
+            /** @var Field $field */
+            $field                = $fieldModel->getRepository()->findOneBySlugs($fieldAlias);
+            if ($field) {
+                /** @var PropertiesProcessor $propertiesAccessor */
+                $propertiesAccessor    = $this->get('mautic.form.conditional.properties.processor');
+                $dataArray['success']  = 1;
+                $dataArray['fields']   = $propertiesAccessor->getFieldPropertiesChoices($field);
+            }
+        }
 
         return $this->sendJsonResponse($dataArray);
     }
@@ -152,7 +152,12 @@ class AjaxController extends CommonAjaxController
      */
     public function submitAction()
     {
-        $response     = $this->forwardWithPost('MauticFormBundle:Public:submit', $this->request->request->all(), [], ['ajax' => true]);
+        $response     = $this->forwardWithPost(
+            'MauticFormBundle:Public:submit',
+            $this->request->request->all(),
+            [],
+            ['ajax' => true]
+        );
         $responseData = json_decode($response->getContent(), true);
         $success      = (!in_array($response->getStatusCode(), [404, 500]) && empty($responseData['errorMessage'])
             && empty($responseData['validationErrors']));

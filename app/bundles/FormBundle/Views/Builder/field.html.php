@@ -293,7 +293,7 @@ $conditionsTabError = (isset($form['conditions']) && ($view['form']->containsErr
                             <?php echo $view['form']->row($form['conditions']['field']); ?>
                         </div>
                         <div class="col-md-5">
-                            <?php echo $view['form']->row($form['conditions']['value']); ?>
+                            <?php echo $view['form']->row($form['conditions']['values']); ?>
                         </div>
                     </div>
                 </div>
