@@ -41,6 +41,7 @@ if (!isset($inBuilder)) {
     </div>
     <?php if ((isset($field['showWhenValueExists']) && $field['showWhenValueExists'] === false) || !empty($field['showAfterXSubmissions'])
         || !empty($field['leadField'])
+        || !empty($field['conditions'])
     ): ?>
         <div class="panel-footer">
             <?php if (!empty($field['leadField'])):
@@ -74,6 +75,17 @@ if (!isset($inBuilder)) {
                 ['%count%' => (int) $field['showAfterXSubmissions']]
             ); ?>
         </span>
+            <?php endif; ?>
+            <?php
+            if (!empty($field['conditions']) && !empty($field['conditions']['enabled']) && !empty($field['conditions']['field'])): ?>
+            <i class="fa fa-eye" aria-hidden="true"></i>
+            <span class="inline-spacer"">
+                <span style="text-transform: none"><?php echo $view['translator']->trans('mautic.form.field.form.condition.show.on'); ?></span>
+                <strong><?php echo str_replace('_', ' ', $field['conditions']['field']); ?></strong>
+
+                <span style="text-transform: none"><?php echo $view['translator']->trans('mautic.form.field.form.condition.select.value'); ?></span>
+                <strong><?php echo implode(', ', $field['conditions']['values']); ?></strong>
+            </span>
             <?php endif; ?>
         </div>
     <?php endif; ?>
