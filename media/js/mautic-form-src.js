@@ -70,9 +70,34 @@
                 }
             }
 
+            this.populateFromUrlParams();
             this.bindClickEvents();
             Profiler.runTime();
-        };
+          };
+
+          Form.populateFromUrlParams = function () {
+            /* Credit to @shawncarr for this code: https://gist.github.com/shawncarr/56c2484cb50bc923107f210310366ad0 */
+            document.addEventListener("readystatechange", function () {
+              if (event.target.readyState == "interactive") {
+                if (document.forms.length !== 0 && location.search) {
+                  var query = location.search.substr(1);
+                  query.split("&").forEach(function (part) {
+                    if (part.indexOf("=") !== -1) {
+                      var item = part.split("=");
+                      var key = item[0];
+                      var value = decodeURIComponent(item[1]);
+                      var inputs = document.getElementsByName(
+                        "mauticform[" + key + "]"
+                      );
+                      inputs.forEach(function (input) {
+                        input.value = value;
+                      });
+                    }
+                  });
+                }
+              }
+            });
+          };
 
         Form.bindClickEvents = function() {
             if (Core.debug()) console.log('binding modal click events');
