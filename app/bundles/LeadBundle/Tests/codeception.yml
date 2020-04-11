@@ -1,0 +1,15 @@
+namespace: Mautic\LeadBundle
+paths:
+    tests: Tests
+    output: Tests/_output
+    data: Tests/_data
+    support: Tests/_support
+    envs: Tests/_envs
+actor_suffix: Tester
+coverage:
+    enabled: true
+    include:
+        - ./*
+extensions:
+    enabled:
+        - Codeception\Extension\RunFailed
