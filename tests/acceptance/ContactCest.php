@@ -18,7 +18,6 @@ class ContactCest
     {
         $I->amOnPage('/s/contacts');
         $I->click('//*[@id="leadTable"]/tbody/tr[1]/td[2]/a');
-        $I->amOnPage('/s/contacts/view/1');
         $I->see('Penny Moore');
     }
 }
