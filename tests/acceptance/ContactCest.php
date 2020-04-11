@@ -7,7 +7,6 @@ class ContactCest
     {
         $I->loginAsUser();
         $I->amOnPage('/s/dashboard');
-        $I->amOnPage('/s/contacts');
     }
 
     public function _after(AcceptanceTester $I)
@@ -17,6 +16,7 @@ class ContactCest
     // tests
     public function viewContact(AcceptanceTester $I)
     {
+        $I->amOnPage('/s/contacts');
         $I->click('//*[@id="leadTable"]/tbody/tr[1]/td[2]/a');
         $I->amOnPage('/s/contacts/view/1');
         $I->see('Penny Moore');
