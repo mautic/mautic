@@ -13,7 +13,7 @@ class Login extends \AcceptanceTester
         // if snapshot exists - skipping login
 
         if ($I->loadSessionSnapshot('login')) {
-            return 'User logged in';
+            return;
         }
 
         // continue with login
