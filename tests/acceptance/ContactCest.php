@@ -31,6 +31,58 @@ class ContactCest
         $I->see('Test First Name Test Last Name');
     }
 
+    public function createContactFromForm(AcceptanceTester $I)
+    {
+        $I->amOnPage('/s/contacts');
+        $I->click('//*[@id="toolbar"]/div[1]/a[2]');
+        $I->wait(2);
+        $I->fillField('//*[@id="lead_firstname"]', 'Test 2 First Name');
+        $I->fillField('//*[@id="lead_lastname"]', 'Test 2 Last Name');
+        $I->fillField('//*[@id="lead_email"]', 'test2@example.com');
+
+        $I->click(['css' => 'div#lead_companies_chosen']); // Clicking the company select dropdown
+        $I->fillField(['xpath' => '//*[@id="lead_companies_chosen"]/ul/li/input'], 'Amazon'); // Searching the desired company
+        $I->wait(2); // We need to wait for it to look up the companies
+        $I->click(['xpath' => '//div[@id="lead_companies_chosen"]/div/ul/li[1]']); // Click the search result
+
+        $I->fillField('//*[@id="lead_position"]', 'Owner');
+        $I->fillField('//*[@id="lead_address1"]', 'Address 1');
+        $I->fillField('//*[@id="lead_address2"]', 'Address 2');
+        $I->fillField('//*[@id="lead_city"]', 'City');
+
+        $I->click(['css' => 'div#lead_state_chosen']); // Clicking the dropdown
+        $I->fillField(['xpath' => '//div[@id="lead_state_chosen"]/div/div/input'], 'California'); // Searching the desired state
+        $I->click(['xpath' => '//div[@id="lead_state_chosen"]/div/ul/li[2]']); // Click the search result
+        $I->fillField('//*[@id="lead_zipcode"]', 'CA 12345');
+
+        $I->click(['css' => 'div#lead_country_chosen']); // Clicking the dropdown
+        $I->fillField(['xpath' => '//div[@id="lead_country_chosen"]/div/div/input'], 'United States'); // Searching the desired country
+        $I->click(['xpath' => '//div[@id="lead_country_chosen"]/div/ul/li[1]']); // Click the search result
+
+        $I->fillField('//*[@id="lead_mobile"]', '+12345678901');
+        $I->fillField('//*[@id="lead_phone"]', '+21345678901');
+        $I->fillField('//*[@id="lead_fax"]', '+31345678901');
+        $I->fillField('//*[@id="lead_website"]', 'https://www.mautic.org');
+        $I->fillField('//*[@id="lead_attribution"]', '1500');
+
+        $today = date('yy-m-d h:m'); //Get today's date
+        $I->fillField('//*[@id="lead_attribution_date"]', $today);
+
+        $I->click(['css' => 'div#lead_preferred_locale_chosen']); // Clicking the dropdown
+        $I->fillField(['xpath' => '//div[@id="lead_preferred_locale_chosen"]/div/div/input'], 'United States'); // Searching the desired language
+        $I->click(['xpath' => '//div[@id="lead_preferred_locale_chosen"]/div/ul/li[1]']); // Click the search result
+
+        $I->click(['css' => 'div#lead_timezone_chosen']); // Clicking the timezone select dropdown
+        $I->fillField(['xpath' => '//*[@id="lead_timezone_chosen"]/div/div/input'], 'Los Angeles'); // Searching the desired timezone
+        $I->wait(2); // We need to wait for it to look up the timezone
+        $I->click(['xpath' => '//div[@id="lead_timezone_chosen"]/div/ul/li[2]']); // Click the search result
+
+        $I->click(['css' => 'div#lead_stage_chosen']); // Clicking the lead stage dropdown
+        $I->fillField(['xpath' => '//*[@id="lead_stage_chosen"]/div/div/input'], 'Cold'); // Searching the desired lead stage
+        $I->wait(2); // We need to wait for it to look up the companies
+        $I->click(['xpath' => '//div[@id="lead_stage_chosen"]/div/ul/li[1]']); // Click the search result
+    }
+
     public function viewContact(AcceptanceTester $I)
     {
         $I->amOnPage('/s/contacts'); //Go to contacts list
