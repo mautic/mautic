@@ -43,7 +43,7 @@ class ContactCest
         $I->see('Test-First-Name Test-Last-Name has been updated!'); // Confirm that the contact has been deleted
     }
 
-    public function deleteContact(AcceptanceTester $I)
+    public function deleteContactFromList(AcceptanceTester $I)
     {
         $I->amOnPage('/s/contacts');
         $contactName = $I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Get name of first contact so we can check for it after delete
@@ -52,8 +52,8 @@ class ContactCest
         $I->waitForElementVisible('#leadTable > tbody > tr:nth-child(1) > td:nth-child(1) > div > div > ul > li:nth-child(3) > a', 5); // Wait for the dropdown menu to show
         $I->click('#leadTable > tbody > tr:nth-child(1) > td:nth-child(1) > div > div > ul > li:nth-child(3) > a'); // Click on the delete menu option
         $I->wait(5); // Wait for the modal to show
-        $I->waitForElementVisible('body > div.modal.fade.confirmation-modal.in > div > div > div.modal-body.text-center > button.btn.btn-danger', 5); // We have to wait for the modal to become visible
-        $I->click('body > div.modal.fade.confirmation-modal.in > div > div > div.modal-body.text-center > button.btn.btn-danger'); //Now the modal is visible, click on the button to confirm delete
+        $I->waitForElementVisible('button.btn.btn-danger', 5); // We have to wait for the modal to become visible
+        $I->click('button.btn.btn-danger'); //Now the modal is visible, click on the button to confirm delete
         $I->wait(5); // Wait for delete to be completed
         $I->see("$contactName has been deleted!"); // Confirm the contact is deleted
     }
