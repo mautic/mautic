@@ -13,6 +13,24 @@ class ContactCest
     }
 
     // tests
+
+    public function createContactFromQuickAdd(AcceptanceTester $I)
+    {
+        $I->amOnPage('/s/contacts');
+        $I->click('//*[@id="toolbar"]/div[1]/a[1]');
+        $I->wait(1);
+        $I->fillField('//*[@id="lead_firstname"]', 'Test First Name');
+        $I->wait(1);
+        $I->fillField('//*[@id="lead_lastname"]', 'Test Last Name');
+        $I->wait(1);
+        $I->fillField('//*[@id="lead_email"]', 'test@example.com');
+        $I->wait(1);
+        $I->click('//*[@id="MauticSharedModal"]/div/div/div[3]/div/button[2]');
+        $I->amOnPage('/s/contacts');
+        $I->reloadPage();
+        $I->see('Test First Name Test Last Name');
+    }
+
     public function viewContact(AcceptanceTester $I)
     {
         $I->amOnPage('/s/contacts'); //Go to contacts list
