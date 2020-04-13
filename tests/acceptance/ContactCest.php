@@ -161,4 +161,17 @@ class ContactCest
         $I->wait(5); // Wait for delete to be completed
         $I->see("$contactName has been deleted!"); // Confirm the contact is deleted
     }
+
+    public function searchContactsFullName(AcceptanceTester $I) //TODO Add more search tests to incorporate wildcards and other fields etc
+    {
+        $I->amOnPage('/s/contacts');
+        $contactName1 = $I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Get name of first contact
+        $contactName2 = $I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]'); // Get name of second contact
+        $I->see("$contactName1", '//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // check first two names
+        $I->see("$contactName2", '//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]');
+        $I->fillField('//*[@id="list-search"]', "$contactName1"); // Search for first contact
+        $I->wait(1);
+        $I->see("$contactName1", '//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]');
+        $I->dontSee("$contactName2", '//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]');
+    }
 }
