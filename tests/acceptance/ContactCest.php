@@ -100,7 +100,6 @@ class ContactCest
         $I->fillField(['xpath' => '//*[@id="lead_tags_chosen"]/ul/li/input'], 'Cold lead'); // Searching the desired lead stage
         $I->wait(1); // We need to wait for it to look up the tags
         $I->pressKey('//*[@id="lead_tags_chosen"]/ul/li/input', WebDriverKeys::ENTER);
-        $I->makeScreenshot('add-tags');
     }
 
     public function viewContact(AcceptanceTester $I)
@@ -110,7 +109,6 @@ class ContactCest
         $I->click('//*[@id="leadTable"]/tbody/tr[1]/td[2]');
         $I->click(['link' => $contactName]); // Click on the first contact in the list
         $I->see($contactName); // Check we see the expected name
-        $I->makeScreenshot('view-contact'); // Take a screenshot of the contact for confirmation
     }
 
     public function editContact(AcceptanceTester $I)
@@ -142,6 +140,22 @@ class ContactCest
         $I->waitForElementVisible('#leadTable > tbody > tr:nth-child(1) > td:nth-child(1) > div > div > ul > li:nth-child(3) > a', 5); // Wait for the dropdown menu to show
         $I->click('#leadTable > tbody > tr:nth-child(1) > td:nth-child(1) > div > div > ul > li:nth-child(3) > a'); // Click on the delete menu option
         $I->wait(5); // Wait for the modal to show
+        $I->waitForElementVisible('button.btn.btn-danger', 5); // We have to wait for the modal to become visible
+        $I->click('button.btn.btn-danger'); //Now the modal is visible, click on the button to confirm delete
+        $I->wait(5); // Wait for delete to be completed
+        $I->see("$contactName has been deleted!"); // Confirm the contact is deleted
+    }
+
+    public function deleteContactFromProfile(AcceptanceTester $I)
+    {
+        $I->amOnPage('/s/contacts');
+        $contactName = $I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Get name of first contact so we can check for it after delete
+        $I->click('//*[@id="leadTable"]/tbody/tr[1]/td[2]');
+        $I->click(['link' => $contactName]); // Click on the first contact in the list
+        $I->see($contactName); // Check we see the expected name
+        $I->click('//*[@id="toolbar"]/div[1]/button'); // Click the dropdown caret to show delete option
+        $I->waitForElementVisible('//*[@id="toolbar"]/div[1]/ul/li[5]/a/span/span', 2); // Wait for the dropdown to be displayed
+        $I->click('//*[@id="toolbar"]/div[1]/ul/li[5]/a/span/span');
         $I->waitForElementVisible('button.btn.btn-danger', 5); // We have to wait for the modal to become visible
         $I->click('button.btn.btn-danger'); //Now the modal is visible, click on the button to confirm delete
         $I->wait(5); // Wait for delete to be completed
