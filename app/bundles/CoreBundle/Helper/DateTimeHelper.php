@@ -63,7 +63,7 @@ class DateTimeHelper
     public function setDateTime($datetime = '', $fromFormat = 'Y-m-d H:i:s', $timezone = 'local')
     {
         if ('local' == $timezone) {
-            $timezone = date_default_timezone_get();
+            $timezone = ArrayHelper::getValue('default_timezone', (new ParamsLoaderHelper())->getParameters(), date_default_timezone_get());
         } elseif (empty($timezone)) {
             $timezone = 'UTC';
         }

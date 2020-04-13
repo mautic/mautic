@@ -116,7 +116,7 @@ $formId = $form->getId();
                     </a>
                     <?php endif; ?>
                 </td>
-                <td><?php echo $view['date']->toFull($item['dateSubmitted'], 'UTC'); ?></td>
+                <td><?php echo $view['date']->toFull($item['dateSubmitted'], 'local'); ?></td>
                 <td><?php echo $view->escape($item['ipAddress']); ?></td>
                 <?php foreach ($item['results'] as $key => $r): ?>
                     <?php $isTextarea = 'textarea' === $r['type']; ?>
