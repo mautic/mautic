@@ -40,14 +40,8 @@ class MailHelper
      */
     protected $factory;
 
-    /**
-     * @var
-     */
     protected $mailer;
 
-    /**
-     * @var
-     */
     protected $transport;
 
     /**
@@ -75,9 +69,6 @@ class MailHelper
      */
     protected $from;
 
-    /**
-     * @var
-     */
     protected $systemFrom;
 
     /**
@@ -429,6 +420,8 @@ class MailHelper
                 if (!$this->transport->isStarted()) {
                     $this->transportStartTime = time();
                 }
+
+                $failures = null;
 
                 $this->mailer->send($this->message, $failures);
 
@@ -983,7 +976,7 @@ class MailHelper
         $content = strtr($content, $this->embedImagesReplaces);
         if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
             foreach ($matches[1] as $match) {
-                if (strpos($match, 'cid:') === false) {
+                if (false === strpos($match, 'cid:')) {
                     $this->embedImagesReplaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
                 }
             }

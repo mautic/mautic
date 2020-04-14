@@ -24,18 +24,63 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|TrackableModel
+     */
     private $trackableModel;
+
+    /**
+     * @var MockObject|PageTokenHelper
+     */
     private $pageTokenHelper;
+
+    /**
+     * @var MockObject|AssetTokenHelper
+     */
     private $assetTokenHelper;
+
+    /**
+     * @var MockObject|FormTokenHelper
+     */
     private $formTokenHelper;
+
+    /**
+     * @var MockObject|FocusTokenHelper
+     */
     private $focusTokenHelper;
+
+    /**
+     * @var MockObject|AuditLogModel
+     */
     private $auditLogModel;
+
+    /**
+     * @var MockObject|LeadModel
+     */
     private $leadModel;
+
+    /**
+     * @var MockObject|DynamicContentHelper
+     */
     private $dynamicContentHelper;
+
+    /**
+     * @var MockObject|DynamicContentModel
+     */
     private $dynamicContentModel;
+
+    /**
+     * @var MockObject|CorePermissions
+     */
+    private $security;
+
+    /**
+     * @var DynamicContentSubscriber
+     */
     private $subscriber;
 
     protected function setUp()
@@ -61,10 +106,9 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->auditLogModel,
             $this->leadModel,
             $this->dynamicContentHelper,
-            $this->dynamicContentModel
+            $this->dynamicContentModel,
+            $this->security
         );
-
-        $this->subscriber->setSecurity($this->security);
     }
 
     /**
