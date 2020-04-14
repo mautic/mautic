@@ -288,7 +288,7 @@ Mautic.focusUpdatePreview = function () {
     // Generate a preview
     var data = mQuery('form[name=focus]').formToArray();
     Mautic.ajaxActionRequest('plugin:focus:generatePreview', data, function (response) {
-        var container = mQuery('<div />').html(response.style);
+        var container = mQuery('<div />');
         var innerContainer = mQuery('<div />').html(response.html);
 
         if (mQuery('.btn-viewport').data('viewport') == 'mobile') {
