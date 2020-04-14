@@ -283,6 +283,8 @@ $conditionsTabError = (isset($form['conditions']) && ($view['form']->containsErr
             </div>
             <?php endif; ?>
 
+            <?php echo $view['form']->row($form['parentId']); ?>
+
             <?php if ($showConditions): ?>
                 <div role="tabpanel" class="tab-pane" id="conditions">
                     <div class="row">

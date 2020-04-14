@@ -243,6 +243,7 @@ class FormModel extends CommonFormModel
         $order          = 1;
         $existingFields = $entity->getFields()->toArray();
         $formName       = $entity->generateFormName();
+        $parents        = [];
         foreach ($sessionFields as $key => $properties) {
             $isNew = (!empty($properties['id']) && isset($existingFields[$properties['id']])) ? false : true;
             $field = !$isNew ? $existingFields[$properties['id']] : new Field();
@@ -271,6 +272,13 @@ class FormModel extends CommonFormModel
                     $field->$func($v);
                 }
             }
+
+            if (!empty($properties['parentId'])) {
+                if (!$field->getParent()) {
+                    $field->setParentIdTemp($properties['parentId']);
+                }
+            }
+
             $field->setForm($entity);
             $field->setSessionId($key);
             $field->setOrder($order);
@@ -281,6 +289,17 @@ class FormModel extends CommonFormModel
         // Persist if the entity is known
         if ($entity->getId()) {
             $this->formFieldModel->saveEntities($existingFields);
+            /* @var Field $existingField */
+         /*   foreach ($existingFields as $existingField) {
+                if ($existingField->getParentIdTemp()) {
+                    foreach ($existingFields as $existingField2) {
+                        if ($existingField->getParentIdTemp() == $existingField2->getSessionId()) {
+                            $existingField->setParent($existingField2);
+                        }
+                    }
+                }
+            }
+            $this->formFieldModel->saveEntities($existingFields);*/
         }
     }
 

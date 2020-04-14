@@ -14,6 +14,7 @@ namespace Mautic\FormBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\FormBundle\ConditionalField\Enum\ConditionalFieldEnum;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
@@ -152,6 +153,16 @@ class Field
     private $showAfterXSubmissions;
 
     /**
+     * @var Field
+     */
+    private $parent;
+
+    /**
+     * @var string
+     */
+    private $parentIdTemp;
+
+    /**
      * Reset properties on clone.
      */
     public function __clone()
@@ -223,6 +234,10 @@ class Field
 
         $builder->createField('validation', 'json_array')
             ->nullable()
+            ->build();
+
+        $builder->createManyToOne('parent', Field::class)
+            ->addJoinColumn('parent_id', 'id', true, false, 'CASCADE')
             ->build();
 
         $builder->createField('conditions', 'json_array')
@@ -387,6 +402,14 @@ class Field
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isConditionalType()
+    {
+        return in_array($this->type, ConditionalFieldEnum::getConditionalFieldTypes());
     }
 
     /**
@@ -940,5 +963,42 @@ class Field
         $this->conditions = $conditions;
 
         return $this;
+    }
+
+    /**
+     * @param Field $parent
+     *
+     * @return Field
+     */
+    public function setParent($parent)
+    {
+        $this->isChanged('parent', $parent);
+        $this->parent = $parent;
+
+        return $this;
+    }
+
+    /**
+     * @return Field
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * @return string
+     */
+    public function getParentIdTemp()
+    {
+        return $this->parentIdTemp;
+    }
+
+    /**
+     * @param string $parentIdTemp
+     */
+    public function setParentIdTemp($parentIdTemp)
+    {
+        $this->parentIdTemp = $parentIdTemp;
     }
 }

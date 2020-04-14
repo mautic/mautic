@@ -102,6 +102,10 @@ class FormSubscriber extends CommonSubscriber
             ];
             $this->auditLogModel->writeToLog($log);
         }
+        foreach ($form->getFields() as $field) {
+            /*echo $field->getId().'-'.$field->getSessionId().'
+            ';*/
+        }
     }
 
     /**

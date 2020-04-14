@@ -41,9 +41,11 @@ class FieldController extends CommonFormController
         } else {
             $fieldType = $this->request->query->get('type');
             $formId    = $this->request->query->get('formId');
+
             $formField = [
-                'type'   => $fieldType,
-                'formId' => $formId,
+                'type'     => $fieldType,
+                'formId'   => $formId,
+                'parentId' => $this->request->query->get('parentId'),
             ];
         }
 
@@ -106,7 +108,6 @@ class FieldController extends CommonFormController
                     } else {
                         $fields[$keyId] = $formField;
                     }
-
                     $session->set('mautic.form.'.$formId.'.fields.modified', $fields);
 
                     // Keep track of used lead fields
@@ -150,14 +151,16 @@ class FieldController extends CommonFormController
             $passthroughVars['fieldHtml'] = $this->renderView(
                 'MauticFormBundle:Builder:fieldwrapper.html.php',
                 [
-                    'template'      => $template,
-                    'inForm'        => true,
-                    'field'         => $formField,
-                    'id'            => $keyId,
-                    'formId'        => $formId,
-                    'contactFields' => $this->getModel('lead.field')->getFieldListWithProperties(),
-                    'companyFields' => $this->getModel('lead.field')->getFieldListWithProperties('company'),
-                    'inBuilder'     => true,
+                    'template'           => $template,
+                    'inForm'             => true,
+                    'field'              => $formField,
+                    'id'                 => $keyId,
+                    'formId'             => $formId,
+                    'contactFields'      => $this->getModel('lead.field')->getFieldListWithProperties(),
+                    'companyFields'      => $this->getModel('lead.field')->getFieldListWithProperties('company'),
+                    'inBuilder'          => true,
+                    'fields'             => $this->get('mautic.helper.form.field_helper')->getChoiceList($this->getModel('form.field')->getSessionFields($formId)),
+                    'viewOnlyFields'     => $customComponents['viewOnlyFields'],
                 ]
             );
         }
@@ -293,14 +296,16 @@ class FieldController extends CommonFormController
             $passthroughVars['fieldHtml'] = $this->renderView(
                 'MauticFormBundle:Builder:fieldwrapper.html.php',
                 [
-                    'template'      => $template,
-                    'inForm'        => true,
-                    'field'         => $formField,
-                    'id'            => $objectId,
-                    'formId'        => $formId,
-                    'contactFields' => $this->getModel('lead.field')->getFieldListWithProperties(),
-                    'companyFields' => $this->getModel('lead.field')->getFieldListWithProperties('company'),
-                    'inBuilder'     => true,
+                    'template'           => $template,
+                    'inForm'             => true,
+                    'field'              => $formField,
+                    'id'                 => $objectId,
+                    'formId'             => $formId,
+                    'contactFields'      => $this->getModel('lead.field')->getFieldListWithProperties(),
+                    'companyFields'      => $this->getModel('lead.field')->getFieldListWithProperties('company'),
+                    'inBuilder'          => true,
+                    'fields'             => $this->get('mautic.helper.form.field_helper')->getChoiceList($this->getModel('form.field')->getSessionFields($formId)),
+                    'viewOnlyFields'     => $customComponents['viewOnlyFields'],
                 ]
             );
 
