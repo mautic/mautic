@@ -219,6 +219,7 @@
   left : 50%;
   width: 320px;
   margin: 0px;
+  margin-top: 20px;
 }
 
 #websiteScreenshot.mobile .preview-body, #websiteScreenshot.mobile  #websiteCanvas {
@@ -235,5 +236,12 @@
 }
 
 #websiteScreenshot.mobile  #websiteCanvas {
-  z-index: 0<;
+  z-index: 0;
+  border: 1px solid #000;
+}
+
+#websiteScreenshot.mobile  #websiteCanvas iframe {
+  height: 100%;
+  width: 320px;
+  border: 0;
 }
