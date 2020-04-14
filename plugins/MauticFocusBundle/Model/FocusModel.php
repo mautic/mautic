@@ -55,7 +55,7 @@ class FocusModel extends FormModel
     protected $templating;
 
     /**
-     * @var
+     * @var LeadModel
      */
     protected $leadModel;
 
@@ -64,9 +64,6 @@ class FocusModel extends FormModel
      */
     protected $leadFieldModel;
 
-    /**
-     * FocusModel constructor.
-     */
     public function __construct(\Mautic\FormBundle\Model\FormModel $formModel, TrackableModel $trackableModel, TemplatingHelper $templating, EventDispatcherInterface $dispatcher, LeadModel $leadModel, FieldModel $leadFieldModel)
     {
         $this->formModel      = $formModel;

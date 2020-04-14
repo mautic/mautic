@@ -38,7 +38,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     protected $maxInvocations = [];
 
     /**
-     * @var
+     * @var string|null
      */
     protected $specialSfCase;
 

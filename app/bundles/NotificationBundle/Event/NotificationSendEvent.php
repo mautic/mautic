@@ -14,9 +14,6 @@ namespace Mautic\NotificationBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class NotificationSendEvent.
- */
 class NotificationSendEvent extends CommonEvent
 {
     /**
@@ -24,9 +21,6 @@ class NotificationSendEvent extends CommonEvent
      */
     protected $message;
 
-    /**
-     * @var
-     */
     protected $heading;
 
     /**

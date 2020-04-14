@@ -106,8 +106,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
 
     /**
      * Stores active role permissions.
-     *
-     * @var
      */
     private $activePermissions;
 

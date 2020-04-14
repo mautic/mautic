@@ -32,8 +32,6 @@ class ConfigController extends FormController
      *
      * @see https://github.com/mautic/mautic/issues/7294
      *
-     * @param array $data
-     *
      * @return array
      */
     protected function filterNormDataForLogging(array $data)

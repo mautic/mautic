@@ -20,14 +20,8 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 class BatchSegmentController extends AbstractFormController
 {
-    /**
-     * @var SegmentActionModel;
-     */
     private $actionModel;
 
-    /**
-     * @var ListModel;
-     */
     private $segmentModel;
 
     /**

@@ -50,8 +50,6 @@ use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class AbstractIntegration.
- *
  * @method pushLead(Lead $lead, array $config = [])
  * @method pushLeadToCampaign(Lead $lead, mixed $integrationCampaign, mixed $integrationMemberStatus)
  * @method getLeads(array $params, string $query, &$executed, array $result = [], $object = 'Lead')
@@ -158,12 +156,12 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     protected $adminUsers;
 
     /**
-     * @var
+     * @var array
      */
     protected $notifications = [];
 
     /**
-     * @var
+     * @var string|null
      */
     protected $lastIntegrationError;
 
@@ -2153,7 +2151,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getLastIntegrationError()
     {

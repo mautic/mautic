@@ -518,7 +518,7 @@ class SugarcrmApi extends CrmApi
                         $found_email = $record['email'][0]['email_address'];
                         if (isset($record['name_value_list'])) {
                             foreach ($record['name_value_list'] as $email) {
-                                if ($email['email_address'] != '' && $email['primary_address'] == 1) {
+                                if ('' != $email['email_address'] && 1 == $email['primary_address']) {
                                     $found_email = $email;
                                     break;
                                 }

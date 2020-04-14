@@ -15,9 +15,6 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class ApiErrorException extends \Exception
 {
-    /**
-     * @var
-     */
     private $contactId;
 
     /**
@@ -26,8 +23,6 @@ class ApiErrorException extends \Exception
     private $contact;
 
     /**
-     * ApiErrorException constructor.
-     *
      * @param string $message
      * @param int    $code
      */

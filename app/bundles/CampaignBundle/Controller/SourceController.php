@@ -132,7 +132,7 @@ class SourceController extends CommonFormController
         $session         = $this->get('session');
         $method          = $this->request->getMethod();
         $modifiedSources = $selectedSources = $session->get('mautic.campaign.'.$objectId.'.leadsources.modified', []);
-        if ($method == 'POST') {
+        if ('POST' == $method) {
             $source     = $this->request->request->get('campaign_leadsource');
             $sourceType = $source['sourceType'];
         } else {
