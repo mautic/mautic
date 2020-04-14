@@ -16,8 +16,9 @@ use GuzzleHttp\Psr7\Response;
 use Http\Adapter\Guzzle6\Client as GuzzleClient;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\WebhookBundle\Http\Client;
+use PHPUnit\Framework\TestCase;
 
-class ClientTest extends \PHPUnit_Framework_TestCase
+class ClientTest extends TestCase
 {
     public function testPost()
     {
