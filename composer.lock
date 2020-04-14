@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b31da94930e207e2aa8f184aadf8ad2c",
+    "content-hash": "33b0b2afd5badf288497f0c8880edd8f",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -11739,6 +11739,110 @@
                 "parser"
             ],
             "time": "2019-01-16T14:22:17+00:00"
+        },
+        {
+            "name": "brianium/habitat",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/brianium/habitat.git",
+                "reference": "d0979e3bb379cbc78ecb42b3ac171bc2b7e06d96"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/brianium/habitat/zipball/d0979e3bb379cbc78ecb42b3ac171bc2b7e06d96",
+                "reference": "d0979e3bb379cbc78ecb42b3ac171bc2b7e06d96",
+                "shasum": ""
+            },
+            "require-dev": {
+                "monolog/monolog": ">=1.5.0",
+                "phpunit/phpunit": ">=3.7.21"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Habitat": [
+                        "src/"
+                    ]
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Brian",
+                    "email": "scaturrob@gmail.com",
+                    "homepage": "http://brianscaturro.com",
+                    "role": "Lead"
+                }
+            ],
+            "description": "A dependable php environment",
+            "time": "2013-06-08T04:42:29+00:00"
+        },
+        {
+            "name": "brianium/paratest",
+            "version": "2.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/paratestphp/paratest.git",
+                "reference": "6c353410b9516d6ddc480f1418d1d83e7713ac03"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/paratestphp/paratest/zipball/6c353410b9516d6ddc480f1418d1d83e7713ac03",
+                "reference": "6c353410b9516d6ddc480f1418d1d83e7713ac03",
+                "shasum": ""
+            },
+            "require": {
+                "brianium/habitat": "1.0.0",
+                "composer/semver": "~1.2",
+                "ext-pcre": "*",
+                "ext-reflection": "*",
+                "ext-simplexml": "*",
+                "php": ">=7.1",
+                "phpunit/php-code-coverage": "^6.0",
+                "phpunit/php-timer": "^2.0",
+                "phpunit/phpunit": "^7.0",
+                "symfony/console": "^3.4|^4.0",
+                "symfony/process": "^3.4|^4.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.3.2"
+            },
+            "bin": [
+                "bin/paratest"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ParaTest\\": [
+                        "src/"
+                    ]
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Brian Scaturro",
+                    "email": "scaturrob@gmail.com",
+                    "homepage": "http://brianscaturro.com",
+                    "role": "Lead"
+                }
+            ],
+            "description": "Parallel testing for PHP",
+            "homepage": "https://github.com/paratestphp/paratest",
+            "keywords": [
+                "concurrent",
+                "parallel",
+                "phpunit",
+                "testing"
+            ],
+            "time": "2019-01-28T08:41:16+00:00"
         },
         {
             "name": "codeception/codeception",
