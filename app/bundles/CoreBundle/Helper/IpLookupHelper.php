@@ -187,7 +187,7 @@ class IpLookupHelper
             }
 
             $details = $ipAddress->getIpDetails();
-            if ($ipAddress->isTrackable() && empty($details['city']) && !$this->coreParametersHelper->getParameter('anonymize_ip')) {
+            if ($ipAddress->isTrackable() && empty($details['city']) && !$this->coreParametersHelper->get('anonymize_ip')) {
                 // Get the IP lookup service
 
                 // Fetch the data

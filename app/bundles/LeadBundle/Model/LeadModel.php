@@ -146,9 +146,6 @@ class LeadModel extends FormModel
      */
     protected $userProvider;
 
-    /**
-     * @var
-     */
     protected $leadTrackingId;
 
     /**
@@ -490,7 +487,7 @@ class LeadModel extends FormModel
             $details = $ips->first()->getIpDetails();
             // Only update with IP details if none of the following are set to prevent wrong combinations
             if (empty($fields['core']['city']['value']) && empty($fields['core']['state']['value']) && empty($fields['core']['country']['value']) && empty($fields['core']['zipcode']['value'])) {
-                if ($this->coreParametersHelper->getParameter('anonymize_ip') && $this->ipLookupHelper->getRealIp()) {
+                if ($this->coreParametersHelper->get('anonymize_ip') && $this->ipLookupHelper->getRealIp()) {
                     $details = $this->ipLookupHelper->getIpDetails($this->ipLookupHelper->getRealIp());
                 }
 
