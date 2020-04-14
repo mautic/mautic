@@ -84,11 +84,12 @@ echo $view['form']->start($form);
                             <div class="input-group">
                                 <input id="websiteUrlPlaceholderInput" disabled type="text" class="form-control" placeholder="https://example.com/" value="https://ihned.cz">
                                 <span class="input-group-btn">
-                                <button class="btn btn-default btn-fetch" type="button"><?php echo $view['translator']->trans(
-                                        'mautic.focus.fetch_snapshot'
-                                    ); ?></button>
-                            </span>
+                                    <button class="btn btn-default btn-fetch" type="button"><?php echo $view['translator']->trans(
+                                            'mautic.focus.fetch_snapshot'
+                                        ); ?></button>
+                                </span>
                             </div>
+                            <div class="help-block hide"><div>
                         </div>
                     </div>
                 </div>

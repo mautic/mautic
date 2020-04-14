@@ -268,7 +268,11 @@ Mautic.launchFocusBuilder = function (forceFetch) {
 
         Mautic.ajaxActionRequest('plugin:focus:checkIframeAvailability', data, function (response) {
             if (response.errorMessage.length) {
-                alert(response.errorMessage);
+                mQuery('.website-placeholder')
+                    .addClass('has-error')
+                    .find('.help-block')
+                    .html(response.errorMessage)
+                    .removeClass('hide');
                 mQuery('#builder-overlay').addClass('hide');
                 mQuery('.website-placeholder').removeClass('hide');
                 return;

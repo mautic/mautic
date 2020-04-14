@@ -16,6 +16,9 @@
 .focus-builder .website-preview .website-placeholder {
   z-index: 1020;
 }
+.focus-builder .website-preview .website-placeholder.has-error input, .focus-builder .website-preview .website-placeholder.has-error button {
+  border-color: #a94442;
+}
 .focus-builder #websiteScreenshot {
   position: absolute;
   top: 0;
