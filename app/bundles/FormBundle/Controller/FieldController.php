@@ -305,6 +305,7 @@ class FieldController extends CommonFormController
                     'companyFields'      => $this->getModel('lead.field')->getFieldListWithProperties('company'),
                     'inBuilder'          => true,
                     'fields'             => $this->get('mautic.helper.form.field_helper')->getChoiceList($this->getModel('form.field')->getSessionFields($formId)),
+                    'formFields'         => $fields,
                     'viewOnlyFields'     => $customComponents['viewOnlyFields'],
                 ]
             );

@@ -122,36 +122,6 @@ if (!isset($inBuilder)) {
                                         ]
                                     ); ?>
                                 <?php endif; ?>
-                                <?php foreach ($formFields as $field2): ?>
-                                    <?php if ($field2['parent'] && $field2['parent']->getId() == $field['id'] && !in_array($field2['id'], $deletedFields)) : ?>
-                                    <div class="ml-15">
-                                        <?php if (!empty($field2['isCustom'])):
-                                            $params   = $field2['customParameters'];
-                                            $template = $params['template'];
-                                        else:
-                                            $template = 'MauticFormBundle:Field:'.$field2['type'].'.html.php';
-                                        endif; ?>
-                                        <?php
-
-                                        echo $view->render(
-                                            'MauticFormBundle:Builder:fieldwrapper.html.php',
-                                            [
-                                                'template'       => $template,
-                                                'field'          => $field2,
-                                                'viewOnlyFields' => $viewOnlyFields,
-                                                'inForm'         => true,
-                                                'id'             => $field2['id'],
-                                                'formId'         => $formId,
-                                                'contactFields'  => $contactFields,
-                                                'companyFields'  => $companyFields,
-                                                'inBuilder'      => $inBuilder,
-                                                'fields'         => $fields,
-                                                'formFields'     => $formFields,
-                                            ]
-                                        ); ?>
-                                    </div>
-                                    <?php endif; ?>
-                                <?php endforeach; ?>
                             <?php endforeach; ?>
                             </div>
                             <?php if (!count($formFields)): ?>

@@ -16,7 +16,7 @@ if (!isset($inBuilder)) {
 }
 
 ?>
-<div class="panel form-field-wrapper" data-sortable-id="mauticform_<?php echo $field['id']; ?>">
+<div class="<?php if (!isset($conditional)): ?> panel <?php endif; ?> form-field-wrapper" data-sortable-id="mauticform_<?php echo $field['id']; ?>">
     <?php
     echo $view->render(
         'MauticFormBundle:Builder:actions.html.php',
@@ -43,6 +43,37 @@ if (!isset($inBuilder)) {
         );
         ?>
     </div>
+    <?php if (isset($fields) && in_array($field['type'], ConditionalFieldEnum::getConditionalFieldTypes())): ?>
+        <div class="row ml-15 mr-0 pb-15">
+            <div class="mt-10 col-sm-6 col-xs-12">
+                <select class="chosen form-builder-new-component"
+                        data-placeholder="<?php echo $view['translator']->trans(
+                            'mautic.form.form.component.fields.conditional'
+                        ); ?>">
+                    <option value=""></option>
+                    <?php foreach ($fields as $conditionalFieldType => $conditionalField): ?>
+                        <?php if (!in_array($conditionalFieldType, $viewOnlyFields)): ?>
+                            <option data-toggle="ajaxmodal"
+                                    data-target="#formComponentModal"
+                                    data-href="<?php echo $view['router']->path(
+                                        'mautic_formfield_action',
+                                        [
+                                            'objectAction' => 'new',
+                                            'type'         => $conditionalFieldType,
+                                            'tmpl'         => 'field',
+                                            'formId'       => $formId,
+                                            'inBuilder'    => $inBuilder,
+                                            'parentId'     => $field['id'],
+                                        ]
+                                    ); ?>">
+                                <?php echo $conditionalField; ?>
+                            </option>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+    <?php endif; ?>
 <?php if ((isset($field['showWhenValueExists']) && $field['showWhenValueExists'] === false) || !empty($field['showAfterXSubmissions'])
     || !empty($field['leadField'])
     || !empty($field['conditions'])
@@ -96,36 +127,36 @@ if (!isset($inBuilder)) {
             </span>
         <?php endif; ?>
     </div>
-    <?php if (isset($fields) && in_array($field['type'], ConditionalFieldEnum::getConditionalFieldTypes())): ?>
-        <div class="row ml-15 mr-0 pb-15">
-            <div class="mt-10 col-sm-6 col-xs-12">
-                <select class="chosen form-builder-new-component"
-                        data-placeholder="<?php echo $view['translator']->trans(
-                            'mautic.form.form.component.fields.conditional'
-                        ); ?>">
-                    <option value=""></option>
-                    <?php foreach ($fields as $conditionalFieldType => $conditionalField): ?>
-                        <?php if (!in_array($conditionalFieldType, $viewOnlyFields)): ?>
-                            <option data-toggle="ajaxmodal"
-                                    data-target="#formComponentModal"
-                                    data-href="<?php echo $view['router']->path(
-                                        'mautic_formfield_action',
-                                        [
-                                            'objectAction' => 'new',
-                                            'type'         => $conditionalFieldType,
-                                            'tmpl'         => 'field',
-                                            'formId'       => $formId,
-                                            'inBuilder'    => $inBuilder,
-                                            'parentId'     => $field['id'],
-                                        ]
-                                    ); ?>">
-                                <?php echo $conditionalField; ?>
-                            </option>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                </select>
+    <?php foreach ($formFields as $field2): ?>
+        <?php if ($field2['parent'] && $field2['parent']->getId() == $field['id']) : ?>
+            <div class="ml-15">
+                <?php if (!empty($field2['isCustom'])):
+                    $params   = $field2['customParameters'];
+                    $template = $params['template'];
+                else:
+                    $template = 'MauticFormBundle:Field:'.$field2['type'].'.html.php';
+                endif; ?>
+                <?php
+
+                echo $view->render(
+                    'MauticFormBundle:Builder:fieldwrapper.html.php',
+                    [
+                        'conditional'       => true,
+                        'template'          => $template,
+                        'field'             => $field2,
+                        'viewOnlyFields'    => $viewOnlyFields,
+                        'inForm'            => true,
+                        'id'                => $field2['id'],
+                        'formId'            => $formId,
+                        'contactFields'     => $contactFields,
+                        'companyFields'     => $companyFields,
+                        'inBuilder'         => $inBuilder,
+                        'fields'            => $fields,
+                        'formFields'        => $formFields,
+                    ]
+                ); ?>
             </div>
-        </div>
-    <?php endif; ?>
+        <?php endif; ?>
+    <?php endforeach; ?>
 <?php endif; ?>
 </div>
