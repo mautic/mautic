@@ -60,12 +60,6 @@ class MembershipManager
 
     /**
      * MembershipManager constructor.
-     *
-     * @param Adder           $adder
-     * @param Remover         $remover
-     * @param EventDispatcher $eventDispatcher
-     * @param LeadRepository  $leadRepository
-     * @param LoggerInterface $logger
      */
     public function __construct(
         Adder $adder,
@@ -82,9 +76,7 @@ class MembershipManager
     }
 
     /**
-     * @param Lead     $contact
-     * @param Campaign $campaign
-     * @param bool     $isManualAction
+     * @param bool $isManualAction
      */
     public function addContact(Lead $contact, Campaign $campaign, $isManualAction = true)
     {
@@ -135,9 +127,7 @@ class MembershipManager
     }
 
     /**
-     * @param ArrayCollection $contacts
-     * @param Campaign        $campaign
-     * @param bool            $isManualAction
+     * @param bool $isManualAction
      */
     public function addContacts(ArrayCollection $contacts, Campaign $campaign, $isManualAction = true)
     {
@@ -181,9 +171,7 @@ class MembershipManager
     }
 
     /**
-     * @param Lead     $contact
-     * @param Campaign $campaign
-     * @param bool     $isExit
+     * @param bool $isExit
      */
     public function removeContact(Lead $contact, Campaign $campaign, $isExit = false)
     {
@@ -217,10 +205,8 @@ class MembershipManager
     }
 
     /**
-     * @param ArrayCollection $contacts
-     * @param Campaign        $campaign
-     * @param bool            $isExit   If true, the contact can be added by a segment/source. If false, the contact can only be added back
-     *                                  by a manual process.
+     * @param bool $isExit If true, the contact can be added by a segment/source. If false, the contact can only be added back
+     *                     by a manual process.
      */
     public function removeContacts(ArrayCollection $contacts, Campaign $campaign, $isExit = false)
     {
@@ -261,9 +247,6 @@ class MembershipManager
         $this->leadRepository->clear();
     }
 
-    /**
-     * @param ProgressBar|null $progressBar
-     */
     public function setProgressBar(ProgressBar $progressBar = null)
     {
         $this->progressBar = $progressBar;

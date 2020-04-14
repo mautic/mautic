@@ -12,9 +12,9 @@
 namespace Mautic\CampaignBundle\Form\Type;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -39,9 +39,6 @@ class CampaignListType extends AbstractType
      */
     private $canViewOther = false;
 
-    /**
-     * @param MauticFactory $factory
-     */
     public function __construct(CampaignModel $campaignModel, TranslatorInterface $translator, CorePermissions $security)
     {
         $this->model        = $campaignModel;
@@ -60,11 +57,11 @@ class CampaignListType extends AbstractType
                     $choices   = [];
                     $campaigns = $this->model->getRepository()->getPublishedCampaigns(null, null, true, $this->canViewOther);
                     foreach ($campaigns as $campaign) {
-                        $choices[$campaign['id']] = $campaign['name'];
+                        $choices[$campaign['name']] = $campaign['id'];
                     }
 
                     //sort by language
-                    asort($choices);
+                    ksort($choices);
 
                     if ($options['include_this']) {
                         $choices = ['this' => $options['this_translation']] + $choices;
@@ -72,26 +69,23 @@ class CampaignListType extends AbstractType
 
                     return $choices;
                 },
-                'empty_value'      => false,
-                'expanded'         => false,
-                'multiple'         => true,
-                'required'         => false,
-                'include_this'     => false,
-                'this_translation' => 'mautic.campaign.form.thiscampaign',
+                'placeholder'       => false,
+                'expanded'          => false,
+                'multiple'          => true,
+                'required'          => false,
+                'include_this'      => false,
+                'this_translation'  => 'mautic.campaign.form.thiscampaign',
             ]
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return 'campaign_list';
-    }
-
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
+    }
+
+    public function getBlockPrefix()
+    {
+        return 'campaign_list';
     }
 }

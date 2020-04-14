@@ -36,8 +36,6 @@ class ResponseItem
     private $statHash;
 
     /**
-     * @param array $item
-     *
      * @throws ResponseItemException
      */
     public function __construct(array $item)
@@ -60,7 +58,7 @@ class ResponseItem
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getReason()
     {
@@ -76,7 +74,7 @@ class ResponseItem
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getStatHash()
     {

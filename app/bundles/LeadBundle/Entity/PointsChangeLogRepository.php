@@ -14,9 +14,6 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
-/**
- * PointsChangeLogRepository.
- */
 class PointsChangeLogRepository extends CommonRepository
 {
     use TimelineTrait;
@@ -25,7 +22,6 @@ class PointsChangeLogRepository extends CommonRepository
      * Get a lead's point log.
      *
      * @param int|null $leadId
-     * @param array    $options
      *
      * @return array
      */
@@ -52,8 +48,6 @@ class PointsChangeLogRepository extends CommonRepository
     /**
      * Get table stat data from point log table.
      *
-     * @param QueryBuilder $query
-     *
      * @return array
      *
      * @throws \Doctrine\ORM\NoResultException
@@ -64,15 +58,11 @@ class PointsChangeLogRepository extends CommonRepository
         $query->setMaxResults($limit)
                 ->setFirstResult($offset);
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
+        return $query->execute()->fetchAll();
     }
 
     /**
      * Get table stat data from lead table.
-     *
-     * @param QueryBuilder $query
      *
      * @return array
      *
@@ -84,34 +74,7 @@ class PointsChangeLogRepository extends CommonRepository
         $query->setMaxResults($limit)
                 ->setFirstResult($offset);
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
-    }
-
-    /**
-     * Count a value in a column.
-     *
-     * @param QueryBuilder $query
-     *
-     * @return array
-     *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     *
-     * @deprecated 2.10 - to be removed in 3.0 - never used in the codebase
-     */
-    public function countValue(QueryBuilder $query, $column, $value)
-    {
-        $query->select('count('.$column.') as quantity')
-            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp', 'lp.lead_id = l.id')
-            ->andwhere($query->expr()->eq($column, ':value'))
-            ->setParameter('value', $value);
-
-        $result = $query->execute()->fetch();
-
-        return $result['quantity'];
+        return $query->execute()->fetchAll();
     }
 
     /**

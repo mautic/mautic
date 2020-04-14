@@ -37,10 +37,6 @@ class RestrictionHelper
 
     /**
      * RestrictionHelper constructor.
-     *
-     * @param TranslatorInterface $translator
-     * @param array               $restrictedFields
-     * @param string              $defaultMode
      */
     public function __construct(TranslatorInterface $translator, array $restrictedFields, $mode)
     {
@@ -49,11 +45,6 @@ class RestrictionHelper
         $this->displayMode      = $mode;
     }
 
-    /**
-     * @param FormInterface $childType
-     * @param FormInterface $parentType
-     * @param array|null    $restrictedFields
-     */
     public function applyRestrictions(FormInterface $childType, FormInterface $parentType, array $restrictedFields = null)
     {
         if (null === $restrictedFields) {
@@ -64,7 +55,7 @@ class RestrictionHelper
         if (array_key_exists($fieldName, $restrictedFields)) {
             if (is_array($restrictedFields[$fieldName])) {
                 // Part of the collection of fields are restricted
-                foreach ($childType as $childFieldName => $grandchild) {
+                foreach ($childType as $grandchild) {
                     $this->applyRestrictions($grandchild, $childType, $restrictedFields[$fieldName]);
                 }
 
@@ -75,34 +66,25 @@ class RestrictionHelper
         }
     }
 
-    /**
-     * @param string        $fieldName
-     * @param FormInterface $childType
-     * @param FormInterface $parentType
-     */
     private function restrictField(FormInterface $childType, FormInterface $parentType)
     {
         switch ($this->displayMode) {
             case self::MODE_MASK:
-                $attr = [
-                    'placeholder' => $this->translator->trans('mautic.config.restricted'),
-                ];
-                $fieldOptions = $childType->getConfig()->getOptions();
-                $fieldOptions = array_merge(
-                    $fieldOptions,
-                    [
-                        'required'  => false,
-                        'mapped'    => false,
-                        'disabled'  => true,
-                        'read_only' => true,
-                        'attr'      => (isset($fieldOptions['attr'])) ? array_merge($fieldOptions['attr'], $attr) : $attr,
-                    ]
-                );
-
                 $parentType->add(
                     $childType->getName(),
-                    $childType->getConfig()->getType()->getName(),
-                    $fieldOptions
+                    get_class($childType->getConfig()->getType()->getInnerType()),
+                    array_merge(
+                        $childType->getConfig()->getOptions(),
+                        [
+                            'required' => false,
+                            'mapped'   => false,
+                            'disabled' => true,
+                            'attr'     => array_merge($childType->getConfig()->getOptions()['attr'] ?? [], [
+                                'placeholder' => $this->translator->trans('mautic.config.restricted'),
+                                'readonly'    => true,
+                            ]),
+                        ]
+                    )
                 );
                 break;
             case self::MODE_REMOVE:

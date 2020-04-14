@@ -11,18 +11,17 @@
 
 namespace Mautic\ReportBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class FilterSelectorType.
- */
 class FilterSelectorType extends AbstractType
 {
     /**
@@ -33,16 +32,16 @@ class FilterSelectorType extends AbstractType
         // Build a list of columns
         $builder->add(
             'column',
-            'choice',
+            ChoiceType::class,
             [
-                'choices'     => $options['filterList'],
-                'expanded'    => false,
-                'multiple'    => false,
-                'label'       => 'mautic.report.report.label.filtercolumn',
-                'label_attr'  => ['class' => 'control-label filter-column'],
-                'empty_value' => false,
-                'required'    => false,
-                'attr'        => [
+                'choices'           => array_flip($options['filterList']),
+                'expanded'          => false,
+                'multiple'          => false,
+                'label'             => 'mautic.report.report.label.filtercolumn',
+                'label_attr'        => ['class' => 'control-label filter-column'],
+                'placeholder'       => false,
+                'required'          => false,
+                'attr'              => [
                     'class' => 'form-control filter-columns',
                 ],
             ]
@@ -58,16 +57,16 @@ class FilterSelectorType extends AbstractType
             // Build a list of condition values
             $form->add(
                 'condition',
-                'choice',
+                ChoiceType::class,
                 [
-                    'choices'     => $choices,
-                    'expanded'    => false,
-                    'multiple'    => false,
-                    'label'       => 'mautic.report.report.label.filtercondition',
-                    'label_attr'  => ['class' => 'control-label filter-condition'],
-                    'empty_value' => false,
-                    'required'    => false,
-                    'attr'        => [
+                    'choices'           => array_flip($choices),
+                    'expanded'          => false,
+                    'multiple'          => false,
+                    'label'             => 'mautic.report.report.label.filtercondition',
+                    'label_attr'        => ['class' => 'control-label filter-condition'],
+                    'placeholder'       => false,
+                    'required'          => false,
+                    'attr'              => [
                         'class' => 'form-control not-chosen',
                     ],
                 ]
@@ -94,13 +93,13 @@ class FilterSelectorType extends AbstractType
             'glue',
             ChoiceType::class,
             [
-                'label'      => false,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control filter-glue not-chosen'],
-                'required'   => false,
-                'choices'    => [
-                    'and' => 'mautic.report.report.glue.choice.and',
-                    'or'  => 'mautic.report.report.glue.choice.or',
+                'label'             => false,
+                'label_attr'        => ['class' => 'control-label'],
+                'attr'              => ['class' => 'form-control filter-glue not-chosen'],
+                'required'          => false,
+                'choices'           => [
+                    'mautic.report.report.glue.choice.and' => 'and',
+                    'mautic.report.report.glue.choice.or'  => 'or',
                 ],
                 'placeholder' => false,
             ]
@@ -108,7 +107,7 @@ class FilterSelectorType extends AbstractType
 
         $builder->add(
             'value',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.report.report.label.filtervalue',
                 'label_attr' => ['class' => 'control-label'],
@@ -119,7 +118,7 @@ class FilterSelectorType extends AbstractType
 
         $builder->add(
             'dynamic',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.report.report.label.filterdynamic',
                 'label_attr' => ['class' => 'control-label'],
@@ -148,7 +147,7 @@ class FilterSelectorType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'filter_selector';
     }
@@ -156,7 +155,7 @@ class FilterSelectorType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [

@@ -15,30 +15,30 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\LeadBundle\Entity\LeadList;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\ListModel;
 
-/**
- * Class LoadSegmentsData.
- */
-class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
-     * @var ContainerInterface
+     * @var ListModel
      */
-    private $container;
+    private $listModel;
+
+    /**
+     * @var LeadModel
+     */
+    private $contactModel;
 
     /**
      * {@inheritdoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function __construct(ListModel $listModel, LeadModel $contactModel)
     {
-        $this->container = $container;
+        $this->listModel    = $listModel;
+        $this->contactModel = $contactModel;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $segments = [
@@ -865,18 +865,18 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
         $manager->flush();
 
         if ($listConfig['populate']) {
-            $this->container->get('mautic.lead.model.list')->rebuildListLeads($list);
+            $this->listModel->rebuildListLeads($list);
         }
 
         if (!empty($listConfig['manually_add'])) {
             foreach ($listConfig['manually_add'] as $lead) {
-                $this->container->get('mautic.lead.model.lead')->addToLists($lead, $list);
+                $this->contactModel->addToLists($lead, $list);
             }
         }
 
         if (!empty($listConfig['manually_remove'])) {
             foreach ($listConfig['manually_remove'] as $lead) {
-                $this->container->get('mautic.lead.model.lead')->removeFromLists($lead, $list);
+                $this->contactModel->removeFromLists($lead, $list);
             }
         }
     }

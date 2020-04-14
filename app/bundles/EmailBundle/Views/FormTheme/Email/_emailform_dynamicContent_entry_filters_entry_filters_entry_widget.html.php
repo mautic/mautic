@@ -8,15 +8,15 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$isPrototype = ($form->vars['name'] == '__name__');
+$isPrototype = ('__name__' == $form->vars['name']);
 $filterType  = $form['field']->vars['value'];
 $filterGroup = $form['object']->vars['value'];
-$inGroup     = $form->vars['data']['glue'] === 'and';
-$objectIcon  = (isset($form->vars['data']['object']) && $form->vars['data']['object'] == 'company') ? 'fa-building' : 'fa-user';
+$inGroup     = 'and' === $form->vars['data']['glue'];
+$objectIcon  = (isset($form->vars['data']['object']) && 'company' == $form->vars['data']['object']) ? 'fa-building' : 'fa-user';
 ?>
 
 <div class="panel<?php echo ($isPrototype || ($inGroup && !$first)) ? ' in-group' : ''; ?>">
-    <div class="panel-footer<?php if (!$isPrototype && $form->vars['name'] === '0') {
+    <div class="panel-footer<?php if (!$isPrototype && '0' === $form->vars['name']) {
     echo ' hide';
 } ?>">
         <div class="col-sm-2 pl-0">

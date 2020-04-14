@@ -51,7 +51,7 @@ class SalesforceApi extends CrmApi
         $requestUrl = RequestUrl::get($this->integration->getApiUrl(), $queryUrl, $operation, $object);
 
         $settings   = $this->requestSettings;
-        if ($method == 'PATCH') {
+        if ('PATCH' == $method) {
             $settings['headers'] = ['Sforce-Auto-Assign' => 'FALSE'];
         }
 
@@ -80,7 +80,7 @@ class SalesforceApi extends CrmApi
      */
     public function getLeadFields($object = null)
     {
-        if ($object == 'company') {
+        if ('company' == $object) {
             $object = 'Account'; //salesforce object name
         }
 
@@ -88,8 +88,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array $data
-     *
      * @return array
      *
      * @throws ApiErrorException
@@ -132,8 +130,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array $data
-     *
      * @return array
      *
      * @throws ApiErrorException
@@ -176,8 +172,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array $data
-     *
      * @return array|mixed|string
      *
      * @throws ApiErrorException
@@ -194,8 +188,7 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array $data
-     * @param       $sfObject
+     * @param $sfObject
      *
      * @return mixed|string
      *
@@ -215,9 +208,8 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array $data
-     * @param       $sfObject
-     * @param       $sfObjectId
+     * @param $sfObject
+     * @param $sfObjectId
      *
      * @return mixed|string
      *
@@ -235,8 +227,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array $data
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
@@ -249,8 +239,7 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array $activity
-     * @param       $object
+     * @param $object
      *
      * @return array
      *
@@ -274,9 +263,9 @@ class SalesforceApi extends CrmApi
                         $namespace.'ReferenceId__c'  => $record['id'].'-'.$sfId,
                     ];
 
-                    if ($object === 'Lead') {
+                    if ('Lead' === $object) {
                         $body[$namespace.'WhoId__c'] = $sfId;
-                    } elseif ($object === 'Contact') {
+                    } elseif ('Contact' === $object) {
                         $body[$namespace.'contact_id__c'] = $sfId;
                     }
 
@@ -349,11 +338,11 @@ class SalesforceApi extends CrmApi
             $fields   = implode(', ', array_unique($fields));
 
             $config = $this->integration->mergeConfigToFeatureSettings([]);
-            if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner') {
+            if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && 'updateOwner' == $config['updateOwner'][0]) {
                 $fields = 'Owner.Name, Owner.Email, '.$fields;
             }
 
-            $ignoreConvertedLeads = ($object == 'Lead') ? ' and ConvertedContactId = NULL' : '';
+            $ignoreConvertedLeads = ('Lead' == $object) ? ' and ConvertedContactId = NULL' : '';
 
             $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where SystemModStamp>='.$query['start'].' and SystemModStamp<='.$query['end']
                 .$ignoreConvertedLeads;
@@ -396,9 +385,7 @@ class SalesforceApi extends CrmApi
         $campaignQuery = 'Select Id, Name from Campaign where isDeleted = false';
         $queryUrl      = $this->integration->getQueryUrl();
 
-        $result = $this->request('query', ['q' => $campaignQuery], 'GET', false, null, $queryUrl);
-
-        return $result;
+        return $this->request('query', ['q' => $campaignQuery], 'GET', false, null, $queryUrl);
     }
 
     /**
@@ -435,9 +422,8 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param       $campaignId
-     * @param       $object
-     * @param array $people
+     * @param $campaignId
+     * @param $object
      *
      * @return array
      *
@@ -474,9 +460,7 @@ class SalesforceApi extends CrmApi
         $campaignQuery = "Select Id, Label from CampaignMemberStatus where isDeleted = false and CampaignId='".$campaignId."'";
         $queryUrl      = $this->integration->getQueryUrl();
 
-        $result = $this->request('query', ['q' => $campaignQuery], 'GET', false, null, $queryUrl);
-
-        return $result;
+        return $this->request('query', ['q' => $campaignQuery], 'GET', false, null, $queryUrl);
     }
 
     /**
@@ -491,8 +475,7 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array $names
-     * @param null  $requiredFieldString
+     * @param null $requiredFieldString
      *
      * @return mixed|string
      *
@@ -508,8 +491,7 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array $ids
-     * @param       $requiredFieldString
+     * @param $requiredFieldString
      *
      * @return mixed|string
      *
@@ -550,8 +532,7 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array $error
-     * @param       $isRetry
+     * @param $isRetry
      *
      * @return string|false
      *

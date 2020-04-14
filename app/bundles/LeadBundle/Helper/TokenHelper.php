@@ -39,31 +39,24 @@ class TokenHelper
         }
 
         // Search for bracket or bracket encoded
-        // @deprecated BC support for leadfield
-        $tokenRegex = [
-            '/({|%7B)leadfield=(.*?)(}|%7D)/',
-            '/({|%7B)contactfield=(.*?)(}|%7D)/',
-        ];
-        $tokenList  = [];
+        $tokenList    = [];
+        $foundMatches = preg_match_all('/({|%7B)contactfield=(.*?)(}|%7D)/', $content, $matches);
 
-        foreach ($tokenRegex as $regex) {
-            $foundMatches = preg_match_all($regex, $content, $matches);
-            if ($foundMatches) {
-                foreach ($matches[2] as $key => $match) {
-                    $token = $matches[0][$key];
+        if ($foundMatches) {
+            foreach ($matches[2] as $key => $match) {
+                $token = $matches[0][$key];
 
-                    if (isset($tokenList[$token])) {
-                        continue;
-                    }
-
-                    $alias             = self::getFieldAlias($match);
-                    $defaultValue      = self::getTokenDefaultValue($match);
-                    $tokenList[$token] = self::getTokenValue($lead, $alias, $defaultValue);
+                if (isset($tokenList[$token])) {
+                    continue;
                 }
 
-                if ($replace) {
-                    $content = str_replace(array_keys($tokenList), $tokenList, $content);
-                }
+                $alias             = self::getFieldAlias($match);
+                $defaultValue      = self::getTokenDefaultValue($match);
+                $tokenList[$token] = self::getTokenValue($lead, $alias, $defaultValue);
+            }
+
+            if ($replace) {
+                $content = str_replace(array_keys($tokenList), $tokenList, $content);
             }
         }
 
@@ -88,9 +81,8 @@ class TokenHelper
     }
 
     /**
-     * @param array $lead
-     * @param       $alias
-     * @param       $defaultValue
+     * @param $alias
+     * @param $defaultValue
      *
      * @return mixed
      */
@@ -141,7 +133,6 @@ class TokenHelper
 
     /**
      * @param $match
-     * @param $urlencode
      *
      * @return string
      */

@@ -13,12 +13,10 @@ namespace Mautic\FormBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\FormBundle\Form\Type\ConfigFormType;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ConfigSubscriber.
- */
-class ConfigSubscriber extends CommonSubscriber
+class ConfigSubscriber implements EventSubscriberInterface
 {
     /**
      * @return array
@@ -35,6 +33,7 @@ class ConfigSubscriber extends CommonSubscriber
         $event->addForm([
             'bundle'     => 'FormBundle',
             'formAlias'  => 'formconfig',
+            'formType'   => ConfigFormType::class,
             'formTheme'  => 'MauticFormBundle:FormTheme\Config',
             'parameters' => $event->getParametersFromConfig('MauticFormBundle'),
         ]);

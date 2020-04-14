@@ -15,8 +15,6 @@ class DecisionAccessor extends AbstractEventAccessor
 {
     /**
      * DecisionAccessor constructor.
-     *
-     * @param array $config
      */
     public function __construct(array $config)
     {

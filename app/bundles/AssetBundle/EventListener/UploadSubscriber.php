@@ -12,7 +12,6 @@
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Exception\FileInvalidException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Validator\FileUploadValidator;
@@ -20,32 +19,25 @@ use Oneup\UploaderBundle\Event\PostUploadEvent;
 use Oneup\UploaderBundle\Event\ValidationEvent;
 use Oneup\UploaderBundle\Uploader\Exception\ValidationException;
 use Oneup\UploaderBundle\UploadEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class UploadSubscriber.
- */
-class UploadSubscriber extends CommonSubscriber
+class UploadSubscriber implements EventSubscriberInterface
 {
     /**
      * @var CoreParametersHelper
      */
-    protected $coreParametersHelper;
+    private $coreParametersHelper;
 
     /**
      * @var AssetModel
      */
-    protected $assetModel;
+    private $assetModel;
 
     /**
      * @var FileUploadValidator
      */
     private $fileUploadValidator;
 
-    /**
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param AssetModel           $assetModel
-     * @param FileUploadValidator  $fileUploadValidator
-     */
     public function __construct(CoreParametersHelper $coreParametersHelper, AssetModel $assetModel, FileUploadValidator $fileUploadValidator)
     {
         $this->coreParametersHelper = $coreParametersHelper;
@@ -67,8 +59,6 @@ class UploadSubscriber extends CommonSubscriber
     /**
      * Moves upladed file to temporary directory where it can be found later
      * and all uploaded files in there cleared. Also sets file name to the response.
-     *
-     * @param PostUploadEvent $event
      */
     public function onPostUpload(PostUploadEvent $event)
     {
@@ -91,17 +81,15 @@ class UploadSubscriber extends CommonSubscriber
     /**
      * Validates file before upload.
      *
-     * @param ValidationEvent $event
-     *
      * @throws ValidationException
      */
     public function onUploadValidation(ValidationEvent $event)
     {
         $file       = $event->getFile();
-        $extensions = $this->coreParametersHelper->getParameter('allowed_extensions');
+        $extensions = $this->coreParametersHelper->get('allowed_extensions');
         $maxSize    = $this->assetModel->getMaxUploadSize('B');
 
-        if ($file === null) {
+        if (null === $file) {
             return;
         }
 

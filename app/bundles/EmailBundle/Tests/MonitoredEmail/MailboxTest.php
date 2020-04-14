@@ -9,15 +9,12 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Tests;
+namespace Mautic\EmailBundle\Tests\MonitoredEmail;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 
-/**
- * Class Mailbox.
- */
-class MailboxTest extends \PHPUnit_Framework_TestCase
+class MailboxTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructWithDefaultConfig()
     {
@@ -71,7 +68,7 @@ class MailboxTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $parametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->will($this->returnValue($config));
 
         $pathsHelper = $this->getMockBuilder(PathsHelper::class)
@@ -118,7 +115,7 @@ class MailboxTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $parametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->will($this->returnValue($config));
 
         $pathsHelper = $this->getMockBuilder(PathsHelper::class)
@@ -156,7 +153,7 @@ class MailboxTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $parametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->will($this->returnValue($config));
 
         $pathsHelper = $this->getMockBuilder(PathsHelper::class)
@@ -183,7 +180,7 @@ class MailboxTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $parametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->will($this->returnValue($config));
 
         $pathsHelper = $this->getMockBuilder(PathsHelper::class)

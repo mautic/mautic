@@ -38,10 +38,8 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
     /**
      * CustomButtonEvent constructor.
      *
-     * @param         $location
-     * @param Request $request
-     * @param array   $buttons
-     * @param null    $item
+     * @param      $location
+     * @param null $item
      */
     public function __construct($location, Request $request, array $buttons = [], $item = null)
     {
@@ -74,9 +72,8 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
     /**
      * Add an array of buttons.
      *
-     * @param array $buttons
-     * @param null  $location
-     * @param null  $route
+     * @param null $location
+     * @param null $route
      *
      * @return $this
      */
@@ -86,7 +83,7 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
             return $this;
         }
 
-        foreach ($buttons as $key => $button) {
+        foreach ($buttons as $button) {
             if (!isset($button['priority'])) {
                 $button['priority'] = 0;
             }
@@ -100,7 +97,6 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
     /**
      * Add a single button.
      *
-     * @param array       $button
      * @param string|null $location
      * @param string|null $route
      *

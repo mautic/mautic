@@ -23,7 +23,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
 
-class UnsubscribeTest extends \PHPUnit_Framework_TestCase
+class UnsubscribeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Test that the transport interface processes the message appropriately

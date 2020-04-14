@@ -37,9 +37,6 @@ class VideoModel extends FormModel
 
     /**
      * VideoModel constructor.
-     *
-     * @param LeadModel      $leadModel
-     * @param IpLookupHelper $ipLookupHelper
      */
     public function __construct(LeadModel $leadModel, IpLookupHelper $ipLookupHelper)
     {
@@ -72,7 +69,6 @@ class VideoModel extends FormModel
     }
 
     /**
-     * @param Lead   $lead
      * @param string $guid
      *
      * @return VideoHit
@@ -143,7 +139,7 @@ class VideoModel extends FormModel
         if (!empty($browserLanguages)) {
             $languages = explode(',', $browserLanguages);
             foreach ($languages as $k => $l) {
-                if ($pos = strpos(';q=', $l) !== false) {
+                if ($pos = false !== strpos(';q=', $l)) {
                     //remove weights
                     $languages[$k] = substr($l, 0, $pos);
                 }

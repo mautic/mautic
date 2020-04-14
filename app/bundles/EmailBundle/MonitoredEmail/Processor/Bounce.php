@@ -69,13 +69,6 @@ class Bounce implements ProcessorInterface
 
     /**
      * Bounce constructor.
-     *
-     * @param \Swift_Transport    $transport
-     * @param ContactFinder       $contactFinder
-     * @param StatRepository      $statRepository
-     * @param LeadModel           $leadModel
-     * @param TranslatorInterface $translator
-     * @param LoggerInterface     $logger
      */
     public function __construct(
         \Swift_Transport $transport,
@@ -94,8 +87,6 @@ class Bounce implements ProcessorInterface
     }
 
     /**
-     * @param Message $message
-     *
      * @return bool
      */
     public function process(Message $message)
@@ -148,10 +139,6 @@ class Bounce implements ProcessorInterface
         return true;
     }
 
-    /**
-     * @param Stat         $stat
-     * @param BouncedEmail $bouncedEmail
-     */
     protected function updateStat(Stat $stat, BouncedEmail $bouncedEmail)
     {
         $dtHelper    = new DateTimeHelper();

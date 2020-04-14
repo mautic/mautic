@@ -14,45 +14,37 @@ namespace Mautic\FormBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CampaignBundle\Model\EventModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\FormBundle\Event\SubmissionEvent;
+use Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType;
+use Mautic\FormBundle\Form\Type\CampaignEventFormSubmitType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
      * @var FormModel
      */
-    protected $formModel;
+    private $formModel;
 
     /**
      * @var SubmissionModel
      */
-    protected $formSubmissionModel;
+    private $formSubmissionModel;
 
     /**
-     * @var EventModel
+     * @var RealTimeExecutioner
      */
-    protected $campaignEventModel;
+    private $realTimeExecutioner;
 
-    /**
-     * CampaignSubscriber constructor.
-     *
-     * @param FormModel       $formModel
-     * @param SubmissionModel $formSubmissionModel
-     * @param EventModel      $campaignEventModel
-     */
-    public function __construct(FormModel $formModel, SubmissionModel $formSubmissionModel, EventModel $campaignEventModel)
+    public function __construct(FormModel $formModel, SubmissionModel $formSubmissionModel, RealTimeExecutioner $realTimeExecutioner)
     {
         $this->formModel           = $formModel;
         $this->formSubmissionModel = $formSubmissionModel;
-        $this->campaignEventModel  = $campaignEventModel;
+        $this->realTimeExecutioner = $realTimeExecutioner;
     }
 
     /**
@@ -70,15 +62,13 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * Add the option to the list.
-     *
-     * @param CampaignBuilderEvent $event
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $trigger = [
             'label'       => 'mautic.form.campaign.event.submit',
             'description' => 'mautic.form.campaign.event.submit_descr',
-            'formType'    => 'campaignevent_formsubmit',
+            'formType'    => CampaignEventFormSubmitType::class,
             'eventName'   => FormEvents::ON_CAMPAIGN_TRIGGER_DECISION,
         ];
         $event->addDecision('form.submit', $trigger);
@@ -86,7 +76,7 @@ class CampaignSubscriber extends CommonSubscriber
         $trigger = [
             'label'       => 'mautic.form.campaign.event.field_value',
             'description' => 'mautic.form.campaign.event.field_value_descr',
-            'formType'    => 'campaignevent_form_field_value',
+            'formType'    => CampaignEventFormFieldValueType::class,
             'formTheme'   => 'MauticFormBundle:FormTheme\FieldValueCondition',
             'eventName'   => FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
         ];
@@ -95,23 +85,18 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * Trigger campaign event for when a form is submitted.
-     *
-     * @param SubmissionEvent $event
      */
     public function onFormSubmit(SubmissionEvent $event)
     {
         $form = $event->getSubmission()->getForm();
-        $this->campaignEventModel->triggerEvent('form.submit', $form, 'form', $form->getId());
+        $this->realTimeExecutioner->execute('form.submit', $form, 'form', $form->getId());
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
     {
         $eventDetails = $event->getEventDetails();
 
-        if ($eventDetails === null) {
+        if (null === $eventDetails) {
             return $event->setResult(true);
         }
 
@@ -125,9 +110,6 @@ class CampaignSubscriber extends CommonSubscriber
         return $event->setResult(true);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerCondition(CampaignExecutionEvent $event)
     {
         $lead = $event->getLead();

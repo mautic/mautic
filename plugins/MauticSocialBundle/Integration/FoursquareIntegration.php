@@ -266,7 +266,7 @@ class FoursquareIntegration extends SocialIntegration
      */
     public function matchFieldName($field, $subfield = '')
     {
-        if ($field == 'contact' && in_array($subfield, ['facebook', 'twitter'])) {
+        if ('contact' == $field && in_array($subfield, ['facebook', 'twitter'])) {
             return $subfield.'ProfileHandle';
         }
 
@@ -339,5 +339,13 @@ class FoursquareIntegration extends SocialIntegration
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormType()
+    {
+        return null;
     }
 }

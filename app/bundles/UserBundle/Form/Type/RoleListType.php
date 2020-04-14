@@ -13,26 +13,60 @@ namespace Mautic\UserBundle\Form\Type;
 
 use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class RoleListType.
- */
 class RoleListType extends AbstractType
 {
     /**
-     * @var array
+     * @var RoleModel
      */
-    private $choices = [];
+    private $roleModel;
+
+    public function __construct(RoleModel $roleModel)
+    {
+        $this->roleModel = $roleModel;
+    }
 
     /**
-     * RoleListType constructor.
-     *
-     * @param RoleModel $model
+     * {@inheritdoc}
      */
-    public function __construct(RoleModel $model)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $choices = $model->getRepository()->getEntities(
+        $resolver->setDefaults(
+            [
+                'choices'           => $this->getRoleChoices(),
+                'expanded'          => false,
+                'multiple'          => false,
+                'required'          => false,
+                'placeholder'       => 'mautic.core.form.chooseone',
+            ]
+        );
+    }
+
+    /**
+     * @return string
+     */
+    public function getBlockPrefix()
+    {
+        return 'role_list';
+    }
+
+    /**
+     * @return string
+     */
+    public function getParent()
+    {
+        return ChoiceType::class;
+    }
+
+    /**
+     * @return array
+     */
+    private function getRoleChoices()
+    {
+        $choices = [];
+        $roles   = $this->roleModel->getRepository()->getEntities(
             [
                 'filter' => [
                     'force' => [
@@ -46,43 +80,13 @@ class RoleListType extends AbstractType
             ]
         );
 
-        foreach ($choices as $choice) {
-            $this->choices[$choice->getId()] = $choice->getName(true);
+        foreach ($roles as $role) {
+            $choices[$role->getName(true)] = $role->getId();
         }
 
-        //sort by language
-        ksort($this->choices);
-    }
+        //sort by name
+        ksort($choices);
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(
-            [
-                'choices'     => $this->choices,
-                'expanded'    => false,
-                'multiple'    => false,
-                'required'    => false,
-                'empty_value' => 'mautic.core.form.chooseone',
-            ]
-        );
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return 'role_list';
-    }
-
-    /**
-     * @return string
-     */
-    public function getParent()
-    {
-        return 'choice';
+        return $choices;
     }
 }

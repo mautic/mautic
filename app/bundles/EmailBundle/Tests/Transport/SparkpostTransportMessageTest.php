@@ -18,7 +18,7 @@ use Mautic\EmailBundle\Swiftmailer\Sparkpost\SparkpostFactoryInterface;
 use Mautic\EmailBundle\Swiftmailer\Transport\SparkpostTransport;
 use Psr\Log\LoggerInterface;
 
-class SparkpostTransportMessageTest extends \PHPUnit_Framework_TestCase
+class SparkpostTransportMessageTest extends \PHPUnit\Framework\TestCase
 {
     public function testCcAndBccFields()
     {

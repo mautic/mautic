@@ -54,9 +54,6 @@ class CompanyChangeLog
      */
     private $dateAdded;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -220,8 +217,6 @@ class CompanyChangeLog
 
     /**
      * Set lead.
-     *
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
      *
      * @return CompanyChangeLog
      */

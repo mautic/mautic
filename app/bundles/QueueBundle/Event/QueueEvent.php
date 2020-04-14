@@ -43,7 +43,6 @@ class QueueEvent extends CommonEvent
      *
      * @param string   $protocol
      * @param string   $queueName
-     * @param array    $payload
      * @param int|null $messages
      */
     public function __construct($protocol, $queueName, array $payload = [], $messages = null)
@@ -63,7 +62,7 @@ class QueueEvent extends CommonEvent
     }
 
     /**
-     * @return array
+     * @return string|array
      */
     public function getPayload($returnArray = false)
     {

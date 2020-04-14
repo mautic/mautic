@@ -22,10 +22,6 @@ class PointsChangeEvent extends CommonEvent
     protected $old;
     protected $new;
 
-    /**
-     * @param Lead $lead
-     * @param bool $isNew
-     */
     public function __construct(Lead &$lead, $old, $new)
     {
         $this->entity = &$lead;

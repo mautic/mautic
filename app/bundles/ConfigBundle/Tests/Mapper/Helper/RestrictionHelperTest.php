@@ -13,7 +13,7 @@ namespace Mautic\ConfigBundle\Tests\Mapper\Helper;
 
 use Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper;
 
-class RestrictionHelperTest extends \PHPUnit_Framework_TestCase
+class RestrictionHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array

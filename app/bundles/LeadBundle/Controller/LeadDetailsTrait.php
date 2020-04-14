@@ -21,10 +21,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 trait LeadDetailsTrait
 {
     /**
-     * @param array      $leads
-     * @param array|null $filters
-     * @param array|null $orderBy
-     * @param int        $page
+     * @param int $page
      *
      * @return array
      */
@@ -149,8 +146,6 @@ trait LeadDetailsTrait
     /**
      * Get a list of places for the lead based on IP location.
      *
-     * @param Lead $lead
-     *
      * @return array
      */
     protected function getPlaces(Lead $lead)
@@ -181,10 +176,6 @@ trait LeadDetailsTrait
     }
 
     /**
-     * @param Lead           $lead
-     * @param \DateTime|null $fromDate
-     * @param \DateTime|null $toDate
-     *
      * @return mixed
      */
     protected function getEngagementData(Lead $lead, \DateTime $fromDate = null, \DateTime $toDate = null)
@@ -214,11 +205,8 @@ trait LeadDetailsTrait
     }
 
     /**
-     * @param Lead       $lead
-     * @param array|null $filters
-     * @param array|null $orderBy
-     * @param int        $page
-     * @param int        $limit
+     * @param int $page
+     * @param int $limit
      *
      * @return array
      */
@@ -251,7 +239,7 @@ trait LeadDetailsTrait
 
         // Audit Log
         /** @var AuditLogModel $auditlogModel */
-        $auditlogModel = $this->getModel('core.auditLog');
+        $auditlogModel = $this->getModel('core.auditlog');
         /** @var AuditLogRepository $repo */
         $repo     = $auditlogModel->getRepository();
         $logCount = $repo->getAuditLogsCount($lead, $filters);
@@ -289,11 +277,8 @@ trait LeadDetailsTrait
     }
 
     /**
-     * @param Lead       $lead
-     * @param array|null $filters
-     * @param array|null $orderBy
-     * @param int        $page
-     * @param int        $limit
+     * @param int $page
+     * @param int $limit
      *
      * @return array
      */
@@ -330,8 +315,6 @@ trait LeadDetailsTrait
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return array
      */
     protected function getScheduledCampaignEvents(Lead $lead)

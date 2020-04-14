@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Segment\Stat;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Model\ActionModel;
@@ -21,9 +20,6 @@ use Mautic\ReportBundle\Model\ReportModel;
 
 class SegmentDependencies
 {
-    /** @var int */
-    private $segmentId;
-
     /**
      * @var EmailModel
      */
@@ -33,11 +29,6 @@ class SegmentDependencies
      * @var CampaignModel
      */
     private $campaignModel;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
 
     /**
      * @var ActionModel
@@ -59,22 +50,10 @@ class SegmentDependencies
      */
     private $reportModel;
 
-    /**
-     * SegmentUsageHelper constructor.
-     *
-     * @param EntityManager     $entityManager
-     * @param EmailModel        $emailModel
-     * @param CampaignModel     $campaignModel
-     * @param ActionModel       $actionModel
-     * @param ListModel         $listModel
-     * @param TriggerEventModel $triggerEventModel
-     * @param ReportModel       $reportModel
-     */
-    public function __construct(EntityManager $entityManager, EmailModel $emailModel, CampaignModel $campaignModel, ActionModel $actionModel, ListModel $listModel, TriggerEventModel $triggerEventModel, ReportModel $reportModel)
+    public function __construct(EmailModel $emailModel, CampaignModel $campaignModel, ActionModel $actionModel, ListModel $listModel, TriggerEventModel $triggerEventModel, ReportModel $reportModel)
     {
         $this->emailModel        = $emailModel;
         $this->campaignModel     = $campaignModel;
-        $this->entityManager     = $entityManager;
         $this->actionModel       = $actionModel;
         $this->listModel         = $listModel;
         $this->triggerEventModel = $triggerEventModel;
@@ -88,9 +67,8 @@ class SegmentDependencies
      */
     public function getChannelsIds($segmentId)
     {
-        $this->segmentId = $segmentId;
-        $usage           = [];
-        $usage[]         = [
+        $usage   = [];
+        $usage[] = [
             'label' => 'mautic.email.emails',
             'route' => 'mautic_email_index',
             'ids'   => $this->emailModel->getEmailsIdsWithDependenciesOnSegment($segmentId),

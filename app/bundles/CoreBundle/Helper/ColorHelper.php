@@ -66,7 +66,7 @@ class ColorHelper
      */
     public function setHex($hex)
     {
-        if (strlen($hex) === 4) {
+        if (4 === strlen($hex)) {
             $format          = '#%1s%1s%1s';
             list($r, $g, $b) = sscanf($hex, $format);
             $this->red       = hexdec("$r$r");

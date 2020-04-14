@@ -181,21 +181,21 @@ var IdleTimer = (function($) {
 
             var doc = $(document);
             var me = this;
-            doc.mousemove(function() {activityHelper._active(me)});
+            doc.on('mousemove', function() {activityHelper._active(me)});
             try {
-                doc.mouseenter(function() {activityHelper._active(me)});
+                doc.on('mouseenter', function() {activityHelper._active(me)});
             } catch (err) {}
             try {
-                doc.scroll(function() {activityHelper._active(me)});
+                doc.on('scroll', function() {activityHelper._active(me)});
             } catch (err) {}
             try {
-                doc.keydown(function() {activityHelper._active(me)});
+                doc.on( 'keydown', function() {activityHelper._active(me)});
             } catch (err) {}
             try {
-                doc.click(function() {activityHelper._active(me)});
+                doc.on('click', function() {activityHelper._active(me)});
             } catch (err) {}
             try {
-                doc.dblclick(function() {activityHelper._active(me)});
+                doc.on('dblclick', function() {activityHelper._active(me)});
             } catch (err) {}
         }
     };

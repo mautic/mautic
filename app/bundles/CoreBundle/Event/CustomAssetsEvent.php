@@ -26,8 +26,6 @@ class CustomAssetsEvent extends Event
 
     /**
      * CustomAssetsEvent constructor.
-     *
-     * @param AssetsHelper $assetsHelper
      */
     public function __construct(AssetsHelper $assetsHelper)
     {

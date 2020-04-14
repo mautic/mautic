@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
 
-class LeadTest extends \PHPUnit_Framework_TestCase
+class LeadTest extends \PHPUnit\Framework\TestCase
 {
     use RequestTrait;
 
@@ -303,7 +303,6 @@ class LeadTest extends \PHPUnit_Framework_TestCase
     /**
      * @param      $points
      * @param      $expected
-     * @param Lead $lead
      * @param bool $operator
      */
     private function adjustPointsTest($points, $expected, Lead $lead, $operator = false)

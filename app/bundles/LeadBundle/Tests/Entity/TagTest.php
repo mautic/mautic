@@ -13,7 +13,7 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\Tag;
 
-class TagTest extends \PHPUnit_Framework_TestCase
+class TagTest extends \PHPUnit\Framework\TestCase
 {
     public function testSetTagByConstructor()
     {
@@ -22,9 +22,6 @@ class TagTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('tagA', $entity->getTag());
     }
 
-    /**
-     * @deprecated as the setter is deprecated
-     */
     public function testSetTagBySetter()
     {
         $entity = new Tag();

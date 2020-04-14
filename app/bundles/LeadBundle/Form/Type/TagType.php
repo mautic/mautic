@@ -15,9 +15,10 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Form\DataTransformer\TagEntityModelTransformer;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TagType extends AbstractType
 {
@@ -26,9 +27,6 @@ class TagType extends AbstractType
      */
     private $em;
 
-    /**
-     * @param EntityManager $em
-     */
     public function __construct(EntityManager $em)
     {
         $this->em = $em;
@@ -40,7 +38,6 @@ class TagType extends AbstractType
             $transformer = new TagEntityModelTransformer(
                 $this->em,
                 Tag::class,
-                'id',
                 ($options['multiple'])
             );
 
@@ -48,10 +45,7 @@ class TagType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
@@ -60,7 +54,7 @@ class TagType extends AbstractType
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('t')->orderBy('t.tag', 'ASC');
                 },
-                'property'        => 'tag',
+                'choice_label'    => 'tag',
                 'multiple'        => true,
                 'required'        => false,
                 'disabled'        => false,
@@ -72,7 +66,7 @@ class TagType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'lead_tag';
     }
@@ -82,6 +76,6 @@ class TagType extends AbstractType
      */
     public function getParent()
     {
-        return 'entity';
+        return EntityType::class;
     }
 }

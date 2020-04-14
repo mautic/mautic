@@ -74,11 +74,9 @@ abstract class AbstractLookup
     /**
      * AbstractLookup constructor.
      *
-     * @param null                 $auth
-     * @param null                 $ipLookupConfig
-     * @param null                 $cacheDir
-     * @param LoggerInterface|null $logger
-     * @param Http|null            $httpConnector
+     * @param null $auth
+     * @param null $ipLookupConfig
+     * @param null $cacheDir
      */
     public function __construct($auth = null, $ipLookupConfig = null, $cacheDir = null, LoggerInterface $logger = null, Http $httpConnector = null)
     {

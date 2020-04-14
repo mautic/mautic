@@ -11,7 +11,6 @@
 
 namespace Mautic\PointBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
@@ -80,10 +79,10 @@ class PointApiController extends CommonApiController
         try {
             $this->logApiPointChange($lead, $delta, $operator);
         } catch (\Exception $e) {
-            return $this->returnError($e->getMessage(), Codes::HTTP_BAD_REQUEST);
+            return $this->returnError($e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->handleView($this->view(['success' => 1], Codes::HTTP_OK));
+        return $this->handleView($this->view(['success' => 1], Response::HTTP_OK));
     }
 
     /**

@@ -45,9 +45,6 @@ class TwilioTransport implements TransportInterface
 
     /**
      * TwilioTransport constructor.
-     *
-     * @param Configuration   $configuration
-     * @param LoggerInterface $logger
      */
     public function __construct(Configuration $configuration, LoggerInterface $logger)
     {
@@ -56,7 +53,6 @@ class TwilioTransport implements TransportInterface
     }
 
     /**
-     * @param Lead   $lead
      * @param string $content
      *
      * @return bool|string
@@ -65,7 +61,7 @@ class TwilioTransport implements TransportInterface
     {
         $number = $lead->getLeadPhoneNumber();
 
-        if ($number === null) {
+        if (null === $number) {
             return false;
         }
 

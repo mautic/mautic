@@ -12,17 +12,17 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class ReportDNCSubscriber extends CommonSubscriber
+class ReportDNCSubscriber implements EventSubscriberInterface
 {
     const DNC = 'contact.dnc';
 
@@ -37,17 +37,20 @@ class ReportDNCSubscriber extends CommonSubscriber
     private $companyReportData;
 
     /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    /**
      * @var ChannelListHelper
      */
     private $channelListHelper;
 
-    /**
-     * @param FieldsBuilder       $fieldsBuilder
-     * @param CompanyReportData   $companyReportData
-     * @param TranslatorInterface $translator
-     * @param RouterInterface     $router
-     * @param ChannelListHelper   $channelListHelper
-     */
     public function __construct(
         FieldsBuilder $fieldsBuilder,
         CompanyReportData $companyReportData,
@@ -76,8 +79,6 @@ class ReportDNCSubscriber extends CommonSubscriber
 
     /**
      * Add available tables and columns to the report builder lookup.
-     *
-     * @param ReportBuilderEvent $event
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
@@ -121,8 +122,6 @@ class ReportDNCSubscriber extends CommonSubscriber
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGeneratorEvent $event
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
@@ -150,9 +149,6 @@ class ReportDNCSubscriber extends CommonSubscriber
         $event->setQueryBuilder($qb);
     }
 
-    /**
-     * @param ReportDataEvent $event
-     */
     public function onReportDisplay(ReportDataEvent $event)
     {
         if (!$event->checkContext([self::DNC])) {
@@ -162,7 +158,7 @@ class ReportDNCSubscriber extends CommonSubscriber
         $data = $event->getData();
 
         if (isset($data[0]['reason']) || isset($data[0]['channel']) || isset($data[0]['channel_id'])) {
-            foreach ($data as $key => &$row) {
+            foreach ($data as &$row) {
                 if (isset($row['reason'])) {
                     $row['reason'] = $this->getDncReasonLabel($row['reason']);
                 }

@@ -1,0 +1,43 @@
+#!/usr/bin/env php
+<?php
+
+// Fix for hosts that do not have date.timezone set
+if (empty(ini_get('date.timezone'))) {
+    date_default_timezone_set('UTC');
+}
+
+// if you don't want to setup permissions the proper way, just uncomment the following PHP line
+// read http://symfony.com/doc/current/book/installation.html#configuration-and-setup for more information
+//umask(0000);
+
+if (function_exists('set_time_limit')) {
+    set_time_limit(0);
+}
+
+defined('IN_MAUTIC_CONSOLE') or define('IN_MAUTIC_CONSOLE', 1);
+
+define('MAUTIC_ROOT_DIR', realpath(__DIR__.'/..'));
+
+require_once __DIR__.'/../app/autoload.php';
+require_once __DIR__.'/../app/AppKernel.php';
+
+use Mautic\CoreBundle\Console\Output\ConsoleDatetimeOutput;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Debug\Debug;
+
+$input = new ArgvInput();
+$env   = $input->getParameterOption(['--env', '-e'], getenv('SYMFONY_ENV') ?: 'prod');
+$debug = getenv('SYMFONY_DEBUG') !== '0' && !$input->hasParameterOption(['--no-debug', '']) && $env !== 'prod';
+
+if ($debug) {
+    Debug::enable();
+}
+
+$output = ($input->getParameterOption(['--no-interaction', '-n']) !== false) ? new ConsoleDatetimeOutput() : null;
+
+$kernel      = new AppKernel($env, $debug);
+$application = new Application($kernel);
+$application->setName('Mautic');
+$application->setVersion($kernel->getVersion().' - '.$kernel->getName().'/'.$kernel->getEnvironment().($kernel->isDebug() ? '/debug' : ''));
+$application->run($input, $output);

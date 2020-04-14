@@ -65,8 +65,7 @@ class IndexSchemaHelper
     protected $dropIndexes = [];
 
     /**
-     * @param Connection $db
-     * @param            $prefix
+     * @param $prefix
      */
     public function __construct(Connection $db, $prefix)
     {

@@ -133,9 +133,6 @@ class Stat
         $this->replies = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -151,7 +148,7 @@ class Stat
             ->addIndex(['date_sent'], 'email_date_sent')
             ->addIndex(['date_read', 'lead_id'], 'email_date_read_lead');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createManyToOne('email', 'Email')
             ->inversedBy('stats')
@@ -626,8 +623,6 @@ class Stat
     }
 
     /**
-     * @param Copy $storedCopy
-     *
      * @return Stat
      */
     public function setStoredCopy(Copy $storedCopy)
@@ -645,9 +640,6 @@ class Stat
         return $this->replies;
     }
 
-    /**
-     * @param EmailReply $reply
-     */
     public function addReply(EmailReply $reply)
     {
         $this->replies[] = $reply;

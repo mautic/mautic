@@ -19,7 +19,6 @@ use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class MembershipBuilder
@@ -38,11 +37,6 @@ class MembershipBuilder
      * @var LeadRepository
      */
     private $leadRepository;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
 
     /**
      * @var TranslatorInterface
@@ -74,34 +68,20 @@ class MembershipBuilder
      */
     private $progressBar;
 
-    /**
-     * MembershipBuilder constructor.
-     *
-     * @param MembershipManager        $manager
-     * @param CampaignMemberRepository $campaignMemberRepository
-     * @param LeadRepository           $leadRepository
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param TranslatorInterface      $translator
-     */
     public function __construct(
         MembershipManager $manager,
         CampaignMemberRepository $campaignMemberRepository,
         LeadRepository $leadRepository,
-        EventDispatcherInterface $eventDispatcher,
         TranslatorInterface $translator
     ) {
         $this->manager                  = $manager;
         $this->campaignMemberRepository = $campaignMemberRepository;
         $this->leadRepository           = $leadRepository;
-        $this->eventDispatcher          = $eventDispatcher;
         $this->translator               = $translator;
     }
 
     /**
-     * @param Campaign             $campaign
-     * @param ContactLimiter       $contactLimiter
-     * @param int                  $runLimit
-     * @param OutputInterface|null $output
+     * @param int $runLimit
      *
      * @return int
      */
@@ -153,7 +133,7 @@ class MembershipBuilder
                 )
             );
 
-            if ($countResult->getCount() === 0) {
+            if (0 === $countResult->getCount()) {
                 // No use continuing
                 return 0;
             }
@@ -215,7 +195,7 @@ class MembershipBuilder
                 )
             );
 
-            if ($countResult->getCount() === 0) {
+            if (0 === $countResult->getCount()) {
                 // No use continuing
                 return 0;
             }

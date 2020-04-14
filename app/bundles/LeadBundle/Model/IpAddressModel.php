@@ -30,10 +30,6 @@ class IpAddressModel
      */
     protected $entityManager;
 
-    /**
-     * @param EntityManager   $entityManager
-     * @param LoggerInterface $logger
-     */
     public function __construct(EntityManager $entityManager, LoggerInterface $logger)
     {
         $this->entityManager = $entityManager;
@@ -43,12 +39,10 @@ class IpAddressModel
     /**
      * Saving IP Address references sometimes throws UniqueConstraintViolationException exception on Lead entity save.
      * Rather pre-save the IP references here and catch the exception.
-     *
-     * @param Lead $contact
      */
     public function saveIpAddressesReferencesForContact(Lead $contact)
     {
-        foreach ($contact->getIpAddresses() as $key => $ipAddress) {
+        foreach ($contact->getIpAddresses() as $ipAddress) {
             $this->insertIpAddressReference($contact, $ipAddress);
         }
     }
@@ -65,9 +59,6 @@ class IpAddressModel
 
     /**
      * Tries to insert the Lead/IP relation and continues even if UniqueConstraintViolationException is thrown.
-     *
-     * @param Lead      $contact
-     * @param IpAddress $ipAddress
      */
     private function insertIpAddressReference(Lead $contact, IpAddress $ipAddress)
     {

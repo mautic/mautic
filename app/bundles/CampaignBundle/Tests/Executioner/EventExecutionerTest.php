@@ -33,63 +33,65 @@ use Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType;
 use Mautic\CampaignBundle\Helper\RemovedContactTracker;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\MockObject\MockBuilder;
 use Psr\Log\LoggerInterface;
 
-class EventExecutionerTest extends \PHPUnit_Framework_TestCase
+class EventExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var EventCollector|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventCollector|\PHPUnit\Framework\MockObject\MockObject
      */
     private $eventCollector;
 
     /**
-     * @var EventLogger|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventLogger|\PHPUnit\Framework\MockObject\MockObject
      */
     private $eventLogger;
 
     /**
-     * @var ActionExecutioner|\PHPUnit_Framework_MockObject_MockObject
+     * @var ActionExecutioner|\PHPUnit\Framework\MockObject\MockObject
      */
     private $actionExecutioner;
 
     /**
-     * @var ConditionExecutioner|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConditionExecutioner|\PHPUnit\Framework\MockObject\MockObject
      */
     private $conditionExecutioner;
 
     /**
-     * @var DecisionExecutioner|\PHPUnit_Framework_MockObject_MockObject
+     * @var DecisionExecutioner|\PHPUnit\Framework\MockObject\MockObject
      */
     private $decisionExecutioner;
 
     /**
-     * @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $logger;
 
     /**
-     * @var EventScheduler|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventScheduler|\PHPUnit\Framework\MockObject\MockObject
      */
     private $eventScheduler;
 
     /**
-     * @var RemovedContactTracker|\PHPUnit_Framework_MockObject_MockObject
+     * @var RemovedContactTracker|\PHPUnit\Framework\MockObject\MockObject
      */
     private $removedContactTracker;
 
     /**
-     * @var LeadRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $leadRepository;
 
     /**
-     * @var EventRepository|\PHPUnit_Framework_MockObject_MockBuilder
+     * @var EventRepository|MockBuilder
      */
     private $eventRepository;
 
     /**
-     * @var Translator|\PHPUnit_Framework_MockObject_MockBuilder
+     * @var Translator|MockBuilder
      */
     private $translator;
 
@@ -128,7 +130,7 @@ class EventExecutionerTest extends \PHPUnit_Framework_TestCase
                 'label'                => 'mautic.email.campaign.event.send',
                 'description'          => 'mautic.email.campaign.event.send_descr',
                 'batchEventName'       => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
-                'formType'             => 'emailsend_list',
+                'formType'             => EmailSendType::class,
                 'formTypeOptions'      => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true],
                 'formTheme'            => 'MauticEmailBundle:FormTheme\EmailSendList',
                 'channel'              => 'email',

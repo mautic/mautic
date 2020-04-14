@@ -29,9 +29,6 @@ class CampaignTriggerEvent extends Event
      */
     protected $triggerCampaign = true;
 
-    /**
-     * @param Campaign $campaign
-     */
     public function __construct(Campaign $campaign)
     {
         $this->campaign = $campaign;

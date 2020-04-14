@@ -35,9 +35,6 @@ class RouteEvent extends Event
      */
     protected $type;
 
-    /**
-     * @param Loader $loader
-     */
     public function __construct(Loader $loader, $type = 'main')
     {
         $this->loader     = $loader;

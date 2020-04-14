@@ -70,9 +70,7 @@ class ReportBuilderEvent extends AbstractReportEvent
     /**
      * ReportBuilderEvent constructor.
      *
-     * @param TranslatorInterface $translator
-     * @param ChannelListHelper   $channelListHelper
-     * @param string              $context
+     * @param string $context
      */
     public function __construct(TranslatorInterface $translator, ChannelListHelper $channelListHelper, $context, $leadFields, ReportHelper $reportHelper)
     {
@@ -104,7 +102,7 @@ class ReportBuilderEvent extends AbstractReportEvent
             if (!isset($d['alias'])) {
                 $d['alias'] = substr(
                     $column,
-                    ($pos = strpos($column, '.')) !== false ? $pos + 1 : 0
+                    false !== ($pos = strpos($column, '.')) ? $pos + 1 : 0
                 );
             }
         }
@@ -122,7 +120,7 @@ class ReportBuilderEvent extends AbstractReportEvent
                 if (!isset($d['alias'])) {
                     $d['alias'] = substr(
                         $column,
-                        ($pos = strpos($column, '.')) !== false ? $pos + 1 : 0
+                        false !== ($pos = strpos($column, '.')) ? $pos + 1 : 0
                     );
                 }
             }
@@ -157,7 +155,7 @@ class ReportBuilderEvent extends AbstractReportEvent
     /**
      * Returns standard form fields such as id, name, publish_up, etc.
      *
-     * @param   $prefix
+     * @param $prefix
      *
      * @return array
      */
@@ -236,7 +234,7 @@ class ReportBuilderEvent extends AbstractReportEvent
     /**
      * Returns lead columns.
      *
-     * @param   $prefix
+     * @param $prefix
      *
      * @return array
      */

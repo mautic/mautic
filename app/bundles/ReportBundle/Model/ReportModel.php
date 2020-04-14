@@ -32,6 +32,7 @@ use Mautic\ReportBundle\Event\ReportQueryEvent;
 use Mautic\ReportBundle\Generator\ReportGenerator;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\ReportEvents;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -45,6 +46,11 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class ReportModel extends FormModel
 {
     const CHANNEL_FEATURE = 'reporting';
+
+    /**
+     * @var array
+     */
+    private $reportBuilderData;
 
     /**
      * @var mixed
@@ -86,17 +92,6 @@ class ReportModel extends FormModel
      */
     private $excelExporter;
 
-    /**
-     * ReportModel constructor.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param TemplatingHelper     $templatingHelper
-     * @param ChannelListHelper    $channelListHelper
-     * @param FieldModel           $fieldModel
-     * @param ReportHelper         $reportHelper
-     * @param CsvExporter          $csvExporter
-     * @param ExcelExporter        $excelExporter
-     */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         TemplatingHelper $templatingHelper,
@@ -106,7 +101,7 @@ class ReportModel extends FormModel
         CsvExporter $csvExporter,
         ExcelExporter $excelExporter
     ) {
-        $this->defaultPageLimit  = $coreParametersHelper->getParameter('default_pagelimit');
+        $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
         $this->templatingHelper  = $templatingHelper;
         $this->channelListHelper = $channelListHelper;
         $this->fieldModel        = $fieldModel;
@@ -115,9 +110,6 @@ class ReportModel extends FormModel
         $this->excelExporter     = $excelExporter;
     }
 
-    /**
-     * @param Session $session
-     */
     public function setSession(Session $session)
     {
         $this->session = $session;
@@ -157,8 +149,10 @@ class ReportModel extends FormModel
         }
 
         $options = array_merge($options, [
-            'read_only'  => false,
             'table_list' => $this->getTableData(),
+            'attr'       => [
+                'readonly' => false,
+            ],
         ]);
 
         // Fire the REPORT_ON_BUILD event off to get the table/column data
@@ -233,13 +227,11 @@ class ReportModel extends FormModel
      */
     public function buildAvailableReports($context)
     {
-        static $data = [];
-
-        if (empty($data[$context])) {
+        if (empty($this->reportBuilderData[$context])) {
             // Check to see if all has been obtained
-            if (isset($data['all'])) {
-                $data[$context]['tables'] = &$data['all']['tables'][$context];
-                $data[$context]['graphs'] = &$data['all']['graphs'][$context];
+            if (isset($this->reportBuilderData['all'])) {
+                $this->reportBuilderData[$context]['tables'] = $this->reportBuilderData['all']['tables'][$context] ?? [];
+                $this->reportBuilderData[$context]['graphs'] = $this->reportBuilderData['all']['graphs'][$context] ?? [];
             } else {
                 //build them
                 $eventContext = ('all' == $context) ? '' : $context;
@@ -251,25 +243,25 @@ class ReportModel extends FormModel
                 $graphs = $event->getGraphs();
 
                 if ('all' == $context) {
-                    $data[$context]['tables'] = $tables;
-                    $data[$context]['graphs'] = $graphs;
+                    $this->reportBuilderData[$context]['tables'] = $tables;
+                    $this->reportBuilderData[$context]['graphs'] = $graphs;
                 } else {
                     if (isset($tables[$context])) {
-                        $data[$context]['tables'] = $tables[$context];
+                        $this->reportBuilderData[$context]['tables'] = $tables[$context];
                     } else {
-                        $data[$context]['tables'] = $tables;
+                        $this->reportBuilderData[$context]['tables'] = $tables;
                     }
 
                     if (isset($graphs[$context])) {
-                        $data[$context]['graphs'] = $graphs[$context];
+                        $this->reportBuilderData[$context]['graphs'] = $graphs[$context];
                     } else {
-                        $data[$context]['graphs'] = $graphs;
+                        $this->reportBuilderData[$context]['graphs'] = $graphs;
                     }
                 }
             }
         }
 
-        return $data[$context];
+        return $this->reportBuilderData[$context];
     }
 
     /**
@@ -294,8 +286,6 @@ class ReportModel extends FormModel
 
     /**
      * Prevent same aliases using numeric suffixes for each alias.
-     *
-     * @param array $columns
      *
      * @return array
      */
@@ -430,8 +420,6 @@ class ReportModel extends FormModel
      * Export report.
      *
      * @param string $format
-     * @param Report $report
-     * @param array  $reportData
      * @param null   $handle
      * @param int    $page
      *
@@ -486,8 +474,8 @@ class ReportModel extends FormModel
                 return new Response($content);
 
             case 'xlsx':
-                if (!class_exists('PHPExcel')) {
-                    throw new \Exception('PHPExcel is required to export to Excel spreadsheets');
+                if (!class_exists(Spreadsheet::class)) {
+                    throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
                 }
 
                 $response = new StreamedResponse(
@@ -509,9 +497,7 @@ class ReportModel extends FormModel
     /**
      * Get report data for view rendering.
      *
-     * @param Report               $entity
      * @param FormFactoryInterface $formFactory
-     * @param array                $options
      *
      * @return array
      */
@@ -736,8 +722,6 @@ class ReportModel extends FormModel
     /**
      * Determine what operators should be used for the filter type.
      *
-     * @param array $data
-     *
      * @return mixed|string
      */
     private function getOperatorOptions(array $data)
@@ -755,7 +739,7 @@ class ReportModel extends FormModel
             $options = MauticReportBuilder::OPERATORS[$operator];
         }
 
-        foreach ($options as $value => &$label) {
+        foreach ($options as &$label) {
             $label = $this->translator->trans($label);
         }
 
@@ -763,9 +747,6 @@ class ReportModel extends FormModel
     }
 
     /**
-     * @param QueryBuilder $qb
-     * @param array        $debugData
-     *
      * @return int
      */
     private function getTotalCount(QueryBuilder $qb, array &$debugData)

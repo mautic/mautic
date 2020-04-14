@@ -17,10 +17,10 @@ use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\FormBundle\Entity\Field;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
+use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\Event;
@@ -152,7 +152,7 @@ class FieldModel extends FormModel
         ],
         'attribution' => [
             'type'       => 'number',
-            'properties' => ['roundmode' => 4, 'precision' => 2],
+            'properties' => ['roundmode' => 4, 'scale' => 2],
             'fixed'      => true,
             'listable'   => true,
             'object'     => 'lead',
@@ -168,11 +168,6 @@ class FieldModel extends FormModel
             'object'   => 'lead',
         ],
         'foursquare' => [
-            'listable' => true,
-            'group'    => 'social',
-            'object'   => 'lead',
-        ],
-        'googleplus' => [
             'listable' => true,
             'group'    => 'social',
             'object'   => 'lead',
@@ -260,7 +255,7 @@ class FieldModel extends FormModel
         ],
         'companynumber_of_employees' => [
             'type'       => 'number',
-            'properties' => ['roundmode' => 4, 'precision' => 0],
+            'properties' => ['roundmode' => 4, 'scale' => 0],
             'group'      => 'professional',
             'listable'   => true,
             'object'     => 'company',
@@ -273,7 +268,7 @@ class FieldModel extends FormModel
         ],
         'companyannual_revenue' => [
             'type'       => 'number',
-            'properties' => ['roundmode' => 4, 'precision' => 2],
+            'properties' => ['roundmode' => 4, 'scale' => 2],
             'listable'   => true,
             'group'      => 'professional',
             'object'     => 'company',
@@ -316,10 +311,6 @@ class FieldModel extends FormModel
 
     /**
      * FieldModel constructor.
-     *
-     * @param IndexSchemaHelper  $indexSchemaHelper
-     * @param ColumnSchemaHelper $columnSchemaHelper
-     * @param ListModel          $leadListModel
      */
     public function __construct(
         IndexSchemaHelper $indexSchemaHelper,
@@ -354,17 +345,15 @@ class FieldModel extends FormModel
      *
      * @param $id
      *
-     * @return null|object
+     * @return object|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new LeadField();
         }
 
-        $entity = parent::getEntity($id);
-
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
@@ -384,7 +373,7 @@ class FieldModel extends FormModel
      */
     public function getLeadFields()
     {
-        $leadFields = $this->getEntities([
+        return $this->getEntities([
             'filter' => [
                 'force' => [
                     [
@@ -395,8 +384,6 @@ class FieldModel extends FormModel
                 ],
             ],
         ]);
-
-        return $leadFields;
     }
 
     /**
@@ -404,7 +391,7 @@ class FieldModel extends FormModel
      */
     public function getCompanyFields()
     {
-        $companyFields = $this->getEntities([
+        return $this->getEntities([
             'filter' => [
                 'force' => [
                     [
@@ -415,8 +402,6 @@ class FieldModel extends FormModel
                 ],
             ],
         ]);
-
-        return $companyFields;
     }
 
     /**
@@ -443,7 +428,7 @@ class FieldModel extends FormModel
         $object  = $objects[$entity->getObject()];
         $type    = $entity->getType();
 
-        if ($type == 'time') {
+        if ('time' == $type) {
             //time does not work well with list filters
             $entity->setIsListable(false);
         }
@@ -471,7 +456,7 @@ class FieldModel extends FormModel
             } catch (DriverException $e) {
                 $this->logger->addWarning($e->getMessage());
 
-                if ($e->getErrorCode() === 1118 /* ER_TOO_BIG_ROWSIZE */) {
+                if (1118 === $e->getErrorCode() /* ER_TOO_BIG_ROWSIZE */) {
                     throw new DBALException($this->translator->trans('mautic.core.error.max.field'));
                 } else {
                     throw $e;
@@ -479,7 +464,7 @@ class FieldModel extends FormModel
             }
 
             // If this is a new contact field, and it was successfully added to the contacts table, save it
-            if ($isNew === true) {
+            if (true === $isNew) {
                 $event = $this->dispatchEvent('pre_save', $entity, $isNew);
                 $this->getRepository()->saveEntity($entity);
                 $this->dispatchEvent('post_save', $entity, $isNew, $event);
@@ -510,7 +495,7 @@ class FieldModel extends FormModel
 
                     $modifySchema->executeChanges();
                 } catch (DriverException $e) {
-                    if ($e->getErrorCode() === 1069 /* ER_TOO_MANY_KEYS */) {
+                    if (1069 === $e->getErrorCode() /* ER_TOO_MANY_KEYS */) {
                         $this->logger->addWarning($e->getMessage());
                     } else {
                         throw $e;
@@ -593,8 +578,6 @@ class FieldModel extends FormModel
     /**
      * Is field used in segment filter?
      *
-     * @param LeadField $field
-     *
      * @return bool
      */
     public function isUsedField(LeadField $field)
@@ -604,8 +587,6 @@ class FieldModel extends FormModel
 
     /**
      * Returns list of all segments that use $field.
-     *
-     * @param LeadField $field
      *
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
@@ -617,14 +598,12 @@ class FieldModel extends FormModel
     /**
      * Filter used field ids.
      *
-     * @param array $ids
-     *
      * @return array
      */
     public function filterUsedFieldIds(array $ids)
     {
         return array_filter($ids, function ($id) {
-            return $this->isUsedField($this->getEntity($id)) === false;
+            return false === $this->isUsedField($this->getEntity($id));
         });
     }
 
@@ -667,8 +646,7 @@ class FieldModel extends FormModel
     /**
      * Reorders fields by a list of field ids.
      *
-     * @param array $list
-     * @param int   $start Number to start the order by (used for paginated reordering)
+     * @param int $start Number to start the order by (used for paginated reordering)
      */
     public function reorderFieldsByList(array $list, $start = 1)
     {
@@ -707,7 +685,7 @@ class FieldModel extends FormModel
      *
      * @return mixed
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws MethodNotAllowedHttpException
      */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
@@ -719,7 +697,7 @@ class FieldModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('leadfield', $entity, $options);
+        return $formFactory->create(FieldType::class, $entity, $options);
     }
 
     /**
@@ -843,7 +821,7 @@ class FieldModel extends FormModel
 
             if ($byGroup) {
                 // Sort each group by translation
-                foreach ($leadFields as $group => &$fieldGroup) {
+                foreach ($leadFields as &$fieldGroup) {
                     uasort($fieldGroup, 'strnatcmp');
                 }
             }
@@ -963,18 +941,6 @@ class FieldModel extends FormModel
     /**
      * Retrieves a list of published fields that are unique identifers.
      *
-     * @deprecated to be removed in 3.0
-     *
-     * @return array
-     */
-    public function getUniqueIdentiferFields($filters = [])
-    {
-        return $this->getUniqueIdentifierFields($filters);
-    }
-
-    /**
-     * Retrieves a list of published fields that are unique identifers.
-     *
      * @param array $filters
      *
      * @return mixed
@@ -1039,7 +1005,7 @@ class FieldModel extends FormModel
                 $schemaType = 'string';
                 break;
             case 'text':
-                $schemaType = (strpos($alias, 'description') !== false) ? 'text' : 'string';
+                $schemaType = (false !== strpos($alias, 'description')) ? 'text' : 'string';
                 break;
             case 'multiselect':
                 $schemaType   = 'text';

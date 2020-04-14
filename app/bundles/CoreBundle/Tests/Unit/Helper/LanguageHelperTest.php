@@ -9,34 +9,35 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Helper;
+namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Joomla\Http\Http;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Monolog\Logger;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-class LanguageHelperTest extends \PHPUnit_Framework_TestCase
+class LanguageHelperTest extends TestCase
 {
     /**
-     * @var PathsHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var PathsHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $pathsHelper;
 
     /**
-     * @var Logger|\PHPUnit_Framework_MockObject_MockObject
+     * @var Logger|\PHPUnit\Framework\MockObject\MockObject
      */
     private $logger;
 
     /**
-     * @var CoreParametersHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $coreParametersHelper;
 
     /**
-     * @var Http|\PHPUnit_Framework_MockObject_MockObject
+     * @var Http|\PHPUnit\Framework\MockObject\MockObject
      */
     private $connector;
 
@@ -52,21 +53,30 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->pathsHelper          = $this->createMock(PathsHelper::class);
         $this->logger               = $this->createMock(Logger::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->connector            = $this->createMock(Http::class);
 
         $this->translationsPath = __DIR__.'/resource/language';
         $this->tmpPath          = $this->translationsPath.'/tmp';
+
+        $this->pathsHelper = $this->createMock(PathsHelper::class);
+        $this->pathsHelper->method('getSystemPath')
+            ->willReturnCallback(
+                function ($path) {
+                    switch ($path) {
+                        case 'translations_root':
+                            return $this->translationsPath;
+                        case 'cache':
+                        case 'tmp':
+                            return $this->tmpPath;
+                    }
+                }
+            );
     }
 
     public function testLanguageIsInstalled()
     {
-        $this->pathsHelper->method('getSystemPath')
-            ->withConsecutive(['translations_root'], ['cache'], ['cache'], ['tmp'])
-            ->willReturnOnConsecutiveCalls($this->translationsPath, $this->tmpPath, $this->tmpPath, $this->tmpPath);
-
         $filesystem = new Filesystem();
 
         // copy the zip to the tmp folder so the helper does not delete the test zip
@@ -85,16 +95,12 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
     public function testLanguageListIsFetchedAndWritten()
     {
         $langFile = $this->tmpPath.'/../languageList.txt';
-        $this->coreParametersHelper->method('getParameter')
+        $this->coreParametersHelper->method('get')
             ->withConsecutive(['language_list_file'], ['translations_list_url'])
             ->willReturnOnConsecutiveCalls(
                 '',
                 'https://languages.test'
             );
-
-        $this->pathsHelper->method('getSystemPath')
-            ->withConsecutive(['translations_root'], ['cache'])
-            ->willReturnOnConsecutiveCalls($this->translationsPath, $this->tmpPath);
 
         $languages      = ['languages' => [['name'=>'Spanish', 'locale'=>'es']]];
         $response       = new \stdClass();
@@ -122,13 +128,9 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
         $langFile  = $this->tmpPath.'/../languageList.txt';
         file_put_contents($langFile, json_encode($languages));
 
-        $this->coreParametersHelper->method('getParameter')
+        $this->coreParametersHelper->method('get')
             ->with('translations_fetch_url')
             ->willReturn('https://languages.test/');
-
-        $this->pathsHelper->method('getSystemPath')
-            ->withConsecutive(['translations_root'], ['cache'], ['cache'])
-            ->willReturnOnConsecutiveCalls($this->translationsPath, $this->tmpPath, $this->tmpPath);
 
         $response       = new \stdClass();
         $response->code = 200;
@@ -145,6 +147,12 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFileExists($this->tmpPath.'/es.zip');
         @unlink($this->tmpPath.'/es.zip');
+    }
+
+    public function testSupportedLanguagesAreReturned()
+    {
+        $helper = $this->getHelper();
+        $this->assertEquals(['en_US' => 'English - United States'], $helper->getSupportedLanguages());
     }
 
     /**

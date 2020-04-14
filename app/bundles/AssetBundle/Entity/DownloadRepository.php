@@ -58,7 +58,6 @@ class DownloadRepository extends CommonRepository
      * Get a lead's page downloads.
      *
      * @param int|null $leadId
-     * @param array    $options
      *
      * @return array
      */
@@ -100,9 +99,7 @@ class DownloadRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
+        return $query->execute()->fetchAll();
     }
 
     /**
@@ -125,9 +122,7 @@ class DownloadRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
+        return $query->execute()->fetchAll();
     }
 
     /**
@@ -180,7 +175,7 @@ class DownloadRepository extends CommonRepository
         $q->andWhere('a.source = "page"')
             ->andWhere('a.code = 200');
 
-        if ($fromDate != null) {
+        if (null != $fromDate) {
             $dh = new DateTimeHelper($fromDate);
             $q->andWhere($q->expr()->gte('a.date_download', ':date'))
                 ->setParameter('date', $dh->toUtcString());
@@ -223,7 +218,7 @@ class DownloadRepository extends CommonRepository
 
         $q->andWhere('a.code = 200');
 
-        if ($fromDate != null) {
+        if (null != $fromDate) {
             $dh = new DateTimeHelper($fromDate);
             $q->andWhere($q->expr()->gte('a.date_download', ':date'))
                 ->setParameter('date', $dh->toUtcString());

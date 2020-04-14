@@ -36,8 +36,6 @@ class StatHelper
 
     /**
      * StatHelper constructor.
-     *
-     * @param StatRepository $statRepository
      */
     public function __construct(StatRepository $statRepository)
     {
@@ -45,8 +43,7 @@ class StatHelper
     }
 
     /**
-     * @param Stat $stat
-     * @param      $emailAddress
+     * @param $emailAddress
      */
     public function storeStat(Stat $stat, $emailAddress)
     {
@@ -66,9 +63,6 @@ class StatHelper
         }
     }
 
-    /**
-     * @param Reference $stat
-     */
     public function markForDeletion(Reference $stat)
     {
         $this->deleteUs[] = $stat->getStatId();

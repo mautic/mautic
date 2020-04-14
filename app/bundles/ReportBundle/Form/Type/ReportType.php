@@ -20,7 +20,6 @@ use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\UserBundle\Form\Type\UserListType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -30,11 +29,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class ReportType.
- */
 class ReportType extends AbstractType
 {
     /**
@@ -42,17 +37,9 @@ class ReportType extends AbstractType
      */
     private $reportModel;
 
-    /**
-     * Translator object.
-     *
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
-     */
-    private $translator;
-
-    public function __construct(ReportModel $reportModel, TranslatorInterface $translator)
+    public function __construct(ReportModel $reportModel)
     {
         $this->reportModel = $reportModel;
-        $this->translator  = $translator;
     }
 
     /**
@@ -64,7 +51,7 @@ class ReportType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('report', $options));
 
         // Only add these fields if we're in edit mode
-        if (!$options['read_only']) {
+        if (!($options['attr']['readonly'] ?? false)) {
             $builder->add(
                 'name',
                 TextType::class,
@@ -138,14 +125,14 @@ class ReportType extends AbstractType
                 'source',
                 ChoiceType::class,
                 [
-                    'choices'     => $tables,
-                    'expanded'    => false,
-                    'multiple'    => false,
-                    'label'       => 'mautic.report.report.form.source',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
-                    'required'    => false,
-                    'attr'        => [
+                    'choices'           => $tables,
+                    'expanded'          => false,
+                    'multiple'          => false,
+                    'label'             => 'mautic.report.report.form.source',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'placeholder'       => false,
+                    'required'          => false,
+                    'attr'              => [
                         'class'    => 'form-control',
                         'tooltip'  => 'mautic.report.report.form.source.help',
                         'onchange' => 'Mautic.updateReportSourceData(this.value)',
@@ -153,19 +140,16 @@ class ReportType extends AbstractType
                 ]
             );
 
-            $model        = $this->reportModel;
-            $tableList    = $options['table_list'];
-            $formModifier = function (FormInterface $form, $source, $currentColumns, $currentGraphs, $formData) use ($model, $tables, $tableList) {
+            $formModifier = function (FormInterface $form, $source, $currentColumns, $currentGraphs, $formData) use ($tables) {
                 if (empty($source)) {
-                    reset($tables);
-                    $firstGroup = key($tables);
-                    reset($tables[$firstGroup]);
-                    $source = key($tables[$firstGroup]);
+                    $firstGroup           = array_key_first($tables);
+                    $firstKeyInFirstGroup = array_key_first($tables[$firstGroup]);
+                    $source               = $tables[$firstGroup][$firstKeyInFirstGroup];
                 }
 
-                $columns           = $model->getColumnList($source);
-                $groupByColumns    = $model->getColumnList($source, true);
-                $filters           = $model->getFilterList($source);
+                $columns           = $this->reportModel->getColumnList($source);
+                $groupByColumns    = $this->reportModel->getColumnList($source, true);
+                $filters           = $this->reportModel->getFilterList($source);
                 $filterDefinitions = htmlspecialchars(json_encode($filters->definitions), ENT_QUOTES, 'UTF-8');
                 $operatorHtml      = htmlspecialchars(json_encode($filters->operatorHtml), ENT_QUOTES, 'UTF-8');
 
@@ -181,13 +165,13 @@ class ReportType extends AbstractType
                     'columns',
                     ChoiceType::class,
                     [
-                        'choices'    => $columns->choices,
-                        'label'      => false,
-                        'label_attr' => ['class' => 'control-label'],
-                        'required'   => false,
-                        'multiple'   => true,
-                        'expanded'   => false,
-                        'attr'       => [
+                        'choices'           => array_flip($columns->choices),
+                        'label'             => false,
+                        'label_attr'        => ['class' => 'control-label'],
+                        'required'          => false,
+                        'multiple'          => true,
+                        'expanded'          => false,
+                        'attr'              => [
                             'class'         => 'form-control multiselect',
                             'data-order'    => $order,
                             'data-sortable' => 'true',
@@ -200,13 +184,13 @@ class ReportType extends AbstractType
                     'groupBy',
                     ChoiceType::class,
                     [
-                        'choices'    => $groupByColumns->choices,
-                        'label'      => false,
-                        'label_attr' => ['class' => 'control-label'],
-                        'required'   => false,
-                        'multiple'   => true,
-                        'expanded'   => false,
-                        'attr'       => [
+                        'choices'           => array_flip($groupByColumns->choices),
+                        'label'             => false,
+                        'label_attr'        => ['class' => 'control-label'],
+                        'required'          => false,
+                        'multiple'          => true,
+                        'expanded'          => false,
+                        'attr'              => [
                             'class'         => 'form-control multiselect',
                             'data-sortable' => 'true',
                             'onchange'      => 'Mautic.checkSelectedGroupBy()',
@@ -219,9 +203,9 @@ class ReportType extends AbstractType
                     'filters',
                     ReportFiltersType::class,
                     [
-                        'type'    => 'filter_selector',
-                        'label'   => false,
-                        'options' => [
+                        'entry_type'    => FilterSelectorType::class,
+                        'label'         => false,
+                        'entry_options' => [
                             'filterList'   => $filters->choices,
                             'operatorList' => $filters->operatorChoices,
                             'required'     => false,
@@ -261,9 +245,9 @@ class ReportType extends AbstractType
                     'tableOrder',
                     CollectionType::class,
                     [
-                        'type'    => 'table_order',
-                        'label'   => false,
-                        'options' => [
+                        'entry_type'    => TableOrderType::class,
+                        'label'         => false,
+                        'entry_options' => [
                             'columnList' => $columns->choices,
                             'required'   => false,
                         ],
@@ -284,15 +268,16 @@ class ReportType extends AbstractType
                         'attr'   => [
                             'class' => 'filter-value',
                         ],
-                        'data'        => 1,
-                        'choice_list' => new ChoiceList(
-                            [0, 1, 2],
-                            ['mautic.core.form.no', 'mautic.core.form.yes', 'mautic.core.filter.clear']
-                        ),
-                    ]
+                        'data'    => 1,
+                        'choices' => [
+                            'mautic.core.form.no'      => 0,
+                            'mautic.core.form.yes'     => 1,
+                            'mautic.core.filter.clear' => 2,
+                        ],
+                        ]
                 );
 
-                $graphList = $model->getGraphList($source);
+                $graphList = $this->reportModel->getGraphList($source);
                 if (is_array($currentGraphs)) {
                     $orderColumns = array_values($currentGraphs);
                     $order        = htmlspecialchars(json_encode($orderColumns), ENT_QUOTES, 'UTF-8');
@@ -304,13 +289,13 @@ class ReportType extends AbstractType
                     'graphs',
                     ChoiceType::class,
                     [
-                        'choices'    => $graphList->choices,
-                        'label'      => 'mautic.report.report.form.graphs',
-                        'label_attr' => ['class' => 'control-label'],
-                        'required'   => false,
-                        'multiple'   => true,
-                        'expanded'   => false,
-                        'attr'       => [
+                        'choices'           => array_flip($graphList->choices),
+                        'label'             => 'mautic.report.report.form.graphs',
+                        'label_attr'        => ['class' => 'control-label'],
+                        'required'          => false,
+                        'multiple'          => true,
+                        'expanded'          => false,
+                        'attr'              => [
                             'class'         => 'form-control multiselect',
                             'data-order'    => $order,
                             'data-sortable' => 'true',
@@ -353,14 +338,14 @@ class ReportType extends AbstractType
                 'scheduleUnit',
                 ChoiceType::class,
                 [
-                    'choices'     => SchedulerEnum::getUnitEnumForSelect(),
-                    'expanded'    => false,
-                    'multiple'    => false,
-                    'label'       => 'mautic.report.schedule.every',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
-                    'required'    => false,
-                    'attr'        => [
+                    'choices'           => SchedulerEnum::getUnitEnumForSelect(),
+                    'expanded'          => false,
+                    'multiple'          => false,
+                    'label'             => 'mautic.report.schedule.every',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'placeholder'       => false,
+                    'required'          => false,
+                    'attr'              => [
                         'class'                => 'form-control',
                         'data-report-schedule' => 'scheduleUnit',
                     ],
@@ -371,14 +356,14 @@ class ReportType extends AbstractType
                 'scheduleDay',
                 ChoiceType::class,
                 [
-                    'choices'     => SchedulerEnum::getDayEnumForSelect(),
-                    'expanded'    => false,
-                    'multiple'    => false,
-                    'label'       => 'mautic.report.schedule.day',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
-                    'required'    => false,
-                    'attr'        => [
+                    'choices'           => SchedulerEnum::getDayEnumForSelect(),
+                    'expanded'          => false,
+                    'multiple'          => false,
+                    'label'             => 'mautic.report.schedule.day',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'placeholder'       => false,
+                    'required'          => false,
+                    'attr'              => [
                         'class'                => 'form-control',
                         'data-report-schedule' => 'scheduleDay',
                     ],
@@ -389,14 +374,14 @@ class ReportType extends AbstractType
                 'scheduleMonthFrequency',
                 ChoiceType::class,
                 [
-                    'choices'     => SchedulerEnum::getMonthFrequencyForSelect(),
-                    'expanded'    => false,
-                    'multiple'    => false,
-                    'label'       => 'mautic.report.schedule.month_frequency',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
-                    'required'    => false,
-                    'attr'        => [
+                    'choices'           => SchedulerEnum::getMonthFrequencyForSelect(),
+                    'expanded'          => false,
+                    'multiple'          => false,
+                    'label'             => 'mautic.report.schedule.month_frequency',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'placeholder'       => false,
+                    'required'          => false,
+                    'attr'              => [
                         'class'                => 'form-control',
                         'data-report-schedule' => 'scheduleMonthFrequency',
                     ],
@@ -429,9 +414,6 @@ class ReportType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -445,7 +427,7 @@ class ReportType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'report';
     }
@@ -465,7 +447,7 @@ class ReportType extends AbstractType
         $list = [];
 
         foreach ($temp as $table) {
-            $list['mautic.report.group.'.$tables[$table]['group']][$table] = $tables[$table]['display_name'];
+            $list['mautic.report.group.'.$tables[$table]['group']][$tables[$table]['display_name']] = $table;
         }
 
         return $list;

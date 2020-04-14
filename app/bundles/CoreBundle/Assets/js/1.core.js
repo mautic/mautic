@@ -605,7 +605,7 @@ var Mautic = {
 
             if (jsonString) {
                 try {
-                    var response = mQuery.parseJSON(jsonString);
+                    var response = JSON.parse(jsonString);
                     if (inDevMode) {
                         console.log(response);
                     }
@@ -776,7 +776,7 @@ var Mautic = {
      * Marks notifications as read and clears unread indicators
      */
     showNotifications: function () {
-        mQuery("#notificationsDropdown").unbind('hide.bs.dropdown');
+        mQuery("#notificationsDropdown").off('hide.bs.dropdown');
         mQuery('#notificationsDropdown').on('hidden.bs.dropdown', function () {
             if (!mQuery('#newNotificationIndicator').hasClass('hide')) {
                 mQuery('#notifications .is-unread').remove();

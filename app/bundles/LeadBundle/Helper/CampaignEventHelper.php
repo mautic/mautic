@@ -20,8 +20,7 @@ use Mautic\LeadBundle\Event\ListChangeEvent;
 class CampaignEventHelper
 {
     /**
-     * @param      $event
-     * @param Lead $lead
+     * @param $event
      *
      * @return bool
      */
@@ -41,8 +40,7 @@ class CampaignEventHelper
     }
 
     /**
-     * @param ListChangeEvent $eventDetails
-     * @param                 $event
+     * @param $event
      *
      * @return bool
      */

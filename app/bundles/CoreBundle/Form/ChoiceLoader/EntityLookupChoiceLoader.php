@@ -22,15 +22,12 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class EntityLookupChoiceLoader.
- */
 class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 {
     /**
      * @var array
      */
-    protected $selected;
+    protected $selected = [];
 
     /**
      * @var array
@@ -58,12 +55,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     protected $connection;
 
     /**
-     * EntityLookupChoiceLoader constructor.
-     *
-     * @param ModelFactory        $modelFactory
-     * @param TranslatorInterface $translator
-     * @param Connection          $connection
-     * @param array               $options
+     * @param array $options
      */
     public function __construct(ModelFactory $modelFactory, TranslatorInterface $translator, Connection $connection, $options = [])
     {
@@ -96,8 +88,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
      *
      * Convert to other data types to strings - we're already working with IDs so just return $values
      *
-     * @param array $values
-     * @param null  $value
+     * @param null $value
      *
      * @return array
      */
@@ -109,8 +100,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * Convert to other data types to strings - we're already working with IDs so just return $choices.
      *
-     * @param array $choices
-     * @param null  $value
+     * @param null $value
      *
      * @return array
      */
@@ -121,23 +111,21 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
     /**
      * Take note of the selected values for loadChoiceList.
-     *
-     * @param FormEvent $event
      */
     public function onFormPostSetData(FormEvent $event)
     {
-        $this->selected = $event->getData();
+        $this->selected = (array) $event->getData();
     }
 
     /**
-     * @param null $data
-     * @param bool $includeNew
+     * @param array|null $data
+     * @param bool       $includeNew
      *
      * @return array
      */
     protected function getChoices($data = null, $includeNew = false)
     {
-        if (null == $data) {
+        if (null === $data) {
             $data = $this->selected;
         }
 
@@ -210,7 +198,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     {
         $prepped   = $choices;
         $isGrouped = false;
-        foreach ($prepped as $key => &$choice) {
+        foreach ($prepped as &$choice) {
             if (is_array($choice)) {
                 $isGrouped = true;
                 $choice    = $this->prepareChoices($choice);
@@ -295,9 +283,6 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         return $choices;
     }
 
-    /**
-     * @param array $choices
-     */
     protected function formatChoices(array &$choices)
     {
         // Get the first key

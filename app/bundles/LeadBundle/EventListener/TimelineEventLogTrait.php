@@ -28,13 +28,12 @@ trait TimelineEventLogTrait
     private $eventLogRepository;
 
     /**
-     * @param LeadTimelineEvent $event
-     * @param                   $eventType
-     * @param                   $eventTypeName
-     * @param                   $icon
-     * @param null              $bundle
-     * @param null              $object
-     * @param null              $action
+     * @param      $eventType
+     * @param      $eventTypeName
+     * @param      $icon
+     * @param null $bundle
+     * @param null $object
+     * @param null $action
      */
     private function addEvents(LeadTimelineEvent $event, $eventType, $eventTypeName, $icon, $bundle = null, $object = null, $action = null, $contentTemplate = null)
     {
@@ -63,12 +62,6 @@ trait TimelineEventLogTrait
     }
 
     /**
-     * @param array $log
-     * @param       $eventType
-     * @param       $eventTypeName
-     * @param       $icon
-     * @param       $contentTemplate
-     *
      * @return array
      */
     private function getEventEntry(array $log, $eventType, $eventTypeName, $icon, $contentTemplate)
@@ -94,8 +87,7 @@ trait TimelineEventLogTrait
     }
 
     /**
-     * @param array $log
-     * @param       $eventType
+     * @param $eventType
      *
      * @return string
      */

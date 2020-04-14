@@ -36,14 +36,14 @@
             <?php echo $view['form']->errors($form); ?>
             <?php $rowCount = 2; ?>
             <?php foreach ($form->children as $key => $child): ?>
-                <?php if ($key != 'properties'): ?>
-                    <?php if ($rowCount++ % 3 == 1): ?>
+                <?php if ('properties' != $key): ?>
+                    <?php if (1 == $rowCount++ % 3): ?>
                         <div class="row">
                     <?php endif; ?>
                     <div class="col-sm-4">
                         <?php echo $view['form']->row($child); ?>
                     </div>
-                    <?php if ($rowCount++ % 3 == 1): ?>
+                    <?php if (1 == $rowCount++ % 3): ?>
                         </div>
                     <?php endif; ?>
                     <?php ++$rowCount; ?>
