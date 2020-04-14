@@ -284,7 +284,7 @@ class LanguageHelper
             ];
         }
 
-        $langUrl = $this->coreParametersHelper->get('translcations_fetch_url').$languageCode.'.zip';
+        $langUrl = $this->coreParametersHelper->get('translations_fetch_url').$languageCode.'.zip';
 
         // GET the update data
         try {
