@@ -29,7 +29,7 @@
   z-index: 0;
 }
 .focus-builder #websiteScreenshot .screenshot-container {
-  overflow: hidden;
+  /*overflow: hidden;*/
 }
 .focus-builder #websiteScreenshot.css-device .screenshot-container {
   height: 392px;
@@ -212,4 +212,28 @@
     border-radius: 18px;
     content: "";
   }
+}
+
+#websiteScreenshot.mobile .screenshot-container{
+  position: absolute;
+  left : 50%;
+  width: 320px;
+  margin: 0px;
+}
+
+#websiteScreenshot.mobile .preview-body, #websiteScreenshot.mobile  #websiteCanvas {
+  margin: 0;
+  padding: 0;
+  border: none;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+  left : -50%;
+  width: 320px;
+  height: 568px;
+}
+
+#websiteScreenshot.mobile  #websiteCanvas {
+  z-index: 0<;
 }

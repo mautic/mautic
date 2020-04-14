@@ -394,20 +394,22 @@ Mautic.focusInitViewportSwitcher = function () {
 Mautic.focusCreateIframe = function (url) {
 
     let builderCss = {
-        margin: "0",
-        padding: "0",
-        border: "none",
-        overflow: "hidden", // Disable scrolling with scrolling="no" attr
-        "pointer-events": "none", // Disable clicks in iframe
+        // margin: "0",
+        // padding: "0",
+        // border: "none",
+        // overflow: "hidden", // Disable scrolling with scrolling="no" attr
+        // "pointer-events": "none", // Disable clicks in iframe
     };
 
     if (mQuery('.btn-viewport').data('viewport') === 'mobile') {
-        builderCss.width = '320px';
-        builderCss.height = '568px';
-        builderCss.border = '1px gray solid';
+        // builderCss.width = '320px';
+        // builderCss.height = '568px';
+        // builderCss.border = '1px gray solid';
+        mQuery('#websiteScreenshot').addClass('mobile');
     } else {
         builderCss.width = "100%";
         builderCss.height = mQuery('#websiteScreenshot').height(); // 100% does not work. Needs to be specified
+        mQuery('#websiteScreenshot').removeClass('mobile');
     }
 
     // Not catching empty iframe
