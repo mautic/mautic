@@ -25,7 +25,7 @@ use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
 
-class DynamicContentSubscriberTest extends \PHPUnit_Framework_TestCase
+class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private $trackableModel;
     private $pageTokenHelper;
