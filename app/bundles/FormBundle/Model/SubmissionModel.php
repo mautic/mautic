@@ -134,7 +134,7 @@ class SubmissionModel extends CommonFormModel
     private $dateHelper;
 
     /**
-     * @var ContactTracker;
+     * @var ContactTracker
      */
     private $contactTracker;
 
