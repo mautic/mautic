@@ -20,6 +20,7 @@ use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -79,6 +80,11 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
     private $security;
 
     /**
+     * @var MockObject|ContactTracker
+     */
+    private $contactTracker;
+
+    /**
      * @var DynamicContentSubscriber
      */
     private $subscriber;
@@ -97,6 +103,7 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dynamicContentHelper = $this->createMock(DynamicContentHelper::class);
         $this->dynamicContentModel  = $this->createMock(DynamicContentModel::class);
         $this->security             = $this->createMock(CorePermissions::class);
+        $this->contactTracker       = $this->createMock(ContactTracker::class);
         $this->subscriber           = new DynamicContentSubscriber(
             $this->trackableModel,
             $this->pageTokenHelper,
@@ -104,10 +111,10 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->formTokenHelper,
             $this->focusTokenHelper,
             $this->auditLogModel,
-            $this->leadModel,
             $this->dynamicContentHelper,
             $this->dynamicContentModel,
-            $this->security
+            $this->security,
+            $this->contactTracker
         );
     }
 
@@ -155,8 +162,8 @@ HTML;
             ->method('isAnonymous')
             ->willReturn(true);
 
-        $this->leadModel->expects($this->once())
-            ->method('getCurrentLead')
+        $this->contactTracker->expects($this->once())
+            ->method('getCurrentContact')
             ->willReturn($contact);
 
         $this->dynamicContentHelper->expects($this->once())
