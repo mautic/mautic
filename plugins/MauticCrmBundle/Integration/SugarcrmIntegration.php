@@ -93,7 +93,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $pathsHelper,
             $notificationModel,
             $fieldModel,
-            $integrationEntityModel
+            $integrationEntityModel,
+            $doNotContactModel
         );
     }
 

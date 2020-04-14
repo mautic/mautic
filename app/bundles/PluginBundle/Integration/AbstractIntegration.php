@@ -22,6 +22,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\Integration;
@@ -193,6 +194,11 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     protected $integrationEntityModel;
 
     /**
+     * @var DoNotContactModel
+     */
+    protected $doNotContact;
+
+    /**
      * @var array
      */
     protected $commandParameters = [];
@@ -212,7 +218,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         PathsHelper $pathsHelper,
         NotificationModel $notificationModel,
         FieldModel $fieldModel,
-        IntegrationEntityModel $integrationEntityModel
+        IntegrationEntityModel $integrationEntityModel,
+        DoNotContactModel $doNotContact
     ) {
         $this->dispatcher             = $eventDispatcher;
         $this->cache                  = $cacheStorageHelper->getCache($this->getName());
@@ -229,6 +236,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $this->notificationModel      = $notificationModel;
         $this->fieldModel             = $fieldModel;
         $this->integrationEntityModel = $integrationEntityModel;
+        $this->doNotContact           = $doNotContact;
     }
 
     public function setCommandParameters(array $params)
@@ -2556,7 +2564,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         $isDoNotContact = 0;
         if ($lead = $this->leadModel->getEntity($leadId)) {
-            $isContactableReason = $this->leadModel->isContactable($lead, $channel);
+            $isContactableReason = $this->doNotContact->isContactable($lead, $channel);
             if (DoNotContact::IS_CONTACTABLE !== $isContactableReason) {
                 $isDoNotContact = 1;
             }
