@@ -89,7 +89,7 @@ echo $view['form']->start($form);
                                         ); ?></button>
                                 </span>
                             </div>
-                            <div class="help-block hide"><div>
+                            <div class="help-block hide"></div>
                         </div>
                     </div>
                 </div>
