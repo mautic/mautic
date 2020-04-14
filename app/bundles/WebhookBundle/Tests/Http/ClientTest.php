@@ -54,7 +54,7 @@ class ClientTest extends TestCase
 
                 $this->assertSame(json_encode($payload), (string) $request->getBody());
 
-                return $request;
+                return true;
             }))
             ->willReturn($response);
 
