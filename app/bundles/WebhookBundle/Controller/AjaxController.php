@@ -37,14 +37,11 @@ class AjaxController extends CommonAjaxController
 
         // get the selected types
         $selectedTypes = InputHelper::cleanArray($request->request->get('types'));
-
-        $payloadPaths = $this->getPayloadPaths($selectedTypes);
-        $payloads     = $this->loadPayloads($payloadPaths);
-
-        $now = new \DateTime();
+        $payloadPaths  = $this->getPayloadPaths($selectedTypes);
+        $payloads      = $this->loadPayloads($payloadPaths);
+        $now           = new \DateTime();
 
         $payloads['timestamp'] = $now->format('c');
-        $jsonPayloads          = json_encode($payloads);
 
         // set the response
         /** @var Psr\Http\Message\ResponseInterface $response */
@@ -59,7 +56,7 @@ class AjaxController extends CommonAjaxController
         ];
 
         // if we get a 2xx response convert to success message
-        if (substr($response->getStatusCode(), 0, 1) == 2) {
+        if (2 == substr($response->getStatusCode(), 0, 1)) {
             $dataArray['html'] =
                 '<div class="has-success"><span class="help-block">'
                 .$this->translator->trans('mautic.webhook.label.success')

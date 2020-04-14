@@ -28,10 +28,6 @@ class Client
      */
     private $httpClient;
 
-    /**
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param GuzzleClient         $httpClient
-     */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         GuzzleClient $httpClient
@@ -41,36 +37,21 @@ class Client
     }
 
     /**
-     * @param string   $url
-     * @param array    $payload
-     * @param int|null $timeout
-     * @param int|null $secret
+     * @param string $url
+     * @param string $secret
      *
      * @return ResponseInterface
      */
-    public function post($url, array $payload, $secret = null)
+    public function post($url, array $payload, $secret)
     {
-        if (is_array($payload)) {
-            $payload = json_encode($payload);
-        }
-
-        // generate a base64 encoded HMAC-SHA256 signature of the payload
-        $signature = base64_encode(hash_hmac('sha256', $payload, $secret, true));
-
-        // Set up custom headers
-        $headers = [
+        $jsonPayload = json_encode($payload);
+        $signature   = base64_encode(hash_hmac('sha256', $jsonPayload, $secret, true));
+        $headers     = [
             'Content-Type'      => 'application/json',
+            'X-Origin-Base-URL' => $this->coreParametersHelper->get('site_url'),
             'Webhook-Signature' => $signature,
-            'X-Origin-Base-URL' => $this->coreParametersHelper->getParameter('site_url'),
         ];
 
-        $request = new Request(
-            'POST',
-            $url,
-            $headers,
-            json_encode($payload)
-        );
-
-        return $this->httpClient->sendRequest($request);
+        return $this->httpClient->sendRequest(new Request('POST', $url, $headers, $jsonPayload));
     }
 }
