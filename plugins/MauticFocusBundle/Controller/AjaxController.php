@@ -27,10 +27,6 @@ class AjaxController extends CommonAjaxController
     {
         $url = $request->request->get('website');
 
-        if (null === $url) {
-            // @todo
-        }
-
         /** @var IframeAvailabilityChecker $availabilityChecker */
         $availabilityChecker = $this->get('mautic.focus.helper.iframe_availability_checker');
 
