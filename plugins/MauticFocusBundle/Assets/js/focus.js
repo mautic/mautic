@@ -12,29 +12,6 @@ Mautic.disabledFocusActions = function(opener) {
     opener.mQuery('#campaignevent_properties_previewFocusButton').prop('disabled', disabled);
 };
 
-/**
- * @todo Remove as unused
- * @param options
- * @returns {*}
- */
-Mautic.standardFocusUrl = function(options) {
-    if (!options) {
-        return;
-    }
-
-    var url = options.windowUrl;
-    if (url) {
-        var editFocusKey = '/focus/edit/focusId';
-        var previewFocusKey = '/focus/preview/focusId';
-        if (url.indexOf(editFocusKey) > -1 ||
-            url.indexOf(previewFocusKey) > -1) {
-            options.windowUrl = url.replace('focusId', mQuery('#campaignevent_properties_focus').val());
-        }
-    }
-
-    return options;
-};
-
 Mautic.focusOnLoad = function () {
     if (mQuery('.builder').length) {
         // Activate droppers
@@ -211,10 +188,7 @@ Mautic.focusOnLoad = function () {
 };
 
 Mautic.focusOnUnload = function () {
-    // @todo Mautic.focusStatsChart used only here
-    if (typeof Mautic.focusStatsChart != 'undefined') {
-        Mautic.focusStatsChart.destroy();
-    }
+    // @todo
 };
 
 Mautic.launchFocusBuilder = function (forceFetch) {
@@ -282,121 +256,15 @@ Mautic.launchFocusBuilder = function (forceFetch) {
             mQuery('.btn-close-builder').prop('disabled', false);
 
 
-            if (false) { // @todo no response available from mautic api providing preview image and such stuff
-                // Enable droppers
-                mQuery('.btn-dropper').removeClass('disabled');
-                mQuery('#websiteUrlPlaceholderInput').prop('disabled', true);
+            mQuery('.website-placeholder').removeClass('hide');
+            mQuery('#websiteUrlPlaceholderInput').prop('disabled', false);
 
-                var canvas = document.getElementById('websiteCanvas');
-                var context = canvas.getContext('2d');
-                var img = new Image();
-                img.onload = function () {
-                    mQuery('#websiteScreenshot').removeClass('css-device css-device--mobile');
+            // Disable droppers
+            mQuery('.btn-dropper').addClass('disabled');
 
-                    // Get the width of the
-                    var useWidth = mQuery('.website-preview').width();
+            Mautic.focusCreateIframe(url);
 
-                    if (useWidth > img.width) {
-                        useWidth = img.width;
-                    }
-
-                    // Get height proportionate to image width used
-                    var ratio = useWidth / img.width;
-                    var useHeight = img.height * ratio;
-
-                    mQuery('#websiteCanvas').attr({width: useWidth, height: useHeight})
-                    context.drawImage(this, 0, 0, useWidth, useHeight);
-
-                    function findPos(obj) {
-                        var current_left = 0, current_top = 0;
-                        if (obj.offsetParent) {
-                            do {
-                                current_left += obj.offsetLeft;
-                                current_top += obj.offsetTop;
-                            } while (obj = obj.offsetParent);
-                            return {x: current_left, y: current_top};
-                        }
-                        return undefined;
-                    }
-
-                    function rgbToHex(r, g, b) {
-                        if (r > 255 || g > 255 || b > 255)
-                            throw "Invalid color component";
-                        return ((r << 16) | (g << 8) | b).toString(16);
-                    }
-
-                    mQuery('#websiteCanvas').off('click.canvas');
-                    mQuery('#websiteCanvas').on('click.canvas', function (e) {
-                        // Check that a dropper is active
-                        if (mQuery('button.btn-dropper.active').length) {
-                            var dropper = mQuery('button.btn-dropper.active').data('dropper');
-
-                            var position = findPos(this);
-                            var x = e.pageX - position.x;
-                            var y = e.pageY - position.y;
-                            var canvas = this.getContext('2d');
-                            var p = canvas.getImageData(x, y, 1, 1).data;
-                            var hex = "#" + ("000000" + rgbToHex(p[0], p[1], p[2])).slice(-6);
-
-                            mQuery('#' + dropper).minicolors('value', hex);
-                        }
-                    });
-
-                    if (mQuery('.btn-viewport').data('viewport') == 'mobile') {
-                        mQuery('#websiteScreenshot').addClass('css-device css-device--mobile');
-                    }
-                };
-
-                img.src = (mQuery('.btn-viewport').data('viewport') == 'mobile') ? response.image.mobile : response.image.desktop;
-
-                if (forceFetch) {
-                    // Only override colors if fetch button is clicked
-                    if (response.colors) {
-                        if ('bar' != mQuery('#focus_style').val() && response.colors.textColor == '#ffffff') {
-                            response.colors.textColor = '#000000';
-                        }
-                        mQuery('#focus_properties_colors_primary').minicolors('value', response.colors.primaryColor);
-                        mQuery('#focus_properties_colors_text').minicolors('value', response.colors.textColor);
-                        mQuery('#focus_properties_colors_button').minicolors('value', response.colors.buttonColor);
-                        mQuery('#focus_properties_colors_button_text').minicolors('value', response.colors.buttonTextColor);
-                    } else if (!response.ignoreDefaultColors) {
-                        Mautic.setFocusDefaultColors();
-                    }
-
-                    if (response.palette) {
-                        // Wipe them out
-                        mQuery('.site-color-list').html('').removeClass('hide');
-
-                        var colorTypes = ['primary', 'text', 'button', 'button_text'];
-                        response.palette.push('#ffffff');
-                        response.palette.push('#000000');
-                        mQuery.each(response.palette, function (index, value) {
-                            mQuery.each(colorTypes, function (ctIndex, ctValue) {
-                                mQuery('<span class="label label-site-color" />')
-                                    .css('backgroundColor', value)
-                                    .css('border', '1px solid #cccccc')
-                                    .on('click', function () {
-                                        mQuery('#focus_properties_colors_' + ctValue).minicolors('value', value);
-                                    })
-                                    .appendTo('#' + ctValue + '_site_colors');
-                            });
-                        });
-                    }
-                }
-
-                Mautic.ignoreMauticFocusPreviewUpdate = false;
-                Mautic.focusUpdatePreview();
-            } else {
-                mQuery('.website-placeholder').removeClass('hide');
-                mQuery('#websiteUrlPlaceholderInput').prop('disabled', false);
-
-                // Disable droppers
-                mQuery('.btn-dropper').addClass('disabled');
-
-                Mautic.focusCreateIframe(url);
-
-                Mautic.ignoreMauticFocusPreviewUpdate = false;
-            }
+            Mautic.ignoreMauticFocusPreviewUpdate = false;
         });
     } else {
         mQuery('#builder-overlay').addClass('hide');
