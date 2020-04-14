@@ -994,6 +994,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 $this->notificationModel,
                 $this->fieldModel,
                 $integrationEntityModelMock,
+                $this->doNotContact,
             ])
             ->setMethods($this->sfMockMethods)
             ->getMock();

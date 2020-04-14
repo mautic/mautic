@@ -161,8 +161,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $manipulator;
 
     /**
-     * Sets if the IP was just created by LeadModel::getCurrentLead().
-     *
      * @var bool
      */
     private $newlyCreated = false;

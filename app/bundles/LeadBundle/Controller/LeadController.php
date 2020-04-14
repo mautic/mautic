@@ -1596,6 +1596,10 @@ class LeadController extends FormController
         if ('POST' == $this->request->getMethod()) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
+
+            /** @var \Mautic\LeadBundle\Model\DoNotContact $doNotContact */
+            $doNotContact = $this->get('mautic.lead.model.dnc');
+
             $data  = $this->request->request->get('lead_batch_dnc', [], true);
             $ids   = json_decode($data['ids'], true);
 
@@ -1621,7 +1625,7 @@ class LeadController extends FormController
                 $persistEntities = [];
                 foreach ($entities as $lead) {
                     if ($this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-                        if ($model->addDncForLead($lead, 'email', $data['reason'], DoNotContact::MANUAL)) {
+                        if ($doNotContact->addDncForContact($lead->getLead(), 'email', $data['reason'], DoNotContact::MANUAL)) {
                             $persistEntities[] = $lead;
                         }
                     }

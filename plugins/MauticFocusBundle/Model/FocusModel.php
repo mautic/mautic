@@ -19,7 +19,7 @@ use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
@@ -55,23 +55,32 @@ class FocusModel extends FormModel
     protected $templating;
 
     /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
      * @var FieldModel
      */
     protected $leadFieldModel;
 
-    public function __construct(\Mautic\FormBundle\Model\FormModel $formModel, TrackableModel $trackableModel, TemplatingHelper $templating, EventDispatcherInterface $dispatcher, LeadModel $leadModel, FieldModel $leadFieldModel)
-    {
+    /**
+     * @var ContactTracker
+     */
+    protected $contactTracker;
+
+    /**
+     * FocusModel constructor.
+     */
+    public function __construct(
+        \Mautic\FormBundle\Model\FormModel $formModel,
+        TrackableModel $trackableModel,
+        TemplatingHelper $templating,
+        EventDispatcherInterface $dispatcher,
+        FieldModel $leadFieldModel,
+        ContactTracker $contactTracker
+    ) {
         $this->formModel      = $formModel;
         $this->trackableModel = $trackableModel;
         $this->templating     = $templating;
         $this->dispatcher     = $dispatcher;
-        $this->leadModel      = $leadModel;
         $this->leadFieldModel = $leadFieldModel;
+        $this->contactTracker = $contactTracker;
     }
 
     /**
@@ -215,7 +224,7 @@ class FocusModel extends FormModel
         }
 
         // Replace tokens to ensure clickthroughs, lead tokens etc are appropriate
-        $lead       = $this->leadModel->getCurrentLead();
+        $lead       = $this->contactTracker->getContact();
         $tokenEvent = new TokenReplacementEvent($cached['focus'], $lead, ['focus_id' => $focus->getId()]);
         $this->dispatcher->dispatch(FocusEvents::TOKEN_REPLACEMENT, $tokenEvent);
         $focusContent = $tokenEvent->getContent();
