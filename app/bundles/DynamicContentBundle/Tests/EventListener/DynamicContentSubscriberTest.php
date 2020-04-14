@@ -163,7 +163,7 @@ HTML;
             ->willReturn(true);
 
         $this->contactTracker->expects($this->once())
-            ->method('getCurrentContact')
+            ->method('getContact')
             ->willReturn($contact);
 
         $this->dynamicContentHelper->expects($this->once())
