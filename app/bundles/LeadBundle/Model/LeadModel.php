@@ -148,9 +148,6 @@ class LeadModel extends FormModel
      */
     protected $userProvider;
 
-    /**
-     * @var
-     */
     protected $leadTrackingId;
 
     /**
@@ -492,6 +489,10 @@ class LeadModel extends FormModel
             $details = $ips->first()->getIpDetails();
             // Only update with IP details if none of the following are set to prevent wrong combinations
             if (empty($fields['core']['city']['value']) && empty($fields['core']['state']['value']) && empty($fields['core']['country']['value']) && empty($fields['core']['zipcode']['value'])) {
+                if ($this->coreParametersHelper->get('anonymize_ip') && $this->ipLookupHelper->getRealIp()) {
+                    $details = $this->ipLookupHelper->getIpDetails($this->ipLookupHelper->getRealIp());
+                }
+
                 if (!empty($details['city'])) {
                     $entity->addUpdatedField('city', $details['city']);
                     $companyFieldMatches['city'] = $details['city'];
@@ -1725,8 +1726,8 @@ class LeadModel extends FormModel
         $this->logger->debug('CONTACT: Adding '.implode(', ', $tags).' to contact ID# '.$lead->getId());
 
         array_walk($tags, function (&$val) {
-            $val = trim($val);
-            InputHelper::clean($val);
+            $val = html_entity_decode(trim($val), ENT_QUOTES);
+            $val = InputHelper::clean($val);
         });
 
         // See which tags already exist
@@ -1746,7 +1747,7 @@ class LeadModel extends FormModel
                 $tagToBeAdded = null;
 
                 if (!array_key_exists($tag, $foundTags)) {
-                    $tagToBeAdded = new Tag($tag);
+                    $tagToBeAdded = new Tag($tag, false);
                 } elseif (!$leadTags->contains($foundTags[$tag])) {
                     $tagToBeAdded = $foundTags[$tag];
                 }
@@ -1763,8 +1764,8 @@ class LeadModel extends FormModel
             $this->logger->debug('CONTACT: Removing '.implode(', ', $removeTags).' for contact ID# '.$lead->getId());
 
             array_walk($removeTags, function (&$val) {
-                $val = trim($val);
-                InputHelper::clean($val);
+                $val = html_entity_decode(trim($val), ENT_QUOTES);
+                $val = InputHelper::clean($val);
             });
 
             // See which tags really exist

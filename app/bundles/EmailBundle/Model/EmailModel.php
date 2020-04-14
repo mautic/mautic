@@ -1045,6 +1045,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             'allowResends'  => false,
             'customHeaders' => [
                 'Precedence' => 'Bulk',
+                'X-EMAIL-ID' => $email->getId(),
             ],
         ];
 

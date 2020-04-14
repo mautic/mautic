@@ -72,7 +72,7 @@ class SendEmailToContact
     private $emailSentCounts = [];
 
     /**
-     * @var
+     * @var array|null
      */
     private $emailEntityErrors;
 

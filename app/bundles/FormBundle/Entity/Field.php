@@ -16,9 +16,6 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class Field.
- */
 class Field
 {
     /**
@@ -131,9 +128,6 @@ class Field
      */
     private $changes;
 
-    /**
-     * @var
-     */
     private $sessionId;
 
     /**

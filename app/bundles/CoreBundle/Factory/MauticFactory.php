@@ -33,14 +33,8 @@ class MauticFactory
      */
     private $container;
 
-    /**
-     * @var
-     */
     private $database;
 
-    /**
-     * @var
-     */
     private $entityManager;
 
     public function __construct(ContainerInterface $container)

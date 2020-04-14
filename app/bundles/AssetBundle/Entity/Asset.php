@@ -151,7 +151,7 @@ class Asset extends FormEntity
     private $size;
 
     /**
-     * @var
+     * @var string|null
      */
     private $downloadUrl;
 
@@ -1362,7 +1362,7 @@ class Asset extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getDownloadUrl()
     {
@@ -1370,7 +1370,7 @@ class Asset extends FormEntity
     }
 
     /**
-     * @param mixed $downloadUrl
+     * @param string|null $downloadUrl
      *
      * @return Asset
      */

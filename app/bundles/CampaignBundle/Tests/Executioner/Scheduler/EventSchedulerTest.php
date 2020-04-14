@@ -38,12 +38,12 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
     private $eventLogger;
 
     /**
-     * @var Interval|
+     * @var Interval
      */
     private $intervalScheduler;
 
     /**
-     * @var DateTime|
+     * @var DateTime
      */
     private $dateTimeScheduler;
 
