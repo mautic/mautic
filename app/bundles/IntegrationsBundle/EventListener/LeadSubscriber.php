@@ -61,6 +61,7 @@ class LeadSubscriber implements EventSubscriberInterface
             LeadEvents::LEAD_POST_DELETE    => ['onLeadPostDelete', 255],
             LeadEvents::COMPANY_POST_SAVE   => ['onCompanyPostSave', 0],
             LeadEvents::COMPANY_POST_DELETE => ['onCompanyPostDelete', 255],
+            LeadEvents::LEAD_COMPANY_CHANGE => ['onLeadCompanyChange', 128],
         ];
     }
 
@@ -154,6 +155,19 @@ class LeadSubscriber implements EventSubscriberInterface
     public function onCompanyPostDelete(Events\CompanyEvent $event): void
     {
         $this->fieldChangeRepo->deleteEntitiesForObject((int) $event->getCompany()->deletedId, MauticSyncDataExchange::OBJECT_COMPANY);
+    }
+
+    public function onLeadCompanyChange(Events\LeadChangeCompanyEvent $event): void
+    {
+        $lead = $event->getLead();
+
+        // This mechanism is not able to record multiple company changes.
+        $changes['company'] = [
+            0 => '',
+            1 => $lead->getCompany(),
+        ];
+
+        $this->recordFieldChanges($changes, $lead->getId(), Lead::class);
     }
 
     /**

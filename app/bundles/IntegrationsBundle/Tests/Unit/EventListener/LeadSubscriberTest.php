@@ -56,6 +56,7 @@ class LeadSubscriberTest extends TestCase
                 LeadEvents::LEAD_POST_DELETE    => ['onLeadPostDelete', 255],
                 LeadEvents::COMPANY_POST_SAVE   => ['onCompanyPostSave', 0],
                 LeadEvents::COMPANY_POST_DELETE => ['onCompanyPostDelete', 255],
+                LeadEvents::LEAD_COMPANY_CHANGE => ['onLeadCompanyChange', 128],
             ],
             LeadSubscriber::getSubscribedEvents()
         );
@@ -99,6 +100,27 @@ class LeadSubscriberTest extends TestCase
             ->method('hasObjectSyncEnabled')
             ->with(Contact::NAME)
             ->willReturn(false);
+
+        $this->subscriber->onLeadPostSave($event);
+    }
+
+    public function testOnLeadCompanyChange(): void
+    {
+        $leadId      = 3;
+        $companyName = 'Dell';
+
+        $lead = $this->createMock(Lead::class);
+        $lead->expects($this->at(0))
+            ->method('getCompany')
+            ->willReturn($companyName);
+        $lead->expects($this->at(0))
+            ->method('getId')
+            ->willReturn($leadId);
+
+        $event = $this->createMock(LeadEvent::class);
+        $event->expects($this->once())
+            ->method('getLead')
+            ->willReturn($lead);
 
         $this->subscriber->onLeadPostSave($event);
     }
