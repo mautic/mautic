@@ -121,6 +121,6 @@ class PointSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->pointModel->triggerAction('email.send', $event->getEmail(), null, $lead);
+        $this->pointModel->triggerAction('email.send', $event->getEmail(), null, $lead, true);
     }
 }
