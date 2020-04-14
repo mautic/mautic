@@ -37,12 +37,21 @@ class Client
     }
 
     /**
-     * @param string $url
-     * @param string $secret
+     * @param string      $url
+     * @param string|null $secret
      *
      * @return ResponseInterface
      */
-    public function post($url, array $payload, $secret)
+
+    /**
+     * @param $url
+     * @param null $secret
+     *
+     * @return mixed|ResponseInterface
+     *
+     * @throws \Http\Client\Exception
+     */
+    public function post($url, array $payload, $secret = null)
     {
         $jsonPayload = json_encode($payload);
         $signature   = base64_encode(hash_hmac('sha256', $jsonPayload, $secret, true));

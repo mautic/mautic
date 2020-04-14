@@ -13,7 +13,6 @@ namespace Mautic\WebhookBundle\Model;
 
 use Doctrine\Common\Collections\Criteria;
 use JMS\Serializer\SerializationContext;
-use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerInterface;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -109,15 +108,9 @@ class WebhookModel extends FormModel
      */
     private $httpClient;
 
-    /**
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param Serializer           $serializer
-     * @param NotificationModel    $notificationModel
-     * @param Client               $httpClient
-     */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        Serializer $serializer,
+        SerializerInterface $serializer,
         NotificationModel $notificationModel,
         Client $httpClient
     ) {
@@ -330,7 +323,7 @@ class WebhookModel extends FormModel
             // throw an error exception if we don't get a 200 back
             if ($responseStatusCode >= 300 || $responseStatusCode < 200) {
                 // The receiver of the webhook is telling us to stop bothering him with our requests by code 410
-                if ($responseStatusCode === 410) {
+                if (410 === $responseStatusCode) {
                     $this->killWebhook($webhook, 'mautic.webhook.stopped.reason.410');
                 }
 
