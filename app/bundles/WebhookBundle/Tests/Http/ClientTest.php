@@ -37,7 +37,7 @@ class ClientTest extends TestCase
         $httpClientMock     = $this->createMock(GuzzleClient::class);
 
         $parametersMock->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('site_url')
             ->willReturn($siteUrl);
 
