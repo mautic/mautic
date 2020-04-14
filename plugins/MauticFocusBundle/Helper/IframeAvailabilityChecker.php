@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * Check if URL can be displayed via IFRAME.
@@ -53,6 +54,7 @@ class IframeAvailabilityChecker
                 ],
             ]);
 
+            /** @var ResponseInterface $httpResponse */
             $httpResponse = $client->request(Request::METHOD_GET, $url);
 
             try {
