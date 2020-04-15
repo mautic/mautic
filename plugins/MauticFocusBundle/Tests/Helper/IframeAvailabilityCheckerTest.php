@@ -35,7 +35,8 @@ class IframeAvailabilityCheckerTest extends \PHPUnit\Framework\TestCase
 
     public function testCheckProtocolMismatch(): void
     {
-        $currentScheme           = 'https://';
+        $currentScheme           = 'https';
+        $url                     = 'http://google.com';
         $translatedErrorMessage  = 'error';
         $expectedResponseContent = [
             'status'       => 0,
@@ -47,13 +48,13 @@ class IframeAvailabilityCheckerTest extends \PHPUnit\Framework\TestCase
             ->with(
                     'mautic.focus.protocol.mismatch',
                     [
-                        '%currentScheme%' => $currentScheme,
+                        '%url%' => str_replace('http://', 'https://', $url),
                     ]
                 )
             ->willReturn($translatedErrorMessage);
 
         /** @var JsonResponse $response */
-        $response = $this->helper->check('http://google.com', 'https://');
+        $response = $this->helper->check($url, $currentScheme);
 
         $responseBody = json_decode($response->getContent(), true);
         $this->assertEquals($expectedResponseContent, $responseBody);
