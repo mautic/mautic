@@ -76,7 +76,7 @@ class Webhook extends FormEntity
     private $removedEvents = [];
 
     /**
-     * @var
+     * @var array
      */
     private $payload;
 

@@ -15,9 +15,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class Stat.
- */
 class Stat
 {
     // Used for querying stats
@@ -50,9 +47,6 @@ class Stat
      */
     private $dateAdded;
 
-    /**
-     * @var
-     */
     private $lead;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)

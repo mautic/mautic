@@ -14,9 +14,6 @@ namespace Mautic\CoreBundle\Event;
 use Mautic\CoreBundle\Menu\MenuHelper;
 use Symfony\Component\EventDispatcher\Event;
 
-/**
- * Class MenuEvent.
- */
 class MenuEvent extends Event
 {
     /**
@@ -25,20 +22,16 @@ class MenuEvent extends Event
     protected $menuItems = ['children' => []];
 
     /**
-     * @var
+     * @var string
      */
     protected $type;
 
     /**
-     * Menu helper.
-     *
      * @var MenuHelper
      */
     protected $helper;
 
     /**
-     * MenuEvent constructor.
-     *
      * @param string $type
      */
     public function __construct(MenuHelper $menuHelper, $type = 'main')

@@ -16,9 +16,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Asset\Packages;
 
-/**
- * Class AssetsHelper.
- */
 class AssetsHelper
 {
     /**
@@ -37,7 +34,7 @@ class AssetsHelper
     protected $assetHelper;
 
     /**
-     * @var
+     * @var string
      */
     protected $context = self::CONTEXT_APP;
 
@@ -49,7 +46,7 @@ class AssetsHelper
     ];
 
     /**
-     * @var
+     * @var string|null
      */
     protected $version;
 
@@ -59,7 +56,7 @@ class AssetsHelper
     protected $packages;
 
     /**
-     * @var
+     * @var string
      */
     protected $siteUrl;
 
@@ -68,9 +65,6 @@ class AssetsHelper
      */
     protected $pathsHelper;
 
-    /**
-     * AssetsHelper constructor.
-     */
     public function __construct(Packages $packages)
     {
         $this->packages = $packages;
@@ -100,11 +94,11 @@ class AssetsHelper
     /**
      * Set asset url path.
      *
-     * @param string     $path
-     * @param null       $packageName
-     * @param null       $version
-     * @param bool|false $absolute
-     * @param bool|false $ignorePrefix
+     * @param string      $path
+     * @param string|null $packageName
+     * @param string|null $version
+     * @param bool|false  $absolute
+     * @param bool|false  $ignorePrefix
      *
      * @return string
      */

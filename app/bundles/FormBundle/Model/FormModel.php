@@ -30,7 +30,7 @@ use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\FormFieldHelper as ContactFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -66,11 +66,6 @@ class FormModel extends CommonFormModel
     protected $formFieldModel;
 
     /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
      * @var FormFieldHelper
      */
     protected $fieldHelper;
@@ -84,6 +79,11 @@ class FormModel extends CommonFormModel
      * @var FormUploader
      */
     private $formUploader;
+
+    /**
+     * @var ContactTracker
+     */
+    private $contactTracker;
 
     /**
      * @var ColumnSchemaHelper
@@ -104,24 +104,24 @@ class FormModel extends CommonFormModel
         ThemeHelper $themeHelper,
         ActionModel $formActionModel,
         FieldModel $formFieldModel,
-        LeadModel $leadModel,
         FormFieldHelper $fieldHelper,
         LeadFieldModel $leadFieldModel,
         FormUploader $formUploader,
+        ContactTracker $contactTracker,
         ColumnSchemaHelper $columnSchemaHelper,
         TableSchemaHelper $tableSchemaHelper
     ) {
-        $this->request             = $requestStack->getCurrentRequest();
-        $this->templatingHelper    = $templatingHelper;
-        $this->themeHelper         = $themeHelper;
-        $this->formActionModel     = $formActionModel;
-        $this->formFieldModel      = $formFieldModel;
-        $this->leadModel           = $leadModel;
-        $this->fieldHelper         = $fieldHelper;
-        $this->leadFieldModel      = $leadFieldModel;
-        $this->formUploader        = $formUploader;
-        $this->columnSchemaHelper  = $columnSchemaHelper;
-        $this->tableSchemaHelper   = $tableSchemaHelper;
+        $this->request                = $requestStack->getCurrentRequest();
+        $this->templatingHelper       = $templatingHelper;
+        $this->themeHelper            = $themeHelper;
+        $this->formActionModel        = $formActionModel;
+        $this->formFieldModel         = $formFieldModel;
+        $this->fieldHelper            = $fieldHelper;
+        $this->leadFieldModel         = $leadFieldModel;
+        $this->formUploader           = $formUploader;
+        $this->contactTracker         = $contactTracker;
+        $this->columnSchemaHelper     = $columnSchemaHelper;
+        $this->tableSchemaHelper      = $tableSchemaHelper;
     }
 
     /**
@@ -492,7 +492,7 @@ class FormModel extends CommonFormModel
         //generate cached HTML
         $theme       = $entity->getTemplate();
         $submissions = null;
-        $lead        = ($this->request) ? $this->leadModel->getCurrentLead() : null;
+        $lead        = ($this->request) ? $this->contactTracker->getContact() : null;
         $style       = '';
 
         if (!empty($theme)) {
@@ -836,7 +836,7 @@ class FormModel extends CommonFormModel
             return;
         }
 
-        $lead = $this->leadModel->getCurrentLead();
+        $lead = $this->contactTracker->getContact();
         if (!$lead instanceof Lead) {
             return;
         }
@@ -1116,6 +1116,9 @@ class FormModel extends CommonFormModel
 
         if (!empty($list)) {
             $formFieldProps['list'] = ['list' => $list];
+            if (array_key_exists('optionlist', $formFieldProps)) {
+                $formFieldProps['optionlist'] = ['list' => $list];
+            }
             $formField->setProperties($formFieldProps);
         }
     }

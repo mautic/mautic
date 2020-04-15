@@ -97,28 +97,30 @@ $hasFeatureErrors =
     <div class="tab-pane fade <?php if (isset($activeTab) && 'details-container' == $activeTab): echo 'in active'; endif; ?> bdr-w-0" id="details-container">
         <?php echo $view['form']->row($form['isPublished']); ?>
         <?php echo $view['form']->rowIfExists($form, 'virtual'); ?>
-        <?php echo $view['form']->row($form['apiKeys']); ?>
-        <?php if (isset($formNotes['authorization'])): ?>
-            <div class="alert alert-<?php echo $formNotes['authorization']['type']; ?>">
-                <?php echo $view['translator']->trans($formNotes['authorization']['note']); ?>
-            </div>
-        <?php endif; ?>
-        <?php if (count($form['apiKeys']) && !empty($callbackUrl)): ?>
-            <div class="well well-sm">
-                <?php echo $view['translator']->trans('mautic.integration.callbackuri'); ?><br/>
-                <input type="text" readonly onclick="this.setSelectionRange(0, this.value.length);" value="<?php echo $view->escape($callbackUrl); ?>" class="form-control"/>
-            </div>
-        <?php endif; ?>
-        <?php if (isset($form['authButton'])): ?>
-            <div class="row">
-                <div class="col-xs-12 text-center">
-                    <?php
-                    $attr          = $form['authButton']->vars['attr'];
-                    $attr['class'] = 'btn btn-success btn-lg';
-                    echo $view['form']->widget($form['authButton'], ['attr' => $attr]);
-                    ?>
+        <?php if (isset($form['apiKeys'])): ?>
+            <?php echo $view['form']->row($form['apiKeys']); ?>
+            <?php if (isset($formNotes['authorization'])): ?>
+                <div class="alert alert-<?php echo $formNotes['authorization']['type']; ?>">
+                    <?php echo $view['translator']->trans($formNotes['authorization']['note']); ?>
                 </div>
-            </div>
+            <?php endif; ?>
+            <?php if (count($form['apiKeys']) && !empty($callbackUrl)): ?>
+                <div class="well well-sm">
+                    <?php echo $view['translator']->trans('mautic.integration.callbackuri'); ?><br/>
+                    <input type="text" readonly onclick="this.setSelectionRange(0, this.value.length);" value="<?php echo $view->escape($callbackUrl); ?>" class="form-control"/>
+                </div>
+            <?php endif; ?>
+            <?php if (isset($form['authButton'])): ?>
+                <div class="row">
+                    <div class="col-xs-12 text-center">
+                        <?php
+                        $attr          = $form['authButton']->vars['attr'];
+                        $attr['class'] = 'btn btn-success btn-lg';
+                        echo $view['form']->widget($form['authButton'], ['attr' => $attr]);
+                        ?>
+                    </div>
+                </div>
+            <?php endif; ?>
         <?php endif; ?>
         <?php if (isset($formNotes['custom'])):
             if (is_string($formNotes['custom'])):

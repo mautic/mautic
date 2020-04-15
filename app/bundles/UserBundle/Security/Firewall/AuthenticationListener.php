@@ -46,9 +46,6 @@ class AuthenticationListener implements ListenerInterface
      */
     protected $authenticationManager;
 
-    /**
-     * @var
-     */
     protected $providerKey;
 
     /**

@@ -21,23 +21,20 @@ class MauticSocialMonitoringCommand extends ContainerAwareCommand
 {
     protected $batchSize;
 
-    /**
-     * @var \MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository;
-     */
     protected $monitorRepo;
 
     /**
-     * @var
+     * @var int|null
      */
     protected $maxPerIterations;
 
     /**
-     * @var
+     * @var OutputInterface
      */
     protected $output;
 
     /**
-     * @var
+     * @var InputInterface
      */
     protected $input;
 

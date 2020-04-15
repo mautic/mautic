@@ -93,7 +93,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $pathsHelper,
             $notificationModel,
             $fieldModel,
-            $integrationEntityModel
+            $integrationEntityModel,
+            $doNotContactModel
         );
     }
 
@@ -538,8 +539,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         $object,
                         'lead',
                         null,
-                        $startDate->format('Y-m-d H:m:s'),
-                        $endDate->format('Y-m-d H:m:s'),
+                        $startDate->format('Y-m-d H:i:s'),
+                        $endDate->format('Y-m-d H:i:s'),
                         true,
                         $start,
                         $limit
@@ -588,8 +589,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             $object,
                             'lead',
                             null,
-                            $startDate->format('Y-m-d H:m:s'),
-                            $endDate->format('Y-m-d H:m:s'),
+                            $startDate->format('Y-m-d H:i:s'),
+                            $endDate->format('Y-m-d H:i:s'),
                             true,
                             $start,
                             $limit

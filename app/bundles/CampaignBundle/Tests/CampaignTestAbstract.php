@@ -19,8 +19,8 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 
 class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
 {
@@ -57,10 +57,6 @@ class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
             ->method('getFormList')
             ->will($this->returnValue([['id' => self::$mockId, 'name' => self::$mockName]]));
 
-        $leadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $leadListModel = $this->getMockBuilder(ListModel::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -80,9 +76,10 @@ class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
         $eventCollector    = $this->createMock(EventCollector::class);
         $membershipBuilder = $this->createMock(MembershipBuilder::class);
 
-        $campaignModel = new CampaignModel($leadModel, $leadListModel, $formModel, $eventCollector, $membershipBuilder);
+        $contactTracker = $this->createMock(ContactTracker::class);
 
-        $leadModel->setEntityManager($entityManager);
+        $campaignModel = new CampaignModel($leadListModel, $formModel, $eventCollector, $membershipBuilder, $contactTracker);
+
         $leadListModel->setEntityManager($entityManager);
         $formModel->setEntityManager($entityManager);
         $campaignModel->setEntityManager($entityManager);

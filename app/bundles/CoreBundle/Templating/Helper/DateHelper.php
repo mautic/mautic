@@ -23,18 +23,16 @@ class DateHelper extends Helper
     protected $formats;
 
     /**
-     * @var \Mautic\CoreBundle\Helper\DateTimeHelper
+     * @var DateTimeHelper
      */
     protected $helper;
 
     /**
-     * @var
+     * @var TranslatorInterface
      */
     protected $translator;
 
     /**
-     * DateHelper constructor.
-     *
      * @param string $dateFullFormat
      * @param string $dateShortFormat
      * @param string $dateOnlyFormat

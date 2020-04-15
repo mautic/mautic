@@ -95,7 +95,7 @@ class TokenHelper
             $value = $lead['companies'][0][$alias];
         }
 
-        if ($value) {
+        if ('' !== $value) {
             switch ($defaultValue) {
                 case 'true':
                     $value = urlencode($value);
@@ -127,7 +127,7 @@ class TokenHelper
         if (in_array($defaultValue, ['true', 'date', 'time', 'datetime'])) {
             return $value;
         } else {
-            return $value ?: $defaultValue;
+            return '' !== $value ? $value : $defaultValue;
         }
     }
 

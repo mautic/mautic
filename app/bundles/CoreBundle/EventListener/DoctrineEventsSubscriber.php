@@ -16,31 +16,26 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Mautic\CoreBundle\Entity\DeprecatedInterface;
 
-/**
- * Class DoctrineEventsSubscriber.
- */
 class DoctrineEventsSubscriber implements EventSubscriber
 {
+    /**
+     * @var string
+     */
     private $tablePrefix;
 
     /**
-     * @var
+     * @var array
      */
     private $deprecatedEntityTables = [];
 
     /**
-     * DoctrineEventsSubscriber constructor.
-     *
-     * @param $tablePrefix
+     * @param string $tablePrefix
      */
     public function __construct($tablePrefix)
     {
         $this->tablePrefix = $tablePrefix;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSubscribedEvents()
     {
         return [

@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 
 class DefaultAvatarHelper
@@ -26,13 +25,10 @@ class DefaultAvatarHelper
         $this->assetsHelper = $assetsHelper;
     }
 
-    /**
-     * @param bool|false $absolute
-     */
     public function getDefaultAvatar(bool $absolute = false): string
     {
-        $img = $this->pathsHelper->getSystemPath('assets', $absolute).'/images/avatar.png';
+        $img = $this->pathsHelper->getSystemPath('assets').'/images/avatar.png';
 
-        return UrlHelper::rel2abs($this->assetsHelper->getUrl($img));
+        return $this->assetsHelper->getUrl($img, null, null, $absolute);
     }
 }
