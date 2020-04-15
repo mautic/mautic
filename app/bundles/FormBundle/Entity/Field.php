@@ -8,6 +8,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
+use Mautic\FormBundle\Entity\FieldRepository;
 use Mautic\LeadBundle\Entity\Lead;
 
 class Field
@@ -150,6 +151,16 @@ class Field
     private $parent;
 
     /**
+     * @var string
+     */
+    private $mappedObject;
+
+    /**
+     * @var string
+     */
+    private $mappedField;
+
+    /**
      * Reset properties on clone.
      */
     public function __clone()
@@ -163,62 +174,23 @@ class Field
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('form_fields')
-            ->setCustomRepositoryClass('Mautic\FormBundle\Entity\FieldRepository')
+            ->setCustomRepositoryClass(FieldRepository::class)
             ->addIndex(['type'], 'form_field_type_search');
 
         $builder->addId();
-
-        $builder->addField('label', 'text');
-
-        $builder->createField('showLabel', 'boolean')
-            ->columnName('show_label')
-            ->nullable()
-            ->build();
-
-        $builder->addField('alias', 'string');
-
-        $builder->addField('type', 'string');
-
-        $builder->createField('isCustom', 'boolean')
-            ->columnName('is_custom')
-            ->build();
-
-        $builder->createField('customParameters', 'array')
-            ->columnName('custom_parameters')
-            ->nullable()
-            ->build();
-
-        $builder->createField('defaultValue', 'text')
-            ->columnName('default_value')
-            ->nullable()
-            ->build();
-
-        $builder->createField('isRequired', 'boolean')
-            ->columnName('is_required')
-            ->build();
-
-        $builder->createField('validationMessage', 'text')
-            ->columnName('validation_message')
-            ->nullable()
-            ->build();
-
-        $builder->createField('helpMessage', 'text')
-            ->columnName('help_message')
-            ->nullable()
-            ->build();
-
-        $builder->createField('order', 'integer')
-            ->columnName('field_order')
-            ->nullable()
-            ->build();
-
-        $builder->createField('properties', 'array')
-            ->nullable()
-            ->build();
-
-        $builder->createField('validation', 'json_array')
-            ->nullable()
-            ->build();
+        $builder->addField('label', Types::TEXT);
+        $builder->addNullableField('showLabel', Types::BOOLEAN, 'show_label');
+        $builder->addField('alias', Types::STRING);
+        $builder->addField('type', Types::STRING);
+        $builder->addNamedField('isCustom', Types::BOOLEAN, 'is_custom');
+        $builder->addNullableField('customParameters', Types::ARRAY, 'custom_parameters');
+        $builder->addNullableField('defaultValue', Types::TEXT, 'default_value');
+        $builder->addNamedField('isRequired', Types::BOOLEAN, 'is_required');
+        $builder->addNullableField('validationMessage', Types::TEXT, 'validation_message');
+        $builder->addNullableField('helpMessage', Types::TEXT, 'help_message');
+        $builder->addNullableField('order', Types::INTEGER, 'field_order');
+        $builder->addNullableField('properties', Types::ARRAY);
+        $builder->addNullableField('validation', Types::JSON);
 
         $builder->addNullableField('parent', 'string', 'parent_id');
         $builder->addNullableField('conditions', 'json_array');
@@ -228,23 +200,17 @@ class Field
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->addNullableField('labelAttributes', 'string', 'label_attr');
-
-        $builder->addNullableField('inputAttributes', 'string', 'input_attr');
-
-        $builder->addNullableField('containerAttributes', 'string', 'container_attr');
-
-        $builder->addNullableField('leadField', 'string', 'lead_field');
-
-        $builder->addNullableField('saveResult', 'boolean', 'save_result');
-
-        $builder->addNullableField('isAutoFill', 'boolean', 'is_auto_fill');
-
-        $builder->addNullableField('showWhenValueExists', 'boolean', 'show_when_value_exists');
-
-        $builder->addNullableField('showAfterXSubmissions', 'integer', 'show_after_x_submissions');
-
+        $builder->addNullableField('labelAttributes', Types::STRING, 'label_attr');
+        $builder->addNullableField('inputAttributes', Types::STRING, 'input_attr');
+        $builder->addNullableField('containerAttributes', Types::STRING, 'container_attr');
+        $builder->addNullableField('leadField', Types::STRING, 'lead_field');
+        $builder->addNullableField('saveResult', Types::BOOLEAN, 'save_result');
+        $builder->addNullableField('isAutoFill', Types::BOOLEAN, 'is_auto_fill');
+        $builder->addNullableField('showWhenValueExists', Types::BOOLEAN, 'show_when_value_exists');
+        $builder->addNullableField('showAfterXSubmissions', Types::INTEGER, 'show_after_x_submissions');
         $builder->addNullableField('alwaysDisplay', Types::BOOLEAN, 'always_display');
+        $builder->addNullableField('mappedObject', Types::STRING, 'mapped_object');
+        $builder->addNullableField('mappedField', Types::STRING, 'mapped_field');
     }
 
     /**
@@ -274,17 +240,19 @@ class Field
                     'labelAttributes',
                     'inputAttributes',
                     'containerAttributes',
-                    'leadField',
+                    'leadField', // @deprecated, to be removed in Mautic 4. Use mappedObject and mappedField instead.
                     'saveResult',
                     'isAutoFill',
+                    'mappedObject',
+                    'mappedField',
                 ]
             )
             ->build();
     }
 
     /**
-     * @param $prop
-     * @param $val
+     * @param string $prop
+     * @param mixed  $val
      */
     private function isChanged($prop, $val)
     {
@@ -547,8 +515,6 @@ class Field
     }
 
     /**
-     * Set form.
-     *
      * @return Field
      */
     public function setForm(Form $form)
@@ -569,8 +535,6 @@ class Field
     }
 
     /**
-     * Set labelAttributes.
-     *
      * @param string $labelAttributes
      *
      * @return Field
@@ -584,8 +548,6 @@ class Field
     }
 
     /**
-     * Get labelAttributes.
-     *
      * @return string
      */
     public function getLabelAttributes()
@@ -594,8 +556,6 @@ class Field
     }
 
     /**
-     * Set inputAttributes.
-     *
      * @param string $inputAttributes
      *
      * @return Field
@@ -609,8 +569,6 @@ class Field
     }
 
     /**
-     * Get inputAttributes.
-     *
      * @return string
      */
     public function getInputAttributes()
@@ -647,8 +605,6 @@ class Field
     }
 
     /**
-     * Set showLabel.
-     *
      * @param bool $showLabel
      *
      * @return Field
@@ -662,8 +618,6 @@ class Field
     }
 
     /**
-     * Get showLabel.
-     *
      * @return bool
      */
     public function getShowLabel()
@@ -682,8 +636,6 @@ class Field
     }
 
     /**
-     * Set helpMessage.
-     *
      * @param string $helpMessage
      *
      * @return Field
@@ -697,8 +649,6 @@ class Field
     }
 
     /**
-     * Get helpMessage.
-     *
      * @return string
      */
     public function getHelpMessage()
@@ -707,8 +657,6 @@ class Field
     }
 
     /**
-     * Set isCustom.
-     *
      * @param bool $isCustom
      *
      * @return Field
@@ -721,8 +669,6 @@ class Field
     }
 
     /**
-     * Get isCustom.
-     *
      * @return bool
      */
     public function getIsCustom()
@@ -741,8 +687,6 @@ class Field
     }
 
     /**
-     * Set customParameters.
-     *
      * @param array $customParameters
      *
      * @return Field
@@ -755,8 +699,6 @@ class Field
     }
 
     /**
-     * Get customParameters.
-     *
      * @return array
      */
     public function getCustomParameters()
@@ -781,6 +723,8 @@ class Field
     }
 
     /**
+     * @deprecated, to be removed in Mautic 4. Use mappedObject and mappedField instead.
+     *
      * @return mixed
      */
     public function getLeadField()
@@ -789,6 +733,8 @@ class Field
     }
 
     /**
+     * @deprecated, to be removed in Mautic 4. Use mappedObject and mappedField instead.
+     *
      * @param mixed $leadField
      */
     public function setLeadField($leadField)
@@ -892,7 +838,7 @@ class Field
             }
 
             // Hide the field if the value is already known from the lead profile
-            if (null !== $lead && $this->leadField && !empty($lead->getFieldValue($this->leadField)) && !$this->isAutoFill) {
+            if (null !== $lead && $this->leadField && !empty($lead->getFieldValue($this->leadField)) && !$this->isAutoFill) { // @todo make this work for all object fields
                 return false;
             }
         }
@@ -1035,5 +981,25 @@ class Field
         }
 
         return null;
+    }
+
+    public function getMappedObject(): ?string
+    {
+        return $this->mappedObject;
+    }
+
+    public function setMappedObject(?string $mappedObject)
+    {
+        $this->mappedObject = $mappedObject;
+    }
+
+    public function getMappedField(): ?string
+    {
+        return $this->mappedField;
+    }
+
+    public function setMappedField(?string $mappedField)
+    {
+        $this->mappedField = $mappedField;
     }
 }
