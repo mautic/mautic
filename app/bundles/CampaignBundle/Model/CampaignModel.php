@@ -28,18 +28,13 @@ use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class CampaignModel extends CommonFormModel
 {
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
     /**
      * @var ListModel
      */
@@ -60,18 +55,23 @@ class CampaignModel extends CommonFormModel
      */
     private $membershipBuilder;
 
+    /**
+     * @var ContactTracker
+     */
+    private $contactTracker;
+
     public function __construct(
-        LeadModel $leadModel,
         ListModel $leadListModel,
         FormModel $formModel,
         EventCollector $eventCollector,
-        MembershipBuilder $membershipBuilder
+        MembershipBuilder $membershipBuilder,
+        ContactTracker $contactTracker
     ) {
-        $this->leadModel         = $leadModel;
         $this->leadListModel     = $leadListModel;
         $this->formModel         = $formModel;
         $this->eventCollector    = $eventCollector;
         $this->membershipBuilder = $membershipBuilder;
+        $this->contactTracker    = $contactTracker;
     }
 
     /**
@@ -573,7 +573,7 @@ class CampaignModel extends CommonFormModel
         static $campaigns = [];
 
         if (null === $lead) {
-            $lead = $this->leadModel->getCurrentLead();
+            $lead = $this->contactTracker->getContact();
         }
 
         if (!isset($campaigns[$lead->getId()])) {

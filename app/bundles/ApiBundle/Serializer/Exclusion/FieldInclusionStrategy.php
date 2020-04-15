@@ -33,9 +33,6 @@ class FieldInclusionStrategy implements ExclusionStrategyInterface
      */
     private $level;
 
-    /**
-     * @var
-     */
     private $path;
 
     /**

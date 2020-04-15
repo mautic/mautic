@@ -587,7 +587,7 @@ class ThemeHelper
         $themes = $this->getInstalledThemes('all', true);
         foreach ($themes as $theme) {
             // Already handled the default
-            if ($theme['name'] === $defaultTheme->getTheme()) {
+            if ($theme['key'] === $defaultTheme->getTheme()) {
                 continue;
             }
 

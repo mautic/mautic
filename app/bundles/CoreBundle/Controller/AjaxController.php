@@ -15,8 +15,11 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Event\UpgradeEvent;
+use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\UpdateHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
@@ -367,7 +370,7 @@ class AjaxController extends CommonController
         $package = $updateHelper->fetchPackage($update['package']);
 
         /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
-        $cookieHelper = $this->factory->getHelper('cookie');
+        $cookieHelper = $this->container->get('mautic.helper.cookie');
 
         if ($package['error']) {
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
@@ -400,15 +403,18 @@ class AjaxController extends CommonController
         $dataArray  = ['success' => 0];
         $translator = $this->translator;
 
-        /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
+        /** @var UpdateHelper $updateHelper */
         $updateHelper = $this->container->get('mautic.helper.update');
 
-        /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
+        /** @var CookieHelper $cookieHelper */
         $cookieHelper = $this->container->get('mautic.helper.cookie');
+
+        /** @var PathsHelper $pathsHelper */
+        $pathsHelper = $this->container->get('mautic.helper.paths');
 
         // Fetch the package data
         $update  = $updateHelper->fetchData();
-        $zipFile = $this->factory->getSystemPath('cache').'/'.basename($update['package']);
+        $zipFile = $pathsHelper->getSystemPath('cache').'/'.basename($update['package']);
 
         $zipper  = new \ZipArchive();
         $archive = $zipper->open($zipFile);
@@ -560,7 +566,7 @@ class AjaxController extends CommonController
             $result = $application->run($input, $output);
         }
 
-        /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
+        /** @var CookieHelper $cookieHelper */
         $cookieHelper = $this->container->get('mautic.helper.cookie');
 
         if (0 !== $result) {
@@ -582,7 +588,7 @@ class AjaxController extends CommonController
         } else {
             // A way to keep the upgrade from failing if the session is lost after
             // the cache is cleared by upgrade.php
-            /* @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
+            /* @var CookieHelper $cookieHelper */
             $cookieHelper->setCookie('mautic_update', 'schemaMigration', 300);
 
             if ($request->get('finalize', false)) {
@@ -627,7 +633,7 @@ class AjaxController extends CommonController
 
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php
-        /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
+        /** @var CookieHelper $cookieHelper */
         $cookieHelper = $this->container->get('mautic.helper.cookie');
         $cookieHelper->deleteCookie('mautic_update');
 
@@ -635,28 +641,6 @@ class AjaxController extends CommonController
         $dataArray['redirect'] = $this->container->get('router')->generate('mautic_core_update');
 
         return $this->sendJsonResponse($dataArray);
-    }
-
-    /**
-     * @return JsonResponse
-     */
-    protected function updateUserStatusAction(Request $request)
-    {
-        $status = InputHelper::clean($request->request->get('status'));
-
-        /** @var \Mautic\UserBundle\Model\UserModel $model */
-        $model = $this->getModel('user');
-
-        $currentStatus = $this->user->getOnlineStatus();
-        if (!in_array($currentStatus, ['manualaway', 'dnd'])) {
-            if ('back' == $status) {
-                $status = 'online';
-            }
-
-            $model->setOnlineStatus($status);
-        }
-
-        return $this->sendJsonResponse(['success' => 1]);
     }
 
     /**

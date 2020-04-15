@@ -4,6 +4,10 @@ language: php
 services:
   - mysql
 
+notifications:
+    webhooks: https://www.travisbuddy.com/
+    on_success: never
+
 php:
   - 7.2
   - 7.3

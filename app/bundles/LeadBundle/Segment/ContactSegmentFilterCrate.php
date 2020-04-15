@@ -51,14 +51,8 @@ class ContactSegmentFilterCrate
      */
     private $sourceArray;
 
-    /**
-     * @var
-     */
     private $nullValue;
 
-    /**
-     * ContactSegmentFilterCrate constructor.
-     */
     public function __construct(array $filter)
     {
         $this->glue        = isset($filter['glue']) ? $filter['glue'] : null;
