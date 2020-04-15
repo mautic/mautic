@@ -190,6 +190,10 @@ trait EntityFieldsBuildFormTrait
                 case SelectType::class:
                 case MultiselectType::class:
                 case BooleanType::class:
+                    if (MultiselectType::class === $type) {
+                        $constraints[] = new Length(['max' => 65535]);
+                    }
+
                     $typeProperties = [
                         'required'    => $required,
                         'label'       => $field['label'],
@@ -261,8 +265,9 @@ trait EntityFieldsBuildFormTrait
                         case TextType::class:
                             $constraints[] = new Length(['max' => 191]);
                             break;
+
                         case MultiselectType::class:
-                            $constraints[] = new Length(['max' => 191]);
+                            $constraints[] = new Length(['max' => 65535]);
                             break;
                         break;
                     }

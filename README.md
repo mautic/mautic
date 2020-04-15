@@ -1,6 +1,6 @@
 Mautic Introduction
 ===========
-![Mautic](https://www.mautic.org/media/images/github_readme.png "Mautic Open Source Marketing Automation")
+![Mautic](.github/readme_image.png "Mautic Open Source Marketing Automation")
 
 ## Supported Versions
 Please note that the release dates indicated with * below are *estimations*, no rights can be derived from them.
@@ -17,7 +17,7 @@ Please note that the release dates indicated with * below are *estimations*, no 
 
 The GitHub version is recommended for development or testing. Production package ready for install with all the libraries is at [https://www.mautic.org/download](https://www.mautic.org/download).
 
-Documentation on how to use Mautic is available at [https://www.mautic.org/docs](https://www.mautic.org/docs).
+Documentation on how to use Mautic is available at [https://docs.mautic.org](https://docs.mautic.org).
 
 This is a simple 3 step installation process. You'll want to make sure you already have [Composer](http://getcomposer.org) available on your computer as this is a development release and you'll need to use Composer to download the vendor packages.
 
@@ -46,16 +46,17 @@ This is a simple 3 step installation process. You'll want to make sure you alrea
 	</tr>
 </table>
 
-**Get stuck?** *No problem. Check out [general troubleshooting](https://mautic.org/docs/en/tips/troubleshooting.html) and if it won't solve your issue join us at the <a href="https://www.mautic.org/community">Mautic community</a> for help and answers.*
+**Get stuck?** *No problem. Check out [general troubleshooting](https://docs.mautic.org/en/troubleshooting) and if it won't solve your issue join us at the <a href="https://www.mautic.org/community">Mautic community</a> for help and answers.*
 
 ## Disclaimer
 Installing from source is only recommended if you are comfortable using the command line. You'll be required to use various CLI commands to get Mautic working and to keep it working. If the source and/or database schema gets out of sync with Mautic's releases, the release updater may not work and will require manual updates. For production the pre-packaged Mautic available at [mautic.org/download](https://www.mautic.org/download) is recommended.
 
 *Also note that the source outside <a href="https://github.com/mautic/mautic/releases">a tagged release</a> should be considered "alpha" and may contain bugs, cause unexpected results, data corruption or loss, and is not recommended for use in a production environment. Use at your own risk.*
 
-## Requirements
+## Ready to Install from Source and/or Contribute?
+That's fantastic! 
 
-#### Contributor Agreement 
+If you want to contribute to Mautic's **code**, please read our [CONTRIBUTING.md](https://github.com/mautic/mautic/blob/staging/.github/CONTRIBUTING.md) or [Contributing Code](https://contribute.mautic.org/about/how-can-i-contribute/developer) docs. Then, check out the issues with the [L1 label](https://github.com/mautic/mautic/issues?q=is%3Aissue+is%3Aopen+label%3AL1) to get started quickly :rocket:
 
 By contributing to this project, you accept and agree to the [Contributor Agreement](https://www.mautic.org/contributor-agreement) in its entirety.
 
@@ -217,16 +218,10 @@ Mautic uses [PHPSTAN](https://github.com/phpstan/phpstan) for static analysis. R
 ## FAQ and Contact Information
 Marketing automation has historically been a difficult tool to implement in a business. The Mautic community is a rich environment for you to learn from others and share your knowledge as well. Open source means more than open code. Open source is providing equality for all and a chance to improve. If you have questions then the Mautic community can help provide the answers.
 
-**Ready to get started with the community?** You can get <a href="https://www.mautic.org/get-involved">more involved</a> on the <a href="https://www.mautic.org">Mautic</a> website. Or follow Mautic on social media just to stay current with what's happening!
+**Ready to get started with the community?** You can get <a href="https://www.mautic.org/community/get-involved">more involved</a> on the <a href="https://www.mautic.org">Mautic</a> website. Or follow Mautic on social media just to stay current with what's happening!
 
 ### Contact Info
 
 * <a href="https://www.mautic.org">https://www.mautic.org</a>
 * <a href="https://twitter.com/MauticCommunity">@MauticCommunity</a> [Twitter]
 * <a href="https://www.facebook.com/MauticCommunity/">@MauticCommunity</a> [Facebook]
-* <a href="https://plus.google.com/+MauticOrg">+MauticOrg</a> [Google+]
-
-### Developers
-
-We love testing our user interface on as many platforms as possible (even those browsers we prefer to not mention). In order to help us do this we use and recommend BrowserStack.
-[<img src="https://www.mautic.org/media/browserstack_small.png" />](https://www.browserstack.com/)

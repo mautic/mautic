@@ -37,6 +37,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
@@ -72,22 +73,23 @@ class FormTestAbstract extends WebTestCase
         $themeHelper          = $this->createMock(ThemeHelper::class);
         $formActionModel      = $this->createMock(ActionModel::class);
         $formFieldModel       = $this->createMock(FieldModel::class);
-        $leadModel            = $this->createMock(LeadModel::class);
         $fieldHelper          = $this->createMock(FormFieldHelper::class);
         $dispatcher           = $this->createMock(EventDispatcher::class);
         $translator           = $this->createMock(Translator::class);
         $entityManager        = $this->createMock(EntityManager::class);
         $formUploaderMock     = $this->createMock(FormUploader::class);
+        $contactTracker       = $this->createMock(ContactTracker::class);
         $this->leadFieldModel = $this->createMock(LeadFieldModel::class);
         $this->formRepository = $this->createMock(FormRepository::class);
         $columnSchemaHelper   = $this->createMock(ColumnSchemaHelper::class);
         $tableSchemaHelper    = $this->createMock(TableSchemaHelper::class);
 
-        $leadModel->expects($this
+        $contactTracker->expects($this
             ->any())
-            ->method('getCurrentLead')
+            ->method('getContact')
             ->willReturn($this
-                ->returnValue(['id' => self::$mockId, 'name' => self::$mockName]));
+                ->returnValue(['id' => self::$mockId, 'name' => self::$mockName])
+            );
 
         $templatingHelperMock->expects($this
             ->any())
@@ -111,10 +113,10 @@ class FormTestAbstract extends WebTestCase
             $themeHelper,
             $formActionModel,
             $formFieldModel,
-            $leadModel,
             $fieldHelper,
             $this->leadFieldModel,
             $formUploaderMock,
+            $contactTracker,
             $columnSchemaHelper,
             $tableSchemaHelper
         );
@@ -144,6 +146,7 @@ class FormTestAbstract extends WebTestCase
         $dispatcher               = $this->createMock(EventDispatcher::class);
         $translator               = $this->createMock(Translator::class);
         $dateHelper               = $this->createMock(DateHelper::class);
+        $contactTracker           = $this->createMock(ContactTracker::class);
         $userHelper               = $this->createMock(UserHelper::class);
         $entityManager            = $this->createMock(EntityManager::class);
         $formRepository           = $this->createMock(FormRepository::class);
@@ -153,15 +156,17 @@ class FormTestAbstract extends WebTestCase
         $formUploaderMock         = $this->createMock(FormUploader::class);
         $deviceTrackingService    = $this->createMock(DeviceTrackingServiceInterface::class);
         $file1Mock                = $this->createMock(UploadedFile::class);
+        $lead                     = new Lead();
+        $lead->setId(123);
 
         $leadFieldModel->expects($this->any())
             ->method('getUniqueIdentifierFields')
             ->willReturn(['eyJpc1B1Ymxpc2hlZCI6dHJ1ZSwiaXNVbmlxdWVJZGVudGlmZXIiOnRydWUsIm9iamVjdCI6ImxlYWQifQ==' => ['email' => 'Email']]);
 
-        $leadModel->expects($this->any())
-            ->method('getCurrentLead')
-            ->with($this->logicalOr(false, true))
-            ->will($this->returnCallback([$this, 'getCurrentLead']));
+        $contactTracker->expects($this
+            ->any())
+            ->method('getContact')
+            ->willReturn($lead);
 
         $userHelper->expects($this->any())
             ->method('getUser')
@@ -223,7 +228,8 @@ class FormTestAbstract extends WebTestCase
             $formUploaderMock,
             $deviceTrackingService,
             new FieldValueTransformer($this->container->get('router')),
-            $dateHelper
+            $dateHelper,
+            $contactTracker
         );
 
         $submissionModel->setDispatcher($dispatcher);
@@ -264,10 +270,5 @@ class FormTestAbstract extends WebTestCase
             ];
 
         return $fields;
-    }
-
-    public function getCurrentLead($tracking)
-    {
-        return $tracking ? [new Lead(), $this->mockTrackingId, true] : new Lead();
     }
 }

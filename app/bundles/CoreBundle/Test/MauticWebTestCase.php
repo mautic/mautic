@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 
 define('MAUTIC_TEST_ENV', 1);
 
@@ -37,7 +38,7 @@ class MauticWebTestCase extends WebTestCase
     protected $em;
 
     /**
-     * @var
+     * @var EncoderFactoryInterface
      */
     protected $encoder;
 

@@ -17,7 +17,6 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserToken;
 use Mautic\UserBundle\Enum\UserTokenAuthorizator;
-use Mautic\UserBundle\Event\StatusChangeEvent;
 use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\Form\Type\UserType;
 use Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface;
@@ -45,20 +44,6 @@ class UserModel extends FormModel
         $this->mailHelper       = $mailHelper;
         $this->userTokenService = $userTokenService;
     }
-
-    /**
-     * Define statuses that are supported.
-     *
-     * @var array
-     */
-    private $supportedOnlineStatuses = [
-        'online',
-        'idle',
-        'away',
-        'manualaway',
-        'dnd',
-        'offline',
-    ];
 
     /**
      * {@inheritdoc}
@@ -360,26 +345,6 @@ class UserModel extends FormModel
         $preferences = $user->getPreferences();
 
         return (isset($preferences[$key])) ? $preferences[$key] : $default;
-    }
-
-    /**
-     * @param $status
-     */
-    public function setOnlineStatus($status)
-    {
-        $status = strtolower($status);
-
-        if (in_array($status, $this->supportedOnlineStatuses)) {
-            if ($this->userHelper->getUser()->getId()) {
-                $this->userHelper->getUser()->setOnlineStatus($status);
-                $this->getRepository()->saveEntity($this->userHelper->getUser());
-
-                if ($this->dispatcher->hasListeners(UserEvents::STATUS_CHANGE)) {
-                    $event = new StatusChangeEvent($this->userHelper->getUser());
-                    $this->dispatcher->dispatch(UserEvents::STATUS_CHANGE, $event);
-                }
-            }
-        }
     }
 
     /**

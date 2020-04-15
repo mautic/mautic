@@ -100,14 +100,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
     private $lastActive;
 
     /**
-     * @var string
-     */
-    private $onlineStatus = 'offline';
-
-    /**
      * Stores active role permissions.
-     *
-     * @var
      */
     private $activePermissions;
 
@@ -196,11 +189,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
             ->nullable()
             ->build();
 
-        $builder->createField('onlineStatus', 'string')
-            ->columnName('online_status')
-            ->nullable()
-            ->build();
-
         $builder->createField('preferences', 'array')
             ->nullable()
             ->build();
@@ -278,8 +266,12 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
      */
     public static function determineValidationGroups(Form $form)
     {
-        $data   = $form->getData();
         $groups = ['User', 'SecondPass'];
+
+        $data   = $form->getData();
+        if (!is_object($data)) {
+            return $groups;
+        }
 
         //check if creating a new user or editing an existing user and the password has been updated
         if (!$data->getId() || ($data->getId() && $data->getPlainPassword())) {
@@ -314,7 +306,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
                     'locale',
                     'lastLogin',
                     'lastActive',
-                    'onlineStatus',
                     'signature',
                 ]
             )
@@ -801,22 +792,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
             $lastActive = new \DateTime();
         }
         $this->lastActive = $lastActive;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getOnlineStatus()
-    {
-        return $this->onlineStatus;
-    }
-
-    /**
-     * @param mixed $status
-     */
-    public function setOnlineStatus($status)
-    {
-        $this->onlineStatus = $status;
     }
 
     /**

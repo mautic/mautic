@@ -29,7 +29,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
     protected $db;
 
     /**
-     * @var
+     * @var string
      */
     protected $prefix;
 

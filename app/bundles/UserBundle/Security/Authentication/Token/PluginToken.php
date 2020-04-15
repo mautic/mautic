@@ -14,13 +14,10 @@ namespace Mautic\UserBundle\Security\Authentication\Token;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 
-/**
- * Class PluginToken.
- */
 class PluginToken extends AbstractToken
 {
     /**
-     * @var
+     * @var array|\Symfony\Component\Security\Core\Role\RoleInterface[]
      */
     protected $providerKey;
 
@@ -29,9 +26,6 @@ class PluginToken extends AbstractToken
      */
     protected $credentials;
 
-    /**
-     * @var
-     */
     protected $authenticatingService;
 
     /**

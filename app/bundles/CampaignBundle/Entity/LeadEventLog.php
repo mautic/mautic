@@ -17,13 +17,10 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 
-/**
- * Class LeadEventLog.
- */
 class LeadEventLog implements ChannelInterface
 {
     /**
-     * @var
+     * @var int|null
      */
     private $id;
 
@@ -83,13 +80,10 @@ class LeadEventLog implements ChannelInterface
     private $channel;
 
     /**
-     * @var
+     * @var int
      */
     private $channelId;
 
-    /**
-     * @var
-     */
     private $previousScheduledState;
 
     /**
@@ -215,7 +209,7 @@ class LeadEventLog implements ChannelInterface
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getId()
     {

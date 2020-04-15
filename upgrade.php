@@ -8,23 +8,9 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 ini_set('display_errors', 'Off');
 date_default_timezone_set('UTC');
-
-define('MAUTIC_MINIMUM_PHP', '7.2.21');
-define('MAUTIC_MAXIMUM_PHP', '7.3.999');
-
-// Are we running the minimum version?
-if (version_compare(PHP_VERSION, MAUTIC_MINIMUM_PHP, 'lt')) {
-    echo 'Your server does not meet the minimum PHP requirements. Mautic requires PHP version '.MAUTIC_MINIMUM_PHP.' while your server has '.PHP_VERSION.'. Please contact your host to update your PHP installation.'."\n";
-    exit;
-}
-
-// Are we running a version newer than what Mautic supports?
-if (version_compare(PHP_VERSION, MAUTIC_MAXIMUM_PHP, 'gt')) {
-    echo 'Mautic does not support PHP version '.PHP_VERSION.' at this time. To use Mautic, you will need to downgrade to an earlier version.'."\n";
-    exit;
-}
 
 $standalone = (int) getVar('standalone', 0);
 $task       = getVar('task');
@@ -40,6 +26,25 @@ if ($standalone || IN_CLI) {
     define('MAUTIC_UPGRADE_ROOT', __DIR__.'/upgrade');
 } else {
     define('MAUTIC_UPGRADE_ROOT', __DIR__);
+}
+
+// Fail-safe PHP version check
+if (file_exists(MAUTIC_UPGRADE_ROOT.'/app/release_metadata.json')) {
+    $metadata = json_decode(file_get_contents(MAUTIC_UPGRADE_ROOT.'/app/release_metadata.json'), true);
+
+    // Are we running the minimum version?
+    if (version_compare(PHP_VERSION, $metadata['minimum_php_version'], 'lt')) {
+        echo 'Your server does not meet the minimum PHP requirements. Mautic requires PHP version '.$metadata['minimum_php_version'].' while your server has '
+            .PHP_VERSION.'. Please contact your host to update your PHP installation.'."\n";
+        exit;
+    }
+
+    // Are we running a version newer than what Mautic supports?
+    if (version_compare(PHP_VERSION, $metadata['maximum_php_version'], 'gt')) {
+        echo 'Mautic does not support PHP version '.PHP_VERSION.' at this time. To use Mautic, you will need to downgrade to an earlier version.'
+            ."\n";
+        exit;
+    }
 }
 
 // Get local parameters
@@ -98,7 +103,7 @@ if (!IN_CLI) {
 
     switch ($task) {
         case '':
-            html_body("<div class='well text-center'><h3><a href='$url?task=startUpgrade&standalone=1'>Click here to start upgrade.</a></h3><br /><strong>Do not refresh or stop the process. This may take serveral minutes.</strong></div>");
+            html_body("<div class='well text-center'><h3><a href='$url?task=startUpgrade&standalone=1'>Click here to start upgrade.</a></h3><br /><strong>Do not refresh or stop the process. This may take several minutes.</strong></div>");
 
             // no break
         case 'startUpgrade':
@@ -106,7 +111,7 @@ if (!IN_CLI) {
             break;
 
         case 'fetchUpdates':
-            list($success, $message) = fetch_updates();
+            [$success, $message] = fetch_updates();
 
             if (!$success) {
                 html_body("<div alert='alert alert-danger'>$message</div>");
@@ -117,7 +122,7 @@ if (!IN_CLI) {
             break;
 
         case 'extractUpdate':
-            list($success, $message) = extract_package(getVar('version'));
+            [$success, $message] = extract_package(getVar('version'));
 
             if (!$success) {
                 html_body("<div alert='alert alert-danger'>$message</div>");
@@ -182,12 +187,6 @@ if (!IN_CLI) {
             $redirect = true;
             break;
 
-        case 'clearCache':
-            clear_mautic_cache();
-            $nextTask = 'buildCache';
-            $redirect = true;
-            break;
-
         case 'applyMigrations':
             // Apply critical migrations
             apply_migrations();
@@ -236,7 +235,7 @@ if (!IN_CLI) {
 } else {
     // CLI upgrade
     echo 'Checking for new updates...';
-    list($success, $message) = fetch_updates();
+    [$success, $message] = fetch_updates();
     if (!$success) {
         echo "failed. $message";
         exit;
@@ -245,7 +244,7 @@ if (!IN_CLI) {
     echo "updating to $version!\n";
 
     echo 'Extracting the update package...';
-    list($success, $message) = extract_package($version);
+    [$success, $message] = extract_package($version);
     if (!$success) {
         echo "failed. $message";
         exit;
@@ -588,7 +587,7 @@ function copy_directory($src, $dest)
 
     // Make sure the destination exists
     if (!is_dir($dest)) {
-        if (!@mkdir($dest, 0755, true)) {
+        if (!@mkdir($dest, 0777, true)) {
             return sprintf(
                 'Could not move files from %s to production since the folder could not be created.',
                 str_replace(MAUTIC_UPGRADE_ROOT, '', $src)

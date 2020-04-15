@@ -111,6 +111,7 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
                 $this->notificationModel,
                 $this->fieldModel,
                 $this->integrationEntityModel,
+                $this->doNotContact,
             ])
             ->setMethodsExcept(['getMauticCompany', 'setCompanyModel', 'setFieldModel', 'hydrateCompanyName'])
             ->getMock();
