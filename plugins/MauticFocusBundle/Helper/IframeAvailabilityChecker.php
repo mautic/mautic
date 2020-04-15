@@ -109,12 +109,12 @@ class IframeAvailabilityChecker
             $return = 'x-frame-options: SAMEORIGIN';
         }
 
-        if ($this->headerContains($headers, 'Content-Security-Policy', "frame-ancestors 'self'")) {
+        if ($this->headerContains($headers, 'content-security-policy', "frame-ancestors 'self'")) {
             // https://seznam.cz
             // Refused to display 'https://www.seznam.cz/' in a frame because an ancestor violates the following
             // Content Security Policy directive: "frame-ancestors 'self'".
             // @see https://stackoverflow.com/questions/31944552/iframe-refuses-to-display
-            $return = 'Content-Security-Policy';
+            $return = 'content-security-policy';
         }
 
         return $return;
@@ -122,9 +122,11 @@ class IframeAvailabilityChecker
 
     private function headerContains(array $headers, string $name, string $content = null): bool
     {
+        $headers = array_change_key_case($headers, CASE_LOWER);
+
         if (array_key_exists($name, $headers)) {
             if (null !== $content) {
-                if ($headers['name'] === $content) {
+                if (0 === strpos($headers[$name][0], $content)) {
                     return true;
                 } else {
                     return false;
