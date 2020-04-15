@@ -266,12 +266,8 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
      */
     public static function determineValidationGroups(Form $form)
     {
-        $groups = ['User', 'SecondPass'];
-
         $data   = $form->getData();
-        if (!is_object($data)) {
-            return $groups;
-        }
+        $groups = ['User', 'SecondPass'];
 
         //check if creating a new user or editing an existing user and the password has been updated
         if (!$data->getId() || ($data->getId() && $data->getPlainPassword())) {
