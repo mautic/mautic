@@ -24,7 +24,7 @@
 2. 
 
 #### Steps to test this PR:
-1. Load up [this PR](https://mautibox.com)
+1. Load up [this PR](https://m3.mautibox.com)
 2. 
 
 #### List deprecations along with the new alternative:
