@@ -243,7 +243,6 @@ class FormModel extends CommonFormModel
         $order          = 1;
         $existingFields = $entity->getFields()->toArray();
         $formName       = $entity->generateFormName();
-        $parents        = [];
         foreach ($sessionFields as $key => $properties) {
             $isNew = (!empty($properties['id']) && isset($existingFields[$properties['id']])) ? false : true;
             $field = !$isNew ? $existingFields[$properties['id']] : new Field();
@@ -261,7 +260,6 @@ class FormModel extends CommonFormModel
                 // Change the alias to prevent potential ID collisions in the rendered HTML
                 $properties['alias'] = 'f_'.$properties['alias'];
             }
-
             foreach ($properties as $f => $v) {
                 if (in_array($f, ['id', 'order'])) {
                     continue;
@@ -273,12 +271,13 @@ class FormModel extends CommonFormModel
                 }
             }
 
-            if (!empty($properties['parentId'])) {
-                if (!$field->getParent()) {
-                    $field->setParentIdTemp($properties['parentId']);
-                }
-            }
-
+            /*   if (!empty($properties['parentId'])) {
+                   if (!$field->getParent()) {
+                       $field->setParentIdTemp($properties['parentId']);
+                   }
+                   $field->setParent(null);
+               }*/
+            $field->setParent(null);
             $field->setForm($entity);
             $field->setSessionId($key);
             $field->setOrder($order);

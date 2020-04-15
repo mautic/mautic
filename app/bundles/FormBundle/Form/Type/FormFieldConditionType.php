@@ -49,42 +49,42 @@ class FormFieldConditionType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add(
-            'enabled',
-            YesNoButtonGroupType::class,
-            [
-                'label' => 'mautic.form.field.form.condition.enabled',
-                'data'  => isset($options['data']['enabled']) ? $options['data']['enabled'] : false,
-            ]
-        );
+        /* $builder->add(
+             'enabled',
+             YesNoButtonGroupType::class,
+             [
+                 'label' => 'mautic.form.field.form.condition.enabled',
+                 'data'  => isset($options['data']['enabled']) ? $options['data']['enabled'] : false,
+             ]
+         );
 
-        $selectedField = isset($options['data']['field']) ? $options['data']['field'] : '';
+         $selectedField = isset($options['data']['field']) ? $options['data']['field'] : '';
 
-        $choices = $this->propertiesProcessor->getFieldsChoices(
-            $this->getFieldsForConditions($options['formId'], $options['fieldAlias'])
-        );
-        $builder->add(
-            'field',
-            ChoiceType::class,
-            [
-                'choices'     => $choices,
-                'multiple'    => false,
-                'label'       => 'mautic.form.field.form.condition.field.mapping',
-                'label_attr'  => ['class' => 'control-label'],
-                'empty_value' => 'mautic.core.select',
-                'attr'        => [
-                    'class'              => 'form-control',
-                    'onchange'           => 'Mautic.updateConditionalFieldValues(this.value);',
-                    'data-field-options' => [],
-                    'data-show-on'       => '{"formfield_conditions_enabled_0": ""}',
-                ],
-                'data'        => $selectedField,
-                'required'    => false,
-            ]
-        );
+         $choices = $this->propertiesProcessor->getFieldsChoices(
+             $this->getFieldsForConditions($options['formId'], $options['fieldAlias'])
+         );
+         $builder->add(
+             'field',
+             ChoiceType::class,
+             [
+                 'choices'     => $choices,
+                 'multiple'    => false,
+                 'label'       => 'mautic.form.field.form.condition.field.mapping',
+                 'label_attr'  => ['class' => 'control-label'],
+                 'empty_value' => 'mautic.core.select',
+                 'attr'        => [
+                     'class'              => 'form-control',
+                     'onchange'           => 'Mautic.updateConditionalFieldValues(this.value);',
+                     'data-field-options' => [],
+                     'data-show-on'       => '{"formfield_conditions_enabled_0": ""}',
+                 ],
+                 'data'        => $selectedField,
+                 'required'    => false,
+             ]
+         );
+*/
 
-        $field   = $this->fieldModel->getRepository()->findOneBySlugs($selectedField);
-        $choices = $field ? $this->propertiesProcessor->getFieldPropertiesChoices($field) : [];
+        $choices = !empty($options['parent']) ? $this->propertiesProcessor->getFieldPropertiesChoices($options['parent']) : [];
         $builder->add(
             'values',
             ChoiceType::class,
@@ -94,7 +94,6 @@ class FormFieldConditionType extends AbstractType
                 'label'    => '',
                 'attr'     => [
                     'class'              => 'form-control',
-                    'data-show-on'       => '{"formfield_conditions_enabled_0": ""}',
                 ],
                 'data'     => isset($options['data']['values']) ? $options['data']['values'] : [],
                 'required' => false,
@@ -131,6 +130,8 @@ class FormFieldConditionType extends AbstractType
             [
                 'formId'     => null,
                 'fieldAlias' => null,
+                'parentId'   => null,
+                'parent'     => null,
             ]
         );
     }

@@ -134,6 +134,7 @@
                 if (formId !== null) {
                     Form.prepareMessengerForm(formId);
                     Form.prepareValidation(formId);
+                    Form.prepareShowOn(formId);
                     Form.preparePagination(formId);
                 }
             }
@@ -196,6 +197,28 @@
                     }
                 });
             }
+        };
+
+        Form.prepareShowOn = function (formId) {
+
+            var theForm = document.getElementById('mauticform_' + formId);
+
+            // Find validations via data-attributes
+            var showOn = theForm.querySelectorAll('[data-mautic-form-show-on]');
+            [].forEach.call(showOn, function (container) {
+                var condition = container.getAttribute('data-mautic-form-show-on');
+                var returnArray = condition.split(':');
+                var id = document.getElementById("mauticform_" + formId+"_"+returnArray[0]);
+                var values = (returnArray[1]).split('|');
+                id.onchange = function(evt) {
+                    if(values.includes(evt.target.value)){
+                        container.style.display = 'block';
+                    }else{
+                        container.style.display = 'none';
+                    }
+
+                }
+            });
         };
 
         Form.preparePagination = function(formId) {

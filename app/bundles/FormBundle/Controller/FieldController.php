@@ -161,6 +161,7 @@ class FieldController extends CommonFormController
                     'inBuilder'          => true,
                     'fields'             => $this->get('mautic.helper.form.field_helper')->getChoiceList($this->getModel('form.field')->getSessionFields($formId)),
                     'viewOnlyFields'     => $customComponents['viewOnlyFields'],
+                    'formFields'         => $fields,
                 ]
             );
         }

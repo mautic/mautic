@@ -561,6 +561,7 @@ class FieldType extends AbstractType
                 'data'       => isset($options['data']['conditions']) ? $options['data']['conditions'] : [],
                 'formId'     => $options['data']['formId'],
                 'fieldAlias' => isset($options['data']['alias']) ? $options['data']['alias'] : '',
+                'parent'     => isset($options['data']['parent']) ? $options['data']['parent'] : null,
             ]
         );
 

@@ -237,7 +237,7 @@ class Field
             ->build();
 
         $builder->createManyToOne('parent', Field::class)
-            ->addJoinColumn('parent_id', 'id', true, false, 'CASCADE')
+            ->addJoinColumn('parent_id', 'id', true, false, 'SET NULL')
             ->build();
 
         $builder->createField('conditions', 'json_array')
@@ -970,7 +970,7 @@ class Field
      *
      * @return Field
      */
-    public function setParent($parent)
+    public function setParent(Field $parent = null)
     {
         $this->isChanged('parent', $parent);
         $this->parent = $parent;

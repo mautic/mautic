@@ -3,16 +3,10 @@ Mautic.formOnLoad = function (container) {
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'form.form');
     }
+
+    Mautic.formBuilderNewComponentInit();
+
     var bodyOverflow = {};
-
-    mQuery('select.form-builder-new-component').change(function (e) {
-        mQuery(this).find('option:selected');
-        Mautic.ajaxifyModal(mQuery(this).find('option:selected'));
-        // Reset the dropdown
-        mQuery(this).val('');
-        mQuery(this).trigger('chosen:updated');
-    });
-
 
     if (mQuery('#mauticforms_fields')) {
         //make the fields sortable
@@ -102,6 +96,16 @@ Mautic.formOnLoad = function (container) {
     Mautic.initHideItemButton('#mauticforms_fields');
     Mautic.initHideItemButton('#mauticforms_actions');
 };
+
+Mautic.formBuilderNewComponentInit = function () {
+    mQuery('select.form-builder-new-component').change(function (e) {
+        mQuery(this).find('option:selected');
+        Mautic.ajaxifyModal(mQuery(this).find('option:selected'));
+        // Reset the dropdown
+        mQuery(this).val('');
+        mQuery(this).trigger('chosen:updated');
+    });
+}
 
 Mautic.updateFormFields = function () {
     Mautic.activateLabelLoadingIndicator('campaignevent_properties_field');
@@ -217,6 +221,10 @@ Mautic.formFieldOnLoad = function (container, response) {
         if (mQuery('#form-field-placeholder').length) {
             mQuery('#form-field-placeholder').remove();
         }
+
+        Mautic.activateChosenSelect(mQuery('.form-builder-new-component'));
+        Mautic.formBuilderNewComponentInit();
+
     }
 };
 

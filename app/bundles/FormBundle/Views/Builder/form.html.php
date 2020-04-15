@@ -64,7 +64,7 @@ if (!isset($lead)) {
                     echo "\n          <div class=\"mauticform-page-wrapper mauticform-page-$pageCount\" data-mautic-form-page=\"$pageCount\"$lastFieldAttribute>\n";
                 endif;
 
-                if ($f->showForContact($submissions, $lead, $form)):
+                if (!$f->getParent() && $f->showForContact($submissions, $lead, $form)):
                     if ($f->isCustom()):
                         if (!isset($fieldSettings[$f->getType()])):
                             continue;
@@ -93,6 +93,38 @@ if (!isset($lead)) {
                         ]
                     );
                 endif;
+                $parentField = $f;
+                foreach ($fields as $fieldId2 => $f):
+                    if ($f->getParent() && $f->getParent()->getId() == $parentField->getId()):
+                    if ($f->isCustom()):
+                        if (!isset($fieldSettings[$f->getType()])):
+                            continue;
+                        endif;
+                        $params = $fieldSettings[$f->getType()];
+                        $f->setCustomParameters($params);
+
+                        $template = $params['template'];
+                    else:
+                        if (!$f->getShowWhenValueExists() && $f->getLeadField() && $f->getIsAutoFill() && $lead && !empty($lead->getFieldValue($f->getLeadField()))) {
+                            $f->setType('hidden');
+                        }
+                        $template = 'MauticFormBundle:Field:'.$f->getType().'.html.php';
+                    endif;
+
+                    echo $view->render(
+                        $theme.$template,
+                        [
+                            'field'         => $f->convertToArray(),
+                            'id'            => $f->getAlias(),
+                            'formName'      => $formName,
+                            'fieldPage'     => ($pageCount - 1), // current page,
+                            'contactFields' => $contactFields,
+                            'companyFields' => $companyFields,
+                            'inBuilder'     => $inBuilder,
+                        ]
+                    );
+                    endif;
+                endforeach;
 
                 if (isset($formPages) && isset($formPages['close'][$fieldId])):
                     // Close the page

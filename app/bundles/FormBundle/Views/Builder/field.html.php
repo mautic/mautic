@@ -67,6 +67,17 @@ $conditionsTabError = (isset($form['conditions']) && ($view['form']->containsErr
                 </a>
             </li>
 
+            <?php if ($showConditions): ?>
+                <li role="presentation">
+                    <a<?php if ($conditionsTabError): echo ' class="text-danger" '; endif; ?> href="#conditions" aria-controls="conditions" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.form.field.form.condition'); ?>
+                        <?php if ($conditionsTabError): ?>
+                            <i class="fa fa-warning"></i>
+                        <?php endif; ?>
+                    </a>
+                </li>
+            <?php endif; ?>
+
             <?php if (isset($form['leadField'])): ?>
             <li role="presentation">
                 <a href="#leadfields" aria-controls="leadfields" role="tab" data-toggle="tab">
@@ -110,16 +121,7 @@ $conditionsTabError = (isset($form['conditions']) && ($view['form']->containsErr
             </li>
             <?php endif; ?>
 
-            <?php if ($showConditions): ?>
-                <li role="presentation">
-                    <a<?php if ($conditionsTabError): echo ' class="text-danger" '; endif; ?> href="#conditions" aria-controls="conditions" role="tab" data-toggle="tab">
-                        <?php echo $view['translator']->trans('mautic.form.field.form.condition'); ?>
-                        <?php if ($conditionsTabError): ?>
-                            <i class="fa fa-warning"></i>
-                        <?php endif; ?>
-                    </a>
-                </li>
-            <?php endif; ?>
+
         </ul>
 
         <!-- Tab panes -->
@@ -288,12 +290,6 @@ $conditionsTabError = (isset($form['conditions']) && ($view['form']->containsErr
             <?php if ($showConditions): ?>
                 <div role="tabpanel" class="tab-pane" id="conditions">
                     <div class="row">
-                        <div class="col-md-3">
-                            <?php echo $view['form']->row($form['conditions']['enabled']); ?>
-                        </div>
-                        <div class="col-md-4">
-                            <?php echo $view['form']->row($form['conditions']['field']); ?>
-                        </div>
                         <div class="col-md-5">
                             <?php echo $view['form']->row($form['conditions']['values']); ?>
                         </div>

@@ -128,7 +128,7 @@ if (!isset($inBuilder)) {
         <?php endif; ?>
     </div>
     <?php foreach ($formFields as $field2): ?>
-        <?php if ($field2['parent'] && $field2['parent']->getId() == $field['id']) : ?>
+        <?php if (!empty($field2['parent']) && $field2['parent']->getId() == $field['id']) : ?>
             <div class="ml-15">
                 <?php if (!empty($field2['isCustom'])):
                     $params   = $field2['customParameters'];
