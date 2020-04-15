@@ -45,7 +45,7 @@ class IframeAvailabilityChecker
             $responseContent['errorMessage'] = $this->translator->trans(
                 'mautic.focus.protocol.mismatch',
                 [
-                    '%currentScheme%' => $currentScheme,
+                    '%url%' => str_replace('http://', 'https://', $url),
                 ]);
         } else {
             $client = HttpClient::create([
