@@ -298,7 +298,6 @@ return [
                 'arguments' => [
                     'translator',
                     'doctrine.orm.entity_manager',
-                    'request_stack',
                     'mautic.stage.model.stage',
                 ],
             ],
