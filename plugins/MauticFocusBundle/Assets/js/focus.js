@@ -164,7 +164,7 @@ Mautic.focusOnLoad = function () {
             var url = mQuery('#websiteUrlPlaceholderInput').val();
             if (url) {
                 mQuery('#focus_website').val(url);
-                Mautic.launchFocusBuilder(true);
+                Mautic.launchFocusBuilder();
             } else {
                 return;
             }
@@ -205,8 +205,6 @@ Mautic.launchFocusBuilder = function (forceFetch) {
 
         var spinnerLeft = (mQuery(document).width() - 300) / 2;
         var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:50%; left:' + spinnerLeft + 'px"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
-    } else {
-        mQuery('#builder-overlay').removeClass('hide');
     }
 
     // Disable the close button until everything is loaded
@@ -225,7 +223,20 @@ Mautic.launchFocusBuilder = function (forceFetch) {
         mQuery('#builder-overlay').addClass('hide');
         mQuery('.btn-close-builder').prop('disabled', false);
         mQuery('#websiteUrlPlaceholderInput').prop('disabled', false);
-    } else if (forceFetch) {
+        mQuery('#websiteCanvas').html('');
+        mQuery('.website-placeholder').show();
+        mQuery('#websiteUrlPlaceholderInput').val('');
+    } else {
+        mQuery('#websiteUrlPlaceholderInput').val(url).prop('disabled', false);
+
+        let iframe = mQuery('#websiteCanvas iframe');
+
+        if (!forceFetch && iframe.length && url === iframe.attr('src')) {
+            return;
+        }
+
+        mQuery('#builder-overlay').removeClass('hide');
+
         Mautic.loadedPreviewImage = url;
 
         // Fetch image
@@ -243,8 +254,10 @@ Mautic.launchFocusBuilder = function (forceFetch) {
                     .find('.help-block')
                     .html(response.errorMessage)
                     .removeClass('hide');
-                mQuery('#builder-overlay').addClass('hide');
-                mQuery('.website-placeholder').removeClass('hide');
+                mQuery('#builder-overlay').hide();
+                mQuery('.website-placeholder').removeClass('hide').show();
+                mQuery('#websiteCanvas').html('');
+                mQuery('.builder-panel-top p button').prop('disabled', false);
                 return;
             }
 
@@ -262,14 +275,6 @@ Mautic.launchFocusBuilder = function (forceFetch) {
 
             Mautic.ignoreMauticFocusPreviewUpdate = false;
         });
-    } else {
-        mQuery('#builder-overlay').addClass('hide');
-        mQuery('.btn-close-builder').prop('disabled', false);
-
-        Mautic.ignoreMauticFocusPreviewUpdate = false;
-        if (url) {
-            Mautic.focusUpdatePreview();
-        }
     }
 };
 
@@ -360,7 +365,7 @@ Mautic.closeFocusBuilder = function (el) {
         delete Mautic.ajaxActionXhr['plugin:focus:generatePreview'];
     }
 
-    mQuery('#websiteUrlPlaceholderInput').prop('disabled', true);
+    // mQuery('#websiteUrlPlaceholderInput').prop('disabled', true);
 
     Mautic.stopIconSpinPostEvent();
 
