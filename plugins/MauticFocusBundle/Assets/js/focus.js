@@ -187,10 +187,6 @@ Mautic.focusOnLoad = function () {
     }
 };
 
-Mautic.focusOnUnload = function () {
-    // @todo
-};
-
 Mautic.launchFocusBuilder = function (forceFetch) {
     mQuery('.website-placeholder').addClass('hide');
     mQuery('body').css('overflow-y', 'hidden');
