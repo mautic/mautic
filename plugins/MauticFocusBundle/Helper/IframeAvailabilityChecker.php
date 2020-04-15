@@ -92,7 +92,7 @@ class IframeAvailabilityChecker
         // Mixed Content: The page at 'https://example.com' was loaded over HTTPS,
         // but requested an insecure frame 'http://target-example.com/'. This request has been blocked; the content
         // must be served over HTTPS.
-        return 0 !== strpos($url, $currentScheme.':');
+        return 'https' === $currentScheme && 0 === strpos($url, 'http://');
     }
 
     /**
