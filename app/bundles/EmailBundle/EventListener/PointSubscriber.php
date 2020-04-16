@@ -33,6 +33,11 @@ class PointSubscriber implements EventSubscriberInterface
     private $pointModel;
 
     /**
+     * @var array
+     */
+    private $triggered = [];
+
+    /**
      * @var EntityManager
      */
     private $entityManager;
@@ -121,6 +126,10 @@ class PointSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->pointModel->triggerAction('email.send', $event->getEmail(), null, $lead, true);
+        if (!isset($this->triggered[$lead->getId()][$event->getEmail()->getId()])) {
+            $this->pointModel->triggerAction('email.send', $event->getEmail(), null, $lead, true);
+        }
+
+        $this->triggered[$lead->getId()][$event->getEmail()->getId()] = true;
     }
 }
