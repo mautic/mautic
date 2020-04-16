@@ -15,7 +15,7 @@ use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Service\Campaign;
 use Mautic\EmailBundle\Entity\EmailRepository;
 
-class CampaignTest extends \PHPUnit_Framework_TestCase
+class CampaignTest extends \PHPUnit\Framework\TestCase
 {
     public function testHasUnpublishedEmail()
     {
