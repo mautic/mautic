@@ -267,11 +267,9 @@ class MailHelper
         $this->returnPath = $factory->getParameter('mailer_return_path');
 
         // Check if batching is supported by the transport
-        if ('memory' == $this->factory->getParameter('mailer_spool_type')
-            && (
-                $this->transport instanceof TokenTransportInterface
-                || ($this->transport instanceof SpoolTransport && $this->transport->supportsTokenization())
-            )
+        if (
+            ('memory' == $this->factory->getParameter('mailer_spool_type') && $this->transport instanceof TokenTransportInterface)
+            || ($this->transport instanceof SpoolTransport && $this->transport->supportsTokenization())
         ) {
             $this->tokenizationEnabled = true;
         }
