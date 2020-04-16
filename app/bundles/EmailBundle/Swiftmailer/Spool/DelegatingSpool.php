@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\Swiftmailer\Spool;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
 use Swift_Mime_SimpleMessage;
 
 /**
@@ -77,6 +78,11 @@ class DelegatingSpool extends \Swift_FileSpool
     public function wasMessageSpooled(): bool
     {
         return $this->messageSpooled;
+    }
+
+    public function isTokenizationEnabled(): bool
+    {
+        return !$this->fileSpoolEnabled && $this->realTransport instanceof TokenTransportInterface;
     }
 
     private function getSpoolDir(): string

@@ -64,4 +64,9 @@ class SpoolTransport extends \Swift_Transport_SpoolTransport
 
         return $count;
     }
+
+    public function supportsTokenization(): bool
+    {
+        return $this->spool->isTokenizationEnabled();
+    }
 }
