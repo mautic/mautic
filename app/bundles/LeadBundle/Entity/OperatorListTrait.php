@@ -78,6 +78,25 @@ trait OperatorListTrait
                 OperatorOptions::NOT_EMPTY,
             ],
         ],
+        'number' => [
+            'include' => [
+                OperatorOptions::EQUAL_TO,
+                OperatorOptions::NOT_EQUAL_TO,
+                OperatorOptions::GREATER_THAN,
+                OperatorOptions::GREATER_THAN_OR_EQUAL,
+                OperatorOptions::LESS_THAN,
+                OperatorOptions::LESS_THAN_OR_EQUAL,
+                OperatorOptions::EMPTY,
+                OperatorOptions::NOT_EMPTY,
+                OperatorOptions::LIKE,
+                OperatorOptions::NOT_LIKE,
+                OperatorOptions::REGEXP,
+                OperatorOptions::NOT_REGEXP,
+                OperatorOptions::STARTS_WITH,
+                OperatorOptions::ENDS_WITH,
+                OperatorOptions::CONTAINS,
+            ],
+        ],
     ];
 
     /**
