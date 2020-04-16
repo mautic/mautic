@@ -69,4 +69,26 @@ class TrustOptionsStoreTest extends TestCase
 
         $this->assertFalse($this->store->has('barfoo'));
     }
+
+    public function testTrustOptionsDoNotSignRequestForDefault()
+    {
+        $this->coreParametersHelper->expects($this->once())
+            ->method('get')
+            ->with('saml_idp_own_certificate')
+            ->willReturn('');
+
+        $store = $this->store->get('foobar');
+        $this->assertFalse($store->getSignAuthnRequest());
+    }
+
+    public function testTrustOptionsSignRequestForCustom()
+    {
+        $this->coreParametersHelper->expects($this->once())
+            ->method('get')
+            ->with('saml_idp_own_certificate')
+            ->willReturn('abc');
+
+        $store = $this->store->get('foobar');
+        $this->assertTrue($store->getSignAuthnRequest());
+    }
 }
