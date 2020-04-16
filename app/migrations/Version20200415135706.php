@@ -39,7 +39,7 @@ final class Version20200415135706 extends AbstractMauticMigration
         $this->addSql("UPDATE {$this->prefix}form_fields 
             SET mapped_object = CASE
                 WHEN lead_field LIKE 'company%' AND lead_field != 'company' THEN 'company'
-                ELSE 'lead'
+                ELSE 'contact'
             END, mapped_field = lead_field 
             WHERE lead_field IS NOT NULL");
     }

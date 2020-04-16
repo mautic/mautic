@@ -158,4 +158,14 @@ final class FormEvents
      * @var string
      */
     const ON_OBJECT_COLLECT = 'mautic.form.on_object_collect';
+
+    /**
+     * The mautic.form.on_field_collect event is fired when there is a call for all available fields for specific object that can be provided for mapping.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundles\Event\FieldCollectEvent
+     *
+     * @var string
+     */
+    const ON_FIELD_COLLECT = 'mautic.form.on_field_collect';
 }

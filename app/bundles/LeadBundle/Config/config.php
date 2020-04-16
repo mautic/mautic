@@ -355,6 +355,7 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.tracker.contact',
                     'mautic.helper.ip_lookup',
+                    'mautic.lead.repository.field',
                 ],
             ],
             'mautic.lead.formbundle.contact.avatar.subscriber' => [

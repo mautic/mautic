@@ -5,6 +5,7 @@ namespace Mautic\FormBundle\Form\Type;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\FormBundle\Collector\FieldCollectorInterface;
 use Mautic\FormBundle\Collector\ObjectCollectorInterface;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\AbstractType;
@@ -31,10 +32,19 @@ class FieldType extends AbstractType
      */
     private $objectCollector;
 
-    public function __construct(TranslatorInterface $translator, ObjectCollectorInterface $objectCollector)
-    {
+    /**
+     * @var FieldCollectorInterface
+     */
+    private $fieldCollector;
+
+    public function __construct(
+        TranslatorInterface $translator,
+        ObjectCollectorInterface $objectCollector,
+        FieldCollectorInterface $fieldCollector
+    ) {
         $this->translator      = $translator;
         $this->objectCollector = $objectCollector;
+        $this->fieldCollector  = $fieldCollector;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -392,32 +402,12 @@ class FieldType extends AbstractType
         }
 
         if ($addLeadFieldList) {
-            if (!isset($options['data']['leadField'])) {
-                switch ($type) {
-                    case 'email':
-                        $data = 'email';
-                        break;
-                    case 'country':
-                        $data = 'country';
-                        break;
-                    case 'tel':
-                        $data = 'phone';
-                        break;
-                    default:
-                        $data = '';
-                        break;
-                }
-            } elseif (isset($options['data']['leadField'])) {
-                $data = $options['data']['leadField'];
-            } else {
-                $data = '';
-            }
-
+            $mappedObject = $options['data']['mappedObject'] ?? 'contact';
             $builder->add(
                 'mappedObject',
                 ChoiceType::class,
                 [
-                    'choices'    => array_flip($this->objectCollector->getObjects()->toChoices()),
+                    'choices'    => $this->objectCollector->getObjects()->toChoices(),
                     'label'      => 'mautic.form.field.form.mapped.object',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
@@ -425,6 +415,7 @@ class FieldType extends AbstractType
                         'tooltip' => 'mautic.form.field.help.mapped.object',
                     ],
                     'required' => false,
+                    'data'     => $mappedObject,
                 ]
             );
 
@@ -432,7 +423,7 @@ class FieldType extends AbstractType
                 'mappedField',
                 ChoiceType::class,
                 [
-                    'choices'     => $options['leadFields'],
+                    'choices'     => $this->fieldCollector->getFields($mappedObject)->toChoices(),
                     'choice_attr' => function ($val, $key, $index) use ($options) {
                         $objects = ['lead', 'company'];
                         foreach ($objects as $object) {
@@ -450,7 +441,7 @@ class FieldType extends AbstractType
                         'tooltip' => 'mautic.form.field.help.mapped.field',
                     ],
                     'required' => false,
-                    'data'     => $data,
+                    'data'     => $options['data']['mappedField'] ?? $this->getDefaultMappedField($type),
                 ]
             );
         }
@@ -614,5 +605,25 @@ class FieldType extends AbstractType
     public function getBlockPrefix()
     {
         return 'formfield';
+    }
+
+    private function getDefaultMappedField(string $type): string
+    {
+        switch ($type) {
+            case 'email':
+                $default = 'email';
+                break;
+            case 'country':
+                $default = 'country';
+                break;
+            case 'tel':
+                $default = 'phone';
+                break;
+            default:
+                $default = '';
+                break;
+        }
+
+        return $default;
     }
 }

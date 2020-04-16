@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Entity\LeadField;
 
 class LeadFieldRepository extends CommonRepository
 {
@@ -55,6 +56,21 @@ class LeadFieldRepository extends CommonRepository
         }
 
         return $aliases;
+    }
+
+    /**
+     * @return LeadField[]
+     */
+    public function getFieldsForObject(string $object): array
+    {
+        $queryBuilder = $this->_em->createQueryBuilder();
+        $queryBuilder->select($this->getTableAlias());
+        $queryBuilder->from($this->_entityName, $this->getTableAlias(), "{$this->getTableAlias()}.id");
+        $queryBuilder->where("{$this->getTableAlias()}.object = :object");
+        $queryBuilder->orderBy("{$this->getTableAlias()}.label");
+        $queryBuilder->setParameter('object', $object);
+
+        return $queryBuilder->getQuery()->execute();
     }
 
     /**
