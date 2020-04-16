@@ -16,6 +16,8 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
+use Mautic\EmailBundle\Swiftmailer\Spool\DelegatingSpool;
+use Mautic\EmailBundle\Swiftmailer\Transport\SpoolTransport;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
 use Mautic\EmailBundle\Tests\Helper\Transport\BcInterfaceTokenTransport;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
@@ -25,6 +27,34 @@ use Monolog\Logger;
 
 class MailHelperTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var FromEmailHelper|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $fromEmailHelper;
+
+    /**
+     * @var MauticFactory|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $mockFactory;
+
+    /**
+     * @var SpoolTransport
+     */
+    private $spoolTransport;
+
+    /**
+     * @var \Swift_Events_EventDispatcher
+     */
+    private $swiftEventsDispatcher;
+
+    /**
+     * @var DelegatingSpool
+     */
+    private $delegatingSpool;
+
+    /**
+     * @var array
+     */
     protected $contacts = [
         [
             'id'        => 1,
@@ -59,6 +89,17 @@ class MailHelperTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+
+        $this->fromEmailHelper = $this->createMock(FromEmailHelper::class);
+        $this->mockFactory     = $this->createMock(MauticFactory::class);
+        $this->mockFactory->method('get')
+            ->with('mautic.helper.from_email_helper')
+            ->willReturn($this->fromEmailHelper);
+
+        $this->swiftEventsDispatcher = $this->createMock(\Swift_Events_EventDispatcher::class);
+        $this->delegatingSpool       = $this->createMock(DelegatingSpool::class);
+
+        $this->spoolTransport = new SpoolTransport($this->swiftEventsDispatcher, $this->delegatingSpool);
     }
 
     /**
@@ -701,5 +742,27 @@ class MailHelperTest extends \PHPUnit\Framework\TestCase
             ],
             $mailer->message->getTo()
         );
+    }
+
+    public function testThatTokenizationIsEnabledIfTransportSupportsTokenization()
+    {
+        $swiftMailer = new \Swift_Mailer($this->spoolTransport);
+        $this->delegatingSpool->expects($this->once())
+            ->method('isTokenizationEnabled')
+            ->willReturn(true);
+
+        $mailer = new MailHelper($this->mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $this->assertTrue($mailer->inTokenizationMode());
+    }
+
+    public function testThatTokenizationIsDisabledIfTransportDoesnotSupportTokenization()
+    {
+        $swiftMailer = new \Swift_Mailer($this->spoolTransport);
+        $this->delegatingSpool->expects($this->once())
+            ->method('isTokenizationEnabled')
+            ->willReturn(false);
+
+        $mailer = new MailHelper($this->mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $this->assertFalse($mailer->inTokenizationMode());
     }
 }
