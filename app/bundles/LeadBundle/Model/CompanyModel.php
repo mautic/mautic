@@ -125,7 +125,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $fields = $this->leadFieldModel->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
 
             $searchFields = [];
-            foreach ($fields as $group => $groupFields) {
+            foreach ($fields as $groupFields) {
                 $searchFields = array_merge($searchFields, array_keys($groupFields));
             }
             $repo->setAvailableSearchFields($searchFields);

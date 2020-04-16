@@ -45,9 +45,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         $this->availableSearchFields = $fields;
     }
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
