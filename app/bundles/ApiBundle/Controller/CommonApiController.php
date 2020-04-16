@@ -168,11 +168,6 @@ class CommonApiController extends FOSRestController implements MauticController
     protected $translator;
 
     /**
-     * @var FlashBag
-     */
-    private $flashBag;
-
-    /**
      * @var User
      */
     protected $user;
@@ -669,7 +664,7 @@ class CommonApiController extends FOSRestController implements MauticController
 
     public function setFlashBag(FlashBag $flashBag)
     {
-        $this->flashBag = $flashBag;
+        // @see \Mautic\CoreBundle\EventListener\CoreSubscriber::onKernelController()
     }
 
     public function setUser(User $user)
