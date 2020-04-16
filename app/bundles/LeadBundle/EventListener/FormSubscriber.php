@@ -4,7 +4,9 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\FormBundle\Crate\ObjectCrate;
 use Mautic\FormBundle\Event\FormBuilderEvent;
+use Mautic\FormBundle\Event\ObjectCollectEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
@@ -60,6 +62,7 @@ class FormSubscriber implements EventSubscriberInterface
     {
         return [
             FormEvents::FORM_ON_BUILD            => ['onFormBuilder', 0],
+            FormEvents::ON_OBJECT_COLLECT        => ['onObjectCollect', 0],
             FormEvents::ON_EXECUTE_SUBMIT_ACTION => [
                 ['onFormSubmitActionChangePoints', 0],
                 ['onFormSubmitActionChangeList', 1],
@@ -128,6 +131,12 @@ class FormSubscriber implements EventSubscriberInterface
             'formType'    => CompanyChangeScoreActionType::class,
             'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
+    }
+
+    public function onObjectCollect(ObjectCollectEvent $event): void
+    {
+        $event->appendObject(new ObjectCrate('contact', 'mautic.lead.contact'));
+        $event->appendObject(new ObjectCrate('company', 'mautic.core.company'));
     }
 
     public function onFormSubmitActionChangePoints(SubmissionEvent $event): void

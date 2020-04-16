@@ -5,6 +5,7 @@ namespace Mautic\FormBundle\Form\Type;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\FormBundle\Collector\ObjectCollectorInterface;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -16,9 +17,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * Class FieldType.
- */
 class FieldType extends AbstractType
 {
     use FormFieldTrait;
@@ -29,16 +27,16 @@ class FieldType extends AbstractType
     private $translator;
 
     /**
-     * FieldType constructor.
+     * @var ObjectCollectorInterface
      */
-    public function __construct(TranslatorInterface $translator)
+    private $objectCollector;
+
+    public function __construct(TranslatorInterface $translator, ObjectCollectorInterface $objectCollector)
     {
-        $this->translator = $translator;
+        $this->translator      = $translator;
+        $this->objectCollector = $objectCollector;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Populate settings
@@ -416,11 +414,26 @@ class FieldType extends AbstractType
             }
 
             $builder->add(
-                'leadField',
+                'mappedObject',
                 ChoiceType::class,
                 [
-                    'choices'           => $options['leadFields'],
-                    'choice_attr'       => function ($val, $key, $index) use ($options) {
+                    'choices'    => array_flip($this->objectCollector->getObjects()->toChoices()),
+                    'label'      => 'mautic.form.field.form.mapped.object',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'   => 'form-control',
+                        'tooltip' => 'mautic.form.field.help.mapped.object',
+                    ],
+                    'required' => false,
+                ]
+            );
+
+            $builder->add(
+                'mappedField',
+                ChoiceType::class,
+                [
+                    'choices'     => $options['leadFields'],
+                    'choice_attr' => function ($val, $key, $index) use ($options) {
                         $objects = ['lead', 'company'];
                         foreach ($objects as $object) {
                             if (!empty($options['leadFieldProperties'][$object][$val]) && (in_array($options['leadFieldProperties'][$object][$val]['type'], FormFieldHelper::getListTypes()) || !empty($options['leadFieldProperties'][$object][$val]['properties']['list']) || !empty($options['leadFieldProperties'][$object][$val]['properties']['optionlist']))) {
@@ -430,11 +443,11 @@ class FieldType extends AbstractType
 
                         return [];
                     },
-                    'label'      => 'mautic.form.field.form.lead_field',
+                    'label'      => 'mautic.form.field.form.mapped.field',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'   => 'form-control',
-                        'tooltip' => 'mautic.form.field.help.lead_field',
+                        'tooltip' => 'mautic.form.field.help.mapped.field',
                     ],
                     'required' => false,
                     'data'     => $data,
@@ -585,9 +598,6 @@ class FieldType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -601,9 +611,6 @@ class FieldType extends AbstractType
         $resolver->setRequired(['leadFields']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'formfield';

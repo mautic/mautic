@@ -280,6 +280,7 @@ return [
                 'class'       => FieldType::class,
                 'arguments'   => [
                     'translator',
+                    'mautic.form.collector.object',
                 ],
                 'methodCalls' => [
                     'setFieldModel' => ['mautic.form.model.field'],
@@ -418,6 +419,10 @@ return [
             ],
         ],
         'other' => [
+            'mautic.form.collector.object' => [
+                'class'     => \Mautic\FormBundle\Collector\ObjectCollector::class,
+                'arguments' => ['event_dispatcher'],
+            ],
             'mautic.helper.form.field_helper' => [
                 'class'     => FormFieldHelper::class,
                 'arguments' => [

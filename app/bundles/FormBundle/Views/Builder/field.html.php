@@ -78,10 +78,10 @@ $conditionsTabError = (isset($form['conditions']) && ($view['form']->containsErr
                 </li>
             <?php endif; ?>
 
-            <?php if (isset($form['leadField'])): ?>
+            <?php if (isset($form['mappedField'])): ?>
             <li role="presentation">
-                <a href="#leadfields" aria-controls="leadfields" role="tab" data-toggle="tab">
-                    <?php echo $view['translator']->trans('mautic.form.field.section.leadfield'); ?>
+                <a href="#mappedfields" aria-controls="mappedfields" role="tab" data-toggle="tab">
+                    <?php echo $view['translator']->trans('mautic.form.field.section.mappedfield'); ?>
                 </a>
             </li>
             <?php endif; ?>
@@ -135,42 +135,11 @@ $conditionsTabError = (isset($form['conditions']) && ($view['form']->containsErr
                 </div>
             </div>
 
-            <?php if (isset($form['leadField'])): ?>
-            <div role="tabpanel" class="tab-pane" id="leadfields">
+            <?php if (isset($form['mappedField'])): ?>
+            <div role="tabpanel" class="tab-pane" id="mappedfields">
                 <div class="row">
-                    <div class="col-md-6">
-                        <?php $fieldGroups = $form['leadField']->vars['choices'];
-                              $data        = $form['leadField']->vars['data'];
-                        ?>
-                        <select id="formfield_leadField" name="formfield[leadField]" class="form-control" autocomplete="false" style="display: none;">
-                            <option value=""></option>
-                            <?php
-                            foreach ($fieldGroups as $object => $group):
-                            $header = $object;
-                            $icon   = ('company' == $object) ? 'building' : 'user';
-                            ?>
-                            <optgroup label="<?php echo $view['translator']->trans('mautic.lead.'.$header); ?>">
-                                <?php
-                                foreach ($group->choices as $subGroup => $fields):
-                                    foreach ($fields->choices as $field) :
-                                        $attr       = (!empty($field->attr)) ? $field->attr : [];
-                                        $attrString = '';
-                                        foreach ($attr as $k => $v) {
-                                            $attrString .= $k.'="'.preg_replace('/"/', '&quot;', $v).'" ';
-                                        }
-                                        $label = $field->label;
-                                        $value = $field->value;
-                                        ?>
-                                        <option value="<?php echo $view->escape($value); ?>" class="segment-filter <?php echo $icon; ?>" <?php if ($data === $value) {
-                                            echo 'Selected';
-                                        } ?> <?php echo $attrString; ?> ><?php echo $label; ?></option>
-                                    <?php endforeach; ?>
-                                <?php endforeach; ?>
-                            </optgroup>
-                            <?php endforeach; ?>
-                        </select>
-                        <?php unset($form['leadField']); ?>
-                    </div>
+                    <?php echo $view['form']->rowIfExists($form, 'mappedObject', $template); ?>
+                    <?php echo $view['form']->rowIfExists($form, 'mappedField', $template); ?>
                 </div>
             </div>
             <?php endif; ?>
