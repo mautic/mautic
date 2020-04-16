@@ -122,7 +122,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             $event->setOperatorsForFieldType($selectAlias, $this->typeOperators['select']);
         }
 
-        foreach (['lookup', 'text', 'email', 'url', 'email', 'tel'] as $textAlias) {
+        foreach (['lookup', 'text', 'email', 'url', 'tel'] as $textAlias) {
             $event->setOperatorsForFieldType($textAlias, $this->typeOperators['text']);
         }
     }
