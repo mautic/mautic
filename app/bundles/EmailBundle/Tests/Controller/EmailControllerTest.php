@@ -63,6 +63,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
         $this->formMock             = $this->createMock(Form::class);
         $this->templatingMock       = $this->createMock(DelegatingEngine::class);
         $this->controller           = new EmailController();
+        $this->controller->setContainer($this->containerMock);
         $this->controller->setTranslator($this->translatorMock);
         $this->controller->setFlashBag($this->flashBagMock);
         $this->sessionMock->method('getFlashBag')->willReturn($this->flashBagMock);
