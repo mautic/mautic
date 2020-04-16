@@ -142,6 +142,7 @@ return [
                 'arguments'   => [
                     'translator',
                     'mautic.form.collector.object',
+                    'mautic.form.collector.field',
                 ],
                 'methodCalls' => [
                     'setFieldModel' => ['mautic.form.model.field'],
@@ -237,6 +238,10 @@ return [
         'other' => [
             'mautic.form.collector.object' => [
                 'class'     => \Mautic\FormBundle\Collector\ObjectCollector::class,
+                'arguments' => ['event_dispatcher'],
+            ],
+            'mautic.form.collector.field' => [
+                'class'     => \Mautic\FormBundle\Collector\FieldCollector::class,
                 'arguments' => ['event_dispatcher'],
             ],
             'mautic.helper.form.field_helper' => [
