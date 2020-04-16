@@ -37,8 +37,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * Used by search functions to search using aliases as commands.
-     *
-     * @param array $fields
      */
     public function setAvailableSearchFields(array $fields)
     {
