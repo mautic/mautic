@@ -18,6 +18,7 @@ use Mautic\CampaignBundle\Service\Campaign as CampaignService;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Service\FlashBag;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
@@ -37,14 +38,21 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $campaignService;
 
+    /**
+     * @var FlashBag
+     */
+    private $flashBag;
+
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
-        CampaignService $campaignService
+        CampaignService $campaignService,
+        FlashBag $flashBag
     ) {
         $this->ipLookupHelper   = $ipLookupHelper;
         $this->auditLogModel    = $auditLogModel;
         $this->campaignService  = $campaignService;
+        $this->flashBag         = $flashBag;
     }
 
     /**

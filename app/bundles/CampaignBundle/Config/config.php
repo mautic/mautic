@@ -119,6 +119,7 @@ return [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                     'mautic.campaign.service.campaign',
+                    'mautic.core.service.flashbag',
                 ],
             ],
             'mautic.campaign.leadbundle.subscriber'     => [
