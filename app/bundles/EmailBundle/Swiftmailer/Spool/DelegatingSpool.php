@@ -96,4 +96,9 @@ class DelegatingSpool extends \Swift_FileSpool
 
         return str_replace('%kernel.root_dir%', $rootPath, $filePath);
     }
+
+    public function getRealTransport(): \Swift_Transport
+    {
+        return $this->realTransport;
+    }
 }
