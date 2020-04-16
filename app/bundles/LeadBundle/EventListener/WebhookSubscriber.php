@@ -192,9 +192,6 @@ class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param LeadChangeCompanyEvent $event
-     */
     public function onLeadCompanyChange(LeadChangeCompanyEvent $event)
     {
         $leads = $event->getLeads();
