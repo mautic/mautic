@@ -102,6 +102,11 @@ class CoreSubscriber implements EventSubscriberInterface
      */
     private $factory;
 
+    /**
+     * @var FlashBag
+     */
+    private $flashBag;
+
     public function __construct(
         BundleHelper $bundleHelper,
         MenuHelper $menuHelper,
