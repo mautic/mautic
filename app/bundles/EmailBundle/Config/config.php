@@ -795,6 +795,13 @@ return [
             ],
         ],
         'repositories' => [
+            'mautic.email.repository.email' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\EmailBundle\Entity\Email::class,
+                ],
+            ],
             'mautic.email.repository.emailReply' => [
                 'class'     => \Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
@@ -802,25 +809,11 @@ return [
                     \Mautic\EmailBundle\Entity\EmailReply::class,
                 ],
             ],
-            'mautic.email.repository.email' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\EmailBundle\Entity\Email::class,
-                ],
-            ],
             'mautic.email.repository.stat' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \Mautic\EmailBundle\Entity\Stat::class,
-                ],
-            ],
-            'mautic.email.repository.email' => [
-                'class'     => \Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\EmailBundle\Entity\Email::class,
                 ],
             ],
         ],
