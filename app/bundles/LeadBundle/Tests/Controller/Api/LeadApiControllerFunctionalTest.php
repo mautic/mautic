@@ -21,15 +21,26 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         $payload = [
             [
-                'email'     => 'batchemail1@email.com',
-                'firstname' => 'BatchUpdate',
-                'points'    => 4,
-                'tags'      => ['batchtest', 'testbatch'],
+                'email'            => 'batchemail1@email.com',
+                'firstname'        => 'BatchUpdate',
+                'points'           => 4,
+                'tags'             => ['batchtest', 'testbatch'],
+                'city'             => 'Houston',
+                'state'            => 'Texas',
+                'country'          => 'United States',
+                'preferred_locale' => 'es_SV',
+                'timezone'         => 'America/Chicago',
+                'owner'            => 1,
             ],
             [
-                'email'     => 'batchemail2@email.com',
-                'firstname' => 'BatchUpdate2',
-                'tags'      => ['batchtest', 'testbatch', 'batchremovetest'],
+                'email'            => 'batchemail2@email.com',
+                'firstname'        => 'BatchUpdate2',
+                'tags'             => ['batchtest', 'testbatch', 'batchremovetest'],
+                'city'             => 'Boston',
+                'state'            => 'Massachusetts',
+                'country'          => 'United States',
+                'preferred_locale' => 'en_GB',
+                'timezone'         => 'America/New_York',
             ],
             [
                 'email'     => 'batchemail3@email.com',
@@ -69,6 +80,36 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(3, count($response['contacts'][1]['tags']));
         $this->assertEquals(0, count($response['contacts'][2]['tags']));
 
+        // Assert city
+        $this->assertEquals($payload[0]['city'], $response['contacts'][0]['fields']['all']['city']);
+        $this->assertEquals($payload[1]['city'], $response['contacts'][1]['fields']['all']['city']);
+        $this->assertEquals('', $response['contacts'][2]['fields']['all']['city']);
+
+        // Assert state
+        $this->assertEquals($payload[0]['state'], $response['contacts'][0]['fields']['all']['state']);
+        $this->assertEquals($payload[1]['state'], $response['contacts'][1]['fields']['all']['state']);
+        $this->assertEquals('', $response['contacts'][2]['fields']['all']['state']);
+
+        // Assert country
+        $this->assertEquals($payload[0]['country'], $response['contacts'][0]['fields']['all']['country']);
+        $this->assertEquals($payload[1]['country'], $response['contacts'][1]['fields']['all']['country']);
+        $this->assertEquals('', $response['contacts'][2]['fields']['all']['country']);
+
+        // Assert preferred_locale
+        $this->assertEquals($payload[0]['preferred_locale'], $response['contacts'][0]['fields']['all']['preferred_locale']);
+        $this->assertEquals($payload[1]['preferred_locale'], $response['contacts'][1]['fields']['all']['preferred_locale']);
+        $this->assertEquals('', $response['contacts'][2]['fields']['all']['preferred_locale']);
+
+        // Assert timezone
+        $this->assertEquals($payload[0]['timezone'], $response['contacts'][0]['fields']['all']['timezone']);
+        $this->assertEquals($payload[1]['timezone'], $response['contacts'][1]['fields']['all']['timezone']);
+        $this->assertEquals('', $response['contacts'][2]['fields']['all']['timezone']);
+
+        // Assert owner
+        $this->assertEquals($payload[0]['owner'], $response['contacts'][0]['owner']['id']);
+        $this->assertEquals(null, $response['contacts'][1]['owner']);
+        $this->assertEquals(null, $response['contacts'][2]['owner']);
+
         // Emulate an unsanitized email to ensure that doesn't cause duplicates
         $payload[0]['email'] = 'batchemail1@email.com,';
 
@@ -77,6 +118,16 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Remove tags from contact 1 to see if they will stick in the database
         unset($payload[0]['tags']);
+
+        // Update others
+        $payload[0]['city']             = 'Sunnyvale';
+        $payload[0]['state']            = 'California';
+        $payload[0]['timezone']         = 'America/Los_Angeles';
+        $payload[0]['preferred_locale'] = 'en_US';
+
+        // Update owner
+        $payload[0]['owner'] = null;
+        $payload[1]['owner'] = 1;
 
         // Set some tags to contact 2 to see if tags update
         $payload[1]['tags'] = ['testbatch1', 'testbatch2', '-batchremovetest'];
@@ -115,16 +166,51 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(2, count($response['contacts'][0]['tags']));
         $this->assertEquals(4, count($response['contacts'][1]['tags']));
         $this->assertEquals(0, count($response['contacts'][2]['tags']));
+
+        // Assert city
+        $this->assertEquals($payload[0]['city'], $response['contacts'][0]['fields']['all']['city']);
+        $this->assertEquals($payload[1]['city'], $response['contacts'][1]['fields']['all']['city']);
+        $this->assertEquals('', $response['contacts'][2]['fields']['all']['city']);
+
+        // Assert state
+        $this->assertEquals($payload[0]['state'], $response['contacts'][0]['fields']['all']['state']);
+        $this->assertEquals($payload[1]['state'], $response['contacts'][1]['fields']['all']['state']);
+        $this->assertEquals('', $response['contacts'][2]['fields']['all']['state']);
+
+        // Assert country
+        $this->assertEquals($payload[0]['country'], $response['contacts'][0]['fields']['all']['country']);
+        $this->assertEquals($payload[1]['country'], $response['contacts'][1]['fields']['all']['country']);
+        $this->assertEquals('', $response['contacts'][2]['fields']['all']['country']);
+
+        // Assert preferred_locale
+        $this->assertEquals($payload[0]['preferred_locale'], $response['contacts'][0]['fields']['all']['preferred_locale']);
+        $this->assertEquals($payload[1]['preferred_locale'], $response['contacts'][1]['fields']['all']['preferred_locale']);
+        $this->assertEquals('', $response['contacts'][2]['fields']['all']['preferred_locale']);
+
+        // Assert timezone
+        $this->assertEquals($payload[0]['timezone'], $response['contacts'][0]['fields']['all']['timezone']);
+        $this->assertEquals($payload[1]['timezone'], $response['contacts'][1]['fields']['all']['timezone']);
+        $this->assertEquals('', $response['contacts'][2]['fields']['all']['timezone']);
+
+        // Assert owner
+        $this->assertEquals(null, $response['contacts'][0]['owner']);
+        $this->assertEquals($payload[1]['owner'], $response['contacts'][1]['owner']['id']);
+        $this->assertEquals(null, $response['contacts'][2]['owner']);
     }
 
     public function testSingleNewEndpointCreateAndUpdate()
     {
         $payload = [
-            'email'     => 'apiemail1@email.com',
-            'firstname' => 'API Update',
-            'lastname'  => 'customlastname',
-            'points'    => 4,
-            'tags'      => ['apitest', 'testapi'],
+            'email'            => 'apiemail1@email.com',
+            'firstname'        => 'API Update',
+            'points'           => 4,
+            'tags'             => ['apitest', 'testapi'],
+            'city'             => 'Houston',
+            'state'            => 'Texas',
+            'country'          => 'United States',
+            'preferred_locale' => 'es_SV',
+            'timezone'         => 'America/Chicago',
+            'owner'            => 1,
         ];
 
         $this->client->request('POST', '/api/contacts/new', $payload);
@@ -137,12 +223,27 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['lastname'], $response['contact']['fields']['all']['lastname']);
         $this->assertEquals(4, $response['contact']['points']);
         $this->assertEquals(2, count($response['contact']['tags']));
+        $this->assertEquals($payload['city'], $response['contact']['fields']['all']['city']);
+        $this->assertEquals($payload['state'], $response['contact']['fields']['all']['state']);
+        $this->assertEquals($payload['country'], $response['contact']['fields']['all']['country']);
+        $this->assertEquals($payload['preferred_locale'], $response['contact']['fields']['all']['preferred_locale']);
+        $this->assertEquals($payload['timezone'], $response['contact']['fields']['all']['timezone']);
+        $this->assertEquals($payload['owner'], $response['contact']['owner']['id']);
 
-        // without overwriteWithBlank lastname is not set empty
-        $payload['lastname'] = '';
+        // Lets try to create the same contact and it should merge based on unique identifier (email)
+        $updatedValues = [
+            'email' => 'apiemail1@email.com',
+            'city'  => 'Boston',
+            'state' => 'Massachusetts',
+            'owner' => 2,
+        ];
 
-        // Lets try to create the same contact to see that the values are not re-setted
-        $this->client->request('POST', '/api/contacts/new', $payload);
+        $this->client->request(
+            'POST',
+            '/api/contacts/new',
+            $updatedValues
+        );
+
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -167,6 +268,40 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEmpty($response['contact']['fields']['all']['lastname']);
         $this->assertEquals(4, $response['contact']['points']);
         $this->assertEquals(2, count($response['contact']['tags']));
+        $this->assertEquals($updatedValues['city'], $response['contact']['fields']['all']['city']);
+        $this->assertEquals($updatedValues['state'], $response['contact']['fields']['all']['state']);
+        $this->assertEquals($payload['country'], $response['contact']['fields']['all']['country']);
+        $this->assertEquals($payload['preferred_locale'], $response['contact']['fields']['all']['preferred_locale']);
+        $this->assertEquals($payload['timezone'], $response['contact']['fields']['all']['timezone']);
+        $this->assertEquals($updatedValues['owner'], $response['contact']['owner']['id']);
+
+        // Test patch and values should be updated
+        $updatedValues = [
+            'email' => 'apiemail1@email.com',
+            'city'  => 'Boston',
+            'state' => 'Massachusetts',
+            'owner' => 2,
+        ];
+
+        $this->client->request(
+            'PATCH',
+            sprintf('/api/contacts/%d/edit', $contactId),
+            $updatedValues
+        );
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals($contactId, $response['contact']['id']);
+        $this->assertEquals($updatedValues['email'], $response['contact']['fields']['all']['email']);
+        $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
+        $this->assertEquals(4, $response['contact']['points']);
+        $this->assertEquals(2, count($response['contact']['tags']));
+        $this->assertEquals($updatedValues['city'], $response['contact']['fields']['all']['city']);
+        $this->assertEquals($updatedValues['state'], $response['contact']['fields']['all']['state']);
+        $this->assertEquals($payload['country'], $response['contact']['fields']['all']['country']);
+        $this->assertEquals($payload['preferred_locale'], $response['contact']['fields']['all']['preferred_locale']);
+        $this->assertEquals($payload['timezone'], $response['contact']['fields']['all']['timezone']);
+        $this->assertEquals($updatedValues['owner'], $response['contact']['owner']['id']);
     }
 
     public function testBachdDncAddAndRemove()
@@ -175,8 +310,8 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $emailAddress = uniqid('', false).'@mautic.com';
 
         $payload = [
-            'id'   => 80,
-            'email'=> $emailAddress,
+            'id'    => 80,
+            'email' => $emailAddress,
         ];
 
         $this->client->request('POST', '/api/contacts/new', $payload);
@@ -185,16 +320,20 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $contactId      = $response['contact']['id'];
 
         // Batch update contact with new DNC record
-        $payload = [[
-            'id'           => $contactId,
-            'email'        => $emailAddress,
-            'doNotContact' => [[
-                'reason'    => DoNotContact::MANUAL,
-                'comments'  => 'manually',
-                'channel'   => 'email',
-                'channelId' => null,
-            ]],
-        ]];
+        $payload = [
+            [
+                'id'           => $contactId,
+                'email'        => $emailAddress,
+                'doNotContact' => [
+                    [
+                        'reason'    => DoNotContact::MANUAL,
+                        'comments'  => 'manually',
+                        'channel'   => 'email',
+                        'channelId' => null,
+                    ],
+                ],
+            ],
+        ];
 
         $this->client->request('PUT', '/api/contacts/batch/edit', $payload);
         $clientResponse = $this->client->getResponse();
@@ -202,16 +341,20 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(3, $response['contacts'][0]['doNotContact'][0]['reason']);
 
         // Batch update contact and remove DNC record
-        $payload = [[
-            'id'           => $contactId,
-            'email'        => $emailAddress,
-            'doNotContact' => [[
-                'reason'    => DoNotContact::IS_CONTACTABLE,
-                'comments'  => 'manually',
-                'channel'   => 'email',
-                'channelId' => null,
-            ]],
-        ]];
+        $payload = [
+            [
+                'id'           => $contactId,
+                'email'        => $emailAddress,
+                'doNotContact' => [
+                    [
+                        'reason'    => DoNotContact::IS_CONTACTABLE,
+                        'comments'  => 'manually',
+                        'channel'   => 'email',
+                        'channelId' => null,
+                    ],
+                ],
+            ],
+        ];
 
         $this->client->request('PUT', '/api/contacts/batch/edit', $payload);
         $clientResponse = $this->client->getResponse();
