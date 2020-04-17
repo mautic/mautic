@@ -4,17 +4,16 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\FormBundle\Collector\FieldCollectorInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class AjaxController.
- */
 class AjaxController extends CommonAjaxController
 {
     /**
      * @param string $name
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     protected function reorderFieldsAction(Request $request, $bundle, $name = 'fields')
     {
@@ -39,7 +38,19 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
+     */
+    protected function getFieldsForObjectAction(Request $request)
+    {
+        /** @var FieldCollectorInterface $fieldCollector */
+        $fieldCollector = $this->container->get('mautic.form.collector.field');
+        $fields         = array_flip($fieldCollector->getFields($request->get('object'))->toChoices());
+
+        return $this->sendJsonResponse(['fields' => $fields]);
+    }
+
+    /**
+     * @return JsonResponse
      */
     protected function reorderActionsAction(Request $request)
     {
@@ -47,7 +58,7 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     protected function updateFormFieldsAction(Request $request)
     {
@@ -104,7 +115,7 @@ class AjaxController extends CommonAjaxController
     /**
      * Ajax submit for forms.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return sonResponse
      */
     public function submitAction()
     {

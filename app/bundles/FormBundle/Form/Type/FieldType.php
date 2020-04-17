@@ -411,8 +411,9 @@ class FieldType extends AbstractType
                     'label'      => 'mautic.form.field.form.mapped.object',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
-                        'class'   => 'form-control',
-                        'tooltip' => 'mautic.form.field.help.mapped.object',
+                        'class'    => 'form-control',
+                        'tooltip'  => 'mautic.form.field.help.mapped.object',
+                        'onchange' => 'Mautic.fetchFieldsOnObjectChange();',
                     ],
                     'required' => false,
                     'data'     => $mappedObject,
