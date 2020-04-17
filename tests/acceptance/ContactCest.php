@@ -192,4 +192,31 @@ class ContactCest
         $I->see("$contactName1", '//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Check that we see the first contact in the list
         $I->dontSee("$contactName2", '//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]'); // Check that we don't see the second contact in the list (as we have filtered to see only the first)
     }
+
+    // Tests for batch changes
+
+    public function batchAddToCampaign(AcceptanceTester $I) // NOTE Sample data does not include campaigns - see https://github.com/mautic/mautic/issues/8677. Create one first.
+    {
+        $I->amOnPage('/s/contacts');
+        $contactName1 = $I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Get name of first contact
+        $contactName2 = $I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]'); // Get name of second contact
+        $I->amOnPage('/s/campaigns/view/1'); // Go to campaign
+        $I->click('//*[@id="app-content"]/div/div[2]/div[1]/div[2]/ul/li[3]/a'); // Click contacts tab
+        $I->dontsee("$contactName1", '//*[@id="leads-container"]/div[1]/div/div[2]/div/div/div[2]/div'); // Confirm first contact is not in the campaign
+        $I->dontsee("$contactName2", '//*[@id="leads-container"]/div[1]/div/div[1]/div/div/div[2]/div'); // Confirm second contact is not in the campaign
+        $I->amOnPage('/s/contacts');
+        $I->checkOption('//*[@id="leadTable"]/tbody/tr[1]/td[1]/div/span/input'); // Select contact 1
+        $I->checkOption('//*[@id="leadTable"]/tbody/tr[2]/td[1]/div/span/input'); // Select contact 2
+        $I->click('//*[@id="leadTable"]/thead/tr/th[1]/div/div/button'); // Click for options
+        $I->click('//*[@id="leadTable"]/thead/tr/th[1]/div/div/ul/li[1]/a/span/span'); // Select campaigns
+        $I->waitForElementVisible('//*[@id="lead_batch_add_chosen"]/ul/li/input', 5); // Wait for modal
+        $I->click('//*[@id="lead_batch_add_chosen"]/ul/li/input'); // Click into add box
+        $I->click('//*[@id="lead_batch_add_chosen"]/div/ul/li'); // Select campaign
+        $I->click('//*[@id="MauticSharedModal"]/div/div/div[3]/div/button[2]'); // Save
+        $I->amOnPage('/s/campaigns/view/1'); // Go to campaign
+        $I->click('//*[@id="app-content"]/div/div[2]/div[1]/div[2]/ul/li[3]/a'); // Click contacts tab
+        $I->wait(2);
+        $I->see("$contactName1", '//*[@id="leads-container"]/div[1]/div/div[2]/div/div/div[2]/div'); // Confirm first contact is now in the campaign
+        $I->see("$contactName2", '//*[@id="leads-container"]/div[1]/div/div[1]/div/div/div[2]/div'); // Confirm second contact is now in the campaign
+    }
 }
