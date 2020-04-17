@@ -28,11 +28,6 @@ use Monolog\Logger;
 class MailHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var FromEmailHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $fromEmailHelper;
-
-    /**
      * @var MauticFactory|\PHPUnit\Framework\MockObject\MockObject
      */
     private $mockFactory;
@@ -90,7 +85,6 @@ class MailHelperTest extends \PHPUnit\Framework\TestCase
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
 
-        $this->fromEmailHelper = $this->createMock(FromEmailHelper::class);
         $this->mockFactory     = $this->createMock(MauticFactory::class);
         $this->mockFactory->method('get')
             ->with('mautic.helper.from_email_helper')
