@@ -12,7 +12,7 @@ class ContactCest
     {
     }
 
-    // tests
+    // Tests for adding contacts
 
     public function createContactFromQuickAdd(AcceptanceTester $I)
     {
@@ -25,10 +25,13 @@ class ContactCest
         $I->wait(1);
         $I->fillField('//*[@id="lead_email"]', 'test@example.com');
         $I->wait(1);
-        $I->click('//*[@id="MauticSharedModal"]/div/div/div[3]/div/button[2]');
+        $I->click('//*[@id="MauticSharedModal"]/div/div/div[3]/div/button[2]'); // Click to save the contact
         $I->amOnPage('/s/contacts');
-        $I->reloadPage();
-        $I->see('Test First Name Test Last Name');
+        $I->reloadPage(); // reload the page to ensure we have the latest data
+        $I->fillField('//*[@id="list-search"]', 'Test'); // Search for the contact we just created
+        $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press the enter key to execute the search
+        $I->wait(1);
+        $I->see('Test First Name', '//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Look for our test contact in the contact list
     }
 
     public function createContactFromForm(AcceptanceTester $I)
@@ -102,6 +105,8 @@ class ContactCest
         $I->pressKey('//*[@id="lead_tags_chosen"]/ul/li/input', WebDriverKeys::ENTER);
     }
 
+    // Tests for viewing contacts
+
     public function viewContact(AcceptanceTester $I)
     {
         $I->amOnPage('/s/contacts'); //Go to contacts list
@@ -110,6 +115,8 @@ class ContactCest
         $I->click(['link' => $contactName]); // Click on the first contact in the list
         $I->see($contactName); // Check we see the expected name
     }
+
+    // Tests for editing contacts
 
     public function editContact(AcceptanceTester $I)
     {
@@ -130,6 +137,8 @@ class ContactCest
         $I->wait(5); // Wait for save to complete
         $I->see('Test-First-Name Test-Last-Name has been updated!'); // Confirm that the contact has been deleted
     }
+
+    // Tests for deleting contacts
 
     public function deleteContactFromList(AcceptanceTester $I)
     {
@@ -161,6 +170,8 @@ class ContactCest
         $I->wait(5); // Wait for delete to be completed
         $I->see("$contactName has been deleted!"); // Confirm the contact is deleted
     }
+
+    // Tests for searching contacts
 
     public function searchContactsFullName(AcceptanceTester $I) //TODO Add more search tests to incorporate wildcards and other fields etc
     {
