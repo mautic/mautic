@@ -55,7 +55,7 @@ class FormUploader
                 $result[$alias]  = $fileName;
                 $uploadedFiles[] = $uploadDir.DIRECTORY_SEPARATOR.$fileName;
             }
-            if (isset($uploadedFiles)) {
+            if (!empty($uploadedFiles)) {
                 $submission->setFilePaths($uploadedFiles);
             }
 

@@ -425,11 +425,8 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array           $config
-     * @param array           $tokens
-     * @param                 $to
-     * @param Submission|null $eventSubmission
-     * @param bool            $internalSend
+     * @param array $to
+     * @param bool  $internalSend
      */
     private function setMailer(array $config, array $tokens, $to, Submission $eventSubmission = null, $internalSend = true)
     {
