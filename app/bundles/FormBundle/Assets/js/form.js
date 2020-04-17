@@ -107,7 +107,35 @@ Mautic.formBuilderNewComponentInit = function () {
         mQuery(this).val('');
         mQuery(this).trigger('chosen:updated');
     });
-}
+};
+
+Mautic.changeSelectOptions = function(selectEl, options) {
+    selectEl.empty();
+    mQuery.each(options, function(key, label) {
+        selectEl.append(
+            mQuery('<option></option>').attr('value', key).text(label)
+        );
+    });
+    selectEl.trigger('chosen:updated');
+};
+
+Mautic.fetchFieldsOnObjectChange = function() {
+    var fieldSelect = mQuery('select#formfield_mappedField');
+    fieldSelect.attr('disable', true);
+    mQuery.ajax({
+        url: mauticAjaxUrl + "?action=form:getFieldsForObject",
+        data: {object: mQuery('select#formfield_mappedObject').val()},
+        success: function (response) {
+            Mautic.changeSelectOptions(fieldSelect, response.fields);
+        },
+        error: function (response, textStatus, errorThrown) {
+            Mautic.processAjaxError(response, textStatus, errorThrown);
+        },
+        complete: function () {
+            fieldSelect.removeAttr('disable');
+        }
+    });
+};
 
 Mautic.updateFormFields = function () {
     Mautic.activateLabelLoadingIndicator('campaignevent_properties_field');
