@@ -14,17 +14,32 @@ namespace Mautic\EmailBundle\Tests\Transport;
 use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\EmailBundle\Swiftmailer\Transport\MailjetTransport;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 
 class MailjetTransportTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|TransportCallback
+     */
+    private $transportCallback;
+
+    /**
+     * @var MailjetTransport
+     */
+    private $transport;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->transportCallback = $this->createMock(TransportCallback::class);
+        $this->transport         = new MailjetTransport($this->transportCallback);
+    }
+
     public function testWebhookPayloadIsProcessed()
     {
-        $transportCallback = $this->getMockBuilder(TransportCallback::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $transportCallback->expects($this->exactly(5))
+        $this->transportCallback->expects($this->exactly(5))
             ->method('addFailureByHashId')
             ->withConsecutive(
                 [$this->equalTo('1'), 'User unsubscribed', DoNotContact::UNSUBSCRIBED],
@@ -34,7 +49,7 @@ class MailjetTransportTest extends \PHPUnit\Framework\TestCase
                 [$this->equalTo('5'), 'bounced: bounced', DoNotContact::BOUNCED]
             );
 
-        $transportCallback->expects($this->once())
+        $this->transportCallback->expects($this->once())
             ->method('addFailureByAddress')
             ->with(
                 'bounce2@test.com',
@@ -42,9 +57,17 @@ class MailjetTransportTest extends \PHPUnit\Framework\TestCase
                 DoNotContact::BOUNCED
             );
 
-        $transport = new MailjetTransport($transportCallback);
+        $this->transport->processCallbackRequest($this->getRequestWithPayload());
+    }
 
-        $transport->processCallbackRequest($this->getRequestWithPayload());
+    public function testSend(): void
+    {
+        /** @var MockObject|\Swift_Mime_SimpleMessage */
+        $message = $this->createMock(\Swift_Mime_SimpleMessage::class);
+
+        $message->method('getReturnPath')->willReturn('return-path-a');
+
+        $this->assertIsInt($this->transport->send($message));
     }
 
     /**
