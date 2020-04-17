@@ -108,6 +108,7 @@ class ThemeController extends FormController
      */
     public function downloadAction(Request $request, ThemeHelperInterface $themeHelper, string $objectId)
     {
+        /** @var ThemeHelper $themeHelper */
         $flashes = [];
         $error   = false;
 
