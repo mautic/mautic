@@ -85,11 +85,7 @@ class MailHelperTest extends \PHPUnit\Framework\TestCase
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
 
-        $this->mockFactory     = $this->createMock(MauticFactory::class);
-        $this->mockFactory->method('get')
-            ->with('mautic.helper.from_email_helper')
-            ->willReturn($this->fromEmailHelper);
-
+        $this->mockFactory           = $this->createMock(MauticFactory::class);
         $this->swiftEventsDispatcher = $this->createMock(\Swift_Events_EventDispatcher::class);
         $this->delegatingSpool       = $this->createMock(DelegatingSpool::class);
 
