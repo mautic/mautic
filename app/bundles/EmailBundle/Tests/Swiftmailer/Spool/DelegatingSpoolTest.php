@@ -132,5 +132,26 @@ class DelegatingSpoolTest extends TestCase
 
         $spool = new DelegatingSpool($this->coreParametersHelper, $this->realTransport);
         $this->assertFalse($spool->isTokenizationEnabled());
+
+    public function testDelegateMessageWillReturnIntEvenIfTransportWillNot()
+    {
+        $spoolPath = __DIR__.'/tmp';
+
+        $this->coreParametersHelper->expects($this->exactly(2))
+            ->method('get')
+            ->withConsecutive(['mailer_spool_type'], ['mailer_spool_path'])
+            ->willReturnOnConsecutiveCalls('memory', $spoolPath);
+
+        $this->realTransport->expects($this->once())
+            ->method('send')
+            ->willReturn(null); // null. Not int. Must be typed to int.
+
+        $spool  = new DelegatingSpool($this->coreParametersHelper, $this->realTransport);
+        $failed = [];
+        $sent   = $spool->delegateMessage($this->message, $failed);
+
+        $this->assertEquals(0, $sent);
+
+        rmdir($spoolPath);
     }
 }
