@@ -32,6 +32,9 @@ class ContactCest
         $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press the enter key to execute the search
         $I->wait(1);
         $I->see('Test First Name', '//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Look for our test contact in the contact list
+        $I->fillField('//*[@id="list-search"]', ''); // Clear search (can't use clearfield as not supported in this version of Codeception)
+        $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press the enter key to execute the search
+        $I->wait(1);
     }
 
     public function createContactFromForm(AcceptanceTester $I)
@@ -74,10 +77,12 @@ class ContactCest
         $I->click(['css' => 'div#lead_preferred_locale_chosen']); // Clicking the dropdown
         $I->fillField(['xpath' => '//div[@id="lead_preferred_locale_chosen"]/div/div/input'], 'United States'); // Searching the desired language
         $I->click(['xpath' => '//div[@id="lead_preferred_locale_chosen"]/div/ul/li[1]']); // Click the search result
+        $I->wait(2);
 
         $I->click(['css' => 'div#lead_timezone_chosen']); // Clicking the timezone select dropdown
+        $I->wait(2);
         $I->fillField(['xpath' => '//*[@id="lead_timezone_chosen"]/div/div/input'], 'Los Angeles'); // Searching the desired timezone
-        $I->wait(1); // We need to wait for it to look up the timezone
+        $I->wait(2); // We need to wait for it to look up the timezone
         $I->click(['xpath' => '//div[@id="lead_timezone_chosen"]/div/ul/li[2]']); // Click the search result
 
         $I->click(['css' => 'div#lead_stage_chosen']); // Clicking the lead stage dropdown
@@ -98,11 +103,11 @@ class ContactCest
         $I->click(['css' => 'div#lead_tags_chosen']); // Clicking the lead stage dropdown
         $I->fillField(['xpath' => '//*[@id="lead_tags_chosen"]/ul/li/input'], 'Mautic'); // Searching the desired lead stage
         $I->wait(1); // We need to wait for it to look up the tags
-        $I->pressKey('//*[@id="lead_tags_chosen"]/ul/li/input', WebDriverKeys::ENTER);
+        $I->pressKey('//*[@id="lead_tags_chosen"]/ul/li/input', WebDriverKeys::ENTER); // Press enter
         $I->click(['css' => 'div#lead_tags_chosen']); // Clicking the lead stage dropdown
         $I->fillField(['xpath' => '//*[@id="lead_tags_chosen"]/ul/li/input'], 'Cold lead'); // Searching the desired lead stage
         $I->wait(1); // We need to wait for it to look up the tags
-        $I->pressKey('//*[@id="lead_tags_chosen"]/ul/li/input', WebDriverKeys::ENTER);
+        $I->pressKey('//*[@id="lead_tags_chosen"]/ul/li/input', WebDriverKeys::ENTER); // Press enter
     }
 
     // Tests for viewing contacts
@@ -124,9 +129,10 @@ class ContactCest
         $contactName = $I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Grab contact name
         $I->click('//*[@id="leadTable"]/tbody/tr[1]/td[2]');
         $I->click(['link' => $contactName]);
+        $I->wait(2);
         $I->see($contactName); // Confirm we're on the contact view page
         $I->click('//*[@id="toolbar"]/div[1]/a[1]'); // Click on edit button
-        $I->waitForElement('//*[@id="core"]/div[1]/h4', 2); // Wait for the form to show (in secs)
+        $I->waitForElement('//*[@id="core"]/div[1]/h4', 5); // Wait for the form to show (in secs)
         $I->see("Edit $contactName"); // Confirm we're on the edit contact page
         $I->fillField('//*[@id="lead_firstname"]', 'Test-First-Name'); // Set the first name to Test-First-Name
         $I->click('//*[@id="lead_buttons_apply_toolbar"]'); // Click on the Apply button
@@ -151,7 +157,7 @@ class ContactCest
         $I->wait(5); // Wait for the modal to show
         $I->waitForElementVisible('button.btn.btn-danger', 5); // We have to wait for the modal to become visible
         $I->click('button.btn.btn-danger'); //Now the modal is visible, click on the button to confirm delete
-        $I->wait(5); // Wait for delete to be completed
+        $I->wait(2); // Wait for delete to be completed
         $I->see("$contactName has been deleted!"); // Confirm the contact is deleted
     }
 
@@ -162,12 +168,13 @@ class ContactCest
         $I->click('//*[@id="leadTable"]/tbody/tr[1]/td[2]');
         $I->click(['link' => $contactName]); // Click on the first contact in the list
         $I->see($contactName); // Check we see the expected name
+        $I->wait(2);
         $I->click('//*[@id="toolbar"]/div[1]/button'); // Click the dropdown caret to show delete option
-        $I->waitForElementVisible('//*[@id="toolbar"]/div[1]/ul/li[5]/a/span/span', 2); // Wait for the dropdown to be displayed
+        $I->waitForElementVisible('//*[@id="toolbar"]/div[1]/ul/li[5]/a/span/span', 5); // Wait for the dropdown to be displayed
         $I->click('//*[@id="toolbar"]/div[1]/ul/li[5]/a/span/span');
         $I->waitForElementVisible('button.btn.btn-danger', 5); // We have to wait for the modal to become visible
         $I->click('button.btn.btn-danger'); //Now the modal is visible, click on the button to confirm delete
-        $I->wait(5); // Wait for delete to be completed
+        $I->wait(2); // Wait for delete to be completed
         $I->see("$contactName has been deleted!"); // Confirm the contact is deleted
     }
 
@@ -182,7 +189,7 @@ class ContactCest
         $I->see("$contactName2", '//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]');
         $I->fillField('//*[@id="list-search"]', "$contactName1"); // Search for first contact
         $I->wait(1);
-        $I->see("$contactName1", '//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]');
-        $I->dontSee("$contactName2", '//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]');
+        $I->see("$contactName1", '//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Check that we see the first contact in the list
+        $I->dontSee("$contactName2", '//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]'); // Check that we don't see the second contact in the list (as we have filtered to see only the first)
     }
 }
