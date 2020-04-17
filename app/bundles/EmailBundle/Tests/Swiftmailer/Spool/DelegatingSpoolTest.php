@@ -132,6 +132,7 @@ class DelegatingSpoolTest extends TestCase
 
         $spool = new DelegatingSpool($this->coreParametersHelper, $this->realTransport);
         $this->assertFalse($spool->isTokenizationEnabled());
+    }
 
     public function testDelegateMessageWillReturnIntEvenIfTransportWillNot()
     {
