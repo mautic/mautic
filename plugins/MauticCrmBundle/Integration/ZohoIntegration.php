@@ -244,6 +244,14 @@ class ZohoIntegration extends CrmAbstractIntegration
                             }
                         }
 
+                        // normalize
+                        foreach ($newMatchedFields as $field=>$value) {
+                            $fields= $entity->getFields(true);
+                            if ($fields[$field]['type'] === 'multiselect') {
+                                $newMatchedFields[$field] = str_replace(';', '|', $value);
+                            }
+                        }
+
                         // update values if already empty
                         foreach ($matchedFields as $field => $value) {
                             if (empty($entity->getFieldValue($field))) {
