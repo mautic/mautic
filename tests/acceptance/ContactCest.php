@@ -191,9 +191,12 @@ class ContactCest
         $I->wait(1);
         $I->see("$contactName1", '//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Check that we see the first contact in the list
         $I->dontSee("$contactName2", '//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]'); // Check that we don't see the second contact in the list (as we have filtered to see only the first)
+        $I->fillField('//*[@id="list-search"]', ''); // Clear search (can't use clearfield as not supported in this version of Codeception)
+        $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press the enter key to execute the search
+        $I->wait(1);
     }
 
-    // Tests for batch changes
+    // Tests for batch contact changes
 
     public function batchAddToCampaign(AcceptanceTester $I) // NOTE Sample data does not include campaigns - see https://github.com/mautic/mautic/issues/8677. Create one first.
     {
