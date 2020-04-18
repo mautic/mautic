@@ -305,7 +305,6 @@ class ContactCest
         $I->click('//*[@id="MauticSharedModal"]/div/div/div[2]/div[2]/form/ul/li[2]/a'); // click on Categories tab
         $I->wait(1);
         $I->seeFieldIsNotEmpty($I->grabTextFrom('//*[@id="lead_contact_frequency_rules_global_categories_chosen"]/ul/li[1]')); // Check that the field is not empty
-        $I->makeScreenshot('contact-1-category-set');
 
         // Check contact 2 has the category set
 
@@ -319,6 +318,5 @@ class ContactCest
         $I->click('//*[@id="MauticSharedModal"]/div/div/div[2]/div[2]/form/ul/li[2]/a'); // click on Categories tab
         $I->wait(1);
         $I->seeFieldIsNotEmpty($I->grabTextFrom('//*[@id="lead_contact_frequency_rules_global_categories_chosen"]/ul/li[1]')); // Check that the field is empty
-        $I->makeScreenshot('contact-2-category-set');
     }
 }
