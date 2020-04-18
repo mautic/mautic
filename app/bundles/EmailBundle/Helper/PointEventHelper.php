@@ -13,7 +13,6 @@ namespace Mautic\EmailBundle\Helper;
 
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
 
 /**
  * Class PointEventHelper.
@@ -51,7 +50,7 @@ class PointEventHelper
      *
      * @return bool
      */
-    public static function sendEmail($event, Lead $lead, EmailModel $model, LeadModel $leadModel)
+    public static function sendEmail($event, Lead $lead, EmailModel $model)
     {
         $properties = $event['properties'];
         $emailId    = (int) $properties['email'];
@@ -62,7 +61,7 @@ class PointEventHelper
         if (null != $email && $email->isPublished()) {
             $leadFields = $lead->getFields();
             if (isset($leadFields['core']['email']['value']) && $leadFields['core']['email']['value']) {
-                $leadCredentials       = $leadModel->flattenFields($leadFields);
+                $leadCredentials       = $lead->getProfileFields();
                 $leadCredentials['id'] = $lead->getId();
 
                 $options   = ['source' => ['trigger', $event['id']]];

@@ -54,7 +54,6 @@ class TriggerModel extends CommonFormModel
         IpLookupHelper $ipLookupHelper,
         LeadModel $leadModel,
         TriggerEventModel $pointTriggerEventModel,
-        MauticFactory $mauticFactory,
         ContactTracker $contactTracker
     ) {
         $this->ipLookupHelper         = $ipLookupHelper;
