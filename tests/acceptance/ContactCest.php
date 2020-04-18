@@ -565,4 +565,23 @@ class ContactCest
         $I->SeeElement('#leadTable > tbody > tr:nth-child(1) > td:nth-child(2) > a > div.pull-right.label.label-danger');
         $I->SeeElement('#leadTable > tbody > tr:nth-child(2) > td:nth-child(2) > a > div.pull-right.label.label-danger');
     }
+
+    public function batchDeleteContacts(AcceptanceTester $I)
+    {
+        $I->amOnPage('/s/contacts');
+        $contactName1 = $I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Get name of first contact so we can check for it after delete
+        $contactName2 = $I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]'); // Get name of second contact so we can check for it after delete
+        $I->see("$contactName1", '//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // check first contact
+        $I->see("$contactName2", '//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // check second contact
+        $I->checkOption('//*[@id="leadTable"]/tbody/tr[1]/td[1]/div/span/input'); // Select contact 1
+        $I->checkOption('//*[@id="leadTable"]/tbody/tr[2]/td[1]/div/span/input'); // Select contact 2
+        $I->click('//*[@id="leadTable"]/thead/tr/th[1]/div/div/button'); // Click for options
+        $I->click('//*[@id="leadTable"]/thead/tr/th[1]/div/div/ul/li[10]/a/span/span'); // Select Delete
+        $I->wait(5); // Wait for the modal to show
+        $I->waitForElementVisible('button.btn.btn-danger', 5); // We have to wait for the modal to become visible
+        $I->click('button.btn.btn-danger'); //Now the modal is visible, click on the button to confirm delete
+        $I->wait(2); // Wait for delete to be completed
+        $I->see("$contactName1", '//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Check we can see first contact name
+        $I->see("$contactName2", '//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]'); // Check we can see second contact name
+    }
 }
