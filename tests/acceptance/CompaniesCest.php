@@ -96,4 +96,17 @@ class CompaniesCest
         $I->wait(5);
         $I->dontSee("$companyName");
     }
+
+    public function searchCompanies(AcceptanceTester $I)
+    {
+        $I->amOnPage('/s/companies');
+        $companyName1=$I->grabTextFrom('//*[@id="companyTable"]/tbody/tr[1]/td[2]/div/a'); // Grab name of first company
+        $companyName2=$I->grabTextFrom('//*[@id="companyTable"]/tbody/tr[2]/td[2]/div/a'); // Grab name of second company
+        $I->fillField('//*[@id="list-search"]', "$companyName1"); // Search companies for Company 1
+        $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press enter
+        $I->wait(2);
+        $I->dontsee("$companyName2"); // Confirm we no longer see Company 2
+        $I->fillField('//*[@id="list-search"]', ''); // Clear field ready for subsequent tests
+        $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press enter
+    }
 }
