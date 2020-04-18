@@ -156,4 +156,17 @@ class CompaniesCest
         $I->dontSee("$companyName1");
         $I->dontSee("$companyName2");
     }
+
+    public function cloneCompanies(AcceptanceTester $I)
+    {
+        $I->amOnPage('/s/companies');
+        $companyName1=$I->grabTextFrom('//*[@id="companyTable"]/tbody/tr[1]/td[2]/div/a'); // Grab name of first company
+        $I->click('//*[@id="companyTable"]/tbody/tr[1]/td[1]/div/div/button/i');
+        $I->click('//*[@id="companyTable"]/tbody/tr[1]/td[1]/div/div/ul/li[2]/a'); // Click to clone company
+        $I->wait(1);
+        $I->fillField('//*[@id="company_companyname"]', "$companyName1 clone");
+        $I->click('//*[@id="company_buttons_save_toolbar"]');
+        $I->wait(2);
+        $I->see("$companyName1 clone");
+    }
 }
