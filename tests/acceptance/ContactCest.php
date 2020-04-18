@@ -248,4 +248,77 @@ class ContactCest
         $I->dontsee("$contactName1", '//*[@id="leads-container"]/div[1]/div/div[2]/div/div/div[2]/div'); // Confirm first contact is now in the campaign
         $I->dontsee("$contactName2", '//*[@id="leads-container"]/div[1]/div/div[1]/div/div/div[2]/div'); // Confirm second contact is now in the campaign
     }
+
+    public function batchAddToCategory(AcceptanceTester $I)
+
+    // NOTE: You need to manually create a global or contact category as it is not included in demo data. This test assumes that the first two contacts do not have any categories assigned to start with.
+    {
+        $I->amOnPage('/s/contacts');
+        $contactName1 = $I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Get name of first contact
+        $contactName2 = $I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]'); // Get name of second contact
+
+        // Check contact 1 does not have the category set
+
+        $I->click('//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Click on first contact
+        $I->wait(2);
+        $I->click('//*[@id="toolbar"]/div[1]/button'); // Click dropdown to reveal preferences
+        $I->waitForElementVisible('//*[@id="toolbar"]/div[1]/ul', 5); // Wait for dropdown to show
+        $I->click('//*[@id="toolbar"]/div[1]/ul/li[4]/a'); // Click on preferences
+        $I->waitForElementVisible('//*[@id="MauticSharedModal"]/div/div/div[2]/div[2]/form/ul/li[2]/a', 5); // Wait for modal to be displayed
+        $I->click('//*[@id="MauticSharedModal"]/div/div/div[2]/div[2]/form/ul/li[2]/a'); // click on Categories tab
+        $I->wait(1);
+        $I->seeFieldIsEmpty($I->grabTextFrom('//*[@id="lead_contact_frequency_rules_global_categories_chosen"]/ul/li[1]')); // Check that the field is empty
+
+        // Check contact 2 does not have the category set
+
+        $I->amOnPage('/s/contacts');
+        $I->click('//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]'); // Click on second contact
+        $I->wait(2);
+        $I->click('//*[@id="toolbar"]/div[1]/button'); // Click dropdown to reveal preferences
+        $I->waitForElementVisible('//*[@id="toolbar"]/div[1]/ul', 5); // Wait for dropdown to show
+        $I->click('//*[@id="toolbar"]/div[1]/ul/li[4]/a'); // Click on preferences
+        $I->waitForElementVisible('//*[@id="MauticSharedModal"]/div/div/div[2]/div[2]/form/ul/li[2]/a', 5); // Wait for modal to be displayed
+        $I->click('//*[@id="MauticSharedModal"]/div/div/div[2]/div[2]/form/ul/li[2]/a'); // click on Categories tab
+        $I->wait(1);
+        $I->seeFieldIsEmpty($I->grabTextFrom('//*[@id="lead_contact_frequency_rules_global_categories_chosen"]/ul/li[1]')); // Check that the field is empty
+
+        // Batch add both contacts to category
+        $I->amOnPage('/s/contacts');
+        $I->checkOption('//*[@id="leadTable"]/tbody/tr[1]/td[1]/div/span/input'); // Select contact 1
+        $I->checkOption('//*[@id="leadTable"]/tbody/tr[2]/td[1]/div/span/input'); // Select contact 2
+        $I->click('//*[@id="leadTable"]/thead/tr/th[1]/div/div/button'); // Click for options
+        $I->click('//*[@id="leadTable"]/thead/tr/th[1]/div/div/ul/li[2]/a/span/span'); // Select categories
+        $I->waitForElementVisible('//*[@id="lead_batch_add_chosen"]', 5); // Wait for modal
+        $I->click('//*[@id="lead_batch_add_chosen"]/ul/li/input'); // Click into add box
+        $I->click('//*[@id="lead_batch_add_chosen"]/div/ul/li'); // Select category
+        $I->click('//*[@id="MauticSharedModal"]/div/div/div[3]/div/button[2]'); // Save
+
+       // Check contact 1 has the category set
+
+        $I->amOnPage('/s/contacts');
+        $I->click('//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Click on first contact
+        $I->wait(2);
+        $I->click('//*[@id="toolbar"]/div[1]/button'); // Click dropdown to reveal preferences
+        $I->waitForElementVisible('//*[@id="toolbar"]/div[1]/ul', 5); // Wait for dropdown to show
+        $I->click('//*[@id="toolbar"]/div[1]/ul/li[4]/a'); // Click on preferences
+        $I->waitForElementVisible('//*[@id="MauticSharedModal"]/div/div/div[2]/div[2]/form/ul/li[2]/a', 5); // Wait for modal to be displayed
+        $I->click('//*[@id="MauticSharedModal"]/div/div/div[2]/div[2]/form/ul/li[2]/a'); // click on Categories tab
+        $I->wait(1);
+        $I->seeFieldIsNotEmpty($I->grabTextFrom('//*[@id="lead_contact_frequency_rules_global_categories_chosen"]/ul/li[1]')); // Check that the field is not empty
+        $I->makeScreenshot('contact-1-category-set');
+
+        // Check contact 2 has the category set
+
+        $I->amOnPage('/s/contacts');
+        $I->click('//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]'); // Click on second contact
+        $I->wait(2);
+        $I->click('//*[@id="toolbar"]/div[1]/button'); // Click dropdown to reveal preferences
+        $I->waitForElementVisible('//*[@id="toolbar"]/div[1]/ul', 5); // Wait for dropdown to show
+        $I->click('//*[@id="toolbar"]/div[1]/ul/li[4]/a'); // Click on preferences
+        $I->waitForElementVisible('//*[@id="MauticSharedModal"]/div/div/div[2]/div[2]/form/ul/li[2]/a', 5); // Wait for modal to be displayed
+        $I->click('//*[@id="MauticSharedModal"]/div/div/div[2]/div[2]/form/ul/li[2]/a'); // click on Categories tab
+        $I->wait(1);
+        $I->seeFieldIsNotEmpty($I->grabTextFrom('//*[@id="lead_contact_frequency_rules_global_categories_chosen"]/ul/li[1]')); // Check that the field is empty
+        $I->makeScreenshot('contact-2-category-set');
+    }
 }
