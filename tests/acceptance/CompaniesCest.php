@@ -115,11 +115,28 @@ class CompaniesCest
         $I->amOnPage('/s/companies');
         $I->click('//*[@id="companyTable"]/tbody/tr[1]/td[2]/div/a'); // Click on first company to edit
         $I->wait(2);
-        $I->makeScreenshot('edit-company');
         $I->see('Choose one...', '//*[@id="company_owner_chosen"]');
         $I->click('//*[@id="company_owner_chosen"]');
         $I->click('//*[@id="company_owner_chosen"]/div/ul/li[2]'); // Assign an owner
         $I->click('//*[@id="company_buttons_apply_toolbar"]');
         $I->dontSee('Choose one...', '//*[@id="company_owner_chosen"]');
+    }
+
+    public function mergeCompanies(AcceptanceTester $I)
+    {
+        //TODO Could maybe check the number of contacts post-merge is equal to the sum of company 1 & 2
+        $I->amOnPage('/s/companies');
+        $companyName1=$I->grabTextFrom('//*[@id="companyTable"]/tbody/tr[1]/td[2]/div/a'); // Grab name of first company
+        $companyName2=$I->grabTextFrom('//*[@id="companyTable"]/tbody/tr[2]/td[2]/div/a'); // Grab name of second company
+        $I->click('//*[@id="companyTable"]/tbody/tr[1]/td[2]/div/a');
+        $I->waitForElementVisible('//*[@id="company_buttons_merge_toolbar"]', 2);
+        $I->click('//*[@id="company_buttons_merge_toolbar"]');
+        $I->wait(1);
+        $I->click('//*[@id="company_merge_company_to_merge_chosen"]');
+        $I->fillField('//*[@id="company_merge_company_to_merge_chosen"]/div/div/input', "$companyName2");
+        $I->click('//*[@id="company_merge_company_to_merge_chosen"]/div/ul/li');
+        $I->click('//*[@id="MauticSharedModal"]/div/div/div[3]/div/button[2]');
+        $I->wait(2);
+        $I->dontSee("$companyName1");
     }
 }
