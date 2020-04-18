@@ -540,4 +540,29 @@ class ContactCest
         $I->seeFieldIsNotEmpty($I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[1]/td[5]/span')); // Check that the stage field is not empty
         $I->seeFieldIsNotEmpty($I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[1]/td[5]/span')); // Check that the stage field is not empty
     }
+
+    public function batchSetDNC(AcceptanceTester $I)
+    {
+        $I->amOnPage('/s/contacts');
+        // Check our first two contacts don't have DNC set
+        $I->dontSeeElement('#leadTable > tbody > tr:nth-child(1) > td:nth-child(2) > a > div.pull-right.label.label-danger');
+        $I->dontSeeElement('#leadTable > tbody > tr:nth-child(2) > td:nth-child(2) > a > div.pull-right.label.label-danger');
+
+        // Batch add DNC to first two contacts
+        $I->checkOption('//*[@id="leadTable"]/tbody/tr[1]/td[1]/div/span/input'); // Select contact 1
+        $I->checkOption('//*[@id="leadTable"]/tbody/tr[2]/td[1]/div/span/input'); // Select contact 2
+        $I->click('//*[@id="leadTable"]/thead/tr/th[1]/div/div/button'); // Click for options
+        $I->click('//*[@id="leadTable"]/thead/tr/th[1]/div/div/ul/li[8]/a/span/span'); // Select DNC
+        $I->wait(1);
+        $I->fillField('//*[@id="lead_batch_dnc_reason"]', 'Test');
+        $I->wait(1);
+        $I->click('//*[@id="MauticSharedModal"]/div/div/div[3]/div/button[2]'); // Save
+        $I->wait(2);
+        $I->reloadPage();
+        $I->wait(1);
+
+        // Check our first two contacts now have DNC set
+        $I->SeeElement('#leadTable > tbody > tr:nth-child(1) > td:nth-child(2) > a > div.pull-right.label.label-danger');
+        $I->SeeElement('#leadTable > tbody > tr:nth-child(2) > td:nth-child(2) > a > div.pull-right.label.label-danger');
+    }
 }
