@@ -109,4 +109,17 @@ class CompaniesCest
         $I->fillField('//*[@id="list-search"]', ''); // Clear field ready for subsequent tests
         $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press enter
     }
+
+    public function assignOwner(AcceptanceTester $I)
+    {
+        $I->amOnPage('/s/companies');
+        $I->click('//*[@id="companyTable"]/tbody/tr[1]/td[2]/div/a'); // Click on first company to edit
+        $I->wait(2);
+        $I->makeScreenshot('edit-company');
+        $I->see('Choose one...', '//*[@id="company_owner_chosen"]');
+        $I->click('//*[@id="company_owner_chosen"]');
+        $I->click('//*[@id="company_owner_chosen"]/div/ul/li[2]'); // Assign an owner
+        $I->click('//*[@id="company_buttons_apply_toolbar"]');
+        $I->dontSee('Choose one...', '//*[@id="company_owner_chosen"]');
+    }
 }
