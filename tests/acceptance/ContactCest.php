@@ -325,8 +325,6 @@ class ContactCest
     // NOTE: This assumes the previous test has run successfully and the first two contacts have a category set.
     {
         $I->amOnPage('/s/contacts');
-        $contactName1 = $I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Get name of first contact
-        $contactName2 = $I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]'); // Get name of second contact
 
         // Check contact 1 has the category set
 
@@ -390,5 +388,55 @@ class ContactCest
         $I->click('//*[@id="MauticSharedModal"]/div/div/div[2]/div[2]/form/ul/li[2]/a'); // click on Categories tab
         $I->wait(1);
         $I->seeFieldIsEmpty($I->grabTextFrom('//*[@id="lead_contact_frequency_rules_global_categories_chosen"]/ul/li[1]')); // Check that the field is empty
+    }
+
+    public function batchChangeOwner(AcceptanceTester $I)
+    {
+        $I->amOnPage('/s/contacts');
+
+        //Check contact 1 owner
+
+        $I->click('//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Click on first contact
+        $I->wait(2);
+        $I->makeScreenshot('view-contact-1');
+        $I->see('Sales User', '//*[@id="app-content"]/div[1]/div[2]/div[2]/div[1]/div[4]/p[1]'); // Confirm contact owned by Sales User
+
+        //Check contact 2 owner
+
+        $I->amOnPage('/s/contacts');
+        $I->click('//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]'); // Click on second contact
+        $I->wait(2);
+        $I->makeScreenshot('view-contact-2');
+        $I->see('Sales User', '//*[@id="app-content"]/div[1]/div[2]/div[2]/div[1]/div[4]/p[1]'); // Confirm contact owned by Sales User
+
+        // Batch change owner
+
+        $I->amOnPage('/s/contacts');
+        $I->checkOption('//*[@id="leadTable"]/tbody/tr[1]/td[1]/div/span/input'); // Select contact 1
+        $I->checkOption('//*[@id="leadTable"]/tbody/tr[2]/td[1]/div/span/input'); // Select contact 2
+        $I->click('//*[@id="leadTable"]/thead/tr/th[1]/div/div/button'); // Click for options
+        $I->click('//*[@id="leadTable"]/thead/tr/th[1]/div/div/ul/li[4]/a/span/span'); // Select owner
+        $I->waitForElementVisible('//*[@id="lead_batch_owner_addowner_chosen"]', 5); // Wait for modal
+        $I->click('//*[@id="lead_batch_owner_addowner_chosen"]'); // Click into select box
+        $I->click('//*[@id="lead_batch_owner_addowner_chosen"]/div/ul/li[1]'); // Select Admin User
+        $I->wait(1);
+        $I->click('//*[@id="MauticSharedModal"]/div/div/div[3]/div/button[2]'); // Save
+
+        $I->amOnPage('/s/contacts');
+
+        //Check contact 1 owner
+
+        $I->click('//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Click on first contact
+        $I->wait(2);
+        $I->makeScreenshot('view-contact-1');
+        $I->see('Admin User', '//*[@id="app-content"]/div[1]/div[2]/div[2]/div[1]/div[4]/p[1]'); // Confirm contact owned by Admin User
+
+        //Check contact 2 owner
+
+        $I->amOnPage('/s/contacts');
+        $I->click('//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]'); // Click on second contact
+        $I->wait(2);
+        $I->makeScreenshot('view-contact-2');
+        $I->see('Admin User', '//*[@id="app-content"]/div[1]/div[2]/div[2]/div[1]/div[4]/p[1]'); // Confirm contact owned by Admin User
     }
 }
