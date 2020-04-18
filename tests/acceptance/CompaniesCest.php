@@ -83,4 +83,17 @@ class CompaniesCest
         $I->wait(2);
         $I->see('Amazon Test');
     }
+
+    public function deleteCompanyFromList(AcceptanceTester $I)
+    {
+        $I->amOnPage('/s/companies');
+        $companyName=$I->grabTextFrom('//*[@id="companyTable"]/tbody/tr[1]/td[2]/div/a');
+        $I->see("$companyName");
+        $I->click('//*[@id="companyTable"]/tbody/tr[1]/td[1]/div/div/button/i');
+        $I->click('//*[@id="companyTable"]/tbody/tr[1]/td[1]/div/div/ul/li[3]/a/span/span');
+        $I->waitForElementVisible('/html/body/div[2]/div/div/div[2]/button[2]', 5); // Wait for modal to display
+        $I->click('/html/body/div[2]/div/div/div[2]/button[2]'); // Click delete
+        $I->wait(5);
+        $I->dontSee("$companyName");
+    }
 }
