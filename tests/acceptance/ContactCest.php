@@ -515,4 +515,29 @@ class ContactCest
         $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press the enter key to execute the search
         $I->wait(1);
     }
+
+    public function batchAddStage(AcceptanceTester $I)
+    // NOTE: You will need to manually create a stage as none is included in sample data. It is not currently possible to batch remove stages via contacts.
+    {
+        // Check if our first two contacts have a stage set
+        $I->amOnPage('/s/contacts');
+        $I->seeFieldIsEmpty($I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[1]/td[5]')); // Check that the stage field is empty
+         $I->seeFieldIsEmpty($I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[2]/td[5]')); // Check that the stage field is empty
+
+        // Batch add stage to first two contacts
+        $I->checkOption('//*[@id="leadTable"]/tbody/tr[1]/td[1]/div/span/input'); // Select contact 1
+        $I->checkOption('//*[@id="leadTable"]/tbody/tr[2]/td[1]/div/span/input'); // Select contact 2
+        $I->click('//*[@id="leadTable"]/thead/tr/th[1]/div/div/button'); // Click for options
+        $I->click('//*[@id="leadTable"]/thead/tr/th[1]/div/div/ul/li[6]/a/span/span'); // Select stages
+        $I->wait(1);
+        $I->click('//*[@id="lead_batch_stage_addstage_chosen"]'); // Click into select box
+        $I->click('//*[@id="lead_batch_stage_addstage_chosen"]/div/ul/li'); // Select Stage
+        $I->wait(1);
+        $I->click('//*[@id="MauticSharedModal"]/div/div/div[3]/div/button[2]'); // Save
+        $I->wait(2);
+        $I->reloadPage();
+        $I->wait(1);
+        $I->seeFieldIsNotEmpty($I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[1]/td[5]/span')); // Check that the stage field is not empty
+        $I->seeFieldIsNotEmpty($I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[1]/td[5]/span')); // Check that the stage field is not empty
+    }
 }
