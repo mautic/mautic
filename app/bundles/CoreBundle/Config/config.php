@@ -1202,6 +1202,7 @@ return [
             'Datafeedwatch',
             'Daum',
             'DeuSu',
+            'developers.google.com',
             'Diffbot',
             'Digg Deeper',
             'Digincore bot',
