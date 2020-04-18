@@ -398,7 +398,6 @@ class ContactCest
 
         $I->click('//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Click on first contact
         $I->wait(2);
-        $I->makeScreenshot('view-contact-1');
         $I->see('Sales User', '//*[@id="app-content"]/div[1]/div[2]/div[2]/div[1]/div[4]/p[1]'); // Confirm contact owned by Sales User
 
         //Check contact 2 owner
@@ -406,7 +405,6 @@ class ContactCest
         $I->amOnPage('/s/contacts');
         $I->click('//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]'); // Click on second contact
         $I->wait(2);
-        $I->makeScreenshot('view-contact-2');
         $I->see('Sales User', '//*[@id="app-content"]/div[1]/div[2]/div[2]/div[1]/div[4]/p[1]'); // Confirm contact owned by Sales User
 
         // Batch change owner
@@ -428,7 +426,6 @@ class ContactCest
 
         $I->click('//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Click on first contact
         $I->wait(2);
-        $I->makeScreenshot('view-contact-1');
         $I->see('Admin User', '//*[@id="app-content"]/div[1]/div[2]/div[2]/div[1]/div[4]/p[1]'); // Confirm contact owned by Admin User
 
         //Check contact 2 owner
@@ -436,7 +433,47 @@ class ContactCest
         $I->amOnPage('/s/contacts');
         $I->click('//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]'); // Click on second contact
         $I->wait(2);
-        $I->makeScreenshot('view-contact-2');
         $I->see('Admin User', '//*[@id="app-content"]/div[1]/div[2]/div[2]/div[1]/div[4]/p[1]'); // Confirm contact owned by Admin User
+    }
+
+    public function batchAddSegment(AcceptanceTester $I)
+    {
+        // Check if our first two contacts are in the segment
+        $I->amOnPage('/s/contacts');
+        $contactName1 = $I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Get name of first contact
+        $contactName2 = $I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]'); // Get name of second contact
+        $I->fillField('//*[@id="list-search"]', 'segment:us'); // Search for contacts in the US segment
+        $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press the enter key to execute the search
+        $I->wait(1);
+        $I->dontsee("$contactName1"); // check first two names are not in the segment
+        $I->dontsee("$contactName2");
+        $I->makeScreenshot('contacts-not-in-segment');
+        $I->fillField('//*[@id="list-search"]', ''); // Clear search (can't use clearfield as not supported in this version of Codeception)
+        $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press the enter key to execute the search
+        $I->wait(1);
+
+        // Batch add first two contacts to US segment
+        $I->checkOption('//*[@id="leadTable"]/tbody/tr[1]/td[1]/div/span/input'); // Select contact 1
+        $I->checkOption('//*[@id="leadTable"]/tbody/tr[2]/td[1]/div/span/input'); // Select contact 2
+        $I->click('//*[@id="leadTable"]/thead/tr/th[1]/div/div/button'); // Click for options
+        $I->click('//*[@id="leadTable"]/thead/tr/th[1]/div/div/ul/li[5]/a/span/span'); // Select segments
+        $I->wait(1);
+        $I->click('//*[@id="lead_batch_add_chosen"]'); // Click into select box
+        $I->click('//*[@id="lead_batch_add_chosen"]/div/ul/li'); // Select United States
+        $I->wait(1);
+        $I->click('//*[@id="MauticSharedModal"]/div/div/div[3]/div/button[2]'); // Save
+        $I->wait(2);
+
+        // Search for contacts in segment
+
+        $I->fillField('//*[@id="list-search"]', 'segment:us'); // Search for contacts in the US segment
+        $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press the enter key to execute the search
+        $I->wait(1);
+        $I->makeScreenshot('contacts-in-segment');
+        $I->see("$contactName1"); // check first two names are not in the segment
+        $I->see("$contactName2");
+        $I->fillField('//*[@id="list-search"]', ''); // Clear search (can't use clearfield as not supported in this version of Codeception)
+        $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press the enter key to execute the search
+        $I->wait(1);
     }
 }
