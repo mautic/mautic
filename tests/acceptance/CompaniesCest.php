@@ -139,4 +139,21 @@ class CompaniesCest
         $I->wait(2);
         $I->dontSee("$companyName1");
     }
+
+    public function batchDeleteCompanies(AcceptanceTester $I)
+    {
+        $I->amOnPage('/s/companies');
+        $companyName1=$I->grabTextFrom('//*[@id="companyTable"]/tbody/tr[1]/td[2]/div/a'); // Grab name of first company
+        $companyName2=$I->grabTextFrom('//*[@id="companyTable"]/tbody/tr[2]/td[2]/div/a'); // Grab name of second company
+        $I->checkOption('//*[@id="companyTable"]/tbody/tr[1]/td[1]/div/span/input'); // Select company 1
+        $I->checkOption('//*[@id="companyTable"]/tbody/tr[2]/td[1]/div/span/input'); // Select company 2
+        $I->click('//*[@id="companyTable"]/thead/tr/th[1]/div/div/button'); // Click for options
+        $I->click('//*[@id="companyTable"]/thead/tr/th[1]/div/div/ul/li[2]/a/span/span'); // Select delete
+        $I->wait(2);
+        $I->makeScreenshot('delete');
+        $I->click('/html/body/div[2]/div/div/div[2]/button[2]'); // Click delete button
+        $I->wait(2);
+        $I->dontSee("$companyName1");
+        $I->dontSee("$companyName2");
+    }
 }
