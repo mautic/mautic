@@ -253,7 +253,7 @@ return [
                 ],
             ],
             'mautic.email.dashboard.best.hours.subscriber' => [
-                'class'     => 'Mautic\EmailBundle\EventListener\DashboardBestHoursSubscriber',
+                'class'     => \Mautic\EmailBundle\EventListener\DashboardBestHoursSubscriber::class,
                 'arguments' => [
                     'mautic.email.model.email',
                 ],
