@@ -47,7 +47,7 @@ class DashboardBestHourdsWidgetType extends AbstractType
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => ['class' => 'form-control'],
                 'empty_data'  => '',
-                'empty_value' => '',
+                'placeholder' => '',
                 'required'    => false,
                 'multiple'    => false,
             ]
