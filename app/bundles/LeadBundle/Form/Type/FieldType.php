@@ -140,7 +140,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'properties_textarea_template',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'       => 'mautic.lead.field.form.properties.allowhtml',
                 'label_attr'  => ['class' => 'control-label'],
