@@ -39,9 +39,6 @@ class MessageQueue
      */
     private $channel;
 
-    /**
-     * @var
-     */
     private $channelId;
 
     /**
@@ -99,9 +96,6 @@ class MessageQueue
      */
     private $dateSent;
 
-    /**
-     * @var array()
-     */
     private $options = [];
 
     /**

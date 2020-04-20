@@ -51,7 +51,7 @@ class ConfigTrackingPageType extends AbstractType
                 'data'  => isset($options['data']['track_contact_by_ip']) ? (bool) $options['data']['track_contact_by_ip'] : false,
                 'attr'  => [
                     'tooltip'      => 'mautic.page.config.form.track_contact_by_ip.tooltip',
-                    'data-show-on' => '{"config_trackingconfig_anonymize_ip_1":"checked"}',
+                    'data-show-on' => '{"config_trackingconfig_anonymize_ip_0":"checked"}',
                 ],
             ]
         );

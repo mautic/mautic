@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
@@ -390,10 +391,10 @@ class PublicController extends CommonFormController
         $model = $this->getModel('page');
         $model->hitPage(null, $this->request);
 
-        /** @var LeadModel $leadModel */
-        $leadModel = $this->getModel('lead');
+        /** @var ContactTracker $contactTracker */
+        $contactTracker = $this->get(ContactTracker::class);
 
-        $lead = $leadModel->getCurrentLead();
+        $lead = $contactTracker->getContact();
         /** @var DeviceTrackingServiceInterface $trackedDevice */
         $trackedDevice = $this->get('mautic.lead.service.device_tracking_service')->getTrackedDevice();
         $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
@@ -614,10 +615,10 @@ class PublicController extends CommonFormController
     {
         $data = [];
         if ($this->get('mautic.security')->isAnonymous()) {
-            /** @var LeadModel $leadModel */
-            $leadModel = $this->getModel('lead');
+            /** @var ContactTracker $contactTracker */
+            $contactTracker = $this->get(ContactTracker::class);
 
-            $lead = $leadModel->getCurrentLead();
+            $lead = $contactTracker->getContact();
             /** @var DeviceTrackingServiceInterface $trackedDevice */
             $trackedDevice = $this->get('mautic.lead.service.device_tracking_service')->getTrackedDevice();
             $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());

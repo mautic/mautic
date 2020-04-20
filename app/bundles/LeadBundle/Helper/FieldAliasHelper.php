@@ -47,7 +47,7 @@ class FieldAliasHelper
         // make sure alias is not already taken
         $repo      = $this->fieldModel->getRepository();
         $testAlias = $alias;
-        $aliases   = $repo->getAliases($field->getId(), false, true, $field->getObject());
+        $aliases   = $repo->getAliases($field->getId(), false, true, null);
         $count     = (int) in_array($testAlias, $aliases);
         $aliasTag  = $count;
 

@@ -71,7 +71,7 @@ class DelegatingSpool extends \Swift_FileSpool
         }
 
         // Send immediately otherwise
-        return $this->realTransport->send($message, $failedRecipients);
+        return (int) $this->realTransport->send($message, $failedRecipients);
     }
 
     public function wasMessageSpooled(): bool
