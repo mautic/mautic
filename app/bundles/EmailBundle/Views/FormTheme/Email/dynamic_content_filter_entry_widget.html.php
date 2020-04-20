@@ -46,10 +46,10 @@
                                         ?
                                         \Mautic\LeadBundle\Helper\FormFieldHelper::parseBooleanList($list)
                                         :
-                                        \Mautic\LeadBundle\Helper\FormFieldHelper::parseList($list);
+                                        \Mautic\LeadBundle\Helper\FormFieldHelper::parseListForChoices($list);
                                     $list      = json_encode($choices);
                                     $callback  = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : '';
-                                    $operators = (!empty($params['operators'])) ? $view->escape(json_encode(array_flip($params['operators']))) : '{}';
+                                    $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';
                                     ?>
                                     <option value="<?php echo $view->escape($value); ?>" data-mautic="available_<?php echo $value; ?>" data-field-object="<?php echo $object; ?>" data-field-type="<?php echo $params['properties']['type']; ?>" data-field-list="<?php echo $view->escape($list); ?>" data-field-callback="<?php echo $callback; ?>" data-field-operators='<?php echo $operators; ?>' class="segment-filter fa <?php echo $icon; ?>"><?php echo $view['translator']->trans($params['label']); ?></option>
                                 <?php endforeach; ?>
