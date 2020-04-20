@@ -273,13 +273,11 @@ trait FilterTrait
                 $choices = [];
                 if (!empty($field['properties']['list'])) {
                     $list    = $field['properties']['list'];
-                    $choices = array_flip(
-                        ('boolean' === $fieldType)
-                            ?
-                            FormFieldHelper::parseBooleanList($list)
-                            :
-                            FormFieldHelper::parseList($list)
-                    );
+                    $choices = ('boolean' === $fieldType)
+                        ?
+                        FormFieldHelper::parseBooleanList($list)
+                        :
+                        FormFieldHelper::parseList($list);
                 }
 
                 if ('select' === $fieldType) {
