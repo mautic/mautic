@@ -2129,7 +2129,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     $filter,
                     $limit,
                     $start,
-                    $this->security->isGranted('email:emails:viewother'),
+                    $this->corePermissions->isGranted('email:emails:viewother'),
                     $options['top_level'] ?? false,
                     $options['email_type'] ?? null,
                     $options['ignore_ids'] ?? [],

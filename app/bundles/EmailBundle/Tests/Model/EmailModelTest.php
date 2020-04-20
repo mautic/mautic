@@ -688,4 +688,37 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $this->emailModel->hitEmail($stat, $request);
     }
+
+    public function testGetLookupResults(): void
+    {
+        $this->emailModel->setUserHelper($this->createMock(UserHelper::class));
+        $this->entityManager->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($this->emailRepository);
+
+        $this->emailRepository->expects($this->once())
+            ->method('getEmailList')
+            ->with(
+                '',
+                0,
+                0,
+                null,
+                false,
+                null,
+                [],
+                null
+            )
+            ->willReturn([
+                [
+                    'id'       => 123,
+                    'name'     => 'Email 123',
+                    'language' => 'EN',
+                ],
+            ]);
+
+        $this->assertSame(
+            ['EN' => ['Email 123' => 123]],
+            $this->emailModel->getLookupResults('email', '', 0, 0)
+        );
+    }
 }
