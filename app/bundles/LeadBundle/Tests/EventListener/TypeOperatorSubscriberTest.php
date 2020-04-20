@@ -176,6 +176,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['Stage D' => 55], $choicesForAliases['stage']);
         $this->assertSame(['Category E' => 66], $choicesForAliases['globalcategory']);
         $this->assertSame(['Email F' => 77], $choicesForAliases['lead_email_received']);
+        $this->assertSame(['Email F' => 77], $choicesForAliases['lead_email_sent']);
         $this->assertSame('smartphone', $choicesForAliases['device_type']['smartphone']);
         $this->assertSame('SA', $choicesForAliases['device_brand']['Samsung']);
         $this->assertSame('Android', $choicesForAliases['device_os']['Android']);
