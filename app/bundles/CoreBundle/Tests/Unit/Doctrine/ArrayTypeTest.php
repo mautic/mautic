@@ -103,4 +103,55 @@ class ArrayTypeTest extends \PHPUnit\Framework\TestCase
             $result
         );
     }
+
+    public function testGiven_objectWithPrivateProperty_when_convertsToPHPValue_then_getsArrayWithoutObject()
+    {
+        $array = [
+            0,
+            new ExampleClassWithPrivateProperty(),
+        ];
+
+        $array = serialize($array);
+
+        $result = $this->arrayType->convertToPHPValue($array, $this->platform);
+        $this->assertEquals(
+            [0],
+            $result
+        );
+    }
+
+    public function testGiven_objectWithProtectedProperty_when_convertsToPHPValue_then_getsArrayWithoutObject()
+    {
+        $array = [
+            0,
+            new ExampleClassWithProtectedProperty(),
+        ];
+
+        $array = serialize($array);
+
+        $result = $this->arrayType->convertToPHPValue($array, $this->platform);
+        $this->assertEquals(
+            [0],
+            $result
+        );
+    }
+
+    public function testGiven_objectWithPublicProperty_when_convertsToPHPValue_then_getsArrayWithObject()
+    {
+        $array = [
+            0,
+            new ExampleClassWithPublicProperty(),
+        ];
+
+        $array = serialize($array);
+
+        $result = $this->arrayType->convertToPHPValue($array, $this->platform);
+        $this->assertEquals(
+            [
+                0,
+                new ExampleClassWithPublicProperty(),
+            ],
+            $result
+        );
+    }
 }
