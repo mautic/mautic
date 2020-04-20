@@ -208,14 +208,8 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                         'label'      => 'Test Select',
                         'properties' => [
                             'list' => [
-                                [
-                                    'label' => 'One',
-                                    'value' => 'one',
-                                ],
-                                [
-                                    'label' => 'Two',
-                                    'value' => 'two',
-                                ],
+                                'One' => 'one',
+                                'Two' => 'two',
                             ],
                             'type' => 'select',
                         ],
