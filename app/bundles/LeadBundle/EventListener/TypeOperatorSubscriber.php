@@ -55,7 +55,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
     private $campaignModel;
 
     /**
-     * @var StageModel
+     * @var EmailModel
      */
     private $emailModel;
 
@@ -137,14 +137,17 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             ]
         );
 
+        $emails = $this->emailModel->getLookupResults('email', '', 0, 0);
+
         $event->setChoicesForFieldAlias('campaign', $this->getCampaignChoices());
         $event->setChoicesForFieldAlias('leadlist', $this->getSegmentChoices());
         $event->setChoicesForFieldAlias('tags', $this->getTagChoices());
         $event->setChoicesForFieldAlias('stage', $this->getStageChoices());
         $event->setChoicesForFieldAlias('globalcategory', $this->getCategoryChoices());
-        $event->setChoicesForFieldAlias('lead_email_received', $this->emailModel->getLookupResults('email', '', 0, 0));
+        $event->setChoicesForFieldAlias('lead_email_received', $emails);
+        $event->setChoicesForFieldAlias('lead_email_sent', $emails);
         $event->setChoicesForFieldAlias('device_type', array_combine((DeviceParser::getAvailableDeviceTypeNames()), (DeviceParser::getAvailableDeviceTypeNames())));
-        $event->setChoicesForFieldAlias('device_brand', DeviceParser::$deviceBrands);
+        $event->setChoicesForFieldAlias('device_brand', array_flip(DeviceParser::$deviceBrands));
         $event->setChoicesForFieldAlias('device_os', array_combine((array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())), array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())));
         $event->setChoicesForFieldType('country', FormFieldHelper::getCountryChoices());
         $event->setChoicesForFieldType('locale', FormFieldHelper::getLocaleChoices());
@@ -294,15 +297,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                 }
             }
 
-            $choices = $event->getFieldChoices();
-            $choices = array_flip(
-                ('boolean' === $event->getFieldType())
-                    ?
-                    FormFieldHelper::parseBooleanList($choices)
-                    :
-                    FormFieldHelper::parseList($choices)
-            );
-
             $form->add(
                 'filter',
                 ChoiceType::class,
@@ -310,7 +304,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                     'label'                     => false,
                     'attr'                      => ['class' => 'form-control'],
                     'data'                      => $filter,
-                    'choices'                   => $choices,
+                    'choices'                   => $event->getFieldChoices(),
                     'multiple'                  => $multiple,
                     'choice_translation_domain' => false,
                     'disabled'                  => $event->filterShouldBeDisabled(),

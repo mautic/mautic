@@ -2110,7 +2110,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param        $type
+     * @param string $type
      * @param string $filter
      * @param int    $limit
      * @param int    $start
@@ -2130,14 +2130,14 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     $limit,
                     $start,
                     $this->security->isGranted('email:emails:viewother'),
-                    isset($options['top_level']) ? $options['top_level'] : false,
-                    isset($options['email_type']) ? $options['email_type'] : null,
-                    isset($options['ignore_ids']) ? $options['ignore_ids'] : [],
-                    isset($options['variant_parent']) ? $options['variant_parent'] : null
+                    $options['top_level'] ?? false,
+                    $options['email_type'] ?? null,
+                    $options['ignore_ids'] ?? [],
+                    $options['variant_parent'] ?? null
                 );
 
                 foreach ($emails as $email) {
-                    $results[$email['language']][$email['id']] = $email['name'];
+                    $results[$email['language']][$email['name']] = $email['id'];
                 }
 
                 //sort by language

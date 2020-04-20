@@ -99,10 +99,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                     $properties['yes'] => 1,
                 ];
             } elseif (in_array($type, ['select', 'multiselect'], true)) {
-                $properties['list'] = (isset($properties['list'])) ? FormFieldHelper::formatList(
-                    FormFieldHelper::FORMAT_ARRAY,
-                    FormFieldHelper::parseList($properties['list'])
-                ) : '';
+                $properties['list'] = array_flip(FormFieldHelper::parseList($properties['list'] ?? []));
             } else {
                 try {
                     $properties['list'] = $this->fieldChoicesProvider->getChoicesForField($type, $field->getAlias());
@@ -362,7 +359,10 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             'lead_email_sent' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_sent'),
                 'object'     => 'lead',
-                'properties' => ['type' => 'lead_email_received'],
+                'properties' => [
+                    'type' => 'select',
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'lead_email_received'),
+                ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
                     OperatorOptions::IN,
                     OperatorOptions::NOT_IN,
