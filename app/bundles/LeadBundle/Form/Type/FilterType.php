@@ -121,20 +121,8 @@ class FilterType extends AbstractType
             }
         };
 
-        $builder->addEventListener(
-            FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($formModifier) {
-                $formModifier($event, FormEvents::PRE_SET_DATA);
-            }
-        );
-
-        $builder->addEventListener(
-            FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($formModifier) {
-                $formModifier($event, FormEvents::PRE_SUBMIT);
-            }
-        );
-
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, $formModifier);
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, $formModifier);
         $builder->add('field', HiddenType::class);
         $builder->add('object', HiddenType::class);
         $builder->add('type', HiddenType::class);
@@ -150,9 +138,6 @@ class FilterType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['fields'] = $this->listModel->getChoiceFields();
