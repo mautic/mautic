@@ -25,8 +25,6 @@ class TimeFormatType extends AbstractType
 
     /**
      * TimeFormat constructor.
-     *
-     * @param TranslatorInterface $translator
      */
     public function __construct(TranslatorInterface $translator)
     {

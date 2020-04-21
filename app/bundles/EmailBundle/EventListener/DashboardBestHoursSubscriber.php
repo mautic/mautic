@@ -54,8 +54,6 @@ class DashboardBestHoursSubscriber extends MainDashboardSubscriber
 
     /**
      * DashboardSubscriber constructor.
-     *
-     * @param EmailModel $emailModel
      */
     public function __construct(EmailModel $emailModel)
     {
@@ -64,15 +62,13 @@ class DashboardBestHoursSubscriber extends MainDashboardSubscriber
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('email:emails:viewother');
 
-        if ($event->getType() == 'emails.best.hours') {
+        if ('emails.best.hours' == $event->getType()) {
             $widget     = $event->getWidget();
             $params     = $widget->getParams();
             $filterKeys = ['companyId', 'campaignId', 'segmentId'];
