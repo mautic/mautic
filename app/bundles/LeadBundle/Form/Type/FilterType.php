@@ -70,10 +70,16 @@ class FilterType extends AbstractType
             $data        = $event->getData();
             $form        = $event->getForm();
             $fieldAlias  = $data['field'];
-            $fieldObject = isset($data['object']) ? $data['object'] : 'behaviors';
-            $field       = isset($fieldChoices[$fieldObject][$fieldAlias]) ? $fieldChoices[$fieldObject][$fieldAlias] : [];
+            $fieldObject = $data['object'] ?? 'behaviors';
+            $field       = $fieldChoices[$fieldObject][$fieldAlias] ?? null;
             $operators   = $field['operators'] ?? [];
-            $operator    = isset($data['operator']) ? $data['operator'] : null;
+            $operator    = $data['operator'] ?? null;
+
+            if (null === $field) {
+                // The field was probably deleted since the segment was created.
+                // Do not show up the filter based on a deleted field.
+                return;
+            }
 
             if ($operators && !$operator) {
                 $operator = array_key_first($operators);
