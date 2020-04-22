@@ -123,7 +123,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
         $actionInverted = ('added' == $action) ? 'removed' : 'added';
         // for added stats we check not existed removed stats greater than date_added
         // for removed stats we check not existed added stats less than date_removed
-        $conditionForNonExistedQuery = ('added' === $action ) ? 'gt' : 'lt';
+        $conditionForNonExistedQuery = ('added' === $action) ? 'gt' : 'lt';
 
         $filter              = [];
         $filter['object']    = 'segment';
