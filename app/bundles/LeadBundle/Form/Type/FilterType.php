@@ -75,12 +75,6 @@ class FilterType extends AbstractType
             $operators   = $field['operators'] ?? [];
             $operator    = $data['operator'] ?? null;
 
-            if (null === $field) {
-                // The field was probably deleted since the segment was created.
-                // Do not show up the filter based on a deleted field.
-                return;
-            }
-
             if ($operators && !$operator) {
                 $operator = array_key_first($operators);
             }
@@ -105,6 +99,12 @@ class FilterType extends AbstractType
                     'label' => false,
                 ]
             );
+
+            if (null === $field) {
+                // The field was probably deleted since the segment was created.
+                // Do not show up the filter based on a deleted field.
+                return;
+            }
 
             $filterPropertiesType = $form->get('properties');
 

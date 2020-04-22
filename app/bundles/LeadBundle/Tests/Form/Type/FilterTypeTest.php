@@ -129,7 +129,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                             'operator' => 'eq',
                         ];
 
-                        $form->expects($this->never())
+                        $form->expects($this->exactly(2))
                             ->method('add');
 
                         $form->expects($this->never())
