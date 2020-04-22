@@ -266,9 +266,8 @@ abstract class AbstractChart
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param int|null     $campaignId
-     * @param string       $fromAlias
+     * @param int|null $campaignId
+     * @param string   $fromAlias
      */
     public function addCampaignFilter(QueryBuilder $q, $campaignId = null, $fromAlias = 't')
     {
@@ -279,9 +278,8 @@ abstract class AbstractChart
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param int|null     $companyId
-     * @param string       $fromAlias
+     * @param int|null $companyId
+     * @param string   $fromAlias
      */
     public function addCompanyFilter(QueryBuilder $q, $companyId = null, $fromAlias = 't')
     {
@@ -306,9 +304,8 @@ abstract class AbstractChart
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param int|null     $segmentId
-     * @param string       $fromAlias
+     * @param int|null $segmentId
+     * @param string   $fromAlias
      */
     public function addSegmentFilter(QueryBuilder $q, $segmentId = null, $fromAlias = 't')
     {

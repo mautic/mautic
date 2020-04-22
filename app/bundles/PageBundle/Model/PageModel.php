@@ -1012,11 +1012,9 @@ class PageModel extends FormModel
     /**
      * Get a list of popular (by hits) tracking pages.
      *
-     * @param int            $limit
-     * @param \DateTime|null $dateFrom
-     * @param \DateTime|null $dateTo
-     * @param array          $filters
-     * @param bool           $canViewOthers
+     * @param int   $limit
+     * @param array $filters
+     * @param bool  $canViewOthers
      *
      * @return array
      */

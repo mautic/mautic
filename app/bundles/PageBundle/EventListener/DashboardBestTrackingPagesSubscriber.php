@@ -53,8 +53,6 @@ class DashboardBestTrackingPagesSubscriber extends MainDashboardSubscriber
 
     /**
      * DashboardSubscriber constructor.
-     *
-     * @param PageModel $pageModel
      */
     public function __construct(PageModel $pageModel)
     {
@@ -63,15 +61,13 @@ class DashboardBestTrackingPagesSubscriber extends MainDashboardSubscriber
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('page:pages:viewother');
 
-        if ($event->getType() == 'best.tracking.pages') {
+        if ('best.tracking.pages' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
