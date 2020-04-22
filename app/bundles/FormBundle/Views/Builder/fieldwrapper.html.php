@@ -16,7 +16,7 @@ if (!isset($inBuilder)) {
 }
 
 ?>
-<div class="<?php if (!isset($conditional)): ?> panel <?php endif; ?> form-field-wrapper" data-sortable-id="mauticform_<?php echo $field['id']; ?>">
+<div class="panel form-field-wrapper" data-sortable-id="mauticform_<?php echo $field['id']; ?>">
     <?php
     echo $view->render(
         'MauticFormBundle:Builder:actions.html.php',
@@ -63,7 +63,7 @@ if (!isset($inBuilder)) {
                                             'tmpl'         => 'field',
                                             'formId'       => $formId,
                                             'inBuilder'    => $inBuilder,
-                                            'parentId'     => $field['id'],
+                                            'parent'       => $field['id'],
                                         ]
                                     ); ?>">
                                 <?php echo $conditionalField; ?>
@@ -112,13 +112,13 @@ if (!isset($inBuilder)) {
         </span>
         <?php endif; ?>
         <?php
-        if (!empty($field['conditions']) && !empty($field['conditions']['enabled']) && !empty($field['conditions']['field'])): ?>
+        if (!empty($field['conditions']['values'])): ?>
             <i class="fa fa-eye" aria-hidden="true"></i>
             <span class="inline-spacer"">
             <span style="text-transform: none"><?php echo $view['translator']->trans(
                     'mautic.form.field.form.condition.show.on'
                 ); ?></span>
-            <strong><?php echo str_replace('_', ' ', $field['conditions']['field']); ?></strong>
+            <strong><?php echo str_replace('_', ' ', $field['parent']); ?></strong>
 
             <span style="text-transform: none"><?php echo $view['translator']->trans(
                     'mautic.form.field.form.condition.select.value'
@@ -127,36 +127,36 @@ if (!isset($inBuilder)) {
             </span>
         <?php endif; ?>
     </div>
-    <?php foreach ($formFields as $field2): ?>
-        <?php if (!empty($field2['parent']) && $field2['parent']->getId() == $field['id']) : ?>
-            <div class="ml-15">
-                <?php if (!empty($field2['isCustom'])):
-                    $params   = $field2['customParameters'];
-                    $template = $params['template'];
-                else:
-                    $template = 'MauticFormBundle:Field:'.$field2['type'].'.html.php';
-                endif; ?>
-                <?php
-
-                echo $view->render(
-                    'MauticFormBundle:Builder:fieldwrapper.html.php',
-                    [
-                        'conditional'       => true,
-                        'template'          => $template,
-                        'field'             => $field2,
-                        'viewOnlyFields'    => $viewOnlyFields,
-                        'inForm'            => true,
-                        'id'                => $field2['id'],
-                        'formId'            => $formId,
-                        'contactFields'     => $contactFields,
-                        'companyFields'     => $companyFields,
-                        'inBuilder'         => $inBuilder,
-                        'fields'            => $fields,
-                        'formFields'        => $formFields,
-                    ]
-                ); ?>
-            </div>
-        <?php endif; ?>
-    <?php endforeach; ?>
 <?php endif; ?>
+    <?php foreach ($formFields as $field2):
+        ?>
+        <?php if (!empty($field2['parent']) && $field2['parent'] == $field['id']) : ?>
+        <div class="ml-15">
+            <?php if (!empty($field2['isCustom'])):
+                $params   = $field2['customParameters'];
+                $template = $params['template'];
+            else:
+                $template = 'MauticFormBundle:Field:'.$field2['type'].'.html.php';
+            endif; ?>
+            <?php
+
+            echo $view->render(
+                'MauticFormBundle:Builder:fieldwrapper.html.php',
+                [
+                    'template'          => $template,
+                    'field'             => $field2,
+                    'viewOnlyFields'    => $viewOnlyFields,
+                    'inForm'            => true,
+                    'id'                => $field2['id'],
+                    'formId'            => $formId,
+                    'contactFields'     => $contactFields,
+                    'companyFields'     => $companyFields,
+                    'inBuilder'         => $inBuilder,
+                    'fields'            => $fields,
+                    'formFields'        => $formFields,
+                ]
+            ); ?>
+        </div>
+    <?php endif; ?>
+    <?php endforeach; ?>
 </div>

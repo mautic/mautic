@@ -54,7 +54,6 @@ if (!isset($lead)) {
         <div class="mauticform-error" id="mauticform<?php echo $formName ?>_error"></div>
         <div class="mauticform-message" id="mauticform<?php echo $formName ?>_message"></div>
         <div class="mauticform-innerform">
-
             <?php
             /** @var \Mautic\FormBundle\Entity\Field $f */
             foreach ($fields as $fieldId => $f):
@@ -95,7 +94,7 @@ if (!isset($lead)) {
                 endif;
                 $parentField = $f;
                 foreach ($fields as $fieldId2 => $f):
-                    if ($f->getParent() && $f->getParent()->getId() == $parentField->getId()):
+                    if ($f->getParent() == $parentField->getId()):
                     if ($f->isCustom()):
                         if (!isset($fieldSettings[$f->getType()])):
                             continue;

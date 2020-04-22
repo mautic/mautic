@@ -153,14 +153,9 @@ class Field
     private $showAfterXSubmissions;
 
     /**
-     * @var Field
-     */
-    private $parent;
-
-    /**
      * @var string
      */
-    private $parentIdTemp;
+    private $parent;
 
     /**
      * Reset properties on clone.
@@ -236,9 +231,7 @@ class Field
             ->nullable()
             ->build();
 
-        $builder->createManyToOne('parent', Field::class)
-            ->addJoinColumn('parent_id', 'id', true, false, 'SET NULL')
-            ->build();
+        $builder->addNullableField('parent', 'string', 'parent_id');
 
         $builder->createField('conditions', 'json_array')
             ->nullable()
@@ -966,11 +959,11 @@ class Field
     }
 
     /**
-     * @param Field $parent
+     * @param string $parent
      *
-     * @return Field
+     * @return string
      */
-    public function setParent(Field $parent = null)
+    public function setParent($parent)
     {
         $this->isChanged('parent', $parent);
         $this->parent = $parent;
@@ -979,26 +972,10 @@ class Field
     }
 
     /**
-     * @return Field
+     * @return string
      */
     public function getParent()
     {
         return $this->parent;
-    }
-
-    /**
-     * @return string
-     */
-    public function getParentIdTemp()
-    {
-        return $this->parentIdTemp;
-    }
-
-    /**
-     * @param string $parentIdTemp
-     */
-    public function setParentIdTemp($parentIdTemp)
-    {
-        $this->parentIdTemp = $parentIdTemp;
     }
 }

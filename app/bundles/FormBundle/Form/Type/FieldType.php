@@ -149,6 +149,29 @@ class FieldType extends AbstractType
             }
         }
 
+        // disable progressing profiling  for conditional fields
+        if (!empty($options['data']['parent'])) {
+            $addBehaviorFields = false;
+            $builder->add(
+                'conditions',
+                FormFieldConditionType::class,
+                [
+                    'label'      => false,
+                    'data'       => isset($options['data']['conditions']) ? $options['data']['conditions'] : [],
+                    'formId'     => $options['data']['formId'],
+                    'parent'     => isset($options['data']['parent']) ? $options['data']['parent'] : null,
+                ]
+            );
+        }
+
+        $builder->add(
+            'parent',
+            HiddenType::class,
+            [
+                'label'=> false,
+            ]
+        );
+
         // Build form fields
         $builder->add(
             'label',
@@ -545,25 +568,6 @@ class FieldType extends AbstractType
                     break;
             }
         }
-        $builder->add(
-            'parentId',
-            HiddenType::class,
-            [
-                'label'=> false,
-            ]
-        );
-
-        $builder->add(
-            'conditions',
-            FormFieldConditionType::class,
-            [
-                'label'      => false,
-                'data'       => isset($options['data']['conditions']) ? $options['data']['conditions'] : [],
-                'formId'     => $options['data']['formId'],
-                'fieldAlias' => isset($options['data']['alias']) ? $options['data']['alias'] : '',
-                'parent'     => isset($options['data']['parent']) ? $options['data']['parent'] : null,
-            ]
-        );
 
         $builder->addEventSubscriber(new CleanFormSubscriber($cleanMasks));
 

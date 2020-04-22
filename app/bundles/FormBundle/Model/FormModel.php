@@ -271,13 +271,6 @@ class FormModel extends CommonFormModel
                 }
             }
 
-            /*   if (!empty($properties['parentId'])) {
-                   if (!$field->getParent()) {
-                       $field->setParentIdTemp($properties['parentId']);
-                   }
-                   $field->setParent(null);
-               }*/
-            $field->setParent(null);
             $field->setForm($entity);
             $field->setSessionId($key);
             $field->setOrder($order);
@@ -288,17 +281,6 @@ class FormModel extends CommonFormModel
         // Persist if the entity is known
         if ($entity->getId()) {
             $this->formFieldModel->saveEntities($existingFields);
-            /* @var Field $existingField */
-         /*   foreach ($existingFields as $existingField) {
-                if ($existingField->getParentIdTemp()) {
-                    foreach ($existingFields as $existingField2) {
-                        if ($existingField->getParentIdTemp() == $existingField2->getSessionId()) {
-                            $existingField->setParent($existingField2);
-                        }
-                    }
-                }
-            }
-            $this->formFieldModel->saveEntities($existingFields);*/
         }
     }
 

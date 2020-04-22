@@ -49,42 +49,7 @@ class FormFieldConditionType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        /* $builder->add(
-             'enabled',
-             YesNoButtonGroupType::class,
-             [
-                 'label' => 'mautic.form.field.form.condition.enabled',
-                 'data'  => isset($options['data']['enabled']) ? $options['data']['enabled'] : false,
-             ]
-         );
-
-         $selectedField = isset($options['data']['field']) ? $options['data']['field'] : '';
-
-         $choices = $this->propertiesProcessor->getFieldsChoices(
-             $this->getFieldsForConditions($options['formId'], $options['fieldAlias'])
-         );
-         $builder->add(
-             'field',
-             ChoiceType::class,
-             [
-                 'choices'     => $choices,
-                 'multiple'    => false,
-                 'label'       => 'mautic.form.field.form.condition.field.mapping',
-                 'label_attr'  => ['class' => 'control-label'],
-                 'empty_value' => 'mautic.core.select',
-                 'attr'        => [
-                     'class'              => 'form-control',
-                     'onchange'           => 'Mautic.updateConditionalFieldValues(this.value);',
-                     'data-field-options' => [],
-                     'data-show-on'       => '{"formfield_conditions_enabled_0": ""}',
-                 ],
-                 'data'        => $selectedField,
-                 'required'    => false,
-             ]
-         );
-*/
-
-        $choices = !empty($options['parent']) ? $this->propertiesProcessor->getFieldPropertiesChoices($options['parent']) : [];
+        $choices = !empty($options['parent']) ? $this->propertiesProcessor->getFieldPropertiesChoicesFromAlias($options['formId'], $options['parent']) : [];
         $builder->add(
             'values',
             ChoiceType::class,
@@ -102,26 +67,6 @@ class FormFieldConditionType extends AbstractType
     }
 
     /**
-     * @param int    $formId
-     * @param string $fieldAlias
-     *
-     * @return array
-     */
-    private function getFieldsForConditions($formId, $fieldAlias)
-    {
-        $fields = $this->fieldModel->getSessionFields($formId);
-        foreach ($fields as $key => $field) {
-            if (!in_array($field['type'], ConditionalFieldEnum::getConditionalFieldTypes())) {
-                unset($fields[$key]);
-            } elseif ($field['alias'] === $fieldAlias) {
-                unset($fields[$key]);
-            }
-        }
-
-        return $fields;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function configureOptions(OptionsResolver $resolver)
@@ -129,8 +74,6 @@ class FormFieldConditionType extends AbstractType
         $resolver->setDefaults(
             [
                 'formId'     => null,
-                'fieldAlias' => null,
-                'parentId'   => null,
                 'parent'     => null,
             ]
         );

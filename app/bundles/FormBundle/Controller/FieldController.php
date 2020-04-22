@@ -45,7 +45,7 @@ class FieldController extends CommonFormController
             $formField = [
                 'type'     => $fieldType,
                 'formId'   => $formId,
-                'parentId' => $this->request->query->get('parentId'),
+                'parent'   => $this->request->query->get('parent'),
             ];
         }
 

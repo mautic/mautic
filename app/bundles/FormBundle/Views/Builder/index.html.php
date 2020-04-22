@@ -92,7 +92,7 @@ if (!isset($inBuilder)) {
                             </div>
                             <div class="drop-here">
                             <?php foreach ($formFields as $field): ?>
-                            <?php if ($field['parent']) {
+                            <?php if (!is_null($field['parent'])) {
                                                         continue;
                                                     }
                                 ?>

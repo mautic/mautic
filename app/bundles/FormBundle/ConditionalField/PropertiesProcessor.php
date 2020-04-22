@@ -41,6 +41,14 @@ class PropertiesProcessor
         return $this->getChoicesFromArray($fields);
     }
 
+    public function getFieldPropertiesChoicesFromAlias($formId, $fieldId)
+    {
+        $fields = $this->fieldModel->getSessionFields($formId);
+        if (isset($fields[$fieldId])) {
+            return $this->getChoicesFromArray($this->getPropertiesFromField($fields[$fieldId]));
+        }
+    }
+
     public function getFieldPropertiesChoices(Field $field = null)
     {
         return $this->getChoicesFromArray($this->getPropertiesFromField($field->convertToArray()));

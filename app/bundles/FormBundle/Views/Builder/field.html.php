@@ -15,7 +15,7 @@ $validation     = (isset($form['validation'])) ? $form['validation'] : [];
 
 $showAttributes = isset($form['labelAttributes']) || isset($form['inputAttributes']) || isset($form['containerAttributes']) || isset($properties['labelAttributes']) || isset($form['alias']);
 $showBehavior   = isset($form['showWhenValueExists']) || isset($properties['showWhenValueExists']);
-$showConditions = (isset($form['conditions'])) ? $form['conditions'] : [];
+$showConditions = (isset($form['parent'])) ? $form['parent']->vars['value'] : null;
 
 $placeholder = '';
 if (isset($properties['placeholder'])):
@@ -285,7 +285,7 @@ $conditionsTabError = (isset($form['conditions']) && ($view['form']->containsErr
             </div>
             <?php endif; ?>
 
-            <?php echo $view['form']->row($form['parentId']); ?>
+            <?php echo $view['form']->row($form['parent']); ?>
 
             <?php if ($showConditions): ?>
                 <div role="tabpanel" class="tab-pane" id="conditions">

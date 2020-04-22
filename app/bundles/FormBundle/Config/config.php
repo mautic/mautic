@@ -252,6 +252,13 @@ return [
                     'doctrine.orm.entity_manager',
                 ],
             ],
+            'mautic.form.conditional.subscriber' => [
+                'class'     => \Mautic\FormBundle\EventListener\FormConditionalSubscriber::class,
+                'arguments' => [
+                    'mautic.form.model.form',
+                    'mautic.form.model.field',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.formconfig' => [
