@@ -1124,7 +1124,6 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * @param Form   $form
      * @param string $fieldAlias
      *
      * @return Field|null
