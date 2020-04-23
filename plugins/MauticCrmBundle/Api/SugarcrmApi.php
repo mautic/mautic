@@ -584,7 +584,7 @@ class SugarcrmApi extends CrmApi
                 // add custom fields to select query
                 if (!empty($availableFields['toTags'])) {
                     foreach ($availableFields['toTags'] as $sugarField) {
-                        if (strpos($sugarField, '__'.$object) !== false) {
+                        if (false !== strpos($sugarField, '__'.$object)) {
                             $field = str_replace('__'.$object, '', $sugarField);
                             if (!in_array($field, $fields)) {
                                 $fields[] = $field;
