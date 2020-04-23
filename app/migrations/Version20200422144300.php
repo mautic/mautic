@@ -78,12 +78,12 @@ SQL;
     private function migrateLookups()
     {
         foreach ($this->rowsToMigrateLookup as $rowToMigrate) {
-            $properties                  = unserialize($rowToMigrate['properties']);
-            $convertedProperties['list'] = explode('|', $properties['list']);
+            $properties         = unserialize($rowToMigrate['properties']);
+            $properties['list'] = explode('|', $properties['list']);
 
             $params = [
                 'id'         => $rowToMigrate['id'],
-                'properties' => serialize($convertedProperties),
+                'properties' => serialize($properties),
             ];
 
             $this->addSql($this->getUpdateSql(), $params);
@@ -111,21 +111,23 @@ SQL;
     private function migrateSelects()
     {
         foreach ($this->rowsToMigrateSelectMultiselect as $rowToMigrate) {
-            $properties = unserialize($rowToMigrate['properties']);
-            $properties = explode('|', $properties['list']);
+            $properties   = unserialize($rowToMigrate['properties']);
+            $propertyList = explode('|', $properties['list']);
 
-            $convertedProperties['list'] = [];
+            $convertedPropertyList = [];
 
-            foreach ($properties as $property) {
-                $convertedProperties['list'][] = [
+            foreach ($propertyList as $property) {
+                $convertedPropertyList[] = [
                     'label' => $property,
                     'value' => $property,
                 ];
             }
 
+            $properties['list'] = $convertedPropertyList;
+
             $params = [
                 'id'         => $rowToMigrate['id'],
-                'properties' => serialize($convertedProperties),
+                'properties' => serialize($properties),
             ];
 
             $this->addSql($this->getUpdateSql(), $params);
