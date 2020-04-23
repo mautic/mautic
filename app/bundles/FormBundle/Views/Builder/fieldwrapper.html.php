@@ -16,7 +16,11 @@ if (!isset($inBuilder)) {
 }
 
 ?>
-<div class="panel form-field-wrapper" data-sortable-id="mauticform_<?php echo $field['id']; ?>">
+
+<?php if (!empty($isConditional)): ?>
+<div class="ml-20">
+<?php endif; ?>
+<div class="<?php if (empty($isConditional)): ?>panel<?php endif; ?> form-field-wrapper" data-sortable-id="mauticform_<?php echo $field['id']; ?>">
     <?php
     echo $view->render(
         'MauticFormBundle:Builder:actions.html.php',
@@ -78,7 +82,7 @@ if (!isset($inBuilder)) {
     || !empty($field['leadField'])
     || !empty($field['conditions'])
 ): ?>
-    <div class="panel-footer">
+    <div class="ml-10">
         <?php if (!empty($field['leadField'])):
             $icon = (in_array($field['leadField'], array_keys($companyFields))) ? 'building' : 'user';
             ?>
@@ -111,14 +115,13 @@ if (!isset($inBuilder)) {
             ); ?>
         </span>
         <?php endif; ?>
-        <?php
-        if (!empty($field['conditions']['values'])): ?>
+        <?php if (!empty($field['conditions']['values'])): ?>
             <i class="fa fa-eye" aria-hidden="true"></i>
             <span class="inline-spacer"">
             <span style="text-transform: none"><?php echo $view['translator']->trans(
                     'mautic.form.field.form.condition.show.on'
                 ); ?></span>
-            <strong><?php echo str_replace('_', ' ', $field['parent']); ?></strong>
+            <strong><?php echo $formFields[$field['parent']]['label']; ?></strong>
 
             <span style="text-transform: none"><?php echo $view['translator']->trans(
                     'mautic.form.field.form.condition.select.value'
@@ -127,11 +130,11 @@ if (!isset($inBuilder)) {
             </span>
         <?php endif; ?>
     </div>
+    <hr />
 <?php endif; ?>
     <?php foreach ($formFields as $field2):
         ?>
         <?php if (!empty($field2['parent']) && $field2['parent'] == $field['id']) : ?>
-        <div class="ml-15">
             <?php if (!empty($field2['isCustom'])):
                 $params   = $field2['customParameters'];
                 $template = $params['template'];
@@ -143,6 +146,7 @@ if (!isset($inBuilder)) {
             echo $view->render(
                 'MauticFormBundle:Builder:fieldwrapper.html.php',
                 [
+                    'isConditional'     => true,
                     'template'          => $template,
                     'field'             => $field2,
                     'viewOnlyFields'    => $viewOnlyFields,
@@ -156,7 +160,9 @@ if (!isset($inBuilder)) {
                     'formFields'        => $formFields,
                 ]
             ); ?>
-        </div>
     <?php endif; ?>
     <?php endforeach; ?>
+<?php if (!empty($isConditional)): ?>
+</div>
+<?php endif; ?>
 </div>

@@ -182,9 +182,14 @@ Mautic.formFieldOnLoad = function (container, response) {
             mQuery(fieldContainer).replaceWith(newHtml);
             var newField = false;
         } else {
-            //append content
-            var panel = mQuery('#mauticforms_fields .mauticform-button-wrapper').closest('.form-field-wrapper');
-            panel.before(newHtml);
+            var parentContainer = mQuery('#mauticform_'+response.parent);
+            if (parentContainer.length) {
+                (parentContainer.parents('.panel:first')).append(newHtml);
+            }else {
+                //append content
+                var panel = mQuery('#mauticforms_fields .mauticform-button-wrapper').closest('.form-field-wrapper');
+                panel.before(newHtml);
+            }
             var newField = true;
         }
 

@@ -146,22 +146,24 @@ class FieldController extends CommonFormController
             $blank     = $entity->convertToArray();
             $formField = array_merge($blank, $formField);
 
+            $passthroughVars['parent']    = $formField['parent'];
             $passthroughVars['fieldId']   = $keyId;
             $template                     = (!empty($customParams)) ? $customParams['template'] : 'MauticFormBundle:Field:'.$fieldType.'.html.php';
             $passthroughVars['fieldHtml'] = $this->renderView(
                 'MauticFormBundle:Builder:fieldwrapper.html.php',
                 [
-                    'template'           => $template,
-                    'inForm'             => true,
-                    'field'              => $formField,
-                    'id'                 => $keyId,
-                    'formId'             => $formId,
-                    'contactFields'      => $this->getModel('lead.field')->getFieldListWithProperties(),
-                    'companyFields'      => $this->getModel('lead.field')->getFieldListWithProperties('company'),
-                    'inBuilder'          => true,
-                    'fields'             => $this->get('mautic.helper.form.field_helper')->getChoiceList($this->getModel('form.field')->getSessionFields($formId)),
-                    'viewOnlyFields'     => $customComponents['viewOnlyFields'],
-                    'formFields'         => $fields,
+                    'isConditional'        => !empty($formField['parent']),
+                    'template'             => $template,
+                    'inForm'               => true,
+                    'field'                => $formField,
+                    'id'                   => $keyId,
+                    'formId'               => $formId,
+                    'contactFields'        => $this->getModel('lead.field')->getFieldListWithProperties(),
+                    'companyFields'        => $this->getModel('lead.field')->getFieldListWithProperties('company'),
+                    'inBuilder'            => true,
+                    'fields'               => $this->get('mautic.helper.form.field_helper')->getChoiceList($this->getModel('form.field')->getSessionFields($formId)),
+                    'viewOnlyFields'       => $customComponents['viewOnlyFields'],
+                    'formFields'           => $fields,
                 ]
             );
         }
