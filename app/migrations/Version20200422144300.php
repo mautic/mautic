@@ -21,14 +21,14 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 class Version20200422144300 extends AbstractMauticMigration
 {
     /**
-     * @var int
+     * @var array|false
      */
-    private $rowId;
+    private $rowsToMigrateLookup;
 
     /**
      * @var array|false
      */
-    private $rowsToMigrate;
+    private $rowsToMigrateSelectMultiselect;
 
     public function getDescription(): string
     {
@@ -41,30 +41,43 @@ class Version20200422144300 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema): void
     {
-        $sql = <<<SQL
-            SELECT id, properties
-            FROM {$this->prefix}lead_fields
-            WHERE
-                (
-                    type = 'lookup' OR
-                    type = 'select' OR
-                    type = 'multiselect' 
-                ) AND
-                    properties LIKE '%|%'
-SQL;
+        $this->fetchLookupsToMigrate();
+        $this->fetchSelectsToMigrate();
 
-        $stmt = $this->connection->prepare($sql);
-        $stmt->execute();
-        $result = $this->rowsToMigrate = $stmt->fetchAll(FetchMode::ASSOCIATIVE);
-
-        if (false === $result) {
+        if (false === $this->rowsToMigrateLookup && false === $this->fetchSelectsToMigrate()) {
             throw new SkipMigration('No data to migrate');
         }
     }
 
     public function up(Schema $schema): void
     {
-        foreach ($this->rowsToMigrate as $rowToMigrate) {
+        if (false !== $this->rowsToMigrateLookup) {
+            $this->migrateLookups();
+        }
+
+        if (false !== $this->rowsToMigrateSelectMultiselect) {
+            $this->migrateSelects();
+        }
+    }
+
+    private function fetchLookupsToMigrate()
+    {
+        $sql = <<<SQL
+            SELECT id, properties
+            FROM {$this->prefix}lead_fields
+            WHERE
+                type = 'lookup' AND
+                properties LIKE '%|%'
+SQL;
+
+        $stmt = $this->connection->prepare($sql);
+        $stmt->execute();
+        $this->rowsToMigrateLookup = $stmt->fetchAll(FetchMode::ASSOCIATIVE);
+    }
+
+    private function migrateLookups()
+    {
+        foreach ($this->rowsToMigrateLookup as $rowToMigrate) {
             $properties                  = unserialize($rowToMigrate['properties']);
             $convertedProperties['list'] = explode('|', $properties['list']);
 
@@ -73,13 +86,58 @@ SQL;
                 'properties' => serialize($convertedProperties),
             ];
 
-            $sql = "
-                UPDATE {$this->prefix}lead_fields
-                SET properties = :properties
-                WHERE id = :id
-            ";
-
-            $this->addSql($sql, $params);
+            $this->addSql($this->getUpdateSql(), $params);
         }
+    }
+
+    private function fetchSelectsToMigrate()
+    {
+        $sql = <<<SQL
+            SELECT id, properties
+            FROM {$this->prefix}lead_fields
+            WHERE
+                (
+                    type = 'select' OR
+                    type = 'multiselect' 
+                ) AND
+                    properties LIKE '%|%'
+SQL;
+
+        $stmt = $this->connection->prepare($sql);
+        $stmt->execute();
+        $this->rowsToMigrateSelectMultiselect = $stmt->fetchAll(FetchMode::ASSOCIATIVE);
+    }
+
+    private function migrateSelects()
+    {
+        foreach ($this->rowsToMigrateSelectMultiselect as $rowToMigrate) {
+            $properties = unserialize($rowToMigrate['properties']);
+            $properties = explode('|', $properties['list']);
+
+            $convertedProperties['list'] = [];
+
+            foreach ($properties as $property) {
+                $convertedProperties['list'][] = [
+                    'label' => $property,
+                    'value' => $property,
+                ];
+            }
+
+            $params = [
+                'id'         => $rowToMigrate['id'],
+                'properties' => serialize($convertedProperties),
+            ];
+
+            $this->addSql($this->getUpdateSql(), $params);
+        }
+    }
+
+    private function getUpdateSql(): string
+    {
+        return <<<SQL
+            UPDATE {$this->prefix}lead_fields
+            SET properties = :properties
+            WHERE id = :id
+SQL;
     }
 }
