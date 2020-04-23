@@ -200,23 +200,42 @@
         };
 
         Form.prepareShowOn = function (formId) {
-
             var theForm = document.getElementById('mauticform_' + formId);
+            var showOnDataAttribute = 'data-mautic-form-show-on';
 
-            // Find validations via data-attributes
-            var showOn = theForm.querySelectorAll('[data-mautic-form-show-on]');
+            var parents = {};
+            var showOn = theForm.querySelectorAll('['+showOnDataAttribute+']');
             [].forEach.call(showOn, function (container) {
-                var condition = container.getAttribute('data-mautic-form-show-on');
+                var condition = container.getAttribute(showOnDataAttribute);
                 var returnArray = condition.split(':');
-                var id = document.getElementById("mauticform_" + formId+"_"+returnArray[0]);
-                var values = (returnArray[1]).split('|');
-                id.onchange = function(evt) {
-                    if(values.includes(evt.target.value)){
-                        container.style.display = 'block';
-                    }else{
-                        container.style.display = 'none';
-                    }
 
+                var idOnChangeElem  = "mauticform_" + formId+"_"+returnArray[0];
+                var elemToShow = container.getAttribute('id');
+                var elemShowOnValues = (returnArray[1]).split('|');
+
+                if(!parents[idOnChangeElem]){
+                    parents[idOnChangeElem] = {};
+                }
+
+                parents[idOnChangeElem][elemToShow] = elemShowOnValues;
+
+            });
+
+            Object.keys(parents).forEach(function(key) {
+                var id = document.getElementById(key);
+                Form.doShowOn(parents, key, id.value)
+                id.onchange = function (evt) {
+                  Form.doShowOn(parents, key, evt.target.value);
+                }
+            });
+        };
+
+        Form.doShowOn = function (parents, key, selectedValue) {
+            Object.keys((parents[key])).forEach(function(key2) {
+                if ((parents[key][key2]).includes(selectedValue)) {
+                    document.getElementById(key2).style.display = 'block';
+                } else {
+                    document.getElementById(key2).style.display = 'none';
                 }
             });
         };

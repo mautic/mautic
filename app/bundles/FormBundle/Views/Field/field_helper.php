@@ -88,8 +88,8 @@ if (!empty($inForm)) {
 // Container
 $containerAttr = 'id="mauticform'.$formName.'_'.$id.'" '.htmlspecialchars_decode($field['containerAttributes']);
 
-if ($field['parent']) {
-    $containerAttr .= " data-mautic-form-show-on=\"{$field['parent']}:".implode('|', $field['conditions']['values']).'" ';
+if (isset($fields) && $field['parent']) {
+    $containerAttr .= " data-mautic-form-show-on=\"{$fields[$field['parent']]->getAlias()}:".implode('|', $field['conditions']['values']).'" ';
 }
 
 if (!isset($containerClass)) {

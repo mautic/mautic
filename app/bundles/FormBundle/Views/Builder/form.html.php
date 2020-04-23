@@ -89,6 +89,7 @@ if (!isset($lead)) {
                             'contactFields' => $contactFields,
                             'companyFields' => $companyFields,
                             'inBuilder'     => $inBuilder,
+                            'fields'        => $fields,
                         ]
                     );
                 endif;
@@ -120,6 +121,7 @@ if (!isset($lead)) {
                             'contactFields' => $contactFields,
                             'companyFields' => $companyFields,
                             'inBuilder'     => $inBuilder,
+                            'fields'        => $fields,
                         ]
                     );
                     endif;
