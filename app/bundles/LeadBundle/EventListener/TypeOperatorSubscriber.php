@@ -15,6 +15,7 @@ namespace Mautic\LeadBundle\EventListener;
 
 use DeviceDetector\Parser\Device\DeviceParserAbstract as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
+use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -70,6 +71,11 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
     private $categoryModel;
 
     /**
+     * @var AssetModel
+     */
+    private $assetModel;
+
+    /**
      * @var TranslatorInterface
      */
     private $translator;
@@ -81,6 +87,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         EmailModel $emailModel,
         StageModel $stageModel,
         CategoryModel $categoryModel,
+        AssetModel $assetModel,
         TranslatorInterface $translator
     ) {
         $this->leadModel     = $leadModel;
@@ -89,6 +96,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $this->emailModel    = $emailModel;
         $this->stageModel    = $stageModel;
         $this->categoryModel = $categoryModel;
+        $this->assetModel    = $assetModel;
         $this->translator    = $translator;
     }
 
@@ -139,6 +147,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
 
         $emails = $this->emailModel->getLookupResults('email', '', 0, 0);
 
+        $event->setChoicesForFieldAlias('lead_asset_download', $this->getAssetChoices());
         $event->setChoicesForFieldAlias('campaign', $this->getCampaignChoices());
         $event->setChoicesForFieldAlias('leadlist', $this->getSegmentChoices());
         $event->setChoicesForFieldAlias('tags', $this->getTagChoices());
@@ -283,7 +292,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $data       = $form->getData();
         $multiple   = $event->operatorIsOneOf(OperatorOptions::IN, OperatorOptions::NOT_IN) || $event->fieldTypeIsOneOf('multiselect');
         $mustBeText = $event->operatorIsOneOf(OperatorOptions::REGEXP, OperatorOptions::NOT_REGEXP, OperatorOptions::STARTS_WITH, OperatorOptions::ENDS_WITH, OperatorOptions::CONTAINS, OperatorOptions::LIKE, OperatorOptions::NOT_LIKE);
-        $isSelect   = $event->fieldTypeIsOneOf('select', 'multiselect', 'boolean', 'country', 'locale', 'region', 'timezone');
+        $isSelect   = $event->fieldTypeIsOneOf('select', 'multiselect', 'boolean', 'country', 'locale', 'region', 'timezone', 'leadlist', 'campaign', 'device_type', 'device_brand', 'device_os', 'stage', 'globalcategory', 'assets', 'lead_email_received');
 
         if (!$mustBeText && $isSelect) {
             $filter = $data['filter'] ?? '';
@@ -356,6 +365,11 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
     private function getCategoryChoices(): array
     {
         return $this->makeChoices($this->categoryModel->getLookupResults('global'), 'title', 'id');
+    }
+
+    private function getAssetChoices(): array
+    {
+        return $this->makeChoices($this->assetModel->getLookupResults('asset'), 'title', 'id');
     }
 
     private function makeChoices(array $items, string $labelName, string $keyName): array

@@ -562,6 +562,7 @@ return [
                     'mautic.email.model.email',
                     'mautic.stage.model.stage',
                     'mautic.category.model.category',
+                    'mautic.asset.model.asset',
                     'translator',
                 ],
             ],

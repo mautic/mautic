@@ -166,7 +166,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             'leadlist' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lists'),
                 'properties' => [
-                    'type' => 'multiselect',
+                    'type' => 'leadlist',
                     'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'leadlist'),
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
@@ -175,7 +175,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             'campaign' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.campaign'),
                 'properties' => [
-                    'type' => 'select',
+                    'type' => 'campaign',
                     'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'campaign'),
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
@@ -186,7 +186,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
                 'properties' => [
-                    'type' => 'multiselect',
+                    'type' => 'tags',
                     'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'tags'),
                 ],
             ],
@@ -195,7 +195,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
                 'properties' => [
-                    'type' => 'select',
+                    'type' => 'device_type',
                     'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'device_type'),
                 ],
             ],
@@ -204,7 +204,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
                 'properties' => [
-                    'type' => 'multiselect',
+                    'type' => 'device_brand',
                     'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'device_brand'),
                 ],
             ],
@@ -213,7 +213,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
                 'properties' => [
-                    'type' => 'multiselect',
+                    'type' => 'device_os',
                     'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'device_os'),
                 ],
             ],
@@ -285,7 +285,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.lead.field.stage'),
                 'object'     => 'lead',
                 'properties' => [
-                    'type' => 'select',
+                    'type' => 'stage',
                     'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'stage'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsIncluding([
@@ -300,7 +300,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
                 'properties' => [
-                    'type' => 'select',
+                    'type' => 'globalcategory',
                     'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'globalcategory'),
                 ],
             ],
@@ -344,11 +344,20 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
     public function onGenerateSegmentFiltersAddBehaviors(LeadListFiltersChoicesEvent $event)
     {
         $choices = [
+            'lead_asset_download' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.lead_asset_download'),
+                'properties' => [
+                    'type' => 'assets',
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'lead_email_received'),
+                ],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
+                'object'     => 'lead',
+            ],
             'lead_email_received' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_received'),
                 'object'     => 'lead',
                 'properties' => [
-                    'type' => 'select',
+                    'type' => 'lead_email_received',
                     'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'lead_email_received'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsIncluding([
@@ -360,7 +369,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_sent'),
                 'object'     => 'lead',
                 'properties' => [
-                    'type' => 'select',
+                    'type' => 'lead_email_received',
                     'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'lead_email_sent'),
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
