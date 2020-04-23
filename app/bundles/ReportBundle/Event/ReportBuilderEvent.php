@@ -143,8 +143,7 @@ class ReportBuilderEvent extends AbstractReportEvent
     }
 
     /**
-     * @param       $context
-     * @param array $data
+     * @param $context
      */
     public function appendToTable($context, array $data)
     {
