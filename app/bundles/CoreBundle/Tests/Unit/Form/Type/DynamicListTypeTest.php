@@ -11,7 +11,7 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Unit\Form\Validator\Constraints;
+namespace Mautic\CoreBundle\Tests\Unit\Form\Type\Constraints;
 
 use Mautic\CoreBundle\Form\Type\DynamicListType;
 use PHPUnit\Framework\MockObject\MockObject;
