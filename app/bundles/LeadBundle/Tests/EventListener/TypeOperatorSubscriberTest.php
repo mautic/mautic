@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -70,6 +71,11 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     private $categoryModel;
 
     /**
+     * @var MockObject|AssetModel
+     */
+    private $assetModel;
+
+    /**
      * @var MockObject|TranslatorInterface
      */
     private $translator;
@@ -95,6 +101,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->stageModel      = $this->createMock(StageModel::class);
         $this->stageRepository = $this->createMock(StageRepository::class);
         $this->categoryModel   = $this->createMock(CategoryModel::class);
+        $this->assetModel      = $this->createMock(AssetModel::class);
         $this->translator      = $this->createMock(TranslatorInterface::class);
         $this->form            = $this->createMock(FormInterface::class);
         $this->subscriber      = new TypeOperatorSubscriber(
@@ -104,6 +111,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->emailModel,
             $this->stageModel,
             $this->categoryModel,
+            $this->assetModel,
             $this->translator
         );
 
@@ -164,6 +172,11 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with('email', '', 0, 0)
             ->willReturn(['Email F' => 77]);
 
+        $this->assetModel->expects($this->once())
+            ->method('getLookupResults')
+            ->with('asset')
+            ->willReturn([['title' => 'Asset G', 'id' => 88]]);
+
         $this->subscriber->onTypeListCollect($event);
 
         $choicesForAliases = $event->getChoicesForAllListFieldAliases();
@@ -178,6 +191,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['Email F' => 77], $choicesForAliases['lead_email_received']);
         $this->assertSame(['Email F' => 77], $choicesForAliases['lead_email_sent']);
         $this->assertSame('smartphone', $choicesForAliases['device_type']['smartphone']);
+        $this->assertSame(['Asset G' => 88], $choicesForAliases['lead_asset_download']);
         $this->assertSame('SA', $choicesForAliases['device_brand']['Samsung']);
         $this->assertSame('Android', $choicesForAliases['device_os']['Android']);
         $this->assertArrayHasKey('Europe', $choicesForTypes['timezone']);

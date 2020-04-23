@@ -470,7 +470,7 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                 'label'      => 'mautic.lead.list.filter.lead_email_received',
                 'object'     => 'lead',
                 'properties' => [
-                    'type' => 'select',
+                    'type' => 'lead_email_received',
                     'list' => [
                         'Choice A' => 'choice_a',
                         'Choice B' => 'choice_b',
