@@ -19,75 +19,75 @@ if (!isset($inBuilder)) {
 
 <?php if (!empty($isConditional)): ?>
 <div class="ml-20">
-<?php endif; ?>
-<div class="<?php if (empty($isConditional)): ?>panel<?php endif; ?> form-field-wrapper" data-sortable-id="mauticform_<?php echo $field['id']; ?>">
-    <?php
-    echo $view->render(
-        'MauticFormBundle:Builder:actions.html.php',
-        [
-            'id'             => $field['id'],
-            'formId'         => $formId,
-            'formName'       => '',
-            'disallowDelete' => ('button' == $field['type']),
-        ]
-    );
-    ?>
-    <div class="row ml-0 mr-0"><?php // wrap in a row to keep bootstrap container classes from affecting builder layout?>
-        <?php echo $view->render(
-            $template,
+    <?php endif; ?>
+    <div class="<?php if (empty($isConditional)): ?>panel<?php endif; ?> form-field-wrapper" data-sortable-id="mauticform_<?php echo $field['id']; ?>">
+        <?php
+        echo $view->render(
+            'MauticFormBundle:Builder:actions.html.php',
             [
-                'field'         => $field,
-                'inForm'        => true,
-                'id'            => $field['id'],
-                'formId'        => $formId,
-                'contactFields' => (isset($contactFields)) ? $contactFields : [],
-                'companyFields' => (isset($companyFields)) ? $companyFields : [],
-                'inBuilder'     => $inBuilder,
+                'id'             => $field['id'],
+                'formId'         => $formId,
+                'formName'       => '',
+                'disallowDelete' => ('button' == $field['type']),
             ]
         );
         ?>
-    </div>
-    <?php if (isset($fields) && in_array($field['type'], ConditionalFieldEnum::getConditionalFieldTypes())): ?>
-        <div class="row ml-15 mr-0 pb-15">
-            <div class="mt-10 col-sm-6 col-xs-12">
-                <select class="chosen form-builder-new-component"
-                        data-placeholder="<?php echo $view['translator']->trans(
-                            'mautic.form.form.component.fields.conditional'
-                        ); ?>">
-                    <option value=""></option>
-                    <?php foreach ($fields as $conditionalFieldType => $conditionalField): ?>
-                        <?php if (!in_array($conditionalFieldType, $viewOnlyFields)): ?>
-                            <option data-toggle="ajaxmodal"
-                                    data-target="#formComponentModal"
-                                    data-href="<?php echo $view['router']->path(
-                                        'mautic_formfield_action',
-                                        [
-                                            'objectAction' => 'new',
-                                            'type'         => $conditionalFieldType,
-                                            'tmpl'         => 'field',
-                                            'formId'       => $formId,
-                                            'inBuilder'    => $inBuilder,
-                                            'parent'       => $field['id'],
-                                        ]
-                                    ); ?>">
-                                <?php echo $conditionalField; ?>
-                            </option>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-        </div>
-    <?php endif; ?>
-<?php if ((isset($field['showWhenValueExists']) && $field['showWhenValueExists'] === false) || !empty($field['showAfterXSubmissions'])
-    || !empty($field['leadField'])
-    || !empty($field['conditions'])
-): ?>
-    <div class="ml-10">
-        <?php if (!empty($field['leadField'])):
-            $icon = (in_array($field['leadField'], array_keys($companyFields))) ? 'building' : 'user';
+        <div class="row ml-0 mr-0"><?php // wrap in a row to keep bootstrap container classes from affecting builder layout?>
+            <?php echo $view->render(
+                $template,
+                [
+                    'field'         => $field,
+                    'inForm'        => true,
+                    'id'            => $field['id'],
+                    'formId'        => $formId,
+                    'contactFields' => (isset($contactFields)) ? $contactFields : [],
+                    'companyFields' => (isset($companyFields)) ? $companyFields : [],
+                    'inBuilder'     => $inBuilder,
+                ]
+            );
             ?>
-            <i class="fa fa-<?php echo $icon ?>" aria-hidden="true"></i>
-            <span class="inline-spacer">
+        </div>
+        <?php if (isset($fields) && in_array($field['type'], ConditionalFieldEnum::getConditionalFieldTypes())): ?>
+            <div class="row ml-15 mr-0 pb-15">
+                <div class="mt-10 col-sm-6 col-xs-12">
+                    <select class="chosen form-builder-new-component"
+                            data-placeholder="<?php echo $view['translator']->trans(
+                                'mautic.form.form.component.fields.conditional'
+                            ); ?>">
+                        <option value=""></option>
+                        <?php foreach ($fields as $conditionalFieldType => $conditionalField): ?>
+                            <?php if (!in_array($conditionalFieldType, $viewOnlyFields)): ?>
+                                <option data-toggle="ajaxmodal"
+                                        data-target="#formComponentModal"
+                                        data-href="<?php echo $view['router']->path(
+                                            'mautic_formfield_action',
+                                            [
+                                                'objectAction' => 'new',
+                                                'type'         => $conditionalFieldType,
+                                                'tmpl'         => 'field',
+                                                'formId'       => $formId,
+                                                'inBuilder'    => $inBuilder,
+                                                'parent'       => $field['id'],
+                                            ]
+                                        ); ?>">
+                                    <?php echo $conditionalField; ?>
+                                </option>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+        <?php endif; ?>
+        <?php if ((isset($field['showWhenValueExists']) && $field['showWhenValueExists'] === false) || !empty($field['showAfterXSubmissions'])
+            || !empty($field['leadField'])
+            || !empty($field['conditions'])
+        ): ?>
+            <div class="ml-10">
+                <?php if (!empty($field['leadField'])):
+                    $icon = (in_array($field['leadField'], array_keys($companyFields))) ? 'building' : 'user';
+                    ?>
+                    <i class="fa fa-<?php echo $icon ?>" aria-hidden="true"></i>
+                    <span class="inline-spacer">
             <?php
             if (isset($contactFields[$field['leadField']]['label'])) {
                 echo $contactFields[$field['leadField']]['label'];
@@ -98,43 +98,42 @@ if (!isset($inBuilder)) {
             }
             ?>
         </span>
-        <?php endif; ?>
-        <?php if (isset($field['showWhenValueExists']) && $field['showWhenValueExists'] === false): ?>
-            <i class="fa fa-eye-slash" aria-hidden="true"></i>
-            <span class="inline-spacer">
+                <?php endif; ?>
+                <?php if (isset($field['showWhenValueExists']) && $field['showWhenValueExists'] === false): ?>
+                    <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                    <span class="inline-spacer">
             <?php echo $view['translator']->trans('mautic.form.field.hide.if.value'); ?>
         </span>
-        <?php endif; ?>
-        <?php if (!empty($field['showAfterXSubmissions'])): ?>
-            <i class="fa fa-refresh" aria-hidden="true"></i>
-            <span class="inline-spacer">
+                <?php endif; ?>
+                <?php if (!empty($field['showAfterXSubmissions'])): ?>
+                    <i class="fa fa-refresh" aria-hidden="true"></i>
+                    <span class="inline-spacer">
             <?php echo $view['translator']->transChoice(
                 'mautic.form.field.hide.if.submission.count',
                 (int) $field['showAfterXSubmissions'],
                 ['%count%' => (int) $field['showAfterXSubmissions']]
             ); ?>
         </span>
-        <?php endif; ?>
-        <?php if (!empty($field['conditions']['values'])): ?>
-            <i class="fa fa-eye" aria-hidden="true"></i>
-            <span class="inline-spacer"">
-            <span style="text-transform: none"><?php echo $view['translator']->trans(
-                    'mautic.form.field.form.condition.show.on'
-                ); ?></span>
-            <strong><?php echo $formFields[$field['parent']]['label']; ?></strong>
+                <?php endif; ?>
+                <?php if (!empty($field['conditions']['values'])): ?>
+                    <span class="inline-spacer"">
+                    <span style="text-transform: none"><?php echo $view['translator']->trans(
+                            'mautic.form.field.form.condition.show.on'
+                        ); ?></span>
+                    <strong><?php echo $formFields[$field['parent']]['label']; ?></strong>
 
-            <span style="text-transform: none"><?php echo $view['translator']->trans(
-                    'mautic.form.field.form.condition.select.value'
-                ); ?></span>
-            <strong><?php echo implode(', ', $field['conditions']['values']); ?></strong>
-            </span>
+                    <span style="text-transform: none"><?php echo $view['translator']->trans(
+                            'mautic.form.field.form.condition.select.value'
+                        ); ?></span>
+                    <strong><?php echo implode(', ', $field['conditions']['values']); ?></strong>
+                    </span>
+                <?php endif; ?>
+            </div>
         <?php endif; ?>
-    </div>
-    <hr />
-<?php endif; ?>
-    <?php foreach ($formFields as $field2):
-        ?>
-        <?php if (!empty($field2['parent']) && $field2['parent'] == $field['id']) : ?>
+
+        <?php foreach ($formFields as $field2):
+            ?>
+            <?php if (!empty($field2['parent']) && $field2['parent'] == $field['id']) : ?>
             <?php if (!empty($field2['isCustom'])):
                 $params   = $field2['customParameters'];
                 $template = $params['template'];
@@ -160,9 +159,12 @@ if (!isset($inBuilder)) {
                     'formFields'        => $formFields,
                 ]
             ); ?>
-    <?php endif; ?>
-    <?php endforeach; ?>
-<?php if (!empty($isConditional)): ?>
-</div>
+        <?php endif; ?>
+        <?php endforeach; ?>
+        <?php if (!empty($isConditional)): ?>
+        <hr />
+    </div>
+<?php else: ?>
+    <br>
 <?php endif; ?>
 </div>
