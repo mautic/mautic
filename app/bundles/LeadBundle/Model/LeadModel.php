@@ -601,12 +601,19 @@ class LeadModel extends FormModel
         }
 
         if (isset($data['stage'])) {
-            $stagesChangeLogRepo = $this->getStagesChangeLogRepository();
-            $currentLeadStageId  = $stagesChangeLogRepo->getCurrentLeadStage($lead->getId());
+            $stagesChangeLogRepo  = $this->getStagesChangeLogRepository();
+            $currentLeadStageId   = $stagesChangeLogRepo->getCurrentLeadStage($lead->getId());
+            $currentLeadStageName = null;
+            if ($currentLeadStageId) {
+                $currentStage = $this->em->getRepository(Stage::class)->findByIdOrName($currentLeadStageId);
+                if ($currentStage) {
+                    $currentLeadStageName = $currentStage->getName();
+                }
+            }
 
-            $newLeadStageId = is_object($data['stage']) ? $data['stage']->getId() : (int) $data['stage'];
-            if ($newLeadStageId !== $currentLeadStageId) {
-                $newStage = $this->em->getRepository(Stage::class)->findByIdOrName($newLeadStageId);
+            $newLeadStageIdOrName = is_object($data['stage']) ? $data['stage']->getId() : $data['stage'];
+            if ((int) $newLeadStageIdOrName !== $currentLeadStageId && $newLeadStageIdOrName !== $currentLeadStageName) {
+                $newStage = $this->em->getRepository(Stage::class)->findByIdOrName($newLeadStageIdOrName);
                 if ($newStage) {
                     $lead->stageChangeLogEntry(
                         $newStage,
@@ -614,7 +621,7 @@ class LeadModel extends FormModel
                         $this->translator->trans('mautic.stage.event.changed')
                     );
                 } else {
-                    throw new ImportFailedException($this->translator->trans('mautic.lead.import.stage.not.exists', ['id' => $newLeadStageId]));
+                    throw new ImportFailedException($this->translator->trans('mautic.lead.import.stage.not.exists', ['id' => $newLeadStageIdOrName]));
                 }
             }
         }
