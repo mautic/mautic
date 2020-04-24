@@ -89,6 +89,11 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     private $userModel;
 
     /**
+     * @var MockObject|UserHelper
+     */
+    private $userHelper;
+
+    /**
      * @var MockObject|Translator
      */
     private $translator;
@@ -199,6 +204,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->leadModel                = $this->createMock(LeadModel::class);
         $this->trackableModel           = $this->createMock(TrackableModel::class);
         $this->userModel                = $this->createMock(UserModel::class);
+        $this->userHelper               = $this->createMock(UserHelper::class);
         $this->translator               = $this->createMock(Translator::class);
         $this->emailEntity              = $this->createMock(Email::class);
         $this->entityManager            = $this->createMock(EntityManager::class);
@@ -598,7 +604,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $messageModel = new MessageQueueModel($this->leadModel, $this->companyModel, $coreParametersHelper);
         $messageModel->setEntityManager($this->entityManager);
-        $messageModel->setUserHelper($this->createMock(UserHelper::class));
+        $messageModel->setUserHelper($this->userHelper);
         $messageModel->setDispatcher($this->createMock(EventDispatcher::class));
 
         $emailModel = new EmailModel(
@@ -690,9 +696,9 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->emailModel->hitEmail($stat, $request);
     }
 
-    public function testGetLookupResults(): void
+    public function testGetLookupResultsWithNameIsKey(): void
     {
-        $this->emailModel->setUserHelper($this->createMock(UserHelper::class));
+        $this->emailModel->setUserHelper($this->userHelper);
         $this->entityManager->expects($this->once())
             ->method('getRepository')
             ->willReturn($this->emailRepository);
@@ -719,6 +725,39 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame(
             ['EN' => ['Email 123' => 123]],
+            $this->emailModel->getLookupResults('email', '', 0, 0, ['name_is_key' => true])
+        );
+    }
+
+    public function testGetLookupResultsWithWithDefaultOptions(): void
+    {
+        $this->emailModel->setUserHelper($this->userHelper);
+        $this->entityManager->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($this->emailRepository);
+
+        $this->emailRepository->expects($this->once())
+            ->method('getEmailList')
+            ->with(
+                '',
+                0,
+                0,
+                null,
+                false,
+                null,
+                [],
+                null
+            )
+            ->willReturn([
+                [
+                    'id'       => 123,
+                    'name'     => 'Email 123',
+                    'language' => 'EN',
+                ],
+            ]);
+
+        $this->assertSame(
+            ['EN' => [123 => 'Email 123']],
             $this->emailModel->getLookupResults('email', '', 0, 0)
         );
     }

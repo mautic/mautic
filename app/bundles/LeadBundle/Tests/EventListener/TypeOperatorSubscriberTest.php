@@ -169,8 +169,8 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->emailModel->expects($this->once())
             ->method('getLookupResults')
-            ->with('email', '', 0, 0)
-            ->willReturn(['Email F' => 77]);
+            ->with('email', '', 0, 0, ['name_is_key' => true])
+            ->willReturn(['En' => ['Email F' => 77]]);
 
         $this->assetModel->expects($this->once())
             ->method('getLookupResults')
@@ -188,8 +188,8 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['Tag C' => 44], $choicesForAliases['tags']);
         $this->assertSame(['Stage D' => 55], $choicesForAliases['stage']);
         $this->assertSame(['Category E' => 66], $choicesForAliases['globalcategory']);
-        $this->assertSame(['Email F' => 77], $choicesForAliases['lead_email_received']);
-        $this->assertSame(['Email F' => 77], $choicesForAliases['lead_email_sent']);
+        $this->assertSame(['En' => ['Email F' => 77]], $choicesForAliases['lead_email_received']);
+        $this->assertSame(['En' => ['Email F' => 77]], $choicesForAliases['lead_email_sent']);
         $this->assertSame('smartphone', $choicesForAliases['device_type']['smartphone']);
         $this->assertSame(['Asset G' => 88], $choicesForAliases['lead_asset_download']);
         $this->assertSame('SA', $choicesForAliases['device_brand']['Samsung']);
