@@ -45,8 +45,15 @@ trait DynamicContentTrait
                 if (empty($data['dynamicContent'])) {
                     $data['dynamicContent'] = $entity->getDefaultDynamicContent();
                     unset($data['dynamicContent'][0]['filters']['filter']);
-                    $event->setData($data);
                 }
+
+                foreach ($data['dynamicContent'] as $key => $dc) {
+                    if (empty($dc['filters'])) {
+                        $data['dynamicContent'][$key]['filters'] = $entity->getDefaultDynamicContent()[0]['filters'];
+                    }
+                }
+
+                $event->setData($data);
             }
         );
     }
