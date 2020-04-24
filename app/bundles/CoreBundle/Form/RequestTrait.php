@@ -21,11 +21,11 @@ trait RequestTrait
      * @param array $params
      * @param null  $entity
      * @param array $masks
-     * @param array $fieldsByGroup
+     * @param array $fields
      *
      * @throws \Exception
      */
-    protected function prepareParametersFromRequest(Form $form, array &$params, $entity = null, $masks = [], $fieldsByGroup = [])
+    protected function prepareParametersFromRequest(Form $form, array &$params, $entity = null, $masks = [], $fields = [])
     {
         // Special handling of some fields
         foreach ($form as $name => $child) {
@@ -45,14 +45,24 @@ trait RequestTrait
                                 break;
                             }
 
-                            // Translate value to key
-                            foreach ($fieldsByGroup as $fields) {
+                            if (!empty($fields)) {
+                                // ungroup fields if need it
+                                foreach ($fields as $key=>$field) {
+                                    if (is_array($field)) {
+                                        foreach ($field as $k=>$f) {
+                                            $fields[$k]=$f;
+                                        }
+                                        unset($fields[$key]);
+                                        continue;
+                                    }
+                                }
+
+                                // find property by value
                                 if (isset($fields[$name]['properties']) && is_array($fields[$name]['properties'])) {
                                     $valuesAsKeys = array_flip(array_values($fields[$name]['properties']));
                                     if (isset($valuesAsKeys[$params[$name]])) {
                                         $params[$name] = $valuesAsKeys[$params[$name]];
                                     }
-                                    break;
                                 }
                             }
 
