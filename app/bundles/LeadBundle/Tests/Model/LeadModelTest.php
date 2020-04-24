@@ -368,7 +368,49 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testInportIsIgnoringContactWitNotFoudStage()
+    public function testSetFieldValuesWithStage()
+    {
+        $lead = new Lead();
+        $lead->setId(1);
+        $lead->setFields(['all' => 'sth']);
+        $stageMock = $this->createMock(Stage::class);
+        $stageMock->expects($this->any())
+            ->method('getId')
+            ->willReturn(1);
+        $data = ['stage' => $stageMock];
+
+        $stagesChangeLogRepo = $this->createMock(StagesChangeLogRepository::class);
+        $stagesChangeLogRepo->expects($this->once())
+            ->method('getCurrentLeadStage')
+            ->with($lead->getId())
+            ->willReturn(null);
+
+        $stageRepositoryMock = $this->createMock(StageRepository::class);
+        $stageRepositoryMock->expects($this->once())
+            ->method('findByIdOrName')
+            ->with(1)
+            ->willReturn($stageMock);
+
+        $this->entityManagerMock->expects($this->at(0))
+            ->method('getRepository')
+            ->with('MauticLeadBundle:StagesChangeLog')
+            ->willReturn($stagesChangeLogRepo);
+
+        $this->entityManagerMock->expects($this->at(1))
+            ->method('getRepository')
+            ->with(Stage::class)
+            ->willReturn($stageRepositoryMock);
+
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->once())
+            ->method('trans')
+            ->with('mautic.stage.event.changed');
+        $this->leadModel->setTranslator($translator);
+
+        $this->leadModel->setFieldValues($lead, $data, false, false);
+    }
+
+    public function testImportIsIgnoringContactWithNotFoundStage()
     {
         $lead = new Lead();
         $lead->setId(1);
