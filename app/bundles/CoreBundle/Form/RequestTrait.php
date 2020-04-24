@@ -45,7 +45,16 @@ trait RequestTrait
                                 break;
                             }
 
-                            $this->getBooleanFromValue($fieldsByGroup, $entity, $params, $name);
+                            // Translate value to key
+                            foreach ($fieldsByGroup as $fields) {
+                                if (isset($fields[$name]['properties']) && is_array($fields[$name]['properties'])) {
+                                    $valuesAsKeys = array_flip(array_values($fields[$name]['properties']));
+                                    if (isset($valuesAsKeys[$params[$name]])) {
+                                        $params[$name] = $valuesAsKeys[$params[$name]];
+                                    }
+                                    break;
+                                }
+                            }
 
                             $data = filter_var($params[$name], FILTER_VALIDATE_BOOLEAN);
                             $data = (bool) $data;
@@ -118,25 +127,6 @@ trait RequestTrait
         }
 
         $params = InputHelper::_($params, $masks);
-    }
-
-    private function getBooleanFromValue($fieldsByGroup = [], $entity = null, array &$params, $name)
-    {
-        $properties = [];
-        foreach ($fieldsByGroup as $fields) {
-            if (isset($fields[$name]['properties']) && is_array($fields[$name]['properties'])) {
-                $properties = $fields[$name]['properties'];
-                break;
-            }
-        }
-        if (empty($properties)) {
-            return;
-        }
-
-        $valuesWithKeys = array_flip(array_values($properties));
-        if (isset($valuesWithKeys[$params[$name]])) {
-            $params[$name] = $valuesWithKeys[$params[$name]];
-        }
     }
 
     /**
