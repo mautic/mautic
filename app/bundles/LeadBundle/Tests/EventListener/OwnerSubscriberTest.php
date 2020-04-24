@@ -23,7 +23,7 @@ use Mautic\LeadBundle\EventListener\OwnerSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
 
-class OwnerSubscriberTest extends \PHPUnit_Framework_TestCase
+class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     protected $contacts = [
         [

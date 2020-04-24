@@ -43,9 +43,6 @@ class OwnerSubscriber implements EventSubscriberInterface
 
     /**
      * OwnerSubscriber constructor.
-     *
-     * @param LeadModel           $leadModel
-     * @param TranslatorInterface $translator
      */
     public function __construct(LeadModel $leadModel, TranslatorInterface $translator)
     {
@@ -65,9 +62,6 @@ class OwnerSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param EmailBuilderEvent $event
-     */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
         $event->addToken($this->buildToken('email'), $this->buildLabel('email'));
@@ -77,17 +71,11 @@ class OwnerSubscriber implements EventSubscriberInterface
         $event->addToken($this->buildToken('signature'), $this->buildLabel('signature'));
     }
 
-    /**
-     * @param EmailSendEvent $event
-     */
     public function onEmailDisplay(EmailSendEvent $event)
     {
         $this->onEmailGenerate($event);
     }
 
-    /**
-     * @param EmailSendEvent $event
-     */
     public function onEmailGenerate(EmailSendEvent $event)
     {
         $event->addTokens($this->getGeneratedTokens($event));
@@ -99,8 +87,6 @@ class OwnerSubscriber implements EventSubscriberInterface
      * * If contact[owner_id] === 0, then we need fake data
      * * If contact[owner_id] === null, then we should blank out tokens
      * * If contact[owner_id] > 0 AND User exists, then we should fill in tokens
-     *
-     * @param EmailSendEvent $event
      *
      * @return array
      */
