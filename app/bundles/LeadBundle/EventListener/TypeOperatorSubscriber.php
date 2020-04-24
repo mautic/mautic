@@ -145,7 +145,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             ]
         );
 
-        $emails = $this->emailModel->getLookupResults('email', '', 0, 0);
+        $emails = $this->emailModel->getLookupResults('email', '', 0, 0, ['name_is_key' => true]);
 
         $event->setChoicesForFieldAlias('lead_asset_download', $this->getAssetChoices());
         $event->setChoicesForFieldAlias('campaign', $this->getCampaignChoices());

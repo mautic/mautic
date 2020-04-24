@@ -2137,7 +2137,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 );
 
                 foreach ($emails as $email) {
-                    $results[$email['language']][$email['name']] = $email['id'];
+                    if (empty($options['name_is_key'])) {
+                        $results[$email['language']][$email['id']] = $email['name'];
+                    } else {
+                        $results[$email['language']][$email['name']] = $email['id'];
+                    }
                 }
 
                 //sort by language
