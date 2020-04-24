@@ -122,7 +122,7 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     $expressions[] = $queryBuilder->expr()->$operator($tableAlias.'.'.$filter->getField(), $parameter);
                 }
 
-                if ($filter->contactSegmentFilterCrate->getSourceOperator() == 'inX') {
+                if ('inX' == $filter->contactSegmentFilterCrate->getSourceOperator()) {
                     $expression = $queryBuilder->expr()->orX($expressions);
                 } else {
                     $expression = $queryBuilder->expr()->andX($expressions);
