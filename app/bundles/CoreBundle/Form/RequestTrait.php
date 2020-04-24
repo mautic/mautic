@@ -21,8 +21,11 @@ trait RequestTrait
      * @param array $params
      * @param null  $entity
      * @param array $masks
+     * @param array $fieldsByGroup
+     *
+     * @throws \Exception
      */
-    protected function prepareParametersFromRequest(Form $form, array &$params, $entity = null, $masks = [])
+    protected function prepareParametersFromRequest(Form $form, array &$params, $entity = null, $masks = [], $fieldsByGroup = [])
     {
         // Special handling of some fields
         foreach ($form as $name => $child) {
@@ -41,6 +44,8 @@ trait RequestTrait
                             if ('' === $params[$name]) {
                                 break;
                             }
+
+                            $this->getBooleanFromValue($fieldsByGroup, $entity, $params, $name);
 
                             $data = filter_var($params[$name], FILTER_VALIDATE_BOOLEAN);
                             $data = (bool) $data;
@@ -113,6 +118,25 @@ trait RequestTrait
         }
 
         $params = InputHelper::_($params, $masks);
+    }
+
+    private function getBooleanFromValue($fieldsByGroup = [], $entity = null, array &$params, $name)
+    {
+        $properties = [];
+        foreach ($fieldsByGroup as $fields) {
+            if (isset($fields[$name]['properties']) && is_array($fields[$name]['properties'])) {
+                $properties = $fields[$name]['properties'];
+                break;
+            }
+        }
+        if (empty($properties)) {
+            return;
+        }
+
+        $valuesWithKeys = array_flip(array_values($properties));
+        if (isset($valuesWithKeys[$params[$name]])) {
+            $params[$name] = $valuesWithKeys[$params[$name]];
+        }
     }
 
     /**
