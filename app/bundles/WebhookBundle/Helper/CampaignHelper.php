@@ -44,7 +44,7 @@ class CampaignHelper
         // dump($config);die;
         $payload = $this->getPayload($config, $contact);
         $headers = $this->getHeaders($config, $contact);
-        $url = rawurldecode(TokenHelper::findLeadTokens($config['url'], $this->getContactValues($contact), true));
+        $url     = rawurldecode(TokenHelper::findLeadTokens($config['url'], $this->getContactValues($contact), true));
         $this->makeRequest($url, $config['method'], $config['timeout'], $headers, $payload);
     }
 
