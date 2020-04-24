@@ -678,8 +678,6 @@ class LeadModel extends FormModel
             }
 
             foreach ($groupFields as $alias => &$field) {
-                echo $alias;
-                print_r($field, 1);
                 if (!isset($field['value'])) {
                     $field['value'] = null;
                 }
