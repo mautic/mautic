@@ -459,7 +459,7 @@ class SubmissionRepository extends CommonRepository
         switch ($operatorExpr) {
             case 'like':
             case 'notLike':
-                $value = strpos($value, '%') === false ? '%'.$value.'%' : $value;
+                $value = false === strpos($value, '%') ? '%'.$value.'%' : $value;
                 break;
             case 'startsWith':
                 $operatorExpr    = 'like';
