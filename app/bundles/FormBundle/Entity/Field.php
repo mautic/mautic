@@ -114,11 +114,6 @@ class Field
     private $leadField;
 
     /**
-     * @var string
-     */
-    private $leadFieldOverwrite;
-
-    /**
      * @var bool
      */
     private $saveResult = true;
