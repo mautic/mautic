@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Form;
 
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Form\Form;
 
@@ -27,6 +28,17 @@ trait RequestTrait
      */
     protected function prepareParametersFromRequest(Form $form, array &$params, $entity = null, $masks = [], $fields = [])
     {
+        // ungroup fields if need it
+        foreach ($fields as $key=>$field) {
+            if (is_array($field)) {
+                foreach ($field as $k=>$f) {
+                    $fields[$k]=$f;
+                }
+                unset($fields[$key]);
+                continue;
+            }
+        }
+
         // Special handling of some fields
         foreach ($form as $name => $child) {
             if (isset($params[$name])) {
@@ -45,21 +57,11 @@ trait RequestTrait
                                 break;
                             }
 
+                            // find property by value
                             if (!empty($fields)) {
-                                // ungroup fields if need it
-                                foreach ($fields as $key=>$field) {
-                                    if (is_array($field)) {
-                                        foreach ($field as $k=>$f) {
-                                            $fields[$k]=$f;
-                                        }
-                                        unset($fields[$key]);
-                                        continue;
-                                    }
-                                }
-
-                                // find property by value
-                                if (isset($fields[$name]['properties']) && is_array($fields[$name]['properties'])) {
-                                    $valuesAsKeys = array_flip(array_values($fields[$name]['properties']));
+                                $properties = ArrayHelper::getValue('properties', $fields[$name]);
+                                if (is_array($properties)) {
+                                    $valuesAsKeys = array_flip(array_values($properties));
                                     if (isset($valuesAsKeys[$params[$name]])) {
                                         $params[$name] = $valuesAsKeys[$params[$name]];
                                     }
