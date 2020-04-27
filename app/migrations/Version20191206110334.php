@@ -20,12 +20,10 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 class Version20191206110334 extends AbstractMauticMigration
 {
     /**
-     * @param Schema $schema
-     *
      * @throws SkipMigrationException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public function preUp(Schema $schema)
+    public function preUp(Schema $schema): void
     {
         // Test to see if this migration has already been applied
         $formTable = $schema->getTable($this->prefix.'form_fields');
@@ -34,10 +32,7 @@ class Version20191206110334 extends AbstractMauticMigration
         }
     }
 
-    /**
-     * @param Schema $schema
-     */
-    public function up(Schema $schema)
+    public function up(Schema $schema): void
     {
         $this->addSql('ALTER TABLE '.$this->prefix.'form_fields ADD COLUMN lead_field_not_overwrite TINYINT(1) DEFAULT NULL');
     }
