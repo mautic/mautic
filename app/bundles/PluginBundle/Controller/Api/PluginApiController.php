@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -11,7 +11,6 @@
 
 namespace Mautic\PluginBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -29,7 +28,7 @@ class PluginApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $view = $this->view(['response' => $this->get('mautic.plugin.facade.reload')->reloadPlugins()], Codes::HTTP_OK);
+        $view = $this->view(['response' => $this->get('mautic.plugin.facade.reload')->reloadPlugins()], Response::HTTP_OK);
 
         return $this->handleView($view);
     }
@@ -48,7 +47,7 @@ class PluginApiController extends CommonApiController
         $integrationHelper = $this->get('mautic.helper.integration');
         $integrationObject = $integrationHelper->getIntegrationObject($integrationName);
         if ($integrationObject && $integrationObject->getIntegrationSettings()->getIsPublished()) {
-            $view = $this->view($integrationObject->getIntegrationSettings()->getFeatureSettings(), Codes::HTTP_OK);
+            $view = $this->view($integrationObject->getIntegrationSettings()->getFeatureSettings(), Response::HTTP_OK);
 
             return $this->handleView($view);
         }
@@ -68,13 +67,13 @@ class PluginApiController extends CommonApiController
         }
 
         if (!is_callable('shell_exec') || false !== stripos(ini_get('disable_functions'), 'shell_exec')) {
-            return $this->returnError($this->translator->trans('mautic.plugin.extension.shell_exec'), Codes::HTTP_BAD_REQUEST);
+            return $this->returnError($this->translator->trans('mautic.plugin.extension.shell_exec'), Response::HTTP_BAD_REQUEST);
         }
 
         $package = $this->get('request_stack')->getCurrentRequest()->get('package');
         @set_time_limit(9999);
         $response = shell_exec('composer require '.$package);
-        $view     = $this->view(['response' => $response], Codes::HTTP_OK);
+        $view     = $this->view(['response' => $response], Response::HTTP_OK);
 
         return $this->handleView($view);
     }
