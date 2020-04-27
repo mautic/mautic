@@ -48,6 +48,11 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
      */
     private $form;
 
+    /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
     protected function setUp(): void
     {
         parent::setUp();
