@@ -63,33 +63,6 @@ class AjaxController extends CommonAjaxController
 
     /**
      * @param Request $request
-     * @param string  $name
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function updateConditionFieldValuesAction(Request $request)
-    {
-        $dataArray  = ['success' => 0];
-        $fieldAlias = InputHelper::clean($request->request->get('fieldAlias'));
-
-        if ($fieldAlias) {
-            /** @var FieldModel $fieldModel */
-            $fieldModel = $this->getModel('form.field');
-            /** @var Field $field */
-            $field                = $fieldModel->getRepository()->findOneBySlugs($fieldAlias);
-            if ($field) {
-                /** @var PropertiesProcessor $propertiesAccessor */
-                $propertiesAccessor    = $this->get('mautic.form.conditional.properties.processor');
-                $dataArray['success']  = 1;
-                $dataArray['fields']   = $propertiesAccessor->getFieldPropertiesChoices($field);
-            }
-        }
-
-        return $this->sendJsonResponse($dataArray);
-    }
-
-    /**
-     * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */

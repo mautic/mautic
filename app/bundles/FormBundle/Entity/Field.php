@@ -14,6 +14,7 @@ namespace Mautic\FormBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\FormBundle\ConditionalField\Enum\ConditionalFieldEnum;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -922,6 +923,26 @@ class Field
     }
 
     /**
+     * Was field displayed.
+     *
+     * @param array $data
+     *
+     * @return bool
+     */
+    public function showForConditionalField(array $data)
+    {
+        if (!$parentField = $this->getParentField()) {
+            return true;
+        }
+
+        if (isset($data[$parentField->getAlias()]) && isset($this->conditions['values']) && in_array($data[$parentField->getAlias()], $this->conditions['values'])) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @return bool
      */
     public function isCaptchaType()
@@ -977,5 +998,17 @@ class Field
     public function getParent()
     {
         return $this->parent;
+    }
+
+    public function getParentField()
+    {
+        if ($this->parent) {
+            $fields = $this->getForm()->getFields();
+            foreach ($fields as $field) {
+                if ($field->getId() == $this->parent) {
+                    return $field;
+                }
+            }
+        }
     }
 }
