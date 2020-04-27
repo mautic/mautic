@@ -935,8 +935,16 @@ class Field
             return true;
         }
 
-        if (isset($data[$parentField->getAlias()]) && isset($this->conditions['values']) && in_array($data[$parentField->getAlias()], $this->conditions['values'])) {
-            return true;
+        if (isset($data[$parentField->getAlias()]) && isset($this->conditions['values'])) {
+            $sendValues = $data[$parentField->getAlias()];
+            if (!is_array($sendValues)) {
+                $sendValues = [$sendValues];
+            }
+            foreach ($sendValues as $value) {
+                if (in_array($value, $this->conditions['values'])) {
+                    return true;
+                }
+            }
         }
 
         return false;

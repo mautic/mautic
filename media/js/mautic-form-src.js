@@ -235,19 +235,23 @@
                         .map(option => option.value);
                   Form.doShowOn(parents, key, selVal);
                 }
-
             });
         };
 
         Form.doShowOn = function (parents, key, selectedValues) {
-            
+
             Object.keys((parents[key])).forEach(function(key2) {
-                document.getElementById(key2).style.display = 'none';
+                var el = document.getElementById(key2);
+                el.style.display = 'none';
+                el.setAttribute('data-validate-disable', 1);
             });
+
             Object.keys((parents[key])).forEach(function(key2) {
                 [].forEach.call(selectedValues, function (selectedValue) {
                     if ((parents[key][key2]).includes(selectedValue)) {
-                        document.getElementById(key2).style.display = 'block';
+                        var el = document.getElementById(key2);
+                        el.style.display = 'block';
+                        el.removeAttribute('data-validate-disable');
                     }
                 })
             });
@@ -445,6 +449,14 @@
 
                 validateField: function(theForm, fieldKey) {
                     var field = MauticFormValidations[formId][fieldKey];
+
+                    var containerId = Form.getFieldContainerId(formId, fieldKey);
+
+                    // Skip conditonal hidden field
+                    if (document.getElementById(containerId).getAttribute('data-validate-disable')) {
+                        return true;
+                    }
+
                     var valid = Form.customCallbackHandler(formId, 'onValidateField', {fieldKey: fieldKey, field: field});
 
                     // If true, then a callback handled it
@@ -477,8 +489,6 @@
                                     break;
                             }
                         }
-
-                        var containerId = Form.getFieldContainerId(formId, fieldKey);
 
                         if (!valid) {
                             validator.markError(containerId, valid);

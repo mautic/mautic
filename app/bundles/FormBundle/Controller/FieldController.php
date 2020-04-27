@@ -112,7 +112,7 @@ class FieldController extends CommonFormController
 
                     // Keep track of used lead fields
                     $usedLeadFields = $this->get('session')->get('mautic.form.'.$formId.'.fields.leadfields', []);
-                    if (!empty($formData['leadField'])) {
+                    if (!empty($formData['leadField']) && empty($formData['leadField'])) {
                         $usedLeadFields[$keyId] = $formData['leadField'];
                     } else {
                         unset($usedLeadFields[$keyId]);
@@ -251,7 +251,7 @@ class FieldController extends CommonFormController
 
                         // Keep track of used lead fields
                         $usedLeadFields = $this->get('session')->get('mautic.form.'.$formId.'.fields.leadfields', []);
-                        if (!empty($formData['leadField'])) {
+                        if (!empty($formData['leadField']) && empty($formData['leadField'])) {
                             $usedLeadFields[$objectId] = $formData['leadField'];
                         } else {
                             unset($usedLeadFields[$objectId]);
@@ -299,17 +299,18 @@ class FieldController extends CommonFormController
             $passthroughVars['fieldHtml'] = $this->renderView(
                 'MauticFormBundle:Builder:fieldwrapper.html.php',
                 [
-                    'template'           => $template,
-                    'inForm'             => true,
-                    'field'              => $formField,
-                    'id'                 => $objectId,
-                    'formId'             => $formId,
-                    'contactFields'      => $this->getModel('lead.field')->getFieldListWithProperties(),
-                    'companyFields'      => $this->getModel('lead.field')->getFieldListWithProperties('company'),
-                    'inBuilder'          => true,
-                    'fields'             => $this->get('mautic.helper.form.field_helper')->getChoiceList($this->getModel('form.field')->getSessionFields($formId)),
-                    'formFields'         => $fields,
-                    'viewOnlyFields'     => $customComponents['viewOnlyFields'],
+                    'isConditional'        => !empty($formField['parent']),
+                    'template'             => $template,
+                    'inForm'               => true,
+                    'field'                => $formField,
+                    'id'                   => $objectId,
+                    'formId'               => $formId,
+                    'contactFields'        => $this->getModel('lead.field')->getFieldListWithProperties(),
+                    'companyFields'        => $this->getModel('lead.field')->getFieldListWithProperties('company'),
+                    'inBuilder'            => true,
+                    'fields'               => $this->get('mautic.helper.form.field_helper')->getChoiceList($this->getModel('form.field')->getSessionFields($formId)),
+                    'formFields'           => $fields,
+                    'viewOnlyFields'       => $customComponents['viewOnlyFields'],
                 ]
             );
 
@@ -363,7 +364,7 @@ class FieldController extends CommonFormController
 
             // Allow to select the lead field from the delete field again
             $unusedLeadField = array_search($formField['leadField'], $usedLeadFields);
-            if (!empty($formField['leadField']) && false !== $unusedLeadField) {
+            if (!empty($formField['leadField']) && empty($formField['parent']) && false !== $unusedLeadField) {
                 unset($usedLeadFields[$unusedLeadField]);
                 $session->set('mautic.form.'.$formId.'.fields.leadfields', $usedLeadFields);
             }

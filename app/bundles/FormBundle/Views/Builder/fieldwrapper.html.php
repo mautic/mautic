@@ -17,10 +17,11 @@ if (!isset($inBuilder)) {
 
 ?>
 
-<?php if (!empty($isConditional)): ?>
-<div class="ml-20">
-    <?php endif; ?>
-    <div class="<?php if (empty($isConditional)): ?>panel<?php endif; ?> form-field-wrapper" data-sortable-id="mauticform_<?php echo $field['id']; ?>">
+<div class="<?php if (empty($isConditional)): ?>panel<?php endif; ?> form-field-wrapper"
+     data-sortable-id="mauticform_<?php echo $field['id']; ?>">
+    <?php if (!empty($isConditional)): ?>
+    <div class="ml-20">
+        <?php endif; ?>
         <?php
         echo $view->render(
             'MauticFormBundle:Builder:actions.html.php',
@@ -47,42 +48,27 @@ if (!isset($inBuilder)) {
             );
             ?>
         </div>
-        <?php if (isset($fields) && in_array($field['type'], ConditionalFieldEnum::getConditionalFieldTypes())): ?>
-            <div class="row ml-15 mr-0 pb-15">
-                <div class="mt-10 col-sm-6 col-xs-12">
-                    <select class="chosen form-builder-new-component"
-                            data-placeholder="<?php echo $view['translator']->trans(
-                                'mautic.form.form.component.fields.conditional'
-                            ); ?>">
-                        <option value=""></option>
-                        <?php foreach ($fields as $conditionalFieldType => $conditionalField): ?>
-                            <?php if (!in_array($conditionalFieldType, $viewOnlyFields)): ?>
-                                <option data-toggle="ajaxmodal"
-                                        data-target="#formComponentModal"
-                                        data-href="<?php echo $view['router']->path(
-                                            'mautic_formfield_action',
-                                            [
-                                                'objectAction' => 'new',
-                                                'type'         => $conditionalFieldType,
-                                                'tmpl'         => 'field',
-                                                'formId'       => $formId,
-                                                'inBuilder'    => $inBuilder,
-                                                'parent'       => $field['id'],
-                                            ]
-                                        ); ?>">
-                                    <?php echo $conditionalField; ?>
-                                </option>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-            </div>
-        <?php endif; ?>
         <?php if ((isset($field['showWhenValueExists']) && $field['showWhenValueExists'] === false) || !empty($field['showAfterXSubmissions'])
             || !empty($field['leadField'])
             || !empty($field['conditions'])
         ): ?>
             <div class="ml-10">
+
+                <?php if (!empty($field['conditions']['values'])): ?>
+                    <span class="inline-spacer"">
+                    <span style="text-transform: none"><?php echo $view['translator']->trans(
+                            'mautic.form.field.form.condition.show.on'
+                        ); ?></span>
+                    <strong><?php echo $formFields[$field['parent']]['label']; ?></strong>
+
+                    <span style="text-transform: none"><?php echo $view['translator']->trans(
+                            'mautic.form.field.form.condition.select.value'
+                        ); ?></span>
+                    <strong><?php echo implode(', ', $field['conditions']['values']); ?></strong>
+                    </span>
+                    <br>
+                <?php endif; ?>
+
                 <?php if (!empty($field['leadField'])):
                     $icon = (in_array($field['leadField'], array_keys($companyFields))) ? 'building' : 'user';
                     ?>
@@ -115,19 +101,38 @@ if (!isset($inBuilder)) {
             ); ?>
         </span>
                 <?php endif; ?>
-                <?php if (!empty($field['conditions']['values'])): ?>
-                    <span class="inline-spacer"">
-                    <span style="text-transform: none"><?php echo $view['translator']->trans(
-                            'mautic.form.field.form.condition.show.on'
-                        ); ?></span>
-                    <strong><?php echo $formFields[$field['parent']]['label']; ?></strong>
+            </div>
+        <?php endif; ?>
 
-                    <span style="text-transform: none"><?php echo $view['translator']->trans(
-                            'mautic.form.field.form.condition.select.value'
-                        ); ?></span>
-                    <strong><?php echo implode(', ', $field['conditions']['values']); ?></strong>
-                    </span>
-                <?php endif; ?>
+        <?php if (isset($fields) && in_array($field['type'], ConditionalFieldEnum::getConditionalFieldTypes())): ?>
+            <div class="row ml-15 mr-0 pb-15">
+                <div class="mt-10 col-sm-6 col-xs-12">
+                    <select class="chosen form-builder-new-component"
+                            data-placeholder="<?php echo $view['translator']->trans(
+                                'mautic.form.form.component.fields.conditional'
+                            ); ?>">
+                        <option value=""></option>
+                        <?php foreach ($fields as $conditionalFieldType => $conditionalField): ?>
+                            <?php if (!in_array($conditionalFieldType, $viewOnlyFields)): ?>
+                                <option data-toggle="ajaxmodal"
+                                        data-target="#formComponentModal"
+                                        data-href="<?php echo $view['router']->path(
+                                            'mautic_formfield_action',
+                                            [
+                                                'objectAction' => 'new',
+                                                'type'         => $conditionalFieldType,
+                                                'tmpl'         => 'field',
+                                                'formId'       => $formId,
+                                                'inBuilder'    => $inBuilder,
+                                                'parent'       => $field['id'],
+                                            ]
+                                        ); ?>">
+                                    <?php echo $conditionalField; ?>
+                                </option>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
             </div>
         <?php endif; ?>
 
