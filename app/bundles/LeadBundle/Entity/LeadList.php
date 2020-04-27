@@ -219,6 +219,10 @@ class LeadList extends FormEntity
      */
     public function getFilters()
     {
+        if (is_array($this->filters)) {
+            return $this->addLegacyParams($this->filters);
+        }
+
         return $this->filters;
     }
 
@@ -320,5 +324,24 @@ class LeadList extends FormEntity
     {
         $this->isChanged('isPreferenceCenter', $isPreferenceCenter);
         $this->isPreferenceCenter = $isPreferenceCenter;
+    }
+
+    /**
+     * @deprecated remove after several of years.
+     *
+     * This is needed go keep BC after we moved 'filter' and 'display' params
+     * to the 'properties' array.
+     */
+    private function addLegacyParams(array $filters): array
+    {
+        return array_map(
+            function (array $filter) {
+                $filter['filter'] = $filter['properties']['filter'] ?? $filter['filter'];
+                $filter['display'] = $filter['properties']['display'] ?? $filter['display'];
+
+                return $filter;
+            },
+            $filters
+        );
     }
 }
