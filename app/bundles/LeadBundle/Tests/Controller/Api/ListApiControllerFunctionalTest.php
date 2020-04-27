@@ -43,6 +43,15 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
                     'display'  => null,
                     'operator' => '=',
                 ],
+                [
+                    'object'   => 'lead',
+                    'glue'     => 'and',
+                    'field'    => 'owner_id',
+                    'type'     => 'lookup_id',
+                    'operator' => '=',
+                    'display'  => 'John Doe',
+                    'filter'   => '4',
+                ],
                 // Current structure.
                 [
                     'object'     => 'lead',
@@ -51,6 +60,17 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
                     'type'       => 'text',
                     'properties' => ['filter' => 'Prague'],
                     'operator'   => '=',
+                ],
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'owner_id',
+                    'type'       => 'lookup_id',
+                    'operator'   => '=',
+                    'properties' => [
+                        'display' => 'John Doe',
+                        'filter'  => '4',
+                    ],
                 ],
             ],
         ];
@@ -82,10 +102,32 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
                 [
                     'object'     => 'lead',
                     'glue'       => 'and',
+                    'field'      => 'owner_id',
+                    'type'       => 'lookup_id',
+                    'operator'   => '=',
+                    'properties' => [
+                        'display' => 'John Doe',
+                        'filter'  => '4',
+                    ],
+                ],
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
                     'field'      => 'city',
                     'type'       => 'text',
                     'properties' => ['filter' => 'Prague'],
                     'operator'   => '=',
+                ],
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'owner_id',
+                    'type'       => 'lookup_id',
+                    'operator'   => '=',
+                    'properties' => [
+                        'display' => 'John Doe',
+                        'filter'  => '4',
+                    ],
                 ],
             ],
             $response['list']['filters']
