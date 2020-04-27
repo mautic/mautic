@@ -222,21 +222,34 @@
             });
 
             Object.keys(parents).forEach(function(key) {
-                var id = document.getElementById(key);
-                Form.doShowOn(parents, key, id.value)
-                id.onchange = function (evt) {
-                  Form.doShowOn(parents, key, evt.target.value);
+                var containerId = document.getElementById(key);
+                var selectElement = document.getElementById(key.replace('mauticform_','mauticform_input_' ));
+                var selVal = Array.from(selectElement.selectedOptions)
+                    .map(option => option.value);
+
+                Form.doShowOn(parents, key, selVal)
+
+                containerId.onchange = function (evt) {
+                    var selectElement = evt.target;
+                    var selVal = Array.from(selectElement.selectedOptions)
+                        .map(option => option.value);
+                  Form.doShowOn(parents, key, selVal);
                 }
+
             });
         };
 
-        Form.doShowOn = function (parents, key, selectedValue) {
+        Form.doShowOn = function (parents, key, selectedValues) {
+            
             Object.keys((parents[key])).forEach(function(key2) {
-                if ((parents[key][key2]).includes(selectedValue)) {
-                    document.getElementById(key2).style.display = 'block';
-                } else {
-                    document.getElementById(key2).style.display = 'none';
-                }
+                document.getElementById(key2).style.display = 'none';
+            });
+            Object.keys((parents[key])).forEach(function(key2) {
+                [].forEach.call(selectedValues, function (selectedValue) {
+                    if ((parents[key][key2]).includes(selectedValue)) {
+                        document.getElementById(key2).style.display = 'block';
+                    }
+                })
             });
         };
 
