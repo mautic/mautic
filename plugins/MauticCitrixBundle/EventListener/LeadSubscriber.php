@@ -172,8 +172,8 @@ class LeadSubscriber implements EventSubscriberInterface
                             'list' => array_flip($eventNamesWithAny),
                         ],
                         'operators' => [
-                            'in'  => $this->translator->trans('mautic.core.operator.in'),
-                            '!in' => $this->translator->trans('mautic.core.operator.notin'),
+                            $this->translator->trans('mautic.core.operator.in')    => 'in',
+                            $this->translator->trans('mautic.core.operator.notin') => '!in',
                         ],
                     ]
                 );
@@ -189,8 +189,8 @@ class LeadSubscriber implements EventSubscriberInterface
                         'list' => array_flip($eventNamesWithAny),
                     ],
                     'operators' => [
-                        'in'  => $this->translator->trans('mautic.core.operator.in'),
-                        '!in' => $this->translator->trans('mautic.core.operator.notin'),
+                        $this->translator->trans('mautic.core.operator.in')    => 'in',
+                        $this->translator->trans('mautic.core.operator.notin') => '!in',
                     ],
                 ]
             );
@@ -205,7 +205,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'list' => array_flip($eventNamesWithoutAny),
                     ],
                     'operators' => [
-                        'in' => $this->translator->trans('mautic.core.operator.in'),
+                        $this->translator->trans('mautic.core.operator.in') => 'in',
                     ],
                 ]
             );
