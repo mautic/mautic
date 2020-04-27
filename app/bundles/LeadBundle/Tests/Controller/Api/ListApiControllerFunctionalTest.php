@@ -67,6 +67,8 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
                     'field'      => 'owner_id',
                     'type'       => 'lookup_id',
                     'operator'   => '=',
+                    'display'    => 'outdated name',
+                    'filter'     => 'outdated_id',
                     'properties' => [
                         'display' => 'John Doe',
                         'filter'  => '4',

@@ -50,7 +50,7 @@ class ListApiController extends CommonApiController
             $filterValue                                         = $filter['properties']['filter'] ?? $bcFilterValue;
             $parameters['filters'][$key]['properties']['filter'] = $filterValue;
 
-            if (!empty($filter['display'])) {
+            if (!empty($filter['display']) && !isset($filter['properties']['display'])) {
                 $parameters['filters'][$key]['properties']['display'] = $filter['display'];
             }
 
