@@ -237,11 +237,7 @@ class LeadSubscriber implements EventSubscriberInterface
             $eventFilters = [$product.'-registration', $product.'-attendance', $product.'-no-attendance'];
 
             if (in_array($currentFilter, $eventFilters, true)) {
-                if (array_key_exists('filter', $details)) {
-                    $eventNames = $details['filter'];
-                } else {
-                    $eventNames = $details['properties']['filter'];
-                }
+                $eventNames = $details['filter'];
                 if (!is_iterable($eventNames)) {
                     $eventNames = [$eventNames];
                 }
