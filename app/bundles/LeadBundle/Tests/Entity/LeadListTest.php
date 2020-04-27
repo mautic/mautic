@@ -74,6 +74,16 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
                         'filter'  => '4',
                     ],
                 ],
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'city',
+                    'type'       => 'text',
+                    'operator'   => '=',
+                    'properties' => [
+                        'filter'  => 'Prague',
+                    ],
+                ],
             ]
         );
 
@@ -91,6 +101,18 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
                     ],
                     'filter'  => '4',
                     'display' => 'John Doe',
+                ],
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'field'      => 'city',
+                    'type'       => 'text',
+                    'operator'   => '=',
+                    'properties' => [
+                        'filter'  => 'Prague',
+                    ],
+                    'filter'  => 'Prague',
+                    'display' => null,
                 ],
             ],
             $entity->getFilters()
