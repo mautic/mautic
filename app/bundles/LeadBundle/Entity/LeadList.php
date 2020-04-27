@@ -327,7 +327,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * @deprecated remove after several of years.
+     * @deprecated remove after several years.
      *
      * This is needed go keep BC after we moved 'filter' and 'display' params
      * to the 'properties' array.
