@@ -58,84 +58,36 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SubmissionModel extends CommonFormModel
 {
-    /**
-     * @var IpLookupHelper
-     */
     protected $ipLookupHelper;
 
-    /**
-     * @var TemplatingHelper
-     */
     protected $templatingHelper;
 
-    /**
-     * @var FormModel
-     */
     protected $formModel;
 
-    /**
-     * @var PageModel
-     */
     protected $pageModel;
 
-    /**
-     * @var LeadModel
-     */
     protected $leadModel;
 
-    /**
-     * @var CampaignModel
-     */
     protected $campaignModel;
 
-    /**
-     * @var MembershipManager
-     */
     protected $membershipManager;
 
-    /**
-     * @var LeadFieldModel
-     */
     protected $leadFieldModel;
 
-    /**
-     * @var CompanyModel
-     */
     protected $companyModel;
 
-    /**
-     * @var FormFieldHelper
-     */
     protected $fieldHelper;
 
-    /**
-     * @var UploadFieldValidator
-     */
     private $uploadFieldValidator;
 
-    /**
-     * @var FormUploader
-     */
     private $formUploader;
 
-    /**
-     * @var DeviceTrackingServiceInterface
-     */
     private $deviceTrackingService;
 
-    /**
-     * @var FieldValueTransformer
-     */
     private $fieldValueTransformer;
 
-    /**
-     * @var DateHelper
-     */
     private $dateHelper;
 
-    /**
-     * @var ContactTracker
-     */
     private $contactTracker;
 
     public function __construct(
@@ -964,7 +916,7 @@ class SubmissionModel extends CommonFormModel
             foreach ($notOverwriteFields as $notOverwriteField) {
                 if (isset($data[$notOverwriteField])
                     && isset($profileFields[$notOverwriteField])
-                    && $profileFields[$notOverwriteField] !== '') {
+                    && '' !== $profileFields[$notOverwriteField]) {
                     unset($data[$notOverwriteField]);
                 }
             }
