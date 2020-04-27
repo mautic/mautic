@@ -75,7 +75,7 @@ class CitrixCampaignActionType extends AbstractType
             ChoiceType::class,
             [
                 'label'   => $this->translator->trans('plugin.citrix.action.criteria'),
-                'choices' => $newChoices,
+                'choices' => array_flip($newChoices),
             ]
         );
 

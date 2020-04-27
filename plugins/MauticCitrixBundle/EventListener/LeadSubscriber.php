@@ -169,7 +169,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'label'      => $this->translator->trans('plugin.citrix.event.'.$product.'.registration'),
                         'properties' => [
                             'type' => 'select',
-                            'list' => $eventNamesWithAny,
+                            'list' => array_flip($eventNamesWithAny),
                         ],
                         'operators' => [
                             'in'  => $this->translator->trans('mautic.core.operator.in'),
@@ -186,7 +186,7 @@ class LeadSubscriber implements EventSubscriberInterface
                     'label'      => $this->translator->trans('plugin.citrix.event.'.$product.'.attendance'),
                     'properties' => [
                         'type' => 'select',
-                        'list' => $eventNamesWithAny,
+                        'list' => array_flip($eventNamesWithAny),
                     ],
                     'operators' => [
                         'in'  => $this->translator->trans('mautic.core.operator.in'),
@@ -202,7 +202,7 @@ class LeadSubscriber implements EventSubscriberInterface
                     'label'      => $this->translator->trans('plugin.citrix.event.'.$product.'.no.attendance'),
                     'properties' => [
                         'type' => 'select',
-                        'list' => $eventNamesWithoutAny,
+                        'list' => array_flip($eventNamesWithoutAny),
                     ],
                     'operators' => [
                         'in' => $this->translator->trans('mautic.core.operator.in'),
@@ -237,7 +237,14 @@ class LeadSubscriber implements EventSubscriberInterface
             $eventFilters = [$product.'-registration', $product.'-attendance', $product.'-no-attendance'];
 
             if (in_array($currentFilter, $eventFilters, true)) {
-                $eventNames = $details['filter'];
+                if (array_key_exists('filter', $details)) {
+                    $eventNames = $details['filter'];
+                } else {
+                    $eventNames = $details['properties']['filter'];
+                }
+                if (!is_iterable($eventNames)) {
+                    $eventNames = [$eventNames];
+                }
                 $isAnyEvent = in_array('any', $eventNames, true);
                 $eventNames = array_map(function ($v) use ($q) {
                     return $q->expr()->literal($v);
