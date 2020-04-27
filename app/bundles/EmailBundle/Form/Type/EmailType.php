@@ -64,12 +64,14 @@ class EmailType extends AbstractType
 
     public function __construct(
         TranslatorInterface $translator,
-        EntityManager $entityManager,
-        StageModel $stageModel
+        EntityManagerInterface $entityManager,
+        StageModel $stageModel,
+        CoreParametersHelper $coreParametersHelper
     ) {
-        $this->translator = $translator;
-        $this->em         = $entityManager;
-        $this->stageModel = $stageModel;
+        $this->translator           = $translator;
+        $this->em                   = $entityManager;
+        $this->stageModel           = $stageModel;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
