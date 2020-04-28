@@ -13,8 +13,6 @@ namespace Mautic\FormBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Field;
-use Mautic\FormBundle\Entity\Form;
-use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\Event\FormFieldEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
@@ -70,7 +68,6 @@ class FieldModel extends CommonFormModel
 
         // Only show the lead fields not already used
         $usedLeadFields   = $this->session->get('mautic.form.'.$entity['formId'].'.fields.leadfields', []);
-
         $testLeadFields   = array_flip($usedLeadFields);
         $currentLeadField = (isset($entity['leadField'])) ? $entity['leadField'] : null;
         if (!empty($currentLeadField) && isset($testLeadFields[$currentLeadField])) {
@@ -80,6 +77,7 @@ class FieldModel extends CommonFormModel
         foreach ($choices as &$group) {
             $group = array_diff_key($group, $testLeadFields);
         }
+
         $options['leadFields']['lead']          = $choices;
         $options['leadFieldProperties']['lead'] = $fields;
 

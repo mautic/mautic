@@ -703,6 +703,7 @@ class FormController extends CommonFormController
         // Get field and action settings
         $fieldHelper     = $this->get('mautic.helper.form.field_helper');
         $availableFields = $fieldHelper->getChoiceList($customComponents['fields']);
+
         if ($cleanSlate) {
             //clean slate
             $this->clearSessionComponents($objectId);

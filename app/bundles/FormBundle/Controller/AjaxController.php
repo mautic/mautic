@@ -13,9 +13,6 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\FormBundle\ConditionalField\PropertiesProcessor;
-use Mautic\FormBundle\Entity\Field;
-use Mautic\FormBundle\Model\FieldModel;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -125,12 +122,7 @@ class AjaxController extends CommonAjaxController
      */
     public function submitAction()
     {
-        $response     = $this->forwardWithPost(
-            'MauticFormBundle:Public:submit',
-            $this->request->request->all(),
-            [],
-            ['ajax' => true]
-        );
+        $response     = $this->forwardWithPost('MauticFormBundle:Public:submit', $this->request->request->all(), [], ['ajax' => true]);
         $responseData = json_decode($response->getContent(), true);
         $success      = (!in_array($response->getStatusCode(), [404, 500]) && empty($responseData['errorMessage'])
             && empty($responseData['validationErrors']));

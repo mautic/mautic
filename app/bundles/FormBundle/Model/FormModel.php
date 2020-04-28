@@ -260,6 +260,7 @@ class FormModel extends CommonFormModel
                 // Change the alias to prevent potential ID collisions in the rendered HTML
                 $properties['alias'] = 'f_'.$properties['alias'];
             }
+
             foreach ($properties as $f => $v) {
                 if (in_array($f, ['id', 'order'])) {
                     continue;
@@ -270,7 +271,6 @@ class FormModel extends CommonFormModel
                     $field->$func($v);
                 }
             }
-
             $field->setForm($entity);
             $field->setSessionId($key);
             $field->setOrder($order);

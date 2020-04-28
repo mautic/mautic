@@ -26,6 +26,7 @@ $formId = $form['sessionId']->vars['data'];
 if (!isset($inBuilder)) {
     $inBuilder = false;
 }
+
 ?>
 <?php echo $view['form']->start($form); ?>
 <div class="box-layout">
@@ -71,6 +72,7 @@ if (!isset($inBuilder)) {
                                     <select class="chosen form-builder-new-component" data-placeholder="<?php echo $view['translator']->trans('mautic.form.form.component.fields'); ?>">
                                         <option value=""></option>
                                         <?php foreach ($fields as $fieldType => $field): ?>
+                                        
                                             <option data-toggle="ajaxmodal"
                                                     data-target="#formComponentModal"
                                                     data-href="<?php echo $view['router']->path(

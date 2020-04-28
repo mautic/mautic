@@ -25,7 +25,7 @@ class PropertiesAccessor
     private $fieldModel;
 
     /**
-     * PropertiesProcessor constructor.
+     * PropertiesAccessor constructor.
      *
      * @param FieldModel $fieldModel
      */

@@ -41,7 +41,6 @@ class FieldController extends CommonFormController
         } else {
             $fieldType = $this->request->query->get('type');
             $formId    = $this->request->query->get('formId');
-
             $formField = [
                 'type'     => $fieldType,
                 'formId'   => $formId,
@@ -108,6 +107,7 @@ class FieldController extends CommonFormController
                     } else {
                         $fields[$keyId] = $formField;
                     }
+
                     $session->set('mautic.form.'.$formId.'.fields.modified', $fields);
 
                     // Keep track of used lead fields

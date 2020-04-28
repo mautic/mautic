@@ -120,8 +120,6 @@ $conditionsTabError = (isset($form['conditions']) && ($view['form']->containsErr
                 </a>
             </li>
             <?php endif; ?>
-
-
         </ul>
 
         <!-- Tab panes -->

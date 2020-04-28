@@ -398,14 +398,6 @@ class Field
     }
 
     /**
-     * @return bool
-     */
-    public function isConditionalType()
-    {
-        return in_array($this->type, ConditionalFieldEnum::getConditionalFieldTypes());
-    }
-
-    /**
      * Set defaultValue.
      *
      * @param string $defaultValue
