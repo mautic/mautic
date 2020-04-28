@@ -329,7 +329,7 @@ class ConfigType extends AbstractType
                     'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getAmazonService().']}',
                     'tooltip'      => 'mautic.email.config.mailer.amazon_host.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
-                ]
+                ],
             ]
         );
 
