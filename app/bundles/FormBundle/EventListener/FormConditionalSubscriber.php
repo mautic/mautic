@@ -63,7 +63,10 @@ class FormConditionalSubscriber extends CommonSubscriber
     {
         $form = $event->getForm();
 
+        // Process temporary fiedl ID to real field ID
+        $actualFieldIds = [];
         foreach ($form->getFields() as $field) {
+            $actualFieldIds[] = $field->getId();
             if (strpos($field->getParent(), 'new') !== false) {
                 foreach ($form->getFields() as $parentField) {
                     if ($field->getParent() == $parentField->getSessionId()) {
@@ -74,6 +77,16 @@ class FormConditionalSubscriber extends CommonSubscriber
             }
         }
 
-        $fields = $this->fieldModel->getSessionFields($form->getId());
+        // Delete child fields
+        $deleteIds = [];
+        foreach ($form->getFields() as $field) {
+            if ($field->getParent() && !in_array($field->getParent(), $actualFieldIds)) {
+                $deleteIds[] = $field->getId();
+            }
+        }
+
+        if (!empty($deleteIds)) {
+            $this->formModel->deleteFields($form, $deleteIds);
+        }
     }
 }
