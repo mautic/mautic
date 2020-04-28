@@ -375,7 +375,7 @@ return [
                 'class'       => \Mautic\FormBundle\Form\Type\FormFieldConditionType::class,
                 'arguments'   => [
                     'mautic.form.model.field',
-                    'mautic.form.conditional.properties.processor',
+                    'mautic.form.helper.properties.accessor',
                 ],
             ],
         ],
@@ -459,15 +459,8 @@ return [
                     'router',
                 ],
             ],
-            'mautic.form.conditional.field.matching.factory' => [
-                'class'     => \Mautic\FormBundle\ConditionalField\FieldsMatching\FieldsMatchingFactory::class,
-                'arguments' => [
-                    'mautic.form.model.field',
-                    'mautic.form.conditional.properties.processor',
-                ],
-            ],
-            'mautic.form.conditional.properties.processor' => [
-                'class'     => \Mautic\FormBundle\ConditionalField\PropertiesProcessor::class,
+            'mautic.form.helper.properties.accessor' => [
+                'class'     => \Mautic\FormBundle\Helper\PropertiesAccessor::class,
                 'arguments' => [
                     'mautic.form.model.field',
                 ],

@@ -11,9 +11,7 @@
 
 namespace Mautic\FormBundle\Form\Type;
 
-use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
-use Mautic\FormBundle\ConditionalField\Enum\ConditionalFieldEnum;
-use Mautic\FormBundle\ConditionalField\PropertiesProcessor;
+use Mautic\FormBundle\Helper\PropertiesAccessor;
 use Mautic\FormBundle\Model\FieldModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -28,20 +26,20 @@ class FormFieldConditionType extends AbstractType
     private $fieldModel;
 
     /**
-     * @var PropertiesProcessor
+     * @var PropertiesAccessor
      */
-    private $propertiesProcessor;
+    private $propertiesAccessor;
 
     /**
      * FormFieldConditionType constructor.
      *
-     * @param FieldModel          $fieldModel
-     * @param PropertiesProcessor $propertiesProcessor
+     * @param FieldModel         $fieldModel
+     * @param PropertiesAccessor $propertiesAccessor
      */
-    public function __construct(FieldModel $fieldModel, PropertiesProcessor $propertiesProcessor)
+    public function __construct(FieldModel $fieldModel, PropertiesAccessor $propertiesAccessor)
     {
         $this->fieldModel          = $fieldModel;
-        $this->propertiesProcessor = $propertiesProcessor;
+        $this->propertiesAccessor  = $propertiesAccessor;
     }
 
     /**
@@ -49,7 +47,14 @@ class FormFieldConditionType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $choices = !empty($options['parent']) ? $this->propertiesProcessor->getFieldPropertiesChoicesFromAlias($options['formId'], $options['parent']) : [];
+        $choices = [];
+        if (!empty($options['parent'])) {
+            $fields = $this->fieldModel->getSessionFields($options['formId']);
+            if (isset($fields[$options['parent']])) {
+                $choices = $this->propertiesAccessor->getChoices($this->propertiesAccessor->getProperties($fields[$options['parent']]));
+            }
+        }
+
         $builder->add(
             'values',
             ChoiceType::class,

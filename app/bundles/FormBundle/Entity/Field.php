@@ -14,8 +14,7 @@ namespace Mautic\FormBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Mautic\CoreBundle\Helper\ArrayHelper;
-use Mautic\FormBundle\ConditionalField\Enum\ConditionalFieldEnum;
+use Mautic\FormBundle\Enum\ConditionalFieldEnum;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**

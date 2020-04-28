@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use Mautic\FormBundle\ConditionalField\Enum\ConditionalFieldEnum;
+use Mautic\FormBundle\Enum\ConditionalFieldEnum;
 
 if (!isset($inBuilder)) {
     $inBuilder = false;

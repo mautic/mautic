@@ -9,12 +9,15 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\FormBundle\ConditionalField;
+namespace Mautic\FormBundle\Helper;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Model\FieldModel;
+use Mautic\PageBundle\Entity\Page;
 
-class PropertiesProcessor
+class PropertiesAccessor
 {
     /**
      * @var FieldModel
@@ -31,30 +34,22 @@ class PropertiesProcessor
         $this->fieldModel = $fieldModel;
     }
 
-    public function getFieldPropertiesChoicesFromAlias($formId, $fieldId)
-    {
-        $fields = $this->fieldModel->getSessionFields($formId);
-        if (isset($fields[$fieldId])) {
-            return $this->getChoicesFromArray($this->getPropertiesFromField($fields[$fieldId]));
-        }
-    }
-
     /**
      * @param array $field
      *
      * @return array|mixed
      */
-    public function getPropertiesFromField(array $field)
+    public function getProperties(array $field)
     {
         if (!empty($field['leadField']) && !empty($field['properties']['syncList'])) {
             $contactFields = $this->fieldModel->getObjectFields('Lead');
             foreach ($contactFields as $contactField) {
                 if ($contactField['alias'] === $field['leadField']) {
-                    return $this->getOptionsFromProperties($contactField['properties']);
+                    return $this->getOptionsListFromProperties($contactField['properties']);
                 }
             }
         } elseif (!empty($field['properties'])) {
-            return $this->getOptionsFromProperties($field['properties']);
+            return $this->getOptionsListFromProperties($field['properties']);
         }
 
         return [];
@@ -63,7 +58,7 @@ class PropertiesProcessor
     /**
      * @return array
      */
-    public function getChoicesFromArray(array $options)
+    public function getChoices(array $options)
     {
         $choices = [];
         foreach ($options as $option) {
@@ -90,7 +85,7 @@ class PropertiesProcessor
      *
      * @return array|mixed
      */
-    private function getOptionsFromProperties(array $properties)
+    private function getOptionsListFromProperties(array $properties)
     {
         if (!empty($properties['list']['list'])) {
             return $properties['list']['list'];
