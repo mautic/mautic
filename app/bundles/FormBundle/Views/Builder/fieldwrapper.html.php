@@ -134,6 +134,7 @@ if (!isset($inBuilder)) {
                     </select>
                 </div>
             </div>
+            <hr>
         <?php endif; ?>
 
         <?php foreach ($formFields as $field2):

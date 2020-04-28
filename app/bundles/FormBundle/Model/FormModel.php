@@ -276,6 +276,8 @@ class FormModel extends CommonFormModel
             $field->setOrder($order);
             if (!$field->getParent()) {
                 ++$order;
+            } else {
+                $field->setOrder($sessionFields[$field->getParent()]['order']);
             }
             $entity->addField($properties['id'], $field);
         }

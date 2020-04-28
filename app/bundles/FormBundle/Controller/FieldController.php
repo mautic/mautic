@@ -112,7 +112,7 @@ class FieldController extends CommonFormController
 
                     // Keep track of used lead fields
                     $usedLeadFields = $this->get('session')->get('mautic.form.'.$formId.'.fields.leadfields', []);
-                    if (!empty($formData['leadField']) && empty($formData['leadField'])) {
+                    if (!empty($formData['leadField']) && empty($formData['parent'])) {
                         $usedLeadFields[$keyId] = $formData['leadField'];
                     } else {
                         unset($usedLeadFields[$keyId]);
@@ -251,7 +251,7 @@ class FieldController extends CommonFormController
 
                         // Keep track of used lead fields
                         $usedLeadFields = $this->get('session')->get('mautic.form.'.$formId.'.fields.leadfields', []);
-                        if (!empty($formData['leadField']) && empty($formData['leadField'])) {
+                        if (!empty($formData['leadField']) && empty($formData['parent'])) {
                             $usedLeadFields[$objectId] = $formData['leadField'];
                         } else {
                             unset($usedLeadFields[$objectId]);
