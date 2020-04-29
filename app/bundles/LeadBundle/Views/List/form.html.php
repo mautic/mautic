@@ -80,8 +80,11 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                     foreach ($fields as $object => $field):
                                         $header = $object;
                                         $icon   = ('company' == $object) ? 'building' : 'user';
+                                        $header = $view['translator']->hasId($translationId = 'mautic.lead.'.$header)
+                                            ? $view['translator']->trans($translationId)
+                                            : $view['translator']->trans($header);
                                     ?>
-                                    <optgroup label="<?php echo $view['translator']->trans('mautic.lead.'.$header); ?>">
+                                    <optgroup label="<?php echo $header; ?>">
                                         <?php foreach ($field as $value => $params):
                                             $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';
                                             ?>
