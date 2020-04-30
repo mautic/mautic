@@ -103,7 +103,7 @@ if (!isset($inBuilder)) {
             </div>
         <?php endif; ?>
 
-    <?php if (isset($fields) && in_array($field['type'], ConditionalFieldEnum::getConditionalFieldTypes())): ?>
+    <?php if (empty($isConditional) && isset($fields) && in_array($field['type'], ConditionalFieldEnum::getConditionalFieldTypes())): ?>
         <div class="row ml-15 mr-0 pb-15">
             <div class="mt-10 col-sm-6 col-xs-12">
                 <select class="chosen form-builder-new-component"
