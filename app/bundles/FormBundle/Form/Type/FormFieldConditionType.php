@@ -55,6 +55,8 @@ class FormFieldConditionType extends AbstractType
             }
         }
 
+        $choices = array_merge(['*'=>'mautic.form.field.form.condition.any_value'], $choices);
+
         $builder->add(
             'values',
             ChoiceType::class,

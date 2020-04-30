@@ -248,7 +248,7 @@
 
             Object.keys((parents[key])).forEach(function(key2) {
                 [].forEach.call(selectedValues, function (selectedValue) {
-                    if ((parents[key][key2]).includes(selectedValue)) {
+                    if ((parents[key][key2]).includes(selectedValue) || (selectedValue && (parents[key][key2]).includes('*'))) {
                         var el = document.getElementById(key2);
                         el.style.display = 'block';
                         el.removeAttribute('data-validate-disable');

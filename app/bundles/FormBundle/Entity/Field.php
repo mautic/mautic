@@ -932,7 +932,7 @@ class Field
                 $sendValues = [$sendValues];
             }
             foreach ($sendValues as $value) {
-                if (in_array($value, $this->conditions['values'])) {
+                if (in_array($value, $this->conditions['values']) || ($value && in_array(' *', $this->conditions['values']))) {
                     return true;
                 }
             }

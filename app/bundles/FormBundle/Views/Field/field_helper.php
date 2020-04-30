@@ -88,15 +88,16 @@ if (!empty($inForm)) {
 // Container
 $containerAttr = 'id="mauticform'.$formName.'_'.$id.'" '.htmlspecialchars_decode($field['containerAttributes']);
 
-if (isset($fields) && $field['parent']) {
-    $containerAttr .= " data-mautic-form-show-on=\"{$fields[$field['parent']]->getAlias()}:".implode('|', $field['conditions']['values']).'" ';
-}
-
 if (!isset($containerClass)) {
     $containerClass = $containerType;
 }
 $order                 = (isset($field['order'])) ? $field['order'] : 0;
 $defaultContainerClass = 'mauticform-row mauticform-'.$containerClass.' mauticform-field-'.$order;
+
+if (isset($fields) && $field['parent']) {
+    $containerAttr .= " data-mautic-form-show-on=\"{$fields[$field['parent']]->getAlias()}:".implode('|', $field['conditions']['values']).'" ';
+    $defaultContainerClass .= '  mauticform-field-hidden';
+}
 
 // Field is required
 $validationMessage = '';
