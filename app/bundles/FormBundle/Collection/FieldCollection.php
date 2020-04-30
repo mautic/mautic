@@ -14,14 +14,10 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Collection;
 
 use Mautic\FormBundle\Crate\FieldCrate;
+use Mautic\FormBundle\Exception\FieldNotFoundException;
 
 final class FieldCollection extends \ArrayIterator
 {
-    public function getFields(FieldCrate $field): void
-    {
-        parent::append($field);
-    }
-
     public function toChoices(): array
     {
         $choices = [];
@@ -32,5 +28,17 @@ final class FieldCollection extends \ArrayIterator
         }
 
         return $choices;
+    }
+
+    public function getFieldByKey(string $key): FieldCrate
+    {
+        /** @var FieldCrate $field */
+        foreach ($this as $field) {
+            if ($key === $field->getKey()) {
+                return $field;
+            }
+        }
+
+        throw new FieldNotFoundException("Field with key {$key} was not found.");
     }
 }

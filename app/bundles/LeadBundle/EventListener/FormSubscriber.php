@@ -156,7 +156,14 @@ class FormSubscriber implements EventSubscriberInterface
         $fields = $this->leadFieldRepository->getFieldsForObject($object);
 
         foreach ($fields as $field) {
-            $event->appendField(new FieldCrate($field->getId(), $field->getLabel()));
+            $event->appendField(
+                new FieldCrate(
+                    $field->getId(),
+                    $field->getLabel(),
+                    $field->getType(),
+                    $field->getProperties()
+                )
+            );
         }
     }
 
