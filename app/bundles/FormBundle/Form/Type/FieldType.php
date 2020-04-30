@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\FormBundle\Collector\FieldCollectorInterface;
 use Mautic\FormBundle\Collector\ObjectCollectorInterface;
-use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Mautic\FormBundle\Exception\FieldNotFoundException;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -420,17 +420,20 @@ class FieldType extends AbstractType
                 ]
             );
 
+            $fields = $this->fieldCollector->getFields($mappedObject);
+
             $builder->add(
                 'mappedField',
                 ChoiceType::class,
                 [
-                    'choices'     => $this->fieldCollector->getFields($mappedObject)->toChoices(),
-                    'choice_attr' => function ($val, $key, $index) use ($options) {
-                        $objects = ['lead', 'company'];
-                        foreach ($objects as $object) {
-                            if (!empty($options['leadFieldProperties'][$object][$val]) && (in_array($options['leadFieldProperties'][$object][$val]['type'], FormFieldHelper::getListTypes()) || !empty($options['leadFieldProperties'][$object][$val]['properties']['list']) || !empty($options['leadFieldProperties'][$object][$val]['properties']['optionlist']))) {
+                    'choices'     => $fields->toChoices(),
+                    'choice_attr' => function ($val) use ($fields) {
+                        try {
+                            $field = $fields->getFieldByKey($val);
+                            if ($field->isListType()) {
                                 return ['data-list-type' => 1];
                             }
+                        } catch (FieldNotFoundException $e) {
                         }
 
                         return [];
@@ -598,9 +601,7 @@ class FieldType extends AbstractType
             ]
         );
 
-        $resolver->setDefined(['customParameters', 'leadFieldProperties']);
-
-        $resolver->setRequired(['leadFields']);
+        $resolver->setDefined(['customParameters']);
     }
 
     public function getBlockPrefix()

@@ -59,6 +59,8 @@ class FieldModel extends CommonFormModel
             $group = array_diff_key($group, $testLeadFields);
         }
 
+        // @todo these can be removed as they are not used anymore.
+        // The issue is with the session use above.
         $options['leadFields']['lead']          = $choices;
         $options['leadFieldProperties']['lead'] = $fields;
 
