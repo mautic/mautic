@@ -24,9 +24,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     const MODE_PID    = 'pid';
     const MODE_FLOCK  = 'flock';
 
-    protected $checkFile;
     protected $moderationKey;
-    protected $moderationTable = [];
     protected $moderationMode  = self::MODE_LOCK;
     protected $runDirectory;
     protected $lockExpiration = false;
@@ -90,10 +88,9 @@ abstract class ModeratedCommand extends ContainerAwareCommand
         // Setup the run directory for lock/pid files
         $this->runDirectory = $this->getContainer()->getParameter('kernel.cache_dir').'/../run';
         if (!file_exists($this->runDirectory)) {
-            if (!mkdir($this->runDirectory)) {
-                $output->writeln('<error>'.$this->runDirectory.' could not be created.</error>');
-
-                return false;
+            if (!@mkdir($this->runDirectory)) {
+                // This needs to throw an exception in order to not silently fail when there is an issue
+                throw new \RuntimeException($this->runDirectory.' could not be created.');
             }
         }
 
