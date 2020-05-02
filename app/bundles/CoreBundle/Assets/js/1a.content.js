@@ -90,6 +90,96 @@ Mautic.loadContent = function (route, link, method, target, showPageLoading, cal
 };
 
 /**
+ *  Load results with  ajax in batch mode
+ *
+ * @param elementName
+ * @param route
+ * @param callback
+ */
+Mautic.loadAjaxColumn = function(elementName, route, callback){
+    var className = '.'+elementName;
+    if (mQuery(className).length) {
+        var ids = [];
+        mQuery(className).each(function () {
+            if(!mQuery(this).text()) {
+                var id = mQuery(this).attr('data-value');
+                ids.push(id);
+            }
+        });
+
+        var batchIds;
+
+        // If not gonna load any data, then just callback
+        if(ids.length == 0) {
+            Mautic.getCallback(callback);
+        }
+
+        // Get all stats numbers in batches of 10
+        while (ids.length > 0) {
+            batchIds = ids.splice(0, 10);
+            Mautic.ajaxActionRequest(
+                route,
+                {ids: batchIds, entityId: Mautic.getEntityId()},
+                function (response) {
+                    if (response.success && response.stats) {
+                        for (var i = 0; i < response.stats.length; i++) {
+                            var stat = response.stats[i];
+                            if (mQuery('#' + elementName + '-' + stat.id).length) {
+                                mQuery('#' + elementName + '-' + stat.id).html(stat.data);
+                            }
+                        }
+                        if(batchIds.length < 10) {
+                            Mautic.getCallback(callback);
+                        }
+                    }
+                },
+                false,
+                true
+            );
+        }
+    }
+}
+
+/**
+ *  Sort table by column
+ *
+ * @param tableId
+ * @param sortElement
+ */
+Mautic.sortTableByColumn = function(tableId, sortElement, removeZero){
+    var tbody = mQuery(tableId).find('tbody');
+    tbody.find('tr').each(function () {
+        if(parseInt(mQuery(this).find(sortElement).text()) == 0) {
+            mQuery(this).remove();
+        }
+    })
+    tbody.find('tr').sort(function(a, b) {
+        var tda = parseFloat(mQuery(a).find(sortElement).text()); // target order attribute
+        var tdb = parseFloat(mQuery(b).find(sortElement).text()); // target order attribute
+        // if a < b return 1
+        return tda < tdb ? 1
+            // else if a > b return -1
+            : tda > tdb ? -1
+            // else they are equal - return 0
+            : 0;
+    }).appendTo(tbody);
+}
+
+/**
+ * @param callback
+ */
+Mautic.getCallback = function (callback) {
+    if (callback && typeof callback !== 'undefined') {
+        if (typeof callback == 'function') {
+            callback();
+        } else {
+            window["Mautic"][callback].apply('window', []);
+        }
+    }
+}
+
+
+/**
  * Generates the title of the current page
  *
  * @param route
@@ -333,14 +423,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
         Mautic.activateMultiSelect(this);
     });
 
-    mQuery(container + " *[data-toggle='field-lookup']").each(function (index) {
-        var target = mQuery(this).attr('data-target');
-        var options = mQuery(this).attr('data-options');
-        var field = mQuery(this).attr('id');
-        var action = mQuery(this).attr('data-action');
-
-        Mautic.activateFieldTypeahead(field, target, options, action);
-    });
+    Mautic.activateLookupTypeahead(mQuery(container));
 
     // Fix dropdowns in responsive tables - https://github.com/twbs/bootstrap/issues/11037#issuecomment-163746965
     mQuery(container + " .table-responsive").on('shown.bs.dropdown', function (e) {
@@ -718,7 +801,22 @@ Mautic.onPageLoad = function (container, response, inModal) {
 };
 
 /**
- *
+ * @param jQueryObject
+ */
+Mautic.activateLookupTypeahead = function(containerEl) {
+    containerEl.find("*[data-toggle='field-lookup']").each(function () {
+        var lookup = mQuery(this);
+
+        Mautic.activateFieldTypeahead(
+            lookup.attr('id'),
+            lookup.attr('data-target'),
+            lookup.attr('data-options'),
+            lookup.attr('data-action')
+        );
+    });
+};
+
+/**
  * @param jQueryObject
  */
 Mautic.makeConfirmationsAlive = function(jQueryObject) {
@@ -975,7 +1073,9 @@ Mautic.activateChosenSelect = function(el, ignoreGlobal, jQueryVariant) {
  * @param el
  */
 Mautic.destroyChosen = function(el) {
-    var eventObject = mQuery._data(el.get(0), 'events');
+    if(el.get(0)) {
+        var eventObject = mQuery._data(el.get(0), 'events');
+    }
 
     // Check if object has chosen event
     if (eventObject !== undefined && eventObject['chosen:activate'] !== undefined) {
@@ -1221,6 +1321,7 @@ Mautic.activateDateTimeInputs = function(el, type) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false
         });
     } else if(type == 'date') {
@@ -1230,6 +1331,7 @@ Mautic.activateDateTimeInputs = function(el, type) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false,
             closeOnDateSelect: true
         });
@@ -1240,6 +1342,7 @@ Mautic.activateDateTimeInputs = function(el, type) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false
         });
     }

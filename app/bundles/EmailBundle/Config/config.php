@@ -127,6 +127,7 @@ return [
                     'mautic.transport.momentum.callback',
                     'mautic.queue.service',
                     'mautic.email.helper.request.storage',
+                    'monolog.logger.mautic',
                 ],
             ],
             'mautic.email.monitored.bounce.subscriber' => [
@@ -557,6 +558,8 @@ return [
                     '%mautic.mailer_api_key%',
                     'translator',
                     'mautic.email.model.transport_callback',
+                    'mautic.sparkpost.factory',
+                    'monolog.logger.mautic',
                 ],
             ],
             'mautic.sparkpost.factory' => [

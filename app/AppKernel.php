@@ -34,14 +34,14 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const MINOR_VERSION = 15;
+    const MINOR_VERSION = 16;
 
     /**
      * Patch version number.
      *
      * @const integer
      */
-    const PATCH_VERSION = 0;
+    const PATCH_VERSION = 2;
 
     /**
      * Extra version identifier.
@@ -51,7 +51,7 @@ class AppKernel extends Kernel
      *
      * @const string
      */
-    const EXTRA_VERSION = '-dev';
+    const EXTRA_VERSION = '';
 
     /**
      * @var array
@@ -83,7 +83,7 @@ class AppKernel extends Kernel
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
         if (strpos($request->getRequestUri(), 'installer') !== false || !$this->isInstalled()) {
-            define('MAUTIC_INSTALLER', 1);
+            defined('MAUTIC_INSTALLER') or define('MAUTIC_INSTALLER', 1);
         }
 
         if (defined('MAUTIC_INSTALLER')) {
@@ -164,6 +164,7 @@ class AppKernel extends Kernel
             new Oneup\UploaderBundle\OneupUploaderBundle(),
             new Symfony\Bundle\TwigBundle\TwigBundle(),
             new Debril\RssAtomBundle\DebrilRssAtomBundle(),
+            new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
             // Mautic Bundles
             new Mautic\ApiBundle\MauticApiBundle(),
             new Mautic\AssetBundle\MauticAssetBundle(),
@@ -526,7 +527,9 @@ class AppKernel extends Kernel
 
         // Warm up the cache if classes.php is missing or in dev mode
         if (!$fresh && $this->container->has('cache_warmer')) {
-            $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
+            $warmer = $this->container->get('cache_warmer');
+            $warmer->enableOptionalWarmers();
+            $warmer->warmUp($this->container->getParameter('kernel.cache_dir'));
         }
     }
 

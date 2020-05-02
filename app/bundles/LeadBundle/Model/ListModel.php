@@ -33,9 +33,12 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
+use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
+use Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * Class ListModel
@@ -56,14 +59,22 @@ class ListModel extends FormModel
     private $leadSegmentService;
 
     /**
+     * @var SegmentChartQueryFactory
+     */
+    private $segmentChartQueryFactory;
+
+    /**
      * ListModel constructor.
      *
-     * @param CoreParametersHelper $coreParametersHelper
+     * @param CoreParametersHelper     $coreParametersHelper
+     * @param ContactSegmentService    $leadSegment
+     * @param SegmentChartQueryFactory $segmentChartQueryFactory
      */
-    public function __construct(CoreParametersHelper $coreParametersHelper, ContactSegmentService $leadSegment)
+    public function __construct(CoreParametersHelper $coreParametersHelper, ContactSegmentService $leadSegment, SegmentChartQueryFactory $segmentChartQueryFactory)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->leadSegmentService   = $leadSegment;
+        $this->coreParametersHelper     = $coreParametersHelper;
+        $this->leadSegmentService       = $leadSegment;
+        $this->segmentChartQueryFactory = $segmentChartQueryFactory;
     }
 
     /**
@@ -309,6 +320,12 @@ class ListModel extends FormModel
                 'operators' => $this->getOperatorsForFieldType('multiselect'),
                 'object'    => 'lead',
             ],
+            'lead_asset_download' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.lead_asset_download'),
+                'properties' => ['type' => 'assets'],
+                'operators'  => $this->getOperatorsForFieldType('multiselect'),
+                'object'     => 'lead',
+            ],
             'lead_email_received' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_received'),
                 'properties' => [
@@ -451,6 +468,18 @@ class ListModel extends FormModel
             ],
             'dnc_unsubscribed' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed'),
+                'properties' => [
+                    'type' => 'boolean',
+                    'list' => [
+                        0 => $this->translator->trans('mautic.core.form.no'),
+                        1 => $this->translator->trans('mautic.core.form.yes'),
+                    ],
+                ],
+                'operators' => $this->getOperatorsForFieldType('bool'),
+                'object'    => 'lead',
+            ],
+            'dnc_manual_email' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_manual_email'),
                 'properties' => [
                     'type' => 'boolean',
                     'list' => [
@@ -776,7 +805,7 @@ class ListModel extends FormModel
             $type               = $field->getType();
             $properties         = $field->getProperties();
             $properties['type'] = $type;
-            if (in_array($type, ['lookup', 'multiselect', 'boolean'])) {
+            if (in_array($type, ['select', 'multiselect', 'boolean'])) {
                 if ('boolean' == $type) {
                     //create a lookup list with ID
                     $properties['list'] = [
@@ -1707,9 +1736,17 @@ class ListModel extends FormModel
     public function getSegmentContactsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
     {
         $chart    = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query    = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-        $contacts = $query->fetchTimeData('lead_lists_leads', 'date_added', $filter);
-        $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts'), $contacts);
+        $query    = new SegmentContactsLineChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $filter);
+
+        // added line everytime
+        $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.added'), $this->segmentChartQueryFactory->getContactsAdded($query));
+
+        // Just if we have event log data
+        // Added in 2.15 , then we can' display just from data from date range with event logs
+        if ($query->isStatsFromEventLog()) {
+            $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.removed'), $this->segmentChartQueryFactory->getContactsRemoved($query));
+            $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.total'), $this->segmentChartQueryFactory->getContactsTotal($query, $this));
+        }
 
         return $chart->render();
     }
@@ -1723,6 +1760,13 @@ class ListModel extends FormModel
      */
     public function isFieldUsed(LeadField $field)
     {
+        $segments = $this->getFieldSegments($field);
+
+        return 0 < $segments->count();
+    }
+
+    public function getFieldSegments(LeadField $field)
+    {
         $alias       = $field->getAlias();
         $aliasLength = mb_strlen($alias);
         $likeContent = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
@@ -1733,6 +1777,101 @@ class ListModel extends FormModel
             ],
         ];
 
-        return $this->getEntities(['filter' => $filter])->count() !== 0;
+        return $this->getEntities(['filter' => $filter]);
+    }
+
+    /**
+     * @param      $segmentId      *
+     * @param null $returnProperty property of entity in returned array, null return all entity
+     *
+     * @return array
+     */
+    public function getSegmentsWithDependenciesOnSegment($segmentId, $returnProperty = 'name')
+    {
+        $filter = [
+            'force'  => [
+                ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=>'%s:8:"leadlist"%'],
+                ['column' => 'l.id', 'expr' => 'neq', 'value'=>$segmentId],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+        $dependents = [];
+        $accessor   = new PropertyAccessor();
+        foreach ($entities as $entity) {
+            $retrFilters = $entity->getFilters();
+            foreach ($retrFilters as $eachFilter) {
+                if ($eachFilter['type'] === 'leadlist' && in_array($segmentId, $eachFilter['filter'])) {
+                    if ($returnProperty && $value = $accessor->getValue($entity, $returnProperty)) {
+                        $dependents[] = $value;
+                    } else {
+                        $dependents[] = $entity;
+                    }
+                }
+            }
+        }
+
+        return $dependents;
+    }
+
+    /**
+     * Get segments which are used as a dependent by other segments to prevent batch deletion of them.
+     *
+     * @param array $segmentIds
+     *
+     * @return array
+     */
+    public function canNotBeDeleted($segmentIds)
+    {
+        $filter = [
+            'force'  => [
+                ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=>'%s:8:"leadlist"%'],
+            ],
+        ];
+
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+
+        $idsNotToBeDeleted   = [];
+        $namesNotToBeDeleted = [];
+        $dependency          = [];
+
+        foreach ($entities as $entity) {
+            $retrFilters = $entity->getFilters();
+            foreach ($retrFilters as $eachFilter) {
+                if ($eachFilter['type'] !== 'leadlist') {
+                    continue;
+                }
+
+                $idsNotToBeDeleted = array_unique(array_merge($idsNotToBeDeleted, $eachFilter['filter']));
+                foreach ($eachFilter['filter'] as $val) {
+                    if (!empty($dependency[$val])) {
+                        $dependency[$val] = array_merge($dependency[$val], [$entity->getId()]);
+                        $dependency[$val] = array_unique($dependency[$val]);
+                    } else {
+                        $dependency[$val] = [$entity->getId()];
+                    }
+                }
+            }
+        }
+        foreach ($dependency as $key => $value) {
+            if (array_intersect($value, $segmentIds) === $value) {
+                $idsNotToBeDeleted = array_unique(array_diff($idsNotToBeDeleted, [$key]));
+            }
+        }
+
+        $idsNotToBeDeleted = array_intersect($segmentIds, $idsNotToBeDeleted);
+
+        foreach ($idsNotToBeDeleted as $val) {
+            $namesNotToBeDeleted[$val] = $this->getEntity($val)->getName();
+        }
+
+        return $namesNotToBeDeleted;
     }
 }

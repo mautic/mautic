@@ -101,6 +101,8 @@ class ConfigType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add('last_shown_tab', 'hidden');
+
         $builder->add(
             'site_url',
             'text',
@@ -496,6 +498,21 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.ip.lookup.auth.tooltip',
                 ],
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'ip_lookup_create_organization',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.core.config.create.organization.from.ip.lookup',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.create.organization.from.ip.lookup.tooltip',
+                ],
+                'data'     => isset($options['data']['ip_lookup_create_organization']) ? (bool) $options['data']['ip_lookup_create_organization'] : false,
                 'required' => false,
             ]
         );

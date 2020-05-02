@@ -7,107 +7,104 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 class ZohoApi extends CrmApi
 {
     /**
-     * @param        $operation
-     * @param array  $parameters
+     * @param string $operation
      * @param string $method
-     * @param string $moduleobject
-     * @param bool   $isJson
+     * @param bool   $json
+     * @param array  $settings
      *
-     * @return mixed|string
+     * @return array
      *
      * @throws ApiErrorException
      */
-    protected function request($operation, array $parameters = [], $method = 'GET', $moduleobject = 'Leads', $isJson = true)
+    protected function request($operation, array $parameters = [], $method = 'GET', $json = false, $settings = [])
     {
         $tokenData = $this->integration->getKeys();
-        $url       = sprintf('%s/%s/%s', $this->integration->getApiUrl($isJson), $moduleobject, $operation);
 
-        $parameters = array_merge([
-            'authtoken' => $tokenData['AUTHTOKEN'],
-            'scope'     => 'crmapi',
-        ], $parameters);
+        $url = sprintf('%s/%s', $tokenData['api_domain'].'/crm/v2', $operation);
 
-        $response = $this->integration->makeRequest($url, $parameters, $method);
+        if (!isset($settings['headers'])) {
+            $settings['headers'] = [];
+        }
+        $settings['headers']['Authorization'] = 'Zoho-oauthtoken '.$tokenData['access_token'];
 
-        if (!empty($response['response']['error'])) {
-            $response = $response['response'];
-            $errorMsg = $response['error']['message'].' ('.$response['error']['code'].')';
-            if (isset($response['uri'])) {
-                $errorMsg .= '; '.$response['uri'];
-            }
-            throw new ApiErrorException($errorMsg);
+        if ($json) {
+            $settings['Content-Type']      = 'application/json';
+            $settings['encode_parameters'] = 'json';
+        }
+
+        $response = $this->integration->makeRequest($url, $parameters, $method, $settings);
+
+        if (isset($response['status']) && 'error' === $response['status']) {
+            throw new ApiErrorException($response['message']);
         }
 
         return $response;
     }
 
     /**
-     * List types.
+     * @param string $object
      *
-     * @param string $object Zoho module name
+     * @return array
      *
-     * @return mixed
+     * @throws ApiErrorException
      */
     public function getLeadFields($object = 'Leads')
     {
-        if ($object == 'company') {
+        if ('company' == $object) {
             $object = 'Accounts'; // Zoho object name
         }
 
-        return $this->request('getFields', [], 'GET', $object);
+        return $this->request('settings/fields?module='.$object, [], 'GET');
     }
 
     /**
-     * @param        $data
-     * @param null   $lead
      * @param string $object
      *
-     * @return mixed|string
+     * @return array
+     *
+     * @throws ApiErrorException
      */
-    public function createLead($data, $lead = null, $object = 'Leads')
+    public function createLead(array $data, $object = 'Leads')
     {
-        $parameters = [
-            'xmlData'        => $data,
-            'duplicateCheck' => 2, // update if exists
-            'newFormat'      => 2, // To include fields with "null" values while inserting data from your CRM account
-            'version'        => 4, // This will trigger duplicate check functionality for multiple records.
-        ];
+        $parameters['data'] = $data;
 
-        return $this->request('insertRecords', $parameters, 'POST', $object, false);
+        return $this->request($object, $parameters, 'POST', true);
     }
 
     /**
-     * @param        $data
-     * @param null   $lead
      * @param string $object
      *
-     * @return mixed|string
+     * @return array
+     *
+     * @throws ApiErrorException
      */
-    public function updateLead($data, $lead = null, $object = 'Leads')
+    public function updateLead(array $data, $object = 'Leads')
     {
-        $parameters = [
-            'xmlData'   => $data,
-            'newFormat' => 2, // To include fields with "null" values while inserting data from your CRM account
-            'version'   => 4, // This will trigger duplicate check functionality for multiple records.
-        ];
+        $parameters['data'] = $data;
 
-        return $this->request('updateRecords', $parameters, 'POST', $object, false);
+        return $this->request($object, $parameters, 'PUT', true);
     }
 
     /**
-     * gets Zoho leads.
+     * @param string $object
+     * @param null   $id
      *
-     * @param array     $params
-     * @param string    $object
-     * @param array|int $id
+     * @return array
      *
-     * @return mixed
+     * @throws ApiErrorException
      */
     public function getLeads(array $params, $object, $id = null)
     {
         if (!isset($params['selectColumns'])) {
             $params['selectColumns'] = 'All';
             $params['newFormat']     = 1;
+        }
+
+        $settings = [];
+        if ($params['lastModifiedTime']) {
+            $settings['headers'] = [
+                'If-Modified-Since' => $params['lastModifiedTime'],
+            ];
         }
 
         if ($id) {
@@ -117,24 +114,20 @@ class ZohoApi extends CrmApi
                 $params['id'] = $id;
             }
 
-            $data = $this->request('getRecordById', $params, 'GET', $object);
+            $data = $this->request($object, $params, 'GET', false, $settings);
         } else {
-            $data = $this->request('getRecords', $params, 'GET', $object);
-        }
-        if (isset($data['response'], $data['response']['result'])) {
-            $data = $data['response']['result'];
+            $data = $this->request($object, $params, 'GET', false, $settings);
         }
 
         return $data;
     }
 
     /**
-     * gets Zoho companies.
+     * @param null $id
      *
-     * @param array  $params
-     * @param string $id
+     * @return array
      *
-     * @return mixed
+     * @throws ApiErrorException
      */
     public function getCompanies(array $params, $id = null)
     {
@@ -142,38 +135,39 @@ class ZohoApi extends CrmApi
             $params['selectColumns'] = 'All';
         }
 
+        $settings = [];
+        if ($params['lastModifiedTime']) {
+            $settings['headers'] = [
+                'If-Modified-Since' => $params['lastModifiedTime'],
+            ];
+        }
+
         if ($id) {
             $params['id'] = $id;
 
-            $data = $this->request('getRecordById', $params, 'GET', 'Accounts');
+            $data = $this->request('Accounts', $params, 'GET', false, $settings);
         } else {
-            $data = $this->request('getRecords', $params, 'GET', 'Accounts');
-        }
-
-        if (isset($data['response'], $data['response']['result'])) {
-            $data = $data['response']['result'];
+            $data = $this->request('Accounts', $params, 'GET', false, $settings);
         }
 
         return $data;
     }
 
     /**
-     * @param        $selectColumns
-     * @param        $searchColumn
-     * @param        $searchValue
+     * @param string $searchColumn
+     * @param string $searchValue
      * @param string $object
      *
      * @return mixed|string
+     *
+     * @throws ApiErrorException
      */
-    public function getSearchRecords($selectColumns, $searchColumn, $searchValue, $object = 'Leads')
+    public function getSearchRecords($searchColumn, $searchValue, $object = 'Leads')
     {
         $parameters = [
-            'selectColumns' => 'All',
-            'searchColumn'  => $searchColumn, // search by email
-            'searchValue'   => $searchValue, // email value
-            'newFormat'     => 2,
+            'criteria' => '('.$searchColumn.':equals:'.$searchValue.')',
         ];
 
-        return $this->request('getSearchRecordsByPDC', $parameters, 'GET', $object, true);
+        return $this->request($object.'/search', $parameters, 'GET', false);
     }
 }

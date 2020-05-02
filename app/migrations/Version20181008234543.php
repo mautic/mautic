@@ -14,6 +14,7 @@ use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Helper\Serializer;
 
 /**
  * Auto-generated Migration: Please modify to your needs!
@@ -54,8 +55,8 @@ class Version20181008234543 extends AbstractMauticMigration
             ->from($this->prefix.'form_fields', 'ff');
         $fields = $qb->execute()->fetchAll();
         if (count($fields)) {
-            foreach ($fields as $key => $field) {
-                $properties = unserialize($field['properties']);
+            foreach ($fields as $field) {
+                $properties = Serializer::decode($field['properties']);
                 if (!empty($properties['international'])) {
                     $validation = ['international' => 1];
                     unset($properties['international']);

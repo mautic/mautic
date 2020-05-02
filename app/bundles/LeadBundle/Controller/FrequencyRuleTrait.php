@@ -80,12 +80,12 @@ trait FrequencyRuleTrait
             'lead_contact_frequency_rules',
             $data,
             [
-                'action'                 => $action,
-                'channels'               => $allChannels,
-                'public_view'            => $isPublic,
-                'preference_center_only' => $isPreferenceCenter,
-                'allow_extra_fields'     => true,
-            ]
+                'action'                   => $action,
+                'channels'                 => $allChannels,
+                'public_view'              => $isPublic,
+                'preference_center_only'   => $isPreferenceCenter,
+                'allow_extra_fields'       => true,
+        ]
         );
 
         $method = $this->request->getMethod();
@@ -174,29 +174,29 @@ trait FrequencyRuleTrait
      */
     protected function persistFrequencyRuleFormData(Lead $lead, array $formData, array $allChannels, $leadChannels, $currentChannelId = null)
     {
-        /** @var LeadModel $model */
-        $model = $this->getModel('lead');
+        /** @var LeadModel $leadModel */
+        $leadModel = $this->getModel('lead.lead');
 
-        foreach ($formData['lead_channels']['subscribed_channels'] as $contactChannel) {
-            if (!isset($leadChannels[$contactChannel])) {
-                $contactable = $model->isContactable($lead, $contactChannel);
-                if ($contactable == DoNotContact::UNSUBSCRIBED) {
-                    // Only resubscribe if the contact did not opt out themselves
-                    $model->removeDncForLead($lead, $contactChannel);
+        /** @var \Mautic\LeadBundle\Model\DoNotContact $dncModel */
+        $dncModel = $this->getModel('lead.dnc');
+
+        // iF subscribed_channels are enabled in form, then touch DNC
+        if (isset($this->request->request->get('lead_contact_frequency_rules')['lead_channels'])) {
+            foreach ($formData['lead_channels']['subscribed_channels'] as $contactChannel) {
+                if (!isset($leadChannels[$contactChannel])) {
+                    $dncModel->removeDncForContact($lead->getId(), $contactChannel);
+                }
+            }
+            $dncChannels = array_diff($allChannels, $formData['lead_channels']['subscribed_channels']);
+            if (!empty($dncChannels)) {
+                foreach ($dncChannels as $channel) {
+                    if ($currentChannelId) {
+                        $channel = [$channel => $currentChannelId];
+                    }
+                    $dncModel->addDncForContact($lead->getId(), $channel, ($this->isPublicView) ? DoNotContact::UNSUBSCRIBED : DoNotContact::MANUAL, 'user');
                 }
             }
         }
-
-        $dncChannels = array_diff($allChannels, $formData['lead_channels']['subscribed_channels']);
-        if (!empty($dncChannels)) {
-            foreach ($dncChannels as $channel) {
-                if ($currentChannelId) {
-                    $channel = [$channel => $currentChannelId];
-                }
-                $model->addDncForLead($lead, $channel, 'user', ($this->isPublicView) ? DoNotContact::UNSUBSCRIBED : DoNotContact::MANUAL);
-            }
-        }
-
-        $model->setFrequencyRules($lead, $formData, $this->leadLists);
+        $leadModel->setFrequencyRules($lead, $formData, $this->leadLists);
     }
 }

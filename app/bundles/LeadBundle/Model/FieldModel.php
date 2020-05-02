@@ -138,6 +138,12 @@ class FieldModel extends FormModel
             'listable' => true,
             'object'   => 'lead',
         ],
+        'last_active' => [
+            'type'     => 'datetime',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
+        ],
         'attribution_date' => [
             'type'     => 'datetime',
             'fixed'    => true,
@@ -597,6 +603,18 @@ class FieldModel extends FormModel
     }
 
     /**
+     * Returns list of all segments that use $field.
+     *
+     * @param LeadField $field
+     *
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
+    public function getFieldSegments(LeadField $field)
+    {
+        return $this->leadListModel->getFieldSegments($field);
+    }
+
+    /**
      * Filter used field ids.
      *
      * @param array $ids
@@ -999,6 +1017,7 @@ class FieldModel extends FormModel
             ];
         }
 
+        $schemaLength = null;
         switch ($type) {
             case 'datetime':
             case 'date':
@@ -1015,13 +1034,16 @@ class FieldModel extends FormModel
             case 'email':
             case 'lookup':
             case 'select':
-            case 'multiselect':
             case 'region':
             case 'tel':
                 $schemaType = 'string';
                 break;
             case 'text':
                 $schemaType = (strpos($alias, 'description') !== false) ? 'text' : 'string';
+                break;
+            case 'multiselect':
+                $schemaType   = 'text';
+                $schemaLength = 65535;
                 break;
             default:
                 $schemaType = 'text';
@@ -1030,7 +1052,7 @@ class FieldModel extends FormModel
         return [
             'name'    => $alias,
             'type'    => $schemaType,
-            'options' => ['notnull' => false],
+            'options' => ['notnull' => false, 'length' => $schemaLength],
         ];
     }
 

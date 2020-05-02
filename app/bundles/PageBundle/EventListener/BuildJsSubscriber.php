@@ -241,7 +241,9 @@ class BuildJsSubscriber extends CommonSubscriber
 
     // Process pageviews after new are added
     document.addEventListener('eventAddedToMauticQueue', function(e) {
-        m.sendPageview(e.detail);
+      if (MauticJS.ensureEventContext(e, 'send', 'pageview')) {
+          m.sendPageview(e.detail);
+      }
     });
 })(MauticJS, location, navigator, document);
 JS;
@@ -260,7 +262,7 @@ JS;
             UrlGeneratorInterface::ABSOLUTE_URL
         );
         $mauticBaseUrl   = $this->router->generate('mautic_base_index', [], UrlGeneratorInterface::ABSOLUTE_URL);
-        $mediaElementCss = $this->assetsHelper->getUrl('media/css/mediaelementplayer.css', null, null, true);
+        $mediaElementCss = $this->assetsHelper->getUrl('media/css/mediaelementplayer.min.css', null, null, true);
         $jQueryUrl       = $this->assetsHelper->getUrl(
             'app/bundles/CoreBundle/Assets/js/libraries/2.jquery.js',
             null,
