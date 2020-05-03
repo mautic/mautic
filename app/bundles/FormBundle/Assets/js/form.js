@@ -1,5 +1,11 @@
 //FormBundle
 Mautic.formOnLoad = function (container) {
+
+    mQuery('.add-new-conditional-field').click(function (e) {
+        e.preventDefault();
+        mQuery(this).parent().next().show('normal');
+    })
+
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'form.form');
     }
@@ -229,6 +235,7 @@ Mautic.formFieldOnLoad = function (container, response) {
 
         Mautic.activateChosenSelect(mQuery('.form-builder-new-component'));
         Mautic.formBuilderNewComponentInit();
+        mQuery('.add-new-conditional-field').parent().next().hide();
 
     }
 };
