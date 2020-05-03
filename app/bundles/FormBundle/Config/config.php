@@ -463,6 +463,7 @@ return [
                 'class'     => \Mautic\FormBundle\Helper\PropertiesAccessor::class,
                 'arguments' => [
                     'mautic.form.model.field',
+                    'mautic.form.model.form',
                 ],
             ],
         ],

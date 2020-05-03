@@ -1112,10 +1112,25 @@ class FormModel extends CommonFormModel
             return;
         }
 
+        $list = $this->getContactFieldPropertiesList($contactFieldAlias);
+
+        if (!empty($list)) {
+            $formFieldProps['list'] = ['list' => $list];
+            $formField->setProperties($formFieldProps);
+        }
+    }
+
+    /**
+     * @param string $contactFieldAlias
+     *
+     * @return array|null
+     */
+    public function getContactFieldPropertiesList($contactFieldAlias)
+    {
         $contactField = $this->leadFieldModel->getEntityByAlias($contactFieldAlias);
 
         if (empty($contactField) || !in_array($contactField->getType(), ContactFieldHelper::getListTypes())) {
-            return;
+            return null;
         }
 
         $contactFieldProps = $contactField->getProperties();
@@ -1142,12 +1157,9 @@ class FormModel extends CommonFormModel
                 $list = ContactFieldHelper::getLocaleChoices();
                 break;
             default:
-                return;
+                return null;
         }
 
-        if (!empty($list)) {
-            $formFieldProps['list'] = ['list' => $list];
-            $formField->setProperties($formFieldProps);
-        }
+        return $list;
     }
 }

@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Model\FieldModel;
+use Mautic\FormBundle\Model\FormModel;
 use Mautic\PageBundle\Entity\Page;
 
 class PropertiesAccessor
@@ -25,13 +26,20 @@ class PropertiesAccessor
     private $fieldModel;
 
     /**
+     * @var FormModel
+     */
+    private $formModel;
+
+    /**
      * PropertiesAccessor constructor.
      *
      * @param FieldModel $fieldModel
+     * @param FormModel  $formModel
      */
-    public function __construct(FieldModel $fieldModel)
+    public function __construct(FieldModel $fieldModel, FormModel $formModel)
     {
         $this->fieldModel = $fieldModel;
+        $this->formModel  = $formModel;
     }
 
     /**
@@ -42,12 +50,7 @@ class PropertiesAccessor
     public function getProperties(array $field)
     {
         if (!empty($field['leadField']) && !empty($field['properties']['syncList'])) {
-            $contactFields = $this->fieldModel->getObjectFields('Lead');
-            foreach ($contactFields as $contactField) {
-                if ($contactField['alias'] === $field['leadField']) {
-                    return $this->getOptionsListFromProperties($contactField['properties']);
-                }
-            }
+            return $this->formModel->getContactFieldPropertiesList($field['leadField']);
         } elseif (!empty($field['properties'])) {
             return $this->getOptionsListFromProperties($field['properties']);
         }
@@ -58,9 +61,18 @@ class PropertiesAccessor
     /**
      * @return array
      */
-    public function getChoices(array $options)
+    public function getChoices($options)
     {
         $choices = [];
+
+        if (is_array($options) && !isset($options[0]['value'])) {
+            return $options;
+        }
+
+        if (!is_array($options)) {
+            $options = explode('|', $options);
+        }
+
         foreach ($options as $option) {
             if (is_array($option)) {
                 if (isset($option['label']) && isset($option['alias'])) {
