@@ -323,3 +323,29 @@ $container->loadFromExtension('fm_elfinder', [
         ],
     ],
 ]);
+
+// Nelmio Swagger config
+$container->loadFromExtension('nelmio_api_doc', [
+    'areas' => [
+        'path_patterns' => [
+            '^/api(?!/doc$)',
+        ],
+    ],
+    'documentation' => [
+        'host'    => 'your_mautic_host.local',
+        'schemes' => ['http', 'https'],
+        'info'    => [
+            'title'       => 'Mautic API docs',
+            'description' => 'Auto-generated Swagger documentation.',
+            'version'     => '3.0.0',
+        ],
+        'securityDefinitions' => [
+            'Basic' => [
+                'type' => 'basic',
+            ],
+        ],
+        'security' => [
+            ['Basic' => []],
+        ],
+    ],
+]);

@@ -130,6 +130,7 @@ class AppKernel extends Kernel
             new Ivory\OrderedFormBundle\IvoryOrderedFormBundle(),
             new Noxlogic\RateLimitBundle\NoxlogicRateLimitBundle(),
             new FM\ElfinderBundle\FMElfinderBundle(),
+            new Nelmio\ApiDocBundle\NelmioApiDocBundle(),
 
             // Mautic Bundles
             new Mautic\ApiBundle\MauticApiBundle(),

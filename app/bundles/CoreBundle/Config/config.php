@@ -69,6 +69,14 @@ return [
                     'url' => '.*/$',
                 ],
             ],
+            'mautic_core_api_swagger' => [
+                'path'       => '/swagger-docs',
+                'controller' => 'nelmio_api_doc.controller.swagger_ui',
+            ],
+            'mautic_core_api_swagger_json' => [
+                'path'       => '/swagger-docs.json',
+                'controller' => 'nelmio_api_doc.controller.swagger',
+            ],
         ],
         'api' => [
             'mautic_core_api_file_list' => [
