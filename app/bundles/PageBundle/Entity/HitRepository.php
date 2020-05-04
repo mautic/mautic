@@ -582,4 +582,61 @@ class HitRepository extends CommonRepository
             ->where('lead_id = '.(int) $fromLeadId)
             ->execute();
     }
+
+    /**
+     * Return contact IDs based on contact Ids,  sources and sources Ids.
+     *
+     * @param array|int|null $contactIds
+     * @param array          $channelsItems
+     * @param array          $includeUrls
+     * @param array          $excludeUrls
+     *
+     * @return array
+     */
+    public function getContactIdsFromHitsBySourceAndSourceId($contactIds = null, $channelsItems = [], $includeUrls = [], $excludeUrls = [])
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('h.lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h');
+
+        if ($contactIds != null) {
+            if (!is_array($contactIds)) {
+                $contactIds = [$contactIds];
+            }
+            $q->where($q->expr()->in('h.lead_id', $contactIds));
+        }
+
+        if (!empty($channelsItems)) {
+            $orStatements = $q->expr()->orX();
+            foreach ($channelsItems as $channel => $channelsItem) {
+                $andStatements = $q->expr()->andX();
+                $orStatements->add(
+                    $andStatements->add($q->expr()->eq('h.source', $q->expr()->literal($channel))),
+                    $andStatements->add($q->expr()->in('h.source_id', $channelsItem))
+                );
+            }
+            $q->andWhere($orStatements);
+        }
+
+        if (!empty($includeUrls)) {
+            $orStatements = $q->expr()->orX();
+            foreach ($includeUrls as $includeUrl) {
+                $orStatements->add($q->expr()->like('h.url', $q->expr()->literal(str_replace('*', '%', $includeUrl))));
+            }
+            $q->andWhere($orStatements);
+        }
+
+        if (!empty($excludeUrls)) {
+            $andStatements = $q->expr()->andX();
+            foreach ($excludeUrls as $excludeUrl) {
+                $andStatements->add($q->expr()->notLike('h.url', $q->expr()->literal(str_replace('*', '%', $excludeUrl))));
+            }
+            $q->andWhere($andStatements);
+        }
+
+        $q->groupBy('h.lead_id');
+
+        return $q->execute()->fetchAll();
+    }
 }

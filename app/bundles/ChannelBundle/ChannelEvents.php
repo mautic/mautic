@@ -109,4 +109,14 @@ final class ChannelEvents
      * @var string
      */
     const MESSAGE_POST_DELETE = 'mautic.message_post_delete';
+
+    /**
+     * The mautic.channel.on_campaign_trigger_condition event is fired when the campaign condition triggers.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_TRIGGER_CONDITION = 'mautic.channel.on_campaign_trigger_condition';
 }

@@ -76,6 +76,7 @@ return [
                     'mautic.campaign.event_collector',
                     'monolog.logger.mautic',
                     'translator',
+                    'mautic.page.model.page',
                 ],
             ],
             'mautic.channel.channelbundle.subscriber' => [
@@ -123,6 +124,11 @@ return [
             'mautic.form.type.message_send' => [
                 'class'     => \Mautic\ChannelBundle\Form\Type\MessageSendType::class,
                 'arguments' => ['router', 'mautic.channel.model.message'],
+            ],
+            'mautic.form.type.channels_items' => [
+                'class'     => 'Mautic\ChannelBundle\Form\Type\ChannelsItemsType',
+                'arguments' => ['mautic.channel.model.message'],
+                'alias'     => 'channels_items',
             ],
         ],
         'helpers' => [
