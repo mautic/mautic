@@ -13,6 +13,7 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Helper\TokenHelper;
@@ -55,8 +56,8 @@ class PublicController extends CommonFormController
             $return = InputHelper::url($return, null, null, null, ['mauticError', 'mauticMessage'], true);
             $query  = (strpos($return, '?') === false) ? '?' : '&';
         }
-
-        $translator = $this->get('translator');
+        $this->get('translator')->setLocale('en_US');
+        $translator = $this->translator;
 
         if (!isset($post['formId']) && isset($post['formid'])) {
             $post['formId'] = $post['formid'];
@@ -396,6 +397,7 @@ class PublicController extends CommonFormController
      */
     public function generateAction()
     {
+
         // Don't store a visitor with this request
         defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
 

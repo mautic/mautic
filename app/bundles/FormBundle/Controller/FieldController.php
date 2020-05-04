@@ -54,7 +54,6 @@ class FieldController extends CommonFormController
         ) {
             return $this->modalAccessDenied();
         }
-
         // Generate the form
         $form = $this->getFieldForm($formId, $formField);
 

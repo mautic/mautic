@@ -15,6 +15,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\TranslationEntityInterface;
+use Mautic\CoreBundle\Entity\TranslationEntityTrait;
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
+use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -23,8 +27,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 /**
  * Class Form.
  */
-class Form extends FormEntity
+class Form extends FormEntity implements TranslationEntityInterface, VariantEntityInterface
 {
+    use TranslationEntityTrait;
+    use VariantEntityTrait;
     /**
      * @var int
      */
@@ -33,7 +39,17 @@ class Form extends FormEntity
     /**
      * @var string
      */
+    private $title;
+
+    /**
+     * @var string
+     */
     private $name;
+
+    /**
+     * @var string
+     */
+    private $formAttributes;
 
     /**
      * @var string
@@ -112,6 +128,10 @@ class Form extends FormEntity
      * @var int
      */
     public $submissionCount;
+    /**
+     * @var bool
+     */
+    private $noIndex;
 
     /**
      * @var string
@@ -153,6 +173,8 @@ class Form extends FormEntity
             ->setCustomRepositoryClass('Mautic\FormBundle\Entity\FormRepository');
 
         $builder->addIdColumns();
+
+        $builder->addField('title', 'string');
 
         $builder->addField('alias', 'string');
 
@@ -204,6 +226,11 @@ class Form extends FormEntity
             ->nullable()
             ->build();
 
+        $builder->createField('noIndex', 'boolean')
+            ->columnName('no_index')
+            ->nullable()
+            ->build();
+
         $builder->createOneToMany('submissions', 'Submission')
             ->setOrderBy(['dateSubmitted' => 'DESC'])
             ->mappedBy('form')
@@ -211,6 +238,8 @@ class Form extends FormEntity
             ->build();
 
         $builder->addNullableField('formType', 'string', 'form_type');
+        self::addTranslationMetadata($builder, self::class);
+        self::addVariantMetadata($builder, self::class);
     }
 
     /**
@@ -324,6 +353,41 @@ class Form extends FormEntity
     }
 
     /**
+     * Set title.
+     *
+     * @param string $title
+     *
+     * @return Page
+     */
+    public function setTitle($title)
+    {
+        $this->isChanged('title', $title);
+        $this->title = $title;
+
+        return $this;
+    }
+
+    /**
+     * Get form attributes.
+     *
+     * @return string
+     */
+    public function getFormAttributes()
+    {
+        return $this->formAttributes;
+    }
+
+    /**
+     * Get title.
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
      * Set name.
      *
      * @param string $name
@@ -333,7 +397,7 @@ class Form extends FormEntity
     public function setName($name)
     {
         $this->isChanged('name', $name);
-        $this->name = $name;
+        $this->title = $this->name = $name;
 
         return $this;
     }
@@ -379,6 +443,26 @@ class Form extends FormEntity
         return $this->description;
     }
 
+    /**
+     * Set noIndex.
+     *
+     * @param bool $noIndex
+     */
+    public function setNoIndex($noIndex)
+    {
+        $this->isChanged('noIndex', $noIndex);
+        $this->noIndex = $noIndex;
+    }
+
+    /**
+     * Get noIndex.
+     *
+     * @return bool
+     */
+    public function getNoIndex()
+    {
+        return $this->noIndex;
+    }
     /**
      * Set cachedHtml.
      *

@@ -543,6 +543,9 @@ class FormModel extends CommonFormModel
             }
         }
 
+        //define lcoale
+        $this->translator->setLocale($entity->getLanguage());
+
         $html = $this->templatingHelper->getTemplating()->render(
             $theme.'MauticFormBundle:Builder:form.html.php',
             [
@@ -560,6 +563,8 @@ class FormModel extends CommonFormModel
                 'inBuilder'     => false,
             ]
         );
+
+            //$html = $this->translator->getLocale();
         if (!$entity->usesProgressiveProfiling()) {
             $entity->setCachedHtml($html);
 

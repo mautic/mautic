@@ -199,6 +199,7 @@ if (!isset($inBuilder)) {
             echo $view['form']->row($form['inKioskMode']);
             echo $view['form']->row($form['renderStyle']);
             echo $view['form']->row($form['template']);
+            echo $view['form']->row($form['language']);
             ?>
         </div>
     </div>
