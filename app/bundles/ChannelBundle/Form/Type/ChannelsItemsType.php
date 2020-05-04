@@ -31,18 +31,12 @@ class ChannelsItemsType extends AbstractType
 
     /**
      * ChannelsItemsType constructor.
-     *
-     * @param MessageModel $messageModel
      */
     public function __construct(MessageModel $messageModel)
     {
         $this->messageModel = $messageModel;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $channels = $this->messageModel->getChannels();
@@ -56,7 +50,7 @@ class ChannelsItemsType extends AbstractType
                 'attr'        => [
                     'onchange' => 'Mautic.reloadChannelItems(this.value)',
                 ],
-                'empty_value' => '',
+                'placeholder' => '',
                 'constraints' => new NotBlank(
                         [
                             'message' => 'mautic.core.value.required',
@@ -96,7 +90,7 @@ class ChannelsItemsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'channels_items';
     }

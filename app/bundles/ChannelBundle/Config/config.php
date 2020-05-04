@@ -126,9 +126,8 @@ return [
                 'arguments' => ['router', 'mautic.channel.model.message'],
             ],
             'mautic.form.type.channels_items' => [
-                'class'     => 'Mautic\ChannelBundle\Form\Type\ChannelsItemsType',
+                'class'     => \Mautic\ChannelBundle\Form\Type\ChannelsItemsType::class,
                 'arguments' => ['mautic.channel.model.message'],
-                'alias'     => 'channels_items',
             ],
         ],
         'helpers' => [

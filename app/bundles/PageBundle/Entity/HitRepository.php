@@ -600,7 +600,7 @@ class HitRepository extends CommonRepository
         $q->select('h.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h');
 
-        if ($contactIds != null) {
+        if (null != $contactIds) {
             if (!is_array($contactIds)) {
                 $contactIds = [$contactIds];
             }

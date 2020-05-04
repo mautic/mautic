@@ -23,8 +23,8 @@ use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\ChannelBundle\ChannelEvents;
-use Mautic\ChannelBundle\Form\Type\MessageSendType;
 use Mautic\ChannelBundle\Form\Type\ChannelsItemsType;
+use Mautic\ChannelBundle\Form\Type\MessageSendType;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\ChannelBundle\PreferenceBuilder\PreferenceBuilder;
 use Mautic\PageBundle\Model\PageModel;
@@ -154,9 +154,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->addCondition('channel.has_click', $trigger);
     }
 
-    /**
-     * @param ConditionEvent $event
-     */
     public function onCampaignTriggerCondition(ConditionEvent $event)
     {
         $contact       = $event->getLead();
