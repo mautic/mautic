@@ -14,7 +14,6 @@ namespace Mautic\CoreBundle\Command;
 use Mautic\CoreBundle\Exception\UpdateFailedException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Update\StepProvider;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -23,6 +22,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * CLI Command to update the application.
@@ -30,7 +30,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 class ApplyUpdatesCommand extends ContainerAwareCommand
 {
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
@@ -59,7 +59,7 @@ class ApplyUpdatesCommand extends ContainerAwareCommand
      */
     private $progressBar;
 
-    public function __construct(Translator $translator, CoreParametersHelper $coreParametersHelper, StepProvider $stepProvider)
+    public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper, StepProvider $stepProvider)
     {
         parent::__construct();
 
