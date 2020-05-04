@@ -46,7 +46,7 @@ class ChannelsItemsType extends AbstractType
             ChoiceType::class,
             [
                 'label'       => 'mautic.core.channel',
-                'choices'     => array_combine(array_keys($channels), array_column($channels, 'label')),
+                'choices'     => array_flip(array_combine(array_keys($channels), array_column($channels, 'label'))),
                 'attr'        => [
                     'onchange' => 'Mautic.reloadChannelItems(this.value)',
                 ],
