@@ -281,6 +281,7 @@ class Field
                     'order',
                     'properties',
                     'validation',
+                    'parent',
                     'conditions',
                     'labelAttributes',
                     'inputAttributes',

@@ -105,7 +105,7 @@ if (!isset($inBuilder)) {
 
     <?php if (empty($isConditional) && isset($fields) && in_array($field['type'], ConditionalFieldEnum::getConditionalFieldTypes())): ?>
         <div class="row ml-15 mr-0 pb-15">
-            <div class="col-sm-5 mt-15">
+            <div class="pull-left mt-15">
             <a class="add-new-conditional-field" href="">
                     <i class="fa fa-plus"></i>
                     <?php echo $view['translator']->trans(
