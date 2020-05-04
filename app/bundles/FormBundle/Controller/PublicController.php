@@ -71,6 +71,7 @@ class PublicController extends CommonFormController
         } else {
             $formModel = $this->getModel('form.form');
             $form      = $formModel->getEntity($post['formId']);
+            $translator->setLocale($form->getLanguage());
 
             //check to see that the form was found
             if ($form === null) {
