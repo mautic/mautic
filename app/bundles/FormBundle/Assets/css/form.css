@@ -12,7 +12,7 @@
 .panel2 label {
     font-size:1em;
 }
-.panel:hover, .panel2:hover {
+.panel:hover {
     border-color:#ccc;
 }
 
