@@ -543,7 +543,7 @@ class FormModel extends CommonFormModel
             }
         }
 
-        //define lcoale
+        //define locale
         $this->translator->setLocale($entity->getLanguage());
 
         $html = $this->templatingHelper->getTemplating()->render(
@@ -563,8 +563,7 @@ class FormModel extends CommonFormModel
                 'inBuilder'     => false,
             ]
         );
-
-            //$html = $this->translator->getLocale();
+        //$html = $this->translator->getLocale();
         if (!$entity->usesProgressiveProfiling()) {
             $entity->setCachedHtml($html);
 
@@ -751,6 +750,8 @@ class FormModel extends CommonFormModel
         if (!empty($theme)) {
             $theme .= '|';
         }
+        //define locale
+        $this->translator->setLocale($form->getLanguage());
 
         $script = $this->templatingHelper->getTemplating()->render(
             $theme.'MauticFormBundle:Builder:script.html.php',
