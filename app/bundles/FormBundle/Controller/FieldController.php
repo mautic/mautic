@@ -4,12 +4,15 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\FormBundle\Collector\MappedFieldCollectorInterface;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FieldModel;
+use Mautic\FormBundle\Model\FieldModel as FormFieldModel;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
@@ -21,20 +24,27 @@ class FieldController extends CommonFormController
     private $formModel;
 
     /**
-     * @var FieldModel|AbstractCommonModel
+     * @var LeadFieldModel
+     */
+    private $leadFieldModel;
+
+    /**
+     * @var FormFieldModel
      */
     private $formFieldModel;
 
     /**
-     * @var FormFieldHelper
+     * @var MappedFieldCollectorInterface
      */
-    private $fieldHelper;
+    private $mappedFieldCollector;
 
     public function initialize(FilterControllerEvent $event)
     {
-        $this->formModel      = $this->getModel('form');
-        $this->formFieldModel = $this->getModel('form.field');
-        $this->fieldHelper    = $this->get('mautic.helper.form.field_helper');
+        $this->leadFieldModel       = $this->getModel('lead.field');
+        $this->formFieldModel       = $this->getModel('form.field');
+        $this->formModel            = $this->getModel('form.form');
+        $this->fieldHelper          = $this->get('mautic.helper.form.field_helper');
+        $this->mappedFieldCollector = $this->get('mautic.form.collector.mapped.field');
     }
 
     /**
@@ -104,7 +114,7 @@ class FieldController extends CommonFormController
 
                     // Generate or ensure a unique alias
                     $alias              = empty($formField['alias']) ? $formField['label'] : $formField['alias'];
-                    $formField['alias'] = $this->getModel('form.field')->generateAlias($alias, $aliases);
+                    $formField['alias'] = $this->formFieldModel->generateAlias($alias, $aliases);
 
                     // Force required for captcha if not a honeypot
                     if ('captcha' == $formField['type']) {
@@ -126,13 +136,9 @@ class FieldController extends CommonFormController
                     $session->set('mautic.form.'.$formId.'.fields.modified', $fields);
 
                     // Keep track of used lead fields
-                    $usedLeadFields = $this->get('session')->get('mautic.form.'.$formId.'.fields.leadfields', []);
-                    if (!empty($formData['leadField']) && empty($formData['parent'])) {
-                        $usedLeadFields[$keyId] = $formData['leadField'];
-                    } else {
-                        unset($usedLeadFields[$keyId]);
+                    if (!empty($formField['mappedObject']) && !empty($formField['mappedField']) && empty($formData['parent'])) {
+                        $this->mappedFieldCollector->addField($formId, $formField['mappedObject'], $formField['mappedField']);
                     }
-                    $session->set('mautic.form.'.$formId.'.fields.leadfields', $usedLeadFields);
                 } else {
                     $success = 0;
                 }
@@ -174,8 +180,8 @@ class FieldController extends CommonFormController
                     'id'                   => $keyId,
                     'formId'               => $formId,
                     'formName'             => null === $formEntity ? 'newform' : $formEntity->generateFormName(),
-                    'contactFields'        => $this->getModel('lead.field')->getFieldListWithProperties(),
-                    'companyFields'        => $this->getModel('lead.field')->getFieldListWithProperties('company'),
+                    'contactFields'        => $this->leadFieldModel->getFieldListWithProperties(),
+                    'companyFields'        => $this->leadFieldModel->getFieldListWithProperties('company'),
                     'inBuilder'            => true,
                     'fields'               => $this->fieldHelper->getChoiceList($customComponents['fields']),
                     'viewOnlyFields'       => $customComponents['viewOnlyFields'],
@@ -269,13 +275,9 @@ class FieldController extends CommonFormController
                         $session->set('mautic.form.'.$formId.'.fields.modified', $fields);
 
                         // Keep track of used lead fields
-                        $usedLeadFields = $this->get('session')->get('mautic.form.'.$formId.'.fields.leadfields', []);
-                        if (!empty($formData['leadField']) && empty($formData['parent'])) {
-                            $usedLeadFields[$objectId] = $formData['leadField'];
-                        } else {
-                            unset($usedLeadFields[$objectId]);
+                        if (!empty($formField['mappedObject']) && !empty($formField['mappedField']) && empty($formData['parent'])) {
+                            $this->mappedFieldCollector->addField($formId, $formField['mappedObject'], $formField['mappedField']);
                         }
-                        $session->set('mautic.form.'.$formId.'.fields.leadfields', $usedLeadFields);
                     }
                 }
             }
@@ -324,8 +326,8 @@ class FieldController extends CommonFormController
                     'field'                => $formField,
                     'id'                   => $objectId,
                     'formId'               => $formId,
-                    'contactFields'        => $this->getModel('lead.field')->getFieldListWithProperties(),
-                    'companyFields'        => $this->getModel('lead.field')->getFieldListWithProperties('company'),
+                    'contactFields'        => $this->leadFieldModel->getFieldListWithProperties(),
+                    'companyFields'        => $this->leadFieldModel->getFieldListWithProperties('company'),
                     'inBuilder'            => true,
                     'fields'               => $this->fieldHelper->getChoiceList($customComponents['fields']),
                     'formFields'           => $fields,
@@ -376,14 +378,8 @@ class FieldController extends CommonFormController
         $formField = (array_key_exists($objectId, $fields)) ? $fields[$objectId] : null;
 
         if ('POST' === $this->request->getMethod() && null !== $formField) {
-            $usedLeadFields = $session->get('mautic.form.'.$formId.'.fields.leadfields');
-
             // Allow to select the lead field from the delete field again
-            $unusedLeadField = array_search($formField['leadField'], $usedLeadFields);
-            if (!empty($formField['leadField']) && empty($formField['parent']) && false !== $unusedLeadField) {
-                unset($usedLeadFields[$unusedLeadField]);
-                $session->set('mautic.form.'.$formId.'.fields.leadfields', $usedLeadFields);
-            }
+            $this->mappedFieldCollector->removeField($formId, $formField['mappedObject'], $formField['mappedField']);
 
             //add the field to the delete list
             if (!in_array($objectId, $delete)) {
@@ -411,10 +407,10 @@ class FieldController extends CommonFormController
     private function getFieldForm($formId, array $formField)
     {
         //fire the form builder event
-        $customComponents = $this->getModel('form.form')->getCustomComponents();
+        $customComponents = $this->formModel->getCustomComponents();
         $customParams     = (isset($customComponents['fields'][$formField['type']])) ? $customComponents['fields'][$formField['type']] : false;
 
-        $form = $this->getModel('form.field')->createForm(
+        $form = $this->formFieldModel->createForm(
             $formField,
             $this->get('form.factory'),
             (!empty($formField['id'])) ?
@@ -424,7 +420,7 @@ class FieldController extends CommonFormController
         );
         $form->get('formId')->setData($formId);
 
-        $event      = new FormBuilderEvent($this->get('translator'));
+        $event = new FormBuilderEvent($this->get('translator'));
         $this->dispatcher->dispatch(FormEvents::FORM_ON_BUILD, $event);
         $event->addValidatorsToBuilder($form);
 

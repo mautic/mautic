@@ -44,28 +44,28 @@ class FieldModel extends CommonFormModel
      */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
-        list($fields, $choices)               = $this->getObjectFields('lead');
-        list($companyFields, $companyChoices) = $this->getObjectFields('company');
+        // @todo these commented lines can be removed as they are not used anymore. Just add the functionality where it matters now.
+        // list($fields, $choices)               = $this->getObjectFields('lead');
+        // list($companyFields, $companyChoices) = $this->getObjectFields('company');
 
-        // Only show the lead fields not already used
-        $usedLeadFields   = $this->session->get('mautic.form.'.$entity['formId'].'.fields.leadfields', []);
-        $testLeadFields   = array_flip($usedLeadFields);
-        $currentLeadField = (isset($entity['leadField'])) ? $entity['leadField'] : null;
-        if (!empty($currentLeadField) && isset($testLeadFields[$currentLeadField])) {
-            unset($testLeadFields[$currentLeadField]);
-        }
+        // // Only show the lead fields not already used
+        // $usedLeadFields   = $this->session->get('mautic.form.'.$entity['formId'].'.fields.mappedfields', []);
+        // $testLeadFields   = array_flip($usedLeadFields);
+        // $currentLeadField = (isset($entity['leadField'])) ? $entity['leadField'] : null;
+        // if (!empty($currentLeadField) && isset($testLeadFields[$currentLeadField])) {
+        //     unset($testLeadFields[$currentLeadField]);
+        // }
 
-        foreach ($choices as &$group) {
-            $group = array_diff_key($group, $testLeadFields);
-        }
+        // foreach ($choices as &$group) {
+        //     $group = array_diff_key($group, $testLeadFields);
+        // }
 
-        // @todo these can be removed as they are not used anymore.
         // The issue is with the session use above.
-        $options['leadFields']['lead']          = $choices;
-        $options['leadFieldProperties']['lead'] = $fields;
+        // $options['leadFields']['lead']          = $choices;
+        // $options['leadFieldProperties']['lead'] = $fields;
 
-        $options['leadFields']['company']          = $companyChoices;
-        $options['leadFieldProperties']['company'] = $companyFields;
+        // $options['leadFields']['company']          = $companyChoices;
+        // $options['leadFieldProperties']['company'] = $companyFields;
 
         if ($action) {
             $options['action'] = $action;
@@ -93,8 +93,6 @@ class FieldModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\FormBundle\Entity\FieldRepository
      */
     public function getRepository()
@@ -102,17 +100,11 @@ class FieldModel extends CommonFormModel
         return $this->em->getRepository('MauticFormBundle:Field');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase()
     {
         return 'form:forms';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntity($id = null)
     {
         if (null === $id) {

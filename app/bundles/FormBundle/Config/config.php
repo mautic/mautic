@@ -428,6 +428,10 @@ return [
                 'class'     => \Mautic\FormBundle\Collector\FieldCollector::class,
                 'arguments' => ['event_dispatcher'],
             ],
+            'mautic.form.collector.mapped.field' => [
+                'class'     => \Mautic\FormBundle\Collector\MappedFieldCollector::class,
+                'arguments' => ['mautic.cache.provider'],
+            ],
             'mautic.helper.form.field_helper' => [
                 'class'     => FormFieldHelper::class,
                 'arguments' => [
