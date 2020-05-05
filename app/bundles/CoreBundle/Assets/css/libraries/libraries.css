@@ -3364,20 +3364,20 @@ fieldset[disabled] .btn-info.focus {
 .btn-warning:focus,
 .btn-warning.focus {
   color: #fff;
-  background-color: #fba702;
-  border-color: #af7502;
+  background-color: #939e00;
+  border-color: #4c5200;
 }
 .btn-warning:hover {
   color: #fff;
-  background-color: #fba702;
-  border-color: #f0a002;
+  background-color: #939e00;
+  border-color: #899400;
 }
 .btn-warning:active,
 .btn-warning.active,
 .open > .dropdown-toggle.btn-warning {
   color: #fff;
-  background-color: #fba702;
-  border-color: #f0a002;
+  background-color: #939e00;
+  border-color: #899400;
 }
 .btn-warning:active:hover,
 .btn-warning.active:hover,
@@ -3389,8 +3389,8 @@ fieldset[disabled] .btn-info.focus {
 .btn-warning.active.focus,
 .open > .dropdown-toggle.btn-warning.focus {
   color: #fff;
-  background-color: #d78f02;
-  border-color: #af7502;
+  background-color: #727a00;
+  border-color: #4c5200;
 }
 .btn-warning:active,
 .btn-warning.active,
@@ -4972,7 +4972,7 @@ a.label:focus {
 }
 .label-warning[href]:hover,
 .label-warning[href]:focus {
-  background-color: #fba702;
+  background-color: #939e00;
 }
 .label-danger {
   background-color: #F86B4F;
@@ -5307,15 +5307,15 @@ a.thumbnail.active {
   padding-left: 0;
   list-style: none;
 }
-form[name="lead"] .media-body {
-  width: 100%;
-}
 .media-list .media-body {
   width: auto;
 }
 .media-list .media-object {
   padding-right: 0;
   margin-right: 10px;
+}
+form[name="lead"] .media-body {
+  width: 100%;
 }
 .list-group {
   margin-bottom: 20px;
@@ -9794,9 +9794,9 @@ button.close {
 }
 .ms-container .ms-list.ms-focus {
   border-color: #235f6d;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), rgba(78, 94, 158, 0.6);
-  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(78, 94, 158, 0.6);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(78, 94, 158, 0.6);
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), rgba(35, 95, 109, 0.6);
+  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(35, 95, 109, 0.6);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(35, 95, 109, 0.6);
   outline: 0;
   outline: thin dotted \9;
 }
