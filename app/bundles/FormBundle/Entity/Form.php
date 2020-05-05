@@ -367,17 +367,7 @@ class Form extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this;
     }
 
-    /**
-     * Get form attributes.
-     *
-     * @return string
-     */
-    public function getFormAttributes()
-    {
-        return $this->formAttributes;
-    }
-
-    /**
+     /**
      * Get title.
      *
      * @return string
