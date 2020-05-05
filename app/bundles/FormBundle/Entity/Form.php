@@ -367,7 +367,7 @@ class Form extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this;
     }
 
-     /**
+    /**
      * Get title.
      *
      * @return string
