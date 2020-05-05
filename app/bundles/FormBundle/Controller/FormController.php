@@ -5,6 +5,7 @@ namespace Mautic\FormBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Mautic\FormBundle\Collector\MappedFieldCollectorInterface;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
@@ -16,9 +17,20 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 class FormController extends CommonFormController
 {
+    /**
+     * @var MappedFieldCollectorInterface
+     */
+    private $mappedFieldCollector;
+
+    public function initialize(FilterControllerEvent $event)
+    {
+        $this->mappedFieldCollector = $this->get('mautic.form.collector.mapped.field');
+    }
+
     /**
      * @param int $page
      *
@@ -704,11 +716,9 @@ class FormController extends CommonFormController
             $this->clearSessionComponents($objectId);
 
             //load existing fields into session
-            $modifiedFields    = [];
-            $usedLeadFields    = [];
-            $usedCompanyFields = [];
-            $existingFields    = $entity->getFields()->toArray();
-            $submitButton      = false;
+            $modifiedFields   = [];
+            $existingFields   = $entity->getFields()->toArray();
+            $submitButton     = false;
 
             foreach ($existingFields as $formField) {
                 // Check to see if the field still exists
@@ -735,14 +745,15 @@ class FormController extends CommonFormController
                     // Set the custom parameters
                     $field['customParameters'] = $customComponents['fields'][$field['type']];
                 }
-                $field['formId'] = $objectId;
 
+                $field['formId']     = $objectId;
                 $modifiedFields[$id] = $field;
 
-                if (!empty($field['leadField']) && empty($field['parent'])) {
-                    $usedLeadFields[$id] = $field['leadField'];
+                if (!empty($field['mappedObject']) && !empty($field['mappedField']) && empty($field['parent'])) {
+                    $this->mappedFieldCollector->addField($objectId, $field['mappedObject'], $field['mappedField']);
                 }
             }
+
             if (!$submitButton) { //means something deleted the submit button from the form
                 //add a submit button
                 $keyId = 'new'.hash('sha1', uniqid(mt_rand()));
@@ -758,7 +769,6 @@ class FormController extends CommonFormController
                 $modifiedFields[$keyId]['formId']          = $objectId;
                 unset($modifiedFields[$keyId]['form']);
             }
-            $session->set('mautic.form.'.$objectId.'.fields.leadfields', $usedLeadFields);
 
             if (!empty($reorder)) {
                 uasort(
