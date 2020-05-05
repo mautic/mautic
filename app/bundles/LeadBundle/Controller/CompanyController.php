@@ -35,6 +35,7 @@ class CompanyController extends FormController
                 'lead:leads:viewother',
                 'lead:leads:create',
                 'lead:leads:editother',
+                'lead:leads:editown',
                 'lead:leads:deleteother',
             ],
             'RETURN_ARRAY'
@@ -44,9 +45,7 @@ class CompanyController extends FormController
             return $this->accessDenied();
         }
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
+        $this->setListFilters();
 
         //set limits
         $limit = $this->get('session')->get(
@@ -351,24 +350,12 @@ class CompanyController extends FormController
                     $data = $this->request->request->get('company');
                     //pull the data from the form in order to apply the form's formatting
                     foreach ($form as $f) {
-                        $name = $f->getName();
-                        if (strpos($name, 'field_') === 0) {
-                            $data[$name] = $f->getData();
-                        }
+                        $data[$f->getName()] = $f->getData();
                     }
+
                     $model->setFieldValues($entity, $data, true);
+
                     //form is valid so process the data
-                    $data = $this->request->request->get('company');
-
-                    //pull the data from the form in order to apply the form's formatting
-                    foreach ($form as $f) {
-                        $name = $f->getName();
-                        if (strpos($name, 'field_') === 0) {
-                            $data[$name] = $f->getData();
-                        }
-                    }
-
-                    $model->setFieldValues($entity, $data, true);
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
                     $this->addFlash(

@@ -66,10 +66,6 @@ return [
                 'path'       => '/forms/results/{objectId}/{page}',
                 'controller' => 'MauticFormBundle:Result:index',
             ],
-            'mautic_form_file_download' => [
-                'path'       => '/forms/results/file/{submissionId}/{field}',
-                'controller' => 'MauticFormBundle:Result:downloadFile',
-            ],
             'mautic_form_export' => [
                 'path'       => '/forms/results/{objectId}/export/{format}',
                 'controller' => 'MauticFormBundle:Result:export',
@@ -120,6 +116,10 @@ return [
             ],
         ],
         'public' => [
+            'mautic_form_file_download' => [
+                'path'       => '/forms/results/file/{submissionId}/{field}',
+                'controller' => 'MauticFormBundle:Result:downloadFile',
+            ],
             'mautic_form_postresults' => [
                 'path'       => '/form/submit',
                 'controller' => 'MauticFormBundle:Public:submit',
@@ -169,12 +169,21 @@ return [
 
     'services' => [
         'events' => [
+            'mautic.core.configbundle.subscriber.form' => [
+                'class'     => \Mautic\FormBundle\EventListener\ConfigSubscriber::class,
+            ],
             'mautic.form.subscriber' => [
                 'class'     => FormSubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                     'mautic.helper.mailer',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
+            'mautic.form.validation.subscriber' => [
+                'class'     => \Mautic\FormBundle\EventListener\FormValidationSubscriber::class,
+                'arguments' => [
                     'mautic.helper.core_parameters',
                 ],
             ],
@@ -245,6 +254,10 @@ return [
             ],
         ],
         'forms' => [
+            'mautic.form.type.formconfig' => [
+                'class'     => \Mautic\FormBundle\Form\Type\ConfigFormType::class,
+                    'alias' => 'formconfig',
+            ],
             'mautic.form.type.form' => [
                 'class'     => FormType::class,
                 'arguments' => 'mautic.factory',
@@ -253,6 +266,9 @@ return [
             'mautic.form.type.field' => [
                 'class'       => FieldType::class,
                 'alias'       => 'formfield',
+                'arguments'   => [
+                    'translator',
+                ],
                 'methodCalls' => [
                     'setFieldModel' => ['mautic.form.model.field'],
                     'setFormModel'  => ['mautic.form.model.form'],
@@ -284,6 +300,18 @@ return [
             ],
             'mautic.form.type.field_propertypagebreak' => [
                 'class'     => FormFieldPageBreakType::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
+            'mautic.form.type.field_propertytel' => [
+                'class'     => \Mautic\FormBundle\Form\Type\FormFieldTelType::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
+            'mautic.form.type.field_propertyemail' => [
+                'class'     => \Mautic\FormBundle\Form\Type\FormFieldEmailType::class,
                 'arguments' => [
                     'translator',
                 ],
@@ -378,6 +406,8 @@ return [
                     'mautic.form.validator.upload_field_validator',
                     'mautic.form.helper.form_uploader',
                     'mautic.lead.service.device_tracking_service',
+                    'mautic.form.service.field.value.transformer',
+                    'mautic.helper.template.date',
                 ],
             ],
             'mautic.form.model.submission_result_loader' => [
@@ -406,6 +436,13 @@ return [
                 'class'     => TokenHelper::class,
                 'arguments' => [
                     'mautic.form.model.form',
+                    'mautic.security',
+                ],
+            ],
+            'mautic.form.service.field.value.transformer' => [
+                'class'     => \Mautic\FormBundle\Event\Service\FieldValueTransformer::class,
+                'arguments' => [
+                    'router',
                 ],
             ],
         ],
@@ -432,5 +469,6 @@ return [
     'parameters' => [
         'form_upload_dir'        => '%kernel.root_dir%/../media/files/form',
         'blacklisted_extensions' => ['php', 'sh'],
+        'do_not_submit_emails'   => [],
     ],
 ];

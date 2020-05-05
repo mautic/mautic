@@ -24,13 +24,14 @@ class MailjetTransportTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $transportCallback->expects($this->exactly(4))
+        $transportCallback->expects($this->exactly(5))
             ->method('addFailureByHashId')
             ->withConsecutive(
                 [$this->equalTo('1'), 'User unsubscribed', DoNotContact::UNSUBSCRIBED],
                 [$this->equalTo('2'), 'blocked: blocked', DoNotContact::BOUNCED],
                 [$this->equalTo('3'), 'User reported email as spam, source: spam button', DoNotContact::UNSUBSCRIBED],
-                [$this->equalTo('4'), 'bounced: bounced', DoNotContact::BOUNCED]
+                [$this->equalTo('4'), 'bounced: bounced', DoNotContact::BOUNCED],
+                [$this->equalTo('5'), 'bounced: bounced', DoNotContact::BOUNCED]
             );
 
         $transportCallback->expects($this->once())
@@ -102,6 +103,21 @@ class MailjetTransportTest extends \PHPUnit_Framework_TestCase
     "mj_contact_id": 0,
     "customcampaign": "",
     "CustomID": "4-bounce@test.com",
+    "Payload": "",
+    "blocked": "",
+    "hard_bounce": "",
+    "error_related_to": "bounced",
+    "error": "bounced"
+  }, 
+  {
+    "event": "bounce",
+    "time": 1513975372,
+    "MessageID": 0,
+    "email": "bounce3@test-test.com",
+    "mj_campaign_id": 0,
+    "mj_contact_id": 0,
+    "customcampaign": "",
+    "CustomID": "5-bounce3@test-test.com",
     "Payload": "",
     "blocked": "",
     "hard_bounce": "",

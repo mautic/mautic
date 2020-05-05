@@ -1044,7 +1044,8 @@ abstract class AbstractIntegration
         $headers = [];
         if (is_array($parseHeaders)) {
             foreach ($parseHeaders as $key => $value) {
-                if (strpos($value, ':') !== false) {
+                // Ignore string keys which assume it is already parsed and avoids splitting up a value that includes colons (such as a date/time)
+                if (!is_string($key) && strpos($value, ':') !== false) {
                     list($key, $value) = explode(':', $value);
                     $key               = trim($key);
                     $value             = trim($value);
@@ -1700,6 +1701,7 @@ abstract class AbstractIntegration
         $missingRequiredFields  = [];
 
         // add special case in order to prevent it from being removed
+        $mauticLeadFields['mauticContactId']                   = '';
         $mauticLeadFields['mauticContactTimelineLink']         = '';
         $mauticLeadFields['mauticContactIsContactableByEmail'] = '';
 
@@ -1761,6 +1763,11 @@ abstract class AbstractIntegration
             }
 
             // Rest of the objects are merged and assumed to be leadFields
+            // BC compatibility If extends fields to objects - 0 === contacts
+            if (isset($availableIntegrationFields[0])) {
+                $leadFields = array_merge($leadFields, $availableIntegrationFields[0]);
+            }
+
             foreach ($submittedObjects as $object) {
                 if (isset($availableIntegrationFields[$object])) {
                     $leadFields = array_merge($leadFields, $availableIntegrationFields[$object]);
@@ -1832,7 +1839,7 @@ abstract class AbstractIntegration
         }
 
         if ($lead instanceof Lead) {
-            $fields = $lead->getFields(true);
+            $fields = $lead->getProfileFields();
             $leadId = $lead->getId();
         } else {
             $fields = $lead;
@@ -1871,10 +1878,14 @@ abstract class AbstractIntegration
 
                     continue;
                 }
+                if ('mauticContactId' === $leadFields[$integrationKey]) {
+                    $matched[$integrationKey] = $lead->getId();
+                    continue;
+                }
                 $mauticKey = $leadFields[$integrationKey];
-                if (isset($fields[$mauticKey]) && $fields[$mauticKey]['value'] !== '' && $fields[$mauticKey]['value'] !== null) {
+                if (isset($fields[$mauticKey]) && $fields[$mauticKey] !== '' && $fields[$mauticKey] !== null) {
                     $matched[$matchIntegrationKey] = $this->cleanPushData(
-                        $fields[$mauticKey]['value'],
+                        $fields[$mauticKey],
                         (isset($field['type'])) ? $field['type'] : 'string'
                     );
                 }
@@ -2752,6 +2763,7 @@ abstract class AbstractIntegration
     public function getCompoundMauticFields($lead)
     {
         if ($lead['internal_entity_id']) {
+            $lead['mauticContactId']                   = $lead['internal_entity_id'];
             $lead['mauticContactTimelineLink']         = $this->getContactTimelineLink($lead['internal_entity_id']);
             $lead['mauticContactIsContactableByEmail'] = $this->getLeadDoNotContact($lead['internal_entity_id']);
         }
@@ -2768,6 +2780,7 @@ abstract class AbstractIntegration
     {
         $compoundFields = [
             'mauticContactTimelineLink' => 'mauticContactTimelineLink',
+            'mauticContactId'           => 'mauticContactId',
         ];
 
         if ($this->updateDncByDate() === true) {

@@ -13,6 +13,7 @@ namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\Serializer;
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -68,7 +69,7 @@ class FormatterHelper extends Helper
             case 'array':
                 if (!is_array($val)) {
                     //assume that it's serialized
-                    $unserialized = unserialize($val);
+                    $unserialized = Serializer::decode($val);
                     if ($unserialized) {
                         $val = $unserialized;
                     }
@@ -149,6 +150,45 @@ class FormatterHelper extends Helper
         }
 
         return $array;
+    }
+
+    /**
+     * @param array  $array
+     * @param string $delimeter
+     *
+     * @return string
+     */
+    public function simpleArrayToHtml(array $array, $delimeter = '<br />')
+    {
+        $pairs = [];
+        foreach ($array as $key => $value) {
+            $pairs[] = "$key: $value";
+        }
+
+        return implode($delimeter, $pairs);
+    }
+
+    /**
+     * Takes a simple csv list like 1,2,3,4 and returns as an array.
+     *
+     * @param $csv
+     *
+     * @return array
+     */
+    public function simpleCsvToArray($csv, $type = null)
+    {
+        if (!$csv) {
+            return [];
+        }
+
+        return array_map(
+            function ($value) use ($type) {
+                $value = trim($value);
+
+                return $this->_($value, $type);
+            },
+            explode(',', $csv)
+        );
     }
 
     /**

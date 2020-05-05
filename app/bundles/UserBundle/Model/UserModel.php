@@ -177,6 +177,21 @@ class UserModel extends FormModel
     }
 
     /**
+     * @return User
+     */
+    public function getSystemAdministrator()
+    {
+        $adminRole = $this->em->getRepository('MauticUserBundle:Role')->findOneBy(['isAdmin' => true]);
+
+        return $this->getRepository()->findOneBy(
+            [
+                'role'        => $adminRole,
+                'isPublished' => true,
+            ]
+        );
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException

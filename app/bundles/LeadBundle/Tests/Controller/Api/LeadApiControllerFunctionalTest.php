@@ -13,6 +13,8 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use FOS\RestBundle\Util\Codes;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\DoNotContact;
+use Symfony\Component\HttpFoundation\Response;
 
 class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -145,5 +147,62 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
         $this->assertEquals(4, $response['contact']['points']);
         $this->assertEquals(2, count($response['contact']['tags']));
+    }
+
+    public function testBachdDncAddAndRemove()
+    {
+        // Create contact
+        $emailAddress = uniqid('', false).'@mautic.com';
+
+        $payload = [
+            'id'   => 80,
+            'email'=> $emailAddress,
+        ];
+
+        $this->client->request('POST', '/api/contacts/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $contactId      = $response['contact']['id'];
+
+        // Batch update contact with new DNC record
+        $payload = [[
+            'id'           => $contactId,
+            'email'        => $emailAddress,
+            'doNotContact' => [[
+                'reason'    => DoNotContact::MANUAL,
+                'comments'  => 'manually',
+                'channel'   => 'email',
+                'channelId' => null,
+            ]],
+        ]];
+
+        $this->client->request('PUT', '/api/contacts/batch/edit', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(3, $response['contacts'][0]['doNotContact'][0]['reason']);
+
+        // Batch update contact and remove DNC record
+        $payload = [[
+            'id'           => $contactId,
+            'email'        => $emailAddress,
+            'doNotContact' => [[
+                'reason'    => DoNotContact::IS_CONTACTABLE,
+                'comments'  => 'manually',
+                'channel'   => 'email',
+                'channelId' => null,
+            ]],
+        ]];
+
+        $this->client->request('PUT', '/api/contacts/batch/edit', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(null, $response['contacts'][0]['doNotContact'][0]['reason']);
+
+        // Remove contact
+        $this->client->request('DELETE', "/api/contacts/$contactId/delete");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 }

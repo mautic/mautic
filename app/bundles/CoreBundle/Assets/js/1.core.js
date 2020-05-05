@@ -16,8 +16,7 @@ MauticVars.activeRequests = 0;
 mQuery.ajaxSetup({
     beforeSend: function (request, settings) {
         if (settings.showLoadingBar) {
-            mQuery('.loading-bar').addClass('active');
-            MauticVars.activeRequests++;
+            Mautic.startPageLoadingBar();
         }
 
         if (typeof IdleTimer != 'undefined') {
@@ -47,6 +46,7 @@ mQuery.ajaxSetup({
 });
 
 mQuery( document ).ajaxComplete(function(event, xhr, settings) {
+    Mautic.stopPageLoadingBar();
     xhr.always(function(response) {
         if (response.flashes) Mautic.setFlashes(response.flashes);
     });
@@ -343,8 +343,13 @@ var Mautic = {
         if (options.windowUrl) {
             Mautic.startModalLoadingBar();
 
+            var popupName = 'mauticpopup';
+            if (options.popupName) {
+                popupName = options.popupName;
+            }
+
             setTimeout(function () {
-                var opener = window.open(options.windowUrl, 'mauticpopup', 'height=600,width=1100');
+                var opener = window.open(options.windowUrl, popupName, 'height=600,width=1100');
 
                 if (!opener || opener.closed || typeof opener.closed == 'undefined') {
                     alert(mauticLang.popupBlockerMessage);
@@ -592,7 +597,7 @@ var Mautic = {
 
         if (typeof request.responseJSON !== 'undefined') {
             response = request.responseJSON;
-        } else {
+        } else if (typeof(request.responseText) !== 'undefined') {
             //Symfony may have added some excess buffer if an exception was hit during a sub rendering and because
             //it uses ob_start, PHP dumps the buffer upon hitting the exception.  So let's filter that out.
             var errorStart = request.responseText.indexOf('{"newContent');

@@ -17,10 +17,13 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Form\Type\ChangeOwnerType;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -53,6 +56,11 @@ class CampaignSubscriber extends CommonSubscriber
     protected $listModel;
 
     /**
+     * @var CompanyModel
+     */
+    protected $companyModel;
+
+    /**
      * @var CampaignModel
      */
     protected $campaignModel;
@@ -63,13 +71,16 @@ class CampaignSubscriber extends CommonSubscriber
      * @param IpLookupHelper $ipLookupHelper
      * @param LeadModel      $leadModel
      * @param FieldModel     $leadFieldModel
+     * @param CompanyModel   $companyModel
+     * @param CampaignModel  $campaignModel
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, FieldModel $leadFieldModel, ListModel $listModel, CampaignModel $campaignModel)
+    public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, FieldModel $leadFieldModel, ListModel $listModel, CompanyModel $companyModel, CampaignModel $campaignModel)
     {
         $this->ipLookupHelper = $ipLookupHelper;
         $this->leadModel      = $leadModel;
         $this->leadFieldModel = $leadFieldModel;
         $this->listModel      = $listModel;
+        $this->companyModel   = $companyModel;
         $this->campaignModel  = $campaignModel;
     }
 
@@ -87,8 +98,8 @@ class CampaignSubscriber extends CommonSubscriber
                 ['onCampaignTriggerActionUpdateTags', 3],
                 ['onCampaignTriggerActionAddToCompany', 4],
                 ['onCampaignTriggerActionChangeCompanyScore', 4],
-                ['onCampaignTriggerActionDeleteContact', 6],
                 ['onCampaignTriggerActionChangeOwner', 7],
+                ['onCampaignTriggerActionUpdateCompany', 8],
             ],
             LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerCondition', 0],
         ];
@@ -128,6 +139,15 @@ class CampaignSubscriber extends CommonSubscriber
         $event->addAction('lead.updatelead', $action);
 
         $action = [
+            'label'       => 'mautic.lead.lead.events.updatecompany',
+            'description' => 'mautic.lead.lead.events.updatecompany_descr',
+            'formType'    => 'updatecompany_action',
+            'formTheme'   => 'MauticLeadBundle:FormTheme\ActionUpdateCompany',
+            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+        ];
+        $event->addAction('lead.updatecompany', $action);
+
+        $action = [
             'label'       => 'mautic.lead.lead.events.changetags',
             'description' => 'mautic.lead.lead.events.changetags_descr',
             'formType'    => 'modify_lead_tags',
@@ -158,20 +178,6 @@ class CampaignSubscriber extends CommonSubscriber
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
         ];
         $event->addAction('lead.scorecontactscompanies', $action);
-
-        $trigger = [
-            'label'                  => 'mautic.lead.lead.events.delete',
-            'description'            => 'mautic.lead.lead.events.delete_descr',
-            'eventName'              => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-            'connectionRestrictions' => [
-                'target' => [
-                    'decision'  => ['none'],
-                    'action'    => ['none'],
-                    'condition' => ['none'],
-                ],
-            ],
-        ];
-        $event->addAction('lead.deletecontact', $trigger);
 
         $trigger = [
             'label'       => 'mautic.lead.lead.events.field_value',
@@ -308,6 +314,9 @@ class CampaignSubscriber extends CommonSubscriber
         return $event->setResult(true);
     }
 
+    /**
+     * @param CampaignExecutionEvent $event
+     */
     public function onCampaignTriggerActionChangeOwner(CampaignExecutionEvent $event)
     {
         if (!$event->checkContext(self::ACTION_LEAD_CHANGE_OWNER)) {
@@ -385,13 +394,40 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * @param CampaignExecutionEvent $event
      */
-    public function onCampaignTriggerActionDeleteContact(CampaignExecutionEvent $event)
+    public function onCampaignTriggerActionUpdateCompany(CampaignExecutionEvent $event)
     {
-        if (!$event->checkContext('lead.deletecontact')) {
+        if (!$event->checkContext('lead.updatecompany')) {
             return;
         }
 
-        $this->leadModel->deleteEntity($event->getLead());
+        $lead    = $event->getLead();
+        $company = $lead->getPrimaryCompany();
+        $config  = $event->getConfig();
+
+        if (empty($company['id'])) {
+            return;
+        }
+
+        $primaryCompany =  $this->companyModel->getEntity($company['id']);
+
+        if (isset($config['companyname']) && $primaryCompany->getName() != $config['companyname']) {
+            list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($config, $lead, $this->companyModel);
+            if ($leadAdded) {
+                $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
+            } elseif ($companyEntity instanceof Company) {
+                $this->companyModel->setFieldValues($companyEntity, $config);
+                $this->companyModel->saveEntity($companyEntity);
+            }
+
+            if (!empty($company)) {
+                // Save after the lead in for new leads created
+                $this->companyModel->addLeadToCompany($companyEntity, $lead);
+                $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
+            }
+        } else {
+            $this->companyModel->setFieldValues($primaryCompany, $config, false);
+            $this->companyModel->saveEntity($primaryCompany);
+        }
 
         return $event->setResult(true);
     }

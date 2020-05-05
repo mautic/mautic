@@ -17,6 +17,8 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
@@ -57,6 +59,11 @@ class FocusModel extends FormModel
     protected $leadModel;
 
     /**
+     * @var FieldModel
+     */
+    protected $leadFieldModel;
+
+    /**
      * FocusModel constructor.
      *
      * @param \Mautic\FormBundle\Model\FormModel $formModel
@@ -64,14 +71,16 @@ class FocusModel extends FormModel
      * @param TemplatingHelper                   $templating
      * @param EventDispatcherInterface           $dispatcher
      * @param LeadModel                          $leadModel
+     * @param FieldModel                         $leadFieldModel
      */
-    public function __construct(\Mautic\FormBundle\Model\FormModel $formModel, TrackableModel $trackableModel, TemplatingHelper $templating, EventDispatcherInterface $dispatcher, LeadModel $leadModel)
+    public function __construct(\Mautic\FormBundle\Model\FormModel $formModel, TrackableModel $trackableModel, TemplatingHelper $templating, EventDispatcherInterface $dispatcher, LeadModel $leadModel, FieldModel $leadFieldModel)
     {
         $this->formModel      = $formModel;
         $this->trackableModel = $trackableModel;
         $this->templating     = $templating;
         $this->dispatcher     = $dispatcher;
         $this->leadModel      = $leadModel;
+        $this->leadFieldModel = $leadFieldModel;
     }
 
     /**
@@ -266,10 +275,12 @@ class FocusModel extends FormModel
         $formContent = (!empty($form)) ? $this->templating->getTemplating()->render(
             'MauticFocusBundle:Builder:form.html.php',
             [
-                'form'    => $form,
-                'style'   => $focus['style'],
-                'focusId' => $focus['id'],
-                'preview' => $isPreview,
+                'form'          => $form,
+                'style'         => $focus['style'],
+                'focusId'       => $focus['id'],
+                'preview'       => $isPreview,
+                'contactFields' => $this->leadFieldModel->getFieldListWithProperties(),
+                'companyFields' => $this->leadFieldModel->getFieldListWithProperties('company'),
             ]
         ) : '';
 
@@ -315,9 +326,27 @@ class FocusModel extends FormModel
      * @param       $type
      * @param null  $data
      * @param null  $lead
+     *
+     * @return Stat
      */
     public function addStat(Focus $focus, $type, $data = null, $lead = null)
     {
+        if (empty($lead)) {
+            return;
+        }
+
+        if ($lead instanceof Lead && !$lead->getId()) {
+            return;
+        }
+
+        if (is_array($lead)) {
+            if (empty($lead['id'])) {
+                return;
+            }
+
+            $lead = $this->em->getReference('MauticLeadBundle:Lead', $lead['id']);
+        }
+
         switch ($type) {
             case Stat::TYPE_FORM:
                 /** @var \Mautic\FormBundle\Entity\Submission $data */
@@ -341,6 +370,8 @@ class FocusModel extends FormModel
             ->setLead($lead);
 
         $this->getStatRepository()->saveEntity($stat);
+
+        return $stat;
     }
 
     /**

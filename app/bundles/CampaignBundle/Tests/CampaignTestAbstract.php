@@ -12,8 +12,11 @@
 namespace Mautic\CampaignBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CampaignBundle\EventCollector\EventCollector;
+use Mautic\CampaignBundle\Helper\RemovedContactTracker;
+use Mautic\CampaignBundle\Membership\MembershipBuilder;
+use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\Entity\FormRepository;
@@ -33,10 +36,6 @@ class CampaignTestAbstract extends \PHPUnit_Framework_TestCase
     {
         $entityManager = $this
             ->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -80,7 +79,14 @@ class CampaignTestAbstract extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->will($this->returnValue($formRepository));
 
-        $campaignModel = new CampaignModel($coreParametersHelper, $leadModel, $leadListModel, $formModel);
+        $eventCollector = $this->createMock(EventCollector::class);
+
+        $removedContactTracker = $this->createMock(RemovedContactTracker::class);
+
+        $membershipManager = $this->createMock(MembershipManager::class);
+        $membershipBuilder = $this->createMock(MembershipBuilder::class);
+
+        $campaignModel = new CampaignModel($leadModel, $leadListModel, $formModel, $eventCollector, $removedContactTracker, $membershipManager, $membershipBuilder);
 
         $leadModel->setEntityManager($entityManager);
         $leadListModel->setEntityManager($entityManager);

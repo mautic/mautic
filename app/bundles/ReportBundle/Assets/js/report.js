@@ -7,9 +7,9 @@ Mautic.reportOnLoad = function (container) {
 
     // Append an index of the number of filters on the edit form
     if (mQuery('div[id=report_filters]').length) {
-        mQuery('div[id=report_filters]').attr('data-index', mQuery('#report_filters > div').length + 1);
-        mQuery('div[id=report_tableOrder]').attr('data-index', mQuery('#report_tableOrder > div').length + 1);
-        mQuery('div[id=report_aggregators]').attr('data-index', mQuery('#report_aggregators > div').length + 1);
+        mQuery('div[id=report_filters]').attr('data-index', Mautic.getHighestIndex('report_filters'));
+        mQuery('div[id=report_tableOrder]').attr('data-index', Mautic.getHighestIndex('report_tableOrder'));
+        mQuery('div[id=report_aggregators]').attr('data-index', Mautic.getHighestIndex('report_aggregators'));
 
         if (mQuery('.filter-columns').length) {
             mQuery('.filter-columns').each(function () {
@@ -67,7 +67,9 @@ Mautic.scheduleDisplay = function ($isScheduled, $unitTypeId, $scheduleDay, $sch
     } else {
         mQuery('#scheduleDay label').show();
     }
-    Mautic.schedulePreview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+    if($isScheduled.length) {
+        Mautic.schedulePreview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+    }
 };
 
 Mautic.schedulePreview = function ($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency) {
@@ -207,9 +209,7 @@ Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
     }
 
     // Replace the value field appropriately
-    if (mQuery('#' + valueId + '_chosen').length) {
-        mQuery('#' + valueId).chosen('destroy');
-    }
+    Mautic.destroyChosen(mQuery('#' + valueId));
 
     if (filterType == 'bool' || filterType == 'boolean') {
         if (mQuery(valueEl).attr('type') != 'radio') {
@@ -361,4 +361,16 @@ Mautic.checkSelectedGroupBy = function () {
         });
         mQuery('#aggregators-button').prop('disabled', true);
     }
+};
+
+Mautic.getHighestIndex = function (selector) {
+    var highestIndex = 1;
+    var selectorChildren = mQuery('#' + selector + ' > div');
+
+    selectorChildren.each(function() {
+        var index = parseInt(mQuery(this).attr('id').split('_')[2]);
+        highestIndex = (index > highestIndex) ? index : highestIndex;
+    });
+
+    return parseInt(highestIndex);
 };

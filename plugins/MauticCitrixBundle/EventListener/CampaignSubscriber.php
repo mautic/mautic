@@ -113,7 +113,6 @@ class CampaignSubscriber extends CommonSubscriber
         $criteria = $config['event-criteria-'.$product];
         /** @var array $list */
         $list     = $config[$product.'-list'];
-        $emailId  = $config['template'];
         $actionId = 'citrix.action.'.$product;
         try {
             $productlist = CitrixHelper::getCitrixChoices($product);
@@ -134,6 +133,7 @@ class CampaignSubscriber extends CommonSubscriber
                 $this->registerProduct($product, $event->getLead(), $products);
             } else {
                 if (in_array($criteria, ['assist_screensharing', 'training_start', 'meeting_start'], true)) {
+                    $emailId = $config['template'];
                     $this->startProduct($product, $event->getLead(), $products, $emailId, $actionId);
                 }
             }

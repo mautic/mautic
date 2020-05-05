@@ -21,6 +21,7 @@ namespace Mautic\EmailBundle\MonitoredEmail;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\Exception\MailboxException;
+use Mautic\EmailBundle\MonitoredEmail\Exception\NotConfiguredException;
 use stdClass;
 
 class Mailbox
@@ -168,6 +169,8 @@ class Mailbox
     protected $isGmail = false;
     protected $mailboxes;
 
+    private $folders = [];
+
     /**
      * Mailbox constructor.
      *
@@ -182,21 +185,16 @@ class Mailbox
             $this->settings = $this->mailboxes['general'];
         } else {
             $this->settings = [
-                'host'       => '',
-                'port'       => '',
-                'password'   => '',
-                'user'       => '',
-                'encryption' => '',
+                'host'            => '',
+                'port'            => '',
+                'password'        => '',
+                'user'            => '',
+                'encryption'      => '',
+                'use_attachments' => false,
             ];
         }
 
-        // Check that cache attachments directory exists
-        $cacheDir             = $pathsHelper->getSystemPath('cache', true);
-        $this->attachmentsDir = $cacheDir.'/attachments';
-
-        if (!file_exists($this->attachmentsDir)) {
-            mkdir($this->attachmentsDir);
-        }
+        $this->createAttachmentsDir($pathsHelper);
 
         if ($this->settings['host'] == 'imap.gmail.com') {
             $this->isGmail = true;
@@ -286,14 +284,12 @@ class Mailbox
      */
     public function getImapPath($settings)
     {
-        /*
-         * @var $host
-         * @var $port
-         * @var $encryption
-         * @var $folder
-         * @var $user
-         * @var $password
-         */
+        /* @var string $host */
+        /* @var int $port */
+        /* @var string $encryption */
+        /* @var string $folder */
+        /* @var string $user */
+        /* @var string $password */
         extract($settings);
         if (!isset($encryption)) {
             $encryption = (!empty($ssl)) ? '/ssl' : '';
@@ -408,6 +404,10 @@ class Mailbox
     protected function initImapStream()
     {
         imap_timeout(IMAP_OPENTIMEOUT, 15);
+        imap_timeout(IMAP_CLOSETIMEOUT, 15);
+        imap_timeout(IMAP_READTIMEOUT, 15);
+        imap_timeout(IMAP_WRITETIMEOUT, 15);
+
         $imapStream = @imap_open(
             $this->imapFullPath,
             $this->settings['user'],
@@ -483,9 +483,11 @@ class Mailbox
      */
     public function getListingFolders()
     {
-        static $folders = [];
+        if (!$this->isConfigured()) {
+            throw new NotConfiguredException('mautic.email.config.monitored_email.not_configured');
+        }
 
-        if (!isset($folders[$this->imapFullPath]) && $this->isConfigured()) {
+        if (!isset($this->folders[$this->imapFullPath])) {
             $tempFolders = @imap_list($this->getImapStream(), $this->imapPath, '*');
 
             if (!empty($tempFolders)) {
@@ -497,10 +499,10 @@ class Mailbox
                 $tempFolders = [];
             }
 
-            $folders[$this->imapFullPath] = $tempFolders;
+            $this->folders[$this->imapFullPath] = $tempFolders;
         }
 
-        return $folders[$this->imapFullPath];
+        return $this->folders[$this->imapFullPath];
     }
 
     /**
@@ -556,9 +558,19 @@ class Mailbox
      */
     public function searchMailbox($criteria = self::CRITERIA_ALL)
     {
-        $mailsIds = imap_search($this->getImapStream(), $criteria, SE_UID);
+        if (preg_match('/'.self::CRITERIA_UID.' ((\d+):(\d+|\*))/', $criteria, $matches)) {
+            // PHP imap_search does not support UID n:* so use imap_fetch_overview instead
+            $messages = imap_fetch_overview($this->getImapStream(), $matches[1], FT_UID);
 
-        return $mailsIds ? $mailsIds : [];
+            $mailIds = [];
+            foreach ($messages as $message) {
+                $mailIds[] = $message->uid;
+            }
+        } else {
+            $mailIds = imap_search($this->getImapStream(), $criteria, SE_UID);
+        }
+
+        return $mailIds ? $mailIds : [];
     }
 
     /**
@@ -971,32 +983,34 @@ class Mailbox
             : (isset($params['filename']) || isset($params['name']) ? mt_rand().mt_rand() : null);
 
         if ($attachmentId) {
-            if (empty($params['filename']) && empty($params['name'])) {
-                $fileName = $attachmentId.'.'.strtolower($partStructure->subtype);
-            } else {
-                $fileName = !empty($params['filename']) ? $params['filename'] : $params['name'];
-                $fileName = $this->decodeMimeStr($fileName, $this->serverEncoding);
-                $fileName = $this->decodeRFC2231($fileName, $this->serverEncoding);
+            if (isset($this->settings['use_attachments']) && $this->settings['use_attachments']) {
+                if (empty($params['filename']) && empty($params['name'])) {
+                    $fileName = $attachmentId.'.'.strtolower($partStructure->subtype);
+                } else {
+                    $fileName = !empty($params['filename']) ? $params['filename'] : $params['name'];
+                    $fileName = $this->decodeMimeStr($fileName, $this->serverEncoding);
+                    $fileName = $this->decodeRFC2231($fileName, $this->serverEncoding);
+                }
+                $attachment       = new Attachment();
+                $attachment->id   = $attachmentId;
+                $attachment->name = $fileName;
+                if ($this->attachmentsDir) {
+                    $replace = [
+                        '/\s/'                   => '_',
+                        '/[^0-9a-zа-яіїє_\.]/iu' => '',
+                        '/_+/'                   => '_',
+                        '/(^_)|(_$)/'            => '',
+                    ];
+                    $fileSysName = preg_replace(
+                        '~[\\\\/]~',
+                        '',
+                        $mail->id.'_'.$attachmentId.'_'.preg_replace(array_keys($replace), $replace, $fileName)
+                    );
+                    $attachment->filePath = $this->attachmentsDir.DIRECTORY_SEPARATOR.$fileSysName;
+                    file_put_contents($attachment->filePath, $data);
+                }
+                $mail->addAttachment($attachment);
             }
-            $attachment       = new Attachment();
-            $attachment->id   = $attachmentId;
-            $attachment->name = $fileName;
-            if ($this->attachmentsDir) {
-                $replace = [
-                    '/\s/'                   => '_',
-                    '/[^0-9a-zа-яіїє_\.]/iu' => '',
-                    '/_+/'                   => '_',
-                    '/(^_)|(_$)/'            => '',
-                ];
-                $fileSysName = preg_replace(
-                    '~[\\\\/]~',
-                    '',
-                    $mail->id.'_'.$attachmentId.'_'.preg_replace(array_keys($replace), $replace, $fileName)
-                );
-                $attachment->filePath = $this->attachmentsDir.DIRECTORY_SEPARATOR.$fileSysName;
-                file_put_contents($attachment->filePath, $data);
-            }
-            $mail->addAttachment($attachment);
         } else {
             if (!empty($params['charset'])) {
                 $data = $this->convertStringEncoding($data, $params['charset'], $this->serverEncoding);
@@ -1176,6 +1190,27 @@ class Mailbox
             imap_alerts();
 
             @imap_close($this->imapStream, CL_EXPUNGE);
+        }
+    }
+
+    /**
+     * @param PathsHelper $pathsHelper
+     */
+    private function createAttachmentsDir(PathsHelper $pathsHelper)
+    {
+        if (!isset($this->settings['use_attachments']) || !$this->settings['use_attachments']) {
+            return;
+        }
+
+        $this->attachmentsDir = $pathsHelper->getSystemPath('tmp', true);
+
+        if (!file_exists($this->attachmentsDir)) {
+            mkdir($this->attachmentsDir);
+        }
+        $this->attachmentsDir .= '/attachments';
+
+        if (!file_exists($this->attachmentsDir)) {
+            mkdir($this->attachmentsDir);
         }
     }
 

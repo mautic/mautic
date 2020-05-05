@@ -59,6 +59,16 @@ class CampaignType extends AbstractType
             'required'   => false,
         ]);
 
+        $builder->add('allowRestart',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.campaign.allow_restart',
+                'attr'  => [
+                    'tooltip' => 'mautic.campaign.allow_restart.tooltip',
+                ],
+            ]
+        );
+
         //add category
         $builder->add('category', 'category', [
             'bundle' => 'campaign',

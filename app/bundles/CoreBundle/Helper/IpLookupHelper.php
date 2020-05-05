@@ -53,6 +53,16 @@ class IpLookupHelper
     protected $doNotTrackInternalIps;
 
     /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    /**
+     * @var string
+     */
+    private $realIp;
+
+    /**
      * IpLookupHelper constructor.
      *
      * @param RequestStack         $requestStack
@@ -72,6 +82,8 @@ class IpLookupHelper
         $this->doNotTrackIps         = $coreParametersHelper->getParameter('mautic.do_not_track_ips');
         $this->doNotTrackBots        = $coreParametersHelper->getParameter('mautic.do_not_track_bots');
         $this->doNotTrackInternalIps = $coreParametersHelper->getParameter('mautic.do_not_track_internal_ips');
+        $this->trackPrivateIPRanges  = $coreParametersHelper->getParameter('mautic.track_private_ip_ranges');
+        $this->coreParametersHelper  = $coreParametersHelper;
     }
 
     /**
@@ -132,6 +144,12 @@ class IpLookupHelper
             $ip = '127.0.0.1';
         }
 
+        $this->realIp = $ip;
+
+        if ($this->coreParametersHelper->getParameter('anonymize_ip')) {
+            $ip = preg_replace(['/\.\d*$/', '/[\da-f]*:[\da-f]*$/'], ['.***', '****:****'], $ip);
+        }
+
         if (empty($ipAddresses[$ip])) {
             $repo      = $this->em->getRepository('MauticCoreBundle:IpAddress');
             $ipAddress = $repo->findOneByIpAddress($ip);
@@ -175,13 +193,12 @@ class IpLookupHelper
             }
 
             $details = $ipAddress->getIpDetails();
-            if ($ipAddress->isTrackable() && empty($details['city'])) {
+            if ($ipAddress->isTrackable() && empty($details['city']) && !$this->coreParametersHelper->getParameter('anonymize_ip')) {
                 // Get the IP lookup service
 
                 // Fetch the data
                 if ($this->ipLookup) {
-                    $details = $this->ipLookup->setIpAddress($ip)
-                        ->getDetails();
+                    $details = $this->getIpDetails($ip);
 
                     $ipAddress->setIpDetails($details);
 
@@ -201,6 +218,20 @@ class IpLookupHelper
     }
 
     /**
+     * @param string $ip
+     *
+     * @return array
+     */
+    public function getIpDetails($ip)
+    {
+        if ($this->ipLookup) {
+            return $this->ipLookup->setIpAddress($ip)->getDetails();
+        }
+
+        return [];
+    }
+
+    /**
      * Validates if an IP address if valid.
      *
      * @param $ip
@@ -209,10 +240,12 @@ class IpLookupHelper
      */
     public function ipIsValid($ip)
     {
+        $filterFlagNoPrivRange = $this->trackPrivateIPRanges ? 0 : FILTER_FLAG_NO_PRIV_RANGE;
+
         return filter_var(
             $ip,
             FILTER_VALIDATE_IP,
-            FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
+            FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6 | $filterFlagNoPrivRange | FILTER_FLAG_NO_RES_RANGE
         );
     }
 
@@ -243,5 +276,13 @@ class IpLookupHelper
         }
 
         return null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRealIp()
+    {
+        return $this->realIp;
     }
 }

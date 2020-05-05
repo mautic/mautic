@@ -17,6 +17,7 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\TokenSubscriber;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
@@ -92,15 +93,18 @@ CONTENT
         $lead->setEmail('hello@someone.com');
         $mailHelper->setLead($lead);
 
+        $dispatcher           = new EventDispatcher();
+        $primaryCompanyHelper = $this->createMock(PrimaryCompanyHelper::class);
+        $primaryCompanyHelper->method('getProfileFieldsWithPrimaryCompany')
+            ->willReturn(['email' => 'hello@someone.com']);
+
         /** @var TokenSubscriber $subscriber */
         $subscriber = $this->getMockBuilder(TokenSubscriber::class)
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([$dispatcher, $primaryCompanyHelper])
             ->setMethods(null)
             ->getMock();
 
-        $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber($subscriber);
-        $subscriber->setDispatcher($dispatcher);
 
         $event = new EmailSendEvent($mailHelper);
 

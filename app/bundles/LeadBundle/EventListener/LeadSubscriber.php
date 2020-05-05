@@ -15,12 +15,12 @@ use Mautic\CoreBundle\EventListener\ChannelTrait;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ChannelTimelineInterface;
+use Mautic\LeadBundle\Templating\Helper\DncReasonHelper;
 
 /**
  * Class LeadSubscriber.
@@ -45,16 +45,26 @@ class LeadSubscriber extends CommonSubscriber
     private $leadEventDispatcher;
 
     /**
-     * LeadSubscriber constructor.
-     *
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
+     * @var DncReasonHelper
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, LeadChangeEventDispatcher $eventDispatcher)
-    {
+    private $dncReasonHelper;
+
+    /**
+     * @param IpLookupHelper            $ipLookupHelper
+     * @param AuditLogModel             $auditLogModel
+     * @param LeadChangeEventDispatcher $eventDispatcher
+     * @param DncReasonHelper           $dncReasonHelper
+     */
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        AuditLogModel $auditLogModel,
+        LeadChangeEventDispatcher $eventDispatcher,
+        DncReasonHelper $dncReasonHelper
+    ) {
         $this->ipLookupHelper      = $ipLookupHelper;
         $this->auditLogModel       = $auditLogModel;
         $this->leadEventDispatcher = $eventDispatcher;
+        $this->dncReasonHelper     = $dncReasonHelper;
     }
 
     /**
@@ -89,8 +99,8 @@ class LeadSubscriber extends CommonSubscriber
         $lead = $event->getLead();
 
         if ($details = $event->getChanges()) {
-            // Unset dateLastActive and dateModified to prevent un-necessary audit log entries
-            unset($details['dateLastActive'], $details['dateModified']);
+            // Unset dateLastActive and dateModified and ipAddress to prevent un-necessary audit log entries
+            unset($details['dateLastActive'], $details['dateModified'], $details['ipAddressList']);
             if (empty($details)) {
                 return;
             }
@@ -535,17 +545,7 @@ class LeadSubscriber extends CommonSubscriber
 
         if (!$event->isEngagementCount()) {
             foreach ($rows['results'] as $row) {
-                switch ($row['reason']) {
-                    case DoNotContact::UNSUBSCRIBED:
-                        $row['reason'] = $this->translator->trans('mautic.lead.event.donotcontact_unsubscribed');
-                        break;
-                    case DoNotContact::BOUNCED:
-                        $row['reason'] = $this->translator->trans('mautic.lead.event.donotcontact_bounced');
-                        break;
-                    case DoNotContact::MANUAL:
-                        $row['reason'] = $this->translator->trans('mautic.lead.event.donotcontact_manual');
-                        break;
-                }
+                $row['reason'] = $this->dncReasonHelper->toText($row['reason']);
 
                 $template = 'MauticLeadBundle:SubscribedEvents\Timeline:donotcontact.html.php';
                 $icon     = 'fa-ban';
@@ -620,7 +620,14 @@ class LeadSubscriber extends CommonSubscriber
     protected function addTimelineImportedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         $eventLogRepo = $this->em->getRepository('MauticLeadBundle:LeadEventLog');
-        $imports      = $eventLogRepo->getEventsByLead('lead', 'import', $event->getLead(), $event->getQueryOptions());
+        $imports      = $eventLogRepo->getEvents(
+            $event->getLead(),
+            'lead',
+            'import',
+            ['failed', 'inserted', 'updated'],
+            $event->getQueryOptions()
+        );
+
         // Add to counter
         $event->addToCounter($eventTypeKey, $imports);
 

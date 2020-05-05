@@ -34,4 +34,7 @@
         </whitelist>
     </filter>
 
+    <php>
+        <env name="MAXMIND_LICENSE_KEY" value=""/>
+    </php>
 </phpunit>

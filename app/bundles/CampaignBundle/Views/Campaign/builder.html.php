@@ -40,7 +40,10 @@
             endforeach;
 
             foreach ($campaignEvents as $event):
-                echo $view->render('MauticCampaignBundle:Event:generic.html.php',
+                $settings = $eventSettings[$event['eventType']][$event['type']];
+                $template = isset($settings['template']) ? $settings['template'] : 'MauticCampaignBundle:Event:generic.html.php';
+
+                echo $view->render($template,
                     ['event' => $event, 'campaignId' => $campaignId]);
             endforeach;
 
@@ -52,8 +55,8 @@
                 ]
             );
             ?>
-
         </div>
+        <div id="EventJumpOverlay"></div>
     </div>
 </div>
 <!-- dropped coordinates -->
@@ -73,15 +76,19 @@
 
 ?>
 <script>
-    <?php if (!empty($canvasSettings)): ?>
+    /**
+     * We typecast to object here so that an empty value will
+     * be encoded to {} instead of []. Adding JSON_FORCE_OBJECT
+     * is not an option because it does a deep transform to
+     * object, whereas typecasting only does the first level.
+     */
     Mautic.campaignBuilderCanvasSettings =
-    <?php echo json_encode($canvasSettings, JSON_PRETTY_PRINT); ?>;
+    <?php echo json_encode((object) $canvasSettings, JSON_PRETTY_PRINT); ?>;
     Mautic.campaignBuilderCanvasSources =
-    <?php echo json_encode($campaignSources, JSON_PRETTY_PRINT); ?>;
+    <?php echo json_encode((object) $campaignSources, JSON_PRETTY_PRINT); ?>;
     Mautic.campaignBuilderCanvasEvents =
-    <?php echo json_encode($campaignEvents, JSON_PRETTY_PRINT); ?>;
-    <?php endif; ?>
+    <?php echo json_encode((object) $campaignEvents, JSON_PRETTY_PRINT); ?>;
 
     Mautic.campaignBuilderConnectionRestrictions =
-    <?php echo json_encode($eventSettings['connectionRestrictions'], JSON_PRETTY_PRINT); ?>;
+    <?php echo json_encode((object) $eventSettings['connectionRestrictions'], JSON_PRETTY_PRINT); ?>;
 </script>

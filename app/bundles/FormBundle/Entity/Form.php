@@ -139,6 +139,11 @@ class Form extends FormEntity implements TranslationEntityInterface, VariantEnti
     private $formType;
 
     /**
+     * @var bool
+     */
+    private $noIndex;
+
+    /**
      * This var is used to cache the result once gained from the loop.
      *
      * @var bool
@@ -177,6 +182,8 @@ class Form extends FormEntity implements TranslationEntityInterface, VariantEnti
         $builder->addField('title', 'string');
 
         $builder->addField('alias', 'string');
+
+        $builder->addNullableField('formAttributes', 'string', 'form_attr');
 
         $builder->addCategory();
 
@@ -226,11 +233,6 @@ class Form extends FormEntity implements TranslationEntityInterface, VariantEnti
             ->nullable()
             ->build();
 
-        $builder->createField('noIndex', 'boolean')
-            ->columnName('no_index')
-            ->nullable()
-            ->build();
-
         $builder->createOneToMany('submissions', 'Submission')
             ->setOrderBy(['dateSubmitted' => 'DESC'])
             ->mappedBy('form')
@@ -240,6 +242,11 @@ class Form extends FormEntity implements TranslationEntityInterface, VariantEnti
         $builder->addNullableField('formType', 'string', 'form_type');
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
+
+        $builder->createField('noIndex', 'boolean')
+            ->columnName('no_index')
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -323,6 +330,8 @@ class Form extends FormEntity implements TranslationEntityInterface, VariantEnti
                     'formType',
                     'postAction',
                     'postActionProperty',
+                    'noIndex',
+                    'formAttributes',
                 ]
             )
             ->build();
@@ -853,6 +862,48 @@ class Form extends FormEntity implements TranslationEntityInterface, VariantEnti
         $this->formType = $formType;
 
         return $this;
+    }
+
+    /**
+     * Set noIndex.
+     *
+     * @param bool $noIndex
+     */
+    public function setNoIndex($noIndex)
+    {
+        $this->isChanged('noIndex', $noIndex);
+        $this->noIndex = $noIndex;
+    }
+
+    /**
+     * Get noIndex.
+     *
+     * @return bool
+     */
+    public function getNoIndex()
+    {
+        return $this->noIndex;
+    }
+
+    /**
+     * @param string $formAttributes
+     *
+     * @return Form
+     */
+    public function setFormAttributes($formAttributes)
+    {
+        $this->isChanged('formAttributes', $formAttributes);
+        $this->formAttributes = $formAttributes;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormAttributes()
+    {
+        return $this->formAttributes;
     }
 
     /**

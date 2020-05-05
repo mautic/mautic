@@ -91,6 +91,10 @@ class FailedLeadEventLog
     {
         $this->log = $log;
 
+        if ($log) {
+            $log->setFailedLog($this);
+        }
+
         return $this;
     }
 

@@ -202,7 +202,16 @@ $detailRowTmpl = 'MauticCoreBundle:Helper:detail_row.html.php';
                                     <?php echo $row['properties']['line']; ?>
                                 </td>
                                 <td>
-                                    <?php echo isset($row['properties']['error']) ? $row['properties']['error'] : 'N/A'; ?>
+                                    <?php
+                                    $error = 'N/A';
+                                    if (isset($row['properties']['error'])):
+                                        $error = $row['properties']['error'];
+                                        if (preg_match('/SQLSTATE\[\w+\]: (.*)/', $error, $matches)):
+                                            $error = $matches[1];
+                                        endif;
+                                    endif;
+                                    echo $error;
+                                    ?>
                                 </td>
                             </tr>
                         <?php endif; ?>
