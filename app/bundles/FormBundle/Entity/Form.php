@@ -357,7 +357,7 @@ class Form extends FormEntity implements TranslationEntityInterface, VariantEnti
      *
      * @param string $title
      *
-     * @return Page
+     * @return Form
      */
     public function setTitle($title)
     {
