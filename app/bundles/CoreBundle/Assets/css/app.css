@@ -2453,6 +2453,9 @@ ul.line-legend li {
 .table-responsive-force > .table-bordered > tfoot > tr:last-child > td {
   border-bottom: 0;
 }
+.col-lead-lastactive {
+  min-width: 120px;
+}
 .progress {
   background-color: #ebedf0;
   -webkit-box-shadow: none;
