@@ -242,11 +242,6 @@ class Form extends FormEntity implements TranslationEntityInterface, VariantEnti
         $builder->addNullableField('formType', 'string', 'form_type');
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
-
-        $builder->createField('noIndex', 'boolean')
-            ->columnName('no_index')
-            ->nullable()
-            ->build();
     }
 
     /**
