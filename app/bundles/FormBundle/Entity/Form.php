@@ -128,10 +128,6 @@ class Form extends FormEntity implements TranslationEntityInterface, VariantEnti
      * @var int
      */
     public $submissionCount;
-    /**
-     * @var bool
-     */
-    private $noIndex;
 
     /**
      * @var string
