@@ -444,26 +444,6 @@ class Form extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set noIndex.
-     *
-     * @param bool $noIndex
-     */
-    public function setNoIndex($noIndex)
-    {
-        $this->isChanged('noIndex', $noIndex);
-        $this->noIndex = $noIndex;
-    }
-
-    /**
-     * Get noIndex.
-     *
-     * @return bool
-     */
-    public function getNoIndex()
-    {
-        return $this->noIndex;
-    }
-    /**
      * Set cachedHtml.
      *
      * @param string $cachedHtml
