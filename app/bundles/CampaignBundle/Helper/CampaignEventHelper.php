@@ -48,6 +48,8 @@ class CampaignEventHelper
     }
 
     /**
+     * @deprecated to be removed in 3.0
+     *
      * @param MauticFactory $factory
      * @param               $lead
      * @param               $event

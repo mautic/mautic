@@ -172,6 +172,19 @@ class SearchSubscriber extends CommonSubscriber
             case $this->translator->trans('mautic.lead.lead.searchcommand.email_pending', [], null, 'en_US'):
                     $this->buildEmailPendingQuery($event);
                 break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.page_source'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.page_source', [], null, 'en_US'):
+            $this->buildPageHitSourceQuery($event);
+                break;
+
+            case $this->translator->trans('mautic.lead.lead.searchcommand.page_source_id'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.page_source_id', [], null, 'en_US'):
+            $this->buildPageHitSourceIdQuery($event);
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.page_id'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.page_id', [], null, 'en_US'):
+                $this->buildPageHitIdQuery($event);
+                break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.sms_sent'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.sms_sent', [], null, 'en_US'):
                     $this->buildSmsSentQuery($event);
@@ -231,6 +244,68 @@ class SearchSubscriber extends CommonSubscriber
             ],
         ];
 
+        $this->buildJoinQuery($event, $tables, $config);
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     */
+    private function buildPageHitSourceQuery(LeadBuildSearchEvent $event)
+    {
+        $tables = [
+            [
+                'from_alias' => 'l',
+                'table'      => 'page_hits',
+                'alias'      => 'ph',
+                'condition'  => 'l.id = ph.lead_id',
+            ],
+        ];
+
+        $config = [
+            'column' => 'ph.source',
+        ];
+
+        $this->buildJoinQuery($event, $tables, $config);
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     */
+    private function buildPageHitSourceIdQuery(LeadBuildSearchEvent $event)
+    {
+        $tables = [
+            [
+                'from_alias' => 'l',
+                'table'      => 'page_hits',
+                'alias'      => 'ph',
+                'condition'  => 'l.id = ph.lead_id',
+            ],
+        ];
+
+        $config = [
+            'column' => 'ph.source_id',
+        ];
+
+        $this->buildJoinQuery($event, $tables, $config);
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     */
+    private function buildPageHitIdQuery(LeadBuildSearchEvent $event)
+    {
+        $tables = [
+            [
+                'from_alias' => 'l',
+                'table'      => 'page_hits',
+                'alias'      => 'ph',
+                'condition'  => 'l.id = ph.lead_id',
+            ],
+        ];
+
+        $config = [
+            'column' => 'ph.redirect_id',
+        ];
         $this->buildJoinQuery($event, $tables, $config);
     }
 

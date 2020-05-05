@@ -119,4 +119,12 @@ final class PageEvents
      * @var string
      */
     const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.page.on_campaign_trigger_action';
+
+    /**
+     * The mautic.page.on_redirect_generate event is fired when generating a redirect.
+     *
+     * The event listener receives a
+     * Mautic\PageBundle\Event\RedirectGenerationEvent
+     */
+    const ON_REDIRECT_GENERATE = 'mautic.page.on_redirect_generate';
 }

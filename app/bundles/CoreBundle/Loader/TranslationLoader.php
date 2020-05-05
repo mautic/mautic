@@ -104,7 +104,8 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
     private function loadTranslations($catalogue, $locale, $file)
     {
         $iniFile  = $file->getRealpath();
-        $messages = parse_ini_file($iniFile, true);
+        $content  = file_get_contents($iniFile);
+        $messages = parse_ini_string($content, true);
         if (false === $messages) {
             // The translation file is corrupt
             if ('dev' === MAUTIC_ENV) {

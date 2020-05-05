@@ -45,6 +45,8 @@ class ReportDataAdapterTest extends \PHPUnit_Framework_TestCase
             'limit'           => 11,
             'ignoreGraphData' => true,
             'page'            => 1,
+            'dateTo'          => null,
+            'dateFrom'        => null,
         ];
 
         $reportModelMock->expects($this->once())

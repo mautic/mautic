@@ -102,7 +102,7 @@ foreach ($responsiveViewports as $viewport):
         <?php if (empty($fixedLimit)): ?>
             <div class="pull-right">
                 <?php $class = (!empty($paginationClass)) ? " input-{$paginationClass}" : ''; ?>
-                <select autocomplete="false" class="form-control not-chosen pagination-limit<?php echo $class; ?>" onchange="Mautic.limitTableData('<?php echo $sessionVar; ?>',this.value,'<?php echo $tmpl; ?>','<?php echo $target; ?>'<?php if (!empty($baseUrl)): ?>, '<?php echo $baseUrl; ?>'<?php endif; ?>);">
+                <select autocomplete="false" class="form-control not-chosen pagination-limit<?php echo $class; ?>" onchange="Mautic.limitTableData('<?php echo $sessionVar; ?>',this.value,'<?php echo $tmpl; ?>','<?php echo $target; ?>'<?php if (!empty($baseUrl)): ?>, '<?php echo $baseUrl.$queryString; ?>'<?php endif; ?>);">
                     <?php foreach ($limitOptions as $value => $label): ?>
                         <?php $selected = ($limit === $value) ? ' selected="selected"' : ''; ?>
                         <option<?php echo $selected; ?> value="<?php echo $view->escape($value); ?>">

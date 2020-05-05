@@ -57,7 +57,7 @@ class CompanyLeadRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
-        $q->select('cl.company_id, cl.date_added as date_associated, cl.is_primary, comp.companyname, comp.companyemail, comp.companyphone, comp.companycity, comp.companycountry, comp.companywebsite, comp.score, comp.date_added')
+        $q->select('cl.company_id, cl.date_added as date_associated, cl.is_primary, comp.*')
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
             ->join('cl', MAUTIC_TABLE_PREFIX.'companies', 'comp', 'comp.id = cl.company_id')
         ->where('cl.lead_id = :leadId')
@@ -68,7 +68,7 @@ class CompanyLeadRepository extends CommonRepository
         )->setParameter('false', false, 'boolean');
 
         if ($companyId) {
-            $q->where(
+            $q->andWhere(
                 $q->expr()->eq('cl.company_id', ':companyId')
             )->setParameter('companyId', $companyId);
         }

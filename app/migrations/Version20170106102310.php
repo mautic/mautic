@@ -14,6 +14,7 @@ use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Helper\Serializer;
 
 /**
  * Auto-generated Migration: Please modify to your needs!
@@ -131,11 +132,11 @@ SQL;
             foreach ($results as $row) {
                 $channelId  = null;
                 $eventType  = $row['type'];
-                $properties = unserialize($row['properties']);
+                $properties = Serializer::decode($row['properties']);
                 $field      = !empty($eventsWithChannels[$eventType]['channelIdField']) ? $eventsWithChannels[$eventType]['channelIdField'] : null;
                 if ($field && isset($properties[$field])) {
                     if (is_array($properties[$field])) {
-                        if (count($properties[$field]) === 1) {
+                        if (1 === count($properties[$field])) {
                             $channelId = $properties[$field][0];
                         }
                     } elseif (!empty($properties[$field])) {

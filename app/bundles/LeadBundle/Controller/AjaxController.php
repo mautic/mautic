@@ -20,7 +20,9 @@ use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -101,35 +103,55 @@ class AjaxController extends CommonAjaxController
      */
     protected function fieldListAction(Request $request)
     {
-        $dataArray = ['success' => 0];
-        $filter    = InputHelper::clean($request->query->get('filter'));
-        $leadField = InputHelper::alphanum($request->query->get('field'), false, false, ['_']);
-        if (!empty($leadField)) {
-            if (strpos($leadField, 'company') === 0) {
-                $results = $this->getModel('lead.company')->getLookupResults('companyfield', [$leadField, $filter]);
-                foreach ($results as $r) {
-                    $dataArray[] = ['value' => $r['label']];
-                }
-            } else {
-                if ($leadField == 'owner_id') {
-                    $results = $this->getModel('lead.lead')->getLookupResults('user', $filter);
-                    foreach ($results as $r) {
-                        $name        = $r['firstName'].' '.$r['lastName'];
-                        $dataArray[] = [
-                            'value' => $name,
-                            'id'    => $r['id'],
-                        ];
-                    }
-                } elseif (in_array($leadField, ['hit_url', 'referer', 'url_title', 'source', 'source_id'])) {
-                    $dataArray[] = [
-                        'value' => '',
-                    ];
-                } else {
-                    $results = $this->getModel('lead.field')->getLookupResults($leadField, $filter);
-                    foreach ($results as $r) {
-                        $dataArray[] = ['value' => $r[$leadField]];
-                    }
-                }
+        $dataArray  = ['success' => 1];
+        $filter     = InputHelper::clean($request->query->get('filter'));
+        $fieldAlias = InputHelper::alphanum($request->query->get('field'), false, false, ['_']);
+        $fieldModel = $this->getModel('lead.field');
+
+        if (empty($fieldAlias)) {
+            $dataArray['error']   = 'Alias cannot be empty';
+            $dataArray['success'] = 0;
+
+            return $this->sendJsonResponse($dataArray);
+        }
+
+        if ('owner_id' === $fieldAlias) {
+            $results = $this->getModel('lead.lead')->getLookupResults('user', $filter);
+            foreach ($results as $r) {
+                $name        = $r['firstName'].' '.$r['lastName'];
+                $dataArray[] = [
+                    'value' => $name,
+                    'id'    => $r['id'],
+                ];
+            }
+
+            return $this->sendJsonResponse($dataArray);
+        }
+
+        $field      = $fieldModel->getEntityByAlias($fieldAlias);
+        $isBehavior = empty($field);
+
+        if ($isBehavior) {
+            return $this->sendJsonResponse($dataArray);
+        }
+
+        // Selet field types that make sense to provide typeahead for.
+        $isLookup     = in_array($field->getType(), ['lookup']);
+        $shouldLookup = in_array($field->getAlias(), ['city', 'company', 'title']);
+
+        if (!$isLookup && !$shouldLookup) {
+            return $this->sendJsonResponse($dataArray);
+        }
+
+        if ('company' === $field->getObject()) {
+            $results = $this->getModel('lead.company')->getLookupResults('companyfield', [$fieldAlias, $filter]);
+            foreach ($results as $r) {
+                $dataArray[] = ['value' => $r['label']];
+            }
+        } elseif ('lead' === $field->getObject()) {
+            $results = $fieldModel->getLookupResults($fieldAlias, $filter);
+            foreach ($results as $r) {
+                $dataArray[] = ['value' => $r[$fieldAlias]];
             }
         }
 
@@ -864,5 +886,25 @@ class AjaxController extends CommonAjaxController
         $dataArray = array_merge($dataArray, $primaryCompany);
 
         return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @param Request $request
+     */
+    protected function getCampaignShareStatsAction(Request $request)
+    {
+        $ids      = $request->get('ids');
+        $entityid = $request->get('entityId');
+        /** @var SegmentCampaignShare $segmentCampaignShareService */
+        $segmentCampaignShareService = $this->get('mautic.lead.segment.stat.campaign.share');
+
+        $data = $segmentCampaignShareService->getCampaignsSegmentShare($entityid, $ids);
+
+        $data = [
+            'success' => 1,
+            'stats'   => $data,
+        ];
+
+        return new JsonResponse($data);
     }
 }

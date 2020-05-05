@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Entity;
 
+use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -44,6 +45,136 @@ class StatRepository extends CommonRepository
         $result = $q->getQuery()->getResult();
 
         return (!empty($result)) ? $result[0] : null;
+    }
+
+    /**
+     * @param int $contactId
+     * @param int $emailId
+     *
+     * @return array
+     */
+    public function getUniqueClickedLinksPerContactAndEmail($contactId, $emailId)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('distinct ph.url, ph.date_hit')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
+            ->where('ph.email_id = :emailId')
+            ->andWhere('ph.lead_id = :leadId')
+            ->setParameter('leadId', $contactId)
+            ->setParameter('emailId', $emailId);
+
+        $result = $q->execute()->fetchAll();
+
+        if ($result) {
+            foreach ($result as $row) {
+                $data[$row['date_hit']] = $row['url'];
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param int       $limit
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param int|null  $createdByUserId
+     * @param int|null  $companyId
+     * @param int|null  $campaignId
+     * @param int|null  $segmentId
+     *
+     * @return array
+     */
+    public function getSentEmailToContactData(
+        $limit,
+        \DateTime $dateFrom,
+        \DateTime $dateTo,
+        $createdByUserId = null,
+        $companyId = null,
+        $campaignId = null,
+        $segmentId = null
+    ) {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('s.id, s.lead_id, s.email_address, s.is_read, s.email_id, s.date_sent, s.date_read')
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'emails', 'e', 's.email_id = e.id')
+            ->addSelect('e.name AS email_name')
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'page_hits', 'ph', 'ph.source = "email" and ph.source_id = s.email_id and ph.lead_id = s.lead_id')
+            ->addSelect('COUNT(ph.id) AS link_hits');
+
+        if ($createdByUserId !== null) {
+            $q->andWhere('e.created_by = :userId')
+                ->setParameter('userId', $createdByUserId);
+        }
+
+        $q->andWhere('s.date_sent BETWEEN :dateFrom AND :dateTo')
+            ->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'))
+            ->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
+
+        $companyJoinOnExpr = $q->expr()->andX(
+            $q->expr()->eq('s.lead_id', 'cl.lead_id')
+        );
+        if (null === $companyId) {
+            // Must force a one to one relationship
+            $companyJoinOnExpr->add(
+                $q->expr()->eq('cl.is_primary', 1)
+            );
+        }
+
+        $q->leftJoin('s', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', $companyJoinOnExpr)
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'companies', 'c', 'cl.company_id = c.id')
+            ->addSelect('c.id AS company_id')
+            ->addSelect('c.companyname AS company_name');
+
+        if ($companyId !== null) {
+            $q->andWhere('cl.company_id = :companyId')
+                ->setParameter('companyId', $companyId);
+        }
+
+        $q->leftJoin('s', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 's.source = "campaign.event" and s.source_id = ce.id')
+            ->leftJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'campaign', 'ce.campaign_id = campaign.id')
+            ->addSelect('campaign.id AS campaign_id')
+            ->addSelect('campaign.name AS campaign_name');
+
+        if ($campaignId !== null) {
+            $q->andWhere('ce.campaign_id = :campaignId')
+                ->setParameter('campaignId', $campaignId);
+        }
+
+        $q->leftJoin('s', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 's.list_id = ll.id')
+            ->addSelect('ll.id AS segment_id')
+            ->addSelect('ll.name AS segment_name');
+
+        if ($segmentId !== null) {
+            $sb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $sb->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
+                ->where(
+                    $sb->expr()->andX(
+                        $sb->expr()->eq('lll.leadlist_id', ':segmentId'),
+                        $sb->expr()->eq('lll.lead_id', 'ph.lead_id'),
+                        $sb->expr()->eq('lll.manually_removed', 0)
+                    )
+                );
+
+            // Filter for both broadcasts and campaign related segments
+            $q->andWhere(
+                $q->expr()->orX(
+                    $q->expr()->eq('s.list_id', ':segmentId'),
+                    $q->expr()->andX(
+                        $q->expr()->isNull('s.list_id'),
+                        sprintf('EXISTS (%s)', $sb->getSQL())
+                    )
+                )
+            )
+                ->setParameter('segmentId', $segmentId);
+        }
+
+        $q->setMaxResults($limit);
+        $q->groupBy('s.id');
+        $q->orderBy('s.id', 'DESC');
+
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -340,23 +471,13 @@ class StatRepository extends CommonRepository
                 $query->andWhere(
                     $query->expr()->eq('s.is_read', 1)
                 );
-            } elseif ('sent' == $state) {
-                // Get only those that have not been read yet
-                $query->andWhere(
-                    $query->expr()->eq('s.is_read', 0)
-                );
-                $query->andWhere(
-                    $query->expr()->eq('s.is_failed', 0)
-                );
             } elseif ('failed' == $state) {
                 $query->andWhere(
                     $query->expr()->eq('s.is_failed', 1)
                 );
-                $state = 'sent';
             }
-        } else {
-            $state = 'sent';
         }
+        $state = 'sent';
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
@@ -550,14 +671,43 @@ class StatRepository extends CommonRepository
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
         $query->select('id, lead_id')
-        ->where('s.email_id = :email')
-        ->andWhere('s.lead_id in (:contacts)')
+            ->where('s.email_id = :email')
+            ->andWhere('s.lead_id in (:contacts)')
             ->andWhere('is_failed = 0')
-        ->setParameter(':email', $emailId)
-        ->setParameter(':contacts', $contacts);
+            ->setParameter(':email', $emailId)
+            ->setParameter(':contacts', $contacts);
 
         $results = $query->execute()->fetch();
 
         return $results;
+    }
+
+    /**
+     * @param array $contacts
+     * @param       $emailId
+     * @param bool  $organizeByContact
+     *
+     * @return array Formatted as [contactId => sentCount]
+     */
+    public function getSentCountForContacts(array $contacts, $emailId)
+    {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
+        $query->select('count(s.id) as sent_count, s.lead_id')
+            ->where('s.email_id = :email')
+            ->andWhere('s.lead_id in (:contacts)')
+            ->andWhere('s.is_failed = 0')
+            ->setParameter(':email', $emailId)
+            ->setParameter(':contacts', $contacts, Connection::PARAM_INT_ARRAY)
+            ->groupBy('s.lead_id');
+
+        $results = $query->execute()->fetchAll();
+
+        $contacts = [];
+        foreach ($results as $result) {
+            $contacts[$result['lead_id']] = $result['sent_count'];
+        }
+
+        return $contacts;
     }
 }

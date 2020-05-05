@@ -114,6 +114,9 @@ trait CustomFieldRepositoryTrait
                 //since we have to be cross-platform; it's way ugly
 
                 //We should probably totally ditch orm for leads
+
+                // This "hack" is in place to allow for custom ordering in the API.
+                // See https://github.com/mautic/mautic/pull/7494#issuecomment-600970208
                 $order = '(CASE';
                 foreach ($ids as $count => $id) {
                     $order .= ' WHEN '.$this->getTableAlias().'.id = '.$id.' THEN '.$count;
@@ -122,6 +125,7 @@ trait CustomFieldRepositoryTrait
                 $order .= ' ELSE '.$count.' END) AS HIDDEN ORD';
 
                 //ORM - generates lead entities
+                /** @var \Doctrine\ORM\QueryBuilder $q */
                 $q = $this->getEntitiesOrmQueryBuilder($order);
                 $this->buildSelectClause($dq, $args);
 
@@ -133,9 +137,11 @@ trait CustomFieldRepositoryTrait
                 $q->orderBy('ORD', 'ASC');
 
                 $results = $q->getQuery()
+                    ->useQueryCache(false) // the query contains ID's, so there is no use in caching it
                     ->getResult();
 
                 //assign fields
+                /** @var Lead $r */
                 foreach ($results as $r) {
                     $id = $r->getId();
                     $r->setFields($fieldValues[$id]);
@@ -263,8 +269,9 @@ trait CustomFieldRepositoryTrait
             $fields = array_diff_key($fields, $changes);
         }
 
+        $this->prepareDbalFieldsForSave($fields);
+
         if (!empty($fields)) {
-            $this->prepareDbalFieldsForSave($fields);
             $this->getEntityManager()->getConnection()->update($table, $fields, ['id' => $entity->getId()]);
         }
 
@@ -321,12 +328,16 @@ trait CustomFieldRepositoryTrait
                             break;
                     }
                 }
+
+                $alias = $fields[$k]['alias'];
+
                 if ($byGroup) {
-                    $fieldValues[$fields[$k]['group']][$fields[$k]['alias']]          = $fields[$k];
-                    $fieldValues[$fields[$k]['group']][$fields[$k]['alias']]['value'] = $r;
+                    $group                                = $fields[$k]['group'];
+                    $fieldValues[$group][$alias]          = $fields[$k];
+                    $fieldValues[$group][$alias]['value'] = $r;
                 } else {
-                    $fieldValues[$fields[$k]['alias']]          = $fields[$k];
-                    $fieldValues[$fields[$k]['alias']]['value'] = $r;
+                    $fieldValues[$alias]          = $fields[$k];
+                    $fieldValues[$alias]['value'] = $r;
                 }
 
                 unset($fields[$k]);
@@ -356,7 +367,7 @@ trait CustomFieldRepositoryTrait
         if (empty($this->customFieldList)) {
             //Get the list of custom fields
             $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-            $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed')
+            $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties, f.default_value')
                 ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
                 ->where('f.is_published = :published')
                 ->andWhere($fq->expr()->eq('object', ':object'))

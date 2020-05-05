@@ -25,9 +25,6 @@ class UntrackableUrlsEvent extends Event
         '{webview_url}',
         '{unsubscribe_url}',
         '{trackable=(.*?)}',
-        // Ignore lead fields with URLs for tracking since each is unique
-        '^{leadfield=(.*?)}',
-        '^{contactfield=(.*?)}',
     ];
 
     /**

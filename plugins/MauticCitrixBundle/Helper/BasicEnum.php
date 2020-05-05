@@ -19,7 +19,7 @@ abstract class BasicEnum
 
     private static function getConstants()
     {
-        if (self::$constCacheArray === null) {
+        if (null === self::$constCacheArray) {
             self::$constCacheArray = [];
         }
         $calledClass = get_called_class();

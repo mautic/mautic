@@ -67,6 +67,13 @@ if (!isset($args['repackage'])) {
         exit;
     }
 
+    echo "Patching Doctrine ORM UnitOfWork.php for Mautic 2.x branch...\n";
+    // Fix for https://github.com/mautic/mautic/issues/7843 where Composer patch isn't applied in build stage because of --no-scripts
+    system('cp patches/UnitOfWork.php packaging/vendor/doctrine/orm/lib/Doctrine/ORM/UnitOfWork.php', $result);
+    if ($result !== 0) {
+        exit;
+    }
+
     // Generate the bootstrap.php.cache file
     system(__DIR__.'/packaging/vendor/sensio/distribution-bundle/Resources/bin/build_bootstrap.php', $result);
     if ($result !== 0) {
@@ -164,3 +171,4 @@ echo "Packaging Mautic Update Package\n";
 system('zip -r ../packages/'.$appVersion.'-update.zip -x@../excludefiles.txt -@ < modified_files.txt > /dev/null');
 
 system('openssl sha1 ../packages/'.$appVersion.'.zip');
+system('openssl sha1 ../packages/'.$appVersion.'-update.zip');

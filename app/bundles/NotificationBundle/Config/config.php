@@ -21,6 +21,9 @@ return [
                     'mautic.notification.api',
                 ],
             ],
+            'mautic.notification.campaignbundle.condition_subscriber' => [
+                'class'     => 'Mautic\NotificationBundle\EventListener\CampaignConditionSubscriber',
+            ],
             'mautic.notification.pagebundle.subscriber' => [
                 'class'     => 'Mautic\NotificationBundle\EventListener\PageSubscriber',
                 'arguments' => [

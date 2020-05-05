@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\DynamicContentTrait;
+use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -72,7 +73,7 @@ class EmailType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html', 'headers' => 'clean']));
         $builder->addEventSubscriber(new FormExitSubscriber('email.email', $options));
 
         $builder->add(
@@ -169,6 +170,21 @@ class EmailType extends AbstractType
                     'tooltip' => 'mautic.email.utm_tags.tooltip',
                 ],
                 'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'headers',
+            SortableListType::class,
+            [
+                'required'        => false,
+                'label'           => 'mautic.email.custom_headers',
+                'attr'            => [
+                    'tooltip' => 'mautic.email.custom_headers.tooltip',
+                ],
+                'option_required' => false,
+                'with_labels'     => true,
+                'key_value_pairs' => true, // do not store under a `list` key and use label as the key
             ]
         );
 

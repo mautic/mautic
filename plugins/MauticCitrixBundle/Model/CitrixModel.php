@@ -96,8 +96,6 @@ class CitrixModel extends FormModel
 
         $this->em->persist($citrixEvent);
         $this->em->flush();
-
-        $this->triggerCampaignEvents($product, $lead);
     }
 
     /**
@@ -408,8 +406,6 @@ class CitrixModel extends FormModel
                     $this->dispatcher->dispatch(CitrixEvents::ON_CITRIX_EVENT_UPDATE, $citrixEvent);
                     unset($citrixEvent);
                 }
-
-                $this->triggerCampaignEvents($product, $entity->getLead());
             }
         }
 
@@ -417,23 +413,6 @@ class CitrixModel extends FormModel
         $this->em->clear(CitrixEvent::class);
 
         return $count;
-    }
-
-    /**
-     * @param string $product
-     * @param string $lead
-     *
-     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
-     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     */
-    private function triggerCampaignEvents($product, $lead)
-    {
-        if (!CitrixProducts::isValidValue($product)) {
-            return; // is not a valid citrix product
-        }
-
-        $this->leadModel->setSystemCurrentLead($lead);
-        $this->eventModel->triggerEvent('citrix.event.'.$product);
     }
 
     /**

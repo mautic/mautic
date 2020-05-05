@@ -419,11 +419,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         protected function log($logLevel, $message, $context = [], $debugTrace = null)
         {
-            if ('dev' !== self::$environment) {
-                // Don't clutter the logs
-                $context = [];
-            }
-
             $message = strip_tags($message);
             if ($this->logger) {
                 if (LogLevel::DEBUG === $logLevel) {
@@ -434,7 +429,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                     if ($this->debugLogger) {
                         if ($debugTrace) {
                             // Just a snippet
-                            $context['trace'] = array_slice($debugTrace, 1, 5);
+                            $context['trace'] = array_slice($debugTrace, 0, 50);
                         }
                         $this->debugLogger->log($logLevel, $message, $context);
                     }
@@ -594,6 +589,26 @@ namespace {
                     ErrorHandler::logDebugEntry($log, (empty($context)) ? [] : $context);
                 }
             }
+        }
+
+        // Call this at each point of interest, passing a descriptive string
+        function prof_flag($str)
+        {
+            global $prof_timing, $prof_names;
+            $prof_timing[] = microtime(true);
+            $prof_names[]  = $str;
+        }
+
+        // Call this when you're done and want to see the results
+        function prof_print()
+        {
+            global $prof_timing, $prof_names;
+            $size = count($prof_timing);
+            for ($i=0; $i < $size - 1; ++$i) {
+                echo "<b>{$prof_names[$i]}</b><br>";
+                echo sprintf('&nbsp;&nbsp;&nbsp;%f<br>', $prof_timing[$i + 1] - $prof_timing[$i]);
+            }
+            echo "<b>{$prof_names[$size - 1]}</b><br>";
         }
     }
 }

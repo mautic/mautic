@@ -37,12 +37,20 @@ if (!isset($style)) {
 if (!isset($isAjax)) {
     $isAjax = true;
 }
+
+if (!isset($submissions)) {
+    $submissions = null;
+}
+
+if (!isset($lead)) {
+    $lead = null;
+}
 ?>
 
 <?php echo $style; ?>
 
 <div id="mauticform_wrapper<?php echo $formName ?>" class="mauticform_wrapper">
-    <form autocomplete="false" role="form" method="post" action="<?php echo  $action; ?>" id="mauticform<?php echo $formName ?>" <?php if ($isAjax): ?> data-mautic-form="<?php echo ltrim($formName, '_') ?>"<?php endif; ?> enctype="multipart/form-data">
+    <form autocomplete="false" role="form" method="post" action="<?php echo  $action; ?>" id="mauticform<?php echo $formName ?>" <?php if ($isAjax): ?> data-mautic-form="<?php echo ltrim($formName, '_') ?>"<?php endif; ?> enctype="multipart/form-data" <?php echo $form->getFormAttributes(); ?>>
         <div class="mauticform-error" id="mauticform<?php echo $formName ?>_error"></div>
         <div class="mauticform-message" id="mauticform<?php echo $formName ?>_message"></div>
         <div class="mauticform-innerform">
@@ -56,7 +64,7 @@ if (!isset($isAjax)) {
                     echo "\n          <div class=\"mauticform-page-wrapper mauticform-page-$pageCount\" data-mautic-form-page=\"$pageCount\"$lastFieldAttribute>\n";
                 endif;
 
-                if (!isset($submissions) || $f->showForContact($submissions, $lead, $form)):
+                if ($f->showForContact($submissions, $lead, $form)):
                     if ($f->isCustom()):
                         if (!isset($fieldSettings[$f->getType()])):
                             continue;

@@ -12,18 +12,42 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class TokenSubscriber.
  */
-class TokenSubscriber extends CommonSubscriber
+class TokenSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
+     * @var PrimaryCompanyHelper
+     */
+    private $primaryCompanyHelper;
+
+    /**
+     * TokenSubscriber constructor.
+     *
+     * @param EventDispatcherInterface $dispatcher
+     * @param PrimaryCompanyHelper     $primaryCompanyHelper
+     */
+    public function __construct(EventDispatcherInterface $dispatcher, PrimaryCompanyHelper $primaryCompanyHelper)
+    {
+        $this->dispatcher           = $dispatcher;
+        $this->primaryCompanyHelper = $primaryCompanyHelper;
+    }
 
     /**
      * {@inheritdoc}
@@ -42,6 +66,11 @@ class TokenSubscriber extends CommonSubscriber
      */
     public function decodeTokens(EmailSendEvent $event)
     {
+        if ($event->isDynamicContentParsing()) {
+            // prevent a loop
+            return;
+        }
+
         // Find and replace encoded tokens for trackable URL conversion
         $content = $event->getContent();
         $content = preg_replace('/(%7B)(.*?)(%7D)/i', '{$2}', $content, -1, $count);
@@ -57,11 +86,15 @@ class TokenSubscriber extends CommonSubscriber
             $lead       = $event->getLead();
             $tokens     = $event->getTokens();
             $tokenEvent = new TokenReplacementEvent(
-                null, $lead, [
+                null,
+                $lead,
+                [
                     'tokens'         => $tokens,
                     'lead'           => null,
                     'dynamicContent' => $dynamicContentAsArray,
-                ]
+                    'idHash'         => $event->getIdHash(),
+                ],
+                $email
             );
             $this->dispatcher->dispatch(EmailEvents::TOKEN_REPLACEMENT, $tokenEvent);
             $event->addTokens($tokenEvent->getTokens());
@@ -84,7 +117,9 @@ class TokenSubscriber extends CommonSubscriber
         $tokenData = $clickthrough['dynamicContent'];
 
         if ($lead instanceof Lead) {
-            $lead = $lead->getProfileFields();
+            $lead = $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead);
+        } else {
+            $lead = $this->primaryCompanyHelper->mergePrimaryCompanyWithProfileFields($lead['id'], $lead);
         }
 
         foreach ($tokenData as $data) {
@@ -102,12 +137,14 @@ class TokenSubscriber extends CommonSubscriber
                 null,
                 [
                     'content' => $filterContent,
-                    'email'   => null,
-                    'idHash'  => null,
+                    'email'   => $event->getPassthrough(),
+                    'idHash'  => !empty($clickthrough['idHash']) ? $clickthrough['idHash'] : null,
                     'tokens'  => $tokens,
                     'lead'    => $lead,
-                ]
+                ],
+                true
             );
+
             $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $emailSendEvent);
             $untokenizedContent = $emailSendEvent->getContent(true);
 

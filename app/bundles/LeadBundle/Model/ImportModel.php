@@ -518,7 +518,7 @@ class ImportModel extends FormModel
             return true;
         }
 
-        return false;
+        return !array_filter($row);
     }
 
     /**

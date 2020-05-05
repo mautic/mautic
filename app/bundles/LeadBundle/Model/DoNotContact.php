@@ -45,16 +45,22 @@ class DoNotContact
      * @param int       $contactId
      * @param string    $channel
      * @param bool|true $persist
+     * @param int|null  $reason
      *
      * @return bool
      */
-    public function removeDncForContact($contactId, $channel, $persist = true)
+    public function removeDncForContact($contactId, $channel, $persist = true, $reason = null)
     {
         $contact = $this->leadModel->getEntity($contactId);
 
         /** @var DNC $dnc */
         foreach ($contact->getDoNotContact() as $dnc) {
             if ($dnc->getChannel() === $channel) {
+                // Skip if reason doesn't match
+                // Some integrations (Sugar CRM) can use both reasons (unsubscribed, bounced)
+                if ($reason && $dnc->getReason() != $reason) {
+                    continue;
+                }
                 $contact->removeDoNotContactEntry($dnc);
 
                 if ($persist) {
@@ -94,7 +100,12 @@ class DoNotContact
         $dnc     = false;
         $contact = $this->leadModel->getEntity($contactId);
 
-        // if !$checkCurrentStatus, assume is contactable due to already being valided
+        if ($contact === null) {
+            // Contact not found, nothing to do
+            return false;
+        }
+
+        // if !$checkCurrentStatus, assume is contactable due to already being validated
         $isContactable = ($checkCurrentStatus) ? $this->isContactable($contact, $channel) : DNC::IS_CONTACTABLE;
 
         // If they don't have a DNC entry yet
@@ -218,5 +229,13 @@ class DoNotContact
     public function clearEntities()
     {
         $this->dncRepo->clear();
+    }
+
+    /**
+     * @return DoNotContactRepository
+     */
+    public function getDncRepo()
+    {
+        return $this->dncRepo;
     }
 }

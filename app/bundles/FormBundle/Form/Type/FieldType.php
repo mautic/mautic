@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -24,6 +25,21 @@ use Symfony\Component\Validator\Constraints as Assert;
 class FieldType extends AbstractType
 {
     use FormFieldTrait;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * FieldType constructor.
+     *
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
 
     /**
      * {@inheritdoc}
@@ -127,7 +143,7 @@ class FieldType extends AbstractType
                     $cleanMasks['properties']['optionlist']['list']['label'] = 'strict_html';
                     break;
                 case 'file':
-                    $addShowLabel = $addDefaultValue = $addLeadFieldList = $addBehaviorFields = false;
+                    $addShowLabel = $addDefaultValue = $addBehaviorFields = false;
                     break;
             }
         }
@@ -223,7 +239,11 @@ class FieldType extends AbstractType
                 [
                     'label'      => 'mautic.form.field.form.validationmsg',
                     'label_attr' => ['class' => 'control-label'],
-                    'attr'       => ['class' => 'form-control'],
+                    'attr'       => [
+                        'class'        => 'form-control',
+                        'tooltip'      => $this->translator->trans('mautic.core.form.default').': '.$this->translator->trans('mautic.form.field.generic.required', [], 'validators'),
+                        'data-show-on' => '{"formfield_isRequired_1": "checked"}',
+                    ],
                     'required'   => false,
                 ]
             );
@@ -477,9 +497,9 @@ class FieldType extends AbstractType
                 case 'date':
                 case 'email':
                 case 'number':
-                case 'tel':
                 case 'text':
                 case 'url':
+                case 'tel':
                     $builder->add(
                         'properties',
                         'formfield_placeholder',
@@ -510,6 +530,9 @@ class FieldType extends AbstractType
                     );
                     break;
                 case 'file':
+                    if (!isset($propertiesData['public'])) {
+                        $propertiesData['public'] = false;
+                    }
                     $builder->add(
                         'properties',
                         FormFieldFileType::class,
@@ -518,6 +541,7 @@ class FieldType extends AbstractType
                             'data'  => $propertiesData,
                         ]
                     );
+                    break;
             }
         }
 

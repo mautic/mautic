@@ -34,7 +34,7 @@ foreach ($groups as $key => $group):
                             <div class="row">
                                 <?php if (isset($form['companyname'])): ?>
                                     <div class="col-sm-<?php echo $halfSize; ?>">
-                                        <?php echo $view['form']->row($form['companyname']); ?>
+                                        <?php echo $view['form']->row($view->escape($form['companyname'])); ?>
                                     </div>
                                 <?php endif; ?>
                                 <?php if (isset($form['companyemail'])): ?>

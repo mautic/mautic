@@ -50,9 +50,11 @@ class EncryptionHelper
             }
             $this->availableCiphers[] = $possibleCipher;
         }
-        if (count($this->availableCiphers) === 0) {
+
+        if (!$this->availableCiphers || count($this->availableCiphers) === 0) {
             throw new \RuntimeException('None of possible cryptography libraries is supported');
         }
+
         $this->key = $coreParametersHelper->getParameter('mautic.secret_key');
     }
 
@@ -102,7 +104,7 @@ class EncryptionHelper
                 return false;
             }
             try {
-                return unserialize($availableCipher->decrypt($encryptedMessage, $this->key, $initVector));
+                return Serializer::decode($availableCipher->decrypt($encryptedMessage, $this->key, $initVector));
             } catch (InvalidDecryptionException $ex) {
             }
             $mainTried = true;

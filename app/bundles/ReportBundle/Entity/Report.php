@@ -133,7 +133,7 @@ class Report extends FormEntity implements SchedulerInterface
 
         $builder->addIdColumns();
 
-        $builder->addField('system', Type::BOOLEAN);
+        $builder->addField('system', Type::BOOLEAN, ['columnName'=>'`system`']);
 
         $builder->addField('source', Type::STRING);
 
@@ -365,6 +365,51 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
+     * Get filter value from a specific filter.
+     *
+     * @param string $column
+     *
+     * @return mixed
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function getFilterValue($column)
+    {
+        foreach ($this->getFilters() as $field) {
+            if ($column === $field['column']) {
+                return $field['value'];
+            }
+        }
+
+        throw new \UnexpectedValueException("Column {$column} doesn't have any filter.");
+    }
+
+    /**
+     * Get filter values from a specific filter.
+     *
+     * @param string $column
+     *
+     * @return array
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function getFilterValues($column)
+    {
+        $values = [];
+        foreach ($this->getFilters() as $field) {
+            if ($column === $field['column']) {
+                $values[] = $field['value'];
+            }
+        }
+
+        if (empty($values)) {
+            throw new \UnexpectedValueException("Column {$column} doesn't have any filter.");
+        }
+
+        return $values;
+    }
+
+    /**
      * @return mixed
      */
     public function getDescription()
@@ -440,6 +485,42 @@ class Report extends FormEntity implements SchedulerInterface
     public function getAggregators()
     {
         return $this->aggregators;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAggregatorColumns()
+    {
+        return array_map(function ($aggregator) {
+            return $aggregator['column'];
+        }, $this->getAggregators());
+    }
+
+    /**
+     * @return array
+     */
+    public function getOrderColumns()
+    {
+        return array_map(function ($order) {
+            return $order['column'];
+        }, $this->getTableOrder());
+    }
+
+    /**
+     * @return array
+     */
+    public function getSelectAndAggregatorAndOrderAndGroupByColumns()
+    {
+        return array_merge($this->getSelectAndAggregatorColumns(), $this->getOrderColumns(), $this->getGroupBy());
+    }
+
+    /**
+     * @return array
+     */
+    public function getSelectAndAggregatorColumns()
+    {
+        return array_merge($this->getColumns(), $this->getAggregatorColumns());
     }
 
     /**

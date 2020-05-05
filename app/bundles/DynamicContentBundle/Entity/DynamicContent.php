@@ -12,6 +12,7 @@
 namespace Mautic\DynamicContentBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -70,6 +71,11 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     private $content;
 
     /**
+     * @var array
+     */
+    private $utmTags = [];
+
+    /**
      * @var int
      */
     private $sentCount = 0;
@@ -94,8 +100,9 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      */
     public function __construct()
     {
-        $this->stats           = new ArrayCollection();
-        $this->variantChildren = new ArrayCollection();
+        $this->stats               = new ArrayCollection();
+        $this->translationChildren = new ArrayCollection();
+        $this->variantChildren     = new ArrayCollection();
     }
 
     /**
@@ -103,10 +110,11 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      */
     public function __clone()
     {
-        $this->id              = null;
-        $this->sentCount       = 0;
-        $this->stats           = new ArrayCollection();
-        $this->variantChildren = new ArrayCollection();
+        $this->id                  = null;
+        $this->sentCount           = 0;
+        $this->stats               = new ArrayCollection();
+        $this->translationChildren = new ArrayCollection();
+        $this->variantChildren     = new ArrayCollection();
 
         parent::__clone();
     }
@@ -145,6 +153,11 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
         $builder->createField('content', 'text')
             ->columnName('content')
+            ->nullable()
+            ->build();
+
+        $builder->createField('utmTags', Type::JSON_ARRAY)
+            ->columnName('utm_tags')
             ->nullable()
             ->build();
 
@@ -243,6 +256,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                 'variantParent',
                 'variantChildren',
                 'content',
+                'utmTags',
                 'filters',
                 'isCampaignBased',
                 'slotName',
@@ -485,5 +499,26 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         if ($this->getIsCampaignBased()) {
             $this->setSlotName('');
         }
+    }
+
+    /**
+     * @param array $utmTags
+     *
+     * @return DynamicContent
+     */
+    public function setUtmTags(array $utmTags)
+    {
+        $this->isChanged('utmTags', $utmTags);
+        $this->utmTags = $utmTags;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUtmTags()
+    {
+        return $this->utmTags;
     }
 }

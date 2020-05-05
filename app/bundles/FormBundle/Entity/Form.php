@@ -19,10 +19,10 @@ use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
-use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Mautic\CoreBundle\Entity\FormEntity;
 
 /**
  * Class Form.
@@ -128,15 +128,16 @@ class Form extends FormEntity implements TranslationEntityInterface, VariantEnti
      * @var int
      */
     public $submissionCount;
-    /**
-     * @var bool
-     */
-    private $noIndex;
 
     /**
      * @var string
      */
     private $formType;
+
+    /**
+     * @var bool
+     */
+    private $noIndex;
 
     /**
      * This var is used to cache the result once gained from the loop.
@@ -177,6 +178,8 @@ class Form extends FormEntity implements TranslationEntityInterface, VariantEnti
         $builder->addField('title', 'string');
 
         $builder->addField('alias', 'string');
+
+        $builder->addNullableField('formAttributes', 'string', 'form_attr');
 
         $builder->addCategory();
 
@@ -223,11 +226,6 @@ class Form extends FormEntity implements TranslationEntityInterface, VariantEnti
 
         $builder->createField('renderStyle', 'boolean')
             ->columnName('render_style')
-            ->nullable()
-            ->build();
-
-        $builder->createField('noIndex', 'boolean')
-            ->columnName('no_index')
             ->nullable()
             ->build();
 
@@ -323,6 +321,8 @@ class Form extends FormEntity implements TranslationEntityInterface, VariantEnti
                     'formType',
                     'postAction',
                     'postActionProperty',
+                    'noIndex',
+                    'formAttributes',
                 ]
             )
             ->build();
@@ -367,17 +367,7 @@ class Form extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this;
     }
 
-    /**
-     * Get form attributes.
-     *
-     * @return string
-     */
-    public function getFormAttributes()
-    {
-        return $this->formAttributes;
-    }
-
-    /**
+     /**
      * Get title.
      *
      * @return string
@@ -443,26 +433,6 @@ class Form extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->description;
     }
 
-    /**
-     * Set noIndex.
-     *
-     * @param bool $noIndex
-     */
-    public function setNoIndex($noIndex)
-    {
-        $this->isChanged('noIndex', $noIndex);
-        $this->noIndex = $noIndex;
-    }
-
-    /**
-     * Get noIndex.
-     *
-     * @return bool
-     */
-    public function getNoIndex()
-    {
-        return $this->noIndex;
-    }
     /**
      * Set cachedHtml.
      *
@@ -853,6 +823,48 @@ class Form extends FormEntity implements TranslationEntityInterface, VariantEnti
         $this->formType = $formType;
 
         return $this;
+    }
+
+    /**
+     * Set noIndex.
+     *
+     * @param bool $noIndex
+     */
+    public function setNoIndex($noIndex)
+    {
+        $this->isChanged('noIndex', $noIndex);
+        $this->noIndex = $noIndex;
+    }
+
+    /**
+     * Get noIndex.
+     *
+     * @return bool
+     */
+    public function getNoIndex()
+    {
+        return $this->noIndex;
+    }
+
+    /**
+     * @param string $formAttributes
+     *
+     * @return Form
+     */
+    public function setFormAttributes($formAttributes)
+    {
+        $this->isChanged('formAttributes', $formAttributes);
+        $this->formAttributes = $formAttributes;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormAttributes()
+    {
+        return $this->formAttributes;
     }
 
     /**

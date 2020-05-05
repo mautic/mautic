@@ -92,6 +92,8 @@ $view['slots']->set(
                 </div>
                 <!--/ stats -->
 
+                <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
+
                 <!-- tabs controls -->
                 <ul class="nav nav-tabs pr-md pl-md">
                     <?php $active = 'active'; ?>
