@@ -58,29 +58,11 @@ if ('index' == $tmpl) {
                         'orderBy'    => 'comp.companywebsite',
                     ]
                 );
-                echo $view->render(
-                    'MauticCoreBundle:Helper:tableheader.html.php',
-                    [
-                        'sessionVar' => 'company',
-                        'text'       => 'mautic.company.score',
-                        'class'      => 'visible-md visible-lg col-company-score',
-                        'orderBy'    => 'comp.score',
-                    ]
-                );
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'company',
                         'text'       => 'mautic.lead.list.thead.leadcount',
                         'class'      => 'visible-md visible-lg col-leadlist-leadcount',
-                    ]
-                );
-                echo $view->render(
-                    'MauticCoreBundle:Helper:tableheader.html.php',
-                    [
-                        'sessionVar' => 'company',
-                        'orderBy'    => 'comp.id',
-                        'text'       => 'mautic.core.id',
-                        'class'      => 'visible-md visible-lg col-company-id',
                     ]
                 );
                 ?>
@@ -146,9 +128,6 @@ if ('index' == $tmpl) {
                         <?php endif; ?>
                     </td>
                     <td class="visible-md visible-lg">
-                        <?php echo $item->getScore(); ?>
-                    </td>
-                    <td class="visible-md visible-lg">
                         <a class="label label-primary" href="<?php echo $view['router']->path(
                             'mautic_contact_index',
                             [
@@ -163,7 +142,6 @@ if ('index' == $tmpl) {
                             ); ?>
                         </a>
                     </td>
-                    <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

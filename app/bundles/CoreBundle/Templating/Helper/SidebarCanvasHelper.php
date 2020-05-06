@@ -84,7 +84,7 @@ class SidebarCanvasHelper extends Helper
         if (!$hasContent) {
             $this->content['main'] = [
                 'header'  => false,
-                'content' => '<div class="mautibot-image"><img class="img-responsive mt-lg" style="margin-right: auto; margin-left: auto;" src="'.MautibotHelper::get('wave').'" /></div>',
+                'content' => '',
                 'footer'  => '',
             ];
         }
