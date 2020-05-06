@@ -13,7 +13,7 @@ class Version20200505235400 extends AbstractMigration
     public function up(Schema $schema)
     {
         $table = $schema->getTable($this->prefix.'forms');
-                if ($table->hasColumn('no_index')) {
+        if ($table->hasColumn('no_index')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
 
