@@ -17,7 +17,7 @@ class Version20200505235400 extends AbstractMigration
             throw new SkipMigrationException('Schema includes this migration');
         }
 
-        $this->addSql('ALTER TABLE '.$this->prefix.'forms ADD translation_parent_id INT DEFAULT NULL, ADD variant_parent_id INT DEFAULT NULL, ADD title VARCHAR(255) NOT NULL, ADD lang VARCHAR(255) NOT NULL, ADD variant_settings LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)', ADD variant_start_date DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)', DROP no_index');
+        $this->addSql('ALTER TABLE '.$this->prefix.'forms ADD translation_parent_id INT DEFAULT NULL, ADD variant_parent_id INT DEFAULT NULL, ADD title VARCHAR(255) NOT NULL, ADD lang VARCHAR(255) NOT NULL, ADD variant_settings LONGTEXT DEFAULT NULL COMMENT \'(DC2Type:array)\', ADD variant_start_date DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime)\', DROP no_index');
         $this->addSql('ALTER TABLE '.$this->prefix.'forms ADD CONSTRAINT FK_526285549091A2FB FOREIGN KEY (translation_parent_id) REFERENCES '.$this->prefix.'forms (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE '.$this->prefix.'forms ADD CONSTRAINT FK_5262855491861123 FOREIGN KEY (variant_parent_id) REFERENCES '.$this->prefix.'forms (id) ON DELETE CASCADE');
         $this->addSql('CREATE INDEX IDX_526285549091A2FB ON '.$this->prefix.'forms (translation_parent_id)');
