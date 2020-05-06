@@ -24,6 +24,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
 class LeadController extends FormController
 {
