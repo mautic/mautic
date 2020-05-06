@@ -53,17 +53,27 @@ if (!isset($inBuilder)) {
             || !empty($field['conditions'])
         ): ?>
             <div class="panel-footer">
-                <?php if (!empty($field['conditions']['values'])): ?>
-                    <span class="inline-spacer"">
+                <?php if (!empty($field['conditions']['expr'])): ?>
+                    <span class="inline-spacer">
                     <span style="text-transform: none"><?php echo $view['translator']->trans(
                             'mautic.form.field.form.condition.show.on'
                         ); ?></span>
                     <strong><?php echo $formFields[$field['parent']]['label']; ?></strong>
-
-                    <span style="text-transform: none"><?php echo $view['translator']->trans(
+                    <span style="text-transform: none">
+                          <?php echo $view['translator']->trans(
+                              'mautic.core.operator.'.strtolower($field['conditions']['expr'])
+                          ); ?>
+                        <?php echo $view['translator']->trans(
                             'mautic.form.field.form.condition.select.value'
-                        ); ?></span>
-                    <strong><?php echo implode(', ', $field['conditions']['values']); ?></strong>
+                        ); ?>
+                    </span>
+                    <strong>
+                        <?php if ($field['conditions']['expr'] == 'in' && !empty($field['conditions']['any'])): ?>
+                            *
+                        <?php else: ?>
+                        <?php echo implode(', ', $field['conditions']['values']); ?></strong>
+                        <?php endif; ?>
+                           </strong>
                     </span>
                     <br>
                 <?php endif; ?>

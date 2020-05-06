@@ -927,14 +927,25 @@ class Field
             return true;
         }
 
-        if (isset($data[$parentField->getAlias()]) && isset($this->conditions['values'])) {
+        if (isset($data[$parentField->getAlias()])) {
             $sendValues = $data[$parentField->getAlias()];
             if (!is_array($sendValues)) {
                 $sendValues = [$sendValues];
             }
             foreach ($sendValues as $value) {
-                if (in_array($value, $this->conditions['values']) || ($value && in_array(' *', $this->conditions['values']))) {
-                    return true;
+                if ($this->conditions['expr'] == 'notIn') {
+                    // value not matched
+                    if ($value && !in_array($value, $this->conditions['values'])) {
+                        return true;
+                    }
+                } else {
+                    // any value
+                    if ($value && !empty($this->conditions['any'])) {
+                        return true;
+                    // value matched
+                    } elseif (in_array($value, $this->conditions['values'])) {
+                        return true;
+                    }
                 }
             }
         }

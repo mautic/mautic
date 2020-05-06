@@ -11,6 +11,7 @@
 
 namespace Mautic\FormBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\FormBundle\Helper\PropertiesAccessor;
 use Mautic\FormBundle\Model\FieldModel;
 use Symfony\Component\Form\AbstractType;
@@ -55,19 +56,46 @@ class FormFieldConditionType extends AbstractType
             }
         }
 
-        $choices = array_merge(['*'=>'mautic.form.field.form.condition.any_value'], $choices);
-
         $builder->add(
             'values',
             ChoiceType::class,
             [
                 'choices'  => $choices,
                 'multiple' => true,
-                'label'    => '',
+                'label'    => false,
                 'attr'     => [
                     'class'              => 'form-control',
+                    'data-show-on'       => '{"formfield_conditions_any_0": "checked","formfield_conditions_expr": "notIn"}',
                 ],
-                'data'     => isset($options['data']['values']) ? $options['data']['values'] : [],
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'any',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.form.field.form.condition.any_value',
+                'attr'       => [
+                    'data-show-on' => '{"formfield_conditions_expr": "in"}',
+                ],
+                'data'=> isset($options['data']['any']) ? $options['data']['any'] : false,
+            ]
+        );
+
+        $builder->add(
+            'expr',
+            ChoiceType::class,
+            [
+                'choices'  => [
+                    'in'    => 'mautic.core.operator.in',
+                    'notIn' => 'mautic.core.operator.notin',
+                ],
+                'label'       => false,
+                'placeholder' => false,
+                'attr'        => [
+                    'class'              => 'form-control',
+                ],
                 'required' => false,
             ]
         );

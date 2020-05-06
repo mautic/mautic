@@ -288,8 +288,23 @@ $conditionsTabError = (isset($form['conditions']) && ($view['form']->containsErr
             <?php if ($showConditions): ?>
                 <div role="tabpanel" class="tab-pane" id="conditions">
                     <div class="row">
+                        <div class="col-md-12">
+                            <label><?php echo $view['translator']->trans(
+                                    'mautic.form.field.form.condition.show.only'
+                                ); ?></label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>&nbsp;</label>
+                            <?php echo $view['form']->widget($form['conditions']['expr']); ?>
+                        </div>
                         <div class="col-md-5">
+                            <label>&nbsp;</label>
                             <?php echo $view['form']->row($form['conditions']['values']); ?>
+                        </div>
+                        <div class="col-md-4">
+                            <?php echo $view['form']->row($form['conditions']['any']); ?>
                         </div>
                     </div>
                 </div>

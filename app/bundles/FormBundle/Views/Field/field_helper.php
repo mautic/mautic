@@ -95,7 +95,14 @@ $order                 = (isset($field['order'])) ? $field['order'] : 0;
 $defaultContainerClass = 'mauticform-row mauticform-'.$containerClass.' mauticform-field-'.$order;
 
 if (isset($fields) && $field['parent']) {
-    $containerAttr .= " data-mautic-form-show-on=\"{$fields[$field['parent']]->getAlias()}:".implode('|', $field['conditions']['values']).'" ';
+    $values = implode('|', $field['conditions']['values']);
+
+    if (!empty($field['conditions']['any']) && $field['conditions']['expr'] != 'notIn') {
+        $values = '*';
+    }
+
+    $containerAttr .= " data-mautic-form-show-on=\"{$fields[$field['parent']]->getAlias()}:".$values.'" data-mautic-form-expr="'.$field['conditions']['expr'].'"';
+
     $defaultContainerClass .= '  mauticform-field-hidden';
 }
 

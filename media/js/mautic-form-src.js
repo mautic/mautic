@@ -248,10 +248,19 @@
 
             Object.keys((parents[key])).forEach(function(key2) {
                 [].forEach.call(selectedValues, function (selectedValue) {
-                    if ((parents[key][key2]).includes(selectedValue) || (selectedValue && (parents[key][key2]).includes('*'))) {
-                        var el = document.getElementById(key2);
-                        el.style.display = 'block';
-                        el.removeAttribute('data-validate-disable');
+
+                    var el = document.getElementById(key2);
+                    if (selectedValue) {
+                        if (el.getAttribute('data-mautic-form-expr') == 'notIn') {
+                            if (!(parents[key][key2]).includes(selectedValue)) {
+                                el.style.display = 'block';
+                                el.removeAttribute('data-validate-disable');
+                            }
+                        }
+                        else if ((parents[key][key2]).includes(selectedValue) || ((parents[key][key2]).includes('*'))) {
+                            el.style.display = 'block';
+                            el.removeAttribute('data-validate-disable');
+                        }
                     }
                 })
             });
