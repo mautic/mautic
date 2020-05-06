@@ -1,16 +1,12 @@
 //FormBundle
 Mautic.formOnLoad = function (container) {
 
-    mQuery('.add-new-conditional-field').click(function (e) {
-        e.preventDefault();
-        mQuery(this).parent().next().toggle('normal');
-    })
-
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'form.form');
     }
 
     Mautic.formBuilderNewComponentInit();
+    Mautic.iniNewConditionalField();
 
     var bodyOverflow = {};
 
@@ -235,10 +231,18 @@ Mautic.formFieldOnLoad = function (container, response) {
 
         Mautic.activateChosenSelect(mQuery('.form-builder-new-component'));
         Mautic.formBuilderNewComponentInit();
-        mQuery('.add-new-conditional-field').parent().next().hide();
-
+        Mautic.iniNewConditionalField();
     }
 };
+
+Mautic.iniNewConditionalField = function(){
+    mQuery('.add-new-conditional-field').click(function (e) {
+        e.preventDefault();
+        mQuery(this).parent().next().toggle('normal');
+    })
+    mQuery('.add-new-conditional-field').parent().next().hide();
+
+}
 
 Mautic.initFormFieldButtons = function (container) {
     if (typeof container == 'undefined') {

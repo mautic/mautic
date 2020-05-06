@@ -11,12 +11,8 @@
 
 namespace Mautic\FormBundle\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\EmailBundle\Entity\Email;
-use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
-use Mautic\PageBundle\Entity\Page;
 
 class PropertiesAccessor
 {
@@ -49,7 +45,7 @@ class PropertiesAccessor
      */
     public function getProperties(array $field)
     {
-        if (!empty($field['leadField']) && !empty($field['properties']['syncList'])) {
+        if ($field['type'] == 'country' || (!empty($field['leadField']) && !empty($field['properties']['syncList']))) {
             return $this->formModel->getContactFieldPropertiesList($field['leadField']);
         } elseif (!empty($field['properties'])) {
             return $this->getOptionsListFromProperties($field['properties']);
