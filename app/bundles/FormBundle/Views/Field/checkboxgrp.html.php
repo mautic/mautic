@@ -38,6 +38,6 @@ echo $view->render(
         'formName'      => (isset($formName)) ? $formName : '',
         'contactFields' => (isset($contactFields)) ? $contactFields : [],
         'companyFields' => (isset($companyFields)) ? $companyFields : [],
-        'fields'        => $fields,
+        'fields'        => isset($fields) ? $fields : null,
     ]
 );
