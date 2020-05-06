@@ -108,6 +108,13 @@ if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) 
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                     'sessionVar' => 'lead',
+                    'orderBy'    => 'l.company',
+                    'text'       => 'mautic.core.company',
+                    'class'      => 'col-lead-company visible-md visible-lg',
+                ]);
+
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
+                    'sessionVar' => 'lead',
                     'orderBy'    => 'l.city, l.state',
                     'text'       => 'mautic.lead.lead.thead.location',
                     'class'      => 'col-lead-location visible-md visible-lg',
@@ -131,13 +138,6 @@ if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) 
                     'text'       => 'mautic.lead.lastactive',
                     'class'      => 'col-lead-lastactive visible-md visible-lg',
                     'default'    => true,
-                ]);
-
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
-                    'sessionVar' => 'lead',
-                    'orderBy'    => 'l.id',
-                    'text'       => 'mautic.core.id',
-                    'class'      => 'col-lead-id visible-md visible-lg',
                 ]);
                 ?>
             </tr>
