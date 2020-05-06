@@ -282,6 +282,7 @@ return [
                     'translator',
                     'mautic.form.collector.object',
                     'mautic.form.collector.field',
+                    'mautic.form.collector.mapped.field',
                 ],
                 'methodCalls' => [
                     'setFieldModel' => ['mautic.form.model.field'],

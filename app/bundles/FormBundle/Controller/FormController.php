@@ -703,6 +703,7 @@ class FormController extends CommonFormController
         if ($cleanSlate) {
             //clean slate
             $this->clearSessionComponents($objectId);
+            $this->mappedFieldCollector->removeAllForForm($objectId);
 
             //load existing fields into session
             $modifiedFields   = [];

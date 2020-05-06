@@ -23,4 +23,9 @@ interface MappedFieldCollectorInterface
     public function addField(string $formId, string $object, string $fieldKey): void;
 
     public function removeField(string $formId, string $object, string $fieldKey): void;
+
+    /**
+     * Removes all mapped fields for the specified form.
+     */
+    public function removeAllForForm(string $formId): void;
 }

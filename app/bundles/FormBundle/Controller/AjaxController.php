@@ -5,11 +5,29 @@ namespace Mautic\FormBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\Collector\FieldCollectorInterface;
+use Mautic\FormBundle\Collector\MappedFieldCollectorInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 class AjaxController extends CommonAjaxController
 {
+    /**
+     * @var FieldCollectorInterface
+     */
+    private $fieldCollector;
+
+    /**
+     * @var MappedFieldCollectorInterface
+     */
+    private $mappedFieldCollector;
+
+    public function initialize(FilterControllerEvent $event)
+    {
+        $this->fieldCollector       = $this->container->get('mautic.form.collector.field');
+        $this->mappedFieldCollector = $this->container->get('mautic.form.collector.mapped.field');
+    }
+
     /**
      * @param string $name
      *
@@ -42,11 +60,14 @@ class AjaxController extends CommonAjaxController
      */
     protected function getFieldsForObjectAction(Request $request)
     {
-        /** @var FieldCollectorInterface $fieldCollector */
-        $fieldCollector = $this->container->get('mautic.form.collector.field');
-        $fields         = array_flip($fieldCollector->getFields($request->get('object'))->toChoices());
+        $formId       = $request->get('formId');
+        $object       = $request->get('object');
+        $mappedFields = $this->mappedFieldCollector->getFields($formId, $object);
+        $fields       = $this->fieldCollector->getFields($object);
+        $fields       = $fields->removeFieldsWithKeys($mappedFields);
+        $fieldChoices = array_flip($fields->toChoices());
 
-        return $this->sendJsonResponse(['fields' => $fields]);
+        return $this->sendJsonResponse(['fields' => $fieldChoices]);
     }
 
     /**

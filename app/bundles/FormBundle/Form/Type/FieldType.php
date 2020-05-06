@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\FormBundle\Collector\FieldCollectorInterface;
+use Mautic\FormBundle\Collector\MappedFieldCollectorInterface;
 use Mautic\FormBundle\Collector\ObjectCollectorInterface;
 use Mautic\FormBundle\Exception\FieldNotFoundException;
 use Symfony\Component\Form\AbstractType;
@@ -37,14 +38,21 @@ class FieldType extends AbstractType
      */
     private $fieldCollector;
 
+    /**
+     * @var MappedFieldCollectorInterface
+     */
+    private $mappedFieldCollector;
+
     public function __construct(
         TranslatorInterface $translator,
         ObjectCollectorInterface $objectCollector,
-        FieldCollectorInterface $fieldCollector
+        FieldCollectorInterface $fieldCollector,
+        MappedFieldCollectorInterface $mappedFieldCollector
     ) {
-        $this->translator      = $translator;
-        $this->objectCollector = $objectCollector;
-        $this->fieldCollector  = $fieldCollector;
+        $this->translator           = $translator;
+        $this->objectCollector      = $objectCollector;
+        $this->fieldCollector       = $fieldCollector;
+        $this->mappedFieldCollector = $mappedFieldCollector;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -420,7 +428,9 @@ class FieldType extends AbstractType
                 ]
             );
 
-            $fields = $this->fieldCollector->getFields($mappedObject);
+            $fields       = $this->fieldCollector->getFields($mappedObject);
+            $mappedFields = $this->mappedFieldCollector->getFields((string) $options['data']['formId'], $mappedObject);
+            $fields       = $fields->removeFieldsWithKeys($mappedFields);
 
             $builder->add(
                 'mappedField',

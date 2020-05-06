@@ -124,7 +124,10 @@ Mautic.fetchFieldsOnObjectChange = function() {
     fieldSelect.attr('disable', true);
     mQuery.ajax({
         url: mauticAjaxUrl + "?action=form:getFieldsForObject",
-        data: {object: mQuery('select#formfield_mappedObject').val()},
+        data: {
+            object: mQuery('select#formfield_mappedObject').val(),
+            formId: mQuery('input#mauticform_sessionId').val()
+        },
         success: function (response) {
             Mautic.changeSelectOptions(fieldSelect, response.fields);
         },
