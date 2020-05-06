@@ -46,4 +46,31 @@ class CustomFieldHelper
 
         return $value;
     }
+
+    /**
+     * Sort array by key field 
+     * 
+     * @param array $array 
+     * @param string $key 
+     * @static
+     * @access public
+     *
+     * @return array
+     */
+    public static function orderFieldsKey($array, $key)
+    {
+        $tmp = array();
+        foreach($array as $akey => $array2) {
+            $tmp[$akey] = $array2[$key];
+        }
+
+        asort($tmp , SORT_NUMERIC);
+
+        $tmp2 = array();
+        foreach($tmp as $key => $value){
+            $tmp2[$key] = $array[$key];
+        }
+
+        return $tmp2;
+    }
 }

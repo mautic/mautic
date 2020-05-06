@@ -367,7 +367,7 @@ trait CustomFieldRepositoryTrait
         if (empty($this->customFieldList)) {
             //Get the list of custom fields
             $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-            $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties, f.default_value')
+            $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties, f.default_value, f.field_order')
                 ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
                 ->where('f.is_published = :published')
                 ->andWhere($fq->expr()->eq('object', ':object'))

@@ -321,7 +321,13 @@ class LeadController extends FormController
             return $this->accessDenied();
         }
 
-        $fields            = $lead->getFields();
+        $_fields            = $lead->getFields();
+
+        $fields = array();
+        foreach($_fields as $group => $group_fields) {
+            $fields[$group] = CustomFieldHelper::orderFieldsKey($group_fields, 'field_order');
+        }
+
         $integrationHelper = $this->get('mautic.helper.integration');
         $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
