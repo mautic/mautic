@@ -3,7 +3,7 @@ Mautic.formOnLoad = function (container) {
 
     mQuery('.add-new-conditional-field').click(function (e) {
         e.preventDefault();
-        mQuery(this).parent().next().show('normal');
+        mQuery(this).parent().next().toggle('normal');
     })
 
     if (mQuery(container + ' #list-search').length) {
