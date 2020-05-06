@@ -11,7 +11,7 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\FormBundle\Tests\EventListener;
+namespace Mautic\FormBundle\Tests\Collector;
 
 use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\FormBundle\Collector\MappedFieldCollector;

@@ -66,17 +66,28 @@ final class MappedFieldCollector implements MappedFieldCollectorInterface
         });
     }
 
+    public function removeAllForForm(string $formId): void
+    {
+        $this->cacheProvider->invalidateTags([$this->buildCacheTag($formId)]);
+    }
+
     private function fetchAndSave(string $formId, string $object, callable $callback): void
     {
         $cacheItem = $this->cacheProvider->getItem($this->buildCacheKey($formId, $object));
         $fields    = json_decode($cacheItem->get() ?? '[]', true);
         $cacheItem->set(json_encode($callback($fields)));
         $cacheItem->expiresAfter(self::EXPIRATION_IN_SECONDS);
+        $cacheItem->tag($this->buildCacheTag($formId));
         $this->cacheProvider->save($cacheItem);
     }
 
     private function buildCacheKey(string $formId, string $object): string
     {
         return sprintf('mautic.form.%s.object.%s.fields.mapped', $formId, $object);
+    }
+
+    private function buildCacheTag(string $formId): string
+    {
+        return sprintf('mautic.form.%s.fields.mapped', $formId);
     }
 }
