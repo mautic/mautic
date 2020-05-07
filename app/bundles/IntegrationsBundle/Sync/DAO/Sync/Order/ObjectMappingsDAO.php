@@ -17,8 +17,14 @@ use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 
 class ObjectMappingsDAO
 {
+    /**
+     * @var ObjectMapping[]
+     */
     private $updatedMappings = [];
 
+    /**
+     * @var ObjectMapping[]
+     */
     private $newMappings = [];
 
     public function addUpdatedObjectMapping(ObjectMapping $objectMapping): void
