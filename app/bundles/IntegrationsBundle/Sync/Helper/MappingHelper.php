@@ -257,5 +257,7 @@ class MappingHelper
         $objectMapping->setLastSyncDate($updatedObjectMappingDAO->getObjectModifiedDate());
 
         $this->saveObjectMapping($objectMapping);
+
+        $updatedObjectMappingDAO->setObjectMapping($objectMapping);
     }
 }
