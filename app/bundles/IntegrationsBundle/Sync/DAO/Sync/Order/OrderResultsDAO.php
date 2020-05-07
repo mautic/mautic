@@ -166,7 +166,7 @@ class OrderResultsDAO
                 $this->deletedObjects[$deletedObject->getObject()] = [];
             }
 
-            $this->deletedObjects[$deletedObject->getObject()][] = $deletedObjects;
+            $this->deletedObjects[$deletedObject->getObject()][] = $deletedObject;
         }
     }
 }
