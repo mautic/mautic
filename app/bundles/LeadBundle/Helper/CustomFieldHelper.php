@@ -50,9 +50,8 @@ class CustomFieldHelper
     /**
      * Sort array by key field 
      * 
-     * @param array $array 
+     * @param array  $array 
      * @param string $key_sort 
-     * @static
      *
      * @return array
      */
