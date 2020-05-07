@@ -51,7 +51,8 @@ class MessageApiController extends CommonApiController
                         'channel'   => $channelType,
                     ];
                 } else {
-                    $params['channels'][$channelType]['channel'] = $channelType;
+                    $params['channels'][$channelType]['channel']   = $channelType;
+                    $params['channels'][$channelType]['isEnabled'] = (int) $params['channels'][$channelType]['isEnabled'];
                 }
             }
         }

@@ -29,6 +29,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorServiceInterface;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
@@ -79,6 +80,11 @@ class AssetModel extends FormModel
     private $deviceTrackingService;
 
     /**
+     * @var ContactTracker
+     */
+    private $contactTracker;
+
+    /**
      * AssetModel constructor.
      */
     public function __construct(
@@ -89,7 +95,8 @@ class AssetModel extends FormModel
         CoreParametersHelper $coreParametersHelper,
         DeviceCreatorServiceInterface $deviceCreatorService,
         DeviceDetectorFactoryInterface $deviceDetectorFactory,
-        DeviceTrackingServiceInterface $deviceTrackingService
+        DeviceTrackingServiceInterface $deviceTrackingService,
+        ContactTracker $contactTracker
     ) {
         $this->leadModel              = $leadModel;
         $this->categoryModel          = $categoryModel;
@@ -98,6 +105,7 @@ class AssetModel extends FormModel
         $this->deviceCreatorService   = $deviceCreatorService;
         $this->deviceDetectorFactory  = $deviceDetectorFactory;
         $this->deviceTrackingService  = $deviceTrackingService;
+        $this->contactTracker         = $contactTracker;
         $this->maxAssetSize           = $coreParametersHelper->get('max_size');
     }
 
@@ -182,7 +190,7 @@ class AssetModel extends FormModel
                         $trackingNewlyGenerated                    = !$wasTrackedAlready;
                         $leadClickthrough                          = true;
 
-                        $this->leadModel->setCurrentLead($lead);
+                        $this->contactTracker->setTrackedContact($lead);
                     }
                 }
                 if (!empty($clickthrough['channel'])) {
@@ -210,7 +218,7 @@ class AssetModel extends FormModel
 
             if (empty($leadClickthrough)) {
                 $wasTrackedAlready         = $this->deviceTrackingService->isTracked();
-                $lead                      = $this->leadModel->getCurrentLead();
+                $lead                      = $this->contactTracker->getContact();
                 $trackedDevice             = $this->deviceTrackingService->getTrackedDevice();
                 $trackingId                = null;
                 $trackingNewlyGenerated    = false;

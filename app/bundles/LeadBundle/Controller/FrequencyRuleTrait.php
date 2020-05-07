@@ -19,14 +19,8 @@ use Symfony\Component\Form\Form;
 
 trait FrequencyRuleTrait
 {
-    /**
-     * @var
-     */
     protected $leadLists;
 
-    /**
-     * @var
-     */
     protected $dncChannels;
 
     /**

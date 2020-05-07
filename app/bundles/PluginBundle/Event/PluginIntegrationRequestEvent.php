@@ -13,14 +13,8 @@ namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
-/**
- * Class PluginIntegrationRequestEvent.
- */
 class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
 {
-    /**
-     * @var
-     */
     private $url;
 
     /**
@@ -28,9 +22,6 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
      */
     private $parameters;
 
-    /**
-     * @var
-     */
     private $headers;
 
     /**
@@ -48,9 +39,6 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
      */
     private $authType;
 
-    /**
-     * @var
-     */
     private $response;
 
     public function __construct(UnifiedIntegrationInterface $integration, $url, $parameters, $headers, $method, $settings, $authType)

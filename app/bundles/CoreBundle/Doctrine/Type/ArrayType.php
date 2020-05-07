@@ -43,7 +43,8 @@ class ArrayType extends \Doctrine\DBAL\Types\ArrayType
         $serialized = serialize($value);
 
         if (false !== strpos($serialized, chr(0))) {
-            throw new \Doctrine\DBAL\Types\ConversionException('Serialized array includes null-byte. This cannot be saved as a text. Please check if you not provided object with protected or private members.');
+            $serialized = str_replace("\0", '__NULL_BYTE__', $serialized);
+            throw new ConversionException('Serialized array includes null-byte. This cannot be saved as a text. Please check if you not provided object with protected or private members. Serialized Array: '.$serialized);
         }
 
         return $serialized;
@@ -57,7 +58,28 @@ class ArrayType extends \Doctrine\DBAL\Types\ArrayType
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
         try {
-            return parent::convertToPHPValue($value, $platform);
+            $value = parent::convertToPHPValue($value, $platform);
+            if (!is_array($value) || (1 > count($value))) {
+                return $value;
+            }
+
+            foreach ($value as $key => $element) {
+                if (!is_object($element)) {
+                    continue;
+                }
+
+                $reflectionObject     = new \ReflectionObject($element);
+                $reflectionProperties = $reflectionObject->getProperties(\ReflectionProperty::IS_PROTECTED | \ReflectionProperty::IS_PRIVATE);
+
+                // Let's check if $value contains objects with private or protected members.
+                // If it contains such objects we have to remove them from $array.
+                // This will "heal" the database. There must be no null bytes.
+                if (0 < count($reflectionProperties)) {
+                    unset($value[$key]);
+                }
+            }
+
+            return $value;
         } catch (ConversionException $exception) {
             return [];
         } catch (ContextErrorException $exeption) {

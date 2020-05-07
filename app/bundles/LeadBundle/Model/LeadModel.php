@@ -46,6 +46,8 @@ use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\CategoryChangeEvent;
+use Mautic\LeadBundle\Event\DoNotContactAddEvent;
+use Mautic\LeadBundle\Event\DoNotContactRemoveEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Form\Type\LeadType;
@@ -146,9 +148,6 @@ class LeadModel extends FormModel
      */
     protected $userProvider;
 
-    /**
-     * @var
-     */
     protected $leadTrackingId;
 
     /**
@@ -490,6 +489,10 @@ class LeadModel extends FormModel
             $details = $ips->first()->getIpDetails();
             // Only update with IP details if none of the following are set to prevent wrong combinations
             if (empty($fields['core']['city']['value']) && empty($fields['core']['state']['value']) && empty($fields['core']['country']['value']) && empty($fields['core']['zipcode']['value'])) {
+                if ($this->coreParametersHelper->get('anonymize_ip') && $this->ipLookupHelper->getRealIp()) {
+                    $details = $this->ipLookupHelper->getIpDetails($this->ipLookupHelper->getRealIp());
+                }
+
                 if (!empty($details['city'])) {
                     $entity->addUpdatedField('city', $details['city']);
                     $companyFieldMatches['city'] = $details['city'];
@@ -872,27 +875,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Takes leads organized by group and flattens them into just alias => value.
-     *
-     * @param $fields
-     *
-     * @deprecated 2.0 to be removed in 3.0 - Use the Lead entity's getProfileFields() instead
-     *
-     * @return array
-     */
-    public function flattenFields($fields)
-    {
-        $flat = [];
-        foreach ($fields as $fields) {
-            foreach ($fields as $field) {
-                $flat[$field['alias']] = $field['value'];
-            }
-        }
-
-        return $flat;
-    }
-
-    /**
      * Returns flat array for single lead.
      *
      * @param $leadId
@@ -1088,18 +1070,6 @@ class LeadModel extends FormModel
         );
 
         return $this;
-    }
-
-    /**
-     * @depreacated 2.6.0 to be removed in 3.0; use getFrequencyRules() instead
-     *
-     * @param null $channel
-     *
-     * @return mixed
-     */
-    public function getFrequencyRule(Lead $lead, $channel = null)
-    {
-        return $this->getFrequencyRules($lead, $channel);
     }
 
     /**
@@ -1449,9 +1419,11 @@ class LeadModel extends FormModel
                 // The email must be set for successful unsubscribtion
                 $lead->addUpdatedField('email', $data[$fields['email']]);
                 if ($doNotEmail) {
-                    $this->addDncForLead($lead, 'email', $reason, DNC::MANUAL);
+                    $event = new DoNotContactAddEvent($lead, 'email', $reason, DNC::MANUAL);
+                    $this->dispatcher->dispatch(DoNotContactAddEvent::ADD_DONOT_CONTACT, $event);
                 } else {
-                    $this->removeDncForLead($lead, 'email');
+                    $event = new DoNotContactRemoveEvent($lead, 'email');
+                    $this->dispatcher->dispatch(DoNotContactRemoveEvent::REMOVE_DONOT_CONTACT, $event);
                 }
             }
         }
@@ -1754,8 +1726,8 @@ class LeadModel extends FormModel
         $this->logger->debug('CONTACT: Adding '.implode(', ', $tags).' to contact ID# '.$lead->getId());
 
         array_walk($tags, function (&$val) {
-            $val = trim($val);
-            InputHelper::clean($val);
+            $val = html_entity_decode(trim($val), ENT_QUOTES);
+            $val = InputHelper::clean($val);
         });
 
         // See which tags already exist
@@ -1775,7 +1747,7 @@ class LeadModel extends FormModel
                 $tagToBeAdded = null;
 
                 if (!array_key_exists($tag, $foundTags)) {
-                    $tagToBeAdded = new Tag($tag);
+                    $tagToBeAdded = new Tag($tag, false);
                 } elseif (!$leadTags->contains($foundTags[$tag])) {
                     $tagToBeAdded = $foundTags[$tag];
                 }
@@ -1792,8 +1764,8 @@ class LeadModel extends FormModel
             $this->logger->debug('CONTACT: Removing '.implode(', ', $removeTags).' for contact ID# '.$lead->getId());
 
             array_walk($removeTags, function (&$val) {
-                $val = trim($val);
-                InputHelper::clean($val);
+                $val = html_entity_decode(trim($val), ENT_QUOTES);
+                $val = InputHelper::clean($val);
             });
 
             // See which tags really exist
@@ -2243,19 +2215,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @deprecatd 2.4; to be removed in 3.0
-     * use mautic.channel.helper.channel_list service (Mautic\ChannelBundle\Helper\ChannelListHelper) to obtain the desired channels
-     *
-     * Get contact channels.
-     *
-     * @return array
-     */
-    public function getAllChannels()
-    {
-        return $this->channelListHelper->getChannelList();
-    }
-
-    /**
      * @return array
      */
     public function getPreferenceChannels()
@@ -2459,159 +2418,6 @@ class LeadModel extends FormModel
         }
 
         return DNC::IS_CONTACTABLE;
-    }
-
-    /**
-     * Remove a Lead's DNC entry based on channel.
-     *
-     * @deprecated 2.12.0 to be removed in 3.0; use Mautic\LeadBundle\Model\DoNotContact instead
-     *
-     * @param string    $channel
-     * @param bool|true $persist
-     *
-     * @return bool
-     */
-    public function removeDncForLead(Lead $lead, $channel, $persist = true)
-    {
-        /** @var DNC $dnc */
-        foreach ($lead->getDoNotContact() as $dnc) {
-            if ($dnc->getChannel() === $channel) {
-                $lead->removeDoNotContactEntry($dnc);
-
-                if ($persist) {
-                    $this->saveEntity($lead);
-                }
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Create a DNC entry for a lead.
-     *
-     * @deprecated 2.12.0 to be removed in 3.0; use Mautic\LeadBundle\Model\DoNotContact instead
-     *
-     * @param string|array $channel            If an array with an ID, use the structure ['email' => 123]
-     * @param string       $comments
-     * @param int          $reason             Must be a class constant from the DoNotContact class
-     * @param bool         $persist
-     * @param bool         $checkCurrentStatus
-     * @param bool         $override
-     *
-     * @return bool|DNC If a DNC entry is added or updated, returns the DNC object. If a DNC is already present
-     *                  and has the specified reason, nothing is done and this returns false
-     */
-    public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DNC::BOUNCED, $persist = true, $checkCurrentStatus = true, $override = false)
-    {
-        // if !$checkCurrentStatus, assume is contactable due to already being valided
-        $isContactable = ($checkCurrentStatus) ? $this->isContactable($lead, $channel) : DNC::IS_CONTACTABLE;
-
-        // If they don't have a DNC entry yet
-        if (DNC::IS_CONTACTABLE === $isContactable) {
-            $dnc = new DNC();
-
-            if (is_array($channel)) {
-                $channelId = reset($channel);
-                $channel   = key($channel);
-
-                $dnc->setChannelId((int) $channelId);
-            }
-
-            $dnc->setChannel($channel);
-            $dnc->setReason($reason);
-            $dnc->setLead($lead);
-            $dnc->setDateAdded(new \DateTime());
-            $dnc->setComments($comments);
-
-            $lead->addDoNotContactEntry($dnc);
-
-            if ($persist) {
-                // Use model saveEntity to trigger events for DNC change
-                $this->saveEntity($lead);
-            }
-
-            return $dnc;
-        }
-        // Or if the given reason is different than the stated reason
-        elseif ($isContactable !== $reason) {
-            /** @var DNC $dnc */
-            foreach ($lead->getDoNotContact() as $dnc) {
-                // Only update if the contact did not unsubscribe themselves
-                if (!$override && DNC::UNSUBSCRIBED !== $dnc->getReason()) {
-                    $override = true;
-                }
-                if ($dnc->getChannel() === $channel && $override) {
-                    // Remove the outdated entry
-                    $lead->removeDoNotContactEntry($dnc);
-
-                    // Update the DNC entry
-                    $dnc->setChannel($channel);
-                    $dnc->setReason($reason);
-                    $dnc->setLead($lead);
-                    $dnc->setDateAdded(new \DateTime());
-                    $dnc->setComments($comments);
-
-                    // Re-add the entry to the lead
-                    $lead->addDoNotContactEntry($dnc);
-
-                    if ($persist) {
-                        // Use model saveEntity to trigger events for DNC change
-                        $this->saveEntity($lead);
-                    }
-
-                    return $dnc;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Get the current lead; if $returnTracking = true then array with lead, trackingId, and boolean of if trackingId
-     * was just generated or not.
-     *
-     * @deprecated 2.13.0 to be removed in 3.0
-     *
-     * @param bool|false $returnTracking
-     *
-     * @return Lead|array|null
-     */
-    public function getCurrentLead($returnTracking = false)
-    {
-        @trigger_error('getCurrentLead is deprecated and will be removed in 3.0; Use the ContactTracker::getContact instead', E_USER_DEPRECATED);
-
-        $trackedContact = $this->contactTracker->getContact();
-        $trackingId     = $this->contactTracker->getTrackingId();
-
-        return ($returnTracking) ? [$trackedContact, $trackingId, false] : $trackedContact;
-    }
-
-    /**
-     * Sets current lead.
-     *
-     * @deprecated 2.13.0 to be removed in 3.0; use ContactTracker::getContact instead
-     */
-    public function setCurrentLead(Lead $lead)
-    {
-        @trigger_error('setCurrentLead is deprecated and will be removed in 3.0; Use the ContactTracker::setTrackedContact instead', E_USER_DEPRECATED);
-
-        $this->contactTracker->setTrackedContact($lead);
-    }
-
-    /**
-     * Used by system processes that hook into events that use getCurrentLead().
-     *
-     * @param Lead $lead
-     */
-    public function setSystemCurrentLead(Lead $lead = null)
-    {
-        @trigger_error('setSystemCurrentLead is deprecated and will be removed in 3.0; Use the ContactTracker::setSystemContac instead', E_USER_DEPRECATED);
-
-        $this->contactTracker->setSystemContact($lead);
     }
 
     /**

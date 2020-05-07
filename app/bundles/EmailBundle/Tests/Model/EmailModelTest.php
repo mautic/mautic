@@ -37,8 +37,8 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
-use Mautic\LeadBundle\Model\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -70,6 +70,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     private $deviceTrackerMock;
     private $redirectRepositoryMock;
     private $cacheStorageHelperMock;
+    private $contactTracker;
     private $emailModel;
     private $doNotContact;
 
@@ -99,7 +100,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->deviceTrackerMock      = $this->createMock(DeviceTracker::class);
         $this->redirectRepositoryMock = $this->createMock(RedirectRepository::class);
         $this->cacheStorageHelperMock = $this->createMock(CacheStorageHelper::class);
-        $this->doNotContact           = $this->createMock(DNC::class);
+        $this->contactTracker         = $this->createMock(ContactTracker::class);
+        $this->doNotContact           = $this->createMock(DoNotContact::class);
 
         $this->emailModel = new EmailModel(
             $this->ipLookupHelper,
@@ -115,6 +117,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->deviceTrackerMock,
             $this->redirectRepositoryMock,
             $this->cacheStorageHelperMock,
+            $this->contactTracker,
             $this->doNotContact
         );
 
@@ -493,6 +496,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->deviceTrackerMock,
             $this->redirectRepositoryMock,
             $this->cacheStorageHelperMock,
+            $this->contactTracker,
             $this->doNotContact
         );
 

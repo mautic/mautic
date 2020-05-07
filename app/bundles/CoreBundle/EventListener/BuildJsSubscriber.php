@@ -392,6 +392,12 @@ if (typeof window[window.MauticTrackingObject] !== 'undefined') {
         return matches; 
     }
 }
+
+MauticJS.ensureEventContext = function(event, context0, context1) { 
+    return (typeof(event.detail) !== 'undefined'
+        && event.detail[0] === context0
+        && event.detail[1] === context1);
+};
 JS;
         $event->appendJs($js, 'Mautic Core');
     }
