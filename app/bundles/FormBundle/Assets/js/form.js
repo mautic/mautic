@@ -238,7 +238,7 @@ Mautic.formFieldOnLoad = function (container, response) {
 Mautic.iniNewConditionalField = function(){
     mQuery('.add-new-conditional-field').click(function (e) {
         e.preventDefault();
-        mQuery(this).parent().next().toggle('normal');
+        mQuery(this).parent().next().show('normal');
     })
     mQuery('.add-new-conditional-field').parent().next().hide();
 
