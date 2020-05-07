@@ -11,24 +11,21 @@
 
 namespace Mautic\FormBundle\Event;
 
-use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\FormBundle\Entity\Field;
+use Symfony\Component\EventDispatcher\Event;
 
-class FormFieldEvent extends CommonEvent
+final class FormFieldEvent extends Event
 {
     /**
-     * @param Field $field
-     * @param bool  $isNew
+     * @param bool $isNew
      */
-    public function __construct(Field &$field, $isNew = false)
+    public function __construct(Field $field, $isNew = false)
     {
-        $this->entity = &$field;
+        $this->entity = $field;
         $this->isNew  = $isNew;
     }
 
     /**
-     * Returns the Field entity.
-     *
      * @return Field
      */
     public function getField()
@@ -37,10 +34,13 @@ class FormFieldEvent extends CommonEvent
     }
 
     /**
-     * Sets the Field entity.
-     *
-     * @param Field $field
+     * @return bool
      */
+    public function isNew()
+    {
+        return $this->isNew();
+    }
+
     public function setField(Field $field)
     {
         $this->entity = $field;
