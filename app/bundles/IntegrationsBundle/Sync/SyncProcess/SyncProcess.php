@@ -397,6 +397,10 @@ class SyncProcess
         // Updated object mappings
         $updatedObjectMappings = [];
         foreach ($syncOrder->getUpdatedObjectMappings() as $updatedObjectMapping) {
+            if (!$updatedObjectMapping->getObjectMapping()) {
+                continue;
+            }
+
             $updatedObjectMappings[] = $updatedObjectMapping->getObjectMapping();
         }
 
