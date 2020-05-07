@@ -7,6 +7,7 @@ namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange;
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectMappingsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
@@ -82,9 +83,9 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         return $this->partialObjectReportBuilder->buildReport($requestDAO);
     }
 
-    public function executeSyncOrder(OrderDAO $syncOrderDAO): void
+    public function executeSyncOrder(OrderDAO $syncOrderDAO): ObjectMappingsDAO
     {
-        $this->orderExecutioner->execute($syncOrderDAO);
+        return $this->orderExecutioner->execute($syncOrderDAO);
     }
 
     /**

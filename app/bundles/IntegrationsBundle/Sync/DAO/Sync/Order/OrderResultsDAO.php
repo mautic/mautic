@@ -15,74 +15,158 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Order;
 
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
 class OrderResultsDAO
 {
     /**
-     * @var ObjectMapping[]
+     * @var array
      */
-    private $newObjectMappings;
+    private $newObjectMappings = [];
 
     /**
-     * @var ObjectMapping[]
+     * @var array
      */
-    private $updatedObjectMappings;
+    private $updatedObjectMappings = [];
 
     /**
-     * @var RemappedObjectDAO[]
+     * @var array
      */
-    private $remappedObjects;
+    private $remappedObjects = [];
 
     /**
-     * @var ObjectChangeDAO[]
+     * @var array
      */
-    private $deletedObjects;
+    private $deletedObjects = [];
 
     public function __construct(array $newObjectMappings, array $updatedObjectMappings, array $remappedObjects, array $deletedObjects)
     {
-        $this->newObjectMappings     = $newObjectMappings;
-        $this->updatedObjectMappings = $updatedObjectMappings;
-        $this->remappedObjects       = $remappedObjects;
-        $this->deletedObjects        = $deletedObjects;
+        $this->groupNewObjectMappingsByObjectName($newObjectMappings);
+        $this->groupUpdatedObjectMappingsByObjectName($updatedObjectMappings);
+        $this->groupRemappedObjectsByObjectName($remappedObjects);
+        $this->groupDeletedObjectsByObjectName($deletedObjects);
     }
 
     /**
      * @return ObjectMapping[]
      */
-    public function getObjectMappings(): array
+    public function getObjectMappings(string $objectName): array
     {
-        return array_merge($this->newObjectMappings, $this->updatedObjectMappings);
+        $newObjectMappings     = $this->newObjectMappings[$objectName] ?? [];
+        $updatedObjectMappings = $this->updatedObjectMappings[$objectName] ?? [];
+
+        return array_merge($newObjectMappings, $updatedObjectMappings);
     }
 
     /**
      * @return ObjectMapping[]
+     *
+     * @throws ObjectNotFoundException
      */
-    public function getNewObjectMappings(): array
+    public function getNewObjectMappings(string $objectName): array
     {
-        return $this->newObjectMappings;
+        if (!isset($this->newObjectMappings[$objectName])) {
+            throw new ObjectNotFoundException($objectName);
+        }
+
+        return $this->newObjectMappings[$objectName];
     }
 
     /**
      * @return ObjectMapping[]
+     *
+     * @throws ObjectNotFoundException
      */
-    public function getUpdatedObjectMappings(): array
+    public function getUpdatedObjectMappings(string $objectName): array
     {
-        return $this->updatedObjectMappings;
+        if (!isset($this->updatedObjectMappings[$objectName])) {
+            throw new ObjectNotFoundException($objectName);
+        }
+
+        return $this->updatedObjectMappings[$objectName];
     }
 
     /**
      * @return RemappedObjectDAO[]
+     *
+     * @throws ObjectNotFoundException
      */
-    public function getRemappedObjects(): array
+    public function getRemappedObjects(string $objectName): array
     {
-        return $this->remappedObjects;
+        if (!isset($this->remappedObjects[$objectName])) {
+            throw new ObjectNotFoundException($objectName);
+        }
+
+        return $this->remappedObjects[$objectName];
     }
 
     /**
      * @return ObjectChangeDAO[]
+     *
+     * @throws ObjectNotFoundException
      */
-    public function getDeletedObjects(): array
+    public function getDeletedObjects(string $objectName): array
     {
-        return $this->deletedObjects;
+        if (!isset($this->deletedObjects[$objectName])) {
+            throw new ObjectNotFoundException($objectName);
+        }
+
+        return $this->deletedObjects[$objectName];
+    }
+
+    /**
+     * @param ObjectMapping[] $objectMappings
+     */
+    private function groupNewObjectMappingsByObjectName(array $objectMappings): void
+    {
+        foreach ($objectMappings as $objectMapping) {
+            if (!isset($this->newObjectMappings[$objectMapping->getIntegrationObjectName()])) {
+                $this->newObjectMappings[$objectMapping->getIntegrationObjectName()] = [];
+            }
+
+            $this->newObjectMappings[$objectMapping->getIntegrationObjectName()][] = $objectMapping;
+        }
+    }
+
+    /**
+     * @param ObjectMapping[] $objectMappings
+     */
+    private function groupUpdatedObjectMappingsByObjectName(array $objectMappings): void
+    {
+        foreach ($objectMappings as $objectMapping) {
+            if (!isset($this->updatedObjectMappings[$objectMapping->getIntegrationObjectName()])) {
+                $this->updatedObjectMappings[$objectMapping->getIntegrationObjectName()] = [];
+            }
+
+            $this->updatedObjectMappings[$objectMapping->getIntegrationObjectName()][] = $objectMapping;
+        }
+    }
+
+    /**
+     * @param RemappedObjectDAO[] $remappedObjects
+     */
+    private function groupRemappedObjectsByObjectName(array $remappedObjects): void
+    {
+        foreach ($remappedObjects as $remappedObject) {
+            if (!isset($this->remappedObjects[$remappedObject->getNewObjectName()])) {
+                $this->remappedObjects[$remappedObject->getNewObjectName()] = [];
+            }
+
+            $this->remappedObjects[$remappedObject->getNewObjectName()][] = $remappedObject;
+        }
+    }
+
+    /**
+     * @param ObjectChangeDAO[] $deletedObjects
+     */
+    private function groupDeletedObjectsByObjectName(array $deletedObjects): void
+    {
+        foreach ($deletedObjects as $deletedObject) {
+            if (!isset($this->deletedObjects[$deletedObject->getObject()])) {
+                $this->deletedObjects[$deletedObject->getObject()] = [];
+            }
+
+            $this->deletedObjects[$deletedObject->getObject()][] = $deletedObjects;
+        }
     }
 }
