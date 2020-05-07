@@ -11,16 +11,13 @@
 
 namespace Mautic\FormBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\FormBundle\Event as Events;
+use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class FormSubscriber.
- */
-class FormConditionalSubscriber extends CommonSubscriber
+final class FormConditionalSubscriber implements EventSubscriberInterface
 {
     /**
      * @var FormModel
@@ -32,44 +29,33 @@ class FormConditionalSubscriber extends CommonSubscriber
      */
     private $fieldModel;
 
-    /**
-     * FormConditionalSubscriber constructor.
-     *
-     * @param FormModel  $formModel
-     * @param FieldModel $fieldModel
-     */
     public function __construct(FormModel $formModel, FieldModel $fieldModel)
     {
         $this->formModel  = $formModel;
         $this->fieldModel = $fieldModel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [
-            FormEvents::FORM_POST_SAVE           => ['onFormPostSave', 0],
+            FormEvents::FORM_POST_SAVE => ['onFormPostSave', 0],
         ];
     }
 
     /**
      * Replace session field Id with field Id after save entity.
-     *
-     * @param Events\FormEvent $event
      */
-    public function onFormPostSave(Events\FormEvent $event)
+    public function onFormPostSave(FormEvent $event)
     {
         $form = $event->getForm();
 
-        // Process temporary fiedl ID to real field ID
+        // Process temporary field ID to real field ID
         $actualFieldIds = [];
         foreach ($form->getFields() as $field) {
             $actualFieldIds[] = $field->getId();
             if (strpos($field->getParent(), 'new') !== false) {
                 foreach ($form->getFields() as $parentField) {
-                    if ($field->getParent() == $parentField->getSessionId()) {
+                    if ($field->getParent() === $parentField->getSessionId()) {
                         $field->setParent($parentField->getId());
                         $this->fieldModel->saveEntity($field);
                     }
