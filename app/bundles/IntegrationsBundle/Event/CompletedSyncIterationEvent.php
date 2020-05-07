@@ -52,7 +52,12 @@ class CompletedSyncIterationEvent extends Event
         $this->mappingManualDAO = $mappingManualDAO;
     }
 
-    public function getOrderStatus(): OrderResultsDAO
+    public function getIntegration(): string
+    {
+        return $this->mappingManualDAO->getIntegration();
+    }
+
+    public function getOrderResults(): OrderResultsDAO
     {
         return $this->orderResultsDAO;
     }
