@@ -51,17 +51,17 @@ class CustomFieldHelper
      * Sort array by key field 
      * 
      * @param array $array 
-     * @param string $key 
+     * @param string $key_sort 
      * @static
      * @access public
      *
      * @return array
      */
-    public static function orderFieldsKey($array, $key)
+    public static function orderFieldsKey($array, $key_sort)
     {
         $tmp = [];
         foreach ($array as $akey => $array2) {
-            $tmp[$akey] = $array2[$key];
+            $tmp[$akey] = $array2[$key_sort];
         }
 
         asort($tmp, SORT_NUMERIC);
