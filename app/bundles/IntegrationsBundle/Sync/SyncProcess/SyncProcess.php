@@ -25,7 +25,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
-use Mautic\IntegrationsBundle\Sync\SyncService\SyncService;
+use Mautic\IntegrationsBundle\Sync\SyncService\SyncServiceInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SyncProcess
@@ -91,7 +91,7 @@ class SyncProcess
     private $syncIteration;
 
     /**
-     * @var SyncService
+     * @var SyncServiceInterface
      */
     private $syncService;
 
@@ -107,7 +107,7 @@ class SyncProcess
         SyncDataExchangeInterface $internalSyncDataExchange,
         SyncDataExchangeInterface $integrationSyncDataExchange,
         InputOptionsDAO $inputOptionsDAO,
-        SyncService $syncService
+        SyncServiceInterface $syncService
     ) {
         $this->syncDateHelper              = $syncDateHelper;
         $this->mappingHelper               = $mappingHelper;
@@ -380,13 +380,13 @@ class SyncProcess
         // Updated objects were processed by OrderExecutioner
         $updatedObjectMappings = $objectMappings->getUpdatedMappings();
 
-        // Deleted objects
-        $deletedObjects = $syncOrder->getDeletedObjects();
-
         // Remapped objects
         $remappedObjects = $syncOrder->getRemappedObjects();
 
-        return new OrderResultsDAO($newObjectMappings, $updatedObjectMappings, $deletedObjects, $remappedObjects);
+        // Deleted objects
+        $deletedObjects = $syncOrder->getDeletedObjects();
+
+        return new OrderResultsDAO($newObjectMappings, $updatedObjectMappings, $remappedObjects, $deletedObjects);
     }
 
     private function getOrderResultsForInternalSync(OrderDAO $syncOrder): OrderResultsDAO
@@ -404,12 +404,12 @@ class SyncProcess
             $updatedObjectMappings[] = $updatedObjectMapping->getObjectMapping();
         }
 
-        // Deleted objects
-        $deletedObjects = $syncOrder->getDeletedObjects();
-
         // Remapped objects
         $remappedObjects = $syncOrder->getRemappedObjects();
 
-        return new OrderResultsDAO($newObjectMappings, $updatedObjectMappings, $deletedObjects, $remappedObjects);
+        // Deleted objects
+        $deletedObjects = $syncOrder->getDeletedObjects();
+
+        return new OrderResultsDAO($newObjectMappings, $updatedObjectMappings, $remappedObjects, $deletedObjects);
     }
 }
