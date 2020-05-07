@@ -19,12 +19,12 @@ use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\CustomFieldHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
 class LeadController extends FormController
 {
@@ -324,8 +324,8 @@ class LeadController extends FormController
 
         $_fields            = $lead->getFields();
 
-        $fields = array();
-        foreach($_fields as $group => $group_fields) {
+        $fields = [];
+        foreach ($_fields as $group => $group_fields) {
             $fields[$group] = CustomFieldHelper::orderFieldsKey($group_fields, 'field_order');
         }
 
