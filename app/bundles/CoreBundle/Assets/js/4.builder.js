@@ -987,6 +987,11 @@ Mautic.rgb2hex = function(orig) {
 Mautic.updateOutlookTag = function (element) {
     if (parent.mQuery('.builder').hasClass('email-builder')) {
 
+        // section-wrapper is TABLE element, no outlook hack need
+        if (element.get(0).tagName == 'TABLE') {
+            return;
+        }
+
         var sectionForm = parent.mQuery('#section-form-container');
 
         if (element[0].hasAttribute('data-section-wrapper')) {
