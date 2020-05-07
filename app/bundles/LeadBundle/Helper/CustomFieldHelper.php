@@ -53,7 +53,6 @@ class CustomFieldHelper
      * @param array $array 
      * @param string $key_sort 
      * @static
-     * @access public
      *
      * @return array
      */
@@ -66,7 +65,7 @@ class CustomFieldHelper
 
         asort($tmp, SORT_NUMERIC);
 
-        $tmp2 = array();
+        $tmp2 = [];
         foreach ($tmp as $key => $value) {
             $tmp2[$key] = $array[$key];
         }
