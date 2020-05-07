@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\Helper;
 
+use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
 use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Helper\MappingHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
@@ -61,7 +64,7 @@ class MappingHelperTest extends TestCase
         );
     }
 
-    public function testObjectReturnedIfKnwonMappingExists(): void
+    public function testObjectReturnedIfKnownMappingExists(): void
     {
         $mappingManual        = new MappingManualDAO('test');
         $integrationObjectDAO = new ObjectDAO('Object', 1);
@@ -130,12 +133,14 @@ class MappingHelperTest extends TestCase
             ->method('dispatch')
             ->with(
                 IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
-                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject) {
-                    $this->assertSame($internalObject, $event->getObject());
-                    $this->assertSame(['email' => 'test@test.com'], $event->getFieldValues());
+                $this->callback(
+                    function (InternalObjectFindEvent $event) use ($internalObject) {
+                        $this->assertSame($internalObject, $event->getObject());
+                        $this->assertSame(['email' => 'test@test.com'], $event->getFieldValues());
 
-                    return true;
-                })
+                        return true;
+                    }
+                )
             );
 
         $foundInternalObject = $this->mappingHelper->findMauticObject($mappingManual, $internalObjectName, $integrationObjectDAO);
@@ -178,19 +183,23 @@ class MappingHelperTest extends TestCase
             ->method('dispatch')
             ->with(
                 IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
-                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject) {
-                    $this->assertSame($internalObject, $event->getObject());
-                    $this->assertSame(['email' => 'test@test.com'], $event->getFieldValues());
+                $this->callback(
+                    function (InternalObjectFindEvent $event) use ($internalObject) {
+                        $this->assertSame($internalObject, $event->getObject());
+                        $this->assertSame(['email' => 'test@test.com'], $event->getFieldValues());
 
-                    // Mock a subscriber.
-                    $event->setFoundObjects([
-                        [
-                            'id' => 3,
-                        ],
-                    ]);
+                        // Mock a subscriber.
+                        $event->setFoundObjects(
+                            [
+                                [
+                                    'id' => 3,
+                                ],
+                            ]
+                        );
 
-                    return true;
-                })
+                        return true;
+                    }
+                )
             );
 
         $foundInternalObject = $this->mappingHelper->findMauticObject($mappingManual, $internalObjectName, $integrationObjectDAO);
@@ -233,19 +242,23 @@ class MappingHelperTest extends TestCase
             ->method('dispatch')
             ->with(
                 IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
-                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject) {
-                    $this->assertSame($internalObject, $event->getObject());
-                    $this->assertSame(['email' => 'test@test.com'], $event->getFieldValues());
+                $this->callback(
+                    function (InternalObjectFindEvent $event) use ($internalObject) {
+                        $this->assertSame($internalObject, $event->getObject());
+                        $this->assertSame(['email' => 'test@test.com'], $event->getFieldValues());
 
-                    // Mock a subscriber.
-                    $event->setFoundObjects([
-                        [
-                            'id' => 3,
-                        ],
-                    ]);
+                        // Mock a subscriber.
+                        $event->setFoundObjects(
+                            [
+                                [
+                                    'id' => 3,
+                                ],
+                            ]
+                        );
 
-                    return true;
-                })
+                        return true;
+                    }
+                )
             );
 
         $foundInternalObject = $this->mappingHelper->findMauticObject(
@@ -283,7 +296,7 @@ class MappingHelperTest extends TestCase
 
     public function testEmptyIntegrationObjectReturnedIfNotMapped(): void
     {
-        $objectName     = 'Object';
+        $objectName = 'Object';
         $this->objectMappingRepository->expects($this->once())
             ->method('getIntegrationObject')
             ->willReturn([]);
@@ -314,5 +327,49 @@ class MappingHelperTest extends TestCase
             );
 
         $this->mappingHelper->findIntegrationObject('Test', $objectName, new ObjectDAO('Contact', 1));
+    }
+
+    public function testObjectMappingIsInjectedIntoUpdatedObjectMappingDAO()
+    {
+        $objectMapping = new ObjectMapping();
+        $objectMapping->setIntegration('foobar');
+        $objectMapping->setIntegrationObjectName('foo');
+        $objectMapping->setIntegrationObjectId(1);
+
+        $this->objectMappingRepository->expects($this->once())
+            ->method('findOneBy')
+            ->with(
+                [
+                    'integration'           => $objectMapping->getIntegration(),
+                    'integrationObjectName' => $objectMapping->getIntegrationObjectName(),
+                    'integrationObjectId'   => $objectMapping->getIntegrationObjectId(),
+                ]
+            )
+            ->willReturn($objectMapping);
+
+        $updatedObjectMappingDAO = new UpdatedObjectMappingDAO('foobar', 'foo', 1, new \DateTime());
+
+        $this->mappingHelper->updateObjectMappings([$updatedObjectMappingDAO]);
+
+        $this->assertSame($objectMapping, $updatedObjectMappingDAO->getObjectMapping());
+    }
+
+    public function testObjectMappingIsNotSetIfObjectMappingNotFoundWhenAttemptingToUpdate()
+    {
+        $this->objectMappingRepository->expects($this->once())
+            ->method('findOneBy')
+            ->with(
+                [
+                    'integration'           => 'foobar',
+                    'integrationObjectName' => 'foo',
+                    'integrationObjectId'   => 1,
+                ]
+            );
+
+        $updatedObjectMappingDAO = new UpdatedObjectMappingDAO('foobar', 'foo', 1, new \DateTime());
+
+        $this->mappingHelper->updateObjectMappings([$updatedObjectMappingDAO]);
+
+        $this->assertEmpty($updatedObjectMappingDAO->getObjectMapping());
     }
 }
