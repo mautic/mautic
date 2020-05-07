@@ -14,12 +14,8 @@ namespace Mautic\FormBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Mautic\FormBundle\Enum\ConditionalFieldEnum;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class Field.
- */
 class Field
 {
     /**
@@ -232,10 +228,7 @@ class Field
             ->build();
 
         $builder->addNullableField('parent', 'string', 'parent_id');
-
-        $builder->createField('conditions', 'json_array')
-            ->nullable()
-            ->build();
+        $builder->addNullableField('conditions', 'json_array');
 
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('fields')
