@@ -101,6 +101,55 @@ class BuilderSectionType extends AbstractType
             ]
         );
 
+        // Content - Background Image
+        $builder->add('content-background-image', 'url', [
+            'label'      => 'mautic.core.content.background.image',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => [
+                'class' => 'form-control',
+                'value' => 'none',
+            ],
+        ]);
+
+        // Content - Background Repeat
+        $builder->add(
+            'content-background-repeat',
+            ChoiceType::class,
+            [
+                'choices' => [
+                    'no-repeat'    => 'no-repeat',
+                    'repeat'       => 'repeat',
+                    'repeat-x'     => 'repeat-x',
+                    'repeat-y'     => 'repeat-y',
+                    'space'        => 'space',
+                    'round'        => 'round',
+                    'repeat-space' => 'repeat-space',
+                    'space-round'  => 'space-round',
+                ],
+                'label'      => 'mautic.core.content.background.repeat',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => ['class' => 'form-control'],
+            ]
+        );
+
+        // Content - Background Size Width
+        $builder->add('content-background-size', 'text', [
+            'label'      => 'mautic.core.content.background.size',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => ['class' => 'form-control'],
+        ]);
+
+        // Content - Background Position
+        $builder->add('content-background-position', 'text', [
+            'label'      => 'mautic.core.content.background.position',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => ['class' => 'form-control'],
+        ]);
+
         // Wrapper - Background Color
         $builder->add(
             'wrapper-background-color',
@@ -166,6 +215,7 @@ class BuilderSectionType extends AbstractType
             ]
         );
 
+<<<<<<< HEAD
         // Wrapper - Background Position
         $builder->add
         (
@@ -178,6 +228,23 @@ class BuilderSectionType extends AbstractType
                 'attr'       => ['class' => 'form-control'],
             ]
         );
+=======
+        // Wrapper - Background Size Width
+        $builder->add('wrapper-background-size', 'text', [
+            'label'      => 'mautic.core.wrapper.background.size',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => ['class' => 'form-control'],
+        ]);
+
+        // Wrapper - Background Position
+        $builder->add('wrapper-background-position', 'text', [
+            'label'      => 'mautic.core.wrapper.background.position',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => ['class' => 'form-control'],
+        ]);
+>>>>>>> 8e038f458c8e00011c1e43365247674230783dc7
     }
 
     /**
