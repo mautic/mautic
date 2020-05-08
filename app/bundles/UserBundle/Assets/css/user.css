@@ -13,7 +13,8 @@
 }
 
 .mautic-logo {
-    width: 150px;
+    width: auto;
+    max-width: 240px;
     margin: 0 auto;
     background: #ffffff;
 }
@@ -37,4 +38,30 @@ span.input-group-addon i.fa {
 
 .inline-login .login-form {
     margin: 20px;
+}
+
+.login-page {
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-color: transparent;
+    overflow-y: hidden;
+}
+
+.login-page .panel-body {
+    padding-top: 32px;
+}
+
+.login-page .input-group-addon {
+    color: #c2d100;
+}
+
+.login-page .text-copyright {
+    color: #E0E0E0;
+}
+.login-page p {
+    color: #9E9E9E;
+    font-size: 12px;
+    line-height: 14px;
+    margin: 0;
 }
