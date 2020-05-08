@@ -167,8 +167,7 @@ class BuilderSectionType extends AbstractType
         );
 
         // Wrapper - Background Position
-        $builder->add
-        (
+        $builder->add(
             'wrapper-background-position',
             TextType::class,
             [
