@@ -23,7 +23,7 @@
     <?php echo $view->render('MauticCoreBundle:Default:script.html.php'); ?>
     <?php $view['assets']->outputHeadDeclarations(); ?>
 </head>
-<body style="background-image: url(<?php echo $view['assets']->getUrl('media/images/background-login.png'); ?>)">
+<body class="login-page" style="background-image: url(<?php echo $view['assets']->getUrl('media/images/background-login.png'); ?>)">
 <section id="main" role="main">
     <div class="container" style="margin-top:100px;">
         <div class="row">
@@ -37,6 +37,7 @@
                             <?php echo $view->render('MauticCoreBundle:Notification:flashes.html.php'); ?>
                         </div>
                         <?php $view['slots']->output('_content'); ?>
+                        <p class="text-center">Powered by Digital360 S.p.A.</p>
                     </div>
                 </div>
             </div>
