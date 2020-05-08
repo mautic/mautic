@@ -23,7 +23,7 @@
     <?php echo $view->render('MauticCoreBundle:Default:script.html.php'); ?>
     <?php $view['assets']->outputHeadDeclarations(); ?>
 </head>
-<body>
+<body style="background-image: url(<?php echo $view['assets']->getUrl('media/images/background-login.png'); ?>)">
 <section id="main" role="main">
     <div class="container" style="margin-top:100px;">
         <div class="row">
@@ -42,7 +42,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-4 col-lg-offset-4 text-center text-muted">
+            <div class="col-lg-4 col-lg-offset-4 text-center text-muted text-copyright">
                 <?php echo $view['translator']->trans('mautic.core.copyright', ['%date%' => date('Y')]); ?>
             </div>
         </div>
