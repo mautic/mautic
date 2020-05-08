@@ -48,11 +48,6 @@ span.input-group-addon i.fa {
     overflow-y: hidden;
 }
 
-.login-page .panel {
-    border-radius: 0;
-    border-color: #E0E0E0;
-}
-
 .login-page .panel-body {
     padding-top: 32px;
 }
@@ -63,15 +58,10 @@ span.input-group-addon i.fa {
 
 .login-page .text-copyright {
     color: #E0E0E0;
-    font-size: 8px;
 }
 .login-page p {
     color: #9E9E9E;
     font-size: 12px;
     line-height: 14px;
     margin: 0;
-}
-
-.login-page .input-lg {
-    font-size: 14px;
 }
