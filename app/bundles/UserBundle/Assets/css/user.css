@@ -66,3 +66,7 @@ span.input-group-addon i.fa {
     line-height: 14px;
     margin: 0;
 }
+
+.login-page .input-lg {
+    font-size: 14px;
+}
