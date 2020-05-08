@@ -41,15 +41,19 @@ class BuilderSectionType extends AbstractType
         );
 
         // Content - Background Image
-        $builder->add('content-background-image', 'url', [
-            'label'      => 'mautic.core.content.background.image',
-            'label_attr' => ['class' => 'control-label'],
-            'required'   => false,
-            'attr'       => [
-                'class' => 'form-control',
-                'value' => 'none',
-            ],
-        ]);
+        $builder->add(
+            'content-background-image',
+            UrlType::class,
+            [
+                'label'      => 'mautic.core.content.background.image',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'class' => 'form-control',
+                    'value' => 'none',
+                ],
+            ]
+        );
 
         // Content - Background Repeat
         $builder->add(
@@ -74,20 +78,28 @@ class BuilderSectionType extends AbstractType
         );
 
         // Content - Background Size Width
-        $builder->add('content-background-size', 'text', [
-            'label'      => 'mautic.core.content.background.size',
-            'label_attr' => ['class' => 'control-label'],
-            'required'   => false,
-            'attr'       => ['class' => 'form-control'],
-        ]);
+        $builder->add(
+            'content-background-size',
+            TextType::class,
+            [
+                'label'      => 'mautic.core.content.background.size',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => ['class' => 'form-control'],
+            ]
+        );
 
         // Content - Background Position
-        $builder->add('content-background-position', 'text', [
-            'label'      => 'mautic.core.content.background.position',
-            'label_attr' => ['class' => 'control-label'],
-            'required'   => false,
-            'attr'       => ['class' => 'form-control'],
-        ]);
+        $builder->add(
+            'content-background-position',
+            TextType::class,
+            [
+                'label'      => 'mautic.core.content.background.position',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => ['class' => 'form-control'],
+            ]
+        );
 
         // Wrapper - Background Color
         $builder->add(
