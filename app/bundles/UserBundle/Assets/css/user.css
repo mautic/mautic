@@ -48,6 +48,11 @@ span.input-group-addon i.fa {
     overflow-y: hidden;
 }
 
+.login-page .panel {
+    border-radius: 0;
+    border-color: #E0E0E0;
+}
+
 .login-page .panel-body {
     padding-top: 32px;
 }
