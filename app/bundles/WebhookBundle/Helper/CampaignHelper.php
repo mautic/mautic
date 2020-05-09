@@ -31,6 +31,9 @@ class CampaignHelper
      */
     private $contactsValues = [];
 
+    /** @var \Joomla\Http\Response */
+    private $response;
+
     public function __construct(Http $connector)
     {
         $this->connector = $connector;
@@ -86,23 +89,23 @@ class CampaignHelper
     {
         switch ($method) {
             case 'get':
-                $payload  = $url.(parse_url($url, PHP_URL_QUERY) ? '&' : '?').http_build_query($payload);
-                $response = $this->connector->get($payload, $headers, $timeout);
+                $payload        = $url.(parse_url($url, PHP_URL_QUERY) ? '&' : '?').http_build_query($payload);
+                $this->response = $this->connector->get($payload, $headers, $timeout);
                 break;
             case 'post':
             case 'put':
             case 'patch':
-                $response = $this->connector->$method($url, $payload, $headers, $timeout);
+                $this->response = $this->connector->$method($url, $payload, $headers, $timeout);
                 break;
             case 'delete':
-                $response = $this->connector->delete($url, $headers, $timeout, $payload);
+                $this->response = $this->connector->delete($url, $headers, $timeout, $payload);
                 break;
             default:
                 throw new \InvalidArgumentException('HTTP method "'.$method.' is not supported."');
         }
 
-        if (!in_array($response->code, [200, 201])) {
-            throw new \OutOfRangeException('Campaign webhook response returned error code: '.$response->code);
+        if (!in_array($this->response->code, [200, 201])) {
+            throw new \OutOfRangeException('Campaign webhook response returned error code: '.$this->response->code);
         }
     }
 
@@ -149,5 +152,13 @@ class CampaignHelper
         }
 
         return implode(',', $addresses);
+    }
+
+    /**
+     * @return \Joomla\Http\Response
+     */
+    public function getResponse()
+    {
+        return $this->response;
     }
 }

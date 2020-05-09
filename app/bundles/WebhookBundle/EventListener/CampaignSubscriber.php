@@ -14,9 +14,11 @@ namespace Mautic\WebhookBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\WebhookBundle\Event\SendWebhookEvent;
 use Mautic\WebhookBundle\Form\Type\CampaignEventSendWebhookType;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
 use Mautic\WebhookBundle\WebhookEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
@@ -26,9 +28,15 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $campaignHelper;
 
-    public function __construct(CampaignHelper $campaignHelper)
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    public function __construct(CampaignHelper $campaignHelper, EventDispatcherInterface $dispatcher)
     {
         $this->campaignHelper = $campaignHelper;
+        $this->dispatcher     = $dispatcher;
     }
 
     /**
@@ -51,6 +59,12 @@ class CampaignSubscriber implements EventSubscriberInterface
             try {
                 $this->campaignHelper->fireWebhook($event->getConfig(), $event->getLead());
                 $event->setResult(true);
+
+                if ($this->dispatcher->hasListeners(WebhookEvents::ON_WEBHOOK_RESPONSE)) {
+                    $sendWebhookEvent = new SendWebhookEvent($this->campaignHelper->getResponse(), $event->getLead());
+                    $this->dispatcher->dispatch(WebhookEvents::ON_WEBHOOK_RESPONSE, $sendWebhookEvent);
+                    unset($sendWebhookEvent);
+                }
             } catch (\Exception $e) {
                 $event->setFailed($e->getMessage());
             }

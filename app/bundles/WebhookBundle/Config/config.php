@@ -96,6 +96,7 @@ return [
                 'class'     => \Mautic\WebhookBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.webhook.campaign.helper',
+                    'event_dispatcher',
                 ],
             ],
         ],
