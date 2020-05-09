@@ -25,11 +25,21 @@ class WebhookReponseEvent extends Event
     /**
      * @var Lead
      */
-    private $contact;
+    protected $contact;
 
     public function __construct(Response $response, Lead $contact)
     {
         $this->response  = $response;
         $this->contact   = $contact;
+    }
+
+    public function getResponse(): Response
+    {
+        return $this->response;
+    }
+
+    public function getContact(): Lead
+    {
+        return $this->contact;
     }
 }
