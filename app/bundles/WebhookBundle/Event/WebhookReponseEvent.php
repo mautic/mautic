@@ -15,7 +15,7 @@ use Joomla\Http\Response;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\Event;
 
-class SendWebhookEvent extends Event
+class WebhookReponseEvent extends Event
 {
     /**
      * @var Response
