@@ -251,6 +251,9 @@ $container->register('mautic.monolog.fulltrace.formatter', 'Monolog\Formatter\Li
     ->addMethodCall('ignoreEmptyContextAndExtra', [true]);
 
 //Register command line logging
+
+use JMS\Serializer\Visitor\SerializationVisitorInterface;
+use Mautic\ApiBundle\ModelDescriber\ApiMetadataDescriber;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -349,3 +352,16 @@ $container->loadFromExtension('nelmio_api_doc', [
         ],
     ],
 ]);
+
+$jmsNamingStrategy = interface_exists(SerializationVisitorInterface::class) ? null : new Reference('jms_serializer.naming_strategy');
+
+$container
+    ->register('mautic.api_metadata_describer', ApiMetadataDescriber::class)
+    ->setArguments(
+        [
+            new Reference('jms_serializer.metadata_factory'),
+            $jmsNamingStrategy,
+            new Reference('annotation_reader'),
+            new Reference('jms_serializer.metadata.api_metadata_driver'),
+        ]
+    )->addTag('nelmio_api_doc.model_describer', ['priority' => 1000]);
