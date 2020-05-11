@@ -50,6 +50,7 @@ use Mautic\LeadBundle\Event\DoNotContactAddEvent;
 use Mautic\LeadBundle\Event\DoNotContactRemoveEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Form\Type\LeadType;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
@@ -576,6 +577,8 @@ class LeadModel extends FormModel
      * @param bool|false $bindWithForm        Send $data through the Lead form and only use valid data (should be used with request data)
      *
      * @return array
+     *
+     * @throws ImportFailedException
      */
     public function setFieldValues(Lead $lead, array $data, $overwriteWithBlank = false, $fetchSocialProfiles = true, $bindWithForm = false)
     {
@@ -598,17 +601,28 @@ class LeadModel extends FormModel
         }
 
         if (isset($data['stage'])) {
-            $stagesChangeLogRepo = $this->getStagesChangeLogRepository();
-            $currentLeadStage    = $stagesChangeLogRepo->getCurrentLeadStage($lead->getId());
+            $stagesChangeLogRepo  = $this->getStagesChangeLogRepository();
+            $currentLeadStageId   = $stagesChangeLogRepo->getCurrentLeadStage($lead->getId());
+            $currentLeadStageName = null;
+            if ($currentLeadStageId) {
+                $currentStage = $this->em->getRepository(Stage::class)->findByIdOrName($currentLeadStageId);
+                if ($currentStage) {
+                    $currentLeadStageName = $currentStage->getName();
+                }
+            }
 
-            $previousId = is_object($data['stage']) ? $data['stage']->getId() : (int) $data['stage'];
-            if ($previousId !== $currentLeadStage) {
-                $stage = $this->em->getRepository('MauticStageBundle:Stage')->find($data['stage']);
-                $lead->stageChangeLogEntry(
-                    $stage,
-                    $stage->getId().':'.$stage->getName(),
-                    $this->translator->trans('mautic.stage.event.changed')
-                );
+            $newLeadStageIdOrName = is_object($data['stage']) ? $data['stage']->getId() : $data['stage'];
+            if ((int) $newLeadStageIdOrName !== $currentLeadStageId && $newLeadStageIdOrName !== $currentLeadStageName) {
+                $newStage = $this->em->getRepository(Stage::class)->findByIdOrName($newLeadStageIdOrName);
+                if ($newStage) {
+                    $lead->stageChangeLogEntry(
+                        $newStage,
+                        $newStage->getId().':'.$newStage->getName(),
+                        $this->translator->trans('mautic.stage.event.changed')
+                    );
+                } else {
+                    throw new ImportFailedException($this->translator->trans('mautic.lead.import.stage.not.exists', ['id' => $newLeadStageIdOrName]));
+                }
             }
         }
 
