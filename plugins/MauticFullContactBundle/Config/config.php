@@ -66,27 +66,25 @@ return [
                     'mautic.lead.model.company',
                 ],
             ],
+          'mautic.plugin.fullcontact.integration.config'            => [
+            'class'     => \MauticPlugin\MauticFullContactBundle\Integration\Config::class,
+            'arguments' => [
+              'mautic.integrations.helper',
+            ],
+          ],
         ],
         'integrations' => [
             'mautic.integration.fullcontact' => [
                 'class'     => \MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'mautic.helper.cache_storage',
-                    'doctrine.orm.entity_manager',
-                    'session',
-                    'request_stack',
-                    'router',
-                    'translator',
-                    'logger',
-                    'mautic.helper.encryption',
-                    'mautic.lead.model.lead',
-                    'mautic.lead.model.company',
-                    'mautic.helper.paths',
-                    'mautic.core.model.notification',
-                    'mautic.lead.model.field',
-                    'mautic.plugin.model.integration_entity',
-                    'mautic.lead.model.dnc',
+                'tags'      => [
+                    'mautic.integration',
+                    'mautic.basic_integration',
+                ],
+            ],
+            'mautic.integration.fullcontact.configuration' => [
+                'class'     => \MauticPlugin\MauticFullContactBundle\Integration\Support\ConfigSupport::class,
+                'tags'      => [
+                  'mautic.config_integration',
                 ],
             ],
         ],
