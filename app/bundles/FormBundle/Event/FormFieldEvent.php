@@ -17,6 +17,16 @@ use Symfony\Component\EventDispatcher\Event;
 final class FormFieldEvent extends Event
 {
     /**
+     * @var Field
+     */
+    private $entity;
+
+    /**
+     * @var bool
+     */
+    private $isNew;
+
+    /**
      * @param bool $isNew
      */
     public function __construct(Field $field, $isNew = false)
@@ -38,7 +48,7 @@ final class FormFieldEvent extends Event
      */
     public function isNew()
     {
-        return $this->isNew();
+        return $this->isNew;
     }
 
     public function setField(Field $field)
