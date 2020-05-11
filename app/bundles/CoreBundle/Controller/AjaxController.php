@@ -644,8 +644,6 @@ class AjaxController extends CommonController
     }
 
     /**
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     protected function clearNotificationAction(Request $request)
