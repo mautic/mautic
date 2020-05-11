@@ -21,7 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class WebhookKillNotificatorTest extends \PHPUnit_Framework_TestCase
+class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
 {
     public function testSendToOwner()
     {

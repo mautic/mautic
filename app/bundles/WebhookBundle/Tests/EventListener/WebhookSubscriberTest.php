@@ -19,7 +19,7 @@ use Mautic\WebhookBundle\EventListener\WebhookSubscriber;
 use Mautic\WebhookBundle\Notificator\WebhookKillNotificator;
 use Mautic\WebhookBundle\WebhookEvents;
 
-class WebhookSubscriberTest extends \PHPUnit_Framework_TestCase
+class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private $ipLookupHelper;
     private $auditLogModel;
