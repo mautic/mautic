@@ -228,9 +228,9 @@ class ReportType extends AbstractType
                     'aggregators',
                     CollectionType::class,
                     [
-                        'type'    => 'aggregator',
-                        'label'   => false,
-                        'options' => [
+                        'entry_type'    => AggregatorType::class,
+                        'label'         => false,
+                        'entry_options' => [
                             'columnList' => $columns->choices,
                             'required'   => false,
                         ],
