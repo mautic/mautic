@@ -25,10 +25,7 @@ trait TranslationModelTrait
     /**
      * Get the entity based on requested translation.
      *
-     *
-     * @param TranslationEntityInterface $entity
-     * @param Lead|array|null            $lead
-     * @param Request|null               $request
+     * @param Lead|array|null $lead
      *
      * @return array[$parentEntity, TranslationEntityInterface $entity]
      */
@@ -79,7 +76,7 @@ trait TranslationModelTrait
                     $browserLanguages = explode(',', $browserLanguages);
                     if (!empty($browserLanguages)) {
                         foreach ($browserLanguages as $language) {
-                            if ($pos = strpos($language, ';q=') !== false) {
+                            if ($pos = false !== strpos($language, ';q=')) {
                                 //remove weights
                                 $language = substr($language, 0, ($pos + 1));
                             }
@@ -134,8 +131,6 @@ trait TranslationModelTrait
 
     /**
      * Run post saving a translation aware entity.
-     *
-     * @param TranslationEntityInterface $entity
      */
     public function postTranslationEntitySave(TranslationEntityInterface $entity)
     {
@@ -152,7 +147,7 @@ trait TranslationModelTrait
      */
     protected function getTranslationLocaleCore($locale)
     {
-        if (strpos($locale, '_') !== false) {
+        if (false !== strpos($locale, '_')) {
             $locale = substr($locale, 0, 2);
         }
 

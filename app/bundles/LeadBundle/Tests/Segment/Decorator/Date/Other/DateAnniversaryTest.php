@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateAnniversary;
 use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
-class DateAnniversaryTest extends \PHPUnit_Framework_TestCase
+class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateAnniversary::getOperator
@@ -46,6 +46,41 @@ class DateAnniversaryTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetParameterValue()
     {
+        /**
+         * Today in '%-m-d' format.
+         *
+         * @var string
+         */
+        $expectedResult = '%'.(new \DateTime(null, new \DateTimeZone('UTC')))->format('-m-d');
+
+        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $timezoneResolver = $this->createMock(TimezoneResolver::class);
+
+        $timezoneResolver->method('getDefaultDate')
+            ->with(false)
+            ->willReturn(
+                new DateTimeHelper(
+                    new \DateTime('midnight today', new \DateTimeZone('UTC')), null, 'UTC')
+            );
+
+        $filter        = [
+            'operator' => '=',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([]);
+
+        $filterDecorator = new DateAnniversary($dateDecorator, $dateOptionParameters);
+
+        $this->assertEquals($expectedResult, $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateAnniversary::getParameterValue
+     */
+    public function testGetParameterValueWithRelativeDate()
+    {
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
@@ -61,10 +96,13 @@ class DateAnniversaryTest extends \PHPUnit_Framework_TestCase
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
         $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
 
-        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([]);
+        $filter        = [
+            'filter'   => 'birthday +2days',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
 
         $filterDecorator = new DateAnniversary($dateDecorator, $dateOptionParameters);
 
-        $this->assertEquals('%-03-02', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+        $this->assertEquals('%-03-04', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 }

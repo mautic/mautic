@@ -13,9 +13,6 @@ namespace Mautic\CoreBundle\Helper;
 
 use Joomla\Filter\InputFilter;
 
-/**
- * Class InputHelper.
- */
 class InputHelper
 {
     /**
@@ -33,7 +30,7 @@ class InputHelper
     private static $htmlFilter;
 
     /**
-     * @var
+     * @var InputFilter
      */
     private static $strictHtmlFilter;
 
@@ -142,7 +139,7 @@ class InputHelper
 
                 if (is_array($v)) {
                     $v = self::_($v, $useMask, $urldecode);
-                } elseif ($useMask == 'filter') {
+                } elseif ('filter' == $useMask) {
                     $v = self::getFilter()->clean($v, $useMask);
                 } else {
                     $v = self::$useMask($v, $urldecode);

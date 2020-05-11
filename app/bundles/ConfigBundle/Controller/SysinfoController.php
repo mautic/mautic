@@ -26,7 +26,7 @@ class SysinfoController extends FormController
      */
     public function indexAction($page = 1)
     {
-        if (!$this->user->isAdmin() || $this->coreParametersHelper->getParameter('sysinfo_disabled')) {
+        if (!$this->user->isAdmin() || $this->coreParametersHelper->get('sysinfo_disabled')) {
             return $this->accessDenied();
         }
 

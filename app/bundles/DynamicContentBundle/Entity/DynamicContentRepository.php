@@ -23,8 +23,6 @@ class DynamicContentRepository extends CommonRepository
     /**
      * Get a list of entities.
      *
-     * @param array $args
-     *
      * @return Paginator
      */
     public function getEntities(array $args = [])
@@ -178,10 +176,10 @@ class DynamicContentRepository extends CommonRepository
                 ->setParameter('id', $this->currentUser->getId());
         }
 
-        if ($topLevel == 'translation') {
+        if ('translation' == $topLevel) {
             //only get top level pages
             $q->andWhere($q->expr()->isNull('e.translationParent'));
-        } elseif ($topLevel == 'variant') {
+        } elseif ('variant' == $topLevel) {
             $q->andWhere($q->expr()->isNull('e.variantParent'));
         }
 
@@ -207,7 +205,7 @@ class DynamicContentRepository extends CommonRepository
     /**
      * @param $slot
      *
-     * @return bool|null|object
+     * @return bool|object|null
      */
     public function getDynamicContentForSlotFromCampaign($slot)
     {

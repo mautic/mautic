@@ -12,19 +12,14 @@
 namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Entity\Integration;
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
 /**
  * Class PluginIntegrationEvent.
  */
 class PluginIntegrationEvent extends AbstractPluginIntegrationEvent
 {
-    /**
-     * PluginIntegrationEvent constructor.
-     *
-     * @param AbstractIntegration $integration
-     */
-    public function __construct(AbstractIntegration $integration)
+    public function __construct(UnifiedIntegrationInterface $integration)
     {
         $this->integration = $integration;
     }
@@ -37,9 +32,6 @@ class PluginIntegrationEvent extends AbstractPluginIntegrationEvent
         return $this->integration->getIntegrationSettings();
     }
 
-    /**
-     * @param Integration $integration
-     */
     public function setEntity(Integration $integration)
     {
         $this->integration->setIntegrationSettings($integration);

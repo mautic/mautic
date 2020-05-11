@@ -6,11 +6,12 @@
  * Time: 8:10 AM.
  */
 
-namespace MauticCrmBundle\Integration;
+namespace MauticPlugin\MauticCrmBundle\Tests;
 
+use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration;
 
-class DynamicsIntegrationTest extends \PHPUnit_Framework_TestCase
+class DynamicsIntegrationTest extends AbstractIntegrationTestCase
 {
     /** @var DynamicsIntegration */
     private $integration;
@@ -19,7 +20,24 @@ class DynamicsIntegrationTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->integration = new DynamicsIntegration();
+        $this->integration = new DynamicsIntegration(
+            $this->dispatcher,
+            $this->cache,
+            $this->em,
+            $this->session,
+            $this->request,
+            $this->router,
+            $this->translator,
+            $this->logger,
+            $this->encryptionHelper,
+            $this->leadModel,
+            $this->companyModel,
+            $this->pathsHelper,
+            $this->notificationModel,
+            $this->fieldModel,
+            $this->integrationEntityModel,
+            $this->doNotContact
+        );
     }
 
     public function testIntegration()

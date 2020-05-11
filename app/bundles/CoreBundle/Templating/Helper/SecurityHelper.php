@@ -47,11 +47,6 @@ class SecurityHelper extends Helper
 
     /**
      * SecurityHelper constructor.
-     *
-     * @param CorePermissions           $security
-     * @param RequestStack              $requestStack
-     * @param EventDispatcherInterface  $dispatcher
-     * @param CsrfTokenManagerInterface $tokenManager
      */
     public function __construct(
         CorePermissions $security,

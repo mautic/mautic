@@ -41,9 +41,6 @@ class CampaignReplySubscriber implements EventSubscriberInterface
 
     /**
      * CampaignReplySubscriber constructor.
-     *
-     * @param TransportChain      $transportChain
-     * @param RealTimeExecutioner $realTimeExecutioner
      */
     public function __construct(TransportChain $transportChain, RealTimeExecutioner $realTimeExecutioner)
     {
@@ -63,12 +60,9 @@ class CampaignReplySubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
-        if (count($this->transportChain->getEnabledTransports()) === 0) {
+        if (0 === count($this->transportChain->getEnabledTransports())) {
             return;
         }
 
@@ -83,9 +77,6 @@ class CampaignReplySubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param DecisionEvent $decisionEvent
-     */
     public function onCampaignReply(DecisionEvent $decisionEvent)
     {
         /** @var ReplyEvent $replyEvent */
@@ -110,8 +101,6 @@ class CampaignReplySubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param ReplyEvent $event
-     *
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException

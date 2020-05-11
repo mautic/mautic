@@ -13,21 +13,13 @@ namespace Mautic\AssetBundle\Helper;
 
 use Mautic\AssetBundle\Model\AssetModel;
 
-/**
- * Class TokenHelper.
- */
 class TokenHelper
 {
     /**
-     * @var
+     * @var AssetModel
      */
     protected $model;
 
-    /**
-     * TokenHelper constructor.
-     *
-     * @param AssetModel $model
-     */
     public function __construct(AssetModel $model)
     {
         $this->model = $model;
@@ -53,7 +45,7 @@ class TokenHelper
                 }
 
                 $asset          = $this->model->getEntity($assetId);
-                $tokens[$token] = ($asset !== null) ? $this->model->generateUrl($asset, true, $clickthrough) : '';
+                $tokens[$token] = (null !== $asset) ? $this->model->generateUrl($asset, true, $clickthrough) : '';
             }
         }
 

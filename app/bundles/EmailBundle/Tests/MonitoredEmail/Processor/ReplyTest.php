@@ -20,10 +20,11 @@ use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\EmailBundle\MonitoredEmail\Search\Result;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class ReplyTest extends \PHPUnit_Framework_TestCase
+class ReplyTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Test that the message is processed appropriately
@@ -82,7 +83,9 @@ class ReplyTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $processor = new Reply($statRepo, $contactFinder, $leadModel, $dispatcher, $logger);
+        $contactTracker = $this->createMock(ContactTracker::class);
+
+        $processor = new Reply($statRepo, $contactFinder, $leadModel, $dispatcher, $logger, $contactTracker);
 
         $message              = new Message();
         $message->fromAddress = 'contact@email.com';

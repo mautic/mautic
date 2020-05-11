@@ -33,17 +33,13 @@ class FieldInclusionStrategy implements ExclusionStrategyInterface
      */
     private $level;
 
-    /**
-     * @var
-     */
     private $path;
 
     /**
      * FieldInclusionStrategy constructor.
      *
-     * @param array $fields
-     * @param int   $level
-     * @param null  $path
+     * @param int  $level
+     * @param null $path
      */
     public function __construct(array $fields, $level = 3, $path = null)
     {
@@ -55,7 +51,7 @@ class FieldInclusionStrategy implements ExclusionStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function shouldSkipClass(ClassMetadata $metadata, Context $navigatorContext)
+    public function shouldSkipClass(ClassMetadata $metadata, Context $navigatorContext): bool
     {
         return false;
     }
@@ -63,7 +59,7 @@ class FieldInclusionStrategy implements ExclusionStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function shouldSkipProperty(PropertyMetadata $property, Context $navigatorContext)
+    public function shouldSkipProperty(PropertyMetadata $property, Context $navigatorContext): bool
     {
         if ($this->path) {
             $path = implode('.', $navigatorContext->getCurrentPath());

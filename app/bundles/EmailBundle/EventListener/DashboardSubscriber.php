@@ -19,6 +19,7 @@ use Mautic\EmailBundle\Form\Type\DashboardEmailsInTimeWidgetType;
 use Mautic\EmailBundle\Form\Type\DashboardMostHitEmailRedirectsWidgetType;
 use Mautic\EmailBundle\Form\Type\DashboardSentEmailToContactsWidgetType;
 use Mautic\EmailBundle\Model\EmailModel;
+use Symfony\Component\Routing\RouterInterface;
 
 class DashboardSubscriber extends MainDashboardSubscriber
 {
@@ -68,19 +69,18 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $emailModel;
 
     /**
-     * DashboardSubscriber constructor.
-     *
-     * @param EmailModel $emailModel
+     * @var RouterInterface
      */
-    public function __construct(EmailModel $emailModel)
+    private $router;
+
+    public function __construct(EmailModel $emailModel, RouterInterface $router)
     {
         $this->emailModel = $emailModel;
+        $this->router     = $router;
     }
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
@@ -88,7 +88,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
         $canViewOthers = $event->hasPermission('email:emails:viewother');
         $defaultLimit  = $this->getDefaultLimit($event->getWidget());
 
-        if ($event->getType() == 'emails.in.time') {
+        if ('emails.in.time' == $event->getType()) {
             $widget     = $event->getWidget();
             $params     = $widget->getParams();
             $filterKeys = ['flag', 'dataset', 'companyId', 'campaignId', 'segmentId'];
@@ -112,7 +112,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'sent.email.to.contacts') {
+        if ('sent.email.to.contacts' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -155,7 +155,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'most.hit.email.redirects') {
+        if ('most.hit.email.redirects' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -184,7 +184,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'ignored.vs.read.emails') {
+        if ('ignored.vs.read.emails' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -200,7 +200,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'upcoming.emails') {
+        if ('upcoming.emails' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
             $height = $widget->getHeight();
@@ -213,7 +213,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'most.sent.emails') {
+        if ('most.sent.emails' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
                 $emails = $this->emailModel->getEmailStatList(
@@ -257,7 +257,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'most.read.emails') {
+        if ('most.read.emails' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
                 $emails = $this->emailModel->getEmailStatList(
@@ -301,7 +301,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'created.emails') {
+        if ('created.emails' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
                 $emails = $this->emailModel->getEmailList(
@@ -346,7 +346,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
             $event->stopPropagation();
         }
-        if ($event->getType() == 'device.granularity.email') {
+        if ('device.granularity.email' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -369,8 +369,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
     /**
      * Count the row limit from the widget height.
-     *
-     * @param Widget $widget
      *
      * @return int
      */

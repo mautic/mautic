@@ -11,14 +11,13 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Processor;
 
-use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\MonitoredEmail\Exception\UnsubscriptionNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\Parser;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\EmailBundle\Swiftmailer\Transport\UnsubscriptionProcessorInterface;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -33,11 +32,6 @@ class Unsubscribe implements ProcessorInterface
      * @var ContactFinder
      */
     private $contactFinder;
-
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
 
     /**
      * @var TranslatorInterface
@@ -55,26 +49,25 @@ class Unsubscribe implements ProcessorInterface
     private $message;
 
     /**
+     * @var DoNotContactModel
+     */
+    private $doNotContact;
+
+    /**
      * Bounce constructor.
-     *
-     * @param \Swift_Transport $transport
-     * @param ContactFinder    $contactFinder
-     * @param StatRepository   $statRepository
-     * @param LeadModel        $leadModel
-     * @param LoggerInterface  $logger
      */
     public function __construct(
         \Swift_Transport $transport,
         ContactFinder $contactFinder,
-        LeadModel $leadModel,
         TranslatorInterface $translator,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        DoNotContactModel $doNotContact
     ) {
         $this->transport     = $transport;
         $this->contactFinder = $contactFinder;
-        $this->leadModel     = $leadModel;
         $this->translator    = $translator;
         $this->logger        = $logger;
+        $this->doNotContact  = $doNotContact;
     }
 
     /**
@@ -123,7 +116,7 @@ class Unsubscribe implements ProcessorInterface
 
         $comments = $this->translator->trans('mautic.email.bounce.reason.unsubscribed');
         foreach ($contacts as $contact) {
-            $this->leadModel->addDncForLead($contact, $channel, $comments, DoNotContact::UNSUBSCRIBED);
+            $this->doNotContact->addDncForContact($contact->getId(), $channel, $comments, DoNotContact::UNSUBSCRIBED);
         }
 
         return true;

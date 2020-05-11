@@ -24,18 +24,15 @@ $container->loadFromExtension("doctrine", array(
 ));
 */
 
-$debugMode = $container->hasParameter('mautic.debug') ? $container->getParameter('mautic.debug') : $container->getParameter('kernel.debug');
-
 $container->loadFromExtension('monolog', [
     'channels' => [
         'mautic',
     ],
     'handlers' => [
         'main' => [
-            'formatter'    => $debugMode ? 'mautic.monolog.fulltrace.formatter' : null,
             'type'         => 'fingers_crossed',
             'buffer_size'  => '200',
-            'action_level' => ($debugMode) ? 'debug' : 'error',
+            'action_level' => 'error',
             'handler'      => 'nested',
             'channels'     => [
                 '!mautic',
@@ -44,26 +41,26 @@ $container->loadFromExtension('monolog', [
         'nested' => [
             'type'      => 'rotating_file',
             'path'      => '%kernel.logs_dir%/%kernel.environment%.php',
-            'level'     => ($debugMode) ? 'debug' : 'error',
+            'level'     => 'error',
             'max_files' => 7,
         ],
         'mautic' => [
-            'formatter' => $debugMode ? 'mautic.monolog.fulltrace.formatter' : null,
-            'type'      => 'rotating_file',
-            'path'      => '%kernel.logs_dir%/mautic_%kernel.environment%.php',
-            'level'     => ($debugMode) ? 'debug' : 'notice',
+            'type'      => 'service',
+            'id'        => 'mautic.monolog.handler',
             'channels'  => [
                 'mautic',
             ],
-            'max_files' => 7,
         ],
     ],
 ]);
 
 //Twig Configuration
 $container->loadFromExtension('twig', [
-    'cache'       => '%mautic.tmp_path%/%kernel.environment%/twig',
+    'cache'       => '%env(resolve:MAUTIC_TWIG_CACHE_DIR)%',
     'auto_reload' => true,
+    'paths'       => [
+        '%kernel.root_dir%/bundles' => 'bundles',
+    ],
 ]);
 
 // Allow overriding config without a requiring a full bundle or hacks

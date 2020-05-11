@@ -162,8 +162,6 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
 
     /**
      * Simulate a PointModel::triggerAction.
-     *
-     * @param LeadEvent $event
      */
     public function addPointsListener(LeadEvent $event)
     {

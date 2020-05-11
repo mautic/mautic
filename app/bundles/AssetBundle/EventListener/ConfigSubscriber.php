@@ -11,14 +11,12 @@
 
 namespace Mautic\AssetBundle\EventListener;
 
+use Mautic\AssetBundle\Form\Type\ConfigType;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ConfigSubscriber.
- */
-class ConfigSubscriber extends CommonSubscriber
+class ConfigSubscriber implements EventSubscriberInterface
 {
     /**
      * @return array
@@ -35,6 +33,7 @@ class ConfigSubscriber extends CommonSubscriber
         $event->addForm([
             'bundle'     => 'AssetBundle',
             'formAlias'  => 'assetconfig',
+            'formType'   => ConfigType::class,
             'formTheme'  => 'MauticAssetBundle:FormTheme\Config',
             'parameters' => $event->getParametersFromConfig('MauticAssetBundle'),
         ]);

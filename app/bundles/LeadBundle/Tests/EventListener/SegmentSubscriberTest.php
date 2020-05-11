@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Event\LeadListEvent as SegmentEvent;
 use Mautic\LeadBundle\EventListener\SegmentSubscriber;
 use Mautic\LeadBundle\LeadEvents;
 
-class SegmentSubscriberTest extends \PHPUnit_Framework_TestCase
+class SegmentSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetSubscribedEvents()
     {

@@ -33,9 +33,6 @@ class ReplyController extends Controller
 
     /**
      * ReplyController constructor.
-     *
-     * @param HandlerContainer $callbackHandler
-     * @param ReplyHelper      $replyHelper
      */
     public function __construct(HandlerContainer $callbackHandler, ReplyHelper $replyHelper)
     {
@@ -44,8 +41,7 @@ class ReplyController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param         $transport
+     * @param $transport
      *
      * @return Response
      *

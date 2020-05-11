@@ -9,15 +9,14 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\IpLookup;
+namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
 use Mautic\CoreBundle\IpLookup\TelizeLookup;
 
-/**
- * Class TelizeLookupTest.
- */
-class TelizeLookupTest extends \PHPUnit_Framework_TestCase
+class TelizeLookupTest extends \PHPUnit\Framework\TestCase
 {
+    private $cacheDir = __DIR__.'/../../../../../../var/cache/test';
+
     public function testIpLookupSuccessful()
     {
         // Mock http connector
@@ -35,7 +34,7 @@ class TelizeLookupTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willReturn($mockResponse);
 
-        $ipService = new TelizeLookup(null, null, __DIR__.'/../../../../cache/test', null, $mockHttp);
+        $ipService = new TelizeLookup(null, null, $this->cacheDir, null, $mockHttp);
 
         $details = $ipService->setIpAddress('54.86.225.32')->getDetails();
 

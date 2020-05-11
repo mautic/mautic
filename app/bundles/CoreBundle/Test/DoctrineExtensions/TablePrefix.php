@@ -22,9 +22,6 @@ class TablePrefix
         $this->prefix = (string) $prefix;
     }
 
-    /**
-     * @param LoadClassMetadataEventArgs $eventArgs
-     */
     public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs)
     {
         /** @var ClassMetadataInfo $classMetadata */

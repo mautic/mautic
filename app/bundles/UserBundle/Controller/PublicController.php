@@ -12,6 +12,8 @@
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\UserBundle\Form\Type\PasswordResetConfirmType;
+use Mautic\UserBundle\Form\Type\PasswordResetType;
 use Symfony\Component\Form\FormError;
 
 class PublicController extends FormController
@@ -26,23 +28,23 @@ class PublicController extends FormController
 
         $data   = ['identifier' => ''];
         $action = $this->generateUrl('mautic_user_passwordreset');
-        $form   = $this->get('form.factory')->create('passwordreset', $data, ['action' => $action]);
+        $form   = $this->get('form.factory')->create(PasswordResetType::class, $data, ['action' => $action]);
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             if ($isValid = $this->isFormValid($form)) {
                 //find the user
                 $data = $form->getData();
                 $user = $model->getRepository()->findByIdentifier($data['identifier']);
 
-                if ($user == null) {
+                if (null == $user) {
                     $form['identifier']->addError(new FormError($this->translator->trans('mautic.user.user.passwordreset.nouserfound', [], 'validators')));
                 } else {
                     try {
                         $model->sendResetEmail($user);
-                        $this->addFlash('mautic.user.user.notice.passwordreset', [], 'notice', null, false);
+                        $this->addFlash('mautic.user.user.notice.passwordreset');
                     } catch (\Exception $exception) {
-                        $this->addFlash('mautic.user.user.notice.passwordreset.error', [], 'error', null, false);
+                        $this->addFlash('mautic.user.user.notice.passwordreset.error', [], 'error');
                     }
 
                     return $this->redirect($this->generateUrl('login'));
@@ -68,7 +70,7 @@ class PublicController extends FormController
 
         $data   = ['identifier' => '', 'password' => '', 'password_confirm' => ''];
         $action = $this->generateUrl('mautic_user_passwordresetconfirm');
-        $form   = $this->get('form.factory')->create('passwordresetconfirm', [], ['action' => $action]);
+        $form   = $this->get('form.factory')->create(PasswordResetConfirmType::class, [], ['action' => $action]);
         $token  = $this->request->query->get('token');
 
         if ($token) {
@@ -76,14 +78,14 @@ class PublicController extends FormController
         }
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             if ($isValid = $this->isFormValid($form)) {
                 //find the user
                 $data = $form->getData();
                 /** @var \Mautic\UserBundle\Entity\User $user */
                 $user = $model->getRepository()->findByIdentifier($data['identifier']);
 
-                if ($user == null) {
+                if (null == $user) {
                     $form['identifier']->addError(new FormError($this->translator->trans('mautic.user.user.passwordreset.nouserfound', [], 'validators')));
                 } else {
                     if ($this->request->getSession()->has('resetToken')) {
@@ -95,7 +97,7 @@ class PublicController extends FormController
                             $user->setPassword($encodedPassword);
                             $model->saveEntity($user);
 
-                            $this->addFlash('mautic.user.user.notice.passwordreset.success', [], 'notice', null, false);
+                            $this->addFlash('mautic.user.user.notice.passwordreset.success');
 
                             $this->request->getSession()->remove('resetToken');
 
@@ -112,7 +114,7 @@ class PublicController extends FormController
                             ],
                         ]);
                     } else {
-                        $this->addFlash('mautic.user.user.notice.passwordreset.missingtoken', [], 'notice', null, false);
+                        $this->addFlash('mautic.user.user.notice.passwordreset.missingtoken');
 
                         return $this->redirect($this->generateUrl('mautic_user_passwordresetconfirm'));
                     }

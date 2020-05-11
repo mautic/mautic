@@ -40,10 +40,6 @@ class LogoutHandler implements LogoutHandlerInterface
 
     /**
      * LogoutHandler constructor.
-     *
-     * @param UserModel                $userModel
-     * @param EventDispatcherInterface $dispatcher
-     * @param UserHelper               $userHelper
      */
     public function __construct(UserModel $userModel, EventDispatcherInterface $dispatcher, UserHelper $userHelper)
     {
@@ -54,8 +50,6 @@ class LogoutHandler implements LogoutHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @param Request $request
      *
      * @return Response never null
      */

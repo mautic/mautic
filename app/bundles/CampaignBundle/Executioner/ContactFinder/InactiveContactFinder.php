@@ -12,7 +12,6 @@
 namespace Mautic\CampaignBundle\Executioner\ContactFinder;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadRepository as CampaignLeadRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -26,11 +25,6 @@ class InactiveContactFinder
      * @var LeadRepository
      */
     private $leadRepository;
-
-    /**
-     * @var CampaignRepository
-     */
-    private $campaignRepository;
 
     /**
      * @var CampaignLeadRepository
@@ -47,30 +41,18 @@ class InactiveContactFinder
      */
     private $campaignMemberDatesAdded;
 
-    /**
-     * InactiveContactFinder constructor.
-     *
-     * @param LeadRepository         $leadRepository
-     * @param CampaignRepository     $campaignRepository
-     * @param CampaignLeadRepository $campaignLeadRepository
-     * @param LoggerInterface        $logger
-     */
     public function __construct(
         LeadRepository $leadRepository,
-        CampaignRepository $campaignRepository,
         CampaignLeadRepository $campaignLeadRepository,
         LoggerInterface $logger
     ) {
         $this->leadRepository         = $leadRepository;
-        $this->campaignRepository     = $campaignRepository;
         $this->campaignLeadRepository = $campaignLeadRepository;
         $this->logger                 = $logger;
     }
 
     /**
-     * @param int            $campaignId
-     * @param Event          $decisionEvent
-     * @param ContactLimiter $limiter
+     * @param int $campaignId
      *
      * @return ArrayCollection
      *
@@ -122,9 +104,7 @@ class InactiveContactFinder
     }
 
     /**
-     * @param int            $campaignId
-     * @param array          $decisionEvents
-     * @param ContactLimiter $limiter
+     * @param int $campaignId
      *
      * @return int
      */

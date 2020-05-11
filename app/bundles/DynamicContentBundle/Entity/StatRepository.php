@@ -23,7 +23,7 @@ class StatRepository extends CommonRepository
     use TimelineTrait;
 
     /**
-     * @param   $dynamicContentId
+     * @param $dynamicContentId
      *
      * @return array
      */
@@ -92,7 +92,7 @@ class StatRepository extends CommonRepository
                 $q->expr()->in('e.dynamic_content_id', $dynamicContentIds)
             );
 
-        if ($fromDate !== null) {
+        if (null !== $fromDate) {
             //make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $q->andWhere(
@@ -117,7 +117,6 @@ class StatRepository extends CommonRepository
      * Get a lead's dynamic content stat.
      *
      * @param int|null $leadId
-     * @param array    $options
      *
      * @return array
      *

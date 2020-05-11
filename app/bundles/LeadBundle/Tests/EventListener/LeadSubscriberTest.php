@@ -11,14 +11,17 @@
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Tests\CommonMocks;
-use Mautic\LeadBundle\Entity\lead;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\EventListener\LeadSubscriber;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\Templating\Helper\DncReasonHelper;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadSubscriberTest extends CommonMocks
 {
@@ -61,26 +64,28 @@ class LeadSubscriberTest extends CommonMocks
             ],
         ];
 
-        $ipLookupHelper = $this->getMockBuilder(IpLookupHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $auditLogModel = $this->getMockBuilder(AuditLogModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $ipLookupHelper      = $this->createMock(IpLookupHelper::class);
+        $auditLogModel       = $this->createMock(AuditLogModel::class);
+        $leadEventDispatcher = $this->createMock(LeadChangeEventDispatcher::class);
+        $dncReasonHelper     = $this->createMock(DncReasonHelper::class);
+        $entityManager       = $this->createMock(EntityManager::class);
+        $translator          = $this->createMock(TranslatorInterface::class);
+        $router              = $this->createMock(RouterInterface::class);
 
         // This method will be called exactly once
         // even though the onLeadPostSave was called twice for the same lead
         $auditLogModel->expects($this->once())
             ->method('writeToLog');
 
-        $leadEventDispatcher = $this->getMockBuilder(LeadChangeEventDispatcher::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $dncReasonHelper = $this->createMock(DncReasonHelper::class);
-
-        $subscriber = new LeadSubscriber($ipLookupHelper, $auditLogModel, $leadEventDispatcher, $dncReasonHelper);
+        $subscriber = new LeadSubscriber(
+            $ipLookupHelper,
+            $auditLogModel,
+            $leadEventDispatcher,
+            $dncReasonHelper,
+            $entityManager,
+            $translator,
+            $router
+        );
 
         $leadEvent = $this->getMockBuilder(LeadEvent::class)
             ->disableOriginalConstructor()

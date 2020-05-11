@@ -16,31 +16,26 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Mautic\CoreBundle\Entity\DeprecatedInterface;
 
-/**
- * Class DoctrineEventsSubscriber.
- */
 class DoctrineEventsSubscriber implements EventSubscriber
 {
-    protected $tablePrefix;
-
     /**
-     * @var
+     * @var string
      */
-    protected $deprecatedEntityTables = [];
+    private $tablePrefix;
 
     /**
-     * DoctrineEventsSubscriber constructor.
-     *
-     * @param $tablePrefix
+     * @var array
+     */
+    private $deprecatedEntityTables = [];
+
+    /**
+     * @param string $tablePrefix
      */
     public function __construct($tablePrefix)
     {
         $this->tablePrefix = $tablePrefix;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSubscribedEvents()
     {
         return [
@@ -49,9 +44,6 @@ class DoctrineEventsSubscriber implements EventSubscriber
         ];
     }
 
-    /**
-     * @param LoadClassMetadataEventArgs $args
-     */
     public function loadClassMetadata(LoadClassMetadataEventArgs $args)
     {
         //in the installer
@@ -97,7 +89,7 @@ class DoctrineEventsSubscriber implements EventSubscriber
             );
 
             foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {
-                if ($mapping['type'] == \Doctrine\ORM\Mapping\ClassMetadataInfo::MANY_TO_MANY
+                if (\Doctrine\ORM\Mapping\ClassMetadataInfo::MANY_TO_MANY == $mapping['type']
                     && isset($classMetadata->associationMappings[$fieldName]['joinTable']['name'])
                 ) {
                     $mappedTableName                                                     = $classMetadata->associationMappings[$fieldName]['joinTable']['name'];
@@ -132,9 +124,6 @@ class DoctrineEventsSubscriber implements EventSubscriber
         }
     }
 
-    /**
-     * @param GenerateSchemaEventArgs $args
-     */
     public function postGenerateSchema(GenerateSchemaEventArgs $args)
     {
         $schema = $args->getSchema();

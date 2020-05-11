@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\EventListener;
+namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
 use Mautic\CoreBundle\EventListener\RequestSubscriber;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
@@ -21,7 +21,7 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class RequestSubscriberTest extends \PHPUnit_Framework_TestCase
+class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var RequestSubscriber
@@ -34,7 +34,7 @@ class RequestSubscriberTest extends \PHPUnit_Framework_TestCase
     private $request;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $getResponseEventMock;
 
@@ -70,9 +70,11 @@ class RequestSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getTemplating')
             ->willReturn($this->createMock(DelegatingEngine::class));
 
-        $this->subscriber = new RequestSubscriber($csrfTokenManagerMock);
-        $this->subscriber->setTranslator($this->createMock(TranslatorInterface::class));
-        $this->subscriber->setTemplating($templatingHelper);
+        $this->subscriber = new RequestSubscriber(
+            $csrfTokenManagerMock,
+            $this->createMock(TranslatorInterface::class),
+            $templatingHelper
+        );
     }
 
     public function testTheValidateCsrfTokenForAjaxPostMethodAsRegularPost()

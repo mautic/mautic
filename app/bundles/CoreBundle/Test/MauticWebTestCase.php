@@ -15,16 +15,18 @@ namespace Mautic\CoreBundle\Test;
 
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 
 define('MAUTIC_TEST_ENV', 1);
 
 class MauticWebTestCase extends WebTestCase
 {
+    use \Liip\TestFixturesBundle\Test\FixturesTrait;
+
     /**
      * @var \Symfony\Bundle\FrameworkBundle\Client
      */
@@ -36,7 +38,7 @@ class MauticWebTestCase extends WebTestCase
     protected $em;
 
     /**
-     * @var
+     * @var EncoderFactoryInterface
      */
     protected $encoder;
 
@@ -178,7 +180,7 @@ class MauticWebTestCase extends WebTestCase
             if (count($crawler)) {
                 $msg .= ': '.trim($crawler->filter('title')->text());
             } elseif ($response->getContent()) {
-                if ($response->headers->get('Content-Type') == 'application/json') {
+                if ('application/json' == $response->headers->get('Content-Type')) {
                     $content = json_decode($response->getContent());
                     if ($fullOutput) {
                         $message = print_r($content, true);
@@ -202,7 +204,7 @@ class MauticWebTestCase extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp()
     {
         static::$kernel = static::createKernel();
         static::$kernel->boot();
@@ -226,7 +228,7 @@ class MauticWebTestCase extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
@@ -254,7 +256,7 @@ class MauticWebTestCase extends WebTestCase
 
         $this->em->getConnection()->query('SET GLOBAL FOREIGN_KEY_CHECKS = 0;');
 
-        $this->fixtures = $this->loadFixtures($this->getMauticFixtures(true))->getReferenceRepository();
+        $this->fixtures = $this->loadFixtures($this->getMauticFixtures(true), false)->getReferenceRepository();
 
         $this->em->getConnection()->query('SET GLOBAL FOREIGN_KEY_CHECKS = 1;');
     }
@@ -291,7 +293,6 @@ class MauticWebTestCase extends WebTestCase
 
     /**
      * @param string $fixturesDir
-     * @param array  $fixtures
      * @param string $classPrefix
      * @param bool   $returnClassNames
      */

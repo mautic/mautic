@@ -25,8 +25,6 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
 
     /**
      * BaseFilterQueryBuilder constructor.
-     *
-     * @param RandomParameterName $randomParameterNameService
      */
     public function __construct(RandomParameterName $randomParameterNameService)
     {
@@ -119,7 +117,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                 break;
             case 'multiselect':
             case '!multiselect':
-                $operator    = $filterOperator === 'multiselect' ? 'regexp' : 'notRegexp';
+                $operator    = 'multiselect' === $filterOperator ? 'regexp' : 'notRegexp';
                 $expressions = [];
                 foreach ($filterParametersHolder as $parameter) {
                     $expressions[] = $queryBuilder->expr()->$operator('l.'.$filter->getField(), $parameter);

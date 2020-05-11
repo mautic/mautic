@@ -70,7 +70,7 @@ class Event implements ChannelInterface
     private $properties = [];
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $triggerDate;
 
@@ -85,22 +85,22 @@ class Event implements ChannelInterface
     private $triggerIntervalUnit;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $triggerHour;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $triggerRestrictedStartHour;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $triggerRestrictedStopHour;
 
     /**
-     * @var null|array
+     * @var array|null
      */
     private $triggerRestrictedDaysOfWeek = [];
 
@@ -122,7 +122,7 @@ class Event implements ChannelInterface
     /**
      * @var Event
      **/
-    private $parent = null;
+    private $parent;
 
     /**
      * @var string
@@ -147,19 +147,19 @@ class Event implements ChannelInterface
     private $contactLog = [];
 
     /**
-     * @var
+     * @var string|null
      */
     private $channel;
 
     /**
-     * @var
+     * @var int|null
      */
     private $channelId;
 
     /**
-     * @var
+     * @var array
      */
-    private $changes;
+    private $changes = [];
 
     public function __construct()
     {
@@ -178,9 +178,6 @@ class Event implements ChannelInterface
         $this->channelId = null;
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -408,7 +405,7 @@ class Event implements ChannelInterface
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
-        if ($prop == 'category' || $prop == 'parent') {
+        if ('category' == $prop || 'parent' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -420,7 +417,7 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getChanges()
     {
@@ -496,8 +493,6 @@ class Event implements ChannelInterface
 
     /**
      * Set campaign.
-     *
-     * @param \Mautic\CampaignBundle\Entity\Campaign $campaign
      *
      * @return Event
      */
@@ -604,8 +599,6 @@ class Event implements ChannelInterface
     /**
      * Add log.
      *
-     * @param LeadEventLog $log
-     *
      * @return Event
      */
     public function addLog(LeadEventLog $log)
@@ -617,8 +610,6 @@ class Event implements ChannelInterface
 
     /**
      * Remove log.
-     *
-     * @param LeadEventLog $log
      */
     public function removeLog(LeadEventLog $log)
     {
@@ -638,7 +629,6 @@ class Event implements ChannelInterface
     /**
      * Get log for a contact and a rotation.
      *
-     * @param Contact $contact
      * @param $rotation
      *
      * @return LeadEventLog|null
@@ -956,8 +946,6 @@ class Event implements ChannelInterface
     /**
      * Used by the API.
      *
-     * @param Contact|null $contact
-     *
      * @return LeadEventLog[]|\Doctrine\Common\Collections\Collection|static
      */
     public function getContactLog(Contact $contact = null)
@@ -1003,7 +991,7 @@ class Event implements ChannelInterface
     /**
      * Get the value of triggerRestrictedStartHour.
      *
-     * @return null|\DateTime
+     * @return \DateTime|null
      */
     public function getTriggerRestrictedStartHour()
     {
@@ -1013,7 +1001,7 @@ class Event implements ChannelInterface
     /**
      * Set the value of triggerRestrictedStartHour.
      *
-     * @param null|\DateTime $triggerRestrictedStartHour
+     * @param \DateTime|null $triggerRestrictedStartHour
      *
      * @return self
      */
@@ -1035,7 +1023,7 @@ class Event implements ChannelInterface
     /**
      * Get the value of triggerRestrictedStopHour.
      *
-     * @return null|\DateTime
+     * @return \DateTime|null
      */
     public function getTriggerRestrictedStopHour()
     {
@@ -1045,7 +1033,7 @@ class Event implements ChannelInterface
     /**
      * Set the value of triggerRestrictedStopHour.
      *
-     * @param null|\DateTime $triggerRestrictedStopHour
+     * @param \DateTime|null $triggerRestrictedStopHour
      *
      * @return self
      */
@@ -1076,8 +1064,6 @@ class Event implements ChannelInterface
 
     /**
      * Set the value of triggerRestrictedDaysOfWeek.
-     *
-     * @param null|array $triggerRestrictedDaysOfWeek
      *
      * @return self
      */

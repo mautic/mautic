@@ -9,15 +9,17 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\unit\IpLookup;
+namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
 use Mautic\CoreBundle\IpLookup\ExtremeIpLookup;
 
 /**
  * Class ExtremeIpLookupTest.
  */
-class ExtemeIpLookupTest extends \PHPUnit_Framework_TestCase
+class ExtemeIpLookupTest extends \PHPUnit\Framework\TestCase
 {
+    private $cacheDir = __DIR__.'/../../../../../../var/cache/test';
+
     public function testIpLookupSuccessful()
     {
         // Mock http connector
@@ -35,7 +37,7 @@ class ExtemeIpLookupTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willReturn($mockResponse);
 
-        $ipService = new ExtremeIpLookup(null, null, __DIR__.'/../../../../cache/test', null, $mockHttp);
+        $ipService = new ExtremeIpLookup(null, null, $this->cacheDir, null, $mockHttp);
 
         $details = $ipService->setIpAddress('63.70.164.200')->getDetails();
 

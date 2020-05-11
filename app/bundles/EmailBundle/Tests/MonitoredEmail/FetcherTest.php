@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Tests;
+namespace Mautic\EmailBundle\Tests\MonitoredEmail;
 
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Event\ParseEmailEvent;
@@ -18,7 +18,7 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class FetcherTest extends \PHPUnit_Framework_TestCase
+class FetcherTest extends \PHPUnit\Framework\TestCase
 {
     protected $mailboxes = [
         'EmailBundle_bounces' => [

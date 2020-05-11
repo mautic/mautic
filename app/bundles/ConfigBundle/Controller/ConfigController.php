@@ -14,17 +14,43 @@ namespace Mautic\ConfigBundle\Controller;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\ConfigBundle\Form\Type\ConfigType;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class ConfigController.
- */
 class ConfigController extends FormController
 {
+    /**
+     * Recursively filters the specified array and replaces any UploadedFile instances with their contents
+     * (or NULL if the file cannot be read).
+     *
+     * @see https://github.com/mautic/mautic/issues/7294
+     *
+     * @return array
+     */
+    protected function filterNormDataForLogging(array $data)
+    {
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $value = $this->filterNormDataForLogging($value);
+            }
+
+            if ($value instanceof UploadedFile) {
+                $value = @file_get_contents($value->getFilename());
+            }
+
+            $data[$key] = $value;
+        }
+
+        return $data;
+    }
+
     /**
      * Controller action for editing the application configuration.
      *
@@ -37,20 +63,19 @@ class ConfigController extends FormController
             return $this->accessDenied();
         }
 
-        $event      = new ConfigBuilderEvent($this->get('mautic.helper.paths'), $this->get('mautic.helper.bundle'));
+        $event      = new ConfigBuilderEvent($this->get('mautic.helper.bundle'));
         $dispatcher = $this->get('event_dispatcher');
         $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
         $fileFields  = $event->getFileFields();
         $formThemes  = $event->getFormThemes();
         $formConfigs = $this->get('mautic.config.mapper')->bindFormConfigsWithRealValues($event->getForms());
-        $doNotChange = $this->coreParametersHelper->getParameter('security.restrictedConfigFields');
 
-        $this->mergeParamsWithLocal($formConfigs, $doNotChange);
+        $this->mergeParamsWithLocal($formConfigs);
 
         // Create the form
         $action = $this->generateUrl('mautic_config_action', ['objectAction' => 'edit']);
         $form   = $this->get('form.factory')->create(
-            'config',
+            ConfigType::class,
             $formConfigs,
             [
                 'action'     => $action,
@@ -66,7 +91,7 @@ class ConfigController extends FormController
         $openTab      = null;
 
         // Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $isValid = false;
                 if ($isWritabale && $isValid = $this->isFormValid($form)) {
@@ -78,7 +103,7 @@ class ConfigController extends FormController
                     $configEvent = new ConfigEvent($formData, $post);
                     $configEvent
                         ->setOriginalNormData($originalNormData)
-                        ->setNormData($form->getNormData());
+                        ->setNormData($this->filterNormDataForLogging($form->getNormData()));
                     $dispatcher->dispatch(ConfigEvents::CONFIG_PRE_SAVE, $configEvent);
                     $formValues = $configEvent->getConfig();
 
@@ -106,7 +131,7 @@ class ConfigController extends FormController
                         $unsetIfEmpty = array_merge($unsetIfEmpty, $fileFields);
 
                         // Merge each bundle's updated configuration into the local configuration
-                        foreach ($formValues as $key => $object) {
+                        foreach ($formValues as $object) {
                             $checkThese = array_intersect(array_keys($object), $unsetIfEmpty);
                             foreach ($checkThese as $checkMe) {
                                 if (empty($object[$checkMe])) {
@@ -129,10 +154,9 @@ class ConfigController extends FormController
 
                             $this->addFlash('mautic.config.config.notice.updated');
 
-                            // We must clear the application cache for the updated values to take effect
-                            /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
+                            /** @var CacheHelper $cacheHelper */
                             $cacheHelper = $this->get('mautic.helper.cache');
-                            $cacheHelper->clearContainerFile();
+                            $cacheHelper->refreshConfig();
 
                             if ($isValid && !empty($formData['coreconfig']['last_shown_tab'])) {
                                 $openTab = $formData['coreconfig']['last_shown_tab'];
@@ -198,7 +222,7 @@ class ConfigController extends FormController
             return $this->accessDenied();
         }
 
-        $event      = new ConfigBuilderEvent($this->get('mautic.helper.paths'), $this->get('mautic.helper.bundle'));
+        $event      = new ConfigBuilderEvent($this->get('mautic.helper.bundle'));
         $dispatcher = $this->get('event_dispatcher');
         $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
 
@@ -209,7 +233,7 @@ class ConfigController extends FormController
             return $this->accessDenied();
         }
 
-        $content  = $this->get('mautic.helper.core_parameters')->getParameter($objectId);
+        $content  = $this->get('mautic.helper.core_parameters')->get($objectId);
         $filename = $this->request->get('filename', $objectId);
 
         if ($decoded = base64_decode($content)) {
@@ -240,7 +264,7 @@ class ConfigController extends FormController
         }
 
         $success    = 0;
-        $event      = new ConfigBuilderEvent($this->get('mautic.helper.paths'), $this->get('mautic.helper.bundle'));
+        $event      = new ConfigBuilderEvent($this->get('mautic.helper.bundle'));
         $dispatcher = $this->get('event_dispatcher');
         $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
 
@@ -252,10 +276,10 @@ class ConfigController extends FormController
             $configurator->mergeParameters([$objectId => null]);
             try {
                 $configurator->write();
-                // We must clear the application cache for the updated values to take effect
-                /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
+
+                /** @var CacheHelper $cacheHelper */
                 $cacheHelper = $this->get('mautic.helper.cache');
-                $cacheHelper->clearContainerFile();
+                $cacheHelper->refreshConfig();
                 $success = 1;
             } catch (\Exception $exception) {
             }
@@ -272,13 +296,14 @@ class ConfigController extends FormController
      *
      * @return array
      */
-    private function mergeParamsWithLocal(&$forms, $doNotChange)
+    private function mergeParamsWithLocal(&$forms)
     {
-        // Import the current local configuration, $parameters is defined in this file
+        $doNotChange = $this->getParameter('mautic.security.restrictedConfigFields');
+        /** @var PathsHelper $pathsHelper */
+        $pathsHelper     = $this->get('mautic.helper.paths');
+        $localConfigFile = $pathsHelper->getLocalConfigurationFile();
 
-        /** @var \AppKernel $kernel */
-        $kernel          = $this->container->get('kernel');
-        $localConfigFile = $kernel->getLocalConfigFile();
+        // Import the current local configuration, $parameters is defined in this file
 
         /** @var $parameters */
         include $localConfigFile;

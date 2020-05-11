@@ -7,7 +7,7 @@ use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\Scheduler\EventListener\ReportSchedulerSubscriber;
 use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
 
-class ReportSchedulerSubscriberTest extends \PHPUnit_Framework_TestCase
+class ReportSchedulerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testOnReportSave()
     {

@@ -23,8 +23,6 @@ class DateTime implements ScheduleModeInterface
 
     /**
      * DateTime constructor.
-     *
-     * @param LoggerInterface $logger
      */
     public function __construct(LoggerInterface $logger)
     {
@@ -32,10 +30,6 @@ class DateTime implements ScheduleModeInterface
     }
 
     /**
-     * @param Event     $event
-     * @param \DateTime $compareFromDateTime
-     * @param \DateTime $comparedToDateTime
-     *
      * @return \DateTime
      */
     public function getExecutionDateTime(Event $event, \DateTime $compareFromDateTime, \DateTime $comparedToDateTime)

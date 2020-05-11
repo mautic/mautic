@@ -21,8 +21,6 @@ use Mautic\UserBundle\Entity\User;
 class ConsumerRepository extends CommonRepository
 {
     /**
-     * @param User $user
-     *
      * @return array
      */
     public function getUserClients(User $user)
@@ -39,10 +37,6 @@ class ConsumerRepository extends CommonRepository
         return $q->getQuery()->getResult();
     }
 
-    /**
-     * @param Consumer $consumer
-     * @param User     $user
-     */
     public function deleteAccessTokens(Consumer $consumer, User $user)
     {
         $qb = $this->_em->createQueryBuilder();

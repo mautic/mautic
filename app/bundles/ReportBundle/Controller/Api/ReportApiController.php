@@ -13,10 +13,10 @@ namespace Mautic\ReportBundle\Controller\Api;
 
 use DateTimeImmutable;
 use DateTimeZone;
-use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 class ReportApiController extends CommonApiController
@@ -64,7 +64,7 @@ class ReportApiController extends CommonApiController
         }
 
         return $this->handleView(
-            $this->view($reportData, Codes::HTTP_OK)
+            $this->view($reportData, Response::HTTP_OK)
         );
     }
 

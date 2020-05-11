@@ -19,7 +19,7 @@ use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorService;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Monolog\Logger;
 
-class DeviceTrackerTest extends \PHPUnit_Framework_TestCase
+class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var DeviceCreatorService
@@ -46,7 +46,7 @@ class DeviceTrackerTest extends \PHPUnit_Framework_TestCase
      */
     private $userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36';
 
-    public function setUp()
+    protected function setUp()
     {
         $this->deviceCreatorService = new DeviceCreatorService();
 

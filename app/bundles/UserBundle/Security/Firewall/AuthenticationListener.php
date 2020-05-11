@@ -46,9 +46,6 @@ class AuthenticationListener implements ListenerInterface
      */
     protected $authenticationManager;
 
-    /**
-     * @var
-     */
     protected $providerKey;
 
     /**
@@ -67,13 +64,7 @@ class AuthenticationListener implements ListenerInterface
     protected $permissionRepository;
 
     /**
-     * @param AuthenticationHandler          $authenticationHandler
-     * @param TokenStorageInterface          $tokenStorage
-     * @param AuthenticationManagerInterface $authenticationManager
-     * @param LoggerInterface                $logger
-     * @param EventDispatcherInterface       $dispatcher
-     * @param                                $providerKey
-     * @param PermissionRepository           $permissionRepository
+     * @param $providerKey
      */
     public function __construct(
         AuthenticationHandler $authenticationHandler,
@@ -93,9 +84,6 @@ class AuthenticationListener implements ListenerInterface
         $this->permissionRepository  = $permissionRepository;
     }
 
-    /**
-     * @param GetResponseEvent $event
-     */
     public function handle(GetResponseEvent $event)
     {
         if (null !== $this->tokenStorage->getToken()) {
@@ -137,9 +125,6 @@ class AuthenticationListener implements ListenerInterface
     }
 
     /**
-     * @param Request                 $request
-     * @param AuthenticationException $failed
-     *
      * @return Response
      */
     private function onFailure(Request $request, AuthenticationException $failed)
@@ -158,10 +143,6 @@ class AuthenticationListener implements ListenerInterface
     }
 
     /**
-     * @param Request        $request
-     * @param TokenInterface $token
-     * @param Response|null  $response
-     *
      * @return Response
      */
     private function onSuccess(Request $request, TokenInterface $token, Response $response = null)

@@ -39,9 +39,6 @@ class MessageQueue
      */
     private $channel;
 
-    /**
-     * @var
-     */
     private $channelId;
 
     /**
@@ -85,23 +82,20 @@ class MessageQueue
     private $datePublished;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $scheduledDate;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $lastAttempt;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $dateSent;
 
-    /**
-     * @var array()
-     */
     private $options = [];
 
     /**
@@ -123,9 +117,6 @@ class MessageQueue
      */
     private $metadataUpdated = false;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -139,7 +130,7 @@ class MessageQueue
             ->addIndex(['success'], 'message_success')
             ->addIndex(['channel', 'channel_id'], 'message_channel_search');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->addField('channel', 'string');
         $builder->addNamedField('channelId', 'integer', 'channel_id');
@@ -280,8 +271,6 @@ class MessageQueue
     }
 
     /**
-     * @param Event $event
-     *
      * @return MessageQueue
      */
     public function setEvent(Event $event)
@@ -347,9 +336,6 @@ class MessageQueue
         return $this->lead;
     }
 
-    /**
-     * @param Lead $lead
-     */
     public function setLead(Lead $lead)
     {
         $this->lead = $lead;
@@ -491,9 +477,6 @@ class MessageQueue
         return (isset($this->options['metadata'])) ? $this->options['metadata'] : [];
     }
 
-    /**
-     * @param array $metadata
-     */
     public function setMetadata(array $metadata = [])
     {
         $this->metadataUpdated     = true;

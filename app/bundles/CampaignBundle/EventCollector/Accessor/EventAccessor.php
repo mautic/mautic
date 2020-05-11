@@ -36,11 +36,6 @@ class EventAccessor
      */
     private $decisions = [];
 
-    /**
-     * EventAccessor constructor.
-     *
-     * @param array $events
-     */
     public function __construct(array $events)
     {
         $this->buildEvents($events);
@@ -141,9 +136,6 @@ class EventAccessor
         return $this->decisions;
     }
 
-    /**
-     * @param array $events
-     */
     private function buildEvents(array $events)
     {
         if (isset($events[Event::TYPE_ACTION])) {

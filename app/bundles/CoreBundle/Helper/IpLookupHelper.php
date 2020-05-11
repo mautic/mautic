@@ -17,13 +17,10 @@ use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class IpLookupHelper.
- */
 class IpLookupHelper
 {
     /**
-     * @var null|Request
+     * @var Request|null
      */
     protected $request;
 
@@ -53,18 +50,20 @@ class IpLookupHelper
     protected $doNotTrackInternalIps;
 
     /**
+     * @var array
+     */
+    protected $trackPrivateIPRanges;
+
+    /**
+     * @var string
+     */
+    private $realIp;
+
+    /**
      * @var CoreParametersHelper
      */
     private $coreParametersHelper;
 
-    /**
-     * IpLookupHelper constructor.
-     *
-     * @param RequestStack         $requestStack
-     * @param EntityManager        $em
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param AbstractLookup       $ipLookup
-     */
     public function __construct(
         RequestStack $requestStack,
         EntityManager $em,
@@ -74,10 +73,10 @@ class IpLookupHelper
         $this->request               = $requestStack->getCurrentRequest();
         $this->em                    = $em;
         $this->ipLookup              = $ipLookup;
-        $this->doNotTrackIps         = $coreParametersHelper->getParameter('mautic.do_not_track_ips');
-        $this->doNotTrackBots        = $coreParametersHelper->getParameter('mautic.do_not_track_bots');
-        $this->doNotTrackInternalIps = $coreParametersHelper->getParameter('mautic.do_not_track_internal_ips');
-        $this->trackPrivateIPRanges  = $coreParametersHelper->getParameter('mautic.track_private_ip_ranges');
+        $this->doNotTrackIps         = $coreParametersHelper->get('do_not_track_ips');
+        $this->doNotTrackBots        = $coreParametersHelper->get('do_not_track_bots');
+        $this->doNotTrackInternalIps = $coreParametersHelper->get('do_not_track_internal_ips');
+        $this->trackPrivateIPRanges  = $coreParametersHelper->get('track_private_ip_ranges');
         $this->coreParametersHelper  = $coreParametersHelper;
     }
 
@@ -103,7 +102,7 @@ class IpLookupHelper
                 if ($this->request->server->get($key)) {
                     $ip = trim($this->request->server->get($key));
 
-                    if (strpos($ip, ',') !== false) {
+                    if (false !== strpos($ip, ',')) {
                         $ip = $this->getClientIpFromProxyList($ip);
                     }
 
@@ -130,7 +129,7 @@ class IpLookupHelper
     {
         static $ipAddresses = [];
 
-        if ($ip === null) {
+        if (null === $ip) {
             $ip = $this->getIpAddressFromRequest();
         }
 
@@ -139,16 +138,19 @@ class IpLookupHelper
             $ip = '127.0.0.1';
         }
 
+        $this->realIp = $ip;
+
+        if ($this->coreParametersHelper->get('anonymize_ip')) {
+            $ip = preg_replace(['/\.\d*$/', '/[\da-f]*:[\da-f]*$/'], ['.***', '****:****'], $ip);
+        }
+
         if (empty($ipAddresses[$ip])) {
             $repo      = $this->em->getRepository('MauticCoreBundle:IpAddress');
             $ipAddress = $repo->findOneByIpAddress($ip);
-            $saveIp    = ($ipAddress === null);
+            $saveIp    = (null === $ipAddress);
 
-            if ($ipAddress === null) {
+            if (null === $ipAddress) {
                 $ipAddress = new IpAddress();
-                if ($this->coreParametersHelper->getParameter('anonymize_ip')) {
-                    $ip = preg_replace(['/\.\d*$/', '/[\da-f]*:[\da-f]*$/'], ['.***', '****:****'], $ip);
-                }
                 $ipAddress->setIpAddress($ip);
             }
 
@@ -176,7 +178,7 @@ class IpLookupHelper
             if ($ipAddress->isTrackable() && $this->request) {
                 $userAgent = $this->request->headers->get('User-Agent');
                 foreach ($this->doNotTrackBots as $bot) {
-                    if (strpos($userAgent, $bot) !== false) {
+                    if (false !== strpos($userAgent, $bot)) {
                         $doNotTrack[] = $ip;
                         $ipAddress->setDoNotTrackList($doNotTrack);
                         continue;
@@ -185,13 +187,12 @@ class IpLookupHelper
             }
 
             $details = $ipAddress->getIpDetails();
-            if ($ipAddress->isTrackable() && empty($details['city'])) {
+            if ($ipAddress->isTrackable() && empty($details['city']) && !$this->coreParametersHelper->get('anonymize_ip')) {
                 // Get the IP lookup service
 
                 // Fetch the data
                 if ($this->ipLookup) {
-                    $details = $this->ipLookup->setIpAddress($ip)
-                        ->getDetails();
+                    $details = $this->getIpDetails($ip);
 
                     $ipAddress->setIpDetails($details);
 
@@ -208,6 +209,20 @@ class IpLookupHelper
         }
 
         return $ipAddresses[$ip];
+    }
+
+    /**
+     * @param string $ip
+     *
+     * @return array
+     */
+    public function getIpDetails($ip)
+    {
+        if ($this->ipLookup) {
+            return $this->ipLookup->setIpAddress($ip)->getDetails();
+        }
+
+        return [];
     }
 
     /**
@@ -255,5 +270,13 @@ class IpLookupHelper
         }
 
         return null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRealIp()
+    {
+        return $this->realIp;
     }
 }

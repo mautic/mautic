@@ -61,11 +61,6 @@ class EventLogger
 
     /**
      * EventLogger constructor.
-     *
-     * @param IpLookupHelper         $ipLookupHelper
-     * @param ContactTracker         $contactTracker
-     * @param LeadEventLogRepository $leadEventLogRepository
-     * @param LeadRepository         $leadRepository
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -82,9 +77,6 @@ class EventLogger
         $this->logs         = new ArrayCollection();
     }
 
-    /**
-     * @param LeadEventLog $log
-     */
     public function queueToPersist(LeadEventLog $log)
     {
         $this->persistQueue->add($log);
@@ -94,18 +86,13 @@ class EventLogger
         }
     }
 
-    /**
-     * @param LeadEventLog $log
-     */
     public function persistLog(LeadEventLog $log)
     {
         $this->leadEventLogRepository->saveEntity($log);
     }
 
     /**
-     * @param Event     $event
-     * @param Lead|null $contact
-     * @param bool      $isInactiveEvent
+     * @param bool $isInactiveEvent
      *
      * @return LeadEventLog
      */
@@ -113,7 +100,9 @@ class EventLogger
     {
         $log = new LeadEventLog();
 
-        $log->setIpAddress($this->ipLookupHelper->getIpAddress());
+        if (!defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED')) {
+            $log->setIpAddress($this->ipLookupHelper->getIpAddress());
+        }
 
         $log->setEvent($event);
         $log->setCampaign($event->getCampaign());
@@ -157,8 +146,6 @@ class EventLogger
     }
 
     /**
-     * @param ArrayCollection $collection
-     *
      * @return $this
      */
     public function persistCollection(ArrayCollection $collection)
@@ -173,8 +160,6 @@ class EventLogger
     }
 
     /**
-     * @param ArrayCollection $collection
-     *
      * @return $this
      */
     public function clearCollection(ArrayCollection $collection)
@@ -185,8 +170,6 @@ class EventLogger
     }
 
     /**
-     * @param ArrayCollection $logs
-     *
      * @return ArrayCollection
      */
     public function extractContactsFromLogs(ArrayCollection $logs)
@@ -203,10 +186,7 @@ class EventLogger
     }
 
     /**
-     * @param Event                 $event
-     * @param AbstractEventAccessor $config
-     * @param ArrayCollection       $contacts
-     * @param bool                  $isInactiveEntry
+     * @param bool $isInactiveEntry
      *
      * @return ArrayCollection
      */
@@ -218,10 +198,7 @@ class EventLogger
     }
 
     /**
-     * @param Event                 $event
-     * @param AbstractEventAccessor $config
-     * @param ArrayCollection       $contacts
-     * @param bool                  $isInactiveEntry
+     * @param bool $isInactiveEntry
      *
      * @return ArrayCollection
      */
@@ -248,8 +225,7 @@ class EventLogger
     }
 
     /**
-     * @param array $contactIds
-     * @param int   $campaignId
+     * @param int $campaignId
      */
     public function hydrateContactRotationsForNewLogs(array $contactIds, $campaignId)
     {

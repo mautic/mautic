@@ -19,8 +19,7 @@ class MessageEvent extends CommonEvent
     /**
      * MessageEvent constructor.
      *
-     * @param Message $message
-     * @param bool    $isNew
+     * @param bool $isNew
      */
     public function __construct(Message $message, $isNew = false)
     {

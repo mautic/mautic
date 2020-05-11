@@ -7,8 +7,6 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 
 class HubspotApi extends CrmApi
 {
-    private $module = 'contacts';
-
     protected $requestSettings = [
         'encode_parameters' => 'json',
     ];
@@ -18,12 +16,12 @@ class HubspotApi extends CrmApi
         $hapikey = $this->integration->getHubSpotApiKey();
         $url     = sprintf('%s/%s/%s/?hapikey=%s', $this->integration->getApiUrl(), $object, $operation, $hapikey);
         $request = $this->integration->makeRequest($url, $parameters, $method, $this->requestSettings);
-        if (isset($request['status']) && $request['status'] == 'error') {
+        if (isset($request['status']) && 'error' == $request['status']) {
             $message = $request['message'];
             if (isset($request['validationResults'])) {
                 $message .= " \n ".print_r($request['validationResults'], true);
             }
-            if (isset($request['validationResults'][0]['error']) && $request['validationResults'][0]['error'] == 'PROPERTY_DOESNT_EXIST') {
+            if (isset($request['validationResults'][0]['error']) && 'PROPERTY_DOESNT_EXIST' == $request['validationResults'][0]['error']) {
                 $this->createProperty($request['validationResults'][0]['name']);
                 $this->request($operation, $parameters, $method, $object);
             } else {
@@ -39,7 +37,7 @@ class HubspotApi extends CrmApi
      */
     public function getLeadFields($object = 'contacts')
     {
-        if ($object == 'company') {
+        if ('company' == $object) {
             $object = 'companies'; //hubspot company object name
         }
 
@@ -48,8 +46,6 @@ class HubspotApi extends CrmApi
 
     /**
      * Creates Hubspot lead.
-     *
-     * @param array $data
      *
      * @return mixed
      */
@@ -75,8 +71,6 @@ class HubspotApi extends CrmApi
     /**
      * gets Hubspot contact.
      *
-     * @param array $data
-     *
      * @return mixed
      */
     public function getContacts($params = [])
@@ -86,8 +80,6 @@ class HubspotApi extends CrmApi
 
     /**
      * gets Hubspot company.
-     *
-     * @param array $data
      *
      * @return mixed
      */

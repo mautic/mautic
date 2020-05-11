@@ -61,8 +61,7 @@ class CampaignScheduledEvent extends Event
     /**
      * CampaignScheduledEvent constructor.
      *
-     * @param                   $args
-     * @param LeadEventLog|null $log
+     * @param $args
      */
     public function __construct(array $args, LeadEventLog $log = null)
     {

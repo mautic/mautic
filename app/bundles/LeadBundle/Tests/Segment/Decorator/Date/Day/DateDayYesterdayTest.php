@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayYesterday;
 use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
-class DateDayYesterdayTest extends \PHPUnit_Framework_TestCase
+class DateDayYesterdayTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayYesterday::getOperator

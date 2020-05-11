@@ -150,9 +150,6 @@ class Notification extends FormEntity
         $this->stats = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -222,9 +219,6 @@ class Notification extends FormEntity
         $builder->createField('mobileSettings', 'array')->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint(
@@ -239,7 +233,7 @@ class Notification extends FormEntity
         $metadata->addConstraint(new Callback([
             'callback' => function (Notification $notification, ExecutionContextInterface $context) {
                 $type = $notification->getNotificationType();
-                if ($type == 'list') {
+                if ('list' == $type) {
                     $validator = $context->getValidator();
                     $violations = $validator->validate(
                         $notification->getLists(),
@@ -309,7 +303,7 @@ class Notification extends FormEntity
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
 
-        if ($prop == 'category' || $prop == 'list') {
+        if ('category' == $prop || 'list' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -414,9 +408,6 @@ class Notification extends FormEntity
         return $this->button;
     }
 
-    /**
-     * @param string $heading
-     */
     public function setButton($button)
     {
         $this->isChanged('button', $button);
@@ -590,8 +581,6 @@ class Notification extends FormEntity
     /**
      * Add list.
      *
-     * @param LeadList $list
-     *
      * @return Notification
      */
     public function addList(LeadList $list)
@@ -603,8 +592,6 @@ class Notification extends FormEntity
 
     /**
      * Remove list.
-     *
-     * @param LeadList $list
      */
     public function removeList(LeadList $list)
     {
@@ -665,8 +652,6 @@ class Notification extends FormEntity
     }
 
     /**
-     * @param array $mobileSettings
-     *
      * @return $this
      */
     public function setMobileSettings(array $mobileSettings)

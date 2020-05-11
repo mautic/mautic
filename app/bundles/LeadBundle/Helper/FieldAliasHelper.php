@@ -21,9 +21,6 @@ class FieldAliasHelper
      */
     private $fieldModel;
 
-    /**
-     * @param FieldModel $fieldModel
-     */
     public function __construct(FieldModel $fieldModel)
     {
         $this->fieldModel = $fieldModel;
@@ -31,8 +28,6 @@ class FieldAliasHelper
 
     /**
      * Cleans the alias and if it's not unique it will make it unique.
-     *
-     * @param LeadField $field
      *
      * @return LeadField
      */
@@ -52,7 +47,7 @@ class FieldAliasHelper
         // make sure alias is not already taken
         $repo      = $this->fieldModel->getRepository();
         $testAlias = $alias;
-        $aliases   = $repo->getAliases($field->getId(), false, true, $field->getObject());
+        $aliases   = $repo->getAliases($field->getId(), false, true, null);
         $count     = (int) in_array($testAlias, $aliases);
         $aliasTag  = $count;
 

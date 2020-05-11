@@ -33,8 +33,6 @@ class ContactIdentificationEvent extends Event
 
     /**
      * ContactIdentificationEvent constructor.
-     *
-     * @param array $clickthrough
      */
     public function __construct(array $clickthrough)
     {
@@ -50,7 +48,6 @@ class ContactIdentificationEvent extends Event
     }
 
     /**
-     * @param Lead   $contact
      * @param string $channel
      */
     public function setIdentifiedContact(Lead $contact, $channel)

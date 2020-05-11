@@ -17,7 +17,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Helper\ReloadHelper;
 
-class ReloadHelperTest extends \PHPUnit_Framework_TestCase
+class ReloadHelperTest extends \PHPUnit\Framework\TestCase
 {
     private $factoryMock;
 
@@ -34,7 +34,7 @@ class ReloadHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @var array
      */
-    private $sampleMetadata = [];
+    private $sampleMetaData = [];
 
     /**
      * @var array

@@ -60,11 +60,7 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
     /**
      * AmazonTransport constructor.
      *
-     * @param string              $host
-     * @param Http                $httpClient
-     * @param LoggerInterface     $logger
-     * @param TranslatorInterface $translator
-     * @param TransportCallback   $transportCallback
+     * @param string $host
      */
     public function __construct($host, Http $httpClient, LoggerInterface $logger, TranslatorInterface $translator, TransportCallback $transportCallback)
     {
@@ -90,8 +86,6 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
     /**
      * Handle bounces & complaints from Amazon.
      *
-     * @param Request $request
-     *
      * @return array
      */
     public function processCallbackRequest(Request $request)
@@ -116,11 +110,11 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
             throw new HttpException(400, "Key 'Type' not found in payload ");
         }
 
-        if ($payload['Type'] == 'SubscriptionConfirmation') {
+        if ('SubscriptionConfirmation' == $payload['Type']) {
             // Confirm Amazon SNS subscription by calling back the SubscribeURL from the playload
             try {
                 $response = $this->httpClient->get($payload['SubscribeURL']);
-                if ($response->code == 200) {
+                if (200 == $response->code) {
                     $this->logger->info('Callback to SubscribeURL from Amazon SNS successfully');
 
                     return;
@@ -136,23 +130,34 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
             return;
         }
 
-        if ($payload['Type'] == 'Notification') {
+        if ('Notification' == $payload['Type']) {
             $message = json_decode($payload['Message'], true);
 
             // only deal with hard bounces
-            if ($message['notificationType'] == 'Bounce' && $message['bounce']['bounceType'] == 'Permanent') {
+            if ('Bounce' == $message['notificationType'] && 'Permanent' == $message['bounce']['bounceType']) {
+                $emailId = null;
+
+                if (isset($message['mail']['headers'])) {
+                    foreach ($message['mail']['headers'] as $header) {
+                        if ('X-EMAIL-ID' === $header['name']) {
+                            $emailId = $header['value'];
+                        }
+                    }
+                }
+
                 // Get bounced recipients in an array
                 $bouncedRecipients = $message['bounce']['bouncedRecipients'];
                 foreach ($bouncedRecipients as $bouncedRecipient) {
-                    $this->transportCallback->addFailureByAddress($bouncedRecipient['emailAddress'], $bouncedRecipient['diagnosticCode']);
-                    $this->logger->debug("Mark email '".$bouncedRecipient['emailAddress']."' as bounced, reason: ".$bouncedRecipient['diagnosticCode']);
+                    $bounceCode = array_key_exists('diagnosticCode', $bouncedRecipient) ? $bouncedRecipient['diagnosticCode'] : 'unknown';
+                    $this->transportCallback->addFailureByAddress($bouncedRecipient['emailAddress'], $bounceCode, DoNotContact::BOUNCED, $emailId);
+                    $this->logger->debug("Mark email '".$bouncedRecipient['emailAddress']."' as bounced, reason: ".$bounceCode);
                 }
 
                 return;
             }
 
             // unsubscribe customer that complain about spam at their mail provider
-            if ($message['notificationType'] == 'Complaint') {
+            if ('Complaint' == $message['notificationType']) {
                 foreach ($message['complaint']['complainedRecipients'] as $complainedRecipient) {
                     $reason = null;
                     if (isset($message['complaint']['complaintFeedbackType'])) {
@@ -170,7 +175,7 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
                         }
                     }
 
-                    if ($reason == null) {
+                    if (null == $reason) {
                         $reason = $this->translator->trans('mautic.email.complaint.reason.unknown');
                     }
 
@@ -188,8 +193,6 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
     }
 
     /**
-     * @param Message $message
-     *
      * @throws BounceNotFound
      */
     public function processBounce(Message $message)
@@ -215,8 +218,6 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
     }
 
     /**
-     * @param Message $message
-     *
      * @return UnsubscribedEmail
      *
      * @throws UnsubscriptionNotFound

@@ -7,14 +7,14 @@ use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class FormFieldHelperTest extends \PHPUnit_Framework_TestCase
+class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var FormFieldHelper
      */
     protected $fixture;
 
-    public function setUp()
+    protected function setUp()
     {
         $translatorMock = $this->getMockBuilder(TranslatorInterface::class)
             ->disableOriginalConstructor()

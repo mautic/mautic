@@ -14,9 +14,6 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
-/**
- * Class CustomFieldRepositoryTrait.
- */
 trait CustomFieldRepositoryTrait
 {
     protected $useDistinctCount = false;
@@ -114,6 +111,9 @@ trait CustomFieldRepositoryTrait
                 //since we have to be cross-platform; it's way ugly
 
                 //We should probably totally ditch orm for leads
+
+                // This "hack" is in place to allow for custom ordering in the API.
+                // See https://github.com/mautic/mautic/pull/7494#issuecomment-600970208
                 $order = '(CASE';
                 foreach ($ids as $count => $id) {
                     $order .= ' WHEN '.$this->getTableAlias().'.id = '.$id.' THEN '.$count;
@@ -222,9 +222,7 @@ trait CustomFieldRepositoryTrait
                 ->setMaxResults($limit);
         }
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -234,7 +232,7 @@ trait CustomFieldRepositoryTrait
      */
     public function saveEntities($entities)
     {
-        foreach ($entities as $k => $entity) {
+        foreach ($entities as $entity) {
             // Leads cannot be batched due to requiring the ID to update the fields
             $this->saveEntity($entity);
         }
@@ -364,7 +362,7 @@ trait CustomFieldRepositoryTrait
         if (empty($this->customFieldList)) {
             //Get the list of custom fields
             $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-            $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties')
+            $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties, f.default_value')
                 ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
                 ->where('f.is_published = :published')
                 ->andWhere($fq->expr()->eq('object', ':object'))

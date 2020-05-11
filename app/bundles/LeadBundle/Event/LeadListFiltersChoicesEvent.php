@@ -40,9 +40,8 @@ class LeadListFiltersChoicesEvent extends CommonEvent
     protected $translator;
 
     /**
-     * @param array               $choices
-     * @param array               $operators
-     * @param TranslatorInterface $translator
+     * @param array $choices
+     * @param array $operators
      */
     public function __construct($choices, $operators, TranslatorInterface $translator)
     {

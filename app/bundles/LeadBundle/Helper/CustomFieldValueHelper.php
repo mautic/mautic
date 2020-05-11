@@ -26,8 +26,6 @@ class CustomFieldValueHelper
     const TYPE_MULTISELECT = 'multiselect';
 
     /**
-     * @param array $customFields
-     *
      * @return array
      */
     public static function normalizeValues(array $customFields)
@@ -52,8 +50,6 @@ class CustomFieldValueHelper
     }
 
     /**
-     * @param array $field
-     *
      * @return mixed
      */
     private static function normalizeValue(array $field)
@@ -61,7 +57,7 @@ class CustomFieldValueHelper
         $value      = ArrayHelper::getValue('value', $field, '');
         $type       = ArrayHelper::getValue('type', $field);
         $properties = ArrayHelper::getValue('properties', $field);
-        if ($value !== '' && $type && $properties) {
+        if ('' !== $value && $type && $properties) {
             if (!is_array($properties)) {
                 $properties = Serializer::decode($properties);
             }
@@ -89,14 +85,13 @@ class CustomFieldValueHelper
     }
 
     /**
-     * @param array  $properties
      * @param string $value
      *
      * @return string
      */
     private static function setValueFromPropertiesList(array $properties, $value)
     {
-        if (isset($properties['list'])) {
+        if (isset($properties['list']) && is_array($properties['list'])) {
             $list = $properties['list'];
             if (!is_array($list)) {
                 return $value;

@@ -15,10 +15,10 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -49,11 +49,6 @@ class CategoryListType extends AbstractType
 
     /**
      * CategoryListType constructor.
-     *
-     * @param EntityManager       $em
-     * @param TranslatorInterface $translator
-     * @param CategoryModel       $model
-     * @param Router              $router
      */
     public function __construct(EntityManager $em, TranslatorInterface $translator, CategoryModel $model, Router $router)
     {
@@ -63,10 +58,6 @@ class CategoryListType extends AbstractType
         $this->router     = $router;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (true === $options['return_entity']) {
@@ -75,9 +66,6 @@ class CategoryListType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -86,17 +74,17 @@ class CategoryListType extends AbstractType
                 $categories = $this->model->getLookupResults($options['bundle'], '', 0);
                 $choices = [];
                 foreach ($categories as $l) {
-                    $choices[$l['id']] = $l['title'];
+                    $choices[$l['title']] = $l['id'];
                 }
-                $choices['new'] = $createNew;
+                $choices[$createNew] = 'new';
 
                 return $choices;
             },
-            'label'       => 'mautic.core.category',
-            'label_attr'  => ['class' => 'control-label'],
-            'multiple'    => false,
-            'empty_value' => 'mautic.core.form.uncategorized',
-            'attr'        => function (Options $options) {
+            'label'             => 'mautic.core.category',
+            'label_attr'        => ['class' => 'control-label'],
+            'multiple'          => false,
+            'placeholder'       => 'mautic.core.form.uncategorized',
+            'attr'              => function (Options $options) {
                 $modalHeader = $this->translator->trans('mautic.category.header.new');
                 $newUrl = $this->router->generate('mautic_category_action', [
                     'objectAction' => 'new',
@@ -119,7 +107,7 @@ class CategoryListType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'category';
     }
@@ -129,6 +117,6 @@ class CategoryListType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

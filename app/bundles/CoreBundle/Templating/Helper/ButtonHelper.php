@@ -19,9 +19,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class ButtonHelper.
- */
 class ButtonHelper extends Helper
 {
     /**
@@ -67,7 +64,7 @@ class ButtonHelper extends Helper
     /**
      * Location of the buttons.
      *
-     * @var
+     * @var string
      */
     private $location;
 
@@ -87,22 +84,22 @@ class ButtonHelper extends Helper
     private $dispatcher;
 
     /**
-     * @var
+     * @var string|null
      */
     private $wrapOpeningTag;
 
     /**
-     * @var
+     * @var string|null
      */
     private $wrapClosingTag;
 
     /**
-     * @var
+     * @var string
      */
     private $groupType = self::TYPE_GROUP;
 
     /**
-     * @var
+     * @var string|null
      */
     private $menuLink;
 
@@ -126,23 +123,13 @@ class ButtonHelper extends Helper
      */
     private $request;
 
-    /**
-     * @var
-     */
     private $item;
 
     /**
-     * @var
+     * @var int
      */
     private $listMarker = 3;
 
-    /**
-     * ButtonHelper constructor.
-     *
-     * @param EngineInterface          $templating
-     * @param TranslatorInterface      $translator
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function __construct(EngineInterface $templating, TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
     {
         $this->templating = $templating;
@@ -151,8 +138,6 @@ class ButtonHelper extends Helper
     }
 
     /**
-     * @param array $buttons
-     *
      * @return $this
      */
     public function addButtons(array $buttons)
@@ -164,8 +149,6 @@ class ButtonHelper extends Helper
     }
 
     /**
-     * @param array $button
-     *
      * @return $this
      */
     public function addButton(array $button)
@@ -244,7 +227,7 @@ class ButtonHelper extends Helper
                 $content .= $this->buildButton($button, $buttonCount);
 
                 $nextButton = $buttonCount + 1;
-                if ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $nextButton === $this->listMarker && $buttonCount !== $this->buttonCount) {
+                if (self::TYPE_BUTTON_DROPDOWN == $this->groupType && $nextButton === $this->listMarker && $buttonCount !== $this->buttonCount) {
                     $content .= $dropdownHtml;
                     $dropdownHtmlAppended = true;
                 }
@@ -281,10 +264,9 @@ class ButtonHelper extends Helper
     /**
      * Reset the buttons.
      *
-     * @param         $buttonCount
-     * @param Request $request
-     * @param string  $groupType
-     * @param null    $item
+     * @param        $buttonCount
+     * @param string $groupType
+     * @param null   $item
      *
      * @return $this
      */
@@ -323,7 +305,7 @@ class ButtonHelper extends Helper
         $buttons = '';
 
         //Wrap links in a tag
-        if ($this->groupType == self::TYPE_DROPDOWN || ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $buttonCount >= $this->listMarker)) {
+        if (self::TYPE_DROPDOWN == $this->groupType || (self::TYPE_BUTTON_DROPDOWN == $this->groupType && $buttonCount >= $this->listMarker)) {
             $this->wrapOpeningTag = "<li>\n";
             $this->wrapClosingTag = "</li>\n";
         }
@@ -332,7 +314,7 @@ class ButtonHelper extends Helper
             $button['attr'] = [];
         }
 
-        if ($this->groupType == self::TYPE_GROUP || ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $buttonCount < $this->listMarker)) {
+        if (self::TYPE_GROUP == $this->groupType || (self::TYPE_BUTTON_DROPDOWN == $this->groupType && $buttonCount < $this->listMarker)) {
             $this->addButtonClasses($button);
         } elseif (in_array($this->groupType, [self::TYPE_BUTTON_DROPDOWN, self::TYPE_DROPDOWN])) {
             $this->removeButtonClasses($button);
@@ -490,7 +472,7 @@ class ButtonHelper extends Helper
             $tooltip .= ' data-toggle="tooltip"';
             if (is_array($button['tooltip'])) {
                 foreach ($button['tooltip'] as $k => $v) {
-                    if ($k == 'title') {
+                    if ('title' == $k) {
                         $v = $this->translator->trans($v);
                     }
                     $tooltip .= " $k=".'"'.$v.'"';
@@ -575,57 +557,5 @@ class ButtonHelper extends Helper
         ];
 
         $removeFrom['attr']['class'] = str_replace($search, '', $removeFrom['attr']['class']);
-    }
-
-    /**
-     * @param       $preCustomButtons
-     * @param array $postCustomButtons
-     *
-     * @deprecated 2.3 to be removed 3.0; use renderButtons() instead
-     *
-     * @return $this
-     */
-    public function setCustomButtons($preCustomButtons, $postCustomButtons = [])
-    {
-        // Give preCustomButtons high priority
-        foreach ($preCustomButtons as $key => $button) {
-            $preCustomButtons[$key]['priority'] = 199;
-            $this->buttons[]                    = $preCustomButtons[$key];
-            ++$this->buttonCount;
-        }
-
-        foreach ($postCustomButtons as $key => $button) {
-            $postCustomButtons[$key]['priority'] = 0;
-            $this->buttons[]                     = $postCustomButtons[$key];
-            ++$this->buttonCount;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param        $buttonCount
-     * @param string $dropdownHtml
-     *
-     * @deprecated 2.3 to be removed 3.0; use renderButtons() instead
-     *
-     * @return string
-     */
-    public function renderPreCustomButtons(&$buttonCount, $dropdownHtml = '')
-    {
-        return $this->renderButtons($dropdownHtml);
-    }
-
-    /**
-     * @param        $buttonCount
-     * @param string $dropdownHtml
-     *
-     * @deprecated 2.3; to be removed 3.0
-     *
-     * @return string
-     */
-    public function renderPostCustomButtons(&$buttonCount, $dropdownHtml = '')
-    {
-        return '';
     }
 }

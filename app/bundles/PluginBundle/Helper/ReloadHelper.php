@@ -24,9 +24,6 @@ class ReloadHelper
      */
     private $factory;
 
-    /**
-     * @param MauticFactory $factory
-     */
     public function __construct(MauticFactory $factory)
     {
         $this->factory = $factory;
@@ -34,9 +31,6 @@ class ReloadHelper
 
     /**
      * Disables plugins that are in the database but are missing in the filesystem.
-     *
-     * @param array $allPlugins
-     * @param array $installedPlugins
      *
      * @return array
      */
@@ -59,9 +53,6 @@ class ReloadHelper
      * Re-enables plugins that were disabled because they were missing in the filesystem
      * but appeared in it again.
      *
-     * @param array $allPlugins
-     * @param array $installedPlugins
-     *
      * @return array
      */
     public function enableFoundPlugins(array $allPlugins, array $installedPlugins)
@@ -82,11 +73,6 @@ class ReloadHelper
     /**
      * Updates plugins that exist in the filesystem and in the database and their version changed.
      *
-     * @param array $allPlugins
-     * @param array $installedPlugins
-     * @param array $pluginMetadata
-     * @param array $installedPluginsSchemas
-     *
      * @return array
      */
     public function updatePlugins(array $allPlugins, array $installedPlugins, array $pluginMetadata, array $installedPluginsSchemas)
@@ -100,7 +86,7 @@ class ReloadHelper
                 $plugin       = $this->mapConfigToPluginEntity($plugin, $pluginConfig);
 
                 //compare versions to see if an update is necessary
-                if (!empty($oldVersion) && version_compare($oldVersion, $plugin->getVersion()) == -1) {
+                if (!empty($oldVersion) && -1 == version_compare($oldVersion, $plugin->getVersion())) {
                     //call the update callback
                     $callback = $pluginConfig['bundleClass'];
                     $metadata = isset($pluginMetadata[$pluginConfig['namespace']])
@@ -123,11 +109,6 @@ class ReloadHelper
     /**
      * Installs plugins that does not exist in the database yet.
      *
-     * @param array $allPlugins
-     * @param array $existingPlugins
-     * @param array $pluginMetadata
-     * @param array $installedPluginsSchemas
-     *
      * @return array
      */
     public function installPlugins(array $allPlugins, array $existingPlugins, array $pluginMetadata, array $installedPluginsSchemas)
@@ -143,7 +124,7 @@ class ReloadHelper
                 $metadata        = isset($pluginMetadata[$pluginConfig['namespace']]) ? $pluginMetadata[$pluginConfig['namespace']] : null;
                 $installedSchema = null;
 
-                if (isset($installedPluginsSchemas[$pluginConfig['namespace']]) && count($installedPluginsSchemas[$pluginConfig['namespace']]->getTables()) !== 0) {
+                if (isset($installedPluginsSchemas[$pluginConfig['namespace']]) && 0 !== count($installedPluginsSchemas[$pluginConfig['namespace']]->getTables())) {
                     $installedSchema = true;
                 }
 
@@ -157,9 +138,6 @@ class ReloadHelper
     }
 
     /**
-     * @param Plugin $plugin
-     * @param array  $config
-     *
      * @return Plugin
      */
     private function mapConfigToPluginEntity(Plugin $plugin, array $config)

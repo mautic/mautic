@@ -40,16 +40,10 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
      */
     protected $campaignModel;
 
-    /**
-     * @var
-     */
     protected static $channels;
 
     /**
      * MessageModel constructor.
-     *
-     * @param ChannelListHelper $channelListHelper
-     * @param CampaignModel     $campaignModel
      */
     public function __construct(ChannelListHelper $channelListHelper, CampaignModel $campaignModel)
     {
@@ -100,7 +94,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Message();
         }
 

@@ -14,54 +14,42 @@ namespace Mautic\PageBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CampaignBundle\Model\EventModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
+use Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageHitEvent;
+use Mautic\PageBundle\Form\Type\CampaignEventPageHitType;
+use Mautic\PageBundle\Form\Type\TrackingPixelSendType;
 use Mautic\PageBundle\Helper\TrackingHelper;
-use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var PageModel
-     */
-    protected $pageModel;
-
-    /**
-     * @var EventModel
-     */
-    protected $campaignEventModel;
-
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
      * @var TrackingHelper
      */
-    protected $trackingHelper;
+    private $trackingHelper;
 
     /**
-     * CampaignSubscriber constructor.
-     *
-     * @param PageModel      $pageModel
-     * @param EventModel     $campaignEventModel
-     * @param LeadModel      $leadModel
-     * @param TrackingHelper $trackingHelper
+     * @var RealTimeExecutioner
      */
-    public function __construct(PageModel $pageModel, EventModel $campaignEventModel, LeadModel $leadModel, TrackingHelper $trackingHelper)
-    {
-        $this->pageModel          = $pageModel;
-        $this->campaignEventModel = $campaignEventModel;
-        $this->leadModel          = $leadModel;
-        $this->trackingHelper     = $trackingHelper;
+    private $realTimeExecutioner;
+
+    public function __construct(
+        LeadModel $leadModel,
+        TrackingHelper $trackingHelper,
+        RealTimeExecutioner $realTimeExecutioner
+    ) {
+        $this->leadModel           = $leadModel;
+        $this->trackingHelper      = $trackingHelper;
+        $this->realTimeExecutioner = $realTimeExecutioner;
     }
 
     /**
@@ -82,8 +70,6 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * Add event triggers and actions.
-     *
-     * @param CampaignBuilderEvent $event
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
@@ -91,7 +77,7 @@ class CampaignSubscriber extends CommonSubscriber
         $pageHitTrigger = [
             'label'          => 'mautic.page.campaign.event.pagehit',
             'description'    => 'mautic.page.campaign.event.pagehit_descr',
-            'formType'       => 'campaignevent_pagehit',
+            'formType'       => CampaignEventPageHitType::class,
             'eventName'      => PageEvents::ON_CAMPAIGN_TRIGGER_DECISION,
             'channel'        => 'page',
             'channelIdField' => 'pages',
@@ -102,7 +88,7 @@ class CampaignSubscriber extends CommonSubscriber
         $deviceHitTrigger = [
             'label'          => 'mautic.page.campaign.event.devicehit',
             'description'    => 'mautic.page.campaign.event.devicehit_descr',
-            'formType'       => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType',
+            'formType'       => CampaignEventLeadDeviceType::class,
             'eventName'      => PageEvents::ON_CAMPAIGN_TRIGGER_DECISION,
             'channel'        => 'page',
             'channelIdField' => 'pages',
@@ -115,7 +101,7 @@ class CampaignSubscriber extends CommonSubscriber
                 'label'                  => 'mautic.page.tracking.pixel.event.send',
                 'description'            => 'mautic.page.tracking.pixel.event.send_desc',
                 'eventName'              => PageEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-                'formType'               => 'tracking_pixel_send_action',
+                'formType'               => TrackingPixelSendType::class,
                 'connectionRestrictions' => [
                     'anchor' => [
                         'decision.inaction',
@@ -133,8 +119,6 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * Trigger actions for page hits.
-     *
-     * @param PageHitEvent $event
      */
     public function onPageHit(PageHitEvent $event)
     {
@@ -147,13 +131,10 @@ class CampaignSubscriber extends CommonSubscriber
         } elseif ($page = $hit->getPage()) {
             $channelId = $page->getId();
         }
-        $this->campaignEventModel->triggerEvent('page.pagehit', $hit, $channel, $channelId);
-        $this->campaignEventModel->triggerEvent('page.devicehit', $hit, $channel, $channelId);
+        $this->realTimeExecutioner->execute('page.pagehit', $hit, $channel, $channelId);
+        $this->realTimeExecutioner->execute('page.devicehit', $hit, $channel, $channelId);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerDecisionDeviceHit(CampaignExecutionEvent $event)
     {
         $eventDetails = $event->getEventDetails();
@@ -196,9 +177,6 @@ class CampaignSubscriber extends CommonSubscriber
         return $event->setResult($result);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
     {
         $eventDetails = $event->getEventDetails();
@@ -208,7 +186,7 @@ class CampaignSubscriber extends CommonSubscriber
             return false;
         }
 
-        if ($eventDetails == null) {
+        if (null == $eventDetails) {
             return true;
         }
         $pageHit = $eventDetails->getPage();
@@ -270,9 +248,6 @@ class CampaignSubscriber extends CommonSubscriber
         return $event->setResult(false);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
         $config = $event->getConfig();

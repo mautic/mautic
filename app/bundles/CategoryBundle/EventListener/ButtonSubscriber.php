@@ -14,14 +14,14 @@ namespace Mautic\CategoryBundle\EventListener;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class ButtonSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var Router
+     * @var RouterInterface
      */
     private $router;
 
@@ -30,7 +30,7 @@ class ButtonSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    public function __construct(Router $router, TranslatorInterface $translator)
+    public function __construct(RouterInterface $router, TranslatorInterface $translator)
     {
         $this->router     = $router;
         $this->translator = $translator;
@@ -43,9 +43,6 @@ class ButtonSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CustomButtonEvent $event
-     */
     public function injectContactBulkButtons(CustomButtonEvent $event)
     {
         if (0 === strpos($event->getRoute(), 'mautic_contact_')) {

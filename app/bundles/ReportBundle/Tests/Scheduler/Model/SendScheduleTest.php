@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ReportBundle\Tests\Model;
+namespace Mautic\ReportBundle\Tests\Scheduler\Model;
 
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\ReportBundle\Entity\Report;
@@ -17,7 +17,7 @@ use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Scheduler\Model\MessageSchedule;
 use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
 
-class SendScheduleTest extends \PHPUnit_Framework_TestCase
+class SendScheduleTest extends \PHPUnit\Framework\TestCase
 {
     public function testSendScheduleWithFile()
     {

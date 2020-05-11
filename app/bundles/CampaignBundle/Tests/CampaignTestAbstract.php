@@ -13,18 +13,16 @@ namespace Mautic\CampaignBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
-use Mautic\CampaignBundle\Helper\RemovedContactTracker;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
-use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 
-class CampaignTestAbstract extends \PHPUnit_Framework_TestCase
+class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
 {
     protected static $mockId   = 232;
     protected static $mockName = 'Mock name';
@@ -59,10 +57,6 @@ class CampaignTestAbstract extends \PHPUnit_Framework_TestCase
             ->method('getFormList')
             ->will($this->returnValue([['id' => self::$mockId, 'name' => self::$mockName]]));
 
-        $leadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $leadListModel = $this->getMockBuilder(ListModel::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -79,16 +73,13 @@ class CampaignTestAbstract extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->will($this->returnValue($formRepository));
 
-        $eventCollector = $this->createMock(EventCollector::class);
-
-        $removedContactTracker = $this->createMock(RemovedContactTracker::class);
-
-        $membershipManager = $this->createMock(MembershipManager::class);
+        $eventCollector    = $this->createMock(EventCollector::class);
         $membershipBuilder = $this->createMock(MembershipBuilder::class);
 
-        $campaignModel = new CampaignModel($leadModel, $leadListModel, $formModel, $eventCollector, $removedContactTracker, $membershipManager, $membershipBuilder);
+        $contactTracker = $this->createMock(ContactTracker::class);
 
-        $leadModel->setEntityManager($entityManager);
+        $campaignModel = new CampaignModel($leadListModel, $formModel, $eventCollector, $membershipBuilder, $contactTracker);
+
         $leadListModel->setEntityManager($entityManager);
         $formModel->setEntityManager($entityManager);
         $campaignModel->setEntityManager($entityManager);

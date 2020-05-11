@@ -21,6 +21,7 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Parser;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\EmailBundle\Swiftmailer\Transport\BounceProcessorInterface;
+use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -68,14 +69,12 @@ class Bounce implements ProcessorInterface
     protected $message;
 
     /**
+     * @var DoNotContact
+     */
+    protected $doNotContact;
+
+    /**
      * Bounce constructor.
-     *
-     * @param \Swift_Transport    $transport
-     * @param ContactFinder       $contactFinder
-     * @param StatRepository      $statRepository
-     * @param LeadModel           $leadModel
-     * @param TranslatorInterface $translator
-     * @param LoggerInterface     $logger
      */
     public function __construct(
         \Swift_Transport $transport,
@@ -83,7 +82,8 @@ class Bounce implements ProcessorInterface
         StatRepository $statRepository,
         LeadModel $leadModel,
         TranslatorInterface $translator,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        DoNotContact $doNotContact
     ) {
         $this->transport      = $transport;
         $this->contactFinder  = $contactFinder;
@@ -91,11 +91,10 @@ class Bounce implements ProcessorInterface
         $this->leadModel      = $leadModel;
         $this->translator     = $translator;
         $this->logger         = $logger;
+        $this->doNotContact   = $doNotContact;
     }
 
     /**
-     * @param Message $message
-     *
      * @return bool
      */
     public function process(Message $message)
@@ -142,16 +141,12 @@ class Bounce implements ProcessorInterface
 
         $comments = $this->translator->trans('mautic.email.bounce.reason.'.$bounce->getRuleCategory());
         foreach ($contacts as $contact) {
-            $this->leadModel->addDncForLead($contact, $channel, $comments);
+            $this->doNotContact->addDncForContact($contact->getId(), $channel, $comments);
         }
 
         return true;
     }
 
-    /**
-     * @param Stat         $stat
-     * @param BouncedEmail $bouncedEmail
-     */
     protected function updateStat(Stat $stat, BouncedEmail $bouncedEmail)
     {
         $dtHelper    = new DateTimeHelper();

@@ -74,57 +74,36 @@ class CommonController extends Controller implements MauticController
      */
     protected $translator;
 
-    /**
-     * @param Request $request
-     */
     public function setRequest(Request $request)
     {
         $this->request = $request;
     }
 
-    /**
-     * @param MauticFactory $factory
-     */
     public function setFactory(MauticFactory $factory)
     {
         $this->factory = $factory;
     }
 
-    /**
-     * @param User $user
-     */
     public function setUser(User $user)
     {
         $this->user = $user;
     }
 
-    /**
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function setCoreParametersHelper(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function setTranslator(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @param FilterControllerEvent $event
-     */
     public function initialize(FilterControllerEvent $event)
     {
     }
@@ -252,8 +231,6 @@ class CommonController extends Controller implements MauticController
 
     /**
      * Redirects URLs with trailing slashes in order to prevent 404s.
-     *
-     * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -415,7 +392,7 @@ class CommonController extends Controller implements MauticController
         $this->get('session')->set('mautic.browser.notifications', []);
 
         $tmpl = (isset($parameters['tmpl'])) ? $parameters['tmpl'] : $this->request->get('tmpl', 'index');
-        if ($tmpl == 'index') {
+        if ('index' == $tmpl) {
             $updatedContent = [];
             if (!empty($newContent)) {
                 $updatedContent['newContent'] = $newContent;
@@ -444,8 +421,6 @@ class CommonController extends Controller implements MauticController
 
     /**
      * Get's the content of error page.
-     *
-     * @param \Exception $e
      *
      * @return Response
      */
@@ -492,13 +467,7 @@ class CommonController extends Controller implements MauticController
         $anonymous = $this->get('mautic.security')->isAnonymous();
 
         if ($anonymous || !$batch) {
-            throw new AccessDeniedHttpException(
-                $this->translator->trans($msg,
-                    [
-                        '%url%' => $this->request->getRequestUri(),
-                    ]
-                )
-            );
+            throw new AccessDeniedHttpException($this->translator->trans($msg, ['%url%' => $this->request->getRequestUri()]));
         }
 
         if ($batch) {
@@ -560,13 +529,13 @@ class CommonController extends Controller implements MauticController
         if ($this->request->query->has('orderby')) {
             $orderBy = InputHelper::clean($this->request->query->get('orderby'), true);
             $dir     = $session->get("$name.orderbydir", 'ASC');
-            $dir     = ($dir == 'ASC') ? 'DESC' : 'ASC';
+            $dir     = ('ASC' == $dir) ? 'DESC' : 'ASC';
             $session->set("$name.orderby", $orderBy);
             $session->set("$name.orderbydir", $dir);
         }
 
         if ($this->request->query->has('limit')) {
-            $limit = InputHelper::int($this->request->query->get('limit'));
+            $limit = (int) $this->request->query->get('limit');
             $session->set("$name.limit", $limit);
         }
 
@@ -575,7 +544,7 @@ class CommonController extends Controller implements MauticController
             $value   = InputHelper::clean($this->request->query->get('value'), true);
             $filters = $session->get("$name.filters", []);
 
-            if ($value == '') {
+            if ('' == $value) {
                 if (isset($filters[$filter])) {
                     unset($filters[$filter]);
                 }
@@ -611,7 +580,7 @@ class CommonController extends Controller implements MauticController
      */
     protected function getNotificationContent(Request $request = null)
     {
-        if ($request == null) {
+        if (null == $request) {
             $request = $this->request;
         }
 
@@ -636,12 +605,11 @@ class CommonController extends Controller implements MauticController
     }
 
     /**
-     * @param                $message
-     * @param null           $type
-     * @param bool|true      $isRead
-     * @param null           $header
-     * @param null           $iconClass
-     * @param \DateTime|null $datetime
+     * @param           $message
+     * @param null      $type
+     * @param bool|true $isRead
+     * @param null      $header
+     * @param null      $iconClass
      */
     public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null)
     {
@@ -659,11 +627,11 @@ class CommonController extends Controller implements MauticController
      */
     public function addFlash($message, $messageVars = [], $type = 'notice', $domain = 'flashes', $addNotification = false)
     {
-        if ($domain == null) {
+        if (null == $domain) {
             $domain = 'flashes';
         }
 
-        if ($domain === false) {
+        if (false === $domain) {
             //message is already translated
             $translatedMessage = $message;
         } else {
@@ -686,6 +654,7 @@ class CommonController extends Controller implements MauticController
                     break;
                 case 'notice':
                     $iconClass = 'fa-info-circle';
+                    // no break
                 default:
                     break;
             }
@@ -709,13 +678,13 @@ class CommonController extends Controller implements MauticController
      */
     public function addBrowserNotification($message, $messageVars = [], $domain = 'flashes', $title = null, $icon = null, $addNotification = true, $type = 'notice')
     {
-        if ($domain == null) {
+        if (null == $domain) {
             $domain = 'flashes';
         }
 
         $translator = $this->translator;
 
-        if ($domain === false) {
+        if (false === $domain) {
             //message is already translated
             $translatedMessage = $message;
         } else {
@@ -726,17 +695,17 @@ class CommonController extends Controller implements MauticController
             }
         }
 
-        if ($title !== null) {
+        if (null !== $title) {
             $title = $translator->trans($title);
         } else {
             $title = 'Mautic';
         }
 
-        if ($icon == null) {
+        if (null == $icon) {
             $icon = 'media/images/favicon.ico';
         }
 
-        if (strpos($icon, 'http') !== 0) {
+        if (0 !== strpos($icon, 'http')) {
             $assetHelper = $this->factory->getHelper('template.assets');
             $icon        = $assetHelper->getUrl($icon, null, null, true);
         }
@@ -761,6 +730,7 @@ class CommonController extends Controller implements MauticController
                     break;
                 case 'notice':
                     $iconClass = 'fa-info-circle';
+                    // no break
                 default:
                     break;
             }
@@ -792,10 +762,10 @@ class CommonController extends Controller implements MauticController
             $sourceIterator = new ArraySourceIterator($toExport);
         }
 
-        $dateFormat  = $this->coreParametersHelper->getParameter('date_format_dateonly');
+        $dateFormat  = $this->coreParametersHelper->get('date_format_dateonly');
         $dateFormat  = str_replace('--', '-', preg_replace('/[^a-zA-Z]/', '-', $dateFormat));
-        $writer      = $type === 'xlsx' ? new XlsWriter('php://output') : new CsvWriter('php://output');
-        $contentType = $type === 'xlsx' ? 'application/vnd.ms-excel' : 'text/csv';
+        $writer      = 'xlsx' === $type ? new XlsWriter('php://output') : new CsvWriter('php://output');
+        $contentType = 'xlsx' === $type ? 'application/vnd.ms-excel' : 'text/csv';
         $filename    = strtolower($filename.'_'.((new \DateTime())->format($dateFormat)).'.'.$type);
         $handler     = Handler::create($sourceIterator, $writer);
 
@@ -809,10 +779,7 @@ class CommonController extends Controller implements MauticController
      *
      * Overwrite in your controller if required.
      *
-     * @param AbstractCommonModel $model
-     * @param array               $args
-     * @param callable|null       $resultsCallback
-     * @param int|null            $start
+     * @param int|null $start
      *
      * @return array
      */

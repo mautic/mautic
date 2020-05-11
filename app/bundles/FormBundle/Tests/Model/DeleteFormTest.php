@@ -12,7 +12,8 @@
 namespace Mautic\FormBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
+use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
+use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\FormBundle\Entity\Form;
@@ -24,7 +25,7 @@ use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Tests\FormTestAbstract;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -47,11 +48,6 @@ class DeleteFormTest extends FormTestAbstract
             ->disableOriginalConstructor()
             ->getMock();
 
-        $schemaHelperFactory = $this
-            ->getMockBuilder(SchemaHelperFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $formActionModel = $this
             ->getMockBuilder(ActionModel::class)
             ->disableOriginalConstructor()
@@ -59,11 +55,6 @@ class DeleteFormTest extends FormTestAbstract
 
         $formFieldModel = $this
             ->getMockBuilder(FieldModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $leadModel = $this
-            ->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -82,17 +73,30 @@ class DeleteFormTest extends FormTestAbstract
             ->disableOriginalConstructor()
             ->getMock();
 
+        $contactTracker = $this->createMock(ContactTracker::class);
+
+        $columnSchemaHelper = $this
+            ->getMockBuilder(ColumnSchemaHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $tableSchemaHelper = $this
+            ->getMockBuilder(TableSchemaHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $formModel = new FormModel(
             $requestStack,
             $templatingHelperMock,
             $themeHelper,
-            $schemaHelperFactory,
             $formActionModel,
             $formFieldModel,
-            $leadModel,
             $fieldHelper,
             $leadFieldModel,
-            $formUploaderMock
+            $formUploaderMock,
+            $contactTracker,
+            $columnSchemaHelper,
+            $tableSchemaHelper
         );
 
         $dispatcher = $this

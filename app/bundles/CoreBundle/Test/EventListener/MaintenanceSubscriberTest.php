@@ -20,20 +20,19 @@ use Mautic\CoreBundle\EventListener\MaintenanceSubscriber;
 use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class MaintenanceSubscriberTest extends \PHPUnit_Framework_TestCase
+class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MaintenanceSubscriber
      */
     private $subscriber;
 
-    public function setUp()
+    protected function setUp()
     {
         $connection          = $this->createMock(Connection::class);
         $userTokenRepository = $this->createMock(UserTokenRepositoryInterface::class);
-        $this->subscriber    = new MaintenanceSubscriber($connection, $userTokenRepository);
         $translator          = $this->createMock(TranslatorInterface::class);
-        $this->subscriber->setTranslator($translator);
+        $this->subscriber    = new MaintenanceSubscriber($connection, $userTokenRepository, $translator);
     }
 
     public function testGetSubscribedEvents()
@@ -109,15 +108,14 @@ class MaintenanceSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('createQueryBuilder')
             ->willReturn($qb);
 
+        $translator          = $this->createMock(TranslatorInterface::class);
         $userTokenRepository = $this->createMock(UserTokenRepositoryInterface::class);
-        $subscriber          = new MaintenanceSubscriber($connection, $userTokenRepository);
+        $subscriber          = new MaintenanceSubscriber($connection, $userTokenRepository, $translator);
 
-        $translator = $this->createMock(TranslatorInterface::class);
         $translator
             ->expects($this->exactly(3))
             ->method('trans')
             ->willReturn($translatedString);
-        $subscriber->setTranslator($translator);
 
         $this->assertNull($subscriber->onDataCleanup($event));
     }

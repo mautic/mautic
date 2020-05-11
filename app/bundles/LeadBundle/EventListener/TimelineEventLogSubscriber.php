@@ -23,9 +23,6 @@ class TimelineEventLogSubscriber implements EventSubscriberInterface
 
     /**
      * TimelineEventLogSubscriber constructor.
-     *
-     * @param TranslatorInterface    $translator
-     * @param LeadEventLogRepository $leadEventLogRepository
      */
     public function __construct(
         TranslatorInterface $translator,
@@ -45,9 +42,6 @@ class TimelineEventLogSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param LeadTimelineEvent $event
-     */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         $this->addEvents(

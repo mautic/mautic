@@ -17,15 +17,15 @@ use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\SmsBundle\Integration\Twilio\Configuration;
 use Twilio\Exceptions\ConfigurationException;
 
-class ConfigurationTest extends \PHPUnit_Framework_TestCase
+class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var IntegrationHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var IntegrationHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $integrationHelper;
 
     /**
-     * @var AbstractIntegration|\PHPUnit_Framework_MockObject_MockObject
+     * @var AbstractIntegration|\PHPUnit\Framework\MockObject\MockObject
      */
     private $integrationObject;
 
@@ -79,10 +79,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 ]
             );
         $this->assertEquals('password', $this->getConfiguration()->getAuthToken());
-    }
-
-    public function testConfigurationExceptionThrownIfNotPublished()
-    {
     }
 
     public function testConfigurationExceptionThrownWithoutSendingNumber()

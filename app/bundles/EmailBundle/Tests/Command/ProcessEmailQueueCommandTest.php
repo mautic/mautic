@@ -22,7 +22,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ProcessEmailQueueCommandTest extends \PHPUnit_Framework_TestCase
+class ProcessEmailQueueCommandTest extends \PHPUnit\Framework\TestCase
 {
     private $coreParametersHelper;
     private $dispatcher;
@@ -85,14 +85,14 @@ class ProcessEmailQueueCommandTest extends \PHPUnit_Framework_TestCase
      * Ensure this error won't happen:.
      *
      * Error: Swift_Mime_SimpleMimeEntity::_getHeaderFieldModel(): The script tried to
-     * execute a method or access a property of an incomplete ob  ject. Please ensure
+     * execute a method or access a property of an incomplete object. Please ensure
      * that the class definition "Swift_Mime_SimpleHeaderSet" of the object you are
      * trying to operate on was loaded _before_ unserialize() gets called or provide
      * an autoloader to load the class definition
      */
     public function testCommandWhenQueueIsEnabled()
     {
-        $tryAgainMessageFile    = '0HZYoueQaC.tryagain';
+        $tryAgainMessageFile    = 'swift_message.tryagain';
         $tmpSpoolDir            = sys_get_temp_dir().'/mauticSpoolTestDir';
         $tryAgainMessage        = __DIR__.'/../Data/SpoolSample/'.$tryAgainMessageFile;
         $tmpTryAgainMessageFile = $tmpSpoolDir.'/'.$tryAgainMessageFile;
@@ -101,7 +101,7 @@ class ProcessEmailQueueCommandTest extends \PHPUnit_Framework_TestCase
         }
         copy($tryAgainMessage, $tmpTryAgainMessageFile);
 
-        $this->coreParametersHelper->method('getParameter')
+        $this->coreParametersHelper->method('get')
             ->withConsecutive(['mailer_spool_type'])
             ->willReturnOnConsecutiveCalls(true);
 

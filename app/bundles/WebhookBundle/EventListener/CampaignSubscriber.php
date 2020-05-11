@@ -14,20 +14,18 @@ namespace Mautic\WebhookBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\WebhookBundle\Form\Type\CampaignEventSendWebhookType;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
 use Mautic\WebhookBundle\WebhookEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
      * @var CampaignHelper
      */
-    protected $campaignHelper;
+    private $campaignHelper;
 
-    /**
-     * @param CampaignHelper $campaignHelper
-     */
     public function __construct(CampaignHelper $campaignHelper)
     {
         $this->campaignHelper = $campaignHelper;
@@ -45,8 +43,6 @@ class CampaignSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param CampaignExecutionEvent $event
-     *
      * @return CampaignExecutionEvent
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
@@ -63,15 +59,13 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * Add event triggers and actions.
-     *
-     * @param Events\CampaignBuilderEvent $event
      */
     public function onCampaignBuild(Events\CampaignBuilderEvent $event)
     {
         $sendWebhookAction = [
             'label'       => 'mautic.webhook.event.sendwebhook',
             'description' => 'mautic.webhook.event.sendwebhook_desc',
-            'formType'    => 'campaignevent_sendwebhook',
+            'formType'    => CampaignEventSendWebhookType::class,
             'eventName'   => WebhookEvents::ON_CAMPAIGN_TRIGGER_ACTION,
         ];
         $event->addAction('campaign.sendwebhook', $sendWebhookAction);

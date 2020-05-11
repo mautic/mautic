@@ -29,8 +29,6 @@ class TableSchemaColumnsCache
 
     /**
      * TableSchemaColumnsCache constructor.
-     *
-     * @param EntityManager $entityManager
      */
     public function __construct(EntityManager $entityManager)
     {

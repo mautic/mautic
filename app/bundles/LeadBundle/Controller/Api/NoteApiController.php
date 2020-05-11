@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\LeadNote;
@@ -55,8 +54,8 @@ class NoteApiController extends CommonApiController
 
             $entity->setLead($lead);
             unset($parameters['lead']);
-        } elseif ($action === 'new') {
-            return $this->returnError('lead ID is mandatory', Codes::HTTP_BAD_REQUEST);
+        } elseif ('new' === $action) {
+            return $this->returnError('lead ID is mandatory', Response::HTTP_BAD_REQUEST);
         }
     }
 }

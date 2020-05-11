@@ -20,8 +20,8 @@
 } ?>
         <li class="media">
             <div class="media-object pull-left">
-                <span class="figure featured <?php echo ($log['action'] == 'create') ? 'bg-success' : ''; ?>">
-                    <span class="fa <?php echo isset($icons[$log['bundle']]) ? $icons[$log['bundle']] : '' ?>"></span>
+                <span class="figure featured <?php echo ('create' == $log['action']) ? 'bg-success' : ''; ?>">
+                    <span class="fa <?php echo isset($icons[$log['bundle']]) ? $icons[$log['bundle']] : ''; ?>"></span>
                 </span>
             </div>
             <div class="media-body">

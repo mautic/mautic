@@ -15,13 +15,10 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference as BaseTemplateReference;
 
-/**
- * Class TemplateReference.
- */
 class TemplateReference extends BaseTemplateReference
 {
     /**
-     * @var
+     * @var string
      */
     protected $themeOverride;
 
@@ -35,17 +32,11 @@ class TemplateReference extends BaseTemplateReference
      */
     protected $pathsHelper;
 
-    /**
-     * @param ThemeHelper $themeHelper
-     */
     public function setThemeHelper(ThemeHelper $themeHelper)
     {
         $this->themeHelper = $themeHelper;
     }
 
-    /**
-     * @param PathsHelper $pathsHelper
-     */
     public function setPathsHelper(PathsHelper $pathsHelper)
     {
         $this->pathsHelper = $pathsHelper;
@@ -54,16 +45,13 @@ class TemplateReference extends BaseTemplateReference
     /**
      * Set a template specific theme override.
      *
-     * @param $theme
+     * @param string $theme
      */
     public function setThemeOverride($theme)
     {
         $this->themeOverride = $theme;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPath()
     {
         $controller = str_replace('\\', '/', $this->get('controller'));
@@ -98,11 +86,13 @@ class TemplateReference extends BaseTemplateReference
                     // Theme override
                     $template = $themeDir.'/html/'.$this->parameters['bundle'].'/'.$path;
                 } else {
+                    // We prefer /*Bundle/Views/something.html.php
                     preg_match('/Mautic(.*?)Bundle/', $this->parameters['bundle'], $match);
 
                     if (
                         (!empty($match[1]) && file_exists($bundleRoot.'/'.$match[1].'Bundle/Views/'.$path)) ||
-                        file_exists($pluginRoot.'/'.$this->parameters['bundle'].'/Views/'.$path)
+                        file_exists($pluginRoot.'/'.$this->parameters['bundle'].'/Views/'.$path) || // Check plugin dir directly
+                        file_exists($bundleRoot.'/'.$this->parameters['bundle'].'/Views/'.$path) // Bundles dir directly
                     ) {
                         // Mautic core template
                         $template = '@'.$this->get('bundle').'/Views/'.$path;
@@ -120,16 +110,13 @@ class TemplateReference extends BaseTemplateReference
         }
 
         if (empty($template)) {
-            //try the parent
+            // Try the parent
             return parent::getPath();
         }
 
         return $template;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLogicalName()
     {
         $logicalName = parent::getLogicalName();

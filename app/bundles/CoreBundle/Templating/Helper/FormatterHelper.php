@@ -11,40 +11,24 @@
 
 namespace Mautic\CoreBundle\Templating\Helper;
 
-use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class FormatHelper.
- */
 class FormatterHelper extends Helper
 {
-    /**
-     * @var AppVersion
-     */
-    private $appVersion;
-
     /**
      * @var DateHelper
      */
     private $dateHelper;
-
     /**
      * @var TranslatorInterface
      */
     private $translator;
 
-    /**
-     * @param AppVersion          $appVersion
-     * @param DateHelper          $dateHelper
-     * @param TranslatorInterface $translator
-     */
-    public function __construct(AppVersion $appVersion, DateHelper $dateHelper, TranslatorInterface $translator)
+    public function __construct(DateHelper $dateHelper, TranslatorInterface $translator)
     {
-        $this->appVersion = $appVersion;
         $this->dateHelper = $dateHelper;
         $this->translator = $translator;
     }
@@ -61,7 +45,7 @@ class FormatterHelper extends Helper
      */
     public function _($val, $type = 'html', $textOnly = false, $round = 1)
     {
-        if (empty($val) && $type !== 'bool') {
+        if (empty($val) && 'bool' !== $type) {
             return $val;
         }
 
@@ -76,14 +60,14 @@ class FormatterHelper extends Helper
                 }
 
                 $stringParts = [];
-                foreach ($val as $k => $v) {
+                foreach ($val as $v) {
                     if (is_array($v)) {
                         $stringParts = $this->_($v, 'array', $textOnly, $round + 1);
                     } else {
                         $stringParts[] = $v;
                     }
                 }
-                if ($round === 1) {
+                if (1 === $round) {
                     $string = implode('; ', $stringParts);
                 } else {
                     $string = implode(', ', $stringParts);
@@ -153,7 +137,6 @@ class FormatterHelper extends Helper
     }
 
     /**
-     * @param array  $array
      * @param string $delimeter
      *
      * @return string
@@ -197,17 +180,5 @@ class FormatterHelper extends Helper
     public function getName()
     {
         return 'formatter';
-    }
-
-    /**
-     * @return string
-     *
-     * @deprecated - Use VersionHelper or AppVersion class
-     *
-     * @todo Remove this method and $this->appVersion in Mautic 3.0
-     */
-    public function getVersion()
-    {
-        return $this->appVersion->getVersion();
     }
 }

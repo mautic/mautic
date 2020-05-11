@@ -107,9 +107,6 @@ class Stat
      */
     private $lastClicked;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -121,7 +118,7 @@ class Stat
             ->addIndex(['tracking_hash'], 'stat_notification_hash_search')
             ->addIndex(['source', 'source_id'], 'stat_notification_source_search');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createManyToOne('notification', 'Notification')
             ->inversedBy('stats')
@@ -469,8 +466,6 @@ class Stat
     }
 
     /**
-     * @param \DateTime $lastClicked
-     *
      * @return Stat
      */
     public function setLastClicked(\DateTime $lastClicked)

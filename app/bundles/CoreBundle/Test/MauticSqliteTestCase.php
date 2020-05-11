@@ -5,10 +5,14 @@ namespace Mautic\CoreBundle\Test;
 use Doctrine\ORM\Events;
 use Mautic\CoreBundle\Test\DoctrineExtensions\TablePrefix;
 use Mautic\InstallBundle\Helper\SchemaHelper;
+use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
+use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
+use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
+use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 
 abstract class MauticSqliteTestCase extends AbstractMauticTestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -17,7 +21,7 @@ abstract class MauticSqliteTestCase extends AbstractMauticTestCase
         } else {
             $this->createDatabase();
             $this->applyMigrations();
-            $this->installDatabaseFixtures();
+            $this->installDatabaseFixtures([LeadFieldData::class, RoleData::class, LoadRoleData::class, LoadUserData::class]);
             $this->backupOrginalDatabase();
         }
     }
