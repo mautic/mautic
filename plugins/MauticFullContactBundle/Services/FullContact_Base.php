@@ -34,7 +34,7 @@ class FullContact_Base
 
 //    protected $_baseUri = 'https://requestbin.fullcontact.com/1ailj6d1?';
     protected $_baseUri     = 'https://api.fullcontact.com/';
-    protected $_version     = 'v2';
+    protected $_version     = 'v3';
     protected $_resourceUri = '';
 
     protected $_apiKey;
@@ -145,8 +145,7 @@ class FullContact_Base
             $params['webhookBody'] = 'json';
         }
 
-        $fullUrl = $this->_baseUri.$this->_version.$this->_resourceUri.
-            '?'.http_build_query($params);
+        $fullUrl = $this->_baseUri.$this->_version;
 
         //open connection
         $connection = curl_init($fullUrl);

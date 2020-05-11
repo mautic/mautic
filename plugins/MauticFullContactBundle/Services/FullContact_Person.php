@@ -30,11 +30,11 @@ class FullContact_Person extends FullContact_Base
      * @var array
      */
     protected $_supportedMethods = ['email', 'phone', 'twitter'];
-    protected $_resourceUri      = '/person.json';
+    protected $_resourceUri      = '/person.enrich';
 
     public function lookupByEmail($search)
     {
-        $this->_execute(['email' => $search, 'method' => 'email']);
+        $this->_execute(['email' => $search, 'method' => 'email'], ['email' => $search]);
 
         return $this->response_obj;
     }
@@ -48,14 +48,19 @@ class FullContact_Person extends FullContact_Base
 
     public function lookupByPhone($search)
     {
-        $this->_execute(['phone' => $search, 'method' => 'phone']);
+        $this->_execute(['phone' => $search, 'method' => 'phone'], ['phone' => $search]);
 
         return $this->response_obj;
     }
 
     public function lookupByTwitter($search)
     {
-        $this->_execute(['twitter' => $search, 'method' => 'twitter']);
+        $this->_execute(['twitter' => $search, 'method' => 'twitter'], [
+          'profiles' => [
+            'service'  => 'twitter',
+            'username' => $search,
+          ],
+        ]);
 
         return $this->response_obj;
     }
