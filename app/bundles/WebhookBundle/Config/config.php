@@ -105,7 +105,6 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'jms_serializer',
-                    'mautic.core.model.notification',
                     'mautic.webhook.http.client',
                     'event_dispatcher',
                 ],
