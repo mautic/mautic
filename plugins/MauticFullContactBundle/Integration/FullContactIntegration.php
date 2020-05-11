@@ -45,4 +45,9 @@ class FullContactIntegration extends BasicIntegration implements BasicInterface
     {
         return 'plugins/MauticFullContactBundle/Assets/img/fullcontact.png';
     }
+
+    public function getAuthenticationType(): string
+    {
+        return 'none';
+    }
 }
