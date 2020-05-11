@@ -11,7 +11,6 @@
 
 namespace Mautic\WebhookBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\WebhookBundle\Event\WebhookEvent;
@@ -35,11 +34,6 @@ class WebhookSubscriber implements EventSubscriberInterface
      * @var WebhookKillNotificator
      */
     private $webhookKillNotificator;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
 
     public function __construct(
         IpLookupHelper $ipLookupHelper,
