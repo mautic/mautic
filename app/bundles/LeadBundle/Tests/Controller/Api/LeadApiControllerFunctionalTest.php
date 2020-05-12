@@ -202,7 +202,8 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         $payload = [
             'email'            => 'apiemail1@email.com',
-            'firstname'        => 'API Update',
+            'firstname'        => 'API',
+            'lastname'         => 'Update',
             'points'           => 4,
             'tags'             => ['apitest', 'testapi'],
             'city'             => 'Houston',
