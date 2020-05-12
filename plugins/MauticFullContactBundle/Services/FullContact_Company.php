@@ -30,11 +30,11 @@ class FullContact_Company extends FullContact_Base
      * @var array
      */
     protected $_supportedMethods = ['domain'];
-    protected $_resourceUri      = '/company/lookup.json';
+    protected $_resourceUri      = '/company.enrich';
 
     public function lookupByDomain($search)
     {
-        $this->_execute(['domain' => $search, 'method' => 'domain']);
+        $this->_execute(['domain' => $search, 'method' => 'domain'], ['domain' => $search]);
 
         return $this->response_obj;
     }

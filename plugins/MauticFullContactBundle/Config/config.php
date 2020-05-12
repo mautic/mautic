@@ -64,6 +64,7 @@ return [
                     'router',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
+                    'mautic.plugin.fullcontact.integration.config',
                 ],
             ],
           'mautic.plugin.fullcontact.integration.config'            => [
