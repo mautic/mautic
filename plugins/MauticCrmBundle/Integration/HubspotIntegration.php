@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -226,6 +227,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                                 ];
                                 if (!empty($fieldInfo['readOnlyValue'])) {
                                     $hubsFields[$object][$fieldInfo['name']]['update_mautic'] = 1;
+                                    $hubsFields[$object][$fieldInfo['name']]['readOnly']      = 1;
                                 }
                             }
                         }
@@ -577,17 +579,28 @@ class HubspotIntegration extends CrmAbstractIntegration
         $object         = 'contacts';
         $fieldsToUpdate = $this->getPriorityFieldsForIntegration($config);
         $createFields   = $config['leadFields'];
-
         //@todo Hubspot's createLead uses createOrUpdate endpoint which means we don't know before we send mapped data if the contact will be updated or created; so we have to send all mapped fields
         $updateFields = array_intersect_key(
             $createFields,
             $fieldsToUpdate
         );
 
+        $readOnlyFields = $this->getReadOnlyFields($object);
+
+        $createFields = array_filter(
+            $createFields,
+            function ($createField, $key) use ($readOnlyFields) {
+                if (!isset($readOnlyFields[$key])) {
+                    return $createField;
+                }
+            },
+            ARRAY_FILTER_USE_BOTH
+        );
+
         $mappedData = $this->populateLeadData(
             $lead,
             [
-                'leadFields'       => $updateFields,
+                'leadFields'       => $createFields,
                 'object'           => $object,
                 'feature_settings' => ['objects' => $config['objects']],
             ]
@@ -636,5 +649,26 @@ class HubspotIntegration extends CrmAbstractIntegration
         foreach ($mappedData as &$data) {
             $data = str_replace('|', ';', $data);
         }
+    }
+
+    /**
+     * @param $object
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
+    private function getReadOnlyFields($object)
+    {
+        $fields = ArrayHelper::getValue($object, $this->getAvailableLeadFields(), []);
+
+        return array_filter(
+            $fields,
+            function ($field) {
+                if (!empty($field['readOnly'])) {
+                    return $field;
+                }
+            }
+        );
     }
 }
