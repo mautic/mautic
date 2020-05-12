@@ -20,6 +20,5 @@ echo $view->render(
         'type'          => 'radio',
         'contactFields' => (isset($contactFields)) ? $contactFields : [],
         'companyFields' => (isset($companyFields)) ? $companyFields : [],
-        'fields'        => isset($fields) ? $fields : null,
     ]
 );
