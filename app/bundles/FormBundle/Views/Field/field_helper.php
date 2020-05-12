@@ -94,7 +94,7 @@ if (!isset($containerClass)) {
 $order                 = (isset($field['order'])) ? $field['order'] : 0;
 $defaultContainerClass = 'mauticform-row mauticform-'.$containerClass.' mauticform-field-'.$order;
 
-if (isset($fields) && $field['parent']) {
+if ($field['parent'] && isset($fields[$field['parent']])) {
     $values = implode('|', $field['conditions']['values']);
 
     if (!empty($field['conditions']['any']) && $field['conditions']['expr'] != 'notIn') {
