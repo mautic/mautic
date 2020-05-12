@@ -50,4 +50,14 @@ class FullContactIntegration extends BasicIntegration implements BasicInterface
     {
         return 'none';
     }
+
+    public function shouldAutoUpdate()
+    {
+        // @todo: "auto_update" is part of $apiKey variable. Move it along with
+        // other data configuration.
+        $featureSettings = $this->getIntegrationConfiguration();
+
+        //return (isset($featureSettings['auto_update'])) ? (bool) $featureSettings['auto_update'] : false;
+        return true;
+    }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFullContactBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -26,6 +27,17 @@ class ConfigAuthType extends AbstractType
                     'class' => 'form-control',
                 ],
             ]
+        );
+        $builder->add(
+          'auto_update',
+          YesNoButtonGroupType::class,
+          [
+            'label' => 'mautic.plugin.fullcontact.auto_update',
+            'data'  => (isset($data['auto_update'])) ? (bool) $data['auto_update'] : false,
+            'attr'  => [
+              'tooltip' => 'mautic.plugin.fullcontact.auto_update.tooltip',
+            ],
+          ]
         );
     }
 

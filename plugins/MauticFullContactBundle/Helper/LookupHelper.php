@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\MauticFullContactBundle\Integration\Config;
 use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
 use MauticPlugin\MauticFullContactBundle\Services\FullContact_Company;
 use MauticPlugin\MauticFullContactBundle\Services\FullContact_Person;
@@ -57,13 +58,19 @@ class LookupHelper
      */
     protected $companyModel;
 
+    /**
+     * @var \MauticPlugin\MauticFullContactBundle\Integration\Config
+     */
+    protected $config;
+
     public function __construct(
         IntegrationHelper $integrationHelper,
         UserHelper $userHelper,
         Logger $logger,
         Router $router,
         LeadModel $leadModel,
-        CompanyModel $companyModel
+        CompanyModel $companyModel,
+        Config $config
     ) {
         $this->integration  = $integrationHelper->getIntegrationObject('FullContact');
         $this->userHelper   = $userHelper;
@@ -71,6 +78,7 @@ class LookupHelper
         $this->router       = $router;
         $this->leadModel    = $leadModel;
         $this->companyModel = $companyModel;
+        $this->config       = $config;
     }
 
     /**
@@ -214,7 +222,7 @@ class LookupHelper
         }
 
         // get api_key from plugin settings
-        $keys = $this->integration->getDecryptedApiKeys();
+        $keys = $this->config->getApiKeys();
 
         return ($person) ? new FullContact_Person($keys['apikey']) : new FullContact_Company($keys['apikey']);
     }
