@@ -2030,7 +2030,7 @@ Mautic.setEmptySlotPlaceholder = function (slot) {
     clonedSlot.find('div[data-slot-focus="true"]').remove()
     clonedSlot.find('div[data-slot-toolbar="true"]').remove()
 
-    if ((clonedSlot.text()).trim() == '') {
+    if ((clonedSlot.text()).trim() == '' && !clonedSlot.find('img').length) {
         slot.addClass('empty');
     } else {
         slot.removeClass('empty');
