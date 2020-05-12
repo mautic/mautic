@@ -231,20 +231,11 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['timezone'], $response['contact']['fields']['all']['timezone']);
         $this->assertEquals($payload['owner'], $response['contact']['owner']['id']);
 
-        // Lets try to create the same contact and it should merge based on unique identifier (email)
-        $updatedValues = [
-            'email' => 'apiemail1@email.com',
-            'city'  => 'Boston',
-            'state' => 'Massachusetts',
-            'owner' => 2,
-        ];
+        // without overwriteWithBlank lastname is not set empty
+        $payload['lastname'] = '';
 
-        $this->client->request(
-            'POST',
-            '/api/contacts/new',
-            $updatedValues
-        );
-
+        // Lets try to create the same contact to see that the values are not re-setted
+        $this->client->request('POST', '/api/contacts/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -257,6 +248,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // with overwriteWithBlank lastname is empty
         $payload['overwriteWithBlank'] = true;
+        $payload['lastname']           = '';
 
         // Lets try to create the same contact to see that the values are not re-setted
         $this->client->request('POST', '/api/contacts/new', $payload);
@@ -267,6 +259,32 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['email'], $response['contact']['fields']['all']['email']);
         $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
         $this->assertEmpty($response['contact']['fields']['all']['lastname']);
+        $this->assertEquals(4, $response['contact']['points']);
+        $this->assertEquals(2, count($response['contact']['tags']));
+        $this->assertEquals($payload['city'], $response['contact']['fields']['all']['city']);
+        $this->assertEquals($payload['state'], $response['contact']['fields']['all']['state']);
+        $this->assertEquals($payload['country'], $response['contact']['fields']['all']['country']);
+        $this->assertEquals($payload['preferred_locale'], $response['contact']['fields']['all']['preferred_locale']);
+        $this->assertEquals($payload['timezone'], $response['contact']['fields']['all']['timezone']);
+        $this->assertEquals($payload['owner'], $response['contact']['owner']['id']);
+
+        // Lets try to create the same contact and it should merge based on unique identifier (email)
+        $updatedValues = [
+            'email'    => 'apiemail1@email.com',
+            'lastname' => 'Update',
+            'city'     => 'Boston',
+            'state'    => 'Massachusetts',
+            'owner'    => 2,
+        ];
+
+        $this->client->request('POST', '/api/contacts/new', $updatedValues);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals($contactId, $response['contact']['id']);
+        $this->assertEquals($updatedValues['email'], $response['contact']['fields']['all']['email']);
+        $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
+        $this->assertEquals($updatedValues['lastname'], $response['contact']['fields']['all']['lastname']);
         $this->assertEquals(4, $response['contact']['points']);
         $this->assertEquals(2, count($response['contact']['tags']));
         $this->assertEquals($updatedValues['city'], $response['contact']['fields']['all']['city']);
