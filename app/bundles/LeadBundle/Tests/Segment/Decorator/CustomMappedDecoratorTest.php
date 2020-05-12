@@ -15,6 +15,8 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
 use Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
 {
@@ -72,7 +74,10 @@ class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
     private function getDecorator()
     {
         $contactSegmentFilterOperator   = $this->createMock(ContactSegmentFilterOperator::class);
-        $contactSegmentFilterDictionary = new ContactSegmentFilterDictionary();
+        $translator                     = $this->createMock(TranslatorInterface::class);
+        $eventDispatcher                = $this->createMock(EventDispatcherInterface::class);
+
+        $contactSegmentFilterDictionary = new ContactSegmentFilterDictionary($translator, $eventDispatcher);
 
         return new CustomMappedDecorator($contactSegmentFilterOperator, $contactSegmentFilterDictionary);
     }
