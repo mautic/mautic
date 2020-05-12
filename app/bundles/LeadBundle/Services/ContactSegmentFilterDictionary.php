@@ -42,9 +42,6 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
 
     /**
      * ContactSegmentFilterDictionary constructor.
-     *
-     * @param TranslatorInterface      $translator
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
     {
