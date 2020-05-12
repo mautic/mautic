@@ -224,6 +224,9 @@ class HubspotIntegration extends CrmAbstractIntegration
                                     'label'    => $fieldInfo['label'],
                                     'required' => ('email' === $fieldInfo['name']),
                                 ];
+                                if (!empty($fieldInfo['readOnlyValue'])) {
+                                    $hubsFields[$object][$fieldInfo['name']]['update_mautic'] = 1;
+                                }
                             }
                         }
 
@@ -584,7 +587,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         $mappedData = $this->populateLeadData(
             $lead,
             [
-                'leadFields'       => $createFields,
+                'leadFields'       => $updateFields,
                 'object'           => $object,
                 'feature_settings' => ['objects' => $config['objects']],
             ]
