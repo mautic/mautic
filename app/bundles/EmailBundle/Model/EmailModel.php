@@ -36,6 +36,7 @@ use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Form\Type\EmailType;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -1579,7 +1580,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
             // If this is the first message, flush the queue. This process clears the cc and bcc.
             if (true === $firstMail) {
-                $errors[]  = $this->flushQueue($mailer);
+                try {
+                    $this->flushQueue($mailer);
+                } catch (EmailCouldNotBeSentException $e) {
+                    $errors[] = $e->getMessage();
+                }
                 $firstMail = false;
             }
         }
@@ -1624,13 +1629,20 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
             // If this is the first message, flush the queue. This process clears the cc and bcc.
             if (true === $firstMail) {
-                $this->flushQueue($mailer);
+                try {
+                    $this->flushQueue($mailer);
+                } catch (EmailCouldNotBeSentException $e) {
+                    $errors[] = $e->getMessage();
+                }
                 $firstMail = false;
             }
         }
 
-        //flush the message
-        $errors[] = $this->flushQueue($mailer);
+        try {
+            $this->flushQueue($mailer);
+        } catch (EmailCouldNotBeSentException $e) {
+            $errors[] = $e->getMessage();
+        }
 
         if (isset($saveEntities)) {
             $this->getStatRepository()->saveEntities($saveEntities);
@@ -1642,16 +1654,17 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         return $errors;
     }
 
-    private function flushQueue(MailHelper $mailer): array
+    /**
+     * @throws EmailCouldNotBeSentException
+     */
+    private function flushQueue(MailHelper $mailer): void
     {
         if (!$mailer->flushQueue()) {
             $errorArray = $mailer->getErrors();
             unset($errorArray['failures']);
 
-            return implode('; ', $errorArray);
+            throw new EmailCouldNotBeSentException(implode('; ', $errorArray));
         }
-
-        return [];
     }
 
     /**
