@@ -820,7 +820,7 @@ if (typeof jQuery === 'undefined') {
     }
 
     Modal.DEFAULTS = {
-        backdrop: true,
+        backdrop: false,
         keyboard: true,
         show: true
     }
@@ -946,12 +946,12 @@ if (typeof jQuery === 'undefined') {
             this.$backdrop = $('<div class="modal-backdrop ' + animate + '" />')
                 .appendTo(document.body)
 
-            this.$element.on('click.dismiss.bs.modal', $.proxy(function (e) {
+            /*this.$element.on('click.dismiss.bs.modal', $.proxy(function (e) {
                 if (e.target !== e.currentTarget) return
                 this.options.backdrop == 'static'
                     ? this.$element[0].focus.call(this.$element[0])
                     : this.hide.call(this)
-            }, this))
+            }, this))*/
 
             if (doAnimate) this.$backdrop[0].offsetWidth // force reflow
 
