@@ -916,30 +916,32 @@ class Field
      */
     public function showForConditionalField(array $data)
     {
-        if (!$parentField = $this->getParentField()) {
+        if (!$parentField = $this->findParentFieldInForm()) {
             return true;
         }
 
-        if (isset($data[$parentField->getAlias()])) {
-            $sendValues = $data[$parentField->getAlias()];
-            if (!is_array($sendValues)) {
-                $sendValues = [$sendValues];
+        if (!isset($data[$parentField->getAlias()])) {
+            return false;
+        }
+
+        $sendValues = $data[$parentField->getAlias()];
+        if (!is_array($sendValues)) {
+            $sendValues = [$sendValues];
+        }
+
+        foreach ($sendValues as $value) {
+            // any value
+            if ($value && !empty($this->conditions['any'])) {
+                return true;
             }
-            foreach ($sendValues as $value) {
-                if ($this->conditions['expr'] == 'notIn') {
-                    // value not matched
-                    if ($value && !in_array($value, $this->conditions['values'])) {
-                        return true;
-                    }
-                } else {
-                    // any value
-                    if ($value && !empty($this->conditions['any'])) {
-                        return true;
-                    // value matched
-                    } elseif (in_array($value, $this->conditions['values'])) {
-                        return true;
-                    }
+
+            if ('notIn' === $this->conditions['expr']) {
+                // value not matched
+                if ($value && !in_array($value, $this->conditions['values'], true)) {
+                    return true;
                 }
+            } elseif (in_array($value, $this->conditions['values'], true)) {
+                return true;
             }
         }
 
@@ -1004,14 +1006,16 @@ class Field
         return $this->parent;
     }
 
-    public function getParentField()
+    private function findParentFieldInForm()
     {
-        if ($this->parent) {
-            $fields = $this->getForm()->getFields();
-            foreach ($fields as $field) {
-                if ($field->getId() == $this->parent) {
-                    return $field;
-                }
+        if (!$this->parent) {
+            return;
+        }
+
+        $fields = $this->getForm()->getFields();
+        foreach ($fields as $field) {
+            if ($field->getId() === $this->parent) {
+                return $field;
             }
         }
     }
