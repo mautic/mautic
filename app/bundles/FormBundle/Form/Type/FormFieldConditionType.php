@@ -31,21 +31,12 @@ class FormFieldConditionType extends AbstractType
      */
     private $propertiesAccessor;
 
-    /**
-     * FormFieldConditionType constructor.
-     *
-     * @param FieldModel         $fieldModel
-     * @param PropertiesAccessor $propertiesAccessor
-     */
     public function __construct(FieldModel $fieldModel, PropertiesAccessor $propertiesAccessor)
     {
         $this->fieldModel          = $fieldModel;
         $this->propertiesAccessor  = $propertiesAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $choices = [];
@@ -64,8 +55,8 @@ class FormFieldConditionType extends AbstractType
                 'multiple' => true,
                 'label'    => false,
                 'attr'     => [
-                    'class'              => 'form-control',
-                    'data-show-on'       => '{"formfield_conditions_any_0": "checked","formfield_conditions_expr": "notIn"}',
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"formfield_conditions_any_0": "checked","formfield_conditions_expr": "notIn"}',
                 ],
                 'required' => false,
             ]
@@ -94,16 +85,13 @@ class FormFieldConditionType extends AbstractType
                 'label'       => false,
                 'placeholder' => false,
                 'attr'        => [
-                    'class'              => 'form-control',
+                    'class' => 'form-control',
                 ],
                 'required' => false,
             ]
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

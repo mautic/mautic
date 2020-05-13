@@ -1132,7 +1132,7 @@ class FormModel extends CommonFormModel
         $contactField = $this->leadFieldModel->getEntityByAlias($contactFieldAlias);
 
         if (empty($contactField) || !in_array($contactField->getType(), ContactFieldHelper::getListTypes())) {
-            return null;
+            return;
         }
 
         $contactFieldProps = $contactField->getProperties();
@@ -1159,7 +1159,7 @@ class FormModel extends CommonFormModel
                 $list = ContactFieldHelper::getLocaleChoices();
                 break;
             default:
-                return null;
+                return;
         }
 
         return $list;

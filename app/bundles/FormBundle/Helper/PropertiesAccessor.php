@@ -45,7 +45,7 @@ class PropertiesAccessor
      */
     public function getProperties(array $field)
     {
-        if ($field['type'] == 'country' || (!empty($field['leadField']) && !empty($field['properties']['syncList']))) {
+        if ($field['type'] === 'country' || (!empty($field['leadField']) && !empty($field['properties']['syncList']))) {
             return $this->formModel->getContactFieldPropertiesList($field['leadField']);
         } elseif (!empty($field['properties'])) {
             return $this->getOptionsListFromProperties($field['properties']);
@@ -76,7 +76,7 @@ class PropertiesAccessor
                 } elseif (isset($option['label']) && isset($option['value'])) {
                     $choices[$option['value']] = $option['label'];
                 } else {
-                    foreach ($option as $group => $opt) {
+                    foreach ($option as $opt) {
                         $choices[$opt] = $opt;
                     }
                 }
