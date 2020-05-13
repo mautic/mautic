@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\FormBundle\Tests\Entity;
+namespace Mautic\FormBundle\Tests\Event;
 
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\FormFieldEvent;
