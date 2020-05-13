@@ -47,6 +47,7 @@ class Copy
             ->build();
 
         $builder->addNullableField('body', 'text');
+        $builder->addNullableField('body_text', 'text');
 
         $builder->addNullableField('subject', 'text');
     }
