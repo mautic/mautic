@@ -15,6 +15,7 @@ class CopyRepository extends CommonRepository
      * @param $hash
      * @param $subject
      * @param $body
+     * @param $bodyText
      */
     public function saveCopy($hash, $subject, $body, $bodyText)
     {
