@@ -43,7 +43,9 @@ class FormFieldConditionType extends AbstractType
         if (!empty($options['parent'])) {
             $fields = $this->fieldModel->getSessionFields($options['formId']);
             if (isset($fields[$options['parent']])) {
-                $choices = $this->propertiesAccessor->getChoices($this->propertiesAccessor->getProperties($fields[$options['parent']]));
+                $choices = $this->propertiesAccessor->getChoices(
+                    $this->propertiesAccessor->getProperties($fields[$options['parent']])
+                );
             }
         }
 
@@ -66,11 +68,11 @@ class FormFieldConditionType extends AbstractType
             'any',
             YesNoButtonGroupType::class,
             [
-                'label'      => 'mautic.form.field.form.condition.any_value',
-                'attr'       => [
+                'label' => 'mautic.form.field.form.condition.any_value',
+                'attr'  => [
                     'data-show-on' => '{"formfield_conditions_expr": "in"}',
                 ],
-                'data'=> isset($options['data']['any']) ? $options['data']['any'] : false,
+                'data' => isset($options['data']['any']) ? $options['data']['any'] : false,
             ]
         );
 
@@ -96,8 +98,8 @@ class FormFieldConditionType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'formId'     => null,
-                'parent'     => null,
+                'formId' => null,
+                'parent' => null,
             ]
         );
     }
