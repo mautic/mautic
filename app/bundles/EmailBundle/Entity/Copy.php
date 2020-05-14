@@ -26,6 +26,11 @@ class Copy
     private $body;
 
     /**
+     * @var string
+     */
+    private $bodyText;
+
+    /**
      * @var string|null
      */
     private $subject;
@@ -47,7 +52,7 @@ class Copy
             ->build();
 
         $builder->addNullableField('body', 'text');
-        $builder->addNullableField('body_text', 'text');
+        $builder->addNullableField('bodyText', 'text', 'body_text');
 
         $builder->addNullableField('subject', 'text');
     }
@@ -134,6 +139,25 @@ class Copy
         $subject = EmojiHelper::toShort($subject);
 
         $this->subject = $subject;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBodyText()
+    {
+        return $this->bodyText;
+    }
+
+    /**
+     * @param string $bodyText
+     */
+    public function setBodyText($bodyText)
+    {
+        $bodyText       = EmojiHelper::toShort($bodyText);
+        $this->bodyText = $bodyText;
 
         return $this;
     }
