@@ -33,14 +33,14 @@ class PointSubscriber implements EventSubscriberInterface
     private $pointModel;
 
     /**
-     * @var array
-     */
-    private $triggered = [];
-
-    /**
      * @var EntityManager
      */
     private $entityManager;
+
+    /**
+     * @var array
+     */
+    private $triggered = [];
 
     public function __construct(PointModel $pointModel, EntityManager $entityManager)
     {
@@ -126,10 +126,21 @@ class PointSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!isset($this->triggered[$lead->getId()][$event->getEmail()->getId()])) {
+        if ($this->shouldTriggerPointEmailSendAction($event, $lead)) {
             $this->pointModel->triggerAction('email.send', $event->getEmail(), null, $lead, true);
         }
+    }
 
-        $this->triggered[$lead->getId()][$event->getEmail()->getId()] = true;
+    private function shouldTriggerPointEmailSendAction(EmailSendEvent $event, Lead $lead)
+    {
+        if ($event->getEmail()) {
+            if (!isset($this->triggered[$lead->getId()][$event->getEmail()->getId()])) {
+                $this->triggered[$lead->getId()][$event->getEmail()->getId()] = true;
+
+                return true;
+            }
+        }
+
+        return false;
     }
 }
