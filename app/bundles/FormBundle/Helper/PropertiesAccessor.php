@@ -11,36 +11,21 @@
 
 namespace Mautic\FormBundle\Helper;
 
-use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 
 class PropertiesAccessor
 {
     /**
-     * @var FieldModel
-     */
-    private $fieldModel;
-
-    /**
      * @var FormModel
      */
     private $formModel;
 
-    /**
-     * PropertiesAccessor constructor.
-     *
-     * @param FieldModel $fieldModel
-     * @param FormModel  $formModel
-     */
-    public function __construct(FieldModel $fieldModel, FormModel $formModel)
+    public function __construct(FormModel $formModel)
     {
-        $this->fieldModel = $fieldModel;
-        $this->formModel  = $formModel;
+        $this->formModel = $formModel;
     }
 
     /**
-     * @param array $field
-     *
      * @return array|mixed
      */
     public function getProperties(array $field)
