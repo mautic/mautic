@@ -270,8 +270,16 @@ class FormModel extends CommonFormModel
             }
             $field->setForm($entity);
             $field->setSessionId($key);
-            $field->setOrder($order);
-            ++$order;
+            if (!$field->getParent()) {
+                $field->setOrder($order);
+                ++$order;
+            } else {
+                if (isset($sessionFields[$field->getParent()]['order'])) {
+                    $field->setOrder($sessionFields[$field->getParent()]['order']);
+                } else {
+                    $field->setOrder($order);
+                }
+            }
             $entity->addField($properties['id'], $field);
         }
 
@@ -1081,6 +1089,24 @@ class FormModel extends CommonFormModel
             return;
         }
 
+        $list = $this->getContactFieldPropertiesList($contactFieldAlias);
+
+        if (!empty($list)) {
+            $formFieldProps['list'] = ['list' => $list];
+            if (array_key_exists('optionlist', $formFieldProps)) {
+                $formFieldProps['optionlist'] = ['list' => $list];
+            }
+            $formField->setProperties($formFieldProps);
+        }
+    }
+
+    /**
+     * @param string $contactFieldAlias
+     *
+     * @return array|null
+     */
+    public function getContactFieldPropertiesList($contactFieldAlias)
+    {
         $contactField = $this->leadFieldModel->getEntityByAlias($contactFieldAlias);
 
         if (empty($contactField) || !in_array($contactField->getType(), ContactFieldHelper::getListTypes())) {
@@ -1114,12 +1140,6 @@ class FormModel extends CommonFormModel
                 return;
         }
 
-        if (!empty($list)) {
-            $formFieldProps['list'] = ['list' => $list];
-            if (array_key_exists('optionlist', $formFieldProps)) {
-                $formFieldProps['optionlist'] = ['list' => $list];
-            }
-            $formField->setProperties($formFieldProps);
-        }
+        return $list;
     }
 }

@@ -442,6 +442,7 @@ class FormController extends CommonFormController
             [
                 'viewParameters' => [
                     'fields'         => $fieldHelper->getChoiceList($customComponents['fields']),
+                    'viewOnlyFields' => $customComponents['viewOnlyFields'],
                     'actions'        => $customComponents['choices'],
                     'actionSettings' => $customComponents['actions'],
                     'formFields'     => $modifiedFields,
@@ -746,7 +747,7 @@ class FormController extends CommonFormController
 
                 $modifiedFields[$id] = $field;
 
-                if (!empty($field['leadField'])) {
+                if (!empty($field['leadField']) && empty($field['parent'])) {
                     $usedLeadFields[$id] = $field['leadField'];
                 }
             }
@@ -818,6 +819,7 @@ class FormController extends CommonFormController
             [
                 'viewParameters' => [
                     'fields'             => $availableFields,
+                    'viewOnlyFields'     => $customComponents['viewOnlyFields'],
                     'actions'            => $customComponents['choices'],
                     'actionSettings'     => $customComponents['actions'],
                     'formFields'         => $modifiedFields,

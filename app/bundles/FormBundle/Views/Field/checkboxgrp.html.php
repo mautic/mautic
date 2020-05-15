@@ -14,6 +14,7 @@ if (isset($field['defaultValue']) && '' !== $field['defaultValue']) {
         'MauticFormBundle:Field:hidden.html.php',
         [
             'field'         => $field,
+            'fields'        => isset($fields) ? $fields : [],
             'inForm'        => (isset($inForm)) ? $inForm : false,
             'id'            => $id,
             'formId'        => (isset($formId)) ? $formId : 0,
@@ -38,5 +39,6 @@ echo $view->render(
         'formName'      => (isset($formName)) ? $formName : '',
         'contactFields' => (isset($contactFields)) ? $contactFields : [],
         'companyFields' => (isset($companyFields)) ? $companyFields : [],
+        'fields'        => isset($fields) ? $fields : null,
     ]
 );

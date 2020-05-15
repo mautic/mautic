@@ -55,6 +55,42 @@ final class FormEvents
     const FORM_POST_DELETE = 'mautic.form_post_delete';
 
     /**
+     * The mautic.field_pre_save event is dispatched right before a field is persisted.
+     *
+     * The event listener receives a Mautic\FormBundle\Event\FormFieldEvent instance.
+     *
+     * @var string
+     */
+    const FIELD_PRE_SAVE = 'mautic.field_pre_save';
+
+    /**
+     * The mautic.field_post_save event is dispatched right after a field is persisted.
+     *
+     * The event listener receives a Mautic\FormBundle\Event\FormFieldEvent instance.
+     *
+     * @var string
+     */
+    const FIELD_POST_SAVE = 'mautic.field_post_save';
+
+    /**
+     * The mautic.field_pre_delete event is dispatched before a field is deleted.
+     *
+     * The event listener receives a Mautic\FormBundle\Event\FormFieldEvent instance.
+     *
+     * @var string
+     */
+    const FIELD_PRE_DELETE = 'mautic.field_pre_delete';
+
+    /**
+     * The mautic.field_post_delete event is dispatched after a field is deleted.
+     *
+     * The event listener receives a Mautic\FormBundle\Event\FormFieldEvent instance.
+     *
+     * @var string
+     */
+    const FIELD_POST_DELETE = 'mautic.field_post_delete';
+
+    /**
      * The mautic.form_on_build event is dispatched before displaying the form builder form to allow adding of custom form
      * fields and submit actions.
      *

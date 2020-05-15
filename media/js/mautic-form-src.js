@@ -134,6 +134,7 @@
                 if (formId !== null) {
                     Form.prepareMessengerForm(formId);
                     Form.prepareValidation(formId);
+                    Form.prepareShowOn(formId);
                     Form.preparePagination(formId);
                 }
             }
@@ -196,6 +197,73 @@
                     }
                 });
             }
+        };
+
+        Form.prepareShowOn = function (formId) {
+            var theForm = document.getElementById('mauticform_' + formId);
+            var showOnDataAttribute = 'data-mautic-form-show-on';
+
+            var parents = {};
+            var showOn = theForm.querySelectorAll('['+showOnDataAttribute+']');
+            [].forEach.call(showOn, function (container) {
+                var condition = container.getAttribute(showOnDataAttribute);
+                var returnArray = condition.split(':');
+
+                var idOnChangeElem  = "mauticform_" + formId+"_"+returnArray[0];
+                var elemToShow = container.getAttribute('id');
+                var elemShowOnValues = (returnArray[1]).split('|');
+
+                if(!parents[idOnChangeElem]){
+                    parents[idOnChangeElem] = {};
+                }
+
+                parents[idOnChangeElem][elemToShow] = elemShowOnValues;
+
+            });
+
+            Object.keys(parents).forEach(function(key) {
+                var containerId = document.getElementById(key);
+                var selectElement = document.getElementById(key.replace('mauticform_','mauticform_input_' ));
+                var selVal = Array.from(selectElement.selectedOptions)
+                    .map(option => option.value);
+
+                Form.doShowOn(parents, key, selVal)
+
+                containerId.onchange = function (evt) {
+                    var selectElement = evt.target;
+                    var selVal = Array.from(selectElement.selectedOptions)
+                        .map(option => option.value);
+                  Form.doShowOn(parents, key, selVal);
+                }
+            });
+        };
+
+        Form.doShowOn = function (parents, key, selectedValues) {
+
+            Object.keys((parents[key])).forEach(function(key2) {
+                var el = document.getElementById(key2);
+                el.style.display = 'none';
+                el.setAttribute('data-validate-disable', 1);
+            });
+
+            Object.keys((parents[key])).forEach(function(key2) {
+                [].forEach.call(selectedValues, function (selectedValue) {
+
+                    var el = document.getElementById(key2);
+                    if (selectedValue) {
+                        if (el.getAttribute('data-mautic-form-expr') == 'notIn') {
+                            if (!(parents[key][key2]).includes(selectedValue)) {
+                                el.style.display = 'block';
+                                el.removeAttribute('data-validate-disable');
+                            }
+                        }
+                        else if ((parents[key][key2]).includes(selectedValue) || ((parents[key][key2]).includes('*'))) {
+                            el.style.display = 'block';
+                            el.removeAttribute('data-validate-disable');
+                        }
+                    }
+                })
+            });
         };
 
         Form.preparePagination = function(formId) {
@@ -390,6 +458,14 @@
 
                 validateField: function(theForm, fieldKey) {
                     var field = MauticFormValidations[formId][fieldKey];
+
+                    var containerId = Form.getFieldContainerId(formId, fieldKey);
+
+                    // Skip conditonal hidden field
+                    if (document.getElementById(containerId).getAttribute('data-validate-disable')) {
+                        return true;
+                    }
+
                     var valid = Form.customCallbackHandler(formId, 'onValidateField', {fieldKey: fieldKey, field: field});
 
                     // If true, then a callback handled it
@@ -422,8 +498,6 @@
                                     break;
                             }
                         }
-
-                        var containerId = Form.getFieldContainerId(formId, fieldKey);
 
                         if (!valid) {
                             validator.markError(containerId, valid);
