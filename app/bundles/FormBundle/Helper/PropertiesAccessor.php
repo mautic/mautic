@@ -59,9 +59,9 @@ class PropertiesAccessor
         foreach ($options as $option) {
             if (is_array($option)) {
                 if (isset($option['label']) && isset($option['alias'])) {
-                    $choices[$option['alias']] = $option['label'];
+                    $choices[$option['label']] = $option['alias'];
                 } elseif (isset($option['label']) && isset($option['value'])) {
-                    $choices[$option['value']] = $option['label'];
+                    $choices[$option['label']] = $option['value'];
                 } else {
                     foreach ($option as $opt) {
                         $choices[$opt] = $opt;

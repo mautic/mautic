@@ -159,7 +159,7 @@ final class PropertiesAccessorTest extends \PHPUnit\Framework\TestCase
         ];
 
         $this->assertSame(
-            ['Value A' => 'Choice A'],
+            ['Choice A' => 'Value A'],
             $this->propertiesAccessor->getChoices($options)
         );
     }

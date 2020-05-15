@@ -83,8 +83,8 @@ class FormFieldConditionType extends AbstractType
             ChoiceType::class,
             [
                 'choices'  => [
-                    'in'    => 'mautic.core.operator.in',
-                    'notIn' => 'mautic.core.operator.notin',
+                    'mautic.core.operator.in'    => 'in',
+                    'mautic.core.operator.notin' => 'notIn',
                 ],
                 'label'       => false,
                 'placeholder' => false,
