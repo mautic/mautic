@@ -36,6 +36,7 @@ use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Form\Type\EmailType;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -1557,26 +1558,34 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         $errors = [];
 
+        $firstMail = true;
         foreach ($to as $toAddress) {
             $idHash = uniqid();
             $mailer->setIdHash($idHash, $saveStat);
 
             if (!$mailer->addTo($toAddress)) {
                 $errors[] = "{$toAddress}: ".$this->translator->trans('mautic.email.bounce.reason.bad_email');
-            } else {
-                if (!$mailer->queue(true)) {
-                    $errorArray = $mailer->getErrors();
-                    unset($errorArray['failures']);
-                    $errors[] = "{$toAddress}: ".implode('; ', $errorArray);
-                }
+                continue;
+            }
 
-                if ($saveStat) {
-                    $saveEntities[] = $mailer->createEmailStat(false, $toAddress);
-                }
+            if (!$mailer->queue(true)) {
+                $errorArray = $mailer->getErrors();
+                unset($errorArray['failures']);
+                $errors[] = "{$toAddress}: ".implode('; ', $errorArray);
+            }
 
-                // Clear CC and BCC to do not duplicate the send several times
-                $mailer->setCc([]);
-                $mailer->setBcc([]);
+            if ($saveStat) {
+                $saveEntities[] = $mailer->createEmailStat(false, $toAddress);
+            }
+
+            // If this is the first message, flush the queue. This process clears the cc and bcc.
+            if (true === $firstMail) {
+                try {
+                    $this->flushQueue($mailer);
+                } catch (EmailCouldNotBeSentException $e) {
+                    $errors[] = $e->getMessage();
+                }
+                $firstMail = false;
             }
         }
 
@@ -1605,28 +1614,34 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
             if (!$mailer->setTo($user['email'], $user['firstname'].' '.$user['lastname'])) {
                 $errors[] = "{$user['email']}: ".$this->translator->trans('mautic.email.bounce.reason.bad_email');
-            } else {
-                if (!$mailer->queue(true)) {
-                    $errorArray = $mailer->getErrors();
-                    unset($errorArray['failures']);
-                    $errors[] = "{$user['email']}: ".implode('; ', $errorArray);
-                }
+                continue;
+            }
 
-                if ($saveStat) {
-                    $saveEntities[] = $mailer->createEmailStat(false, $user['email']);
-                }
+            if (!$mailer->queue(true)) {
+                $errorArray = $mailer->getErrors();
+                unset($errorArray['failures']);
+                $errors[] = "{$user['email']}: ".implode('; ', $errorArray);
+            }
 
-                // Clear CC and BCC to do not duplicate the send several times
-                $mailer->setCc([]);
-                $mailer->setBcc([]);
+            if ($saveStat) {
+                $saveEntities[] = $mailer->createEmailStat(false, $user['email']);
+            }
+
+            // If this is the first message, flush the queue. This process clears the cc and bcc.
+            if (true === $firstMail) {
+                try {
+                    $this->flushQueue($mailer);
+                } catch (EmailCouldNotBeSentException $e) {
+                    $errors[] = $e->getMessage();
+                }
+                $firstMail = false;
             }
         }
 
-        //flush the message
-        if (!$mailer->flushQueue()) {
-            $errorArray = $mailer->getErrors();
-            unset($errorArray['failures']);
-            $errors[] = implode('; ', $errorArray);
+        try {
+            $this->flushQueue($mailer);
+        } catch (EmailCouldNotBeSentException $e) {
+            $errors[] = $e->getMessage();
         }
 
         if (isset($saveEntities)) {
@@ -1637,6 +1652,19 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         unset($mailer);
 
         return $errors;
+    }
+
+    /**
+     * @throws EmailCouldNotBeSentException
+     */
+    private function flushQueue(MailHelper $mailer): void
+    {
+        if (!$mailer->flushQueue()) {
+            $errorArray = $mailer->getErrors();
+            unset($errorArray['failures']);
+
+            throw new EmailCouldNotBeSentException(implode('; ', $errorArray));
+        }
     }
 
     /**
@@ -1773,9 +1801,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get line chart data of emails sent and read.
      *
-     * @param char   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string $dateFormat
-     * @param bool   $canViewOthers
+     * @param          $reason
+     * @param          $canViewOthers
+     * @param int|null $companyId
+     * @param int|null $campaignId
+     * @param int|null $segmentId
      *
      * @return array
      */
