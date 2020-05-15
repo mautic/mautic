@@ -21,6 +21,7 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
+use Mautic\EmailBundle\Swiftmailer\Transport\SpoolTransport;
 use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -266,7 +267,10 @@ class MailHelper
         $this->returnPath = $factory->getParameter('mailer_return_path');
 
         // Check if batching is supported by the transport
-        if ('memory' == $this->factory->getParameter('mailer_spool_type') && $this->transport instanceof TokenTransportInterface) {
+        if (
+            ('memory' == $this->factory->getParameter('mailer_spool_type') && $this->transport instanceof TokenTransportInterface)
+            || ($this->transport instanceof SpoolTransport && $this->transport->supportsTokenization())
+        ) {
             $this->tokenizationEnabled = true;
         }
 
@@ -737,7 +741,7 @@ class MailHelper
         /** @var \Swift_Mime_SimpleMimeEntity $child */
         foreach ($children as $child) {
             $childType  = $child->getContentType();
-            list($type) = sscanf($childType, '%[^/]/%s');
+            [$type]     = sscanf($childType, '%[^/]/%s');
 
             if ('text' == $type) {
                 $childBody = $child->getBody();
@@ -1928,7 +1932,7 @@ class MailHelper
 
         if ($settings = $this->isMontoringEnabled('EmailBundle', 'bounces')) {
             // Append the bounce notation
-            list($email, $domain) = explode('@', $settings['address']);
+            [$email, $domain] = explode('@', $settings['address']);
             $email .= '+bounce';
             if ($idHash || $this->idHash) {
                 $email .= '_'.($idHash ?: $this->idHash);
@@ -1952,7 +1956,7 @@ class MailHelper
 
         if ($settings = $this->isMontoringEnabled('EmailBundle', 'unsubscribes')) {
             // Append the bounce notation
-            list($email, $domain) = explode('@', $settings['address']);
+            [$email, $domain] = explode('@', $settings['address']);
             $email .= '+unsubscribe';
             if ($idHash || $this->idHash) {
                 $email .= '_'.($idHash ?: $this->idHash);
