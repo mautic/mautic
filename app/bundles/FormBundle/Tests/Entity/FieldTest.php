@@ -14,7 +14,7 @@ namespace Mautic\FormBundle\Tests\Entity;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 
-final class FieldTest extends \PHPUnit_Framework_TestCase
+final class FieldTest extends \PHPUnit\Framework\TestCase
 {
     public function testShowForConditionalFieldWithNoParent()
     {

@@ -15,10 +15,11 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\FormBundle\Form\Type\FormFieldConditionType;
 use Mautic\FormBundle\Helper\PropertiesAccessor;
 use Mautic\FormBundle\Model\FieldModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-final class FormFieldConditionTypeTest extends \PHPUnit_Framework_TestCase
+final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject|FieldModel

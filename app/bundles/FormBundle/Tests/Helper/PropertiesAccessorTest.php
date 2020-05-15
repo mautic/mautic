@@ -13,11 +13,12 @@ namespace Mautic\FormBundle\Tests\Form\Helper;
 
 use Mautic\FormBundle\Helper\PropertiesAccessor;
 use Mautic\FormBundle\Model\FormModel;
+use PHPUnit\Framework\MockObject\MockObject;
 
-final class PropertiesAccessorTest extends \PHPUnit_Framework_TestCase
+final class PropertiesAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|FormModel
+     * @var MockObject|FormModel
      */
     private $formModel;
 

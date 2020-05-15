@@ -14,7 +14,7 @@ namespace Mautic\FormBundle\Tests\Event;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\FormFieldEvent;
 
-final class FormFieldEventTest extends \PHPUnit_Framework_TestCase
+final class FormFieldEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testWorkflow()
     {

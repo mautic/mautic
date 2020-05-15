@@ -17,16 +17,17 @@ use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\EventListener\FormConditionalSubscriber;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
+use PHPUnit\Framework\MockObject\MockObject;
 
-final class FormConditionalSubscriberTest extends \PHPUnit_Framework_TestCase
+final class FormConditionalSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|FormModel
+     * @var MockObject|FormModel
      */
     private $formModel;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|FieldModel
+     * @var MockObject|FieldModel
      */
     private $fieldModel;
 
