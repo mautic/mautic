@@ -17,15 +17,13 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-class Version20200409102100 extends AbstractMauticMigration
+final class Version20200409102100 extends AbstractMauticMigration
 {
     /**
-     * @param Schema $schema
-     *
      * @throws SkipMigrationException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public function preUp(Schema $schema)
+    public function preUp(Schema $schema): void
     {
         $fieldsTable = $schema->getTable($this->prefix.'form_fields');
 
@@ -34,10 +32,7 @@ class Version20200409102100 extends AbstractMauticMigration
         }
     }
 
-    /**
-     * @param Schema $schema
-     */
-    public function up(Schema $schema)
+    public function up(Schema $schema): void
     {
         $this->addSql(
             "ALTER TABLE {$this->prefix}form_fields ADD conditions LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json_array)';"

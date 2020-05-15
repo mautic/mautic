@@ -14,13 +14,13 @@ use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
-class Version20200507122854 extends AbstractMauticMigration
+final class Version20200507122854 extends AbstractMauticMigration
 {
     /**
      * @throws SkipMigrationException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public function preUp(Schema $schema)
+    public function preUp(Schema $schema): void
     {
         $fieldsTable = $schema->getTable($this->prefix.'form_fields');
 
@@ -29,7 +29,7 @@ class Version20200507122854 extends AbstractMauticMigration
         }
     }
 
-    public function up(Schema $schema)
+    public function up(Schema $schema): void
     {
         $this->addSql(
             "ALTER TABLE {$this->prefix}form_fields ADD parent_id VARCHAR(255) DEFAULT NULL;"
