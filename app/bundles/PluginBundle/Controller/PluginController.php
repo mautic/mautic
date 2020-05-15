@@ -204,6 +204,19 @@ class PluginController extends FormController
                     $em          = $this->get('doctrine.orm.entity_manager');
                     $integration = $entity->getName();
 
+                    if (isset($form['apiKeys'])) {
+                        $keys = $form['apiKeys']->getData();
+
+                        // Prevent merged keys
+                        $secretKeys = $integrationObject->getSecretKeys();
+                        foreach ($secretKeys as $secretKey) {
+                            if (empty($keys[$secretKey]) && !empty($currentKeys[$secretKey])) {
+                                $keys[$secretKey] = $currentKeys[$secretKey];
+                            }
+                        }
+                        $integrationObject->encryptAndSetApiKeys($keys, $entity);
+                    }
+
                     if (!$authorize) {
                         $features = $entity->getSupportedFeatures();
                         if (in_array('public_profile', $features) || in_array('push_lead', $features)) {
@@ -243,17 +256,6 @@ class PluginController extends FormController
                             }
                         }
                     } else {
-                        $keys = $form['apiKeys']->getData();
-
-                        // Prevent merged keys
-                        $secretKeys = $integrationObject->getSecretKeys();
-                        foreach ($secretKeys as $secretKey) {
-                            if (empty($keys[$secretKey]) && !empty($currentKeys[$secretKey])) {
-                                $keys[$secretKey] = $currentKeys[$secretKey];
-                            }
-                        }
-                        $integrationObject->encryptAndSetApiKeys($keys, $entity);
-
                         //make sure they aren't overwritten because of API connection issues
                         $entity->setFeatureSettings($currentFeatureSettings);
                     }
