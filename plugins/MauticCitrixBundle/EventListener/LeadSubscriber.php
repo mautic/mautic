@@ -169,11 +169,11 @@ class LeadSubscriber implements EventSubscriberInterface
                         'label'      => $this->translator->trans('plugin.citrix.event.'.$product.'.registration'),
                         'properties' => [
                             'type' => 'select',
-                            'list' => $eventNamesWithAny,
+                            'list' => array_flip($eventNamesWithAny),
                         ],
                         'operators' => [
-                            'in'  => $this->translator->trans('mautic.core.operator.in'),
-                            '!in' => $this->translator->trans('mautic.core.operator.notin'),
+                            $this->translator->trans('mautic.core.operator.in')    => 'in',
+                            $this->translator->trans('mautic.core.operator.notin') => '!in',
                         ],
                     ]
                 );
@@ -186,11 +186,11 @@ class LeadSubscriber implements EventSubscriberInterface
                     'label'      => $this->translator->trans('plugin.citrix.event.'.$product.'.attendance'),
                     'properties' => [
                         'type' => 'select',
-                        'list' => $eventNamesWithAny,
+                        'list' => array_flip($eventNamesWithAny),
                     ],
                     'operators' => [
-                        'in'  => $this->translator->trans('mautic.core.operator.in'),
-                        '!in' => $this->translator->trans('mautic.core.operator.notin'),
+                        $this->translator->trans('mautic.core.operator.in')    => 'in',
+                        $this->translator->trans('mautic.core.operator.notin') => '!in',
                     ],
                 ]
             );
@@ -202,10 +202,10 @@ class LeadSubscriber implements EventSubscriberInterface
                     'label'      => $this->translator->trans('plugin.citrix.event.'.$product.'.no.attendance'),
                     'properties' => [
                         'type' => 'select',
-                        'list' => $eventNamesWithoutAny,
+                        'list' => array_flip($eventNamesWithoutAny),
                     ],
                     'operators' => [
-                        'in' => $this->translator->trans('mautic.core.operator.in'),
+                        $this->translator->trans('mautic.core.operator.in') => 'in',
                     ],
                 ]
             );
@@ -238,6 +238,9 @@ class LeadSubscriber implements EventSubscriberInterface
 
             if (in_array($currentFilter, $eventFilters, true)) {
                 $eventNames = $details['filter'];
+                if (!is_iterable($eventNames)) {
+                    $eventNames = [$eventNames];
+                }
                 $isAnyEvent = in_array('any', $eventNames, true);
                 $eventNames = array_map(function ($v) use ($q) {
                     return $q->expr()->literal($v);
