@@ -2231,16 +2231,16 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         switch ($type) {
             case 'oauth1a':
             case 'oauth2':
-                $callback = $authorization = true;
+                $callback = true;
                 break;
             default:
-                $callback = $authorization = false;
+                $callback = false;
                 break;
         }
 
         return [
             'requires_callback'      => $callback,
-            'requires_authorization' => $authorization,
+            'requires_authorization' => (bool) $this->getRequiredKeyFields(),
             'default_features'       => [],
             'enable_data_priority'   => $enableDataPriority,
         ];
