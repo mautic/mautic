@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -35,7 +37,7 @@ final class FormConditionalSubscriber implements EventSubscriberInterface
         $this->fieldModel = $fieldModel;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::FORM_POST_SAVE => ['onFormPostSave', 0],
@@ -45,7 +47,7 @@ final class FormConditionalSubscriber implements EventSubscriberInterface
     /**
      * Replace session field Id with field Id after save entity.
      */
-    public function onFormPostSave(FormEvent $event)
+    public function onFormPostSave(FormEvent $event): void
     {
         $form = $event->getForm();
 
@@ -53,7 +55,7 @@ final class FormConditionalSubscriber implements EventSubscriberInterface
         $actualFieldIds = [];
         foreach ($form->getFields() as $field) {
             $actualFieldIds[] = $field->getId();
-            if (false !== strpos($field->getParent(), 'new')) {
+            if (false !== strpos((string) $field->getParent(), 'new')) {
                 foreach ($form->getFields() as $parentField) {
                     if ($field->getParent() === $parentField->getSessionId()) {
                         $field->setParent($parentField->getId());

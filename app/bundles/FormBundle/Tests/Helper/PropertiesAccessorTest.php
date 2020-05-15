@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -27,7 +29,7 @@ final class PropertiesAccessorTest extends \PHPUnit\Framework\TestCase
      */
     private $propertiesAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formModel          = $this->createMock(FormModel::class);
         $this->propertiesAccessor = new PropertiesAccessor(
@@ -35,7 +37,7 @@ final class PropertiesAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPropertiesForCountryField()
+    public function testGetPropertiesForCountryField(): void
     {
         $field = [
             'type'      => 'country',
@@ -53,7 +55,7 @@ final class PropertiesAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPropertiesForSyncList()
+    public function testGetPropertiesForSyncList(): void
     {
         $field = [
             'type'       => 'custom_select_a',
@@ -72,7 +74,7 @@ final class PropertiesAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPropertiesForTextField()
+    public function testGetPropertiesForTextField(): void
     {
         $field = [
             'type'       => 'custom_text_a',
@@ -89,7 +91,7 @@ final class PropertiesAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPropertiesForListField()
+    public function testGetPropertiesForListField(): void
     {
         $field = [
             'type'       => 'custom_select_a',
@@ -108,7 +110,7 @@ final class PropertiesAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPropertiesForOptionlistField()
+    public function testGetPropertiesForOptionlistField(): void
     {
         $field = [
             'type'       => 'custom_select_a',
@@ -127,7 +129,7 @@ final class PropertiesAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetChoicesForWellFormattedChoices()
+    public function testGetChoicesForWellFormattedChoices(): void
     {
         $options = ['choice_a' => 'Choice A'];
 
@@ -137,7 +139,7 @@ final class PropertiesAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetChoicesForPipeFormattedChoices()
+    public function testGetChoicesForPipeFormattedChoices(): void
     {
         $options = 'Choice A|Choice B';
 
@@ -147,7 +149,7 @@ final class PropertiesAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetChoicesForLabelValueArrayChoices()
+    public function testGetChoicesForLabelValueArrayChoices(): void
     {
         $options = [
             [

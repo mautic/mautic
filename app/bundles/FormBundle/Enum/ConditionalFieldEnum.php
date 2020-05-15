@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -15,10 +17,7 @@ class ConditionalFieldEnum
 {
     private static $conditionalFieldTypes = ['select', 'country'];
 
-    /**
-     * @return array
-     */
-    public static function getConditionalFieldTypes()
+    public static function getConditionalFieldTypes(): array
     {
         return self::$conditionalFieldTypes;
     }

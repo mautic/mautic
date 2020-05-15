@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -26,32 +28,23 @@ final class FormFieldEvent extends Event
      */
     private $isNew;
 
-    /**
-     * @param bool $isNew
-     */
-    public function __construct(Field $field, $isNew = false)
+    public function __construct(Field $field, bool $isNew = false)
     {
         $this->entity = $field;
         $this->isNew  = $isNew;
     }
 
-    /**
-     * @return Field
-     */
-    public function getField()
+    public function getField(): Field
     {
         return $this->entity;
     }
 
-    /**
-     * @return bool
-     */
-    public function isNew()
+    public function isNew(): bool
     {
         return $this->isNew;
     }
 
-    public function setField(Field $field)
+    public function setField(Field $field): void
     {
         $this->entity = $field;
     }

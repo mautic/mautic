@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -16,13 +18,13 @@ use Mautic\FormBundle\Entity\Form;
 
 final class FieldTest extends \PHPUnit\Framework\TestCase
 {
-    public function testShowForConditionalFieldWithNoParent()
+    public function testShowForConditionalFieldWithNoParent(): void
     {
         $field = new Field();
         $this->assertTrue($field->showForConditionalField([]));
     }
 
-    public function testShowForConditionalFieldWithParentButNoAlias()
+    public function testShowForConditionalFieldWithParentButNoAlias(): void
     {
         $parentFieldId = '55';
         $field         = new Field();
@@ -36,7 +38,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($field->showForConditionalField([]));
     }
 
-    public function testShowForConditionalFieldWithParentAndAliasAndNotInConditionAndBadValue()
+    public function testShowForConditionalFieldWithParentAndAliasAndNotInConditionAndBadValue(): void
     {
         $parentFieldId    = '55';
         $parentFieldAlias = 'field_a';
@@ -54,7 +56,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($field->showForConditionalField($data));
     }
 
-    public function testShowForConditionalFieldWithParentAndAliasAndNotInConditionAndMatchingValue()
+    public function testShowForConditionalFieldWithParentAndAliasAndNotInConditionAndMatchingValue(): void
     {
         $parentFieldId    = '55';
         $parentFieldAlias = 'field_a';
@@ -72,7 +74,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($field->showForConditionalField($data));
     }
 
-    public function testShowForConditionalFieldWithParentAndAliasAndAnyValue()
+    public function testShowForConditionalFieldWithParentAndAliasAndAnyValue(): void
     {
         $parentFieldId    = '55';
         $parentFieldAlias = 'field_a';
@@ -90,7 +92,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($field->showForConditionalField($data));
     }
 
-    public function testShowForConditionalFieldWithParentAndAliasAndInValueMatches()
+    public function testShowForConditionalFieldWithParentAndAliasAndInValueMatches(): void
     {
         $parentFieldId    = '55';
         $parentFieldAlias = 'field_a';
@@ -108,7 +110,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($field->showForConditionalField($data));
     }
 
-    public function testShowForConditionalFieldWithParentAndAliasAndInValueDoesNotMatch()
+    public function testShowForConditionalFieldWithParentAndAliasAndInValueDoesNotMatch(): void
     {
         $parentFieldId    = '55';
         $parentFieldAlias = 'field_a';

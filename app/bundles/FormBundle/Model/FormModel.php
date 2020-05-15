@@ -1100,17 +1100,12 @@ class FormModel extends CommonFormModel
         }
     }
 
-    /**
-     * @param string $contactFieldAlias
-     *
-     * @return array|null
-     */
-    public function getContactFieldPropertiesList($contactFieldAlias)
+    public function getContactFieldPropertiesList(string $contactFieldAlias): ?array
     {
         $contactField = $this->leadFieldModel->getEntityByAlias($contactFieldAlias);
 
         if (empty($contactField) || !in_array($contactField->getType(), ContactFieldHelper::getListTypes())) {
-            return;
+            return null;
         }
 
         $contactFieldProps = $contactField->getProperties();
@@ -1119,7 +1114,7 @@ class FormModel extends CommonFormModel
             case 'select':
             case 'multiselect':
             case 'lookup':
-                $list = isset($contactFieldProps['list']) ? $contactFieldProps['list'] : [];
+                $list = $contactFieldProps['list'] ?? [];
                 break;
             case 'boolean':
                 $list = [$contactFieldProps['no'], $contactFieldProps['yes']];
@@ -1137,7 +1132,7 @@ class FormModel extends CommonFormModel
                 $list = ContactFieldHelper::getLocaleChoices();
                 break;
             default:
-                return;
+                return null;
         }
 
         return $list;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -16,7 +18,7 @@ use Mautic\FormBundle\Event\FormFieldEvent;
 
 final class FormFieldEventTest extends \PHPUnit\Framework\TestCase
 {
-    public function testWorkflow()
+    public function testWorkflow(): void
     {
         $field  = new Field();
         $field2 = new Field();

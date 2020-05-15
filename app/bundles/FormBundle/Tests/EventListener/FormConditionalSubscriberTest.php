@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -36,7 +38,7 @@ final class FormConditionalSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $subscriber;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->formModel  = $this->createMock(FormModel::class);
@@ -47,7 +49,7 @@ final class FormConditionalSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnFormPostSaveForNewForm()
+    public function testOnFormPostSaveForNewForm(): void
     {
         $parentField = $this->createMock(Field::class);
         $childField  = $this->createMock(Field::class);
@@ -77,7 +79,7 @@ final class FormConditionalSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * A child field should be deleted when the parent does not exist anymore.
      */
-    public function testOnFormPostSaveForDeletedParent()
+    public function testOnFormPostSaveForDeletedParent(): void
     {
         $childField  = $this->createMock(Field::class);
         $parentId    = 123;

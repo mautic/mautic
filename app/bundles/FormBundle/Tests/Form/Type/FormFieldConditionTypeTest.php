@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -41,7 +43,7 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
      */
     private $form;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fieldModel         = $this->createMock(FieldModel::class);
         $this->propertiesAccessor = $this->createMock(PropertiesAccessor::class);
@@ -52,7 +54,7 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBuildFormIfParentIsEmpty()
+    public function testBuildFormIfParentIsEmpty(): void
     {
         $options = [];
 
@@ -85,11 +87,11 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
                 'any',
                 YesNoButtonGroupType::class,
                 [
-                    'label'      => 'mautic.form.field.form.condition.any_value',
-                    'attr'       => [
+                    'label' => 'mautic.form.field.form.condition.any_value',
+                    'attr'  => [
                         'data-show-on' => '{"formfield_conditions_expr": "in"}',
                     ],
-                    'data'=> isset($options['data']['any']) ? $options['data']['any'] : false,
+                    'data' => isset($options['data']['any']) ? $options['data']['any'] : false,
                 ]
             );
 
@@ -115,7 +117,7 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
         $this->form->buildForm($this->formBuilder, $options);
     }
 
-    public function testBuildFormIfParentExists()
+    public function testBuildFormIfParentExists(): void
     {
         $options = [
             'parent' => 'parent_field_id',

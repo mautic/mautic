@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -37,7 +39,7 @@ class FormFieldConditionType extends AbstractType
         $this->propertiesAccessor  = $propertiesAccessor;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $choices = [];
         if (!empty($options['parent'])) {
@@ -72,7 +74,7 @@ class FormFieldConditionType extends AbstractType
                 'attr'  => [
                     'data-show-on' => '{"formfield_conditions_expr": "in"}',
                 ],
-                'data' => isset($options['data']['any']) ? $options['data']['any'] : false,
+                'data' => $options['data']['any'] ?? false,
             ]
         );
 
@@ -94,7 +96,7 @@ class FormFieldConditionType extends AbstractType
         );
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

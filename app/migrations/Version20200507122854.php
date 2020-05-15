@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @package     Mautic
  * @copyright   2020 Mautic Contributors. All rights reserved.
