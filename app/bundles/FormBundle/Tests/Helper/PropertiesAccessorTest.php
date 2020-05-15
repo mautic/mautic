@@ -160,19 +160,4 @@ final class PropertiesAccessorTest extends \PHPUnit_Framework_TestCase
             $this->propertiesAccessor->getChoices($options)
         );
     }
-
-    public function testGetChoicesForLabelAliasArrayChoices()
-    {
-        $options = [
-            [
-                'label' => 'Choice A',
-                'alias' => 'Alias A',
-            ],
-        ];
-
-        $this->assertSame(
-            ['Alias A' => 'Choice A'],
-            $this->propertiesAccessor->getChoices($options)
-        );
-    }
 }
