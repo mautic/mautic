@@ -53,7 +53,7 @@ final class FormConditionalSubscriber implements EventSubscriberInterface
         $actualFieldIds = [];
         foreach ($form->getFields() as $field) {
             $actualFieldIds[] = $field->getId();
-            if (strpos($field->getParent(), 'new') !== false) {
+            if (false !== strpos($field->getParent(), 'new')) {
                 foreach ($form->getFields() as $parentField) {
                     if ($field->getParent() === $parentField->getSessionId()) {
                         $field->setParent($parentField->getId());

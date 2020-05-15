@@ -902,8 +902,6 @@ class Field
     /**
      * Was field displayed.
      *
-     * @param array $data
-     *
      * @return bool
      */
     public function showForConditionalField(array $data)

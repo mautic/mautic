@@ -97,7 +97,7 @@ $defaultContainerClass = 'mauticform-row mauticform-'.$containerClass.' mauticfo
 if ($field['parent'] && isset($fields[$field['parent']])) {
     $values = implode('|', $field['conditions']['values']);
 
-    if (!empty($field['conditions']['any']) && $field['conditions']['expr'] != 'notIn') {
+    if (!empty($field['conditions']['any']) && 'notIn' != $field['conditions']['expr']) {
         $values = '*';
     }
 

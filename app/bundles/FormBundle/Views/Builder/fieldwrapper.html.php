@@ -48,7 +48,7 @@ if (!isset($inBuilder)) {
             ?>
         </div>
 
-        <?php if ((isset($field['showWhenValueExists']) && $field['showWhenValueExists'] === false) || !empty($field['showAfterXSubmissions'])
+        <?php if ((isset($field['showWhenValueExists']) && false === $field['showWhenValueExists']) || !empty($field['showAfterXSubmissions'])
             || !empty($field['leadField'])
             || !empty($field['conditions'])
         ): ?>
@@ -68,7 +68,7 @@ if (!isset($inBuilder)) {
                         ); ?>
                     </span>
                     <strong>
-                        <?php if ($field['conditions']['expr'] == 'in' && !empty($field['conditions']['any'])): ?>
+                        <?php if ('in' == $field['conditions']['expr'] && !empty($field['conditions']['any'])): ?>
                             *
                         <?php else: ?>
                         <?php echo implode(', ', $field['conditions']['values']); ?></strong>
@@ -81,7 +81,7 @@ if (!isset($inBuilder)) {
                 <?php if (!empty($field['leadField'])):
                     $icon = (in_array($field['leadField'], array_keys($companyFields))) ? 'building' : 'user';
                     ?>
-                    <i class="fa fa-<?php echo $icon ?>" aria-hidden="true"></i>
+                    <i class="fa fa-<?php echo $icon; ?>" aria-hidden="true"></i>
                     <span class="inline-spacer">
             <?php
             if (isset($contactFields[$field['leadField']]['label'])) {
