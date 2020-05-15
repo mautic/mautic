@@ -21,12 +21,12 @@ use Mautic\FormBundle\Model\FormModel;
 final class FormConditionalSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var MockObject|FormModel
+     * @var \PHPUnit_Framework_MockObject_MockObject|FormModel
      */
     private $formModel;
 
     /**
-     * @var MockObject|FieldModel
+     * @var \PHPUnit_Framework_MockObject_MockObject|FieldModel
      */
     private $fieldModel;
 
