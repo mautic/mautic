@@ -237,6 +237,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$dow]);
         $event->method('getCampaign')
             ->willReturn($campaign);
+        $event->method('getTriggerIntervalUnit')
+            ->willReturn('d');
 
         $contact = $this->createMock(Lead::class);
         $contact->method('getId')
