@@ -64,9 +64,6 @@ class LeadNote extends FormEntity
             ->build();
     }
 
-    /** @var string */
-    private $attachment;
-
     /**
      * Prepares the metadata for API usage.
      *
