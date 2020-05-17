@@ -27,29 +27,23 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
 {
     const EVENT_NAME = 'campaign.jump_to_event';
 
-    /**
-     * @var EventRepository
-     */
     private $eventRepository;
 
-    /**
-     * @var EventExecutioner
-     */
     private $eventExecutioner;
 
-    /**
-     * @var TranslatorInterface
-     */
     private $translator;
+
+    private $leadRepository;
 
     /**
      * CampaignActionJumpToEvent constructor.
      */
-    public function __construct(EventRepository $eventRepository, EventExecutioner $eventExecutioner, TranslatorInterface $translator)
+    public function __construct(EventRepository $eventRepository, EventExecutioner $eventExecutioner, TranslatorInterface $translator, LeadRepository $leadRepository)
     {
         $this->eventRepository  = $eventRepository;
         $this->eventExecutioner = $eventExecutioner;
         $this->translator       = $translator;
+        $this->leadRepository   = $leadRepository;
     }
 
     /**
@@ -111,7 +105,12 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
                 );
             }
         } else {
-            $this->eventExecutioner->executeForContacts($jumpTarget, $campaignEvent->getContacts());
+            // Increment the campaign rotation for the given contacts and current campaign
+            $this->leadRepository->incrementCampaignRotationForContacts(
+                $campaignEvent->getContactsKeyedById()->getKeys(),
+                $event->getCampaign()->getId()
+            );
+            $this->eventExecutioner->executeForContacts($jumpTarget, $campaignEvent->getContactsKeyedById());
             $campaignEvent->passRemaining();
         }
     }

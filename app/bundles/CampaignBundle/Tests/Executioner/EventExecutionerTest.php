@@ -40,59 +40,26 @@ use Psr\Log\LoggerInterface;
 
 class EventExecutionerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EventCollector|\PHPUnit\Framework\MockObject\MockObject
-     */
     private $eventCollector;
 
-    /**
-     * @var EventLogger|\PHPUnit\Framework\MockObject\MockObject
-     */
     private $eventLogger;
 
-    /**
-     * @var ActionExecutioner|\PHPUnit\Framework\MockObject\MockObject
-     */
     private $actionExecutioner;
 
-    /**
-     * @var ConditionExecutioner|\PHPUnit\Framework\MockObject\MockObject
-     */
     private $conditionExecutioner;
 
-    /**
-     * @var DecisionExecutioner|\PHPUnit\Framework\MockObject\MockObject
-     */
     private $decisionExecutioner;
 
-    /**
-     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
     private $logger;
 
-    /**
-     * @var EventScheduler|\PHPUnit\Framework\MockObject\MockObject
-     */
     private $eventScheduler;
 
-    /**
-     * @var RemovedContactTracker|\PHPUnit\Framework\MockObject\MockObject
-     */
     private $removedContactTracker;
 
-    /**
-     * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
-     */
     private $leadRepository;
 
-    /**
-     * @var EventRepository|MockBuilder
-     */
     private $eventRepository;
 
-    /**
-     * @var Translator|MockBuilder
-     */
     private $translator;
 
     protected function setUp(): void
@@ -286,7 +253,7 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->eventRepository->method('getEntities')
             ->willReturn([]);
 
-        $subscriber = new CampaignActionJumpToEventSubscriber($this->eventRepository, $this->getEventExecutioner(), $this->translator);
+        $subscriber = new CampaignActionJumpToEventSubscriber($this->eventRepository, $this->getEventExecutioner(), $this->translator, $this->leadRepository);
         $subscriber->onJumpToEvent($pendingEvent);
 
         $this->assertEquals(count($pendingEvent->getSuccessful()), 1);
