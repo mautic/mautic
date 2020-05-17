@@ -11,6 +11,12 @@
 
 return [
     'routes' => [
+        'public' => [
+            'mautic_lead_note_attachment_download' => [
+                'path'       => '/note/download/{objectId}',
+                'controller' => 'MauticLeadBundle:Public:download',
+            ],
+        ],
         'main' => [
             'mautic_plugin_timeline_index' => [
                 'path'         => '/plugin/{integration}/timeline/{page}',
@@ -809,6 +815,15 @@ return [
                     '@doctrine.orm.entity_manager',
                 ],
             ],
+            'mautic.lead.note.uploader' => [
+                'class'     => \Mautic\LeadBundle\Uploader\LeadNoteUploader::class,
+                'arguments' => [
+                    'mautic.helper.file_uploader',
+                    'request_stack',
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.paths',
+                ],
+            ],
         ],
         'repositories' => [
             'mautic.lead.repository.company' => [
@@ -1117,7 +1132,10 @@ return [
                 'class'     => \Mautic\LeadBundle\Segment\OperatorOptions::class,
             ],
             'mautic.lead.model.note' => [
-                'class' => 'Mautic\LeadBundle\Model\NoteModel',
+                'class'     => \Mautic\LeadBundle\Model\NoteModel::class,
+                'arguments' => [
+                    'mautic.lead.note.uploader',
+                ],
             ],
             'mautic.lead.model.device' => [
                 'class'     => Mautic\LeadBundle\Model\DeviceModel::class,

@@ -9,17 +9,19 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 if ($note instanceof \Mautic\LeadBundle\Entity\LeadNote) {
-    $id     = $note->getId();
-    $text   = $note->getText();
-    $date   = $note->getDateTime();
-    $author = $note->getCreatedByUser();
-    $type   = $note->getType();
+    $id         = $note->getId();
+    $text       = $note->getText();
+    $date       = $note->getDateTime();
+    $author     = $note->getCreatedByUser();
+    $type       = $note->getType();
+    $attachment = $note->getAttachment();
 } else {
-    $id     = $note['id'];
-    $text   = $note['text'];
-    $date   = $note['dateTime'];
-    $author = $note['createdByUser'];
-    $type   = $note['type'];
+    $id         = $note['id'];
+    $text       = $note['text'];
+    $date       = $note['dateTime'];
+    $author     = $note['createdByUser'];
+    $type       = $note['type'];
+    $attachment = $note['attachment'];
 }
 
 switch ($type) {
@@ -63,7 +65,11 @@ switch ($type) {
                      <?php endif; ?>
                 </div>
                 <?php echo $text; ?>
-                <div class="mt-15 text-muted"><i class="fa fa-clock-o fa-fw"></i><span class="small"><?php echo $view['date']->toFullConcat($date); ?></span> <i class="fa fa-user fa-fw"></i><span class="small"><?php echo $author; ?></span></div>
+                <div class="mt-15 text-muted"><i class="fa fa-clock-o fa-fw"></i><span class="small"><?php echo $view['date']->toFullConcat($date); ?></span> <i class="fa fa-user fa-fw"></i><span class="small"><?php echo $author; ?></span>
+                     <?php if ($attachment): ?>
+                        <i class="fa fa-download fa-fw"></i><span class="small"><a href="<?php echo $view['router']->path('mautic_lead_note_attachment_download', ['objectId'=> $id]); ?>"><?php echo $attachment; ?></a></span>
+                     <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
