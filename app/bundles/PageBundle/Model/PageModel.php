@@ -54,64 +54,28 @@ class PageModel extends FormModel
     use VariantModelTrait;
     use BuilderModelTrait;
 
-    /**
-     * @var bool
-     */
     protected $catInUrl;
 
-    /**
-     * @var CookieHelper
-     */
     protected $cookieHelper;
 
-    /**
-     * @var IpLookupHelper
-     */
     protected $ipLookupHelper;
 
-    /**
-     * @var LeadModel
-     */
     protected $leadModel;
 
-    /**
-     * @var FieldModel
-     */
     protected $leadFieldModel;
 
-    /**
-     * @var RedirectModel
-     */
     protected $pageRedirectModel;
 
-    /**
-     * @var TrackableModel
-     */
     protected $pageTrackableModel;
 
-    /**
-     * @var DateTimeHelper
-     */
     protected $dateTimeHelper;
 
-    /**
-     * @var QueueService
-     */
     protected $queueService;
 
-    /**
-     * @var DeviceTracker
-     */
     private $deviceTracker;
 
-    /**
-     * @var CompanyModel
-     */
     private $companyModel;
 
-    /**
-     * @var ContactTracker
-     */
     private $contactTracker;
 
     /**
@@ -1038,9 +1002,7 @@ class PageModel extends FormModel
         $chartQuery->addCampaignFilter($q, $campaignId);
         $chartQuery->addSegmentFilter($q, $segmentId);
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
