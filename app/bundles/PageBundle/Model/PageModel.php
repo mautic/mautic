@@ -1014,11 +1014,10 @@ class PageModel extends FormModel
      *
      * @param int   $limit
      * @param array $filters
-     * @param bool  $canViewOthers
      *
      * @return array
      */
-    public function getPopularTrackedPages($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $canViewOthers = true)
+    public function getPopularTrackedPages($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [])
     {
         $companyId  = ArrayHelper::pickValue('companyId', $filters);
         $campaignId = ArrayHelper::pickValue('campaignId', $filters);
@@ -1031,11 +1030,6 @@ class PageModel extends FormModel
             ->orderBy('hits', 'DESC')
             ->groupBy('t.url_title')
             ->setMaxResults($limit);
-
-        if (!$canViewOthers) {
-            $q->andWhere('p.created_by = :userId')
-                ->setParameter('userId', $this->userHelper->getUser()->getId());
-        }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 

@@ -37,16 +37,6 @@ class DashboardBestTrackingPagesSubscriber extends MainDashboardSubscriber
     ];
 
     /**
-     * Define permissions to see those widgets.
-     *
-     * @var array
-     */
-    protected $permissions = [
-        'page:pages:viewown',
-        'page:pages:viewother',
-    ];
-
-    /**
      * @var PageModel
      */
     protected $pageModel;
@@ -64,16 +54,13 @@ class DashboardBestTrackingPagesSubscriber extends MainDashboardSubscriber
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
-        $this->checkPermissions($event);
-        $canViewOthers = $event->hasPermission('page:pages:viewother');
-
         if ('best.tracking.pages' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
             if (!$event->isCached()) {
                 $items = [];
-                $pages = $this->pageModel->getPopularTrackedPages($widget->getLimitCalcByWeight(), $params['dateFrom'], $params['dateTo'], $params, $canViewOthers);
+                $pages = $this->pageModel->getPopularTrackedPages($widget->getLimitCalcByWeight(), $params['dateFrom'], $params['dateTo'], $params);
                 // Build table rows with links
                 if ($pages) {
                     foreach ($pages as $page) {
