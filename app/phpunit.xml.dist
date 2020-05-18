@@ -19,6 +19,9 @@
         <testsuite name="Plugin tests">
             <directory>./../plugins/*Bundle/Tests</directory>
         </testsuite>
+        <testsuite name="Middleware tests">
+            <directory>middlewares/Tests</directory>
+        </testsuite>
     </testsuites>
 
     <filter>
