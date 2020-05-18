@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
@@ -22,7 +22,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 final class Version20200409102100 extends AbstractMauticMigration
 {
     /**
-     * @throws SkipMigrationException
+     * @throws SkipMigration
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public function preUp(Schema $schema): void
@@ -30,7 +30,7 @@ final class Version20200409102100 extends AbstractMauticMigration
         $fieldsTable = $schema->getTable($this->prefix.'form_fields');
 
         if ($fieldsTable->hasColumn('conditions')) {
-            throw new SkipMigrationException('Schema includes this migration');
+            throw new SkipMigration('Schema includes this migration');
         }
     }
 

@@ -12,14 +12,14 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20200507122854 extends AbstractMauticMigration
 {
     /**
-     * @throws SkipMigrationException
+     * @throws SkipMigration
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public function preUp(Schema $schema): void
@@ -27,7 +27,7 @@ final class Version20200507122854 extends AbstractMauticMigration
         $fieldsTable = $schema->getTable($this->prefix.'form_fields');
 
         if ($fieldsTable->hasColumn('parent_id')) {
-            throw new SkipMigrationException('Schema includes this migration');
+            throw new SkipMigration('Schema includes this migration');
         }
     }
 
