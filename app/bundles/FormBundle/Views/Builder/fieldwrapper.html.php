@@ -128,7 +128,7 @@ if (!isset($inBuilder)) {
                             'mautic.form.form.component.fields'
                         ); ?>">
                     <option value=""></option>
-                    <?php foreach ($fields as $conditionalFieldType => $conditionalField): ?>
+                    <?php foreach ($fields as $conditionalField => $conditionalFieldType): ?>
                         <?php if (!in_array($conditionalFieldType, $viewOnlyFields)): ?>
                             <option data-toggle="ajaxmodal"
                                     data-target="#formComponentModal"
