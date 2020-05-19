@@ -276,9 +276,12 @@ $view['slots']->set(
                 <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.core.type.email'); ?></h6>
                 <p class="text-muted"><?php echo $view->escape($company->getEmail()); ?></p>
 
-                <?php if (isset($fields['core']['phone'])) : ?>
-                    <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.field.type.tel'); ?></h6>
-                    <p class="text-muted"><?php echo $view->escape($company->getPhone()); ?></p>
+                <?php
+                    $phone = $company->getPhone();
+                    if (isset($company)) :
+                ?>
+                    <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.company.phone'); ?></h6>
+                    <p class="text-muted"><?php echo $view->escape($phone); ?></p>
                 <?php endif; ?>
             </div>
         </div>
