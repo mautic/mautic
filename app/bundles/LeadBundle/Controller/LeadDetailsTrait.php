@@ -371,13 +371,12 @@ trait LeadDetailsTrait
             $engagements = array_map(function ($a, $b) {
                 return $a + $b;
             }, $engagementsData['engagements']['byUnit'], $engagements);
-            $points = array_map(function ($a, $b) {
-                return $a + $b;
+            $points = array_map(function ($points_first_user, $points_second_user) {
+                return $points_first_user + $points_second_user;
             }, $engagementsData['points'], $points);
         }
-        $engagementsData = $this->getCompanyEngagementsForGraph($engagements, $points);
 
-        return $engagementsData;
+        return $this->getCompanyEngagementsForGraph($engagements, $points);
     }
 
     /**
