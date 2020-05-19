@@ -128,6 +128,8 @@
         };
 
         Form.prepareForms = function() {
+            if (Core.debug()) console.log('Preparing forms found on the page');
+
             var forms = document.getElementsByTagName('form');
             for (var i = 0, n = forms.length; i < n; i++) {
                 var formId = forms[i].getAttribute('data-mautic-form');
@@ -882,7 +884,7 @@
             if (Core.debug()) console.log('Automatic setup mautic_base_url as: ' + config.mautic_base_url);
             Modal.loadStyle();
             document.addEventListener("DOMContentLoaded", function(e){
-                if (Core.debug()) console.log('DOM is ready');
+                if (Core.debug()) console.log('DOMContentLoaded dispatched as DOM is ready');
                 Form.initialize();
             });
         };
@@ -892,9 +894,24 @@
         };
 
         Core.onLoad = function() {
+            if (Core.debug()) console.log('Object onLoad called');
+
+            Core.setupForms();
+        };
+
+        Core.setupForms = function() {
+            if (Core.debug()) console.log('DOM ready state is ' + document.readyState);
+
+            // Landing pages and form "previews" cannot process till the DOM is fully loaded
+            if ("complete" !== document.readyState) {
+                setTimeout(function () { Core.setupForms(); }, 1);
+
+                return;
+            }
+
             Form.prepareForms();
             Form.registerFormMessenger();
-        };
+        }
 
         return Core;
     }
