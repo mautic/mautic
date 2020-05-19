@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CompanyController extends FormController
 {
+    use LeadDetailsTrait;
+
     /**
      * @param int $page
      *
@@ -30,16 +32,18 @@ class CompanyController extends FormController
         //set some permissions
         $permissions = $this->get('mautic.security')->isGranted(
             [
+                'lead:leads:viewown',
                 'lead:leads:viewother',
                 'lead:leads:create',
                 'lead:leads:editother',
                 'lead:leads:editown',
+                'lead:leads:deleteown',
                 'lead:leads:deleteother',
             ],
             'RETURN_ARRAY'
         );
 
-        if (!$permissions['lead:leads:viewother']) {
+        if (!$permissions['lead:leads:viewother'] && !$permissions['lead:leads:viewown']) {
             return $this->accessDenied();
         }
 
@@ -120,6 +124,51 @@ class CompanyController extends FormController
                     'mauticContent' => 'company',
                     'route'         => $this->generateUrl('mautic_company_index', ['page' => $page]),
                 ],
+            ]
+        );
+    }
+
+    /**
+     * Refresh contacts list in company view with new parameters like order or page.
+     *
+     * @param int $objectId company id
+     * @param int $page
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function contactsListAction($objectId, $page = 1)
+    {
+        if (empty($objectId)) {
+            return $this->accessDenied();
+        }
+
+        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+        $model  = $this->getModel('lead.company');
+
+        /** @var \Mautic\LeadBundle\Entity\Company $company */
+        $company = $model->getEntity($objectId);
+
+        $companiesRepo  = $model->getCompanyLeadRepository();
+        $contacts       = $companiesRepo->getCompanyLeads($objectId);
+
+        $leadsIds = 'ids:';
+        foreach ($contacts as $contact) {
+            $leadsIds .= $contact['lead_id'].',';
+        }
+        $leadsIds = substr($leadsIds, 0, -1);
+
+        $data = $this->getCompanyContacts($company, $objectId, $page, $leadsIds);
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'company'    => $company,
+                    'page'       => $data['page'],
+                    'contacts'   => $data['items'],
+                    'totalItems' => $data['count'],
+                    'limit'      => $data['limit'],
+                ],
+                'contentTemplate' => 'MauticLeadBundle:Company:list_rows_contacts.html.php',
             ]
         );
     }
@@ -450,6 +499,162 @@ class CompanyController extends FormController
     }
 
     /**
+     * Loads a specific company into the detailed panel.
+     *
+     * @param $objectId
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function viewAction($objectId)
+    {
+        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+        $model  = $this->getModel('lead.company');
+
+        // When we change company data these changes get cached
+        // so we need to clear the entity manager
+        $model->getRepository()->clear();
+
+        /** @var \Mautic\LeadBundle\Entity\Company $company */
+        $company = $model->getEntity($objectId);
+
+        //set some permissions
+        $permissions = $this->get('mautic.security')->isGranted(
+            [
+                'lead:leads:viewown',
+                'lead:leads:viewother',
+                'lead:leads:create',
+                'lead:leads:editown',
+                'lead:leads:editother',
+                'lead:leads:deleteown',
+                'lead:leads:deleteother',
+            ],
+            'RETURN_ARRAY'
+        );
+
+        //set the return URL
+        $returnUrl = $this->generateUrl('mautic_company_index');
+
+        $postActionVars = [
+            'returnUrl'       => $returnUrl,
+            'contentTemplate' => 'MauticLeadBundle:Company:index',
+            'passthroughVars' => [
+                'activeLink'    => '#mautic_company_index',
+                'mauticContent' => 'company',
+            ],
+        ];
+
+        if (null === $company) {
+            return $this->postActionRedirect(
+                array_merge(
+                    $postActionVars,
+                    [
+                        'flashes' => [
+                            [
+                                'type'    => 'error',
+                                'msg'     => 'mautic.company.error.notfound',
+                                'msgVars' => ['%id%' => $objectId],
+                            ],
+                        ],
+                    ]
+                )
+            );
+        }
+
+        if (!$this->get('mautic.security')->hasEntityAccess(
+            'lead:leads:viewown',
+            'lead:leads:viewother',
+            $company->getPermissionUser()
+        )
+        ) {
+            return $this->accessDenied();
+        }
+
+        $fields         = $company->getFields();
+        $companiesRepo  = $model->getCompanyLeadRepository();
+        $contacts       = $companiesRepo->getCompanyLeads($objectId);
+
+        $leadsIds = 'ids:';
+        foreach ($contacts as $contact) {
+            $leadsIds .= $contact['lead_id'].',';
+        }
+        $leadsIds = substr($leadsIds, 0, -1);
+
+        $engagementData = is_array($contacts) ? $this->getCompanyEngagementData($contacts) : [];
+
+        $contacts = $this->getCompanyContacts($company, $objectId, null, $leadsIds);
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'company'           => $company,
+                    'fields'            => $fields,
+                    'items'             => $contacts['items'],
+                    'permissions'       => $permissions,
+                    'engagementData'    => $engagementData,
+                    'security'          => $this->get('mautic.security'),
+                    'page'              => $contacts['page'],
+                    'totalItems'        => $contacts['count'],
+                    'limit'             => $contacts['limit'],
+                ],
+                'contentTemplate' => 'MauticLeadBundle:Company:company.html.php',
+            ]
+        );
+    }
+
+    /**
+     * Get company's contacts for company view.
+     *
+     * @param \Mautic\LeadBundle\Entity\Company $company
+     * @param int                               $companyId
+     * @param int                               $page
+     * @param string                            $leadsIds  filter to get only company's contacts
+     *
+     * @return array
+     */
+    public function getCompanyContacts($company, $companyId, $page = 0, $leadsIds = '')
+    {
+        $this->setListFilters();
+
+        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        $model   = $this->getModel('lead');
+        $session = $this->get('session');
+        //set limits
+        $limit = $session->get('mautic.company.'.$companyId.'.contacts.limit', $this->get('mautic.helper.core_parameters')->get('default_pagelimit'));
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
+        if ($start < 0) {
+            $start = 0;
+        }
+
+        //do some default filtering
+        $orderBy    = $session->get('mautic.company.'.$companyId.'.contacts.orderby', 'l.last_active');
+        $orderByDir = $session->get('mautic.company.'.$companyId.'.contacts.orderbydir', 'DESC');
+
+        $translator  = $this->get('translator');
+
+        $results = $model->getEntities([
+            'start'          => $start,
+            'limit'          => $limit,
+            'filter'         => ['string' => $leadsIds],
+            'orderBy'        => $orderBy,
+            'orderByDir'     => $orderByDir,
+            'withTotalCount' => true,
+        ]);
+
+        $count = $results['count'];
+        unset($results['count']);
+
+        $leads = $results['results'];
+        unset($results);
+
+        return [
+            'items' => $leads,
+            'page'  => $page,
+            'count' => $count,
+            'limit' => $limit,
+        ];
+    }
+
+    /**
      * Clone an entity.
      *
      * @param int $objectId
@@ -752,5 +957,41 @@ class CompanyController extends FormController
                 ],
             ]
         );
+    }
+
+    public function companyExportAction($companyId)
+    {
+        //set some permissions
+        $permissions = $this->get('mautic.security')->isGranted(
+            [
+                'lead:leads:viewown',
+                'lead:leads:viewother',
+            ],
+            'RETURN_ARRAY'
+        );
+
+        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+            return $this->accessDenied();
+        }
+
+        /** @var companyModel $companyModel */
+        $companyModel  = $this->getModel('lead.company');
+        $company       = $companyModel->getEntity($companyId);
+        $dataType      = $this->request->get('filetype', 'csv');
+
+        if (empty($company)) {
+            return $this->notFound();
+        }
+
+        $companyFields = $company->getProfileFields();
+        $export        = [];
+        foreach ($companyFields as $alias=>$companyField) {
+            $export[] = [
+                'alias' => $alias,
+                'value' => $companyField,
+            ];
+        }
+
+        return $this->exportResultsAs($export, $dataType, 'company_data_'.($companyFields['companyemail'] ?: $companyFields['id']));
     }
 }
