@@ -47,8 +47,8 @@ Mautic.launchBuilder = function (formName, actionName) {
  *
  * @param object
  */
+var editor;
 Mautic.initGrapesJS = function (object) {
-    let editor;
     let panelManager;
     let textareaHtml = mQuery('textarea.builder-html');
     let textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
@@ -143,7 +143,9 @@ Mautic.initGrapesJS = function (object) {
 
             plugins: ['gjs-preset-webpage', 'grapesjs-parser-postcss', 'grapesjs-preset-mautic'],
             pluginsOpts: {
-                'gjs-preset-webpage': {},
+                'gjs-preset-webpage': {
+                    'formsOpts': false,
+                },
                 'grapesjs-preset-mautic': presetMauticConf
             },
             keymaps: keymapsConf
@@ -192,7 +194,7 @@ Mautic.initGrapesJS = function (object) {
                 },
                 keymaps: keymapsConf
             });
-
+            
             // Customize GrapesJS -> add close button with save for Mautic
             panelManager = editor.Panels;
             panelManager.addButton('views', [
@@ -419,7 +421,7 @@ let mjmlToHtml = function (source, destination, container) {
     }
 
     let code = '';
-    let editor = grapesjs.init({
+    editor = grapesjs.init({
         clearOnRender: true,
         container: container,
         components: source.val(),

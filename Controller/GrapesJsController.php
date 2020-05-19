@@ -7,6 +7,7 @@ namespace MauticPlugin\GrapesJsBuilderBundle\Controller;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\Response;
@@ -69,6 +70,7 @@ class GrapesJsController extends CommonController
         $template     = InputHelper::clean($this->request->query->get('template'));
         $templateName = ':'.$template.':'.$objectType;
         $content      = $entity->getContent();
+        /** @var ThemeHelper $themeHelper */
         $themeHelper  = $this->get('mautic.helper.theme');
 
         // Check for MJML template
