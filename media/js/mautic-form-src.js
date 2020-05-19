@@ -911,7 +911,7 @@
 
             Form.prepareForms();
             Form.registerFormMessenger();
-        }
+        };
 
         return Core;
     }
