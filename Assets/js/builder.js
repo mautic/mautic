@@ -256,6 +256,13 @@ Mautic.initGrapesJS = function (object) {
                 keymaps: keymapsConf
             });
 
+            editor.BlockManager.get('button').set({
+                content: "<a href=\"#\" target=\"_blank\" style=\"display:inline-block;text-decoration:none;border-color:#4e5d9d;border-width: 10px 20px;border-style:solid; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; background-color: #4e5d9d; display: inline-block;font-size: 16px; color: #ffffff; \">\n" +
+                    "Button\n" +
+                    "</a>",
+            })
+
+
             // Customize GrapesJS -> add close button with save for Mautic
             panelManager = editor.Panels;
             panelManager.addButton('views', [
