@@ -376,17 +376,22 @@ trait LeadDetailsTrait
             }, $engagementsData['points'], $points);
         }
 
-        return $this->getCompanyEngagementsForGraph($engagements, $points);
+        return [
+            'engagements' => $engagements,
+            'points'      => $points,
+        ];
     }
 
     /**
-     * @param $engagements
-     * @param $pointStats
+     * Get company graph for points and engagements.
+     *
+     * @param $contacts
      *
      * @return mixed
      */
-    protected function getCompanyEngagementsForGraph($engagements, $pointStats)
+    protected function getCompanyEngagementsForGraph($contacts)
     {
+        $graphData  = $this->getCompanyEngagementData($contacts);
         $translator = $this->get('translator');
 
         $fromDate = new \DateTime('first day of this month 00:00:00');
@@ -397,9 +402,9 @@ trait LeadDetailsTrait
         $lineChart  = new LineChart(null, $fromDate, $toDate);
         $chartQuery = new ChartQuery($this->getDoctrine()->getConnection(), $fromDate, $toDate);
 
-        $lineChart->setDataset($translator->trans('mautic.lead.graph.line.all_engagements'), $engagements);
+        $lineChart->setDataset($translator->trans('mautic.lead.graph.line.all_engagements'), $graphData['engagements']);
 
-        $lineChart->setDataset($translator->trans('mautic.lead.graph.line.points'), $pointStats);
+        $lineChart->setDataset($translator->trans('mautic.lead.graph.line.points'), $graphData['points']);
 
         return $lineChart->render();
     }

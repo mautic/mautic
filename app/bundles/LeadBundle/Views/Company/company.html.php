@@ -28,13 +28,12 @@ $edit   = $view['security']->hasEntityAccess(
 $buttons = [];
 
 //Merge button
-if (($view['security']->hasEntityAccess(
+$merge = $view['security']->hasEntityAccess(
     $permissions['lead:leads:deleteown'],
     $permissions['lead:leads:deleteother'],
     $company->getPermissionUser()
-))
-    && $edit
-) {
+);
+if ($merge && $edit) {
     $buttons[] = [
         'attr' => [
             'data-toggle' => 'ajaxmodal',

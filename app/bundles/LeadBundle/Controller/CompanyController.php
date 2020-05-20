@@ -579,7 +579,7 @@ class CompanyController extends FormController
         }
         $leadsIds = substr($leadsIds, 0, -1);
 
-        $engagementData = is_array($contacts) ? $this->getCompanyEngagementData($contacts) : [];
+        $engagementData = is_array($contacts) ? $this->getCompanyEngagementsForGraph($contacts) : [];
 
         $contacts = $this->getCompanyContacts($company, $objectId, null, $leadsIds);
 
@@ -959,6 +959,13 @@ class CompanyController extends FormController
         );
     }
 
+    /**
+     * Export company's data.
+     *
+     * @param $companyId
+     *
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\StreamedResponse
+     */
     public function companyExportAction($companyId)
     {
         //set some permissions
