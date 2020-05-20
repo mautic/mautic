@@ -15,14 +15,35 @@ use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\FormEvents;
-use Mautic\FormBundle\Model\FormModel;
+use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\FormBundle\Model\FieldModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
-/**
- * Class FieldController.
- */
 class FieldController extends CommonFormController
 {
+    /**
+     * @var FormModel
+     */
+    private $formModel;
+
+    /**
+     * @var FieldModel
+     */
+    private $formFieldModel;
+
+    /**
+     * @var FormFieldHelper
+     */
+    private $fieldHelper;
+
+    public function initialize(FilterControllerEvent $event)
+    {
+        $this->formModel      = $this->getModel('form');
+        $this->formFieldModel = $this->getModel('form.field');
+        $this->fieldHelper    = $this->get('mautic.helper.form.field_helper');
+    }
+
     /**
      * Generates new form and processes post data.
      *
@@ -49,7 +70,7 @@ class FieldController extends CommonFormController
             ];
         }
 
-        $customComponents = $this->getModel('form')->getCustomComponents();
+        $customComponents = $this->formModel->getCustomComponents();
         $customParams     = (isset($customComponents['fields'][$fieldType])) ? $customComponents['fields'][$fieldType] : false;
         //ajax only for form fields
         if (!$fieldType ||
@@ -147,10 +168,6 @@ class FieldController extends CommonFormController
             $blank     = $entity->convertToArray();
             $formField = array_merge($blank, $formField);
 
-            /** @var FormModel $formModel */
-            $formModel  = $this->getModel('form');
-            $formEntity = $formModel->getEntity($formId);
-
             $passthroughVars['parent']    = $formField['parent'];
             $passthroughVars['fieldId']   = $keyId;
             $template                     = (!empty($customParams)) ? $customParams['template'] : 'MauticFormBundle:Field:'.$fieldType.'.html.php';
@@ -167,7 +184,7 @@ class FieldController extends CommonFormController
                     'contactFields'        => $this->getModel('lead.field')->getFieldListWithProperties(),
                     'companyFields'        => $this->getModel('lead.field')->getFieldListWithProperties('company'),
                     'inBuilder'            => true,
-                    'fields'               => $this->get('mautic.helper.form.field_helper')->getChoiceList($this->getModel('form.field')->getSessionFields($formId)),
+                    'fields'               => $this->fieldHelper->getChoiceList($customComponents['fields']),
                     'viewOnlyFields'       => $customComponents['viewOnlyFields'],
                     'formFields'           => $fields,
                 ]
@@ -314,7 +331,7 @@ class FieldController extends CommonFormController
                     'contactFields'        => $this->getModel('lead.field')->getFieldListWithProperties(),
                     'companyFields'        => $this->getModel('lead.field')->getFieldListWithProperties('company'),
                     'inBuilder'            => true,
-                    'fields'               => $this->get('mautic.helper.form.field_helper')->getChoiceList($this->getModel('form.field')->getSessionFields($formId)),
+                    'fields'               => $this->fieldHelper->getChoiceList($customComponents['fields']),
                     'formFields'           => $fields,
                     'viewOnlyFields'       => $customComponents['viewOnlyFields'],
                 ]
