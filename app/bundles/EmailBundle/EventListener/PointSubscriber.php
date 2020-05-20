@@ -27,19 +27,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var PointModel
-     */
     private $pointModel;
 
-    /**
-     * @var EntityManager
-     */
     private $entityManager;
 
-    /**
-     * @var array
-     */
     private $triggered = [];
 
     public function __construct(PointModel $pointModel, EntityManager $entityManager)
@@ -120,7 +111,7 @@ class PointSubscriber implements EventSubscriberInterface
      */
     public function onEmailSend(EmailSendEvent $event)
     {
-        if ($leadArray = $event->getLead()) {
+        if ($leadArray = $event->getLead() && !empty($leadArray['id'])) {
             $lead = $this->entityManager->getReference(Lead::class, $leadArray['id']);
         } else {
             return;
