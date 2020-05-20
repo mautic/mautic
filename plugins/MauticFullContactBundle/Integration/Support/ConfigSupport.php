@@ -10,6 +10,8 @@ use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormFeatureSettingsIn
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use MauticPlugin\MauticFullContactBundle\Form\Type\ConfigAuthType;
 use MauticPlugin\MauticFullContactBundle\Form\Type\ConfigFeaturesType;
 use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
@@ -39,7 +41,9 @@ class ConfigSupport extends FullContactIntegration implements ConfigFormInterfac
      */
     public function getSupportedFeatures(): array
     {
-        return [];
+        return [
+          ConfigFormFeaturesInterface::FEATURE_SYNC => 'mautic.integration.feature.sync',
+        ];
     }
 
     /**
@@ -47,7 +51,10 @@ class ConfigSupport extends FullContactIntegration implements ConfigFormInterfac
      */
     public function getSyncConfigObjects(): array
     {
-        return [];
+        return [
+          'Contact' => 'mautic.plugin.fullcontact.contact',
+          'Company' => 'mautic.plugin.fullcontact.company',
+        ];
     }
 
     /**
@@ -55,7 +62,10 @@ class ConfigSupport extends FullContactIntegration implements ConfigFormInterfac
      */
     public function getSyncMappedObjects(): array
     {
-        return [];
+        return [
+          'Contact' => Contact::NAME,
+          'Company' => Company::NAME,
+        ];
     }
 
     /**
