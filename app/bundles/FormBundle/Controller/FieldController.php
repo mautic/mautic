@@ -223,7 +223,7 @@ class FieldController extends CommonFormController
         $valid     = $cancelled = false;
         $formField = array_key_exists($objectId, $fields) ? $fields[$objectId] : [];
 
-        if (null !== $formField) {
+        if ($formField) {
             $fieldType = $formField['type'];
 
             //ajax only for form fields
@@ -261,7 +261,7 @@ class FieldController extends CommonFormController
                                     $aliases[] = $f['alias'];
                                 }
                             }
-                            $formField['alias'] = $this->getModel('form.field')->generateAlias($formField['label'], $aliases);
+                            $formField['alias'] = $this->formFieldModel->generateAlias($formField['label'], $aliases);
                         }
 
                         // Force required for captcha if not a honeypot
@@ -285,7 +285,7 @@ class FieldController extends CommonFormController
             }
 
             $viewParams       = ['type' => $fieldType];
-            $customComponents = $this->getModel('form.form')->getCustomComponents();
+            $customComponents = $this->formModel->getCustomComponents();
             $customParams     = (isset($customComponents['fields'][$fieldType])) ? $customComponents['fields'][$fieldType] : false;
 
             if ($cancelled || $valid) {
