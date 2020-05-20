@@ -243,9 +243,7 @@
         Form.doShowOn = function (parents, key, selectedValues) {
 
             Object.keys((parents[key])).forEach(function(key2) {
-                var el = document.getElementById(key2);
-                el.style.display = 'none';
-                el.setAttribute('data-validate-disable', 1);
+                Form.hideField(document.getElementById(key2));
             });
 
             Object.keys((parents[key])).forEach(function(key2) {
@@ -255,17 +253,54 @@
                     if (selectedValue) {
                         if (el.getAttribute('data-mautic-form-expr') == 'notIn') {
                             if (!(parents[key][key2]).includes(selectedValue)) {
-                                el.style.display = 'block';
-                                el.removeAttribute('data-validate-disable');
+                                Form.showField(el, selectedValue);
                             }
                         }
                         else if ((parents[key][key2]).includes(selectedValue) || ((parents[key][key2]).includes('*'))) {
-                            el.style.display = 'block';
-                            el.removeAttribute('data-validate-disable');
+                            Form.showField(el, selectedValue);
                         }
                     }
                 })
             });
+        };
+
+        Form.hideField = function(element) {
+            element.style.display = 'none';
+            element.setAttribute('data-validate-disable', 1);
+        }
+
+        Form.showField = function(element, selectedValue) {
+            element.style.display = 'block';
+            element.removeAttribute('data-validate-disable');
+            Form.filterOptGroups(element, selectedValue);
+        }
+
+        Form.filterOptGroups = function(selectElement, optGroupValue) {
+            var optGroups = selectElement.querySelectorAll('optgroup');
+            var optGroupCount = optGroups.length;
+
+            if (!optGroupCount) {
+                return;
+            }
+
+            var optGroupFound = false;
+
+            for (var index = 0; index < optGroupCount; ++index) {
+                var optGroup = optGroups[index];
+                if (optGroup.getAttribute('label') !== optGroupValue) {
+                    optGroup.style.display = 'none';
+                } else {
+                    optGroup.style.display = 'block';
+                    optGroup.children[0].selected = 'selected';
+                    optGroupFound = true;
+                }
+            }
+
+            // Hide select field itself if no opt group label match the selected value.
+            // Use case: Show states only for countries which have some states.
+            if (false === optGroupFound) {
+                Form.hideField(selectElement);
+            }
         };
 
         Form.preparePagination = function(formId) {
