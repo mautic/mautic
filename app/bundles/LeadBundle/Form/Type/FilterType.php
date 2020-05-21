@@ -158,7 +158,7 @@ class FilterType extends AbstractType
      */
     private function setPropertiesFormData(FormInterface $filterPropertiesType, array $data): void
     {
-        if (empty($data['properties']) && !empty($data['filter'])) {
+        if (empty($data['properties'])) {
             $propertiesData = [
                 'filter'  => $data['filter'] ?? null,
                 'display' => $data['display'] ?? null,

@@ -16,7 +16,9 @@ namespace Mautic\LeadBundle\Tests\Form\Type;
 use Mautic\LeadBundle\Form\Type\FilterType;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -59,7 +61,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testTransform(): void
+    public function testBuildFormWithTextField(): void
     {
         /** @var MockObject|FormBuilderInterface $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
@@ -140,6 +142,96 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
                             ->method('adjustForm');
 
                         $formModifier(new FormEvent($form, $data));
+
+                        return true;
+                    }
+                )
+            );
+
+        $this->form->buildForm($builder, $options);
+    }
+
+    /**
+     * This ensures that legacy segment structure with "0" filter value will show up.
+     */
+    public function testBuildFormWithNumberField(): void
+    {
+        /** @var MockObject|FormBuilderInterface $builder */
+        $builder = $this->createMock(FormBuilderInterface::class);
+        $options = [];
+
+        $this->listModel->expects($this->once())
+            ->method('getChoiceFields')
+            ->willReturn([
+                'lead' => [
+                    'number1' => [
+                        'label'      => 'Number 1',
+                        'properties' => [
+                            'type' => 'number',
+                        ],
+                        'object'    => 'lead',
+                        'operators' => [
+                            'equals' => 'eq',
+                        ],
+                    ],
+                ],
+            ]);
+
+        // Adding a filter with an existing field:
+        $builder->expects($this->at(1))
+            ->method('addEventListener')
+            ->with(
+                FormEvents::PRE_SET_DATA,
+                $this->callback(
+                    function (callable $formModifier) {
+                        $form = new class() extends Form {
+                            public $addMethodCallCounter = 0;
+
+                            public function __construct()
+                            {
+                            }
+
+                            public function get($name)
+                            {
+                                Assert::assertSame('properties', $name);
+
+                                return new class() extends Form {
+                                    public function __construct()
+                                    {
+                                    }
+
+                                    public function setData($modelData)
+                                    {
+                                        Assert::assertSame(
+                                            [
+                                                'filter'  => '0',
+                                                'display' => null,
+                                            ],
+                                            $modelData
+                                        );
+                                    }
+                                };
+                            }
+
+                            public function add($child, $type = null, array $options = [])
+                            {
+                                ++$this->addMethodCallCounter;
+                            }
+                        };
+
+                        $this->formAdjustmentsProvider->expects($this->once())
+                            ->method('adjustForm');
+
+                        $data = [
+                            'field'    => 'number1',
+                            'object'   => 'lead',
+                            'filter'   => '0',
+                            'operator' => 'eq',
+                        ];
+
+                        $formModifier(new FormEvent($form, $data));
+
+                        Assert::assertSame(2, $form->addMethodCallCounter);
 
                         return true;
                     }
