@@ -1124,10 +1124,10 @@ class FormController extends CommonFormController
         $session = $this->get('session');
         $session->remove('mautic.form.'.$sessionId.'.fields.modified');
         $session->remove('mautic.form.'.$sessionId.'.fields.deleted');
-        $session->remove('mautic.form.'.$sessionId.'.fields.leadfields');
-
         $session->remove('mautic.form.'.$sessionId.'.actions.modified');
         $session->remove('mautic.form.'.$sessionId.'.actions.deleted');
+
+        $this->mappedFieldCollector->removeAllForForm((string) $sessionId);
     }
 
     public function batchRebuildHtmlAction()
