@@ -799,7 +799,12 @@ class Field
             }
 
             // Hide the field if the value is already known from the lead profile
-            if (null !== $lead && $this->leadField && !empty($lead->getFieldValue($this->leadField)) && !$this->isAutoFill) { // @todo make this work for all object fields
+            if (null !== $lead
+                && $this->mappedField
+                && 'lead' === $this->mappedObject
+                && !empty($lead->getFieldValue($this->mappedField))
+                && !$this->isAutoFill
+            ) {
                 return false;
             }
         }
