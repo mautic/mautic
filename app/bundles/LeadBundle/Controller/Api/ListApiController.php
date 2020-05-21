@@ -36,7 +36,7 @@ class ListApiController extends CommonApiController
      * @deprecated This conversion won't be needed in couple of years.
      *
      * The 'filter' and 'display' fields used to be part of each segment filter root array.
-     * Those fields were moved to 'parameters' subarray. We have to ensure BC and remove them
+     * Those fields were moved to 'properties' subarray. We have to ensure BC and remove them
      * from filter root array so Symfony forms would not fail with unknown field error.
      */
     protected function prepareParametersForBinding($parameters, $entity, $action)
