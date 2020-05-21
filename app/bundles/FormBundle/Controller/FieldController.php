@@ -163,10 +163,10 @@ class FieldController extends CommonFormController
         ];
 
         if (!empty($keyId)) {
-            //prevent undefined errors
-            $entity    = new Field();
-            $blank     = $entity->convertToArray();
-            $formField = array_merge($blank, $formField);
+            $entity     = new Field();
+            $blank      = $entity->convertToArray();
+            $formField  = array_merge($blank, $formField);
+            $formEntity = $this->formModel->getEntity($formId);
 
             $passthroughVars['parent']    = $formField['parent'];
             $passthroughVars['fieldId']   = $keyId;
