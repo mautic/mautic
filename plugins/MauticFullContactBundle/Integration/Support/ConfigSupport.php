@@ -15,10 +15,21 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use MauticPlugin\MauticFullContactBundle\Form\Type\ConfigAuthType;
 use MauticPlugin\MauticFullContactBundle\Form\Type\ConfigFeaturesType;
 use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
+use MauticPlugin\MauticFullContactBundle\Sync\Mapping\Field\FieldRepository;
 
 class ConfigSupport extends FullContactIntegration implements ConfigFormInterface, ConfigFormAuthInterface, ConfigFormFeatureSettingsInterface, ConfigFormSyncInterface, ConfigFormFeaturesInterface
 {
     use DefaultConfigFormTrait;
+
+    /**
+     * @var FieldRepository
+     */
+    private $fieldRepository;
+
+    public function __construct(FieldRepository $fieldRepository)
+    {
+        $this->fieldRepository = $fieldRepository;
+    }
 
     /**
      * {@inheritdoc}
@@ -89,6 +100,6 @@ class ConfigSupport extends FullContactIntegration implements ConfigFormInterfac
      */
     public function getAllFieldsForMapping(string $object): array
     {
-        return [];
+        return $this->fieldRepository->getAllFieldsForMapping($object);
     }
 }
