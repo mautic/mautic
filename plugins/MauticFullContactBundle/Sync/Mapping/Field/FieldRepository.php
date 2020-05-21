@@ -1,0 +1,53 @@
+<?php
+
+declare(strict_types=1);
+
+namespace MauticPlugin\MauticFullContactBundle\Sync\Mapping\Field;
+
+use Symfony\Component\Yaml\Yaml;
+
+class FieldRepository
+{
+    /**
+     * @return MappedFieldInfo[]
+     */
+    public function getAllFieldsForMapping(string $objectName): array
+    {
+        $fieldObjects = $this->getFields($objectName);
+
+        $allFields = [];
+        foreach ($fieldObjects as $field) {
+            // Fields must have the name as the key
+            $allFields[$field->getName()] = new MappedFieldInfo($field);
+        }
+
+        return $allFields;
+    }
+
+    /**
+     * Get and prepare all the fields for the sync.
+     *
+     * @return Field[]
+     */
+    public function getFields(string $objectName): array
+    {
+        // Fetch the fields from field mapping file.
+        // @todo: Update proper nested structure as per the response from FullContact API.
+        $fields = Yaml::parse(file_get_contents(__DIR__.'/../FieldMapping.yaml'));
+
+        return $this->hydrateFieldObjects($fields);
+    }
+
+    /**
+     * @return Field[]
+     */
+    private function hydrateFieldObjects(array $fields): array
+    {
+        $fieldObjects = [];
+        foreach ($fields as $field) {
+            $fieldObjects[$field['name']] = new Field($field);
+        }
+
+        return $fieldObjects;
+    }
+}

@@ -87,6 +87,30 @@ return [
                 'tags'      => [
                   'mautic.config_integration',
                 ],
+                'arguments' => [
+                    'mautic.plugin.fullcontact.fields.repository',
+                ],
+            ],
+            'mautic.integration.fullcontact.sync'          => [
+                'class'     => \MauticPlugin\MauticFullContactBundle\Integration\Support\SyncSupport::class,
+                'arguments' => [
+                    'mautic.plugin.fullcontact.mapping_manual.factory',
+                ],
+                'tags'      => [
+                    'mautic.sync_integration',
+                ],
+            ],
+        ],
+        'sync' => [
+            'mautic.plugin.fullcontact.mapping_manual.factory' => [
+                'class'     => \MauticPlugin\MauticFullContactBundle\Sync\Mapping\Manual\MappingManualFactory::class,
+                'arguments' => [
+                    'mautic.plugin.fullcontact.fields.repository',
+                ],
+            ],
+            'mautic.plugin.fullcontact.fields.repository'      => [
+                'class'     => \MauticPlugin\MauticFullContactBundle\Sync\Mapping\Field\FieldRepository::class,
+                'arguments' => [],
             ],
         ],
     ],

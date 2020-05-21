@@ -1,0 +1,17 @@
+---
+-
+    displayName: "Email Address"
+    name: email
+    type: text
+-
+    displayName: "First Name"
+    name: fullName
+    type: text
+-
+    displayName: "Last Name"
+    name: lastName
+    type: text
+-
+    displayName: "Job Title"
+    name: title
+    type: text
