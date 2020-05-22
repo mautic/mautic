@@ -6,16 +6,106 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Tests\FormTestAbstract;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
+use PHPUnit\Framework\Assert;
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
+use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Entity\FormRepository;
+use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\FormBundle\Helper\FormUploader;
+use Mautic\FormBundle\Model\ActionModel;
+use Mautic\FormBundle\Model\FieldModel;
+use Mautic\FormBundle\Model\FormModel;
+use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\RequestStack;
 
-class FormModelTest extends FormTestAbstract
+class FormModelTest extends \PHPUnit\Framework\TestCase
 {
+    private $requestStack;
+    private $templatingHelperMock;
+    private $themeHelper;
+    private $formActionModel;
+    private $formFieldModel;
+    private $dispatcher;
+    private $translator;
+    private $entityManager;
+    private $formUploaderMock;
+    private $columnSchemaHelper;
+    private $tableSchemaHelper;
+    private $formRepository;
+    private $leadFieldModel;
+
+    /**
+     * @var MockObject|LeadModel
+     */
+    private $leadModel;
+
+    /**
+     * @var MockObject|FormFieldHelper
+     */
+    private $fieldHelper;
+
+    protected function setUp()
+    {
+        $this->requestStack         = $this->createMock(RequestStack::class);
+        $this->templatingHelperMock = $this->createMock(TemplatingHelper::class);
+        $this->themeHelper          = $this->createMock(ThemeHelper::class);
+        $this->formActionModel      = $this->createMock(ActionModel::class);
+        $this->formFieldModel       = $this->createMock(FieldModel::class);
+        $this->leadModel            = $this->createMock(LeadModel::class);
+        $this->fieldHelper          = $this->createMock(FormFieldHelper::class);
+        $this->dispatcher           = $this->createMock(EventDispatcher::class);
+        $this->translator           = $this->createMock(Translator::class);
+        $this->entityManager        = $this->createMock(EntityManager::class);
+        $this->formUploaderMock     = $this->createMock(FormUploader::class);
+        $this->leadFieldModel       = $this->createMock(LeadFieldModel::class);
+        $this->formRepository       = $this->createMock(FormRepository::class);
+        $this->columnSchemaHelper   = $this->createMock(ColumnSchemaHelper::class);
+        $this->tableSchemaHelper    = $this->createMock(TableSchemaHelper::class);
+
+        $this->entityManager->expects($this
+            ->any())
+            ->method('getRepository')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['MauticFormBundle:Form', $this->formRepository],
+                    ]
+                )
+            );
+
+        $this->formModel = new FormModel(
+            $this->requestStack,
+            $this->templatingHelperMock,
+            $this->themeHelper,
+            $this->formActionModel,
+            $this->formFieldModel,
+            $this->leadModel,
+            $this->fieldHelper,
+            $this->leadFieldModel,
+            $this->formUploaderMock,
+            $this->columnSchemaHelper,
+            $this->tableSchemaHelper
+        );
+
+        $this->formModel->setDispatcher($this->dispatcher);
+        $this->formModel->setTranslator($this->translator);
+        $this->formModel->setEntityManager($this->entityManager);
+    }
+
     public function testSetFields()
     {
-        $form      = new Form();
-        $fields    = $this->getTestFormFields();
-        $formModel = $this->getFormModel();
-        $formModel->setFields($form, $fields);
+        $form   = new Form();
+        $fields = $this->getTestFormFields();
+        $this->formModel->setFields($form, $fields);
         $entityFields = $form->getFields()->toArray();
 
         /** @var Field $newField */
@@ -53,32 +143,27 @@ class FormModelTest extends FormTestAbstract
 
     public function testGetComponentsFields()
     {
-        $formModel  = $this->getFormModel();
-        $components = $formModel->getCustomComponents();
+        $components = $this->formModel->getCustomComponents();
         $this->assertArrayHasKey('fields', $components);
     }
 
     public function testGetComponentsActions()
     {
-        $formModel  = $this->getFormModel();
-        $components = $formModel->getCustomComponents();
+        $components = $this->formModel->getCustomComponents();
         $this->assertArrayHasKey('actions', $components);
     }
 
     public function testGetComponentsValidators()
     {
-        $formModel  = $this->getFormModel();
-        $components = $formModel->getCustomComponents();
+        $components = $this->formModel->getCustomComponents();
         $this->assertArrayHasKey('validators', $components);
     }
 
     public function testGetEntityForNotFoundContactField()
     {
-        $formModel  = $this->getFormModel();
         $formEntity = $this->createMock(Form::class);
         $fields     = new ArrayCollection();
-
-        $formField = new Field();
+        $formField  = new Field();
         $formField->setLeadField('contactselect');
         $formField->setProperties(['syncList' => true]);
 
@@ -97,18 +182,16 @@ class FormModelTest extends FormTestAbstract
             ->method('getEntityByAlias')
             ->willReturn(null);
 
-        $formModel->getEntity(5);
+        $this->formModel->getEntity(5);
 
         $this->assertSame(['syncList' => true], $formField->getProperties());
     }
 
     public function testGetEntityForNotLinkedSelectField()
     {
-        $formModel  = $this->getFormModel();
         $formEntity = $this->createMock(Form::class);
         $fields     = new ArrayCollection();
-
-        $formField = new Field();
+        $formField  = new Field();
         $formField->setProperties(['syncList' => true]);
 
         $fields->add($formField);
@@ -125,16 +208,14 @@ class FormModelTest extends FormTestAbstract
         $this->leadFieldModel->expects($this->never())
             ->method('getEntityByAlias');
 
-        $formModel->getEntity(5);
+        $this->formModel->getEntity(5);
     }
 
     public function testGetEntityForNotSyncedSelectField()
     {
-        $formModel  = $this->getFormModel();
         $formEntity = $this->createMock(Form::class);
         $fields     = new ArrayCollection();
-
-        $formField = new Field();
+        $formField  = new Field();
         $formField->setLeadField('contactselect');
         $formField->setProperties(['syncList' => false]);
 
@@ -152,17 +233,15 @@ class FormModelTest extends FormTestAbstract
         $this->leadFieldModel->expects($this->never())
             ->method('getEntityByAlias');
 
-        $formModel->getEntity(5);
+        $this->formModel->getEntity(5);
     }
 
     public function testGetEntityForSyncedBooleanField()
     {
-        $formModel  = $this->getFormModel();
         $formEntity = $this->createMock(Form::class);
         $fields     = new ArrayCollection();
         $options    = ['no' => 'lunch?', 'yes' => 'dinner?'];
-
-        $formField = new Field();
+        $formField  = new Field();
         $formField->setLeadField('contactbool');
         $formField->setProperties(['syncList' => true]);
 
@@ -186,7 +265,7 @@ class FormModelTest extends FormTestAbstract
             ->with('contactbool')
             ->willReturn($contactField);
 
-        $formModel->getEntity(5);
+        $this->formModel->getEntity(5);
 
         $this->assertSame(['lunch?', 'dinner?'], $formField->getProperties()['list']['list']);
     }
@@ -219,16 +298,20 @@ class FormModelTest extends FormTestAbstract
         $this->assertArrayHasKey('Czech (Czechia)', $formField->getProperties()['list']['list']);
     }
 
-    public function testGetEntityForLinkedSyncListFields()
+    public function fieldTypeProvider()
     {
-        $this->standardSyncListFieldTest('select');
-        $this->standardSyncListFieldTest('multiselect');
-        $this->standardSyncListFieldTest('lookup');
+        return [
+            ['select'],
+            ['multiselect'],
+            ['lookup'],
+        ];
     }
 
-    private function standardSyncListFieldTest($type)
+    /**
+     * @dataProvider fieldTypeProvider
+     */
+    public function testSyncListField($type)
     {
-        $formModel  = $this->getFormModel();
         $formEntity = $this->createMock(Form::class);
         $fields     = new ArrayCollection();
         $options    = [
@@ -260,18 +343,16 @@ class FormModelTest extends FormTestAbstract
             ->with('contactfieldalias')
             ->willReturn($contactField);
 
-        $formModel->getEntity(5);
+        $this->formModel->getEntity(5);
 
         $this->assertSame($options, $formField->getProperties()['list']['list']);
     }
 
     private function standardSyncListStaticFieldTest($type)
     {
-        $formModel  = $this->getFormModel();
         $formEntity = $this->createMock(Form::class);
         $fields     = new ArrayCollection();
-
-        $formField = new Field();
+        $formField  = new Field();
         $formField->setLeadField('contactfield');
         $formField->setProperties(['syncList' => true]);
 
@@ -294,38 +375,34 @@ class FormModelTest extends FormTestAbstract
             ->with('contactfield')
             ->willReturn($contactField);
 
-        $formModel->getEntity(5);
+        $this->formModel->getEntity(5);
 
         return $formField;
     }
 
     public function testGetContactFieldPropertiesListWhenFieldNotFound(): void
     {
-        $formModel = $this->getFormModel();
-
         $this->leadFieldModel->expects($this->once())
             ->method('getEntityByAlias');
 
-        $this->assertNull($formModel->getContactFieldPropertiesList('alias_a'));
+        $this->assertNull($this->formModel->getContactFieldPropertiesList('alias_a'));
     }
 
     public function testGetContactFieldPropertiesListWhenFieldFoundButNotList(): void
     {
-        $formModel = $this->getFormModel();
-        $field     = new LeadField();
+        $field = new LeadField();
         $field->setType('text');
 
         $this->leadFieldModel->expects($this->once())
             ->method('getEntityByAlias')
             ->willReturn($field);
 
-        $this->assertNull($formModel->getContactFieldPropertiesList('alias_a'));
+        $this->assertNull($this->formModel->getContactFieldPropertiesList('alias_a'));
     }
 
     public function testGetContactFieldPropertiesListWhenSelectFieldFound(): void
     {
-        $formModel = $this->getFormModel();
-        $field     = new LeadField();
+        $field = new LeadField();
         $field->setType('select');
         $field->setProperties(['list' => ['choice_a' => 'Choice A']]);
 
@@ -335,7 +412,190 @@ class FormModelTest extends FormTestAbstract
 
         $this->assertSame(
             ['choice_a' => 'Choice A'],
-            $formModel->getContactFieldPropertiesList('alias_a')
+            $this->formModel->getContactFieldPropertiesList('alias_a')
         );
+    }
+
+    public function testPopulateValuesWithLeadWithoutAutofill(): void
+    {
+        $formHtml = '<html>';
+        $form = new Form();
+        $emailField = new Field();
+        $emailField->setMappedField('email');
+        $emailField->setMappedObject('lead');
+        $emailField->setIsAutoFill(false);
+        $form->addField(123, $emailField);
+
+        $this->leadModel->expects($this->never())
+            ->method('getCurrentLead');
+
+        $this->formModel->populateValuesWithLead($form, $formHtml);
+    }
+
+    public function testPopulateValuesWithLeadWithoutLeadObject(): void
+    {
+        $formHtml = '<html>';
+        $form = new Form();
+        $emailField = new Field();
+        $emailField->setMappedField('email');
+        $emailField->setMappedObject('unicorn');
+        $emailField->setIsAutoFill(true);
+        $form->addField(123, $emailField);
+
+        $this->leadModel->expects($this->never())
+            ->method('getCurrentLead');
+
+        $this->formModel->populateValuesWithLead($form, $formHtml);
+    }
+
+    public function testPopulateValuesWithLeadWithoutLeadEntity(): void
+    {
+        $formHtml = '<html>';
+        $form = new Form();
+        $emailField = new Field();
+        $emailField->setMappedField('email');
+        $emailField->setMappedObject('lead');
+        $emailField->setIsAutoFill(true);
+        $form->addField(123, $emailField);
+
+        $this->leadModel->expects($this->once())
+            ->method('getCurrentLead')
+            ->willReturn(null);
+
+        $this->fieldHelper->expects($this->never())
+            ->method('populateField');
+
+        $this->formModel->populateValuesWithLead($form, $formHtml);
+    }
+
+    public function testPopulateValuesWithLeadWithoutMappedField(): void
+    {
+        $formHtml = '<html>';
+        $form = new Form();
+        $emailField = new Field();
+        $emailField->setIsAutoFill(true);
+        $form->addField(123, $emailField);
+
+        $this->leadModel->expects($this->never())
+            ->method('getCurrentLead');
+
+        $this->formModel->populateValuesWithLead($form, $formHtml);
+    }
+
+    public function testPopulateValuesWithLeadWithEmptyLeadFieldValue(): void
+    {
+        $formHtml = '<html>';
+        $form = new Form();
+        $emailField = new Field();
+        $contact = new class extends Lead {
+            public function getFieldValue($field, $group = null)
+            {
+                Assert::assertSame('email', $field);
+
+                return '';
+            }
+        };
+        $emailField->setMappedField('email');
+        $emailField->setMappedObject('lead');
+        $emailField->setIsAutoFill(true);
+        $form->addField(123, $emailField);
+
+        $this->leadModel->method('getCurrentLead')
+            ->willReturn($contact);
+
+        $this->fieldHelper->expects($this->never())
+            ->method('populateField');
+
+        $this->formModel->populateValuesWithLead($form, $formHtml);
+    }
+
+    public function testPopulateValuesWithLead(): void
+    {
+        $formHtml = '<html>';
+        $form = new Form();
+        $emailField = new Field();
+        $contact = new class extends Lead {
+            public function getFieldValue($field, $group = null)
+            {
+                Assert::assertSame('email', $field);
+
+                return 'john@doe.email';
+            }
+        };
+        $emailField->setMappedField('email');
+        $emailField->setMappedObject('lead');
+        $emailField->setIsAutoFill(true);
+        $form->addField(123, $emailField);
+
+        $this->leadModel->method('getCurrentLead')
+            ->willReturn($contact);
+
+        $this->fieldHelper->expects($this->once())
+            ->method('populateField')
+            ->with($emailField, 'john@doe.email', 'form-', $formHtml);
+
+        $this->formModel->populateValuesWithLead($form, $formHtml);
+    }
+
+    private function getTestFormFields()
+    {
+        $fieldSession          = 'mautic_'.sha1(uniqid(mt_rand(), true));
+        $fieldSession2         = 'mautic_'.sha1(uniqid(mt_rand(), true));
+        $fields[$fieldSession] = [
+            'label'        => 'Email',
+            'showLabel'    => 1,
+            'saveResult'   => 1,
+            'defaultValue' => false,
+            'alias'        => 'email',
+            'type'         => 'email',
+            'leadField'    => 'email',
+            'id'           => $fieldSession,
+        ];
+
+        $fields['file'] = [
+            'label'                   => 'File',
+            'showLabel'               => 1,
+            'saveResult'              => 1,
+            'defaultValue'            => false,
+            'alias'                   => 'file',
+            'type'                    => 'file',
+            'id'                      => 'file',
+            'allowed_file_size'       => 1,
+            'allowed_file_extensions' => ['jpg', 'gif'],
+        ];
+
+        $fields['123'] = [
+            'label'        => 'Parent Field',
+            'showLabel'    => 1,
+            'saveResult'   => 1,
+            'defaultValue' => false,
+            'alias'        => 'parent',
+            'type'         => 'select',
+            'id'           => '123',
+        ];
+
+        $fields['456'] = [
+            'label'        => 'Child',
+            'showLabel'    => 1,
+            'saveResult'   => 1,
+            'defaultValue' => false,
+            'alias'        => 'child',
+            'type'         => 'text',
+            'id'           => '456',
+            'parent'       => '123',
+        ];
+
+        $fields[$fieldSession2] = [
+            'label'        => 'New Child',
+            'showLabel'    => 1,
+            'saveResult'   => 1,
+            'defaultValue' => false,
+            'alias'        => 'new_child',
+            'type'         => 'text',
+            'id'           => $fieldSession2,
+            'parent'       => '123',
+        ];
+
+        return $fields;
     }
 }

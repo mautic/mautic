@@ -26,9 +26,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * @extends CommonFormModel<Form>
- */
 class FormModel extends CommonFormModel
 {
     /**
@@ -86,9 +83,6 @@ class FormModel extends CommonFormModel
      */
     private $tableSchemaHelper;
 
-    /**
-     * FormModel constructor.
-     */
     public function __construct(
         RequestStack $requestStack,
         TemplatingHelper $templatingHelper,
@@ -817,7 +811,7 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * @param $formHtml
+     * @param string $formHtml
      */
     public function populateValuesWithLead(Form $form, &$formHtml)
     {
@@ -831,7 +825,7 @@ class FormModel extends CommonFormModel
             $isAutoFill = $field->getIsAutoFill();
 
             // we want work just with matched autofill fields
-            if (isset($leadField) && $isAutoFill) {
+            if ($field->getMappedField() && 'lead' === $field->getMappedObject() && $field->getIsAutoFill()) {
                 $autoFillFields[$key] = $field;
             }
         }
@@ -847,7 +841,7 @@ class FormModel extends CommonFormModel
         }
 
         foreach ($autoFillFields as $field) {
-            $value = $lead->getFieldValue($field->getLeadField());
+            $value = $lead->getFieldValue($field->getMappedField());
             // just skip string empty field
             if ('' !== $value) {
                 $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
