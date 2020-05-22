@@ -1073,9 +1073,9 @@ class FormModel extends CommonFormModel
     private function addLeadFieldOptions(Field $formField)
     {
         $formFieldProps    = $formField->getProperties();
-        $contactFieldAlias = $formField->getLeadField();
+        $contactFieldAlias = $formField->getMappedField();
 
-        if (empty($formFieldProps['syncList']) || empty($contactFieldAlias)) {
+        if (empty($formFieldProps['syncList']) || empty($contactFieldAlias) || 'lead' !== $formField->getMappedObject()) {
             return;
         }
 
