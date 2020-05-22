@@ -14,9 +14,8 @@ namespace Mautic\CacheBundle\Tests\EventListener;
 use Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter;
 use Mautic\CacheBundle\EventListener\CacheClearSubscriber;
 use Monolog\Logger;
-use PHPUnit\Framework\TestCase;
 
-class CacheClearSubscriberTest extends TestCase
+class CacheClearSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var

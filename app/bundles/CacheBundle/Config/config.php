@@ -34,6 +34,8 @@ return [
             'mautic.cache.provider'           => [
                 'class'     => \Mautic\CacheBundle\Cache\CacheProvider::class,
                 'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'service_container',
                 ],
             ],
             'mautic.cache.adapter.filesystem' => [
