@@ -303,6 +303,7 @@ class SubmissionModelTest extends FormTestAbstract
         $tokens = $submissionEvent->getTokens();
         $this->assertEquals($formData['email'], $tokens['{formfield=email}']);
         $this->assertEquals($formData['file'], $tokens['{formfield=file}']);
+        $this->assertSame(['email' => 'test@email.com'], $submissionEvent->getContactFieldMatches());
 
         $alias              = $this->getTestFormFields()['file']['alias'];
         $token              = '{formfield='.$alias.'}';
