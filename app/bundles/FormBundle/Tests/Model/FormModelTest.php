@@ -583,7 +583,8 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
             'defaultValue' => false,
             'alias'        => 'email',
             'type'         => 'email',
-            'leadField'    => 'email',
+            'mappedField'  => 'email',
+            'mappedObject' => 'lead',
             'id'           => $fieldSession,
         ];
 

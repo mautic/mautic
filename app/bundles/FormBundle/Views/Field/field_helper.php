@@ -130,26 +130,26 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
         $companyFields = [];
     }
     $formFields = array_merge($contactFields, $companyFields);
-    if (!empty($properties['syncList']) && !empty($field['leadField']) && isset($formFields[$field['leadField']])) {
-        $leadFieldType = $formFields[$field['leadField']]['type'];
+    if (!empty($properties['syncList']) && !empty($field['mappedField']) && isset($formFields[$field['mappedField']])) {
+        $mappedFieldType = $formFields[$field['mappedField']]['type'];
         switch (true) {
-            case !empty($formFields[$field['leadField']]['properties']['list']):
-                $parseList = $formFields[$field['leadField']]['properties']['list'];
+            case !empty($formFields[$field['mappedField']]['properties']['list']):
+                $parseList = $formFields[$field['mappedField']]['properties']['list'];
                 break;
-            case 'boolean' == $leadFieldType:
-                $parseList     = [
-                    0 => $formFields[$field['leadField']]['properties']['no'],
-                    1 => $formFields[$field['leadField']]['properties']['yes'],
+            case 'boolean' === $mappedFieldType:
+                $parseList = [
+                    0 => $formFields[$field['mappedField']]['properties']['no'],
+                    1 => $formFields[$field['mappedField']]['properties']['yes'],
                 ];
                 $isBooleanList = true;
                 break;
-            case 'country' == $leadFieldType:
+            case 'country' === $mappedFieldType:
                 $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getCountryChoices();
                 break;
-            case 'region' == $leadFieldType:
+            case 'region' === $mappedFieldType:
                 $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getRegionChoices();
                 break;
-            case 'timezone' == $leadFieldType:
+            case 'timezone' === $mappedFieldType:
                 $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getTimezonesChoices();
                 break;
             case 'locale':
@@ -172,14 +172,14 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
         }
     }
 
-    if ($field['leadField'] && !empty($formFields[$field['leadField']]['type'])
+    if ($field['mappedField'] && !empty($formFields[$field['mappedField']]['type'])
         && in_array(
-            $formFields[$field['leadField']]['type'],
+            $formFields[$field['mappedField']]['type'],
             ['datetime', 'date']
         )) {
-        $tempLeadFieldType = $formFields[$field['leadField']]['type'];
+        $tempMappedFieldType = $formFields[$field['mappedField']]['type'];
         foreach ($parseList as $key => $aTemp) {
-            if ($date = ('datetime' == $tempLeadFieldType ? $view['date']->toFull($aTemp['label']) : $view['date']->toDate($aTemp['label']))) {
+            if ($date = ('datetime' == $tempMappedFieldType ? $view['date']->toFull($aTemp['label']) : $view['date']->toDate($aTemp['label']))) {
                 $parseList[$key]['label'] = $date;
             }
         }
