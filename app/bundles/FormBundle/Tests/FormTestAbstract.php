@@ -3,29 +3,19 @@
 namespace Mautic\FormBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CampaignBundle\Membership\MembershipManager;
-use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
-use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\FormRepository;
-use Mautic\FormBundle\Event\Service\FieldValueTransformer;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\ActionModel;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
-use Mautic\FormBundle\Model\SubmissionModel;
-use Mautic\FormBundle\Validator\UploadFieldValidator;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -34,10 +24,9 @@ use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Templating\EngineInterface;
 
 class FormTestAbstract extends TestCase
@@ -45,8 +34,19 @@ class FormTestAbstract extends TestCase
     protected static $mockId   = 123;
     protected static $mockName = 'Mock test name';
     protected $mockTrackingId;
+    protected $container;
     protected $formRepository;
     protected $leadFieldModel;
+
+    /**
+     * @var MockObject|LeadModel
+     */
+    protected $leadModel;
+
+    /**
+     * @var MockObject|FormFieldHelper
+     */
+    protected $fieldHelper;
 
     protected function setUp(): void
     {
@@ -63,7 +63,8 @@ class FormTestAbstract extends TestCase
         $themeHelper          = $this->createMock(ThemeHelperInterface::class);
         $formActionModel      = $this->createMock(ActionModel::class);
         $formFieldModel       = $this->createMock(FieldModel::class);
-        $fieldHelper          = $this->createMock(FormFieldHelper::class);
+        $this->leadModel      = $this->createMock(LeadModel::class);
+        $this->fieldHelper    = $this->createMock(FormFieldHelper::class);
         $dispatcher           = $this->createMock(EventDispatcher::class);
         $translator           = $this->createMock(Translator::class);
         $entityManager        = $this->createMock(EntityManager::class);
