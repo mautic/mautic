@@ -3,12 +3,8 @@
 namespace Mautic\FormBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CampaignBundle\Membership\MembershipManager;
-use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
-use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -36,11 +32,10 @@ use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServic
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Templating\EngineInterface;
 
 class FormTestAbstract extends TestCase
@@ -48,8 +43,19 @@ class FormTestAbstract extends TestCase
     protected static $mockId   = 123;
     protected static $mockName = 'Mock test name';
     protected $mockTrackingId;
+    protected $container;
     protected $formRepository;
     protected $leadFieldModel;
+
+    /**
+     * @var MockObject|LeadModel
+     */
+    protected $leadModel;
+
+    /**
+     * @var MockObject|FormFieldHelper
+     */
+    protected $fieldHelper;
 
     protected function setUp(): void
     {
@@ -66,7 +72,8 @@ class FormTestAbstract extends TestCase
         $themeHelper          = $this->createMock(ThemeHelperInterface::class);
         $formActionModel      = $this->createMock(ActionModel::class);
         $formFieldModel       = $this->createMock(FieldModel::class);
-        $fieldHelper          = $this->createMock(FormFieldHelper::class);
+        $this->leadModel      = $this->createMock(LeadModel::class);
+        $this->fieldHelper    = $this->createMock(FormFieldHelper::class);
         $dispatcher           = $this->createMock(EventDispatcher::class);
         $translator           = $this->createMock(Translator::class);
         $entityManager        = $this->createMock(EntityManager::class);
