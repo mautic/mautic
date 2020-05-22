@@ -3,26 +3,25 @@
 namespace Mautic\FormBundle\Tests\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Mautic\FormBundle\Entity\Field;
-use Mautic\FormBundle\Entity\Form;
-use Mautic\FormBundle\Tests\FormTestAbstract;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadField;
-use PHPUnit\Framework\Assert;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\ActionModel;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -164,7 +163,8 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $formEntity = $this->createMock(Form::class);
         $fields     = new ArrayCollection();
         $formField  = new Field();
-        $formField->setLeadField('contactselect');
+        $formField->setMappedField('contactselect');
+        $formField->setMappedObject('lead');
         $formField->setProperties(['syncList' => true]);
 
         $fields->add($formField);
@@ -216,10 +216,42 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $formEntity = $this->createMock(Form::class);
         $fields     = new ArrayCollection();
         $formField  = new Field();
-        $formField->setLeadField('contactselect');
+        $formField->setMappedField('contactselect');
+        $formField->setMappedObject('lead');
         $formField->setProperties(['syncList' => false]);
 
         $fields->add($formField);
+
+        $formEntity->expects($this->exactly(2))
+            ->method('getFields')
+            ->willReturn($fields);
+
+        $this->formRepository->expects($this->once())
+            ->method('getEntity')
+            ->with(5)
+            ->willReturn($formEntity);
+
+        $this->leadFieldModel->expects($this->never())
+            ->method('getEntityByAlias');
+
+        $this->formModel->getEntity(5);
+    }
+
+    public function testGetEntityForSyncedBooleanFieldFromNotLeadObject()
+    {
+        $formEntity = $this->createMock(Form::class);
+        $fields     = new ArrayCollection();
+        $options    = ['no' => 'lunch?', 'yes' => 'dinner?'];
+        $formField  = new Field();
+        $formField->setMappedField('contactbool');
+        $formField->setMappedObject('unicorn');
+        $formField->setProperties(['syncList' => true]);
+
+        $fields->add($formField);
+
+        $contactField = new LeadField();
+        $contactField->setType('boolean');
+        $contactField->setProperties($options);
 
         $formEntity->expects($this->exactly(2))
             ->method('getFields')
@@ -242,7 +274,8 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $fields     = new ArrayCollection();
         $options    = ['no' => 'lunch?', 'yes' => 'dinner?'];
         $formField  = new Field();
-        $formField->setLeadField('contactbool');
+        $formField->setMappedField('contactbool');
+        $formField->setMappedObject('lead');
         $formField->setProperties(['syncList' => true]);
 
         $fields->add($formField);
@@ -320,7 +353,8 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         ];
 
         $formField = new Field();
-        $formField->setLeadField('contactfieldalias');
+        $formField->setMappedField('contactfieldalias');
+        $formField->setMappedObject('lead');
         $formField->setProperties(['syncList' => true]);
 
         $contactField = new LeadField();
@@ -353,7 +387,8 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $formEntity = $this->createMock(Form::class);
         $fields     = new ArrayCollection();
         $formField  = new Field();
-        $formField->setLeadField('contactfield');
+        $formField->setMappedField('contactfield');
+        $formField->setMappedObject('lead');
         $formField->setProperties(['syncList' => true]);
 
         $fields->add($formField);
@@ -418,8 +453,8 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
 
     public function testPopulateValuesWithLeadWithoutAutofill(): void
     {
-        $formHtml = '<html>';
-        $form = new Form();
+        $formHtml   = '<html>';
+        $form       = new Form();
         $emailField = new Field();
         $emailField->setMappedField('email');
         $emailField->setMappedObject('lead');
@@ -434,8 +469,8 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
 
     public function testPopulateValuesWithLeadWithoutLeadObject(): void
     {
-        $formHtml = '<html>';
-        $form = new Form();
+        $formHtml   = '<html>';
+        $form       = new Form();
         $emailField = new Field();
         $emailField->setMappedField('email');
         $emailField->setMappedObject('unicorn');
@@ -450,8 +485,8 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
 
     public function testPopulateValuesWithLeadWithoutLeadEntity(): void
     {
-        $formHtml = '<html>';
-        $form = new Form();
+        $formHtml   = '<html>';
+        $form       = new Form();
         $emailField = new Field();
         $emailField->setMappedField('email');
         $emailField->setMappedObject('lead');
@@ -470,8 +505,8 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
 
     public function testPopulateValuesWithLeadWithoutMappedField(): void
     {
-        $formHtml = '<html>';
-        $form = new Form();
+        $formHtml   = '<html>';
+        $form       = new Form();
         $emailField = new Field();
         $emailField->setIsAutoFill(true);
         $form->addField(123, $emailField);
@@ -484,10 +519,10 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
 
     public function testPopulateValuesWithLeadWithEmptyLeadFieldValue(): void
     {
-        $formHtml = '<html>';
-        $form = new Form();
+        $formHtml   = '<html>';
+        $form       = new Form();
         $emailField = new Field();
-        $contact = new class extends Lead {
+        $contact    = new class() extends Lead {
             public function getFieldValue($field, $group = null)
             {
                 Assert::assertSame('email', $field);
@@ -511,10 +546,10 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
 
     public function testPopulateValuesWithLead(): void
     {
-        $formHtml = '<html>';
-        $form = new Form();
+        $formHtml   = '<html>';
+        $form       = new Form();
         $emailField = new Field();
-        $contact = new class extends Lead {
+        $contact    = new class() extends Lead {
             public function getFieldValue($field, $group = null)
             {
                 Assert::assertSame('email', $field);
