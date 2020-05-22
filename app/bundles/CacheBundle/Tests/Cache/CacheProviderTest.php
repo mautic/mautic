@@ -13,9 +13,10 @@ namespace Mautic\CacheBundle\Tests;
 
 use Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter;
 use Mautic\CacheBundle\Cache\CacheProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Simple\Psr6Cache;
 
-class CacheProviderTest extends \PHPUnit_Framework_TestCase
+class CacheProviderTest extends TestCase
 {
     /**
      * @var CacheProvider
