@@ -136,21 +136,6 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
-     */
-    public function getFormSettings()
-    {
-        $enableDataPriority = $this->getDataPriority();
-
-        return [
-            'requires_callback'      => false,
-            'requires_authorization' => false,
-            'default_features'       => [],
-            'enable_data_priority'   => $enableDataPriority,
-        ];
-    }
-
-    /**
      * {@inheritdoc}
      *
      * @return string
