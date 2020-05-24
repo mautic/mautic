@@ -68,4 +68,28 @@ class Config
 
         return $integrationObject->getIntegrationConfiguration();
     }
+
+    /**
+     * @return mixed[]
+     */
+    public function getFeatureSettings(): array
+    {
+        try {
+            $integration = $this->getIntegrationEntity();
+
+            return $integration->getFeatureSettings() ?: [];
+        } catch (IntegrationNotFoundException $e) {
+            return [];
+        }
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getMappedFields($entity): array
+    {
+        $featureSettings = $this->getFeatureSettings();
+
+        return $featureSettings['sync']['fieldMappings'][$entity] ?? [];
+    }
 }
