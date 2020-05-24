@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticFullContactBundle\Integration\Config;
 use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
+use MauticPlugin\MauticFullContactBundle\Services\ContactStorageHelper;
 use MauticPlugin\MauticFullContactBundle\Services\FullContact_Company;
 use MauticPlugin\MauticFullContactBundle\Services\FullContact_Person;
 use Monolog\Logger;
@@ -59,9 +60,14 @@ class LookupHelper
     protected $companyModel;
 
     /**
-     * @var \MauticPlugin\MauticFullContactBundle\Integration\Config
+     * @var Config
      */
     protected $config;
+
+    /**
+     * @var ContactStorageHelper
+     */
+    protected $contactStorageHelper;
 
     public function __construct(
         IntegrationHelper $integrationHelper,
@@ -70,15 +76,17 @@ class LookupHelper
         Router $router,
         LeadModel $leadModel,
         CompanyModel $companyModel,
-        Config $config
+        Config $config,
+        ContactStorageHelper $contactStorageHelper
     ) {
-        $this->integration  = $integrationHelper->getIntegrationObject('FullContact');
-        $this->userHelper   = $userHelper;
-        $this->logger       = $logger;
-        $this->router       = $router;
-        $this->leadModel    = $leadModel;
-        $this->companyModel = $companyModel;
-        $this->config       = $config;
+        $this->integration          = $integrationHelper->getIntegrationObject('FullContact');
+        $this->userHelper           = $userHelper;
+        $this->logger               = $logger;
+        $this->router               = $router;
+        $this->leadModel            = $leadModel;
+        $this->companyModel         = $companyModel;
+        $this->config               = $config;
+        $this->contactStorageHelper = $contactStorageHelper;
     }
 
     /**
@@ -107,6 +115,7 @@ class LookupHelper
                             $webhookId
                         );
                         $res = $fullcontact->lookupByEmail($lead->getEmail());
+                        $this->contactStorageHelper->processContactData($res, $lead);
                         // Prevent from filling up the cache
                         $cache['fullcontact'] = [
                             $cacheId => serialize($res),

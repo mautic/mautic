@@ -21,6 +21,9 @@ class ConfigSupport extends FullContactIntegration implements ConfigFormInterfac
 {
     use DefaultConfigFormTrait;
 
+    public const CONTACT = 'Contact';
+    public const COMPANY = 'Company';
+
     /**
      * @var FieldRepository
      */

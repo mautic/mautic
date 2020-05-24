@@ -65,14 +65,25 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
                     'mautic.plugin.fullcontact.integration.config',
+                    'mautic.plugin.fullcontact.service.contact.sync',
                 ],
             ],
-          'mautic.plugin.fullcontact.integration.config'            => [
-            'class'     => \MauticPlugin\MauticFullContactBundle\Integration\Config::class,
-            'arguments' => [
-              'mautic.integrations.helper',
+            'mautic.plugin.fullcontact.integration.config'            => [
+                'class'     => \MauticPlugin\MauticFullContactBundle\Integration\Config::class,
+                'arguments' => [
+                    'mautic.integrations.helper',
+                ],
             ],
-          ],
+            'mautic.plugin.fullcontact.service.contact.sync' => [
+                'class'     => \MauticPlugin\MauticFullContactBundle\Services\ContactStorageHelper::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.integrations.repository.object_mapping',
+                    'monolog.logger.mautic',
+                    'mautic.integration.fullcontact.field.repository',
+                    'mautic.plugin.fullcontact.integration.config',
+                ],
+            ],
         ],
         'integrations' => [
             'mautic.integration.fullcontact' => [
@@ -99,6 +110,10 @@ return [
                 'tags'      => [
                     'mautic.sync_integration',
                 ],
+            ],
+            'mautic.integration.fullcontact.field.repository'      => [
+                'class'     => \MauticPlugin\MauticFullContactBundle\Sync\Mapping\Field\FieldRepository::class,
+                'arguments' => [],
             ],
         ],
         'sync' => [
