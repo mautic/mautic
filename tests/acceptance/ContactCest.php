@@ -18,23 +18,20 @@ class ContactCest
     {
         $I->amOnPage('/s/contacts');
         $I->click('//*[@id="toolbar"]/div[1]/a[1]');
-        $I->wait(1);
+        $I->wait(2);
         $I->fillField('//*[@id="lead_firstname"]', 'Test First Name');
-        $I->wait(1);
         $I->fillField('//*[@id="lead_lastname"]', 'Test Last Name');
-        $I->wait(1);
         $I->fillField('//*[@id="lead_email"]', 'test@example.com');
-        $I->wait(1);
         $I->click('//*[@id="MauticSharedModal"]/div/div/div[3]/div/button[2]'); // Click to save the contact
         $I->amOnPage('/s/contacts');
         $I->reloadPage(); // reload the page to ensure we have the latest data
         $I->fillField('//*[@id="list-search"]', 'Test'); // Search for the contact we just created
-        $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press the enter key to execute the search
-        $I->wait(1);
+        $I->pressKey('//*[@id="list-search"]', \Facebook\WebDriver\WebDriverKeys::ENTER); // Press the enter key to execute the search
+        $I->wait(2);
         $I->see('Test First Name', '//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Look for our test contact in the contact list
         $I->fillField('//*[@id="list-search"]', ''); // Clear search (can't use clearfield as not supported in this version of Codeception)
-        $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press the enter key to execute the search
-        $I->wait(1);
+        $I->pressKey('//*[@id="list-search"]', \Facebook\WebDriver\WebDriverKeys::ENTER); // Press the enter key to execute the search
+    //    $I->wait(1);
     }
 
     public function createContactFromForm(AcceptanceTester $I)
@@ -192,7 +189,7 @@ class ContactCest
         $I->see("$contactName1", '//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Check that we see the first contact in the list
         $I->dontSee("$contactName2", '//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]'); // Check that we don't see the second contact in the list (as we have filtered to see only the first)
         $I->fillField('//*[@id="list-search"]', ''); // Clear search (can't use clearfield as not supported in this version of Codeception)
-        $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press the enter key to execute the search
+        $I->pressKey('//*[@id="list-search"]', \Facebook\WebDriver\WebDriverKeys::ENTER); // Press the enter key to execute the search
         $I->wait(1);
     }
 
@@ -443,12 +440,12 @@ class ContactCest
         $contactName1 = $I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Get name of first contact
         $contactName2 = $I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]'); // Get name of second contact
         $I->fillField('//*[@id="list-search"]', 'segment:us'); // Search for contacts in the US segment
-        $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press the enter key to execute the search
+        $I->pressKey('//*[@id="list-search"]', \Facebook\WebDriver\WebDriverKeys::ENTER); // Press the enter key to execute the search
         $I->wait(1);
         $I->dontsee("$contactName1"); // check first two names are not in the segment
         $I->dontsee("$contactName2");
         $I->fillField('//*[@id="list-search"]', ''); // Clear search (can't use clearfield as not supported in this version of Codeception)
-        $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press the enter key to execute the search
+        $I->pressKey('//*[@id="list-search"]', \Facebook\WebDriver\WebDriverKeys::ENTER); // Press the enter key to execute the search
         $I->wait(1);
 
         // Batch add first two contacts to US segment
@@ -466,12 +463,12 @@ class ContactCest
         // Search for contacts in segment
 
         $I->fillField('//*[@id="list-search"]', 'segment:us'); // Search for contacts in the US segment
-        $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press the enter key to execute the search
+        $I->pressKey('//*[@id="list-search"]', \Facebook\WebDriver\WebDriverKeys::ENTER); // Press the enter key to execute the search
         $I->wait(1);
         $I->see("$contactName1"); // check first two names are not in the segment
         $I->see("$contactName2");
         $I->fillField('//*[@id="list-search"]', ''); // Clear search (can't use clearfield as not supported in this version of Codeception)
-        $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press the enter key to execute the search
+        $I->pressKey('//*[@id="list-search"]', \Facebook\WebDriver\WebDriverKeys::ENTER); // Press the enter key to execute the search
         $I->wait(1);
     }
 
@@ -483,13 +480,13 @@ class ContactCest
         $contactName1 = $I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[1]/td[2]/a/div[1]'); // Get name of first contact
         $contactName2 = $I->grabTextFrom('//*[@id="leadTable"]/tbody/tr[2]/td[2]/a/div[1]'); // Get name of second contact
         $I->fillField('//*[@id="list-search"]', 'segment:us'); // Search for contacts in the US segment
-        $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press the enter key to execute the search
+        $I->pressKey('//*[@id="list-search"]', \Facebook\WebDriver\WebDriverKeys::ENTER); // Press the enter key to execute the search
         $I->wait(1);
         $I->see("$contactName1"); // check first two names are in the segment
         $I->see("$contactName2");
         $I->makeScreenshot('contacts-in-segment');
         $I->fillField('//*[@id="list-search"]', ''); // Clear search (can't use clearfield as not supported in this version of Codeception)
-        $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press the enter key to execute the search
+        $I->pressKey('//*[@id="list-search"]', \Facebook\WebDriver\WebDriverKeys::ENTER); // Press the enter key to execute the search
         $I->wait(1);
 
         // Batch remove first two contacts to US segment
@@ -507,12 +504,12 @@ class ContactCest
         // Search for contacts in segment
 
         $I->fillField('//*[@id="list-search"]', 'segment:us'); // Search for contacts in the US segment
-        $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press the enter key to execute the search
+        $I->pressKey('//*[@id="list-search"]', \Facebook\WebDriver\WebDriverKeys::ENTER); // Press the enter key to execute the search
         $I->wait(1);
         $I->dontsee("$contactName1"); // check first two names are not in the segment
         $I->dontsee("$contactName2");
         $I->fillField('//*[@id="list-search"]', ''); // Clear search (can't use clearfield as not supported in this version of Codeception)
-        $I->pressKey('//*[@id="list-search"]', WebDriverKeys::ENTER); // Press the enter key to execute the search
+        $I->pressKey('//*[@id="list-search"]', \Facebook\WebDriver\WebDriverKeys::ENTER); // Press the enter key to execute the search
         $I->wait(1);
     }
 
