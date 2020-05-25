@@ -448,7 +448,7 @@ class PublicController extends CommonFormController
         $fragment = false;
         if (strpos($url, '#') !== false) {            
             $fragment = '#'.parse_url($url, PHP_URL_FRAGMENT);
-            $url = str_replace($fragment,'',$url);
+            $url      = str_replace($fragment, '', $url);
         }
         
         // Get query string
@@ -465,7 +465,7 @@ class PublicController extends CommonFormController
         }
         
         //adding a fragment to the end of the url (#anchor)
-        if($fragment) {
+        if ($fragment) {
             $url .= $fragment;
         }
         
