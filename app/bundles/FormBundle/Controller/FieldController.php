@@ -15,13 +15,39 @@ use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\FormEvents;
+use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\FormBundle\Model\FieldModel;
+use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
  * Class FieldController.
  */
 class FieldController extends CommonFormController
 {
+    /**
+     * @var FormModel
+     */
+    private $formModel;
+
+    /**
+     * @var FieldModel
+     */
+    private $formFieldModel;
+
+    /**
+     * @var FormFieldHelper
+     */
+    private $fieldHelper;
+
+    public function initialize(FilterControllerEvent $event)
+    {
+        $this->formModel      = $this->getModel('form');
+        $this->formFieldModel = $this->getModel('form.field');
+        $this->fieldHelper    = $this->get('mautic.helper.form.field_helper');
+    }
+
     /**
      * Generates new form and processes post data.
      *
@@ -48,7 +74,7 @@ class FieldController extends CommonFormController
             ];
         }
 
-        $customComponents = $this->getModel('form.form')->getCustomComponents();
+        $customComponents = $this->formModel->getCustomComponents();
         $customParams     = (isset($customComponents['fields'][$fieldType])) ? $customComponents['fields'][$fieldType] : false;
         //ajax only for form fields
         if (!$fieldType ||
@@ -89,7 +115,7 @@ class FieldController extends CommonFormController
 
                     // Generate or ensure a unique alias
                     $alias              = empty($formField['alias']) ? $formField['label'] : $formField['alias'];
-                    $formField['alias'] = $this->getModel('form.field')->generateAlias($alias, $aliases);
+                    $formField['alias'] = $this->formFieldModel->generateAlias($alias, $aliases);
 
                     // Force required for captcha if not a honeypot
                     if ($formField['type'] == 'captcha') {
@@ -161,7 +187,7 @@ class FieldController extends CommonFormController
                     'contactFields'        => $this->getModel('lead.field')->getFieldListWithProperties(),
                     'companyFields'        => $this->getModel('lead.field')->getFieldListWithProperties('company'),
                     'inBuilder'            => true,
-                    'fields'               => $this->get('mautic.helper.form.field_helper')->getChoiceList($this->getModel('form.field')->getSessionFields($formId)),
+                    'fields'               => $this->fieldHelper->getChoiceList($customComponents['fields']),
                     'viewOnlyFields'       => $customComponents['viewOnlyFields'],
                     'formFields'           => $fields,
                 ]
@@ -200,7 +226,7 @@ class FieldController extends CommonFormController
         $valid     = $cancelled     = false;
         $formField = (array_key_exists($objectId, $fields)) ? $fields[$objectId] : [];
 
-        if ($formField !== null) {
+        if ($formField) {
             $fieldType = $formField['type'];
 
             //ajax only for form fields
@@ -238,7 +264,7 @@ class FieldController extends CommonFormController
                                     $aliases[] = $f['alias'];
                                 }
                             }
-                            $formField['alias'] = $this->getModel('form.field')->generateAlias($formField['label'], $aliases);
+                            $formField['alias'] = $this->formFieldModel->generateAlias($formField['label'], $aliases);
                         }
 
                         // Force required for captcha if not a honeypot
@@ -262,7 +288,7 @@ class FieldController extends CommonFormController
             }
 
             $viewParams       = ['type' => $fieldType];
-            $customComponents = $this->getModel('form.form')->getCustomComponents();
+            $customComponents = $this->formModel->getCustomComponents();
             $customParams     = (isset($customComponents['fields'][$fieldType])) ? $customComponents['fields'][$fieldType] : false;
 
             if ($cancelled || $valid) {
@@ -308,7 +334,7 @@ class FieldController extends CommonFormController
                     'contactFields'        => $this->getModel('lead.field')->getFieldListWithProperties(),
                     'companyFields'        => $this->getModel('lead.field')->getFieldListWithProperties('company'),
                     'inBuilder'            => true,
-                    'fields'               => $this->get('mautic.helper.form.field_helper')->getChoiceList($this->getModel('form.field')->getSessionFields($formId)),
+                    'fields'               => $this->fieldHelper->getChoiceList($customComponents['fields']),
                     'formFields'           => $fields,
                     'viewOnlyFields'       => $customComponents['viewOnlyFields'],
                 ]
@@ -396,10 +422,10 @@ class FieldController extends CommonFormController
     private function getFieldForm($formId, array $formField)
     {
         //fire the form builder event
-        $customComponents = $this->getModel('form.form')->getCustomComponents();
+        $customComponents = $this->formModel->getCustomComponents();
         $customParams     = (isset($customComponents['fields'][$formField['type']])) ? $customComponents['fields'][$formField['type']] : false;
 
-        $form = $this->getModel('form.field')->createForm(
+        $form = $this->formFieldModel->createForm(
             $formField,
             $this->get('form.factory'),
             (!empty($formField['id'])) ?

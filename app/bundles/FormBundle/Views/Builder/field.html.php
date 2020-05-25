@@ -289,9 +289,10 @@ $conditionsTabError = (isset($form['conditions']) && ($view['form']->containsErr
                 <div role="tabpanel" class="tab-pane" id="conditions">
                     <div class="row">
                         <div class="col-md-12">
-                            <label><?php echo $view['translator']->trans(
-                                    'mautic.form.field.form.condition.show.only'
-                                ); ?></label>
+                            <label data-toggle="tooltip" data-container="body" data-placement="top" data-original-title="<?php echo $view['translator']->trans('mautic.form.field.form.condition.show.only.tooltip'); ?>">
+                                <?php echo $view['translator']->trans('mautic.form.field.form.condition.show.only'); ?>
+                                <i class="fa fa-question-circle"></i>
+                            </label>
                         </div>
                     </div>
                     <div class="row">
