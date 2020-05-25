@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Command;
 
+use DateTime;
+use DateTimeZone;
+use Doctrine\DBAL\Connection;
 use Exception;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Lead;
 use Mautic\CampaignBundle\Entity\LeadRepository;
-use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
-use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
@@ -89,8 +90,9 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->fetchAll();
         $this->assertCount(0, $stats);
 
-        // Wait 6 seconds then execute the campaign again to send scheduled events
-        $this->getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
+        $this->shiftEmailEventsToThePast();
+
+        // Execute the campaign again to send scheduled events
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
 
         // Send email 1 should no longer be scheduled
@@ -132,8 +134,9 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(25, $byEvent[3]);
         $this->assertCount(25, $byEvent[10]);
 
-        // Wait another 6 seconds to go beyond the inaction timeframe
-        $this->getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
+        $this->shiftEventsToThePast([4, 5]);
+        $eventDate = clone $this->eventDate;
+        $eventDate->modify('-40 second');
 
         // Execute the command again to trigger inaction related events
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
@@ -155,14 +158,14 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(25, $byEvent[14]);
         $this->assertCount(25, $byEvent[15]);
 
-        $utcTimezone = new \DateTimeZone('UTC');
+        $utcTimezone = new DateTimeZone('UTC');
         foreach ($byEvent[14] as $log) {
             if (0 === (int) $log['is_scheduled']) {
                 $this->fail('Tag EmailNotOpen is not scheduled for lead ID '.$log['lead_id']);
             }
 
-            $scheduledFor = new \DateTime($log['trigger_date'], $utcTimezone);
-            $diff         = $this->eventDate->diff($scheduledFor);
+            $scheduledFor = new DateTime($log['trigger_date'], $utcTimezone);
+            $diff         = $eventDate->diff($scheduledFor);
 
             if (2 !== $diff->i) {
                 $this->fail('Tag EmailNotOpen should be scheduled for around 2 minutes ('.$diff->i.' minutes)');
@@ -174,8 +177,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
                 $this->fail('Tag EmailNotOpen Again is not scheduled for lead ID '.$log['lead_id']);
             }
 
-            $scheduledFor = new \DateTime($log['trigger_date'], $utcTimezone);
-            $diff         = $this->eventDate->diff($scheduledFor);
+            $scheduledFor = new DateTime($log['trigger_date'], $utcTimezone);
+            $diff         = $eventDate->diff($scheduledFor);
 
             if (6 !== $diff->i) {
                 $this->fail('Tag EmailNotOpen Again should be scheduled for around 6 minutes ('.$diff->i.' minutes)');
@@ -254,8 +257,9 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->fetchAll();
         $this->assertCount(0, $stats);
 
-        // Wait 6 seconds then execute the campaign again to send scheduled events
-        $this->getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
+        $this->shiftEmailEventsToThePast();
+
+        // Execute the campaign again to send scheduled events
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
         // Send email 1 should no longer be scheduled
@@ -297,8 +301,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(1, $byEvent[3]);
         $this->assertCount(1, $byEvent[10]);
 
-        // Wait 6 seconds to go beyond the inaction timeframe
-        $this->getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
+        $this->shiftEventsToThePast([4, 5]);
 
         // Execute the command again to trigger inaction related events
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
@@ -317,32 +320,6 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $byEvent[14]);
         $this->assertCount(0, $byEvent[15]);
 
-        $utcTimezone = new \DateTimeZone('UTC');
-        foreach ($byEvent[14] as $log) {
-            if (0 === (int) $log['is_scheduled']) {
-                $this->fail('Tag EmailNotOpen is not scheduled for lead ID '.$log['lead_id']);
-            }
-
-            $scheduledFor = new \DateTime($log['trigger_date'], $utcTimezone);
-            $diff         = $this->eventDate->diff($scheduledFor);
-
-            if (2 !== $diff->i) {
-                $this->fail('Tag EmailNotOpen should be scheduled for around 2 minutes ('.$diff->i.' minutes)');
-            }
-        }
-
-        foreach ($byEvent[15] as $log) {
-            if (0 === (int) $log['is_scheduled']) {
-                $this->fail('Tag EmailNotOpen Again is not scheduled for lead ID '.$log['lead_id']);
-            }
-
-            $scheduledFor = new \DateTime($log['trigger_date'], $utcTimezone);
-            $diff         = $this->eventDate->diff($scheduledFor);
-
-            if (6 !== $diff->i) {
-                $this->fail('Tag EmailNotOpen Again should be scheduled for around 6 minutes ('.$diff->i.' minutes)');
-            }
-        }
         $byEvent = $this->getCampaignEventLogs([6, 7, 8, 9]);
         $tags    = $this->getTagCounts();
 
@@ -413,8 +390,9 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->fetchAll();
         $this->assertCount(0, $stats);
 
-        // Wait 6 seconds then execute the campaign again to send scheduled events
-        $this->getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
+        $this->shiftEmailEventsToThePast();
+
+        // Execute the campaign again to send scheduled events
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
 
         // Send email 1 should no longer be scheduled
@@ -456,8 +434,9 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(2, $byEvent[3]);
         $this->assertCount(2, $byEvent[10]);
 
-        // Wait 6 seconds to go beyond the inaction timeframe
-        $this->getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
+        $this->shiftEventsToThePast([4, 5]);
+        $eventDate = clone $this->eventDate;
+        $eventDate->modify('-40 second');
 
         // Execute the command again to trigger inaction related events
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
@@ -479,14 +458,14 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(3, $byEvent[14]);
         $this->assertCount(3, $byEvent[15]);
 
-        $utcTimezone = new \DateTimeZone('UTC');
+        $utcTimezone = new DateTimeZone('UTC');
         foreach ($byEvent[14] as $log) {
             if (0 === (int) $log['is_scheduled']) {
                 $this->fail('Tag EmailNotOpen is not scheduled for lead ID '.$log['lead_id']);
             }
 
-            $scheduledFor = new \DateTime($log['trigger_date'], $utcTimezone);
-            $diff         = $this->eventDate->diff($scheduledFor);
+            $scheduledFor = new DateTime($log['trigger_date'], $utcTimezone);
+            $diff         = $eventDate->diff($scheduledFor);
 
             if (2 !== $diff->i) {
                 $this->fail('Tag EmailNotOpen should be scheduled for around 2 minutes ('.$diff->i.' minutes)');
@@ -498,8 +477,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
                 $this->fail('Tag EmailNotOpen Again is not scheduled for lead ID '.$log['lead_id']);
             }
 
-            $scheduledFor = new \DateTime($log['trigger_date'], $utcTimezone);
-            $diff         = $this->eventDate->diff($scheduledFor);
+            $scheduledFor = new DateTime($log['trigger_date'], $utcTimezone);
+            $diff         = $eventDate->diff($scheduledFor);
 
             if (6 !== $diff->i) {
                 $this->fail('Tag EmailNotOpen Again should be scheduled for around 6 minutes ('.$diff->i.' minutes)');
@@ -645,5 +624,34 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         }
 
         return $nonActionCount;
+    }
+
+    private function shiftEmailEventsToThePast(): void
+    {
+        $this->shiftEventsToThePast([2]);
+        $this->db->createQueryBuilder()->update(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log')
+            ->set('trigger_date', ':trigger')
+            ->where('campaign_id = :id')
+            ->andWhere('trigger_date IS NOT NULL')
+            ->andWhere('event_id IN (:eventId)')
+            ->setParameter('trigger', (new DateTime('-40 second'))->format('Y-m-d H:i:s'))
+            ->setParameter('id', 1)
+            ->setParameter('eventId', [2], Connection::PARAM_INT_ARRAY)
+            ->execute();
+
+        $this->em->clear();
+    }
+
+    private function shiftEventsToThePast(array $ids): void
+    {
+        $this->db->createQueryBuilder()->update(MAUTIC_TABLE_PREFIX.'campaign_events')
+            ->set('trigger_date', ':trigger')
+            ->where('trigger_date IS NOT NULL')
+            ->andWhere('id IN (:id)')
+            ->setParameter('trigger', (new DateTime('-40 second'))->format('Y-m-d H:i:s'))
+            ->setParameter('id', $ids, Connection::PARAM_INT_ARRAY)
+            ->execute();
+
+        $this->em->clear();
     }
 }
