@@ -19,7 +19,9 @@ use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class PageController.
@@ -183,7 +185,7 @@ class PageController extends FormController
      */
     public function viewAction($objectId)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model = $this->getModel('page.page');
         //set some permissions
         $security   = $this->get('mautic.security');
@@ -359,7 +361,7 @@ class PageController extends FormController
      */
     public function newAction($entity = null)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model = $this->getModel('page.page');
 
         if (!($entity instanceof Page)) {
@@ -481,7 +483,7 @@ class PageController extends FormController
      */
     public function editAction($objectId, $ignorePost = false)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model    = $this->getModel('page.page');
         $security = $this->get('mautic.security');
         $entity   = $model->getEntity($objectId);
@@ -639,7 +641,7 @@ class PageController extends FormController
      */
     public function cloneAction($objectId)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model  = $this->getModel('page.page');
         $entity = $model->getEntity($objectId);
 
@@ -693,7 +695,7 @@ class PageController extends FormController
         ];
 
         if ('POST' == $this->request->getMethod()) {
-            /** @var \Mautic\PageBundle\Model\PageModel $model */
+            /** @var PageModel $model */
             $model  = $this->getModel('page.page');
             $entity = $model->getEntity($objectId);
 
@@ -754,7 +756,7 @@ class PageController extends FormController
         ];
 
         if ('POST' == $this->request->getMethod()) {
-            /** @var \Mautic\PageBundle\Model\PageModel $model */
+            /** @var PageModel $model */
             $model     = $this->getModel('page');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];
@@ -810,7 +812,7 @@ class PageController extends FormController
      */
     public function builderAction($objectId)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model = $this->getModel('page.page');
 
         //permission check
@@ -866,32 +868,36 @@ class PageController extends FormController
      */
     public function abtestAction($objectId)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model  = $this->getModel('page.page');
         $entity = $model->getEntity($objectId);
 
-        if (null != $entity) {
-            $parent = $entity->getVariantParent();
+        if (null === $entity) {
+            $this->addFlash('mautic.page.error.notfound', ['%id%' => $objectId]);
 
-            if ($parent || !$this->get('mautic.security')->isGranted('page:pages:create') ||
-                !$this->get('mautic.security')->hasEntityAccess(
-                    'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
-                )
-            ) {
-                return $this->accessDenied();
-            }
-
-            $clone = clone $entity;
-
-            //reset
-            $clone->setHits(0);
-            $clone->setRevision(0);
-            $clone->setVariantHits(0);
-            $clone->setUniqueHits(0);
-            $clone->setVariantStartDate(null);
-            $clone->setIsPublished(false);
-            $clone->setVariantParent($entity);
+            return $this->redirectToRoute('mautic_page_index', [], Response::HTTP_FOUND);
         }
+
+        $parent = $entity->getVariantParent();
+
+        if ($parent || !$this->get('mautic.security')->isGranted('page:pages:create') ||
+            !$this->get('mautic.security')->hasEntityAccess(
+                'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
+            )
+        ) {
+            return $this->accessDenied();
+        }
+
+        $clone = clone $entity;
+
+        //reset
+        $clone->setHits(0);
+        $clone->setRevision(0);
+        $clone->setVariantHits(0);
+        $clone->setUniqueHits(0);
+        $clone->setVariantStartDate(null);
+        $clone->setIsPublished(false);
+        $clone->setVariantParent($entity);
 
         return $this->newAction($clone);
     }
@@ -921,7 +927,7 @@ class PageController extends FormController
         ];
 
         if ('POST' == $this->request->getMethod()) {
-            /** @var \Mautic\PageBundle\Model\PageModel $model */
+            /** @var PageModel $model */
             $model  = $this->getModel('page.page');
             $entity = $model->getEntity($objectId);
 
