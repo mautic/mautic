@@ -15,14 +15,14 @@ class Version20180921144421 extends AbstractMauticMigration
      * @throws SkipMigrationException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public function preUp(Schema $schema)
+    public function preUp(Schema $schema): void
     {
         if ($schema->getTable($this->prefix.'lead_fields')->hasColumn('column_is_not_created')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
 
-    public function up(Schema $schema)
+    public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
@@ -30,7 +30,7 @@ class Version20180921144421 extends AbstractMauticMigration
         $this->addSql("ALTER TABLE {$this->prefix}lead_fields ADD column_is_not_created TINYINT(1) NOT NULL, ADD original_is_published_value TINYINT(1) NOT NULL");
     }
 
-    public function down(Schema $schema)
+    public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
