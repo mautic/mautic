@@ -22,7 +22,7 @@ use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Monolog\Logger;
 
-class CustomFieldColumnTest extends \PHPUnit_Framework_TestCase
+class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
 {
     public function testColumnExists()
     {

@@ -13,7 +13,7 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\LeadField;
 
-class LeadFieldTest extends \PHPUnit_Framework_TestCase
+class LeadFieldTest extends \PHPUnit\Framework\TestCase
 {
     public function testNewEntity()
     {

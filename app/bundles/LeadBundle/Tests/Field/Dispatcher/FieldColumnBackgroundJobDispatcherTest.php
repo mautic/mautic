@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Field\Event\AddColumnBackgroundEvent;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit_Framework_TestCase
+class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     public function testNoListener()
     {
