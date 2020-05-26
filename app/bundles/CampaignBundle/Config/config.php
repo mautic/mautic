@@ -603,7 +603,7 @@ return [
         ],
         'fixtures' => [
             'mautic.campaign.fixture.campaign' => [
-                'class'    => \Mautic\CampaignBundle\Tests\DataFixtures\ORM\CampaignData::class,
+                'class'    => \Mautic\CampaignBundle\DataFixtures\ORM\CampaignData::class,
                 'tag'      => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'optional' => true,
             ],
