@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFullContactBundle\Sync\Mapping\Field;
 
+use MauticPlugin\MauticFullContactBundle\Integration\Support\ConfigSupport;
 use Symfony\Component\Yaml\Yaml;
 
 class FieldRepository
@@ -32,8 +33,14 @@ class FieldRepository
     public function getFields(string $objectName): array
     {
         // Fetch the fields from field mapping file.
-        // @todo: Update proper nested structure as per the response from FullContact API.
-        $fields = Yaml::parse(file_get_contents(__DIR__.'/../FieldMapping.yaml'));
+        $fields = [];
+        if ($objectName === ConfigSupport::CONTACT) {
+            $fields = Yaml::parse(file_get_contents(__DIR__.'/../FieldMappings/ContactFieldMapping.yaml'));
+        }
+        elseif ($objectName === ConfigSupport::COMPANY) {
+            //$fields = Yaml::parse(file_get_contents(__DIR__.'/../FieldMappings/CompanyFieldMapping.yaml'));
+            $fields = Yaml::parse(file_get_contents(__DIR__.'/../FieldMappings/ContactFieldMapping.yaml'));
+        }
 
         return $this->hydrateFieldObjects($fields);
     }

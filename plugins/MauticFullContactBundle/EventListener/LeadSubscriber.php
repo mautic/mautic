@@ -34,10 +34,11 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return [
-            LeadEvents::LEAD_POST_SAVE    => ['leadPostSave', 0],
-            LeadEvents::COMPANY_POST_SAVE => ['companyPostSave', 0],
-        ];
+        return [];
+//        return [
+//            LeadEvents::LEAD_POST_SAVE    => ['leadPostSave', 0],
+//            LeadEvents::COMPANY_POST_SAVE => ['companyPostSave', 0],
+//        ];
     }
 
     public function leadPostSave(LeadEvent $event)

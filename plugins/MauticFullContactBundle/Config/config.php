@@ -66,6 +66,7 @@ return [
                     'mautic.lead.model.company',
                     'mautic.plugin.fullcontact.integration.config',
                     'mautic.plugin.fullcontact.service.contact.sync',
+                    'mautic.plugin.fullcontact.service.company.sync',
                 ],
             ],
             'mautic.plugin.fullcontact.integration.config'            => [
@@ -78,6 +79,16 @@ return [
                 'class'     => \MauticPlugin\MauticFullContactBundle\Services\ContactStorageHelper::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
+                    'mautic.integrations.repository.object_mapping',
+                    'monolog.logger.mautic',
+                    'mautic.integration.fullcontact.field.repository',
+                    'mautic.plugin.fullcontact.integration.config',
+                ],
+            ],
+            'mautic.plugin.fullcontact.service.company.sync' => [
+                'class'     => \MauticPlugin\MauticFullContactBundle\Services\CompanyStorageHelper::class,
+                'arguments' => [
+                    'mautic.lead.model.company',
                     'mautic.integrations.repository.object_mapping',
                     'monolog.logger.mautic',
                     'mautic.integration.fullcontact.field.repository',

@@ -2,16 +2,13 @@
 
 namespace MauticPlugin\MauticFullContactBundle\Services;
 
-use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\PointBundle\Model\PointModel;
 use MauticPlugin\MauticFullContactBundle\Integration\Config;
 use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
 use MauticPlugin\MauticFullContactBundle\Integration\Support\ConfigSupport;
-use MauticPlugin\MauticFullContactBundle\Sync\Mapping\Field\Field;
 use MauticPlugin\MauticFullContactBundle\Sync\Mapping\Field\FieldRepository;
 use Monolog\Logger;
 
@@ -46,9 +43,10 @@ class ContactStorageHelper
      */
     private $logger;
 
+    /**
+     * @var string[]
+     */
     private $mappedFields = [];
-
-    protected $fullContactData = [];
 
     public function __construct(
         LeadModel $lead_model,
@@ -65,40 +63,12 @@ class ContactStorageHelper
         $this->mappedFields            = $this->config->getMappedFields(ConfigSupport::CONTACT);
     }
 
-    public function getInternalObject($integrationObjectId)
-    {
-        return $this->objectMappingRepository->getInternalObject(
-            $this->integrationName,
-            $this->integrationObjectName,
-            $integrationObjectId,
-            $this->internalObjectName);
-    }
-
-    public function mapContactObject($fullContactId, $mauticId)
-    {
-        $objectMapping = new ObjectMapping();
-        $objectMapping->setIntegration($this->integrationName)
-            ->setIntegrationObjectName($this->integrationObjectName)
-            ->setInternalObjectName($this->internalObjectName)
-            ->setIntegrationObjectId($fullContactId)
-            ->setInternalObjectId($mauticId)
-            ->setLastSyncDate(new \DateTime());
-        $this->saveObjectMapping($objectMapping);
-    }
-
-    private function saveObjectMapping(ObjectMapping $objectMapping): void
-    {
-        $this->objectMappingRepository->saveEntity($objectMapping);
-        $this->objectMappingRepository->clear();
-    }
-
     public function processContactData($data, $lead)
     {
         // Process the response so we can map it with Mautic data.
         $contactData           = json_decode(json_encode($data), true);
-        $this->fullContactData = $this->deflateFullContactData($contactData);
 
-        $updates = $this->mapFieldData();
+        $updates = $this->mapFieldData($contactData);
 
         // Get the lead and save all the values to lead entity.
         $model = $this->leadModel;
@@ -108,29 +78,64 @@ class ContactStorageHelper
         $this->logger->addInfo('Updated contact with '.$lead->getId().' id');
     }
 
-    private function deflateFullContactData(array $data): array
+    /**
+     * Map field's sync settings and prepare array of values to be updated.
+     *
+     * @param array $contactData
+     *    Data from the FullContact Json response.
+     *
+     * @return array
+     */
+    private function mapFieldData($contactData): array
     {
-        // @todo: Check and review the approach for nested attributes returned from Fullcontact API response.
-        foreach ($data as $field => $value) {
-            $data[$field] = $value;
-        }
-
-        return $data;
-    }
-
-    private function mapFieldData(): array
-    {
-        $fields        = $this->fieldRepository->getFields($this->integrationObjectName);
         $contactValues = [];
-        $data          = $this->fullContactData;
+        $data          = $contactData;
         foreach ($this->mappedFields as $integrationFieldAlias => $field) {
             if (ObjectMappingDAO::SYNC_TO_MAUTIC !== $field['syncDirection']
                 && ObjectMappingDAO::SYNC_BIDIRECTIONALLY !== $field['syncDirection']) {
                 continue;
             }
-            $contactValues[$field['mappedField']] = $data[$integrationFieldAlias];
+            $contactValues[$field['mappedField']] = $this->fetchFieldValue($data, $integrationFieldAlias);
         }
 
         return $contactValues;
+    }
+
+    /**
+     * Fetch values from the data returned by FullContact.
+     *
+     * @param array $data
+     *   Data from the FullContact Json response.
+     * @param $fieldName
+     *   Field name that we want to retrieve.
+     * @return mixed|string
+     */
+    public function fetchFieldValue($data, $fieldName)
+    {
+        switch ($fieldName) {
+            case 'twitter':
+            case 'linkedin':
+            case 'facebook':
+            case 'title':
+            case 'organization':
+            case 'website':
+                $value = $data[$fieldName];
+                break;
+
+            case 'given':
+            case 'family':
+                $value = $data['details']['name'][$fieldName];
+                break;
+
+            case 'city':
+            case 'region':
+            case 'country':
+                $value = $data['details']['locations'][0][$fieldName];
+                break;
+
+            default:
+                $value = '';
+        }
+        return $value;
     }
 }
