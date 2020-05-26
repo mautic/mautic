@@ -11,7 +11,7 @@
 
 namespace Mautic\CampaignBundle\Tests\Functional\Campaign;
 
-use Mautic\CampaignBundle\Tests\DataFixtures\ORM\CampaignData;
+use Mautic\CampaignBundle\DataFixtures\ORM\CampaignData;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
 class DetailsTest extends MauticMysqlTestCase
