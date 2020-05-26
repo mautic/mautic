@@ -40,8 +40,7 @@ if (!isset($inBuilder)) {
                     'inForm'        => true,
                     'id'            => $field['id'],
                     'formId'        => $formId,
-                    'contactFields' => (isset($contactFields)) ? $contactFields : [],
-                    'companyFields' => (isset($companyFields)) ? $companyFields : [],
+                    'mappedFields'  => (isset($mappedFields)) ? $mappedFields : [],
                     'inBuilder'     => $inBuilder,
                 ]
             );
@@ -73,20 +72,13 @@ if (!isset($inBuilder)) {
                     <br>
                 <?php endif; ?>
 
-                <?php if (!empty($field['mappedField'])):
-                    $icon = (in_array($field['mappedField'], array_keys($companyFields))) ? 'building' : 'user';
-                    ?>
+                <?php if (!empty($field['mappedObject']) && !empty($field['mappedField'])): ?>
+                    <?php $defaultIcon = 'arrow'; ?>
+                    <?php $icon        = 'company' === $field['mappedObject'] ? 'building' : $defaultIcon; ?>
+                    <?php $icon        = 'lead' === $field['mappedObject'] ? 'user' : $defaultIcon; ?>
                     <i class="fa fa-<?php echo $icon; ?>" aria-hidden="true"></i>
                     <span class="inline-spacer">
-            <?php
-            if (isset($contactFields[$field['mappedField']]['label'])) {
-                echo $contactFields[$field['mappedField']]['label'];
-            } elseif ($companyFields[$field['mappedField']]['label']) {
-                echo $companyFields[$field['mappedField']]['label'];
-            } else {
-                ucfirst($field['mappedField']);
-            }
-            ?>
+                    <?php echo $mappedFields[$field['mappedField']]['label'] ?? ucfirst($field['mappedField']); ?>
         </span>
             <?php endif; ?>
             <?php if (isset($field['alwaysDisplay']) && $field['alwaysDisplay']): ?>
@@ -174,8 +166,7 @@ if (!isset($inBuilder)) {
                     'inForm'            => true,
                     'id'                => $field2['id'],
                     'formId'            => $formId,
-                    'contactFields'     => $contactFields,
-                    'companyFields'     => $companyFields,
+                    'mappedFields'      => $mappedFields,
                     'inBuilder'         => $inBuilder,
                     'fields'            => $fields,
                     'formFields'        => $formFields,
