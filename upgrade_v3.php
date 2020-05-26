@@ -26,6 +26,7 @@ define('MAUTIC_UPGRADE_ERROR_LOG', MAUTIC_ROOT . '/upgrade_errors.txt');
 define('MAUTIC_APP_ROOT', MAUTIC_ROOT . '/app');
 define('MAUTIC_UPGRADE_FOLDER_NAME', 'mautic-3-temp-files');
 define('MAUTIC_UPGRADE_ROOT', MAUTIC_ROOT . DIRECTORY_SEPARATOR . MAUTIC_UPGRADE_FOLDER_NAME);
+// This value always needs to contain mautic-2-backup-files as we replace that with a unique hashed name later on!
 define('MAUTIC_BACKUP_FOLDER_ROOT', MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'mautic-2-backup-files');
 
 if (!file_exists(MAUTIC_UPGRADE_ROOT)) {
@@ -121,12 +122,18 @@ function runPreUpgradeChecks()
         }
     }
 
-    // Check if we have the required Mautic version 2.16.3 prior to upgrading.
-    $version = file_get_contents(MAUTIC_APP_ROOT . '/version.txt');
-    $version = str_replace("\n", "", $version);
+    if (file_exists(MAUTIC_APP_ROOT . '/release_metadata.json')) {
+        $preUpgradeErrors[] = 'You already seem to be running Mautic 3.0.0 or newer, so this upgrade script is not relevant to you anymore. Aborting.';
+    } elseif (file_exists(MAUTIC_APP_ROOT . '/version.txt')) {
+        // Check if we have the required Mautic version 2.16.3 prior to upgrading.
+        $version = file_get_contents(MAUTIC_APP_ROOT . '/version.txt');
+        $version = str_replace("\n", "", $version);
 
-    if (!version_compare($version, '2.16.3', '>=')) {
-        $preUpgradeErrors[] = 'You need to have at least Mautic 2.16.3 installed, which supports upgrading to 3.0. Please update to 2.16.3 first.';
+        if (!version_compare($version, '2.16.3', '>=')) {
+            $preUpgradeErrors[] = 'You need to have at least Mautic 2.16.3 installed, which supports upgrading to 3.0. Please update to 2.16.3 first.';
+        }
+    } else {
+        $preUpgradeErrors[] = 'We can\'t seem to detect your current Mautic version. Make sure you have a version.txt file in your app folder.';
     }
 
     // Check PHP's max_execution_time
@@ -348,24 +355,16 @@ if (!IN_CLI) {
                 html_body("<div alert='alert alert-danger'>Oops! We tried cleaning up after ourselves, but it didn\'t work as expected. Please check our knowledgebase (TODO link)</div>");
             }
 
-            $nextTask = 'finish';
-            break;
-
-        case 'finish':
-            // clear_mautic_cache();
-
             sendUpgradeStats('succeeded');
 
-            if (!empty($standalone)) {
-                html_body("<div class='well'><h3 class='text-center'>Success!</h3><h4 class='text-danger text-center'>Remove this script!</h4></div>");
-            } else {
-                $status['complete']                     = true;
-                $status['stepStatus']                   = 'Success';
-                $status['nextStep']                     = 'Processing Database Updates';
-                $status['nextStepStatus']               = 'In Progress';
-                $status['updateState']['cacheComplete'] = true;
-            }
-            break;
+            // Destroy the upgrade script as we no longer need it.
+            unlink(__FILE__);
+
+            html_body("<div class='card card-body bg-light text-center'>
+                <h3>We're done! ✅</h3>
+                <br /><strong>You're ready to use Mautic 3! This script has destroyed itself, so there's nothing left to do for you. Enjoy!</strong><br><br>
+                <iframe src='https://giphy.com/embed/1GrsfWBDiTN60' width='480' height='262' frameBorder='0' class='giphy-embed' allowFullScreen></iframe><p><a href='https://giphy.com/gifs/dance-long-hair-shake-1GrsfWBDiTN60'>via GIPHY</a></p>
+            </div>");
 
         default:
             $status['error']      = true;
@@ -394,65 +393,160 @@ if (!IN_CLI) {
     }
 } else {
     // CLI upgrade
-    echo 'Checking for new updates...';
-    list($success, $message) = fetch_updates();
-    if (!$success) {
-        echo "failed. $message";
+
+    // We create this file when we've moved M3 files into place. Users have to restart the script then for Symfony commands to finish successfully.
+    $m3_phase_2_file = MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'm3_upgrade_pending_phase_2.txt';
+
+    if (!file_exists($m3_phase_2_file)) {
+        echo "Doing pre-upgrade checks...\n";
+        $preUpgradeCheckResults = runPreUpgradeChecks();
+        $preUpgradeCheckErrors = $preUpgradeCheckResults['errors'];
+        $preUpgradeCheckWarnings = $preUpgradeCheckResults['warnings'];
+
+        if (count($preUpgradeCheckErrors) > 0) {
+            echo "One or more errors occurred during pre-upgrade checks: \n" . implode("\n", $preUpgradeCheckErrors) . "\n";
+            exit;
+        }
+
+        if (count($preUpgradeCheckWarnings) > 0) {
+            echo "One or more warnings occurred during pre-upgrade checks, please run this script with the --ignore-warnings flag to continue: \n" . implode("\n", $preUpgradeCheckWarnings) . "\n";
+
+            $val = getopt('i', ['ignore-warnings']);
+            if (empty($val)) {
+                exit;
+            }
+        }
+
+        echo "Starting upgrade...\n";
+
+        sendUpgradeStats('started');
+
+        echo "Applying Mautic 2 migrations, just so we're sure your database is up to date before upgrading. This might take a while, DO NOT ABORT THE SCRIPT!!!\n";
+
+        if (apply_migrations() === false) {
+            sendUpgradeStats('failed');
+            echo "Something went wrong while applying Mautic 2 migrations. Please try to run app/console doctrine:migrations:migrate --env=prod, to troubleshoot further. Then run this script again.\n";
+            exit;
+        };
+
+        echo "Downloading Mautic 3...\n";
+        list($success, $message) = fetch_updates();
+
+        if (!$success) {
+            sendUpgradeStats('failed');
+            echo "Failed. $message";
+            exit;
+        }
+
+        echo "Extracting the update package...\n";
+
+        list($success, $message) = extract_package();
+        if (!$success) {
+            sendUpgradeStats('failed');
+            echo "Failed. $message";
+            exit;
+        }
+
+        echo "Extracting done!\n";
+
+        echo "Moving Mautic 2 files into mautic-2-backup and moving the Mautic 3 files in place, this might take a while... DO NOT ABORT THE SCRIPT!!!\n";
+
+        /**
+         * Move current Mautic 2 files into a temporary directory called "mautic-2-backup-files",
+         * then move the Mautic 3 files from "mautic-3-temp-files" to the root directory.
+         */
+        list($success, $message) = replace_mautic_2_with_mautic_3();
+
+        if (!$success) {
+            sendUpgradeStats('failed');
+            echo "Failed. $message";
+            exit;
+        }
+
+        echo "Done!\n";
+
+        echo "Restoring your user data like custom plugins/themes/media from the Mautic 2 installation. This might take a while... DO NOT ABORT THE SCRIPT!!!\n";
+
+        list($success, $message) = restore_user_data();
+
+        if (!$success) {
+            sendUpgradeStats('failed');
+            echo "Failed. $message";
+            exit;
+        }
+
+        echo "Done! Your user data has been restored.\n";
+
+        echo "Updating your config/local.php with new settings that were changed/introduced in Mautic 3...\n";
+
+        list($success, $message) = update_local_config();
+
+        if (!$success) {
+            sendUpgradeStats('failed');
+            echo "Failed. $message";
+            exit;
+        }
+
+        echo "Done! Your config file has been updated.\n";
+
+        echo "Preparing for phase 2 of the upgrade...\n";
+
+        $result = file_put_contents($m3_phase_2_file, 'READY FOR PHASE 2, RUN php upgrade_v3.php');
+
+        if ($result === false) {
+            sendUpgradeStats('failed');
+            echo "IMPORTANT: We couldn't prepare for Phase 2 of the upgrade, so we need your help. In the same folder where upgrade_v3.php is located, create a file called m3_upgrade_pending_phase_2.txt (no contents needed), then run this script again.";
+            exit;
+        }
+
+        echo "IMPORTANT: NOT DONE YET! Due to the large amount of changes in Composer dependencies, we now need to restart the script to continue. We've saved your state, so we'll continue where we left off.\n";
+        echo "PLEASE RUN php upgrade_v3.php AGAIN TO START PHASE 2 OF THE UPGRADE!\n";
         exit;
     }
-    $version = $message;
-    echo "updating to $version!\n";
 
-    echo 'Extracting the update package...';
-    list($success, $message) = extract_package($version);
-    if (!$success) {
-        echo "failed. $message";
+    echo "Welcome to Phase 2 of the Mautic 3 upgrade! We'll continue where we left off.\n";
+
+    echo "Building cache for Mautic 3...\n";
+
+    if (build_cache() === false) {
+        sendUpgradeStats('failed');
+        echo "Failed. $message";
+        exit;
+    };
+
+    echo "Done! Cache has been built.\n";
+
+    echo "Applying database migrations for Mautic 3... This might take a while, DO NOT ABORT THE SCRIPT!!!\n";
+
+    if (apply_migrations() === false) {
+        sendUpgradeStats('failed');
+        echo "Database migrations failed. Please try manually with app/console doctrine:migrations:migrate --env=prod. When database migrations are done, Mautic 3 is ready to use!\n";
+        exit;
+    };
+
+    echo "Done! Your Mautic 3 installation is ready. Just one more thing:\n";
+
+    echo "Cleaning up installation files that we no longer need...\n";
+
+    // We only use the Phase 2 file in the CLI version of the upgrade, so we'll delete it here...
+    unlink($m3_phase_2_file);
+
+    if (cleanup_files() === false) {
+        sendUpgradeStats('failed');
+        echo "Cleaning up failed. Probably a permissions issue. This is not a big problem; you can still start using Mautic 3 now.\n";
         exit;
     }
-    echo "done!\n";
 
-    echo 'Moving files...';
-    $status = move_mautic_bundles($status, -1);
-    $status = move_mautic_core($status);
-    $status = move_mautic_vendors($status, -1);
-    if (empty($status['complete'])) {
-        echo 'failed. Review udpate errors log for details.';
-        exit;
-    }
-    unset($status['complete']);
-    echo "done!\n";
+    echo "Cleaned up successfully!\n";
 
-    echo 'Clearing the cache...';
-    if (!clear_mautic_cache()) {
-        echo 'failed. Review udpate errors log for details.';
-        exit;
-    }
-    echo "done!\n";
+    sendUpgradeStats('succeeded');
 
-    echo 'Rebuilding the cache...';
-    if (!build_cache()) {
-        echo 'failed. Review udpate errors log for details.';
-        exit;
-    }
-    echo "done!\n";
+    echo "We're done! Enjoy using Mautic 3 :)\n";
 
-    echo 'Applying migrations...';
-    if (!apply_migrations()) {
-        echo 'failed. Review udpate errors log for details.';
-        exit;
-    }
-    echo "done!\n";
+    // Destroy the upgrade script as we no longer need it.
+    unlink(__FILE__);
 
-    echo 'Cleaning up...';
-    if (!recursive_remove_directory(MAUTIC_UPGRADE_ROOT)) {
-        echo "failed. Manually delete the upgrade folder.\n";
-    }
-    if (!clear_mautic_cache()) {
-        echo 'failed. Manually delete app/cache/prod.';
-    }
-    echo "done!\n";
-
-    echo "\nSuccess!";
+    exit;
 }
 
 /**
@@ -745,7 +839,7 @@ function replace_mautic_2_with_mautic_3()
 
     if (count($errorLog) > 0) {
         return [false, 'The old configuration files couldn\'t be copied from the old Mautic 2 folder into the new folder. This is really, really bad. Errors: ' . implode(',', $errorLog)];
-    }
+    }    
 
     return [true, 'OK'];
 }
@@ -847,20 +941,32 @@ function update_local_config()
     $filename = MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'local.php';
     require $filename;
 
-    if( array_key_exists('api_rate_limiter_cache', $parameters) ) {
+    if (array_key_exists('api_rate_limiter_cache', $parameters)) {
         if (array_key_exists('type', $parameters['api_rate_limiter_cache'])) {
             if ($parameters['api_rate_limiter_cache']['type'] === 'file_system') {
                 unset($parameters['api_rate_limiter_cache']['type']);
                 $parameters['api_rate_limiter_cache']['adapter'] = 'cache.adapter.filesystem';
             }
         }
+    }
 
-        // Write updated config to local.php
-        $result = file_put_contents($filename, "<?php\n" . '$parameters = ' . var_export($parameters, true) . ';');
-
-        if ($result === false) {
-            return [false, 'Couldn\'t update configuration file with new api_rate_limiter_cache value.'];
+    if (array_key_exists('mailer_transport', $parameters)) {
+        if ($parameters['mailer_transport'] === 'mail') {
+            $parameters['mailer_transport'] = 'sendmail';
         }
+    }
+
+    if (array_key_exists('system_update_url', $parameters)) {
+        if ($parameters['system_update_url'] === 'https://updates.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates') {
+            $parameters['system_update_url'] = 'https://api.github.com/repos/mautic/mautic/releases';
+        }
+    }
+
+    // Write updated config to local.php
+    $result = file_put_contents($filename, "<?php\n" . '$parameters = ' . var_export($parameters, true) . ';');
+
+    if ($result === false) {
+        return [false, 'Couldn\'t update configuration file with new api_rate_limiter_cache value.'];
     }
 
     return [true, 'OK'];
@@ -1040,6 +1146,7 @@ function sendUpgradeStats($status)
             'upgradeStatus' => $status,
         ];
 
+        // TODO update this URL with the actual stats URL
         make_request('http://ddev-statsapp-web/mautic3upgrade/send', 'post', $data);
     } catch (\Exception $exception) {
         // Not so concerned about failures here, move along
@@ -1051,10 +1158,110 @@ function sendUpgradeStats($status)
  * 
  * @return bool
  */
-function cleanup_files() {
-    // TODO remove .htaccess and rename .htaccess.m3 to .htaccess
+function cleanup_files()
+{
+    $failedChanges = [];
+
+    if (file_exists(MAUTIC_ROOT . DIRECTORY_SEPARATOR . '.htaccess.m3')) {
+        $status = rename(MAUTIC_ROOT . DIRECTORY_SEPARATOR . '.htaccess.m3', MAUTIC_ROOT . DIRECTORY_SEPARATOR . '.htaccess');
+        if ($status === false) $failedChanges[] = 'htaccess';
+    }
+
+    if (file_exists(MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'critical_migrations.txt')) {
+        $status = unlink(MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'critical_migrations.txt');
+        if ($status === false) $failedChanges[] = 'critical_migrations';
+    }
+
+    if (file_exists(MAUTIC_UPGRADE_ROOT)) {
+        $status = recursive_remove_directory(MAUTIC_UPGRADE_ROOT);
+        if ($status === false) $failedChanges[] = 'mautic-3-temp-files';
+    }
+
+    // Rename the mautic-2-backup-files folder to one with a random hash to prevent public access
+    if (file_exists(MAUTIC_BACKUP_FOLDER_ROOT)) {
+        $hash = bin2hex(random_bytes(16));
+        $newFolderPath = str_replace('mautic-2-backup-files', 'mautic-2-backup-files-' . $hash, MAUTIC_BACKUP_FOLDER_ROOT);
+        $status = rename(MAUTIC_BACKUP_FOLDER_ROOT, $newFolderPath);
+        if ($status === false) $failedChanges[] = 'mautic-2-backup-files';
+    }
+
+    // Rename the db_backup.sql file to one with a random hash to prevent public access
+    if (file_exists(MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'db_backup.sql')) {
+        $hash = bin2hex(random_bytes(16));
+        $status = rename(MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'db_backup.sql', MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'db_backup_' . $hash . '.sql');
+        if ($status === false) $failedChanges[] = 'db_backup.sql';
+    }
+
+    // NOTE: we leave the mautic-2-backup-files-$HASH folder and db_backup_$HASH.sql file as-is in case something still doesn't work as expected.
+
+    if (count($failedChanges) === 0) {
+        return true;
+    }
 
     return false;
+}
+
+/**
+ * Tries to recursively delete a directory.
+ *
+ * This code is based on the recursive_remove_directory function used by Akeeba Restore
+ *
+ * @param string $directory
+ *
+ * @return bool
+ */
+function recursive_remove_directory($directory)
+{
+    // if the path has a slash at the end we remove it here
+    if ('/' == substr($directory, -1)) {
+        $directory = substr($directory, 0, -1);
+    }
+
+    // if the path is not valid or is not a directory ...
+    if (!file_exists($directory)) {
+        return true;
+    } elseif (!is_dir($directory)) {
+        return false;
+        // ... if the path is not readable
+    } elseif (!is_readable($directory)) {
+        // ... we return false and exit the function
+        return false;
+        // ... else if the path is readable
+    } else {
+        // we open the directory
+        $handle = opendir($directory);
+
+        // and scan through the items inside
+        while (false !== ($item = readdir($handle))) {
+            // if the filepointer is not the current directory
+            // or the parent directory
+            if ('.' != $item && '..' != $item) {
+                // we build the new path to delete
+                $path = $directory . '/' . $item;
+                // if the new path is a directory
+                if (is_dir($path)) {
+                    // we call this function with the new path
+                    recursive_remove_directory($path);
+                    // if the new path is a file
+                } else {
+                    // we remove the file
+                    @unlink($path);
+                }
+            }
+        }
+
+        // close the directory
+        closedir($handle);
+
+        // try to delete the now empty directory
+        if (!@rmdir($directory)) {
+            // return false if not possible
+            return false;
+        }
+
+        // return success
+        return true;
+    }
 }
 
 /**
