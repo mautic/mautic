@@ -195,7 +195,7 @@ class ContactRequestHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->leadModel->expects($this->once())
             ->method('checkForDuplicateContact')
-            ->with($queryWithEmail, $this->trackedContact, true, true)
+            ->with($queryWithEmail, null, true, true)
             ->willReturn([$lead, ['email' => 'test@test.com']]);
 
         $helper = $this->getContactRequestHelper();
@@ -227,9 +227,12 @@ class ContactRequestHelperTest extends \PHPUnit_Framework_TestCase
         $this->leadModel->expects($this->never())
             ->method('getEntity');
 
+        $this->trackedContact->method('isNew')
+            ->willReturn(true);
+
         $this->leadModel->expects($this->once())
             ->method('checkForDuplicateContact')
-            ->with($query, $this->trackedContact, true, true)
+            ->with($query, null, true, true)
             ->willReturn([$this->trackedContact, []]);
 
         $helper = $this->getContactRequestHelper();
@@ -253,6 +256,8 @@ class ContactRequestHelperTest extends \PHPUnit_Framework_TestCase
             ->willReturn(2);
         $lead->method('getIpAddresses')
             ->willReturn(new ArrayCollection());
+        $lead->method('isNew')
+            ->willReturn(true);
 
         $this->leadModel->expects($this->once())
             ->method('getEntity')
@@ -273,55 +278,12 @@ class ContactRequestHelperTest extends \PHPUnit_Framework_TestCase
             ->willReturn(['lead_id' => 2]);
 
         $this->leadModel->expects($this->once())
-            ->method('mergeLeads')
-            ->with($this->trackedContact, $lead, false)
-            ->willReturn($lead);
-
-        $this->leadModel->expects($this->once())
             ->method('checkForDuplicateContact')
-            ->with($query, $lead, true, true)
-            ->willReturn([$this->trackedContact, []]);
+            ->with($query, null, true, true)
+            ->willReturn([$lead, []]);
 
         $helper = $this->getContactRequestHelper();
         $this->assertEquals($lead->getId(), $helper->getContactFromQuery($query)->getId());
-    }
-
-    public function testTrackedIdentifiedVisitorIsNotTrackedByFingerprint()
-    {
-        $this->coreParametersHelper->expects($this->at(0))
-            ->method('getParameter')
-            ->with('track_by_tracking_url')
-            ->willReturn(false);
-
-        $this->coreParametersHelper->expects($this->at(1))
-            ->method('getParameter')
-            ->with('track_by_fingerprint')
-            ->willReturn(true);
-
-        $this->leadModel->expects($this->never())
-            ->method('getEntity');
-
-        $this->trackedContact->method('isAnonymous')
-            ->willReturn(false);
-
-        $query = [
-            'ct'          => [],
-            'fingerprint' => 'abc123',
-        ];
-
-        $this->leadDeviceRepository->expects($this->never())
-            ->method('getDeviceByFingerprint');
-
-        $this->leadModel->expects($this->never())
-            ->method('mergeLeads');
-
-        $this->leadModel->expects($this->once())
-            ->method('checkForDuplicateContact')
-            ->with($query, $this->trackedContact, true, true)
-            ->willReturn([$this->trackedContact, []]);
-
-        $helper = $this->getContactRequestHelper();
-        $this->assertEquals($this->trackedContact->getId(), $helper->getContactFromQuery($query)->getId());
     }
 
     public function testFingerprintIsNotUsedToIdentifyLeadIfDisabled()
@@ -353,9 +315,13 @@ class ContactRequestHelperTest extends \PHPUnit_Framework_TestCase
         $this->leadModel->expects($this->never())
             ->method('mergeLeads');
 
+        $this->trackedContact->expects($this->once())
+            ->method('isNew')
+            ->willReturn(true);
+
         $this->leadModel->expects($this->once())
             ->method('checkForDuplicateContact')
-            ->with($query, $this->trackedContact, true, true)
+            ->with($query, null, true, true)
             ->willReturn([$this->trackedContact, []]);
 
         $helper = $this->getContactRequestHelper();

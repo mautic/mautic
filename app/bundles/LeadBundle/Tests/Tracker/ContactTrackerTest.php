@@ -127,6 +127,10 @@ class ContactTrackerTest extends \PHPUnit_Framework_TestCase
     {
         $contactTracker = $this->getContactTracker();
 
+        $this->leadRepositoryMock->expects($this->any())
+            ->method('getFieldValues')
+            ->willReturn([]);
+
         $lead1 = new Lead();
         $lead1->setEmail('lead1@test.com');
         $contactTracker->setTrackedContact($lead1);
@@ -221,6 +225,10 @@ class ContactTrackerTest extends \PHPUnit_Framework_TestCase
     public function testNewContactIsCreated()
     {
         $contactTracker = $this->getContactTracker();
+
+        $this->leadRepositoryMock->expects($this->once())
+            ->method('getFieldValues')
+            ->willReturn([]);
 
         $this->ipLookupHelperMock->expects($this->exactly(2))
             ->method('getIpAddress')

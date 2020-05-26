@@ -415,7 +415,7 @@ class LeadRepository extends CommonRepository
             );
 
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter, true);
-        $this->updateQueryWithExistingMembershipExclusion($campaignId, $qb);
+        $this->updateQueryWithExistingMembershipExclusion($campaignId, $qb, $campaignCanBeRestarted);
 
         if (!$campaignCanBeRestarted) {
             $this->updateQueryWithHistoryExclusion($campaignId, $qb);
@@ -450,7 +450,7 @@ class LeadRepository extends CommonRepository
             );
 
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter);
-        $this->updateQueryWithExistingMembershipExclusion($campaignId, $qb);
+        $this->updateQueryWithExistingMembershipExclusion($campaignId, $qb, $campaignCanBeRestarted);
 
         if (!$campaignCanBeRestarted) {
             $this->updateQueryWithHistoryExclusion($campaignId, $qb);
@@ -588,16 +588,22 @@ class LeadRepository extends CommonRepository
      * @param              $campaignId
      * @param QueryBuilder $qb
      */
-    private function updateQueryWithExistingMembershipExclusion($campaignId, QueryBuilder $qb)
+    private function updateQueryWithExistingMembershipExclusion($campaignId, QueryBuilder $qb, $campaignCanBeRestarted = false)
     {
+        $membershipConditions = [
+            $qb->expr()->eq('cl.lead_id', 'll.lead_id'),
+            $qb->expr()->eq('cl.campaign_id', (int) $campaignId),
+        ];
+
+        if ($campaignCanBeRestarted) {
+            $membershipConditions[] = $qb->expr()->eq('cl.manually_removed', 0);
+        }
+
         $subq = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
-                $qb->expr()->andX(
-                    $qb->expr()->eq('cl.lead_id', 'll.lead_id'),
-                    $qb->expr()->eq('cl.campaign_id', (int) $campaignId)
-                )
+                $qb->expr()->andX(...$membershipConditions)
             );
 
         $qb->andWhere(

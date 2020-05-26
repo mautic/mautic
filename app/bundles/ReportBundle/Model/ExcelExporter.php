@@ -12,6 +12,7 @@
 namespace Mautic\ReportBundle\Model;
 
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\ReportBundle\Crate\ReportDataResult;
 
 /**
  * Class CsvExporter.
@@ -52,20 +53,17 @@ class ExcelExporter
 
             $header = [];
 
+            $reportDataResult = new ReportDataResult($reportData);
             //build the data rows
-            foreach ($reportData['data'] as $count => $data) {
+            foreach ($reportDataResult->getData() as $count=>$data) {
                 $row = [];
                 foreach ($data as $k => $v) {
-                    if ($count === 0) {
-                        //set the header
-                        $header[] = $k;
-                    }
-                    $row[] = htmlspecialchars_decode($this->formatterHelper->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true), ENT_QUOTES);
+                    $type       = $reportDataResult->getType($k);
+                    $row[]      = htmlspecialchars_decode($this->formatterHelper->_($v, $type, true), ENT_QUOTES);
                 }
-
                 if ($count === 0) {
                     //write the column names row
-                    $objPHPExcel->getActiveSheet()->fromArray($header);
+                    $objPHPExcel->getActiveSheet()->fromArray($reportDataResult->getHeaders());
                 }
                 //write the row
                 $rowCount = $count + 2;

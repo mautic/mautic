@@ -295,8 +295,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Build SELECT clause
         if (!$selectOptions = $event->getSelectColumns()) {
-            $fields         = $this->entity->getColumns();
-            $groupByColumns = $queryBuilder->getQueryPart('groupBy');
+            $fields             = $this->entity->getColumns();
+            $groupByColumns     = $queryBuilder->getQueryPart('groupBy');
+            $groupByColumnsKeys = array_flip($groupByColumns);
 
             foreach ($fields as $field) {
                 if (isset($options['columns'][$field])) {
@@ -306,7 +307,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         $selectText = $this->buildCaseSelect($fieldOptions['channelData']);
                     } else {
                         // If there is a group by, and this field has groupByFormula
-                        if (isset($groupByColumns) && isset($fieldOptions['groupByFormula'])) {
+                        if (isset($fieldOptions['groupByFormula']) && isset($groupByColumnsKeys[$fieldOptions['groupByFormula']])) {
                             $selectText = $fieldOptions['groupByFormula'];
                         } elseif (isset($fieldOptions['formula'])) {
                             $selectText = $fieldOptions['formula'];
@@ -428,11 +429,13 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         );
                         break;
                     case 'empty':
-                        $groupExpr->add(
-                            $expr->isNull($filter['column'])
+                        $expression = $queryBuilder->expr()->orX(
+                            $queryBuilder->expr()->isNull($filter['column']),
+                            $queryBuilder->expr()->eq($filter['column'], $expr->literal(''))
                         );
+
                         $groupExpr->add(
-                            $expr->eq($filter['column'], $expr->literal(''))
+                            $expression
                         );
                         break;
                     default:
@@ -503,7 +506,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
         if ($groupExpr->count()) {
             $groups[] = $groupExpr;
         }
-
         if (count($groups) === 1) {
             // Only one andX expression
             $filterExpr = $groups[0];

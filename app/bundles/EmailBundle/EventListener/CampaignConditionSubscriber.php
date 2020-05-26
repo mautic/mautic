@@ -74,11 +74,7 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
         try {
             $this->validator->validate($event->getLead()->getEmail());
         } catch (InvalidEmailException $exception) {
-            return $event->setResult(
-                [
-                    'timeline' => $exception->getMessage(),
-                ]
-            );
+            return $event->setResult(false);
         }
 
         return $event->setResult(true);

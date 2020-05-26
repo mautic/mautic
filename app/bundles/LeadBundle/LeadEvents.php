@@ -468,6 +468,24 @@ final class LeadEvents
     const ON_CAMPAIGN_ACTION_DELETE_CONTACT = 'mautic.lead.on_campaign_action_delete_contact';
 
     /**
+     * The mautic.lead.on_campaign_action_add_donotcontact event is dispatched when the campaign action to add a donotcontact is executed.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\PendingEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_ACTION_ADD_DONOTCONTACT = 'mautic.lead.on_campaign_action_add_donotcontact';
+
+    /**
+     * The mautic.lead.on_campaign_action_remove_donotcontact event is dispatched when the campaign action to remove a donotcontact is executed.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\PendingEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_ACTION_REMOVE_DONOTCONTACT = 'mautic.lead.on_campaign_action_remove_donotcontact';
+
+    /**
      * The mautic.lead.on_campaign_trigger_condition event is fired when the campaign condition triggers.
      *
      * The event listener receives a

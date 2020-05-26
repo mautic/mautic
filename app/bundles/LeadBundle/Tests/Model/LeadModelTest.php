@@ -132,7 +132,8 @@ class LeadModelTest extends \PHPUnit_Framework_TestCase
 
         $entity->addIpAddress($ipAddress);
 
-        $this->coreParametersHelperMock->expects($this->once())->method('getParameter')->with('ip_lookup_create_organization', false)->willReturn(false);
+        $this->coreParametersHelperMock->expects($this->at(0))->method('getParameter')->with('anonymize_ip', false)->willReturn(false);
+        $this->coreParametersHelperMock->expects($this->at(1))->method('getParameter')->with('ip_lookup_create_organization', false)->willReturn(false);
         $this->fieldModelMock->method('getFieldListWithProperties')->willReturn([]);
         $this->fieldModelMock->method('getFieldList')->willReturn([]);
         $this->companyLeadRepositoryMock->expects($this->never())->method('getEntitiesByLead');
@@ -154,7 +155,9 @@ class LeadModelTest extends \PHPUnit_Framework_TestCase
 
         $entity->addIpAddress($ipAddress);
 
-        $this->coreParametersHelperMock->expects($this->once())->method('getParameter')->with('ip_lookup_create_organization', false)->willReturn(true);
+        $this->coreParametersHelperMock->expects($this->at(0))->method('getParameter')->with('anonymize_ip', false)->willReturn(false);
+        $this->coreParametersHelperMock->expects($this->at(1))->method('getParameter')->with('ip_lookup_create_organization', false)->willReturn(true);
+
         $this->fieldModelMock->method('getFieldListWithProperties')->willReturn([]);
         $this->fieldModelMock->method('getFieldList')->willReturn([]);
         $this->companyLeadRepositoryMock->method('getEntitiesByLead')->willReturn([]);
@@ -178,7 +181,7 @@ class LeadModelTest extends \PHPUnit_Framework_TestCase
 
         $entity->addIpAddress($ipAddress);
 
-        $this->coreParametersHelperMock->expects($this->never())->method('getParameter');
+        $this->coreParametersHelperMock->expects($this->once())->method('getParameter')->with('anonymize_ip', false)->willReturn(false);
         $this->fieldModelMock->method('getFieldListWithProperties')->willReturn([]);
         $this->fieldModelMock->method('getFieldList')->willReturn([]);
         $this->companyLeadRepositoryMock->method('getEntitiesByLead')->willReturn([]);

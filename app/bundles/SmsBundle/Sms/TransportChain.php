@@ -12,14 +12,14 @@ namespace Mautic\SmsBundle\Sms;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\SmsBundle\Api\AbstractSmsApi;
 use Mautic\SmsBundle\Entity\Stat;
+use Mautic\SmsBundle\Exception\PrimaryTransportNotEnabledException;
 use Monolog\Logger;
 
 class TransportChain
 {
     /**
-     * @var AbstractSmsApi[]
+     * @var TransportInterface[]
      */
     private $transports;
 
@@ -41,9 +41,9 @@ class TransportChain
     /**
      * TransportChain constructor.
      *
-     * @param $primaryTransport
-     * @param $integrationHelper
-     * @param $logger
+     * @param string            $primaryTransport
+     * @param IntegrationHelper $integrationHelper
+     * @param Logger            $logger
      */
     public function __construct($primaryTransport, IntegrationHelper $integrationHelper, Logger $logger)
     {
@@ -54,14 +54,14 @@ class TransportChain
     }
 
     /**
-     * @param                $alias
-     * @param AbstractSmsApi $transport
-     * @param                $translatableAlias
-     * @param                $integrationAlias
+     * @param string             $alias
+     * @param TransportInterface $transport
+     * @param string             $translatableAlias
+     * @param string             $integrationAlias
      *
      * @return $this
      */
-    public function addTransport($alias, AbstractSmsApi $transport, $translatableAlias, $integrationAlias)
+    public function addTransport($alias, TransportInterface $transport, $translatableAlias, $integrationAlias)
     {
         $this->transports[$alias]['alias']            = $translatableAlias;
         $this->transports[$alias]['integrationAlias'] = $integrationAlias;
@@ -73,11 +73,11 @@ class TransportChain
     /**
      * Return the transport defined in parameters.
      *
-     * @return AbstractSmsApi
+     * @return TransportInterface
      *
-     * @throws \Exception
+     * @throws PrimaryTransportNotEnabledException
      */
-    private function getPrimaryTransport()
+    public function getPrimaryTransport()
     {
         $enabled = $this->getEnabledTransports();
 
@@ -86,8 +86,12 @@ class TransportChain
             return array_shift($enabled);
         }
 
+        if (count($enabled) === 0) {
+            throw new PrimaryTransportNotEnabledException('Primary SMS transport is not enabled');
+        }
+
         if (!array_key_exists($this->primaryTransport, $enabled)) {
-            throw new \Exception('Primary SMS transport is not enabled. '.$this->primaryTransport);
+            throw new PrimaryTransportNotEnabledException('Primary SMS transport is not enabled. '.$this->primaryTransport);
         }
 
         return $enabled[$this->primaryTransport];
@@ -112,7 +116,7 @@ class TransportChain
     /**
      * Get all transports registered in service container.
      *
-     * @return AbstractSmsApi[][]
+     * @return TransportInterface[]
      */
     public function getTransports()
     {
@@ -120,9 +124,27 @@ class TransportChain
     }
 
     /**
+     * @param string $transport
+     *
+     * @return TransportInterface
+     *
+     * @throws PrimaryTransportNotEnabledException
+     */
+    public function getTransport($transport)
+    {
+        $enabled = $this->getEnabledTransports();
+
+        if (!array_key_exists($transport, $enabled)) {
+            throw new PrimaryTransportNotEnabledException($transport.' SMS transport is not enabled or does not exist');
+        }
+
+        return $enabled[$transport];
+    }
+
+    /**
      * Get published transports.
      *
-     * @return AbstractSmsApi[]
+     * @return TransportInterface[]
      */
     public function getEnabledTransports()
     {

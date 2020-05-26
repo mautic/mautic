@@ -4,11 +4,16 @@ language: php
 services:
   - mysql
 
+notifications:
+    webhooks: https://www.travisbuddy.com/
+    on_success: never
+
 php:
   - 5.6
   - 7.0
   - 7.1
   - 7.2
+  - 7.3
 
 cache:
   directories:

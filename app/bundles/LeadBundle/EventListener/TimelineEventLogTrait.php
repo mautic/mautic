@@ -36,7 +36,7 @@ trait TimelineEventLogTrait
      * @param null              $object
      * @param null              $action
      */
-    private function addEvents(LeadTimelineEvent $event, $eventType, $eventTypeName, $icon, $bundle = null, $object = null, $action = null)
+    private function addEvents(LeadTimelineEvent $event, $eventType, $eventTypeName, $icon, $bundle = null, $object = null, $action = null, $contentTemplate = null)
     {
         $eventTypeName = $this->translator->trans($eventTypeName);
         $event->addEventType($eventType, $eventTypeName);
@@ -57,7 +57,7 @@ trait TimelineEventLogTrait
         // Add the logs to the event array
         foreach ($events['results'] as $log) {
             $event->addEvent(
-                $this->getEventEntry($log, $eventType, $eventTypeName, $icon)
+                $this->getEventEntry($log, $eventType, $eventTypeName, $icon, $contentTemplate)
             );
         }
     }
@@ -67,20 +67,30 @@ trait TimelineEventLogTrait
      * @param       $eventType
      * @param       $eventTypeName
      * @param       $icon
+     * @param       $contentTemplate
      *
      * @return array
      */
-    private function getEventEntry(array $log, $eventType, $eventTypeName, $icon)
+    private function getEventEntry(array $log, $eventType, $eventTypeName, $icon, $contentTemplate)
     {
-        return [
-            'event'           => $eventType,
-            'eventId'         => $eventType.$log['id'],
-            'eventType'       => $eventTypeName,
-            'eventLabel'      => $this->getSourceName($log, $eventType),
-            'timestamp'       => $log['date_added'],
-            'icon'            => $icon,
-            'contactId'       => $log['lead_id'],
+        $properties = json_decode($log['properties'], true);
+
+        $entry = [
+            'event'      => $eventType,
+            'eventId'    => $eventType.$log['id'],
+            'eventType'  => $eventTypeName,
+            'eventLabel' => $this->getSourceName($log, $eventType),
+            'timestamp'  => $log['date_added'],
+            'icon'       => $icon,
+            'contactId'  => $log['lead_id'],
+            'extra'      => $properties,
         ];
+
+        if ($contentTemplate) {
+            $entry['contentTemplate'] = $contentTemplate;
+        }
+
+        return $entry;
     }
 
     /**

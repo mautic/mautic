@@ -31,10 +31,11 @@ class Tag
 
     /**
      * @param string $tag
+     * @param bool   $clean
      */
-    public function __construct($tag = null)
+    public function __construct($tag = null, $clean = true)
     {
-        $this->tag = $this->validateTag($tag);
+        $this->tag = $clean ? $this->validateTag($tag) : $tag;
     }
 
     /**

@@ -2,7 +2,9 @@
 <?php
 
 // Fix for hosts that do not have date.timezone set
-date_default_timezone_set('UTC');
+if (empty(ini_get('date.timezone'))) {
+    date_default_timezone_set('UTC');
+}
 
 // if you don't want to setup permissions the proper way, just uncomment the following PHP line
 // read http://symfony.com/doc/current/book/installation.html#configuration-and-setup for more information

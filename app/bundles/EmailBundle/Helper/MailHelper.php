@@ -254,6 +254,11 @@ class MailHelper
     private $copies = [];
 
     /**
+     * @var array
+     */
+    private $embedImagesReplaces = [];
+
+    /**
      * @param MauticFactory $factory
      * @param               $mailer
      * @param null          $from
@@ -949,21 +954,11 @@ class MailHelper
      * @param string $contentType
      * @param null   $charset
      * @param bool   $ignoreTrackingPixel
-     * @param bool   $ignoreEmbedImageConversion
      */
-    public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false, $ignoreEmbedImageConversion = false)
+    public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false)
     {
-        if (!$ignoreEmbedImageConversion && $this->factory->getParameter('mailer_convert_embed_images')) {
-            $matches = [];
-            if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
-                $replaces = [];
-                foreach ($matches[1] as $match) {
-                    if (strpos($match, 'cid:') === false) {
-                        $replaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
-                    }
-                }
-                $content = strtr($content, $replaces);
-            }
+        if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_convert_embed_images')) {
+            $content = $this->convertEmbedImages($content);
         }
 
         if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
@@ -984,6 +979,27 @@ class MailHelper
             'contentType' => $contentType,
             'charset'     => $charset,
         ];
+    }
+
+    /**
+     * @param string $content
+     *
+     * @return string
+     */
+    private function convertEmbedImages($content)
+    {
+        $matches = [];
+        $content = strtr($content, $this->embedImagesReplaces);
+        if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
+            foreach ($matches[1] as $match) {
+                if (strpos($match, 'cid:') === false) {
+                    $this->embedImagesReplaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
+                }
+            }
+            $content = strtr($content, $this->embedImagesReplaces);
+        }
+
+        return $content;
     }
 
     /**
@@ -1889,7 +1905,8 @@ class MailHelper
             $copy        = $emailModel->getCopyRepository()->findByHash($hash);
             $copyCreated = false;
             if (null === $copy) {
-                if (!$emailModel->getCopyRepository()->saveCopy($hash, $this->subject, $this->body['content'])) {
+                $contentToPersist = strtr($this->body['content'], array_flip($this->embedImagesReplaces));
+                if (!$emailModel->getCopyRepository()->saveCopy($hash, $this->subject, $contentToPersist)) {
                     // Try one more time to find the ID in case there was overlap when creating
                     $copy = $emailModel->getCopyRepository()->findByHash($hash);
                 } else {

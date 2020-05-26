@@ -17,6 +17,7 @@ use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -25,6 +26,33 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ConfigController extends FormController
 {
+    /**
+     * Recursively filters the specified array and replaces any UploadedFile instances with their contents
+     * (or NULL if the file cannot be read).
+     *
+     * @see https://github.com/mautic/mautic/issues/7294
+     *
+     * @param array $data
+     *
+     * @return array
+     */
+    protected function filterNormDataForLogging(array $data)
+    {
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $value = $this->filterNormDataForLogging($value);
+            }
+
+            if ($value instanceof UploadedFile) {
+                $value = @file_get_contents($value->getFilename());
+            }
+
+            $data[$key] = $value;
+        }
+
+        return $data;
+    }
+
     /**
      * Controller action for editing the application configuration.
      *
@@ -78,7 +106,7 @@ class ConfigController extends FormController
                     $configEvent = new ConfigEvent($formData, $post);
                     $configEvent
                         ->setOriginalNormData($originalNormData)
-                        ->setNormData($form->getNormData());
+                        ->setNormData($this->filterNormDataForLogging($form->getNormData()));
                     $dispatcher->dispatch(ConfigEvents::CONFIG_PRE_SAVE, $configEvent);
                     $formValues = $configEvent->getConfig();
 

@@ -39,7 +39,7 @@ trait RequestTrait
                             }
 
                             if ('' === $params[$name]) {
-                                continue;
+                                break;
                             }
 
                             $data = filter_var($params[$name], FILTER_VALIDATE_BOOLEAN);

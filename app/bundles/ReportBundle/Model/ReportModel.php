@@ -308,13 +308,15 @@ class ReportModel extends FormModel
 
             // Count suffixes
             if (!array_key_exists($alias, $existingAliases)) {
-                $existingAliases[$alias] = 1;
+                $existingAliases[$alias] = 0;
             } else {
                 ++$existingAliases[$alias];
             }
 
             // Add numeric suffix
-            $columns[$key]['alias'] = $alias.$existingAliases[$alias];
+            if ($existingAliases[$alias] > 0) {
+                $columns[$key]['alias'] = $alias.$existingAliases[$alias];
+            }
         }
 
         return $columns;
@@ -470,13 +472,14 @@ class ReportModel extends FormModel
                 $content = $this->templatingHelper->getTemplating()->renderResponse(
                     'MauticReportBundle:Report:export.html.php',
                     [
-                        'data'      => $reportData['data'],
-                        'columns'   => $reportData['columns'],
-                        'pageTitle' => $name,
-                        'graphs'    => $reportData['graphs'],
-                        'report'    => $report,
-                        'dateFrom'  => $reportData['dateFrom'],
-                        'dateTo'    => $reportData['dateTo'],
+                        'reportData' => $reportData,
+                        'data'       => $reportData['data'],
+                        'columns'    => $reportData['columns'],
+                        'pageTitle'  => $name,
+                        'graphs'     => $reportData['graphs'],
+                        'report'     => $report,
+                        'dateFrom'   => $reportData['dateFrom'],
+                        'dateTo'     => $reportData['dateTo'],
                     ]
                 )->getContent();
 
@@ -689,6 +692,9 @@ class ReportModel extends FormModel
             $params             = $query->getParameters();
 
             foreach ($params as $name => $param) {
+                if (is_array($param)) {
+                    $param = implode("','", $param);
+                }
                 $debugData['query'] = str_replace(":$name", "'$param'", $debugData['query']);
             }
 
@@ -775,6 +781,37 @@ class ReportModel extends FormModel
         }
 
         return (int) $countQb->execute()->fetchColumn();
+    }
+
+    /**
+     * @param int $segmentId
+     *
+     * @return array
+     */
+    public function getReportsIdsWithDependenciesOnSegment($segmentId)
+    {
+        $search = 'lll.leadlist_id';
+        $filter = [
+            'force'  => [
+                ['column' => 'r.filters', 'expr' => 'LIKE', 'value'=>'%'.$search.'"%'],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+        $dependents = [];
+        foreach ($entities as $entity) {
+            $retrFilters = $entity->getFilters();
+            foreach ($retrFilters as $eachFilter) {
+                if ($eachFilter['column'] == $search && $eachFilter['value'] == $segmentId) {
+                    $dependents[] = $entity->getId();
+                }
+            }
+        }
+
+        return $dependents;
     }
 
     /**

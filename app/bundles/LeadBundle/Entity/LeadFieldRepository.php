@@ -47,9 +47,11 @@ class LeadFieldRepository extends CommonRepository
                 ->setParameter(':true', true, 'boolean');
         }
 
-        $q->andWhere(
-            $q->expr()->eq('l.object', ':object')
-        )->setParameter('object', $object);
+        if ($object) {
+            $q->andWhere(
+                $q->expr()->eq('l.object', ':object')
+            )->setParameter('object', $object);
+        }
 
         $results = $q->execute()->fetchAll();
         $aliases = [];

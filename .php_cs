@@ -18,5 +18,6 @@ return PhpCsFixer\Config::create()
         'array_syntax' => [
             'syntax' => 'short'
         ],
+        'no_unused_imports' => false,
     ])
     ->setFinder($finder);
