@@ -282,6 +282,11 @@ class LeadSubscriber extends CommonSubscriber
             $event->getVictor()->getId()
         );
 
+        $this->em->getRepository('MauticLeadBundle:LeadDevice')->updateLead(
+            $event->getLoser()->getId(),
+            $event->getVictor()->getId()
+        );
+
         $log = [
             'bundle'    => 'lead',
             'object'    => 'lead',
