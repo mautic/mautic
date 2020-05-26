@@ -13,6 +13,7 @@ class Field
     private $dataType;
     private $isRequired;
     private $isWritable;
+    private $selector;
 
     public function __construct(array $field = [])
     {
@@ -21,6 +22,7 @@ class Field
         $this->dataType   = $field['type'];
         $this->isRequired = (bool) ($field['required'] ?? false);
         $this->isWritable = true;
+        $this->selector   = $field['selector'];
     }
 
     public function getName(): string
@@ -51,5 +53,10 @@ class Field
     public function getSupportedSyncDirection(): string
     {
         return ObjectMappingDAO::SYNC_TO_MAUTIC;
+    }
+
+    public function getSelector(): string
+    {
+        return $this->selector;
     }
 }

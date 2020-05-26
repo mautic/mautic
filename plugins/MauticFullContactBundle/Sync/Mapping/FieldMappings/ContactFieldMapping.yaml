@@ -1,0 +1,56 @@
+---
+-
+    displayName: "First Name"
+    name: given
+    type: text
+    selector: "'details']['name']['given'"
+-
+    displayName: "Last Name"
+    name: family
+    type: text
+    selector: "'details']['name']['family'"
+-
+    displayName: "Job Title"
+    name: title
+    type: text
+    selector: "title"
+-
+    displayName: "City"
+    name: city
+    type: text
+    selector: "'locations'][0]['city'"
+-
+    displayName: "State"
+    name: region
+    type: text
+    selector: "'locations'][0]['region'"
+-
+    displayName: "Country"
+    name: country
+    type: text
+    selector: "'locations'][0]['country'"
+-
+    displayName: "Twitter"
+    name: twitter
+    type: text
+    selector: "twitter"
+-
+    displayName: "Website"
+    name: website
+    type: text
+    selector: "website"
+-
+    displayName: "LinkedIn"
+    name: linkedin
+    type: text
+    selector: "linkedin"
+-
+    displayName: "Facebook"
+    name: facebook
+    type: text
+    selector: "facebook"
+-
+    displayName: "Organization"
+    name: organization
+    type: text
+    selector: "organization"
