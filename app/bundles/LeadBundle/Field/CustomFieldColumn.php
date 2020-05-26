@@ -55,6 +55,11 @@ class CustomFieldColumn
      */
     private $fieldColumnDispatcher;
 
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
     public function __construct(
         ColumnSchemaHelper $columnSchemaHelper,
         SchemaDefinition $schemaDefinition,
