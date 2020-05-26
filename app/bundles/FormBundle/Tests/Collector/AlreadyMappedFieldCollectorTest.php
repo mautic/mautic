@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Collector;
 
 use Mautic\CacheBundle\Cache\CacheProviderInterface;
-use Mautic\FormBundle\Collector\MappedFieldCollector;
+use Mautic\FormBundle\Collector\AlreadyMappedFieldCollector;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Cache\CacheItem;
 
-final class MappedFieldCollectorTest extends \PHPUnit\Framework\TestCase
+final class AlreadyMappedFieldCollectorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject|CacheProviderInterface
@@ -26,7 +26,7 @@ final class MappedFieldCollectorTest extends \PHPUnit\Framework\TestCase
     private $cacheProvider;
 
     /**
-     * @var MappedFieldCollector
+     * @var AlreadyMappedFieldCollector
      */
     private $collector;
 
@@ -35,7 +35,7 @@ final class MappedFieldCollectorTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->cacheProvider = $this->createMock(CacheProviderInterface::class);
-        $this->collector     = new MappedFieldCollector($this->cacheProvider);
+        $this->collector     = new AlreadyMappedFieldCollector($this->cacheProvider);
     }
 
     public function testWorkflow()

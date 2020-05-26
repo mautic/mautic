@@ -4,12 +4,12 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
-use Mautic\FormBundle\Collector\MappedFieldCollectorInterface;
+use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
+use Mautic\FormBundle\Collector\FieldCollector;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
-use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FieldModel as FormFieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
@@ -34,17 +34,28 @@ class FieldController extends CommonFormController
     private $formFieldModel;
 
     /**
-     * @var MappedFieldCollectorInterface
+     * @var FormFieldHelper
      */
-    private $mappedFieldCollector;
+    private $fieldHelper;
+
+    /**
+     * @var FieldCollector
+     */
+    private $fieldcollector;
+
+    /**
+     * @var AlreadyMappedFieldCollectorInterface
+     */
+    private $alreadyMappedFieldCollector;
 
     public function initialize(FilterControllerEvent $event)
     {
-        $this->leadFieldModel       = $this->getModel('lead.field');
-        $this->formFieldModel       = $this->getModel('form.field');
-        $this->formModel            = $this->getModel('form.form');
-        $this->fieldHelper          = $this->get('mautic.helper.form.field_helper');
-        $this->mappedFieldCollector = $this->get('mautic.form.collector.mapped.field');
+        $this->leadFieldModel              = $this->getModel('lead.field');
+        $this->formFieldModel              = $this->getModel('form.field');
+        $this->formModel                   = $this->getModel('form.form');
+        $this->fieldHelper                 = $this->get('mautic.helper.form.field_helper');
+        $this->fieldCollector              = $this->get('mautic.form.collector.field');
+        $this->alreadyMappedFieldCollector = $this->get('mautic.form.collector.already.mapped.field');
     }
 
     /**
@@ -137,7 +148,7 @@ class FieldController extends CommonFormController
 
                     // Keep track of used lead fields
                     if (!empty($formField['mappedObject']) && !empty($formField['mappedField']) && empty($formData['parent'])) {
-                        $this->mappedFieldCollector->addField($formId, $formField['mappedObject'], $formField['mappedField']);
+                        $this->alreadyMappedFieldCollector->addField($formId, $formField['mappedObject'], $formField['mappedField']);
                     }
                 } else {
                     $success = 0;
@@ -276,7 +287,7 @@ class FieldController extends CommonFormController
 
                         // Keep track of used lead fields
                         if (!empty($formField['mappedObject']) && !empty($formField['mappedField']) && empty($formData['parent'])) {
-                            $this->mappedFieldCollector->addField($formId, $formField['mappedObject'], $formField['mappedField']);
+                            $this->alreadyMappedFieldCollector->addField($formId, $formField['mappedObject'], $formField['mappedField']);
                         }
                     }
                 }
@@ -313,9 +324,14 @@ class FieldController extends CommonFormController
             $template                   = (!empty($customParams)) ? $customParams['template'] : 'MauticFormBundle:Field:'.$fieldType.'.html.php';
 
             //prevent undefined errors
-            $entity    = new Field();
-            $blank     = $entity->convertToArray();
-            $formField = array_merge($blank, $formField);
+            $entity       = new Field();
+            $blank        = $entity->convertToArray();
+            $formField    = array_merge($blank, $formField);
+            $mappedFields = [];
+
+            if ($formField['mappedObject'] && $formField['mappedField']) {
+                $mappedFields[$formField['mappedObject']] = $this->fieldcollector->getFields($formField['mappedObject']);
+            }
 
             $passthroughVars['fieldHtml'] = $this->renderView(
                 'MauticFormBundle:Builder:fieldwrapper.html.php',
@@ -326,8 +342,9 @@ class FieldController extends CommonFormController
                     'field'                => $formField,
                     'id'                   => $objectId,
                     'formId'               => $formId,
-                    'contactFields'        => $this->leadFieldModel->getFieldListWithProperties(),
-                    'companyFields'        => $this->leadFieldModel->getFieldListWithProperties('company'),
+                    'mappedFields'         => $mappedFields,
+                    // 'contactFields'        => $this->leadFieldModel->getFieldListWithProperties(),
+                    // 'companyFields'        => $this->leadFieldModel->getFieldListWithProperties('company'),
                     'inBuilder'            => true,
                     'fields'               => $this->fieldHelper->getChoiceList($customComponents['fields']),
                     'formFields'           => $fields,
@@ -378,8 +395,10 @@ class FieldController extends CommonFormController
         $formField = (array_key_exists($objectId, $fields)) ? $fields[$objectId] : null;
 
         if ('POST' === $this->request->getMethod() && null !== $formField) {
-            // Allow to select the lead field from the delete field again
-            $this->mappedFieldCollector->removeField($formId, $formField['mappedObject'], $formField['mappedField']);
+            if ($formField['mappedObject'] && $formField['mappedField']) {
+                // Allow to select the lead field from the delete field again
+                $this->alreadyMappedFieldCollector->removeField($formId, $formField['mappedObject'], $formField['mappedField']);
+            }
 
             //add the field to the delete list
             if (!in_array($objectId, $delete)) {

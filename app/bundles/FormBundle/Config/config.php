@@ -282,7 +282,7 @@ return [
                     'translator',
                     'mautic.form.collector.object',
                     'mautic.form.collector.field',
-                    'mautic.form.collector.mapped.field',
+                    'mautic.form.collector.already.mapped.field',
                 ],
                 'methodCalls' => [
                     'setFieldModel' => ['mautic.form.model.field'],
@@ -429,8 +429,8 @@ return [
                 'class'     => \Mautic\FormBundle\Collector\FieldCollector::class,
                 'arguments' => ['event_dispatcher'],
             ],
-            'mautic.form.collector.mapped.field' => [
-                'class'     => \Mautic\FormBundle\Collector\MappedFieldCollector::class,
+            'mautic.form.collector.already.mapped.field' => [
+                'class'     => \Mautic\FormBundle\Collector\AlreadyMappedFieldCollector::class,
                 'arguments' => ['mautic.cache.provider'],
             ],
             'mautic.helper.form.field_helper' => [
