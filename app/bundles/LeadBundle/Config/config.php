@@ -991,14 +991,6 @@ return [
                 'class'     => \Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder::class,
                 'arguments' => ['mautic.lead.model.random_parameter_name'],
             ],
-            'mautic.lead.query.builder.relation.value' => [
-                'class'     => \Mautic\LeadBundle\Segment\Query\Filter\RelationValueFilterQueryBuilder::class,
-                'arguments' => ['mautic.lead.model.random_parameter_name'],
-            ],
-            'mautic.lead.query.builder.relation.func' => [
-                'class'     => \Mautic\LeadBundle\Segment\Query\Filter\RelationFuncFilterQueryBuilder::class,
-                'arguments' => ['mautic.lead.model.random_parameter_name'],
-            ],
             'mautic.lead.query.builder.special.leadlist' => [
                 'class'     => \Mautic\LeadBundle\Segment\Query\Filter\SegmentReferenceFilterQueryBuilder::class,
                 'arguments' => [

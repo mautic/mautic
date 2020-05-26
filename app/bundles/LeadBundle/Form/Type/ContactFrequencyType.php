@@ -45,7 +45,6 @@ class ContactFrequencyType extends AbstractType
         $showContactCategories = $this->coreParametersHelper->getParameter('show_contact_categories');
         $showContactSegments   = $this->coreParametersHelper->getParameter('show_contact_segments');
 
-        // var_dump($options['data'], $options['channels']);die;
         if (!empty($options['channels'])) {
             $builder->add(
                 'lead_channels',
