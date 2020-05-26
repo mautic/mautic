@@ -21,6 +21,7 @@ use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Monolog\Logger;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
 {
@@ -32,8 +33,9 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
         $leadFieldSaver        = $this->createMock(LeadFieldSaver::class);
         $customFieldIndex      = $this->createMock(CustomFieldIndex::class);
         $fieldColumnDispatcher = $this->createMock(FieldColumnDispatcher::class);
+        $translator            = $this->createMock(TranslatorInterface::class);
 
-        $customFieldColumn = new CustomFieldColumn($columnSchemaHelper, $schemaDefinition, $logger, $leadFieldSaver, $customFieldIndex, $fieldColumnDispatcher);
+        $customFieldColumn = new CustomFieldColumn($columnSchemaHelper, $schemaDefinition, $logger, $leadFieldSaver, $customFieldIndex, $fieldColumnDispatcher, $translator);
 
         $columnSchemaHelper->expects($this->exactly(2))
             ->method('setName')
