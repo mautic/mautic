@@ -4,8 +4,8 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
 use Mautic\FormBundle\Collector\FieldCollectorInterface;
-use Mautic\FormBundle\Collector\MappedFieldCollectorInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -18,14 +18,14 @@ class AjaxController extends CommonAjaxController
     private $fieldCollector;
 
     /**
-     * @var MappedFieldCollectorInterface
+     * @var AlreadyMappedFieldCollectorInterface
      */
     private $mappedFieldCollector;
 
     public function initialize(FilterControllerEvent $event)
     {
         $this->fieldCollector       = $this->container->get('mautic.form.collector.field');
-        $this->mappedFieldCollector = $this->container->get('mautic.form.collector.mapped.field');
+        $this->mappedFieldCollector = $this->container->get('mautic.form.collector.already.mapped.field');
     }
 
     /**

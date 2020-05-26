@@ -5,8 +5,8 @@ namespace Mautic\FormBundle\Form\Type;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
 use Mautic\FormBundle\Collector\FieldCollectorInterface;
-use Mautic\FormBundle\Collector\MappedFieldCollectorInterface;
 use Mautic\FormBundle\Collector\ObjectCollectorInterface;
 use Mautic\FormBundle\Exception\FieldNotFoundException;
 use Symfony\Component\Form\AbstractType;
@@ -39,7 +39,7 @@ class FieldType extends AbstractType
     private $fieldCollector;
 
     /**
-     * @var MappedFieldCollectorInterface
+     * @var AlreadyMappedFieldCollectorInterface
      */
     private $mappedFieldCollector;
 
@@ -47,7 +47,7 @@ class FieldType extends AbstractType
         TranslatorInterface $translator,
         ObjectCollectorInterface $objectCollector,
         FieldCollectorInterface $fieldCollector,
-        MappedFieldCollectorInterface $mappedFieldCollector
+        AlreadyMappedFieldCollectorInterface $mappedFieldCollector
     ) {
         $this->translator           = $translator;
         $this->objectCollector      = $objectCollector;
