@@ -173,7 +173,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
           'mailer_enable',
-          'yesno_button_group',
+          YesNoButtonGroupType::class,
           [
             'label'      => 'mautic.email.config.mailer.enable',
             'label_attr' => ['class' => 'control-label'],
