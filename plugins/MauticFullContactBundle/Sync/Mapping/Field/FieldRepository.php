@@ -34,12 +34,10 @@ class FieldRepository
     {
         // Fetch the fields from field mapping file.
         $fields = [];
-        if ($objectName === ConfigSupport::CONTACT) {
+        if (ConfigSupport::CONTACT === $objectName) {
             $fields = Yaml::parse(file_get_contents(__DIR__.'/../FieldMappings/ContactFieldMapping.yaml'));
-        }
-        elseif ($objectName === ConfigSupport::COMPANY) {
-            //$fields = Yaml::parse(file_get_contents(__DIR__.'/../FieldMappings/CompanyFieldMapping.yaml'));
-            $fields = Yaml::parse(file_get_contents(__DIR__.'/../FieldMappings/ContactFieldMapping.yaml'));
+        } elseif (ConfigSupport::COMPANY === $objectName) {
+            $fields = Yaml::parse(file_get_contents(__DIR__.'/../FieldMappings/CompanyFieldMapping.yaml'));
         }
 
         return $this->hydrateFieldObjects($fields);

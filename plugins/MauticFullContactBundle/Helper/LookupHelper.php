@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticFullContactBundle\Integration\Config;
 use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
+use MauticPlugin\MauticFullContactBundle\Services\CompanyStorageHelper;
 use MauticPlugin\MauticFullContactBundle\Services\ContactStorageHelper;
 use MauticPlugin\MauticFullContactBundle\Services\FullContact_Company;
 use MauticPlugin\MauticFullContactBundle\Services\FullContact_Person;
@@ -69,6 +70,11 @@ class LookupHelper
      */
     protected $contactStorageHelper;
 
+    /**
+     * @var CompanyStorageHelper
+     */
+    protected $companyStorageHelper;
+
     public function __construct(
         IntegrationHelper $integrationHelper,
         UserHelper $userHelper,
@@ -77,7 +83,8 @@ class LookupHelper
         LeadModel $leadModel,
         CompanyModel $companyModel,
         Config $config,
-        ContactStorageHelper $contactStorageHelper
+        ContactStorageHelper $contactStorageHelper,
+        CompanyStorageHelper $companyStorageHelper
     ) {
         $this->integration          = $integrationHelper->getIntegrationObject('FullContact');
         $this->userHelper           = $userHelper;
@@ -87,6 +94,7 @@ class LookupHelper
         $this->companyModel         = $companyModel;
         $this->config               = $config;
         $this->contactStorageHelper = $contactStorageHelper;
+        $this->companyStorageHelper = $companyStorageHelper;
     }
 
     /**
@@ -153,7 +161,7 @@ class LookupHelper
                     $parse                             = parse_url($website);
                     list($cacheId, $webhookId, $cache) = $this->getCache($company, $notify);
 
-                    if (isset($parse['host']) && !array_key_exists($cacheId, $cache['fullcontact'])) {
+                    if (isset($parse['host']) && array_key_exists($cacheId, $cache['fullcontact'])) {
                         $fullcontact->setWebhookUrl(
                             $this->router->generate(
                                 'mautic_plugin_fullcontact_index',
@@ -163,6 +171,7 @@ class LookupHelper
                             $webhookId
                         );
                         $res = $fullcontact->lookupByDomain($parse['host']);
+                        $this->companyStorageHelper->processCompanyData($res, $company);
                         // Prevent from filling up the cache
                         $cache['fullcontact'] = [
                             $cacheId => serialize($res),

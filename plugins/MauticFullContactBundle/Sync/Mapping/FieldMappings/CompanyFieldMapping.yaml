@@ -1,0 +1,61 @@
+---
+-
+    displayName: "Name"
+    name: name
+    type: text
+-
+    displayName: "Location"
+    name: location
+    type: text
+-
+    displayName: "Website"
+    name: website
+    type: text
+-
+    displayName: "LinkedIn"
+    name: linkedin
+    type: text
+-
+    displayName: "Email"
+    name: emails
+    type: text
+-
+    displayName: "Address 1"
+    name: addressLine1
+    type: text
+-
+    displayName: "Address 2"
+    name: addressLine2
+    type: text
+-
+    displayName: "City"
+    name: city
+    type: text
+-
+    displayName: "State"
+    name: region
+    type: text
+-
+    displayName: "Postal Code"
+    name: postalCode
+    type: text
+-
+    displayName: "Country"
+    name: country
+    type: text
+-
+    displayName: "Phone"
+    name: phones
+    type: text
+-
+    displayName: "Number of employees"
+    name: employees
+    type: text
+-
+    displayName: "Industry"
+    name: industries
+    type: text
+-
+    displayName: "Description"
+    name: companydescription
+    type: text
