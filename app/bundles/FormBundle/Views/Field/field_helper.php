@@ -1,5 +1,9 @@
 <?php
 
+use Mautic\FormBundle\Collection\FieldCollection;
+use Mautic\FormBundle\Exception\FieldNotFoundException;
+
+// Defaults
 $appendAttribute = function (&$attributes, $attributeName, $append) {
     if (false === stripos($attributes, "{$attributeName}=")) {
         $attributes .= ' '.$attributeName.'="'.$append.'"';
@@ -123,38 +127,38 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
     $parseList     = [];
     $isBooleanList = false;
 
-    if (!isset($contactFields)) {
-        $contactFields = [];
-    }
-    if (!isset($companyFields)) {
-        $companyFields = [];
-    }
-    $formFields = array_merge($contactFields, $companyFields);
-    if (!empty($properties['syncList']) && !empty($field['mappedField']) && isset($formFields[$field['mappedField']])) {
-        $mappedFieldType = $formFields[$field['mappedField']]['type'];
-        switch (true) {
-            case !empty($formFields[$field['mappedField']]['properties']['list']):
-                $parseList = $formFields[$field['mappedField']]['properties']['list'];
-                break;
-            case 'boolean' === $mappedFieldType:
-                $parseList = [
-                    0 => $formFields[$field['mappedField']]['properties']['no'],
-                    1 => $formFields[$field['mappedField']]['properties']['yes'],
-                ];
-                $isBooleanList = true;
-                break;
-            case 'country' === $mappedFieldType:
-                $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getCountryChoices();
-                break;
-            case 'region' === $mappedFieldType:
-                $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getRegionChoices();
-                break;
-            case 'timezone' === $mappedFieldType:
-                $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getTimezonesChoices();
-                break;
-            case 'locale':
-                $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getLocaleChoices();
-                break;
+    if (!empty($properties['syncList']) && !empty($field['mappedField']) && !empty($field['mappedObject']) && isset($mappedFields[$field['mappedObject']])) {
+        /** @var FieldCollection $fieldCollection */
+        $fieldCollection = $mappedFields[$field['mappedObject']];
+
+        try {
+            $mappedField     = $fieldCollection->getFieldByKey($field['mappedField']);
+            $mappedFieldType = $mappedField->getType();
+            switch (true) {
+                case !empty($mappedField->getProperties()['list']):
+                    $parseList = $mappedField->getProperties()['list'];
+                    break;
+                case 'boolean' === $mappedFieldType:
+                    $parseList = [
+                        0 => $mappedField->getProperties()['no'],
+                        1 => $mappedField->getProperties()['yes'],
+                    ];
+                    $isBooleanList = true;
+                    break;
+                case 'country' === $mappedFieldType:
+                    $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getCountryChoices();
+                    break;
+                case 'region' === $mappedFieldType:
+                    $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getRegionChoices();
+                    break;
+                case 'timezone' === $mappedFieldType:
+                    $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getTimezonesChoices();
+                    break;
+                case 'locale':
+                    $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getLocaleChoices();
+                    break;
+            }
+        } catch (FieldNotFoundException $e) {
         }
     }
 
@@ -172,16 +176,20 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
         }
     }
 
-    if ($field['mappedField'] && !empty($formFields[$field['mappedField']]['type'])
-        && in_array(
-            $formFields[$field['mappedField']]['type'],
-            ['datetime', 'date']
-        )) {
-        $tempMappedFieldType = $formFields[$field['mappedField']]['type'];
-        foreach ($parseList as $key => $aTemp) {
-            if ($date = ('datetime' == $tempMappedFieldType ? $view['date']->toFull($aTemp['label']) : $view['date']->toDate($aTemp['label']))) {
-                $parseList[$key]['label'] = $date;
+    if ($field['mappedField'] && isset($mappedFields[$field['mappedObject']])) {
+        /** @var FieldCollection $fieldCollection */
+        $fieldCollection = $mappedFields[$field['mappedObject']];
+
+        try {
+            $mappedField = $fieldCollection->getFieldByKey($field['mappedField']);
+            if (in_array($mappedField->getType(), ['datetime', 'date'])) {
+                foreach ($parseList as $key => $aTemp) {
+                    if ($date = ('datetime' === $mappedField->getType() ? $view['date']->toFull($aTemp['label']) : $view['date']->toDate($aTemp['label']))) {
+                        $parseList[$key]['label'] = $date;
+                    }
+                }
             }
+        } catch (FieldNotFoundException $e) {
         }
     }
 
