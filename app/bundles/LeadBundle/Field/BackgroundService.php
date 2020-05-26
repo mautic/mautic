@@ -50,15 +50,6 @@ class BackgroundService
      */
     private $customFieldNotification;
 
-    /**
-     * @param FieldModel                         $fieldModel
-     * @param CustomFieldColumn                  $customFieldColumn
-     * @param LeadFieldSaver                     $leadFieldSaver
-     * @param FieldColumnBackgroundJobDispatcher $fieldColumnBackgroundJobDispatcher
-     * @param CustomFieldNotification            $customFieldNotification
-     */
-    private $customFieldNotification;
-
     public function __construct(
         FieldModel $fieldModel,
         CustomFieldColumn $customFieldColumn,
