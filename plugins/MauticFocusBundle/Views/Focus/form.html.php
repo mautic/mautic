@@ -400,14 +400,14 @@ echo $view['form']->start($form);
                                 <?php echo $view['form']->row($form['form']); ?>
                             </div>
 
-                            <?php echo $view['form']->row($form['properties']['content']['css']); ?>
-
                             <!-- link type properties -->
                             <div class="focus-hide visible-focus-type-link">
                                 <?php echo $view['form']->row($form['properties']['content']['link_text']); ?>
                                 <?php echo $view['form']->row($form['properties']['content']['link_url']); ?>
                                 <?php echo $view['form']->row($form['properties']['content']['link_new_window']); ?>
                             </div>
+
+                            <?php echo $view['form']->row($form['properties']['content']['css']); ?>
                         </div>
                     </div>
                 </div>
