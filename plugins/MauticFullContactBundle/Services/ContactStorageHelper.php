@@ -82,9 +82,7 @@ class ContactStorageHelper
      * Map field's sync settings and prepare array of values to be updated.
      *
      * @param array $contactData
-     *    Data from the FullContact Json response.
-     *
-     * @return array
+     *                           Data from the FullContact Json response
      */
     private function mapFieldData($contactData): array
     {
@@ -105,9 +103,10 @@ class ContactStorageHelper
      * Fetch values from the data returned by FullContact.
      *
      * @param array $data
-     *   Data from the FullContact Json response.
+     *                    Data from the FullContact Json response
      * @param $fieldName
-     *   Field name that we want to retrieve.
+     *   Field name that we want to retrieve
+     *
      * @return mixed|string
      */
     public function fetchFieldValue($data, $fieldName)
@@ -119,23 +118,24 @@ class ContactStorageHelper
             case 'title':
             case 'organization':
             case 'website':
-                $value = $data[$fieldName];
+                $value = isset($data[$fieldName]) ? $data[$fieldName] : '';
                 break;
 
             case 'given':
             case 'family':
-                $value = $data['details']['name'][$fieldName];
+                $value = isset($data['details']['name'][$fieldName]) ? $data['details']['name'][$fieldName] : '';
                 break;
 
             case 'city':
             case 'region':
             case 'country':
-                $value = $data['details']['locations'][0][$fieldName];
+                $value = isset($data['details']['locations'][0][$fieldName]) ? $data['details']['locations'][0][$fieldName] : '';
                 break;
 
             default:
                 $value = '';
         }
+
         return $value;
     }
 }

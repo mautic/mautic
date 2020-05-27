@@ -127,16 +127,16 @@ class CompanyStorageHelper
             case 'website':
             case 'employees':
             case 'location':
-                $value = $data[$fieldName];
+                $value = isset($data[$fieldName]) ? $data[$fieldName] : '';
                 break;
 
             case 'emails':
             case 'phones':
-                $value = $data['details'][$fieldName][0]['value'];
+                $value = isset($data['details'][$fieldName][0]['value']) ? $data['details'][$fieldName][0]['value'] : '';
                 break;
 
             case 'industries':
-                $value = $data['details'][$fieldName][0]['name'];
+                $value = isset($data['details'][$fieldName][0]['name']) ? $data['details'][$fieldName][0]['name'] : '';
                 break;
 
             case 'addressLine1':
@@ -145,7 +145,7 @@ class CompanyStorageHelper
             case 'region':
             case 'country':
             case 'postalCode':
-                $value = $data['details']['locations'][0][$fieldName];
+                $value = isset($data['details']['locations'][0][$fieldName]) ? $data['details']['locations'][0][$fieldName] : '';
                 break;
 
             default:

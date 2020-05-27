@@ -161,7 +161,7 @@ class LookupHelper
                     $parse                             = parse_url($website);
                     list($cacheId, $webhookId, $cache) = $this->getCache($company, $notify);
 
-                    if (isset($parse['host']) && array_key_exists($cacheId, $cache['fullcontact'])) {
+                    if (isset($parse['host']) && !array_key_exists($cacheId, $cache['fullcontact'])) {
                         $fullcontact->setWebhookUrl(
                             $this->router->generate(
                                 'mautic_plugin_fullcontact_index',
