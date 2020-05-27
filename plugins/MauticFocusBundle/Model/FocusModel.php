@@ -286,9 +286,6 @@ class FocusModel extends FormModel
 
         if ($isPreview) {
             $content = str_replace('{focus_form}', $formContent, $content, $formReplaced);
-            if (!$formReplaced && !empty($formContent)) {
-                $content .= $formContent;
-            }
 
             return $content;
         }
