@@ -398,8 +398,9 @@ echo $view['form']->start($form);
                                     </div>
                                 </div>
                                 <?php echo $view['form']->row($form['form']); ?>
-                                <div style="margin-bottom: 50px;"></div>
                             </div>
+
+                            <?php echo $view['form']->row($form['properties']['content']['css']); ?>
 
                             <!-- link type properties -->
                             <div class="focus-hide visible-focus-type-link">
