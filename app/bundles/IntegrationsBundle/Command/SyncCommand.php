@@ -106,7 +106,7 @@ class SyncCommand extends Command
             defined('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS') or define('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS', $inputOptions->getIntegration());
 
             // Tell audit log to use integration name rather than "System"
-            define('MAUTIC_AUDITLOG_USER', $inputOptions->getIntegration());
+            defined('MAUTIC_AUDITLOG_USER') or define('MAUTIC_AUDITLOG_USER', $inputOptions->getIntegration());
 
             $this->syncService->processIntegrationSync($inputOptions);
         } catch (\Throwable $e) {
