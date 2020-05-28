@@ -15,6 +15,7 @@ use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 
 class FieldController extends CommonFormController
 {
@@ -39,9 +40,9 @@ class FieldController extends CommonFormController
     private $fieldHelper;
 
     /**
-     * @var FieldCollector
+     * @var MappedObjectCollectorInterface
      */
-    private $fieldcollector;
+    private $mappedObjectCollector;
 
     /**
      * @var AlreadyMappedFieldCollectorInterface
@@ -54,7 +55,7 @@ class FieldController extends CommonFormController
         $this->formFieldModel              = $this->getModel('form.field');
         $this->formModel                   = $this->getModel('form.form');
         $this->fieldHelper                 = $this->get('mautic.helper.form.field_helper');
-        $this->fieldCollector              = $this->get('mautic.form.collector.field');
+        $this->mappedObjectCollector       = $this->get('mautic.form.collector.mapped.object');
         $this->alreadyMappedFieldCollector = $this->get('mautic.form.collector.already.mapped.field');
     }
 
@@ -191,8 +192,7 @@ class FieldController extends CommonFormController
                     'id'                   => $keyId,
                     'formId'               => $formId,
                     'formName'             => null === $formEntity ? 'newform' : $formEntity->generateFormName(),
-                    'contactFields'        => $this->leadFieldModel->getFieldListWithProperties(),
-                    'companyFields'        => $this->leadFieldModel->getFieldListWithProperties('company'),
+                    'mappedFields'         => $this->mappedObjectCollector->buildCollection($formField['mappedObject']),
                     'inBuilder'            => true,
                     'fields'               => $this->fieldHelper->getChoiceList($customComponents['fields']),
                     'viewOnlyFields'       => $customComponents['viewOnlyFields'],
@@ -327,11 +327,6 @@ class FieldController extends CommonFormController
             $entity       = new Field();
             $blank        = $entity->convertToArray();
             $formField    = array_merge($blank, $formField);
-            $mappedFields = [];
-
-            if ($formField['mappedObject'] && $formField['mappedField']) {
-                $mappedFields[$formField['mappedObject']] = $this->fieldcollector->getFields($formField['mappedObject']);
-            }
 
             $passthroughVars['fieldHtml'] = $this->renderView(
                 'MauticFormBundle:Builder:fieldwrapper.html.php',
@@ -342,9 +337,7 @@ class FieldController extends CommonFormController
                     'field'                => $formField,
                     'id'                   => $objectId,
                     'formId'               => $formId,
-                    'mappedFields'         => $mappedFields,
-                    // 'contactFields'        => $this->leadFieldModel->getFieldListWithProperties(),
-                    // 'companyFields'        => $this->leadFieldModel->getFieldListWithProperties('company'),
+                    'mappedFields'         => $this->mappedObjectCollector->buildCollection($formField['mappedObject']),
                     'inBuilder'            => true,
                     'fields'               => $this->fieldHelper->getChoiceList($customComponents['fields']),
                     'formFields'           => $fields,

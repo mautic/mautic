@@ -1,16 +1,17 @@
 <?php
 
+use Mautic\FormBundle\Collection\MappedObjectCollection;
+
 echo $view->render(
     'MauticFormBundle:Field:group.html.php',
     [
         'field'         => $field,
-        'fields'        => isset($fields) ? $fields : [],
-        'inForm'        => (isset($inForm)) ? $inForm : false,
+        'fields'        => $fields ?? [],
+        'inForm'        => $inForm ?? false,
         'id'            => $id,
-        'formId'        => (isset($formId)) ? $formId : 0,
-        'formName'      => (isset($formName)) ? $formName : '',
+        'formId'        => $formId ?? 0,
+        'formName'      => $formName ?? '',
         'type'          => 'radio',
-        'contactFields' => (isset($contactFields)) ? $contactFields : [],
-        'companyFields' => (isset($companyFields)) ? $companyFields : [],
+        'mappedFields'  => $mappedFields ?? new MappedObjectCollection(),
     ]
 );

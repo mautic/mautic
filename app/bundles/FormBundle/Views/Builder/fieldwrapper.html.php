@@ -10,11 +10,14 @@
  */
 
 use Mautic\FormBundle\Enum\ConditionalFieldEnum;
+use Mautic\FormBundle\Collection\FieldCollection;
+use Mautic\FormBundle\Exception\FieldNotFoundException;
 
 if (!isset($inBuilder)) {
     $inBuilder = false;
 }
 
+/** @var \Mautic\FormBundle\Collection\MappedObjectCollection $mappedFields */
 ?>
 
 <div class="<?php if (empty($isConditional)): ?>panel<?php else: ?>panel2<?php endif; ?> form-field-wrapper"
@@ -40,7 +43,7 @@ if (!isset($inBuilder)) {
                     'inForm'        => true,
                     'id'            => $field['id'],
                     'formId'        => $formId,
-                    'mappedFields'  => (isset($mappedFields)) ? $mappedFields : [],
+                    'mappedFields'  => $mappedFields,
                     'inBuilder'     => $inBuilder,
                 ]
             );
@@ -72,13 +75,21 @@ if (!isset($inBuilder)) {
                     <br>
                 <?php endif; ?>
 
-                <?php if (!empty($field['mappedObject']) && !empty($field['mappedField'])): ?>
-                    <?php $defaultIcon = 'arrow'; ?>
+                <?php if (!empty($field['mappedObject']) && !empty($field['mappedField']) && $mappedFields->offsetExists($field['mappedObject'])): ?>
+                    <?php $defaultIcon = 'compress'; ?>
                     <?php $icon        = 'company' === $field['mappedObject'] ? 'building' : $defaultIcon; ?>
-                    <?php $icon        = 'lead' === $field['mappedObject'] ? 'user' : $defaultIcon; ?>
+                    <?php $icon        = 'contact' === $field['mappedObject'] ? 'user' : $defaultIcon; ?>
                     <i class="fa fa-<?php echo $icon; ?>" aria-hidden="true"></i>
                     <span class="inline-spacer">
-                    <?php echo $mappedFields[$field['mappedField']]['label'] ?? ucfirst($field['mappedField']); ?>
+                        <?php 
+                            /** @var FieldCollection $fieldCollection */
+                            $fieldCollection = $mappedFields->offsetGet($field['mappedObject']);
+                            try {
+                                echo $fieldCollection->getFieldByKey($field['mappedField'])->getName();
+                            } catch (FieldNotFoundException $e) {
+                                echo ucfirst($field['mappedField']);
+                            }
+                        ?>
         </span>
             <?php endif; ?>
             <?php if (isset($field['alwaysDisplay']) && $field['alwaysDisplay']): ?>

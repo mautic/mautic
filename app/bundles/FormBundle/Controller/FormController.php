@@ -14,6 +14,7 @@ use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Mautic\FormBundle\Collector\MappedObjectCollector;
 
 class FormController extends CommonFormController
 {
@@ -23,14 +24,14 @@ class FormController extends CommonFormController
     private $alreadyMappedFieldCollector;
 
     /**
-     * @var FieldCollector
+     * @var MappedObjectCollector
      */
-    private $fieldCollector;
+    private $mappedObjectCollector;
 
     public function initialize(FilterControllerEvent $event)
     {
         $this->alreadyMappedFieldCollector = $this->get('mautic.form.collector.already.mapped.field');
-        $this->fieldCollector              = $this->get('mautic.form.collector.field');
+        $this->mappedObjectCollector       = $this->get('mautic.form.collector.mapped.object');
     }
 
     /**
@@ -441,18 +442,17 @@ class FormController extends CommonFormController
             [
                 'viewParameters' => [
                     'fields'         => $fieldHelper->getChoiceList($customComponents['fields']),
+                    'formFields'     => $modifiedFields,
+                    'mappedFields'   => $this->mappedObjectCollector->buildCollection(...$entity->getMappedFieldObjects()),
+                    'deletedFields'  => $deletedFields,
                     'viewOnlyFields' => $customComponents['viewOnlyFields'],
                     'actions'        => $customComponents['choices'],
                     'actionSettings' => $customComponents['actions'],
-                    'formFields'     => $modifiedFields,
                     'formActions'    => $modifiedActions,
-                    'deletedFields'  => $deletedFields,
                     'deletedActions' => $deletedActions,
                     'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'activeForm'     => $entity,
                     'form'           => $form->createView(),
-                    'contactFields'  => $this->getModel('lead.field')->getFieldListWithProperties(),
-                    'companyFields'  => $this->getModel('lead.field')->getFieldListWithProperties('company'),
                     'inBuilder'      => true,
                 ],
                 'contentTemplate' => 'MauticFormBundle:Builder:index.html.php',
@@ -813,20 +813,13 @@ class FormController extends CommonFormController
             $deletedActions = [];
         }
 
-        $mappedFields  = [];
-        $mappedObjects = $entity->getMappedFieldObjects();
-
-        foreach ($mappedObjects as $mappedObject) {
-            $mappedFields[$mappedObject] = $this->fieldCollector->getFields($mappedObject);
-        }
-
         return $this->delegateView(
             [
                 'viewParameters' => [
                     'fields'             => $availableFields,
                     'formFields'         => $modifiedFields,
                     'deletedFields'      => $deletedFields,
-                    'mappedFields'       => $mappedFields,
+                    'mappedFields'       => $this->mappedObjectCollector->buildCollection(...$entity->getMappedFieldObjects()),
                     'formActions'        => $modifiedActions,
                     'deletedActions'     => $deletedActions,
                     'viewOnlyFields'     => $customComponents['viewOnlyFields'],
@@ -837,8 +830,6 @@ class FormController extends CommonFormController
                     'activeForm'         => $entity,
                     'form'               => $form->createView(),
                     'forceTypeSelection' => $forceTypeSelection,
-                    // 'contactFields'      => $this->getModel('lead.field')->getFieldListWithProperties('lead'),
-                    // 'companyFields'      => $this->getModel('lead.field')->getFieldListWithProperties('company'),
                     'inBuilder'          => true,
                 ],
                 'contentTemplate' => 'MauticFormBundle:Builder:index.html.php',

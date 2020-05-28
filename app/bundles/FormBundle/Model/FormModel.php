@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
@@ -83,6 +84,11 @@ class FormModel extends CommonFormModel
      */
     private $tableSchemaHelper;
 
+    /**
+     * @var MappedObjectCollectorInterface
+     */
+    private $mappedObjectCollector;
+
     public function __construct(
         RequestStack $requestStack,
         TemplatingHelper $templatingHelper,
@@ -94,19 +100,22 @@ class FormModel extends CommonFormModel
         FormUploader $formUploader,
         ContactTracker $contactTracker,
         ColumnSchemaHelper $columnSchemaHelper,
-        TableSchemaHelper $tableSchemaHelper
+        TableSchemaHelper $tableSchemaHelper,
+        MappedObjectCollectorInterface $mappedObjectCollector
     ) {
-        $this->requestStack           = $requestStack;
-        $this->templatingHelper       = $templatingHelper;
-        $this->themeHelper            = $themeHelper;
-        $this->formActionModel        = $formActionModel;
-        $this->formFieldModel         = $formFieldModel;
-        $this->fieldHelper            = $fieldHelper;
-        $this->leadFieldModel         = $leadFieldModel;
-        $this->formUploader           = $formUploader;
-        $this->contactTracker         = $contactTracker;
-        $this->columnSchemaHelper     = $columnSchemaHelper;
-        $this->tableSchemaHelper      = $tableSchemaHelper;
+        $this->requestStack        = $requestStack;
+        $this->templatingHelper    = $templatingHelper;
+        $this->themeHelper         = $themeHelper;
+        $this->formActionModel     = $formActionModel;
+        $this->formFieldModel      = $formFieldModel;
+        $this->leadModel           = $leadModel;
+        $this->fieldHelper         = $fieldHelper;
+        $this->leadFieldModel      = $leadFieldModel;
+        $this->formUploader        = $formUploader;
+        $this->contactTracker      = $contactTracker;
+        $this->columnSchemaHelper  = $columnSchemaHelper;
+        $this->tableSchemaHelper   = $tableSchemaHelper;
+        $this->mappedObjectCollector = $mappedObjectCollector;
     }
 
     /**
@@ -518,19 +527,18 @@ class FormModel extends CommonFormModel
         $html               = $this->templatingHelper->getTemplating()->render(
             $theme.'MauticFormBundle:Builder:form.html.php',
             [
-                'fieldSettings'  => $this->getCustomComponents()['fields'],
+                'fieldSettings' => $this->getCustomComponents()['fields'],
                 'viewOnlyFields' => $this->getCustomComponents()['viewOnlyFields'],
-                'fields'         => $fields,
-                'contactFields'  => $this->leadFieldModel->getFieldListWithProperties(),
-                'companyFields'  => $this->leadFieldModel->getFieldListWithProperties('company'),
-                'form'           => $entity,
-                'theme'          => $theme,
-                'submissions'    => $submissions,
-                'lead'           => $lead,
-                'formPages'      => $pages,
-                'lastFormPage'   => $lastPage,
-                'style'          => $style,
-                'inBuilder'      => false,
+                'fields'        => $fields,
+                'mappedFields'  => $this->mappedObjectCollector->buildCollection(...$entity->getMappedFieldObjects()),
+                'form'          => $entity,
+                'theme'         => $theme,
+                'submissions'   => $submissions,
+                'lead'          => $lead,
+                'formPages'     => $pages,
+                'lastFormPage'  => $lastPage,
+                'style'         => $style,
+                'inBuilder'     => false,
             ]
         );
 
@@ -551,7 +559,6 @@ class FormModel extends CommonFormModel
         $pages = ['open' => [], 'close' => []];
 
         $openFieldId  =
-        $closeFieldId =
         $previousId   =
         $lastPage     = false;
         $pageCount    = 1;

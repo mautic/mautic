@@ -378,6 +378,7 @@ return [
                     'mautic.tracker.contact',
                     'mautic.schema.helper.column',
                     'mautic.schema.helper.table',
+                    'mautic.form.collector.mapped.object',
                 ],
             ],
             'mautic.form.model.submission' => [
@@ -428,6 +429,10 @@ return [
             'mautic.form.collector.field' => [
                 'class'     => \Mautic\FormBundle\Collector\FieldCollector::class,
                 'arguments' => ['event_dispatcher'],
+            ],
+            'mautic.form.collector.mapped.object' => [
+                'class'     => \Mautic\FormBundle\Collector\MappedObjectCollector::class,
+                'arguments' => ['mautic.form.collector.field'],
             ],
             'mautic.form.collector.already.mapped.field' => [
                 'class'     => \Mautic\FormBundle\Collector\AlreadyMappedFieldCollector::class,
