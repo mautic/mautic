@@ -3,6 +3,8 @@
 use Mautic\FormBundle\Collection\FieldCollection;
 use Mautic\FormBundle\Exception\FieldNotFoundException;
 
+/** @var \Mautic\FormBundle\Collection\MappedObjectCollection $mappedFields */
+
 // Defaults
 $appendAttribute = function (&$attributes, $attributeName, $append) {
     if (false === stripos($attributes, "{$attributeName}=")) {
@@ -127,9 +129,9 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
     $parseList     = [];
     $isBooleanList = false;
 
-    if (!empty($properties['syncList']) && !empty($field['mappedField']) && !empty($field['mappedObject']) && isset($mappedFields[$field['mappedObject']])) {
+    if (!empty($properties['syncList']) && !empty($field['mappedField']) && !empty($field['mappedObject']) && $mappedFields->offsetExists($field['mappedObject'])) {
         /** @var FieldCollection $fieldCollection */
-        $fieldCollection = $mappedFields[$field['mappedObject']];
+        $fieldCollection = $mappedFields->offsetGet($field['mappedObject']);
 
         try {
             $mappedField     = $fieldCollection->getFieldByKey($field['mappedField']);
@@ -176,9 +178,9 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
         }
     }
 
-    if ($field['mappedField'] && isset($mappedFields[$field['mappedObject']])) {
+    if ($field['mappedField'] && $mappedFields->offsetExists($field['mappedObject'])) {
         /** @var FieldCollection $fieldCollection */
-        $fieldCollection = $mappedFields[$field['mappedObject']];
+        $fieldCollection = $mappedFields->offsetGet($field['mappedObject']);
 
         try {
             $mappedField = $fieldCollection->getFieldByKey($field['mappedField']);
