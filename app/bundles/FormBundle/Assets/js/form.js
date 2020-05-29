@@ -129,7 +129,7 @@ Mautic.fetchFieldsOnObjectChange = function() {
         url: mauticAjaxUrl + "?action=form:getFieldsForObject",
         data: {
             mappedObject: mQuery('select#formfield_mappedObject').val(),
-            mappedField: mQuery('select#formfield_mappedField').val(),
+            mappedField: mQuery('input#formfield_originalMappedField').val(),
             formId: mQuery('input#mauticform_sessionId').val()
         },
         success: function (response) {
