@@ -120,6 +120,10 @@ class Interval implements ScheduleModeInterface
         $startTime             = $event->getTriggerRestrictedStartHour();
         $endTime               = $event->getTriggerRestrictedStopHour();
         $daysOfWeek            = $event->getTriggerRestrictedDaysOfWeek();
+        $triggerInterval       = $event->getTriggerInterval();
+        $triggerIntervalUnit   = $event->getTriggerIntervalUnit();
+
+        $isTriggerIntervalInDaysSet = 'd' === $triggerIntervalUnit && $triggerInterval > 0;
 
         // Get the difference between now and the date we're supposed to be executing
         $compareFromDateTime = $compareFromDateTime ? clone $compareFromDateTime : new \DateTime('now');
@@ -136,7 +140,8 @@ class Interval implements ScheduleModeInterface
                 $hour,
                 $startTime,
                 $endTime,
-                $daysOfWeek
+                $daysOfWeek,
+                $isTriggerIntervalInDaysSet
             );
             if (!isset($groupedExecutionDates[$groupExecutionDate->getTimestamp()])) {
                 $groupedExecutionDates[$groupExecutionDate->getTimestamp()] = new GroupExecutionDateDAO($groupExecutionDate);
@@ -171,19 +176,18 @@ class Interval implements ScheduleModeInterface
     }
 
     /**
-     * @param $eventId
-     *
      * @return \DateTime
      */
     private function getGroupExecutionDateTime(
-        $eventId,
+        int $eventId,
         Lead $contact,
         \DateInterval $diff,
         \DateTime $compareFromDateTime,
         \DateTime $hour = null,
         \DateTime $startTime = null,
         \DateTime $endTime = null,
-        array $daysOfWeek = []
+        array $daysOfWeek = [],
+        bool $isTriggerIntervalInDaysSet = false
     ) {
         $this->logger->debug(
             sprintf('CAMPAIGN: Comparing calculated executed time for event ID %s and contact ID %s with %s', $eventId, $contact->getId(), $compareFromDateTime->format('Y-m-d H:i:s e'))
@@ -215,7 +219,7 @@ class Interval implements ScheduleModeInterface
             $groupDateTime->add($diff);
         }
 
-        if ($daysOfWeek) {
+        if ($daysOfWeek && !$isTriggerIntervalInDaysSet) {
             $this->logger->debug(
                 sprintf(
                     'CAMPAIGN: Scheduling event ID %s for contact ID %s based on DOW restrictions of %s',
