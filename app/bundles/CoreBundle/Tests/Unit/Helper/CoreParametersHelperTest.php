@@ -26,24 +26,36 @@ class CoreParametersHelperTest extends TestCase
      */
     private $container;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $helper;
-
     protected function setUp()
     {
         $this->container = $this->createMock(ContainerInterface::class);
-        $this->helper    = new CoreParametersHelper($this->container);
     }
 
     public function testAllReturnsResolvedParameters()
     {
-        $all = $this->helper->all();
+        $this->container->method('hasParameter')
+            ->willReturnCallback(
+                function (string $key) {
+                    return 'mautic.cache_path' === $key;
+                }
+            );
+
+        $this->container->expects($this->once())
+            ->method('getParameter')
+            ->with('mautic.cache_path')
+            ->willReturn('/path/to/cache');
+
+        $all = $this->getHelper()->all();
 
         // Assert that a few of the config keys exist
         Assert::assertArrayHasKey('api_enabled', $all);
         Assert::assertArrayHasKey('cache_path', $all);
+        Assert::assertSame('/path/to/cache', $all['cache_path']);
         Assert::assertArrayHasKey('log_path', $all);
+    }
+
+    private function getHelper(): CoreParametersHelper
+    {
+        return new CoreParametersHelper($this->container);
     }
 }
