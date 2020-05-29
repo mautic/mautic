@@ -334,7 +334,7 @@ class SubmissionModel extends CommonFormModel
             }
 
             $mappedField = $f->getMappedField();
-            if (!empty($mappedField) && 'lead' === $f->getMappedObject()) {
+            if (!empty($mappedField) && 'contact' === $f->getMappedObject()) {
                 $leadValue = $value;
 
                 $leadFieldMatches[$mappedField] = $leadValue;

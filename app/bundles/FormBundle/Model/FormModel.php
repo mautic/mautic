@@ -108,7 +108,6 @@ class FormModel extends CommonFormModel
         $this->themeHelper         = $themeHelper;
         $this->formActionModel     = $formActionModel;
         $this->formFieldModel      = $formFieldModel;
-        $this->leadModel           = $leadModel;
         $this->fieldHelper         = $fieldHelper;
         $this->leadFieldModel      = $leadFieldModel;
         $this->formUploader        = $formUploader;
@@ -175,7 +174,7 @@ class FormModel extends CommonFormModel
 
         if ($entity && $entity->getFields()) {
             foreach ($entity->getFields() as $field) {
-                $this->addLeadFieldOptions($field);
+                $this->addMappedFieldOptions($field);
             }
         }
 
@@ -1077,16 +1076,16 @@ class FormModel extends CommonFormModel
     /**
      * Finds out whether the.
      */
-    private function addLeadFieldOptions(Field $formField)
+    private function addMappedFieldOptions(Field $formField)
     {
-        $formFieldProps    = $formField->getProperties();
-        $contactFieldAlias = $formField->getMappedField();
+        $formFieldProps   = $formField->getProperties();
+        $mappedFieldAlias = $formField->getMappedField();
 
-        if (empty($formFieldProps['syncList']) || empty($contactFieldAlias) || 'lead' !== $formField->getMappedObject()) {
+        if (empty($formFieldProps['syncList']) || empty($mappedFieldAlias) || 'lead' !== $formField->getMappedObject()) {
             return;
         }
 
-        $list = $this->getContactFieldPropertiesList($contactFieldAlias);
+        $list = $this->getContactFieldPropertiesList($mappedFieldAlias);
 
         if (!empty($list)) {
             $formFieldProps['list'] = ['list' => $list];
@@ -1102,7 +1101,7 @@ class FormModel extends CommonFormModel
      */
     public function getContactFieldPropertiesList(string $contactFieldAlias): ?array
     {
-        $contactField = $this->leadFieldModel->getEntityByAlias($contactFieldAlias);
+        $contactField = $this->leadFieldModel->getEntityByAlias($contactFieldAlias); // @todo this must use all objects as well. Not just contact.
 
         if (empty($contactField) || !in_array($contactField->getType(), ContactFieldHelper::getListTypes())) {
             return null;

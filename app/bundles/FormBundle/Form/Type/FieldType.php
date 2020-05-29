@@ -72,7 +72,7 @@ class FieldType extends AbstractType
         $addLabelAttributes     =
         $addInputAttributes     =
         $addContainerAttributes =
-        $addLeadFieldList       =
+        $addMappedFieldList     =
         $addSaveResult          =
         $addBehaviorFields      =
         $addIsRequired          = true;
@@ -101,7 +101,7 @@ class FieldType extends AbstractType
                 'inputAttributesText',
                 'addContainerAttributes',
                 'containerAttributesText',
-                'addLeadFieldList',
+                'addMappedFieldList',
                 'addSaveResult',
                 'addBehaviorFields',
                 'addIsRequired',
@@ -116,7 +116,7 @@ class FieldType extends AbstractType
             $type = $options['data']['type'];
             switch ($type) {
                 case 'freetext':
-                    $addHelpMessage      = $addDefaultValue      = $addIsRequired      = $addLeadFieldList      = $addSaveResult      = $addBehaviorFields      = false;
+                    $addHelpMessage      = $addDefaultValue      = $addIsRequired      = $addMappedFieldList      = $addSaveResult      = $addBehaviorFields      = false;
                     $labelText           = 'mautic.form.field.form.header';
                     $showLabelText       = 'mautic.form.field.form.showheader';
                     $inputAttributesText = 'mautic.form.field.form.freetext_attributes';
@@ -126,7 +126,7 @@ class FieldType extends AbstractType
                     $cleanMasks['properties'] = 'html';
                     break;
                 case 'freehtml':
-                    $addHelpMessage      = $addDefaultValue      = $addIsRequired      = $addLeadFieldList      = $addSaveResult      = $addBehaviorFields      = false;
+                    $addHelpMessage      = $addDefaultValue      = $addIsRequired      = $addMappedFieldList      = $addSaveResult      = $addBehaviorFields      = false;
                     $labelText           = 'mautic.form.field.form.header';
                     $showLabelText       = 'mautic.form.field.form.showheader';
                     $inputAttributesText = 'mautic.form.field.form.freehtml_attributes';
@@ -135,16 +135,16 @@ class FieldType extends AbstractType
                     $cleanMasks['properties'] = 'html';
                     break;
                 case 'button':
-                    $addHelpMessage = $addShowLabel = $addDefaultValue = $addLabelAttributes = $addIsRequired = $addLeadFieldList = $addSaveResult = $addBehaviorFields = false;
+                    $addHelpMessage = $addShowLabel = $addDefaultValue = $addLabelAttributes = $addIsRequired = $addMappedFieldList = $addSaveResult = $addBehaviorFields = false;
                     break;
                 case 'hidden':
                     $addHelpMessage = $addShowLabel = $addLabelAttributes = $addIsRequired = false;
                     break;
                 case 'captcha':
-                    $addShowLabel = $addIsRequired = $addDefaultValue = $addLeadFieldList = $addSaveResult = $addBehaviorFields = false;
+                    $addShowLabel = $addIsRequired = $addDefaultValue = $addMappedFieldList = $addSaveResult = $addBehaviorFields = false;
                     break;
                 case 'pagebreak':
-                    $addShowLabel = $allowCustomAlias = $addHelpMessage = $addIsRequired = $addDefaultValue = $addLeadFieldList = $addSaveResult = $addBehaviorFields = false;
+                    $addShowLabel = $allowCustomAlias = $addHelpMessage = $addIsRequired = $addDefaultValue = $addMappedFieldList = $addSaveResult = $addBehaviorFields = false;
                     break;
                 case 'select':
                     $cleanMasks['properties']['list']['list']['label'] = 'strict_html';
@@ -409,7 +409,7 @@ class FieldType extends AbstractType
             );
         }
 
-        if ($addLeadFieldList) {
+        if ($addMappedFieldList) {
             $mappedObject = $options['data']['mappedObject'] ?? 'contact';
             $builder->add(
                 'mappedObject',
