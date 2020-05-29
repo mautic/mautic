@@ -84,8 +84,9 @@ if (!isset($inBuilder)) {
                         <?php
                             /** @var FieldCollection $fieldCollection */
                             $fieldCollection = $mappedFields->offsetGet($field['mappedObject']);
+                            echo $field['mappedObject'].': ';
                             try {
-                                echo $fieldCollection->getFieldByKey($field['mappedField'])->getName();
+                                echo $view->escape($fieldCollection->getFieldByKey($field['mappedField'])->getName());
                             } catch (FieldNotFoundException $e) {
                                 echo ucfirst($field['mappedField']);
                             }
