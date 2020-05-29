@@ -459,6 +459,16 @@ class FieldType extends AbstractType
                     'data'     => $mappedField ?? $this->getDefaultMappedField($type),
                 ]
             );
+
+            $builder->add(
+                'originalMappedField',
+                HiddenType::class,
+                [
+                    'label'    => false,
+                    'required' => false,
+                    'data'     => $mappedField,
+                ]
+            );
         }
 
         $builder->add('type', HiddenType::class);
