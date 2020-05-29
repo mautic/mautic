@@ -158,7 +158,7 @@ class FormSubscriber implements EventSubscriberInterface
         foreach ($fields as $field) {
             $event->appendField(
                 new FieldCrate(
-                    $field->getId(),
+                    $field->getAlias(),
                     $field->getLabel(),
                     $field->getType(),
                     $field->getProperties()
