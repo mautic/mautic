@@ -111,9 +111,12 @@ Mautic.formBuilderNewComponentInit = function () {
 
 Mautic.changeSelectOptions = function(selectEl, options) {
     selectEl.empty();
-    mQuery.each(options, function(key, label) {
+    mQuery.each(options, function(key, field) {
         selectEl.append(
-            mQuery('<option></option>').attr('value', key).text(label)
+            mQuery('<option></option>')
+                .attr('value', field.value)
+                .attr('data-list-type', field.isListType ? 1 : 0)
+                .text(field.label)
         );
     });
     selectEl.trigger('chosen:updated');
@@ -125,7 +128,8 @@ Mautic.fetchFieldsOnObjectChange = function() {
     mQuery.ajax({
         url: mauticAjaxUrl + "?action=form:getFieldsForObject",
         data: {
-            object: mQuery('select#formfield_mappedObject').val(),
+            mappedObject: mQuery('select#formfield_mappedObject').val(),
+            mappedField: mQuery('select#formfield_mappedField').val(),
             formId: mQuery('input#mauticform_sessionId').val()
         },
         success: function (response) {
