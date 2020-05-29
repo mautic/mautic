@@ -9,15 +9,15 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use Mautic\FormBundle\Enum\ConditionalFieldEnum;
 use Mautic\FormBundle\Collection\FieldCollection;
+use Mautic\FormBundle\Enum\ConditionalFieldEnum;
 use Mautic\FormBundle\Exception\FieldNotFoundException;
 
 if (!isset($inBuilder)) {
     $inBuilder = false;
 }
 
-/** @var \Mautic\FormBundle\Collection\MappedObjectCollection $mappedFields */
+/* @var \Mautic\FormBundle\Collection\MappedObjectCollection $mappedFields */
 ?>
 
 <div class="<?php if (empty($isConditional)): ?>panel<?php else: ?>panel2<?php endif; ?> form-field-wrapper"
@@ -76,12 +76,12 @@ if (!isset($inBuilder)) {
                 <?php endif; ?>
 
                 <?php if (!empty($field['mappedObject']) && !empty($field['mappedField']) && $mappedFields->offsetExists($field['mappedObject'])): ?>
-                    <?php $defaultIcon = 'compress'; ?>
-                    <?php $icon        = 'company' === $field['mappedObject'] ? 'building' : $defaultIcon; ?>
-                    <?php $icon        = 'contact' === $field['mappedObject'] ? 'user' : $defaultIcon; ?>
+                    <?php $icon = 'compress'; ?>
+                    <?php $icon = 'company' === $field['mappedObject'] ? 'building' : $icon; ?>
+                    <?php $icon = 'contact' === $field['mappedObject'] ? 'user' : $icon; ?>
                     <i class="fa fa-<?php echo $icon; ?>" aria-hidden="true"></i>
                     <span class="inline-spacer">
-                        <?php 
+                        <?php
                             /** @var FieldCollection $fieldCollection */
                             $fieldCollection = $mappedFields->offsetGet($field['mappedObject']);
                             try {
