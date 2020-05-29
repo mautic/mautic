@@ -50,7 +50,7 @@ final class FieldCollectionTest extends \PHPUnit\Framework\TestCase
         $collection->getFieldByKey('8');
     }
 
-    public function testRemoveFieldsWithKeys()
+    public function testRemoveFieldsWithKeysWithNoKeyToKeep()
     {
         $field6             = new FieldCrate('6', 'email', 'email', []);
         $field7             = new FieldCrate('7', 'first_name', 'text', []);
@@ -62,5 +62,18 @@ final class FieldCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertNotSame($originalCollection, $resultCollection);
         $this->assertCount(1, $resultCollection);
         $this->assertSame($field7, $resultCollection->getFieldByKey('7'));
+    }
+
+    public function testRemoveFieldsWithKeysWithKeyToKeep()
+    {
+        $field6             = new FieldCrate('6', 'email', 'email', []);
+        $field7             = new FieldCrate('7', 'first_name', 'text', []);
+        $field8             = new FieldCrate('8', 'last_name', 'text', []);
+        $originalCollection = new FieldCollection([$field6, $field7, $field8]);
+        $resultCollection   = $originalCollection->removeFieldsWithKeys(['6', '8'], '8');
+
+        $this->assertCount(2, $resultCollection);
+        $this->assertSame($field7, $resultCollection->getFieldByKey('7'));
+        $this->assertSame($field8, $resultCollection->getFieldByKey('8'));
     }
 }

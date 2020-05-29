@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
 use Mautic\FormBundle\Collector\FieldCollectorInterface;
+use Mautic\FormBundle\Crate\FieldCrate;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -61,13 +62,26 @@ class AjaxController extends CommonAjaxController
     protected function getFieldsForObjectAction(Request $request)
     {
         $formId       = $request->get('formId');
-        $object       = $request->get('object');
-        $mappedFields = $this->mappedFieldCollector->getFields($formId, $object);
-        $fields       = $this->fieldCollector->getFields($object);
-        $fields       = $fields->removeFieldsWithKeys($mappedFields);
-        $fieldChoices = array_flip($fields->toChoices());
+        $mappedObject = $request->get('mappedObject');
+        $mappedField  = $request->get('mappedField');
+        $mappedFields = $this->mappedFieldCollector->getFields($formId, $mappedObject);
+        $fields       = $this->fieldCollector->getFields($mappedObject);
+        $fields       = $fields->removeFieldsWithKeys($mappedFields, $mappedField);
 
-        return $this->sendJsonResponse(['fields' => $fieldChoices]);
+        return $this->sendJsonResponse(
+            [
+                'fields' => array_map(
+                    function (FieldCrate $field) {
+                        return [
+                            'label'      => $field->getName(),
+                            'value'      => $field->getKey(),
+                            'isListType' => $field->isListType(),
+                        ];
+                    },
+                    $fields->getArrayCopy()
+                ),
+            ]
+        );
     }
 
     /**
