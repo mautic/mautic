@@ -17,6 +17,7 @@ use Mautic\IntegrationsBundle\Event\CompletedSyncIterationEvent;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderResultsDAO;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 class CompletedSyncIterationEventTest extends TestCase
@@ -30,10 +31,10 @@ class CompletedSyncIterationEventTest extends TestCase
 
         $event = new CompletedSyncIterationEvent($orderResults, $iteration, $inputOptions, $mappingManual);
 
-        $this->assertSame($mappingManual->getIntegration(), $event->getIntegration());
-        $this->assertSame($orderResults, $event->getOrderResults());
-        $this->assertSame($iteration, $event->getIteration());
-        $this->assertSame($inputOptions, $event->getInputOptions());
-        $this->assertSame($mappingManual, $event->getMappingManual());
+        Assert::assertSame($mappingManual->getIntegration(), $event->getIntegration());
+        Assert::assertSame($orderResults, $event->getOrderResults());
+        Assert::assertSame($iteration, $event->getIteration());
+        Assert::assertSame($inputOptions, $event->getInputOptions());
+        Assert::assertSame($mappingManual, $event->getMappingManual());
     }
 }

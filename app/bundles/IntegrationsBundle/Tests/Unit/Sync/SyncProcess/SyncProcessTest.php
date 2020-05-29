@@ -34,6 +34,7 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\Integration
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\SyncProcess;
 use Mautic\IntegrationsBundle\Sync\SyncService\SyncServiceInterface;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -193,10 +194,10 @@ class SyncProcessTest extends TestCase
                 IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC,
                 $this->callback(function (CompletedSyncIterationEvent $event) {
                     $orderResult = $event->getOrderResults();
-                    $this->assertCount(1, $orderResult->getUpdatedObjectMappings('bar'));
-                    $this->assertCount(1, $orderResult->getNewObjectMappings('foo'));
-                    $this->assertCount(1, $orderResult->getDeletedObjects('foo'));
-                    $this->assertCount(1, $orderResult->getRemappedObjects('bar'));
+                    Assert::assertCount(1, $orderResult->getUpdatedObjectMappings('bar'));
+                    Assert::assertCount(1, $orderResult->getNewObjectMappings('foo'));
+                    Assert::assertCount(1, $orderResult->getDeletedObjects('foo'));
+                    Assert::assertCount(1, $orderResult->getRemappedObjects('bar'));
 
                     return true;
                 })
@@ -257,8 +258,8 @@ class SyncProcessTest extends TestCase
                 IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION,
                 $this->callback(function (CompletedSyncIterationEvent $event) {
                     $orderResult = $event->getOrderResults();
-                    $this->assertCount(1, $orderResult->getNewObjectMappings('bar'));
-                    $this->assertCount(1, $orderResult->getUpdatedObjectMappings('foo'));
+                    Assert::assertCount(1, $orderResult->getNewObjectMappings('bar'));
+                    Assert::assertCount(1, $orderResult->getUpdatedObjectMappings('foo'));
 
                     return true;
                 })
