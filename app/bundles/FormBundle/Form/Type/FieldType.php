@@ -428,9 +428,19 @@ class FieldType extends AbstractType
                 ]
             );
 
+            $mappedField  = $options['data']['mappedField'];
             $fields       = $this->fieldCollector->getFields($mappedObject);
             $mappedFields = $this->mappedFieldCollector->getFields((string) $options['data']['formId'], $mappedObject);
-            $fields       = $fields->removeFieldsWithKeys($mappedFields);
+            $fields       = $fields->removeFieldsWithKeys(
+                // We have to remove the field that is actually mapped to this field.
+                // Otherwise it will not exist when we edit the field.
+                array_filter(
+                    $mappedFields,
+                    function (string $fieldKey) use ($mappedField) {
+                        return $fieldKey !== $mappedField;
+                    }
+                )
+            );
 
             $builder->add(
                 'mappedField',
@@ -455,7 +465,7 @@ class FieldType extends AbstractType
                         'tooltip' => 'mautic.form.field.help.mapped.field',
                     ],
                     'required' => false,
-                    'data'     => $options['data']['mappedField'] ?? $this->getDefaultMappedField($type),
+                    'data'     => $mappedField ?? $this->getDefaultMappedField($type),
                 ]
             );
         }
