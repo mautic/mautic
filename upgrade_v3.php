@@ -1,14 +1,14 @@
 <?php
 
 /*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- * 
- * NOTE: This upgrade script is specifically for upgrading Mautic 2.16.3+ to Mautic 3.0.0 (or later patch releases). It can only be started in standalone mode!
+     * @copyright   2020 Mautic Contributors. All rights reserved
+     * @author      Mautic
+     *
+     * @link        http://mautic.org
+     *
+     * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+     * 
+     * NOTE: This upgrade script is specifically for upgrading Mautic 2.16.3+ to Mautic 3.0.0 (or later patch releases). It can only be started in standalone mode!
  */
 ini_set('display_errors', 'Off');
 date_default_timezone_set('UTC');
@@ -839,7 +839,7 @@ function replace_mautic_2_with_mautic_3()
 
     if (count($errorLog) > 0) {
         return [false, 'The old configuration files couldn\'t be copied from the old Mautic 2 folder into the new folder. This is really, really bad. Errors: ' . implode(',', $errorLog)];
-    }    
+    }
 
     return [true, 'OK'];
 }
@@ -941,6 +941,7 @@ function update_local_config()
     $filename = MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'local.php';
     require $filename;
 
+    // API rate limiter cache config changed, see https://github.com/mautic/mautic/blob/3.x/UPGRADE-3.0.md#configuration
     if (array_key_exists('api_rate_limiter_cache', $parameters)) {
         if (array_key_exists('type', $parameters['api_rate_limiter_cache'])) {
             if ($parameters['api_rate_limiter_cache']['type'] === 'file_system') {
@@ -950,16 +951,46 @@ function update_local_config()
         }
     }
 
-    if (array_key_exists('mailer_transport', $parameters)) {
-        if ($parameters['mailer_transport'] === 'mail') {
-            $parameters['mailer_transport'] = 'sendmail';
-        }
+    // Replace "mail" transport by "sendmail" as it's removed in SwiftMailer 6 https://symfony.com/doc/3.4/email.html#configuration
+    $parameters = replaceConfigValueIfExistsAndEquals($parameters, 'mailer_transport', 'mail', 'sendmail');
+
+    // System update URL has changed in M3 to use GitHub releases
+    $parameters = replaceConfigValueIfExistsAndEquals($parameters, 'system_update_url', 'https://updates.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates', 'https://api.github.com/repos/mautic/mautic/releases');
+
+    // dev_hosts has been changed from null to an empty array
+    $parameters = replaceConfigValueIfExistsAndEquals($parameters, 'dev_hosts', null, array());
+
+    // Mauve theme was removed in 3.x and replaced by blank
+    $parameters = replaceConfigValueIfExistsAndEquals($parameters, 'theme', 'Mauve', 'blank');
+
+    // Track by fingerprint was removed in 3.x
+    if (array_key_exists('track_by_fingerprint', $parameters)) {
+        unset($parameters['track_by_fingerprint']);
     }
 
-    if (array_key_exists('system_update_url', $parameters)) {
-        if ($parameters['system_update_url'] === 'https://updates.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates') {
-            $parameters['system_update_url'] = 'https://api.github.com/repos/mautic/mautic/releases';
-        }
+    // webhook_start was removed in 3.x
+    if (array_key_exists('webhook_start', $parameters)) {
+        unset($parameters['webhook_start']);
+    }
+
+    // Cache path was moved from app/cache to var/cache
+    if (array_key_exists('cache_path', $parameters)) {
+        $parameters['cache_path'] = str_replace('/app/cache', '/app/../var/cache', $parameters['cache_path']);
+    }
+
+    // Log path was moved from app/logs to var/logs
+    if (array_key_exists('log_path', $parameters)) {
+        $parameters['log_path'] = str_replace('/app/logs', '/app/../var/logs', $parameters['log_path']);
+    }
+
+    // Temp path was moved from app/cache to ITS OWN FOLDER var/tmp
+    if (array_key_exists('tmp_path', $parameters)) {
+        $parameters['tmp_path'] = str_replace('/app/cache', '/app/../var/tmp', $parameters['tmp_path']);
+    }
+
+    // Spool path was moved from %kernel.root_dir%/spool to %kernel.root_dir%/../var/spool
+    if (array_key_exists('mailer_spool_path', $parameters)) {
+        $parameters['mailer_spool_path'] = str_replace('%kernel.root_dir%/spool', '%kernel.root_dir%/../var/spool', $parameters['mailer_spool_path']);
     }
 
     // Write updated config to local.php
@@ -970,6 +1001,20 @@ function update_local_config()
     }
 
     return [true, 'OK'];
+}
+
+/**
+ * Replace a config value if it exists and if it equals oldValue.
+ */
+function replaceConfigValueIfExistsAndEquals(array $parameters, string $key, $oldValue, $newValue)
+{
+    if (array_key_exists($key, $parameters)) {
+        if ($parameters[$key] === $oldValue) {
+            $parameters[$key] = $newValue;
+        }
+    }
+
+    return $parameters;
 }
 
 /**
