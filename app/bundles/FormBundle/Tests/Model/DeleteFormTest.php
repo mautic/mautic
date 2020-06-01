@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
+use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Helper\FormFieldHelper;
@@ -40,6 +41,7 @@ class DeleteFormTest extends \PHPUnit\Framework\TestCase
         $dispatcher           = $this->createMock(EventDispatcher::class);
         $formRepository       = $this->createMock(FormRepository::class);
         $form                 = $this->createMock(Form::class);
+        $mappedObjectCollector = $this->createMock(MappedObjectCollectorInterface::class);
         $formModel            = new FormModel(
             $requestStack,
             $templatingHelperMock,
@@ -51,7 +53,8 @@ class DeleteFormTest extends \PHPUnit\Framework\TestCase
             $formUploaderMock,
             $contactTracker,
             $columnSchemaHelper,
-            $tableSchemaHelper
+            $tableSchemaHelper,
+            $mappedObjectCollector
         );
 
         $dispatcher->expects($this->exactly(2))
