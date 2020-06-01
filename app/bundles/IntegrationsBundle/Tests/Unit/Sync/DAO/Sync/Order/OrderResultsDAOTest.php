@@ -109,4 +109,25 @@ class OrderResultsDAOTest extends TestCase
         $orderResults = new OrderResultsDAO([], [], [], []);
         $orderResults->getDeletedObjects('foo');
     }
+
+    public function testGetObjectMappingsReturnsMergedNewAndUpdated()
+    {
+        $newObjectMapping = new ObjectMapping();
+        $newObjectMapping->setIntegrationObjectName('foo');
+        $newObjectMapping->setIntegrationObjectId('abc');
+
+        $updatedObjectMapping = new ObjectMapping();
+        $updatedObjectMapping->setIntegrationObjectName('foo');
+        $updatedObjectMapping->setIntegrationObjectId('hij');
+
+        $orderResults = new OrderResultsDAO([$newObjectMapping], [$updatedObjectMapping], [], []);
+
+        $objectMappings = $orderResults->getObjectMappings('foo');
+        Assert::assertCount(2, $objectMappings);
+        Assert::assertEquals('abc', $objectMappings[0]->getIntegrationObjectId());
+        Assert::assertEquals('hij', $objectMappings[1]->getIntegrationObjectId());
+
+        $objectMappings = $orderResults->getObjectMappings('bar');
+        Assert::assertEmpty($objectMappings);
+    }
 }
