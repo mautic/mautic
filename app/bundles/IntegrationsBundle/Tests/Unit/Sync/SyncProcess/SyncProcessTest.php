@@ -225,9 +225,13 @@ class SyncProcessTest extends TestCase
             ->willReturn([(new ObjectMapping())->setIntegrationObjectName('bar')]);
         $updatedObjectMapping = new UpdatedObjectMappingDAO('foobar', 'foo', 'foo1', new \DateTime());
         $updatedObjectMapping->setObjectMapping((new ObjectMapping())->setIntegrationObjectName('foo'));
+
+        // Test that getOrderResultsForInternalSync ignores an object with a missing ObjectMapping
+        $updatedObjectMapping2 = new UpdatedObjectMappingDAO('foobar', 'foo', 'foo2', new \DateTime());
+
         $internalSyncOrder->expects($this->exactly(2))
             ->method('getUpdatedObjectMappings')
-            ->willReturn([$updatedObjectMapping]);
+            ->willReturn([$updatedObjectMapping, $updatedObjectMapping2]);
         $internalSyncOrder->expects($this->exactly(2))
             ->method('getDeletedObjects')
             ->willReturn([]); // currently not supported for Mautic to integration
