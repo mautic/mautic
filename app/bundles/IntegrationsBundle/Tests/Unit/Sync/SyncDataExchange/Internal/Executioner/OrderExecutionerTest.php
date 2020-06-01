@@ -305,6 +305,10 @@ class OrderExecutionerTest extends TestCase
                             $updatedObjectMapping->setObjectMapping($objectMapping);
                         }
 
+                        // Unset one of the mappings to test that it bypasses
+                        // \Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectMappingsDAO::addUpdatedObjectMapping
+                        array_pop($updatedObjectMappings);
+
                         $event->setUpdatedObjectMappings($updatedObjectMappings);
 
                         return true;
@@ -364,7 +368,7 @@ class OrderExecutionerTest extends TestCase
         }
 
         $orderMappings = $this->orderExecutioner->execute($syncOrder);
-        Assert::assertCount(4, $orderMappings->getUpdatedMappings());
+        Assert::assertCount(3, $orderMappings->getUpdatedMappings());
         Assert::assertCount(2, $orderMappings->getNewMappings());
     }
 
