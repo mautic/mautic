@@ -42,7 +42,7 @@ final class FieldCollection extends \ArrayIterator
         throw new FieldNotFoundException("Field with key {$key} was not found.");
     }
 
-    public function removeFieldsWithKeys(array $keys, ?string $keyToKeep = null): FieldCollection
+    public function removeFieldsWithKeys(array $keys, string $keyToKeep = null): FieldCollection
     {
         return new self(
             array_filter(
