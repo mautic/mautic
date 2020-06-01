@@ -411,7 +411,7 @@ class FieldType extends AbstractType
 
         if ($addMappedFieldList) {
             $mappedObject = $options['data']['mappedObject'] ?? 'contact';
-            $mappedField  = $options['data']['mappedField'] ?? null;
+            $mappedField  = $options['data']['mappedField'] ?? '';
             $builder->add(
                 'mappedObject',
                 ChoiceType::class,
