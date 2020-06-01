@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
+use Mautic\FormBundle\Collector\MappedObjectCollector;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Exception\ValidationException;
@@ -14,7 +15,6 @@ use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Mautic\FormBundle\Collector\MappedObjectCollector;
 
 class FormController extends CommonFormController
 {
