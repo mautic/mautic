@@ -232,7 +232,7 @@ class ObjectChangeDAO
      */
     public function getObjectMapping(): ObjectMapping
     {
-        return $this->getObjectMapping();
+        return $this->objectMapping;
     }
 
     public function removeField(string $field): void
