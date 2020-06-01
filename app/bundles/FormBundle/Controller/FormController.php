@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\FormBundle\Collector\MappedFieldCollectorInterface;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
+use Mautic\FormBundle\Collector\MappedObjectCollector;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Exception\ValidationException;
@@ -19,7 +20,6 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Mautic\FormBundle\Collector\MappedObjectCollector;
 
 class FormController extends CommonFormController
 {

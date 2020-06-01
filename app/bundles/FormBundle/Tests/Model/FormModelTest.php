@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
@@ -52,23 +53,34 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
      */
     private $fieldHelper;
 
+    /**
+     * @var MockObject|MappedObjectCollectorInterface
+     */
+    private $mappedObjectCollector;
+
+    /**
+     * @var FormModel
+     */
+    private $formModel;
+
     protected function setUp()
     {
-        $this->requestStack         = $this->createMock(RequestStack::class);
-        $this->templatingHelperMock = $this->createMock(TemplatingHelper::class);
-        $this->themeHelper          = $this->createMock(ThemeHelper::class);
-        $this->formActionModel      = $this->createMock(ActionModel::class);
-        $this->formFieldModel       = $this->createMock(FieldModel::class);
-        $this->leadModel            = $this->createMock(LeadModel::class);
-        $this->fieldHelper          = $this->createMock(FormFieldHelper::class);
-        $this->dispatcher           = $this->createMock(EventDispatcher::class);
-        $this->translator           = $this->createMock(Translator::class);
-        $this->entityManager        = $this->createMock(EntityManager::class);
-        $this->formUploaderMock     = $this->createMock(FormUploader::class);
-        $this->leadFieldModel       = $this->createMock(LeadFieldModel::class);
-        $this->formRepository       = $this->createMock(FormRepository::class);
-        $this->columnSchemaHelper   = $this->createMock(ColumnSchemaHelper::class);
-        $this->tableSchemaHelper    = $this->createMock(TableSchemaHelper::class);
+        $this->requestStack          = $this->createMock(RequestStack::class);
+        $this->templatingHelperMock  = $this->createMock(TemplatingHelper::class);
+        $this->themeHelper           = $this->createMock(ThemeHelper::class);
+        $this->formActionModel       = $this->createMock(ActionModel::class);
+        $this->formFieldModel        = $this->createMock(FieldModel::class);
+        $this->leadModel             = $this->createMock(LeadModel::class);
+        $this->fieldHelper           = $this->createMock(FormFieldHelper::class);
+        $this->dispatcher            = $this->createMock(EventDispatcher::class);
+        $this->translator            = $this->createMock(Translator::class);
+        $this->entityManager         = $this->createMock(EntityManager::class);
+        $this->formUploaderMock      = $this->createMock(FormUploader::class);
+        $this->leadFieldModel        = $this->createMock(LeadFieldModel::class);
+        $this->formRepository        = $this->createMock(FormRepository::class);
+        $this->columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
+        $this->tableSchemaHelper     = $this->createMock(TableSchemaHelper::class);
+        $this->mappedObjectCollector = $this->createMock(MappedObjectCollectorInterface::class);
 
         $this->entityManager->expects($this
             ->any())
@@ -92,7 +104,8 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
             $this->leadFieldModel,
             $this->formUploaderMock,
             $this->columnSchemaHelper,
-            $this->tableSchemaHelper
+            $this->tableSchemaHelper,
+            $this->mappedObjectCollector
         );
 
         $this->formModel->setDispatcher($this->dispatcher);

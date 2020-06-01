@@ -228,7 +228,7 @@ class SubmissionModelTest extends FormTestAbstract
             ->method('getUser')
             ->willReturn(new User());
 
-        $this->mockLeadField['email'] = [
+        $mockLeadField['email'] = [
                 'label'        => 'Email',
                 'alias'        => 'email',
                 'type'         => 'email',
@@ -244,7 +244,7 @@ class SubmissionModelTest extends FormTestAbstract
 
         $this->leadFieldModel->expects($this->any())
             ->method('getFieldListWithProperties')
-            ->willReturn($this->mockLeadField);
+            ->willReturn($mockLeadField);
 
         $this->entityManager->expects($this->any())
             ->method('getRepository')
