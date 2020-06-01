@@ -11,6 +11,14 @@
      * NOTE: This upgrade script is specifically for upgrading Mautic 2.16.3+ to Mautic 3.0.0 (or later patch releases). It can only be started in standalone mode!
  */
 ini_set('display_errors', 'Off');
+
+// Try to set max_execution_time to 240 if it's lower, if this fails we'll throw an error later in the preUpgradeChecks.
+$minExecutionTime = 240;
+$maxExecutionTime = (int) ini_get('max_execution_time');
+if ($maxExecutionTime > 0 && $maxExecutionTime < $minExecutionTime) {
+    ini_set('max_execution_time', $minExecutionTime);
+}
+
 date_default_timezone_set('UTC');
 
 define('MAUTIC_MINIMUM_PHP', '7.2.21');
@@ -70,6 +78,7 @@ function runPreUpgradeChecks()
 {
     global $updateData;
     global $localParameters;
+    global $minExecutionTime;
 
     // Errors prevent a user from updating.
     $preUpgradeErrors = [];
@@ -122,6 +131,42 @@ function runPreUpgradeChecks()
         }
     }
 
+    // Check if there are items in the spool/default folder
+    $spoolFolder = str_replace(
+        '%kernel.root_dir%',
+        MAUTIC_APP_ROOT,
+        $localParameters['mailer_spool_path']
+    );
+    $spoolFolder .= DIRECTORY_SEPARATOR . 'default';
+
+    if (file_exists($spoolFolder)) {
+        $data = scandir($spoolFolder);
+
+        // We always have . and .. in the array, so only raise a warning if the count > 2
+        if (count($data) > 2) {
+            $preUpgradeWarnings[] = 'It looks like there are items in your spool/default foler, which might mean that there are still emails pending to be sent. If you have access to the command line, run "php /path/to/mautic/app/console mautic:email:process --env=prod" to send them before proceeding.';
+        }
+    }
+
+    // Check free disk space.
+    $freeDiskSpace = disk_free_space(MAUTIC_ROOT);
+    $mauticRootFolderSize = 0;
+
+    foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(MAUTIC_ROOT)) as $file) {
+        $mauticRootFolderSize += $file->getSize();
+    }
+
+    if (empty($freeDiskSpace) || $mauticRootFolderSize === 0) {
+        $preUpgradeWarnings[] = 'We cannot seem to check your free disk space or current Mautic installation folder size. Please ensure your free disk space is at least 2x of your current Mautic installation, just to be sure.';
+    } else {
+        if (($mauticRootFolderSize * 2) > $freeDiskSpace) {
+            $preUpgradeWarnings[] = 'You don\'t seem to have enough disk space for the upgrade. Just to be sure, we\'d like to have 2x the size of the current Mautic installation.';
+        }
+
+        $preUpgradeWarnings[] = 'Free disk space is ' . $freeDiskSpace . ', Mautic installation size is  ' . $mauticRootFolderSize;
+    }
+
+    // Check Mautic version
     if (file_exists(MAUTIC_APP_ROOT . '/release_metadata.json')) {
         $preUpgradeErrors[] = 'You already seem to be running Mautic 3.0.0 or newer, so this upgrade script is not relevant to you anymore. Aborting.';
     } elseif (file_exists(MAUTIC_APP_ROOT . '/version.txt')) {
@@ -139,8 +184,8 @@ function runPreUpgradeChecks()
     // Check PHP's max_execution_time
     $maxExecutionTime = ini_get('max_execution_time');
 
-    if ($maxExecutionTime > 0 && $maxExecutionTime < 240) {
-        $preUpgradeErrors[] = 'PHP max_execution_time needs to be at least 240 seconds (4 minutes) to allow for a successful upgrade. Please contact your host to set this value to 240 seconds or higher.';
+    if ($maxExecutionTime > 0 && $maxExecutionTime < $minExecutionTime) {
+        $preUpgradeErrors[] = 'PHP max_execution_time needs to be at least ' . $minExecutionTime . ' seconds (' . round($minExecutionTime / 60, 2) . ' minutes) to allow for a successful upgrade. We tried setting it to this value but weren\'t able to do so. Please contact your host to set this value to 240 seconds or higher.';
     }
 
     // Check if mysqldump is available on the system for creating a DB backup.
@@ -216,8 +261,14 @@ if (!IN_CLI) {
             $preUpgradeCheckWarnings = $preUpgradeCheckResults['warnings'];
             $html = "<div class='card card-body bg-light text-center'>";
 
+            $generalRemarks = "<strong>IMPORTANT: you will need to update your cron jobs from app/console/* to bin/console/* after the upgrade.<br>
+            You can already change them now if you want. For instructions, read HERE (TODO)<br><br>
+            <u>It's strongly recommended to have a backup before you start upgrading!</u></strong><br><br>";
+
             if (count($preUpgradeCheckErrors) > 0) {
-                $html .= '<h3>Whoops! You\'re not ready for Mautic 3 (yet)</h3><p>The following <strong style="color: red">errors</strong> occurred while checking system compatibility:</p><ul style="text-align: left">';
+                $html .= '<h3>Whoops! You\'re not ready for Mautic 3 (yet)</h3>
+                <p>The following <strong style="color: red">errors</strong> occurred while checking system compatibility:</p>
+                <ul style="text-align: left">';
                 foreach ($preUpgradeCheckErrors as $error) {
                     $html .= '<li>' . $error . '</li>';
                 }
@@ -229,16 +280,22 @@ if (!IN_CLI) {
                 foreach ($preUpgradeCheckWarnings as $warning) {
                     $html .= '<li>' . $warning . '</li>';
                 }
+                $html .= '</ul>';
+            }
 
+            if (count($preUpgradeCheckErrors) === 0 && count($preUpgradeCheckWarnings) > 0) {
                 // The checkbox doesn't do anything, but is just there to make users aware that they are doing risky things.
-                $html .= '</ul>
-                <input type="checkbox" id="forceUpgradeStart" /> <label for="forceUpgradeStart">Yes, I am aware of the warnings above and still want to proceed with the upgrade.</label><br /><br />
+                $html .= '<br><br>' . $generalRemarks . '
+                <div style="text-align: left">
+                    <input type="checkbox" id="forceUpgradeStart" /> <label for="forceUpgradeStart">Yes, I am aware of the warnings above and still want to proceed with the upgrade.</label>
+                </div><br /><br />
                 <a class="btn btn-primary" href="' . $url . '?task=startUpgrade&standalone=1">Start the upgrade</a>';
             }
 
             if (count($preUpgradeCheckErrors) === 0 && count($preUpgradeCheckWarnings) === 0) {
                 $html .= "<h3>Ready to upgrade ✅</h3>
-                <br /><strong>Your system is compatible with Mautic 3!<br>Do not refresh or stop the process. This may take several minutes.<br><br><u>It's strongly recommended to have a backup before you start upgrading!</u></strong><br><Br>
+                <br />Your system is compatible with Mautic 3!<br>Do not refresh or stop the process. This may take several minutes.<br><br>
+                " . $generalRemarks . "
                 <a class='btn btn-primary' href='$url?task=startUpgrade&standalone=1' onClick='document.getElementById(\"updateInProgress\").style.display = \"block\"'>Start the upgrade</a><br><br>
                 <div style='display: none' class=\"text-center\" id='updateInProgress'>
                     <div class=\"spinner-border\" role=\"status\">
@@ -398,6 +455,19 @@ if (!IN_CLI) {
     $m3_phase_2_file = MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'm3_upgrade_pending_phase_2.txt';
 
     if (!file_exists($m3_phase_2_file)) {
+        echo "Welcome to the Mautic 3 upgrade script! Before we start, we'll run some pre-upgrade checks to make sure your system is compatible.\n";
+        echo "IMPORTANT: you will need to update your cron jobs from app/console/* to bin/console/* after the upgrade. You can already change them now if you want.\n";
+        echo "Please type 'yes' if you're ready to start: ";
+        $handle = fopen("php://stdin", "r");
+        $line = fgets($handle);
+        if (trim($line) != 'yes') {
+            echo "Alright, we'll abort the upgrade now.\n";
+            exit;
+        }
+        fclose($handle);
+        echo "\n";
+        echo "Thank you, continuing...\n";
+
         echo "Doing pre-upgrade checks...\n";
         $preUpgradeCheckResults = runPreUpgradeChecks();
         $preUpgradeCheckErrors = $preUpgradeCheckResults['errors'];
@@ -1138,12 +1208,6 @@ function build_cache()
  */
 function apply_migrations()
 {
-    $minExecutionTime = 300;
-    $maxExecutionTime = (int) ini_get('max_execution_time');
-    if ($maxExecutionTime > 0 && $maxExecutionTime < $minExecutionTime) {
-        ini_set('max_execution_time', $minExecutionTime);
-    }
-
     return run_symfony_command('doctrine:migrations:migrate', ['--no-interaction', '--env=prod', '--no-debug']);
 }
 
