@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class FormApiControllerFunctionalTest extends MauticMysqlTestCase
+final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testFormWorkflow()
     {
@@ -67,6 +69,76 @@ class FormApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertEquals($payload['fields'][$i]['type'], $response['form']['fields'][$i]['type']);
             $this->assertEquals($payload['fields'][$i]['leadField'], $response['form']['fields'][$i]['leadField']);
         }
+    }
+
+    public function testSingleFormWorkflow()
+    {
+        // Create a standalone form:
+        $payload = [
+            'name'        => 'API form',
+            'description' => 'Form created via API test',
+            'formType'    => 'standalone',
+            'fields'      => [
+                [
+                    'label'        => 'Email',
+                    'type'         => 'text',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'email',
+                    'showLabel'    => true,
+                    'isRequired'   => true,
+                ],
+            ],
+            'actions' => [
+            ],
+        ];
+
+        $this->client->request('POST', '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $formId         = $response['form']['id'];
+
+        $this->assertSame(201, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertGreaterThan(0, $formId);
+        $this->assertEquals($payload['name'], $response['form']['name']);
+        $this->assertEquals($payload['description'], $response['form']['description']);
+        $this->assertEquals($payload['formType'], $response['form']['formType']);
+        $this->assertCount(count($payload['fields']), $response['form']['fields']);
+        $this->assertNotEmpty($response['form']['cachedHtml']);
+
+        // Edit PATCH:
+        $patchPayload = [
+            'name' => 'API form renamed',
+        ];
+        $this->client->request('PATCH', "/api/forms/{$formId}/edit", $patchPayload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame($formId, $response['form']['id']);
+        $this->assertEquals('API form renamed', $response['form']['name']);
+        $this->assertEquals($payload['description'], $response['form']['description']);
+        $this->assertCount(count($payload['fields']), $response['form']['fields']);
+        $this->assertEquals($payload['formType'], $response['form']['formType']);
+        $this->assertNotEmpty($response['form']['cachedHtml']);
+
+        // Edit PUT:
+        $payload['description'] .= ' renamed';
+        // $payload['fields']    = [$segmentAId, $segmentBId];
+        $payload['postAction'] = 'return'; // Must be present for PUT as all empty values are being cleared.
+        $payload['language']   = 'en'; // Must be present for PUT as all empty values are being cleared.
+        $this->client->request('PUT', "/api/forms/{$formId}/edit", $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame($formId, $response['form']['id']);
+        $this->assertEquals($payload['name'], $response['form']['name']);
+        $this->assertEquals('Form created via API test renamed', $response['form']['description']);
+        // $this->assertCount(count($payload['fields']), $response['form']['fields']);
+        // $this->assertEquals($segmentAId, $response['form']['fields'][1]['id']);
+        // $this->assertEquals($segmentBId, $response['form']['fields'][0]['id']);
+        $this->assertEquals($payload['formType'], $response['form']['formType']);
+        $this->assertNotEmpty($response['form']['cachedHtml']);
 
         // Get:
         $this->client->request('GET', "/api/forms/{$formId}");
@@ -78,6 +150,7 @@ class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['formType'], $response['form']['formType']);
         $this->assertEquals($payload['isPublished'], $response['form']['isPublished']);
         $this->assertEquals($payload['description'], $response['form']['description']);
+        $this->assertNotEmpty($response['form']['cachedHtml']);
         $this->assertIsArray($response['form']['fields']);
         $this->assertCount(count($payload['fields']), $response['form']['fields']);
         for ($i = 0; $i < count($payload['fields']); ++$i) {
@@ -90,14 +163,22 @@ class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         // Delete:
         $this->client->request('DELETE', "/api/forms/{$formId}/delete");
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertNull($response['form']['id']);
+        $this->assertEquals($payload['name'], $response['form']['name']);
+        $this->assertEquals($payload['description'], $response['form']['description']);
+        // $this->assertCount(count($payload['fields']), $response['form']['fields']);
+        $this->assertEquals($payload['formType'], $response['form']['formType']);
+        $this->assertNotEmpty($response['form']['cachedHtml']);
 
         // Get (ensure it's deleted):
         $this->client->request('GET', "/api/forms/{$formId}");
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(404, $clientResponse->getStatusCode());
+        $this->assertSame(404, $clientResponse->getStatusCode(), $clientResponse->getContent());
         $this->assertSame(404, $response['errors'][0]['code']);
     }
 
