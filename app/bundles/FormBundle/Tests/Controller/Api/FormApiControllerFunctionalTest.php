@@ -83,9 +83,24 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
                     'label'        => 'Email',
                     'type'         => 'text',
                     'mappedObject' => 'contact',
-                    'mappedField'  => 'email',
+                    'mappedField'  => 'email', // Setting mappedField, no leadField.
                     'showLabel'    => true,
                     'isRequired'   => true,
+                ],
+                [
+                    'label'        => 'Number',
+                    'type'         => 'number',
+                    'leadField'    => 'points', // @deprecated Setting leadField, no mappedField or mappedObject (BC).
+                ],
+                [
+                    'label'        => 'Company',
+                    'type'         => 'text',
+                    'leadField'    => 'company', // @deprecated Setting leadField, no mappedField or mappedObject (BC).
+                ],
+                [
+                    'label'        => 'Company Phone',
+                    'type'         => 'phone',
+                    'leadField'    => 'companyphone', // @deprecated Setting leadField, no mappedField or mappedObject (BC).
                 ],
             ],
             'actions' => [
@@ -102,8 +117,32 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['name'], $response['form']['name']);
         $this->assertEquals($payload['description'], $response['form']['description']);
         $this->assertEquals($payload['formType'], $response['form']['formType']);
-        $this->assertCount(count($payload['fields']), $response['form']['fields']);
         $this->assertNotEmpty($response['form']['cachedHtml']);
+        $this->assertCount(count($payload['fields']), $response['form']['fields']);
+        $this->assertEquals($payload['fields'][0]['label'], $response['form']['fields'][0]['label']);
+        $this->assertEquals($payload['fields'][0]['type'], $response['form']['fields'][0]['type']);
+        $this->assertEquals($payload['fields'][0]['mappedObject'], $response['form']['fields'][0]['mappedObject']);
+        $this->assertEquals($payload['fields'][0]['mappedField'], $response['form']['fields'][0]['mappedField']);
+        $this->assertEquals($payload['fields'][0]['mappedField'], $response['form']['fields'][0]['leadField']); // @deprecated leadField was replaced by mappedField. Check for BC.
+        $this->assertEquals($payload['fields'][0]['showLabel'], $response['form']['fields'][0]['showLabel']);
+        $this->assertEquals($payload['fields'][0]['isRequired'], $response['form']['fields'][0]['isRequired']);
+        $this->assertEquals($payload['fields'][1]['label'], $response['form']['fields'][1]['label']);
+        $this->assertEquals($payload['fields'][1]['type'], $response['form']['fields'][1]['type']);
+        $this->assertEquals('contact', $response['form']['fields'][1]['mappedObject']);
+        $this->assertEquals('points', $response['form']['fields'][1]['mappedField']);
+        $this->assertEquals($payload['fields'][1]['leadField'], $response['form']['fields'][1]['leadField']); // @deprecated leadField was replaced by mappedField. Check for BC.
+        $this->assertTrue($response['form']['fields'][1]['showLabel']);
+        $this->assertFalse($response['form']['fields'][1]['isRequired']);
+        $this->assertEquals($payload['fields'][2]['label'], $response['form']['fields'][2]['label']);
+        $this->assertEquals($payload['fields'][2]['type'], $response['form']['fields'][2]['type']);
+        $this->assertEquals('contact', $response['form']['fields'][2]['mappedObject']);
+        $this->assertEquals('company', $response['form']['fields'][2]['mappedField']);
+        $this->assertEquals($payload['fields'][2]['leadField'], $response['form']['fields'][2]['leadField']); // @deprecated leadField was replaced by mappedField. Check for BC.
+        $this->assertEquals($payload['fields'][3]['label'], $response['form']['fields'][3]['label']);
+        $this->assertEquals($payload['fields'][3]['type'], $response['form']['fields'][3]['type']);
+        $this->assertEquals('company', $response['form']['fields'][3]['mappedObject']);
+        $this->assertEquals('companyphone', $response['form']['fields'][3]['mappedField']);
+        $this->assertEquals($payload['fields'][3]['leadField'], $response['form']['fields'][3]['leadField']); // @deprecated leadField was replaced by mappedField. Check for BC.
 
         // Edit PATCH:
         $patchPayload = [

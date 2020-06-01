@@ -406,6 +406,8 @@ class FormModel extends CommonFormModel
             $entity->setAlias($alias);
         }
 
+        $this->backfillReplacedPropertiesForBc($entity);
+
         //save the form so that the ID is available for the form html
         parent::saveEntity($entity, $unlock);
 
@@ -1151,5 +1153,20 @@ class FormModel extends CommonFormModel
         }
 
         return null;
+    }
+
+    private function backfillReplacedPropertiesForBc(Form $entity): void
+    {
+        /** @var Field $field */
+        foreach ($entity->getFields() as $field) {
+            if (!$field->getLeadField() && $field->getMappedField()) {
+                $field->setLeadField($field->getMappedField());
+            } elseif ($field->getLeadField() && !$field->getMappedField()) {
+                $field->setMappedField($field->getLeadField());
+                $field->setMappedObject(
+                    'company' === substr($field->getLeadField(), 0, 7) && 'company' !== $field->getLeadField() ? 'company' : 'contact'
+                );
+            }
+        }
     }
 }
