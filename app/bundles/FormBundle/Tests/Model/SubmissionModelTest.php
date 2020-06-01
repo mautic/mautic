@@ -319,6 +319,18 @@ class SubmissionModelTest extends FormTestAbstract
         $reflection          = new \ReflectionClass(SubmissionModel::class);
         $method              = $reflection->getMethod('normalizeValue');
         $method->setAccessible(true);
+        $fieldSession          = 'mautic_'.sha1(uniqid(mt_rand(), true));
+        $fields[$fieldSession] = [
+            'label'        => 'Email',
+            'showLabel'    => 1,
+            'saveResult'   => 1,
+            'defaultValue' => false,
+            'alias'        => 'email',
+            'type'         => 'email',
+            'mappedField'  => 'email',
+            'mappedObject' => 'contact',
+            'id'           => $fieldSession,
+        ];
 
         $field = new Field();
         $this->assertEquals('', $method->invokeArgs($submissionModel, ['', $field]));
