@@ -80,8 +80,14 @@ final class AlreadyMappedFieldCollectorTest extends \PHPUnit\Framework\TestCase
         // Remove a not exsting field.
         $this->collector->removeField('3', 'contact', '44');
 
-        // The field with key 44 should be removed from the cache item.
+        // Still the same result after removing a field that did not exist.
         $this->assertSame('["55"]', $cacheItem->get());
         $this->assertSame(['55'], $this->collector->getFields($formId, $object));
+
+        $this->cacheProvider->expects($this->once())
+            ->method('invalidateTags')
+            ->with(['mautic.form.3.fields.mapped']);
+
+        $this->collector->removeAllForForm($formId);
     }
 }
