@@ -238,7 +238,7 @@ class EventController extends CommonFormController
                 'anchorEventType' => $campaignEvent['anchorEventType'] ?? '',
             ]);
         } else {
-            if (!isset($event['anchor'])) {
+            if (!isset($event['anchor']) && !empty($event['decisionPath'])) {
                 // Used to generate label
                 $event['anchor'] = $event['decisionPath'];
             }
