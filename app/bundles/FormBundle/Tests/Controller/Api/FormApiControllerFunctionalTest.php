@@ -5,10 +5,81 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    private const TEST_PAYLOAD = [
+        'name'        => 'API form',
+        'description' => 'Form created via API test',
+        'formType'    => 'standalone',
+        'isPublished' => true,
+        'fields'      => [
+            [
+                'label'        => 'Email',
+                'type'         => 'text',
+                'alias'        => 'email',
+                'mappedObject' => 'contact',
+                'mappedField'  => 'email',
+                'showLabel'    => true,
+                'isRequired'   => true,
+            ],
+            [
+                'label'        => 'Number',
+                'type'         => 'number',
+                'alias'        => 'number',
+                'leadField'    => 'points', // @deprecated Setting leadField, no mappedField or mappedObject (BC).
+            ],
+            [
+                'label'        => 'Company',
+                'type'         => 'text',
+                'alias'        => 'company',
+                'leadField'    => 'company', // @deprecated Setting leadField, no mappedField or mappedObject (BC).
+            ],
+            [
+                'label'        => 'Company Phone',
+                'type'         => 'tel',
+                'alias'        => 'phone',
+                'leadField'    => 'companyphone', // @deprecated Setting leadField, no mappedField or mappedObject (BC).
+            ],
+            [
+                'label'        => 'Country',
+                'type'         => 'country',
+                'alias'        => 'country',
+                'mappedObject' => 'contact',
+                'mappedField'  => 'country',
+            ],
+            [
+                'label'        => 'Multiselect',
+                'type'         => 'select',
+                'alias'        => 'multiselect',
+                'properties'   => [
+                    'syncList' => 0,
+                    'multiple' => 1,
+                    'list'     => [
+                        'list' => [
+                            [
+                                'label' => 'One',
+                                'value' => 'one',
+                            ],
+                            [
+                                'label' => 'Two',
+                                'value' => 'two',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'label'        => 'Submit',
+                'type'         => 'button',
+            ],
+        ],
+        'actions' => [
+        ],
+    ];
+
     public function testFormWorkflow()
     {
         $payload = [
@@ -73,52 +144,20 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testSingleFormWorkflow()
     {
-        // Create a standalone form:
-        $payload = [
-            'name'        => 'API form',
-            'description' => 'Form created via API test',
-            'formType'    => 'standalone',
-            'fields'      => [
-                [
-                    'label'        => 'Email',
-                    'type'         => 'text',
-                    'mappedObject' => 'contact',
-                    'mappedField'  => 'email', // Setting mappedField, no leadField.
-                    'showLabel'    => true,
-                    'isRequired'   => true,
-                ],
-                [
-                    'label'        => 'Number',
-                    'type'         => 'number',
-                    'leadField'    => 'points', // @deprecated Setting leadField, no mappedField or mappedObject (BC).
-                ],
-                [
-                    'label'        => 'Company',
-                    'type'         => 'text',
-                    'leadField'    => 'company', // @deprecated Setting leadField, no mappedField or mappedObject (BC).
-                ],
-                [
-                    'label'        => 'Company Phone',
-                    'type'         => 'phone',
-                    'leadField'    => 'companyphone', // @deprecated Setting leadField, no mappedField or mappedObject (BC).
-                ],
-            ],
-            'actions' => [
-            ],
-        ];
-
-        $this->client->request('POST', '/api/forms/new', $payload);
+        $payload    = self::TEST_PAYLOAD;
+        $fieldCount = count($payload['fields']);
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         $formId         = $response['form']['id'];
 
-        $this->assertSame(201, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
         $this->assertGreaterThan(0, $formId);
         $this->assertEquals($payload['name'], $response['form']['name']);
         $this->assertEquals($payload['description'], $response['form']['description']);
         $this->assertEquals($payload['formType'], $response['form']['formType']);
         $this->assertNotEmpty($response['form']['cachedHtml']);
-        $this->assertCount(count($payload['fields']), $response['form']['fields']);
+        $this->assertCount($fieldCount, $response['form']['fields']);
         $this->assertEquals($payload['fields'][0]['label'], $response['form']['fields'][0]['label']);
         $this->assertEquals($payload['fields'][0]['type'], $response['form']['fields'][0]['type']);
         $this->assertEquals($payload['fields'][0]['mappedObject'], $response['form']['fields'][0]['mappedObject']);
@@ -146,46 +185,65 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Edit PATCH:
         $patchPayload = [
-            'name' => 'API form renamed',
+            'name'   => 'API form renamed',
+            'fields' => [
+                [
+                    'label'        => 'State',
+                    'type'         => 'select',
+                    'alias'        => 'state',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'state',
+                    'parent'       => $response['form']['fields'][4]['id'],
+                    'conditions'   => [
+                        'expr'   => 'in',
+                        'any'    => 1,
+                        'values' => [],
+                    ],
+                    'properties'   => [
+                        'syncList' => 0,
+                        'multiple' => 1,
+                    ],
+                ],
+            ],
         ];
-        $this->client->request('PATCH', "/api/forms/{$formId}/edit", $patchPayload);
+        $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", $patchPayload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
+        $fieldCount     = $fieldCount + 1;
 
-        $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
         $this->assertSame($formId, $response['form']['id']);
         $this->assertEquals('API form renamed', $response['form']['name']);
         $this->assertEquals($payload['description'], $response['form']['description']);
-        $this->assertCount(count($payload['fields']), $response['form']['fields']);
+        $this->assertCount($fieldCount, $response['form']['fields']);
         $this->assertEquals($payload['formType'], $response['form']['formType']);
         $this->assertNotEmpty($response['form']['cachedHtml']);
 
         // Edit PUT:
         $payload['description'] .= ' renamed';
-        // $payload['fields']    = [$segmentAId, $segmentBId];
-        $payload['postAction'] = 'return'; // Must be present for PUT as all empty values are being cleared.
-        $payload['language']   = 'en'; // Must be present for PUT as all empty values are being cleared.
-        $this->client->request('PUT', "/api/forms/{$formId}/edit", $payload);
+        $payload['fields']       = []; // Set fields to an empty array as it would duplicate all fields.
+        $payload['postAction']   = 'return'; // Must be present for PUT as all empty values are being cleared.
+        $this->client->request(Request::METHOD_PUT, "/api/forms/{$formId}/edit", $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-
-        $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
         $this->assertSame($formId, $response['form']['id']);
         $this->assertEquals($payload['name'], $response['form']['name']);
         $this->assertEquals('Form created via API test renamed', $response['form']['description']);
-        // $this->assertCount(count($payload['fields']), $response['form']['fields']);
-        // $this->assertEquals($segmentAId, $response['form']['fields'][1]['id']);
-        // $this->assertEquals($segmentBId, $response['form']['fields'][0]['id']);
+        $this->assertCount($fieldCount, $response['form']['fields']);
         $this->assertEquals($payload['formType'], $response['form']['formType']);
         $this->assertNotEmpty($response['form']['cachedHtml']);
 
         // Get:
-        $this->client->request('GET', "/api/forms/{$formId}");
+        $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}");
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
+
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertSame($formId, $response['form']['id'], 'ID of the created form does not match with the fetched one.');
         $this->assertEquals('Form API renamed', $response['form']['name']);
+        $this->assertEquals($payload['description'], $response['form']['description']);
+        $this->assertCount($fieldCount, $response['form']['fields']);
         $this->assertEquals($payload['formType'], $response['form']['formType']);
         $this->assertEquals($payload['isPublished'], $response['form']['isPublished']);
         $this->assertEquals($payload['description'], $response['form']['description']);
@@ -199,8 +257,24 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertEquals($payload['fields'][$i]['leadField'], $response['form']['fields'][$i]['leadField']);
         }
 
+        // Submit the form:
+        $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $formCrawler = $crawler->filter('form[id=mauticform_apiform]');
+        $this->assertSame(1, $formCrawler->count());
+        $form = $formCrawler->form();
+        $form->setValues([
+            'mauticform[email]'       => 'john@doe.test',
+            'mauticform[number]'      => 123,
+            'mauticform[company]'     => 'Doe Corp',
+            'mauticform[phone]]'      => '+420444555666',
+            'mauticform[country]'     => 'Czech Republic',
+            // 'mauticform[state]'      => 'john@doe.test', // We'd have to provide all state values in this test. The select is empty.
+            'mauticform[multiselect]' => ['two'],
+        ]);
+        $this->client->submit($form);
+
         // Delete:
-        $this->client->request('DELETE', "/api/forms/{$formId}/delete");
+        $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -208,17 +282,17 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNull($response['form']['id']);
         $this->assertEquals($payload['name'], $response['form']['name']);
         $this->assertEquals($payload['description'], $response['form']['description']);
-        // $this->assertCount(count($payload['fields']), $response['form']['fields']);
+        $this->assertCount($fieldCount, $response['form']['fields']);
         $this->assertEquals($payload['formType'], $response['form']['formType']);
         $this->assertNotEmpty($response['form']['cachedHtml']);
 
         // Get (ensure it's deleted):
-        $this->client->request('GET', "/api/forms/{$formId}");
+        $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}");
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(404, $clientResponse->getStatusCode(), $clientResponse->getContent());
-        $this->assertSame(404, $response['errors'][0]['code']);
+        $this->assertSame(Response::HTTP_NOT_FOUND, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_NOT_FOUND, $response['errors'][0]['code']);
     }
 
     public function testFormWithChangeTagsAction()
