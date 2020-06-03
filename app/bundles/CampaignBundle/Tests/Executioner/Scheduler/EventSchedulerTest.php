@@ -262,6 +262,29 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
     }
 
+    public function testScheduleDayOfWeek()
+    {
+        $scheduler = $this->getScheduler();
+
+        $event = new Event();
+        $this->assertFalse($scheduler->shouldSchedule(new \DateTime(), new \DateTime(), $event));
+
+        $event->setProperties([
+            'triggerRestrictedDaysOfWeek' => [],
+        ]);
+
+        $this->assertFalse($scheduler->shouldSchedule(new \DateTime(), new \DateTime(), $event));
+
+        $event->setProperties([
+            'triggerRestrictedDaysOfWeek' => [
+                0 => 1,
+                1 => 2,
+            ],
+        ]);
+
+        $this->assertTrue($scheduler->shouldSchedule(new \DateTime(), new \DateTime(), $event));
+    }
+
     private function getScheduler()
     {
         return new EventScheduler(
