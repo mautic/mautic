@@ -17,11 +17,6 @@ use Mautic\FormBundle\Crate\ObjectCrate;
 
 final class ObjectCollection extends \ArrayIterator
 {
-    public function getObjects(ObjectCrate $object): void
-    {
-        parent::append($object);
-    }
-
     public function toChoices(): array
     {
         $choices = [];
