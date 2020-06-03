@@ -137,6 +137,23 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->scheduler->shouldSchedule(new \DateTime(), new \DateTime(), $event));
     }
 
+    public function testGetExecutionDateForInactivity()
+    {
+        $date = new \DateTime();
+        $now  = new \DateTime();
+        $now->add(new \DateInterval('P2D'));
+
+        $clonedNow = $this->scheduler->getExecutionDateForInactivity($date, $date, $now);
+        $this->assertNotSame($now, $clonedNow);
+        $this->assertSame($now->getTimestamp(), $clonedNow->getTimestamp());
+
+        $secondDate = clone $date;
+        $secondDate->add(new \DateInterval('P1D'));
+
+        $resultDate = $this->scheduler->getExecutionDateForInactivity($date, $secondDate, $now);
+        $this->assertSame($date, $resultDate);
+    }
+
     public function testEventDoesNotGetRescheduledForRelativeTimeWhenValidated()
     {
         $campaign = $this->createMock(Campaign::class);

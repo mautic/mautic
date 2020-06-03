@@ -292,10 +292,7 @@ class EventScheduler
         return $eventExecutionDates;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getExecutionDateForInactivity(\DateTime $eventExecutionDate, \DateTime $earliestExecutionDate, \DateTime $now)
+    public function getExecutionDateForInactivity(\DateTime $eventExecutionDate, \DateTime $earliestExecutionDate, \DateTime $now): \DateTime
     {
         if ($earliestExecutionDate->getTimestamp() === $eventExecutionDate->getTimestamp()) {
             // Inactivity is based on the "wait" period so execute now
