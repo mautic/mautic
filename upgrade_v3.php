@@ -115,6 +115,19 @@ function runPreUpgradeChecks()
         $mysqli->close();
     }
 
+    // Check if there is a custom configuration for api_rate_limiter_cache in the local.php file (see https://github.com/mautic/mautic/blob/3.x/UPGRADE-3.0.md#configuration)
+    if (
+        !empty($localParameters['api_rate_limiter_cache'])
+        && !empty($localParameters['api_rate_limiter_cache']['type'])
+        && $localParameters['api_rate_limiter_cache']['type'] !== 'file_system'
+    ) {
+        $preUpgradeWarnings[] = 'You seem to have a custom configuration for the api_rate_limiter_cache setting in local.php. '
+            . 'This is an advanced feature and we can only support the default file_system type during migration. '
+            . 'WE WILL UPDATE YOUR CUSTOM CONFIGURATION TO THE DEFAULT file_system ADAPTER TO PREVENT CONFLICTS. '
+            . 'If you want to keep your custom configuration, you can manually update it after the migration. '
+            . 'Please check https://github.com/mautic/mautic/blob/3.x/UPGRADE-3.0.md#configuration for details.';
+    }
+
     // Check if Mautic's root folder is writable
     if (!is_writable(MAUTIC_ROOT)) {
         $preUpgradeErrors[] = 'Mautic\'s root directory is not writable. We need write access in order to update application files.';
@@ -160,10 +173,8 @@ function runPreUpgradeChecks()
         $preUpgradeWarnings[] = 'We cannot seem to check your free disk space or current Mautic installation folder size. Please ensure your free disk space is at least 2x of your current Mautic installation, just to be sure.';
     } else {
         if (($mauticRootFolderSize * 2) > $freeDiskSpace) {
-            $preUpgradeWarnings[] = 'You don\'t seem to have enough disk space for the upgrade. Just to be sure, we\'d like to have 2x the size of the current Mautic installation.';
+            $preUpgradeWarnings[] = 'You don\'t seem to have enough disk space for the upgrade. Just to be sure, we\'d like to have 2x the size of the current Mautic installation. Current free disk space is ' . $freeDiskSpace . ' bytes, Mautic installation size is  ' . $mauticRootFolderSize . ' bytes.';
         }
-
-        $preUpgradeWarnings[] = 'Free disk space is ' . $freeDiskSpace . ', Mautic installation size is  ' . $mauticRootFolderSize;
     }
 
     // Check Mautic version
@@ -174,7 +185,7 @@ function runPreUpgradeChecks()
         $version = file_get_contents(MAUTIC_APP_ROOT . '/version.txt');
         $version = str_replace("\n", "", $version);
 
-        if (!version_compare($version, '2.16.3', '>=')) {
+        if (!version_compare($version, '2.16.2', '>')) {
             $preUpgradeErrors[] = 'You need to have at least Mautic 2.16.3 installed, which supports upgrading to 3.0. Please update to 2.16.3 first.';
         }
     } else {
@@ -190,18 +201,10 @@ function runPreUpgradeChecks()
 
     // Check if mysqldump is available on the system for creating a DB backup.
     if (!function_exists('exec')) {
-        $preUpgradeErrors[] = 'We can\'t make a database backup for you due to restrictions on your system. Only continue if you have your own database backup available! Click HERE (TODO) if you have a backup available and want to continue.';
+        $preUpgradeWarnings[] = 'We can\'t make a database backup for you due to restrictions on your system. Only continue if you have your own database backup available!';
     } else {
-        $return_var = null;
-        $output = null;
-        // Escape single quotes in DB password
-        $db_password = str_replace("'", "'\''", $localParameters['db_password']);
-        // Check if mysqldump command finishes by writing to /dev/null
-        $command = "mysqldump -u " . $localParameters['db_user'] . " -h " . $localParameters['db_host'] . " -p'" . $db_password . "' " . $localParameters['db_name'] . " > /dev/null";
-        exec($command, $output, $return_var);
-
-        if ($return_var) {
-            $preUpgradeErrors[] = 'We tried making a backup for you, but failed. Click HERE (TODO) if you have a backup available and want to continue.';
+        if (is_mysqldump_available() === false) {
+            $preUpgradeWarnings[] = 'We can\'t work with the database backup mechanism called "mysqldump" on your system. Only continue if you have your own database backup available!';
         }
     }
 
@@ -309,8 +312,22 @@ if (!IN_CLI) {
             break;
 
         case 'startUpgrade':
-            $nextTask = 'applyV2Migrations';
+            $nextTask = 'backupDatabase';
             sendUpgradeStats('started');
+            break;
+
+        case 'backupDatabase':
+            // Only do the backup if mysqldump is available, otherwise skip this step.
+            if (is_mysqldump_available() === true) {
+                list($success, $message) = backup_database();
+
+                if (!$success) {
+                    sendUpgradeStats('failed');
+                    html_body("<div alert='alert alert-danger'>Database backup failed. Your Mautic 2 installation is intact, so you can safely restart the upgrade. Error from mysqldump: $message</div>");
+                }
+            }
+            
+            $nextTask = 'applyV2Migrations';
             break;
 
         case 'applyV2Migrations':
@@ -389,7 +406,7 @@ if (!IN_CLI) {
             // Build fresh cache for M3.
             if (build_cache() === false) {
                 sendUpgradeStats('failed');
-                html_body("<div alert='alert alert-danger'>Oh no! We couldn\'t build a fresh cache for Mautic 3. Please check our knowledgebase (TODO) for more info.</div>");
+                html_body("<div alert='alert alert-danger'>Oh no! We couldn't build a fresh cache for Mautic 3. Please check our knowledgebase (TODO) for more info.</div>");
             };
 
             $nextTask = 'applyMigrations';
@@ -474,12 +491,12 @@ if (!IN_CLI) {
         $preUpgradeCheckWarnings = $preUpgradeCheckResults['warnings'];
 
         if (count($preUpgradeCheckErrors) > 0) {
-            echo "One or more errors occurred during pre-upgrade checks: \n" . implode("\n", $preUpgradeCheckErrors) . "\n";
+            echo "One or more errors occurred during pre-upgrade checks: \n- " . implode("\n- ", $preUpgradeCheckErrors) . "\n";
             exit;
         }
 
         if (count($preUpgradeCheckWarnings) > 0) {
-            echo "One or more warnings occurred during pre-upgrade checks, please run this script with the --ignore-warnings flag to continue: \n" . implode("\n", $preUpgradeCheckWarnings) . "\n";
+            echo "One or more warnings occurred during pre-upgrade checks, please run this script with the --ignore-warnings flag to continue: \n- " . implode("\n- ", $preUpgradeCheckWarnings) . "\n";
 
             $val = getopt('i', ['ignore-warnings']);
             if (empty($val)) {
@@ -490,6 +507,21 @@ if (!IN_CLI) {
         echo "Starting upgrade...\n";
 
         sendUpgradeStats('started');
+
+        if (is_mysqldump_available() === true) {
+            echo "Backing up your database...\n";
+            list($success, $message) = backup_database();
+
+            if (!$success) {
+                sendUpgradeStats('failed');
+                echo "Database backup failed. Your Mautic 2 installation is intact, so you can safely restart the upgrade. Error from mysqldump: " . $message;
+                exit;
+            } else {
+                echo "Database backup successfully written to your Mautic root folder.\n";
+            }
+        } else {
+            echo "Skipping database backup because we can't find mysqldump on your system...\n";
+        }
 
         echo "Applying Mautic 2 migrations, just so we're sure your database is up to date before upgrading. This might take a while, DO NOT ABORT THE SCRIPT!!!\n";
 
@@ -717,6 +749,61 @@ function make_request($url, $method = 'GET', $data = null)
 }
 
 /**
+ * Check if mysqldump is available on the system.
+ * We check this by doing a mysqldump of the plugins table (which should be rather small on all installations) to /dev/null.
+ * 
+ * @return bool
+ */
+function is_mysqldump_available()
+{
+    global $localParameters;
+
+    // We can only execute mysqldump if PHP's exec function is available (blocked on some hosts)
+    if (!function_exists('exec')) {
+        return false;
+    }
+
+    $return_var = null;
+    $output = null;
+    // Escape single quotes in DB password
+    $db_password = str_replace("'", "'\''", $localParameters['db_password']);
+    $db_prefix = !empty($localParameters['db_table_prefix']) ? $localParameters['db_table_prefix'] : '';
+    // Do the database backup with mysqldump
+    $command = "mysqldump -u " . $localParameters['db_user'] . " -h " . $localParameters['db_host'] . " -p'" . $db_password . "' " . $localParameters['db_name'] . " " . $db_prefix . "plugins > /dev/null";
+    exec($command, $output, $return_var);
+
+    if ($return_var === null) {
+        return true;
+    }
+
+    return true;
+}
+
+/**
+ * Backup the database.
+ * 
+ * @return array
+ */
+function backup_database()
+{
+    global $localParameters;
+
+    $return_var = null;
+    $output = null;
+    // Escape single quotes in DB password
+    $db_password = str_replace("'", "'\''", $localParameters['db_password']);
+    // Do the database backup with mysqldump
+    $command = "mysqldump -u " . $localParameters['db_user'] . " -h " . $localParameters['db_host'] . " -p'" . $db_password . "' " . $localParameters['db_name'] . " > " . MAUTIC_ROOT . '/m3_upgrade_db_backup.sql';
+    exec($command, $output, $return_var);
+
+    if (empty($return_var)) {
+        return [true, 'OK'];
+    }
+
+    return [false, $output];
+}
+
+/**
  * Fetch a list of updates.
  *
  * @return array
@@ -814,7 +901,7 @@ function replace_mautic_2_with_mautic_3()
     }
 
     // Only exclude the Mautic 2 backup folder, Mautic 3 upgrade files folder, the current upgrade file and the DB backup file.
-    $excludedFilesAndFolders = [MAUTIC_UPGRADE_ROOT, MAUTIC_BACKUP_FOLDER_ROOT, __FILE__, MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'db_backup.sql'];
+    $excludedFilesAndFolders = [MAUTIC_UPGRADE_ROOT, MAUTIC_BACKUP_FOLDER_ROOT, __FILE__, MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'm3_upgrade_db_backup.sql'];
 
     $iterator = new DirectoryIterator(MAUTIC_ROOT);
 
@@ -1012,13 +1099,11 @@ function update_local_config()
     require $filename;
 
     // API rate limiter cache config changed, see https://github.com/mautic/mautic/blob/3.x/UPGRADE-3.0.md#configuration
-    if (array_key_exists('api_rate_limiter_cache', $parameters)) {
-        if (array_key_exists('type', $parameters['api_rate_limiter_cache'])) {
-            if ($parameters['api_rate_limiter_cache']['type'] === 'file_system') {
-                unset($parameters['api_rate_limiter_cache']['type']);
-                $parameters['api_rate_limiter_cache']['adapter'] = 'cache.adapter.filesystem';
-            }
-        }
+    // Always overwrite custom configurations with the default filesystem adapter to avoid conflicts. We warn users about this during the pre-upgrade checks.
+    if (!empty($parameters['api_rate_limiter_cache'])) {
+        $parameters['api_rate_limiter_cache'] = array(
+            'adapter' => 'cache.adapter.filesystem'
+        );
     }
 
     // Replace "mail" transport by "sendmail" as it's removed in SwiftMailer 6 https://symfony.com/doc/3.4/email.html#configuration
@@ -1294,14 +1379,14 @@ function cleanup_files()
         if ($status === false) $failedChanges[] = 'mautic-2-backup-files';
     }
 
-    // Rename the db_backup.sql file to one with a random hash to prevent public access
-    if (file_exists(MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'db_backup.sql')) {
+    // Rename the m3_upgrade_db_backup.sql file to one with a random hash to prevent public access
+    if (file_exists(MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'm3_upgrade_db_backup.sql')) {
         $hash = bin2hex(random_bytes(16));
-        $status = rename(MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'db_backup.sql', MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'db_backup_' . $hash . '.sql');
-        if ($status === false) $failedChanges[] = 'db_backup.sql';
+        $status = rename(MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'm3_upgrade_db_backup.sql', MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'm3_upgrade_db_backup_' . $hash . '.sql');
+        if ($status === false) $failedChanges[] = 'm3_upgrade_db_backup.sql';
     }
 
-    // NOTE: we leave the mautic-2-backup-files-$HASH folder and db_backup_$HASH.sql file as-is in case something still doesn't work as expected.
+    // NOTE: we leave the mautic-2-backup-files-$HASH folder and m3_upgrade_db_backup_$HASH.sql file as-is in case something still doesn't work as expected.
 
     if (count($failedChanges) === 0) {
         return true;
