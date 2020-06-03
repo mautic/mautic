@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\FormBundle\Entity\Submission;
+use Mautic\LeadBundle\Entity\Company;
+use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -200,8 +203,8 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
                         'values' => [],
                     ],
                     'properties'   => [
-                        'syncList' => 0,
-                        'multiple' => 1,
+                        'syncList' => 1,
+                        'multiple' => 0,
                     ],
                 ],
             ],
@@ -264,14 +267,58 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $form = $formCrawler->form();
         $form->setValues([
             'mauticform[email]'       => 'john@doe.test',
-            'mauticform[number]'      => 123,
+            'mauticform[number]'      => '123',
             'mauticform[company]'     => 'Doe Corp',
-            'mauticform[phone]]'      => '+420444555666',
+            'mauticform[phone]'       => '+420444555666',
             'mauticform[country]'     => 'Czech Republic',
-            // 'mauticform[state]'      => 'john@doe.test', // We'd have to provide all state values in this test. The select is empty.
+            'mauticform[state]'       => 'Plzeňský kraj',
             'mauticform[multiselect]' => ['two'],
         ]);
         $this->client->submit($form);
+
+        // Ensure the submission was created properly.
+        $submissions = $this->em->getRepository(Submission::class)->findAll();
+
+        Assert::assertCount(1, $submissions);
+
+        /** @var Submission $submission */
+        $submission = $submissions[0];
+        Assert::assertSame([
+            'email'       => 'john@doe.test',
+            'number'      => 123.0,
+            'company'     => 'Doe Corp',
+            'phone'       => '+420444555666',
+            'country'     => 'Czech Republic',
+            'multiselect' => 'two',
+            'state'       => 'Plzeňský kraj',
+        ], $submission->getResults());
+
+        // A contact should be created by the submission.
+        $contact = $submission->getLead();
+
+        Assert::assertSame('john@doe.test', $contact->getEmail());
+        Assert::assertSame('Czech Republic', $contact->getCountry());
+        Assert::assertSame('Plzeňský kraj', $contact->getState());
+        Assert::assertSame(123, $contact->getPoints());
+        Assert::assertSame('Doe Corp', $contact->getCompany());
+
+        $companies = $this->em->getRepository(Company::class)->findAll();
+
+        Assert::assertCount(1, $companies);
+
+        // A company should be created by the submission.
+        /** @var Company $company */
+        $company = $companies[0];
+        Assert::assertSame('Doe Corp', $company->getName());
+        Assert::assertSame('+420444555666', $company->getPhone());
+
+        // The previous request changes user to anonymous. We have to configure API again.
+        $this->setUpSymfony(
+            [
+                'api_enabled'           => true,
+                'api_enable_basic_auth' => true,
+            ]
+        );
 
         // Delete:
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
@@ -286,7 +333,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['formType'], $response['form']['formType']);
         $this->assertNotEmpty($response['form']['cachedHtml']);
 
-        // Get (ensure it's deleted):
+        // Get (ensure that the form is gone):
         $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}");
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
