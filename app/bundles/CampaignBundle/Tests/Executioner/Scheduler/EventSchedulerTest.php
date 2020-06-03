@@ -99,6 +99,31 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testScheduleDayOfWeek()
+    {
+        $scheduler = $this->getScheduler();
+
+        $event = new Event();
+        $this->assertFalse($scheduler->shouldSchedule(new \DateTime(), new \DateTime(), $event));
+
+        $event->setProperties([
+            'triggerRestrictedDaysOfWeek' => [],
+        ]);
+
+        $this->assertFalse($scheduler->shouldSchedule(new \DateTime(), new \DateTime(), $event));
+
+        $event->setProperties([
+            'triggerRestrictedDaysOfWeek' => [
+                0 => 1,
+                1 => 2,
+            ],
+        ]);
+
+        $this->assertTrue($scheduler->shouldSchedule(new \DateTime(), new \DateTime(), $event));
+
+        $this->assertTrue($scheduler->shouldSchedule(new \DateTime(), new \DateTime(), $event));
+    }
+
     public function testEventDoesNotGetRescheduledForRelativeTimeWhenValidated()
     {
         $campaign = $this->createMock(Campaign::class);
@@ -260,29 +285,6 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($scheduler->shouldSchedule($executionDate, $simulatedNow));
         $this->assertEquals('2018-08-31 13:00:15', $executionDate->format('Y-m-d H:i:s'));
         $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
-    }
-
-    public function testScheduleDayOfWeek()
-    {
-        $scheduler = $this->getScheduler();
-
-        $event = new Event();
-        $this->assertFalse($scheduler->shouldSchedule(new \DateTime(), new \DateTime(), $event));
-
-        $event->setProperties([
-            'triggerRestrictedDaysOfWeek' => [],
-        ]);
-
-        $this->assertFalse($scheduler->shouldSchedule(new \DateTime(), new \DateTime(), $event));
-
-        $event->setProperties([
-            'triggerRestrictedDaysOfWeek' => [
-                0 => 1,
-                1 => 2,
-            ],
-        ]);
-
-        $this->assertTrue($scheduler->shouldSchedule(new \DateTime(), new \DateTime(), $event));
     }
 
     private function getScheduler()
