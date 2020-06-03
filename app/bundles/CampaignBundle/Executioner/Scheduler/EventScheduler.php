@@ -302,10 +302,7 @@ class EventScheduler
         return $eventExecutionDate;
     }
 
-    /**
-     * @return bool
-     */
-    public function shouldSchedule(\DateTime $executionDate, \DateTime $now)
+    public function shouldSchedule(\DateTime $executionDate, \DateTime $now, Event $event = null): bool
     {
         if (null !== $event) {
             $eventProperties = $event->getProperties();
