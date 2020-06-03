@@ -133,8 +133,6 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         ]);
 
         $this->assertTrue($this->scheduler->shouldSchedule(new \DateTime(), new \DateTime(), $event));
-
-        $this->assertTrue($this->scheduler->shouldSchedule(new \DateTime(), new \DateTime(), $event));
     }
 
     public function testGetExecutionDateForInactivity()
