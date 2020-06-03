@@ -123,6 +123,54 @@ class Notification extends FormEntity
      */
     private $mobileSettings;
 
+    /**
+     * @var int
+     */
+    private $ttl = 72;
+
+    /**
+     * @var int
+     */
+    private $priority = 5;
+
+    /**
+     * @var string
+     */
+    private $actionButtonIcon1;
+
+    /**
+     * @var string
+     */
+    private $actionButtonUrl1;
+
+    /**
+     * @var string
+     */
+    private $actionButtonText2;
+
+    /**
+     * @var string
+     */
+    private $actionButtonIcon2;
+
+    /**
+     * @var string
+     */
+    private $actionButtonUrl2;
+
+    /**
+     * @var string
+     */
+    private $icon;
+
+    /**
+     * @var string
+     */
+    private $image;
+
+    /**
+     * @var array
+     */
     public function __clone()
     {
         $this->id        = null;
@@ -220,6 +268,52 @@ class Notification extends FormEntity
         $builder->createField('mobile', 'boolean')->build();
 
         $builder->createField('mobileSettings', 'array')->build();
+
+        $builder->createField('ttl', 'integer')
+            ->build();
+
+        $builder->createField('priority', 'integer')
+            ->build();
+
+        $builder->createField('actionButtonIcon1', 'string')
+            ->columnName('action_button_icon_1')
+            ->length(512)
+            ->nullable()
+            ->build();
+
+        $builder->createField('actionButtonUrl1', 'string')
+            ->columnName('action_button_url_1')
+            ->length(512)
+            ->nullable()
+            ->build();
+
+        $builder->createField('actionButtonText2', 'string')
+            ->columnName('action_button_text_2')
+            ->length(512)
+            ->nullable()
+            ->build();
+
+        $builder->createField('actionButtonIcon2', 'string')
+            ->columnName('action_button_icon_2')
+            ->length(512)
+            ->nullable()
+            ->build();
+
+        $builder->createField('actionButtonUrl2', 'string')
+            ->columnName('action_button_url_2')
+            ->length(512)
+            ->nullable()
+            ->build();
+
+        $builder->createField('icon', 'string')
+            ->length(512)
+            ->nullable()
+            ->build();
+
+        $builder->createField('image', 'string')
+            ->length(512)
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -290,11 +384,18 @@ class Notification extends FormEntity
             )
             ->addProperties(
                 [
+                    'actionButtonUrl1',
+                    'actionButtonIcon1',
+                    'actionButtonUrl2',
+                    'actionButtonIcon2',
+                    'actionButtonText2',
                     'utmTags',
                     'publishUp',
                     'publishDown',
                     'readCount',
                     'sentCount',
+                    'ttl',
+                    'priority',
                 ]
             )
             ->build();
@@ -366,6 +467,16 @@ class Notification extends FormEntity
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Get file alias.
+     *
+     * @return string
+     */
+    public function getFileAlias()
+    {
+        return 'notification-file-'.$this->id;
     }
 
     /**
@@ -674,5 +785,158 @@ class Notification extends FormEntity
         $this->mobileSettings = $mobileSettings;
 
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTtl()
+    {
+        return $this->ttl;
+    }
+
+    /**
+     * @param int $ttl
+     */
+    public function setTtl($ttl)
+    {
+        $this->isChanged('ttl', $ttl);
+        $this->ttl = $ttl;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPriority()
+    {
+        return $this->priority;
+    }
+
+    /**
+     * @param int $priority
+     */
+    public function setPriority($priority)
+    {
+        $this->isChanged('priority', $priority);
+        $this->priority = $priority;
+    }
+
+    /**
+     * @return string
+     */
+    public function getActionButtonIcon1()
+    {
+        return $this->actionButtonIcon1;
+    }
+
+    /**
+     * @param string $actionButtonIcon1
+     */
+    public function setActionButtonIcon1($actionButtonIcon1)
+    {
+        $this->isChanged('actionButtonIcon1', $actionButtonIcon1);
+        $this->actionButtonIcon1 = $actionButtonIcon1;
+    }
+
+    /**
+     * @return string
+     */
+    public function getActionButtonUrl1()
+    {
+        return $this->actionButtonUrl1;
+    }
+
+    /**
+     * @param string $actionButtonUrl1
+     */
+    public function setActionButtonUrl1($actionButtonUrl1)
+    {
+        $this->isChanged('actionButtonUrl1', $actionButtonUrl1);
+        $this->actionButtonUrl1 = $actionButtonUrl1;
+    }
+
+    /**
+     * @return string
+     */
+    public function getActionButtonText2()
+    {
+        return $this->actionButtonText2;
+    }
+
+    /**
+     * @param string $actionButtonText2
+     */
+    public function setActionButtonText2($actionButtonText2)
+    {
+        $this->isChanged('actionButtonText2', $actionButtonText2);
+        $this->actionButtonText2 = $actionButtonText2;
+    }
+
+    /**
+     * @return string
+     */
+    public function getActionButtonIcon2()
+    {
+        return $this->actionButtonIcon2;
+    }
+
+    /**
+     * @param string $actionButtonIcon2
+     */
+    public function setActionButtonIcon2($actionButtonIcon2)
+    {
+        $this->isChanged('actionButtonIcon2', $actionButtonIcon2);
+        $this->actionButtonIcon2 = $actionButtonIcon2;
+    }
+
+    /**
+     * @return string
+     */
+    public function getActionButtonUrl2()
+    {
+        return $this->actionButtonUrl2;
+    }
+
+    /**
+     * @param string $actionButtonUrl2
+     */
+    public function setActionButtonUrl2($actionButtonUrl2)
+    {
+        $this->isChanged('actionButtonUrl2', $actionButtonUrl2);
+        $this->actionButtonUrl2 = $actionButtonUrl2;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIcon()
+    {
+        return $this->icon;
+    }
+
+    /**
+     * @param string $icon
+     */
+    public function setIcon($icon)
+    {
+        $this->isChanged('icon', $icon);
+        $this->icon = $icon;
+    }
+
+    /**
+     * @return string
+     */
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    /**
+     * @param string $image
+     */
+    public function setImage($image)
+    {
+        $this->isChanged('image', $image);
+        $this->image = $image;
     }
 }

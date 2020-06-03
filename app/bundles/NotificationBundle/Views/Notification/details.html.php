@@ -17,7 +17,33 @@ if (empty($notificationType)) {
     $notificationType = 'template';
 }
 
-$customButtons = [];
+$customButtons = [
+    [
+        'attr' => [
+            'data-toggle' => 'ajaxmodal',
+            'data-target' => '#MauticSharedModal',
+            'data-header' => $view['translator']->trans('mautic.notification.notification.header.preview'),
+            'data-footer' => 'false',
+            'href'        => $view['router']->path(
+                'mautic_notification_action',
+                ['objectId' => $notification->getId(), 'objectAction' => 'preview']
+            ),
+        ],
+        'btnText'   => $view['translator']->trans('mautic.notification.preview'),
+        'iconClass' => 'fa fa-share',
+    ],
+    [
+        'attr' => [
+            'data-toggle' => '',
+            'data-target' => '',
+            'target'      => '_blank',
+            'data-footer' => 'false',
+            'href'        => 'https://documentation.onesignal.com/docs/web-push-overview',
+        ],
+        'btnText'   => $view['translator']->trans('mautic.notification.read.docs'),
+        'iconClass' => 'fa fa-file-text-o',
+    ],
+];
 
 $view['slots']->set(
     'actions',

@@ -79,7 +79,12 @@ return [
         ],
         'forms' => [
             'mautic.form.type.notification' => [
-                'class' => 'Mautic\NotificationBundle\Form\Type\NotificationType',
+                'class'    => 'Mautic\NotificationBundle\Form\Type\NotificationType',
+                'arguments'=> [
+                    'translator',
+                    'mautic.notification.helper.uploader',
+                    'mautic.notification.model.notification',
+                ],
                 'alias' => 'notification',
             ],
             'mautic.form.type.mobile.notification' => [
@@ -138,8 +143,25 @@ return [
                     'mautic.http.connector',
                     'mautic.page.model.trackable',
                     'mautic.helper.integration',
+                    'mautic.notification.helper.uploader',
                 ],
                 'alias' => 'notification_api',
+            ],
+            'mautic.notification.helper.uploader' => [
+                'class'     => \Mautic\NotificationBundle\Helper\NotificationUploader::class,
+                'arguments' => [
+                    'mautic.helper.file_uploader',
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.paths',
+                ],
+            ],
+        ],
+        'validator' => [
+            'mautic.notification.validator.upload_field_validator' => [
+                'class'     => \Mautic\NotificationBundle\Validator\UploadNotificationValidator::class,
+                'arguments' => [
+                    'mautic.core.validator.file_upload',
+                ],
             ],
         ],
         'models' => [
@@ -272,5 +294,6 @@ return [
         'gcm_sender_id'                      => '482941778795',
         'notification_subdomain_name'        => null,
         'welcomenotification_enabled'        => true,
+        'notification_image_directory'       => 'notifications',
     ],
 ];

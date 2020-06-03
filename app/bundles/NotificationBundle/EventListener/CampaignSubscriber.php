@@ -179,15 +179,25 @@ class CampaignSubscriber extends CommonSubscriber
             return $event->setFailed('mautic.notification.campaign.failed.not_subscribed');
         }
 
-        if ($url = $notification->getUrl()) {
-            $url = $this->notificationApi->convertToTrackedUrl(
-                $url,
-                [
-                    'notification' => $notification->getId(),
-                    'lead'         => $lead->getId(),
-                ],
-                $notification
-            );
+        // prevent rewrite notification entity
+        $sendNotification = clone $notification;
+
+        // trackable links and update Notification entity
+        $convertedLinks = ['url', 'actionButtonUrl1', 'actionButtonUrl2'];
+        foreach ($convertedLinks as $key) {
+            $getVar = 'get'.ucfirst($key);
+            $setVar = 'set'.ucfirst($key);
+            if ($url = $notification->$getVar()) {
+                $url = $this->notificationApi->convertToTrackedUrl(
+                    $url,
+                    [
+                        'notification' => $notification->getId(),
+                        'lead'         => $lead->getId(),
+                    ],
+                    $notification
+                );
+            }
+            $sendNotification->$setVar($url);
         }
 
         /** @var TokenReplacementEvent $tokenEvent */
@@ -206,16 +216,26 @@ class CampaignSubscriber extends CommonSubscriber
             new NotificationSendEvent($tokenEvent->getContent(), $notification->getHeading(), $lead)
         );
 
-        // prevent rewrite notification entity
-        $sendNotification = clone $notification;
-        $sendNotification->setUrl($url);
         $sendNotification->setMessage($sendEvent->getMessage());
         $sendNotification->setHeading($sendEvent->getHeading());
 
         $response = $this->notificationApi->sendNotification(
             $playerID,
-            $sendNotification
+            $sendNotification,
+            $notification
         );
+
+        // enable/disable push_id
+        $results    = \GuzzleHttp\json_decode($response->body, true);
+        $invalidIds = !empty($results['errors']['invalid_player_ids']) ? $results['errors']['invalid_player_ids'] : [];
+        foreach ($pushIDs as $pushID) {
+            if (in_array($pushID->getPushID(), $invalidIds)) {
+                $pushID->setEnabled(false);
+            } else {
+                $pushID->setEnabled(true);
+            }
+        }
+        $this->notificationModel->getPushIDRepository()->saveEntities($pushIDs);
 
         $event->setChannel('notification', $notification->getId());
 
