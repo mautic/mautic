@@ -55,12 +55,15 @@ class DoNotContact
             if ($dnc->getChannel() === $channel) {
                 // Skip if reason doesn't match
                 // Some integrations (Sugar CRM) can use both reasons (unsubscribed, bounced)
-                if (!is_array($reason)) {
-                    $reason = [$reason];
+                if ($reason) {
+                    if (!is_array($reason)) {
+                        $reason = [$reason];
+                    }
+                    if (!in_array($dnc->getReason(), $reason)) {
+                        continue;
+                    }
                 }
-                if ($reason && !in_array($dnc->getReason(), $reason)) {
-                    continue;
-                }
+
                 $contact->removeDoNotContactEntry($dnc);
 
                 if ($persist) {
