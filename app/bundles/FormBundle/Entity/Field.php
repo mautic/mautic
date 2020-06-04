@@ -801,7 +801,7 @@ class Field
             // Hide the field if the value is already known from the lead profile
             if (null !== $lead
                 && $this->mappedField
-                && 'lead' === $this->mappedObject
+                && 'contact' === $this->mappedObject
                 && !empty($lead->getFieldValue($this->mappedField))
                 && !$this->isAutoFill
             ) {

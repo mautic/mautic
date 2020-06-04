@@ -177,7 +177,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $fields     = new ArrayCollection();
         $formField  = new Field();
         $formField->setMappedField('contactselect');
-        $formField->setMappedObject('lead');
+        $formField->setMappedObject('contact');
         $formField->setProperties(['syncList' => true]);
 
         $fields->add($formField);
@@ -230,7 +230,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $fields     = new ArrayCollection();
         $formField  = new Field();
         $formField->setMappedField('contactselect');
-        $formField->setMappedObject('lead');
+        $formField->setMappedObject('contact');
         $formField->setProperties(['syncList' => false]);
 
         $fields->add($formField);
@@ -288,7 +288,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $options    = ['no' => 'lunch?', 'yes' => 'dinner?'];
         $formField  = new Field();
         $formField->setMappedField('contactbool');
-        $formField->setMappedObject('lead');
+        $formField->setMappedObject('contact');
         $formField->setProperties(['syncList' => true]);
 
         $fields->add($formField);
@@ -367,7 +367,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
 
         $formField = new Field();
         $formField->setMappedField('contactfieldalias');
-        $formField->setMappedObject('lead');
+        $formField->setMappedObject('contact');
         $formField->setProperties(['syncList' => true]);
 
         $contactField = new LeadField();
@@ -401,7 +401,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $fields     = new ArrayCollection();
         $formField  = new Field();
         $formField->setMappedField('contactfield');
-        $formField->setMappedObject('lead');
+        $formField->setMappedObject('contact');
         $formField->setProperties(['syncList' => true]);
 
         $fields->add($formField);
@@ -470,7 +470,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $form       = new Form();
         $emailField = new Field();
         $emailField->setMappedField('email');
-        $emailField->setMappedObject('lead');
+        $emailField->setMappedObject('contact');
         $emailField->setIsAutoFill(false);
         $form->addField(123, $emailField);
 
@@ -502,7 +502,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $form       = new Form();
         $emailField = new Field();
         $emailField->setMappedField('email');
-        $emailField->setMappedObject('lead');
+        $emailField->setMappedObject('contact');
         $emailField->setIsAutoFill(true);
         $form->addField(123, $emailField);
 
@@ -544,7 +544,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
             }
         };
         $emailField->setMappedField('email');
-        $emailField->setMappedObject('lead');
+        $emailField->setMappedObject('contact');
         $emailField->setIsAutoFill(true);
         $form->addField(123, $emailField);
 
@@ -571,7 +571,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
             }
         };
         $emailField->setMappedField('email');
-        $emailField->setMappedObject('lead');
+        $emailField->setMappedObject('contact');
         $emailField->setIsAutoFill(true);
         $form->addField(123, $emailField);
 
@@ -597,7 +597,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
             'alias'        => 'email',
             'type'         => 'email',
             'mappedField'  => 'email',
-            'mappedObject' => 'lead',
+            'mappedObject' => 'contact',
             'id'           => $fieldSession,
         ];
 

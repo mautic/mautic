@@ -237,7 +237,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $form->setInKioskMode(false);
         $field->setShowWhenValueExists(false);
         $field->setMappedField('field_a');
-        $field->setMappedObject('lead');
+        $field->setMappedObject('contact');
         $field->setIsAutoFill(false);
         Assert::assertFalse($field->showForContact(null, $contact, $form));
     }
@@ -257,7 +257,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $form->setInKioskMode(false);
         $field->setShowWhenValueExists(false);
         $field->setMappedField('field_a');
-        $field->setMappedObject('lead');
+        $field->setMappedObject('contact');
         $field->setIsAutoFill(false);
         Assert::assertTrue($field->showForContact(null, $contact, $form));
     }

@@ -79,7 +79,7 @@ final class FieldValueTransformerTest extends \PHPUnit\Framework\TestCase
         $field->setType('file');
         $field->setAlias('file_field_1');
         $field->setMappedField('contact_field_1');
-        $field->setMappedObject('lead');
+        $field->setMappedObject('contact');
         $form->addField('123', $field);
         $submission->setForm($form);
         $submissionEvent->setTokens(['{formfield=file_field_1}' => 'original/route']);

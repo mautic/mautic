@@ -51,7 +51,7 @@ final class PropertiesAccessorTest extends \PHPUnit\Framework\TestCase
         $field = [
             'type'         => 'custom_select_a',
             'mappedField'  => 'contact_field_a',
-            'mappedObject' => 'lead',
+            'mappedObject' => 'contact',
             'properties'   => ['syncList' => true],
         ];
 
@@ -71,7 +71,7 @@ final class PropertiesAccessorTest extends \PHPUnit\Framework\TestCase
         $field = [
             'type'         => 'custom_text_a',
             'mappedField'  => 'contact_field_a',
-            'mappedObject' => 'lead',
+            'mappedObject' => 'contact',
             'properties'   => ['syncList' => false],
         ];
 
