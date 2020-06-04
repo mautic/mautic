@@ -64,4 +64,19 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(1, $response['success'], $this->client->getResponse()->getContent());
         Assert::assertSame(1, $response['closeModal'], $this->client->getResponse()->getContent());
     }
+
+    public function testNewEmailFieldFormIsPreMapped()
+    {
+        $this->client->request(
+            Request::METHOD_GET,
+            '/s/forms/field/new?type=email&tmpl=field&formId=temporary_form_hash&inBuilder=1',
+            [],
+            [],
+            $this->createAjaxHeaders()
+        );
+        $clientResponse = $this->client->getResponse();
+        $payload        = json_decode($clientResponse->getContent(), true);
+        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        Assert::assertStringContainsString('<option value="email"  selected="selected">', $payload['newContent']);
+    }
 }

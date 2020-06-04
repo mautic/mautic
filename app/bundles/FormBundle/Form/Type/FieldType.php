@@ -411,7 +411,7 @@ class FieldType extends AbstractType
 
         if ($addMappedFieldList) {
             $mappedObject = $options['data']['mappedObject'] ?? 'contact';
-            $mappedField  = $options['data']['mappedField'] ?? '';
+            $mappedField  = $options['data']['mappedField'] ?? null;
             $builder->add(
                 'mappedObject',
                 ChoiceType::class,
@@ -431,7 +431,7 @@ class FieldType extends AbstractType
 
             $fields       = $this->fieldCollector->getFields($mappedObject);
             $mappedFields = $this->mappedFieldCollector->getFields((string) $options['data']['formId'], $mappedObject);
-            $fields       = $fields->removeFieldsWithKeys($mappedFields, $mappedField);
+            $fields       = $fields->removeFieldsWithKeys($mappedFields, (string) $mappedField);
 
             $builder->add(
                 'mappedField',
