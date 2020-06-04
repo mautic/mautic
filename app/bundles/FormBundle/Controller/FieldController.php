@@ -5,7 +5,6 @@ namespace Mautic\FormBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
-use Mautic\FormBundle\Collector\FieldCollector;
 use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\FormBuilderEvent;
@@ -13,7 +12,6 @@ use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FieldModel as FormFieldModel;
 use Mautic\FormBundle\Model\FormModel;
-use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
@@ -23,11 +21,6 @@ class FieldController extends CommonFormController
      * @var FormModel|AbstractCommonModel
      */
     private $formModel;
-
-    /**
-     * @var LeadFieldModel
-     */
-    private $leadFieldModel;
 
     /**
      * @var FormFieldModel
@@ -51,7 +44,6 @@ class FieldController extends CommonFormController
 
     public function initialize(FilterControllerEvent $event)
     {
-        $this->leadFieldModel              = $this->getModel('lead.field');
         $this->formFieldModel              = $this->getModel('form.field');
         $this->formModel                   = $this->getModel('form.form');
         $this->fieldHelper                 = $this->get('mautic.helper.form.field_helper');
