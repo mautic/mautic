@@ -87,7 +87,7 @@ if (!isset($lead)) {
                         if (!$f->isAlwaysDisplay()
                             && !$f->getShowWhenValueExists()
                             && $f->getMappedField()
-                            && 'lead' === $f->getMappedObject()
+                            && 'contact' === $f->getMappedObject()
                             && $f->getIsAutoFill()
                             && $lead
                             && !empty($lead->getFieldValue($f->getMappedField()))
@@ -126,7 +126,7 @@ if (!isset($lead)) {
                     else:
                         if (!$f->getShowWhenValueExists()
                             && $f->getMappedField()
-                            && 'lead' === $f->getMappedObject()
+                            && 'contact' === $f->getMappedObject()
                             && $f->getIsAutoFill()
                             && $lead
                             && !empty($lead->getFieldValue($f->getMappedField()))

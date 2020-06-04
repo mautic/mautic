@@ -25,7 +25,7 @@ class PropertiesAccessor
      */
     public function getProperties(array $field)
     {
-        $hasContactFieldMapped = !empty($field['mappedField']) && !empty($field['mappedObject']) && 'lead' === $field['mappedObject'];
+        $hasContactFieldMapped = !empty($field['mappedField']) && !empty($field['mappedObject']) && 'contact' === $field['mappedObject'];
         if ('country' === $field['type'] || ($hasContactFieldMapped && !empty($field['properties']['syncList']))) {
             return $this->formModel->getContactFieldPropertiesList((string) $field['mappedField']);
         } elseif (!empty($field['properties'])) {

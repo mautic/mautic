@@ -833,7 +833,7 @@ class FormModel extends CommonFormModel
             $isAutoFill = $field->getIsAutoFill();
 
             // we want work just with matched autofill fields
-            if ($field->getMappedField() && 'lead' === $field->getMappedObject() && $field->getIsAutoFill()) {
+            if ($field->getMappedField() && 'contact' === $field->getMappedObject() && $field->getIsAutoFill()) {
                 $autoFillFields[$key] = $field;
             }
         }
@@ -1084,7 +1084,7 @@ class FormModel extends CommonFormModel
         $formFieldProps   = $formField->getProperties();
         $mappedFieldAlias = $formField->getMappedField();
 
-        if (empty($formFieldProps['syncList']) || empty($mappedFieldAlias) || 'lead' !== $formField->getMappedObject()) {
+        if (empty($formFieldProps['syncList']) || empty($mappedFieldAlias) || 'contact' !== $formField->getMappedObject()) {
             return;
         }
 

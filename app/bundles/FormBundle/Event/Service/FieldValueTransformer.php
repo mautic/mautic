@@ -64,7 +64,7 @@ class FieldValueTransformer
                     }
 
                     $contactFieldAlias = $field->getMappedField();
-                    if ('lead' === $field->getMappedObject() && !empty($contactFieldMatches[$contactFieldAlias])) {
+                    if ('contact' === $field->getMappedObject() && !empty($contactFieldMatches[$contactFieldAlias])) {
                         $this->contactFieldsToUpdate[$contactFieldAlias] = $contactFieldMatches[$contactFieldAlias] = $newValue;
                     }
 
