@@ -228,8 +228,6 @@ class Stat
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param ApiMetadataDriver $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -297,9 +295,6 @@ class Stat
         return $this->email;
     }
 
-    /**
-     * @param Email|null $email
-     */
     public function setEmail(Email $email = null)
     {
         $this->email = $email;
@@ -361,9 +356,6 @@ class Stat
         return $this->lead;
     }
 
-    /**
-     * @param Lead|null $lead
-     */
     public function setLead(Lead $lead = null)
     {
         $this->lead = $lead;
@@ -521,9 +513,6 @@ class Stat
         return $this->tokens;
     }
 
-    /**
-     * @param array $tokens
-     */
     public function setTokens(array $tokens)
     {
         $this->tokens = $tokens;
@@ -601,8 +590,6 @@ class Stat
     }
 
     /**
-     * @param array $openDetails
-     *
      * @return Stat
      */
     public function setOpenDetails(array $openDetails)

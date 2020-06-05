@@ -14,9 +14,9 @@ namespace Mautic\EmailBundle\EventListener;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\EventListener\CommonStatsSubscriber;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\EmailBundle\Entity\EmailReply;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatDevice;
-use Mautic\EmailBundle\Entity\EmailReply;
 use Mautic\EmailBundle\Entity\StatDeviceRepository;
 use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
 
@@ -37,7 +37,7 @@ class StatsSubscriber extends CommonStatsSubscriber
         $repo                           = $entityManager->getRepository(Stat::class);
         $this->repositories[]           = $repo;
         $statsTable                     = $repo->getTableName();
-        $this->permissions[$statsTable] = ['lead' => 'lead:leads',];
+        $this->permissions[$statsTable] = ['lead' => 'lead:leads'];
         $this->selects[$statsTable]     = [
             'id',
             'email_id',

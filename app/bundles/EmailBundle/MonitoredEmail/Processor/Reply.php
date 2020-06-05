@@ -174,9 +174,6 @@ class Reply implements ProcessorInterface
         return strtolower(preg_replace("/[^a-z0-9\.@]/i", '', $email));
     }
 
-    /**
-     * @param Stat $stat
-     */
     private function dispatchEvent(Stat $stat)
     {
         if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_REPLY)) {
