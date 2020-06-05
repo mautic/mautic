@@ -36,6 +36,7 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
     private $leadModel;
     private $dispatcher;
     private $logger;
+    private $contactTracker;
 
     /**
      * @var Reply
@@ -46,18 +47,20 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->statRepo      = $this->createMock(StatRepository::class);
-        $this->contactFinder = $this->createMock(ContactFinder::class);
-        $this->leadModel     = $this->createMock(LeadModel::class);
-        $this->leadModel     = $this->createMock(LeadModel::class);
-        $this->dispatcher    = $this->createMock(EventDispatcherInterface::class);
-        $this->logger        = $this->createMock(Logger::class);
-        $this->processor     = new Reply(
+        $this->statRepo       = $this->createMock(StatRepository::class);
+        $this->contactFinder  = $this->createMock(ContactFinder::class);
+        $this->leadModel      = $this->createMock(LeadModel::class);
+        $this->leadModel      = $this->createMock(LeadModel::class);
+        $this->dispatcher     = $this->createMock(EventDispatcherInterface::class);
+        $this->logger         = $this->createMock(Logger::class);
+        $this->contactTracker = $this->createMock(ContactTracker::class);
+        $this->processor      = new Reply(
             $this->statRepo,
             $this->contactFinder,
             $this->leadModel,
             $this->dispatcher,
-            $this->logger
+            $this->logger,
+            $this->contactTracker
         );
     }
 
@@ -173,8 +176,8 @@ BODY;
             ->with(EmailEvents::EMAIL_ON_REPLY)
             ->willReturn(true);
 
-        $this->leadModel->expects($this->once())
-            ->method('setSystemCurrentLead')
+        $this->contactTracker->expects($this->once())
+            ->method('setTrackedContact')
             ->with($contact);
 
         $this->dispatcher->expects($this->once())

@@ -11,10 +11,10 @@
 
 namespace Mautic\EmailBundle\Tests\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Symfony\Component\HttpFoundation\Response;
 
 class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -152,7 +152,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
 
-        $this->assertSame(Codes::HTTP_NOT_FOUND, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
         $this->assertSame('Email Stat with tracking hash tracking_hash_123 was not found', $responseData['errors'][0]['message']);
     }
 
@@ -175,7 +175,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', "/api/emails/reply/{$trackingHash}");
         $response = $this->client->getResponse();
 
-        $this->assertSame(Codes::HTTP_CREATED, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode());
         $this->assertSame(['success' => true], json_decode($response->getContent(), true));
 
         // Get the email reply that was just created from the stat API.

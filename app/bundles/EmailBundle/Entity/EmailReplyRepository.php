@@ -61,7 +61,7 @@ final class EmailReplyRepository extends CommonRepository implements EmailReplyR
         );
     }
 
-    private function getTableAlias(): string
+    public function getTableAlias(): string
     {
         return 'reply';
     }
