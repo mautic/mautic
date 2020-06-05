@@ -687,7 +687,7 @@ class Report extends FormEntity implements SchedulerInterface
      */
     public function isScheduledNow()
     {
-        return $this->getScheduleUnit() === SchedulerEnum::UNIT_NOW;
+        return SchedulerEnum::UNIT_NOW === $this->getScheduleUnit();
     }
 
     /**

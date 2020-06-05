@@ -26,9 +26,6 @@ class ScheduleIsValidValidator extends ConstraintValidator
      */
     private $schedulerBuilder;
 
-    /**
-     * @param SchedulerBuilder $schedulerBuilder
-     */
     public function __construct(SchedulerBuilder $schedulerBuilder)
     {
         $this->schedulerBuilder = $schedulerBuilder;
@@ -86,9 +83,6 @@ class ScheduleIsValidValidator extends ConstraintValidator
             ->addViolation();
     }
 
-    /**
-     * @param Report $report
-     */
     private function buildScheduler(Report $report)
     {
         try {

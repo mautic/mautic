@@ -848,10 +848,7 @@ class ReportController extends FormController
     public function downloadAction($reportId, $format = 'csv')
     {
         if ('csv' !== $format) {
-            throw new \Exception($this->translator->trans(
-                'mautic.format.invalid',
-                ['%format%' => $format, '%validFormats%' => 'csv']
-            ));
+            throw new \Exception($this->translator->trans('mautic.format.invalid', ['%format%' => $format, '%validFormats%' => 'csv']));
         }
 
         /** @var \Mautic\ReportBundle\Model\ReportModel $model */

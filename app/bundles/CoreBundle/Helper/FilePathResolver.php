@@ -22,10 +22,6 @@ class FilePathResolver
 
     private $inputHelper;
 
-    /**
-     * @param Filesystem  $filesystem
-     * @param InputHelper $inputHelper
-     */
     public function __construct(Filesystem $filesystem, InputHelper $inputHelper)
     {
         $this->filesystem  = $filesystem;
@@ -116,14 +112,12 @@ class FilePathResolver
     }
 
     /**
-     * @param UploadedFile $file
-     *
      * @return string
      */
     private function getFileExtension(UploadedFile $file)
     {
         $ext = $file->getClientOriginalExtension();
-        $ext = ($ext === '' ? '' : '.').$ext;
+        $ext = ('' === $ext ? '' : '.').$ext;
 
         return $ext;
     }

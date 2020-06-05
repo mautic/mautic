@@ -33,11 +33,6 @@ class SendSchedule
      */
     private $fileHandler;
 
-    /**
-     * @param MailHelper      $mailer
-     * @param MessageSchedule $messageSchedule
-     * @param FileHandler     $fileHandler
-     */
     public function __construct(
         MailHelper $mailer,
         MessageSchedule $messageSchedule,

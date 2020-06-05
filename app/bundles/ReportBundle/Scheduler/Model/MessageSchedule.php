@@ -54,7 +54,7 @@ class MessageSchedule
 
     /**
      * @deprecated 2.15.2 to be removed in 3.0. Use getMessageForAttachedFile or getMessageForLinkedFile
-     * 
+     *
      * @param string $filePath
      *
      * @return string
@@ -79,8 +79,6 @@ class MessageSchedule
     }
 
     /**
-     * @param Report $report
-     *
      * @return string
      */
     public function getMessageForAttachedFile(Report $report)
@@ -95,8 +93,6 @@ class MessageSchedule
     }
 
     /**
-     * @param Report $report
-     *
      * @return string
      */
     public function getMessageForLinkedFile(Report $report)

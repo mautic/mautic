@@ -77,7 +77,7 @@ class FileHandler
         $zipFilePath = str_replace('.csv', '.zip', $originalFilePath);
         $zipArchive  = new \ZipArchive();
 
-        if ($zipArchive->open($zipFilePath, \ZipArchive::OVERWRITE | \ZipArchive::CREATE) === true) {
+        if (true === $zipArchive->open($zipFilePath, \ZipArchive::OVERWRITE | \ZipArchive::CREATE)) {
             $zipArchive->addFile($originalFilePath, 'report.csv');
             $zipArchive->close();
 
@@ -88,8 +88,6 @@ class FileHandler
     }
 
     /**
-     * @param Report $report
-     *
      * @return string;
      */
     public function getPathToCompressedCsvFileForReport(Report $report)
@@ -100,8 +98,6 @@ class FileHandler
     }
 
     /**
-     * @param Report $report
-     *
      * @return bool
      *
      * @codeCoverageIgnore as it calls PHP function only.
@@ -112,7 +108,6 @@ class FileHandler
     }
 
     /**
-     * @param Report $report
      * @param string $originalPath
      */
     public function moveZipToPermanentLocation(Report $report, $originalPath)
