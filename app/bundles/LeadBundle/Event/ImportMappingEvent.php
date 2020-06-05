@@ -54,9 +54,6 @@ class ImportMappingEvent extends Event
         return $this->objectSupported;
     }
 
-    /**
-     * @param array $fields
-     */
     public function setFields(array $fields)
     {
         $this->fields = $fields;

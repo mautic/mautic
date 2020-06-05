@@ -38,11 +38,6 @@ class ImportContactSubscriber extends CommonSubscriber
      */
     private $contactModel;
 
-    /**
-     * @param FieldList       $fieldList
-     * @param CorePermissions $corePermissions
-     * @param LeadModel       $contactModel
-     */
     public function __construct(
         FieldList $fieldList,
         CorePermissions $corePermissions,
@@ -66,8 +61,6 @@ class ImportContactSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param ImportInitEvent $event
-     *
      * @throws AccessDeniedException
      */
     public function onImportInit(ImportInitEvent $event)
@@ -85,9 +78,6 @@ class ImportContactSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param ImportMappingEvent $event
-     */
     public function onFieldMapping(ImportMappingEvent $event)
     {
         if ($event->importIsForRouteObject('contacts')) {
@@ -113,9 +103,6 @@ class ImportContactSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param ImportProcessEvent $event
-     */
     public function onImportProcess(ImportProcessEvent $event)
     {
         if ($event->importIsForObject('lead')) {

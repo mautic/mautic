@@ -38,11 +38,6 @@ class ImportCompanySubscriber extends CommonSubscriber
      */
     private $companyModel;
 
-    /**
-     * @param FieldList       $fieldList
-     * @param CorePermissions $corePermissions
-     * @param CompanyModel    $companyModel
-     */
     public function __construct(
         FieldList $fieldList,
         CorePermissions $corePermissions,
@@ -66,8 +61,6 @@ class ImportCompanySubscriber extends CommonSubscriber
     }
 
     /**
-     * @param ImportInitEvent $event
-     *
      * @throws AccessDeniedException
      */
     public function onImportInit(ImportInitEvent $event)
@@ -85,9 +78,6 @@ class ImportCompanySubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param ImportMappingEvent $event
-     */
     public function onFieldMapping(ImportMappingEvent $event)
     {
         if ($event->importIsForRouteObject('companies')) {
@@ -105,9 +95,6 @@ class ImportCompanySubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param ImportProcessEvent $event
-     */
     public function onImportProcess(ImportProcessEvent $event)
     {
         if ($event->importIsForObject('company')) {

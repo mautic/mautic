@@ -126,7 +126,6 @@ class ImportInitEvent extends Event
 
     /**
      * @param string $indexRoute
-     * @param array  $routeParams
      */
     public function setIndexRoute($indexRoute, array $routeParams = [])
     {

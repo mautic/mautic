@@ -37,11 +37,6 @@ class ImportProcessEvent extends Event
      */
     private $wasMerged;
 
-    /**
-     * @param Import       $import
-     * @param LeadEventLog $eventLog
-     * @param array        $rowData
-     */
     public function __construct(Import $import, LeadEventLog $eventLog, array $rowData)
     {
         $this->import   = $import;
