@@ -17,11 +17,23 @@ use Mautic\CoreBundle\Helper\FileProperties;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Exception\FileTooBigException;
 use Mautic\ReportBundle\Scheduler\Model\FileHandler;
+use PHPUnit\Framework\MockObject\MockObject;
 
-class FileHandlerTest extends \PHPUnit_Framework_TestCase
+class FileHandlerTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|FilePathResolver
+     */
     private $filePathResolver;
+
+    /**
+     * @var MockObject|FileProperties
+     */
     private $fileProperties;
+
+    /**
+     * @var MockObject|CoreParametersHelper
+     */
     private $coreParametersHelper;
 
     /**
