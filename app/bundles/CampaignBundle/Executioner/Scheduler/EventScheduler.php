@@ -302,16 +302,8 @@ class EventScheduler
         return $eventExecutionDate;
     }
 
-    public function shouldSchedule(\DateTime $executionDate, \DateTime $now, Event $event = null): bool
+    public function shouldSchedule(\DateTime $executionDate, \DateTime $now): bool
     {
-        if (null !== $event) {
-            $eventProperties = $event->getProperties();
-            if (!empty($eventProperties['triggerRestrictedDaysOfWeek'])) {
-                // Event has days in week specified. Needs to be recalculated to the next day configured
-                return true;
-            }
-        }
-
         // Mainly for functional tests so we don't have to wait minutes but technically can be used in an environment as well if this behavior
         // is desired by system admin
         if (false === (bool) getenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS')) {
@@ -321,6 +313,19 @@ class EventScheduler
         }
 
         return $executionDate > $now;
+    }
+
+    public function shouldScheduleForInactive(Event $event): bool
+    {
+        if (null !== $event) {
+            $eventProperties = $event->getProperties();
+            if (!empty($eventProperties['triggerRestrictedDaysOfWeek'])) {
+                // Event has days in week specified. Needs to be recalculated to the next day configured
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

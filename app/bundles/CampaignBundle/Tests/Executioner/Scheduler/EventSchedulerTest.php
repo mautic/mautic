@@ -114,16 +114,16 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testScheduleDayOfWeek()
+    public function testShouldScheduleForInactive()
     {
         $event = new Event();
-        $this->assertFalse($this->scheduler->shouldSchedule(new \DateTime(), new \DateTime(), $event));
+        $this->assertFalse($this->scheduler->shouldScheduleForInactive($event));
 
         $event->setProperties([
             'triggerRestrictedDaysOfWeek' => [],
         ]);
 
-        $this->assertFalse($this->scheduler->shouldSchedule(new \DateTime(), new \DateTime(), $event));
+        $this->assertFalse($this->scheduler->shouldScheduleForInactive($event));
 
         $event->setProperties([
             'triggerRestrictedDaysOfWeek' => [
@@ -132,7 +132,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
             ],
         ]);
 
-        $this->assertTrue($this->scheduler->shouldSchedule(new \DateTime(), new \DateTime(), $event));
+        $this->assertTrue($this->scheduler->shouldScheduleForInactive($event));
     }
 
     public function testGetExecutionDateForInactivity()
