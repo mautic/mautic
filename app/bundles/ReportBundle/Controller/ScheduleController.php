@@ -17,14 +17,11 @@ use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class ScheduleController.
- */
 class ScheduleController extends CommonAjaxController
 {
     public function indexAction($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency)
     {
-        /* @var DateBuilder $dateBuilder */
+        /** @var DateBuilder $dateBuilder */
         $dateBuilder = $this->container->get('mautic.report.model.scheduler_date_builder');
         $dates       = $dateBuilder->getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency);
 
