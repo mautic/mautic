@@ -240,19 +240,6 @@ function runPreUpgradeChecks()
     ];
 }
 
-// Fetch the update state out of the request if applicable
-$state = json_decode(base64_decode(getVar('updateState', 'W10=')), true);
-
-// Prime the state if it's empty
-if (empty($state)) {
-    $state['pluginComplete'] = false;
-    $state['bundleComplete'] = false;
-    $state['cacheComplete']  = false;
-    $state['coreComplete']   = false;
-    $state['vendorComplete'] = false;
-}
-$status = ['complete' => false, 'error' => false, 'updateState' => $state, 'stepStatus' => 'In Progress'];
-
 // Web request upgrade
 if (!IN_CLI) {
     $request         = explode('?', $_SERVER['REQUEST_URI'])[0];
@@ -532,29 +519,19 @@ if (!IN_CLI) {
             </div>");
 
         default:
-            $status['error']      = true;
-            $status['message']    = 'Invalid task';
-            $status['stepStatus'] = 'Failed';
+            echo 'Oops! No task selected. Please try again.';
+            exit;
             break;
     }
 
-    if ($standalone || !empty($redirect)) {
-        // Standalone updater or redirecting to help prevent timeouts
-        if (!empty($nextTask)) {
-            if ('finish' == $nextTask) {
-                header("Location: $url?task=$nextTask&standalone=$standalone");
-            } else {
-                header("Location: $url?{$query}task=$nextTask&standalone=$standalone&updateState=" . get_state_param($state));
-            }
-
-            exit;
+    if (!empty($nextTask)) {
+        if ('finish' == $nextTask) {
+            header("Location: $url?task=$nextTask");
+        } else {
+            header("Location: $url?{$query}task=$nextTask");
         }
-    } else {
-        // Request through Mautic's UI
-        $status['updateState'] = get_state_param($status['updateState']);
 
-        throw new \Exception('test');
-        // send_response($status);
+        exit;
     }
 } else {
     // CLI upgrade
@@ -862,16 +839,6 @@ function logUpdateStart()
     $data .= "OS: " . PHP_OS . "\n";
 
     writeToLog($data);
-}
-
-/**
- * @param array $state
- *
- * @return string
- */
-function get_state_param(array $state)
-{
-    return base64_encode(json_encode($state));
 }
 
 /**
@@ -1511,7 +1478,7 @@ function copy_directory($src, $dest)
 function build_cache()
 {
     // Rebuild the cache
-    return run_symfony_command('cache:clear', ['--no-interaction', '--env=prod', '--no-debug', '--no-warmup']);
+    return run_symfony_command('cache:clear', ['--no-interaction', '--env=prod', '--no-debug']);
 }
 
 /**
@@ -1721,24 +1688,30 @@ function recursive_remove_directory($directory)
 function html_body($content)
 {
     $html = <<<HTML
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>Upgrade Mautic</title>
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">-->
-  </head>
-  <body>
-    <div class="container" style="padding: 25px;">
-        $content
-    </div>
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-  </body>
-</html>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Upgrade Mautic</title>
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    </head>
+    <body>
+        <div class="container" style="padding: 25px;">
+            <div>$content</div>
+            <div id="upgradeProgressStatus"></div>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+        <script type="text/javascript">
+            $(document).ready(function(){
+                var hash = window.location.hash;
+            });
+        </script>
+    </body>
+    </html>
 HTML;
 
     echo $html;
