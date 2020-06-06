@@ -299,6 +299,7 @@ class FormController extends CommonFormController
 
         $action = $this->generateUrl('mautic_form_action', ['objectAction' => 'new']);
         $form   = $model->createForm($entity, $this->get('form.factory'), $action);
+        $this->get('translator')->setLocale($form->getLanguage());
 
         ///Check for a submitted form and process it
         if ('POST' == $this->request->getMethod()) {
@@ -912,6 +913,7 @@ class FormController extends CommonFormController
         /** @var FormModel $model */
         $model = $this->getModel('form.form');
         $form  = $model->getEntity($objectId);
+        $this->get('translator')->setLocale($form->getLanguage());
 
         if (null === $form) {
             $html =

@@ -39,7 +39,6 @@ class PublicController extends CommonFormController
             return $this->accessDenied();
         }
         $isAjax        = $this->request->query->get('ajax', false);
-        $form          = null;
         $post          = $this->request->request->get('mauticform');
         $messengerMode = (!empty($post['messenger']));
         $server        = $this->request->server->all();
@@ -57,6 +56,9 @@ class PublicController extends CommonFormController
         }
 
         $translator = $this->get('translator');
+        $formModel  = $this->getModel('form.form');
+        $form       = $formModel->getEntity($post['formId']);
+        $translator->setLocale($form->getLanguage());
 
         if (!isset($post['formId']) && isset($post['formid'])) {
             $post['formId'] = $post['formid'];
@@ -68,9 +70,6 @@ class PublicController extends CommonFormController
         if (!isset($post['formId'])) {
             $error = $translator->trans('mautic.form.submit.error.unavailable', [], 'flashes');
         } else {
-            $formModel = $this->getModel('form.form');
-            $form      = $formModel->getEntity($post['formId']);
-
             //check to see that the form was found
             if (null === $form) {
                 $error = $translator->trans('mautic.form.submit.error.unavailable', [], 'flashes');
