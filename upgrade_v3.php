@@ -30,7 +30,6 @@ $task       = getVar('task');
 
 define('IN_CLI', php_sapi_name() === 'cli');
 define('MAUTIC_ROOT', __DIR__);
-define('MAUTIC_UPGRADE_ERROR_LOG', MAUTIC_ROOT . '/upgrade_errors.txt');
 define('MAUTIC_APP_ROOT', MAUTIC_ROOT . '/app');
 define('MAUTIC_UPGRADE_FOLDER_NAME', 'mautic-3-temp-files');
 define('MAUTIC_UPGRADE_ROOT', MAUTIC_ROOT . DIRECTORY_SEPARATOR . MAUTIC_UPGRADE_FOLDER_NAME);
@@ -39,6 +38,13 @@ define('MAUTIC_BACKUP_FOLDER_ROOT', MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'mautic-
 
 if (!file_exists(MAUTIC_UPGRADE_ROOT)) {
     mkdir(MAUTIC_UPGRADE_ROOT);
+}
+
+// This value always needs to contain upgrade_log.txt as we replace that with a unique hashed name later on!
+define('UPGRADE_LOG_FILE', MAUTIC_ROOT . '/upgrade_log.txt');
+
+if (!file_exists(UPGRADE_LOG_FILE)) {
+    file_put_contents(UPGRADE_LOG_FILE, '');
 }
 
 // Get local parameters
@@ -263,14 +269,17 @@ if (!IN_CLI) {
 
     switch ($task) {
         case '':
+            logUpdateStart();
             header("Refresh: 2; URL=$url?{$query}task=preUpgradeChecks");
             html_body("<div class='card card-body bg-light text-center'><h3>Checking system requirements...</h3><br /><strong>We're checking whether your system meets the requirements for Mautic 3. This may take several minutes, do not close this window!</strong></div>");
             exit;
 
         case 'preUpgradeChecks':
+            writeToLog('Running pre-upgrade checks...');
             $preUpgradeCheckResults = runPreUpgradeChecks();
             $preUpgradeCheckErrors = $preUpgradeCheckResults['errors'];
             $preUpgradeCheckWarnings = $preUpgradeCheckResults['warnings'];
+
             $html = "<div class='card card-body bg-light text-center'>";
 
             $generalRemarks = "<strong>IMPORTANT: you will need to update your cron jobs from app/console/* to bin/console/* after the upgrade.<br>
@@ -278,21 +287,30 @@ if (!IN_CLI) {
             <u>It's strongly recommended to have a backup before you start upgrading!</u></strong><br><br>";
 
             if (count($preUpgradeCheckErrors) > 0) {
+                $logData = "One or more errors occurred in the pre-upgrade checks:";
                 $html .= '<h3>Whoops! You\'re not ready for Mautic 3 (yet)</h3>
                 <p>The following <strong style="color: red">errors</strong> occurred while checking system compatibility:</p>
                 <ul style="text-align: left">';
                 foreach ($preUpgradeCheckErrors as $error) {
+                    $logData .= "\n- " . $error;
                     $html .= '<li>' . $error . '</li>';
                 }
                 $html .= '</ul>';
+
+                $logData .= "\n";
+                writeToLog($logData);
             }
 
             if (count($preUpgradeCheckWarnings) > 0) {
+                $logData = "One or more warnings occurred in the pre-upgrade checks:";
                 $html .= '<p>The following <strong style="color: orange">warnings</strong> occurred while checking system compatibility:</p><ul style="text-align: left">';
                 foreach ($preUpgradeCheckWarnings as $warning) {
+                    $logData .= "\n- " . $warning;
                     $html .= '<li>' . $warning . '</li>';
                 }
                 $html .= '</ul>';
+                $logData .= "\n";
+                writeToLog($logData);
             }
 
             if (count($preUpgradeCheckErrors) === 0 && count($preUpgradeCheckWarnings) > 0) {
@@ -305,6 +323,7 @@ if (!IN_CLI) {
             }
 
             if (count($preUpgradeCheckErrors) === 0 && count($preUpgradeCheckWarnings) === 0) {
+                writeToLog("All pre-upgrade checks passed successfully.");
                 $html .= "<h3>Ready to upgrade ✅</h3>
                 <br />Your system is compatible with Mautic 3!<br>Do not refresh or stop the process. This may take several minutes.<br><br>
                 " . $generalRemarks . "
@@ -321,6 +340,7 @@ if (!IN_CLI) {
             break;
 
         case 'startUpgrade':
+            writeToLog("Starting the upgrade...");
             $nextTask = 'backupDatabase';
             sendUpgradeStats('started');
             break;
@@ -328,47 +348,71 @@ if (!IN_CLI) {
         case 'backupDatabase':
             // Only do the backup if mysqldump is available, otherwise skip this step.
             if (is_mysqldump_available() === true) {
+                writeToLog("Running database backup...");
                 list($success, $message) = backup_database();
 
                 if (!$success) {
                     sendUpgradeStats('failed');
-                    html_body("<div alert='alert alert-danger'>Database backup failed. Your Mautic 2 installation is intact, so you can safely restart the upgrade. Error from mysqldump: $message</div>");
+                    throwErrorAndWriteToLog(
+                        "ERR_DATABASE_BACKUP_FAILED",
+                        "Database backup failed. Your Mautic 2 installation is intact, so you can safely restart the upgrade. Error from mysqldump: " . $message
+                    );
                 }
+                writeToLog("Successfully backed up database.");
+            } else {
+                writeToLog("Skipping database backup due to mysqldump not being available.");
             }
 
             $nextTask = 'applyV2Migrations';
             break;
 
         case 'applyV2Migrations':
+            writeToLog("Applying Mautic 2 migrations to ensure all migrations are in place prior to upgrade...");
             // Apply migrations on the 2.x branch just so we're sure that we have all migrations in place.
-            if (apply_migrations() === false) {
+            list($success, $output) = apply_migrations();
+            if ($success === false) {
                 sendUpgradeStats('failed');
-                html_body("<div alert='alert alert-danger'>Oh no! While preparing the upgrade, the so-called 'database migrations' for Mautic 2 have failed. Please check our knowledgebase (TODO) for more info.</div>");
+                throwErrorAndWriteToLog(
+                    "ERR_MAUTIC_2_MIGRATIONS_FAILED",
+                    "Oh no! While preparing the upgrade, the so-called 'database migrations' for Mautic 2 have failed. "
+                        . "Command output: " . $output
+                );
             };
 
+            writeToLog("Mautic 2 migrations applied successfully.");
             $nextTask = 'fetchUpdates';
             break;
 
         case 'fetchUpdates':
+            writeToLog("Downloading Mautic 3 upgrade package...");
             list($success, $message) = fetch_updates();
 
             if (!$success) {
                 sendUpgradeStats('failed');
-                html_body("<div alert='alert alert-danger'>$message</div>");
+                throwErrorAndWriteToLog(
+                    "ERR_DOWNLOAD_UPGRADE_PACKAGE_FAILED",
+                    "Downloading the Mautic 3 upgrade package has failed: " . $message
+                );
             }
 
+            writeToLog("Successfully downloaded Mautic 3 upgrade package.");
             $query    = "version=$message&";
             $nextTask = 'extractUpdate';
             break;
 
         case 'extractUpdate':
+            writeToLog("Extracting Mautic 3 files...");
             list($success, $message) = extract_package();
 
             if (!$success) {
                 sendUpgradeStats('failed');
-                html_body("<div alert='alert alert-danger'>$message</div>");
+                throwErrorAndWriteToLog(
+                    "ERR_EXTRACT_UPGRADE_PACKAGE_FAILED",
+                    "Error while extracting Mautic 3 files: " . $message
+                );
             }
 
+            writeToLog("Mautic 3 files extracted successfully.");
             $nextTask = 'moveMautic2and3Files';
             break;
 
@@ -377,67 +421,104 @@ if (!IN_CLI) {
              * Move current Mautic 2 files into a temporary directory called "mautic-2-backup-files",
              * then move the Mautic 3 files from "mautic-3-temp-files" to the root directory.
              */
+            writeToLog("Moving Mautic 2 files to mautic-2-backup-files folder, then moving Mautic 3 files from mautic-3-temp-files to the root folder...");
             list($success, $message) = replace_mautic_2_with_mautic_3();
 
             if (!$success) {
                 sendUpgradeStats('failed');
-                html_body("<div alert='alert alert-danger'>$message</div>");
+                throwErrorAndWriteToLog(
+                    "ERR_MOVE_MAUTIC_2_AND_3_FILES",
+                    "Error while moving Mautic 2 or 3 files: " . $message
+                );
             }
 
+            writeToLog("Successfully moved Mautic 3 files into place!");
             $nextTask = 'updateLocalConfig';
             break;
 
         case 'updateLocalConfig':
             // Update config/local.php with updated keys.
+            writeToLog("Updating config/local.php with new configuration parameters...");
             list($success, $message) = update_local_config();
 
             if (!$success) {
                 sendUpgradeStats('failed');
-                html_body("<div alert='alert alert-danger'>$message</div>");
+                throwErrorAndWriteToLog(
+                    "ERR_UPDATE_LOCAL_CONFIG",
+                    "Failed updating your configuration in config/local.php: " . $message
+                );
             }
 
+            writeToLog("Successfully updated config/local.php.");
             $nextTask = 'applyMigrations';
             break;
 
         case 'applyMigrations':
             // Apply Mautic 3 migrations. Almost there!!
-            if (apply_migrations() === false) {
+            writeToLog("Applying Mautic 3 database migrations...");
+
+            list($success, $output) = apply_migrations();
+            if ($success === false) {
                 sendUpgradeStats('failed');
-                html_body("<div alert='alert alert-danger'>Oh no! We were almost there, but we couldn\'t run the so-called 'database migrations' for Mautic 3. Please check our knowledgebase (TODO) for more info.</div>");
+                throwErrorAndWriteToLog(
+                    "ERR_MAUTIC_3_MIGRATIONS_FAILED",
+                    "Oops! We couldn\'t run the so-called 'database migrations' for Mautic 3. These are crucial for the upgrade to finish, so we can't proceed."
+                        . "Command output: " . $output
+                );
             };
 
+            writeToLog("Successfully applied Mautic 3 database migrations");
             $nextTask = 'restoreUserData';
             break;
 
         case 'restoreUserData':
+            writeToLog("Restoring user data from Mautic 2 installation...");
             // Restore user data like plugins/themes/media from the original Mautic 2 installation to the "fresh" M3 installation
             list($success, $message) = restore_user_data();
 
             if (!$success) {
                 sendUpgradeStats('failed');
-                html_body("<div alert='alert alert-danger'>$message</div>");
+                throwErrorAndWriteToLog(
+                    "ERR_RESTORE_USER_DATA_FAILED",
+                    "Failed to restore user data from Mautic 2 installation: " . $message
+                );
             }
 
+            writeToLog("Successfully restored user data from Mautic 2 installation.");
             $nextTask = 'buildCache';
             break;
 
         case 'buildCache':
+            writeToLog("Building cache for Mautic 3...");
             // Build fresh cache for M3.
-            if (build_cache() === false) {
+            list($success, $output) = build_cache();
+            if ($success === false) {
                 sendUpgradeStats('failed');
-                html_body("<div alert='alert alert-danger'>Oh no! We couldn't build a fresh cache for Mautic 3. Please check our knowledgebase (TODO) for more info.</div>");
+                throwErrorAndWriteToLog(
+                    "ERR_BUILD_M3_CACHE",
+                    "Failed to build cache for Mautic 3. "
+                        . "All your data has been successfully migrated to Mautic 3, "
+                        . "but this error very likely needs to be fixed before you can start using Mautic 3. "
+                        . "Command output: " . $output
+                );
             };
 
-            $nextTask = 'restoreUserData';
+            writeToLog("Successfully created cache for Mautic 3");
+            $nextTask = 'cleanupFiles';
             break;
 
         case 'cleanupFiles':
             // Cleanup some of our installation files that we no longer need.
+            writeToLog("Cleanup upgrade files...");
             if (cleanup_files() === false) {
                 sendUpgradeStats('failed');
-                html_body("<div alert='alert alert-danger'>Oops! We tried cleaning up after ourselves, but it didn\'t work as expected. Please check our knowledgebase (TODO link)</div>");
+                throwErrorAndWriteToLog(
+                    "ERR_CLEANUP_FILES",
+                    "Oops! We tried cleaning up after ourselves, but it didn\'t work as expected. You should be able to start using Mautic 3 now, though."
+                );
             }
 
+            writeToLog("Successfully cleaned up upgrade files. We're done!");
             sendUpgradeStats('succeeded');
 
             // Destroy the upgrade script as we no longer need it.
@@ -446,7 +527,8 @@ if (!IN_CLI) {
             html_body("<div class='card card-body bg-light text-center'>
                 <h3>We're done! ✅</h3>
                 <br /><strong>You're ready to use Mautic 3! This script has destroyed itself, so there's nothing left to do for you. Enjoy!</strong><br><br>
-                <iframe src='https://giphy.com/embed/1GrsfWBDiTN60' width='480' height='262' frameBorder='0' class='giphy-embed' allowFullScreen></iframe><p><a href='https://giphy.com/gifs/dance-long-hair-shake-1GrsfWBDiTN60'>via GIPHY</a></p>
+                <a href=\"" . $localParameters['site_url'] . "\" class=\"btn btn-primary\" target=\"_blank\">Open Mautic 3</a><br><br>'
+                <iframe src='https://giphy.com/embed/1GrsfWBDiTN60' style='margin: 0 auto' width='480' height='262' frameBorder='0' class='giphy-embed' allowFullScreen></iframe><p><a href='https://giphy.com/gifs/dance-long-hair-shake-1GrsfWBDiTN60'>via GIPHY</a></p>
             </div>");
 
         default:
@@ -494,18 +576,20 @@ if (!IN_CLI) {
         echo "\n";
         echo "Thank you, continuing...\n";
 
-        echo "Doing pre-upgrade checks...\n";
+        logUpdateStart();
+
+        writeToLog("Doing pre-upgrade checks...");
         $preUpgradeCheckResults = runPreUpgradeChecks();
         $preUpgradeCheckErrors = $preUpgradeCheckResults['errors'];
         $preUpgradeCheckWarnings = $preUpgradeCheckResults['warnings'];
 
         if (count($preUpgradeCheckErrors) > 0) {
-            echo "One or more errors occurred during pre-upgrade checks: \n- " . implode("\n- ", $preUpgradeCheckErrors) . "\n";
+            writeToLog("One or more errors occurred during pre-upgrade checks: \n- " . implode("\n- ", $preUpgradeCheckErrors));
             exit;
         }
 
         if (count($preUpgradeCheckWarnings) > 0) {
-            echo "One or more warnings occurred during pre-upgrade checks, please run this script with the --ignore-warnings flag to continue: \n- " . implode("\n- ", $preUpgradeCheckWarnings) . "\n";
+            writeToLog("One or more warnings occurred during pre-upgrade checks, please run this script with the --ignore-warnings flag to continue: \n- " . implode("\n- ", $preUpgradeCheckWarnings));
 
             $val = getopt('i', ['ignore-warnings']);
             if (empty($val)) {
@@ -513,54 +597,67 @@ if (!IN_CLI) {
             }
         }
 
-        echo "Starting upgrade...\n";
+        writeToLog("Finished pre-upgrade checks.");
+        writeToLog("Starting upgrade...");
 
         sendUpgradeStats('started');
 
         if (is_mysqldump_available() === true) {
-            echo "Backing up your database...\n";
+            writeToLog("Backing up your database...");
             list($success, $message) = backup_database();
 
             if (!$success) {
                 sendUpgradeStats('failed');
-                echo "Database backup failed. Your Mautic 2 installation is intact, so you can safely restart the upgrade. Error from mysqldump: " . $message;
-                exit;
+                throwErrorAndWriteToLog(
+                    "ERR_DATABASE_BACKUP_FAILED",
+                    "Database backup failed. Your Mautic 2 installation is intact, so you can safely restart the upgrade. Error from mysqldump: " . $message
+                );
             } else {
-                echo "Database backup successfully written to your Mautic root folder.\n";
+                writeToLog("Database backup successfully written to your Mautic root folder.");
             }
         } else {
-            echo "Skipping database backup because we can't find mysqldump on your system...\n";
+            writeToLog("Skipping database backup because we can't find mysqldump on your system...");
         }
 
-        echo "Applying Mautic 2 migrations, just so we're sure your database is up to date before upgrading. This might take a while, DO NOT ABORT THE SCRIPT!!!\n";
+        writeToLog("Applying Mautic 2 migrations, just so we're sure your database is up to date before upgrading. This might take a while, DO NOT ABORT THE SCRIPT!!!");
 
-        if (apply_migrations() === false) {
+        list($success, $output) = apply_migrations();
+        if ($success === false) {
             sendUpgradeStats('failed');
-            echo "Something went wrong while applying Mautic 2 migrations. Please try to run app/console doctrine:migrations:migrate --env=prod, to troubleshoot further. Then run this script again.\n";
-            exit;
+            throwErrorAndWriteToLog(
+                "ERR_MAUTIC_2_MIGRATIONS_FAILED",
+                "Something went wrong while applying Mautic 2 migrations. "
+                    . "Please try to run app/console doctrine:migrations:migrate --env=prod, to troubleshoot further. "
+                    . "Then run this script again."
+                    . "Command output: " . $output
+            );
         };
 
-        echo "Downloading Mautic 3...\n";
+        writeToLog("Downloading Mautic 3...");
         list($success, $message) = fetch_updates();
 
         if (!$success) {
             sendUpgradeStats('failed');
-            echo "Failed. $message";
-            exit;
+            throwErrorAndWriteToLog(
+                "ERR_DOWNLOAD_UPGRADE_PACKAGE_FAILED",
+                "Downloading the Mautic 3 upgrade package has failed: " . $message
+            );
         }
 
-        echo "Extracting the update package...\n";
+        writeToLog("Extracting the update package...");
 
         list($success, $message) = extract_package();
         if (!$success) {
             sendUpgradeStats('failed');
-            echo "Failed. $message";
-            exit;
+            throwErrorAndWriteToLog(
+                "ERR_EXTRACT_UPGRADE_PACKAGE_FAILED",
+                "Error while extracting Mautic 3 files: " . $message
+            );
         }
 
-        echo "Extracting done!\n";
+        writeToLog("Extracting done!");
 
-        echo "Moving Mautic 2 files into mautic-2-backup and moving the Mautic 3 files in place, this might take a while... DO NOT ABORT THE SCRIPT!!!\n";
+        writeToLog("Moving Mautic 2 files into mautic-2-backup and moving the Mautic 3 files in place, this might take a while... DO NOT ABORT THE SCRIPT!!!");
 
         /**
          * Move current Mautic 2 files into a temporary directory called "mautic-2-backup-files",
@@ -570,89 +667,110 @@ if (!IN_CLI) {
 
         if (!$success) {
             sendUpgradeStats('failed');
-            echo "Failed. $message";
-            exit;
+            throwErrorAndWriteToLog(
+                "ERR_MOVE_MAUTIC_2_AND_3_FILES",
+                "Error while moving Mautic 2 or 3 files: " . $message
+            );
         }
 
-        echo "Done!\n";
+        writeToLog("Done!\n");
 
-        echo "Updating your config/local.php with new settings that were changed/introduced in Mautic 3...\n";
+        writeToLog("Updating your config/local.php with new settings that were changed/introduced in Mautic 3...");
 
         list($success, $message) = update_local_config();
 
         if (!$success) {
             sendUpgradeStats('failed');
-            echo "Failed. $message";
-            exit;
+            throwErrorAndWriteToLog(
+                "ERR_UPDATE_LOCAL_CONFIG",
+                "Failed updating your configuration in config/local.php: " . $message
+            );
         }
 
-        echo "Done! Your config file has been updated.\n";
+        writeToLog("Done! Your config file has been updated.");
 
-        echo "Preparing for phase 2 of the upgrade...\n";
+        writeToLog("Preparing for phase 2 of the upgrade...");
 
         $result = file_put_contents($m3_phase_2_file, 'READY FOR PHASE 2, RUN php upgrade_v3.php');
 
         if ($result === false) {
             sendUpgradeStats('failed');
-            echo "IMPORTANT: We couldn't prepare for Phase 2 of the upgrade, so we need your help. In the same folder where upgrade_v3.php is located, create a file called m3_upgrade_pending_phase_2.txt (no contents needed), then run this script again.";
+            writeToLog("IMPORTANT: We couldn't prepare for Phase 2 of the upgrade, so we need your help. "
+                . "In the same folder where upgrade_v3.php is located, create a file called m3_upgrade_pending_phase_2.txt (no contents needed), then run this script again.");
             exit;
         }
 
-        echo "IMPORTANT: NOT DONE YET! Due to the large amount of changes in Composer dependencies, we now need to restart the script to continue. We've saved your state, so we'll continue where we left off.\n";
-        echo "PLEASE RUN php upgrade_v3.php AGAIN TO START PHASE 2 OF THE UPGRADE!\n";
+        writeToLog("IMPORTANT: NOT DONE YET! Due to the large amount of changes in Composer dependencies, we now need to restart the script to continue. "
+            . "We've saved your state, so we'll continue where we left off.");
+        writeToLog("PLEASE RUN php upgrade_v3.php AGAIN TO START PHASE 2 OF THE UPGRADE!");
         exit;
     }
 
-    echo "Welcome to Phase 2 of the Mautic 3 upgrade! We'll continue where we left off.\n";
+    writeToLog("Welcome to Phase 2 of the Mautic 3 upgrade! We'll continue where we left off.");
 
-    echo "Applying database migrations for Mautic 3... This might take a while, DO NOT ABORT THE SCRIPT!!!\n";
+    writeToLog("Applying database migrations for Mautic 3... This might take a while, DO NOT ABORT THE SCRIPT!!!");
 
-    if (apply_migrations() === false) {
+    list($success, $output) = apply_migrations();
+    if ($success === false) {
         sendUpgradeStats('failed');
-        echo "Database migrations failed. Please try manually with app/console doctrine:migrations:migrate --env=prod. When database migrations are done, Mautic 3 is ready to use!\n";
-        exit;
+        throwErrorAndWriteToLog(
+            "ERR_MAUTIC_3_MIGRATIONS_FAILED",
+            "Database migrations failed. Please try manually with app/console doctrine:migrations:migrate --env=prod. "
+                . "When database migrations are done, run this script again to proceed."
+                . "Command output: " . $output
+        );
     };
 
-    echo "Database migration done!";
-    
-    echo "Restoring your user data like custom plugins/themes/media from the Mautic 2 installation. This might take a while... DO NOT ABORT THE SCRIPT!!!\n";
+    writeToLog("Database migration done!");
+
+    writeToLog("Restoring your user data like custom plugins/themes/media from the Mautic 2 installation. This might take a while... DO NOT ABORT THE SCRIPT!!!");
 
     list($success, $message) = restore_user_data();
 
     if (!$success) {
         sendUpgradeStats('failed');
-        echo "Failed. $message";
-        exit;
+        throwErrorAndWriteToLog(
+            "ERR_RESTORE_USER_DATA_FAILED",
+            "Failed to restore user data from Mautic 2 installation: " . $message
+        );
     }
 
-    echo "Done! Your user data has been restored. Your Mautic 3 installation is ready. Just one more thing:\n";
+    writeToLog("Done! Your user data has been restored. Your Mautic 3 installation is ready. Just one more thing:");
 
-    echo "Building cache for Mautic 3...\n";
+    writeToLog("Building cache for Mautic 3...");
 
-    if (build_cache() === false) {
+    list($success, $output) = build_cache();
+    if ($success === false) {
         sendUpgradeStats('failed');
-        echo "Failed. $message";
-        exit;
+        throwErrorAndWriteToLog(
+            "ERR_BUILD_M3_CACHE",
+            "Failed to build cache for Mautic 3. "
+                . "All your data has been successfully migrated to Mautic 3, "
+                . "but this error very likely needs to be fixed before you can start using Mautic 3. "
+                . "Command output: " . $output
+        );
     };
 
-    echo "Done! Cache has been built.\n";
+    writeToLog("Done! Cache has been built.");
 
-    echo "Cleaning up installation files that we no longer need...\n";
+    writeToLog("Cleaning up installation files that we no longer need...");
 
     // We only use the Phase 2 file in the CLI version of the upgrade, so we'll delete it here...
     unlink($m3_phase_2_file);
 
     if (cleanup_files() === false) {
         sendUpgradeStats('failed');
-        echo "Cleaning up failed. Probably a permissions issue. This is not a big problem; you can still start using Mautic 3 now.\n";
-        exit;
+        throwErrorAndWriteToLog(
+            "ERR_CLEANUP_FILES",
+            "Oops! We tried cleaning up after ourselves, but it didn\'t work as expected. You should be able to start using Mautic 3 now, though."
+        );
     }
 
-    echo "Cleaned up successfully!\n";
+    writeToLog("Cleaned up successfully!");
 
     sendUpgradeStats('succeeded');
 
-    echo "We're done! Enjoy using Mautic 3 :)\n";
+    writeToLog("We're done! Enjoy using Mautic 3 :)");
 
     // Destroy the upgrade script as we no longer need it.
     unlink(__FILE__);
@@ -701,6 +819,49 @@ function get_local_config()
     }
 
     return $parameters;
+}
+
+/**
+ * Throw an error. In the CLI, we echo it, in the UI we output it in the browser.
+ * This function also automatically generates a link to Mautic's documentation.
+ * 
+ * @param string $code
+ * @param string $message
+ * 
+ * @return void
+ */
+function throwErrorAndWriteToLog($code, $message)
+{
+    writeToLog($code . ': ' . $message);
+
+    // Generate URL to docs including error code.
+    $url = 'https://docs.mautic.org/en/mautic-3-upgrade-errors#' . strtolower($code);
+
+    if (!IN_CLI) {
+        html_body("<div alert='alert alert-danger'>$code: $message. Read more details about this error <a target=\"_blank\" href=\"$url\">in our documentation</a>.</div>");
+    } else {
+        echo $code . ": " . $message . ". For more details about this message, see " . $url . "\n";
+        exit;
+    }
+}
+
+/**
+ * Write update start data to log.
+ */
+function logUpdateStart()
+{
+    $data = "===== STARTING MAUTIC 3 UPGRADE AT " . date('Y-m-d H:i:s') . "... =====\n";
+
+    if (file_exists(MAUTIC_APP_ROOT . '/version.txt')) {
+        $version = file_get_contents(MAUTIC_APP_ROOT . '/version.txt');
+        $version = str_replace("\n", "", $version);
+        $data .= "Installed Mautic version: " . $version . "\n";
+    }
+
+    $data .= "PHP version: " . PHP_VERSION . "\n";
+    $data .= "OS: " . PHP_OS . "\n";
+
+    writeToLog($data);
 }
 
 /**
@@ -960,7 +1121,13 @@ function replace_mautic_2_with_mautic_3()
     }
 
     // Only exclude the Mautic 2 backup folder, Mautic 3 upgrade files folder, the current upgrade file and the DB backup file.
-    $excludedFilesAndFolders = [MAUTIC_UPGRADE_ROOT, MAUTIC_BACKUP_FOLDER_ROOT, __FILE__, MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'm3_upgrade_db_backup.sql'];
+    $excludedFilesAndFolders = [
+        MAUTIC_UPGRADE_ROOT,
+        MAUTIC_BACKUP_FOLDER_ROOT,
+        __FILE__,
+        MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'm3_upgrade_db_backup.sql',
+        UPGRADE_LOG_FILE
+    ];
 
     $iterator = new DirectoryIterator(MAUTIC_ROOT);
 
@@ -1027,13 +1194,12 @@ function replace_mautic_2_with_mautic_3()
         }
 
         // Temporarily restore our M2 htaccess as the M3 one doesn't include upgrade_v3.php for whitelisting
-        // TODO RESTORE THIS FILE WHEN UPGRADE IS FINISHED
         rename(MAUTIC_ROOT . DIRECTORY_SEPARATOR . '/.htaccess', MAUTIC_ROOT . DIRECTORY_SEPARATOR . '/.htaccess.m3');
         copy(MAUTIC_BACKUP_FOLDER_ROOT . DIRECTORY_SEPARATOR . '/.htaccess', MAUTIC_ROOT . DIRECTORY_SEPARATOR . '/.htaccess');
 
         // Last step is to restore the config files (otherwise this script can't be loaded with a new step, as the local.php file won't exist)
     } else {
-        return [false, 'Something went wrong while we tried to move the new Mautic 3 files to your Mautic root folder. You are in a critical state now where you need to restore things manually. Read more HERE (TODO).'];
+        return [false, 'Something went wrong while we tried to move the new Mautic 3 files to your Mautic root folder. You are in a critical state now where you need to restore things manually.'];
     }
 
     /**
@@ -1232,10 +1398,12 @@ function replaceConfigValueIfExistsAndEquals(array $parameters, string $key, $ol
 }
 
 /**
+ * Run Symfony command. Returns array of [bool $success, string $output]
+ * 
  * @param       $command
  * @param array $args
  *
- * @return bool
+ * @return array
  *
  * @throws Exception
  */
@@ -1258,12 +1426,13 @@ function run_symfony_command($command, array $args)
     }
 
     $input    = new \Symfony\Component\Console\Input\ArgvInput($args);
-    $output   = new \Symfony\Component\Console\Output\NullOutput();
+    $output   = new \Symfony\Component\Console\Output\BufferedOutput();
     $exitCode = $application->run($input, $output);
 
-    unset($input, $output);
-
-    return $exitCode === 0;
+    return [
+        $exitCode === 0,
+        $output->fetch()
+    ];
 }
 
 /**
@@ -1337,7 +1506,7 @@ function copy_directory($src, $dest)
 /**
  * Build the cache.
  *
- * @return bool
+ * @return array
  */
 function build_cache()
 {
@@ -1348,7 +1517,7 @@ function build_cache()
 /**
  * Apply all migrations.
  *
- * @return bool
+ * @return array
  */
 function apply_migrations()
 {
@@ -1407,6 +1576,26 @@ function sendUpgradeStats($status)
 }
 
 /**
+ * Write some text to the log.
+ */
+function writeToLog($content)
+{
+    $data = '';
+
+    if (file_exists(UPGRADE_LOG_FILE)) {
+        $data = file_get_contents(UPGRADE_LOG_FILE);
+    }
+
+    $data .= "\n[" . date('Y-m-d H:i:s') . "] $content";
+
+    file_put_contents(UPGRADE_LOG_FILE, $data);
+
+    if (IN_CLI) {
+        echo "$content\n";
+    }
+}
+
+/**
  * Cleanup some of our upgrade files after the upgrade took place.
  * 
  * @return bool
@@ -1443,6 +1632,13 @@ function cleanup_files()
         $hash = bin2hex(random_bytes(16));
         $status = rename(MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'm3_upgrade_db_backup.sql', MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'm3_upgrade_db_backup_' . $hash . '.sql');
         if ($status === false) $failedChanges[] = 'm3_upgrade_db_backup.sql';
+    }
+
+    // Rename the upgrade_log.txt file to one with a random hash to prevent public access
+    if (file_exists(UPGRADE_LOG_FILE)) {
+        $hash = bin2hex(random_bytes(16));
+        $status = rename(UPGRADE_LOG_FILE, str_replace('upgrade_log.txt', 'upgrade_log_' . $hash . '.txt', UPGRADE_LOG_FILE));
+        if ($status === false) $failedChanges[] = 'upgrade_log.txt';
     }
 
     // NOTE: we leave the mautic-2-backup-files-$HASH folder and m3_upgrade_db_backup_$HASH.sql file as-is in case something still doesn't work as expected.
