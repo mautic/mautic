@@ -244,21 +244,15 @@ function runPreUpgradeChecks()
 if (!IN_CLI) {
     $request         = explode('?', $_SERVER['REQUEST_URI'])[0];
     $url             = "//{$_SERVER['HTTP_HOST']}{$request}";
-    $isSSL           = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off');
-    $cookie_path     = (isset($localParameters['cookie_path'])) ? $localParameters['cookie_path'] : '/';
-    $cookie_domain   = (isset($localParameters['cookie_domain'])) ? $localParameters['cookie_domain'] : '';
-    $cookie_secure   = (isset($localParameters['cookie_secure'])) ? $localParameters['cookie_secure'] : $isSSL;
-    $cookie_httponly = (isset($localParameters['cookie_httponly'])) ? $localParameters['cookie_httponly'] : false;
-
-    setcookie('mautic_update', $task, time() + 300, $cookie_path, $cookie_domain, $cookie_secure, $cookie_httponly);
     $query    = '';
     $maxCount = (!empty($standalone)) ? 25 : 5;
+    $apiTask = !empty($_GET['apiTask']) ? $_GET['apiTask'] : '';
 
-    switch ($task) {
+    switch ($apiTask) {
         case '':
+            // If no specific API task is given, we render our HTML.
             logUpdateStart();
-            header("Refresh: 2; URL=$url?{$query}task=preUpgradeChecks");
-            html_body("<div class='card card-body bg-light text-center'><h3>Checking system requirements...</h3><br /><strong>We're checking whether your system meets the requirements for Mautic 3. This may take several minutes, do not close this window!</strong></div>");
+            html_body('');
             exit;
 
         case 'preUpgradeChecks':
@@ -267,7 +261,7 @@ if (!IN_CLI) {
             $preUpgradeCheckErrors = $preUpgradeCheckResults['errors'];
             $preUpgradeCheckWarnings = $preUpgradeCheckResults['warnings'];
 
-            $html = "<div class='card card-body bg-light text-center'>";
+            $html = "";
 
             $generalRemarks = "<strong>IMPORTANT: you will need to update your cron jobs from app/console/* to bin/console/* after the upgrade.<br>
             You can already change them now if you want. For instructions, read HERE (TODO)<br><br>
@@ -302,11 +296,11 @@ if (!IN_CLI) {
 
             if (count($preUpgradeCheckErrors) === 0 && count($preUpgradeCheckWarnings) > 0) {
                 // The checkbox doesn't do anything, but is just there to make users aware that they are doing risky things.
-                $html .= '<br><br>' . $generalRemarks . '
+                $html .= $generalRemarks . '
                 <div style="text-align: left">
                     <input type="checkbox" id="forceUpgradeStart" /> <label for="forceUpgradeStart">Yes, I am aware of the warnings above and still want to proceed with the upgrade.</label>
-                </div><br /><br />
-                <a class="btn btn-primary" href="' . $url . '?task=startUpgrade&standalone=1">Start the upgrade</a>';
+                </div><br />
+                <button class="btn btn-primary" id="startUpgradeButton">Start the upgrade</button>';
             }
 
             if (count($preUpgradeCheckErrors) === 0 && count($preUpgradeCheckWarnings) === 0) {
@@ -314,23 +308,15 @@ if (!IN_CLI) {
                 $html .= "<h3>Ready to upgrade ✅</h3>
                 <br />Your system is compatible with Mautic 3!<br>Do not refresh or stop the process. This may take several minutes.<br><br>
                 " . $generalRemarks . "
-                <a class='btn btn-primary' href='$url?task=startUpgrade&standalone=1' onClick='document.getElementById(\"updateInProgress\").style.display = \"block\"'>Start the upgrade</a><br><br>
-                <div style='display: none' class=\"text-center\" id='updateInProgress'>
-                    <div class=\"spinner-border\" role=\"status\">
-                        <span class=\"sr-only\">Please wait...</span>
-                    </div><br><br>
-                    <div>Upgrade in progress, this might make several minutes! Do not leave this page.</div>
-                </div>";
+                <button class=\"btn btn-primary\" id=\"startUpgradeButton\">Start the upgrade</button>";
             }
 
-            html_body($html);
-            break;
+            outputJSON('success', $html);
 
         case 'startUpgrade':
             writeToLog("Starting the upgrade...");
-            $nextTask = 'backupDatabase';
             sendUpgradeStats('started');
-            break;
+            outputJSON('success', 'OK', 'backupDatabase', 'Backing up the database if we can...');
 
         case 'backupDatabase':
             // Only do the backup if mysqldump is available, otherwise skip this step.
@@ -350,11 +336,10 @@ if (!IN_CLI) {
                 writeToLog("Skipping database backup due to mysqldump not being available.");
             }
 
-            $nextTask = 'applyV2Migrations';
-            break;
+            outputJSON('success', 'OK', 'applyV2Migrations', 'Applying Mautic 2 database migrations to ensure all migrations are in place prior to upgrade...');
 
         case 'applyV2Migrations':
-            writeToLog("Applying Mautic 2 migrations to ensure all migrations are in place prior to upgrade...");
+            writeToLog("Applying Mautic 2 database migrations to ensure all migrations are in place prior to upgrade...");
             // Apply migrations on the 2.x branch just so we're sure that we have all migrations in place.
             list($success, $output) = apply_migrations();
             if ($success === false) {
@@ -367,8 +352,7 @@ if (!IN_CLI) {
             };
 
             writeToLog("Mautic 2 migrations applied successfully.");
-            $nextTask = 'fetchUpdates';
-            break;
+            outputJSON('success', 'OK', 'fetchUpdates', 'Downloading Mautic 3 upgrade package...');
 
         case 'fetchUpdates':
             writeToLog("Downloading Mautic 3 upgrade package...");
@@ -383,9 +367,7 @@ if (!IN_CLI) {
             }
 
             writeToLog("Successfully downloaded Mautic 3 upgrade package.");
-            $query    = "version=$message&";
-            $nextTask = 'extractUpdate';
-            break;
+            outputJSON('success', 'OK', 'extractUpdate', 'Extracting Mautic 3 files...');
 
         case 'extractUpdate':
             writeToLog("Extracting Mautic 3 files...");
@@ -400,7 +382,13 @@ if (!IN_CLI) {
             }
 
             writeToLog("Mautic 3 files extracted successfully.");
-            $nextTask = 'moveMautic2and3Files';
+
+            outputJSON(
+                'success',
+                'OK',
+                'moveMautic2and3Files',
+                'Moving Mautic 2 files to mautic-2-backup-files folder, then moving Mautic 3 files from mautic-3-temp-files to the root folder...'
+            );
             break;
 
         case 'moveMautic2and3Files':
@@ -420,8 +408,13 @@ if (!IN_CLI) {
             }
 
             writeToLog("Successfully moved Mautic 3 files into place!");
-            $nextTask = 'updateLocalConfig';
-            break;
+
+            outputJSON(
+                'success',
+                'OK',
+                'updateLocalConfig',
+                'Updating config/local.php with new configuration parameters...'
+            );
 
         case 'updateLocalConfig':
             // Update config/local.php with updated keys.
@@ -437,8 +430,8 @@ if (!IN_CLI) {
             }
 
             writeToLog("Successfully updated config/local.php.");
-            $nextTask = 'applyMigrations';
-            break;
+
+            outputJSON('success', 'OK', 'applyMigrations', 'Applying Mautic 3 database migrations...');
 
         case 'applyMigrations':
             // Apply Mautic 3 migrations. Almost there!!
@@ -449,17 +442,17 @@ if (!IN_CLI) {
                 sendUpgradeStats('failed');
                 throwErrorAndWriteToLog(
                     "ERR_MAUTIC_3_MIGRATIONS_FAILED",
-                    "Oops! We couldn\'t run the so-called 'database migrations' for Mautic 3. These are crucial for the upgrade to finish, so we can't proceed."
+                    "Oops! We couldn't run the so-called 'database migrations' for Mautic 3. These are crucial for the upgrade to finish, so we can't proceed."
                         . "Command output: " . $output
                 );
             };
 
             writeToLog("Successfully applied Mautic 3 database migrations");
-            $nextTask = 'restoreUserData';
-            break;
+
+            outputJSON('success', 'OK', 'restoreUserData', 'Restoring user data (plugins/themes/media) from Mautic 2 installation...');
 
         case 'restoreUserData':
-            writeToLog("Restoring user data from Mautic 2 installation...");
+            writeToLog("Restoring user data (plugins/themes/media) from Mautic 2 installation...");
             // Restore user data like plugins/themes/media from the original Mautic 2 installation to the "fresh" M3 installation
             list($success, $message) = restore_user_data();
 
@@ -472,27 +465,8 @@ if (!IN_CLI) {
             }
 
             writeToLog("Successfully restored user data from Mautic 2 installation.");
-            $nextTask = 'buildCache';
-            break;
 
-        case 'buildCache':
-            writeToLog("Building cache for Mautic 3...");
-            // Build fresh cache for M3.
-            list($success, $output) = build_cache();
-            if ($success === false) {
-                sendUpgradeStats('failed');
-                throwErrorAndWriteToLog(
-                    "ERR_BUILD_M3_CACHE",
-                    "Failed to build cache for Mautic 3. "
-                        . "All your data has been successfully migrated to Mautic 3, "
-                        . "but this error very likely needs to be fixed before you can start using Mautic 3. "
-                        . "Command output: " . $output
-                );
-            };
-
-            writeToLog("Successfully created cache for Mautic 3");
-            $nextTask = 'cleanupFiles';
-            break;
+            outputJSON('success', 'OK', 'cleanupFiles', 'Cleaning up after ourselves...');
 
         case 'cleanupFiles':
             // Cleanup some of our installation files that we no longer need.
@@ -505,33 +479,51 @@ if (!IN_CLI) {
                 );
             }
 
-            writeToLog("Successfully cleaned up upgrade files. We're done!");
+            writeToLog("Successfully cleaned up upgrade files.");
+
+            outputJSON('success', 'OK', 'buildCache', 'Preparing Mautic 3 cache...');
+
+        case 'buildCache':
+            writeToLog("Building cache for Mautic 3...");
+            // Build fresh cache for M3.
+            list($success, $output) = build_cache();
+            if ($success === false) {
+                sendUpgradeStats('failed');
+                throwErrorAndWriteToLog(
+                    "ERR_BUILD_M3_CACHE",
+                    "Failed to build cache for Mautic 3. "
+                        . "All your data has been successfully migrated to Mautic 3, "
+                        . "but this error very likely needs to be fixed before you can start using Mautic 3. "
+                        . "<br><br>Command output: " . $output
+                );
+            };
+
+            writeToLog("Successfully created cache for Mautic 3");
+
+            outputJSON('success', 'OK', 'finished', 'Finishing up...');
+
+            break;
+
+        case 'finished':
             sendUpgradeStats('succeeded');
+
+            writeToLog("We're done! Ready to use Mautic 3 :)");
+
+            final_cleanup_files();
 
             // Destroy the upgrade script as we no longer need it.
             unlink(__FILE__);
 
-            html_body("<div class='card card-body bg-light text-center'>
-                <h3>We're done! ✅</h3>
+            outputJSON(
+                'success',
+                "<h3>We're done! ✅</h3>
                 <br /><strong>You're ready to use Mautic 3! This script has destroyed itself, so there's nothing left to do for you. Enjoy!</strong><br><br>
                 <a href=\"" . $localParameters['site_url'] . "\" class=\"btn btn-primary\" target=\"_blank\">Open Mautic 3</a><br><br>'
-                <iframe src='https://giphy.com/embed/1GrsfWBDiTN60' style='margin: 0 auto' width='480' height='262' frameBorder='0' class='giphy-embed' allowFullScreen></iframe><p><a href='https://giphy.com/gifs/dance-long-hair-shake-1GrsfWBDiTN60'>via GIPHY</a></p>
-            </div>");
+                <iframe src='https://giphy.com/embed/1GrsfWBDiTN60' style='margin: 0 auto' width='480' height='262' frameBorder='0' class='giphy-embed' allowFullScreen></iframe><p><a href='https://giphy.com/gifs/dance-long-hair-shake-1GrsfWBDiTN60'>via GIPHY</a></p>"
+            );
 
         default:
-            echo 'Oops! No task selected. Please try again.';
-            exit;
-            break;
-    }
-
-    if (!empty($nextTask)) {
-        if ('finish' == $nextTask) {
-            header("Location: $url?task=$nextTask");
-        } else {
-            header("Location: $url?{$query}task=$nextTask");
-        }
-
-        exit;
+            outputJSON('error', 'unknown apiTask given');
     }
 } else {
     // CLI upgrade
@@ -642,7 +634,7 @@ if (!IN_CLI) {
          */
         list($success, $message) = replace_mautic_2_with_mautic_3();
 
-        if (!$success) {
+        if ($success === false) {
             sendUpgradeStats('failed');
             throwErrorAndWriteToLog(
                 "ERR_MOVE_MAUTIC_2_AND_3_FILES",
@@ -714,22 +706,6 @@ if (!IN_CLI) {
 
     writeToLog("Done! Your user data has been restored. Your Mautic 3 installation is ready. Just one more thing:");
 
-    writeToLog("Building cache for Mautic 3...");
-
-    list($success, $output) = build_cache();
-    if ($success === false) {
-        sendUpgradeStats('failed');
-        throwErrorAndWriteToLog(
-            "ERR_BUILD_M3_CACHE",
-            "Failed to build cache for Mautic 3. "
-                . "All your data has been successfully migrated to Mautic 3, "
-                . "but this error very likely needs to be fixed before you can start using Mautic 3. "
-                . "Command output: " . $output
-        );
-    };
-
-    writeToLog("Done! Cache has been built.");
-
     writeToLog("Cleaning up installation files that we no longer need...");
 
     // We only use the Phase 2 file in the CLI version of the upgrade, so we'll delete it here...
@@ -745,9 +721,27 @@ if (!IN_CLI) {
 
     writeToLog("Cleaned up successfully!");
 
+    writeToLog("Building cache for Mautic 3...");
+
+    list($success, $output) = build_cache();
+    if ($success === false) {
+        sendUpgradeStats('failed');
+        throwErrorAndWriteToLog(
+            "ERR_BUILD_M3_CACHE",
+            "Failed to build cache for Mautic 3. "
+                . "All your data has been successfully migrated to Mautic 3, "
+                . "but this error very likely needs to be fixed before you can start using Mautic 3. "
+                . "\n\nCommand output: " . $output
+        );
+    };
+
+    writeToLog("Done! Cache has been built.");
+
     sendUpgradeStats('succeeded');
 
     writeToLog("We're done! Enjoy using Mautic 3 :)");
+
+    final_cleanup_files();
 
     // Destroy the upgrade script as we no longer need it.
     unlink(__FILE__);
@@ -815,7 +809,10 @@ function throwErrorAndWriteToLog($code, $message)
     $url = 'https://docs.mautic.org/en/mautic-3-upgrade-errors#' . strtolower($code);
 
     if (!IN_CLI) {
-        html_body("<div alert='alert alert-danger'>$code: $message. Read more details about this error <a target=\"_blank\" href=\"$url\">in our documentation</a>.</div>");
+        outputJSON(
+            "error",
+            "$code: $message.<br><br>Read more details about this error <a target=\"_blank\" href=\"$url\">in our documentation</a>."
+        );
     } else {
         echo $code . ": " . $message . ". For more details about this message, see " . $url . "\n";
         exit;
@@ -1396,9 +1393,11 @@ function run_symfony_command($command, array $args)
     $output   = new \Symfony\Component\Console\Output\BufferedOutput();
     $exitCode = $application->run($input, $output);
 
+    $content = $output->fetch();
+
     return [
         $exitCode === 0,
-        $output->fetch()
+        $content
     ];
 }
 
@@ -1477,8 +1476,8 @@ function copy_directory($src, $dest)
  */
 function build_cache()
 {
-    // Rebuild the cache
-    return run_symfony_command('cache:clear', ['--no-interaction', '--env=prod', '--no-debug']);
+    // Build the cache
+    return run_symfony_command('cache:warmup', ['--no-interaction', '--env=prod', '--no-debug']);
 }
 
 /**
@@ -1571,11 +1570,6 @@ function cleanup_files()
 {
     $failedChanges = [];
 
-    if (file_exists(MAUTIC_ROOT . DIRECTORY_SEPARATOR . '.htaccess.m3')) {
-        $status = rename(MAUTIC_ROOT . DIRECTORY_SEPARATOR . '.htaccess.m3', MAUTIC_ROOT . DIRECTORY_SEPARATOR . '.htaccess');
-        if ($status === false) $failedChanges[] = 'htaccess';
-    }
-
     if (file_exists(MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'critical_migrations.txt')) {
         $status = unlink(MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'critical_migrations.txt');
         if ($status === false) $failedChanges[] = 'critical_migrations';
@@ -1601,13 +1595,6 @@ function cleanup_files()
         if ($status === false) $failedChanges[] = 'm3_upgrade_db_backup.sql';
     }
 
-    // Rename the upgrade_log.txt file to one with a random hash to prevent public access
-    if (file_exists(UPGRADE_LOG_FILE)) {
-        $hash = bin2hex(random_bytes(16));
-        $status = rename(UPGRADE_LOG_FILE, str_replace('upgrade_log.txt', 'upgrade_log_' . $hash . '.txt', UPGRADE_LOG_FILE));
-        if ($status === false) $failedChanges[] = 'upgrade_log.txt';
-    }
-
     // NOTE: we leave the mautic-2-backup-files-$HASH folder and m3_upgrade_db_backup_$HASH.sql file as-is in case something still doesn't work as expected.
 
     if (count($failedChanges) === 0) {
@@ -1615,6 +1602,26 @@ function cleanup_files()
     }
 
     return false;
+}
+
+/**
+ * These files can only be deleted/changed at the very, very end.
+ * 
+ * @return void
+ */
+function final_cleanup_files()
+{
+    if (file_exists(MAUTIC_ROOT . DIRECTORY_SEPARATOR . '.htaccess.m3')) {
+        $status = rename(MAUTIC_ROOT . DIRECTORY_SEPARATOR . '.htaccess.m3', MAUTIC_ROOT . DIRECTORY_SEPARATOR . '.htaccess');
+        if ($status === false) $failedChanges[] = 'htaccess';
+    }
+
+    // Rename the upgrade_log.txt file to one with a random hash to prevent public access
+    if (file_exists(UPGRADE_LOG_FILE)) {
+        $hash = bin2hex(random_bytes(16));
+        $status = rename(UPGRADE_LOG_FILE, str_replace('upgrade_log.txt', 'upgrade_log_' . $hash . '.txt', UPGRADE_LOG_FILE));
+        if ($status === false) $failedChanges[] = 'upgrade_log.txt';
+    }
 }
 
 /**
@@ -1681,6 +1688,28 @@ function recursive_remove_directory($directory)
 }
 
 /**
+ * Output JSON to the browser and exit script.
+ * 
+ * @param string $status (success or error)
+ * @param string $message
+ * @param string $nextTaskCode
+ * @param string $nextTaskLabel
+ * 
+ * @return void
+ */
+function outputJSON($status, $message, $nextTaskCode = null, $nextTaskLabel = null)
+{
+    header('Content-Type: application/json');
+    echo json_encode([
+        'status' => $status,
+        'message' => $message,
+        'nextTaskCode' => $nextTaskCode,
+        'nextTaskLabel' => $nextTaskLabel
+    ]);
+    exit;
+}
+
+/**
  * Wrap content in some HTML.
  *
  * @param $content
@@ -1698,17 +1727,102 @@ function html_body($content)
     </head>
     <body>
         <div class="container" style="padding: 25px;">
-            <div>$content</div>
-            <div id="upgradeProgressStatus"></div>
+            <div class='card card-body bg-light'>
+                <div id="mainContent">$content</div>
+                <div id="upgradeProgressStatus">
+                    <table class="table" id="upgradeProgressStatusTable">
+                    </table>
+                    <div style="display: none" class="alert alert-danger" id="errorBox">
+                    </div>
+                    <div style="display: none" class="alert alert-success"id="successBox">
+                    </div>
+                </div>
+            </div>
         </div>
-        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 
         <script type="text/javascript">
+            const apiUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
+            let apiTaskCode = 'startUpgrade';
+            let apiTaskLabel = 'Starting the upgrade...';
+
             $(document).ready(function(){
-                var hash = window.location.hash;
+                // If a specific upgrade step is set in the URL, use that one.
+                if (window.location.hash && window.location.hash.length > 1) {
+                    apiTaskCode = window.location.hash.replace('#', '');
+                    apiTaskLabel = 'Picking up where we left off... Running the following task: ' + apiTaskCode;
+                    executeApiTask(apiTaskCode, apiTaskLabel);
+                } else {
+                    runPreUpgradeChecks();
+                }
             });
+
+            function runPreUpgradeChecks() {
+                $('#mainContent').html("<h3>Checking system requirements...</h3><p><strong>We're checking whether your system meets the requirements for Mautic 3. This may take several minutes, do not close this window!</strong></p><div class=\"spinner-border\" role=\"status\"><span class=\"sr-only\">Loading...</span></div>");
+
+                $.getJSON( apiUrl + '?apiTask=preUpgradeChecks', function(data) {
+                    if (data.status && data.status === 'success') {
+                        if (data.message) {
+                            $('#mainContent').html(data.message);
+                            $('#startUpgradeButton').click(function() {
+                                $('#mainContent').html('<h2>Upgrading Mautic...</h2><p>This might take several minutes.</p>');
+                                executeApiTask(apiTaskCode, apiTaskLabel);
+                            });
+                        } else {
+                            alert("We got an unexpected response from the server. Please try again");
+                        }
+                        
+                    } else {
+                        alert('We got an unknown response back from the server. Please try again or contact Mautic support!');
+                    }
+                });
+            }
+
+            function executeApiTask(taskCode, taskLabel) {
+                apiTaskCode = taskCode;
+                apiTaskLabel = taskLabel;
+
+                $('#upgradeProgressStatusTable').append('<tr><td>' + apiTaskLabel + '</td><td id="api-task-' + apiTaskCode + '-status"><div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div></td></tr>');
+
+                // Update URL hash so that if the user gets stuck, he can refresh the page and pick up where they left off.
+                window.location.hash = '#' + apiTaskCode;
+
+                var jqxhr = $.getJSON( apiUrl + '?apiTask=' + apiTaskCode, function(data) {
+                    if (data.status && data.status === 'success') {
+                        $('#api-task-' + apiTaskCode + '-status').html('<svg class="bi bi-check2" width="2em" height="2em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>');
+                        
+                        if (data.nextTaskCode && data.nextTaskLabel) {
+                            executeApiTask(data.nextTaskCode, data.nextTaskLabel);
+                        } else if (data.message) {
+                            $('#successBox').show();
+                            $('#successBox').html(data.message);
+                        } else {
+                            $('#successBox').show();
+                            $('#successBox').html('We\'re done, but we didn\'t get a specific success message from the server.');
+                        }
+                    } else if (data.status && data.status === 'error') {
+                        $('#api-task-' + apiTaskCode + '-status').html('<svg class="bi bi-exclamation-triangle-fill" width="2em" height="2em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 5zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>');
+
+                        if (data.message) {
+                            $('#errorBox').show();
+                            $('#errorBox').html(data.message);
+                        } else {
+                            $('#errorBox').show();
+                            $('#errorBox').html('Unknown error occurred');
+                        }
+                    } else {
+                        alert('We got an unknown response back from the server. Please try again or contact Mautic support!');
+                    }
+                })
+                .fail(function() {
+                    $('#api-task-' + apiTaskCode + '-status').html('<svg class="bi bi-exclamation-triangle-fill" width="2em" height="2em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 5zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>');
+
+                    $('#errorBox').show();
+                    $('#errorBox').html('Something went wrong on the server, but we didn\'t get any further details. This might be a timeout (the script was running for too long). Please check your server logs and refresh this page to try again.');
+                })
+            }
         </script>
     </body>
     </html>
