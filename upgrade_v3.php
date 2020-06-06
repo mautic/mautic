@@ -219,6 +219,15 @@ function runPreUpgradeChecks()
             please proceed with caution! For all details and to see if you\'re affected, <strong>please see our <a href="' . $updateData['statusPageUrl'] . '" target="_blank">status page</a></strong>.';
     }
 
+    // Check if there are custom plugins installed
+    list($areCustomPluginsInstalled, $customPluginsString) = are_custom_plugins_installed();
+
+    if ($areCustomPluginsInstalled === true) {
+        $preUpgradeWarnings[] = 'It looks like you have one or more custom plugins installed (' . $customPluginsString . '). '
+            . 'Please make sure they are compatible with Mautic 3, otherwise temporarily disable them! '
+            . 'Incompatible plugins will very likely cause errors in the upgrade process.';
+    }
+
     return [
         'warnings' => $preUpgradeWarnings,
         'errors' => $preUpgradeErrors
@@ -326,7 +335,7 @@ if (!IN_CLI) {
                     html_body("<div alert='alert alert-danger'>Database backup failed. Your Mautic 2 installation is intact, so you can safely restart the upgrade. Error from mysqldump: $message</div>");
                 }
             }
-            
+
             $nextTask = 'applyV2Migrations';
             break;
 
@@ -375,24 +384,34 @@ if (!IN_CLI) {
                 html_body("<div alert='alert alert-danger'>$message</div>");
             }
 
-            $nextTask = 'restoreUserData';
-            break;
-
-        case 'restoreUserData':
-            // Restore user data like plugins/themes/media from the original Mautic 2 installation to the "fresh" M3 installation
-            list($success, $message) = restore_user_data();
-
-            if (!$success) {
-                sendUpgradeStats('failed');
-                html_body("<div alert='alert alert-danger'>$message</div>");
-            }
-
             $nextTask = 'updateLocalConfig';
             break;
 
         case 'updateLocalConfig':
             // Update config/local.php with updated keys.
             list($success, $message) = update_local_config();
+
+            if (!$success) {
+                sendUpgradeStats('failed');
+                html_body("<div alert='alert alert-danger'>$message</div>");
+            }
+
+            $nextTask = 'applyMigrations';
+            break;
+
+        case 'applyMigrations':
+            // Apply Mautic 3 migrations. Almost there!!
+            if (apply_migrations() === false) {
+                sendUpgradeStats('failed');
+                html_body("<div alert='alert alert-danger'>Oh no! We were almost there, but we couldn\'t run the so-called 'database migrations' for Mautic 3. Please check our knowledgebase (TODO) for more info.</div>");
+            };
+
+            $nextTask = 'restoreUserData';
+            break;
+
+        case 'restoreUserData':
+            // Restore user data like plugins/themes/media from the original Mautic 2 installation to the "fresh" M3 installation
+            list($success, $message) = restore_user_data();
 
             if (!$success) {
                 sendUpgradeStats('failed');
@@ -409,17 +428,7 @@ if (!IN_CLI) {
                 html_body("<div alert='alert alert-danger'>Oh no! We couldn't build a fresh cache for Mautic 3. Please check our knowledgebase (TODO) for more info.</div>");
             };
 
-            $nextTask = 'applyMigrations';
-            break;
-
-        case 'applyMigrations':
-            // Apply Mautic 3 migrations. Almost there!!
-            if (apply_migrations() === false) {
-                sendUpgradeStats('failed');
-                html_body("<div alert='alert alert-danger'>Oh no! We were almost there, but we couldn\'t run the so-called 'database migrations' for Mautic 3. Please check our knowledgebase (TODO) for more info.</div>");
-            };
-
-            $nextTask = 'cleanupFiles';
+            $nextTask = 'restoreUserData';
             break;
 
         case 'cleanupFiles':
@@ -567,18 +576,6 @@ if (!IN_CLI) {
 
         echo "Done!\n";
 
-        echo "Restoring your user data like custom plugins/themes/media from the Mautic 2 installation. This might take a while... DO NOT ABORT THE SCRIPT!!!\n";
-
-        list($success, $message) = restore_user_data();
-
-        if (!$success) {
-            sendUpgradeStats('failed');
-            echo "Failed. $message";
-            exit;
-        }
-
-        echo "Done! Your user data has been restored.\n";
-
         echo "Updating your config/local.php with new settings that were changed/introduced in Mautic 3...\n";
 
         list($success, $message) = update_local_config();
@@ -608,6 +605,28 @@ if (!IN_CLI) {
 
     echo "Welcome to Phase 2 of the Mautic 3 upgrade! We'll continue where we left off.\n";
 
+    echo "Applying database migrations for Mautic 3... This might take a while, DO NOT ABORT THE SCRIPT!!!\n";
+
+    if (apply_migrations() === false) {
+        sendUpgradeStats('failed');
+        echo "Database migrations failed. Please try manually with app/console doctrine:migrations:migrate --env=prod. When database migrations are done, Mautic 3 is ready to use!\n";
+        exit;
+    };
+
+    echo "Database migration done!";
+    
+    echo "Restoring your user data like custom plugins/themes/media from the Mautic 2 installation. This might take a while... DO NOT ABORT THE SCRIPT!!!\n";
+
+    list($success, $message) = restore_user_data();
+
+    if (!$success) {
+        sendUpgradeStats('failed');
+        echo "Failed. $message";
+        exit;
+    }
+
+    echo "Done! Your user data has been restored. Your Mautic 3 installation is ready. Just one more thing:\n";
+
     echo "Building cache for Mautic 3...\n";
 
     if (build_cache() === false) {
@@ -617,16 +636,6 @@ if (!IN_CLI) {
     };
 
     echo "Done! Cache has been built.\n";
-
-    echo "Applying database migrations for Mautic 3... This might take a while, DO NOT ABORT THE SCRIPT!!!\n";
-
-    if (apply_migrations() === false) {
-        sendUpgradeStats('failed');
-        echo "Database migrations failed. Please try manually with app/console doctrine:migrations:migrate --env=prod. When database migrations are done, Mautic 3 is ready to use!\n";
-        exit;
-    };
-
-    echo "Done! Your Mautic 3 installation is ready. Just one more thing:\n";
 
     echo "Cleaning up installation files that we no longer need...\n";
 
@@ -746,6 +755,56 @@ function make_request($url, $method = 'GET', $data = null)
     curl_close($ch);
 
     return $data;
+}
+
+/**
+ * Check if there are custom plugins installed.
+ * 
+ * @return array
+ */
+function are_custom_plugins_installed()
+{
+    $standardPlugins = [
+        'MauticCitrixBundle',
+        'MauticClearbitBundle',
+        'MauticCloudStorageBundle',
+        'MauticCrmBundle',
+        'MauticEmailMarketingBundle',
+        'MauticFocusBundle',
+        'MauticFullContactBundle',
+        'MauticGmailBundle',
+        'MauticOutlookBundle',
+        'MauticSocialBundle',
+        'MauticZapierBundle'
+    ];
+    $customPlugins = [];
+    $iterator = new DirectoryIterator(MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'plugins');
+
+    // Sanity check, make sure there are actually directories here to process
+    $dirs = glob(MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'plugins' . '/*', GLOB_ONLYDIR);
+
+    if (count($dirs)) {
+        /** @var DirectoryIterator $directory */
+        foreach ($iterator as $directory) {
+            // Sanity checks
+            if (
+                !$directory->isDot()
+                && $directory->isDir()
+                && !in_array($directory->getBasename(), $standardPlugins)
+            ) {
+                $customPlugins[] = $directory->getBasename();
+            }
+        }
+
+        if (count($customPlugins) > 0) {
+            return [true, implode(', ', $customPlugins)];
+        }
+    } else {
+        return [true, 'We couldn\'t seem to scan your plugins directory. Please make sure it exists'];
+    }
+
+    // No custom plugins found
+    return [false, null];
 }
 
 /**
