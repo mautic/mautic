@@ -59,7 +59,7 @@ define('MAUTIC_CACHE_DIR', $cacheDir);
 // Data we fetch from a special JSON file to control upgrade behavior.
 // TODO replace with actual JSON file
 $updateData = [
-    'mautic3downloadUrl' => 'https://github.com/dennisameling/mautic/releases/download/3.0.0-beta2/3.0.0-beta2-update.zip',
+    'mautic3downloadUrl' => 'https://github.com/dennisameling/mautic/releases/download/3.0.0-beta2/3.0.0-beta2.zip',
     'killSwitchActivated' => false,
     'statusPageUrl' => 'https://mautic.org'
 ];
@@ -234,6 +234,17 @@ function runPreUpgradeChecks()
             . 'Incompatible plugins will very likely cause errors in the upgrade process.';
     }
 
+    // Get the amount of available database migrations
+    list($success, $data) = get_available_migrations();
+
+    if ($success === false) {
+        $preUpgradeWarnings[] = 'We couldn\'t reliably detect the amount of available database migrations. Please proceed with caution!';
+    } else {
+        if (!isset($data[2]) || !isset($data[2][0])) {
+            $preUpgradeWarnings[] = 'We couldn\'t reliably detect the amount of available database migrations. Please proceed with caution!';
+        }
+    }
+
     return [
         'warnings' => $preUpgradeWarnings,
         'errors' => $preUpgradeErrors
@@ -339,20 +350,61 @@ if (!IN_CLI) {
             outputJSON('success', 'OK', 'applyV2Migrations', 'Applying Mautic 2 database migrations to ensure all migrations are in place prior to upgrade...');
 
         case 'applyV2Migrations':
-            writeToLog("Applying Mautic 2 database migrations to ensure all migrations are in place prior to upgrade...");
-            // Apply migrations on the 2.x branch just so we're sure that we have all migrations in place.
-            list($success, $output) = apply_migrations();
+            writeToLog("Getting the amount of available Mautic 2 database migrations...");
+            // Get the amount of available database migrations
+            list($success, $data) = get_available_migrations();
+
             if ($success === false) {
-                sendUpgradeStats('failed');
                 throwErrorAndWriteToLog(
                     "ERR_MAUTIC_2_MIGRATIONS_FAILED",
-                    "Oh no! While preparing the upgrade, the so-called 'database migrations' for Mautic 2 have failed. "
-                        . "Command output: " . $output
+                    'We couldn\'t reliably detect the amount of available database migrations. Please try again by refreshing this page.'
                 );
-            };
+            } else {
+                if (isset($data[2]) && isset($data[2][0])) {
+                    $availableMigrations = intval($data[2][0]);
 
-            writeToLog("Mautic 2 migrations applied successfully.");
-            outputJSON('success', 'OK', 'fetchUpdates', 'Downloading Mautic 3 upgrade package...');
+                    if ($availableMigrations > 0) {
+                        writeToLog("Applying Mautic 2 database migrations, " . $availableMigrations . " to go...");
+
+                        // Apply migrations on the 2.x branch just so we're sure that we have all migrations in place.
+                        list($success, $output) = apply_single_migration();
+
+                        if ($success === false) {
+                            sendUpgradeStats('failed');
+                            throwErrorAndWriteToLog(
+                                "ERR_MAUTIC_2_MIGRATIONS_FAILED",
+                                "Oh no! While preparing the upgrade, the so-called 'database migrations' for Mautic 2 have failed. "
+                                    . "Command output: " . $output
+                            );
+                        };
+
+                        $availableMigrations--;
+
+                        if ($availableMigrations > 0) {
+                            // There are still more than 0 available migrations left, so we need to re-run this script...
+                            outputJSON(
+                                'success',
+                                'OK',
+                                'applyV2Migrations',
+                                'Applying Mautic 2 database migrations to ensure all migrations are in place prior to upgrade... ' . $availableMigrations . ' to go...'
+                            );
+                        } else {
+                            writeToLog("All Mautic 2 migrations applied successfully.");
+                            outputJSON('success', 'OK', 'fetchUpdates', 'Downloading Mautic 3 upgrade package...');
+                        }
+                    } else {
+                        writeToLog("No available database migrations found. On to the next step...");
+                        outputJSON('success', 'OK', 'fetchUpdates', 'Downloading Mautic 3 upgrade package...');
+                    }
+                } else {
+                    throwErrorAndWriteToLog(
+                        "ERR_MAUTIC_2_MIGRATIONS_FAILED",
+                        'We couldn\'t reliably detect the amount of available database migrations. Please try again by refreshing this page.'
+                    );
+                }
+            }
+
+            break;
 
         case 'fetchUpdates':
             writeToLog("Downloading Mautic 3 upgrade package...");
@@ -434,22 +486,61 @@ if (!IN_CLI) {
             outputJSON('success', 'OK', 'applyMigrations', 'Applying Mautic 3 database migrations...');
 
         case 'applyMigrations':
-            // Apply Mautic 3 migrations. Almost there!!
-            writeToLog("Applying Mautic 3 database migrations...");
+            writeToLog("Getting the amount of available Mautic 3 database migrations...");
+            // Get the amount of available database migrations
+            list($success, $data) = get_available_migrations();
 
-            list($success, $output) = apply_migrations();
             if ($success === false) {
-                sendUpgradeStats('failed');
                 throwErrorAndWriteToLog(
                     "ERR_MAUTIC_3_MIGRATIONS_FAILED",
-                    "Oops! We couldn't run the so-called 'database migrations' for Mautic 3. These are crucial for the upgrade to finish, so we can't proceed."
-                        . "Command output: " . $output
+                    'We couldn\'t reliably detect the amount of available database migrations. Please try again by refreshing this page.'
                 );
-            };
+            } else {
+                if (isset($data[2]) && isset($data[2][0])) {
+                    $availableMigrations = intval($data[2][0]);
 
-            writeToLog("Successfully applied Mautic 3 database migrations");
+                    if ($availableMigrations > 0) {
+                        writeToLog("Applying Mautic 3 database migrations, " . $availableMigrations . " to go...");
 
-            outputJSON('success', 'OK', 'restoreUserData', 'Restoring user data (plugins/themes/media) from Mautic 2 installation...');
+                        // Apply migrations one by one.
+                        list($success, $output) = apply_single_migration();
+
+                        if ($success === false) {
+                            sendUpgradeStats('failed');
+                            throwErrorAndWriteToLog(
+                                "ERR_MAUTIC_3_MIGRATIONS_FAILED",
+                                "Oops! We couldn't run the so-called 'database migrations' for Mautic 3. These are crucial for the upgrade to finish, so we can't proceed. "
+                                    . "Command output: " . $output
+                            );
+                        };
+
+                        $availableMigrations--;
+
+                        if ($availableMigrations > 0) {
+                            // There are still more than 0 available migrations left, so we need to re-run this script...
+                            outputJSON(
+                                'success',
+                                'OK',
+                                'applyMigrations',
+                                'Applying Mautic 3 database migrations... ' . $availableMigrations . ' to go...'
+                            );
+                        } else {
+                            writeToLog("Successfully applied Mautic 3 database migrations");
+                            outputJSON('success', 'OK', 'restoreUserData', 'Restoring user data (plugins/themes/media) from Mautic 2 installation...');
+                        }
+                    } else {
+                        writeToLog("No available database migrations found. On to the next step...");
+                        outputJSON('success', 'OK', 'restoreUserData', 'Restoring user data (plugins/themes/media) from Mautic 2 installation...');
+                    }
+                } else {
+                    throwErrorAndWriteToLog(
+                        "ERR_MAUTIC_3_MIGRATIONS_FAILED",
+                        'We couldn\'t reliably detect the amount of available database migrations. Please try again by refreshing this page.'
+                    );
+                }
+            }
+
+            break;
 
         case 'restoreUserData':
             writeToLog("Restoring user data (plugins/themes/media) from Mautic 2 installation...");
@@ -518,8 +609,7 @@ if (!IN_CLI) {
                 'success',
                 "<h3>We're done! ✅</h3>
                 <br /><strong>You're ready to use Mautic 3! This script has destroyed itself, so there's nothing left to do for you. Enjoy!</strong><br><br>
-                <a href=\"" . $localParameters['site_url'] . "\" class=\"btn btn-primary\" target=\"_blank\">Open Mautic 3</a><br><br>'
-                <iframe src='https://giphy.com/embed/1GrsfWBDiTN60' style='margin: 0 auto' width='480' height='262' frameBorder='0' class='giphy-embed' allowFullScreen></iframe><p><a href='https://giphy.com/gifs/dance-long-hair-shake-1GrsfWBDiTN60'>via GIPHY</a></p>"
+                <a href=\"" . $localParameters['site_url'] . "\" class=\"btn btn-primary\" target=\"_blank\">Open Mautic 3</a><br><br>'"
             );
 
         default:
@@ -588,19 +678,8 @@ if (!IN_CLI) {
             writeToLog("Skipping database backup because we can't find mysqldump on your system...");
         }
 
-        writeToLog("Applying Mautic 2 migrations, just so we're sure your database is up to date before upgrading. This might take a while, DO NOT ABORT THE SCRIPT!!!");
-
-        list($success, $output) = apply_migrations();
-        if ($success === false) {
-            sendUpgradeStats('failed');
-            throwErrorAndWriteToLog(
-                "ERR_MAUTIC_2_MIGRATIONS_FAILED",
-                "Something went wrong while applying Mautic 2 migrations. "
-                    . "Please try to run app/console doctrine:migrations:migrate --env=prod, to troubleshoot further. "
-                    . "Then run this script again."
-                    . "Command output: " . $output
-            );
-        };
+        // Run Mautic 2 migrations
+        checkAndRunMigrationsCLI(2);
 
         writeToLog("Downloading Mautic 3...");
         list($success, $message) = fetch_updates();
@@ -677,20 +756,8 @@ if (!IN_CLI) {
 
     writeToLog("Welcome to Phase 2 of the Mautic 3 upgrade! We'll continue where we left off.");
 
-    writeToLog("Applying database migrations for Mautic 3... This might take a while, DO NOT ABORT THE SCRIPT!!!");
-
-    list($success, $output) = apply_migrations();
-    if ($success === false) {
-        sendUpgradeStats('failed');
-        throwErrorAndWriteToLog(
-            "ERR_MAUTIC_3_MIGRATIONS_FAILED",
-            "Database migrations failed. Please try manually with app/console doctrine:migrations:migrate --env=prod. "
-                . "When database migrations are done, run this script again to proceed."
-                . "Command output: " . $output
-        );
-    };
-
-    writeToLog("Database migration done!");
+    // Run Mautic 3 migrations
+    checkAndRunMigrationsCLI(3);
 
     writeToLog("Restoring your user data like custom plugins/themes/media from the Mautic 2 installation. This might take a while... DO NOT ABORT THE SCRIPT!!!");
 
@@ -747,6 +814,60 @@ if (!IN_CLI) {
     unlink(__FILE__);
 
     exit;
+}
+
+/**
+ * Check if there are any migrations available and run them.
+ * 
+ * @return void
+ */
+function checkAndRunMigrationsCLI($mauticMajorVersion, $ignoreFirstLog = false)
+{
+    if ($ignoreFirstLog === false) {
+        writeToLog("Getting the amount of available Mautic $mauticMajorVersion database migrations...");
+    }
+
+    // Get the amount of available database migrations
+    list($success, $data) = get_available_migrations();
+
+    if ($success === false) {
+        var_dump($data);
+        throwErrorAndWriteToLog(
+            "ERR_MAUTIC_" . $mauticMajorVersion . "_MIGRATIONS_FAILED",
+            'We couldn\'t reliably detect the amount of available database migrations.'
+        );
+    } else {
+        if (isset($data[2]) && isset($data[2][0])) {
+            $availableMigrations = intval($data[2][0]);
+
+            if ($availableMigrations > 0) {
+                writeToLog("Applying Mautic $mauticMajorVersion database migrations, " . $availableMigrations . " migrations in total... This might take a while!");
+
+                // Apply all migrations.
+                list($success, $output) = apply_migrations();
+
+                if ($success === false) {
+                    sendUpgradeStats('failed');
+                    throwErrorAndWriteToLog(
+                        "ERR_MAUTIC_" . $mauticMajorVersion . "_MIGRATIONS_FAILED",
+                        "Something went wrong while applying Mautic " . $mauticMajorVersion . " migrations. "
+                            . "Please try to run app/console doctrine:migrations:migrate --no-interaction --env=prod --no-debug, to troubleshoot further. "
+                            . "Then run this script again."
+                            . "\n\nCommand output: " . $output
+                    );
+                };
+
+                writeToLog("All Mautic $mauticMajorVersion migrations applied successfully.");
+            } else {
+                writeToLog("No available database migrations found. On to the next step...");
+            }
+        } else {
+            throwErrorAndWriteToLog(
+                "ERR_MAUTIC_" . $mauticMajorVersion . "_MIGRATIONS_FAILED",
+                'We couldn\'t reliably detect the amount of available database migrations.'
+            );
+        }
+    }
 }
 
 /**
@@ -829,11 +950,13 @@ function logUpdateStart()
     if (file_exists(MAUTIC_APP_ROOT . '/version.txt')) {
         $version = file_get_contents(MAUTIC_APP_ROOT . '/version.txt');
         $version = str_replace("\n", "", $version);
-        $data .= "Installed Mautic version: " . $version . "\n";
+        $data .= "Installed Mautic version:\t" . $version . "\n";
     }
 
-    $data .= "PHP version: " . PHP_VERSION . "\n";
-    $data .= "OS: " . PHP_OS . "\n";
+    $data .= "PHP version:\t\t\t\t" . PHP_VERSION . "\n";
+    $data .= "OS:\t\t\t\t\t\t\t" . PHP_OS . "\n";
+    $upgradeType = IN_CLI ? 'CLI' : 'UI';
+    $data .= "Upgrade type:\t\t\t\t" . $upgradeType . "\n";
 
     writeToLog($data);
 }
@@ -1477,17 +1600,45 @@ function copy_directory($src, $dest)
 function build_cache()
 {
     // Build the cache
-    return run_symfony_command('cache:warmup', ['--no-interaction', '--env=prod', '--no-debug']);
+    return run_symfony_command('cache:clear', ['--no-interaction', '--env=prod', '--no-debug', '--no-warmup']);
 }
 
 /**
- * Apply all migrations.
+ * Apply all available migrations. NOTE: should only be used in CLI environments due to possible timeouts!
  *
  * @return array
  */
 function apply_migrations()
 {
     return run_symfony_command('doctrine:migrations:migrate', ['--no-interaction', '--env=prod', '--no-debug']);
+}
+
+/**
+ * Apply the next migration. We do it one by one to prevent PHP timeouts.
+ *
+ * @return array
+ */
+function apply_single_migration()
+{
+    return run_symfony_command('doctrine:migrations:migrate', ['next', '--no-interaction', '--env=prod', '--no-debug']);
+}
+
+/**
+ * Get the amount of available migrations.
+ * Returns array with [bool $success, int $available_migrations]
+ * 
+ * @return array
+ */
+function get_available_migrations()
+{
+    list($success, $message) = run_symfony_command('doctrine:migrations:status', []);
+
+    if ($success === false) {
+        return [false, 'Couldn\'t determine amount of available database migrations.'];
+    } else {
+        preg_match_all('/>> New Migrations:( )+(\d+)/', $message, $data);
+        return [true, $data];
+    }
 }
 
 /**
@@ -1780,21 +1931,31 @@ function html_body($content)
                 });
             }
 
-            function executeApiTask(taskCode, taskLabel) {
+            function executeApiTask(taskCode, taskLabel, appendRow = true) {
                 apiTaskCode = taskCode;
                 apiTaskLabel = taskLabel;
 
-                $('#upgradeProgressStatusTable').append('<tr><td>' + apiTaskLabel + '</td><td id="api-task-' + apiTaskCode + '-status"><div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div></td></tr>');
+                if (appendRow === true) {
+                    $('#upgradeProgressStatusTable').append('<tr><td id="api-task-' + apiTaskCode + '-label">' + apiTaskLabel + '</td><td id="api-task-' + apiTaskCode + '-status"><div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div></td></tr>');
+                }   
 
                 // Update URL hash so that if the user gets stuck, he can refresh the page and pick up where they left off.
                 window.location.hash = '#' + apiTaskCode;
 
                 var jqxhr = $.getJSON( apiUrl + '?apiTask=' + apiTaskCode, function(data) {
+                    appendRow = true;
+
                     if (data.status && data.status === 'success') {
-                        $('#api-task-' + apiTaskCode + '-status').html('<svg class="bi bi-check2" width="2em" height="2em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>');
-                        
+                        // Sometimes we need to re-run a task in case it takes long (to prevent timeouts), so we update the existing label.
+                        if (data.nextTaskCode && data.nextTaskLabel && data.nextTaskCode === apiTaskCode) {
+                            $('#api-task-' + apiTaskCode + '-label').html(data.nextTaskLabel);
+                            appendRow = false;
+                        } else {
+                            $('#api-task-' + apiTaskCode + '-status').html('<svg class="bi bi-check2" width="2em" height="2em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>');
+                        }
+                            
                         if (data.nextTaskCode && data.nextTaskLabel) {
-                            executeApiTask(data.nextTaskCode, data.nextTaskLabel);
+                            executeApiTask(data.nextTaskCode, data.nextTaskLabel, appendRow);
                         } else if (data.message) {
                             $('#successBox').show();
                             $('#successBox').html(data.message);
