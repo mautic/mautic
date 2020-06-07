@@ -59,7 +59,7 @@ define('MAUTIC_CACHE_DIR', $cacheDir);
 // Data we fetch from a special JSON file to control upgrade behavior.
 // TODO replace with actual JSON file
 $updateData = [
-    'mautic3downloadUrl' => 'https://github.com/dennisameling/mautic/releases/download/3.0.0-beta2/3.0.0-beta2.zip',
+    'mautic3downloadUrl' => 'https://github.com/dennisameling/mautic/releases/download/3.0.0-beta2fixed/3.0.0-beta2.zip',
     'killSwitchActivated' => false,
     'statusPageUrl' => 'https://mautic.org'
 ];
