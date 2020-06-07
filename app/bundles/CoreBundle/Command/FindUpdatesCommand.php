@@ -53,7 +53,11 @@ EOT
             $output->writeln('<info>'.$translator->trans($updateData['message']).'</info>');
         } else {
             $output->writeln($translator->trans($updateData['message'], ['%version%' => $updateData['version'], '%announcement%' => $updateData['announcement']]));
-            $output->writeln($translator->trans('mautic.core.updater.cli.update'));
+            if (!empty($updateData['isMautic3Upgrade'])) {
+                $output->writeln("To update, you can run 'php upgrade_v3.php' from the command line.");
+            } else {
+                $output->writeln($translator->trans('mautic.core.updater.cli.update'));
+            }
         }
 
         return 0;

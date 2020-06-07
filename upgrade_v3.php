@@ -609,7 +609,7 @@ if (!IN_CLI) {
                 'success',
                 "<h3>We're done! ✅</h3>
                 <br /><strong>You're ready to use Mautic 3! This script has destroyed itself, so there's nothing left to do for you. Enjoy!</strong><br><br>
-                <a href=\"" . $localParameters['site_url'] . "\" class=\"btn btn-primary\" target=\"_blank\">Open Mautic 3</a><br><br>'"
+                <a href=\"" . $localParameters['site_url'] . "\" class=\"btn btn-primary\" target=\"_blank\">Open Mautic 3</a>"
             );
 
         default:

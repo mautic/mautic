@@ -104,12 +104,25 @@ EOT
             $progressBar->advance();
             $zipFile = $package;
             $version = basename($package);
+
+            // Even if a user tries to use the M3 update package, we throw an error because only the upgrade_v3.php script is supported.
+            if (version_compare($version, '2.999.999', '>')) {
+                $output->writeln("\n\n<error>You can only upgrade to Mautic 3 by running 'php upgrade_v3.php' instead of this command.</error>");
+    
+                return 1;
+            }
         } else {
             $progressBar->setMessage($translator->trans('mautic.core.command.update.step.loading_update_information').'                  ');
             $progressBar->advance();
 
             $updateHelper = $this->getContainer()->get('mautic.helper.update');
             $update       = $updateHelper->fetchData();
+
+            if (!empty($update['isMautic3Upgrade'])) {
+                $output->writeln("\n\n<error>You can only upgrade to Mautic 3 by running 'php upgrade_v3.php' instead of this command.</error>");
+
+                return 1;
+            }
 
             if (!isset($update['package'])) {
                 $output->writeln("\n\n<error>".$translator->trans('mautic.core.update.no_cache_data').'</error>');
