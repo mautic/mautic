@@ -905,7 +905,7 @@ function throwErrorAndWriteToLog($code, $message)
     sendUpgradeStats('failed', $code);
 
     // Generate URL to docs including error code.
-    $url = 'https://docs.mautic.org/en/mautic-3-upgrade-errors#' . strtolower($code);
+    $url = 'https://docs.mautic.org/en/mautic-3-upgrade/mautic-3-upgrade-errors#' . strtolower($code);
 
     if (!IN_CLI) {
         outputJSON(
