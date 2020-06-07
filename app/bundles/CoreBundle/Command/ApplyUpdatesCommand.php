@@ -108,7 +108,7 @@ EOT
             // Even if a user tries to use the M3 update package, we throw an error because only the upgrade_v3.php script is supported.
             if (version_compare($version, '2.999.999', '>')) {
                 $output->writeln("\n\n<error>You can only upgrade to Mautic 3 by running 'php upgrade_v3.php' instead of this command.</error>");
-    
+
                 return 1;
             }
         } else {

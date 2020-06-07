@@ -201,9 +201,9 @@ class NotificationModel extends FormModel
         $newUpdate     = false;
 
         if (!$this->disableUpdates && $this->userHelper->getUser()->isAdmin()) {
-            $updateData = [];
-            $cacheFile  = $this->pathsHelper->getSystemPath('cache').'/lastUpdateCheck.txt';
-            $m3CacheFile = $this->pathsHelper->getSystemPath('cache').'/lastM3UpgradeCheck.txt';
+            $updateData       = [];
+            $cacheFile        = $this->pathsHelper->getSystemPath('cache').'/lastUpdateCheck.txt';
+            $m3CacheFile      = $this->pathsHelper->getSystemPath('cache').'/lastM3UpgradeCheck.txt';
             $isMautic3Upgrade = false;
 
             //check to see when we last checked for an update
@@ -216,7 +216,7 @@ class NotificationModel extends FormModel
             } elseif (file_exists($cacheFile)) {
                 $updateData = json_decode(file_get_contents($cacheFile), true);
             } elseif (file_exists($m3CacheFile)) {
-                $updateData = json_decode(file_get_contents($m3CacheFile), true);
+                $updateData       = json_decode(file_get_contents($m3CacheFile), true);
                 $isMautic3Upgrade = true;
             }
 
@@ -245,11 +245,11 @@ class NotificationModel extends FormModel
             $notifications,
             $showNewIndicator,
             [
-                'isNew' => $newUpdate,
-                'message' => $updateMessage,
-                'isMautic3Upgrade' => $isMautic3Upgrade,
-                'mautic3UpgradeUrl' => $this->coreParametersHelper->getParameter('site_url') . '/upgrade_v3.php'
-            ]
+                'isNew'             => $newUpdate,
+                'message'           => $updateMessage,
+                'isMautic3Upgrade'  => $isMautic3Upgrade,
+                'mautic3UpgradeUrl' => $this->coreParametersHelper->getParameter('site_url').'/upgrade_v3.php',
+            ],
         ];
     }
 

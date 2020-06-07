@@ -68,7 +68,7 @@ class UpdateHelper
         try {
             $data = $this->connector->get($package);
         } catch (\Exception $exception) {
-            $this->logger->addError('An error occurred while attempting to fetch the package: ' . $exception->getMessage());
+            $this->logger->addError('An error occurred while attempting to fetch the package: '.$exception->getMessage());
 
             return [
                 'error'   => true,
@@ -84,7 +84,7 @@ class UpdateHelper
         }
 
         // Set the filesystem target
-        $target = $this->pathsHelper->getSystemPath('cache') . '/' . basename($package);
+        $target = $this->pathsHelper->getSystemPath('cache').'/'.basename($package);
 
         // Write the response to the filesystem
         file_put_contents($target, $data->body);
@@ -103,7 +103,7 @@ class UpdateHelper
     public function getServerOs()
     {
         if (function_exists('php_uname')) {
-            return php_uname('s') . ' ' . php_uname('r');
+            return php_uname('s').' '.php_uname('r');
         } elseif (defined('PHP_OS')) {
             return PHP_OS;
         }
@@ -120,7 +120,7 @@ class UpdateHelper
      */
     public function fetchData($overrideCache = false)
     {
-        $cacheFile = $this->pathsHelper->getSystemPath('cache') . '/lastUpdateCheck.txt';
+        $cacheFile = $this->pathsHelper->getSystemPath('cache').'/lastUpdateCheck.txt';
 
         // Check if we have a cache file and try to return cached data if so
         if (!$overrideCache && is_readable($cacheFile)) {
@@ -140,7 +140,7 @@ class UpdateHelper
             // Generate a unique instance ID for the site
             $instanceId = hash(
                 'sha1',
-                $this->coreParametersHelper->getParameter('secret_key') . 'Mautic' . $this->coreParametersHelper->getParameter('db_driver')
+                $this->coreParametersHelper->getParameter('secret_key').'Mautic'.$this->coreParametersHelper->getParameter('db_driver')
             );
 
             $data = array_map(
@@ -176,7 +176,7 @@ class UpdateHelper
             $update = json_decode($data->body);
         } catch (\Exception $exception) {
             // Log the error
-            $this->logger->addError('An error occurred while attempting to fetch updates: ' . $exception->getMessage());
+            $this->logger->addError('An error occurred while attempting to fetch updates: '.$exception->getMessage());
 
             return [
                 'error'   => true,
@@ -186,7 +186,7 @@ class UpdateHelper
 
         // Check if Mautic 3 upgrade is available
         try {
-            $m3CacheFile = $this->pathsHelper->getSystemPath('cache') . '/lastM3UpgradeCheck.txt';
+            $m3CacheFile = $this->pathsHelper->getSystemPath('cache').'/lastM3UpgradeCheck.txt';
 
             if ($this->coreParametersHelper->getParameter('block_mautic_3_upgrade', null) === null) {
                 $m3Data   = $this->connector->get('https://updates.mautic.org/upgrade-configs/m2-to-m3.json', [], 10);
@@ -211,13 +211,13 @@ class UpdateHelper
                 // If the kill switch is activated for the upgrade, we don't offer the upgrade to the user.
                 if (isset($m3Update->killSwitchActivated) && $m3Update->killSwitchActivated === false) {
                     $m3Data = [
-                        'error'        => false,
-                        'message'      => 'mautic.core.updater.update.available',
-                        'version'      => $m3Update->version,
-                        'announcement' => $m3Update->announcement,
-                        'package'      => $m3Update->mautic3downloadUrl,
-                        'checkedTime'  => time(),
-                        'isMautic3Upgrade' => true
+                        'error'            => false,
+                        'message'          => 'mautic.core.updater.update.available',
+                        'version'          => $m3Update->version,
+                        'announcement'     => $m3Update->announcement,
+                        'package'          => $m3Update->mautic3downloadUrl,
+                        'checkedTime'      => time(),
+                        'isMautic3Upgrade' => true,
                     ];
 
                     file_put_contents($m3CacheFile, json_encode($m3Data));
@@ -233,7 +233,7 @@ class UpdateHelper
             }
         } catch (\Exception $exception) {
             // Log the error
-            $this->logger->addError('An error occurred while attempting to check if Mautic 3 is available: ' . $exception->getMessage());
+            $this->logger->addError('An error occurred while attempting to check if Mautic 3 is available: '.$exception->getMessage());
 
             return [
                 'error'   => true,
@@ -281,7 +281,7 @@ class UpdateHelper
             'announcement' => $update->announcement,
             'package'      => $update->package,
             'checkedTime'  => time(),
-            'stability'    => $this->coreParametersHelper->getParameter('update_stability')
+            'stability'    => $this->coreParametersHelper->getParameter('update_stability'),
         ];
 
         file_put_contents($cacheFile, json_encode($data));

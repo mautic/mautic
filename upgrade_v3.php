@@ -56,13 +56,9 @@ if (isset($localParameters['cache_path'])) {
 }
 define('MAUTIC_CACHE_DIR', $cacheDir);
 
-// Data we fetch from a special JSON file to control upgrade behavior.
-// TODO replace with actual JSON file
-$updateData = [
-    'mautic3downloadUrl' => 'https://github.com/dennisameling/mautic/releases/download/3.0.0-beta2fixed/3.0.0-beta2.zip',
-    'killSwitchActivated' => false,
-    'statusPageUrl' => 'https://mautic.org'
-];
+// Data we fetch from a special JSON file to control upgrade behavior, like e.g. the download URL.
+$data = make_request('https://updates.mautic.org/upgrade-configs/m2-to-m3.json', 'GET');
+$updateData = json_decode($data, true);
 
 /**
  * Run pre-upgrade checks. Returns array with keys "warnings" (dismissable) and "errors" (block upgrading)
@@ -1600,7 +1596,7 @@ function copy_directory($src, $dest)
 function build_cache()
 {
     // Build the cache
-    return run_symfony_command('cache:clear', ['--no-interaction', '--env=prod', '--no-debug', '--no-warmup']);
+    return run_symfony_command('cache:clear', ['--no-interaction', '--env=prod', '--no-debug']);
 }
 
 /**
