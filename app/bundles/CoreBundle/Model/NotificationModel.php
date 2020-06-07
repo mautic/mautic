@@ -213,6 +213,9 @@ class NotificationModel extends FormModel
                 $this->session->set('mautic.update.checked', time());
 
                 $updateData = $this->updateHelper->fetchData();
+                if (!empty($updateData['isMautic3Upgrade'])) {
+                    $isMautic3Upgrade = true;
+                }
             } elseif (file_exists($cacheFile)) {
                 $updateData = json_decode(file_get_contents($cacheFile), true);
             } elseif (file_exists($m3CacheFile)) {
