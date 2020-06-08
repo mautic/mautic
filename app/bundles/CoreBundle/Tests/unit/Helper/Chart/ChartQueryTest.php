@@ -17,16 +17,17 @@ use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ChartQueryTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Connection
+     * @var MockObject|Connection
      */
     private $connection;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|QueryBuilder
+     * @var MockObject|QueryBuilder
      */
     private $queryBuilder;
 
