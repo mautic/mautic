@@ -36,11 +36,6 @@ class MigrationCommandSubscriber extends CommonSubscriber
      */
     private $connection;
 
-    /**
-     * @param VersionProviderInterface          $versionProvider
-     * @param GeneratedColumnsProviderInterface $generatedColumnsProvider
-     * @param Connection                        $connection
-     */
     public function __construct(
         VersionProviderInterface $versionProvider,
         GeneratedColumnsProviderInterface $generatedColumnsProvider,
@@ -61,15 +56,12 @@ class MigrationCommandSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param ConsoleCommandEvent $event
-     */
     public function addGeneratedColumns(ConsoleCommandEvent $event)
     {
         $command = $event->getCommand();
         $output  = $event->getOutput();
 
-        if ($command->getName() !== 'doctrine:migrations:migrate') {
+        if ('doctrine:migrations:migrate' !== $command->getName()) {
             return;
         }
 
@@ -104,8 +96,6 @@ class MigrationCommandSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param GeneratedColumn $generatedColumn
-     *
      * @return bool
      */
     private function generatedColumnExistsInSchema(GeneratedColumn $generatedColumn)

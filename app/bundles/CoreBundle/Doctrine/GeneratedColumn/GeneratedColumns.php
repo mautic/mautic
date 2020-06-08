@@ -33,9 +33,6 @@ final class GeneratedColumns implements GeneratedColumnsInterface
      */
     private $dateColumnIndex = [];
 
-    /**
-     * @param GeneratedColumn $generatedColumn
-     */
     public function add(GeneratedColumn $generatedColumn)
     {
         $this->generatedColumns[] = $generatedColumn;

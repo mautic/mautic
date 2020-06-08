@@ -35,9 +35,6 @@ class GeneratedColumnsEvent extends Event
         return $this->generatedColumns;
     }
 
-    /**
-     * @param GeneratedColumn $generatedColumn
-     */
     public function addGeneratedColumn(GeneratedColumn $generatedColumn)
     {
         $this->generatedColumns->add($generatedColumn);

@@ -28,19 +28,12 @@ class DoctrineGeneratedColumnsListener
      */
     protected $logger;
 
-    /**
-     * @param GeneratedColumnsProviderInterface $generatedColumnsProvider
-     * @param LoggerInterface                   $logger
-     */
     public function __construct(GeneratedColumnsProviderInterface $generatedColumnsProvider, LoggerInterface $logger)
     {
         $this->generatedColumnsProvider = $generatedColumnsProvider;
         $this->logger                   = $logger;
     }
 
-    /**
-     * @param GenerateSchemaEventArgs $args
-     */
     public function postGenerateSchema(GenerateSchemaEventArgs $args)
     {
         $schema           = $args->getSchema();

@@ -13,9 +13,6 @@ namespace Mautic\CoreBundle\Doctrine\GeneratedColumn;
 
 interface GeneratedColumnsInterface extends \Iterator
 {
-    /**
-     * @param GeneratedColumn $generatedColumn
-     */
     public function add(GeneratedColumn $generatedColumn);
 
     /**

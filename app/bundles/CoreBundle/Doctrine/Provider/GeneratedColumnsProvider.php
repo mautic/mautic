@@ -47,10 +47,6 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
      */
     private $generatedColumns;
 
-    /**
-     * @param VersionProviderInterface $versionProvider
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function __construct(
         VersionProviderInterface $versionProvider,
         EventDispatcherInterface $dispatcher

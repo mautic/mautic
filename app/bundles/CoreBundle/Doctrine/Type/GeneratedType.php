@@ -25,9 +25,6 @@ class GeneratedType extends Type
     const GENERATED = 'generated';
 
     /**
-     * @param array            $fieldDeclaration
-     * @param AbstractPlatform $platform
-     *
      * @return string
      */
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
@@ -36,8 +33,7 @@ class GeneratedType extends Type
     }
 
     /**
-     * @param mixed            $value
-     * @param AbstractPlatform $platform
+     * @param mixed $value
      *
      * @return mixed
      */
@@ -47,8 +43,7 @@ class GeneratedType extends Type
     }
 
     /**
-     * @param mixed            $value
-     * @param AbstractPlatform $platform
+     * @param mixed $value
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {

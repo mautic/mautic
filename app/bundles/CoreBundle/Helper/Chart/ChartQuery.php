@@ -80,9 +80,6 @@ class ChartQuery extends AbstractChart
         $this->setDateRange($dateFrom, $dateTo);
     }
 
-    /**
-     * @param GeneratedColumnsProviderInterface $generatedColumnProvider
-     */
     public function setGeneratedColumnProvider(GeneratedColumnsProviderInterface $generatedColumnProvider)
     {
         $this->generatedColumnProvider = $generatedColumnProvider;
@@ -236,7 +233,7 @@ class ChartQuery extends AbstractChart
         // Convert time unitst to the right form for current database platform
         $limit         = $this->countAmountFromDateRange();
         $dateConstruct = $this->getDateConstruct($tablePrefix, $column);
-        $count         = ($isEnumerable === true) ? 'COUNT('.$countColumn.') AS count' : $countColumn.' AS count';
+        $count         = (true === $isEnumerable) ? 'COUNT('.$countColumn.') AS count' : $countColumn.' AS count';
 
         if (true === $isEnumerable) {
             $count = 'COUNT('.$countColumn.') AS count';

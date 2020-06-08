@@ -38,10 +38,6 @@ final class VersionProvider implements VersionProviderInterface
      */
     private $version;
 
-    /**
-     * @param Connection           $connection
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function __construct(Connection $connection, CoreParametersHelper $coreParametersHelper)
     {
         $this->connection           = $connection;
@@ -69,7 +65,7 @@ final class VersionProvider implements VersionProviderInterface
      */
     public function isMariaDb()
     {
-        return strpos($this->getVersion(), 'MariaDB') !== false;
+        return false !== strpos($this->getVersion(), 'MariaDB');
     }
 
     /**

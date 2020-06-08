@@ -28,9 +28,6 @@ class GeneratedColumnSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param GeneratedColumnsEvent $event
-     */
     public function onGeneratedColumnsBuild(GeneratedColumnsEvent $event)
     {
         $sentDate = new GeneratedColumn('email_stats', 'generated_sent_date', 'DATE', 'CONCAT(YEAR(date_sent), "-", LPAD(MONTH(date_sent), 2, "0"), "-", LPAD(DAY(date_sent), 2, "0"))');
