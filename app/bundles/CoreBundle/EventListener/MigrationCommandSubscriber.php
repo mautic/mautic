@@ -20,7 +20,7 @@ use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
-class MigrationCommandSubscriber extends EventSubscriberInterface
+class MigrationCommandSubscriber implements EventSubscriberInterface
 {
     /**
      * @var VersionProviderInterface
