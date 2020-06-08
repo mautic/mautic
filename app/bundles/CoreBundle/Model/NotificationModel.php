@@ -197,14 +197,14 @@ class NotificationModel extends FormModel
         }
 
         // Check for updates
-        $updateMessage = '';
-        $newUpdate     = false;
+        $updateMessage    = '';
+        $newUpdate        = false;
+        $isMautic3Upgrade = false;
 
         if (!$this->disableUpdates && $this->userHelper->getUser()->isAdmin()) {
-            $updateData       = [];
-            $cacheFile        = $this->pathsHelper->getSystemPath('cache').'/lastUpdateCheck.txt';
-            $m3CacheFile      = $this->pathsHelper->getSystemPath('cache').'/lastM3UpgradeCheck.txt';
-            $isMautic3Upgrade = false;
+            $updateData  = [];
+            $cacheFile   = $this->pathsHelper->getSystemPath('cache').'/lastUpdateCheck.txt';
+            $m3CacheFile = $this->pathsHelper->getSystemPath('cache').'/lastM3UpgradeCheck.txt';
 
             //check to see when we last checked for an update
             $lastChecked = $this->session->get('mautic.update.checked', 0);
