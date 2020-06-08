@@ -22,7 +22,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MigrationCommandSubscriberTest extends \PHPUnit_Framework_TestCase
+class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private $versionProvider;
     private $generatedColumnsProvider;

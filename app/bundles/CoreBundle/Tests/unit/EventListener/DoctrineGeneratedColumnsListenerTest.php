@@ -20,7 +20,7 @@ use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener;
 use Psr\Log\LoggerInterface;
 
-class DoctrineGeneratedColumnsListenerTest extends \PHPUnit_Framework_TestCase
+class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
 {
     private $generatedColumnsProvider;
     private $logger;

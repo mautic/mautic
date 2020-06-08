@@ -18,7 +18,7 @@ use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class GeneratedColumnsProviderTest extends \PHPUnit_Framework_TestCase
+class GeneratedColumnsProviderTest extends \PHPUnit\Framework\TestCase
 {
     private $versionProvider;
     private $dispatcher;

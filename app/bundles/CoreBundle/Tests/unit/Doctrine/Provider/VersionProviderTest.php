@@ -16,7 +16,7 @@ use Doctrine\DBAL\Driver\Statement;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProvider;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-class VersionProviderTest extends \PHPUnit_Framework_TestCase
+class VersionProviderTest extends \PHPUnit\Framework\TestCase
 {
     private $connection;
     private $coreParametersHelper;

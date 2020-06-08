@@ -13,7 +13,7 @@ namespace Mautic\CoreBundle\Tests\Doctrine\GeneratedColumn;
 
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 
-class GeneratedColumnTest extends \PHPUnit_Framework_TestCase
+class GeneratedColumnTest extends \PHPUnit\Framework\TestCase
 {
     public function testAllGettersAndSeters()
     {
