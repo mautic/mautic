@@ -12,7 +12,7 @@ $defaultInputClass = $containerType = 'freehtml';
 include __DIR__.'/field_helper.php';
 
 if ($inBuilder) {
-    $htmlContent = $properties['text'];
+    $htmlContent = $view['content']->showScriptTags($properties['text']);
 } else {
     $htmlContent = $properties['text'];
 }
