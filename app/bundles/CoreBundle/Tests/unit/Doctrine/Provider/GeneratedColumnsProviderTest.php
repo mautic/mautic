@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Doctrine\Provider;
+namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Provider;
 
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumnsInterface;
@@ -70,11 +70,14 @@ class GeneratedColumnsProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($event);
 
         $generatedColumns = $this->provider->getGeneratedColumns();
-
         $this->assertInstanceOf(GeneratedColumnsInterface::class, $generatedColumns);
-        $this->assertGreaterThanOrEqual(1, count($generatedColumns));
+
+        /** @var GeneratedColumn $generatedColumn */
+        $generatedColumn = $generatedColumns->current();
+        $this->assertSame('page_hits', $generatedColumn->getTableName());
 
         // Ensure that the cache works and dispatcher is called only once
         $generatedColumns = $this->provider->getGeneratedColumns();
+        $this->assertCount(1, $generatedColumns);
     }
 }
