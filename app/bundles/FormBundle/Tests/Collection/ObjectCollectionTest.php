@@ -18,7 +18,7 @@ use Mautic\FormBundle\Crate\ObjectCrate;
 
 final class ObjectCollectionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testToChoices()
+    public function testToChoicesWithObjects()
     {
         $collection = new ObjectCollection(
             [
@@ -34,5 +34,12 @@ final class ObjectCollectionTest extends \PHPUnit\Framework\TestCase
             ],
             $collection->toChoices()
         );
+    }
+
+    public function testToChoicesWithoutObjects()
+    {
+        $collection = new ObjectCollection();
+
+        $this->assertSame([], $collection->toChoices());
     }
 }

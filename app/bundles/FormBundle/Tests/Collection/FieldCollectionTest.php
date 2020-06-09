@@ -19,7 +19,7 @@ use Mautic\FormBundle\Exception\FieldNotFoundException;
 
 final class FieldCollectionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testToChoices()
+    public function testToChoicesWithObjects()
     {
         $collection = new FieldCollection(
             [
@@ -35,6 +35,13 @@ final class FieldCollectionTest extends \PHPUnit\Framework\TestCase
             ],
             $collection->toChoices()
         );
+    }
+
+    public function testToChoicesWithoutObjects()
+    {
+        $collection = new FieldCollection();
+
+        $this->assertSame([], $collection->toChoices());
     }
 
     public function testGetFieldByKey()
