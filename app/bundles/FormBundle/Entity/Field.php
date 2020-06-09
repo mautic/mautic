@@ -1004,7 +1004,7 @@ class Field
 
         $fields = $this->getForm()->getFields();
         foreach ($fields as $field) {
-            if ($field->getId() === $this->parent) {
+            if (intval($field->getId()) === intval($this->parent)) {
                 return $field;
             }
         }
