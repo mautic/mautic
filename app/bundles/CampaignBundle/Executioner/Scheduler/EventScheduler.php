@@ -325,7 +325,7 @@ class EventScheduler
             }
         }
 
-        return false;
+        return $this->shouldSchedule($executionDate, $now);
     }
 
     /**
