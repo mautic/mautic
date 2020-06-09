@@ -26,7 +26,7 @@ final class FieldCollector implements FieldCollectorInterface
     private $dispatcher;
 
     /**
-     * @var FieldCollection[]|null
+     * @var FieldCollection[]
      */
     private $fieldCollections = [];
 

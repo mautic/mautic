@@ -4,7 +4,6 @@ namespace Mautic\FormBundle\Event\Service;
 
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\SubmissionEvent;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 class FieldValueTransformer
