@@ -150,7 +150,7 @@ class AjaxController extends CommonAjaxController
     /**
      * Ajax submit for forms.
      *
-     * @return sonResponse
+     * @return JsonResponse
      */
     public function submitAction()
     {
