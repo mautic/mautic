@@ -117,7 +117,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
     public function testShouldScheduleForInactive()
     {
         $date  = new \DateTime();
-        $now   = new \DateTime();
+        $now   = clone $date;
         $event = new Event();
 
         $this->assertFalse($this->scheduler->shouldScheduleForInactive($event, $date, $now));
@@ -145,7 +145,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
     public function testGetExecutionDateForInactivity()
     {
         $date = new \DateTime();
-        $now  = new \DateTime();
+        $now  = clone $date;
         $now->add(new \DateInterval('P2D'));
 
         $clonedNow = $this->scheduler->getExecutionDateForInactivity($date, $date, $now);
