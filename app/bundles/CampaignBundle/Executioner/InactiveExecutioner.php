@@ -337,7 +337,7 @@ class InactiveExecutioner implements ExecutionerInterface
                 ' to be executed on '.$eventExecutionDate->format('Y-m-d H:i:s e')
             );
 
-            if ($this->scheduler->shouldScheduleForInactive($event) || $this->scheduler->shouldSchedule($eventExecutionDate, $executionDate)) {
+            if ($this->scheduler->shouldScheduleForInactive($event, $eventExecutionDate, $executionDate)) {
                 $childrenCounter->advanceTotalScheduled($contacts->count());
                 $this->scheduler->schedule($event, $eventExecutionDate, $contacts, true);
 

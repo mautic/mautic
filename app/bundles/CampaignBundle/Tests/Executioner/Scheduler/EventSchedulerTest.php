@@ -116,14 +116,17 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldScheduleForInactive()
     {
+        $date  = new \DateTime();
+        $now   = new \DateTime();
         $event = new Event();
-        $this->assertFalse($this->scheduler->shouldScheduleForInactive($event));
+
+        $this->assertFalse($this->scheduler->shouldScheduleForInactive($event, $date, $now));
 
         $event->setProperties([
             'triggerRestrictedDaysOfWeek' => [],
         ]);
 
-        $this->assertFalse($this->scheduler->shouldScheduleForInactive($event));
+        $this->assertFalse($this->scheduler->shouldScheduleForInactive($event, $date, $now));
 
         $event->setProperties([
             'triggerRestrictedDaysOfWeek' => [
@@ -132,7 +135,11 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
             ],
         ]);
 
-        $this->assertTrue($this->scheduler->shouldScheduleForInactive($event));
+        $this->assertTrue($this->scheduler->shouldScheduleForInactive($event, $date, $now));
+
+        $date->add(new \DateInterval('P2D'));
+        $event = new Event();
+        $this->assertTrue($this->scheduler->shouldScheduleForInactive($event, $date, $now));
     }
 
     public function testGetExecutionDateForInactivity()
