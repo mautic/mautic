@@ -499,6 +499,10 @@ class FormController extends CommonFormController
         $formData         = $this->request->request->get('mauticform');
         $sessionId        = isset($formData['sessionId']) ? $formData['sessionId'] : null;
         $customComponents = $model->getCustomComponents();
+        $modifiedFields   = [];
+        $deletedFields    = [];
+        $modifiedActions  = [];
+        $deletedActions   = [];
 
         if ($objectId instanceof Form) {
             $entity   = $objectId;
