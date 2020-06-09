@@ -59,6 +59,7 @@ return [
                 'class'     => \MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel::class,
                 'arguments' => [
                     'request_stack',
+                    'mautic.email.model.email'
                 ],
             ],
         ],

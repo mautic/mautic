@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\Model;
 
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Model\EmailModel;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -18,13 +20,20 @@ class GrapesJsBuilderModel extends AbstractCommonModel
     private $requestStack;
 
     /**
+     * @var EmailModel
+     */
+    private $emailModel;
+
+    /**
      * GrapesJsBuilderModel constructor.
      *
      * @param RequestStack $requestStack
+     * @param EmailModel   $emailModel
      */
-    public function __construct(RequestStack $requestStack)
+    public function __construct(RequestStack $requestStack, EmailModel $emailModel)
     {
         $this->requestStack = $requestStack;
+        $this->emailModel = $emailModel;
     }
 
     /**
@@ -65,5 +74,9 @@ class GrapesJsBuilderModel extends AbstractCommonModel
         }
 
         $this->getRepository()->saveEntity($grapesJsBuilder);
+
+        $customHtml = ArrayHelper::getValue('customHtml',$this->requestStack->getCurrentRequest()->get('emailform'));
+        $email->setCustomHtml($customHtml);
+        $this->emailModel->getRepository()->saveEntity($email);
     }
 }
