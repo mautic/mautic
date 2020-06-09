@@ -712,6 +712,8 @@
                     Form.switchPage(document.getElementById('mauticform_' + formId), 1);
 
                     document.getElementById('mauticform_' + formId).reset();
+
+                    Form.prepareShowOn(formId); // Hides conditional fields again.
                 },
 
                 disableSubmitButton: function() {
