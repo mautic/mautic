@@ -2,16 +2,13 @@
 
 ## Instalation
 
-Require:
-
 1. Apply PR https://github.com/mautic/mautic/pull/8892
 
 2. Copy to plugin/IntegrationsBundle https://github.com/mautic-inc/plugin-integrations  +  PR https://github.com/mautic-inc/plugin-integrations/pull/76
 
-3. Copy to plugins/GrapesJsBuilderBundle this bundle
+3. Copy to plugins/GrapesJsBuilderBundle actual version of GrapeJS bundle https://github.com/Webmecanik/plugin-grapesjs-builder/archive/master.zip
 
 4. Remove cache
-
 
 ## Setup
 
@@ -27,11 +24,26 @@ Require:
 
 ## MJML support
 
-GrapeJS plugin introduce also support for [MJML](https://mjml.io/) language. Just [create template](https://developer.mautic.org/#themes) as usual, just add to template `email.mjml.tpl` file with properly MJML syntax.  
+GrapeJS plugin introduce also support for [MJML](https://mjml.io/) language. Just [create template](https://developer.mautic.org/#themes) as usual and add to template `email.mjml.tpl` file with properly MJML syntax.  
 
-You can use our Blank MJML template
+You can use our Blank MJML template to good start
 
 [blank_mjml.zip](https://github.com/Webmecanik/plugin-grapesjs-builder/files/4757520/blank_mjml.zip)
+
+## Support
+
+Use Github issues for reporting and discuss more about this plugin
+
+## Contribution
+
+Create pull requests and we will review it soon as possible.
+
+## Know issues
+
+- Dynamic Content is not supported for MJML version of builder
+- Edit button text by Delete/Backspace is not working
+
+Contributions are welcome.
 
 ## Dependencies
 
@@ -44,16 +56,3 @@ This plugin use following GrapesJS plugin:
 - Parser CSS : https://github.com/artf/grapesjs-parser-postcss
 
 If you need to update it, codes are in the `plguin/GrapesJsBuilderBundle/Assets/js` folder.
-
-## Support
-
-Use Github issues for reporting and discuss more about this plugin
-
-## Contribution
-
-Every contributions are welcome. Create pull requests and we will review it soon as possible.
-
-## Know issues
-
-- Dynamic Content is not supported for MJML version of builder
-- Edit button text by Delete/Backspace is not working
