@@ -10320,8 +10320,8 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mautic/intl/zipball/236c4eb3d12813f766d6b52d23b5677bf0a9840f",
-                "reference": "236c4eb3d12813f766d6b52d23b5677bf0a9840f",
+                "url": "https://api.github.com/repos/mautic/intl/zipball/d2ac83703951bc3206e9ea3f6114b355de14e3ce",
+                "reference": "d2ac83703951bc3206e9ea3f6114b355de14e3ce",
                 "shasum": ""
             },
             "require": {
@@ -12136,8 +12136,8 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mautic/BazingaOAuthServerBundle/zipball/f7685479cdc35114cc4e6219313f57f5c72a5ee6",
-                "reference": "f7685479cdc35114cc4e6219313f57f5c72a5ee6",
+                "url": "https://api.github.com/repos/mautic/BazingaOAuthServerBundle/zipball/35979d2d341e4b10d40777328723511c71213a73",
+                "reference": "35979d2d341e4b10d40777328723511c71213a73",
                 "shasum": ""
             },
             "require": {
