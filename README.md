@@ -42,6 +42,7 @@ Create pull requests and we will review it soon as possible.
 
 - Dynamic Content is not supported for MJML version of builder
 - Edit button text by Delete/Backspace is not working
+- Code mode editor is not working anymore
 
 Contributions are welcome.
 
