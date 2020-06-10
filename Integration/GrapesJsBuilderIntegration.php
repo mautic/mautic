@@ -35,4 +35,8 @@ class GrapesJsBuilderIntegration extends BasicIntegration implements BasicInterf
     {
         return 'plugins/GrapesJsBuilderBundle/Assets/img/grapesjsbuilder.png';
     }
+
+    public function __call($name, $arguments)
+    {
+    }
 }
