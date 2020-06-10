@@ -41,23 +41,26 @@ class AjaxController extends CommonAjaxController
                 $snapshotUrl = $this->get('mautic.helper.core_parameters')->getParameter('website_snapshot_url');
                 $snapshotKey = $this->get('mautic.helper.core_parameters')->getParameter('website_snapshot_key');
 
-                $http     = $this->get('mautic.http.connector');
-                $response = $http->get($snapshotUrl.'?url='.urlencode($website).'&key='.$snapshotKey, [], 30);
+                try {
+                    $http     = $this->get('mautic.http.connector');
+                    $response = $http->get($snapshotUrl.'?url='.urlencode($website).'&key='.$snapshotKey, [], 30);
 
-                if ($response->code === 200) {
-                    $package = json_decode($response->body, true);
-                    if (isset($package['images'])) {
-                        $data['image']['desktop'] = $package['images']['desktop'];
-                        $data['image']['mobile']  = $package['images']['mobile'];
-                        $palette                  = $package['palette'];
-                        $data['colors']           = [
-                            'primaryColor'    => $palette[0],
-                            'textColor'       => FocusModel::isLightColor($palette[0]) ? '#000000' : '#ffffff',
-                            'buttonColor'     => $palette[1],
-                            'buttonTextColor' => FocusModel::isLightColor($palette[1]) ? '#000000' : '#ffffff',
-                        ];
-                        $data['success'] = 1;
+                    if ($response->code === 200) {
+                        $package = json_decode($response->body, true);
+                        if (isset($package['images'])) {
+                            $data['image']['desktop'] = $package['images']['desktop'];
+                            $data['image']['mobile']  = $package['images']['mobile'];
+                            $palette                  = $package['palette'];
+                            $data['colors']           = [
+                                'primaryColor'    => $palette[0],
+                                'textColor'       => FocusModel::isLightColor($palette[0]) ? '#000000' : '#ffffff',
+                                'buttonColor'     => $palette[1],
+                                'buttonTextColor' => FocusModel::isLightColor($palette[1]) ? '#000000' : '#ffffff',
+                            ];
+                            $data['success'] = 1;
+                        }
                     }
+                } catch (\RuntimeException $exception) {
                 }
             }
         }
