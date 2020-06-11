@@ -31,12 +31,45 @@
 
 ### Configuration
 
-If you have `api_rate_limiter_cache` present in you `app/config/local.php`, you need to change the value to:
+In Mautic 3, several configuration parameters have changed (`app/config/local.php`). The [upgrade script](https://github.com/mautic/mautic/issues/8819) will update those automatically for you, but here's an overview of parameters that will be updated by the script:
 
+| Key | Old value | New value | Comment
+|---|---|---|---|
+| api_rate_limiter_cache | 'type' => 'file_system' | 'adapter' => 'cache.adapter.filesystem' | See below |
+| mailer_transport | 'mail' | 'sendmail' | 'mail' option was removed in SwiftMailer 6, other options should keep working as-is
+| system_update_url | 'https://updates.mautic.org/ index.php?option=com_mauticdownload& task=checkUpdates' | 'https://api.github.com/ repos/mautic/mautic/releases' | new update mechanism
+| dev_hosts | null | array() | If this was set to null, it should now be an empty array
+| theme | 'Mauve' | 'blank' | Mauve theme was removed in 3.x (already deprecated for a while)
+| track_by_fingerprint | 0 | N/A | Functionality removed in 3.x
+| webhook_start | '0' | N/A | Removed in 3.x
+| cache_path | 'YOUR_MAUTIC_FOLDER/ app/cache' | 'YOUR_MAUTIC_FOLDER/ app/../var/cache' | We'll only change the default value (new location is var/cache) but leave any custom configs intact
+| log_path | 'YOUR_MAUTIC_FOLDER/ app/logs' | 'YOUR_MAUTIC_FOLDER/ app/../var/logs' | We'll only change the default value (new location is var/logs) but leave any custom configs intact
+| tmp_path | 'YOUR_MAUTIC_FOLDER/ app/cache' | 'YOUR_MAUTIC_FOLDER/ app/../var/tmp' | We'll only change the default value (new location is var/tmp, it has its own dedicated folder now) but leave any custom configs intact
+| mailer_spool_path | '%kernel.root_dir%/spool' | '%kernel.root_dir%/../var/spool' | We'll only change the default value (new location is var/spool) but leave any custom configs intact
+
+**Note on the `api_rate_limiter_cache` parameter**: this is an advanced feature that we only expect a very small subset of users to be using currently. 
+
+If you had a custom API rate limiter other than the filesystem (default), you'll need to specify a [Symfony cache adapter](https://symfony.com/doc/3.4/cache.html#configuring-cache-with-frameworkbundle) as of Mautic 3. **The upgrade script will change it to 'cache.adapter.filesystem' to prevent issues in the upgrade process, so you should change it yourself post-upgrade**.  For example, if you had Memcached set up with the following configuration:
+
+```PHP
+'api_rate_limiter_cache' => array(
+  'memcached' => array(
+    'servers' => array(
+      '0' => array(
+        'host' => 'memcached.local',
+          'port' => '12345'
+      )
+    )
+  )
+),
 ```
-'api_rate_limiter_cache'            => [
-     'adapter' => 'cache.adapter.filesystem',
-],
+... it should now be:
+
+```PHP
+'api_rate_limiter_cache' => array(
+  'adapter' => 'cache.adapter.memcached',
+  'provider' => 'memcached://memcached.local:12345'
+),
 ```
 
 #### Removing the Container as a Configuration Dependency
