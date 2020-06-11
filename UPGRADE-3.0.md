@@ -36,7 +36,7 @@ In Mautic 3, several configuration parameters have changed (`app/config/local.ph
 | Key | Old value | New value | Comment
 |---|---|---|---|
 | mailer_transport | 'mail' | 'sendmail' | 'mail' option was removed in SwiftMailer 6, other options should keep working as-is
-| system_update_url | 'https://updates.mautic.org/ index.php?option=com_mauticdownload& task=checkUpdates' | 'https://api.github.com/ repos/mautic/mautic/releases' | new update mechanism
+| system_update_url | 'https://updates.mautic.org/ index.php?option=com_mauticdownload& task=checkUpdates' | 'https://api.github.com/ repos/mautic/mautic/releases' | New update mechanism
 | dev_hosts | null | array() | If this was set to null, it should now be an empty array
 | theme | 'Mauve' | 'blank' | Mauve theme was removed in 3.x (already deprecated for a while)
 | track_by_fingerprint | 0 | N/A | Functionality removed in 3.x
