@@ -35,7 +35,6 @@ In Mautic 3, several configuration parameters have changed (`app/config/local.ph
 
 | Key | Old value | New value | Comment
 |---|---|---|---|
-| api_rate_limiter_cache | 'type' => 'file_system' | 'adapter' => 'cache.adapter.filesystem' | See below |
 | mailer_transport | 'mail' | 'sendmail' | 'mail' option was removed in SwiftMailer 6, other options should keep working as-is
 | system_update_url | 'https://updates.mautic.org/ index.php?option=com_mauticdownload& task=checkUpdates' | 'https://api.github.com/ repos/mautic/mautic/releases' | new update mechanism
 | dev_hosts | null | array() | If this was set to null, it should now be an empty array
@@ -46,6 +45,7 @@ In Mautic 3, several configuration parameters have changed (`app/config/local.ph
 | log_path | 'YOUR_MAUTIC_FOLDER/ app/logs' | 'YOUR_MAUTIC_FOLDER/ app/../var/logs' | We'll only change the default value (new location is var/logs) but leave any custom configs intact
 | tmp_path | 'YOUR_MAUTIC_FOLDER/ app/cache' | 'YOUR_MAUTIC_FOLDER/ app/../var/tmp' | We'll only change the default value (new location is var/tmp, it has its own dedicated folder now) but leave any custom configs intact
 | mailer_spool_path | '%kernel.root_dir%/spool' | '%kernel.root_dir%/../var/spool' | We'll only change the default value (new location is var/spool) but leave any custom configs intact
+| api_rate_limiter_cache | 'type' => 'file_system' | 'adapter' => 'cache.adapter.filesystem' | See below |
 
 **Note on the `api_rate_limiter_cache` parameter**: this is an advanced feature that we only expect a very small subset of users to be using currently. 
 
