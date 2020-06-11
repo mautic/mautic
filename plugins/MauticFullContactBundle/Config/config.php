@@ -89,9 +89,7 @@ return [
                 'class'     => \MauticPlugin\MauticFullContactBundle\Services\CompanyStorageHelper::class,
                 'arguments' => [
                     'mautic.lead.model.company',
-                    'mautic.integrations.repository.object_mapping',
                     'monolog.logger.mautic',
-                    'mautic.integration.fullcontact.field.repository',
                     'mautic.plugin.fullcontact.integration.config',
                 ],
             ],

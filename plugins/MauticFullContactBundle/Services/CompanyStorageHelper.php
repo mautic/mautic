@@ -15,29 +15,15 @@ use Monolog\Logger;
 
 class CompanyStorageHelper
 {
-    private $integrationName       = FullContactIntegration::NAME;
-    private $integrationObjectName = FullContactIntegration::NAME;
-    private $internalObjectName    = Contact::NAME;
-
     /**
      * @var CompanyModel
      */
     private $companyModel;
 
     /**
-     * @var ObjectMappingRepository
-     */
-    private $objectMappingRepository;
-
-    /**
      * @var Config
      */
     private $config;
-
-    /**
-     * @var FieldRepository
-     */
-    private $fieldRepository;
 
     /**
      * @var Logger
@@ -51,15 +37,11 @@ class CompanyStorageHelper
 
     public function __construct(
         CompanyModel $companyModel,
-        ObjectMappingRepository $objectMappingRepository,
         Logger $logger,
-        FieldRepository $fieldRepository,
         Config $config
     ) {
         $this->companyModel               = $companyModel;
-        $this->objectMappingRepository    = $objectMappingRepository;
         $this->logger                     = $logger;
-        $this->fieldRepository            = $fieldRepository;
         $this->config                     = $config;
         $this->mappedFields               = $this->config->getMappedFields(ConfigSupport::COMPANY);
     }
