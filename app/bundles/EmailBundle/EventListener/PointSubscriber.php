@@ -111,7 +111,8 @@ class PointSubscriber implements EventSubscriberInterface
      */
     public function onEmailSend(EmailSendEvent $event)
     {
-        if ($leadArray = $event->getLead() && !empty($leadArray['id'])) {
+        $leadArray = $event->getLead();
+        if ($leadArray && is_array($leadArray) && !empty($leadArray['id'])) {
             $lead = $this->entityManager->getReference(Lead::class, $leadArray['id']);
         } else {
             return;
