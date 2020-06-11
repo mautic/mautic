@@ -28,9 +28,6 @@
   margin: auto;
   z-index: 0;
 }
-.focus-builder #websiteScreenshot .screenshot-container {
-  /*overflow: hidden;*/
-}
 .focus-builder #websiteScreenshot.css-device .screenshot-container {
   height: 392px;
 }
