@@ -226,16 +226,12 @@
             Object.keys(parents).forEach(function(key) {
                 var containerId = document.getElementById(key);
                 var selectElement = document.getElementById(key.replace('mauticform_','mauticform_input_' ));
-                var selVal = Array.from(selectElement.selectedOptions)
-                    .map(option => option.value);
 
-                Form.doShowOn(parents, key, selVal)
+                Form.doShowOn(parents, key, Form.getSelectedValues(containerId));
 
                 containerId.onchange = function (evt) {
                     var selectElement = evt.target;
-                    var selVal = Array.from(selectElement.selectedOptions)
-                        .map(option => option.value);
-                  Form.doShowOn(parents, key, selVal);
+                    Form.doShowOn(parents, key, Form.getSelectedValues(evt.currentTarget));
                 }
             });
         };
@@ -276,7 +272,7 @@
         }
 
         Form.getSelectedValues = function(selectElement) {
-            if (selectElement.querySelectorAll('input[type=checkbox], input[type=radio]').length) {
+            if (selectElement.querySelectorAll('input[type=checkbox]').length) {
                 return Array.from(selectElement.querySelectorAll('input:checked'))
                     .map(option => option.value);
 
@@ -284,8 +280,6 @@
                 return Array.from(selectElement.querySelectorAll('option:checked'))
                     .map(option => option.value);
             }
-
-            return [];
         }
 
         Form.filterOptGroups = function(selectElement, optGroupValue) {
