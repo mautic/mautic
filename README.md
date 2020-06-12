@@ -1,6 +1,6 @@
 # GrapesJS Builder with MJML support for Mautic
 
-## Instalation
+## Installation
 
 1. Apply PR https://github.com/mautic/mautic/pull/8892
 
@@ -26,7 +26,7 @@
 
 GrapeJS plugin introduce also support for [MJML](https://mjml.io/) language. Just [create template](https://developer.mautic.org/#themes) as usual and add to template `email.mjml.tpl` file with properly MJML syntax.  
 
-You can use our Blank MJML template to good start
+You can use our Blank MJML template to start
 
 [blank_mjml.zip](https://github.com/Webmecanik/plugin-grapesjs-builder/files/4757520/blank_mjml.zip)
 
