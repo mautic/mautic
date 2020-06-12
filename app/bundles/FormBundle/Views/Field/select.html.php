@@ -29,10 +29,11 @@ $help = (empty($field['helpMessage'])) ? '' : <<<HTML
 HTML;
 
 $emptyOption = '';
-if ((!empty($properties['empty_value']) && empty($field['defaultValue']) && empty($properties['multiple']))):
+if ((!empty($properties['empty_value']) || empty($field['defaultValue']) && empty($properties['multiple']))):
+    $placeholder = isset($properties['empty_value']) ? $properties['empty_value'] : '';
     $emptyOption = <<<HTML
 
-                    <option value="">{$properties['empty_value']}</option>
+                    <option value="">{$placeholder}</option>
 HTML;
 endif;
 

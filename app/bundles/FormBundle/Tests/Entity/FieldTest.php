@@ -119,7 +119,7 @@ final class FieldTest extends \PHPUnit_Framework_TestCase
         $field->setForm($form);
         $field->setParent($parentFieldId);
         $field->setConditions(['expr' => 'in', 'values' => ['value B']]);
-        $parentField->method('getId')->willReturn($parentFieldId);
+        $parentField->method('getId')->willReturn(55);
         $parentField->method('getAlias')->willReturn($parentFieldAlias);
         $data = [$parentFieldAlias => ['value A']];
 
