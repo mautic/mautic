@@ -1048,20 +1048,31 @@ function is_mysqldump_available()
         return false;
     }
 
-    $return_var = null;
-    $output = null;
+    $return_var  = null;
+    $output      = null;
+    $db_password = '';
+    $output_path = '/dev/null';
+
+    if (stristr(PHP_OS, 'WIN')) {
+        $output_path = 'NUL';
+    }
+
     // Escape single quotes in DB password
-    $db_password = str_replace("'", "'\''", $localParameters['db_password']);
+    if (!empty($localParameters['db_password'])) {
+        $db_password = str_replace("'", "'\''", $localParameters['db_password']);
+        $db_password = "-p'" . $db_password . "'";
+    }
+    
     $db_prefix = !empty($localParameters['db_table_prefix']) ? $localParameters['db_table_prefix'] : '';
     // Do the database backup with mysqldump
-    $command = "mysqldump -u " . $localParameters['db_user'] . " -h " . $localParameters['db_host'] . " -p'" . $db_password . "' " . $localParameters['db_name'] . " " . $db_prefix . "plugins > /dev/null";
+    $command = "mysqldump -u " . $localParameters['db_user'] . " -h " . $localParameters['db_host'] . " " . $db_password . " " . $localParameters['db_name'] . " " . $db_prefix . "plugins > " . $output_path;
     exec($command, $output, $return_var);
 
-    if ($return_var === null) {
+    if (empty($return_var)) {
         return true;
     }
 
-    return true;
+    return false;
 }
 
 /**
@@ -1073,12 +1084,18 @@ function backup_database()
 {
     global $localParameters;
 
-    $return_var = null;
-    $output = null;
+    $return_var  = null;
+    $output      = null;
+    $db_password = '';
+    
     // Escape single quotes in DB password
-    $db_password = str_replace("'", "'\''", $localParameters['db_password']);
+    if (!empty($localParameters['db_password'])) {
+        $db_password = str_replace("'", "'\''", $localParameters['db_password']);
+        $db_password = "-p'" . $db_password . "'";
+    }
+    
     // Do the database backup with mysqldump
-    $command = "mysqldump -u " . $localParameters['db_user'] . " -h " . $localParameters['db_host'] . " -p'" . $db_password . "' " . $localParameters['db_name'] . " > " . MAUTIC_ROOT . '/m3_upgrade_db_backup.sql';
+    $command = "mysqldump -u " . $localParameters['db_user'] . " -h " . $localParameters['db_host'] . " " . $db_password . " " . $localParameters['db_name'] . " > " . MAUTIC_ROOT . '/m3_upgrade_db_backup.sql';
     exec($command, $output, $return_var);
 
     if (empty($return_var)) {
