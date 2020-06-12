@@ -224,16 +224,12 @@
             Object.keys(parents).forEach(function(key) {
                 var containerId = document.getElementById(key);
                 var selectElement = document.getElementById(key.replace('mauticform_','mauticform_input_' ));
-                var selVal = Array.from(selectElement.selectedOptions)
-                    .map(option => option.value);
 
-                Form.doShowOn(parents, key, selVal)
+                Form.doShowOn(parents, key, Form.getSelectedValues(containerId));
 
                 containerId.onchange = function (evt) {
                     var selectElement = evt.target;
-                    var selVal = Array.from(selectElement.selectedOptions)
-                        .map(option => option.value);
-                  Form.doShowOn(parents, key, selVal);
+                    Form.doShowOn(parents, key, Form.getSelectedValues(evt.currentTarget));
                 }
             });
         };
@@ -271,6 +267,17 @@
             element.style.display = 'block';
             element.removeAttribute('data-validate-disable');
             Form.filterOptGroups(element, selectedValue);
+        }
+
+        Form.getSelectedValues = function(selectElement) {
+            if (selectElement.querySelectorAll('input[type=checkbox]').length) {
+                return Array.from(selectElement.querySelectorAll('input:checked'))
+                    .map(option => option.value);
+
+            }else if(selectElement.querySelectorAll('select').length){
+                return Array.from(selectElement.querySelectorAll('option:checked'))
+                    .map(option => option.value);
+            }
         }
 
         Form.filterOptGroups = function(selectElement, optGroupValue) {
