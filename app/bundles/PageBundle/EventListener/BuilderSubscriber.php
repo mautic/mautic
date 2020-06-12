@@ -631,8 +631,6 @@ class BuilderSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array $params
-     *
      * @return string
      */
     protected function renderDoNotContact(array $params = [])

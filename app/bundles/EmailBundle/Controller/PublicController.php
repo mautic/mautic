@@ -361,7 +361,7 @@ class PublicController extends CommonFormController
             $message = $this->translator->trans('mautic.email.stat_record.not_found');
         }
 
-        $template = ($email !== null && 'mautic_code_mode' !== $email->getTemplate()) ? $email->getTemplate() : $this->coreParametersHelper->getParameter('theme');
+        $template = (null !== $email && 'mautic_code_mode' !== $email->getTemplate()) ? $email->getTemplate() : $this->coreParametersHelper->getParameter('theme');
 
         $theme = $this->factory->getTheme($template);
 
