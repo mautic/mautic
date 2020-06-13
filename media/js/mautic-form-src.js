@@ -242,7 +242,7 @@
 
             Object.keys((parents[key])).forEach(function(key2) {
                 [].forEach.call(selectedValues, function (selectedValue) {
-
+                    
                     var el = document.getElementById(key2);
                     if (selectedValue) {
                         if (el.getAttribute('data-mautic-form-expr') == 'notIn') {
@@ -270,7 +270,7 @@
         }
 
         Form.getSelectedValues = function(selectElement) {
-            if (selectElement.querySelectorAll('input[type=checkbox]').length) {
+            if (selectElement.querySelectorAll('input[type=checkbox], input[type=radio]').length) {
                 return Array.from(selectElement.querySelectorAll('input:checked'))
                     .map(option => option.value);
 
@@ -278,6 +278,8 @@
                 return Array.from(selectElement.querySelectorAll('option:checked'))
                     .map(option => option.value);
             }
+
+            return [];
         }
 
         Form.filterOptGroups = function(selectElement, optGroupValue) {
