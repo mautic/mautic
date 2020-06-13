@@ -10,13 +10,13 @@
      * 
      * NOTE: This upgrade script is specifically for upgrading Mautic 2.16.3+ to Mautic 3.0.0 (or later patch releases). It can only be started in standalone mode!
  */
-ini_set('display_errors', 'Off');
+@ini_set('display_errors', 'Off');
 
 if (stristr(PHP_OS, 'WIN')) {
     define('IS_WINDOWS', true);
 }
 
-// Try to set max_execution_time to 240 if it's lower, if this fails we'll throw an error later in the preUpgradeChecks.
+// Try to set max_execution_time to 240 if it's lower currently. If this fails we'll throw an error later in the preUpgradeChecks.
 $minExecutionTime = 240;
 
 if (defined('IS_WINDOWS')) {
@@ -26,7 +26,18 @@ if (defined('IS_WINDOWS')) {
 
 $maxExecutionTime = (int) ini_get('max_execution_time');
 if ($maxExecutionTime > 0 && $maxExecutionTime < $minExecutionTime) {
-    ini_set('max_execution_time', $minExecutionTime);
+    @ini_set('max_execution_time', $minExecutionTime);
+}
+
+// Try to set the memory_limit to 256M if it's lower currently. If this fails we'll throw an error later in the preUpgradeChecks.
+$minMemoryLimit = '256M';
+$minMemoryLimitBytes = (int)$minMemoryLimit * 1024 ** ['k' => 1, 'm' => 2, 'g' => 3][strtolower($minMemoryLimit)[-1]] ?? 0;
+
+$memoryLimit = ini_get('memory_limit');
+$memoryLimitBytes = (int)$memoryLimit * 1024 ** ['k' => 1, 'm' => 2, 'g' => 3][strtolower($memoryLimit)[-1]] ?? 0;
+
+if ($memoryLimitBytes > 0 && $memoryLimitBytes < $minMemoryLimitBytes) {
+    @ini_set('memory_limit', $minMemoryLimit);
 }
 
 date_default_timezone_set('UTC');
@@ -91,6 +102,8 @@ function runPreUpgradeChecks()
     global $updateData;
     global $localParameters;
     global $minExecutionTime;
+    global $minMemoryLimit;
+    global $minMemoryLimitBytes;
 
     // Errors prevent a user from updating.
     $preUpgradeErrors = [];
@@ -208,7 +221,7 @@ function runPreUpgradeChecks()
     $maxExecutionTime = ini_get('max_execution_time');
 
     if ($maxExecutionTime > 0 && $maxExecutionTime < $minExecutionTime) {
-        $preUpgradeErrors[] = 'PHP max_execution_time needs to be at least ' . $minExecutionTime . ' seconds (' . round($minExecutionTime / 60, 2) . ' minutes) to allow for a successful upgrade. We tried setting it to this value but weren\'t able to do so. Please contact your host to set this value to 240 seconds or higher.';
+        $preUpgradeErrors[] = 'PHP max_execution_time needs to be at least ' . $minExecutionTime . ' seconds (' . round($minExecutionTime / 60, 2) . ' minutes) to allow for a successful upgrade (current value is ' .$maxExecutionTime . ' seconds). We tried setting it to this value but weren\'t able to do so. Please contact your host to set this value to ' . $minExecutionTime . ' seconds or higher.';
     }
 
     // Check if mysqldump is available on the system for creating a DB backup.
@@ -257,6 +270,14 @@ function runPreUpgradeChecks()
             . 'The "creating cache" step is very slow on this platform and it might look like it hangs; please be patient in this case.';
     }
 
+    // Check PHP's memory_limit
+    $memoryLimit = ini_get('memory_limit');
+    $memoryLimitBytes = (int)$memoryLimit * 1024 ** ['k' => 1, 'm' => 2, 'g' => 3][strtolower($memoryLimit)[-1]] ?? 0;
+
+    if ($memoryLimitBytes > 0 && $memoryLimitBytes < $minMemoryLimitBytes) {
+        $preUpgradeErrors[] = 'PHP memory_limit needs to be at least ' . $minMemoryLimit . ' to allow for a successful upgrade (current value is ' . $memoryLimit . '). We tried setting it to this value but weren\'t able to do so. Please contact your host to set this value to ' . $minMemoryLimit . ' or higher.';
+    }
+
     return [
         'warnings' => $preUpgradeWarnings,
         'errors' => $preUpgradeErrors
@@ -287,7 +308,7 @@ if (!IN_CLI) {
             $html = "";
 
             $generalRemarks = "<strong>IMPORTANT: you will need to update your cron jobs from app/console to bin/console after the upgrade.<br>
-            You can already change them now if you want. For instructions, please read our <a target=\"_blank\" href=\"https://docs.mautic.org/en/mautic-3-upgrade/getting-started\">Mautic 3: Getting Started guide</a>.<br><br>
+            You can already change them now if you want. For instructions, please read our <a target=\"_blank\" href=\"http://mau.tc/m3-upgrade-getting-started\">Mautic 3: Getting Started guide</a>.<br><br>
             <u>It's strongly recommended to have a backup before you start upgrading!</u></strong><br><br>";
 
             if (count($preUpgradeCheckErrors) > 0) {
@@ -920,7 +941,7 @@ function throwErrorAndWriteToLog($code, $message)
     sendUpgradeStats('failed', $code);
 
     // Generate URL to docs including error code.
-    $url = 'https://docs.mautic.org/en/mautic-3-upgrade/mautic-3-upgrade-errors#' . strtolower($code);
+    $url = 'http://mau.tc/m3-upgrade-error#' . strtolower($code);
 
     if (!IN_CLI) {
         outputJSON(
@@ -1068,7 +1089,7 @@ function is_mysqldump_available()
     $db_password = '';
     $output_path = '/dev/null';
 
-    if (stristr(PHP_OS, 'WIN')) {
+    if (defined('IS_WINDOWS')) {
         $output_path = 'NUL';
     }
 
