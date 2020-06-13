@@ -76,7 +76,7 @@ $localParameters = get_local_config();
 
 if (file_exists(POST_UPGRADE_BACKUP_FILES_REMOVAL_PENDING_FILE)) {
     if (IN_CLI) {
-        echo "Mautic 3 upgrade complete. Do you want to remove the backup files? Type \"yes\" to remove: ";
+        echo "Mautic 3 upgrade complete. Do you want to remove the backup files? We recommend first checking in a browser whether Mautic 3 works as expected. Type \"yes\" to remove: ";
         $handle = fopen("php://stdin", "r");
         $line = fgets($handle);
         if (trim($line) != "yes") {
@@ -93,7 +93,7 @@ if (file_exists(POST_UPGRADE_BACKUP_FILES_REMOVAL_PENDING_FILE)) {
     } else {
         if (!isset($_GET['confirmDeleteBackup'])) {
             html_body(
-                "<p>Mautic 3 upgrade complete. Do you want to remove the backup files?</p>"
+                "<p>Mautic 3 upgrade complete. Do you want to remove the backup files? We recommend first checking in a browser whether Mautic 3 works as expected.</p>"
                 . "<p>Please note that upgrade_v3.php will remain (publicly) available until you choose to remove the backup files using this script! "
                 . "Run this script again to be prompted to delete backup files.</p>
                 
@@ -879,7 +879,7 @@ if (!IN_CLI) {
 
     final_cleanup_files();
 
-    writeToLog("Do you want to remove the backup files? Type \"yes\" to remove: ");
+    writeToLog("Do you want to remove the backup files? We recommend first checking in a browser whether Mautic 3 works as expected. Type \"yes\" to remove: ");
     $handle = fopen("php://stdin", "r");
     $line = fgets($handle);
     if (trim($line) != "yes") {
