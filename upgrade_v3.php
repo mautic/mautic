@@ -44,10 +44,10 @@ if (defined('IS_WINDOWS')) {
     $minMemoryLimit = '512M';
 }
 
-$minMemoryLimitBytes = (int)$minMemoryLimit * 1024 ** ['k' => 1, 'm' => 2, 'g' => 3][strtolower($minMemoryLimit)[-1]] ?? 0;
+$minMemoryLimitBytes = returnBytes($minMemoryLimit);
 
 $memoryLimit = ini_get('memory_limit');
-$memoryLimitBytes = (int)$memoryLimit * 1024 ** ['k' => 1, 'm' => 2, 'g' => 3][strtolower($memoryLimit)[-1]] ?? 0;
+$memoryLimitBytes = returnBytes($memoryLimit);
 
 if ($memoryLimitBytes > 0 && $memoryLimitBytes < $minMemoryLimitBytes) {
     @ini_set('memory_limit', $minMemoryLimit);
@@ -68,13 +68,15 @@ define('MAUTIC_UPGRADE_FOLDER_NAME', 'mautic-3-temp-files');
 define('MAUTIC_UPGRADE_ROOT', MAUTIC_ROOT . DIRECTORY_SEPARATOR . MAUTIC_UPGRADE_FOLDER_NAME);
 // This value always needs to contain mautic-2-backup-files as we replace that with a unique hashed name later on!
 define('MAUTIC_BACKUP_FOLDER_ROOT', MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'mautic-2-backup-files');
+define('MAUTIC_POST_UPGRADE_BACKUP_FOLDER_ROOT', MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'mautic-2-backup-files');
 
 if (!file_exists(MAUTIC_UPGRADE_ROOT)) {
     mkdir(MAUTIC_UPGRADE_ROOT);
 }
 
 // This value always needs to contain upgrade_log.txt as we replace that with a unique hashed name later on!
-define('UPGRADE_LOG_FILE', MAUTIC_ROOT . '/upgrade_log.txt');
+define('UPGRADE_LOG_FILE', MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'upgrade_log.txt');
+define('POST_UPGRADE_LOG_FILE', MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'upgrade_log.txt');
 
 if (!file_exists(UPGRADE_LOG_FILE)) {
     file_put_contents(UPGRADE_LOG_FILE, '');
@@ -284,7 +286,7 @@ function runPreUpgradeChecks()
 
     // Check PHP's memory_limit
     $memoryLimit = ini_get('memory_limit');
-    $memoryLimitBytes = (int)$memoryLimit * 1024 ** ['k' => 1, 'm' => 2, 'g' => 3][strtolower($memoryLimit)[-1]] ?? 0;
+    $memoryLimitBytes = returnBytes($memoryLimit);
 
     if ($memoryLimitBytes > 0 && $memoryLimitBytes < $minMemoryLimitBytes) {
         $preUpgradeErrors[] = 'PHP memory_limit needs to be at least ' . $minMemoryLimit . ' to allow for a successful upgrade (current value is ' . $memoryLimit . '). We tried setting it to this value but weren\'t able to do so. Please contact your host to set this value to ' . $minMemoryLimit . ' or higher.';
@@ -522,7 +524,7 @@ if (!IN_CLI) {
 
             writeToLog("Successfully updated config/local.php.");
 
-            outputJSON('success', 'OK', 'applyMigrations', 'Applying Mautic 3 database migrations...');
+            outputJSON('success', 'OK', 'applyMigrations', 'Applying Mautic 3 database migrations... This might take a while!');
 
         case 'applyMigrations':
             writeToLog("Getting the amount of available Mautic 3 database migrations... This might take a while!");
@@ -1789,7 +1791,7 @@ function cleanup_files()
     // Rename the mautic-2-backup-files folder to one with a random hash to prevent public access
     if (file_exists(MAUTIC_BACKUP_FOLDER_ROOT)) {
         $hash = bin2hex(random_bytes(16));
-        $newFolderPath = str_replace('mautic-2-backup-files', 'mautic-2-backup-files-' . $hash, MAUTIC_BACKUP_FOLDER_ROOT);
+        $newFolderPath = str_replace('mautic-2-backup-files', 'mautic-2-backup-files-' . $hash, MAUTIC_POST_UPGRADE_BACKUP_FOLDER_ROOT);
         $status = rename(MAUTIC_BACKUP_FOLDER_ROOT, $newFolderPath);
         if ($status === false) $failedChanges[] = 'mautic-2-backup-files';
     }
@@ -1797,7 +1799,7 @@ function cleanup_files()
     // Rename the m3_upgrade_db_backup.sql file to one with a random hash to prevent public access
     if (file_exists(MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'm3_upgrade_db_backup.sql')) {
         $hash = bin2hex(random_bytes(16));
-        $status = rename(MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'm3_upgrade_db_backup.sql', MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'm3_upgrade_db_backup_' . $hash . '.sql');
+        $status = rename(MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'm3_upgrade_db_backup.sql', MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'm3_upgrade_db_backup_' . $hash . '.sql');
         if ($status === false) $failedChanges[] = 'm3_upgrade_db_backup.sql';
     }
 
@@ -1825,7 +1827,7 @@ function final_cleanup_files()
     // Rename the upgrade_log.txt file to one with a random hash to prevent public access
     if (file_exists(UPGRADE_LOG_FILE)) {
         $hash = bin2hex(random_bytes(16));
-        $status = rename(UPGRADE_LOG_FILE, str_replace('upgrade_log.txt', 'upgrade_log_' . $hash . '.txt', UPGRADE_LOG_FILE));
+        $status = rename(UPGRADE_LOG_FILE, str_replace('upgrade_log.txt', 'upgrade_log_' . $hash . '.txt', POST_UPGRADE_LOG_FILE));
         if ($status === false) $failedChanges[] = 'upgrade_log.txt';
     }
 }
@@ -1913,6 +1915,31 @@ function outputJSON($status, $message, $nextTaskCode = null, $nextTaskLabel = nu
         'nextTaskLabel' => $nextTaskLabel
     ]);
     exit;
+}
+
+/**
+ * Converts shorthand memory notation value to bytes
+ * From http://php.net/manual/en/function.ini-get.php
+ *
+ * @param $val Memory size shorthand notation string
+ *
+ * @return int
+ */
+function returnBytes($val)
+{
+    $val = trim($val);
+    $last = strtolower($val[strlen($val)-1]);
+    $val = substr($val, 0, -1);
+    switch($last) {
+        // The 'G' modifier is available since PHP 5.1.0
+        case 'g':
+            $val *= 1024;
+        case 'm':
+            $val *= 1024;
+        case 'k':
+            $val *= 1024;
+    }
+    return $val;
 }
 
 /**
