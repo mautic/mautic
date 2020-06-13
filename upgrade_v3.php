@@ -367,7 +367,7 @@ if (!IN_CLI) {
 
             if ($success === false) {
                 throwErrorAndWriteToLog(
-                    "ERR_MAUTIC_2_MIGRATIONS_FAILED",
+                    "ERR_MAUTIC_2_MIGRATIONS_IDENTIFICATION_FAILED",
                     'We couldn\'t reliably detect the amount of available database migrations. Please try again by refreshing this page.'
                 );
             } else {
@@ -408,7 +408,7 @@ if (!IN_CLI) {
                     }
                 } else {
                     throwErrorAndWriteToLog(
-                        "ERR_MAUTIC_2_MIGRATIONS_FAILED",
+                        "ERR_MAUTIC_2_MIGRATIONS_IDENTIFICATION_FAILED",
                         'We couldn\'t reliably detect the amount of available database migrations. Please try again by refreshing this page.'
                     );
                 }
@@ -498,7 +498,7 @@ if (!IN_CLI) {
 
             if ($success === false) {
                 throwErrorAndWriteToLog(
-                    "ERR_MAUTIC_3_MIGRATIONS_FAILED",
+                    "ERR_MAUTIC_3_MIGRATIONS_IDENTIFICATION_FAILED",
                     'We couldn\'t reliably detect the amount of available database migrations. Please try again by refreshing this page.'
                 );
             } else {
@@ -539,7 +539,7 @@ if (!IN_CLI) {
                     }
                 } else {
                     throwErrorAndWriteToLog(
-                        "ERR_MAUTIC_3_MIGRATIONS_FAILED",
+                        "ERR_MAUTIC_3_MIGRATIONS_IDENTIFICATION_FAILED",
                         'We couldn\'t reliably detect the amount of available database migrations. Please try again by refreshing this page.'
                     );
                 }
@@ -826,7 +826,7 @@ function checkAndRunMigrationsCLI($mauticMajorVersion, $ignoreFirstLog = false)
 
     if ($success === false) {
         throwErrorAndWriteToLog(
-            "ERR_MAUTIC_" . $mauticMajorVersion . "_MIGRATIONS_FAILED",
+            "ERR_MAUTIC_" . $mauticMajorVersion . "_MIGRATIONS_IDENTIFICATION_FAILED",
             'We couldn\'t reliably detect the amount of available database migrations.'
         );
     } else {
@@ -855,7 +855,7 @@ function checkAndRunMigrationsCLI($mauticMajorVersion, $ignoreFirstLog = false)
             }
         } else {
             throwErrorAndWriteToLog(
-                "ERR_MAUTIC_" . $mauticMajorVersion . "_MIGRATIONS_FAILED",
+                "ERR_MAUTIC_" . $mauticMajorVersion . "_MIGRATIONS_IDENTIFICATION_FAILED",
                 'We couldn\'t reliably detect the amount of available database migrations.'
             );
         }
