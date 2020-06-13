@@ -725,36 +725,6 @@ if (!IN_CLI) {
 
         writeToLog("Extracting done!");
 
-        writeToLog("Moving Mautic 2 files into mautic-2-backup and moving the Mautic 3 files in place, this might take a while... DO NOT ABORT THE SCRIPT!!!");
-
-        /**
-         * Move current Mautic 2 files into a temporary directory called "mautic-2-backup-files",
-         * then move the Mautic 3 files from "mautic-3-temp-files" to the root directory.
-         */
-        list($success, $message) = replace_mautic_2_with_mautic_3();
-
-        if ($success === false) {
-            throwErrorAndWriteToLog(
-                "ERR_MOVE_MAUTIC_2_AND_3_FILES",
-                "Error while moving Mautic 2 or 3 files: " . $message
-            );
-        }
-
-        writeToLog("Done!\n");
-
-        writeToLog("Updating your config/local.php with new settings that were changed/introduced in Mautic 3...");
-
-        list($success, $message) = update_local_config();
-
-        if (!$success) {
-            throwErrorAndWriteToLog(
-                "ERR_UPDATE_LOCAL_CONFIG",
-                "Failed updating your configuration in config/local.php: " . $message
-            );
-        }
-
-        writeToLog("Done! Your config file has been updated.");
-
         writeToLog("Preparing for phase 2 of the upgrade...");
 
         $result = file_put_contents($m3_phase_2_file, 'READY FOR PHASE 2, RUN php upgrade_v3.php');
@@ -773,6 +743,36 @@ if (!IN_CLI) {
     }
 
     writeToLog("Welcome to Phase 2 of the Mautic 3 upgrade! We'll continue where we left off.");
+
+    writeToLog("Moving Mautic 2 files into mautic-2-backup and moving the Mautic 3 files in place, this might take a while... DO NOT ABORT THE SCRIPT!!!");
+
+    /**
+     * Move current Mautic 2 files into a temporary directory called "mautic-2-backup-files",
+     * then move the Mautic 3 files from "mautic-3-temp-files" to the root directory.
+     */
+    list($success, $message) = replace_mautic_2_with_mautic_3();
+
+    if ($success === false) {
+        throwErrorAndWriteToLog(
+            "ERR_MOVE_MAUTIC_2_AND_3_FILES",
+            "Error while moving Mautic 2 or 3 files: " . $message
+        );
+    }
+
+    writeToLog("Done!\n");
+
+    writeToLog("Updating your config/local.php with new settings that were changed/introduced in Mautic 3...");
+
+    list($success, $message) = update_local_config();
+
+    if (!$success) {
+        throwErrorAndWriteToLog(
+            "ERR_UPDATE_LOCAL_CONFIG",
+            "Failed updating your configuration in config/local.php: " . $message
+        );
+    }
+
+    writeToLog("Done! Your config file has been updated.");
 
     // Run Mautic 3 migrations
     checkAndRunMigrationsCLI(3);
