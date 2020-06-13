@@ -12,8 +12,18 @@
  */
 ini_set('display_errors', 'Off');
 
+if (stristr(PHP_OS, 'WIN')) {
+    define('IS_WINDOWS', true);
+}
+
 // Try to set max_execution_time to 240 if it's lower, if this fails we'll throw an error later in the preUpgradeChecks.
 $minExecutionTime = 240;
+
+if (defined('IS_WINDOWS')) {
+    // Cache creation is slower on Windows; set an even higher minExecutionTime.
+    $minExecutionTime = 600;
+}
+
 $maxExecutionTime = (int) ini_get('max_execution_time');
 if ($maxExecutionTime > 0 && $maxExecutionTime < $minExecutionTime) {
     ini_set('max_execution_time', $minExecutionTime);
@@ -239,6 +249,12 @@ function runPreUpgradeChecks()
         if (!isset($data[2]) || !isset($data[2][0])) {
             $preUpgradeWarnings[] = 'We couldn\'t reliably detect the amount of available database migrations. Please proceed with caution!';
         }
+    }
+    
+    // Cache creation is a lot slower on Windows; inform the user about this.
+    if (defined('IS_WINDOWS')) {
+        $preUpgradeWarnings[] = 'It looks like you\'re running Mautic on Windows. '
+            . 'The "creating cache" step is very slow on this platform and it might look like it hangs; please be patient in this case.';
     }
 
     return [
@@ -809,7 +825,6 @@ function checkAndRunMigrationsCLI($mauticMajorVersion, $ignoreFirstLog = false)
     list($success, $data) = get_available_migrations();
 
     if ($success === false) {
-        var_dump($data);
         throwErrorAndWriteToLog(
             "ERR_MAUTIC_" . $mauticMajorVersion . "_MIGRATIONS_FAILED",
             'We couldn\'t reliably detect the amount of available database migrations.'
@@ -1491,7 +1506,8 @@ function replaceConfigValueIfExistsAndEquals(array $parameters, string $key, $ol
  */
 function run_symfony_command($command, array $args)
 {
-    static $application;
+    // Don't re-use the $application varaiable as it will cause problems with the CLI upgrade
+    $application = null;
 
     require_once MAUTIC_APP_ROOT . '/autoload.php';
     require_once MAUTIC_APP_ROOT . '/AppKernel.php';
@@ -1512,6 +1528,8 @@ function run_symfony_command($command, array $args)
     $exitCode = $application->run($input, $output);
 
     $content = $output->fetch();
+    
+    unset($application, $input, $output);
 
     return [
         $exitCode === 0,
