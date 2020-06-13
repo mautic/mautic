@@ -69,6 +69,46 @@ define('MAUTIC_UPGRADE_ROOT', MAUTIC_ROOT . DIRECTORY_SEPARATOR . MAUTIC_UPGRADE
 // This value always needs to contain mautic-2-backup-files as we replace that with a unique hashed name later on!
 define('MAUTIC_BACKUP_FOLDER_ROOT', MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'mautic-2-backup-files');
 define('MAUTIC_POST_UPGRADE_BACKUP_FOLDER_ROOT', MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'mautic-2-backup-files');
+define('POST_UPGRADE_BACKUP_FILES_REMOVAL_PENDING_FILE', MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'm3_upgrade_backup_files_not_removed_yet.txt');
+
+// Get local parameters
+$localParameters = get_local_config();
+
+if (file_exists(POST_UPGRADE_BACKUP_FILES_REMOVAL_PENDING_FILE)) {
+    if (IN_CLI) {
+        echo "Mautic 3 upgrade complete. Do you want to remove the backup files? Type \"yes\" to remove: ";
+        $handle = fopen("php://stdin", "r");
+        $line = fgets($handle);
+        if (trim($line) != "yes") {
+            echo "Ok, we won't do anything for now. "
+                . "Please note that upgrade_v3.php will remain (publicly) available until you choose to remove the backup files using this script! "
+                . "Run this script again to be prompted to delete backup files.\n";
+            exit;
+        }
+        fclose($handle);
+        echo "\n"; 
+        echo "Thank you, continuing...\n";
+
+        removeBackupFilesAndExit();
+    } else {
+        if (!isset($_GET['confirmDeleteBackup'])) {
+            html_body(
+                "<p>Mautic 3 upgrade complete. Do you want to remove the backup files?</p>"
+                . "<p>Please note that upgrade_v3.php will remain (publicly) available until you choose to remove the backup files using this script! "
+                . "Run this script again to be prompted to delete backup files.</p>
+                
+                <a class=\"btn btn-primary\" href=\"?confirmDeleteBackup\">Click here to remove the backup files and continue to Mautic</a>",
+                true
+            );
+            exit;
+        } else {
+            removeBackupFilesAndExit();
+        }
+    }
+
+    // Additional exit, just to be sure
+    exit;
+}
 
 if (!file_exists(MAUTIC_UPGRADE_ROOT)) {
     mkdir(MAUTIC_UPGRADE_ROOT);
@@ -82,8 +122,6 @@ if (!file_exists(UPGRADE_LOG_FILE)) {
     file_put_contents(UPGRADE_LOG_FILE, '');
 }
 
-// Get local parameters
-$localParameters = get_local_config();
 if (isset($localParameters['cache_path'])) {
     $cacheDir = str_replace('%kernel.root_dir%', MAUTIC_APP_ROOT, $localParameters['cache_path'] . '/prod');
 } else {
@@ -639,14 +677,14 @@ if (!IN_CLI) {
 
             final_cleanup_files();
 
-            // Destroy the upgrade script as we no longer need it.
-            unlink(__FILE__);
-
             outputJSON(
                 'success',
                 "<h3>We're done! ✅</h3>
-                <br /><strong>You're ready to use Mautic 3! This script has destroyed itself, so there's nothing left to do for you. Enjoy!</strong><br><br>
-                <a href=\"" . $localParameters['site_url'] . "\" class=\"btn btn-primary\" target=\"_blank\">Open Mautic 3</a>"
+                <p><strong>You're ready to use Mautic 3!</strong> Don't forget to <a target=\"_blank\" href=\"http://mau.tc/m3-upgrade-getting-started\">update your cron jobs</a> if you haven't done so already.</p>
+                <p>One last thing: during the upgrade, we created several backup files. Please remove them as soon as possible if you are sure Mautic works as expected. "
+                . "You can do that by clicking \"Open Mautic 3 without removing backup files\" below, and if everything works, come back here to remove the backup files.</p><br>
+                <a href=\"" . $localParameters['site_url'] . "\" class=\"btn btn-primary\" target=\"_blank\">Open Mautic 3 without removing backup files</a><br><br>
+                <a href=\"?confirmDeleteBackup\" class=\"btn btn-primary\">Remove backup files and open Mautic 3</a>"
             );
 
         default:
@@ -837,13 +875,27 @@ if (!IN_CLI) {
 
     sendUpgradeStats('succeeded');
 
-    writeToLog("We're done! Enjoy using Mautic 3 :)");
+    writeToLog("We're done! Enjoy using Mautic 3 :)\nDon't forget to update your cron jobs!");
 
     final_cleanup_files();
 
-    // Destroy the upgrade script as we no longer need it.
-    unlink(__FILE__);
+    writeToLog("Do you want to remove the backup files? Type \"yes\" to remove: ");
+    $handle = fopen("php://stdin", "r");
+    $line = fgets($handle);
+    if (trim($line) != "yes") {
+        writeToLog(
+            "Ok, we won't do anything for now. "
+            . "Please note that upgrade_v3.php will remain (publicly) available until you choose to remove the backup files using this script! "
+            . "Run this script again to be prompted to delete backup files."
+        );
+        exit;
+    }
+    fclose($handle);
+    writeToLog("\nThank you, continuing...");
 
+    removeBackupFilesAndExit();
+
+    // Exit just to be sure.
     exit;
 }
 
@@ -1819,9 +1871,11 @@ function cleanup_files()
  */
 function final_cleanup_files()
 {
-    if (file_exists(MAUTIC_ROOT . DIRECTORY_SEPARATOR . '.htaccess.m3')) {
-        $status = rename(MAUTIC_ROOT . DIRECTORY_SEPARATOR . '.htaccess.m3', MAUTIC_ROOT . DIRECTORY_SEPARATOR . '.htaccess');
-        if ($status === false) $failedChanges[] = 'htaccess';
+    if (!file_exists(POST_UPGRADE_BACKUP_FILES_REMOVAL_PENDING_FILE)) {
+        file_put_contents(
+            POST_UPGRADE_BACKUP_FILES_REMOVAL_PENDING_FILE,
+            "This file is removed automatically if you open upgrade_v3.php to delete backup files."
+        );
     }
 
     // Rename the upgrade_log.txt file to one with a random hash to prevent public access
@@ -1943,12 +1997,74 @@ function returnBytes($val)
 }
 
 /**
+ * Remove backup files.
+ * 
+ * @return void
+ */
+function removeBackupFilesAndExit()
+{
+    global $localParameters;
+
+    $varFolder = MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'var';
+
+    $iterator = new GlobIterator($varFolder . DIRECTORY_SEPARATOR . 'mautic-2-backup-files-*');
+
+    foreach ($iterator as $directory) {
+        if ($directory->isDir()) {
+            recursive_remove_directory($directory->getPathname());
+        }
+    }
+
+    $sqlIterator = new GlobIterator($varFolder . DIRECTORY_SEPARATOR . 'm3_upgrade_db_backup_*.sql');
+
+    foreach ($sqlIterator as $sql) {
+        if ($sql->isFile()) {
+            unlink($sql->getPathname());
+        }
+    }
+
+    $logIterator = new GlobIterator($varFolder . DIRECTORY_SEPARATOR . 'upgrade_log_*.txt');
+
+    foreach ($logIterator as $log) {
+        if ($log->isFile()) {
+            unlink($log->getPathname());
+        }
+    }
+
+    // Restore the Mautic 3 .htaccess file
+    if (file_exists(MAUTIC_ROOT . DIRECTORY_SEPARATOR . '.htaccess.m3')) {
+        rename(MAUTIC_ROOT . DIRECTORY_SEPARATOR . '.htaccess.m3', MAUTIC_ROOT . DIRECTORY_SEPARATOR . '.htaccess');
+    }
+
+    // Remove the upgrade script file.
+    unlink(__FILE__);
+
+    if (file_exists(POST_UPGRADE_BACKUP_FILES_REMOVAL_PENDING_FILE)) {
+        unlink(POST_UPGRADE_BACKUP_FILES_REMOVAL_PENDING_FILE);
+    }
+
+    if (IN_CLI) {
+        echo "Backup files successfully removed, as well as the current upgrade script. Enjoy Mautic 3!\n";
+        exit;
+    } else {
+        header("Refresh:5;url=" . $localParameters["site_url"]);
+        echo "<p>Backup files successfully removed, as well as the current upgrade script. You will be redirected to Mautic in 5 seconds. Enjoy Mautic 3!</p>
+        <p>If you are not redirected within 5 seconds, <a href=\"" . $localParameters["site_url"] . "\">click here to open Mautic</a>.</p>";
+        exit;
+    }
+}
+
+/**
  * Wrap content in some HTML.
  *
- * @param $content
+ * @param string $content The content
+ * @param bool   $noJS    If this is true, we don't run JS API calls
+ * 
+ * @return void
  */
-function html_body($content)
+function html_body($content, $noJS = false)
 {
+    $noJSvar = $noJS === true ? 'true' : 'false';
     $html = <<<HTML
     <!DOCTYPE html>
     <html lang="en">
@@ -1980,10 +2096,13 @@ function html_body($content)
             const apiUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
             let apiTaskCode = 'startUpgrade';
             let apiTaskLabel = 'Starting the upgrade...';
+            const noJS = $noJSvar;
 
             $(document).ready(function(){
-                // If a specific upgrade step is set in the URL, use that one.
-                if (window.location.hash && window.location.hash.length > 1) {
+                if (noJS === true) {
+                    return;
+                } else if (window.location.hash && window.location.hash.length > 1) {
+                    // If a specific upgrade step is set in the URL, use that one.
                     apiTaskCode = window.location.hash.replace('#', '');
                     apiTaskLabel = 'Picking up where we left off... Running the following task: ' + apiTaskCode;
                     executeApiTask(apiTaskCode, apiTaskLabel);
