@@ -16,6 +16,13 @@ if (stristr(PHP_OS, 'WIN')) {
     define('IS_WINDOWS', true);
 }
 
+define('IN_CLI', php_sapi_name() === 'cli');
+
+// Enable PHP errors only in CLI
+if (IN_CLI === true) {
+    @ini_set('display_errors', 'STDOUT');
+}
+
 // Try to set max_execution_time to 240 if it's lower currently. If this fails we'll throw an error later in the preUpgradeChecks.
 $minExecutionTime = 240;
 
@@ -31,6 +38,12 @@ if ($maxExecutionTime > 0 && $maxExecutionTime < $minExecutionTime) {
 
 // Try to set the memory_limit to 256M if it's lower currently. If this fails we'll throw an error later in the preUpgradeChecks.
 $minMemoryLimit = '256M';
+
+if (defined('IS_WINDOWS')) {
+    // In our testing, during CLI upgrades, 256M was not enough on Windows
+    $minMemoryLimit = '512M';
+}
+
 $minMemoryLimitBytes = (int)$minMemoryLimit * 1024 ** ['k' => 1, 'm' => 2, 'g' => 3][strtolower($minMemoryLimit)[-1]] ?? 0;
 
 $memoryLimit = ini_get('memory_limit');
@@ -49,7 +62,6 @@ define('MAUTIC_MAXIMUM_PHP', '7.3.999');
 $standalone = 1;
 $task       = getVar('task');
 
-define('IN_CLI', php_sapi_name() === 'cli');
 define('MAUTIC_ROOT', __DIR__);
 define('MAUTIC_APP_ROOT', MAUTIC_ROOT . '/app');
 define('MAUTIC_UPGRADE_FOLDER_NAME', 'mautic-3-temp-files');
@@ -513,7 +525,7 @@ if (!IN_CLI) {
             outputJSON('success', 'OK', 'applyMigrations', 'Applying Mautic 3 database migrations...');
 
         case 'applyMigrations':
-            writeToLog("Getting the amount of available Mautic 3 database migrations...");
+            writeToLog("Getting the amount of available Mautic 3 database migrations... This might take a while!");
             // Get the amount of available database migrations
             list($success, $data) = get_available_migrations();
 
@@ -790,10 +802,7 @@ if (!IN_CLI) {
 
     writeToLog("Done! Your user data has been restored. Your Mautic 3 installation is ready. Just one more thing:");
 
-    writeToLog("Cleaning up installation files that we no longer need...");
-
-    // We only use the Phase 2 file in the CLI version of the upgrade, so we'll delete it here...
-    unlink($m3_phase_2_file);
+    writeToLog("Cleaning up installation files that we no longer need...");    
 
     if (cleanup_files() === false) {
         throwErrorAndWriteToLog(
@@ -802,6 +811,11 @@ if (!IN_CLI) {
         );
     }
 
+    // We only use the Phase 2 file in the CLI version of the upgrade, so we'll delete it here...
+    if (file_exists($m3_phase_2_file)) {
+        unlink($m3_phase_2_file);
+    }
+    
     writeToLog("Cleaned up successfully!");
 
     writeToLog("Building cache for Mautic 3...");
@@ -839,7 +853,7 @@ if (!IN_CLI) {
 function checkAndRunMigrationsCLI($mauticMajorVersion, $ignoreFirstLog = false)
 {
     if ($ignoreFirstLog === false) {
-        writeToLog("Getting the amount of available Mautic $mauticMajorVersion database migrations...");
+        writeToLog("Getting the amount of available Mautic $mauticMajorVersion database migrations... This might take a while!");
     }
 
     // Get the amount of available database migrations
@@ -1228,6 +1242,8 @@ function extract_package()
  */
 function replace_mautic_2_with_mautic_3()
 {
+    global $m3_phase_2_file;
+
     /**
      * ==== BACKUP MAUTIC 2 FILES ====
      * We'll backup the original M2 installation in case something goes wrong.
@@ -1246,6 +1262,10 @@ function replace_mautic_2_with_mautic_3()
         MAUTIC_ROOT . DIRECTORY_SEPARATOR . 'm3_upgrade_db_backup.sql',
         UPGRADE_LOG_FILE
     ];
+
+    if (!empty($m3_phase_2_file)) {
+        $excludedFilesAndFolders[] = $m3_phase_2_file;
+    } 
 
     $iterator = new DirectoryIterator(MAUTIC_ROOT);
 
