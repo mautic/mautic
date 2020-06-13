@@ -15,7 +15,7 @@ namespace Mautic\FormBundle\Enum;
 
 class ConditionalFieldEnum
 {
-    private static $conditionalFieldTypes = ['select', 'country'];
+    private static $conditionalFieldTypes = ['select', 'country', 'checkboxgrp', 'radiogrp'];
 
     public static function getConditionalFieldTypes(): array
     {
