@@ -38,4 +38,11 @@ class FullContact_Company extends FullContact_Base
 
         return $this->response_obj;
     }
+
+    public function lookupByName($search)
+    {
+        $this->_execute(['name' => $search, 'method' => 'name'], ['companyName' => $search]);
+
+        return $this->response_obj;
+    }
 }

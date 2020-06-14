@@ -2,15 +2,11 @@
 
 namespace MauticPlugin\MauticFullContactBundle\Services;
 
-use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
-use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Model\CompanyModel;
 use MauticPlugin\MauticFullContactBundle\Integration\Config;
-use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
 use MauticPlugin\MauticFullContactBundle\Integration\Support\ConfigSupport;
-use MauticPlugin\MauticFullContactBundle\Sync\Mapping\Field\FieldRepository;
 use Monolog\Logger;
 
 class CompanyStorageHelper

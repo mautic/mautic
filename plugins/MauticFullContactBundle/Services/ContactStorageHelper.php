@@ -2,41 +2,23 @@
 
 namespace MauticPlugin\MauticFullContactBundle\Services;
 
-use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
-use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\MauticFullContactBundle\Integration\Config;
-use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
 use MauticPlugin\MauticFullContactBundle\Integration\Support\ConfigSupport;
-use MauticPlugin\MauticFullContactBundle\Sync\Mapping\Field\FieldRepository;
 use Monolog\Logger;
 
 class ContactStorageHelper
 {
-    private $integrationName       = FullContactIntegration::NAME;
-    private $integrationObjectName = FullContactIntegration::NAME;
-    private $internalObjectName    = Contact::NAME;
-
     /**
      * @var LeadModel
      */
     private $leadModel;
 
     /**
-     * @var ObjectMappingRepository
-     */
-    private $objectMappingRepository;
-
-    /**
      * @var Config
      */
     private $config;
-
-    /**
-     * @var FieldRepository
-     */
-    private $fieldRepository;
 
     /**
      * @var Logger
@@ -50,15 +32,11 @@ class ContactStorageHelper
 
     public function __construct(
         LeadModel $lead_model,
-        ObjectMappingRepository $objectMappingRepository,
         Logger $logger,
-        FieldRepository $fieldRepository,
         Config $config
     ) {
         $this->leadModel               = $lead_model;
-        $this->objectMappingRepository = $objectMappingRepository;
         $this->logger                  = $logger;
-        $this->fieldRepository         = $fieldRepository;
         $this->config                  = $config;
         $this->mappedFields            = $this->config->getMappedFields(ConfigSupport::CONTACT);
     }
