@@ -20,7 +20,7 @@ class Field
         $this->label      = $field['displayName'];
         $this->dataType   = $field['type'];
         $this->isRequired = (bool) ($field['required'] ?? false);
-        $this->isWritable = true;
+        $this->isWritable = false;
     }
 
     public function getName(): string
