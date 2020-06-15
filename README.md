@@ -56,7 +56,7 @@ Installing from source is only recommended if you are comfortable using the comm
 ## Ready to Install from Source and/or Contribute?
 That's fantastic! 
 
-If you want to contribute to Mautic's **code**, please read our [CONTRIBUTING.md](https://github.com/mautic/mautic/blob/staging/.github/CONTRIBUTING.md) or [Contributing Code](https://contribute.mautic.org/about/how-can-i-contribute/developer) docs. Then, check out the issues with the [L1 label](https://github.com/mautic/mautic/issues?q=is%3Aissue+is%3Aopen+label%3AL1) to get started quickly :rocket:
+If you want to contribute to Mautic's **code**, please read our [CONTRIBUTING.md](https://github.com/mautic/mautic/blob/staging/.github/CONTRIBUTING.md) or [Contributing Code](https://contribute.mautic.org/contributing-to-mautic/developer) docs. Then, check out the issues with the [L1 label](https://github.com/mautic/mautic/issues?q=is%3Aissue+is%3Aopen+label%3AL1) to get started quickly :rocket:
 
 If you want to contribute in **other areas** of Mautic, please read our general [Contributing](https://contribute.mautic.org/about/how-can-i-contribute) guide.
 
