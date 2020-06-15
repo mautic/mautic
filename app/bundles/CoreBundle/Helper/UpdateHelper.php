@@ -184,6 +184,63 @@ class UpdateHelper
             ];
         }
 
+        // Check if Mautic 3 upgrade is available
+        try {
+            $m3CacheFile = $this->pathsHelper->getSystemPath('cache').'/lastM3UpgradeCheck.txt';
+
+            if ($this->coreParametersHelper->getParameter('block_mautic_3_upgrade', null) === null) {
+                $m3Data   = $this->connector->get('https://updates.mautic.org/upgrade-configs/m2-to-m3.json', [], 10);
+                $m3Update = json_decode($m3Data->body);
+
+                if ($m3Data->code != 200) {
+                    // Log the error
+                    $this->logger->addError(
+                        sprintf(
+                            'An unexpected %1$s code was returned while attempting to fetch the Mautic 3 upgrade.  The message received was: %2$s',
+                            $data->code,
+                            is_string($data->body) ? $data->body : implode('; ', $data->body)
+                        )
+                    );
+
+                    return [
+                        'error'   => true,
+                        'message' => 'mautic.core.updater.error.fetching.updates',
+                    ];
+                }
+
+                // If the kill switch is activated for the upgrade, we don't offer the upgrade to the user.
+                if (isset($m3Update->killSwitchActivated) && $m3Update->killSwitchActivated === false) {
+                    $m3Data = [
+                        'error'            => false,
+                        'message'          => 'mautic.core.updater.update.available',
+                        'version'          => $m3Update->version,
+                        'announcement'     => $m3Update->announcement,
+                        'package'          => $m3Update->mautic3downloadUrl,
+                        'checkedTime'      => time(),
+                        'isMautic3Upgrade' => true,
+                    ];
+
+                    file_put_contents($m3CacheFile, json_encode($m3Data));
+
+                    return $m3Data;
+                }
+            } else {
+                // If the user blocked the Mautic 3 upgrade after we already checked for updates before,
+                // we delete the cache file so that the upgrade isn't offered anymore.
+                if (file_exists($m3CacheFile)) {
+                    unlink($m3CacheFile);
+                }
+            }
+        } catch (\Exception $exception) {
+            // Log the error
+            $this->logger->addError('An error occurred while attempting to check if Mautic 3 is available: '.$exception->getMessage());
+
+            return [
+                'error'   => true,
+                'message' => 'mautic.core.updater.error.fetching.updates',
+            ];
+        }
+
         if ($data->code != 200) {
             // Log the error
             $this->logger->addError(
