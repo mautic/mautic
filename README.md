@@ -4,13 +4,13 @@ Mautic Introduction
 
 ## Supported Versions
 
-| Branch | Beta Release | Initial Release | Active Support Until | Security Support Until
+| Branch | Beta Release | Initial Release | Active Support Until | Security Support Until *
 |--|--|--|--|--|
 |2.15  | 27 Sep 2019 | 8 Oct 2019 | 8 Oct 2019 | 8 Oct 2019
 |2.16  | 30 Jan 2020 | 13 Feb 2020 | 15 June 2020 | 15 December 2020
 |3.0   | 27 Jan 2020 | 15 June 2020 | 15 June 2021 | 15 December 2021
 
-** = Security Support for 2.16 will only be provided for Mautic itself, not for core dependencies that are EOL like Symfony 2.8.
+* = Security Support for 2.16 will only be provided for Mautic itself, not for core dependencies that are EOL like Symfony 2.8.
 
 ## Getting Started
 
