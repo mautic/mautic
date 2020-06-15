@@ -72,6 +72,20 @@ If you had a custom API rate limiter other than the filesystem (default), you'll
 ),
 ```
 
+In case you've been using `$_SERVER['MAUTIC_DEV_HOSTS']` to add more allowed IP addresses for the development enviroment, there had to be 2 changes because it was conflicting with handling configuration with environment variables.
+1. Change `MAUTIC_DEV_HOSTS` to `MAUTIC_CUSTOM_DEV_HOSTS`.
+2. It's not a string anymore, but a JSON encoded array.
+
+Before:
+```
+$_SERVER['MAUTIC_DEV_HOSTS'] = '1.2.3.4';
+```
+
+After:
+```
+$_SERVER['MAUTIC_CUSTOM_DEV_HOSTS'] = '["1.2.3.4"]';
+```
+
 #### Removing the Container as a Configuration Dependency
 Mautic's Configuration is no longer dependent on the Symfony container. This means that any parameter that has to be used in a cache compiler pass is no longer compatible with the UI. These "advanced" configuration options have to be manually set in the local.php file then delete Mautic's cache. For example, the QueueBundle must now be manually configured due to its dependency on cache compilers.
 
