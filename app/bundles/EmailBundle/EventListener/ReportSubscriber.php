@@ -30,19 +30,10 @@ class ReportSubscriber implements EventSubscriberInterface
     const CONTEXT_EMAILS      = 'emails';
     const CONTEXT_EMAIL_STATS = 'email.stats';
 
-    /**
-     * @var Connection
-     */
     private $db;
 
-    /**
-     * @var CompanyReportData
-     */
     private $companyReportData;
 
-    /**
-     * @var StatRepository
-     */
     private $statRepository;
 
     public function __construct(Connection $db, CompanyReportData $companyReportData, StatRepository $statRepository)
@@ -386,6 +377,8 @@ class ReportSubscriber implements EventSubscriberInterface
                 }
 
                 $event->addCampaignByChannelJoin($qb, 'e', 'email');
+                $qb->leftJoin('clel', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 'clel.event_id = ce.id');
+                $qb->andWhere('ce.type = \'email.send\'');
 
                 if ($this->companyReportData->eventHasCompanyColumns($event)) {
                     $event->addCompanyLeftJoin($qb);
