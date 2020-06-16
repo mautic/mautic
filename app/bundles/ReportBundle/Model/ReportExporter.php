@@ -61,8 +61,6 @@ class ReportExporter
     }
 
     /**
-     * @param ExportOption $exportOption
-     *
      * @throws FileIOException
      */
     public function processExport(ExportOption $exportOption)
@@ -74,8 +72,6 @@ class ReportExporter
     }
 
     /**
-     * @param Scheduler $scheduler
-     *
      * @throws FileIOException
      */
     private function processReport(Scheduler $scheduler)

@@ -17,7 +17,7 @@
 <?php $count = 0; ?>
 <div class="row">
 <?php foreach ($integrations as $details): ?>
-    <?php if ($count > 0 && $count % 2 == 0): echo '</div><div class="row">'; endif; ?>
+    <?php if ($count > 0 && 0 == $count % 2): echo '</div><div class="row">'; endif; ?>
     <div class="col-md-6">
         <div class="panel panel-default">
             <div class="panel-heading pr-0">

@@ -31,7 +31,7 @@ if (!empty($data['errors'])) {
 </dl>
 <div class="small">
     <hr />
-    <strong><?php echo $view['translator']->trans('mautic.sms.timeline.content.heading') ?></strong>
+    <strong><?php echo $view['translator']->trans('mautic.sms.timeline.content.heading'); ?></strong>
     <br />
     <?php echo $data['content']; ?>
 </div>

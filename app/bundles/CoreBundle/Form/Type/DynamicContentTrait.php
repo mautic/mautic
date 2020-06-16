@@ -25,11 +25,11 @@ trait DynamicContentTrait
             'dynamicContent',
             CollectionType::class,
             [
-                'entry_type'   => DynamicContentFilterType::class,
-                'allow_add'    => true,
-                'allow_delete' => true,
-                'label'        => false,
-                'options'      => [
+                'entry_type'         => DynamicContentFilterType::class,
+                'allow_add'          => true,
+                'allow_delete'       => true,
+                'label'              => false,
+                'entry_options'      => [
                     'label' => false,
                 ],
             ]

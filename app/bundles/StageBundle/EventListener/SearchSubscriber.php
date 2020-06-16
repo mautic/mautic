@@ -13,27 +13,36 @@ namespace Mautic\StageBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\StageBundle\Model\StageModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class SearchSubscriber.
- */
-class SearchSubscriber extends CommonSubscriber
+class SearchSubscriber implements EventSubscriberInterface
 {
     /**
      * @var StageModel
      */
-    protected $stageModel;
+    private $stageModel;
 
     /**
-     * SearchSubscriber constructor.
-     *
-     * @param StageModel $stageModel
+     * @var CorePermissions
      */
-    public function __construct(StageModel $stageModel)
-    {
+    private $security;
+
+    /**
+     * @var TemplatingHelper
+     */
+    private $templating;
+
+    public function __construct(
+        StageModel $stageModel,
+        CorePermissions $security,
+        TemplatingHelper $templating
+    ) {
         $this->stageModel = $stageModel;
+        $this->security   = $security;
+        $this->templating = $templating;
     }
 
     /**
@@ -47,9 +56,6 @@ class SearchSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param MauticEvents\GlobalSearchEvent $event
-     */
     public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
     {
         if ($this->security->isGranted('stage:stages:view')) {
@@ -68,7 +74,7 @@ class SearchSubscriber extends CommonSubscriber
                 $stagesResults = [];
                 $canEdit       = $this->security->isGranted('stage:stages:edit');
                 foreach ($items as $item) {
-                    $stagesResults[] = $this->templating->renderResponse(
+                    $stagesResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticStageBundle:SubscribedEvents\Search:global.html.php',
                         [
                             'item'    => $item,
@@ -77,7 +83,7 @@ class SearchSubscriber extends CommonSubscriber
                     )->getContent();
                 }
                 if ($stageCount > 5) {
-                    $stagesResults[] = $this->templating->renderResponse(
+                    $stagesResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticStageBundle:SubscribedEvents\Search:global.html.php',
                         [
                             'showMore'     => true,
@@ -92,9 +98,6 @@ class SearchSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param MauticEvents\CommandListEvent $event
-     */
     public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
         if ($this->security->isGranted('stage:stages:view')) {

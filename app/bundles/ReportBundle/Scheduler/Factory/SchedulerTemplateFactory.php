@@ -21,8 +21,6 @@ use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 class SchedulerTemplateFactory
 {
     /**
-     * @param SchedulerInterface $scheduler
-     *
      * @return BuilderInterface
      *
      * @throws NotSupportedScheduleTypeException

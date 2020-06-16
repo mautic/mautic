@@ -11,70 +11,74 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class VariantType.
- */
 class VariantType extends AbstractType
 {
-    private $factory;
+    /**
+     * @var EmailModel
+     */
+    private $emailModel;
 
-    public function __construct(MauticFactory $factory)
+    public function __construct(EmailModel $emailModel)
     {
-        $this->factory = $factory;
+        $this->emailModel = $emailModel;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('weight', 'integer', [
-            'label'      => 'mautic.core.ab_test.form.traffic_weight',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.core.ab_test.form.traffic_weight.help',
-            ],
-            'constraints' => [
-                new NotBlank(
-                    ['message' => 'mautic.email.variant.weight.notblank']
-                ),
-            ],
-        ]);
+        $builder->add('weight',
+            IntegerType::class,
+            [
+                'label'      => 'mautic.core.ab_test.form.traffic_weight',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.ab_test.form.traffic_weight.help',
+                ],
+                'constraints' => [
+                    new NotBlank(
+                        ['message' => 'mautic.email.variant.weight.notblank']
+                    ),
+                ],
+            ]
+        );
 
-        $abTestWinnerCriteria = $this->factory->getModel('email')->getBuilderComponents(null, 'abTestWinnerCriteria');
+        $abTestWinnerCriteria = $this->emailModel->getBuilderComponents(null, 'abTestWinnerCriteria');
 
         if (!empty($abTestWinnerCriteria)) {
             $criteria = $abTestWinnerCriteria['criteria'];
             $choices  = $abTestWinnerCriteria['choices'];
 
-            $builder->add('winnerCriteria', 'choice', [
-                'label'      => 'mautic.core.ab_test.form.winner',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'    => 'form-control',
-                    'onchange' => 'Mautic.getAbTestWinnerForm(\'email\', \'emailform\', this);',
-                ],
-                'expanded'    => false,
-                'multiple'    => false,
-                'choices'     => $choices,
-                'empty_value' => 'mautic.core.form.chooseone',
-                'constraints' => [
-                    new NotBlank(
-                        ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']
-                    ),
-                ],
-            ]);
+            $builder->add(
+                'winnerCriteria',
+                ChoiceType::class, [
+                    'label'             => 'mautic.core.ab_test.form.winner',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'attr'              => [
+                        'class'    => 'form-control',
+                        'onchange' => 'Mautic.getAbTestWinnerForm(\'email\', \'emailform\', this);',
+                    ],
+                    'expanded'    => false,
+                    'multiple'    => false,
+                    'choices'     => $choices,
+                    'placeholder' => 'mautic.core.form.chooseone',
+                    'constraints' => [
+                        new NotBlank(
+                            ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']
+                        ),
+                    ],
+                ]
+            );
 
-            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options, $criteria) {
+            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($criteria) {
                 $form = $event->getForm();
                 $data = $event->getData();
 
@@ -97,7 +101,7 @@ class VariantType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'emailvariant';
     }

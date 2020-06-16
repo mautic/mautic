@@ -20,7 +20,6 @@ use Mautic\LeadBundle\Entity\Tag;
 class TagEvent extends CommonEvent
 {
     /**
-     * @param Tag  $tag
      * @param bool $isNew
      */
     public function __construct(Tag $tag, $isNew = false)

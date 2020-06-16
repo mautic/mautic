@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Menu;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,7 +28,7 @@ class MenuHelper
     protected $security;
 
     /**
-     * @var null|Request
+     * @var Request|null
      */
     protected $request;
 
@@ -39,9 +40,9 @@ class MenuHelper
     private $orphans = [];
 
     /**
-     * @var array
+     * @var CoreParametersHelper
      */
-    protected $mauticParameters;
+    private $coreParametersHelper;
 
     /**
      * @var IntegrationHelper
@@ -50,18 +51,13 @@ class MenuHelper
 
     /**
      * MenuHelper constructor.
-     *
-     * @param CorePermissions   $security
-     * @param RequestStack      $requestStack
-     * @param array             $mauticParameters
-     * @param IntegrationHelper $integrationHelper
      */
-    public function __construct(CorePermissions $security, RequestStack $requestStack, array $mauticParameters, IntegrationHelper $integrationHelper)
+    public function __construct(CorePermissions $security, RequestStack $requestStack, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper)
     {
-        $this->security          = $security;
-        $this->mauticParameters  = $mauticParameters;
-        $this->request           = $requestStack->getCurrentRequest();
-        $this->integrationHelper = $integrationHelper;
+        $this->security              = $security;
+        $this->coreParametersHelper  = $coreParametersHelper;
+        $this->request               = $requestStack->getCurrentRequest();
+        $this->integrationHelper     = $integrationHelper;
     }
 
     /**
@@ -80,7 +76,7 @@ class MenuHelper
             }
 
             // Remove the item if the checks fail
-            if ($this->handleChecks($i) === false) {
+            if (false === $this->handleChecks($i)) {
                 unset($items[$k]);
                 continue;
             }
@@ -175,9 +171,8 @@ class MenuHelper
     /**
      * Give orphaned menu items a home.
      *
-     * @param array $menuItems
-     * @param bool  $appendOrphans
-     * @param int   $depth
+     * @param bool $appendOrphans
+     * @param int  $depth
      */
     public function placeOrphans(array &$menuItems, $appendOrphans = false, $depth = 1, $type = 'main')
     {
@@ -202,7 +197,7 @@ class MenuHelper
                     array_merge($items['children'], $this->orphans[$type][$key]);
                 unset($this->orphans[$type][$key]);
             } elseif (isset($items['children'])) {
-                foreach ($items['children'] as $subKey => $subItems) {
+                foreach ($items['children'] as $subItems) {
                     $this->placeOrphans($subItems, false, $depth + 1, $type);
                 }
             }
@@ -248,16 +243,15 @@ class MenuHelper
     /**
      * @param $name
      *
-     * @return bool
+     * @return mixed
      */
     protected function getParameter($name)
     {
-        return isset($this->mauticParameters[$name]) ? $this->mauticParameters[$name] : false;
+        return $this->coreParametersHelper->get($name, false);
     }
 
     /**
      * @param string $integrationName
-     * @param array  $config
      *
      * @return bool
      */
@@ -334,13 +328,11 @@ class MenuHelper
     /**
      * Handle access check and other checks for menu items.
      *
-     * @param array $menuItem
-     *
      * @return bool Returns false if the item fails the access check or any other checks
      */
     protected function handleChecks(array $menuItem)
     {
-        if (isset($menuItem['access']) && $this->handleAccessCheck($menuItem['access']) === false) {
+        if (isset($menuItem['access']) && false === $this->handleAccessCheck($menuItem['access'])) {
             return false;
         }
 
@@ -353,7 +345,7 @@ class MenuHelper
                 }
 
                 foreach ($checkConfig as $name => $value) {
-                    if ($this->$checkMethod($name, $value) === false) {
+                    if (false === $this->$checkMethod($name, $value)) {
                         return false;
                     }
                 }

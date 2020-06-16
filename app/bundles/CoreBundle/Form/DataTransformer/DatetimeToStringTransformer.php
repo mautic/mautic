@@ -58,11 +58,9 @@ class DatetimeToStringTransformer implements DataTransformerInterface
             return null;
         }
 
-        $val = \DateTime::createFromFormat(
+        return \DateTime::createFromFormat(
             $this->format,
             $value
         );
-
-        return $val;
     }
 }

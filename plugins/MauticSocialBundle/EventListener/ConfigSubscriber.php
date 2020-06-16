@@ -14,12 +14,10 @@ namespace MauticPlugin\MauticSocialBundle\EventListener;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use MauticPlugin\MauticSocialBundle\Form\Type\ConfigType;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ConfigSubscriber.
- */
-class ConfigSubscriber extends CommonSubscriber
+class ConfigSubscriber implements EventSubscriberInterface
 {
     /**
      * @return array
@@ -32,23 +30,18 @@ class ConfigSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param ConfigBuilderEvent $event
-     */
     public function onConfigGenerate(ConfigBuilderEvent $event)
     {
         $event->addForm(
             [
                 'formAlias'  => 'social_config',
                 'formTheme'  => 'MauticSocialBundle:FormTheme\Config',
+                'formType'   => ConfigType::class,
                 'parameters' => $event->getParametersFromConfig('MauticSocialBundle'),
             ]
         );
     }
 
-    /**
-     * @param ConfigEvent $event
-     */
     public function onConfigSave(ConfigEvent $event)
     {
         /** @var array $values */

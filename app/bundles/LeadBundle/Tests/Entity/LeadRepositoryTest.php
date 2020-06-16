@@ -16,7 +16,7 @@ use Mautic\LeadBundle\Entity\CustomFieldRepositoryTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 
-class LeadRepositoryTest extends \PHPUnit_Framework_TestCase
+class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testBooleanWithPrepareDbalFieldsForSave()
     {

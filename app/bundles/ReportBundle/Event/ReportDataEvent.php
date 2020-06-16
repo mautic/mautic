@@ -36,10 +36,7 @@ class ReportDataEvent extends AbstractReportEvent
     /**
      * ReportDataEvent constructor.
      *
-     * @param Report $report
-     * @param array  $data
-     * @param        $totalResults
-     * @param array  $options
+     * @param $totalResults
      */
     public function __construct(Report $report, array $data, $totalResults, array $options)
     {

@@ -12,6 +12,7 @@
 namespace Mautic\CoreBundle\IpLookup;
 
 use Joomla\Http\HttpFactory;
+use Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType;
 use PharData;
 use PharFileInfo;
 use RecursiveIteratorIterator;
@@ -50,7 +51,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
      */
     public function getConfigFormService()
     {
-        return 'iplookup_download_data_store_button';
+        return IpLookupDownloadDataStoreButtonType::class;
     }
 
     /**
@@ -109,7 +110,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
                     file_put_contents($temporaryPhar, $data->body);
                     $pharData = new PharData($temporaryPhar);
                     foreach (new RecursiveIteratorIterator($pharData) as $file) {
-                        /* @var PharFileInfo $file*/
+                        /** @var PharFileInfo $file */
                         if ($file->getBasename() === basename($localTarget)) {
                             $success = copy($file->getPathname(), $localTarget);
                         }
@@ -165,7 +166,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
     /**
      * Get the common directory for data.
      *
-     * @return null|string
+     * @return string|null
      */
     protected function getDataDir()
     {
@@ -209,6 +210,6 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
      */
     private function endsWith($haystack, $needle)
     {
-        return substr_compare($haystack, $needle, -strlen($needle)) === 0;
+        return 0 === substr_compare($haystack, $needle, -strlen($needle));
     }
 }

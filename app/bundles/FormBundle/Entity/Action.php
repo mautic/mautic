@@ -71,9 +71,6 @@ class Action
         $this->form = null;
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -121,9 +118,6 @@ class Action
             ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('type', new Assert\NotBlank([
@@ -215,8 +209,6 @@ class Action
 
     /**
      * Set form.
-     *
-     * @param Form $form
      *
      * @return Action
      */
