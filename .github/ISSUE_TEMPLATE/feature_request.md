@@ -1,6 +1,7 @@
 ---
 name: Feature request
 about: Please share your ideas and find support at https://forum.mautic.org/c/ideas
+labels: needs triage
 
 ---
 
