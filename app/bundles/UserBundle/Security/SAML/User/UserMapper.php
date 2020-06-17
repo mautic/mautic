@@ -61,7 +61,9 @@ class UserMapper implements UsernameMapperInterface
         if (isset($attributes['email'])) {
             $user->setEmail($attributes['email']);
             $user->setUsername($attributes['email']);
-        } elseif (isset($attributes['username'])) {
+        }
+
+        if (isset($attributes['username']) && !empty($attributes['username'])) {
             $user->setUsername($attributes['username']);
         }
 
