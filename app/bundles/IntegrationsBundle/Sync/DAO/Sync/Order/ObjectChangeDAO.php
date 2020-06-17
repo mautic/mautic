@@ -180,6 +180,12 @@ class ObjectChangeDAO
         return $this;
     }
 
+    public function removeField(string $field): void
+    {
+        unset($this->fields[$field]);
+        unset($this->fieldsByState[ReportFieldDAO::FIELD_CHANGED][$field]);
+    }
+
     public function setObjectMapping(ObjectMapping $objectMapping): void
     {
         $this->objectMapping = $objectMapping;

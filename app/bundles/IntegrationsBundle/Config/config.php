@@ -287,6 +287,7 @@ return [
                     'mautic.integrations.sync.notification.handler_container',
                     'mautic.integrations.helper.sync_integrations',
                     'mautic.integrations.helper.config_integrations',
+                    'translator',
                 ],
             ],
             'mautic.integrations.sync.notification.writer' => [
