@@ -49,3 +49,6 @@ jobs:
     -
       name: CS Fixer
       script: bin/php-cs-fixer fix --config=.php_cs -v --dry-run --using-cache=no --show-progress=dots --diff $(git diff -- '*.php' --name-only --diff-filter=ACMRTUXB "${TRAVIS_COMMIT_RANGE}")
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
