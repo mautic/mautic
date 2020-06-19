@@ -292,12 +292,9 @@ class EventScheduler
         return $eventExecutionDates;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getExecutionDateForInactivity(\DateTime $eventExecutionDate, \DateTime $earliestExecutionDate, \DateTime $now)
+    public function getExecutionDateForInactivity(\DateTime $eventExecutionDate, \DateTime $earliestExecutionDate, \DateTime $now): \DateTime
     {
-        if ($earliestExecutionDate->getTimestamp() === $eventExecutionDate->getTimestamp()) {
+        if ($eventExecutionDate->getTimestamp() === $earliestExecutionDate->getTimestamp()) {
             // Inactivity is based on the "wait" period so execute now
             return clone $now;
         }
@@ -305,10 +302,7 @@ class EventScheduler
         return $eventExecutionDate;
     }
 
-    /**
-     * @return bool
-     */
-    public function shouldSchedule(\DateTime $executionDate, \DateTime $now)
+    public function shouldSchedule(\DateTime $executionDate, \DateTime $now): bool
     {
         // Mainly for functional tests so we don't have to wait minutes but technically can be used in an environment as well if this behavior
         // is desired by system admin
@@ -319,6 +313,19 @@ class EventScheduler
         }
 
         return $executionDate > $now;
+    }
+
+    public function shouldScheduleForInactive(Event $event, \DateTime $executionDate, \DateTime $now): bool
+    {
+        if (null !== $event) {
+            $eventProperties = $event->getProperties();
+            if (!empty($eventProperties['triggerRestrictedDaysOfWeek'])) {
+                // Event has days in week specified. Needs to be recalculated to the next day configured
+                return true;
+            }
+        }
+
+        return $this->shouldSchedule($executionDate, $now);
     }
 
     /**

@@ -62,6 +62,11 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
      */
     private $coreParamtersHelper;
 
+    /**
+     * @var EventScheduler
+     */
+    private $scheduler;
+
     protected function setUp()
     {
         $this->logger              = new NullLogger();
@@ -77,12 +82,22 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->dateTimeScheduler = new DateTime($this->logger);
         $this->eventCollector    = $this->createMock(EventCollector::class);
         $this->dispatcher        = $this->createMock(EventDispatcherInterface::class);
+
+        $this->scheduler         = new EventScheduler(
+            $this->logger,
+            $this->eventLogger,
+            $this->intervalScheduler,
+            $this->dateTimeScheduler,
+            $this->eventCollector,
+            $this->dispatcher,
+            $this->coreParamtersHelper
+        );
     }
 
     public function testShouldScheduleIgnoresSeconds()
     {
         $this->assertFalse(
-            $this->getScheduler()->shouldSchedule(
+            $this->scheduler->shouldSchedule(
                 new \DateTime('2018-07-03 09:20:45'),
                 new \DateTime('2018-07-03 09:20:30')
             )
@@ -92,11 +107,56 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
     public function testShouldSchedule()
     {
         $this->assertTrue(
-            $this->getScheduler()->shouldSchedule(
+            $this->scheduler->shouldSchedule(
                 new \DateTime('2018-07-03 09:21:45'),
                 new \DateTime('2018-07-03 09:20:30')
             )
         );
+    }
+
+    public function testShouldScheduleForInactive()
+    {
+        $date  = new \DateTime();
+        $now   = clone $date;
+        $event = new Event();
+
+        $this->assertFalse($this->scheduler->shouldScheduleForInactive($event, $date, $now));
+
+        $event->setProperties([
+            'triggerRestrictedDaysOfWeek' => [],
+        ]);
+
+        $this->assertFalse($this->scheduler->shouldScheduleForInactive($event, $date, $now));
+
+        $event->setProperties([
+            'triggerRestrictedDaysOfWeek' => [
+                0 => 1,
+                1 => 2,
+            ],
+        ]);
+
+        $this->assertTrue($this->scheduler->shouldScheduleForInactive($event, $date, $now));
+
+        $date->add(new \DateInterval('P2D'));
+        $event = new Event();
+        $this->assertTrue($this->scheduler->shouldScheduleForInactive($event, $date, $now));
+    }
+
+    public function testGetExecutionDateForInactivity()
+    {
+        $date = new \DateTime();
+        $now  = clone $date;
+        $now->add(new \DateInterval('P2D'));
+
+        $clonedNow = $this->scheduler->getExecutionDateForInactivity($date, $date, $now);
+        $this->assertNotSame($now, $clonedNow);
+        $this->assertSame($now->getTimestamp(), $clonedNow->getTimestamp());
+
+        $secondDate = clone $date;
+        $secondDate->add(new \DateInterval('P1D'));
+
+        $resultDate = $this->scheduler->getExecutionDateForInactivity($date, $secondDate, $now);
+        $this->assertSame($date, $resultDate);
     }
 
     public function testEventDoesNotGetRescheduledForRelativeTimeWhenValidated()
@@ -146,10 +206,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $log->method('getEvent')
             ->willReturn($event);
 
-        $scheduler = $this->getScheduler();
-
-        $executionDate = $scheduler->validateExecutionDateTime($log, $simulatedNow);
-        $this->assertFalse($scheduler->shouldSchedule($executionDate, $simulatedNow));
+        $executionDate = $this->scheduler->validateExecutionDateTime($log, $simulatedNow);
+        $this->assertFalse($this->scheduler->shouldSchedule($executionDate, $simulatedNow));
         $this->assertEquals('2018-08-31 09:00:00', $executionDate->format('Y-m-d H:i:s'));
         $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
     }
@@ -201,10 +259,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $log->method('getEvent')
             ->willReturn($event);
 
-        $scheduler = $this->getScheduler();
-
-        $executionDate = $scheduler->validateExecutionDateTime($log, $simulatedNow);
-        $this->assertTrue($scheduler->shouldSchedule($executionDate, $simulatedNow));
+        $executionDate = $this->scheduler->validateExecutionDateTime($log, $simulatedNow);
+        $this->assertTrue($this->scheduler->shouldSchedule($executionDate, $simulatedNow));
         $this->assertEquals('2018-08-31 11:00:00', $executionDate->format('Y-m-d H:i:s'));
         $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
     }
@@ -254,24 +310,10 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $log->method('getEvent')
             ->willReturn($event);
 
-        $scheduler     = $this->getScheduler();
-        $executionDate = $scheduler->validateExecutionDateTime($log, $simulatedNow);
+        $executionDate = $this->scheduler->validateExecutionDateTime($log, $simulatedNow);
 
-        $this->assertFalse($scheduler->shouldSchedule($executionDate, $simulatedNow));
+        $this->assertFalse($this->scheduler->shouldSchedule($executionDate, $simulatedNow));
         $this->assertEquals('2018-08-31 13:00:15', $executionDate->format('Y-m-d H:i:s'));
         $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
-    }
-
-    private function getScheduler()
-    {
-        return new EventScheduler(
-            $this->logger,
-            $this->eventLogger,
-            $this->intervalScheduler,
-            $this->dateTimeScheduler,
-            $this->eventCollector,
-            $this->dispatcher,
-            $this->coreParamtersHelper
-        );
     }
 }
