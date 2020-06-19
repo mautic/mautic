@@ -12,12 +12,21 @@ php:
   - 7.2
   - 7.3
 
+addons:
+  mariadb: '10.2'
+
+env:
+  - DB=mysql
+  - DB=mariadb
+
 cache:
   directories:
     - $HOME/.composer/cache
 
 before_install:
   # Create mautictest database
+  - mysql --version
+  - mysql -e 'DROP DATABASE IF EXISTS mautictest;'
   - mysql -e 'CREATE DATABASE mautictest;'
 
   # increase memory limit for all PHP processes
