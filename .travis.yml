@@ -12,6 +12,10 @@ php:
   - 7.2
   - 7.3
 
+env:
+  - DB=mysql
+  - DB=mariadb
+
 cache:
   directories:
     - $HOME/.composer/cache
@@ -42,8 +46,7 @@ script:
 
 jobs:
   include:
-    - name: MariaDB
-      env: DB=mariadb
+    - env: DB=mariadb
       addons:
         mariadb: '10.2'
     - 
