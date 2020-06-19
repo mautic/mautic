@@ -42,12 +42,17 @@ script:
 
 jobs:
   include:
-    - {}
+    - stage: test
+      php: 7.2
       env: DB=mariadb
       addons:
         mariadb: '10.2'
     - 
-      stage: test
+      php: 7.3
+      env: DB=mariadb
+      addons:
+        mariadb: '10.2'
+    - 
       name: PHPSTAN
       script: composer phpstan
     -
