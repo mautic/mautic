@@ -74,6 +74,7 @@
                     </a>
                 </td>
                 <td class="visible-md visible-lg"><?php echo $view->escape($fields['core']['email']['value']); ?></td>
+                <td class="visible-md visible-lg"><?php echo $item->getCompany(); ?></td>
                 <td class="visible-md visible-lg">
                     <?php
                     $flag = (!empty($fields['core']['country'])) ? $view['assets']->getCountryFlag($fields['core']['country']['value']) : '';
@@ -116,6 +117,5 @@
                         <?php echo $view['date']->toText($item->getLastActive()); ?>
                     </abbr>
                 </td>
-                <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
             </tr>
         <?php endforeach; ?>

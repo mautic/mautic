@@ -5291,13 +5291,13 @@ div[data-slot-focus] {
   margin: 0;
   padding: 0;
   position: absolute;
-  border: 1px solid #4e5e9e;
+  border: 1px solid #235f6d;
   z-index: 1;
 }
 div[data-section-focus] {
   content: '';
   position: absolute;
-  border: 1px solid #fdb933;
+  border: 1px solid #c2d100;
 }
 div[data-section-focus="top"] {
   left: 0px;
@@ -5324,7 +5324,7 @@ div[data-section-focus="clone"] {
   height: 25px;
   bottom: 62px;
   left: 10px;
-  background: #4e5e9e;
+  background: #235f6d;
   color: #fff;
   text-align: center;
   border: 0;
@@ -5335,7 +5335,7 @@ div[data-section-focus="handle"] {
   height: 25px;
   bottom: 10px;
   left: 10px;
-  background: #4e5e9e;
+  background: #235f6d;
   color: #fff;
   text-align: center;
   border: 0;
@@ -5346,7 +5346,7 @@ div[data-section-focus="delete"] {
   height: 25px;
   bottom: 36px;
   left: 10px;
-  background: #4e5e9e;
+  background: #235f6d;
   color: #fff;
   text-align: center;
   border: 0;
@@ -5367,9 +5367,9 @@ div[data-slot-toolbar] {
   z-index: 10;
   cursor: pointer;
   cursor: move;
-  background-color: #4e5e9e;
-  border-left: 1px solid #4e5e9e;
-  border-right: 1px solid #4e5e9e;
+  background-color: #235f6d;
+  border-left: 1px solid #235f6d;
+  border-right: 1px solid #235f6d;
   padding-top: 2px;
 }
 div[data-slot-toolbar] .btn {
@@ -5413,16 +5413,16 @@ div[data-slot^="image"] img {
   position: relative;
 }
 div[data-slot].ui-sortable-helper {
-  border: 1px solid #4e5e9e;
+  border: 1px solid #235f6d;
 }
 .slot-placeholder {
-  border: 2px dotted #4e5e9e;
+  border: 2px dotted #235f6d;
 }
 [data-slot="text"].fr-box {
   padding: initial;
 }
 [data-slot="text"].fr-box .fr-toolbar {
-  border-top: 2px solid #4e5e9e;
+  border-top: 2px solid #235f6d;
   position: absolute;
   left: -15px;
   bottom: initial !important;

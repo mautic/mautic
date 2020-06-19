@@ -2,7 +2,7 @@ body {
     background-color: #f8f8f8;
 }
 a, a:hover, a:focus {
-  color: #4e5d9d;
+  color: #003b4a;
 }
 
 .list-group-item.active a, .well a {
@@ -19,13 +19,13 @@ hr {
 }
 
 .well, .panel-default>.panel-heading {
-  background-color: #4e5d9d;
+  background-color: #003b4a;
   border-color: rgba(71, 85, 143, 0.5);
   color: #fff;
 }
 
 h1 {
-  color: #4e5d9d;
+  color: #003b4a;
 }
 
 .form-container {
