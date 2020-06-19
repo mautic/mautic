@@ -23,9 +23,6 @@ before_install:
   # increase memory limit for all PHP processes
   - echo "memory_limit=4G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
 
-  # turn off XDebug
-  #- phpenv config-rm xdebug.ini || return
-
   # install dependencies in parallel
   - travis_retry composer global require hirak/prestissimo
 
