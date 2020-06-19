@@ -1,4 +1,4 @@
-dist: bionic
+dist: trusty
 language: php
 
 services:
@@ -11,9 +11,6 @@ notifications:
 php:
   - 7.2
   - 7.3
-
-addons:
-  mariadb: '10.2'
 
 env:
   - DB=mysql
@@ -50,6 +47,11 @@ script:
 jobs:
   include:
     - stage: test
+      name: MariaDB
+      env: DB=mariadb
+      addons:
+        mariadb: '10.2'
+    -
       name: PHPSTAN
       script: composer phpstan
     -
