@@ -4,27 +4,20 @@
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
- * @link        http://mautic.org
+ * @link        https://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Doctrine\Provider;
 
+use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
+
 interface GeneratedColumnsProviderInterface
 {
-    /**
-     * @return GeneratedColumns
-     */
-    public function getGeneratedColumns();
+    public function getGeneratedColumns(): GeneratedColumns;
 
-    /**
-     * @return bool
-     */
-    public function generatedColumnsAreSupported();
+    public function generatedColumnsAreSupported(): bool;
 
-    /**
-     * @return string
-     */
-    public function getMinimalSupportedVersion();
+    public function getMinimalSupportedVersion(): string;
 }

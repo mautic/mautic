@@ -4,7 +4,7 @@
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
- * @link        http://mautic.org
+ * @link        https://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -55,16 +55,15 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
         $this->dispatcher      = $dispatcher;
     }
 
-    /**
-     * @return GeneratedColumns
-     */
-    public function getGeneratedColumns()
+    public function getGeneratedColumns(): GeneratedColumns
     {
-        if ($this->generatedColumnsAreSupported()
-            && null === $this->generatedColumns
-            && $this->dispatcher->hasListeners(CoreEvents::ON_GENERATED_COLUMNS_BUILD)
-        ) {
-            $event                  = $this->dispatcher->dispatch(CoreEvents::ON_GENERATED_COLUMNS_BUILD, new GeneratedColumnsEvent());
+        if (null !== $this->generatedColumns) {
+            return $this->generatedColumns;
+        }
+
+        if ($this->generatedColumnsAreSupported()) {
+            $event = new GeneratedColumnsEvent();
+            $this->dispatcher->dispatch(CoreEvents::ON_GENERATED_COLUMNS_BUILD, $event);
             $this->generatedColumns = $event->getGeneratedColumns();
         } else {
             $this->generatedColumns = new GeneratedColumns();
@@ -73,18 +72,12 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
         return $this->generatedColumns;
     }
 
-    /**
-     * @return bool
-     */
-    public function generatedColumnsAreSupported()
+    public function generatedColumnsAreSupported(): bool
     {
         return 1 !== version_compare($this->getMinimalSupportedVersion(), $this->versionProvider->getVersion());
     }
 
-    /**
-     * @return string
-     */
-    public function getMinimalSupportedVersion()
+    public function getMinimalSupportedVersion(): string
     {
         if ($this->versionProvider->isMariaDb()) {
             return self::MARIADB_MINIMUM_VERSION;
