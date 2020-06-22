@@ -628,8 +628,6 @@ class CompanyController extends FormController
         $orderBy    = $session->get('mautic.company.'.$companyId.'.contacts.orderby', 'l.last_active');
         $orderByDir = $session->get('mautic.company.'.$companyId.'.contacts.orderbydir', 'DESC');
 
-        $translator  = $this->get('translator');
-
         $results = $model->getEntities([
             'start'          => $start,
             'limit'          => $limit,
