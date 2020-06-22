@@ -98,7 +98,7 @@ if (!isset($lead)) {
                 endif;
                 $parentField = $f;
                 foreach ($fields as $fieldId2 => $f):
-                    if ($parentField->getType() !== 'hidden' && $f->getParent() == $parentField->getId()):
+                    if ('hidden' !== $parentField->getType() && $f->getParent() == $parentField->getId()):
                     if ($f->isCustom()):
                         if (!isset($fieldSettings[$f->getType()])):
                             continue;

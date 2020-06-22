@@ -224,12 +224,11 @@
             });
 
             Object.keys(parents).forEach(function(key) {
-                var containerId = document.getElementById(key);
-                var selectElement = document.getElementById(key.replace('mauticform_','mauticform_input_' ));
+                var containerElement = document.getElementById(key);
 
-                Form.doShowOn(parents, key, Form.getSelectedValues(containerId));
+                Form.doShowOn(parents, key, Form.getSelectedValues(containerElement));
 
-                containerId.onchange = function (evt) {
+                containerElement.onchange = function (evt) {
                     var selectElement = evt.target;
                     Form.doShowOn(parents, key, Form.getSelectedValues(evt.currentTarget));
                 }
@@ -271,13 +270,13 @@
             Form.filterOptGroups(element, selectedValue);
         }
 
-        Form.getSelectedValues = function(selectElement) {
-            if (selectElement.querySelectorAll('input[type=checkbox]').length) {
-                return Array.from(selectElement.querySelectorAll('input:checked'))
+        Form.getSelectedValues = function(containerElement) {
+            if (containerElement.querySelectorAll('input[type=checkbox], input[type=radio]').length) {
+                return Array.from(containerElement.querySelectorAll('input:checked'))
                     .map(option => option.value);
 
-            }else if(selectElement.querySelectorAll('select').length){
-                return Array.from(selectElement.querySelectorAll('option:checked'))
+            }else if(containerElement.querySelectorAll('select').length){
+                return Array.from(containerElement.querySelectorAll('option:checked'))
                     .map(option => option.value);
             }
         }
