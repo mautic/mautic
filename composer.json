@@ -129,7 +129,8 @@
         "friendsofphp/php-cs-fixer": "~2.16.1",
         "liip/test-fixtures-bundle": "^1.6",
         "phpstan/phpstan": "^0.12.3",
-        "rector/rector-prefixed": "0.6.13"
+        "rector/rector-prefixed": "0.6.13",
+        "pcov/clobber": "^2.0"
     },
     "repositories": [
         {
@@ -154,7 +155,7 @@
             "php -r \"if(file_exists('./.git')&&file_exists('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''))){copy('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''),'./.git/hooks/pre-commit');}\"",
             "php -r \"if(file_exists('./.git/hooks/pre-commit')&&(PHP_OS!='WINNT')){chmod('./.git/hooks/pre-commit',0755);}\""
         ],
-        "test": "bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --filter CampaignBundle",
+        "test": "bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml",
         "phpstan": "bin/phpstan analyse app/bundles plugins",
         "cs": "bin/php-cs-fixer fix -v --dry-run --diff",
         "fixcs": "bin/php-cs-fixer fix -v",
