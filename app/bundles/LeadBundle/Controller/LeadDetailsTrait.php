@@ -321,8 +321,6 @@ trait LeadDetailsTrait
      */
     protected function getStatsCount(Lead $lead, \DateTime $fromDate = null, \DateTime $toDate = null)
     {
-        $translator = $this->get('translator');
-
         if (null == $fromDate) {
             $fromDate = new \DateTime('first day of this month 00:00:00');
             $fromDate->modify('-6 months');

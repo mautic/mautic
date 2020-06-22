@@ -157,7 +157,7 @@ class CompanyController extends FormController
         }
         $leadsIds = substr($leadsIds, 0, -1);
 
-        $data = $this->getCompanyContacts($company, $objectId, $page, $leadsIds);
+        $data = $this->getCompanyContacts($objectId, $page, $leadsIds);
 
         return $this->delegateView(
             [
@@ -581,7 +581,7 @@ class CompanyController extends FormController
 
         $engagementData = is_array($contacts) ? $this->getCompanyEngagementsForGraph($contacts) : [];
 
-        $contacts = $this->getCompanyContacts($company, $objectId, null, $leadsIds);
+        $contacts = $this->getCompanyContacts($objectId, null, $leadsIds);
 
         return $this->delegateView(
             [
@@ -604,14 +604,13 @@ class CompanyController extends FormController
     /**
      * Get company's contacts for company view.
      *
-     * @param \Mautic\LeadBundle\Entity\Company $company
-     * @param int                               $companyId
-     * @param int                               $page
-     * @param string                            $leadsIds  filter to get only company's contacts
+     * @param int    $companyId
+     * @param int    $page
+     * @param string $leadsIds  filter to get only company's contacts
      *
      * @return array
      */
-    public function getCompanyContacts($company, $companyId, $page = 0, $leadsIds = '')
+    public function getCompanyContacts($companyId, $page = 0, $leadsIds = '')
     {
         $this->setListFilters();
 
