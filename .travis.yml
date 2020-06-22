@@ -35,6 +35,7 @@ before_install:
 install:
   - pecl install pcov
   - composer install
+  - bin/pcov clobber
 
 script:
   - composer test
