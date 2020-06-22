@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/dennisameling/mautic/branch/test-codecov/graph/badge.svg)](https://codecov.io/gh/dennisameling/mautic)
+
 Mautic Introduction
 ===========
 ![Mautic](.github/readme_image.png "Mautic Open Source Marketing Automation")
