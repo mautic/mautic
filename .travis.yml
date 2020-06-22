@@ -35,6 +35,8 @@ before_install:
 install:
   - pecl install pcov
   - composer install
+
+  # Clobber is needed because PCOV normally only works with PHPUnit 8+
   - bin/pcov clobber
 
 script:
