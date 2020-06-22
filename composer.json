@@ -154,7 +154,7 @@
             "php -r \"if(file_exists('./.git')&&file_exists('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''))){copy('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''),'./.git/hooks/pre-commit');}\"",
             "php -r \"if(file_exists('./.git/hooks/pre-commit')&&(PHP_OS!='WINNT')){chmod('./.git/hooks/pre-commit',0755);}\""
         ],
-        "test": "bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml",
+        "test": "bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml --filter CampaignBundle",
         "phpstan": "bin/phpstan analyse app/bundles plugins",
         "cs": "bin/php-cs-fixer fix -v --dry-run --diff",
         "fixcs": "bin/php-cs-fixer fix -v",
