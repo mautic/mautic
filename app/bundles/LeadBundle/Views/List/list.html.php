@@ -57,6 +57,36 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'segment',
+                        'orderBy'    => 'l.dateAdded',
+                        'text'       => 'mautic.lead.import.label.dateAdded',
+                        'class'      => 'visible-md visible-lg col-leadlist-dateAdded',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'segment',
+                        'orderBy'    => 'l.dateModified',
+                        'text'       => 'mautic.lead.import.label.dateModified',
+                        'class'      => 'visible-md visible-lg col-leadlist-dateModified',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'segment',
+                        'orderBy'    => 'l.createdByUser',
+                        'text'       => 'mautic.core.createdby',
+                        'class'      => 'visible-md visible-lg col-leadlist-createdByUser',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'segment',
                         'orderBy'    => 'l.id',
                         'text'       => 'mautic.core.id',
                         'class'      => 'visible-md visible-lg col-leadlist-id',
@@ -144,6 +174,9 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                             ); ?>
                         </a>
                     </td>
+                    <td class="visible-md visible-lg"><?php echo $item->getDateAdded() ? $item->getDateAdded()->format('Y-m-d H:i:s') : ''; ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getDateModified() ? $item->getDateModified()->format('Y-m-d H:i:s') : ''; ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getCreatedByUser(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>
