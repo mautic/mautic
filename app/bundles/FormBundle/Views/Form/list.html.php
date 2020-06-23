@@ -55,7 +55,6 @@ if ('index' == $tmpl) {
                         'orderBy'    => 'f.name',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-form-name',
-                        'default'    => true,
                     ]
                 );
 
@@ -96,6 +95,7 @@ if ('index' == $tmpl) {
                         'orderBy'    => 'f.dateModified',
                         'text'       => 'mautic.lead.import.label.dateModified',
                         'class'      => 'visible-md visible-lg col-form-dateModified',
+                        'default'    => true,
                     ]
                 );
 
