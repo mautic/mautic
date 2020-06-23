@@ -398,7 +398,6 @@ trait LeadDetailsTrait
         $toDate = new \DateTime();
 
         $lineChart  = new LineChart(null, $fromDate, $toDate);
-        $chartQuery = new ChartQuery($this->getDoctrine()->getConnection(), $fromDate, $toDate);
 
         $lineChart->setDataset($translator->trans('mautic.lead.graph.line.all_engagements'), $graphData['engagements']);
 
