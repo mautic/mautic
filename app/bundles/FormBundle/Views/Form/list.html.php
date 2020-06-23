@@ -83,6 +83,36 @@ if ('index' == $tmpl) {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'form',
+                        'orderBy'    => 'f.dateAdded',
+                        'text'       => 'mautic.lead.import.label.dateAdded',
+                        'class'      => 'visible-md visible-lg col-form-dateAdded',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'form',
+                        'orderBy'    => 'f.dateModified',
+                        'text'       => 'mautic.lead.import.label.dateModified',
+                        'class'      => 'visible-md visible-lg col-form-dateModified',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'form',
+                        'orderBy'    => 'f.createdByUser',
+                        'text'       => 'mautic.core.createdby',
+                        'class'      => 'visible-md visible-lg col-form-createdby',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'form',
                         'orderBy'    => 'f.id',
                         'text'       => 'mautic.core.id',
                         'class'      => 'visible-md visible-lg col-form-id',
@@ -187,6 +217,9 @@ if ('index' == $tmpl) {
                             ); ?>
                         </a>
                     </td>
+                    <td class="visible-md visible-lg"><?php echo $item->getDateAdded() ? $item->getDateAdded()->format('Y-m-d H:i:s') : ''; ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getDateModified() ? $item->getDateModified()->format('Y-m-d H:i:s') : ''; ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getCreatedByUser(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>
