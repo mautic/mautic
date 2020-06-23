@@ -141,7 +141,7 @@ $updateData = json_decode($data, true);
  * To ensure a smooth upgrade to 3.0, we check a few things beforehand:
  * - PHP version >= 7.2.21 and <= 7.3999
  * - Current database driver = pdo_mysql or mysqli (get from existing Mautic config file)
- * - MySQL version > 5.7.14 or MariaDB version > 10.1
+ * - MySQL version > 5.7.14 or MariaDB version > 10.2
  * - Mautic version > 2.16.3 (this version adds support for upgrading to 3.0)
  * - Check if Mautic's root folder is writable by creating + deleting a dummy folder
  * - Ensure PHP's max_execution_time is at least 240 (4 mins).
@@ -173,20 +173,33 @@ function runPreUpgradeChecks()
         $preUpgradeErrors[] = 'Mautic does not support PHP version ' . PHP_VERSION . ' at this time. To use Mautic, you will need to downgrade to an earlier version.' . "\n";
     }
 
-    // Check database connection and database version
+    // Check database connection, database version and amount of contacts.
     if (!in_array($localParameters['db_driver'], ['pdo_mysql', 'mysqli'])) {
         $preUpgradeErrors[] = 'Your database driver is not pdo_mysql or mysqli, which are the only drivers that Mautic supports. Please change your database driver (config/local.php)!';
     }
 
-    $mysqli = new mysqli($localParameters['db_host'], $localParameters['db_user'], $localParameters['db_password']);
+    $mysqli = new mysqli($localParameters['db_host'], $localParameters['db_user'], $localParameters['db_password'], $localParameters['db_name'], $localParameters['db_port']);
 
     if (mysqli_connect_errno()) {
         $preUpgradeErrors[] = 'Could not connect to your database. Please try again or fix your Mautic settings.';
     } else {
         $dbVersion = $mysqli->server_version;
 
-        if (!(($dbVersion >= 50714 && $dbVersion < 100000) || ($dbVersion >= 100100))) {
-            $preUpgradeErrors[] = 'Your MySQL/MariaDB version is not supported. You need at least MySQL 5.7.14 or MariaDB 10.1 in order to run Mautic 3.';
+        if (!(($dbVersion >= 50714 && $dbVersion < 100000) || ($dbVersion >= 100200))) {
+            $preUpgradeErrors[] = 'Your MySQL/MariaDB version is not supported. You need at least MySQL 5.7.14 or MariaDB 10.2 in order to run Mautic 3.';
+        } else {
+            $db_prefix = !empty($localParameters['db_table_prefix']) ? $localParameters['db_table_prefix'] : '';
+            $result = $mysqli->query("SELECT COUNT(id) AS leads FROM " . $db_prefix . "leads");
+
+            if (empty($result)) {
+                $preUpgradeWarnings[] = 'Could not determine the amout of contacts in your system. If you have more than 10000 contacts, please use the CLI (command line) to perform the upgrade.';
+            } else {
+                $count_leads = intval($result->fetch_row()[0]);
+
+                if ($count_leads >= 10000) {
+                    $preUpgradeWarnings[] = 'You have 10000 or more contacts in your system. We recommend upgrading by using the CLI (command line) for the best performance and stability.';
+                }
+            }
         }
 
         $mysqli->close();
@@ -273,7 +286,7 @@ function runPreUpgradeChecks()
     $maxExecutionTime = ini_get('max_execution_time');
 
     if ($maxExecutionTime > 0 && $maxExecutionTime < $minExecutionTime) {
-        $preUpgradeErrors[] = 'PHP max_execution_time needs to be at least ' . $minExecutionTime . ' seconds (' . round($minExecutionTime / 60, 2) . ' minutes) to allow for a successful upgrade (current value is ' .$maxExecutionTime . ' seconds). We tried setting it to this value but weren\'t able to do so. Please contact your host to set this value to ' . $minExecutionTime . ' seconds or higher.';
+        $preUpgradeErrors[] = 'PHP max_execution_time needs to be at least ' . $minExecutionTime . ' seconds (' . round($minExecutionTime / 60, 2) . ' minutes) to allow for a successful upgrade (current value is ' . $maxExecutionTime . ' seconds). We tried setting it to this value but weren\'t able to do so. Please contact your host to set this value to ' . $minExecutionTime . ' seconds or higher.';
     }
 
     // Check if mysqldump is available on the system for creating a DB backup.
@@ -328,6 +341,13 @@ function runPreUpgradeChecks()
 
     if ($memoryLimitBytes > 0 && $memoryLimitBytes < $minMemoryLimitBytes) {
         $preUpgradeErrors[] = 'PHP memory_limit needs to be at least ' . $minMemoryLimit . ' to allow for a successful upgrade (current value is ' . $memoryLimit . '). We tried setting it to this value but weren\'t able to do so. Please contact your host to set this value to ' . $minMemoryLimit . ' or higher.';
+    }
+
+    // Check if a composer.json file is present. If it is, it might very likely be the case that the user is using a version cloned from GitHub
+    if (file_exists(__DIR__ . '/composer.json')) {
+        $preUpgradeWarnings[] = 'You seem to have installed Mautic by cloning from GitHub. '
+            . 'We don\'t support upgrading with the upgrade script in this scenario. '
+            . 'Proceed at your own risk or reinstall with the official package at <a target="_blank" href="https://www.mautic.org/download">https://www.mautic.org/download</a>';
     }
 
     return [
@@ -1784,9 +1804,26 @@ function sendUpgradeStats($status, $errorCode = null)
         // Generate a unique instance ID for the site
         $instanceId = hash('sha1', $localParameters['secret_key'] . 'Mautic' . $localParameters['db_driver']);
 
+        // Get database version if possible.
+        $mysqli = new mysqli($localParameters['db_host'], $localParameters['db_user'], $localParameters['db_password'], $localParameters['db_name'], $localParameters['db_port']);
+        $dbVersion = null;
+
+        if (mysqli_connect_errno() === 0 && !empty($mysqli->server_version)) {
+            // E.g. 100200 for MariaDB 10.2.0 or 50714 for MySQL 5.7.14
+            // PHP uses the following calculation: main_version * 10000 + minor_version * 100 + sub_version
+            $dbVersionRaw = $mysqli->server_version;
+
+            $main = ltrim(substr($dbVersionRaw, -6, -4), '0'); // E.g. 5
+            $minor = ltrim(substr($dbVersionRaw, -4, 2), '0'); // E.g. 7
+            $sub = ltrim(substr($dbVersionRaw, -2, 2), '0'); // E.g. 14
+
+            $dbVersion = implode('.', [$main, $minor, $sub]);
+        }
+
         $data = [
             'application'   => 'Mautic',
             'version'       => $version,
+            'dbVersion'     => $dbVersion,
             'phpVersion'    => PHP_VERSION,
             'dbDriver'      => $localParameters['db_driver'],
             'serverOs'      => php_uname('s') . ' ' . php_uname('r'),
