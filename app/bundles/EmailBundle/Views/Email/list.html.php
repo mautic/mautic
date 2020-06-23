@@ -61,7 +61,7 @@ if ('index' == $tmpl) {
                         'sessionVar' => 'email',
                         'orderBy'    => 'e.dateAdded',
                         'text'       => 'mautic.lead.import.label.dateAdded',
-                        'class'      => 'visible-md visible-lg col-email-id',
+                        'class'      => 'visible-md visible-lg col-email-dateAdded',
                     ]
                 );
                 ?>
@@ -72,7 +72,18 @@ if ('index' == $tmpl) {
                         'sessionVar' => 'email',
                         'orderBy'    => 'e.dateModified',
                         'text'       => 'mautic.lead.import.label.dateModified',
-                        'class'      => 'visible-md visible-lg col-email-id',
+                        'class'      => 'visible-md visible-lg col-email-dateModified',
+                    ]
+                );
+                ?>
+                <?php
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'email',
+                        'orderBy'    => 'e.createdByUser',
+                        'text'       => 'mautic.core.createdby',
+                        'class'      => 'visible-md visible-lg col-email-createdByUser',
                     ]
                 );
                 ?>
@@ -241,6 +252,7 @@ if ('index' == $tmpl) {
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getDateAdded() ? $item->getDateAdded()->format('Y-m-d H:i:s') : ''; ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getDateModified() ? $item->getDateModified()->format('Y-m-d H:i:s') : ''; ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getCreatedByUser(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>
