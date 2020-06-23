@@ -377,6 +377,7 @@ class PageController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);
+                    $entity->setDateModified(new \DateTime());
 
                     //form is valid so process the data
                     $model->saveEntity($entity);
