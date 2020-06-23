@@ -38,7 +38,6 @@ if ('index' == $tmpl) {
                         'orderBy'    => 'p.title',
                         'text'       => 'mautic.core.title',
                         'class'      => 'col-page-title',
-                        'default'    => true,
                     ]
                 );
 
@@ -59,6 +58,36 @@ if ('index' == $tmpl) {
                         'orderBy'    => 'p.hits',
                         'text'       => 'mautic.page.thead.hits',
                         'class'      => 'col-page-hits visible-md visible-lg',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'page',
+                        'orderBy'    => 'p.dateAdded',
+                        'text'       => 'mautic.lead.import.label.dateAdded',
+                        'class'      => 'col-page-dateAdded visible-md visible-lg',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'page',
+                        'orderBy'    => 'p.dateModified',
+                        'text'       => 'mautic.lead.import.label.dateModified',
+                        'class'      => 'col-page-dateModified visible-md visible-lg',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'page',
+                        'orderBy'    => 'p.createdByUser',
+                        'text'       => 'mautic.core.createdby',
+                        'class'      => 'col-page-createdByUser visible-md visible-lg',
                     ]
                 );
 
@@ -170,6 +199,9 @@ if ('index' == $tmpl) {
                             ); ?>
                         </a>
                     </td>
+                    <td class="visible-md visible-lg"><?php echo $item->getDateAdded() ? $item->getDateAdded()->format('Y-m-d H:i:s') : ''; ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getDateModified() ? $item->getDateModified()->format('Y-m-d H:i:s') : ''; ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getCreatedByUser(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>
