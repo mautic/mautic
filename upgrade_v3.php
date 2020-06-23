@@ -347,7 +347,7 @@ function runPreUpgradeChecks()
     if (file_exists(__DIR__ . '/composer.json')) {
         $preUpgradeWarnings[] = 'You seem to have installed Mautic by cloning from GitHub. '
             . 'We don\'t support upgrading with the upgrade script in this scenario. '
-            . 'Proceed at your own risk or reinstall with the official package at <a target="_blank" href="https://www.mautic.org/download">https://www.mautic.org/download</a>';
+            . 'Proceed at your own risk or reinstall with the official package at <a target="_blank" href="https://github.com/mautic/mautic/releases/tag/2.16.3">https://github.com/mautic/mautic/releases/tag/2.16.3</a>';
     }
 
     return [
