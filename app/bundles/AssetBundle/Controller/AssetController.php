@@ -333,7 +333,7 @@ class AssetController extends FormController
                     $entity->setUploadDir($this->get('mautic.helper.core_parameters')->get('upload_dir'));
                     $entity->preUpload();
                     $entity->upload();
-
+                    $entity->setDateModified(new \DateTime());
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
