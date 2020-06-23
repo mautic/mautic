@@ -18,7 +18,7 @@ use Mautic\SmsBundle\SmsEvents;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
 
-class WebhookSubscriberTest extends \PHPUnit_Framework_TestCase
+class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private $webhookModel;
 

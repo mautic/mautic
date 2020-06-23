@@ -18,9 +18,13 @@ use Mautic\EmailBundle\EventListener\WebhookSubscriber;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
+use PHPUnit\Framework\MockObject\MockObject;
 
-class WebhookSubscriberTest extends \PHPUnit_Framework_TestCase
+class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|WebhookModel
+     */
     private $webhookModel;
 
     /**
@@ -33,9 +37,7 @@ class WebhookSubscriberTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
 
         $this->webhookModel = $this->createMock(WebhookModel::class);
-        $this->subscriber   = new WebhookSubscriber();
-
-        $this->subscriber->setWebhookModel($this->webhookModel);
+        $this->subscriber   = new WebhookSubscriber($this->webhookModel);
     }
 
     public function testOnWebhookBuild()
