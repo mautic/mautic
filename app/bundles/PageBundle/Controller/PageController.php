@@ -113,7 +113,7 @@ class PageController extends FormController
             $filter['force'][] = ['column' => 'p.translationParent', 'expr' => 'isNull'];
         }
 
-        $orderBy    = $this->get('session')->get('mautic.page.orderby', 'p.title');
+        $orderBy    = $this->get('session')->get('mautic.page.orderby', 'p.dateModified');
         $orderByDir = $this->get('session')->get('mautic.page.orderbydir', 'DESC');
         $pages      = $model->getEntities(
             [
