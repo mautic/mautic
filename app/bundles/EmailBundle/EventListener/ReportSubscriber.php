@@ -655,10 +655,6 @@ class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param QueryBuilder     $queryBuilder
-     * @param ReportGraphEvent $event
-     */
     private function joinEmailsTableIfMissing(QueryBuilder $queryBuilder, ReportGraphEvent $event)
     {
         if ($event->checkContext(self::CONTEXT_EMAIL_STATS) && !$this->isJoined($queryBuilder, MAUTIC_TABLE_PREFIX.'emails', self::EMAIL_STATS_PREFIX, self::EMAILS_PREFIX)) {
@@ -685,8 +681,6 @@ class ReportSubscriber implements EventSubscriberInterface
 
     /**
      * Add the Do Not Contact table to the query builder.
-     *
-     * @param QueryBuilder $qb
      */
     private function addDNCTableForEmailStats(QueryBuilder $qb)
     {

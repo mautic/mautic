@@ -16,7 +16,7 @@ use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 
-class ReportGeneratorEventTest extends \PHPUnit_Framework_TestCase
+class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
 {
     private $report;
     private $queryBuilder;

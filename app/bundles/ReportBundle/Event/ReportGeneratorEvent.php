@@ -63,12 +63,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     private $sortedFilters;
 
-    /**
-     * @param Report            $report
-     * @param array             $options
-     * @param QueryBuilder      $qb
-     * @param ChannelListHelper $channelListHelper
-     */
     public function __construct(Report $report, array $options, QueryBuilder $qb, ChannelListHelper $channelListHelper)
     {
         $this->report            = $report;
@@ -196,9 +190,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Add category left join.
      *
-     * @param QueryBuilder $queryBuilder
-     * @param string       $prefix
-     * @param string       $categoryPrefix
+     * @param string $prefix
+     * @param string $categoryPrefix
      *
      * @return $this
      */
@@ -214,9 +207,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Add lead left join.
      *
-     * @param QueryBuilder $queryBuilder
-     * @param string       $prefix
-     * @param string       $leadPrefix
+     * @param string $prefix
+     * @param string $leadPrefix
      *
      * @return $this
      */
@@ -237,9 +229,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Add IP left join.
      *
-     * @param QueryBuilder $queryBuilder
-     * @param string       $prefix
-     * @param string       $ipPrefix
+     * @param string $prefix
+     * @param string $ipPrefix
      *
      * @return $this
      */
@@ -274,11 +265,10 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Add IP left join.
      *
-     * @param QueryBuilder $queryBuilder
-     * @param string       $prefix
-     * @param string       $channel
-     * @param string       $leadPrefix
-     * @param string       $onColumn
+     * @param string $prefix
+     * @param string $channel
+     * @param string $leadPrefix
+     * @param string $onColumn
      *
      * @return $this
      */
@@ -296,8 +286,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Join channel columns.
      *
-     * @param QueryBuilder $queryBuilder
-     * @param string       $prefix
+     * @param string $prefix
      *
      * @return $this
      */
@@ -343,10 +332,9 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Apply date filters to the query.
      *
-     * @param QueryBuilder $queryBuilder
-     * @param string       $dateColumn
-     * @param string       $tablePrefix
-     * @param bool         $dateOnly
+     * @param string $dateColumn
+     * @param string $tablePrefix
+     * @param bool   $dateOnly
      *
      * @return $this
      *
@@ -527,7 +515,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
 
     private function buildSortedFilters()
     {
-        if ($this->sortedFilters !== null) {
+        if (null !== $this->sortedFilters) {
             return;
         }
 
