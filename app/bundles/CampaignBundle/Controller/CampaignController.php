@@ -214,7 +214,6 @@ class CampaignController extends AbstractStandardFormController
         $filter = ['string' => $search, 'force' => []];
 
         $model = $this->getModel('campaign');
-        $repo  = $model->getRepository();
 
         if (!$permissions[$this->getPermissionBase().':viewother']) {
             $filter['force'][] = ['column' => 'c.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
