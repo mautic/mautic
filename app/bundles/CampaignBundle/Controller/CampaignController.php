@@ -290,64 +290,60 @@ class CampaignController extends AbstractStandardFormController
      */
     public function newAction()
     {
-        $entity = $this->getFormEntity('new');
+        $model    = $this->getModel('campaign');
+        $campaign = $model->getEntity();
 
-        if (!$this->checkActionPermission('new')) {
+        if (!$this->get('mautic.security')->isGranted('campaign:campaigns:create')) {
             return $this->accessDenied();
         }
 
-        $model = $this->getModel($this->getModelName());
-        if (!$model instanceof FormModel) {
-            throw new \Exception(get_class($model).' must extend '.FormModel::class);
-        }
-
         //set the page we came from
-        $page = $this->get('session')->get('mautic.'.$this->getSessionBase().'.page', 1);
+        $page = $this->get('session')->get('mautic.campaign.page', 1);
 
         $options = $this->getEntityFormOptions();
-        $action  = $this->generateUrl($this->getActionRoute(), ['objectAction' => 'new']);
-        $form    = $model->createForm($entity, $this->get('form.factory'), $action, $options);
+        $action  = $this->generateUrl('mautic_campaign_action', ['objectAction' => 'new']);
+        $form    = $model->createForm($campaign, $this->get('form.factory'), $action, $options);
 
         ///Check for a submitted form and process it
         $isPost = 'POST' === $this->request->getMethod();
-        $this->beforeFormProcessed($entity, $form, 'new', $isPost);
+        $this->beforeFormProcessed($campaign, $form, 'new', $isPost);
 
         if ($isPost) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    if ($valid = $this->beforeEntitySave($entity, $form, 'new')) {
-                        $model->saveEntity($entity);
-                        $this->afterEntitySave($entity, $form, 'new', $valid);
+                    if ($valid = $this->beforeEntitySave($campaign, $form, 'new')) {
+                        $model->saveEntity($campaign);
+                        $this->afterEntitySave($campaign, $form, 'new', $valid);
 
                         if (method_exists($this, 'viewAction')) {
-                            $viewParameters = ['objectId' => $entity->getId(), 'objectAction' => 'view'];
-                            $returnUrl      = $this->generateUrl($this->getActionRoute(), $viewParameters);
-                            $template       = $this->getControllerBase().':view';
+                            $viewParameters = ['objectId' => $campaign->getId(), 'objectAction' => 'view'];
+                            $returnUrl      = $this->generateUrl('mautic_campaign_action', $viewParameters);
+                            $template       = 'MauticCampaignBundle:Campaign:view';
                         } else {
                             $viewParameters = ['page' => $page];
-                            $returnUrl      = $this->generateUrl($this->getIndexRoute(), $viewParameters);
-                            $template       = $this->getControllerBase().':'.$this->getPostActionControllerAction('new');
+                            $returnUrl      = $this->generateUrl('mautic_campaign_index', $viewParameters);
+                            $template       = 'MauticCampaignBundle:Campaign:index';
                         }
                     }
                 }
 
-                $this->afterFormProcessed($valid, $entity, $form, 'new');
+                $this->afterFormProcessed($valid, $campaign, $form, 'new');
             } else {
                 $viewParameters = ['page' => $page];
-                $returnUrl      = $this->generateUrl($this->getIndexRoute(), $viewParameters);
-                $template       = $this->getControllerBase().':'.$this->getPostActionControllerAction('new');
+                $returnUrl      = $this->generateUrl('c', $viewParameters);
+                $template       = 'MauticCampaignBundle:Campaign:index';
             }
 
             $passthrough = [
-                'mauticContent' => $this->getJsLoadMethodPrefix(),
+                'mauticContent' => 'cammpaign',
             ];
 
             if ($isInPopup = isset($form['updateSelect'])) {
                 $template    = false;
                 $passthrough = array_merge(
                     $passthrough,
-                    $this->getUpdateSelectParams($form['updateSelect']->getData(), $entity)
+                    $this->getUpdateSelectParams($form['updateSelect']->getData(), $campaign)
                 );
             }
 
@@ -363,42 +359,42 @@ class CampaignController extends AbstractStandardFormController
                             'viewParameters'  => $viewParameters,
                             'contentTemplate' => $template,
                             'passthroughVars' => $passthrough,
-                            'entity'          => $entity,
+                            'entity'          => $campaign,
                         ],
                         'new'
                     )
                 );
             } elseif ($valid && $this->isFormApplied($form)) {
-                return $this->editAction($entity->getId(), true);
+                return $this->editAction($campaign->getId(), true);
             }
         }
 
         $delegateArgs = [
             'viewParameters' => [
-                'permissionBase'  => $this->getPermissionBase(),
-                'mauticContent'   => $this->getJsLoadMethodPrefix(),
-                'actionRoute'     => $this->getActionRoute(),
-                'indexRoute'      => $this->getIndexRoute(),
-                'tablePrefix'     => $model->getRepository()->getTableAlias(),
-                'modelName'       => $this->getModelName(),
+                'permissionBase'  => $model->getPermissionBase(),
+                'mauticContent'   => 'campaign',
+                'actionRoute'     => 'mautic_campaign_action',
+                'indexRoute'      => 'mautic_campaign_index',
+                'tablePrefix'     => 'c',
+                'modelName'       => 'campaign',
                 'translationBase' => $this->getTranslationBase(),
                 'tmpl'            => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
-                'entity'          => $entity,
+                'entity'          => $campaign,
                 'form'            => $this->getFormView($form, 'new'),
             ],
-            'contentTemplate' => $this->getTemplateName('form.html.php'),
+            'contentTemplate' => 'MauticCampaignBundle:Campaign:form.html.php',
             'passthroughVars' => [
-                'mauticContent' => $this->getJsLoadMethodPrefix(),
+                'mauticContent' => 'campaign',
                 'route'         => $this->generateUrl(
-                    $this->getActionRoute(),
+                    'mautic_campaign_action',
                     [
                         'objectAction' => (!empty($valid) ? 'edit' : 'new'), //valid means a new form was applied
-                        'objectId'     => ($entity) ? $entity->getId() : 0,
+                        'objectId'     => ($campaign) ? $campaign->getId() : 0,
                     ]
                 ),
                 'validationError' => $this->getFormErrorForBuilder($form),
             ],
-            'entity' => $entity,
+            'entity' => $campaign,
             'form'   => $form,
         ];
 
