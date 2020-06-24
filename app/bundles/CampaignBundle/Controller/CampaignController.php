@@ -219,8 +219,8 @@ class CampaignController extends AbstractStandardFormController
             $filter['force'][] = ['column' => 'c.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
-        $orderBy    = $session->get('mautic.campaign.orderby', $repo->getTableAlias().'.'.$this->getDefaultOrderColumn());
-        $orderByDir = $session->get('mautic.campaign.orderbydir', $this->getDefaultOrderDirection());
+        $orderBy    = $session->get('mautic.campaign.orderby', 'c.dateModified');
+        $orderByDir = $session->get('mautic.campaign.orderbydir', 'DESC');
 
         list($count, $items) = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
 
