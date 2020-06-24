@@ -290,7 +290,121 @@ class CampaignController extends AbstractStandardFormController
      */
     public function newAction()
     {
-        return $this->newStandard();
+        $entity = $this->getFormEntity('new');
+
+        if (!$this->checkActionPermission('new')) {
+            return $this->accessDenied();
+        }
+
+        $model = $this->getModel($this->getModelName());
+        if (!$model instanceof FormModel) {
+            throw new \Exception(get_class($model).' must extend '.FormModel::class);
+        }
+
+        //set the page we came from
+        $page = $this->get('session')->get('mautic.'.$this->getSessionBase().'.page', 1);
+
+        $options = $this->getEntityFormOptions();
+        $action  = $this->generateUrl($this->getActionRoute(), ['objectAction' => 'new']);
+        $form    = $model->createForm($entity, $this->get('form.factory'), $action, $options);
+
+        ///Check for a submitted form and process it
+        $isPost = 'POST' === $this->request->getMethod();
+        $this->beforeFormProcessed($entity, $form, 'new', $isPost);
+
+        if ($isPost) {
+            $valid = false;
+            if (!$cancelled = $this->isFormCancelled($form)) {
+                if ($valid = $this->isFormValid($form)) {
+                    if ($valid = $this->beforeEntitySave($entity, $form, 'new')) {
+                        $model->saveEntity($entity);
+                        $this->afterEntitySave($entity, $form, 'new', $valid);
+
+                        if (method_exists($this, 'viewAction')) {
+                            $viewParameters = ['objectId' => $entity->getId(), 'objectAction' => 'view'];
+                            $returnUrl      = $this->generateUrl($this->getActionRoute(), $viewParameters);
+                            $template       = $this->getControllerBase().':view';
+                        } else {
+                            $viewParameters = ['page' => $page];
+                            $returnUrl      = $this->generateUrl($this->getIndexRoute(), $viewParameters);
+                            $template       = $this->getControllerBase().':'.$this->getPostActionControllerAction('new');
+                        }
+                    }
+                }
+
+                $this->afterFormProcessed($valid, $entity, $form, 'new');
+            } else {
+                $viewParameters = ['page' => $page];
+                $returnUrl      = $this->generateUrl($this->getIndexRoute(), $viewParameters);
+                $template       = $this->getControllerBase().':'.$this->getPostActionControllerAction('new');
+            }
+
+            $passthrough = [
+                'mauticContent' => $this->getJsLoadMethodPrefix(),
+            ];
+
+            if ($isInPopup = isset($form['updateSelect'])) {
+                $template    = false;
+                $passthrough = array_merge(
+                    $passthrough,
+                    $this->getUpdateSelectParams($form['updateSelect']->getData(), $entity)
+                );
+            }
+
+            if ($cancelled || ($valid && !$this->isFormApplied($form))) {
+                if ($isInPopup) {
+                    $passthrough['closeModal'] = true;
+                }
+
+                return $this->postActionRedirect(
+                    $this->getPostActionRedirectArguments(
+                        [
+                            'returnUrl'       => $returnUrl,
+                            'viewParameters'  => $viewParameters,
+                            'contentTemplate' => $template,
+                            'passthroughVars' => $passthrough,
+                            'entity'          => $entity,
+                        ],
+                        'new'
+                    )
+                );
+            } elseif ($valid && $this->isFormApplied($form)) {
+                return $this->editAction($entity->getId(), true);
+            }
+        }
+
+        $delegateArgs = [
+            'viewParameters' => [
+                'permissionBase'  => $this->getPermissionBase(),
+                'mauticContent'   => $this->getJsLoadMethodPrefix(),
+                'actionRoute'     => $this->getActionRoute(),
+                'indexRoute'      => $this->getIndexRoute(),
+                'tablePrefix'     => $model->getRepository()->getTableAlias(),
+                'modelName'       => $this->getModelName(),
+                'translationBase' => $this->getTranslationBase(),
+                'tmpl'            => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+                'entity'          => $entity,
+                'form'            => $this->getFormView($form, 'new'),
+            ],
+            'contentTemplate' => $this->getTemplateName('form.html.php'),
+            'passthroughVars' => [
+                'mauticContent' => $this->getJsLoadMethodPrefix(),
+                'route'         => $this->generateUrl(
+                    $this->getActionRoute(),
+                    [
+                        'objectAction' => (!empty($valid) ? 'edit' : 'new'), //valid means a new form was applied
+                        'objectId'     => ($entity) ? $entity->getId() : 0,
+                    ]
+                ),
+                'validationError' => $this->getFormErrorForBuilder($form),
+            ],
+            'entity' => $entity,
+            'form'   => $form,
+        ];
+
+        return $this->delegateView(
+            $this->getViewArguments($delegateArgs, 'new')
+        );
     }
 
     /**
