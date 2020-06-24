@@ -168,7 +168,119 @@ class CampaignController extends AbstractStandardFormController
      */
     public function indexAction($page = null)
     {
-        return $this->indexStandard($page);
+        //set some permissions
+        $permissions = $this->get('mautic.security')->isGranted(
+            [
+                'campaign:campaigns:view',
+                'campaign:campaigns:viewown',
+                'campaign:campaigns:viewother',
+                'campaign:campaigns:create',
+                'campaign:campaigns:edit',
+                'campaign:campaigns:editown',
+                'campaign:campaigns:editother',
+                'campaign:campaigns:delete',
+                'campaign:campaigns:deleteown',
+                'campaign:campaigns:deleteother',
+                'campaign:campaigns:publish',
+                'campaign:campaigns:publishown',
+                'campaign:campaigns:publishother',
+            ],
+            'RETURN_ARRAY',
+            null,
+            true
+        );
+
+        if (!$permissions['campaign:campaigns:view']) {
+            return $this->accessDenied();
+        }
+
+        $this->setListFilters();
+
+        $session = $this->get('session');
+        if (empty($page)) {
+            $page = $session->get('mautic.campaign.page', 1);
+        }
+
+        //set limits
+        $limit = $session->get('mautic.campaign.limit', $this->coreParametersHelper->get('default_pagelimit'));
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
+        if ($start < 0) {
+            $start = 0;
+        }
+
+        $search = $this->request->get('search', $session->get('mautic.campaign.filter', ''));
+        $session->set('mautic.campaign.filter', $search);
+
+        $filter = ['string' => $search, 'force' => []];
+
+        $model = $this->getModel('campaign');
+        $repo  = $model->getRepository();
+
+        if (!$permissions[$this->getPermissionBase().':viewother']) {
+            $filter['force'][] = ['column' => 'c.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
+        }
+
+        $orderBy    = $session->get('mautic.campaign.orderby', $repo->getTableAlias().'.'.$this->getDefaultOrderColumn());
+        $orderByDir = $session->get('mautic.campaign.orderbydir', $this->getDefaultOrderDirection());
+
+        list($count, $items) = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
+
+        if ($count && $count < ($start + 1)) {
+            //the number of entities are now less then the current page so redirect to the last page
+            $lastPage = (1 === $count) ? 1 : ((ceil($count / $limit)) ?: 1) ?: 1;
+
+            $session->set('mautic.campaign.page', $lastPage);
+            $returnUrl = $this->generateUrl('mautic_campaign_index', ['page' => $lastPage]);
+
+            return $this->postActionRedirect(
+                $this->getPostActionRedirectArguments(
+                    [
+                        'returnUrl'       => $returnUrl,
+                        'viewParameters'  => ['page' => $lastPage],
+                        'contentTemplate' => 'MauticCampaignBundle:Campaign:index',
+                        'passthroughVars' => [
+                            'mauticContent' => 'campaign',
+                        ],
+                    ],
+                    'index'
+                )
+            );
+        }
+
+        //set what page currently on so that we can return here after form submission/cancellation
+        $session->set('mautic.campaign.page', $page);
+
+        $viewParameters = [
+            'permissionBase'  => $this->getPermissionBase(),
+            'mauticContent'   => $this->getJsLoadMethodPrefix(),
+            'sessionVar'      => $this->getSessionBase(),
+            'actionRoute'     => $this->getActionRoute(),
+            'indexRoute'      => $this->getIndexRoute(),
+            'tablePrefix'     => $model->getRepository()->getTableAlias(),
+            'modelName'       => $this->getModelName(),
+            'translationBase' => $this->getTranslationBase(),
+            'searchValue'     => $search,
+            'items'           => $items,
+            'totalItems'      => $count,
+            'page'            => $page,
+            'limit'           => $limit,
+            'permissions'     => $permissions,
+            'tmpl'            => $this->request->get('tmpl', 'index'),
+        ];
+
+        return $this->delegateView(
+            $this->getViewArguments(
+                [
+                    'viewParameters'  => $viewParameters,
+                    'contentTemplate' => $this->getTemplateName('list.html.php'),
+                    'passthroughVars' => [
+                        'mauticContent' => $this->getJsLoadMethodPrefix(),
+                        'route'         => $this->generateUrl($this->getIndexRoute(), ['page' => $page]),
+                    ],
+                ],
+                'index'
+            )
+        );
     }
 
     /**
