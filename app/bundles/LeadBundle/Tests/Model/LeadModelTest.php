@@ -451,6 +451,8 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
     public function testManipulatorIsLoggedOnlyOnce()
     {
+        $this->mockGetLeadRepository();
+
         $contact     = $this->createMock(Lead::class);
         $manipulator = new LeadManipulator('lead', 'import', 333);
 
@@ -512,7 +514,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticLeadBundle:Lead', $this->leadRepositoryMock],
+                        [Lead::class, $this->leadRepositoryMock],
                     ]
                 )
             );
