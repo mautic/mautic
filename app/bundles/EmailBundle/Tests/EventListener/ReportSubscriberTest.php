@@ -14,7 +14,6 @@ namespace Mautic\EmailBundle\Tests\EventListener;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -33,7 +32,6 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     private $companyReportDataMock;
     private $statRepository;
     private $generatedColumnsProvider;
-    private $emMock;
     private $report;
     private $channelListHelper;
     private $queryBuilder;
@@ -51,15 +49,14 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->connectionMock           = $this->createMock(Connection::class);
         $this->companyReportDataMock    = $this->createMock(CompanyReportData::class);
-        $this->emMock                   = $this->createMock(EntityManager::class);
         $this->statRepository           = $this->createMock(StatRepository::class);
+        $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
         $this->subscriber               = new ReportSubscriber(
             $this->connectionMock,
             $this->companyReportDataMock,
-            $this->statRepository
+            $this->statRepository,
+            $this->generatedColumnsProvider
         );
-
-        $this->subscriber->setEntityManager($this->emMock);
 
         $this->report            = $this->createMock(Report::class);
         $this->channelListHelper = $this->createMock(ChannelListHelper::class);
