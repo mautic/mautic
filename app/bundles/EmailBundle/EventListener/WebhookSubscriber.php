@@ -63,9 +63,6 @@ class WebhookSubscriber implements EventSubscriberInterface
         $event->addEvent(EmailEvents::EMAIL_ON_OPEN, $mailOpen);
     }
 
-    /**
-     * @param EmailSendEvent $event
-     */
     public function onEmailSend(EmailSendEvent $event)
     {
         // Ignore test email sends.
@@ -89,9 +86,6 @@ class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param EmailOpenEvent $event
-     */
     public function onEmailOpen(EmailOpenEvent $event)
     {
         $this->webhookModel->queueWebhooksByType(
