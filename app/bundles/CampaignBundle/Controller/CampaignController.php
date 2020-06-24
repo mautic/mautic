@@ -312,6 +312,7 @@ class CampaignController extends AbstractStandardFormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     if ($valid = $this->beforeEntitySave($campaign, $form, 'new')) {
+                        $campaign->setDateModified(new \DateTime());
                         $model->saveEntity($campaign);
                         $this->afterEntitySave($campaign, $form, 'new', $valid);
 
