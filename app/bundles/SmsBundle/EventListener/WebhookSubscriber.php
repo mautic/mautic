@@ -18,7 +18,7 @@ use Mautic\WebhookBundle\Model\WebhookModel;
 use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class WebhookSubscriber extends EventSubscriberInterface
+class WebhookSubscriber implements EventSubscriberInterface
 {
     /**
      * @var WebhookModel
