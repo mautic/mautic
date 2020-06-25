@@ -18,17 +18,46 @@ use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
 use Mautic\CoreBundle\EventListener\MigrationCommandSubscriber;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|VersionProviderInterface
+     */
     private $versionProvider;
+
+    /**
+     * @var MockObject|GeneratedColumnsProviderInterface
+     */
     private $generatedColumnsProvider;
+
+    /**
+     * @var MockObject|Connection
+     */
     private $connection;
+
+    /**
+     * @var MockObject|ConsoleCommandEvent
+     */
     private $event;
+
+    /**
+     * @var MockObject|Command
+     */
     private $command;
+
+    /**
+     * @var MockObject|MySqlSchemaManager
+     */
+    private $schemaManager;
+
+    /**
+     * @var MockObject|OutputInterface
+     */
     private $output;
 
     /**
