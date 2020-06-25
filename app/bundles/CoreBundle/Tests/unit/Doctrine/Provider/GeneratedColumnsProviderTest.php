@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Provider;
 
+use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumnsInterface;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider;
@@ -70,16 +71,22 @@ final class GeneratedColumnsProviderTest extends \PHPUnit\Framework\TestCase
     {
         $supportedMySqlVersion = '5.7.14';
 
-        $event = new GeneratedColumnsEvent();
-        $event->addGeneratedColumn(new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important'));
-
-        $this->versionProvider->expects($this->once())
-            ->method('getVersion')
+        $this->versionProvider->method('getVersion')
             ->willReturn($supportedMySqlVersion);
 
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->willReturn($event);
+            ->with(
+                CoreEvents::ON_GENERATED_COLUMNS_BUILD,
+                $this->callback(
+                    // Emulate a subscriber.
+                    function (GeneratedColumnsEvent $event) {
+                        $event->addGeneratedColumn(new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important'));
+
+                        return true;
+                    }
+                )
+            );
 
         $generatedColumns = $this->provider->getGeneratedColumns();
         $this->assertInstanceOf(GeneratedColumnsInterface::class, $generatedColumns);
