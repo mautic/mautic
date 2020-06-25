@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Doctrine\Provider;
+namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Provider;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Statement;

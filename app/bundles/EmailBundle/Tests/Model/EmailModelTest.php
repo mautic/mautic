@@ -73,6 +73,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     private $cacheStorageHelperMock;
     private $contactTracker;
     private $emailModel;
+    private $generatedColumnsProvider;
     private $doNotContact;
 
     protected function setUp()

@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Doctrine\GeneratedColumn;
+namespace Mautic\CoreBundle\Tests\Unit\Doctrine\GeneratedColumn;
 
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
