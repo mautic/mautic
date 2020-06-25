@@ -340,7 +340,107 @@ class UpdateHelperTest extends TestCase
                 function (string $method, string $url, array $options) {
                     $request = $this->createMock(RequestInterface::class);
 
+                    throw new \Exception('something bad happened');
+                }
+            );
+
+        $this->logger->expects($this->once())
+            ->method('error');
+
+        $this->helper->fetchData();
+    }
+
+    public function testRequestExceptionDoesNotGoUncaughtWhenThrownDuringUpdatingStats()
+    {
+        $cache = [
+            'error'        => false,
+            'message'      => 'mautic.core.updater.update.available',
+            'version'      => '10.0.1',
+            'announcement' => 'https://mautic.org',
+            'package'      => 'https://mautic.org/10.0.1/upgrade.zip',
+            'stability'    => 'stable',
+            'checkedTime'  => time() - 10800,
+        ];
+        file_put_contents(__DIR__.'/resource/update/tmp/lastUpdateCheck.txt', json_encode($cache));
+
+        $statsUrl = 'https://mautic.org/stats';
+        $this->coreParametersHelper->expects($this->exactly(6))
+            ->method('get')
+            ->withConsecutive(
+                ['update_stability'],
+                ['stats_update_url'],
+                ['secret_key'],
+                ['db_driver'],
+                ['install_source', 'Mautic'],
+                ['system_update_url']
+            )
+            ->willReturnOnConsecutiveCalls(
+                'stable',
+                $statsUrl,
+                'abc123',
+                'mysql',
+                'Mautic',
+                null
+            );
+
+        $this->client->expects($this->once())
+            ->method('request')
+            ->with('POST', $statsUrl, $this->anything())
+            ->willReturnCallback(
+                function (string $method, string $url, array $options) {
+                    $request = $this->createMock(RequestInterface::class);
+
                     throw new RequestException('something bad happened', $request, $this->response);
+                }
+            );
+
+        $this->logger->expects($this->once())
+            ->method('error');
+
+        $this->helper->fetchData();
+    }
+
+    public function testRequestExceptionWithEmptyResponseDoesNotGoUncaughtWhenThrownDuringUpdatingStats()
+    {
+        $cache = [
+            'error'        => false,
+            'message'      => 'mautic.core.updater.update.available',
+            'version'      => '10.0.1',
+            'announcement' => 'https://mautic.org',
+            'package'      => 'https://mautic.org/10.0.1/upgrade.zip',
+            'stability'    => 'stable',
+            'checkedTime'  => time() - 10800,
+        ];
+        file_put_contents(__DIR__.'/resource/update/tmp/lastUpdateCheck.txt', json_encode($cache));
+
+        $statsUrl = 'https://mautic.org/stats';
+        $this->coreParametersHelper->expects($this->exactly(6))
+            ->method('get')
+            ->withConsecutive(
+                ['update_stability'],
+                ['stats_update_url'],
+                ['secret_key'],
+                ['db_driver'],
+                ['install_source', 'Mautic'],
+                ['system_update_url']
+            )
+            ->willReturnOnConsecutiveCalls(
+                'stable',
+                $statsUrl,
+                'abc123',
+                'mysql',
+                'Mautic',
+                null
+            );
+
+        $this->client->expects($this->once())
+            ->method('request')
+            ->with('POST', $statsUrl, $this->anything())
+            ->willReturnCallback(
+                function (string $method, string $url, array $options) {
+                    $request = $this->createMock(RequestInterface::class);
+
+                    throw new RequestException('something bad happened', $request, null);
                 }
             );
 
