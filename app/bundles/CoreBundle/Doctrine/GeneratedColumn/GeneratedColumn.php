@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -53,13 +55,7 @@ final class GeneratedColumn implements GeneratedColumnInterface
      */
     private $indexColumns = [];
 
-    /**
-     * @param string $tableName
-     * @param string $columnName
-     * @param string $columnType
-     * @param string $as
-     */
-    public function __construct($tableName, $columnName, $columnType, $as)
+    public function __construct(string $tableName, string $columnName, string $columnType, string $as)
     {
         $this->as             = $as;
         $this->tableName      = $tableName;
@@ -69,97 +65,59 @@ final class GeneratedColumn implements GeneratedColumnInterface
         $this->columnType     = $columnType;
     }
 
-    /**
-     * @return string
-     */
-    public function getTableName()
+    public function getTableName(): string
     {
         return $this->tablePrefix.$this->tableName;
     }
 
-    /**
-     * @return string
-     */
-    public function getColumnName()
+    public function getColumnName(): string
     {
         return $this->columnName;
     }
 
-    /**
-     * @param string $indexColumn
-     */
-    public function addIndexColumn($indexColumn)
+    public function addIndexColumn(string $indexColumn): void
     {
         $this->indexColumns[] = $indexColumn;
     }
 
-    /**
-     * If set then the line chart queries will use this column for the time unit instead of the original.
-     *
-     * @param string $originalDateColumn
-     * @param string $timeUnit
-     */
-    public function setOriginalDateColumn($originalDateColumn, $timeUnit)
+    public function setOriginalDateColumn(string $originalDateColumn, string $timeUnit): void
     {
         $this->originalDateColumn = $originalDateColumn;
         $this->timeUnit           = $timeUnit;
     }
 
-    /**
-     * @return string
-     */
-    public function getOriginalDateColumn()
+    public function getOriginalDateColumn(): string
     {
         return $this->originalDateColumn;
     }
 
-    /**
-     * @return string
-     */
-    public function getTimeUnit()
+    public function getTimeUnit(): string
     {
         return $this->timeUnit;
     }
 
-    /**
-     * @return string
-     */
-    public function getAlterTableSql()
+    public function getAlterTableSql(): string
     {
         return "ALTER TABLE {$this->getTableName()} ADD {$this->getColumnName()} {$this->getColumnDefinition()};
             ALTER TABLE {$this->getTableName()} ADD INDEX `{$this->getIndexName()}`({$this->indexColumnsToString()})";
     }
 
-    /**
-     * @return string
-     */
-    public function getColumnDefinition()
+    public function getColumnDefinition(): string
     {
         return "{$this->columnType} AS ({$this->as}) COMMENT '(DC2Type:generated)'";
     }
 
-    /**
-     * @return array
-     */
-    public function getIndexColumns()
+    public function getIndexColumns(): array
     {
         return $this->indexColumns;
     }
 
-    /**
-     * @return string
-     */
-    public function getIndexName()
+    public function getIndexName(): string
     {
         return $this->tablePrefix.$this->indexColumnsToString('_');
     }
 
-    /**
-     * @param string $separator
-     *
-     * @return string
-     */
-    private function indexColumnsToString($separator = ', ')
+    private function indexColumnsToString(string $separator = ', '): string
     {
         return implode($separator, $this->indexColumns);
     }

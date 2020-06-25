@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -34,7 +36,7 @@ class DoctrineGeneratedColumnsListener
         $this->logger                   = $logger;
     }
 
-    public function postGenerateSchema(GenerateSchemaEventArgs $args)
+    public function postGenerateSchema(GenerateSchemaEventArgs $args): void
     {
         $schema           = $args->getSchema();
         $generatedColumns = $this->generatedColumnsProvider->getGeneratedColumns();

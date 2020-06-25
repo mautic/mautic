@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -11,13 +13,14 @@
 
 namespace Mautic\CoreBundle\Doctrine\GeneratedColumn;
 
+use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumnInterface;
+
 interface GeneratedColumnsInterface extends \Iterator
 {
-    public function add(GeneratedColumn $generatedColumn);
+    public function add(GeneratedColumn $generatedColumn): void;
 
     /**
-     * @param string $originalDateColumn
-     * @param string $unit
+     * @throws \UnexpectedValueException
      */
-    public function getForOriginalDateColumnAndUnit($originalDateColumn, $unit);
+    public function getForOriginalDateColumnAndUnit(string $originalDateColumn, string $unit): GeneratedColumnInterface;
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -47,9 +49,6 @@ class MigrationCommandSubscriber implements EventSubscriberInterface
         $this->connection               = $connection;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [
@@ -57,7 +56,7 @@ class MigrationCommandSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function addGeneratedColumns(ConsoleCommandEvent $event)
+    public function addGeneratedColumns(ConsoleCommandEvent $event): void
     {
         $command = $event->getCommand();
         $output  = $event->getOutput();
@@ -96,10 +95,7 @@ class MigrationCommandSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @return bool
-     */
-    private function generatedColumnExistsInSchema(GeneratedColumn $generatedColumn)
+    private function generatedColumnExistsInSchema(GeneratedColumn $generatedColumn): bool
     {
         $tableColumns = $this->connection->getSchemaManager()->listTableColumns($generatedColumn->getTableName());
 

@@ -13,18 +13,9 @@ namespace Mautic\CoreBundle\Doctrine\Provider;
 
 interface VersionProviderInterface
 {
-    /**
-     * @return string
-     */
-    public function getVersion();
+    public function getVersion(): string;
 
-    /**
-     * @return bool
-     */
-    public function isMariaDb();
+    public function isMariaDb(): bool;
 
-    /**
-     * @return bool
-     */
-    public function isMySql();
+    public function isMySql(): bool;
 }

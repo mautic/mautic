@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -27,15 +29,12 @@ class GeneratedColumnsEvent extends Event
         $this->generatedColumns = new GeneratedColumns();
     }
 
-    /**
-     * @return GeneratedColumns
-     */
-    public function getGeneratedColumns()
+    public function getGeneratedColumns(): GeneratedColumns
     {
         return $this->generatedColumns;
     }
 
-    public function addGeneratedColumn(GeneratedColumn $generatedColumn)
+    public function addGeneratedColumn(GeneratedColumn $generatedColumn): void
     {
         $this->generatedColumns->add($generatedColumn);
     }

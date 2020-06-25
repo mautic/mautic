@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -28,7 +30,7 @@ class GeneratedColumnSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onGeneratedColumnsBuild(GeneratedColumnsEvent $event)
+    public function onGeneratedColumnsBuild(GeneratedColumnsEvent $event): void
     {
         $sentDate = new GeneratedColumn('email_stats', 'generated_sent_date', 'DATE', 'CONCAT(YEAR(date_sent), "-", LPAD(MONTH(date_sent), 2, "0"), "-", LPAD(DAY(date_sent), 2, "0"))');
         $sentDate->addIndexColumn('email_id');

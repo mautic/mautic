@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -44,10 +46,7 @@ final class VersionProvider implements VersionProviderInterface
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    /**
-     * @return string
-     */
-    public function getVersion()
+    public function getVersion(): string
     {
         if (null === $this->version) {
             try {
@@ -60,28 +59,20 @@ final class VersionProvider implements VersionProviderInterface
         return $this->version;
     }
 
-    /**
-     * @return bool
-     */
-    public function isMariaDb()
+    public function isMariaDb(): bool
     {
         return false !== strpos($this->getVersion(), 'MariaDB');
     }
 
-    /**
-     * @return bool
-     */
-    public function isMySql()
+    public function isMySql(): bool
     {
         return !$this->isMariaDb();
     }
 
     /**
-     * @return string
-     *
      * @throws \UnexpectedValueException
      */
-    private function getVersionFromConfig()
+    private function getVersionFromConfig(): string
     {
         $version = $this->coreParametersHelper->getParameter('db_server_version');
 
@@ -96,10 +87,7 @@ final class VersionProvider implements VersionProviderInterface
         return $version;
     }
 
-    /**
-     * @return string
-     */
-    private function fetchVersionFromDb()
+    private function fetchVersionFromDb(): string
     {
         return $this->connection->executeQuery('SELECT VERSION()')->fetchColumn();
     }

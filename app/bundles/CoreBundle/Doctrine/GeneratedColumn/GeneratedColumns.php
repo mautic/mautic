@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -33,7 +35,7 @@ final class GeneratedColumns implements GeneratedColumnsInterface
      */
     private $dateColumnIndex = [];
 
-    public function add(GeneratedColumn $generatedColumn)
+    public function add(GeneratedColumn $generatedColumn): void
     {
         $this->generatedColumns[] = $generatedColumn;
 
@@ -46,11 +48,7 @@ final class GeneratedColumns implements GeneratedColumnsInterface
         }
     }
 
-    /**
-     * @param string $originalDateColumn
-     * @param string $unit
-     */
-    public function getForOriginalDateColumnAndUnit($originalDateColumn, $unit)
+    public function getForOriginalDateColumnAndUnit(string $originalDateColumn, string $unit): GeneratedColumnInterface
     {
         if (isset($this->dateColumnIndex[$originalDateColumn][$unit])) {
             return $this->dateColumnIndex[$originalDateColumn][$unit];
