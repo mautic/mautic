@@ -19,7 +19,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
  */
 class Version20200220172041 extends AbstractMauticMigration
 {
-    public function up(Schema $schema)
+    public function up(Schema $schema): void
     {
         $this->addSql("UPDATE `{$this->prefix}categories` SET bundle = 'messages' WHERE bundle = '0';");
     }
