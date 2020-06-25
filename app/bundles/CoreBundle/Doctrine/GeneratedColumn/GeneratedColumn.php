@@ -41,7 +41,7 @@ final class GeneratedColumn implements GeneratedColumnInterface
     private $as;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $originalDateColumn;
 
@@ -86,7 +86,7 @@ final class GeneratedColumn implements GeneratedColumnInterface
         $this->timeUnit           = $timeUnit;
     }
 
-    public function getOriginalDateColumn(): string
+    public function getOriginalDateColumn(): ?string
     {
         return $this->originalDateColumn;
     }
