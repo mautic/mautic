@@ -1117,19 +1117,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
-     */
-    public function getFormSettings()
-    {
-        $settings                           = parent::getFormSettings();
-        $settings['requires_callback']      = false;
-        $settings['requires_authorization'] = true;
-        //'requires_callback'      => false,
-        //'requires_authorization' => true,
-        return $settings;
-    }
-
-    /**
      * @param \Mautic\LeadBundle\Entity\Lead $lead
      * @param array                          $config
      *

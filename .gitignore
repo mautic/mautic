@@ -5,6 +5,7 @@
 .php_cs.cache
 /.env
 /composer.phar
+/coverage.xml
 
 /app/bootstrap*
 /app/console

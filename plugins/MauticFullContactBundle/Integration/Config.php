@@ -17,6 +17,9 @@ class Config
      */
     private $integrationsHelper;
 
+    /**
+     * Config constructor.
+     */
     public function __construct(IntegrationsHelper $integrationsHelper)
     {
         $this->integrationsHelper = $integrationsHelper;

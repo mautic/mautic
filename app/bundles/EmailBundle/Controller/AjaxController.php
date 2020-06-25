@@ -320,7 +320,7 @@ class AjaxController extends CommonAjaxController
         }
 
         // Support for legacy calls
-        if ($request->get('id')) {
+        if ($request->get('id') && !empty($data[0])) {
             $data = $data[0];
         } else {
             $data = [
