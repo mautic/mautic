@@ -17,11 +17,6 @@ class Config
      */
     private $integrationsHelper;
 
-    /**
-     * @var array[]
-     */
-    private $fieldDirections = [];
-
     public function __construct(IntegrationsHelper $integrationsHelper)
     {
         $this->integrationsHelper = $integrationsHelper;
