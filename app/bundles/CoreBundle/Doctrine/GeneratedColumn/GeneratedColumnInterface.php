@@ -26,7 +26,7 @@ interface GeneratedColumnInterface
      */
     public function setOriginalDateColumn(string $originalDateColumn, string $timeUnit): void;
 
-    public function getOriginalDateColumn(): string;
+    public function getOriginalDateColumn(): ?string;
 
     public function getTimeUnit(): string;
 
