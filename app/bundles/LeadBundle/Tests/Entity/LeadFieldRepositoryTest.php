@@ -18,14 +18,24 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 
-class LeadFieldRepositoryTest extends \PHPUnit_Framework_TestCase
+class LeadFieldRepositoryTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|EntityManager
+     */
     private $entityManager;
+
+    /**
+     * @var MockObject|ClassMetadata
+     */
     private $classMetadata;
+
+    /**
+     * @var MockObject|Connection
+     */
     private $connection;
-    private $dbalBuilder;
-    private $statement;
 
     /**
      * @var LeadFieldRepository
@@ -41,8 +51,6 @@ class LeadFieldRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->entityManager = $this->createMock(EntityManager::class);
         $this->classMetadata = $this->createMock(ClassMetadata::class);
         $this->connection    = $this->createMock(Connection::class);
-        $this->dbalBuilder   = $this->createMock(QueryBuilder::class);
-        $this->statement     = $this->createMock(Statement::class);
         $this->repository    = new LeadFieldRepository($this->entityManager, $this->classMetadata);
     }
 
