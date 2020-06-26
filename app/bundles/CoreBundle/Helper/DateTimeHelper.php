@@ -13,34 +13,16 @@ namespace Mautic\CoreBundle\Helper;
 
 class DateTimeHelper
 {
-    /**
-     * @var string
-     */
     private $string;
 
-    /**
-     * @var string
-     */
     private $format;
 
-    /**
-     * @var string
-     */
     private $timezone;
 
-    /**
-     * @var \DateTimeZone
-     */
     private $utc;
 
-    /**
-     * @var \DateTimeZone
-     */
     private $local;
 
-    /**
-     * @var \DateTimeInterface
-     */
     private $datetime;
 
     /**
