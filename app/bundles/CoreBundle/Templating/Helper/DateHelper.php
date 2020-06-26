@@ -18,24 +18,12 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class DateHelper extends Helper
 {
-    /**
-     * @var array
-     */
     protected $formats;
 
-    /**
-     * @var DateTimeHelper
-     */
     protected $helper;
 
-    /**
-     * @var TranslatorInterface
-     */
     protected $translator;
 
-    /**
-     * @var CoreParametersHelper
-     */
     private $coreParametersHelper;
 
     /**
@@ -181,7 +169,7 @@ class DateHelper extends Helper
         $dt       = $this->helper->getLocalDateTime();
 
         if ($textDate) {
-            return $this->translator->trans('mautic.core.date.'.$textDate, ['%time%' => $dt->format($this->coreParametersHelper->getParameter('date_format_timeonly'))]);
+            return $this->translator->trans('mautic.core.date.'.$textDate, ['%time%' => $dt->format($this->coreParametersHelper->get('date_format_timeonly'))]);
         } else {
             $interval = $this->helper->getDiff('now', null, true);
 
