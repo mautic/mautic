@@ -33,12 +33,10 @@ before_install:
   - export SYMFONY_ENV="test"
 
 install:
-  # Needed only to run test coverage.
-  - pecl install pcov
   - composer install
 
   # Clobber is needed because PCOV normally only works with PHPUnit 8+. Needed only to run test coverage.
-  - if [ ${TRAVIS_PHP_VERSION:0:3} == "7.3" ]; then bin/pcov clobber; fi
+  - if [ ${TRAVIS_PHP_VERSION:0:3} == "7.3" ]; then pecl install pcov && composer require --dev pcov/clobber && bin/pcov clobber; fi
 
 script:
   - if [ ${TRAVIS_PHP_VERSION:0:3} == "7.3" ]; 

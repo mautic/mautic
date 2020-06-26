@@ -129,8 +129,7 @@
         "friendsofphp/php-cs-fixer": "~2.16.1",
         "liip/test-fixtures-bundle": "^1.6",
         "phpstan/phpstan": "^0.12.3",
-        "rector/rector-prefixed": "0.6.13",
-        "pcov/clobber": "^2.0"
+        "rector/rector-prefixed": "0.6.13"
     },
     "repositories": [
         {
