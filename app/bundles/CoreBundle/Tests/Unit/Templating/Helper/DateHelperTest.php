@@ -11,11 +11,15 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\Templating\Helper;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class DateHelperTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface
+     */
     private $translator;
 
     /**
@@ -27,6 +31,11 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
      * @var string
      */
     private static $oldTimezone;
+
+    /**
+     * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $coreParametersHelper;
 
     public static function setupBeforeClass()
     {
@@ -40,13 +49,15 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->helper     = new DateHelper(
+        $this->translator           = $this->createMock(TranslatorInterface::class);
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->helper               = new DateHelper(
             'F j, Y g:i a T',
             'D, M d',
             'F j, Y',
             'g:i a',
-            $this->translator
+            $this->translator,
+            $this->coreParametersHelper
         );
     }
 
@@ -78,5 +89,25 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         $dateTime = new \DateTime('2016-01-27 14:30:00', new \DateTimeZone('UTC'));
 
         $this->assertSame('January 27, 2016 2:30 pm', $this->helper->toText($dateTime, 'UTC', 'Y-m-d H:i:s', true));
+    }
+
+    public function testToTextWithConfigurationToTime()
+    {
+        $this->coreParametersHelper->method('get')
+            ->with('date_format_timeonly')
+            ->willReturn('00:00:00');
+
+        $this->translator->method('trans')
+            ->willReturnCallback(
+                function (string $key, array $parameters = []) {
+                    if (isset($parameters['%time%'])) {
+                        return $parameters['%time%'];
+                    }
+                }
+            );
+
+        $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
+
+        $this->assertSame('00:00:00', $this->helper->toText($dateTime));
     }
 }
