@@ -43,13 +43,11 @@ install:
 jobs:
   include:
     - stage: test
-      name: PHPSTAN
-      script: if [ ${TRAVIS_PHP_VERSION:0:3} == "7.3" ]; 
-        then 
-          composer test -- --coverage-clover=coverage.xml && bash <(curl -s https://codecov.io/bash); 
-        else 
-          composer test;
-      fi
+      name: PHPUNIT
+      script:
+        - if [ ${TRAVIS_PHP_VERSION:0:3} == "7.3" ]; 
+          then composer test -- --coverage-clover=coverage.xml && bash <(curl -s https://codecov.io/bash); 
+          else composer test; fi
     -
       name: PHPSTAN
       script: composer phpstan
