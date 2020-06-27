@@ -72,7 +72,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->connector->expects($this->once())
             ->method('post')
-            ->with('https://mautic.org', ['test'  => 'tee', 'email' => 'john@doe.email', 'IP' => '127.0.0.1,127.0.0.2'], ['test' => 'tee', 'company' => 'Mautic'], 10)
+            ->with('https://mautic.org', json_encode(['test'  => 'tee', 'email' => 'john@doe.email', 'IP' => '127.0.0.1,127.0.0.2']), ['test' => 'tee', 'company' => 'Mautic', 'content-type' => 'application/json'], 10)
             ->willReturn((object) ['code' => 200]);
 
         $this->campaignHelper->fireWebhook($config, $this->contact);

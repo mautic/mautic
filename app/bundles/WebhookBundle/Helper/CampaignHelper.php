@@ -92,6 +92,11 @@ class CampaignHelper
             case 'post':
             case 'put':
             case 'patch':
+                $headers = array_change_key_case($headers);
+                if (!array_key_exists('content-type', $headers) || 'application/json' == strtolower($headers['content-type'])) {
+                    $headers['content-type'] = 'application/json';
+                    $payload                 = json_encode($payload);
+                }
                 $response = $this->connector->$method($url, $payload, $headers, $timeout);
                 break;
             case 'delete':
