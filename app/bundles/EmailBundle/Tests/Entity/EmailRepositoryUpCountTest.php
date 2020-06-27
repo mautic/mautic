@@ -18,7 +18,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\EmailBundle\Entity\EmailRepository;
 
-class EmailRepositoryUpCountTest extends \PHPUnit_Framework_TestCase
+class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
 {
     private $mockConnection;
     private $queryBuilderMock;

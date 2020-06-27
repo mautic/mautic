@@ -59,8 +59,6 @@ class DateBuilder
     }
 
     /**
-     * @param SchedulerInterface $scheduler
-     *
      * @return \DateTimeInterface
      *
      * @throws NoScheduleException

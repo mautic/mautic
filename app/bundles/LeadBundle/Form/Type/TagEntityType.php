@@ -12,11 +12,9 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class TagEntityType.
- */
 class TagEntityType extends AbstractType
 {
     /**
@@ -24,14 +22,6 @@ class TagEntityType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('tag', 'text');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::class;
+        $builder->add('tag', TextType::class);
     }
 }

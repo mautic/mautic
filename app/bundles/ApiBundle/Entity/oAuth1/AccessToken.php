@@ -48,13 +48,10 @@ class AccessToken implements AccessTokenInterface
     protected $secret;
 
     /**
-     * @var null|int
+     * @var int|null
      */
     protected $expiresAt;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);

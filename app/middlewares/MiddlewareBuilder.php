@@ -11,56 +11,42 @@
 
 namespace Mautic\Middleware;
 
+use AppKernel;
+use Mautic\CoreBundle\Cache\MiddlewareCacheWarmer;
+use ReflectionClass;
+use ReflectionException;
+use SplPriorityQueue;
 use Stack\StackedHttpKernel;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class MiddlewareBuilder
 {
-    protected $specs;
+    /**
+     * @var AppKernel
+     */
+    private $app;
 
-    public function __construct($env = null)
+    /**
+     * @var string
+     */
+    private $cacheFile;
+
+    /**
+     * MiddlewareBuilder constructor.
+     */
+    public function __construct(AppKernel $app)
     {
-        $this->specs = new \SplPriorityQueue();
-
-        $middlewares = glob(__DIR__.'/*Middleware.php');
-
-        $this->addMiddlewares($middlewares);
-
-        if (isset($env)) {
-            $envMiddlewares = glob(__DIR__.'/'.ucfirst($env).'/*Middleware.php');
-
-            if (!empty($envMiddlewares)) {
-                $this->addMiddlewares($envMiddlewares, $env);
-            }
-        }
+        $this->app       = $app;
+        $this->cacheFile = sprintf('%s/middlewares.cache.php', $app->getCacheDir());
+        $this->specs     = new SplPriorityQueue();
     }
 
-    public function addMiddlewares(array $middlewares, $env = null)
+    public function resolve(): StackedHttpKernel
     {
-        $prefix = 'Mautic\\Middleware\\';
+        $this->loadMiddlewares();
 
-        if ($env) {
-            $prefix .= ucfirst($env).'\\';
-        }
-
-        foreach ($middlewares as $middleware) {
-            $this->push($prefix.basename(substr($middleware, 0, -4)));
-        }
-    }
-
-    public function push($kernelClass)
-    {
-        $reflection = new \ReflectionClass($kernelClass);
-        $priority   = $reflection->getConstant('PRIORITY');
-
-        $this->specs->insert($reflection, $priority);
-    }
-
-    public function resolve(HttpKernelInterface $app)
-    {
+        $app         = $this->app;
         $middlewares = [$app];
 
-        /** @var \ReflectionClass $spec */
         foreach ($this->specs as $spec) {
             $app = $spec->newInstanceArgs([$app]);
 
@@ -68,5 +54,50 @@ class MiddlewareBuilder
         }
 
         return new StackedHttpKernel($app, $middlewares);
+    }
+
+    private function loadMiddlewares(): void
+    {
+        if (!$this->hasCacheFile()) {
+            $this->warmUpCacheCommand();
+        }
+
+        $this->loadCacheFile();
+    }
+
+    private function warmUpCacheCommand(): void
+    {
+        $middlewareCacheWarmer = new MiddlewareCacheWarmer($this->app->getEnvironment());
+        $middlewareCacheWarmer->warmUp($this->app->getCacheDir());
+    }
+
+    private function hasCacheFile(): bool
+    {
+        return file_exists($this->cacheFile);
+    }
+
+    private function loadCacheFile(): void
+    {
+        /** @var array $middlewares */
+        $middlewares = include $this->cacheFile;
+
+        foreach ($middlewares as $middleware) {
+            $this->push($middleware);
+        }
+    }
+
+    private function push(string $middlewareClass): void
+    {
+        try {
+            $reflection = new ReflectionClass($middlewareClass);
+            $priority   = $reflection->getConstant('PRIORITY');
+
+            $this->specs->insert($reflection, $priority);
+        } catch (ReflectionException $e) {
+            /* If there's an error getting the kernel class, it's
+             * an invalid middleware. If it's invalid, don't push
+             * it to the stack
+             */
+        }
     }
 }

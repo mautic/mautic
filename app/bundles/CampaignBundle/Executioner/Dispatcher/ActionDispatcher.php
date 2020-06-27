@@ -57,12 +57,6 @@ class ActionDispatcher
 
     /**
      * EventDispatcher constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
-     * @param LoggerInterface          $logger
-     * @param EventScheduler           $scheduler
-     * @param NotificationHelper       $notificationHelper
-     * @param LegacyEventDispatcher    $legacyDispatcher
      */
     public function __construct(
         EventDispatcherInterface $dispatcher,
@@ -79,11 +73,6 @@ class ActionDispatcher
     }
 
     /**
-     * @param ActionAccessor    $config
-     * @param Event             $event
-     * @param ArrayCollection   $logs
-     * @param PendingEvent|null $pendingEvent
-     *
      * @return PendingEvent
      *
      * @throws LogNotProcessedException
@@ -123,11 +112,6 @@ class ActionDispatcher
         return $pendingEvent;
     }
 
-    /**
-     * @param AbstractEventAccessor $config
-     * @param Event                 $event
-     * @param ArrayCollection       $logs
-     */
     private function dispatchExecutedEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
     {
         if (!$logs->count()) {
@@ -147,10 +131,6 @@ class ActionDispatcher
         );
     }
 
-    /**
-     * @param AbstractEventAccessor $config
-     * @param ArrayCollection       $logs
-     */
     private function dispatchedFailedEvent(AbstractEventAccessor $config, ArrayCollection $logs)
     {
         if (!$logs->count()) {
@@ -175,10 +155,6 @@ class ActionDispatcher
     }
 
     /**
-     * @param ArrayCollection $pending
-     * @param ArrayCollection $success
-     * @param ArrayCollection $failed
-     *
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
      */

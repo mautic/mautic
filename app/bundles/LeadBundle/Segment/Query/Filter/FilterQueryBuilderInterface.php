@@ -19,9 +19,6 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 interface FilterQueryBuilderInterface
 {
     /**
-     * @param QueryBuilder         $queryBuilder
-     * @param ContactSegmentFilter $filter
-     *
      * @return QueryBuilder
      */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter);

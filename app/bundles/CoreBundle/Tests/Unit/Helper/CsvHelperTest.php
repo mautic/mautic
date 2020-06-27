@@ -9,11 +9,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Helper;
+namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CsvHelper;
 
-class CsvHelperTest extends \PHPUnit_Framework_TestCase
+class CsvHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testSanitizeHeaders()
     {

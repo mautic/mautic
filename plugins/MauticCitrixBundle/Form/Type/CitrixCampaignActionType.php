@@ -11,9 +11,11 @@
 
 namespace MauticPlugin\MauticCitrixBundle\Form\Type;
 
+use Mautic\EmailBundle\Form\Type\EmailListType;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -29,8 +31,6 @@ class CitrixCampaignActionType extends AbstractType
 
     /**
      * CitrixCampaignActionType constructor.
-     *
-     * @param TranslatorInterface $translator
      */
     public function __construct(TranslatorInterface $translator)
     {
@@ -65,35 +65,35 @@ class CitrixCampaignActionType extends AbstractType
 
         $newChoices = [];
         foreach ($choices as $k => $c) {
-            if (0 === strpos($k, $product)) {
+            if (0 === mb_strpos($k, $product)) {
                 $newChoices[$k] = $c;
             }
         }
 
         $builder->add(
             'event-criteria-'.$product,
-            'choice',
+            ChoiceType::class,
             [
                 'label'   => $this->translator->trans('plugin.citrix.action.criteria'),
-                'choices' => $newChoices,
+                'choices' => array_flip($newChoices),
             ]
         );
 
         if (CitrixProducts::GOTOASSIST !== $product) {
             $builder->add(
                 $product.'-list',
-                'choice',
+                ChoiceType::class,
                 [
                     'label'    => $this->translator->trans('plugin.citrix.decision.'.$product.'.list'),
-                    'choices'  => CitrixHelper::getCitrixChoices($product),
+                    'choices'  => array_flip(CitrixHelper::getCitrixChoices($product)),
                     'multiple' => true,
                 ]
             );
         }
 
-        if (array_key_exists('meeting_start', $newChoices)
-            || array_key_exists('training_start', $newChoices)
-            || array_key_exists('assist_screensharing', $newChoices)
+        if (in_array('meeting_start', $newChoices)
+            || in_array('training_start', $newChoices)
+            || in_array('assist_screensharing', $newChoices)
         ) {
             $defaultOptions = [
                 'label'      => 'plugin.citrix.emailtemplate',
@@ -102,8 +102,8 @@ class CitrixCampaignActionType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'plugin.citrix.emailtemplate_descr',
                 ],
-                'required' => true,
-                'multiple' => false,
+                'required'   => true,
+                'multiple'   => false,
             ];
 
             if (array_key_exists('list_options', $options)) {
@@ -115,14 +115,14 @@ class CitrixCampaignActionType extends AbstractType
                 $defaultOptions = array_merge($defaultOptions, $options['list_options']);
             }
 
-            $builder->add('template', 'email_list', $defaultOptions);
+            $builder->add('template', EmailListType::class, $defaultOptions);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'citrix_campaign_action';
     }

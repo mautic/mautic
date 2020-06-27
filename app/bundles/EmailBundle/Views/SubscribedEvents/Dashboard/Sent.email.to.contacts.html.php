@@ -54,31 +54,31 @@ $showValues = [
                         <?php foreach ($row as $key => $item) : ?>
                             <?php if (in_array($key, $showValues)) : ?>
                             <td>
-                                <?php if ($key === 'contact_email' && !empty($row['contact_id'])) : ?>
+                                <?php if ('contact_email' === $key && !empty($row['contact_id'])) : ?>
                                     <a href="<?php echo $view['router']->path('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $row['contact_id']]); ?>"
                                         title="<?php echo $item; ?>"
                                         data-toggle="ajax">
                                         <?php echo $view['assets']->shortenText($item, $shortenLinkText); ?>
                                     </a>
-                                <?php elseif ($key === 'email_name' && !empty($row['email_id'])) : ?>
+                                <?php elseif ('email_name' === $key && !empty($row['email_id'])) : ?>
                                     <a href="<?php echo $view['router']->path('mautic_email_action', ['objectAction' => 'view', 'objectId' => $row['email_id']]); ?>"
                                         title="<?php echo $item; ?>"
                                         data-toggle="ajax">
                                         <?php echo $view['assets']->shortenText($item, $shortenLinkText); ?>
                                     </a>
-                                <?php elseif ($key === 'segment_name' && !empty($row['segment_id'])) : ?>
+                                <?php elseif ('segment_name' === $key && !empty($row['segment_id'])) : ?>
                                     <a href="<?php echo $view['router']->path('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $row['segment_id']]); ?>"
                                         title="<?php echo $item; ?>"
                                         data-toggle="ajax">
                                         <?php echo $view['assets']->shortenText($item, $shortenLinkText); ?>
                                     </a>
-                                <?php elseif ($key === 'company_name' && !empty($row['company_id'])) : ?>
+                                <?php elseif ('company_name' === $key && !empty($row['company_id'])) : ?>
                                     <a href="<?php echo $view['router']->path('mautic_company_action', ['objectAction' => 'edit', 'objectId' => $row['company_id']]); ?>"
                                         title="<?php echo $item; ?>"
                                         data-toggle="ajax">
                                         <?php echo $view['assets']->shortenText($item, $shortenLinkText); ?>
                                     </a>
-                                <?php elseif ($key === 'campaign_name' && !empty($row['campaign_id'])) : ?>
+                                <?php elseif ('campaign_name' === $key && !empty($row['campaign_id'])) : ?>
                                     <a href="<?php echo $view['router']->path('mautic_campaign_action', ['objectAction' => 'view', 'objectId' => $row['campaign_id']]); ?>"
                                         title="<?php echo $item; ?>"
                                         data-toggle="ajax">

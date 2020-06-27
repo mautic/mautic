@@ -25,12 +25,10 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
     /**
      * @var Logger
      */
-    protected $logger;
+    private $logger;
 
     /**
      * DoctrineSubscriber constructor.
-     *
-     * @param Logger $logger
      */
     public function __construct(Logger $logger)
     {
@@ -47,9 +45,6 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
         ];
     }
 
-    /**
-     * @param GenerateSchemaEventArgs $args
-     */
     public function postGenerateSchema(GenerateSchemaEventArgs $args)
     {
         $schema = $args->getSchema();
@@ -79,7 +74,7 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                 // Email will always be included first
                 $uniqueFields = ('lead' === $object) ? ['email' => 'email'] : ['companyemail' => 'companyemail'];
                 foreach ($fields as $f) {
-                    if ($f['is_unique'] && $f['alias'] != 'email') {
+                    if ($f['is_unique'] && 'email' != $f['alias']) {
                         $uniqueFields[$f['alias']] = $f['alias'];
                     }
                     $columnDef = FieldModel::getSchemaDefinition($f['alias'], $f['type'], !empty($f['is_unique']));
@@ -102,8 +97,6 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
 
                     if (!$type instanceof StringType) {
                         unset($uniqueFields[$name]);
-                    } elseif (isset($uniqueFields[$name])) {
-                        $uniqueFields[$name] = $uniqueFields[$name];
                     }
                 }
 

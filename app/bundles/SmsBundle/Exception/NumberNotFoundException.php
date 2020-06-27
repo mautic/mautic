@@ -23,10 +23,9 @@ class NumberNotFoundException extends \Exception
     /**
      * NumberNotFoundException constructor.
      *
-     * @param string         $number
-     * @param string         $message
-     * @param int            $code
-     * @param Throwable|null $previous
+     * @param string $number
+     * @param string $message
+     * @param int    $code
      */
     public function __construct($number, $message = '', $code = 0, Throwable $previous = null)
     {

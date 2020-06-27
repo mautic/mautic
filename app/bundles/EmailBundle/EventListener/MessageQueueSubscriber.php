@@ -14,24 +14,16 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\Model\EmailModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CalendarSubscriber.
- */
-class MessageQueueSubscriber extends CommonSubscriber
+class MessageQueueSubscriber implements EventSubscriberInterface
 {
     /**
      * @var EmailModel
      */
-    protected $emailModel;
+    private $emailModel;
 
-    /**
-     * MessageQueueSubscriber constructor.
-     *
-     * @param EmailModel $emailModel
-     */
     public function __construct(EmailModel $emailModel)
     {
         $this->emailModel = $emailModel;
@@ -49,8 +41,6 @@ class MessageQueueSubscriber extends CommonSubscriber
 
     /**
      * Sends campaign emails.
-     *
-     * @param MessageQueueBatchProcessEvent $event
      */
     public function onProcessMessageQueueBatch(MessageQueueBatchProcessEvent $event)
     {
@@ -69,7 +59,7 @@ class MessageQueueSubscriber extends CommonSubscriber
             ];
 
         /** @var MessageQueue $message */
-        foreach ($messages as $id => $message) {
+        foreach ($messages as $message) {
             if ($email && $message->getLead() && $email->isPublished()) {
                 $contact = $message->getLead()->getProfileFields();
                 if (empty($contact['email'])) {

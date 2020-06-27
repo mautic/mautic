@@ -15,9 +15,8 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\NotificationBundle\Api\AbstractNotificationApi;
 use Mautic\NotificationBundle\Event\NotificationSendEvent;
 use Mautic\NotificationBundle\Form\Type\MobileNotificationSendType;
@@ -25,50 +24,48 @@ use Mautic\NotificationBundle\Form\Type\NotificationSendType;
 use Mautic\NotificationBundle\Model\NotificationModel;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
     /**
      * @var NotificationModel
      */
-    protected $notificationModel;
+    private $notificationModel;
 
     /**
      * @var AbstractNotificationApi
      */
-    protected $notificationApi;
+    private $notificationApi;
 
     /**
      * @var IntegrationHelper
      */
-    protected $integrationHelper;
+    private $integrationHelper;
 
     /**
-     * CampaignSubscriber constructor.
-     *
-     * @param IntegrationHelper       $integrationHelper
-     * @param LeadModel               $leadModel
-     * @param NotificationModel       $notificationModel
-     * @param AbstractNotificationApi $notificationApi
+     * @var EventDispatcherInterface
      */
+    private $dispatcher;
+
+    /**
+     * @var DoNotContactModel
+     */
+    private $doNotContact;
+
     public function __construct(
         IntegrationHelper $integrationHelper,
-        LeadModel $leadModel,
         NotificationModel $notificationModel,
-        AbstractNotificationApi $notificationApi
+        AbstractNotificationApi $notificationApi,
+        EventDispatcherInterface $dispatcher,
+        DoNotContactModel $doNotContact
     ) {
         $this->integrationHelper = $integrationHelper;
-        $this->leadModel         = $leadModel;
         $this->notificationModel = $notificationModel;
         $this->notificationApi   = $notificationApi;
+        $this->dispatcher        = $dispatcher;
+        $this->doNotContact      = $doNotContact;
     }
 
     /**
@@ -82,19 +79,15 @@ class CampaignSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
-        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+        if (!$integration || false === $integration->getIntegrationSettings()->getIsPublished()) {
             return;
         }
 
         $features = $integration->getSupportedFeatures();
-        $settings = $integration->getIntegrationSettings();
 
         if (in_array('mobile', $features)) {
             $event->addAction(
@@ -130,15 +123,13 @@ class CampaignSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param CampaignExecutionEvent $event
-     *
      * @return CampaignExecutionEvent
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
         $lead = $event->getLead();
 
-        if ($this->leadModel->isContactable($lead, 'notification') !== DoNotContact::IS_CONTACTABLE) {
+        if (DoNotContact::IS_CONTACTABLE !== $this->doNotContact->isContactable($lead, 'notification')) {
             return $event->setFailed('mautic.notification.campaign.failed.not_contactable');
         }
 
@@ -163,12 +154,12 @@ class CampaignSubscriber extends CommonSubscriber
 
         foreach ($pushIDs as $pushID) {
             // Skip non-mobile PushIDs if this is a mobile event
-            if ($event->checkContext('notification.send_mobile_notification') && $pushID->isMobile() == false) {
+            if ($event->checkContext('notification.send_mobile_notification') && false == $pushID->isMobile()) {
                 continue;
             }
 
             // Skip mobile PushIDs if this is a non-mobile event
-            if ($event->checkContext('notification.send_notification') && $pushID->isMobile() == true) {
+            if ($event->checkContext('notification.send_notification') && true == $pushID->isMobile()) {
                 continue;
             }
 
@@ -220,7 +211,7 @@ class CampaignSubscriber extends CommonSubscriber
         $event->setChannel('notification', $notification->getId());
 
         // If for some reason the call failed, tell mautic to try again by return false
-        if ($response->code !== 200) {
+        if (200 !== $response->code) {
             return $event->setResult(false);
         }
 

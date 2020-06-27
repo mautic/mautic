@@ -90,16 +90,6 @@ class EventExecutioner
 
     /**
      * EventExecutioner constructor.
-     *
-     * @param EventCollector        $eventCollector
-     * @param EventLogger           $eventLogger
-     * @param ActionExecutioner     $actionExecutioner
-     * @param ConditionExecutioner  $conditionExecutioner
-     * @param DecisionExecutioner   $decisionExecutioner
-     * @param LoggerInterface       $logger
-     * @param EventScheduler        $scheduler
-     * @param RemovedContactTracker $removedContactTracker
-     * @param LeadRepository        $leadRepository
      */
     public function __construct(
         EventCollector $eventCollector,
@@ -127,11 +117,6 @@ class EventExecutioner
     }
 
     /**
-     * @param Event          $event
-     * @param Lead           $contact
-     * @param Responses|null $responses
-     * @param Counter|null   $counter
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
@@ -149,11 +134,6 @@ class EventExecutioner
     }
 
     /**
-     * @param ArrayCollection $events
-     * @param Lead            $contact
-     * @param Responses|null  $responses
-     * @param Counter|null    $counter
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
@@ -171,10 +151,7 @@ class EventExecutioner
     }
 
     /**
-     * @param Event           $event
-     * @param ArrayCollection $contacts
-     * @param Counter|null    $counter
-     * @param bool            $isInactiveEvent
+     * @param bool $isInactiveEvent
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
@@ -196,10 +173,6 @@ class EventExecutioner
     }
 
     /**
-     * @param Event           $event
-     * @param ArrayCollection $logs
-     * @param Counter|null    $counter
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
@@ -246,10 +219,7 @@ class EventExecutioner
     }
 
     /**
-     * @param ArrayCollection $events
-     * @param ArrayCollection $contacts
-     * @param Counter|null    $childrenCounter
-     * @param bool            $isInactive
+     * @param bool $isInactive
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
@@ -303,9 +273,7 @@ class EventExecutioner
     }
 
     /**
-     * @param Event           $event
-     * @param ArrayCollection $contacts
-     * @param bool            $isInactiveEvent
+     * @param bool $isInactiveEvent
      */
     public function recordLogsAsExecutedForEvent(Event $event, ArrayCollection $contacts, $isInactiveEvent = false)
     {
@@ -318,10 +286,8 @@ class EventExecutioner
     }
 
     /**
-     * @param Event           $event
-     * @param ArrayCollection $contacts
-     * @param                 $reason
-     * @param bool            $isInactiveEvent
+     * @param      $reason
+     * @param bool $isInactiveEvent
      */
     public function recordLogsAsFailedForEvent(Event $event, ArrayCollection $contacts, $reason, $isInactiveEvent = false)
     {
@@ -370,10 +336,7 @@ class EventExecutioner
     }
 
     /**
-     * @param ArrayCollection $events
-     * @param ArrayCollection $contacts
-     * @param Counter|null    $childrenCounter
-     * @param bool            $isInactive
+     * @param bool $isInactive
      *
      * @return ArrayCollection
      *
@@ -414,9 +377,6 @@ class EventExecutioner
         return $events;
     }
 
-    /**
-     * @param ArrayCollection $logs
-     */
     private function persistLogs(ArrayCollection $logs)
     {
         if ($this->responses) {
@@ -431,9 +391,6 @@ class EventExecutioner
             ->clearCollection($logs);
     }
 
-    /**
-     * @param ArrayCollection $logs
-     */
     private function checkForRemovedContacts(ArrayCollection $logs)
     {
         /**
@@ -457,10 +414,6 @@ class EventExecutioner
     }
 
     /**
-     * @param Event           $event
-     * @param ArrayCollection $contacts
-     * @param Counter|null    $counter
-     *
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
@@ -483,10 +436,6 @@ class EventExecutioner
     }
 
     /**
-     * @param Event           $event
-     * @param ArrayCollection $contacts
-     * @param Counter|null    $counter
-     *
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
@@ -509,10 +458,6 @@ class EventExecutioner
     }
 
     /**
-     * @param Event             $event
-     * @param EvaluatedContacts $contacts
-     * @param Counter|null      $counter
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
@@ -531,9 +476,7 @@ class EventExecutioner
     }
 
     /**
-     * @param Event           $event
-     * @param ArrayCollection $contacts
-     * @param Counter|null    $counter
+     * @param Counter|null $counter
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
@@ -555,9 +498,7 @@ class EventExecutioner
     }
 
     /**
-     * @param Event           $event
-     * @param ArrayCollection $contacts
-     * @param Counter|null    $counter
+     * @param Counter|null $counter
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException

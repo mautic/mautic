@@ -19,13 +19,11 @@ class UnsubscribedEmail
     private $contactEmail;
 
     /**
-     * @var
+     * @var string
      */
     private $unsubscriptionAddress;
 
     /**
-     * UnsubscribedEmail constructor.
-     *
      * @param string $contactEmail
      * @param string $unsubscriptionAddress
      */

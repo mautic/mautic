@@ -9,14 +9,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Helper\Chart;
+namespace Mautic\CoreBundle\Tests\Unit\Helper\Chart;
 
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 
-/**
- * Class ColorHelper test.
- */
-class LineChartTest extends \PHPUnit_Framework_TestCase
+class LineChartTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox The getUnitInterval returns the correct interval objects

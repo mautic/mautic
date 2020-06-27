@@ -11,14 +11,12 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class MergeType.
- */
 class ContactFrequencyType extends AbstractType
 {
     /**
@@ -26,26 +24,16 @@ class ContactFrequencyType extends AbstractType
      */
     protected $coreParametersHelper;
 
-    /**
-     * ContactFrequencyType constructor.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $showContactCategories = $this->coreParametersHelper->getParameter('show_contact_categories');
-        $showContactSegments   = $this->coreParametersHelper->getParameter('show_contact_segments');
+        $showContactCategories = $this->coreParametersHelper->get('show_contact_categories');
+        $showContactSegments   = $this->coreParametersHelper->get('show_contact_segments');
 
-        // var_dump($options['data'], $options['channels']);die;
         if (!empty($options['channels'])) {
             $builder->add(
                 'lead_channels',
@@ -62,7 +50,7 @@ class ContactFrequencyType extends AbstractType
         if (!$options['public_view']) {
             $builder->add(
                 'lead_lists',
-                'leadlist_choices',
+                LeadListType::class,
                 [
                     'label'      => 'mautic.lead.form.list',
                     'label_attr' => ['class' => 'control-label'],
@@ -74,7 +62,7 @@ class ContactFrequencyType extends AbstractType
         } elseif ($showContactSegments) {
             $builder->add(
                 'lead_lists',
-                'leadlist_choices',
+                LeadListType::class,
                 [
                     'preference_center_only' => $options['preference_center_only'],
                     'label'                  => 'mautic.lead.form.list',
@@ -89,7 +77,7 @@ class ContactFrequencyType extends AbstractType
         if (!$options['public_view'] || $showContactCategories) {
             $builder->add(
                 'global_categories',
-                'leadcategory_choices',
+                LeadCategoryType::class,
                 [
                     'label'      => 'mautic.lead.form.categories',
                     'label_attr' => ['class' => 'control-label'],
@@ -102,7 +90,7 @@ class ContactFrequencyType extends AbstractType
 
         $builder->add(
             'buttons',
-            'form_buttons',
+            FormButtonsType::class,
             [
                 'apply_text'     => false,
                 'save_text'      => 'mautic.core.form.save',
@@ -118,9 +106,6 @@ class ContactFrequencyType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['channels']);
@@ -135,7 +120,7 @@ class ContactFrequencyType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'lead_contact_frequency_rules';
     }

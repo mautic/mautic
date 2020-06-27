@@ -1,6 +1,5 @@
 <?php
 
-
 /*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -76,17 +75,6 @@ class OneSignalIntegration extends AbstractIntegration
     }
 
     /**
-     * @return array
-     */
-    public function getFormSettings()
-    {
-        return [
-            'requires_callback'      => false,
-            'requires_authorization' => false,
-        ];
-    }
-
-    /**
      * {@inheritdoc}
      *
      * @return string
@@ -103,7 +91,7 @@ class OneSignalIntegration extends AbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        if ($formArea == 'features') {
+        if ('features' == $formArea) {
             /* @var FormBuilder $builder */
             $builder->add(
                 'subdomain_name',
@@ -122,17 +110,17 @@ class OneSignalIntegration extends AbstractIntegration
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'ios'     => 'mautic.integration.form.platforms.ios',
-                        'android' => 'mautic.integration.form.platforms.android',
+                        'mautic.integration.form.platforms.ios'     => 'ios',
+                        'mautic.integration.form.platforms.android' => 'android',
                     ],
-                    'attr' => [
+                    'attr'              => [
                         'tooltip'      => 'mautic.integration.form.platforms.tooltip',
                         'data-show-on' => '{"integration_details_supportedFeatures_0":"checked"}',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
                     'label'       => 'mautic.integration.form.platforms',
-                    'empty_value' => false,
+                    'placeholder' => false,
                     'required'    => false,
                 ]
             );

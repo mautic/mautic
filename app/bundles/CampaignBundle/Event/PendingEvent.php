@@ -47,11 +47,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     private $now;
 
     /**
-     * PendingEvent constructor.
-     *
-     * @param AbstractEventAccessor $config
-     * @param Event                 $event
-     * @param ArrayCollection       $logs
+     * @throws \Exception
      */
     public function __construct(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
     {
@@ -71,8 +67,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @param LeadEventLog $log
-     * @param string       $reason
+     * @param string $reason
      */
     public function fail(LeadEventLog $log, $reason)
     {
@@ -135,9 +130,6 @@ class PendingEvent extends AbstractLogCollectionEvent
         }
     }
 
-    /**
-     * @param LeadEventLog $log
-     */
     public function pass(LeadEventLog $log)
     {
         $metadata = $log->getMetadata();
@@ -151,8 +143,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @param LeadEventLog $log
-     * @param string       $error
+     * @param string $error
      */
     public function passWithError(LeadEventLog $log, $error)
     {
@@ -217,7 +208,7 @@ class PendingEvent extends AbstractLogCollectionEvent
 
     /**
      * @param string   $channel
-     * @param null|int $channelId
+     * @param int|null $channelId
      */
     public function setChannel($channel, $channelId = null)
     {
@@ -225,9 +216,6 @@ class PendingEvent extends AbstractLogCollectionEvent
         $this->channelId = $channelId;
     }
 
-    /**
-     * @param LeadEventLog $log
-     */
     private function passLog(LeadEventLog $log)
     {
         if ($failedLog = $log->getFailedLog()) {
@@ -242,9 +230,6 @@ class PendingEvent extends AbstractLogCollectionEvent
         $this->successful->set($log->getId(), $log);
     }
 
-    /**
-     * @param LeadEventLog $log
-     */
     private function logChannel(LeadEventLog $log)
     {
         if ($this->channel) {

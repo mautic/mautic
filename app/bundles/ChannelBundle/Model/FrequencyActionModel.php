@@ -28,10 +28,6 @@ class FrequencyActionModel
      */
     private $frequencyRuleRepository;
 
-    /**
-     * @param LeadModel               $contactModel
-     * @param FrequencyRuleRepository $frequencyRuleRepository
-     */
     public function __construct(
         LeadModel $contactModel,
         FrequencyRuleRepository $frequencyRuleRepository
@@ -43,8 +39,6 @@ class FrequencyActionModel
     /**
      * Update channels.
      *
-     * @param array  $contactIds
-     * @param array  $params
      * @param string $preferredChannel
      */
     public function update(array $contactIds, array $params, $preferredChannel)
@@ -61,8 +55,6 @@ class FrequencyActionModel
     }
 
     /**
-     * @param Lead   $contact
-     * @param array  $params
      * @param string $preferredChannel
      */
     private function updateFrequencyRules(Lead $contact, array $params, $preferredChannel)

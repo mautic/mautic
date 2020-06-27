@@ -60,11 +60,7 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
     /**
      * AmazonTransport constructor.
      *
-     * @param string              $host
-     * @param Http                $httpClient
-     * @param LoggerInterface     $logger
-     * @param TranslatorInterface $translator
-     * @param TransportCallback   $transportCallback
+     * @param string $host
      */
     public function __construct($host, Http $httpClient, LoggerInterface $logger, TranslatorInterface $translator, TransportCallback $transportCallback)
     {
@@ -89,8 +85,6 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
 
     /**
      * Handle bounces & complaints from Amazon.
-     *
-     * @param Request $request
      *
      * @return array
      */
@@ -199,8 +193,6 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
     }
 
     /**
-     * @param Message $message
-     *
      * @throws BounceNotFound
      */
     public function processBounce(Message $message)
@@ -226,8 +218,6 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
     }
 
     /**
-     * @param Message $message
-     *
      * @return UnsubscribedEmail
      *
      * @throws UnsubscriptionNotFound
