@@ -18,12 +18,24 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class DateHelper extends Helper
 {
+    /**
+     * @var string[]
+     */
     protected $formats;
 
+    /**
+     * @var DateTimeHelper
+     */
     protected $helper;
 
+    /**
+     * @var TranslatorInterface
+     */
     protected $translator;
 
+    /**
+     * @var CoreParametersHelper
+     */
     private $coreParametersHelper;
 
     /**
