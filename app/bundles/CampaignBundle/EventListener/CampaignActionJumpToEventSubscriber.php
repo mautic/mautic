@@ -28,12 +28,24 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
 {
     const EVENT_NAME = 'campaign.jump_to_event';
 
+    /**
+     * @var EventRepository
+     */
     private $eventRepository;
 
+    /**
+     * @var EventExecutioner
+     */
     private $eventExecutioner;
 
+    /**
+     * @var TranslatorInterface
+     */
     private $translator;
 
+    /**
+     * @var LeadRepository
+     */
     private $leadRepository;
 
     /**
