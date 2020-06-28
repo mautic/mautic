@@ -32,28 +32,64 @@ class ContactTracker
 {
     use DefaultValueTrait;
 
+    /**
+     * @var LeadRepository
+     */
     private $leadRepository;
 
+    /**
+     * @var ContactTrackingServiceInterface
+     */
     private $contactTrackingService;
 
+    /**
+     * @var DeviceTracker
+     */
     private $deviceTracker;
 
+    /**
+     * @var CorePermissions
+     */
     private $security;
 
+    /**
+     * @var Lead|null
+     */
     private $systemContact;
 
+    /**
+     * @var Lead|null
+     */
     private $trackedContact;
 
+    /**
+     * @var Logger
+     */
     private $logger;
 
+    /**
+     * @var IpLookupHelper
+     */
     private $ipLookupHelper;
 
+    /**
+     * @var Request
+     */
     private $request;
 
+    /**
+     * @var CoreParametersHelper
+     */
     private $coreParametersHelper;
 
+    /**
+     * @var EventDispatcherInterface
+     */
     private $dispatcher;
 
+    /**
+     * @var FieldModel
+     */
     private $leadFieldModel;
 
     /**
