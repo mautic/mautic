@@ -33,14 +33,15 @@ before_install:
   - export SYMFONY_ENV="test"
 
 install:
-  - pecl install pcov
   - composer install
 
-  # Clobber is needed because PCOV normally only works with PHPUnit 8+
-  - bin/pcov clobber
+  # Clobber is needed because PCOV normally only works with PHPUnit 8+. Needed only to run test coverage.
+  - if [ ${TRAVIS_PHP_VERSION:0:3} == "7.3" ]; then pecl install pcov && composer require --dev pcov/clobber && bin/pcov clobber; fi
 
 script:
-  - composer test
+  - if [ ${TRAVIS_PHP_VERSION:0:3} == "7.3" ]; 
+    then composer test -- --coverage-clover=coverage.xml && bash <(curl -s https://codecov.io/bash); 
+    else composer test; fi
 
 jobs:
   include:
@@ -53,6 +54,3 @@ jobs:
     -
       name: CS Fixer
       script: bin/php-cs-fixer fix --config=.php_cs -v --dry-run --using-cache=no --show-progress=dots --diff $(git diff -- '*.php' --name-only --diff-filter=ACMRTUXB "${TRAVIS_COMMIT_RANGE}")
-
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
