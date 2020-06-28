@@ -127,8 +127,11 @@ class InstallService
 
         if (file_exists($localConfigFile)) {
             /** @var array $parameters */
+            $parameters = false;
+
+            // Load local config to override parameters
             include $localConfigFile;
-            $localParameters = (isset($parameters) && is_array($parameters)) ? $parameters : [];
+            $localParameters = (is_array($parameters)) ? $parameters : [];
         } else {
             $localParameters = [];
         }
