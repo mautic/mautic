@@ -173,7 +173,7 @@ class DateHelper extends Helper
         $dt       = $this->helper->getLocalDateTime();
 
         if ($textDate) {
-            return $this->translator->trans('mautic.core.date.'.$textDate, ['%time%' => $dt->format('g:i a')]);
+            return $this->translator->trans('mautic.core.date.'.$textDate, ['%time%' => $dt->format($this->formats['time'])]);
         } else {
             $interval = $this->helper->getDiff('now', null, true);
 
