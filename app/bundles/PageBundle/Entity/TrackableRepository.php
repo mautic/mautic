@@ -141,7 +141,7 @@ class TrackableRepository extends CommonRepository
      * @param $channel
      * @param $channelIds
      * @param $listId
-     * @param bool $combined
+     * @param bool   $combined
      * @param string $countColumn
      *
      * @return array|int
