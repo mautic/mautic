@@ -12,7 +12,7 @@
  */
 @ini_set('display_errors', 'Off');
 
-if (stristr(PHP_OS, 'WIN')) {
+if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
     define('IS_WINDOWS', true);
 }
 
