@@ -19,9 +19,6 @@ use Mautic\CoreBundle\Helper\ParamsLoaderHelper;
  */
 class TokenHelper
 {
-    /**
-     * @var array
-     */
     private static $parameters;
 
     /**
@@ -44,6 +41,9 @@ class TokenHelper
 
         if ($foundMatches) {
             foreach ($matches[2] as $key => $match) {
+                if (false !== strpos($match, '%7C')) {
+                    $match = urldecode($match);
+                }
                 $token = $matches[0][$key];
 
                 if (isset($tokenList[$token])) {

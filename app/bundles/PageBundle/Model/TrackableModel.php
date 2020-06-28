@@ -23,45 +23,28 @@ class TrackableModel extends AbstractCommonModel
 {
     /**
      * Array of URLs and/or tokens that should not be converted to trackables.
-     *
-     * @var array
      */
     protected $doNotTrack = [];
 
     /**
      * Tokens with values that could be used as URLs.
-     *
-     * @var array
      */
     protected $contentTokens = [];
 
     /**
      * Stores content that needs to be replaced when URLs are parsed out of content.
-     *
-     * @var array
      */
     protected $contentReplacements = [];
 
     /**
      * Used to rebuild correct URLs when the tokenized URL contains query parameters.
-     *
-     * @var bool
      */
     protected $usingClickthrough = true;
 
-    /**
-     * @var RedirectModel
-     */
     protected $redirectModel;
 
-    /**
-     * @var LeadFieldRepository
-     */
     private $leadFieldRepository;
 
-    /**
-     * @var array|null
-     */
     private $contactFieldUrlTokens;
 
     /**
@@ -486,7 +469,7 @@ class TrackableModel extends AbstractCommonModel
             }
 
             // Do not convert contact tokens
-            if (!$this->isContactFieldToken($token)) {
+            if (!$this->isSupportedToken($token)) {
                 $trackableUrl = (!empty($urlParts['query'])) ? $this->contentTokens[$token].'?'.$urlParts['query'] : $this->contentTokens[$token];
                 $trackableKey = $trackableUrl;
 
@@ -543,7 +526,7 @@ class TrackableModel extends AbstractCommonModel
             return false;
         }
 
-        if ($this->isContactFieldToken($token)) {
+        if ($this->isSupportedToken($token)) {
             // Assume it's true as the redirect methods should handle this dynamically
             return true;
         }
@@ -851,9 +834,9 @@ class TrackableModel extends AbstractCommonModel
      *
      * @return bool
      */
-    private function isContactFieldToken($token)
+    private function isSupportedToken($token)
     {
-        return false !== strpos($token, '{contactfield') || false !== strpos($token, '{leadfield');
+        return false !== strpos($token, '{contactfield') || false !== strpos($token, '{leadfield') || false !== strpos($token, '{pagelink');
     }
 
     /**

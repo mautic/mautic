@@ -181,4 +181,17 @@ STRING
             )
         );
     }
+
+    /**
+     * Case with:
+     * http://domain.tld/r/hash?utm_source=source&utm_mediuum=medium - redirect URL with utm_tags
+     * Redirected url with ? in query http://redirecttoanotherdomain.tld?some=content is translated to http://redirectdomain.tld?some=content?utm_source=source&utm_mediuum=medium    *.
+     */
+    public function testSanitizeAbsoluteUrlSanitizeQueryRedirect()
+    {
+        $this->assertEquals(
+            'http://username:password@hostname:9090/path?ar_g1=value&arg2=some+email%40address.com#anchor',
+            UrlHelper::sanitizeAbsoluteUrl('http://username:password@hostname:9090/path?ar g1=value?arg2=some+email@address.com#anchor')
+        );
+    }
 }

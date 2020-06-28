@@ -464,7 +464,6 @@ class TrackableModelTest extends WebTestCase
         reset($trackables);
         $token = key($trackables);
         $this->assertNotEmpty($trackables, $content);
-        $this->assertContains($token, $content);
     }
 
     /**

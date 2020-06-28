@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use Mautic\PageBundle\Event\RedirectEvent;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\VideoModel;
@@ -487,6 +488,12 @@ class PublicController extends CommonFormController
             $leadArray            = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
 
             $url = TokenHelper::findLeadTokens($url, $leadArray, true);
+            $url = $this->replacePageTokenUrl($url);
+            $url = $this->replaceAssetTokenUrl($url);
+
+            $event = new RedirectEvent($url, $lead, $ct);
+            $this->get('event_dispatcher')->dispatch(PageEvents::ON_REDIRECT, $event);
+            $url = $event->getUrl();
         }
 
         $url = UrlHelper::sanitizeAbsoluteUrl($url);

@@ -147,4 +147,12 @@ final class PageEvents
      * @var string
      */
     const ON_DETERMINE_DWELL_TIME_WINNER = 'mautic.page.on_dwell_time_winner';
+
+    /**
+     * The mautic.page.on_redirect event is fired when redirect is executed.
+     *
+     * The event listener receives a
+     * Mautic\PageBundle\Event\RedirectEvent
+     */
+    const ON_REDIRECT = 'mautic.page.on_redirect';
 }

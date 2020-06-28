@@ -16,19 +16,10 @@ use Monolog\Logger;
 
 class UrlHelper
 {
-    /**
-     * @var Http
-     */
     protected $http;
 
-    /**
-     * @var string
-     */
     protected $shortnerServiceUrl;
 
-    /**
-     * @var Logger
-     */
     protected $logger;
 
     /**
@@ -290,8 +281,7 @@ class UrlHelper
         $query = parse_url($url, PHP_URL_QUERY);
 
         if (!empty($query)) {
-            parse_str($query, $parsedQuery);
-
+            parse_str(str_replace('?', '&', $query), $parsedQuery);
             if ($parsedQuery) {
                 $encodedQuery = http_build_query($parsedQuery);
                 $url          = str_replace($query, $encodedQuery, $url);
