@@ -17,12 +17,10 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Helper\CacheHelper;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\InstallBundle\Helper\SchemaHelper;
 use Mautic\UserBundle\Entity\User;
-use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -39,81 +37,35 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class InstallService
 {
-    /**
-     * @var Configurator
-     */
     private $configurator;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var CacheHelper
-     */
     private $cacheHelper;
 
-    /**
-     * @var PathsHelper
-     */
     protected $pathsHelper;
 
-    /**
-     * @var EntityManager
-     */
     private $entityManager;
 
-    /**
-     * @var TranslatorInterface
-     */
     private $translator;
 
-    /**
-     * @var KernelInterface
-     */
     private $kernel;
-    /**
-     * @var ValidatorInterface
-     */
+
     private $validator;
-    /**
-     * @var EncoderFactory
-     */
+
     private $encoder;
 
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * InstallService constructor.
-     *
-     * @param Configurator         $configurator
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param CacheHelper          $cacheHelper
-     * @param PathsHelper          $pathsHelper
-     * @param EntityManager        $entityManager
-     * @param TranslatorInterface  $translator
-     * @param KernelInterface      $kernel
-     * @param ValidatorInterface   $validator
-     * @param EncoderFactory       $encoder
-     * @param LoggerInterface      $logger
      */
     public function __construct(Configurator $configurator,
-                                CoreParametersHelper $coreParametersHelper,
                                 CacheHelper $cacheHelper,
                                 PathsHelper $pathsHelper,
                                 EntityManager $entityManager,
                                 TranslatorInterface $translator,
                                 KernelInterface $kernel,
                                 ValidatorInterface $validator,
-                                EncoderFactory $encoder,
-                                LoggerInterface $logger)
+                                EncoderFactory $encoder)
     {
         $this->configurator             = $configurator;
-        $this->coreParametersHelper     = $coreParametersHelper;
         $this->cacheHelper              = $cacheHelper;
         $this->pathsHelper              = $pathsHelper;
         $this->entityManager            = $entityManager;
@@ -121,7 +73,6 @@ class InstallService
         $this->kernel                   = $kernel;
         $this->validator                = $validator;
         $this->encoder                  = $encoder;
-        $this->logger                   = $logger;
     }
 
     /**
@@ -141,7 +92,7 @@ class InstallService
             return true;
         }
 
-        if (($pos = strpos($index, '.')) !== false) {
+        if (false !== ($pos = strpos($index, '.'))) {
             $index = (int) substr($index, 0, $pos);
         }
 
@@ -234,7 +185,7 @@ class InstallService
     /**
      * Checks for step's requirements.
      *
-     * @param null|StepInterface $step
+     * @param StepInterface|null $step
      *
      * @return array
      */
@@ -248,7 +199,7 @@ class InstallService
     /**
      * Checks for step's optional settings.
      *
-     * @param null|StepInterface $step
+     * @param StepInterface|null $step
      *
      * @return array
      */
@@ -261,7 +212,7 @@ class InstallService
 
     /**
      * @param array|StepInterface $params
-     * @param null|StepInterface  $step
+     * @param StepInterface|null  $step
      * @param bool                $clearCache
      *
      * @return bool
@@ -282,7 +233,7 @@ class InstallService
             $this->configurator->write();
             $messages = true;
         } catch (\RuntimeException $exception) {
-            $messages = [];
+            $messages          = [];
             $messages['error'] = $translator->trans(
                 'mautic.installer.error.writing.configuration',
                 [],
@@ -338,7 +289,7 @@ class InstallService
     /**
      * Create the database.
      *
-     * @param null|StepInterface $step
+     * @param StepInterface|null $step
      * @param array              $dbParams
      *
      * @return array|bool
@@ -349,7 +300,7 @@ class InstallService
 
         $messages = $this->validateDatabaseParams($dbParams);
 
-        if (is_bool($messages) && $messages === true) {
+        if (is_bool($messages) && true === $messages) {
             // Check if connection works and/or create database if applicable
             $schemaHelper = new SchemaHelper($dbParams);
 
@@ -420,8 +371,6 @@ class InstallService
     /**
      * Load the database fixtures in the database.
      *
-     * @param ContainerInterface $container
-     *
      * @return array|bool
      */
     public function createFixturesStep(ContainerInterface $container)
@@ -445,8 +394,6 @@ class InstallService
     /**
      * Installs data fixtures for the application.
      *
-     * @param ContainerInterface $container
-     *
      * @return bool boolean true on success
      */
     public function installDatabaseFixtures(ContainerInterface $container)
@@ -464,12 +411,7 @@ class InstallService
         $fixtures = $loader->getFixtures();
 
         if (!$fixtures) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Could not find any fixtures to load in: %s',
-                    "\n\n- ".implode("\n- ", $paths)
-                )
-            );
+            throw new \InvalidArgumentException(sprintf('Could not find any fixtures to load in: %s', "\n\n- ".implode("\n- ", $paths)));
         }
 
         $purger = new ORMPurger($entityManager);
@@ -598,7 +540,7 @@ class InstallService
     /**
      * Setup the email configuration.
      *
-     * @param null|StepInterface $step
+     * @param StepInterface|null $step
      * @param array              data
      *
      * @return array|bool
@@ -642,11 +584,9 @@ class InstallService
             foreach ($errors as $error) {
                 $messages[] = $error->getMessage();
             }
-
-            return $messages;
+        } else {
+            $messages = $this->saveConfiguration($data, $step, true);
         }
-
-        $messages = $this->saveConfiguration($data, $step, true);
 
         return $messages;
     }
@@ -666,9 +606,7 @@ class InstallService
             'site_url'   => $siteUrl,
         ];
 
-        $messages = $this->saveConfiguration($finalConfigVars, null, true);
-
-        return $messages;
+        return $this->saveConfiguration($finalConfigVars, null, true);
     }
 
     /**

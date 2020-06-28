@@ -333,6 +333,7 @@ class InstallCommand extends ContainerAwareCommand
                 // Keep on with next step
                 $step = self::DOCTRINE_STEP;
 
+                // no break
             case self::DOCTRINE_STEP:
                 $output->writeln($step.' - Creating database...');
                 $messages = $this->stepAction($installer, $dbParams, $step);
@@ -371,6 +372,7 @@ class InstallCommand extends ContainerAwareCommand
                 // Keep on with next step
                 $step = self::USER_STEP;
 
+                // no break
             case self::USER_STEP:
                 $output->writeln($step.' - Creating admin user...');
                 $messages = $this->stepAction($installer, $adminParam, $step);
@@ -385,6 +387,7 @@ class InstallCommand extends ContainerAwareCommand
                 // Keep on with next step
                 $step = self::EMAIL_STEP;
 
+                // no break
             case self::EMAIL_STEP:
                 $output->writeln($step.' - Email configuration and final steps...');
                 $messages = $this->stepAction($installer, $allParams, $step);
@@ -421,7 +424,7 @@ class InstallCommand extends ContainerAwareCommand
      */
     protected function stepAction(InstallService $installer, $params, $index = 0)
     {
-        if (strpos($index, '.') !== false) {
+        if (false !== strpos($index, '.')) {
             list($index, $subIndex) = explode('.', $index);
         }
 
@@ -487,11 +490,11 @@ class InstallCommand extends ContainerAwareCommand
                 break;
         }
 
-        if (is_bool($messages) && $messages === true) {
+        if (is_bool($messages) && true === $messages) {
             $siteUrl  = $params['site_url'];
             $messages = $installer->createFinalConfigStep($siteUrl);
 
-            if (is_bool($messages) && $messages === true) {
+            if (is_bool($messages) && true === $messages) {
                 $installer->finalMigrationStep();
             }
         }
@@ -500,8 +503,7 @@ class InstallCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param OutputInterface $output
-     * @param array           $messages
+     * Handle install command errors.
      */
     private function handleInstallerErrors(OutputInterface $output, array $messages)
     {

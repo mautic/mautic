@@ -30,18 +30,12 @@ class InstallController extends CommonController
     const USER_STEP     = 2;
     const EMAIL_STEP    = 3;
 
-    /**
-     * @var Configurator
-     */
     private $configurator;
 
-    /**
-     * @var InstallService
-     */
     private $installer;
 
     /**
-     * @param FilterControllerEvent $event
+     * Initialize controller.
      */
     public function initialize(FilterControllerEvent $event)
     {
@@ -111,7 +105,7 @@ class InstallController extends CommonController
                         $dbParams = (array) $formData;
 
                         $messages = $this->installer->createDatabaseStep($step, $dbParams);
-                        if (is_bool($messages) && $messages === true) {
+                        if (is_bool($messages) && true === $messages) {
                             // XXX Regression: we used to also get this if database created but configuration not saved
                             $schemaHelper             = new SchemaHelper($dbParams);
                             $formData->server_version = $schemaHelper->getServerVersion();
@@ -127,7 +121,7 @@ class InstallController extends CommonController
                         $adminParam = (array) $formData;
                         $messages   = $this->installer->createAdminUserStep($adminParam);
 
-                        if (is_bool($messages) && $messages === true) {
+                        if (is_bool($messages) && true === $messages) {
                             // Store the data to repopulate the form
                             unset($formData->password);
                             $session->set('mautic.installer.user', $formData);
@@ -158,7 +152,7 @@ class InstallController extends CommonController
                         case 1:
                             $messages = $this->installer->createSchemaStep($dbParams);
 
-                            if (is_bool($messages) && $messages === true) {
+                            if (is_bool($messages) && true === $messages) {
                                 return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => 1.2]));
                             } elseif (is_array($messages) && !empty($messages)) {
                                 $this->handleInstallerErrors($form, $messages);
@@ -168,7 +162,7 @@ class InstallController extends CommonController
                         case 2:
                             $messages = $this->installer->createFixturesStep($this->container);
 
-                            if (is_bool($messages) && $messages === true) {
+                            if (is_bool($messages) && true === $messages) {
                                 $complete = true;
                             } elseif (is_array($messages) && !empty($messages)) {
                                 $this->handleInstallerErrors($form, $messages);
@@ -298,8 +292,7 @@ class InstallController extends CommonController
     }
 
     /**
-     * @param Form  $form
-     * @param array $messages
+     * Handle installer errors.
      */
     private function handleInstallerErrors(Form $form, array $messages)
     {
