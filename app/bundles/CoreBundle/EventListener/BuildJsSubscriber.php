@@ -298,7 +298,7 @@ document.addEventListener('mauticPageEventDelivered', function(e) {
 * Check if a DOM tracking pixel is present
 */
 MauticJS.checkForTrackingPixel = function() {
-    if (document.readyState != 'complete') {
+    if (document.readyState !== 'complete') {
         // Periodically call self until the DOM is completely loaded
         setTimeout(function(){MauticJS.checkForTrackingPixel()}, 9)
     } else {
