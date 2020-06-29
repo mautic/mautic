@@ -23,10 +23,23 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
      */
     private $helper;
 
+    /**
+     * @var string
+     */
+    private static $oldTimezone;
+
+    public static function setupBeforeClass()
+    {
+        self::$oldTimezone = date_default_timezone_get();
+    }
+
+    public static function tearDownAfterClass()
+    {
+        date_default_timezone_set(self::$oldTimezone);
+    }
+
     protected function setUp()
     {
-        parent::setUp();
-
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->helper     = new DateHelper(
             'F j, Y g:i a T',
@@ -37,18 +50,33 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToTextWithPragueTimezone()
+    public function testStringToText()
     {
-        $dateTime    = new \DateTime('2016-01-27 13:30:00', new \DateTimeZone('UTC'));
-        $regexForDst = '/^January 27, 2016 [1,2]:30 pm$/';
-
-        $this->assertRegExp($regexForDst, $this->helper->toText($dateTime, 'Europe/Prague', 'Y-m-d H:i:s', true));
+        date_default_timezone_set('Etc/GMT-4');
+        $time = '2016-01-27 14:30:00';
+        $this->assertSame('January 27, 2016 6:30 pm', $this->helper->toText($time, 'UTC', 'Y-m-d H:i:s', true));
     }
 
-    public function testToTextWithUtcTimezone()
+    public function testStringToTextUtc()
     {
-        $dateTime = new \DateTime('2017-11-20 15:45:00', new \DateTimeZone('UTC'));
+        date_default_timezone_set('UTC');
+        $time = '2016-01-27 14:30:00';
 
-        $this->assertSame('November 20, 2017 3:45 pm', $this->helper->toText($dateTime, 'UTC', 'Y-m-d H:i:s', true));
+        $this->assertSame('January 27, 2016 2:30 pm', $this->helper->toText($time, 'UTC', 'Y-m-d H:i:s', true));
+    }
+
+    public function testDateTimeToText()
+    {
+        date_default_timezone_set('Etc/GMT-4');
+        $dateTime = new \DateTime('2016-01-27 14:30:00', new \DateTimeZone('UTC'));
+        $this->assertSame('January 27, 2016 6:30 pm', $this->helper->toText($dateTime, 'UTC', 'Y-m-d H:i:s', true));
+    }
+
+    public function testDateTimeToTextUtc()
+    {
+        date_default_timezone_set('UTC');
+        $dateTime = new \DateTime('2016-01-27 14:30:00', new \DateTimeZone('UTC'));
+
+        $this->assertSame('January 27, 2016 2:30 pm', $this->helper->toText($dateTime, 'UTC', 'Y-m-d H:i:s', true));
     }
 }
