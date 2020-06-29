@@ -320,14 +320,6 @@ class AppKernel extends Kernel
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getProjectDir(): string
-    {
-        return dirname(__DIR__);
-    }
-
-    /**
      * Get local config file.
      */
     public function getLocalConfigFile(): string
