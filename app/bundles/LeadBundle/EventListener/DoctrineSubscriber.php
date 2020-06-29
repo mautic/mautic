@@ -118,6 +118,9 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                 }
             }
         } catch (\Exception $e) {
+            if (defined('MAUTIC_INSTALLER')) {
+                return;
+            }
             //table doesn't exist or something bad happened so oh well
             $this->logger->addError('SCHEMA ERROR: '.$e->getMessage());
         }
