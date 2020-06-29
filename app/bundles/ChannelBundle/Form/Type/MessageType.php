@@ -87,8 +87,7 @@ class MessageType extends AbstractFormStandardType
     {
         $resolver->setDefaults(
             [
-                'data_class'      => Message::class,
-                'category_bundle' => 'messages',
+                'data_class' => Message::class,
             ]
         );
     }

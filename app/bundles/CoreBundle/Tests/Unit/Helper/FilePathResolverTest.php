@@ -90,7 +90,7 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $filesystemMock->expects($this->exactly(1000))
+        $filesystemMock->expects($this->exactly(100))
             ->method('exists')
             ->willReturn(true);
 

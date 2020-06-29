@@ -100,29 +100,26 @@ class ReportExporter
             $this->reportExportOptions->setDateTo($dateTo->sub(new \DateInterval('PT1S')));
         }
 
-        // just published reports, but schedule continue
-        if ($report->isPublished()) {
-            $this->reportExportOptions->beginExport();
-            while (true) {
-                $data = $this->reportDataAdapter->getReportData($report, $this->reportExportOptions);
+        $this->reportExportOptions->beginExport();
+        while (true) {
+            $data = $this->reportDataAdapter->getReportData($report, $this->reportExportOptions);
 
-                $this->reportFileWriter->writeReportData($scheduler, $data, $this->reportExportOptions);
+            $this->reportFileWriter->writeReportData($scheduler, $data, $this->reportExportOptions);
 
-                $totalResults = $data->getTotalResults();
-                unset($data);
+            $totalResults = $data->getTotalResults();
+            unset($data);
 
-                if ($this->reportExportOptions->getNumberOfProcessedResults() >= $totalResults) {
-                    break;
-                }
-
-                $this->reportExportOptions->nextBatch();
+            if ($this->reportExportOptions->getNumberOfProcessedResults() >= $totalResults) {
+                break;
             }
 
-            $file = $this->reportFileWriter->getFilePath($scheduler);
-
-            $event = new ReportScheduleSendEvent($scheduler, $file);
-            $this->eventDispatcher->dispatch(ReportEvents::REPORT_SCHEDULE_SEND, $event);
+            $this->reportExportOptions->nextBatch();
         }
+
+        $file = $this->reportFileWriter->getFilePath($scheduler);
+
+        $event = new ReportScheduleSendEvent($scheduler, $file);
+        $this->eventDispatcher->dispatch(ReportEvents::REPORT_SCHEDULE_SEND, $event);
 
         $this->schedulerModel->reportWasScheduled($report);
     }

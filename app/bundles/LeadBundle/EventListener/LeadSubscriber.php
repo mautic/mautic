@@ -17,7 +17,6 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\LeadBundle\Entity\ListLead;
@@ -282,11 +281,6 @@ class LeadSubscriber implements EventSubscriberInterface
         );
 
         $this->entityManager->getRepository(LeadNote::class)->updateLead(
-            $event->getLoser()->getId(),
-            $event->getVictor()->getId()
-        );
-
-        $this->entityManager->getRepository(LeadDevice::class)->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );

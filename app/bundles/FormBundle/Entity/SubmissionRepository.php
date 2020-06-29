@@ -12,6 +12,7 @@
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -423,17 +424,16 @@ class SubmissionRepository extends CommonRepository
     /**
      * Compare a form result value with defined value for defined lead.
      *
-     * @param int         $lead         ID
-     * @param int         $form         ID
-     * @param string      $formAlias
-     * @param int         $field        alias
-     * @param string      $value        to compare with
-     * @param string      $operatorExpr for WHERE clause
-     * @param string|null $type
+     * @param int    $lead         ID
+     * @param int    $form         ID
+     * @param string $formAlias
+     * @param int    $field        alias
+     * @param string $value        to compare with
+     * @param string $operatorExpr for WHERE clause
      *
      * @return bool
      */
-    public function compareValue($lead, $form, $formAlias, $field, $value, $operatorExpr, $type = null)
+    public function compareValue($lead, $form, $formAlias, $field, $value, $operatorExpr)
     {
         // Modify operator
         switch ($operatorExpr) {
@@ -459,22 +459,13 @@ class SubmissionRepository extends CommonRepository
             ->where(
                 $q->expr()->andX(
                     $q->expr()->eq('s.lead_id', ':lead'),
-                    $q->expr()->eq('s.form_id', ':form')
+                    $q->expr()->eq('s.form_id', ':form'),
+                    $q->expr()->$operatorExpr('r.'.$field, ':value')
                 )
             )
             ->setParameter('lead', (int) $lead)
-            ->setParameter('form', (int) $form);
-
-        switch ($type) {
-            case 'boolean':
-            case 'number':
-            $q->andWhere($q->expr()->$operatorExpr('r.'.$field, $value));
-                break;
-            default:
-        $q->andWhere($q->expr()->$operatorExpr('r.'.$field, ':value'))
+            ->setParameter('form', (int) $form)
             ->setParameter('value', $value);
-                break;
-        }
 
         $result = $q->execute()->fetch();
 

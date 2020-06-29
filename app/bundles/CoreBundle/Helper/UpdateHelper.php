@@ -153,22 +153,13 @@ class UpdateHelper
                 'message' => 'mautic.core.updater.error.fetching.updates',
             ];
         } catch (RequestException $exception) {
-            if (!empty($exception->getResponse())) {
-                $this->logger->error(
-                    sprintf(
-                        'UPDATE CHECK: Could not fetch a release list: %s (%s)',
-                        $exception->getResponse()->getStatusCode(),
-                        $exception->getResponse()->getReasonPhrase()
-                    )
-                );
-            } else {
-                $this->logger->error(
-                    sprintf(
-                        'UPDATE CHECK: Could not fetch a release list: %s',
-                        $exception->getMessage()
-                    )
-                );
-            }
+            $this->logger->error(
+                sprintf(
+                    'UPDATE CHECK: Could not fetch a release list: %s (%s)',
+                    $exception->getResponse()->getStatusCode(),
+                    $exception->getResponse()->getReasonPhrase()
+                )
+            );
 
             return [
                 'error'   => true,
@@ -229,31 +220,19 @@ class UpdateHelper
             );
 
             $options = [
-                \GuzzleHttp\RequestOptions::FORM_PARAMS     => $data,
-                \GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => 10,
-                \GuzzleHttp\RequestOptions::HEADERS         => [
-                    'Accept' => '*/*',
-                ],
+                'form_params'     => $data,
+                'connect_timeout' => 10,
             ];
 
             $this->client->request('POST', $statUrl, $options);
         } catch (RequestException $exception) {
-            if (!empty($exception->getResponse())) {
-                $this->logger->error(
-                    sprintf(
-                        'STAT UPDATE: Error communicating with the stat server: %s (%s)',
-                        $exception->getResponse()->getStatusCode(),
-                        $exception->getResponse()->getReasonPhrase()
-                    )
-                );
-            } else {
-                $this->logger->error(
-                    sprintf(
-                        'STAT UPDATE: Error communicating with the stat server: %s',
-                        $exception->getMessage()
-                    )
-                );
-            }
+            $this->logger->error(
+                sprintf(
+                    'STAT UPDATE: Error communicating with the stat server: %s (%s)',
+                    $exception->getResponse()->getStatusCode(),
+                    $exception->getResponse()->getReasonPhrase()
+                )
+            );
         } catch (\Exception $exception) {
             // Not so concerned about failures here, move along
             $this->logger->error(sprintf('STAT UPDATE: %s', $exception->getMessage()));

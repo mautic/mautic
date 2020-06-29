@@ -125,16 +125,13 @@ class CampaignSubscriber implements EventSubscriberInterface
             return $event->setResult(false);
         }
 
-        $field = $this->formModel->findFormFieldByAlias($form, $event->getConfig()['field']);
-
         $result = $this->formSubmissionModel->getRepository()->compareValue(
             $lead->getId(),
             $form->getId(),
             $form->getAlias(),
             $event->getConfig()['field'],
             $event->getConfig()['value'],
-            $operators[$event->getConfig()['operator']]['expr'],
-            $field ? $field->getType() : null
+            $operators[$event->getConfig()['operator']]['expr']
         );
 
         $event->setChannel('form', $form->getId());
