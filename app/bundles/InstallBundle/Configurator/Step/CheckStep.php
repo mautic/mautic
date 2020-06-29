@@ -63,6 +63,13 @@ class CheckStep implements StepInterface
     public $site_url;
 
     /**
+     * Recommended minimum memory limit for Mautic.
+     *
+     * @var string
+     */
+    public static $memory_limit = '512M';
+
+    /**
      * @param Configurator $configurator Configurator service
      * @param string       $kernelRoot   Kernel root path
      * @param RequestStack $requestStack Request stack
@@ -228,7 +235,7 @@ class CheckStep implements StepInterface
         }
 
         $memoryLimit    = FileHelper::convertPHPSizeToBytes(ini_get('memory_limit'));
-        $suggestedLimit = FileHelper::convertPHPSizeToBytes('512M');
+        $suggestedLimit = FileHelper::convertPHPSizeToBytes(self::$memory_limit);
         if ($memoryLimit < $suggestedLimit) {
             $messages[] = 'mautic.install.memory.limit';
         }

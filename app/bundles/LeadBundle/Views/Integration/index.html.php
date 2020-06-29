@@ -30,9 +30,9 @@
                     <dt>Object ID</dt>
                     <dd><?php echo $details['integration_entity_id']; ?></dd>
                     <dt>Date Added</dt>
-                    <dd><?php echo $view['date']->toText($details['date_added'], 'local', 'Y-m-d H:i:s', true); ?></dd>
+                    <dd><?php echo $view['date']->toText($details['date_added'], 'UTC', 'Y-m-d H:i:s', true); ?></dd>
                     <dt>Last Sync Date</dt>
-                    <dd><?php echo $view['date']->toText($details['last_sync_date'], 'local', 'Y-m-d H:i:s', true); ?></dd>
+                    <dd><?php echo $view['date']->toText($details['last_sync_date'], 'UTC', 'Y-m-d H:i:s', true); ?></dd>
                 </dl>
             </div>
         </div>
