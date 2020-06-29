@@ -35,8 +35,13 @@ before_install:
 install:
   - composer install
 
+  # Clobber is needed because PCOV normally only works with PHPUnit 8+. Needed only to run test coverage.
+  - if [ ${TRAVIS_PHP_VERSION:0:3} == "7.3" ]; then pecl install pcov && composer require --dev pcov/clobber && bin/pcov clobber; fi
+
 script:
-  - composer test
+  - if [ ${TRAVIS_PHP_VERSION:0:3} == "7.3" ]; 
+    then composer test -- --coverage-clover=coverage.xml && bash <(curl -s https://codecov.io/bash); 
+    else composer test; fi
 
 jobs:
   include:
