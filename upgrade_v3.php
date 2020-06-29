@@ -899,19 +899,17 @@ if (!IN_CLI) {
 
     final_cleanup_files();
 
-    writeToLog("Do you want to remove the backup files? We recommend first checking in a browser whether Mautic 3 works as expected. Type \"yes\" to remove: ");
+    echo "Do you want to remove the backup files? We recommend first checking in a browser whether Mautic 3 works as expected. Type \"yes\" to remove:\n";
     $handle = fopen("php://stdin", "r");
     $line = fgets($handle);
     if (trim($line) != "yes") {
-        writeToLog(
-            "Ok, we won't do anything for now. "
+        echo "Ok, we won't do anything for now. "
             . "Please note that upgrade_v3.php will remain (publicly) available until you choose to remove the backup files using this script! "
-            . "Run this script again to be prompted to delete backup files."
-        );
+            . "Run this script again to be prompted to delete backup files.\n";
         exit;
     }
     fclose($handle);
-    writeToLog("\nThank you, continuing...");
+    echo "\nThank you, continuing...\n";
 
     removeBackupFilesAndExit();
 
