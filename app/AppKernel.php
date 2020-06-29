@@ -289,6 +289,11 @@ class AppKernel extends Kernel
         return __DIR__;
     }
 
+    public function getProjectDir(): string
+    {
+        return dirname(__DIR__);
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -312,14 +317,6 @@ class AppKernel extends Kernel
         }
 
         return dirname(__DIR__).'/var/logs';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getProjectDir(): string
-    {
-        return dirname(__DIR__);
     }
 
     /**
