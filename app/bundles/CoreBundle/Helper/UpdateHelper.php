@@ -211,13 +211,14 @@ class UpdateHelper
                 // If the kill switch is activated for the upgrade, we don't offer the upgrade to the user.
                 if (isset($m3Update->killSwitchActivated) && $m3Update->killSwitchActivated === false) {
                     $m3Data = [
-                        'error'            => false,
-                        'message'          => 'mautic.core.updater.update.available',
-                        'version'          => $m3Update->version,
-                        'announcement'     => $m3Update->announcement,
-                        'package'          => $m3Update->mautic3downloadUrl,
-                        'checkedTime'      => time(),
-                        'isMautic3Upgrade' => true,
+                        'error'             => false,
+                        'message'           => 'mautic.core.updater.update.available',
+                        'version'           => $m3Update->version,
+                        'announcement'      => $m3Update->announcement,
+                        'package'           => $m3Update->mautic3downloadUrl,
+                        'checkedTime'       => time(),
+                        'isMautic3Upgrade'  => true,
+                        'mautic3UpgradeUrl' => $this->coreParametersHelper->getParameter('site_url').'/upgrade_v3.php',
                     ];
 
                     file_put_contents($m3CacheFile, json_encode($m3Data));
