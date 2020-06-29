@@ -220,8 +220,11 @@ class UpdateHelper
             );
 
             $options = [
-                'form_params'     => $data,
-                'connect_timeout' => 10,
+                \GuzzleHttp\RequestOptions::FORM_PARAMS     => $data,
+                \GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => 10,
+                \GuzzleHttp\RequestOptions::HEADERS         => [
+                    'Accept' => '*/*',
+                ],
             ];
 
             $this->client->request('POST', $statUrl, $options);
