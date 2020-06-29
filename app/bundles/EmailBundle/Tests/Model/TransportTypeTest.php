@@ -21,6 +21,7 @@ class TransportTypeTest extends \PHPUnit\Framework\TestCase
 
         $expected = [
             'mautic.transport.amazon'       => 'mautic.email.config.mailer_transport.amazon',
+            'mautic.transport.amazon_api'   => 'mautic.email.config.mailer_transport.amazon_api',
             'mautic.transport.elasticemail' => 'mautic.email.config.mailer_transport.elasticemail',
             'gmail'                         => 'mautic.email.config.mailer_transport.gmail',
             'mautic.transport.mandrill'     => 'mautic.email.config.mailer_transport.mandrill',
@@ -55,6 +56,15 @@ class TransportTypeTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $transportType->getAmazonService());
     }
 
+    public function testAmazonApiService()
+    {
+        $transportType = new TransportType();
+
+        $expected = '"mautic.transport.amazon_api"';
+
+        $this->assertSame($expected, $transportType->getAmazonApiService());
+    }
+
     public function testMailjetService()
     {
         $transportType = new TransportType();
@@ -68,7 +78,7 @@ class TransportTypeTest extends \PHPUnit\Framework\TestCase
     {
         $transportType = new TransportType();
 
-        $expected = '"mautic.transport.mailjet","mautic.transport.sendgrid","mautic.transport.pepipost","mautic.transport.elasticemail","mautic.transport.amazon","mautic.transport.postmark","gmail"';
+        $expected = '"mautic.transport.mailjet","mautic.transport.sendgrid","mautic.transport.pepipost","mautic.transport.elasticemail","mautic.transport.amazon","mautic.transport.amazon_api","mautic.transport.postmark","gmail"';
 
         $this->assertSame($expected, $transportType->getServiceRequiresUser());
     }
@@ -86,7 +96,7 @@ class TransportTypeTest extends \PHPUnit\Framework\TestCase
     {
         $transportType = new TransportType();
 
-        $expected = '"mautic.transport.mailjet","mautic.transport.sendgrid","mautic.transport.pepipost","mautic.transport.elasticemail","mautic.transport.amazon","mautic.transport.postmark","gmail"';
+        $expected = '"mautic.transport.mailjet","mautic.transport.sendgrid","mautic.transport.pepipost","mautic.transport.elasticemail","mautic.transport.amazon","mautic.transport.amazon_api","mautic.transport.postmark","gmail"';
 
         $this->assertSame($expected, $transportType->getServiceRequiresPassword());
     }
