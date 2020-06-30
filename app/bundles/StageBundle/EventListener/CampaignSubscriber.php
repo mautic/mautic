@@ -22,8 +22,8 @@ use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Form\Type\StageActionChangeType;
 use Mautic\StageBundle\Model\StageModel;
 use Mautic\StageBundle\StageEvents;
-use Recurr\Transformer\TranslatorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
