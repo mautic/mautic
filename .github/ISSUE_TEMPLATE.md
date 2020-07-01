@@ -3,13 +3,14 @@
 [//]: # (Please post questions, support requests and feature requests/ideas at https://forum.mautic.org.)
 [//]: # (Strictly follow the instructions hereunder, otherwise your issue will be closed for lack of information.)
 [//]: # (DO NOT report security vulnerabilities here. Send them to security@mautic.com.)
+[//]: # (MAUTIC 2 is not supported anymore (except for security matters), report your issue only if it relies on Mautic 3 series.)
 
 Detail your bug report:
 
 | Q  | A
 | ---| ---
 | Confirm it is a Bug report |
-| Mautic version | 
+| Mautic version | [//]: # (MAUTIC 2 is not supported anymore.)
 | PHP version | 
 
 [//]: # (Feature request? ---> Go to forum please ---> https://forum.mautic.org/c/ideas)
