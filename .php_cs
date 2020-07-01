@@ -14,6 +14,7 @@ return PhpCsFixer\Config::create()
             'align_double_arrow' => true,
             'align_equals'       => true,
         ],
+        'no_superfluous_phpdoc_tags' => false,
         'phpdoc_to_comment' => false,
         'ordered_imports'   => true,
         'array_syntax'      => [
