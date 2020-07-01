@@ -1494,3 +1494,19 @@ Mautic.setAsPrimaryCompany = function (companyId,leadId){
         }
     });
 };
+
+Mautic.updateContactActionModifiers = function () {
+    mQuery('.update-contact-row .contact-update-action input:radio:checked').each(function () {
+        Mautic.updateContactActionModifier(mQuery(this));
+    });
+}
+Mautic.updateContactActionModifier = function (action) {
+    var el = mQuery(action);
+    var inputField = el.parents('.contact-update-action:first').next('.contact-update-input').find('input, select');
+    if (el.val() == 'empty') {
+        inputField.prop('disabled', true).val('').removeClass('.btn-succes').removeClass('.btn-danger').parent().addClass('disabled').removeClass('active');
+    }else{
+        inputField.removeAttr('disabled').parent().removeClass('disabled');
+    }
+    inputField.trigger("chosen:updated");
+}

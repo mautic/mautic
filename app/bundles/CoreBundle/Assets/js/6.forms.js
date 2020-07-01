@@ -291,7 +291,9 @@ Mautic.switchFormFieldVisibilty = function (formName) {
 
     var checkValueCondition = function (sourceFieldVal, condition) {
         var visible = true;
-        if (typeof condition == 'object') {
+        if (typeof condition == 'string' && typeof sourceFieldVal == 'object') {
+            visible = mQuery.inArray(condition, sourceFieldVal) !== -1;
+        } else if (typeof condition == 'object') {
             visible = mQuery.inArray(sourceFieldVal, condition) !== -1;
         } else if (condition == 'empty' || (condition == 'notEmpty')) {
             var isEmpty = (sourceFieldVal == '' || sourceFieldVal == null || sourceFieldVal == 'undefined');

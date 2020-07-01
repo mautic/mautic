@@ -68,6 +68,9 @@ trait EntityFieldsBuildFormTrait
             if ($field['isUniqueIdentifer']) {
                 $attr['data-unique-identifier'] = $field['alias'];
             }
+            if (isset($options['disabled'][$alias])) {
+                $attr['disabled'] = true;
+            }
 
             if ($isObject) {
                 $value = (isset($fieldValues[$group][$alias]['value'])) ?
@@ -271,6 +274,9 @@ trait EntityFieldsBuildFormTrait
                             break;
                         break;
                     }
+
+                    $attr['class']            = 'form-control';
+                    $attr['data-placeholder'] = $field['label'];
 
                     $builder->add(
                         $alias,
