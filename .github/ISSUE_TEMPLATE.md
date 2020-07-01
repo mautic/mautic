@@ -10,7 +10,7 @@ Detail your bug report:
 | Q  | A
 | ---| ---
 | Confirm it is a Bug report |
-| Mautic version | [//]: # (MAUTIC 2 is not supported anymore.)
+| Mautic version | **MAUTIC 2 is not supported anymore**
 | PHP version | 
 
 [//]: # (Feature request? ---> Go to forum please ---> https://forum.mautic.org/c/ideas)
