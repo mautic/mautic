@@ -47,13 +47,13 @@ class UpdateLeadActionType extends AbstractType
 
         $builder->add(
             'fields_to_update',
-            'leadfields_choices',
+            LeadFieldsType::class,
             [
                 'label'       => '',
                 'label_attr'  => ['class' => 'control-label'],
                 'multiple'    => true,
                 'object'      => 'lead',
-                'empty_value' => 'mautic.core.select',
+                'placeholder' => 'mautic.core.select',
                 'attr'        => [
                     'class'    => 'form-control',
                     'onchange' => 'Mautic.updateContactActionModifiers()',

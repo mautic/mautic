@@ -26,7 +26,7 @@ class Version20181102165747 extends AbstractMauticMigration
      * @throws SkipMigrationException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public function preUp(Schema $schema)
+    public function preUp(Schema $schema): void
     {
         $qb              = $this->connection->createQueryBuilder();
         $notUpdateEvents = $qb->select('ce.id')
@@ -42,7 +42,7 @@ class Version20181102165747 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      */
-    public function postUp(Schema $schema)
+    public function postUp(Schema $schema): void
     {
         // Check if there are even boolean fields to worry about
         $qb = $this->connection->createQueryBuilder();
