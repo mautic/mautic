@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Create a bug report
-labels: needs triage
+labels: needs-triage
 
 ---
 
