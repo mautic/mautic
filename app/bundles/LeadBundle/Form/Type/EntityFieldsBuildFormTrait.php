@@ -124,14 +124,17 @@ trait EntityFieldsBuildFormTrait
                         'required'    => $required,
                         'label'       => $field['label'],
                         'label_attr'  => ['class' => 'control-label'],
-                        'widget'      => 'single_text',
                         'attr'        => $attr,
                         'mapped'      => $mapped,
-                        'input'       => 'string',
-                        'html5'       => false,
                         'constraints' => $constraints,
                     ];
 
+                if (!empty($options['ignore_date_type'])) {
+                    $type = 'text';
+                } else {
+                    $opts['html5']  = false;
+                    $opts['input']  = 'string';
+                    $opts['widget'] = 'single_text';
                     if ($value) {
                         try {
                             $dtHelper = new DateTimeHelper($value, null, 'local');
@@ -153,8 +156,8 @@ trait EntityFieldsBuildFormTrait
                     } else {
                         $opts['model_timezone'] = 'UTC';
                         // $opts['with_seconds']   = true; // @todo figure out why this cause the contact form to fail.
-                        $opts['view_timezone']  = date_default_timezone_get();
-                        $opts['data']           = (!empty($value)) ? $dtHelper->toLocalString('H:i:s') : null;
+                        $opts['view_timezone'] = date_default_timezone_get();
+                        $opts['data']          = (!empty($value)) ? $dtHelper->toLocalString('H:i:s') : null;
                     }
 
                     $builder->addEventListener(
@@ -184,6 +187,7 @@ trait EntityFieldsBuildFormTrait
                             $event->setData($data);
                         }
                     );
+                }
 
                     $builder->add($alias, $type, $opts);
                     break;
@@ -269,7 +273,7 @@ trait EntityFieldsBuildFormTrait
                         case MultiselectType::class:
                             $constraints[] = new Length(['max' => 65535]);
                             break;
-                        break;
+                            break;
                     }
 
                     $builder->add(
