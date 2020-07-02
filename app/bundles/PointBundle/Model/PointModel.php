@@ -79,7 +79,7 @@ class PointModel extends CommonFormModel
         $this->leadModel          = $leadModel;
         $this->mauticFactory      = $mauticFactory;
         $this->contactTracker     = $contactTracker;
-        $this->propertyAccessor = new PropertyAccessor();
+        $this->propertyAccessor   = new PropertyAccessor();
     }
 
     /**
@@ -302,10 +302,6 @@ class PointModel extends CommonFormModel
         }
     }
 
-    /**
-     * @param Point $action
-     * @param Lead  $lead
-     */
     private function adjustLeadPoints(Point $action, Lead $lead)
     {
         $delta = $action->getDelta();
@@ -321,10 +317,7 @@ class PointModel extends CommonFormModel
     }
 
     /**
-     * @param Point $action
-     * @param Lead  $lead
-     * @param       $eventDetails
-     * @param array $settings
+     * @param $eventDetails
      *
      * @return bool
      */
@@ -342,13 +335,13 @@ class PointModel extends CommonFormModel
                 'points'     => $action->getDelta(),
             ],
             'lead'         => $lead,
-            'factory'      => $this->factory, // WHAT?
+            'factory'      => $this->mauticFactory, // WHAT?
             'eventDetails' => $eventDetails,
         ];
 
         if (is_array($callback)) {
             $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-        } elseif (strpos($callback, '::') !== false) {
+        } elseif (false !== strpos($callback, '::')) {
             $parts      = explode('::', $callback);
             $reflection = new \ReflectionMethod($parts[0], $parts[1]);
         } else {
@@ -366,7 +359,6 @@ class PointModel extends CommonFormModel
 
         return $reflection->invokeArgs($this, $pass);
     }
-
 
     /**
      * Get line chart data of points.

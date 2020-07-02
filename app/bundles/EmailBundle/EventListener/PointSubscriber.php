@@ -20,7 +20,6 @@ use Mautic\EmailBundle\Form\Type\EmailToUserType;
 use Mautic\EmailBundle\Form\Type\PointActionEmailOpenType;
 use Mautic\EmailBundle\Form\Type\PointActionEmailSendType;
 use Mautic\EmailBundle\Helper\PointEventHelper;
-use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\PointChangeActionExecutedEvent;
@@ -41,16 +40,10 @@ class PointSubscriber implements EventSubscriberInterface
      */
     private $entityManager;
 
-    /**
-     * @var EmailModel
-     */
-    private $emailModel;
-
-    public function __construct(PointModel $pointModel, EntityManager $entityManager, EmailModel $emailModel)
+    public function __construct(PointModel $pointModel, EntityManager $entityManager)
     {
         $this->pointModel    = $pointModel;
         $this->entityManager = $entityManager;
-        $this->emailModel    = $emailModel;
     }
 
     /**
@@ -138,9 +131,6 @@ class PointSubscriber implements EventSubscriberInterface
         $this->pointModel->triggerAction('email.send', $event->getEmail(), null, $lead);
     }
 
-    /**
-     * @param PointChangeActionExecutedEvent $changeActionExecutedEvent
-     */
     public function onEmailOpenPointChange(PointChangeActionExecutedEvent $changeActionExecutedEvent)
     {
         $action = $changeActionExecutedEvent->getPointAction();
@@ -166,9 +156,6 @@ class PointSubscriber implements EventSubscriberInterface
         $changeActionExecutedEvent->setStatusFromLogs();
     }
 
-    /**
-     * @param PointChangeActionExecutedEvent $changeActionExecutedEvent
-     */
     public function onEmailSentPointChange(PointChangeActionExecutedEvent $changeActionExecutedEvent)
     {
         $action = $changeActionExecutedEvent->getPointAction();

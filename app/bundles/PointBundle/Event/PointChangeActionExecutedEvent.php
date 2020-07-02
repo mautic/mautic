@@ -27,9 +27,6 @@ class PointChangeActionExecutedEvent extends Event
      */
     private $lead;
 
-    /**
-     * @var
-     */
     private $eventDetails;
 
     /**
@@ -45,8 +42,6 @@ class PointChangeActionExecutedEvent extends Event
     /**
      * PointChangeActionExecutedEvent constructor.
      *
-     * @param Point $pointAction
-     * @param Lead  $lead
      * @param       $eventDetails
      * @param array $completedActions
      */

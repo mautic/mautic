@@ -208,7 +208,6 @@ return [
                 'arguments' => [
                     'mautic.point.model.point',
                     'doctrine.orm.entity_manager',
-                    'mautic.email.model.email',
                 ],
             ],
             'mautic.email.touser.subscriber' => [
