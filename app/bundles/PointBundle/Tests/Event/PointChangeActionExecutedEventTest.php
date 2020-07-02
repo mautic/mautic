@@ -16,7 +16,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Event\PointChangeActionExecutedEvent;
 
-class PointChangeActionExecutedEventTest extends \PHPUnit_Framework_TestCase
+class PointChangeActionExecutedEventTest extends \PHPUnit\Framework\TestCase
 {
     private $eventDetailsMock;
 

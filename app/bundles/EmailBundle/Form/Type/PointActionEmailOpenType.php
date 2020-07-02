@@ -11,7 +11,6 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
-use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Symfony\Component\Form\FormBuilderInterface;
 
