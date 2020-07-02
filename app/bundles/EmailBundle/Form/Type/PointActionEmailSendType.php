@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -11,23 +11,32 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
-use Mautic\CategoryBundle\Form\Type\CategoryListType;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class PointActionType extends EmailOpenType
+class PointActionEmailSendType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        parent::buildForm($builder, $options);
+        $builder->add(
+            'emails',
+            EmailListType::class,
+            [
+                'label'=> 'mautic.email.open.limittoemails',
+                'attr' => [
+                    'tooltip'=> 'mautic.email.open.limittoemails_descr',
+                ],
+            ]
+        );
 
         $builder->add(
             'categories',
-            CategoryListType::class,
+            'category',
             [
                 'label'           => 'mautic.email.open.limittocategories',
                 'bundle'          => 'email',
                 'multiple'        => true,
-                'placeholder'     => true,
+                'empty_value'     => true,
                 'with_create_new' => false,
                 'return_entity'   => false,
                 'attr'            => [

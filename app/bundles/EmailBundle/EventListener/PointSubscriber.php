@@ -18,7 +18,7 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\EmailBundle\Form\Type\EmailToUserType;
 use Mautic\EmailBundle\Form\Type\PointActionEmailOpenType;
-use Mautic\EmailBundle\Form\Type\PointActionType;
+use Mautic\EmailBundle\Form\Type\PointActionEmailSendType;
 use Mautic\EmailBundle\Helper\PointEventHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
@@ -31,10 +31,19 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var PointModel
+     */
     private $pointModel;
 
+    /**
+     * @var EntityManager
+     */
     private $entityManager;
 
+    /**
+     * @var EmailModel
+     */
     private $emailModel;
 
     public function __construct(PointModel $pointModel, EntityManager $entityManager, EmailModel $emailModel)
@@ -76,7 +85,7 @@ class PointSubscriber implements EventSubscriberInterface
             'group'     => 'mautic.email.actions',
             'label'     => 'mautic.email.point.action.send',
             'eventName' => EmailEvents::ON_POINT_CHANGE_ACTION_EXECUTED,
-            'formType'  => PointActionType::class,
+            'formType'  => PointActionEmailSendType::class,
         ];
 
         $event->addAction('email.send', $action);
@@ -129,6 +138,9 @@ class PointSubscriber implements EventSubscriberInterface
         $this->pointModel->triggerAction('email.send', $event->getEmail(), null, $lead);
     }
 
+    /**
+     * @param PointChangeActionExecutedEvent $changeActionExecutedEvent
+     */
     public function onEmailOpenPointChange(PointChangeActionExecutedEvent $changeActionExecutedEvent)
     {
         $action = $changeActionExecutedEvent->getPointAction();
@@ -154,6 +166,9 @@ class PointSubscriber implements EventSubscriberInterface
         $changeActionExecutedEvent->setStatusFromLogs();
     }
 
+    /**
+     * @param PointChangeActionExecutedEvent $changeActionExecutedEvent
+     */
     public function onEmailSentPointChange(PointChangeActionExecutedEvent $changeActionExecutedEvent)
     {
         $action = $changeActionExecutedEvent->getPointAction();
