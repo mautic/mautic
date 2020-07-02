@@ -12,37 +12,31 @@
 namespace Mautic\PointBundle\Form\Type;
 
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\PointBundle\Entity\Trigger;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class TriggerType.
- */
 class TriggerType extends AbstractType
 {
     /**
-     * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
+     * @var CorePermissions
      */
     private $security;
 
-    /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
-     */
-    private $translator;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
+    public function __construct(CorePermissions $security)
     {
-        $this->translator = $factory->getTranslator();
-        $this->security   = $factory->getSecurity();
+        $this->security = $security;
     }
 
     /**
@@ -55,7 +49,7 @@ class TriggerType extends AbstractType
 
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.name',
                 'label_attr' => ['class' => 'control-label'],
@@ -65,7 +59,7 @@ class TriggerType extends AbstractType
 
         $builder->add(
             'description',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.core.description',
                 'label_attr' => ['class' => 'control-label'],
@@ -74,7 +68,6 @@ class TriggerType extends AbstractType
             ]
         );
 
-        //add category
         $builder->add(
             'category',
             CategoryListType::class,
@@ -85,7 +78,7 @@ class TriggerType extends AbstractType
 
         $builder->add(
             'points',
-            'number',
+            NumberType::class,
             [
                 'label'      => 'mautic.point.trigger.form.points',
                 'label_attr' => ['class' => 'control-label'],
@@ -101,7 +94,7 @@ class TriggerType extends AbstractType
 
         $builder->add(
             'color',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.point.trigger.form.color',
                 'label_attr' => ['class' => 'control-label'],
@@ -139,19 +132,21 @@ class TriggerType extends AbstractType
             'isPublished',
             YesNoButtonGroupType::class,
             [
-                'read_only' => $readonly,
                 'data'      => $data,
+                'attr'      => [
+                    'readonly' => $readonly,
+                ],
             ]
         );
 
         $builder->add(
             'publishUp',
-            'datetime',
+            DateTimeType::class,
             [
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishup',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
+                'widget'         => 'single_text',
+                'label'          => 'mautic.core.form.publishup',
+                'label_attr'     => ['class' => 'control-label'],
+                    'attr'       => [
                     'class'       => 'form-control',
                     'data-toggle' => 'datetime',
                 ],
@@ -162,7 +157,7 @@ class TriggerType extends AbstractType
 
         $builder->add(
             'publishDown',
-            'datetime',
+            DateTimeType::class,
             [
                 'widget'     => 'single_text',
                 'label'      => 'mautic.core.form.publishdown',
@@ -178,7 +173,7 @@ class TriggerType extends AbstractType
 
         $builder->add(
             'sessionId',
-            'hidden',
+            HiddenType::class,
             [
                 'mapped' => false,
             ]
@@ -194,11 +189,11 @@ class TriggerType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Mautic\PointBundle\Entity\Trigger',
+                'data_class' => Trigger::class,
             ]
         );
     }
@@ -206,7 +201,7 @@ class TriggerType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'pointtrigger';
     }

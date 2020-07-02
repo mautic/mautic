@@ -33,18 +33,12 @@ abstract class AbstractFormStandardType extends AbstractType
      */
     protected $security;
 
-    /**
-     * @param CorePermissions $security
-     */
     public function setSecurity(CorePermissions $security)
     {
         $this->security = $security;
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     *
      * @throws \Exception
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -122,8 +116,10 @@ abstract class AbstractFormStandardType extends AbstractType
                 'isPublished',
                 YesNoButtonGroupType::class,
                 [
-                    'read_only' => $readonly,
-                    'data'      => $data,
+                    'data' => $data,
+                    'attr' => [
+                        'readonly' => $readonly,
+                    ],
                 ]
             );
 
@@ -138,10 +134,10 @@ abstract class AbstractFormStandardType extends AbstractType
                         'attr'       => [
                             'class'       => 'form-control',
                             'data-toggle' => 'datetime',
+                            'readonly'    => $readonly,
                         ],
                         'format'     => 'yyyy-MM-dd HH:mm',
                         'required'   => false,
-                        'read_only'  => $readonly,
                     ]
                 );
 
@@ -155,10 +151,10 @@ abstract class AbstractFormStandardType extends AbstractType
                         'attr'       => [
                             'class'       => 'form-control',
                             'data-toggle' => 'datetime',
+                            'readonly'    => $readonly,
                         ],
                         'format'     => 'yyyy-MM-dd HH:mm',
                         'required'   => false,
-                        'read_only'  => $readonly,
                     ]
                 );
             }

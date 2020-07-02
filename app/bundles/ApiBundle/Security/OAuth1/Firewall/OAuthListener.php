@@ -18,16 +18,9 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
-/**
- * Class OAuthListener.
- */
 class OAuthListener extends \Bazinga\OAuthServerBundle\Security\Firewall\OAuthListener
 {
     /**
-     * @author William DURAND <william.durand1@gmail.com>
-     *
-     * @param GetResponseEvent $event
-     *
      * @throws AuthenticationException
      * @throws HttpException
      */
@@ -48,14 +41,12 @@ class OAuthListener extends \Bazinga\OAuthServerBundle\Security\Firewall\OAuthLi
             $returnValue = $this->authenticationManager->authenticate($token);
 
             if ($returnValue instanceof TokenInterface) {
-                return $this->securityContext->setToken($returnValue);
+                return $this->tokenStorage->setToken($returnValue);
             } elseif ($returnValue instanceof Response) {
                 return $event->setResponse($returnValue);
             }
         } catch (AuthenticationException $e) {
             throw $e;
         }
-
-        throw new HttpException(401);
     }
 }

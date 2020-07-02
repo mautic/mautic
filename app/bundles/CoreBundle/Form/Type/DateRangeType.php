@@ -35,9 +35,6 @@ class DateRangeType extends AbstractType
 
     /**
      * DateRangeType constructor.
-     *
-     * @param SessionInterface     $session
-     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(SessionInterface $session, CoreParametersHelper $coreParametersHelper)
     {
@@ -45,10 +42,6 @@ class DateRangeType extends AbstractType
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $humanFormat     = 'M j, Y';
@@ -58,7 +51,7 @@ class DateRangeType extends AbstractType
             $defaultFrom = new \DateTime($sessionDateFrom);
             $defaultTo   = new \DateTime($sessionDateTo);
         } else {
-            $dateRangeDefault = $this->coreParametersHelper->getParameter('default_daterange_filter', '-1 month');
+            $dateRangeDefault = $this->coreParametersHelper->get('default_daterange_filter', '-1 month');
             $defaultFrom      = new \DateTime($dateRangeDefault);
             $defaultTo        = new \DateTime();
         }

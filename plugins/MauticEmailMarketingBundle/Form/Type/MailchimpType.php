@@ -13,6 +13,7 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\PluginBundle\Form\Type\FieldsType;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\Form\AbstractType;
@@ -56,10 +57,6 @@ class MailchimpType extends AbstractType
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         /** @var \MauticPlugin\MauticEmailMarketingBundle\Integration\MailchimpIntegration $mailchimp */
@@ -85,7 +82,6 @@ class MailchimpType extends AbstractType
 
         $builder->add('list', ChoiceType::class, [
             'choices'           => array_flip($choices), // Choice type expects labels as keys
-            'choices_as_values' => true,
             'label'             => 'mautic.emailmarketing.list',
             'required'          => false,
             'attr'              => [
@@ -114,7 +110,7 @@ class MailchimpType extends AbstractType
             });
         }
 
-        if (isset($options['form_area']) && $options['form_area'] == 'integration') {
+        if (isset($options['form_area']) && 'integration' == $options['form_area']) {
             $leadFields = $this->pluginModel->getLeadFields();
 
             $formModifier = function (FormInterface $form, $data) use ($mailchimp, $leadFields) {
@@ -122,7 +118,7 @@ class MailchimpType extends AbstractType
                 $session         = $this->session;
                 $limit           = $session->get(
                     'mautic.plugin.'.$integrationName.'.lead.limit',
-                    $this->coreParametersHelper->getParameter('default_pagelimit')
+                    $this->coreParametersHelper->get('default_pagelimit')
                 );
                 $page     = $session->get('mautic.plugin.'.$integrationName.'.lead.page', 1);
                 $settings = [
@@ -130,7 +126,7 @@ class MailchimpType extends AbstractType
                     'feature_settings'   => [
                         'list_settings' => $data,
                     ],
-                    'ignore_field_cache' => ($page == 1 && 'POST' !== $_SERVER['REQUEST_METHOD']) ? true : false,
+                    'ignore_field_cache' => (1 == $page && 'POST' !== $_SERVER['REQUEST_METHOD']) ? true : false,
                 ];
                 try {
                     $fields = $mailchimp->getFormLeadFields($settings);
@@ -146,7 +142,7 @@ class MailchimpType extends AbstractType
                 }
 
                 list($specialInstructions) = $mailchimp->getFormNotes('leadfield_match');
-                $form->add('leadFields', 'integration_fields', [
+                $form->add('leadFields', FieldsType::class, [
                     'label'                => 'mautic.integration.leadfield_matches',
                     'required'             => true,
                     'mautic_fields'        => $leadFields,

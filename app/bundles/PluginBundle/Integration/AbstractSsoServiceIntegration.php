@@ -12,12 +12,12 @@
 namespace Mautic\PluginBundle\Integration;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Form\Type\RoleListType;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * Used by SSO auth plugins that use OAuth2, etc means of logins.
- *
- * Class AbstractSsoIntegration
  */
 abstract class AbstractSsoServiceIntegration extends AbstractIntegration
 {
@@ -34,7 +34,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     /**
      * Get the user role for new users.
      *
-     * @return bool|\Doctrine\Common\Proxy\Proxy|null|object
+     * @return bool|\Doctrine\Common\Proxy\Proxy|object|null
      *
      * @throws \Doctrine\ORM\ORMException
      */
@@ -45,7 +45,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
         $role = (isset($featureSettings['new_user_role'])) ? $featureSettings['new_user_role'] : false;
 
         if ($role) {
-            return $this->factory->getEntityManager()->getReference('MauticUserBundle:Role', $role);
+            return $this->em->getReference(Role::class, $role);
         }
 
         throw new AuthenticationException('mautic.integration.sso.error.no_role');
@@ -68,7 +68,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
      */
     public function getAuthCallbackUrl()
     {
-        return $this->factory->getRouter()->generate('mautic_sso_login_check',
+        return $this->router->generate('mautic_sso_login_check',
             ['integration' => $this->getName()],
             true //absolute
         );
@@ -109,7 +109,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
 
         $error = $this->getErrorsFromResponse($data);
         if (empty($error)) {
-            $error = $this->factory->getTranslator()->trans('mautic.integration.error.genericerror', [], 'flashes');
+            $error = $this->translator->trans('mautic.integration.error.genericerror', [], 'flashes');
         }
 
         throw new AuthenticationException($error);
@@ -147,7 +147,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        if ($formArea == 'features') {
+        if ('features' == $formArea) {
             $builder->add('auto_create_user',
                 YesNoButtonGroupType::class,
                 [
@@ -161,7 +161,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
 
             $builder->add(
                 'new_user_role',
-                'role_list',
+                RoleListType::class,
                 [
                     'label'      => 'mautic.integration.sso.new_user_role',
                     'label_attr' => ['class' => 'control-label'],

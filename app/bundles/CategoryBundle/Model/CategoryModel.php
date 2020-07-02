@@ -27,14 +27,12 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class CategoryModel extends FormModel
 {
     /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
+     * @var \Symfony\Component\HttpFoundation\Request|null
      */
     protected $request;
 
     /**
      * CategoryModel constructor.
-     *
-     * @param RequestStack $requestStack
      */
     public function __construct(RequestStack $requestStack)
     {
@@ -67,8 +65,8 @@ class CategoryModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param   $entity
-     * @param   $unlock
+     * @param $entity
+     * @param $unlock
      *
      * @return mixed
      */
@@ -133,13 +131,11 @@ class CategoryModel extends FormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Category();
         }
 
-        $entity = parent::getEntity($id);
-
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**

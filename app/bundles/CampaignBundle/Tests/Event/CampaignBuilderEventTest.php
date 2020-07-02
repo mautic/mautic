@@ -15,6 +15,7 @@ use Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType;
 
 class CampaignBuilderEventTest extends CampaignTestAbstract
 {
@@ -68,7 +69,7 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
 
         $decisions = $event->getDecisions();
 
-        $this->assertSame(3, count($decisions));
+        $this->assertCount(3, $decisions);
 
         $shouldBe = 1;
         foreach ($decisions as $key => $resultDecision) {
@@ -82,7 +83,7 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
         $condition = [
             'label'       => 'mautic.form.campaign.event.field_value',
             'description' => 'mautic.form.campaign.event.field_value_descr',
-            'formType'    => 'campaignevent_form_field_value',
+            'formType'    => CampaignEventFormFieldValueType::class,
             'formTheme'   => 'MauticFormBundle:FormTheme\FieldValueCondition',
             'eventName'   => 'mautic.form.on_campaign_trigger_condition',
         ];
@@ -97,7 +98,7 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
 
         $conditions = $event->getConditions();
 
-        $this->assertSame(3, count($conditions));
+        $this->assertCount(3, $conditions);
 
         $shouldBe = 1;
         foreach ($conditions as $key => $resultCondition) {
@@ -126,7 +127,7 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
 
         $actions = $event->getActions();
 
-        $this->assertSame(3, count($actions));
+        $this->assertCount(3, $actions);
 
         $shouldBe = 1;
         foreach ($actions as $key => $resultAction) {

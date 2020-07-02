@@ -55,7 +55,7 @@ class ClearbitIntegration extends AbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        if ($formArea === 'keys') {
+        if ('keys' === $formArea) {
             $builder->add(
                 'auto_update',
                 YesNoButtonGroupType::class,

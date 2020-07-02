@@ -17,9 +17,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class ChannelListHelper.
- */
 class ChannelListHelper extends Helper
 {
     /**
@@ -42,12 +39,6 @@ class ChannelListHelper extends Helper
      */
     protected $dispatcher;
 
-    /**
-     * ChannelListHelper constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
-     * @param TranslatorInterface      $translator
-     */
     public function __construct(EventDispatcherInterface $dispatcher, TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -103,7 +94,7 @@ class ChannelListHelper extends Helper
             $channels[$feature] = $returnChannels;
         }
 
-        if (count($features) === 1) {
+        if (1 === count($features)) {
             $channels = $channels[$features[0]];
         }
 

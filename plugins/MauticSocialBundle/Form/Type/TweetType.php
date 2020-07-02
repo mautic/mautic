@@ -16,6 +16,7 @@ use Mautic\AssetBundle\Form\Type\AssetListType;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\PageBundle\Form\Type\PageListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -32,18 +33,11 @@ class TweetType extends AbstractType
      */
     protected $em;
 
-    /**
-     * @param EntityManager $em
-     */
     public function __construct(EntityManager $em)
     {
         $this->em = $em;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -109,7 +103,7 @@ class TweetType extends AbstractType
                 AssetListType::class,
                 [
                     'label'       => 'mautic.social.monitoring.twitter.assets',
-                    'empty_value' => 'mautic.social.monitoring.list.choose',
+                    'placeholder' => 'mautic.social.monitoring.list.choose',
                     'label_attr'  => ['class' => 'control-label'],
                     'multiple'    => false,
                     'attr'        => [
@@ -124,10 +118,10 @@ class TweetType extends AbstractType
         $builder->add(
             $builder->create(
                 'page',
-                'page_list',
+                PageListType::class,
                 [
                     'label'       => 'mautic.social.monitoring.twitter.pages',
-                    'empty_value' => 'mautic.social.monitoring.list.choose',
+                    'placeholder' => 'mautic.social.monitoring.list.choose',
                     'label_attr'  => ['class' => 'control-label'],
                     'multiple'    => false,
                     'attr'        => [
@@ -182,9 +176,6 @@ class TweetType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefined(['update_select']);

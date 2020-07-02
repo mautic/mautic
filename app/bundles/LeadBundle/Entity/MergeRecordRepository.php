@@ -21,7 +21,7 @@ class MergeRecordRepository extends CommonRepository
     /**
      * @param $id
      *
-     * @return null|Lead
+     * @return Lead|null
      */
     public function findMergedContact($id)
     {

@@ -2,7 +2,7 @@
 $list            = $form->children['list'];
 $parentHasErrors = $view['form']->containsErrors($form->parent);
 
-if ($parentHasErrors && empty($list->vars['value']) && isset($form->parent->children['properties']['list']) && $form->parent->vars['data']->getId() === null) {
+if ($parentHasErrors && empty($list->vars['value']) && isset($form->parent->children['properties']['list']) && null === $form->parent->vars['data']->getId()) {
     // Work around for Symfony bug not repopulating values only for add action
     $list = $form->parent->children['properties']['list'];
 }

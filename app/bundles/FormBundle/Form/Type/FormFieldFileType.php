@@ -30,6 +30,7 @@ class FormFieldFileType extends AbstractType
 {
     const PROPERTY_ALLOWED_FILE_EXTENSIONS = 'allowed_file_extensions';
     const PROPERTY_ALLOWED_FILE_SIZE       = 'allowed_file_size';
+    const PROPERTY_PREFERED_PROFILE_IMAGE  = 'profile_image';
 
     /** @var CoreParametersHelper */
     private $coreParametersHelper;
@@ -51,10 +52,10 @@ class FormFieldFileType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (empty($options['data'][self::PROPERTY_ALLOWED_FILE_EXTENSIONS])) {
-            $options['data'][self::PROPERTY_ALLOWED_FILE_EXTENSIONS] = $this->coreParametersHelper->getParameter('allowed_extensions');
+            $options['data'][self::PROPERTY_ALLOWED_FILE_EXTENSIONS] = $this->coreParametersHelper->get('allowed_extensions');
         }
         if (empty($options['data'][self::PROPERTY_ALLOWED_FILE_SIZE])) {
-            $options['data'][self::PROPERTY_ALLOWED_FILE_SIZE] = $this->coreParametersHelper->getParameter('max_size');
+            $options['data'][self::PROPERTY_ALLOWED_FILE_SIZE] = $this->coreParametersHelper->get('max_size');
         }
 
         $arrayStringTransformer = new ArrayStringTransformer();
@@ -97,7 +98,16 @@ class FormFieldFileType extends AbstractType
             'public',
             YesNoButtonGroupType::class,
             [
-                'label'      => 'mautic.form.field.file.public',
+                'label' => 'mautic.form.field.file.public',
+            ]
+        );
+
+        $builder->add(
+            self::PROPERTY_PREFERED_PROFILE_IMAGE,
+            YesNoButtonGroupType::class,
+            [
+                'label'       => 'mautic.form.field.file.set_as_profile_image',
+                'data'        => isset($options['data'][self::PROPERTY_PREFERED_PROFILE_IMAGE]) ? $options['data'][self::PROPERTY_PREFERED_PROFILE_IMAGE] : false,
             ]
         );
     }

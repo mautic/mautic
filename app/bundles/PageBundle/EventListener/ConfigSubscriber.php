@@ -14,11 +14,11 @@ namespace Mautic\PageBundle\EventListener;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PageBundle\Form\Type\ConfigTrackingPageType;
 use Mautic\PageBundle\Form\Type\ConfigType;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ConfigSubscriber extends CommonSubscriber
+class ConfigSubscriber implements EventSubscriberInterface
 {
     /**
      * @return array
@@ -63,7 +63,6 @@ class ConfigSubscriber extends CommonSubscriber
                 'anonymize_ip'                          => false,
                 'track_contact_by_ip'                   => false,
                 'track_by_tracking_url'                 => false,
-                'track_by_fingerprint'                  => false,
                 'facebook_pixel_id'                     => null,
                 'facebook_pixel_trackingpage_enabled'   => false,
                 'facebook_pixel_landingpage_enabled'    => false,

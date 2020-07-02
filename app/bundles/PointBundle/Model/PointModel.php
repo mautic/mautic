@@ -11,37 +11,30 @@
 
 namespace Mautic\PointBundle\Model;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\PointBundle\Entity\Action;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Entity\LeadPointLog;
 use Mautic\PointBundle\Entity\Point;
+use Mautic\PointBundle\Entity\PointRepository;
 use Mautic\PointBundle\Event\PointActionEvent;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\PointChangeActionExecutedEvent;
 use Mautic\PointBundle\Event\PointEvent;
+use Mautic\PointBundle\Form\Type\PointType;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-/**
- * Class PointModel.
- */
 class PointModel extends CommonFormModel
 {
-    /**
-     * @deprecated Remove in 2.0
-     *
-     * @var MauticFactory
-     */
-    protected $factory;
-
     /**
      * @var Session
      */
@@ -58,29 +51,41 @@ class PointModel extends CommonFormModel
     protected $leadModel;
 
     /**
+     * @deprecated https://github.com/mautic/mautic/issues/8229
+     *
+     * @var MauticFactory
+     */
+    protected $mauticFactory;
+
+    /**
+     * @var ContactTracker
+     */
+    private $contactTracker;
+
+    /**
      * @var PropertyAccessor
      */
     private $propertyAccessor;
 
-    /**
-     * PointModel constructor.
-     *
-     * @param Session        $session
-     * @param IpLookupHelper $ipLookupHelper
-     * @param LeadModel      $leadModel
-     */
-    public function __construct(Session $session, IpLookupHelper $ipLookupHelper, LeadModel $leadModel)
-    {
-        $this->session          = $session;
-        $this->ipLookupHelper   = $ipLookupHelper;
-        $this->leadModel        = $leadModel;
+    public function __construct(
+        Session $session,
+        IpLookupHelper $ipLookupHelper,
+        LeadModel $leadModel,
+        MauticFactory $mauticFactory,
+        ContactTracker $contactTracker
+    ) {
+        $this->session            = $session;
+        $this->ipLookupHelper     = $ipLookupHelper;
+        $this->leadModel          = $leadModel;
+        $this->mauticFactory      = $mauticFactory;
+        $this->contactTracker     = $contactTracker;
         $this->propertyAccessor = new PropertyAccessor();
     }
 
     /**
      * {@inheritdoc}
      *
-     * @return \Mautic\PointBundle\Entity\PointRepository
+     * @return PointRepository
      */
     public function getRepository()
     {
@@ -114,7 +119,7 @@ class PointModel extends CommonFormModel
             $options['pointActions'] = $this->getPointActions();
         }
 
-        return $formFactory->create('point', $entity, $options);
+        return $formFactory->create(PointType::class, $entity, $options);
     }
 
     /**
@@ -124,7 +129,7 @@ class PointModel extends CommonFormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Point();
         }
 
@@ -210,7 +215,7 @@ class PointModel extends CommonFormModel
             return;
         }
 
-        if ($typeId !== null && MAUTIC_ENV === 'prod') {
+        if (null !== $typeId && MAUTIC_ENV === 'prod') {
             //let's prevent some unnecessary DB calls
             $triggeredEvents = $this->session->get('mautic.triggered.point.actions', []);
             if (in_array($typeId, $triggeredEvents)) {
@@ -227,7 +232,7 @@ class PointModel extends CommonFormModel
         $ipAddress       = $this->ipLookupHelper->getIpAddress();
 
         if (null === $lead) {
-            $lead = $this->leadModel->getCurrentLead();
+            $lead = $this->contactTracker->getContact();
 
             if (null === $lead || !$lead->getId()) {
                 return;
@@ -239,7 +244,8 @@ class PointModel extends CommonFormModel
 
         //get a list of actions that has already been performed on this lead
         $completedActions = $repo->getCompletedLeadActions($type, $lead->getId());
-        $persist          = [];
+
+        $persist = [];
         /** @var Point $action */
         foreach ($availablePoints as $action) {
             //make sure the action still exists
@@ -361,15 +367,14 @@ class PointModel extends CommonFormModel
         return $reflection->invokeArgs($this, $pass);
     }
 
+
     /**
      * Get line chart data of points.
      *
-     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
-     * @param bool      $canViewOthers
+     * @param string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
+     * @param array  $filter
+     * @param bool   $canViewOthers
      *
      * @return array
      */

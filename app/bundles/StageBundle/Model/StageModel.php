@@ -45,11 +45,6 @@ class StageModel extends CommonFormModel
      */
     protected $userHelper;
 
-    /**
-     * @param LeadModel  $leadModel
-     * @param Session    $session
-     * @param UserHelper $userHelper
-     */
     public function __construct(LeadModel $leadModel, Session $session, UserHelper $userHelper)
     {
         $this->session    = $session;
@@ -99,7 +94,7 @@ class StageModel extends CommonFormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Stage();
         }
 

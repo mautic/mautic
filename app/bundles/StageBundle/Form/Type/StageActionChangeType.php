@@ -21,10 +21,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class StageActionChangeType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('stage', StageActionListType::class, [

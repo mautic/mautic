@@ -28,18 +28,12 @@ class SlotSavePrefsButtonType extends SlotType
 
     /**
      * ConfigType constructor.
-     *
-     * @param TranslatorInterface $translator
      */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -86,12 +80,11 @@ class SlotSavePrefsButtonType extends SlotType
                     'data-slot-param' => 'button-size',
                 ],
                 'choices'           => [
-                    'S' => 's',
-                    'M' => 'm',
-                    'L' => 'l',
+                    'S' => 0,
+                    'M' => 1,
+                    'L' => 2,
                 ],
-                'choices_as_values' => true,
-            ]
+                ]
         );
 
         $builder->add(
@@ -106,12 +99,11 @@ class SlotSavePrefsButtonType extends SlotType
                     'data-slot-param' => 'float',
                 ],
                 'choices'           => [
-                    'mautic.core.left'   => 'left',
-                    'mautic.core.center' => 'center',
-                    'mautic.core.right'  => 'right',
+                    'mautic.core.left'   => 0,
+                    'mautic.core.center' => 1,
+                    'mautic.core.right'  => 2,
                 ],
-                'choices_as_values' => true,
-            ]
+                ]
         );
 
         $builder->add(

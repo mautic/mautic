@@ -13,6 +13,7 @@ namespace Mautic\PageBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -20,10 +21,6 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class ConfigType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -40,7 +37,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'google_analytics',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.page.config.form.google.analytics',
                 'label_attr' => ['class' => 'control-label'],
@@ -57,7 +54,7 @@ class ConfigType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'pageconfig';
     }

@@ -12,23 +12,22 @@
 namespace Mautic\PluginBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
 trait FieldsTypeTrait
 {
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     * @param array                $integrationFields
-     * @param array                $mauticFields
-     * @param string               $fieldObject
+     * @param string $fieldObject
+     * @param $limit
+     * @param $start
      */
     protected function buildFormFields(
         FormBuilderInterface $builder,
@@ -37,12 +36,11 @@ trait FieldsTypeTrait
         array $mauticFields,
         $fieldObject,
         $limit,
-        $start,
-        TranslatorInterface $translator
+        $start
     ) {
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($options, $integrationFields, $mauticFields, $fieldObject, $limit, $start, $translator) {
+            function (FormEvent $event) use ($options, $integrationFields, $mauticFields, $fieldObject, $limit, $start) {
                 $form = $event->getForm();
                 $index = 0;
                 $choices = [];
@@ -50,6 +48,13 @@ trait FieldsTypeTrait
                 $optionalFields = [];
                 $group = [];
                 $fieldData = $event->getData();
+
+                foreach ($mauticFields as $key => $value) {
+                    if (is_array($mauticFields)) {
+                        $mauticFields[$key] = array_flip($value);
+                    }
+                }
+
                 // First loop to build options
                 foreach ($integrationFields as $field => $details) {
                     $groupName = '0default';
@@ -73,7 +78,7 @@ trait FieldsTypeTrait
                         $optionalFields[$groupName] = [];
                     }
 
-                    if (is_array($details) && (!empty($details['required']) || $choices[$field] == 'Email')) {
+                    if (is_array($details) && (!empty($details['required']) || 'Email' == $choices[$field])) {
                         $requiredFields[$groupName][$field] = $details;
                     } else {
                         $optionalFields[$groupName][$field] = $details;
@@ -101,19 +106,19 @@ trait FieldsTypeTrait
                 };
 
                 $fields = [];
-                foreach ($requiredFields as $groupName => $groupedFields) {
+                foreach ($requiredFields as $groupedFields) {
                     uasort($groupedFields, $sortFieldsFunction);
 
                     $fields = array_merge($fields, $groupedFields);
                 }
-                foreach ($optionalFields as $groupName => $groupedFields) {
+                foreach ($optionalFields as $groupedFields) {
                     uasort($groupedFields, $sortFieldsFunction);
 
                     $fields = array_merge($fields, $groupedFields);
                 }
 
                 // Ensure that fields aren't hidden
-                if ($start > count($fields) || $options['page'] == 0) {
+                if ($start > count($fields) || 0 == $options['page']) {
                     $start = 0;
                 }
 
@@ -128,11 +133,11 @@ trait FieldsTypeTrait
 
                 foreach ($paginatedFields as $field => $details) {
                     $matched = isset($fieldData[$fieldsName][$field]);
-                    $required = (int) (!empty($integrationFields[$field]['required']) || $choices[$field] == 'Email');
+                    $required = (int) (!empty($integrationFields[$field]['required']) || 'Email' == $choices[$field]);
                     ++$index;
                     $form->add(
                         'label_'.$index,
-                        'text',
+                        TextType::class,
                         [
                             'label' => false,
                             'data'  => $choices[$field],
@@ -170,13 +175,13 @@ trait FieldsTypeTrait
                             ButtonGroupType::class,
                             [
                                 'choices' => [
-                                    '<btn class="btn-nospin fa fa-arrow-circle-left"></btn>',
-                                    '<btn class="btn-nospin fa fa-arrow-circle-right"></btn>',
+                                    '<btn class="btn-nospin fa fa-arrow-circle-left"></btn>'  => 0,
+                                    '<btn class="btn-nospin fa fa-arrow-circle-right"></btn>' => 1,
                                 ],
-                                'label'       => false,
-                                'data'        => $data,
-                                'empty_value' => false,
-                                'attr'        => [
+                                'label'             => false,
+                                'data'              => $data,
+                                'placeholder'       => false,
+                                'attr'              => [
                                     'data-toggle'   => 'tooltip',
                                     'title'         => 'mautic.plugin.direction.data.update',
                                     'disabled'      => $disabled,
@@ -185,16 +190,16 @@ trait FieldsTypeTrait
                             ]
                         );
                     }
+
                     if (!$fieldObject) {
-                        $contactId['mauticContactId'] = $this->translator->trans('mautic.lead.report.contact_id');
-                        $contactLink['mauticContactTimelineLink'] = $this->translator->trans('mautic.plugin.integration.contact.timeline.link');
-                        $isContactable['mauticContactIsContactableByEmail'] = $this->translator->trans('mautic.plugin.integration.contact.donotcontact.email');
-                        $mauticFields = array_merge($mauticFields, $contactLink, $isContactable, $contactId);
+                        $mauticFields['mautic.lead.report.contact_id'] = 'mauticContactId';
+                        $mauticFields['mautic.plugin.integration.contact.timeline.link'] = 'mauticContactTimelineLink';
+                        $mauticFields['mautic.plugin.integration.contact.donotcontact.email'] = 'mauticContactIsContactableByEmail';
                     }
 
                     $form->add(
                         'm_'.$index,
-                        'choice',
+                        ChoiceType::class,
                         [
                             'choices'    => $mauticFields,
                             'label'      => false,
@@ -236,22 +241,18 @@ trait FieldsTypeTrait
         );
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     * @param                 $object
-     */
     protected function configureFieldOptions(OptionsResolver $resolver, $object)
     {
         $resolver->setRequired(['integration_fields', 'mautic_fields', 'integration', 'integration_object', 'page']);
         $resolver->setDefined([('lead' === $object) ? 'update_mautic' : 'update_mautic_company']);
         $resolver->setDefaults(
             [
-                'special_instructions' => function (Options $options) use ($object) {
+                'special_instructions' => function (Options $options) {
                     list($specialInstructions, $alertType) = $options['integration_object']->getFormNotes('leadfield_match');
 
                     return $specialInstructions;
                 },
-                'alert_type' => function (Options $options) use ($object) {
+                'alert_type' => function (Options $options) {
                     list($specialInstructions, $alertType) = $options['integration_object']->getFormNotes('leadfield_match');
 
                     return $alertType;
@@ -272,10 +273,6 @@ trait FieldsTypeTrait
         );
     }
 
-    /**
-     * @param FormView $view
-     * @param array    $options
-     */
     protected function buildFieldView(FormView $view, array $options)
     {
         $view->vars['specialInstructions'] = $options['special_instructions'];

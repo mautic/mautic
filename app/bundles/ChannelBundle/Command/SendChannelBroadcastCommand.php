@@ -71,9 +71,6 @@ EOT
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -91,7 +88,7 @@ EOT
         }
 
         $translator = $this->getContainer()->get('translator');
-        $translator->setLocale($this->getContainer()->get('mautic.helper.core_parameters')->getParameter('locale'));
+        $translator->setLocale($this->getContainer()->get('mautic.helper.core_parameters')->get('locale'));
 
         $dispatcher = $this->getContainer()->get('event_dispatcher');
 

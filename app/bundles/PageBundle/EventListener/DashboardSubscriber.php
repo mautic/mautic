@@ -13,11 +13,10 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
+use Mautic\PageBundle\Form\Type\DashboardHitsInTimeWidgetType;
 use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\Routing\RouterInterface;
 
-/**
- * Class DashboardSubscriber.
- */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
@@ -34,7 +33,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     protected $types = [
         'page.hits.in.time' => [
-            'formAlias' => 'page_dashboard_hits_in_time_widget',
+            'formAlias' => DashboardHitsInTimeWidgetType::class,
         ],
         'unique.vs.returning.leads' => [],
         'dwell.times'               => [],
@@ -59,26 +58,25 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $pageModel;
 
     /**
-     * DashboardSubscriber constructor.
-     *
-     * @param PageModel $pageModel
+     * @var RouterInterface
      */
-    public function __construct(PageModel $pageModel)
+    protected $router;
+
+    public function __construct(PageModel $pageModel, RouterInterface $router)
     {
         $this->pageModel = $pageModel;
+        $this->router    = $router;
     }
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('page:pages:viewother');
 
-        if ($event->getType() == 'page.hits.in.time') {
+        if ('page.hits.in.time' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -105,7 +103,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'unique.vs.returning.leads') {
+        if ('unique.vs.returning.leads' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
                 $event->setTemplateData([
@@ -119,7 +117,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'dwell.times') {
+        if ('dwell.times' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
                 $event->setTemplateData([
@@ -133,7 +131,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'popular.pages') {
+        if ('popular.pages' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
 
@@ -179,7 +177,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'created.pages') {
+        if ('created.pages' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
 
@@ -221,7 +219,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'device.granularity') {
+        if ('device.granularity' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 

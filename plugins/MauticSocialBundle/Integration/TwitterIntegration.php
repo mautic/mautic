@@ -111,7 +111,7 @@ class TwitterIntegration extends SocialIntegration
         // Prevent SSL issues
         $settings['ssl_verifypeer'] = false;
 
-        if (empty($settings['authorize_session']) && $authType != 'access_token') {
+        if (empty($settings['authorize_session']) && 'access_token' != $authType) {
             // Twitter requires oauth_token_secret to be part of composite key
             if (isset($this->keys['oauth_token_secret'])) {
                 $settings['token_secret'] = $this->keys['oauth_token_secret'];
@@ -222,7 +222,7 @@ class TwitterIntegration extends SocialIntegration
             ];
 
             foreach ($data as $k => $d) {
-                if ($k == 10) {
+                if (10 == $k) {
                     break;
                 }
 
@@ -238,7 +238,7 @@ class TwitterIntegration extends SocialIntegration
                 //images
                 if (isset($d['entities']['media'])) {
                     foreach ($d['entities']['media'] as $m) {
-                        if ($m['type'] == 'photo') {
+                        if ('photo' == $m['type']) {
                             $photo = [
                                 'url' => (isset($m['media_url_https']) ? $m['media_url_https'] : $m['media_url']),
                             ];
@@ -290,7 +290,7 @@ class TwitterIntegration extends SocialIntegration
         if (preg_match('#https?://twitter.com/(.*?)(/.*?|$)#i', $identifier, $match)) {
             //extract the handle
             $identifier = $match[1];
-        } elseif (substr($identifier, 0, 1) == '@') {
+        } elseif ('@' == substr($identifier, 0, 1)) {
             $identifier = substr($identifier, 1);
         }
 

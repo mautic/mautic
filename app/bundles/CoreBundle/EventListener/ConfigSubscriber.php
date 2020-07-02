@@ -15,29 +15,19 @@ use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\CoreBundle\Form\Type\ConfigType;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ConfigSubscriber extends CommonSubscriber
+class ConfigSubscriber implements EventSubscriberInterface
 {
     /**
      * @var LanguageHelper
      */
-    protected $languageHelper;
+    private $languageHelper;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
-     * @param LanguageHelper       $languageHelper
-     * @param CoreParametersHelper $coreParametersHelper
-     */
-    public function __construct(LanguageHelper $languageHelper, CoreParametersHelper $coreParametersHelper)
+    public function __construct(LanguageHelper $languageHelper)
     {
-        $this->languageHelper       = $languageHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
+        $this->languageHelper = $languageHelper;
     }
 
     /**
@@ -73,9 +63,7 @@ class ConfigSubscriber extends CommonSubscriber
         $event->unsetIfEmpty('transifex_password');
 
         // Check if the selected locale has been downloaded already, fetch it if not
-        $installedLanguages = $this->coreParametersHelper->getParameter('supported_languages');
-
-        if (!array_key_exists($values['coreconfig']['locale'], $installedLanguages)) {
+        if (!array_key_exists($values['coreconfig']['locale'], $this->languageHelper->getSupportedLanguages())) {
             $fetchLanguage = $this->languageHelper->extractLanguagePackage($values['coreconfig']['locale']);
 
             // If there is an error, fall back to 'en_US' as it is our system default

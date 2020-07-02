@@ -11,7 +11,6 @@
 
 namespace Mautic\PageBundle\Entity;
 
-use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -27,7 +26,6 @@ class VideoHitRepository extends CommonRepository
      * Get video hit info for lead timeline.
      *
      * @param int|null $leadId
-     * @param array    $options
      *
      * @return array
      */
@@ -52,7 +50,6 @@ class VideoHitRepository extends CommonRepository
     }
 
     /**
-     * @param Lead   $lead
      * @param string $guid
      *
      * @return VideoHit
@@ -67,8 +64,7 @@ class VideoHitRepository extends CommonRepository
     /**
      * Get a lead's page hits.
      *
-     * @param int   $leadId
-     * @param array $options
+     * @param int $leadId
      *
      * @return array
      *

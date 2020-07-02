@@ -18,14 +18,15 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\EmailBundle\Model\TransportType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class ConfigType.
- */
 class ConfigType extends AbstractType
 {
     /**
@@ -38,22 +39,12 @@ class ConfigType extends AbstractType
      */
     private $transportType;
 
-    /**
-     * ConfigType constructor.
-     *
-     * @param TranslatorInterface $translator
-     * @param TransportType       $transportType
-     */
     public function __construct(TranslatorInterface $translator, TransportType $transportType)
     {
         $this->translator    = $translator;
         $this->transportType = $transportType;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(
@@ -74,7 +65,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'unsubscribe_text',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.email.config.unsubscribe_text',
                 'label_attr' => ['class' => 'control-label'],
@@ -94,7 +85,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'webview_text',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.email.config.webview_text',
                 'label_attr' => ['class' => 'control-label'],
@@ -114,7 +105,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'unsubscribe_message',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.email.config.unsubscribe_message',
                 'label_attr' => ['class' => 'control-label'],
@@ -137,7 +128,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'resubscribe_message',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.email.config.resubscribe_message',
                 'label_attr' => ['class' => 'control-label'],
@@ -160,7 +151,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'default_signature_text',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.email.config.default_signature_text',
                 'label_attr' => ['class' => 'control-label'],
@@ -182,7 +173,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_from_name',
-            'text',
+            TextType::class,
             [
                 'label'       => 'mautic.email.config.mailer.from.name',
                 'label_attr'  => ['class' => 'control-label'],
@@ -203,7 +194,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_from_email',
-            'text',
+            TextType::class,
             [
                 'label'       => 'mautic.email.config.mailer.from.email',
                 'label_attr'  => ['class' => 'control-label'],
@@ -229,7 +220,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_return_path',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.email.config.mailer.return.path',
                 'label_attr' => ['class' => 'control-label'],
@@ -246,15 +237,15 @@ class ConfigType extends AbstractType
             'mailer_transport',
             ChoiceType::class,
             [
-                'choices'     => $this->getTransportChoices(),
-                'label'       => 'mautic.email.config.mailer.transport',
-                'required'    => false,
-                'attr'        => [
+                'choices'           => $this->getTransportChoices(),
+                'label'             => 'mautic.email.config.mailer.transport',
+                'required'          => false,
+                'attr'              => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.email.config.mailer.transport.tooltip',
                     'onchange' => 'Mautic.disableSendTestEmailButton()',
                 ],
-                'empty_value' => false,
+                'placeholder' => false,
             ]
         );
 
@@ -305,7 +296,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_host',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.email.config.mailer.host',
                 'label_attr' => ['class' => 'control-label'],
@@ -321,12 +312,12 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_amazon_region',
-            'choice',
+            ChoiceType::class,
             [
-                'choices'     => [
-                    'email-smtp.eu-west-1.amazonaws.com' => 'mautic.email.config.mailer.amazon_host.eu_west_1',
-                    'email-smtp.us-east-1.amazonaws.com' => 'mautic.email.config.mailer.amazon_host.us_east_1',
-                    'email-smtp.us-west-2.amazonaws.com' => 'mautic.email.config.mailer.amazon_host.eu_west_2',
+                'choices'           => [
+                    'mautic.email.config.mailer.amazon_host.eu_west_1' => 'email-smtp.eu-west-1.amazonaws.com',
+                    'mautic.email.config.mailer.amazon_host.us_east_1' => 'email-smtp.us-east-1.amazonaws.com',
+                    'mautic.email.config.mailer.amazon_host.eu_west_2' => 'email-smtp.us-west-2.amazonaws.com',
                 ],
                 'label'       => 'mautic.email.config.mailer.amazon_host',
                 'required'    => false,
@@ -336,13 +327,13 @@ class ConfigType extends AbstractType
                     'tooltip'      => 'mautic.email.config.mailer.amazon_host.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],
-                'empty_value' => false,
+                'placeholder' => false,
             ]
         );
 
         $builder->add(
             'mailer_port',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.email.config.mailer.port',
                 'label_attr' => ['class' => 'control-label'],
@@ -359,12 +350,12 @@ class ConfigType extends AbstractType
         $smtpServiceShowConditions = '{"config_emailconfig_mailer_transport":['.$this->transportType->getSmtpService().']}';
         $builder->add(
             'mailer_auth_mode',
-            'choice',
+            ChoiceType::class,
             [
-                'choices'     => [
-                    'plain'    => 'mautic.email.config.mailer_auth_mode.plain',
-                    'login'    => 'mautic.email.config.mailer_auth_mode.login',
-                    'cram-md5' => 'mautic.email.config.mailer_auth_mode.cram-md5',
+                'choices'           => [
+                    'mautic.email.config.mailer_auth_mode.plain'    => 'plain',
+                    'mautic.email.config.mailer_auth_mode.login'    => 'login',
+                    'mautic.email.config.mailer_auth_mode.cram-md5' => 'cram-md5',
                 ],
                 'label'       => 'mautic.email.config.mailer.auth.mode',
                 'label_attr'  => ['class' => 'control-label'],
@@ -375,13 +366,13 @@ class ConfigType extends AbstractType
                     'tooltip'      => 'mautic.email.config.mailer.auth.mode.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],
-                'empty_value' => 'mautic.email.config.mailer_auth_mode.none',
+                'placeholder' => 'mautic.email.config.mailer_auth_mode.none',
             ]
         );
 
         $builder->add(
             'mailer_user',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.email.config.mailer.user',
                 'label_attr' => ['class' => 'control-label'],
@@ -406,7 +397,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_password',
-            'password',
+            PasswordType::class,
             [
                 'label'      => 'mautic.email.config.mailer.password',
                 'label_attr' => ['class' => 'control-label'],
@@ -433,7 +424,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_api_key',
-            'password',
+            PasswordType::class,
             [
                 'label'      => 'mautic.email.config.mailer.apikey',
                 'label_attr' => ['class' => 'control-label'],
@@ -451,11 +442,11 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_encryption',
-            'choice',
+            ChoiceType::class,
             [
-                'choices'     => [
-                    'ssl' => 'mautic.email.config.mailer_encryption.ssl',
-                    'tls' => 'mautic.email.config.mailer_encryption.tls',
+                'choices'           => [
+                    'mautic.email.config.mailer_encryption.ssl' => 'ssl',
+                    'mautic.email.config.mailer_encryption.tls' => 'tls',
                 ],
                 'label'       => 'mautic.email.config.mailer.encryption',
                 'required'    => false,
@@ -465,7 +456,7 @@ class ConfigType extends AbstractType
                     'tooltip'      => 'mautic.email.config.mailer.encryption.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],
-                'empty_value' => 'mautic.email.config.mailer_encryption.none',
+                'placeholder' => 'mautic.email.config.mailer_encryption.none',
             ]
         );
 
@@ -514,7 +505,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_mailjet_sandbox_default_mail',
-            'text',
+            TextType::class,
             [
                 'label'       => 'mautic.email.config.mailer.mailjet.sandbox.mail',
                 'label_attr'  => ['class' => 'control-label'],
@@ -540,11 +531,11 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_spool_type',
-            'choice',
+            ChoiceType::class,
             [
-                'choices'     => [
-                    'memory' => 'mautic.email.config.mailer_spool_type.memory',
-                    'file'   => 'mautic.email.config.mailer_spool_type.file',
+                'choices'           => [
+                    'mautic.email.config.mailer_spool_type.memory' => 'memory',
+                    'mautic.email.config.mailer_spool_type.file'   => 'file',
                 ],
                 'label'       => 'mautic.email.config.mailer.spool.type',
                 'label_attr'  => ['class' => 'control-label'],
@@ -553,7 +544,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.spool.type.tooltip',
                 ],
-                'empty_value' => false,
+                'placeholder' => false,
             ]
         );
 
@@ -575,7 +566,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_spool_path',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.email.config.mailer.spool.path',
                 'label_attr' => ['class' => 'control-label'],
@@ -590,7 +581,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_spool_msg_limit',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.email.config.mailer.spool.msg.limit',
                 'label_attr' => ['class' => 'control-label'],
@@ -605,7 +596,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_spool_time_limit',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.email.config.mailer.spool.time.limit',
                 'label_attr' => ['class' => 'control-label'],
@@ -620,7 +611,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_spool_recover_timeout',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.email.config.mailer.spool.recover.timeout',
                 'label_attr' => ['class' => 'control-label'],
@@ -635,7 +626,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_spool_clear_timeout',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.email.config.mailer.spool.clear.timeout',
                 'label_attr' => ['class' => 'control-label'],
@@ -674,9 +665,9 @@ class ConfigType extends AbstractType
         );
         $builder->add(
             'email_frequency_number',
-            'number',
+            NumberType::class,
             [
-                'precision'  => 0,
+                'scale'      => 0,
                 'label'      => 'mautic.lead.list.frequency.number',
                 'label_attr' => ['class' => 'control-label'],
                 'required'   => false,
@@ -687,12 +678,12 @@ class ConfigType extends AbstractType
         );
         $builder->add(
             'email_frequency_time',
-            'choice',
+            ChoiceType::class,
             [
-                'choices'    => [
-                    'DAY'   => 'day',
-                    'WEEK'  => 'week',
-                    'MONTH' => 'month',
+                'choices'           => [
+                    'day'   => 'DAY',
+                    'week'  => 'WEEK',
+                    'month' => 'MONTH',
                 ],
                 'label'      => 'mautic.lead.list.frequency.times',
                 'label_attr' => ['class' => 'control-label'],
@@ -792,7 +783,7 @@ class ConfigType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'emailconfig';
     }
@@ -802,13 +793,14 @@ class ConfigType extends AbstractType
      */
     private function getTransportChoices()
     {
-        $choices = $this->transportType->getTransportTypes();
+        $choices    = [];
+        $transports = $this->transportType->getTransportTypes();
 
-        foreach ($choices as $value => $label) {
-            $choices[$value] = $this->translator->trans($label);
+        foreach ($transports as $value => $label) {
+            $choices[$this->translator->trans($label)] = $value;
         }
 
-        asort($choices, SORT_NATURAL);
+        ksort($choices, SORT_NATURAL);
 
         return $choices;
     }

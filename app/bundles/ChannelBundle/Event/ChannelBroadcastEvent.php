@@ -75,9 +75,6 @@ class ChannelBroadcastEvent extends Event
 
     /**
      * MaintenanceEvent constructor.
-     *
-     * @param int  $daysOld
-     * @param bool $dryRun
      */
     public function __construct($channel, $channelId, OutputInterface $output)
     {
@@ -106,7 +103,6 @@ class ChannelBroadcastEvent extends Event
      * @param string $channelLabel
      * @param int    $successCount
      * @param int    $failedCount
-     * @param array  $failedRecipientsByList
      */
     public function setResults($channelLabel, $successCount, $failedCount = 0, array $failedRecipientsByList = [])
     {

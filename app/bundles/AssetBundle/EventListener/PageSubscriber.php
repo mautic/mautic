@@ -12,14 +12,11 @@
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\AssetEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\PageEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class PageSubscriber.
- */
-class PageSubscriber extends CommonSubscriber
+class PageSubscriber implements EventSubscriberInterface
 {
     /**
      * {@inheritdoc}
@@ -33,8 +30,6 @@ class PageSubscriber extends CommonSubscriber
 
     /**
      * Add forms to available page tokens.
-     *
-     * @param PageBuilderEvent $event
      */
     public function onPageBuild(PageBuilderEvent $event)
     {

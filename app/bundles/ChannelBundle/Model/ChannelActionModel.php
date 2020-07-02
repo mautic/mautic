@@ -34,11 +34,6 @@ class ChannelActionModel
      */
     private $translator;
 
-    /**
-     * @param LeadModel           $contactModel
-     * @param DoNotContact        $doNotContact
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         LeadModel $contactModel,
         DoNotContact $doNotContact,
@@ -51,9 +46,6 @@ class ChannelActionModel
 
     /**
      * Update channels and frequency rules.
-     *
-     * @param array $contactIds
-     * @param array $subscribedChannels
      */
     public function update(array $contactIds, array $subscribedChannels)
     {
@@ -72,9 +64,6 @@ class ChannelActionModel
     /**
      * Add contact's channels.
      * Only resubscribe if the contact did not opt out themselves.
-     *
-     * @param Lead  $contact
-     * @param array $subscribedChannels
      */
     private function addChannels(Lead $contact, array $subscribedChannels)
     {
@@ -83,7 +72,7 @@ class ChannelActionModel
         foreach ($subscribedChannels as $subscribedChannel) {
             if (!array_key_exists($subscribedChannel, $contactChannels)) {
                 $contactable = $this->doNotContact->isContactable($contact, $subscribedChannel);
-                if ($contactable !== DNC::UNSUBSCRIBED) {
+                if (DNC::UNSUBSCRIBED !== $contactable) {
                     $this->doNotContact->removeDncForContact($contact->getId(), $subscribedChannel);
                 }
             }
@@ -92,9 +81,6 @@ class ChannelActionModel
 
     /**
      * Remove contact's channels.
-     *
-     * @param Lead  $contact
-     * @param array $subscribedChannels
      */
     private function removeChannels(Lead $contact, array $subscribedChannels)
     {

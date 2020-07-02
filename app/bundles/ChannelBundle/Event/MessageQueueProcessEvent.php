@@ -18,9 +18,6 @@ class MessageQueueProcessEvent extends CommonEvent
 {
     /**
      * MessageQueueEvent constructor.
-     *
-     * @param MessageQueue $entity
-     * @param bool         $isNew
      */
     public function __construct(MessageQueue $entity)
     {

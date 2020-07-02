@@ -32,18 +32,12 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
 
     /**
      * DynamicContentFilterEntryFiltersType constructor.
-     *
-     * @param TranslatorInterface $translator
      */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -55,7 +49,6 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
                     'mautic.lead.list.form.glue.and' => 'and',
                     'mautic.lead.list.form.glue.or'  => 'or',
                 ],
-                'choices_as_values' => true,
                 'attr'              => [
                     'class'    => 'form-control not-chosen glue-select',
                     'onchange' => 'Mautic.updateFilterPositioning(this)',
@@ -86,9 +79,6 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
         $builder->add('type', HiddenType::class);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(

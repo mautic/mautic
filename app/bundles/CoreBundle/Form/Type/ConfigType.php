@@ -17,11 +17,11 @@ use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
+use Mautic\PageBundle\Form\Type\PageListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
@@ -33,9 +33,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class ConfigType.
- */
 class ConfigType extends AbstractType
 {
     /**
@@ -54,7 +51,7 @@ class ConfigType extends AbstractType
     private $supportedLanguages;
 
     /**
-     * @var
+     * @var IpLookupFactory
      */
     private $ipLookupFactory;
 
@@ -68,21 +65,10 @@ class ConfigType extends AbstractType
      */
     private $ipLookupServices;
 
-    /**
-     * ConfigType constructor.
-     *
-     * @param TranslatorInterface $translator
-     * @param LanguageHelper      $langHelper
-     * @param IpLookupFactory     $ipLookupFactory
-     * @param array               $supportedLanguages
-     * @param array               $ipLookupServices
-     * @param AbstractLookup      $ipLookup
-     */
     public function __construct(
         TranslatorInterface $translator,
         LanguageHelper $langHelper,
         IpLookupFactory $ipLookupFactory,
-        array $supportedLanguages,
         array $ipLookupServices,
         AbstractLookup $ipLookup = null
     ) {
@@ -90,14 +76,10 @@ class ConfigType extends AbstractType
         $this->langHelper          = $langHelper;
         $this->ipLookupFactory     = $ipLookupFactory;
         $this->ipLookup            = $ipLookup;
-        $this->supportedLanguages  = $supportedLanguages;
+        $this->supportedLanguages  = $langHelper->getSupportedLanguages();
         $this->ipLookupServices    = $ipLookupServices;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('last_shown_tab', HiddenType::class);
@@ -124,7 +106,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'webroot',
-            'page_list',
+            PageListType::class,
             [
                 'label'      => 'mautic.core.config.form.webroot',
                 'label_attr' => ['class' => 'control-label'],
@@ -134,7 +116,7 @@ class ConfigType extends AbstractType
                     'data-placeholder' => $this->translator->trans('mautic.core.config.form.webroot.dashboard'),
                 ],
                 'multiple'    => false,
-                'empty_value' => '',
+                'placeholder' => '',
                 'required'    => false,
             ]
         );
@@ -204,14 +186,13 @@ class ConfigType extends AbstractType
             ChoiceType::class,
             [
                 'choices'           => $this->getLanguageChoices(),
-                'choices_as_values' => true,
                 'label'             => 'mautic.core.config.form.locale',
                 'required'          => false,
                 'attr'              => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.locale.tooltip',
                 ],
-                'empty_value'       => false,
+                'placeholder'       => false,
             ]
         );
 
@@ -297,7 +278,6 @@ class ConfigType extends AbstractType
                     'mautic.core.pagination.50'  => 50,
                     'mautic.core.pagination.100' => 100,
                 ],
-                'choices_as_values' => true,
                 'expanded'          => false,
                 'multiple'          => false,
                 'label'             => 'mautic.core.config.form.default.pagelimit',
@@ -307,7 +287,7 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.core.config.form.default.pagelimit.tooltip',
                 ],
                 'required'          => false,
-                'empty_value'       => false,
+                'placeholder'       => false,
             ]
         );
 
@@ -322,7 +302,7 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.core.config.form.default.timezone.tooltip',
                 ],
                 'multiple'    => false,
-                'empty_value' => 'mautic.user.user.form.defaulttimezone',
+                'placeholder' => 'mautic.user.user.form.defaulttimezone',
                 'required'    => false,
             ]
         );
@@ -445,7 +425,6 @@ class ConfigType extends AbstractType
                     $this->translator->transChoice('mautic.core.daterange.year', 1, ['%count%' => 1])  => '-1 year',
                     $this->translator->transChoice('mautic.core.daterange.year', 2, ['%count%' => 2])  => '-2 years',
                 ],
-                'choices_as_values' => true,
                 'expanded'          => false,
                 'multiple'          => false,
                 'label'             => 'mautic.core.config.form.default.daterange_default',
@@ -455,7 +434,7 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.core.config.form.default.daterange_default.tooltip',
                 ],
                 'required'          => false,
-                'empty_value'       => false,
+                'placeholder'       => false,
             ]
         );
 
@@ -464,7 +443,6 @@ class ConfigType extends AbstractType
             ChoiceType::class,
             [
                 'choices'           => $this->getIpServicesChoices(),
-                'choices_as_values' => true,
                 'label'             => 'mautic.core.config.form.ip.lookup.service',
                 'label_attr'        => [
                     'class' => 'control-label',
@@ -542,38 +520,6 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
-            'transifex_username',
-            TextType::class,
-            [
-                'label'      => 'mautic.core.config.form.transifex.username',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'tooltip'      => 'mautic.core.config.form.transifex.username.tooltip',
-                    'autocomplete' => 'off',
-                ],
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
-            'transifex_password',
-            PasswordType::class,
-            [
-                'label'      => 'mautic.core.config.form.transifex.password',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'placeholder'  => 'mautic.user.user.form.passwordplaceholder',
-                    'preaddon'     => 'fa fa-lock',
-                    'tooltip'      => 'mautic.core.config.form.transifex.password.tooltip',
-                    'autocomplete' => 'off',
-                ],
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
             'update_stability',
             ChoiceType::class,
             [
@@ -583,14 +529,13 @@ class ConfigType extends AbstractType
                     'mautic.core.config.update_stability.rc'     => 'rc',
                     'mautic.core.config.update_stability.stable' => 'stable',
                 ],
-                'choices_as_values' => true,
                 'label'             => 'mautic.core.config.form.update.stability',
                 'required'          => false,
                 'attr'              => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.update.stability.tooltip',
                 ],
-                'empty_value'       => false,
+                'placeholder'       => false,
             ]
         );
 

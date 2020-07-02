@@ -190,7 +190,7 @@ class VtigerIntegration extends CrmAbstractIntegration
                 if (!empty($vTigerObjects) && is_array($vTigerObjects)) {
                     foreach ($vTigerObjects as $object) {
                         // The object key for contacts should be 0 for some BC reasons
-                        if ($object == 'contacts') {
+                        if ('contacts' == $object) {
                             $object = 0;
                         }
 
@@ -249,7 +249,7 @@ class VtigerIntegration extends CrmAbstractIntegration
      */
     public function getFormNotes($section)
     {
-        if ($section == 'leadfield_match') {
+        if ('leadfield_match' == $section) {
             return ['mautic.vtiger.form.field_match_notes', 'info'];
         }
 
@@ -276,7 +276,7 @@ class VtigerIntegration extends CrmAbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        if ($formArea == 'features') {
+        if ('features' == $formArea) {
             $builder->add(
                 'objects',
                 ChoiceType::class,
@@ -285,27 +285,15 @@ class VtigerIntegration extends CrmAbstractIntegration
                         'mautic.vtiger.object.contact' => 'contacts',
                         'mautic.vtiger.object.company' => 'company',
                     ],
-                    'choices_as_values' => true,
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.vtiger.form.objects_to_pull_from',
                     'label_attr'        => ['class' => ''],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                 ]
             );
         }
-    }
-
-    /**
-     * @return array
-     */
-    public function getFormSettings()
-    {
-        return [
-            'requires_callback'      => false,
-            'requires_authorization' => true,
-        ];
     }
 
     /**

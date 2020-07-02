@@ -44,7 +44,7 @@ class ThemeController extends FormController
         $action      = $this->generateUrl('mautic_themes_index');
         $form        = $this->get('form.factory')->create(ThemeUploadType::class, [], ['action' => $action]);
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             if (isset($form) && !$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     $fileData = $form['file']->getData();
@@ -62,7 +62,7 @@ class ThemeController extends FormController
                         if (!empty($fileData)) {
                             $extension = pathinfo($fileName, PATHINFO_EXTENSION);
 
-                            if ($extension === 'zip') {
+                            if ('zip' === $extension) {
                                 try {
                                     $fileData->move($dir, $fileName);
                                     $themeHelper->install($dir.'/'.$fileName);
@@ -188,7 +188,7 @@ class ThemeController extends FormController
     {
         $flashes = [];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $flashes = $this->deleteTheme($themeName);
         }
 
@@ -208,7 +208,7 @@ class ThemeController extends FormController
     {
         $flashes = [];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $themeNames = json_decode($this->request->query->get('ids', '{}'));
 
             foreach ($themeNames as $themeName) {

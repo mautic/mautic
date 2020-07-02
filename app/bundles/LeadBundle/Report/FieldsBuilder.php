@@ -115,7 +115,7 @@ class FieldsBuilder
      */
     private function getBaseLeadColumns()
     {
-        $columns = [
+        return [
             'l.id' => [
                 'label' => 'mautic.lead.report.contact_id',
                 'type'  => 'int',
@@ -148,8 +148,6 @@ class FieldsBuilder
                 'type'  => 'string',
             ],
         ];
-
-        return $columns;
     }
 
     /**
@@ -157,7 +155,7 @@ class FieldsBuilder
      */
     private function getBaseCompanyColumns()
     {
-        $columns = [
+        return [
             'comp.id' => [
                 'label' => 'mautic.lead.report.company.company_id',
                 'type'  => 'int',
@@ -189,8 +187,6 @@ class FieldsBuilder
                 'link'  => 'mautic_company_action',
             ],
         ];
-
-        return $columns;
     }
 
     /**
@@ -247,7 +243,7 @@ class FieldsBuilder
      */
     private function sanitizePrefix($prefix)
     {
-        if (strpos($prefix, '.') === false) {
+        if (false === strpos($prefix, '.')) {
             $prefix .= '.';
         }
 

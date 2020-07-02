@@ -29,9 +29,6 @@ class MessageSendType extends AbstractType
 
     /**
      * MessageSendType constructor.
-     *
-     * @param RouterInterface $router
-     * @param MessageModel    $messageModel
      */
     public function __construct(RouterInterface $router, MessageModel $messageModel)
     {
@@ -39,10 +36,6 @@ class MessageSendType extends AbstractType
         $this->messageModel = $messageModel;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -111,9 +104,6 @@ class MessageSendType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefined(['update_select']);

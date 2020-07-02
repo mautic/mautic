@@ -22,39 +22,19 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class CategoryType.
- */
 class CategoryType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
     /**
      * @var Session
      */
     private $session;
 
-    /**
-     * CategoryType constructor.
-     *
-     * @param TranslatorInterface $translator
-     * @param Session             $session
-     */
-    public function __construct(TranslatorInterface $translator, Session $session)
+    public function __construct(Session $session)
     {
-        $this->translator = $translator;
-        $this->session    = $session;
+        $this->session = $session;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
@@ -62,7 +42,7 @@ class CategoryType extends AbstractType
 
         if (!$options['data']->getId()) {
             // Do not allow custom bundle
-            if ($options['show_bundle_select'] == true) {
+            if (true == $options['show_bundle_select']) {
                 // Create new category from category bundle - let user select the bundle
                 $selected = $this->session->get('mautic.category.type', 'category');
                 $builder->add(
@@ -154,9 +134,6 @@ class CategoryType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

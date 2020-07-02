@@ -24,9 +24,6 @@ class StageListType extends AbstractType
 {
     private $choices = [];
 
-    /**
-     * @param StageModel $model
-     */
     public function __construct(StageModel $model)
     {
         $choices = $model->getRepository()->getEntities([
@@ -60,8 +57,7 @@ class StageListType extends AbstractType
             'expanded'          => false,
             'multiple'          => true,
             'required'          => false,
-            'empty_value'       => 'mautic.core.form.chooseone',
-            'choices_as_values' => true,
+            'placeholder'       => 'mautic.core.form.chooseone',
         ]);
     }
 

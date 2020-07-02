@@ -35,11 +35,6 @@ class AssetListType extends AbstractType
      */
     private $userHelper;
 
-    /**
-     * @param CorePermissions $corePermissions
-     * @param AssetModel      $assetModel
-     * @param UserHelper      $userHelper
-     */
     public function __construct(
         CorePermissions $corePermissions,
         AssetModel $assetModel,
@@ -57,8 +52,7 @@ class AssetListType extends AbstractType
     {
         $resolver->setDefaults([
             'choices'           => $this->getAssetChoices(),
-            'choices_as_values' => true,
-            'empty_value'       => false,
+            'placeholder'       => false,
             'expanded'          => false,
             'multiple'          => true,
             'required'          => false,

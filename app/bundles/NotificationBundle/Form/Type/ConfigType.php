@@ -13,6 +13,7 @@ namespace Mautic\NotificationBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -20,10 +21,6 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class ConfigType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -66,7 +63,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'notification_app_id',
-            'text',
+            TextType::class,
             [
                 'label' => 'mautic.notification.config.form.notification.app_id',
                 'data'  => $options['data']['notification_app_id'],
@@ -80,7 +77,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'notification_safari_web_id',
-            'text',
+            TextType::class,
             [
                 'label' => 'mautic.notification.config.form.notification.safari_web_id',
                 'data'  => $options['data']['notification_safari_web_id'],
@@ -94,7 +91,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'notification_rest_api_key',
-            'text',
+            TextType::class,
             [
                 'label' => 'mautic.notification.config.form.notification.rest_api_key',
                 'data'  => $options['data']['notification_rest_api_key'],
@@ -107,7 +104,7 @@ class ConfigType extends AbstractType
         );
         $builder->add(
             'gcm_sender_id',
-            'text',
+            TextType::class,
             [
                 'label' => 'mautic.notification.config.form.notification.gcm_sender_id',
                 'data'  => $options['data']['gcm_sender_id'],
@@ -121,7 +118,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'notification_subdomain_name',
-            'text',
+            TextType::class,
             [
                 'label' => 'mautic.notification.config.form.notification.subdomain_name',
                 'data'  => $options['data']['notification_subdomain_name'],
@@ -150,7 +147,7 @@ class ConfigType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'notificationconfig';
     }

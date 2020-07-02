@@ -28,20 +28,17 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\ValidatorInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-/**
- * Class ClientType.
- */
 class ClientType extends AbstractType
 {
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
     /**
-     * @var \Symfony\Component\Validator\Validator
+     * @var ValidatorInterface
      */
     private $validator;
 
@@ -51,19 +48,10 @@ class ClientType extends AbstractType
     private $apiMode;
 
     /**
-     * @var \Symfony\Component\Routing\RouterInterface
+     * @var RouterInterface
      */
     private $router;
 
-    /**
-     * Constructor.
-     *
-     * @param RequestStack        $requestStack
-     * @param TranslatorInterface $translator
-     * @param ValidatorInterface  $validator
-     * @param Session             $session
-     * @param RouterInterface     $router
-     */
     public function __construct(
         RequestStack $requestStack,
         TranslatorInterface $translator,
@@ -104,9 +92,8 @@ class ClientType extends AbstractType
                         'OAuth 1.0a' => 'oauth1a',
                         'OAuth 2'    => 'oauth2',
                     ],
-                    'choices_as_values' => true,
                     'required'          => false,
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'data'              => $this->apiMode,
                 ]
             );
@@ -122,7 +109,7 @@ class ClientType extends AbstractType
             ]
         );
 
-        if ($this->apiMode == 'oauth2') {
+        if ('oauth2' == $this->apiMode) {
             $arrayStringTransformer = new Transformers\ArrayStringTransformer();
             $builder->add(
                 $builder->create(
@@ -166,28 +153,22 @@ class ClientType extends AbstractType
                 ]
             );
 
-            $translator = $this->translator;
-            $validator  = $this->validator;
-
             $builder->addEventListener(
                 FormEvents::POST_SUBMIT,
-                function (FormEvent $event) use ($translator, $validator) {
+                function (FormEvent $event) {
                     $form = $event->getForm();
                     $data = $event->getData();
 
                     if ($form->has('redirectUris')) {
                         foreach ($data->getRedirectUris() as $uri) {
                             $urlConstraint = new OAuthCallback();
-                            $urlConstraint->message = $translator->trans(
+                            $urlConstraint->message = $this->translator->trans(
                                 'mautic.api.client.redirecturl.invalid',
                                 ['%url%' => $uri],
                                 'validators'
                             );
 
-                            $errors = $validator->validateValue(
-                                $uri,
-                                $urlConstraint
-                            );
+                            $errors = $this->validator->validate($uri, $urlConstraint);
 
                             if (!empty($errors)) {
                                 foreach ($errors as $error) {
@@ -222,10 +203,10 @@ class ClientType extends AbstractType
                     'label'      => 'mautic.api.client.form.consumerkey',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
-                        'class'   => 'form-control',
-                        'onclick' => 'this.setSelectionRange(0, this.value.length);',
+                        'class'    => 'form-control',
+                        'onclick'  => 'this.setSelectionRange(0, this.value.length);',
+                        'readonly' => true,
                     ],
-                    'read_only' => true,
                     'required'  => false,
                     'mapped'    => false,
                     'data'      => $options['data']->getConsumerKey(),
@@ -239,32 +220,26 @@ class ClientType extends AbstractType
                     'label'      => 'mautic.api.client.form.consumersecret',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
-                        'class'   => 'form-control',
-                        'onclick' => 'this.setSelectionRange(0, this.value.length);',
+                        'class'    => 'form-control',
+                        'onclick'  => 'this.setSelectionRange(0, this.value.length);',
+                        'readonly' => true,
                     ],
-                    'read_only' => true,
                     'required'  => false,
                 ]
             );
 
-            $translator = $this->translator;
-            $validator  = $this->validator;
-
             $builder->addEventListener(
                 FormEvents::POST_SUBMIT,
-                function (FormEvent $event) use ($translator, $validator) {
+                function (FormEvent $event) {
                     $form = $event->getForm();
                     $data = $event->getData();
 
                     if ($form->has('callback')) {
                         $uri = $data->getCallback();
                         $urlConstraint = new OAuthCallback();
-                        $urlConstraint->message = $translator->trans('mautic.api.client.redirecturl.invalid', ['%url%' => $uri], 'validators');
+                        $urlConstraint->message = $this->translator->trans('mautic.api.client.redirecturl.invalid', ['%url%' => $uri], 'validators');
 
-                        $errors = $validator->validateValue(
-                            $uri,
-                            $urlConstraint
-                        );
+                        $errors = $this->validator->validate($uri, $urlConstraint);
 
                         if (!empty($errors)) {
                             foreach ($errors as $error) {
@@ -288,7 +263,7 @@ class ClientType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $dataClass = ($this->apiMode == 'oauth2') ? 'Mautic\ApiBundle\Entity\oAuth2\Client' : 'Mautic\ApiBundle\Entity\oAuth1\Consumer';
+        $dataClass = ('oauth2' == $this->apiMode) ? 'Mautic\ApiBundle\Entity\oAuth2\Client' : 'Mautic\ApiBundle\Entity\oAuth1\Consumer';
         $resolver->setDefaults(
             [
                 'data_class' => $dataClass,

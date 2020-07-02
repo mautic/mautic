@@ -15,7 +15,7 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember\Organizer
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Contact;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
 
-class OrganizerTest extends \PHPUnit_Framework_TestCase
+class OrganizerTest extends \PHPUnit\Framework\TestCase
 {
     public function testRecordsAreOrganizedIntoLeadsAndContacts()
     {

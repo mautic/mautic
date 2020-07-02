@@ -21,10 +21,6 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class FacebookType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('layout', ChoiceType::class, [
@@ -35,10 +31,9 @@ class FacebookType extends AbstractType
                 'mautic.integration.Facebook.share.layout.boxcount'    => 'box_count',
                 'mautic.integration.Facebook.share.layout.icon'        => 'icon',
             ],
-            'choices_as_values' => true,
             'label'             => 'mautic.integration.Facebook.share.layout',
             'required'          => false,
-            'empty_value'       => false,
+            'placeholder'       => false,
             'label_attr'        => ['class' => 'control-label'],
             'attr'              => ['class' => 'form-control'],
         ]);
@@ -49,10 +44,9 @@ class FacebookType extends AbstractType
                 'mautic.integration.Facebook.share.action.recommend' => 'recommend',
                 'mautic.integration.Facebook.share.action.share'     => 'share',
             ],
-            'choices_as_values' => true,
             'label'             => 'mautic.integration.Facebook.share.action',
             'required'          => false,
-            'empty_value'       => false,
+            'placeholder'       => false,
             'label_attr'        => ['class' => 'control-label'],
             'attr'              => ['class' => 'form-control'],
         ]);

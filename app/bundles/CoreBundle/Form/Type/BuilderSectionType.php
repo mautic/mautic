@@ -22,10 +22,6 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class BuilderSectionType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Content - Background Color
@@ -90,10 +86,10 @@ class BuilderSectionType extends AbstractType
                     'repeat-space' => 'repeat-space',
                     'space-round'  => 'space-round',
                 ],
-                'label'      => 'mautic.core.wrapper.background.repeat',
-                'label_attr' => ['class' => 'control-label'],
-                'required'   => false,
-                'attr'       => ['class' => 'form-control'],
+                'label'             => 'mautic.core.wrapper.background.repeat',
+                'label_attr'        => ['class' => 'control-label'],
+                'required'          => false,
+                'attr'              => ['class' => 'form-control'],
             ]
         );
 

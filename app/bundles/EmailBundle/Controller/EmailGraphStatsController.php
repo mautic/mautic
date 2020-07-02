@@ -21,11 +21,10 @@ class EmailGraphStatsController extends Controller
     /**
      * Loads a specific form into the detailed panel.
      *
-     * @param Request $request
-     * @param int     $objectId
-     * @param bool    $isVariant
-     * @param string  $dateFrom
-     * @param string  $dateTo
+     * @param int    $objectId
+     * @param bool   $isVariant
+     * @param string $dateFrom
+     * @param string $dateTo
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
@@ -66,7 +65,7 @@ class EmailGraphStatsController extends Controller
         $dateFromObject = new \DateTime($dateFrom);
         $dateToObject   = new \DateTime($dateTo);
 
-        if ($email->getEmailType() === 'template') {
+        if ('template' === $email->getEmailType()) {
             $stats = $model->getEmailGeneralStats(
                 $email,
                 $includeVariants,

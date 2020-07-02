@@ -9,14 +9,14 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Entity;
+namespace Mautic\CoreBundle\Tests\Unit\Entity;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
-class CommonRepositoryTest extends \PHPUnit_Framework_TestCase
+class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var CommonRepository

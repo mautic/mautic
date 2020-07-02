@@ -14,9 +14,6 @@ namespace Mautic\ChannelBundle\Event;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\Event\CommonEvent;
 
-/**
- * Class ChannelEvent.
- */
 class ChannelEvent extends CommonEvent
 {
     /**

@@ -1,128 +1,10 @@
 <?php
 
+// Include path settings
+$root = $container->getParameter('kernel.root_dir');
+
+/** @var array $paths */
 include __DIR__.'/paths_helper.php';
-
-$ormMappings        =
-$serializerMappings =
-$ipLookupServices   = [];
-
-//Note Mautic specific bundles so they can be applied as needed without having to specify them individually
-$buildBundles = function ($namespace, $bundle) use ($container, $paths, $root, &$ormMappings, &$serializerMappings, &$ipLookupServices) {
-    $isPlugin = $isMautic = false;
-
-    if (strpos($namespace, 'MauticPlugin\\') !== false) {
-        $isPlugin   = true;
-        $bundleBase = $bundle;
-        $relative   = $paths['plugins'].'/'.$bundleBase;
-    } elseif (strpos($namespace, 'Mautic\\') !== false) {
-        $isMautic   = true;
-        $bundleBase = str_replace('Mautic', '', $bundle);
-        $relative   = $paths['bundles'].'/'.$bundleBase;
-    }
-
-    if ($isMautic || $isPlugin) {
-        $baseNamespace = preg_replace('#\\\[^\\\]*$#', '', $namespace);
-        $directory     = $paths['root'].'/'.$relative;
-
-        // Check for a single config file
-        $config = (file_exists($directory.'/Config/config.php')) ? include $directory.'/Config/config.php' : [];
-
-        // Services need to have percent signs escaped to prevent ParameterCircularReferenceException
-        if (isset($config['services'])) {
-            array_walk_recursive(
-                $config['services'],
-                function (&$v, $k) {
-                    $v = str_replace('%', '%%', $v);
-                }
-            );
-        }
-
-        // Register IP lookup services
-        if (isset($config['ip_lookup_services'])) {
-            $ipLookupServices = array_merge($ipLookupServices, $config['ip_lookup_services']);
-        }
-
-        // Check for staticphp mapping
-        if (file_exists($directory.'/Entity')) {
-            $finder = \Symfony\Component\Finder\Finder::create()->files('*.php')->in($directory.'/Entity')->notName('*Repository.php');
-
-            foreach ($finder as $file) {
-                // Check to see if entities are organized by subfolder
-                $subFolder = $file->getRelativePath();
-
-                // Just check first file for the loadMetadata function
-                $reflectionClass = new \ReflectionClass('\\'.$baseNamespace.'\\Entity\\'.(!empty($subFolder) ? $subFolder.'\\' : '').basename($file->getFilename(), '.php'));
-
-                if (!$reflectionClass->implementsInterface(\Mautic\CoreBundle\Entity\DeprecatedInterface::class)) {
-                    // Register API metadata
-                    if ($reflectionClass->hasMethod('loadApiMetadata')) {
-                        $serializerMappings[$bundle] = [
-                            'namespace_prefix' => $baseNamespace.'\\Entity',
-                            'path'             => "@$bundle/Entity",
-                        ];
-                    }
-
-                    // Register entities
-                    if ($reflectionClass->hasMethod('loadMetadata')) {
-                        $ormMappings[$bundle] = [
-                            'dir'       => 'Entity',
-                            'type'      => 'staticphp',
-                            'prefix'    => $baseNamespace.'\\Entity',
-                            'mapping'   => true,
-                            'is_bundle' => true,
-                        ];
-                    }
-                }
-            }
-        }
-
-        // Build permission object lists
-        // @todo - convert to tagged services
-        $permissionClasses = [];
-        if (file_exists($directory.'/Security/Permissions')) {
-            $finder = \Symfony\Component\Finder\Finder::create()->files('*Permissions.php')->in($directory.'/Security/Permissions');
-
-            foreach ($finder as $file) {
-                $className       = basename($file->getFilename(), '.php');
-                $permissionClass = '\\'.$baseNamespace.'\\Security\\Permissions\\'.$className;
-                // Skip CorePermissions and AbstractPermissions
-                if ('CoreBundle' === $bundleBase && in_array($className, ['CorePermissions', 'AbstractPermissions'])) {
-                    continue;
-                }
-
-                $permissionInstance = new $permissionClass([]);
-                $permissionName     = $permissionInstance->getName();
-
-                $permissionClasses[$permissionName] = $permissionClass;
-            }
-        }
-
-        return [
-            'isPlugin'          => $isPlugin,
-            'base'              => str_replace('Bundle', '', $bundleBase),
-            'bundle'            => $bundleBase,
-            'namespace'         => $baseNamespace,
-            'symfonyBundleName' => $bundle,
-            'bundleClass'       => $namespace,
-            'permissionClasses' => $permissionClasses,
-            'relative'          => $relative,
-            'directory'         => $directory,
-            'config'            => $config,
-        ];
-    }
-
-    return false;
-};
-
-// Separate out Mautic's bundles from other Symfony bundles
-$symfonyBundles = $container->getParameter('kernel.bundles');
-$mauticBundles  = array_filter(
-    array_map($buildBundles, $symfonyBundles, array_keys($symfonyBundles)),
-    function ($v) {
-        return !empty($v);
-    }
-);
-unset($buildBundles);
 
 // Load extra annotations
 $container->loadFromExtension('sensio_framework_extra', [
@@ -132,42 +14,34 @@ $container->loadFromExtension('sensio_framework_extra', [
     'cache'   => ['annotations' => false],
 ]);
 
-// Sort Mautic's bundles into Core and Plugins
-$setBundles = $setPluginBundles = [];
-foreach ($mauticBundles as $bundle) {
-    if ($bundle['isPlugin']) {
-        $setPluginBundles[$bundle['symfonyBundleName']] = $bundle;
-    } else {
-        $setBundles[$bundle['symfonyBundleName']] = $bundle;
-    }
-}
+// Build and store Mautic bundle metadata
+$symfonyBundles        = $container->getParameter('kernel.bundles');
+$bundleMetadataBuilder = new \Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadataBuilder($symfonyBundles, $paths, $root);
 
-// Make Core the first in the list
-$coreBundle = $setBundles['MauticCoreBundle'];
-unset($setBundles['MauticCoreBundle']);
-$setBundles = array_merge(['MauticCoreBundle' => $coreBundle], $setBundles);
-
-$container->setParameter('mautic.bundles', $setBundles);
-$container->setParameter('mautic.plugin.bundles', $setPluginBundles);
-unset($setBundles, $setPluginBundles);
+$container->setParameter('mautic.bundles', $bundleMetadataBuilder->getCoreBundleMetadata());
+$container->setParameter('mautic.plugin.bundles', $bundleMetadataBuilder->getPluginMetadata());
 
 // Set IP lookup services
-$container->setParameter('mautic.ip_lookup_services', $ipLookupServices);
+$container->setParameter('mautic.ip_lookup_services', $bundleMetadataBuilder->getIpLookupServices());
 
 // Load parameters
 include __DIR__.'/parameters.php';
 $container->loadFromExtension('mautic_core');
+$configParameterBag = (new \Mautic\CoreBundle\Loader\ParameterLoader())->getParameterBag();
 
 // Set template engines
 $engines = ['php', 'twig'];
 
-// Decide on secure cookie based on site_url setting
-$secureCookie = $container->hasParameter('mautic.site_url') && substr(ltrim($container->getParameter('mautic.site_url')), 0, 5) === 'https';
+// Decide on secure cookie based on site_url setting or the request if in installer
+// This cannot be set dynamically
 
-// Generate session name
-// Cannot use $parameters here directly because that fails spectaculary if parameters_local file exists
-$key         = $container->hasParameter('mautic.secret_key') ? $container->getParameter('mautic.secret_key') : uniqid();
-$sessionName = md5(md5($paths['local_config']).$key);
+if (defined('MAUTIC_INSTALLER')) {
+    $request      = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
+    $secureCookie = $request->isSecure();
+} else {
+    $siteUrl      = $configParameterBag->get('site_url');
+    $secureCookie = ($siteUrl && 0 === strpos($siteUrl, 'https'));
+}
 
 $container->loadFromExtension('framework', [
     'secret' => '%mautic.secret_key%',
@@ -193,11 +67,9 @@ $container->loadFromExtension('framework', [
         'enabled'  => true,
         'fallback' => 'en_US',
     ],
-    'trusted_hosts'   => '%mautic.trusted_hosts%',
-    'trusted_proxies' => '%mautic.trusted_proxies%',
     'session'         => [ //handler_id set to null will use default session handler from php.ini
         'handler_id'    => null,
-        'name'          => $sessionName,
+        'name'          => '%env(MAUTIC_SESSION_NAME)%',
         'cookie_secure' => $secureCookie,
     ],
     'fragments'            => null,
@@ -218,10 +90,10 @@ $dbalSettings = [
     'dbname'                => '%mautic.db_name%',
     'user'                  => '%mautic.db_user%',
     'password'              => '%mautic.db_password%',
-    'charset'               => 'UTF8',
+    'charset'               => 'utf8mb4',
     'default_table_options' => [
-        'charset'    => 'utf8',
-        'collate'    => 'utf8_unicode_ci',
+        'charset'    => 'utf8mb4',
+        'collate'    => 'utf8mb4_unicode_ci',
         'row_format' => 'DYNAMIC',
     ],
     'types'    => [
@@ -237,32 +109,26 @@ $dbalSettings = [
     'server_version' => '%mautic.db_server_version%',
 ];
 
-// If using pdo_sqlite as the database driver, add the path to config file
-$dbDriver = $container->getParameter('mautic.db_driver');
-if ($dbDriver == 'pdo_sqlite') {
-    $dbalSettings['path'] = '%mautic.db_path%';
-}
-
 $container->loadFromExtension('doctrine', [
     'dbal' => $dbalSettings,
     'orm'  => [
         'auto_generate_proxy_classes' => '%kernel.debug%',
         'auto_mapping'                => true,
-        'mappings'                    => $ormMappings,
+        'mappings'                    => $bundleMetadataBuilder->getOrmConfig(),
     ],
 ]);
 
 //MigrationsBundle Configuration
-$prefix = $container->getParameter('mautic.db_table_prefix');
 $container->loadFromExtension('doctrine_migrations', [
-    'dir_name'   => '%kernel.root_dir%/migrations',
-    'namespace'  => 'Mautic\\Migrations',
-    'table_name' => $prefix.'migrations',
-    'name'       => 'Mautic Migrations',
+    'dir_name'        => '%kernel.root_dir%/migrations',
+    'namespace'       => 'Mautic\\Migrations',
+    'table_name'      => '%env(MAUTIC_MIGRATIONS_TABLE_NAME)%',
+    'name'            => 'Mautic Migrations',
+    'custom_template' => '%kernel.root_dir%/migrations/Migration.template',
 ]);
 
 // Swiftmailer Configuration
-$mailerSettings = [
+$container->loadFromExtension('swiftmailer', [
     'transport'  => '%mautic.mailer_transport%',
     'host'       => '%mautic.mailer_host%',
     'port'       => '%mautic.mailer_port%',
@@ -270,17 +136,11 @@ $mailerSettings = [
     'password'   => '%mautic.mailer_password%',
     'encryption' => '%mautic.mailer_encryption%',
     'auth_mode'  => '%mautic.mailer_auth_mode%',
-];
-
-// Only spool if using file as otherwise emails are not sent on redirects
-$spoolType = $container->getParameter('mautic.mailer_spool_type');
-if ($spoolType == 'file') {
-    $mailerSettings['spool'] = [
-        'type' => '%mautic.mailer_spool_type%',
-        'path' => '%mautic.mailer_spool_path%',
-    ];
-}
-$container->loadFromExtension('swiftmailer', $mailerSettings);
+    'spool'      => [
+        'type' => 'service',
+        'id'   => 'mautic.transport.spool',
+    ],
+]);
 
 //KnpMenu Configuration
 $container->loadFromExtension('knp_menu', [
@@ -290,8 +150,6 @@ $container->loadFromExtension('knp_menu', [
 ]);
 
 // OneupUploader Configuration
-$uploadDir = $container->getParameter('mautic.upload_dir');
-$maxSize   = $container->getParameter('mautic.max_size');
 $container->loadFromExtension('oneup_uploader', [
     // 'orphanage' => array(
     //     'maxage' => 86400,
@@ -308,7 +166,7 @@ $container->loadFromExtension('oneup_uploader', [
             // 'max_size' => ($maxSize * 1000000),
             // 'use_orphanage' => true,
             'storage' => [
-                'directory' => $uploadDir,
+                'directory' => '%mautic.upload_dir%',
             ],
         ],
     ],
@@ -348,36 +206,38 @@ $container->loadFromExtension('jms_serializer', [
     'metadata' => [
         'cache'          => 'none',
         'auto_detection' => false,
-        'directories'    => $serializerMappings,
+        'directories'    => $bundleMetadataBuilder->getSerializerConfig(),
     ],
     'visitors' => [
-        'json' => [
+        'json_deserialization' => [
             'options' => JSON_PRETTY_PRINT,
         ],
     ],
 ]);
 
-$container->loadFromExtension('doctrine_cache', [
-  'providers' => [
-    'api_rate_limiter_cache' => '%mautic.api_rate_limiter_cache%',
-  ],
+$container->loadFromExtension('framework', [
+    'cache' => [
+        'pools' => [
+            'api_rate_limiter_cache' => $configParameterBag->get('api_rate_limiter_cache'),
+        ],
+    ],
 ]);
 
-$api_rate_limiter_limit = $container->getParameter('mautic.api_rate_limiter_limit');
+$rateLimit = (int) $configParameterBag->get('api_rate_limiter_limit');
 $container->loadFromExtension('noxlogic_rate_limit', [
-  'enabled'           => $api_rate_limiter_limit == 0 ? false : true,
-  'storage_engine'    => 'doctrine',
-  'doctrine_provider' => 'api_rate_limiter_cache',
-  'path_limits'       => [
+  'enabled'        => 0 === $rateLimit ? false : true,
+  'storage_engine' => 'cache',
+  'cache_service'  => 'api_rate_limiter_cache',
+  'path_limits'    => [
     [
       'path'   => '/api',
-      'limit'  => '%mautic.api_rate_limiter_limit%',
+      'limit'  => $rateLimit,
       'period' => 3600,
     ],
   ],
   'fos_oauth_key_listener' => true,
   'display_headers'        => true,
-  'rate_response_message'  => '{ "errors": [ { "code": 429, "message": "You exceeded the rate limit of %mautic.api_rate_limiter_limit% API calls per hour.", "details": [] } ]}',
+  'rate_response_message'  => '{ "errors": [ { "code": 429, "message": "You exceeded the rate limit of '.$rateLimit.' API calls per hour.", "details": [] } ]}',
 ]);
 
 $container->setParameter(
@@ -427,3 +287,39 @@ $container->setDefinition(
     'mautic.kernel.listener.command_terminate',
     $definitionConsoleExceptionListener
 );
+
+// ElFinder File Manager
+$container->loadFromExtension('fm_elfinder', [
+    'assets_path' => 'media/assets',
+    'instances'   => [
+        'default' => [
+            'locale'          => 'LANG',
+            'editor'          => 'custom',
+            'editor_template' => '@bundles/CoreBundle/Assets/js/libraries/filemanager/index.html.twig',
+            'fullscreen'      => true,
+            'include_assets'  => true,
+            'relative_path'   => false,
+            'connector'       => [
+                'debug' => '%kernel.debug%',
+                'roots' => [
+                    'local' => [
+                        'driver'    => 'Flysystem',
+                        'path'      => '',
+                        'flysystem' => [
+                            'type'    => 'local',
+                            'options' => [
+                                'local' => [
+                                    'path' => '%env(resolve:MAUTIC_EL_FINDER_PATH)%',
+                                ],
+                            ],
+                        ],
+                        'upload_allow'  => ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'],
+                        'upload_deny'   => ['all'],
+                        'accepted_name' => '/^[\w\x{0300}-\x{036F}][\w\x{0300}-\x{036F}\s\.\%\-]*$/u', // Supports diacritic symbols
+                        'url'           => '%env(resolve:MAUTIC_EL_FINDER_URL)%', // We need to specify URL in case mod_rewrite is disabled
+                    ],
+                ],
+            ],
+        ],
+    ],
+]);

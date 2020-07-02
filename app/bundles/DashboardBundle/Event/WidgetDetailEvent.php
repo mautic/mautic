@@ -38,7 +38,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * @var CorePermissions
      */
-    protected $security = null;
+    protected $security;
 
     public function __construct(TranslatorInterface $translator)
     {
@@ -89,8 +89,6 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Set the widget entity.
-     *
-     * @param Widget $widget
      */
     public function setWidget(Widget $widget)
     {
@@ -154,8 +152,6 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Set the widget template data.
-     *
-     * @param array $templateData
      */
     public function setTemplateData(array $templateData, $skipCache = false)
     {
@@ -265,8 +261,6 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Set security object to check the perimissions.
-     *
-     * @param CorePermissions $security
      */
     public function setSecurity(CorePermissions $security)
     {
@@ -275,8 +269,6 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Check if the user has at least one permission of defined array of permissions.
-     *
-     * @param array $permissions
      *
      * @return bool
      */

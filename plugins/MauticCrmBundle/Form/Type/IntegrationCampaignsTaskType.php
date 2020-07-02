@@ -11,26 +11,25 @@
 
 namespace MauticPlugin\MauticCrmBundle\Form\Type;
 
+use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-/**
- * Class IntegrationCampaignsTaskType.
- */
 class IntegrationCampaignsTaskType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
+    private $connectwiseIntegration;
+
+    public function __construct(ConnectwiseIntegration $connectwiseIntegration)
+    {
+        $this->connectwiseIntegration = $connectwiseIntegration;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $integrationObject = $options['helper']->getIntegrationObject('Connectwise');
         $builder->add(
             'activity_name',
             TextType::class,
@@ -51,30 +50,25 @@ class IntegrationCampaignsTaskType extends AbstractType
             ]
         );
 
-        $activityTypes = $integrationObject->getActivityTypes();
         $builder->add(
             'campaign_activity_type',
             ChoiceType::class,
             [
-                'choices'           => array_flip($activityTypes), // Choice type expects labels as keys
-                'choices_as_values' => true,
-                'attr'              => [
-                    'class' => 'form-control', ],
-                'label'    => 'mautic.plugin.integration.campaigns.connectwise.activity.type',
-                'required' => false,
+                'choices'           => array_flip($this->connectwiseIntegration->getActivityTypes()), // Choice type expects labels as keys
+                'attr'              => ['class' => 'form-control'],
+                'label'             => 'mautic.plugin.integration.campaigns.connectwise.activity.type',
+                'required'          => false,
             ]
         );
-        $members = $integrationObject->getMembers();
+
         $builder->add(
             'campaign_members',
             ChoiceType::class,
             [
-                'choices'           => array_flip($members),  // Choice type expects labels as keys
-                'choices_as_values' => true,
-                'attr'              => [
-                    'class' => 'form-control', ],
-                'label'       => 'mautic.plugin.integration.campaigns.connectwise.members',
-                'constraints' => [
+                'choices'           => array_flip($this->connectwiseIntegration->getMembers()),  // Choice type expects labels as keys
+                'attr'              => ['class' => 'form-control'],
+                'label'             => 'mautic.plugin.integration.campaigns.connectwise.members',
+                'constraints'       => [
                     new Callback(
                         function ($validateMe, ExecutionContextInterface $context) {
                             $data = $context->getRoot()->getData();
@@ -86,14 +80,6 @@ class IntegrationCampaignsTaskType extends AbstractType
                 ],
             ]
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        $resolver->setDefined(['helper']);
     }
 
     /**

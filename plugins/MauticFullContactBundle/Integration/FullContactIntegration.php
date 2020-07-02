@@ -13,6 +13,8 @@ namespace MauticPlugin\MauticFullContactBundle\Integration;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -55,10 +57,10 @@ class FullContactIntegration extends AbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        if ($formArea === 'keys') {
+        if ('keys' === $formArea) {
             $builder->add(
                 'test_api',
-                'button',
+                ButtonType::class,
                 [
                     'label' => 'mautic.plugin.fullcontact.test_api',
                     'attr'  => [
@@ -71,7 +73,7 @@ class FullContactIntegration extends AbstractIntegration
 
             $builder->add(
                 'stats',
-                'textarea',
+                TextareaType::class,
                 [
                     'label_attr' => ['class' => 'control-label'],
                     'label'      => 'mautic.plugin.fullcontact.stats',

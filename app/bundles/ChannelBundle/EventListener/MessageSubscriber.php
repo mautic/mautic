@@ -13,24 +13,16 @@ namespace Mautic\ChannelBundle\EventListener;
 
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\MessageEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class MessageSubscriber.
- */
-class MessageSubscriber extends CommonSubscriber
+class MessageSubscriber implements EventSubscriberInterface
 {
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
-    /**
-     * DynamicContentSubscriber constructor.
-     *
-     * @param AuditLogModel $auditLogModel
-     */
     public function __construct(
         AuditLogModel $auditLogModel
     ) {
@@ -50,8 +42,6 @@ class MessageSubscriber extends CommonSubscriber
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param MessageEvent $event
      */
     public function onPostSave(MessageEvent $event)
     {
@@ -70,8 +60,6 @@ class MessageSubscriber extends CommonSubscriber
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param MessageEvent $event
      */
     public function onDelete(MessageEvent $event)
     {

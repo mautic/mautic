@@ -49,11 +49,6 @@ class CategoryListType extends AbstractType
 
     /**
      * CategoryListType constructor.
-     *
-     * @param EntityManager       $em
-     * @param TranslatorInterface $translator
-     * @param CategoryModel       $model
-     * @param Router              $router
      */
     public function __construct(EntityManager $em, TranslatorInterface $translator, CategoryModel $model, Router $router)
     {
@@ -63,10 +58,6 @@ class CategoryListType extends AbstractType
         $this->router     = $router;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (true === $options['return_entity']) {
@@ -75,9 +66,6 @@ class CategoryListType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -86,33 +74,33 @@ class CategoryListType extends AbstractType
                 $categories = $this->model->getLookupResults($options['bundle'], '', 0);
                 $choices = [];
                 foreach ($categories as $l) {
-                    $choices[$l['id']] = $l['title'];
+                    $choices[$l['title']] = $l['id'];
                 }
                 if ($options['with_create_new']) {
-                    $choices['new'] = $createNew;
+                    $choices[$createNew] = 'new';
                 }
 
                 return $choices;
             },
-            'label'       => 'mautic.core.category',
-            'label_attr'  => ['class' => 'control-label'],
-            'multiple'    => false,
-            'empty_value' => 'mautic.core.form.uncategorized',
-            'attr'        => function (Options $options) {
+            'label'             => 'mautic.core.category',
+            'label_attr'        => ['class' => 'control-label'],
+            'multiple'          => false,
+            'placeholder'       => 'mautic.core.form.uncategorized',
+            'attr'              => function (Options $options) {
                 if (!$options['with_create_new']) {
                     return [];
                 }
                 $modalHeader = $this->translator->trans('mautic.category.header.new');
                 $newUrl = $this->router->generate('mautic_category_action', [
-                        'objectAction' => 'new',
-                        'bundle'       => $options['bundle'],
-                        'inForm'       => 1,
-                    ]);
+                    'objectAction' => 'new',
+                    'bundle'       => $options['bundle'],
+                    'inForm'       => 1,
+                ]);
 
                 return [
-                        'class'    => 'form-control category-select',
-                        'onchange' => "Mautic.loadAjaxModalBySelectValue(this, 'new', '{$newUrl}', '{$modalHeader}');",
-                    ];
+                    'class'    => 'form-control category-select',
+                    'onchange' => "Mautic.loadAjaxModalBySelectValue(this, 'new', '{$newUrl}', '{$modalHeader}');",
+                ];
             },
             'required'      => false,
             'return_entity' => true,

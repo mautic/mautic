@@ -22,8 +22,7 @@ class EventHelper
     use PushToIntegrationTrait;
 
     /**
-     * @param               $lead
-     * @param MauticFactory $factory
+     * @param $lead
      */
     public static function pushLead($config, $lead, MauticFactory $factory)
     {
@@ -34,8 +33,7 @@ class EventHelper
 
         static::setStaticIntegrationHelper($integrationHelper);
         $errors  = [];
-        $success = static::pushIt($config, $contact, $errors);
 
-        return $success;
+        return static::pushIt($config, $contact, $errors);
     }
 }

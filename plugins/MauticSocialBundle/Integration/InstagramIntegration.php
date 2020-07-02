@@ -111,7 +111,7 @@ class InstagramIntegration extends SocialIntegration
                         break;
                     }
 
-                    if ($m->type == 'image') {
+                    if ('image' == $m->type) {
                         $socialCache['activity']['photos'][] = [
                             'url' => $m->images->standard_resolution->url,
                         ];

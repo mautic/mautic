@@ -22,10 +22,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class ConfigType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -90,26 +86,6 @@ class ConfigType extends AbstractType
                     ),
                 ],
             ]
-        );
-
-        $builder->add(
-          'api_rate_limiter_limit',
-          NumberType::class,
-          [
-            'label' => 'mautic.api.config.form.api.rate_limiter_limit',
-            'attr'  => [
-              'tooltip'      => 'mautic.api.config.form.api.rate_limiter_limit.tooltip',
-              'class'        => 'form-control',
-              'data-show-on' => '{"config_apiconfig_api_enabled_1":"checked"}',
-            ],
-            'constraints' => [
-              new NotBlank(
-                [
-                  'message' => 'mautic.core.value.required',
-                ]
-              ),
-            ],
-          ]
         );
     }
 

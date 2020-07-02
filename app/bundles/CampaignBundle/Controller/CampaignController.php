@@ -14,6 +14,7 @@ namespace Mautic\CampaignBundle\Controller;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
@@ -69,9 +70,6 @@ class CampaignController extends AbstractStandardFormController
      */
     protected $modifiedEvents = [];
 
-    /**
-     * @var
-     */
     protected $sessionId;
 
     /**
@@ -143,7 +141,7 @@ class CampaignController extends AbstractStandardFormController
     /**
      * Deletes the entity.
      *
-     * @param   $objectId
+     * @param $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -269,7 +267,6 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * @param      $entity
-     * @param Form $form
      * @param      $action
      * @param null $persistConnections
      */
@@ -287,7 +284,6 @@ class CampaignController extends AbstractStandardFormController
     /**
      * @param      $isValid
      * @param      $entity
-     * @param Form $form
      * @param      $action
      * @param bool $isClone
      */
@@ -304,7 +300,6 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * @param      $entity
-     * @param Form $form
      * @param      $action
      * @param      $isPost
      * @param null $objectId
@@ -347,7 +342,6 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * @param Campaign $entity
-     * @param Form     $form
      * @param          $action
      * @param null     $objectId
      * @param bool     $isClone
@@ -433,11 +427,10 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param Campaign $campaign
-     * @param          $action
-     * @param null     $objectId
+     * @param      $action
+     * @param null $objectId
      *
-     * @return int|null|string
+     * @return int|string|null
      */
     protected function getCampaignSessionId(Campaign $campaign, $action, $objectId = null)
     {
@@ -450,7 +443,8 @@ class CampaignController extends AbstractStandardFormController
         } elseif ('new' === $action && empty($sessionId)) {
             $sessionId = 'mautic_'.sha1(uniqid(mt_rand(), true));
             if ($this->request->request->has('campaign')) {
-                $sessionId = $this->request->request->get('campaign[sessionId]', $sessionId, true);
+                $campaign  = $this->request->request->get('campaign', []);
+                $sessionId = $campaign['sessionId'] ?? $sessionId;
             }
         } elseif ('edit' === $action) {
             $sessionId = $campaign->getId();
@@ -470,12 +464,11 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param       $start
-     * @param       $limit
-     * @param       $filter
-     * @param       $orderBy
-     * @param       $orderByDir
-     * @param array $args
+     * @param $start
+     * @param $limit
+     * @param $filter
+     * @param $orderBy
+     * @param $orderByDir
      */
     protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = [])
     {
@@ -529,7 +522,7 @@ class CampaignController extends AbstractStandardFormController
                 $listFilters['filters']['groups']['mautic.campaign.leadsource.'.$type]['values'] = $typeFilters;
 
                 foreach ($typeFilters as $fltr) {
-                    if ($type == 'list') {
+                    if ('list' == $type) {
                         $listIds[] = (int) $fltr;
                     } else {
                         $formIds[] = (int) $fltr;
@@ -573,8 +566,7 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param array $args
-     * @param       $action
+     * @param $action
      *
      * @return array
      */
@@ -660,13 +652,15 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param array $args
-     * @param       $action
+     * @param $action
      *
      * @return array
      */
     protected function getViewArguments(array $args, $action)
     {
+        /** @var EventCollector $eventCollector */
+        $eventCollector = $this->get('mautic.campaign.event_collector');
+
         switch ($action) {
             case 'index':
                 $args['viewParameters']['filters'] = $this->listFilters;
@@ -723,7 +717,7 @@ class CampaignController extends AbstractStandardFormController
                         $event['percent']            = $parentEvent['percent'];
                         $event['yesPercent']         = $parentEvent['yesPercent'];
                         $event['noPercent']          = $parentEvent['noPercent'];
-                        if ($event['decisionPath'] == 'yes') {
+                        if ('yes' == $event['decisionPath']) {
                             $event['noPercent'] = 0;
                         } else {
                             $event['yesPercent'] = 0;
@@ -740,8 +734,6 @@ class CampaignController extends AbstractStandardFormController
                     ['campaign_id' => $objectId]
                 );
 
-                $session = $this->get('session');
-
                 $campaignSources = $this->getCampaignModel()->getSourceLists();
 
                 $this->prepareCampaignSourcesForEdit($objectId, $campaignSources, true);
@@ -753,7 +745,7 @@ class CampaignController extends AbstractStandardFormController
                         'campaign'        => $entity,
                         'stats'           => $stats,
                         'events'          => $sortedEvents,
-                        'eventSettings'   => $this->getCampaignModel()->getEvents(),
+                        'eventSettings'   => $eventCollector->getEventsArray(),
                         'sources'         => $this->getCampaignModel()->getLeadSources($entity),
                         'dateRangeForm'   => $dateRangeForm->createView(),
                         'campaignSources' => $this->campaignSources,
@@ -775,7 +767,7 @@ class CampaignController extends AbstractStandardFormController
                 $args['viewParameters'] = array_merge(
                     $args['viewParameters'],
                     [
-                        'eventSettings'   => $this->getCampaignModel()->getEvents(),
+                        'eventSettings'   => $eventCollector->getEventsArray(),
                         'campaignEvents'  => $this->campaignEvents,
                         'campaignSources' => $this->campaignSources,
                         'deletedEvents'   => $this->deletedEvents,
@@ -821,7 +813,7 @@ class CampaignController extends AbstractStandardFormController
             switch ($event['triggerMode']) {
                 case 'interval':
                     $label = $translator->trans(
-                        'mautic.campaign.connection.trigger.interval.label'.($event['decisionPath'] == 'no' ? '_inaction' : ''),
+                        'mautic.campaign.connection.trigger.interval.label'.('no' == $event['decisionPath'] ? '_inaction' : ''),
                         [
                             '%number%' => $event['triggerInterval'],
                             '%unit%'   => $translator->transChoice(
@@ -833,7 +825,7 @@ class CampaignController extends AbstractStandardFormController
                     break;
                 case 'date':
                     $label = $translator->trans(
-                        'mautic.campaign.connection.trigger.date.label'.($event['decisionPath'] == 'no' ? '_inaction' : ''),
+                        'mautic.campaign.connection.trigger.date.label'.('no' == $event['decisionPath'] ? '_inaction' : ''),
                         [
                             '%full%' => $dateHelper->toFull($event['triggerDate']),
                             '%time%' => $dateHelper->toTime($event['triggerDate']),
@@ -854,8 +846,8 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param   $objectId
-     * @param   $campaignSources
+     * @param $objectId
+     * @param $campaignSources
      */
     protected function prepareCampaignSourcesForEdit($objectId, $campaignSources, $isPost = false)
     {

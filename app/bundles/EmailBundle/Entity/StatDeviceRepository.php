@@ -33,7 +33,7 @@ class StatDeviceRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'email_stats_devices', 'ed')
             ->join('ed', MAUTIC_TABLE_PREFIX.'lead_devices', 'd', 'd.id = ed.device_id')
             ->join('ed', MAUTIC_TABLE_PREFIX.'email_stats', 'es', 'es.id = ed.stat_id');
-        if ($emailIds != null) {
+        if (null != $emailIds) {
             if (!is_array($emailIds)) {
                 $emailIds = [(int) $emailIds];
             }
@@ -44,14 +44,14 @@ class StatDeviceRepository extends CommonRepository
 
         $qb->groupBy('es.list_id, d.device');
 
-        if ($fromDate !== null) {
+        if (null !== $fromDate) {
             //make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $qb->andWhere(
                 $qb->expr()->gte('es.date_read', $qb->expr()->literal($dt->toUtcString()))
             );
         }
-        if ($toDate !== null) {
+        if (null !== $toDate) {
             //make sure the date is UTC
             $dt = new DateTimeHelper($toDate);
             $qb->andWhere(

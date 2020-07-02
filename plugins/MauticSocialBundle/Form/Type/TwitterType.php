@@ -22,10 +22,6 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class TwitterType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('count', ChoiceType::class, [
@@ -34,10 +30,9 @@ class TwitterType extends AbstractType
                 'mautic.integration.Twitter.share.layout.vertical'   => 'vertical',
                 'mautic.integration.Twitter.share.layout.none'       => 'none',
             ],
-            'choices_as_values' => true,
             'label'             => 'mautic.integration.Twitter.share.layout',
             'required'          => false,
-            'empty_value'       => false,
+            'placeholder'       => false,
             'label_attr'        => ['class' => 'control-label'],
             'attr'              => ['class' => 'form-control'],
         ]);

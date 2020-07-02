@@ -22,7 +22,6 @@ class LeadUtmTagsEvent extends CommonEvent
     protected $utmtags;
 
     /**
-     * @param Lead $lead
      * @param bool $utmTag
      */
     public function __construct(Lead $lead, $utmTag)

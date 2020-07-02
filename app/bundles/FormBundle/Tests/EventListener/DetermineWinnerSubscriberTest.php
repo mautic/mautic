@@ -11,16 +11,15 @@
 
 namespace Mautic\FormBundle\Tests\EventListener;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\EventListener\DetermineWinnerSubscriber;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class DetermineWinnerSubscriberTest extends \PHPUnit_Framework_TestCase
+class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    private $em;
+    private $submissionRepository;
     private $translator;
 
     /**
@@ -32,25 +31,22 @@ class DetermineWinnerSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->em         = $this->createMock(EntityManager::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->subscriber = new DetermineWinnerSubscriber($this->em, $this->translator);
+        $this->submissionRepository = $this->createMock(SubmissionRepository::class);
+        $this->translator           = $this->createMock(TranslatorInterface::class);
+        $this->subscriber           = new DetermineWinnerSubscriber($this->submissionRepository, $this->translator);
     }
 
     public function testOnDetermineSubmissionWinner()
     {
-        $parentMock    = $this->createMock(Page::class);
-        $childMock     = $this->createMock(Page::class);
-        $children      = [2 => $childMock];
-        $repoMock      = $this->createMock(SubmissionRepository::class);
-        $parameters    = ['parent' => $parentMock, 'children' => $children];
-        $event         = new DetermineWinnerEvent($parameters);
-        $startDate     = new \DateTime();
-
+        $parentMock       = $this->createMock(Page::class);
+        $childMock        = $this->createMock(Page::class);
+        $children         = [2 => $childMock];
+        $parameters       = ['parent' => $parentMock, 'children' => $children];
+        $event            = new DetermineWinnerEvent($parameters);
+        $startDate        = new \DateTime();
         $transSubmissions = 'submissions';
         $transHits        = 'hits';
-
-        $counts = [
+        $counts           = [
             1 => [
                 'count' => 20,
                 'id'    => 1,
@@ -62,7 +58,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit_Framework_TestCase
                 'id'    => 2,
                 'name'  => 'Test 6',
                 'total' => 150,
-                ],
+            ],
         ];
 
         $this->translator->expects($this->at(0))
@@ -72,10 +68,6 @@ class DetermineWinnerSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->translator->expects($this->at(1))
             ->method('trans')
             ->willReturn($transHits);
-
-        $this->em->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($repoMock);
 
         $parentMock->expects($this->any())
             ->method('isPublished')
@@ -97,7 +89,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getVariantStartDate')
             ->willReturn($startDate);
 
-        $repoMock->expects($this->once())
+        $this->submissionRepository->expects($this->once())
             ->method('getSubmissionCountsByPage')
             ->with([1, 2], $startDate)
             ->willReturn($counts);

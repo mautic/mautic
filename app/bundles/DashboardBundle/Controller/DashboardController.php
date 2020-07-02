@@ -56,7 +56,7 @@ class DashboardController extends AbstractFormController
 
             if (!empty($dateRangeFilter['date_to'])) {
                 $to = new \DateTime($dateRangeFilter['date_to']);
-                $session->set('mautic.daterange.form.to', $to->format($mysqlFormat));
+                $session->set('mautic.daterange.form.to', $to->format($mysqlFormat.' 23:59:59'));
             }
 
             $model->clearDashboardCache();
@@ -106,7 +106,7 @@ class DashboardController extends AbstractFormController
         $valid      = false;
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $closeModal = true;
@@ -139,9 +139,7 @@ class DashboardController extends AbstractFormController
                 $passthroughVars['widgetHeight'] = $widget->getHeight();
             }
 
-            $response = new JsonResponse($passthroughVars);
-
-            return $response;
+            return new JsonResponse($passthroughVars);
         } else {
             return $this->delegateView([
                 'viewParameters' => [
@@ -170,7 +168,7 @@ class DashboardController extends AbstractFormController
         $closeModal = false;
         $valid      = false;
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $closeModal = true;
@@ -203,9 +201,7 @@ class DashboardController extends AbstractFormController
                 $passthroughVars['widgetHeight'] = $widget->getHeight();
             }
 
-            $response = new JsonResponse($passthroughVars);
-
-            return $response;
+            return new JsonResponse($passthroughVars);
         } else {
             return $this->delegateView([
                 'viewParameters' => [
@@ -242,7 +238,7 @@ class DashboardController extends AbstractFormController
         /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
         $model  = $this->getModel('dashboard');
         $entity = $model->getEntity($objectId);
-        if ($entity === null) {
+        if (null === $entity) {
             $flashes[] = [
                 'type'    => 'error',
                 'msg'     => 'mautic.api.client.error.notfound',
@@ -279,7 +275,7 @@ class DashboardController extends AbstractFormController
     public function saveAction()
     {
         // Accept only AJAX POST requests because those are check for CSRF tokens
-        if ($this->request->getMethod() !== 'POST' || !$this->request->isXmlHttpRequest()) {
+        if ('POST' !== $this->request->getMethod() || !$this->request->isXmlHttpRequest()) {
             return $this->accessDenied();
         }
 
@@ -431,13 +427,13 @@ class DashboardController extends AbstractFormController
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'import']);
         $form   = $this->get('form.factory')->create(UploadType::class, [], ['action' => $action]);
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             if (isset($form) && !$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     $fileData = $form['file']->getData();
                     if (!empty($fileData)) {
                         $extension = pathinfo($fileData->getClientOriginalName(), PATHINFO_EXTENSION);
-                        if ($extension === 'json') {
+                        if ('json' === $extension) {
                             $fileData->move($directories['user'], $fileData->getClientOriginalName());
                         } else {
                             $form->addError(

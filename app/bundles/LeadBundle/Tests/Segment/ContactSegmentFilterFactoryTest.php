@@ -20,7 +20,7 @@ use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\TableSchemaColumnsCache;
 use Symfony\Component\DependencyInjection\Container;
 
-class ContactSegmentFilterFactoryTest extends \PHPUnit_Framework_TestCase
+class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterFactory

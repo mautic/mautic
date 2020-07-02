@@ -14,8 +14,9 @@ namespace Mautic\CoreBundle\EventListener;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\CoreBundle\Form\Type\ConfigThemeType;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ConfigThemeSubscriber extends CommonSubscriber
+class ConfigThemeSubscriber implements EventSubscriberInterface
 {
     /**
      * @return array

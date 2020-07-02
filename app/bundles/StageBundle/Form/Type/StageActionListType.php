@@ -24,17 +24,11 @@ class StageActionListType extends AbstractType
 {
     private $model;
 
-    /**
-     * @param StageModel $model
-     */
     public function __construct(StageModel $model)
     {
         $this->model = $model;
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -49,12 +43,11 @@ class StageActionListType extends AbstractType
                 return $choices;
             },
             'required'          => false,
-            'choices_as_values' => true,
-        ]);
+            ]);
     }
 
     /**
-     * @return null|string|\Symfony\Component\Form\FormTypeInterface
+     * @return string|\Symfony\Component\Form\FormTypeInterface|null
      */
     public function getParent()
     {

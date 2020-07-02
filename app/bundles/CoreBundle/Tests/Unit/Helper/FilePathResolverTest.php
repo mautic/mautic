@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Helper;
+namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Helper\FilePathResolver;
@@ -18,7 +18,7 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FilePathResolverTest extends \PHPUnit_Framework_TestCase
+class FilePathResolverTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Get correct name if few previous names are taken
@@ -90,7 +90,7 @@ class FilePathResolverTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $filesystemMock->expects($this->exactly(100))
+        $filesystemMock->expects($this->exactly(1000))
             ->method('exists')
             ->willReturn(true);
 

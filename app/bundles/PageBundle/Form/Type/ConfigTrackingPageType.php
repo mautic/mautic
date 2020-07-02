@@ -13,6 +13,7 @@ namespace Mautic\PageBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -20,10 +21,6 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class ConfigTrackingPageType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('track_by_tracking_url', YesNoButtonGroupType::class, [
@@ -31,14 +28,6 @@ class ConfigTrackingPageType extends AbstractType
             'data'  => isset($options['data']['track_by_tracking_url']) ? (bool) $options['data']['track_by_tracking_url'] : true,
             'attr'  => [
                 'tooltip' => 'mautic.page.config.form.track.by.tracking.url.tooltip',
-            ],
-        ]);
-
-        $builder->add('track_by_fingerprint', YesNoButtonGroupType::class, [
-            'label' => 'mautic.page.config.form.track.by.fingerprint',
-            'data'  => isset($options['data']['track_by_fingerprint']) ? (bool) $options['data']['track_by_fingerprint'] : false,
-            'attr'  => [
-                'tooltip' => 'mautic.page.config.form.track.by.fingerprint.tooltip',
             ],
         ]);
 
@@ -62,14 +51,14 @@ class ConfigTrackingPageType extends AbstractType
                 'data'  => isset($options['data']['track_contact_by_ip']) ? (bool) $options['data']['track_contact_by_ip'] : false,
                 'attr'  => [
                     'tooltip'      => 'mautic.page.config.form.track_contact_by_ip.tooltip',
-                    'data-show-on' => '{"config_trackingconfig_anonymize_ip_1":"checked"}',
+                    'data-show-on' => '{"config_trackingconfig_anonymize_ip_0":"checked"}',
                 ],
             ]
         );
 
         $builder->add(
             'facebook_pixel_id',
-            'text',
+            TextType::class,
             [
                 'label' => 'mautic.page.config.form.facebook.pixel.id',
                 'attr'  => [
@@ -99,7 +88,7 @@ class ConfigTrackingPageType extends AbstractType
 
         $builder->add(
             'google_analytics_id',
-            'text',
+            TextType::class,
             [
                 'label' => 'mautic.page.config.form.google.analytics.id',
                 'attr'  => [
@@ -143,7 +132,7 @@ class ConfigTrackingPageType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'trackingconfig';
     }

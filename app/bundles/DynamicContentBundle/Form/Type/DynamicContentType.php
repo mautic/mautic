@@ -22,11 +22,18 @@ use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\LocaleType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -34,7 +41,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Constraints\Callback;
 
 /**
  * Class DynamicContentType.
@@ -59,11 +65,6 @@ class DynamicContentType extends AbstractType
 
     /**
      * DynamicContentType constructor.
-     *
-     * @param EntityManager       $entityManager
-     * @param ListModel           $listModel
-     * @param TranslatorInterface $translator
-     * @param LeadModel           $leadModel
      *
      * @throws \InvalidArgumentException
      */
@@ -93,10 +94,6 @@ class DynamicContentType extends AbstractType
         );
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html']));
@@ -104,7 +101,7 @@ class DynamicContentType extends AbstractType
 
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.dynamicContent.form.internal.name',
                 'label_attr' => ['class' => 'control-label'],
@@ -114,7 +111,7 @@ class DynamicContentType extends AbstractType
 
         $builder->add(
             'slotName',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.dynamicContent.send.slot_name',
                 'label_attr' => ['class' => 'control-label'],
@@ -129,7 +126,7 @@ class DynamicContentType extends AbstractType
         $builder->add(
             $builder->create(
                 'description',
-                'textarea',
+                TextareaType::class,
                 [
                     'label'      => 'mautic.dynamicContent.description',
                     'label_attr' => ['class' => 'control-label'],
@@ -156,7 +153,7 @@ class DynamicContentType extends AbstractType
 
         $builder->add(
             'language',
-            'locale',
+            LocaleType::class,
             [
                 'label'      => 'mautic.core.language',
                 'label_attr' => ['class' => 'control-label'],
@@ -169,7 +166,7 @@ class DynamicContentType extends AbstractType
 
         $builder->add(
             'publishUp',
-            'datetime',
+            DateTimeType::class,
             [
                 'widget'     => 'single_text',
                 'label'      => 'mautic.core.form.publishup',
@@ -185,7 +182,7 @@ class DynamicContentType extends AbstractType
 
         $builder->add(
             'publishDown',
-            'datetime',
+            DateTimeType::class,
             [
                 'widget'     => 'single_text',
                 'label'      => 'mautic.core.form.publishdown',
@@ -201,7 +198,7 @@ class DynamicContentType extends AbstractType
 
         $builder->add(
             'content',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.dynamicContent.form.content',
                 'label_attr' => ['class' => 'control-label'],
@@ -217,7 +214,7 @@ class DynamicContentType extends AbstractType
         );
         $builder->add(
             'utmTags',
-            'utm_tags',
+            EmailUtmTagsType::class,
             [
                 'label'      => 'mautic.email.utm_tags',
                 'label_attr' => ['class' => 'control-label'],
@@ -233,7 +230,7 @@ class DynamicContentType extends AbstractType
         $builder->add(
             $builder->create(
                 'translationParent',
-                'dwc_list',
+                DynamicContentListType::class,
                 [
                     'label'      => 'mautic.core.form.translation_parent',
                     'label_attr' => ['class' => 'control-label'],
@@ -243,7 +240,7 @@ class DynamicContentType extends AbstractType
                     ],
                     'required'    => false,
                     'multiple'    => false,
-                    'empty_value' => 'mautic.core.form.translation_parent.empty',
+                    'placeholder' => 'mautic.core.form.translation_parent.empty',
                     'top_level'   => 'translation',
                     'ignore_ids'  => [(int) $options['data']->getId()],
                 ]
@@ -265,7 +262,7 @@ class DynamicContentType extends AbstractType
 
             $builder->add(
                 'updateSelect',
-                'hidden',
+                HiddenType::class,
                 [
                     'data'   => $options['update_select'],
                     'mapped' => false,
@@ -282,10 +279,10 @@ class DynamicContentType extends AbstractType
         $builder->add(
             $builder->create(
                 'filters',
-                'collection',
+                CollectionType::class,
                 [
-                    'type'    => DwcEntryFiltersType::class,
-                    'options' => [
+                    'entry_type'    => DwcEntryFiltersType::class,
+                    'entry_options' => [
                         'countries'    => $this->countryChoices,
                         'regions'      => $this->regionChoices,
                         'timezones'    => $this->timezoneChoices,
@@ -320,8 +317,6 @@ class DynamicContentType extends AbstractType
     }
 
     /**
-     * @param OptionsResolver $resolver
-     *
      * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      */
     public function configureOptions(OptionsResolver $resolver)
@@ -363,7 +358,7 @@ class DynamicContentType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'dwc';
     }

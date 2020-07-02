@@ -22,18 +22,12 @@ class ConfigType extends AbstractType
 
     /**
      * ConfigType constructor.
-     *
-     * @param FieldModel $fieldModel
      */
     public function __construct(FieldModel $fieldModel)
     {
         $this->fieldModel = $fieldModel;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $leadFields = $this->fieldModel->getFieldList(false, false);
@@ -43,7 +37,6 @@ class ConfigType extends AbstractType
             ChoiceType::class,
             [
                 'choices'           => array_flip($leadFields),
-                'choices_as_values' => true,
                 'label'             => 'mautic.social.config.twitter.field.label',
                 'required'          => false,
                 'label_attr'        => ['class' => 'control-label'],

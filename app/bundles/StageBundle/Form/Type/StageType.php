@@ -25,7 +25,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class StageType extends AbstractType
 {
@@ -34,19 +33,9 @@ class StageType extends AbstractType
      */
     private $security;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @param TranslatorInterface $translator
-     * @param CorePermissions     $security
-     */
-    public function __construct(TranslatorInterface $translator, CorePermissions $security)
+    public function __construct(CorePermissions $security)
     {
-        $this->translator = $translator;
-        $this->security   = $security;
+        $this->security = $security;
     }
 
     /**
@@ -77,8 +66,8 @@ class StageType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.stage.action.weight.help',
                 ],
-            'precision' => 0,
-            'required'  => false,
+            'scale'    => 0,
+            'required' => false,
         ]);
 
         if (!empty($options['data']) && $options['data'] instanceof Stage) {
@@ -98,8 +87,10 @@ class StageType extends AbstractType
         }
 
         $builder->add('isPublished', YesNoButtonGroupType::class, [
-            'read_only' => $readonly,
-            'data'      => $data,
+            'data' => $data,
+            'attr' => [
+                'readonly' => $readonly,
+            ],
         ]);
 
         $builder->add('publishUp', DateTimeType::class, [

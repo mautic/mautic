@@ -28,8 +28,6 @@ class CategoryBundlesType extends AbstractType
 
     /**
      * CategoryBundlesType constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
@@ -50,11 +48,11 @@ class CategoryBundlesType extends AbstractType
                     $types = [];
                 }
 
-                return $types;
+                return array_flip($types);
             },
-            'expanded' => false,
-            'multiple' => false,
-            'required' => false,
+            'expanded'          => false,
+            'multiple'          => false,
+            'required'          => false,
         ]);
     }
 

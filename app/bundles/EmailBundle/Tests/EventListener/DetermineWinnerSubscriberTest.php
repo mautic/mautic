@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Test\EventListener;
+namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
@@ -19,7 +19,7 @@ use Mautic\EmailBundle\EventListener\DetermineWinnerSubscriber;
 use Mautic\PageBundle\Entity\HitRepository;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class DetermineWinnerSubscriberTest extends \PHPUnit_Framework_TestCase
+class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private $em;
     private $translator;

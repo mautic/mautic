@@ -77,9 +77,6 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Create/update Tweet Stat and update sent count for Tweet.
      *
-     * @param Tweet  $tweet
-     * @param Lead   $lead
-     * @param array  $sendResponse
      * @param string $source
      * @param int    $sourceId
      *
@@ -140,7 +137,6 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
      * @param Tweet $entity
      * @param       $formFactory
      * @param null  $action
-     * @param array $options
      *
      * @return mixed
      *
@@ -164,11 +160,11 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param int $id
      *
-     * @return null|Tweet
+     * @return Tweet|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             $entity = new Tweet();
         } else {
             $entity = parent::getEntity($id);

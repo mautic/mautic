@@ -11,8 +11,8 @@
 
 namespace Mautic\PageBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
+use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -20,23 +20,19 @@ use Symfony\Component\Translation\TranslatorInterface;
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var EntityManager
+     * @var HitRepository
      */
-    private $em;
+    private $hitRepository;
 
     /**
      * @var TranslatorInterface
      */
     private $translator;
 
-    /**
-     * @param EntityManager       $em
-     * @param TranslatorInterface $translator
-     */
-    public function __construct(EntityManager $em, TranslatorInterface $translator)
+    public function __construct(HitRepository $hitRepository, TranslatorInterface $translator)
     {
-        $this->em         = $em;
-        $this->translator = $translator;
+        $this->hitRepository = $hitRepository;
+        $this->translator    = $translator;
     }
 
     /**
@@ -52,21 +48,18 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 
     /**
      * Determines the winner of A/B test based on bounce rates.
-     *
-     * @param DetermineWinnerEvent $event
      */
     public function onDetermineBounceRateWinner(DetermineWinnerEvent $event)
     {
         //find the hits that did not go any further
-        $repo      = $this->em->getRepository('MauticPageBundle:Hit');
         $parent    = $event->getParameters()['parent'];
         $children  = $event->getParameters()['children'];
         $pageIds   = $parent->getRelatedEntityIds();
         $startDate = $parent->getVariantStartDate();
 
-        if ($startDate != null && !empty($pageIds)) {
+        if (null != $startDate && !empty($pageIds)) {
             //get their bounce rates
-            $counts = $repo->getBounces($pageIds, $startDate, true);
+            $counts = $this->hitRepository->getBounces($pageIds, $startDate, true);
             if ($counts) {
                 // Group by translation
                 $combined = [
@@ -141,22 +134,18 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 
     /**
      * Determines the winner of A/B test based on dwell time rates.
-     *
-     * @param DetermineWinnerEvent $event
      */
     public function onDetermineDwellTimeWinner(DetermineWinnerEvent $event)
     {
         //find the hits that did not go any further
-        $repo      = $this->em->getRepository('MauticPageBundle:Hit');
         $parent    = $event->getParameters()['parent'];
         $pageIds   = $parent->getRelatedEntityIds();
         $startDate = $parent->getVariantStartDate();
 
-        if ($startDate != null && !empty($pageIds)) {
+        if (null != $startDate && !empty($pageIds)) {
             //get their bounce rates
-            $counts     = $repo->getDwellTimesForPages($pageIds, ['fromDate' => $startDate]);
-            $translator = $this->translator;
-            $support    = [];
+            $counts  = $this->hitRepository->getDwellTimesForPages($pageIds, ['fromDate' => $startDate]);
+            $support = [];
 
             if ($counts) {
                 //in order to get a fair grade, we have to compare the averages here since a page that is only shown
@@ -165,9 +154,9 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                 $support['data']   = [];
                 $support['labels'] = [];
                 foreach ($counts as $pid => $stats) {
-                    $avgs[$pid]                                                                          = $stats['average'];
-                    $support['data'][$translator->trans('mautic.page.abtest.label.dewlltime.average')][] = $stats['average'];
-                    $support['labels'][]                                                                 = $pid.':'.$stats['title'];
+                    $avgs[$pid]                                                                                = $stats['average'];
+                    $support['data'][$this->translator->trans('mautic.page.abtest.label.dewlltime.average')][] = $stats['average'];
+                    $support['labels'][]                                                                       = $pid.':'.$stats['title'];
                 }
 
                 //set max for scales

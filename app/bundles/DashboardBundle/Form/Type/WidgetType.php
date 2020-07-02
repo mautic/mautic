@@ -41,20 +41,12 @@ class WidgetType extends AbstractType
      */
     protected $security;
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param CorePermissions          $security
-     */
     public function __construct(EventDispatcherInterface $dispatcher, CorePermissions $security)
     {
         $this->dispatcher = $dispatcher;
         $this->security   = $security;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -72,15 +64,19 @@ class WidgetType extends AbstractType
         $event->setSecurity($this->security);
         $this->dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE, $event);
 
+        $types = array_map(function ($category) {
+            return array_flip($category);
+        }, $event->getTypes());
+
         $builder->add(
             'type',
             ChoiceType::class,
             [
-                'label'       => 'mautic.dashboard.widget.form.type',
-                'choices'     => $event->getTypes(),
-                'label_attr'  => ['class' => 'control-label'],
-                'empty_value' => 'mautic.core.select',
-                'attr'        => [
+                'label'             => 'mautic.dashboard.widget.form.type',
+                'choices'           => $types,
+                'label_attr'        => ['class' => 'control-label'],
+                'placeholder'       => 'mautic.core.select',
+                'attr'              => [
                     'class'    => 'form-control',
                     'onchange' => 'Mautic.updateWidgetForm(this)',
                 ],
@@ -93,10 +89,10 @@ class WidgetType extends AbstractType
             [
                 'label'   => 'mautic.dashboard.widget.form.width',
                 'choices' => [
-                    '25'  => '25%',
-                    '50'  => '50%',
-                    '75'  => '75%',
-                    '100' => '100%',
+                    '25%'  => '25',
+                    '50%'  => '50',
+                    '75%'  => '75',
+                    '100%' => '100',
                 ],
                 'empty_data'        => '100',
                 'label_attr'        => ['class' => 'control-label'],
@@ -111,11 +107,11 @@ class WidgetType extends AbstractType
             [
                 'label'   => 'mautic.dashboard.widget.form.height',
                 'choices' => [
-                    '215' => '215px',
-                    '330' => '330px',
-                    '445' => '445px',
-                    '560' => '560px',
-                    '675' => '675px',
+                    '215px' => '215',
+                    '330px' => '330',
+                    '445px' => '445',
+                    '560px' => '560',
+                    '675px' => '675',
                 ],
                 'empty_data'        => '330',
                 'label_attr'        => ['class' => 'control-label'],

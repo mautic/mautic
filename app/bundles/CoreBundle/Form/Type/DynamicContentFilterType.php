@@ -18,15 +18,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class DynamicContentFilterType.
- */
 class DynamicContentFilterType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -54,9 +47,9 @@ class DynamicContentFilterType extends AbstractType
         $builder->add(
             $builder->create(
                 'filters',
-                CollectionType::class,
+                DynamicListType::class,
                 [
-                    'type'           => DynamicContentFilterEntryType::class,
+                    'entry_type'     => DynamicContentFilterEntryType::class,
                     'entry_options'  => [
                         'label' => false,
                         'attr'  => [
@@ -70,9 +63,6 @@ class DynamicContentFilterType extends AbstractType
         );
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

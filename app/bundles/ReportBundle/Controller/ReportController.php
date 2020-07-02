@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Form\Type\DynamicFiltersType;
 use Mautic\ReportBundle\Model\ExportResponse;
 use Symfony\Component\HttpFoundation;
 
@@ -57,8 +58,8 @@ class ReportController extends FormController
         $this->setListFilters();
 
         //set limits
-        $limit = $this->container->get('session')->get('mautic.report.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $limit = $this->container->get('session')->get('mautic.report.limit', $this->coreParametersHelper->get('default_pagelimit'));
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -88,7 +89,7 @@ class ReportController extends FormController
         $count = count($reports);
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
+            $lastPage = (1 === $count) ? 1 : (ceil($count / $limit)) ?: 1;
             $this->container->get('session')->set('mautic.report.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_report_index', ['page' => $lastPage]);
 
@@ -146,7 +147,7 @@ class ReportController extends FormController
         $model  = $this->getModel('report');
         $entity = $model->getEntity($objectId);
 
-        if ($entity != null) {
+        if (null != $entity) {
             if (!$this->container->get('mautic.security')->isGranted('report:reports:create')
                 || !$this->container->get('mautic.security')->hasEntityAccess(
                     'report:reports:viewown',
@@ -187,7 +188,7 @@ class ReportController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             /* @type \Mautic\ReportBundle\Model\ReportModel $model */
             $model  = $this->getModel('report');
             $entity = $model->getEntity($objectId);
@@ -200,7 +201,7 @@ class ReportController extends FormController
                 $model,
                 'report'
             );
-            if ($check !== true) {
+            if (true !== $check) {
                 return $check;
             }
 
@@ -248,7 +249,7 @@ class ReportController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $model     = $this->getModel('report');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];
@@ -257,7 +258,7 @@ class ReportController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if ($entity === null) {
+                if (null === $entity) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.report.report.error.notfound',
@@ -339,7 +340,7 @@ class ReportController extends FormController
             $model,
             'report'
         );
-        if ($check !== true) {
+        if (true !== $check) {
             return $check;
         }
 
@@ -348,7 +349,7 @@ class ReportController extends FormController
         $form   = $model->createForm($entity, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && 'POST' == $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 // Columns have to be reset in order for Symfony to honor the new submitted order
@@ -472,7 +473,7 @@ class ReportController extends FormController
         $form   = $model->createForm($entity, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -562,7 +563,7 @@ class ReportController extends FormController
         $entity   = $model->getEntity($objectId);
         $security = $this->container->get('mautic.security');
 
-        if ($entity === null) {
+        if (null === $entity) {
             $page = $this->container->get('session')->get('mautic.report.page', 1);
 
             return $this->postActionRedirect(
@@ -612,7 +613,7 @@ class ReportController extends FormController
         }
 
         $dateRangeForm = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
-        if ($this->request->getMethod() == 'POST' && $this->request->request->has('daterange')) {
+        if ('POST' == $this->request->getMethod() && $this->request->request->has('daterange')) {
             if ($this->isFormValid($dateRangeForm)) {
                 $to                         = new \DateTime($dateRangeForm['date_to']->getData());
                 $dateRangeValues['date_to'] = $to->format($mysqlFormat);
@@ -631,7 +632,7 @@ class ReportController extends FormController
         $filterSettings = [];
 
         if (count($dynamicFilters) > 0 && count($entity->getFilters()) > 0) {
-            foreach ($entity->getFilters() as $fid => $filter) {
+            foreach ($entity->getFilters() as $filter) {
                 foreach ($dynamicFilters as $dfcol => $dfval) {
                     if (1 === $filter['dynamic'] && $filter['column'] === $dfcol) {
                         $dynamicFilters[$dfcol]['expr'] = $filter['condition'];
@@ -646,7 +647,7 @@ class ReportController extends FormController
         }
 
         $dynamicFilterForm = $this->get('form.factory')->create(
-            'report_dynamicfilters',
+            DynamicFiltersType::class,
             $filterSettings,
             [
                 'action'            => $action,
@@ -716,7 +717,6 @@ class ReportController extends FormController
      *
      * @param object                               $entity
      * @param int                                  $objectId
-     * @param array                                $permissions
      * @param \Mautic\CoreBundle\Model\CommonModel $model
      * @param string                               $modelName
      *
@@ -724,7 +724,7 @@ class ReportController extends FormController
      */
     private function checkEntityAccess($postActionVars, $entity, $objectId, array $permissions, $model, $modelName)
     {
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -764,7 +764,7 @@ class ReportController extends FormController
         $entity   = $model->getEntity($objectId);
         $security = $this->container->get('mautic.security');
 
-        if ($entity === null) {
+        if (null === $entity) {
             $page = $this->container->get('session')->get('mautic.report.page', 1);
 
             return $this->postActionRedirect(
@@ -800,7 +800,7 @@ class ReportController extends FormController
         $dynamicFilters            = $session->get('mautic.report.'.$objectId.'.filters', []);
         $options['dynamicFilters'] = $dynamicFilters;
 
-        if ($format === 'csv') {
+        if ('csv' === $format) {
             $response = new HttpFoundation\StreamedResponse(
                 function () use ($model, $entity, $format, $options) {
                     $options['paginate']        = true;
@@ -824,7 +824,7 @@ class ReportController extends FormController
             $fileName = $name.'.'.$format;
             ExportResponse::setResponseHeaders($response, $fileName);
         } else {
-            if ($format === 'xlsx') {
+            if ('xlsx' === $format) {
                 $options['ignoreGraphData'] = true;
             }
             $reportData = $model->getReportData($entity, null, $options);

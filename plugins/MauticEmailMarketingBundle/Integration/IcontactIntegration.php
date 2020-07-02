@@ -150,19 +150,6 @@ class IcontactIntegration extends EmailAbstractIntegration
     }
 
     /**
-     * Returns settings for the integration form.
-     *
-     * @return array
-     */
-    public function getFormSettings()
-    {
-        return [
-            'requires_callback'      => false,
-            'requires_authorization' => true,
-        ];
-    }
-
-    /**
      * @return array
      */
     public function getAvailableLeadFields($settings = [])
@@ -195,7 +182,7 @@ class IcontactIntegration extends EmailAbstractIntegration
                 $leadFields[$f] = [
                     'label'    => $this->translator->trans('mautic.icontact.field.'.$f),
                     'type'     => 'string',
-                    'required' => ($f == 'email') ? true : false,
+                    'required' => ('email' == $f) ? true : false,
                 ];
             }
 
@@ -239,7 +226,7 @@ class IcontactIntegration extends EmailAbstractIntegration
             if ($this->isAuthorized()) {
                 $customfields = [];
                 foreach ($mappedData as $k => &$v) {
-                    if (strpos($k, 'cf_') === 0) {
+                    if (0 === strpos($k, 'cf_')) {
                         $customfields[str_replace('cf_', '', $k)] = (string) $v;
                         unset($mappedData[$k]);
                     } else {

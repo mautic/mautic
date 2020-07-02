@@ -31,10 +31,6 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    /**
-     * @param EntityManager       $em
-     * @param TranslatorInterface $translator
-     */
     public function __construct(EntityManager $em, TranslatorInterface $translator)
     {
         $this->em         = $em;
@@ -53,8 +49,6 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 
     /**
      * Determines the winner of A/B test based on number of asset downloads.
-     *
-     * @param DetermineWinnerEvent $event
      */
     public function onDetermineDownloadRateWinner(DetermineWinnerEvent $event)
     {
@@ -77,8 +71,8 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
         }
 
         $startDate = $parent->getVariantStartDate();
-        if ($startDate != null && !empty($ids)) {
-            $counts = ($type == 'page') ? $repo->getDownloadCountsByPage($ids, $startDate) : $repo->getDownloadCountsByEmail($ids, $startDate);
+        if (null != $startDate && !empty($ids)) {
+            $counts = ('page' == $type) ? $repo->getDownloadCountsByPage($ids, $startDate) : $repo->getDownloadCountsByEmail($ids, $startDate);
 
             $translator = $this->translator;
             if ($counts) {
@@ -86,7 +80,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                 $hasResults = [];
 
                 $downloadsLabel = $translator->trans('mautic.asset.abtest.label.downloads');
-                $hitsLabel      = ($type == 'page') ? $translator->trans('mautic.asset.abtest.label.hits') : $translator->trans('mautic.asset.abtest.label.sentemils');
+                $hitsLabel      = ('page' == $type) ? $translator->trans('mautic.asset.abtest.label.hits') : $translator->trans('mautic.asset.abtest.label.sentemils');
                 foreach ($counts as $stats) {
                     $rate                    = ($stats['total']) ? round(($stats['count'] / $stats['total']) * 100, 2) : 0;
                     $downloads[$stats['id']] = $rate;
@@ -100,7 +94,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                 if (!in_array($parent->getId(), $hasResults)) {
                     $data[$downloadsLabel][] = 0;
                     $data[$hitsLabel][]      = 0;
-                    $support['labels'][]     = $parent->getId().':'.(($type == 'page') ? $parent->getTitle() : $parent->getName()).' (0%)';
+                    $support['labels'][]     = $parent->getId().':'.(('page' == $type) ? $parent->getTitle() : $parent->getName()).' (0%)';
                 }
 
                 foreach ($children as $c) {
@@ -108,7 +102,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                         if (!in_array($c->getId(), $hasResults)) {
                             $data[$downloadsLabel][] = 0;
                             $data[$hitsLabel][]      = 0;
-                            $support['labels'][]     = $c->getId().':'.(($type == 'page') ? $c->getTitle() : $c->getName()).' (0%)';
+                            $support['labels'][]     = $c->getId().':'.(('page' == $type) ? $c->getTitle() : $c->getName()).' (0%)';
                         }
                     }
                 }
@@ -116,7 +110,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 
                 //set max for scales
                 $maxes = [];
-                foreach ($support['data'] as $label => $data) {
+                foreach ($support['data'] as $data) {
                     $maxes[] = max($data);
                 }
                 $top                   = max($maxes);

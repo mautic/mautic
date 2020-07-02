@@ -30,10 +30,6 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    /**
-     * @param EntityManager       $em
-     * @param TranslatorInterface $translator
-     */
     public function __construct(EntityManager $em, TranslatorInterface $translator)
     {
         $this->em         = $em;
@@ -53,8 +49,6 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 
     /**
      * Determines the winner of A/B test based on open rate.
-     *
-     * @param DetermineWinnerEvent $event
      */
     public function onDetermineOpenRateWinner(DetermineWinnerEvent $event)
     {
@@ -68,7 +62,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
         $ids       = $parent->getRelatedEntityIds();
         $startDate = $parent->getVariantStartDate();
 
-        if ($startDate != null && !empty($ids)) {
+        if (null != $startDate && !empty($ids)) {
             //get their bounce rates
             $counts = $repo->getOpenedRates($ids, $startDate);
 
@@ -114,7 +108,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 
                 //set max for scales
                 $maxes = [];
-                foreach ($support['data'] as $label => $data) {
+                foreach ($support['data'] as $data) {
                     $maxes[] = max($data);
                 }
                 $top                   = max($maxes);
@@ -149,8 +143,6 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 
     /**
      * Determines the winner of A/B test based on clickthrough rates.
-     *
-     * @param DetermineWinnerEvent $event
      */
     public function onDetermineClickthroughRateWinner(DetermineWinnerEvent $event)
     {
@@ -166,7 +158,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
         $ids = $parent->getRelatedEntityIds();
 
         $startDate = $parent->getVariantStartDate();
-        if ($startDate != null && !empty($ids)) {
+        if (null != $startDate && !empty($ids)) {
             //get their bounce rates
             $clickthroughCounts = $pageRepo->getEmailClickthroughHitCount($ids, $startDate);
             $sentCounts         = $emailRepo->getSentCounts($ids, $startDate);
@@ -217,7 +209,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 
                 //set max for scales
                 $maxes = [];
-                foreach ($support['data'] as $label => $data) {
+                foreach ($support['data'] as $data) {
                     $maxes[] = max($data);
                 }
                 $top                   = max($maxes);

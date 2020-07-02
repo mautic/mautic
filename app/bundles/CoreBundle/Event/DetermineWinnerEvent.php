@@ -25,9 +25,6 @@ class DetermineWinnerEvent extends Event
      */
     private $abTestResults;
 
-    /**
-     * @param array $parameters
-     */
     public function __construct(array $parameters)
     {
         $this->parameters = $parameters;
@@ -49,9 +46,6 @@ class DetermineWinnerEvent extends Event
         return $this->abTestResults;
     }
 
-    /**
-     * @param array $abTestResults
-     */
     public function setAbTestResults(array $abTestResults)
     {
         $this->abTestResults = $abTestResults;

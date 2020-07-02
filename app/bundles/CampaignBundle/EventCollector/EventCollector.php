@@ -44,9 +44,6 @@ class EventCollector
 
     /**
      * EventCollector constructor.
-     *
-     * @param TranslatorInterface      $translator
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
     {
@@ -71,9 +68,6 @@ class EventCollector
     }
 
     /**
-     * @param string $type
-     * @param string $key
-     *
      * @return AbstractEventAccessor
      */
     public function getEventConfig(Event $event)
@@ -86,7 +80,7 @@ class EventCollector
      *
      * @deprecated 2.13.0 to be removed in 3.0
      *
-     * @param null|string $type
+     * @param string|null $type
      *
      * @return array|mixed
      */

@@ -151,40 +151,49 @@ return [
     'services' => [
         'events' => [
             'mautic.core.subscriber' => [
-                'class'     => 'Mautic\CoreBundle\EventListener\CoreSubscriber',
+                'class'     => Mautic\CoreBundle\EventListener\CoreSubscriber::class,
                 'arguments' => [
                     'mautic.helper.bundle',
                     'mautic.helper.menu',
                     'mautic.helper.user',
                     'templating.helper.assets',
                     'mautic.helper.core_parameters',
-                    'security.context',
+                    'security.authorization_checker',
                     'mautic.user.model.user',
+                    'event_dispatcher',
+                    'translator',
+                    'request_stack',
+                    'mautic.form.repository.form',
+                    'mautic.factory',
                 ],
             ],
             'mautic.core.environment.subscriber' => [
-                'class'     => 'Mautic\CoreBundle\EventListener\EnvironmentSubscriber',
+                'class'     => \Mautic\CoreBundle\EventListener\EnvironmentSubscriber::class,
                 'arguments' => [
-                    'mautic.helper.cookie',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.core.configbundle.subscriber' => [
-                'class'     => 'Mautic\CoreBundle\EventListener\ConfigSubscriber',
+                'class'     => \Mautic\CoreBundle\EventListener\ConfigSubscriber::class,
                 'arguments' => [
                     'mautic.helper.language',
-                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.core.configbundle.subscriber.theme' => [
                 'class'     => \Mautic\CoreBundle\EventListener\ConfigThemeSubscriber::class,
             ],
             'mautic.webpush.js.subscriber' => [
-                'class' => 'Mautic\CoreBundle\EventListener\BuildJsSubscriber',
+                'class' => \Mautic\CoreBundle\EventListener\BuildJsSubscriber::class,
             ],
             'mautic.core.dashboard.subscriber' => [
-                'class'     => 'Mautic\CoreBundle\EventListener\DashboardSubscriber',
+                'class'     => \Mautic\CoreBundle\EventListener\DashboardSubscriber::class,
                 'arguments' => [
                     'mautic.core.model.auditlog',
+                    'translator',
+                    'router',
+                    'mautic.security',
+                    'event_dispatcher',
+                    'mautic.model.factory',
                 ],
             ],
 
@@ -193,24 +202,29 @@ return [
                 'arguments' => [
                     'doctrine.dbal.default_connection',
                     'mautic.user.token.repository',
+                    'translator',
                 ],
             ],
             'mautic.core.request.subscriber' => [
                 'class'     => \Mautic\CoreBundle\EventListener\RequestSubscriber::class,
                 'arguments' => [
                     'security.csrf.token_manager',
+                    'translator',
+                    'mautic.helper.templating',
                 ],
             ],
             'mautic.core.stats.subscriber' => [
                 'class'     => \Mautic\CoreBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],
             'mautic.core.assets.subscriber' => [
-                'class'     => 'Mautic\CoreBundle\EventListener\AssetsSubscriber',
+                'class'     => \Mautic\CoreBundle\EventListener\AssetsSubscriber::class,
                 'arguments' => [
                     'templating.helper.assets',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.core.subscriber.router' => [
@@ -244,7 +258,6 @@ return [
                     'translator',
                     'mautic.helper.language',
                     'mautic.ip_lookup.factory',
-                    '%mautic.supported_languages%',
                     '%mautic.ip_lookup_services%',
                     'mautic.ip_lookup',
                 ],
@@ -348,6 +361,7 @@ return [
                     '%mautic.date_format_dateonly%',
                     '%mautic.date_format_timeonly%',
                     'translator',
+                    'mautic.helper.core_parameters',
                 ],
                 'alias' => 'date',
             ],
@@ -359,9 +373,7 @@ return [
             'mautic.helper.template.gravatar' => [
                 'class'     => \Mautic\CoreBundle\Templating\Helper\GravatarHelper::class,
                 'arguments' => [
-                    'mautic.helper.paths',
-                    'templating.helper.assets',
-                    'mautic.helper.template.avatar',
+                    'mautic.helper.template.default_avatar',
                     'mautic.helper.core_parameters',
                     'request_stack',
                 ],
@@ -405,7 +417,6 @@ return [
             'mautic.helper.template.formatter' => [
                 'class'     => \Mautic\CoreBundle\Templating\Helper\FormatterHelper::class,
                 'arguments' => [
-                    'mautic.helper.app_version',
                     'mautic.helper.template.date',
                     'translator',
                 ],
@@ -433,6 +444,9 @@ return [
                 'arguments' => [
                     'mautic.helper.user',
                     'mautic.helper.core_parameters',
+                    '%kernel.cache_dir%',
+                    '%kernel.logs_dir%',
+                    '%kernel.root_dir%',
                 ],
             ],
             'mautic.helper.ip_lookup' => [
@@ -451,17 +465,17 @@ return [
                 ],
             ],
             'mautic.helper.core_parameters' => [
-                'class'     => 'Mautic\CoreBundle\Helper\CoreParametersHelper',
+                'class'     => \Mautic\CoreBundle\Helper\CoreParametersHelper::class,
                 'arguments' => [
-                    'kernel',
+                    'service_container',
                 ],
                 'serviceAlias' => 'mautic.config',
             ],
             'mautic.helper.bundle' => [
                 'class'     => 'Mautic\CoreBundle\Helper\BundleHelper',
                 'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'kernel',
+                    '%mautic.bundles%',
+                    '%mautic.plugin.bundles%',
                 ],
             ],
             'mautic.helper.phone_number' => [
@@ -492,6 +506,24 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
+            'mautic.helper.token_builder' => [
+                'class'     => \Mautic\CoreBundle\Helper\BuilderTokenHelper::class,
+                'arguments' => [
+                    'mautic.security',
+                    'mautic.model.factory',
+                    'database_connection',
+                    'mautic.helper.user',
+                ],
+            ],
+            'mautic.helper.token_builder.factory' => [
+                'class'     => \Mautic\CoreBundle\Helper\BuilderTokenHelperFactory::class,
+                'arguments' => [
+                    'mautic.security',
+                    'mautic.model.factory',
+                    'database_connection',
+                    'mautic.helper.user',
+                ],
+            ],
         ],
         'menus' => [
             'mautic.menu.main' => [
@@ -516,7 +548,53 @@ return [
                 ],
             ],
         ],
+        'commands' => [
+            'mautic.core.command.transifex_pull' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\PullTransifexCommand::class,
+                'arguments' => [
+                    'transifex.factory',
+                    'translator',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
+            'mautic.core.command.transifex_push' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\PushTransifexCommand::class,
+                'arguments' => [
+                    'transifex.factory',
+                    'translator',
+                ],
+            ],
+            'mautic.core.command.apply_update' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\ApplyUpdatesCommand::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.core_parameters',
+                    'mautic.update.step_provider',
+                ],
+            ],
+        ],
         'other' => [
+            'mautic.cache.warmer.middleware' => [
+                'class'     => \Mautic\CoreBundle\Cache\MiddlewareCacheWarmer::class,
+                'tag'       => 'kernel.cache_warmer',
+                'arguments' => [
+                    '%kernel.environment%',
+                ],
+            ],
+            'mautic.http.client' => [
+                'class' => GuzzleHttp\Client::class,
+            ],
+            'mautic.http.client.psr-18' => [
+                // Warning: Only dev dependency (for TransifexFactory)
+                // Can be replaced with 'mautic.http.client' once the standard Guzzle
+                // Client implements \Psr\Http\Client\ClientInterface
+                // @see https://github.com/guzzle/guzzle/pull/2525
+                // When removing, remove also the ricardofiorani/guzzle-psr18-adapter dependency.
+                'class' => \RicardoFiorani\GuzzlePsr18Adapter\Client::class,
+            ],
             'symfony.filesystem' => [
                 'class' => \Symfony\Component\Filesystem\Filesystem::class,
             ],
@@ -540,17 +618,15 @@ return [
                 ],
             ],
 
-            // Template helper overrides
-            'templating.helper.assets.class'    => 'Mautic\CoreBundle\Templating\Helper\AssetsHelper',
-            'templating.helper.slots.class'     => 'Mautic\CoreBundle\Templating\Helper\SlotsHelper',
-            'templating.name_parser.class'      => 'Mautic\CoreBundle\Templating\TemplateNameParser',
-            'templating.helper.form.class'      => 'Mautic\CoreBundle\Templating\Helper\FormHelper',
-            'templating.engine.php.class'       => 'Mautic\CoreBundle\Templating\Engine\PhpEngine',
-            'debug.templating.engine.php.class' => 'Mautic\CoreBundle\Templating\Engine\PhpEngine',
-            // Translator overrides
-            'translator.class'                   => 'Mautic\CoreBundle\Translation\Translator',
-            'templating.helper.translator.class' => 'Mautic\CoreBundle\Templating\Helper\TranslatorHelper',
             // System uses
+            'mautic.di.env_processor.nullable' => [
+                'class' => \Mautic\CoreBundle\DependencyInjection\EnvProcessor\NullableProcessor::class,
+                'tag'   => 'container.env_var_processor',
+            ],
+            'mautic.di.env_processor.int_nullable' => [
+                'class' => \Mautic\CoreBundle\DependencyInjection\EnvProcessor\IntNullableProcessor::class,
+                'tag'   => 'container.env_var_processor',
+            ],
             'mautic.cipher.openssl' => [
                 'class'     => \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class,
                 'arguments' => ['%kernel.environment%'],
@@ -580,7 +656,7 @@ return [
                 'arguments' => [
                     'mautic.helper.user',
                     'translator',
-                    '%mautic.parameters%',
+                    'mautic.helper.core_parameters',
                     '%mautic.bundles%',
                     '%mautic.plugin.bundles%',
                 ],
@@ -613,13 +689,11 @@ return [
                     'priority' => 255,
                 ],
             ],
-            'transifex' => [
-                'class'     => 'BabDev\Transifex\Transifex',
+            'transifex.factory' => [
+                'class'     => \Mautic\CoreBundle\Factory\TransifexFactory::class,
                 'arguments' => [
-                    [
-                        'api.username' => '%mautic.transifex_username%',
-                        'api.password' => '%mautic.transifex_password%',
-                    ],
+                    'mautic.http.client.psr-18',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             // Helpers
@@ -627,6 +701,7 @@ return [
                 'class'     => \Mautic\CoreBundle\Helper\AssetGenerationHelper::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
+                    'mautic.helper.bundle',
                     'mautic.helper.paths',
                     'mautic.helper.app_version',
                 ],
@@ -651,13 +726,27 @@ return [
                 ],
             ],
             'mautic.helper.update' => [
-                'class'     => 'Mautic\CoreBundle\Helper\UpdateHelper',
-                'arguments' => 'mautic.factory',
+                'class'     => \Mautic\CoreBundle\Helper\UpdateHelper::class,
+                'arguments' => [
+                    'mautic.helper.paths',
+                    'monolog.logger.mautic',
+                    'mautic.helper.core_parameters',
+                    'mautic.http.client',
+                    'mautic.helper.update.release_parser',
+                ],
+            ],
+            'mautic.helper.update.release_parser' => [
+                'class'     => \Mautic\CoreBundle\Helper\Update\Github\ReleaseParser::class,
+                'arguments' => [
+                    'mautic.http.client',
+                ],
             ],
             'mautic.helper.cache' => [
-                'class'     => 'Mautic\CoreBundle\Helper\CacheHelper',
+                'class'     => \Mautic\CoreBundle\Helper\CacheHelper::class,
                 'arguments' => [
-                    'kernel',
+                    '%kernel.cache_dir%',
+                    'session',
+                    'mautic.helper.paths',
                 ],
             ],
             'mautic.helper.templating' => [
@@ -681,7 +770,7 @@ return [
                 ],
             ],
             'mautic.helper.encryption' => [
-                'class'     => 'Mautic\CoreBundle\Helper\EncryptionHelper',
+                'class'     => \Mautic\CoreBundle\Helper\EncryptionHelper::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.cipher.openssl',
@@ -689,10 +778,15 @@ return [
             ],
             'mautic.helper.language' => [
                 'class'     => 'Mautic\CoreBundle\Helper\LanguageHelper',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'mautic.helper.paths',
+                    'monolog.logger.mautic',
+                    'mautic.helper.core_parameters',
+                    'mautic.http.connector',
+                ],
             ],
             'mautic.helper.url' => [
-                'class'     => 'Mautic\CoreBundle\Helper\UrlHelper',
+                'class'     => \Mautic\CoreBundle\Helper\UrlHelper::class,
                 'arguments' => [
                     'mautic.http.connector',
                     '%mautic.link_shortener_url%',
@@ -705,7 +799,7 @@ return [
                 'arguments' => [
                     'mautic.security',
                     'request_stack',
-                    '%mautic.parameters%',
+                    'mautic.helper.core_parameters',
                     'mautic.helper.integration',
                 ],
             ],
@@ -720,7 +814,6 @@ return [
                 'arguments' => [
                     'knp_menu.matcher',
                     'mautic.helper.templating',
-                    '%kernel.charset%',
                 ],
                 'tag'   => 'knp_menu.renderer',
                 'alias' => 'mautic',
@@ -790,14 +883,6 @@ return [
                 'tag' => 'twig.extension',
             ],
             // Schema
-            'mautic.schema.helper.factory' => [
-                'class'     => 'Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory',
-                'arguments' => [
-                    'mautic.schema.helper.table',
-                    'mautic.schema.helper.index',
-                    'mautic.schema.helper.column',
-                ],
-            ],
             'mautic.schema.helper.column' => [
                 'class'     => 'Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper',
                 'arguments' => [
@@ -827,6 +912,72 @@ return [
                     'request_stack',
                 ],
                 'tag' => 'validator.constraint_validator',
+            ],
+            // Logger
+            'mautic.monolog.handler' => [
+                'class'     => \Mautic\CoreBundle\Monolog\Handler\FileLogHandler::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.monolog.fulltrace.formatter',
+                ],
+            ],
+
+            // Update steps
+            'mautic.update.step_provider' => [
+                'class' => \Mautic\CoreBundle\Update\StepProvider::class,
+            ],
+            'mautic.update.step.delete_cache' => [
+                'class'     => \Mautic\CoreBundle\Update\Step\DeleteCacheStep::class,
+                'arguments' => [
+                    'mautic.helper.cache',
+                    'translator',
+                ],
+                'tag' => 'mautic.update_step',
+            ],
+            'mautic.update.step.finalize' => [
+                'class'     => \Mautic\CoreBundle\Update\Step\FinalizeUpdateStep::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.paths',
+                    'session',
+                    'mautic.helper.app_version',
+                ],
+                'tag' => 'mautic.update_step',
+            ],
+            'mautic.update.step.install_new_files' => [
+                'class'     => \Mautic\CoreBundle\Update\Step\InstallNewFilesStep::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.update',
+                    'mautic.helper.paths',
+                ],
+                'tag' => 'mautic.update_step',
+            ],
+            'mautic.update.step.remove_deleted_files' => [
+                'class'     => \Mautic\CoreBundle\Update\Step\RemoveDeletedFilesStep::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.paths',
+                    'monolog.logger.mautic',
+                ],
+                'tag' => 'mautic.update_step',
+            ],
+            'mautic.update.step.update_schema' => [
+                'class'     => \Mautic\CoreBundle\Update\Step\UpdateSchemaStep::class,
+                'arguments' => [
+                    'translator',
+                    'service_container',
+                ],
+                'tag' => 'mautic.update_step',
+            ],
+            'mautic.update.step.update_translations' => [
+                'class'     => \Mautic\CoreBundle\Update\Step\UpdateTranslationsStep::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.language',
+                    'monolog.logger.mautic',
+                ],
+                'tag' => 'mautic.update_step',
             ],
         ],
         'models' => [
@@ -915,11 +1066,13 @@ return [
     'parameters' => [
         'site_url'                        => '',
         'webroot'                         => '',
-        'cache_path'                      => '%kernel.root_dir%/cache',
-        'log_path'                        => '%kernel.root_dir%/logs',
+        'cache_path'                      => '%kernel.root_dir%/../var/cache',
+        'log_path'                        => '%kernel.root_dir%/../var/logs',
+        'max_log_files'                   => 7,
+        'log_file_name'                   => 'mautic_%kernel.environment%.php',
         'image_path'                      => 'media/images',
-        'tmp_path'                        => '%kernel.root_dir%/cache',
-        'theme'                           => 'Mauve',
+        'tmp_path'                        => '%kernel.root_dir%/../var/tmp',
+        'theme'                           => 'blank',
         'theme_import_allowed_extensions' => ['json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif'],
         'db_driver'                       => 'pdo_mysql',
         'db_host'                         => '127.0.0.1',
@@ -931,9 +1084,9 @@ return [
         'db_server_version'               => '5.5',
         'locale'                          => 'en_US',
         'secret_key'                      => '',
-        'dev_hosts'                       => null,
-        'trusted_hosts'                   => null,
-        'trusted_proxies'                 => null,
+        'dev_hosts'                       => [],
+        'trusted_hosts'                   => [],
+        'trusted_proxies'                 => [],
         'rememberme_key'                  => hash('sha1', uniqid(mt_rand())),
         'rememberme_lifetime'             => 31536000, //365 days in seconds
         'rememberme_path'                 => '/',
@@ -1005,8 +1158,14 @@ return [
         'batch_campaign_sleep_time' => false,
         'cors_restrict_domains'     => true,
         'cors_valid_domains'        => [],
-        'rss_notification_url'      => 'https://mautic.com/?feed=rss2&tag=notification',
         'max_entity_lock_time'      => 0,
         'default_daterange_filter'  => '-1 month',
+        'debug'                     => false,
+        'rss_notification_url'      => '',
+        'translations_list_url'     => 'https://language-packs.mautic.com/manifest.json',
+        'translations_fetch_url'    => 'https://language-packs.mautic.com/',
+        'stats_update_url'          => 'https://updates.mautic.org/stats/send', // set to empty in config file to disable
+        'install_source'            => 'Mautic',
+        'system_update_url'         => 'https://api.github.com/repos/mautic/mautic/releases',
     ],
 ];

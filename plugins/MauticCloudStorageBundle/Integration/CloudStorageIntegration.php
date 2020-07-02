@@ -13,7 +13,7 @@ namespace MauticPlugin\MauticCloudStorageBundle\Integration;
 
 use Gaufrette\Adapter;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
-use MauticPlugin\MauticFullContactBundle\Exception\NoFormNeededException;
+use MauticPlugin\MauticCloudStorageBundle\Exception\NoFormNeededException;
 
 abstract class CloudStorageIntegration extends AbstractIntegration
 {

@@ -44,9 +44,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * Class RestrictionHelperTest.
- *
- * Mocking a representative ConfigForm by leveraging Symfony's TypeTestCase to test RestrictionHelper
+ * Mocking a representative ConfigForm by leveraging Symfony's TypeTestCase to test RestrictionHelper.
  */
 class RestrictionHelperTest extends TypeTestCase
 {
@@ -90,7 +88,7 @@ class RestrictionHelperTest extends TypeTestCase
                 'mailer_auth_mode'             => null,
                 'mailer_amazon_region'         => 'email-smtp.us-east-1.amazonaws.com',
                 'mailer_spool_type'            => 'memory',
-                'mailer_spool_path'            => '%kernel.root_dir%/spool',
+                'mailer_spool_path'            => '%kernel.root_dir%/../var/spool',
                 'mailer_spool_msg_limit'       => null,
                 'mailer_spool_time_limit'      => null,
                 'mailer_spool_recover_timeout' => 900,
@@ -212,7 +210,7 @@ class RestrictionHelperTest extends TypeTestCase
         /** @var FormInterface $address */
         $address = $form['emailconfig']['monitored_email']['EmailBundle_unsubscribes']['address'];
 
-        $this->assertTrue($address->getConfig()->getOption('read_only'));
+        $this->assertTrue($address->getConfig()->getOption('attr')['readonly']);
         $this->assertTrue($address->getConfig()->getOption('disabled'));
         $this->assertEquals(
             [

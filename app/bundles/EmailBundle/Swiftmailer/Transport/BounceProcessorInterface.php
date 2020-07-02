@@ -23,8 +23,6 @@ interface BounceProcessorInterface
     /**
      * Get the email address that bounced.
      *
-     * @param Message $message
-     *
      * @return BouncedEmail
      *
      * @throws BounceNotFound
