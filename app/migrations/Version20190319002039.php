@@ -25,7 +25,7 @@ class Version20190319002039 extends AbstractMauticMigration
      * @throws SkipMigrationException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public function preUp(Schema $schema)
+    public function preUp(Schema $schema): void
     {
         $table = $schema->getTable($this->prefix.'point_lead_action_log');
 
@@ -37,7 +37,7 @@ class Version20190319002039 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema): void
     {
         $this->addSql("ALTER TABLE {$this->prefix}point_lead_action_log ADD internal_id VARCHAR(255) DEFAULT NULL");
         $this->addSql('ALTER TABLE '.$this->prefix.'`point_lead_action_log`
