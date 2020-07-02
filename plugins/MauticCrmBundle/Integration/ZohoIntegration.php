@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -20,6 +21,7 @@ use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper;
 use MauticPlugin\MauticCrmBundle\Api\ZohoApi;
+use MauticPlugin\MauticCrmBundle\Helper\IntegrationConfigHelper;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -198,6 +200,14 @@ class ZohoIntegration extends CrmAbstractIntegration
             /** @var array $objects */
             foreach ($objects as $recordId => $entityData) {
                 $isModified = false;
+
+                // Normalize
+                foreach ($entityData as $key=>$value) {
+                    if (is_array($value) && isset($value['name'])) {
+                        $entityData[$key] = $value['name'];
+                    }
+                }
+
                 if ('Accounts' === $object) {
                     $recordId = $entityData['id'];
                     // first try to find integration entity
@@ -247,7 +257,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                         }
 
                         if (count($newMatchedFields)) {
-                            $this->companyModel->setFieldValues($entity, $newMatchedFields, false);
+                            $this->companyModel->setFieldValues($entity, $newMatchedFields, IntegrationConfigHelper::hasOverwriteWithBlank($config));
                             $this->companyModel->saveEntity($entity, false);
                             $isModified = true;
                         }
@@ -302,7 +312,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                             }
                         }
                         if (count($newMatchedFields)) {
-                            $this->leadModel->setFieldValues($entity, $newMatchedFields, false, false);
+                            $this->leadModel->setFieldValues($entity, $newMatchedFields, IntegrationConfigHelper::hasOverwriteWithBlank($config), false);
                             $this->leadModel->saveEntity($entity, false);
                             $isModified = true;
                         }
@@ -376,9 +386,8 @@ class ZohoIntegration extends CrmAbstractIntegration
                                 unset($newMatchedFields[$k]);
                             }
                         }
-
                         if (count($newMatchedFields)) {
-                            $this->leadModel->setFieldValues($entity, $newMatchedFields, false, false);
+                            $this->leadModel->setFieldValues($entity, $newMatchedFields, IntegrationConfigHelper::hasOverwriteWithBlank($config), false);
                             $this->leadModel->saveEntity($entity, false);
                             $isModified = true;
                         }
@@ -391,13 +400,13 @@ class ZohoIntegration extends CrmAbstractIntegration
                         $result[] = $entity->getEmail();
 
                         // Associate lead company
-                        if (!empty($entityData['AccountName'])
-                            && $entityData['AccountName'] !== $this->translator->trans(
+                        if (!empty($entityData['Account_Name'])
+                            && $entityData['Account_Name'] !== $this->translator->trans(
                                 'mautic.integration.form.lead.unknown'
                             )
                         ) {
                             $company = IdentifyCompanyHelper::identifyLeadsCompany(
-                                ['company' => $entityData['AccountName']],
+                                ['company' => $entityData['Account_Name']],
                                 null,
                                 $this->companyModel
                             );
@@ -743,6 +752,22 @@ class ZohoIntegration extends CrmAbstractIntegration
                     'required'    => false,
                 ]
             );
+
+            $builder->add(
+                'overwriteWithBlank',
+                ChoiceType::class,
+                [
+                    'choices'     => [
+                        'overwriteWithBlank' => 'mautic.zoho.form.blanks',
+                    ],
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.zoho.form.blanks.label',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'empty_value' => false,
+                    'required'    => false,
+                ]
+            );
         }
     }
 
@@ -892,15 +917,6 @@ class ZohoIntegration extends CrmAbstractIntegration
         $totalToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, false, $params['start'], $params['end']);
         $totalCount    = $totalToCreate + $totalToUpdate;
 
-        if (defined('IN_MAUTIC_CONSOLE')) {
-            // start with update
-            if ($totalToUpdate + $totalToCreate) {
-                $output = new ConsoleOutput();
-                $output->writeln("About $totalToUpdate to update and about $totalToCreate to create/update");
-                $progress = new ProgressBar($output, $totalCount);
-            }
-        }
-
         // Start with contacts so we know who is a contact when we go to process converted leads
         $leadsToCreateInZ    = [];
         $leadsToUpdateInZ    = [];
@@ -1000,16 +1016,44 @@ class ZohoIntegration extends CrmAbstractIntegration
         }
         unset($leadsToCreate);
 
+        // If exists in Zoho, but not exists integration entity
+        foreach (['Leads', 'Contacts'] as $zObject) {
+            foreach ($leadsToCreateInZ as $key=>$lead) {
+                $existingPerson = $this->getExistingRecord('Email', $lead['email'], $zObject);
+                if (!empty($existingPerson) && isset($existingPerson['id'])) {
+                    $leadsToUpdateInZ[$key]                          = $leadsToCreateInZ[$key];
+                    $leadsToUpdateInZ[$key]['existingPerson']        = $existingPerson;
+                    $leadsToUpdateInZ[$key]['integration_entity']    = $zObject;
+                    $leadsToUpdateInZ[$key]['integration_entity_id'] = (string) $existingPerson['id'];
+                    unset($leadsToCreateInZ[$key]);
+                    continue;
+                }
+            }
+        }
+
         if (count($integrationEntities)) {
             // Persist updated entities if applicable
             $integrationEntityRepo->saveEntities($integrationEntities);
             $this->em->clear(IntegrationEntity::class);
         }
 
+        $totalToCreate = count($leadsToCreateInZ);
+        $totalToUpdate = count($leadsToUpdateInZ);
+
+        if (defined('IN_MAUTIC_CONSOLE')) {
+            // start with update
+            if ($totalToUpdate + $totalToCreate) {
+                $output = new ConsoleOutput();
+                $output->writeln("About $totalToUpdate to update and about $totalToCreate to create/update");
+                $progress = new ProgressBar($output, $totalCount);
+            }
+        }
+
         // update leads and contacts
-        $mapper = new Mapper($availableFields);
         foreach (['Leads', 'Contacts'] as $zObject) {
             $counter = 1;
+            $mapper  = new Mapper($availableFields);
+            $mapper->setConfig($config);
             $mapper->setObject($zObject);
             foreach ($leadsToUpdateInZ as $lead) {
                 if ($zObject !== $lead['integration_entity']) {
@@ -1020,9 +1064,10 @@ class ZohoIntegration extends CrmAbstractIntegration
                     $progress->advance();
                 }
 
-                $existingPerson           = $this->getExistingRecord('Email', $lead['email'], $zObject);
-                $objectFields             = $this->prepareFieldsForPush($availableFields[$zObject]);
-                $fieldsToUpdate[$zObject] = $this->getBlankFieldsToUpdate($fieldsToUpdate[$zObject], $existingPerson, $objectFields, $config);
+                $existInZohoWihtoutIntegrationEntity = isset($lead['existingPerson']);
+                $existingPerson                      = isset($lead['existingPerson']) ? $lead['existingPerson'] : $this->getExistingRecord('Email', $lead['email'], $zObject);
+                $objectFields                        = $this->prepareFieldsForPush($availableFields[$zObject]);
+                $fieldsToUpdate[$zObject]            = $this->getBlankFieldsToUpdate($fieldsToUpdate[$zObject], $existingPerson, $objectFields, $config);
 
                 $totalUpdated += $mapper
                     ->setMappedFields($fieldsToUpdate[$zObject])
@@ -1032,19 +1077,21 @@ class ZohoIntegration extends CrmAbstractIntegration
 
                 // ONLY 100 RECORDS CAN BE SENT AT A TIME
                 if ($maxRecords === $counter) {
-                    $this->updateContactInZoho($mapper, $zObject, $totalUpdated, $totalErrors);
+                    $this->updateContactInZoho($mapper, $zObject, $totalUpdated, $totalErrors, $existInZohoWihtoutIntegrationEntity);
                     $counter = 1;
                 }
             }
 
             if ($counter > 1) {
-                $this->updateContactInZoho($mapper, $zObject, $totalUpdated, $totalErrors);
+                $this->updateContactInZoho($mapper, $zObject, $totalUpdated, $totalErrors, $existInZohoWihtoutIntegrationEntity);
             }
         }
 
         // create leads and contacts
         foreach (['Leads', 'Contacts'] as $zObject) {
             $counter = 1;
+            $mapper  = new Mapper($availableFields);
+            $mapper->setConfig($config);
             $mapper->setObject($zObject);
             foreach ($leadsToCreateInZ as $lead) {
                 if ($zObject !== $lead['integration_entity']) {
@@ -1098,15 +1145,23 @@ class ZohoIntegration extends CrmAbstractIntegration
         $fieldsToUpdate['Leads']    = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdate['Leads']));
         $fieldsToUpdate['Contacts'] = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdate['Contacts']));
         $objectFields               = $this->prepareFieldsForPush($availableFields[$zObject]);
-        $existingPerson             = $this->getExistingRecord('Email', $lead->getEmail(), $zObject);
-        $fieldsToUpdate[$zObject]   = $this->getBlankFieldsToUpdate($fieldsToUpdate[$zObject], $existingPerson, $objectFields, $config);
 
         if (empty($config['leadFields'])) {
             return [];
         }
 
-        $mapper = new Mapper($availableFields);
+        foreach (['Leads', 'Contacts'] as $zObjectForExistingPerson) {
+            $existingPerson             = $this->getExistingRecord('Email', $lead->getEmail(), $zObjectForExistingPerson);
+            if (!empty($existingPerson)) {
+                $zObject = $zObjectForExistingPerson;
+                break;
+            }
+        }
+
+        $fieldsToUpdate[$zObject]   = $this->getBlankFieldsToUpdate($fieldsToUpdate[$zObject], $existingPerson, $objectFields, $config);
+        $mapper                     = new Mapper($availableFields);
         $mapper->setObject($zObject);
+        $mapper->setConfig($config);
 
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Zoho', $zObject, 'lead', $lead->getId());
@@ -1285,10 +1340,10 @@ class ZohoIntegration extends CrmAbstractIntegration
      * @param int    $counter
      * @param int    $errorCounter
      */
-    private function updateContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter)
+    private function updateContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter, $createIntegrationEntity = false)
     {
         $response     = $this->getApiHelper()->updateLead($mapper->getArray(), $object);
-        $failed       = $this->consumeResponse($response, $object, false, $mapper);
+        $failed       = $this->consumeResponse($response, $object, $createIntegrationEntity, $mapper);
         $counter -= $failed;
         $errorCounter += $failed;
     }
@@ -1297,13 +1352,19 @@ class ZohoIntegration extends CrmAbstractIntegration
      * @param string $object
      * @param int    $counter
      * @param int    $errorCounter
+     * @param bool   $createIntegrationEntity
+     *
+     * @throws ApiErrorException
+     * @throws \MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException
      */
     private function createContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter)
     {
-        $response     = $this->getApiHelper()->createLead($mapper->getArray(), $object);
-        $failed       = $this->consumeResponse($response, $object, true, $mapper);
-        $counter -= $failed;
-        $errorCounter += $failed;
+        if (!empty($mapper->getArray())) {
+            $response     = $this->getApiHelper()->createLead($mapper->getArray(), $object);
+            $failed       = $this->consumeResponse($response, $object, true, $mapper);
+            $counter -= $failed;
+            $errorCounter += $failed;
+        }
     }
 
     /**

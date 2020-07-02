@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticCrmBundle\Api\Zoho;
 
 use MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException;
+use MauticPlugin\MauticCrmBundle\Helper\IntegrationConfigHelper;
 
 class Mapper
 {
@@ -57,6 +58,11 @@ class Mapper
     }
 
     /**
+     * @var array
+     */
+    private $config = [];
+
+    /**
      * @param $object
      *
      * @return $this
@@ -73,6 +79,11 @@ class Mapper
      */
     public function setContact(array $contact)
     {
+        foreach ($contact as $field => &$value) {
+            if (is_string($value) && strpos($value, '|') !== false) {
+                $value = explode('|', $value);
+            }
+        }
         $this->contact = $contact;
 
         return $this;
@@ -89,6 +100,18 @@ class Mapper
     }
 
     /**
+     * @param array $config
+     *
+     * @return $this
+     */
+    public function setConfig(array $config)
+    {
+        $this->config = $config;
+
+        return $this;
+    }
+
+    /**
      * @param int      $mauticContactId Mautic Contact ID
      * @param int|null $zohoId          Zoho ID if known
      *
@@ -99,13 +122,17 @@ class Mapper
         $mapped             = 0;
         $objectMappedValues = [];
 
+        $hasOverwriteWithBlank = IntegrationConfigHelper::hasOverwriteWithBlank($this->config);
         foreach ($this->mappedFields as $zohoField => $mauticField) {
             $field = $this->getField($zohoField);
-            if ($field && isset($this->contact[$mauticField]) && $this->contact[$mauticField]) {
+            if ($field && ($hasOverwriteWithBlank || (!$hasOverwriteWithBlank && isset($this->contact[$mauticField]) && $this->contact[$mauticField] != ''))) {
                 $mapped   = 1;
                 $apiField = $field['api_name'];
                 $apiValue = $this->contact[$mauticField];
-
+                // skip If required field is empty
+                if (!empty($field['required']) && $apiValue == '') {
+                    return 0;
+                }
                 $objectMappedValues[$apiField] = $apiValue;
             }
 
@@ -113,7 +140,6 @@ class Mapper
                 $objectMappedValues['id'] = $zohoId;
             }
         }
-
         $this->objectMappedValues[$this->objectCounter] = $objectMappedValues;
         $this->contactMapper[$this->objectCounter]      = $mauticContactId;
 
