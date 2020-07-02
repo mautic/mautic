@@ -18,7 +18,7 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\EmailBundle\Form\Type\EmailToUserType;
 use Mautic\EmailBundle\Form\Type\PointActionEmailOpenType;
-use Mautic\EmailBundle\Form\Type\PointActionEmailSendType;
+use Mautic\EmailBundle\Form\Type\PointActionType;
 use Mautic\EmailBundle\Helper\PointEventHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
@@ -31,26 +31,17 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var PointModel
-     */
     private $pointModel;
 
-    /**
-     * @var EntityManager
-     */
     private $entityManager;
 
-    /**
-     * @var EmailModel
-     */
     private $emailModel;
 
     public function __construct(PointModel $pointModel, EntityManager $entityManager, EmailModel $emailModel)
     {
         $this->pointModel    = $pointModel;
         $this->entityManager = $entityManager;
-        $this->emailModel = $emailModel;
+        $this->emailModel    = $emailModel;
     }
 
     /**
@@ -59,10 +50,10 @@ class PointSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            PointEvents::POINT_ON_BUILD   => ['onPointBuild', 0],
-            PointEvents::TRIGGER_ON_BUILD => ['onTriggerBuild', 0],
-            EmailEvents::EMAIL_ON_OPEN    => ['onEmailOpen', 0],
-            EmailEvents::EMAIL_ON_SEND    => ['onEmailSend', 0],
+            PointEvents::POINT_ON_BUILD                     => ['onPointBuild', 0],
+            PointEvents::TRIGGER_ON_BUILD                   => ['onTriggerBuild', 0],
+            EmailEvents::EMAIL_ON_OPEN                      => ['onEmailOpen', 0],
+            EmailEvents::EMAIL_ON_SEND                      => ['onEmailSend', 0],
             EmailEvents::ON_POINT_CHANGE_ACTION_EXECUTED    => [
                 ['onEmailOpenPointChange', 0],
                 ['onEmailSentPointChange', 1],
@@ -85,7 +76,7 @@ class PointSubscriber implements EventSubscriberInterface
             'group'     => 'mautic.email.actions',
             'label'     => 'mautic.email.point.action.send',
             'eventName' => EmailEvents::ON_POINT_CHANGE_ACTION_EXECUTED,
-            'formType'  => PointActionEmailSendType::class,
+            'formType'  => PointActionType::class,
         ];
 
         $event->addAction('email.send', $action);
@@ -138,14 +129,11 @@ class PointSubscriber implements EventSubscriberInterface
         $this->pointModel->triggerAction('email.send', $event->getEmail(), null, $lead);
     }
 
-    /**
-     * @param PointChangeActionExecutedEvent $changeActionExecutedEvent
-     */
     public function onEmailOpenPointChange(PointChangeActionExecutedEvent $changeActionExecutedEvent)
     {
         $action = $changeActionExecutedEvent->getPointAction();
 
-        if ($action->getType() != 'email.open') {
+        if ('email.open' != $action->getType()) {
             return;
         }
         /** @var Email $eventDetails */
@@ -157,7 +145,7 @@ class PointSubscriber implements EventSubscriberInterface
             return;
         }
         $triggerMode = isset($action->getProperties()['triggerMode']) ? $action->getProperties()['triggerMode'] : null;
-        if ($triggerMode == 'internalId') {
+        if ('internalId' == $triggerMode) {
             $changeActionExecutedEvent->setStatusFromLogsForInternalId($eventDetails->getId());
 
             return;
@@ -166,14 +154,11 @@ class PointSubscriber implements EventSubscriberInterface
         $changeActionExecutedEvent->setStatusFromLogs();
     }
 
-    /**
-     * @param PointChangeActionExecutedEvent $changeActionExecutedEvent
-     */
     public function onEmailSentPointChange(PointChangeActionExecutedEvent $changeActionExecutedEvent)
     {
         $action = $changeActionExecutedEvent->getPointAction();
 
-        if ($action->getType() != 'email.send') {
+        if ('email.send' != $action->getType()) {
             return;
         }
 
