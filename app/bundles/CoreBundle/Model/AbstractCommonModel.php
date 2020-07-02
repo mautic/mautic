@@ -248,13 +248,15 @@ abstract class AbstractCommonModel
         if ($this->coreParametersHelper) {
             $siteUrl = $this->coreParametersHelper->getParameter('site_url');
             //clean url to extract host only
-            preg_match('#(http|https)\:\/\/(.*)$#', $siteUrl, $out);
-            $host = $out[2];
-            //define host for url build
-            $generator = $this->router->getGenerator();
-            $generator->setContext($generator->getContext()->setHost($host));
+            if (!empty($siteUrl)) {
+                preg_match('#(http|https)\:\/\/(.*)$#', $siteUrl, $out);
+                $host = $out[2];
+                //define host for url build
+                $generator = $this->router->getGenerator();
+                $generator->setContext($generator->getContext()->setHost($host));
+            }
         }
-        
+
         $referenceType = ($absolute) ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
         $url           = $this->router->generate($route, $routeParams, $referenceType);
 
