@@ -16,15 +16,27 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 class LeadPointLog
 {
+    /**
+     * @var Point
+     **/
     private $point;
 
+    /**
+     * @var \Mautic\LeadBundle\Entity\Lead
+     */
     private $lead;
 
+    /**
+     * @var \Mautic\CoreBundle\Entity\IpAddress
+     */
     private $ipAddress;
 
     /** @var int|string */
     private $internalId;
 
+    /**
+     * @var \DateTime
+     **/
     private $dateFired;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)
