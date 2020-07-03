@@ -82,7 +82,7 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with('l.', 'lll.')
             ->willReturn($filterColumns);
 
-        $reportBuilderEvent = new ReportBuilderEvent($translatorMock, $channelListHelperMock, 'segment.membership', [], $reportHelperMock);
+        $reportBuilderEvent = new ReportBuilderEvent($translatorMock, $channelListHelperMock, 'segment.membership', [], new ReportHelper());
 
         $segmentReportSubscriber = new SegmentReportSubscriber($fieldsBuilderMock);
         $segmentReportSubscriber->onReportBuilder($reportBuilderEvent);
