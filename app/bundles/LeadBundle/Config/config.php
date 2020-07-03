@@ -1294,5 +1294,14 @@ return [
     'parameters' => [
         'parallel_import_limit'               => 1,
         'background_import_if_more_rows_than' => 0,
+        'contact_columns'                     => [
+            '0' => 'name',
+            '1' => 'email',
+            '2' => 'location',
+            '3' => 'stage',
+            '4' => 'points',
+            '5' => 'last_active',
+            '6' => 'id',
+        ],
     ],
 ];

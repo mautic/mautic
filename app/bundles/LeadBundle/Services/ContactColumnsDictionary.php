@@ -17,31 +17,14 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class ContactColumnsDictionary
 {
-    /**
-     * @var FieldModel
-     */
     protected $fieldModel;
 
-    /**
-     * @var TranslatorInterface
-     */
     private $translator;
 
-    /**
-     * @var CoreParametersHelper
-     */
     private $coreParametersHelper;
 
-    /**
-     * @var array
-     */
     private $fieldList = [];
 
-    /**
-     * @param FieldModel           $fieldModel
-     * @param TranslatorInterface  $translator
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function __construct(FieldModel $fieldModel, TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
     {
         $this->fieldModel           = $fieldModel;
@@ -54,7 +37,7 @@ class ContactColumnsDictionary
      */
     public function getColumns()
     {
-        $columns = array_flip($this->coreParametersHelper->getParameter('contact_columns'));
+        $columns = array_flip($this->coreParametersHelper->get('contact_columns', []));
         $fields  = $this->getFields();
         foreach ($columns as $alias=>&$column) {
             if (isset($fields[$alias])) {

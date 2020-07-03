@@ -62,7 +62,7 @@ class ConfigType extends AbstractType
                             ['message' => 'mautic.core.value.required']
                         ),
                     ],
-                    'data'=> $orderColumns,
+                    'data'=> array_flip($orderColumns),
                 ]
             );
         };

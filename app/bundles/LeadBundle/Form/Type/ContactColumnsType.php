@@ -18,15 +18,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ContactColumnsType extends AbstractType
 {
-    /**
-     * @var ContactColumnsDictionary
-     */
     private $columnsDictionary;
 
     /**
      * ContactColumnsType constructor.
-     *
-     * @param ContactColumnsDictionary $columnsDictionary
      */
     public function __construct(ContactColumnsDictionary $columnsDictionary)
     {
@@ -40,7 +35,7 @@ class ContactColumnsType extends AbstractType
     {
         $resolver->setDefaults(
           [
-              'choices'    => $this->columnsDictionary->getFields(),
+              'choices'    => array_flip($this->columnsDictionary->getFields()),
               'label'      => false,
               'label_attr' => ['class' => 'control-label'],
               'required'   => false,
