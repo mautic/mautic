@@ -244,9 +244,8 @@ class InstallService
         }
 
         if ($clearCache) {
-            $this->cacheHelper->clearContainerFile(false);
+            $this->cacheHelper->refreshConfig();
         }
-        $this->cacheHelper->refreshConfig();
 
         return $messages;
     }
