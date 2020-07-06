@@ -125,7 +125,6 @@ return [
                 'class'     => 'Mautic\InstallBundle\Install\InstallService',
                 'arguments' => [
                     'mautic.configurator',
-                    'mautic.helper.core_parameters',
                     'mautic.helper.cache',
                     'mautic.helper.paths',
                     'doctrine.orm.entity_manager',
@@ -133,7 +132,6 @@ return [
                     'kernel',
                     'validator',
                     'security.encoder_factory',
-                    'monolog.logger.mautic',
                 ],
             ],
         ],
