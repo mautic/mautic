@@ -1,5 +1,5 @@
-**Please be sure you are submitting this against the _staging_ branch.**
-
+[//]: # ( Please be sure you are submitting this against the staging branch.)
+[//]: # ( Any PR related to Mautic 2 issues are not relavant any more, please consider upgrading your code to the Mautic 3 series (staging branch).)
 [//]: # ( Please answer the following questions: )
 
 | Q  | A
