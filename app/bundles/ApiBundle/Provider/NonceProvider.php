@@ -31,9 +31,6 @@ class NonceProvider implements NonceProviderInterface
      */
     protected $em;
 
-    /**
-     * @param EntityManager $em
-     */
     public function __construct(EntityManager $em)
     {
         $this->em   = $em;
@@ -43,9 +40,8 @@ class NonceProvider implements NonceProviderInterface
     /**
      * Ensure a unique nonce and appropriate timestamp.
      *
-     * @param                                                    $nonce
-     * @param                                                    $timestamp
-     * @param \Bazinga\OAuthServerBundle\Model\ConsumerInterface $consumer
+     * @param $nonce
+     * @param $timestamp
      *
      * @return bool
      */
@@ -65,7 +61,7 @@ class NonceProvider implements NonceProviderInterface
                 //make sure nonce has not been used before
                 $usedNonces = $this->repo->findBy(['nonce' => $nonce]);
 
-                if (count($usedNonces) === 0) {
+                if (0 === count($usedNonces)) {
                     $notUsed = true;
                 }
 
@@ -83,9 +79,8 @@ class NonceProvider implements NonceProviderInterface
     }
 
     /**
-     * @param                                                    $nonce
-     * @param                                                    $timestamp
-     * @param \Bazinga\OAuthServerBundle\Model\ConsumerInterface $consumer
+     * @param $nonce
+     * @param $timestamp
      *
      * @return bool
      */

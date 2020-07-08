@@ -30,8 +30,6 @@ trait EventArrayTrait
     /**
      * Used to convert entities to the old array format; tried to minimize the need for this except where needed.
      *
-     * @param Event $event
-     *
      * @return array
      */
     protected function getEventArray(Event $event)
@@ -75,8 +73,6 @@ trait EventArrayTrait
     }
 
     /**
-     * @param LeadEventLog $log
-     *
      * @return array
      */
     protected function getLegacyEventsArray(LeadEventLog $log)
@@ -91,9 +87,6 @@ trait EventArrayTrait
     }
 
     /**
-     * @param Event                 $event
-     * @param AbstractEventAccessor $config
-     *
      * @return array
      */
     protected function getLegacyEventsConfigArray(Event $event, AbstractEventAccessor $config)

@@ -36,10 +36,6 @@ class ContactSegmentFilterFactory
 
     /**
      * ContactSegmentFilterFactory constructor.
-     *
-     * @param TableSchemaColumnsCache $schemaCache
-     * @param Container               $container
-     * @param DecoratorFactory        $decoratorFactory
      */
     public function __construct(
         TableSchemaColumnsCache $schemaCache,
@@ -52,8 +48,6 @@ class ContactSegmentFilterFactory
     }
 
     /**
-     * @param LeadList $leadList
-     *
      * @return ContactSegmentFilters
      *
      * @throws \Exception
@@ -79,9 +73,6 @@ class ContactSegmentFilterFactory
     }
 
     /**
-     * @param FilterDecoratorInterface  $decorator
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return FilterQueryBuilderInterface
      *
      * @throws \Exception

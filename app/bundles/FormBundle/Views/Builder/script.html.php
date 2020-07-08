@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$scriptSrc = $view['assets']->getUrl('media/js/'.($app->getEnvironment() == 'dev' ? 'mautic-form-src.js' : 'mautic-form.js'), null, null, true);
+$scriptSrc = $view['assets']->getUrl('media/js/'.('dev' == $app->getEnvironment() ? 'mautic-form-src.js' : 'mautic-form.js'), null, null, true);
 $scriptSrc = str_replace('/index_dev.php', '', $scriptSrc);
 ?>
 

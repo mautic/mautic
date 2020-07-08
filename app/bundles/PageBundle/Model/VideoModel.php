@@ -14,7 +14,7 @@ namespace Mautic\PageBundle\Model;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Entity\VideoHit;
 use Mautic\PageBundle\Event\VideoHitEvent;
 use Mautic\PageBundle\PageEvents;
@@ -26,25 +26,24 @@ use Symfony\Component\HttpFoundation\Request;
 class VideoModel extends FormModel
 {
     /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
      * @var IpLookupHelper
      */
     protected $ipLookupHelper;
 
     /**
-     * VideoModel constructor.
-     *
-     * @param LeadModel      $leadModel
-     * @param IpLookupHelper $ipLookupHelper
+     * @var ContactTracker
      */
-    public function __construct(LeadModel $leadModel, IpLookupHelper $ipLookupHelper)
-    {
-        $this->leadModel      = $leadModel;
+    protected $contactTracker;
+
+    /**
+     * VideoModel constructor.
+     */
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        ContactTracker $contactTracker
+    ) {
         $this->ipLookupHelper = $ipLookupHelper;
+        $this->contactTracker = $contactTracker;
     }
 
     /**
@@ -72,7 +71,6 @@ class VideoModel extends FormModel
     }
 
     /**
-     * @param Lead   $lead
      * @param string $guid
      *
      * @return VideoHit
@@ -96,7 +94,7 @@ class VideoModel extends FormModel
             //return;
         }
 
-        $lead = $this->leadModel->getCurrentLead();
+        $lead = $this->contactTracker->getContact();
         $guid = $request->get('guid');
 
         $hit = ($lead) ? $this->getHitForLeadByGuid($lead, $guid) : new VideoHit();
@@ -143,7 +141,7 @@ class VideoModel extends FormModel
         if (!empty($browserLanguages)) {
             $languages = explode(',', $browserLanguages);
             foreach ($languages as $k => $l) {
-                if ($pos = strpos(';q=', $l) !== false) {
+                if ($pos = false !== strpos(';q=', $l)) {
                     //remove weights
                     $languages[$k] = substr($l, 0, $pos);
                 }

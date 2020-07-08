@@ -10,7 +10,6 @@
     convertWarningsToExceptions = "true"
     processIsolation            = "false"
     stopOnFailure               = "false"
-    syntaxCheck                 = "false"
     bootstrap                   = "autoload.php" >
 
     <testsuites>
@@ -19,6 +18,9 @@
         </testsuite>
         <testsuite name="Plugin tests">
             <directory>./../plugins/*Bundle/Tests</directory>
+        </testsuite>
+        <testsuite name="Middleware tests">
+            <directory>middlewares/Tests</directory>
         </testsuite>
     </testsuites>
 
@@ -35,6 +37,7 @@
     </filter>
 
     <php>
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled" />
         <env name="MAXMIND_LICENSE_KEY" value=""/>
     </php>
 </phpunit>

@@ -60,9 +60,6 @@ class Message extends FormEntity
      */
     private $channels;
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadMetadata(ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -85,9 +82,6 @@ class Message extends FormEntity
                 ->build();
     }
 
-    /**
-     * @param ValidationClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ValidationClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new NotBlank([
@@ -257,9 +251,6 @@ class Message extends FormEntity
         return $this;
     }
 
-    /**
-     * @param Channel $channel
-     */
     public function addChannel(Channel $channel)
     {
         if (!$this->channels->contains($channel)) {
@@ -270,9 +261,6 @@ class Message extends FormEntity
         }
     }
 
-    /**
-     * @param Channel $channel
-     */
     public function removeChannel(Channel $channel)
     {
         if ($channel->getId()) {

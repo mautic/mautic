@@ -19,41 +19,43 @@ use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Mautic\FormBundle\Model\ActionModel;
+use Mautic\FormBundle\Model\FieldModel;
+use Mautic\FormBundle\Model\FormModel;
 
-/**
- * Class LoadFormData.
- */
-class LoadFormData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
-     * @var ContainerInterface
+     * @var FormModel
      */
-    private $container;
+    private $formModel;
 
     /**
-     * {@inheritdoc}
+     * @var FieldModel
      */
-    public function setContainer(ContainerInterface $container = null)
+    private $formFieldModel;
+
+    /**
+     * @var ActionModel
+     */
+    private $actionModel;
+
+    public function __construct(FormModel $formModel, FieldModel $formFieldModel, ActionModel $actionModel)
     {
-        $this->container = $container;
+        $this->formModel      = $formModel;
+        $this->formFieldModel = $formFieldModel;
+        $this->actionModel    = $actionModel;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
-        $model        = $this->container->get('mautic.form.model.form');
-        $repo         = $model->getRepository();
         $forms        = CsvHelper::csv_to_array(__DIR__.'/fakeformdata.csv');
         $formEntities = [];
         foreach ($forms as $count => $rows) {
             $form = new Form();
             $key  = $count + 1;
             foreach ($rows as $col => $val) {
-                if ($val != 'NULL') {
+                if ('NULL' != $val) {
                     $setter = 'set'.ucfirst($col);
 
                     if (in_array($col, ['dateAdded'])) {
@@ -66,18 +68,17 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface, C
                     }
                 }
             }
-            $repo->saveEntity($form);
+            $this->formModel->getRepository()->saveEntity($form);
             $formEntities[] = $form;
             $this->setReference('form-'.$key, $form);
         }
 
         //import fields
         $fields = CsvHelper::csv_to_array(__DIR__.'/fakefielddata.csv');
-        $repo   = $this->container->get('mautic.form.model.field')->getRepository();
         foreach ($fields as $count => $rows) {
             $field = new Field();
             foreach ($rows as $col => $val) {
-                if ($val != 'NULL') {
+                if ('NULL' != $val) {
                     $setter = 'set'.ucfirst($col);
 
                     if (in_array($col, ['form'])) {
@@ -92,23 +93,22 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface, C
                     }
                 }
             }
-            $repo->saveEntity($field);
+            $this->formFieldModel->getRepository()->saveEntity($field);
         }
 
         //import actions
         $actions = CsvHelper::csv_to_array(__DIR__.'/fakeactiondata.csv');
-        $repo    = $this->container->get('mautic.form.model.action')->getRepository();
-        foreach ($actions as $count => $rows) {
+        foreach ($actions as $rows) {
             $action = new Action();
             foreach ($rows as $col => $val) {
-                if ($val != 'NULL') {
+                if ('NULL' != $val) {
                     $setter = 'set'.ucfirst($col);
 
                     if (in_array($col, ['form'])) {
                         $action->$setter($this->getReference('form-'.$val));
                     } elseif (in_array($col, ['properties'])) {
                         $val = Serializer::decode(stripslashes($val));
-                        if ($col == 'settings') {
+                        if ('settings' == $col) {
                             $val['callback'] = stripslashes($val['callback']);
                         }
 
@@ -118,16 +118,16 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface, C
                     }
                 }
             }
-            $repo->saveEntity($action);
+            $this->actionModel->getRepository()->saveEntity($action);
         }
 
         //create the tables
         foreach ($formEntities as $form) {
             //create the HTML
-            $model->generateHtml($form);
+            $this->formModel->generateHtml($form);
 
             //create the schema
-            $model->createTableSchema($form, true, true);
+            $this->formModel->createTableSchema($form, true, true);
         }
     }
 

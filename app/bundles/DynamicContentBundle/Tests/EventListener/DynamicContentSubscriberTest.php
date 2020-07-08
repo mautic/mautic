@@ -20,22 +20,73 @@ use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
-class DynamicContentSubscriberTest extends \PHPUnit_Framework_TestCase
+class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|TrackableModel
+     */
     private $trackableModel;
+
+    /**
+     * @var MockObject|PageTokenHelper
+     */
     private $pageTokenHelper;
+
+    /**
+     * @var MockObject|AssetTokenHelper
+     */
     private $assetTokenHelper;
+
+    /**
+     * @var MockObject|FormTokenHelper
+     */
     private $formTokenHelper;
+
+    /**
+     * @var MockObject|FocusTokenHelper
+     */
     private $focusTokenHelper;
+
+    /**
+     * @var MockObject|AuditLogModel
+     */
     private $auditLogModel;
+
+    /**
+     * @var MockObject|LeadModel
+     */
     private $leadModel;
+
+    /**
+     * @var MockObject|DynamicContentHelper
+     */
     private $dynamicContentHelper;
+
+    /**
+     * @var MockObject|DynamicContentModel
+     */
     private $dynamicContentModel;
+
+    /**
+     * @var MockObject|CorePermissions
+     */
+    private $security;
+
+    /**
+     * @var MockObject|ContactTracker
+     */
+    private $contactTracker;
+
+    /**
+     * @var DynamicContentSubscriber
+     */
     private $subscriber;
 
     protected function setUp()
@@ -52,6 +103,7 @@ class DynamicContentSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->dynamicContentHelper = $this->createMock(DynamicContentHelper::class);
         $this->dynamicContentModel  = $this->createMock(DynamicContentModel::class);
         $this->security             = $this->createMock(CorePermissions::class);
+        $this->contactTracker       = $this->createMock(ContactTracker::class);
         $this->subscriber           = new DynamicContentSubscriber(
             $this->trackableModel,
             $this->pageTokenHelper,
@@ -59,12 +111,11 @@ class DynamicContentSubscriberTest extends \PHPUnit_Framework_TestCase
             $this->formTokenHelper,
             $this->focusTokenHelper,
             $this->auditLogModel,
-            $this->leadModel,
             $this->dynamicContentHelper,
-            $this->dynamicContentModel
+            $this->dynamicContentModel,
+            $this->security,
+            $this->contactTracker
         );
-
-        $this->subscriber->setSecurity($this->security);
     }
 
     /**
@@ -111,8 +162,8 @@ HTML;
             ->method('isAnonymous')
             ->willReturn(true);
 
-        $this->leadModel->expects($this->once())
-            ->method('getCurrentLead')
+        $this->contactTracker->expects($this->once())
+            ->method('getContact')
             ->willReturn($contact);
 
         $this->dynamicContentHelper->expects($this->once())

@@ -19,7 +19,7 @@ class RepliedEmail
     private $fromAddress;
 
     /**
-     * @var null|string
+     * @var string|null
      */
     private $statHash;
 
@@ -44,7 +44,7 @@ class RepliedEmail
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getStatHash()
     {

@@ -9,9 +9,6 @@ notifications:
     on_success: never
 
 php:
-  - 5.6
-  - 7.0
-  - 7.1
   - 7.2
   - 7.3
 
@@ -21,6 +18,8 @@ cache:
 
 before_install:
   # Create mautictest database
+  - mysql --version
+  - mysql -e 'DROP DATABASE IF EXISTS mautictest;'
   - mysql -e 'CREATE DATABASE mautictest;'
 
   # increase memory limit for all PHP processes
@@ -35,20 +34,35 @@ before_install:
   # set to test environment for Symfony's commands in post install commands
   - export SYMFONY_ENV="test"
 
-  # install PHPSTAN for PHP 7+
-  - if [[ ${TRAVIS_PHP_VERSION:0:3} != "5.6" ]]; then composer global require phpstan/phpstan-shim:0.8.5; fi
-
 install:
   - composer install
 
+  # Clobber is needed because PCOV normally only works with PHPUnit 8+. Needed only to run test coverage.
+  - if [ ${TRAVIS_PHP_VERSION:0:3} == "7.3" ]; then pecl install pcov && composer require --dev pcov/clobber && bin/pcov clobber; fi
+
 script:
+  - if [ ${TRAVIS_PHP_VERSION:0:3} == "7.3" ]; 
+    then composer test -- --coverage-clover=coverage.xml && bash <(curl -s https://codecov.io/bash); 
+    else composer test; fi
 
-  # Run PHPUnit
-  - bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --fail-on-warning
-
-  # Run PHPSTAN analysis for PHP 7+
-  - if [[ ${TRAVIS_PHP_VERSION:0:3} != "5.6" ]]; then ~/.composer/vendor/phpstan/phpstan-shim/phpstan.phar analyse app/bundles/DashboardBundle app/bundles/ConfigBundle app/bundles/CampaignBundle app/bundles/WebhookBundle app/bundles/LeadBundle app/bundles/FormBundle; fi
-
-  # Check if the code standards weren't broken.
-  # Run it only on PHP 7.2 which should be the fastest. No need to run it for all PHP versions
-  - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.2" ]]; then bin/php-cs-fixer fix -v --dry-run --diff; fi
+jobs:
+  include:
+    - stage: test
+      php: 7.2
+      env: DB=mariadb
+      addons:
+        mariadb: '10.2'
+    - 
+      php: 7.3
+      env: DB=mariadb
+      addons:
+        mariadb: '10.2'
+    - 
+      name: PHPSTAN
+      script: composer phpstan
+    -
+      name: Rector
+      script: composer rector -- --dry-run --no-progress-bar
+    -
+      name: CS Fixer
+      script: bin/php-cs-fixer fix --config=.php_cs -v --dry-run --using-cache=no --show-progress=dots --diff $(git diff -- '*.php' --name-only --diff-filter=ACMRTUXB "${TRAVIS_COMMIT_RANGE}")

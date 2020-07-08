@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index'):
+if ('index' == $tmpl):
     $view->extend('MauticFormBundle:Result:index.html.php');
 endif;
 
@@ -69,7 +69,7 @@ $formId = $form->getId();
                 $fields     = $form->getFields();
                 $fieldCount = ($canDelete) ? 4 : 3;
                 foreach ($fields as $f):
-                    if (in_array($f->getType(), $viewOnlyFields) || $f->getSaveResult() === false) {
+                    if (in_array($f->getType(), $viewOnlyFields) || false === $f->getSaveResult()) {
                         continue;
                     }
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
@@ -119,11 +119,11 @@ $formId = $form->getId();
                 <td><?php echo $view['date']->toFull($item['dateSubmitted'], 'UTC'); ?></td>
                 <td><?php echo $view->escape($item['ipAddress']); ?></td>
                 <?php foreach ($item['results'] as $key => $r): ?>
-                    <?php $isTextarea = $r['type'] === 'textarea'; ?>
+                    <?php $isTextarea = 'textarea' === $r['type']; ?>
                     <td <?php echo $isTextarea ? 'class="long-text"' : ''; ?>>
                         <?php if ($isTextarea) : ?>
                             <?php echo $view->escape(nl2br($r['value'])); ?>
-                        <?php elseif ($r['type'] === 'file') : ?>
+                        <?php elseif ('file' === $r['type']) : ?>
                             <a href="<?php echo $view['router']->path('mautic_form_file_download', ['submissionId' => $item['id'], 'field' => $key]); ?>">
                                 <?php echo $view->escape($r['value']); ?>
                             </a>

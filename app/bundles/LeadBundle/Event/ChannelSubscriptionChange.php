@@ -40,10 +40,9 @@ class ChannelSubscriptionChange extends Event
     /**
      * ContactStatusChange constructor.
      *
-     * @param Lead $lead
-     * @param      $channel
-     * @param      $oldStatus
-     * @param      $newStatus
+     * @param $channel
+     * @param $oldStatus
+     * @param $newStatus
      */
     public function __construct(Lead $lead, $channel, $oldStatus, $newStatus)
     {

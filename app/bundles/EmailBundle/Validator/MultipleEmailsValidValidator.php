@@ -30,8 +30,7 @@ class MultipleEmailsValidValidator extends ConstraintValidator
     }
 
     /**
-     * @param string     $emailsInString
-     * @param Constraint $constraint
+     * @param string $emailsInString
      */
     public function validate($emailsInString, Constraint $constraint)
     {

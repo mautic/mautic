@@ -20,8 +20,7 @@ use Mautic\EmailBundle\Entity\Email;
 class EmailEvent extends CommonEvent
 {
     /**
-     * @param Email $email
-     * @param bool  $isNew
+     * @param bool $isNew
      */
     public function __construct(Email &$email, $isNew = false)
     {
@@ -41,8 +40,6 @@ class EmailEvent extends CommonEvent
 
     /**
      * Sets the Email entity.
-     *
-     * @param Email $email
      */
     public function setEmail(Email $email)
     {

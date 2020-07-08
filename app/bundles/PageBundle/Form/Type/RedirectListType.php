@@ -2,52 +2,55 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class RedirectListType.
  */
 class RedirectListType extends AbstractType
 {
-    private $factory;
-
     /**
-     * @param MauticFactory $factory
+     * @var CoreParametersHelper
      */
-    public function __construct(MauticFactory $factory)
+    private $coreParametersHelper;
+
+    public function __construct(CoreParametersHelper $coreParametersHelper)
     {
-        $this->factory = $factory;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $factory = $this->factory;
+        $choices = $this->coreParametersHelper->get('redirect_list_types');
+        $choices = (null === $choices) ? [] : array_flip($choices);
+
         $resolver->setDefaults([
-            'choices'     => $factory->getParameter('redirect_list_types'),
+            'choices'     => $choices,
             'expanded'    => false,
             'multiple'    => false,
             'label'       => 'mautic.page.form.redirecttype',
             'label_attr'  => ['class' => 'control-label'],
-            'empty_value' => false,
+            'placeholder' => false,
             'required'    => false,
             'attr'        => [
                 'class' => 'form-control',
             ],
-            'feature' => 'all',
-        ]);
+            'feature'           => 'all',
+            ]);
 
-        $resolver->setOptional(['feature']);
+        $resolver->setDefined(['feature']);
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'redirect_list';
     }
@@ -57,6 +60,6 @@ class RedirectListType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

@@ -26,8 +26,7 @@ class ListPreProcessListEvent extends CommonEvent
     protected $result;
 
     /**
-     * @param array $list
-     * @param bool  $isNew
+     * @param bool $isNew
      */
     public function __construct(array $list, $isNew = false)
     {
@@ -47,8 +46,6 @@ class ListPreProcessListEvent extends CommonEvent
 
     /**
      * Sets the lead list entity.
-     *
-     * @param array $list
      */
     public function setList(array $list)
     {

@@ -9,13 +9,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Helper;
+namespace Mautic\CoreBundle\Tests\Unit\Templating\Helper;
 
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Symfony\Component\Asset\Packages;
 
-class AssetsHelperTest extends \PHPUnit_Framework_TestCase
+class AssetsHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testAssetContext()
     {
