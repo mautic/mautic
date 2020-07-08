@@ -197,6 +197,7 @@ return [
                 'class'     => ReportSubscriber::class,
                 'arguments' => [
                     'mautic.lead.model.company_report_data',
+                    'mautic.lead.reportbundle.fields_builder',
                 ],
             ],
             'mautic.form.campaignbundle.subscriber' => [

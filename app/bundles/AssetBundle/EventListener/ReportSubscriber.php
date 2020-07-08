@@ -15,6 +15,7 @@ use Mautic\AssetBundle\Entity\Download;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
@@ -33,9 +34,21 @@ class ReportSubscriber extends CommonSubscriber
      */
     private $companyReportData;
 
-    public function __construct(CompanyReportData $companyReportData)
+    /**
+     * @var FieldsBuilder
+     */
+    private $fieldsBuilder;
+
+    /**
+     * ReportSubscriber constructor.
+     *
+     * @param CompanyReportData $companyReportData
+     * @param FieldsBuilder     $fieldsBuilder
+     */
+    public function __construct(CompanyReportData $companyReportData, FieldsBuilder $fieldsBuilder)
     {
         $this->companyReportData = $companyReportData;
+        $this->fieldsBuilder     = $fieldsBuilder;
     }
 
     /**
@@ -128,19 +141,23 @@ class ReportSubscriber extends CommonSubscriber
             ];
 
             $companyColumns = $this->companyReportData->getCompanyData();
+            $columns        = $filters        = array_merge(
+                $columns,
+                $downloadColumns,
+                $event->getCampaignByChannelColumns(),
+                $event->getLeadColumns(),
+                $event->getIpColumn(),
+                $companyColumns
+            );
+
+            $this->fieldsBuilder->appendSegmentFilter($filters);
 
             $event->addTable(
                 self::CONTEXT_ASSET_DOWNLOAD,
                 [
                     'display_name' => 'mautic.asset.report.downloads.table',
-                    'columns'      => array_merge(
-                        $columns,
-                        $downloadColumns,
-                        $event->getCampaignByChannelColumns(),
-                        $event->getLeadColumns(),
-                        $event->getIpColumn(),
-                        $companyColumns
-                    ),
+                    'columns'      => $columns,
+                    'filters'      => $filters,
                 ],
                 self::CONTEXT_ASSET
             );
@@ -182,6 +199,9 @@ class ReportSubscriber extends CommonSubscriber
 
             if ($this->companyReportData->eventHasCompanyColumns($event)) {
                 $event->addCompanyLeftJoin($queryBuilder);
+            }
+            if ($event->hasFilter('s.leadlist_id')) {
+                $queryBuilder->join('ad', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = ad.lead_id AND s.manually_removed = 0');
             }
         }
 

@@ -18,6 +18,8 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\EventListener\ReportSubscriber;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Report\FieldsBuilder;
+use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
@@ -25,9 +27,16 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ReportSubscriberTest extends WebTestCase
 {
+    /**
+     * @var FieldsBuilder|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $fieldBuilderMock;
+
     public function setUp()
     {
         parent::setUp();
+        $this->fieldBuilderMock = $this->createMock(FieldsBuilder::class);
+
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
     }
 
@@ -99,7 +108,7 @@ class ReportSubscriberTest extends WebTestCase
             ->with()
             ->willReturn([]);
 
-        $subscriber = new ReportSubscriber($companyReportDataMock);
+        $subscriber = new ReportSubscriber($companyReportDataMock, $this->fieldBuilderMock);
 
         $subscriber->onReportBuilder($mockEvent);
 
@@ -140,7 +149,7 @@ class ReportSubscriberTest extends WebTestCase
             ->method('getContext')
             ->willReturn('forms');
 
-        $subscriber = new ReportSubscriber($companyReportDataMock);
+        $subscriber = new ReportSubscriber($companyReportDataMock, $this->fieldBuilderMock);
 
         $subscriber->onReportGenerate($mockEvent);
     }
@@ -158,6 +167,7 @@ class ReportSubscriberTest extends WebTestCase
                 'addCampaignByChannelJoin',
                 'applyDateFilters',
                 'setQueryBuilder',
+                'getReport',
             ])
             ->getMock();
 
@@ -186,7 +196,17 @@ class ReportSubscriberTest extends WebTestCase
             ->method('getContext')
             ->willReturn('form.submissions');
 
-        $subscriber = new ReportSubscriber($companyReportDataMock);
+        $reportMock = $this->createMock(Report::class);
+
+        $mockEvent->expects($this->once())
+            ->method('getReport')
+            ->willReturn($reportMock);
+
+        $reportMock->expects($this->once())
+            ->method('getFilters')
+            ->willReturn([]);
+
+        $subscriber = new ReportSubscriber($companyReportDataMock, $this->fieldBuilderMock);
 
         $subscriber->onReportGenerate($mockEvent);
     }
@@ -209,7 +229,7 @@ class ReportSubscriberTest extends WebTestCase
         $mockEvent->expects($this->never())
             ->method('getRequestedGraphs');
 
-        $subscriber = new ReportSubscriber($companyReportDataMock);
+        $subscriber = new ReportSubscriber($companyReportDataMock, $this->fieldBuilderMock);
 
         $subscriber->onReportGraphGenerate($mockEvent);
     }
@@ -319,7 +339,7 @@ class ReportSubscriberTest extends WebTestCase
                 ['MauticFormBundle:Submission', $mockSubmissionRepo],
             ]);
 
-        $subscriber = new ReportSubscriber($companyReportDataMock);
+        $subscriber = new ReportSubscriber($companyReportDataMock, $this->fieldBuilderMock);
 
         $subscriber->setEntityManager($mockEntityManager);
         $subscriber->setTranslator($mockTrans);
