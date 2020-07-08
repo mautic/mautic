@@ -37,9 +37,6 @@ class LogoutEvent extends Event
 
     /**
      * LogoutEvent constructor.
-     *
-     * @param User    $user
-     * @param Request $request
      */
     public function __construct(User $user, Request $request)
     {

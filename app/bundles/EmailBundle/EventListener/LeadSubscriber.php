@@ -11,28 +11,47 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\Entity\EmailReplyRepositoryInterface;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class LeadSubscriber.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
-    /** @var EmailReplyRepositoryInterface */
+    /**
+     * @var EmailReplyRepositoryInterface
+     */
     private $emailReplyRepository;
 
     /**
-     * LeadSubscriber constructor.
-     *
-     * @param EmailReplyRepositoryInterface $emailReplyRepository
+     * @var StatRepository
      */
-    public function __construct(EmailReplyRepositoryInterface $emailReplyRepository)
-    {
+    private $statRepository;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    public function __construct(
+        EmailReplyRepositoryInterface $emailReplyRepository,
+        StatRepository $statRepository,
+        TranslatorInterface $translator,
+        RouterInterface $router
+    ) {
         $this->emailReplyRepository = $emailReplyRepository;
+        $this->statRepository       = $statRepository;
+        $this->translator           = $translator;
+        $this->router               = $router;
     }
 
     /**
@@ -48,8 +67,6 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
@@ -59,22 +76,18 @@ class LeadSubscriber extends CommonSubscriber
         $this->addEmailReplies($event);
     }
 
-    /**
-     * @param LeadMergeEvent $event
-     */
     public function onLeadMerge(LeadMergeEvent $event)
     {
-        $this->em->getRepository('MauticEmailBundle:Stat')->updateLead(
+        $this->statRepository->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
     }
 
     /**
-     * @param LeadTimelineEvent $event
-     * @param                   $state
+     * @param $state
      */
-    protected function addEmailEvents(LeadTimelineEvent $event, $state)
+    private function addEmailEvents(LeadTimelineEvent $event, $state)
     {
         // Set available event types
         $eventTypeKey  = 'email.'.$state;
@@ -87,11 +100,9 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepository */
-        $statRepository        = $this->em->getRepository('MauticEmailBundle:Stat');
         $queryOptions          = $event->getQueryOptions();
         $queryOptions['state'] = $state;
-        $stats                 = $statRepository->getLeadStats($event->getLeadId(), $queryOptions);
+        $stats                 = $this->statRepository->getLeadStats($event->getLeadId(), $queryOptions);
 
         // Add total to counter
         $event->addToCounter($eventTypeKey, $stats);
@@ -136,7 +147,7 @@ class LeadSubscriber extends CommonSubscriber
                             'type' => $state,
                         ],
                         'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php',
-                        'icon'            => ($state == 'read') ? 'fa-envelope-o' : 'fa-envelope',
+                        'icon'            => ('read' == $state) ? 'fa-envelope-o' : 'fa-envelope',
                         'contactId'       => $contactId,
                     ]
                 );
@@ -144,10 +155,7 @@ class LeadSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param LeadTimelineEvent $event
-     */
-    protected function addEmailReplies(LeadTimelineEvent $event)
+    private function addEmailReplies(LeadTimelineEvent $event)
     {
         $eventTypeKey  = 'email.replied';
         $eventTypeName = $this->translator->trans('mautic.email.replied');

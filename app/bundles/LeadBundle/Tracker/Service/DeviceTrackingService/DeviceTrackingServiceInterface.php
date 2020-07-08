@@ -29,8 +29,7 @@ interface DeviceTrackingServiceInterface
     public function getTrackedDevice();
 
     /**
-     * @param LeadDevice $device
-     * @param bool       $replaceExistingTracking
+     * @param bool $replaceExistingTracking
      *
      * @return LeadDevice
      */

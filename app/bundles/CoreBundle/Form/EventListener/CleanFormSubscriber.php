@@ -46,9 +46,6 @@ class CleanFormSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSubmitData(FormEvent $event)
     {
         $data = $event->getData();

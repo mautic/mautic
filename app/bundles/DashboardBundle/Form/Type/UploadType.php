@@ -12,6 +12,8 @@
 namespace Mautic\DashboardBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -19,25 +21,24 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class UploadType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('file', 'file', [
-            'label' => 'mautic.lead.import.file',
-            'attr'  => [
-                'accept' => '.json',
-                'class'  => 'form-control',
-            ],
-        ]);
-        $constraints = [
-            new \Symfony\Component\Validator\Constraints\NotBlank(
-                ['message' => 'mautic.core.value.required']
-            ),
-        ];
-        $builder->add('start', 'submit', [
+        $builder->add(
+            'file',
+            FileType::class,
+            [
+                'label' => 'mautic.lead.import.file',
+                'attr'  => [
+                    'accept' => '.json',
+                    'class'  => 'form-control',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'start',
+            SubmitType::class,
+            [
             'attr' => [
                 'class'   => 'btn btn-primary',
                 'icon'    => 'fa fa-upload',
@@ -53,7 +54,7 @@ class UploadType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'dashboard_upload';
     }

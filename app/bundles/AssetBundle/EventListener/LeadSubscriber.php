@@ -11,31 +11,48 @@
 
 namespace Mautic\AssetBundle\EventListener;
 
+use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class AssetBundle.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
     /**
      * @var AssetModel
      */
-    protected $assetModel;
+    private $assetModel;
 
     /**
-     * LeadSubscriber constructor.
-     *
-     * @param AssetModel $assetModel
+     * @var TranslatorInterface
      */
-    public function __construct(AssetModel $assetModel)
-    {
-        $this->assetModel = $assetModel;
+    private $translator;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    /**
+     * @var DownloadRepository
+     */
+    private $downloadRepository;
+
+    public function __construct(
+        AssetModel $assetModel,
+        TranslatorInterface $translator,
+        RouterInterface $router,
+        DownloadRepository $downloadRepository
+    ) {
+        $this->assetModel         = $assetModel;
+        $this->translator         = $translator;
+        $this->router             = $router;
+        $this->downloadRepository = $downloadRepository;
     }
 
     /**
@@ -52,8 +69,6 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
@@ -68,9 +83,7 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        /** @var \Mautic\AssetBundle\Entity\DownloadRepository $downloadRepository */
-        $downloadRepository = $this->em->getRepository('MauticAssetBundle:Download');
-        $downloads          = $downloadRepository->getLeadDownloads($event->getLeadId(), $event->getQueryOptions());
+        $downloads = $this->downloadRepository->getLeadDownloads($event->getLeadId(), $event->getQueryOptions());
 
         // Add total number to counter
         $event->addToCounter($eventTypeKey, $downloads);
@@ -102,9 +115,6 @@ class LeadSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param LeadChangeEvent $event
-     */
     public function onLeadChange(LeadChangeEvent $event)
     {
         $this->assetModel->getDownloadRepository()->updateLeadByTrackingId(
@@ -114,9 +124,6 @@ class LeadSubscriber extends CommonSubscriber
         );
     }
 
-    /**
-     * @param LeadMergeEvent $event
-     */
     public function onLeadMerge(LeadMergeEvent $event)
     {
         $this->assetModel->getDownloadRepository()->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());

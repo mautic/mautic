@@ -13,7 +13,7 @@ namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\EmailBundle\Helper\UrlMatcher;
 
-class UrlMatcherTest extends \PHPUnit_Framework_TestCase
+class UrlMatcherTest extends \PHPUnit\Framework\TestCase
 {
     public function testUrlIsFound()
     {

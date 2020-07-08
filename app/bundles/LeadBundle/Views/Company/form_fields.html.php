@@ -18,7 +18,7 @@ foreach ($groups as $key => $group):
     if (isset($fields[$group])):
         $groupFields = $fields[$group];
         if (!empty($groupFields)): ?>
-            <div class="tab-pane fade<?php if ($key === 0) {
+            <div class="tab-pane fade<?php if (0 === $key) {
             echo ' in active';
         } ?> bdr-rds-0 bdr-w-0" id="company-<?php echo $group; ?>">
                 <?php if (empty($embedded)): ?>
@@ -29,7 +29,7 @@ foreach ($groups as $key => $group):
                     </div>
                 <?php endif; ?>
                 <div class="pa-md">
-                    <?php if ($group == 'core'): ?>
+                    <?php if ('core' == $group): ?>
                         <div class="form-group mb-0">
                             <div class="row">
                                 <?php if (isset($form['companyname'])): ?>

@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Month\DateMonthThis;
 use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
-class DateMonthThisTest extends \PHPUnit_Framework_TestCase
+class DateMonthThisTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Month\DateMonthThis::getOperator

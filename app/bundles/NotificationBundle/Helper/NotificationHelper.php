@@ -11,22 +11,22 @@
 
 namespace Mautic\NotificationBundle\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class NotificationHelper
 {
     /**
-     * @var MauticFactory
+     * @var EntityManager
      */
-    protected $factory;
+    protected $em;
 
     /**
      * @var IntegrationHelper
@@ -54,23 +54,22 @@ class NotificationHelper
     protected $request;
 
     /**
-     * NotificationHelper constructor.
-     *
-     * @param MauticFactory        $factory
-     * @param AssetsHelper         $assetsHelper
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param IntegrationHelper    $integrationHelper
-     * @param Router               $router
-     * @param RequestStack         $requestStack
+     * @var \Mautic\LeadBundle\Model\DoNotContact
      */
-    public function __construct(MauticFactory $factory, AssetsHelper $assetsHelper, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper, Router $router, RequestStack $requestStack)
+    private $doNotContact;
+
+    /**
+     * NotificationHelper constructor.
+     */
+    public function __construct(EntityManager $em, AssetsHelper $assetsHelper, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper, Router $router, RequestStack $requestStack, \Mautic\LeadBundle\Model\DoNotContact $doNotContact)
     {
-        $this->factory              = $factory;
+        $this->em                   = $em;
         $this->assetsHelper         = $assetsHelper;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->integrationHelper    = $integrationHelper;
         $this->router               = $router;
         $this->request              = $requestStack;
+        $this->doNotContact         = $doNotContact;
     }
 
     /**
@@ -81,14 +80,11 @@ class NotificationHelper
     public function unsubscribe($notification)
     {
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $repo */
-        $repo = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead');
+        $repo = $this->em->getRepository('MauticLeadBundle:Lead');
 
         $lead = $repo->getLeadByEmail($notification);
 
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->factory->getModel('lead.lead');
-
-        return $leadModel->addDncForLead($lead, 'notification', null, DoNotContact::UNSUBSCRIBED);
+        return $this->doNotContact->addDncForContact($lead->getId(), 'notification', DoNotContact::UNSUBSCRIBED);
     }
 
     public function getHeaderScript()
@@ -104,7 +100,7 @@ class NotificationHelper
         if ($this->hasScript()) {
             $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
-            if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+            if (!$integration || false === $integration->getIntegrationSettings()->getIsPublished()) {
                 return;
             }
 
@@ -130,7 +126,7 @@ class NotificationHelper
             }
 
             $server        = $this->request->getCurrentRequest()->server;
-            $https         = (parse_url($server->get('HTTP_REFERER'), PHP_URL_SCHEME) == 'https') ? true : false;
+            $https         = ('https' == parse_url($server->get('HTTP_REFERER'), PHP_URL_SCHEME)) ? true : false;
             $subdomainName = '';
 
             if (!$https && $notificationSubdomainName) {
@@ -218,25 +214,25 @@ JS;
             return false;
         }
 
-        if (strpos($server->get('HTTP_REFERER'), $this->coreParametersHelper->getParameter('site_url')) === false) {
+        if (false === strpos($server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
             $landingPage = false;
         }
 
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
-        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+        if (!$integration || false === $integration->getIntegrationSettings()->getIsPublished()) {
             return false;
         }
 
         $supportedFeatures = $integration->getIntegrationSettings()->getSupportedFeatures();
 
         // disable on Landing pages
-        if ($landingPage === true && !in_array('landing_page_enabled', $supportedFeatures)) {
+        if (true === $landingPage && !in_array('landing_page_enabled', $supportedFeatures)) {
             return false;
         }
 
         // disable on Landing pages
-        if ($landingPage === false && !in_array('tracking_page_enabled', $supportedFeatures)) {
+        if (false === $landingPage && !in_array('tracking_page_enabled', $supportedFeatures)) {
             return false;
         }
 

@@ -11,8 +11,7 @@
 
 namespace Mautic\AssetBundle\EventListener;
 
-use Mautic\AssetBundle\Entity\Download;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Report\FieldsBuilder;
@@ -20,11 +19,9 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ReportSubscriber.
- */
-class ReportSubscriber extends CommonSubscriber
+class ReportSubscriber implements EventSubscriberInterface
 {
     const CONTEXT_ASSET          = 'assets';
     const CONTEXT_ASSET_DOWNLOAD = 'asset.downloads';
@@ -35,19 +32,19 @@ class ReportSubscriber extends CommonSubscriber
     private $companyReportData;
 
     /**
+     * @var DownloadRepository
+     */
+    private $downloadRepository;
+
+    /**
      * @var FieldsBuilder
      */
     private $fieldsBuilder;
 
-    /**
-     * ReportSubscriber constructor.
-     *
-     * @param CompanyReportData $companyReportData
-     * @param FieldsBuilder     $fieldsBuilder
-     */
-    public function __construct(CompanyReportData $companyReportData, FieldsBuilder $fieldsBuilder)
+    public function __construct(CompanyReportData $companyReportData, DownloadRepository $downloadRepository, FieldsBuilder $fieldsBuilder)
     {
-        $this->companyReportData = $companyReportData;
+        $this->companyReportData  = $companyReportData;
+        $this->downloadRepository = $downloadRepository;
         $this->fieldsBuilder     = $fieldsBuilder;
     }
 
@@ -65,8 +62,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Add available tables and columns to the report builder lookup.
-     *
-     * @param ReportBuilderEvent $event
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
@@ -173,8 +168,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGeneratorEvent $event
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
@@ -210,8 +203,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGraphEvent $event
      */
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
@@ -220,9 +211,8 @@ class ReportSubscriber extends CommonSubscriber
             return;
         }
 
-        $graphs       = $event->getRequestedGraphs();
-        $qb           = $event->getQueryBuilder();
-        $downloadRepo = $this->em->getRepository(Download::class);
+        $graphs = $event->getRequestedGraphs();
+        $qb     = $event->getQueryBuilder();
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
@@ -244,7 +234,7 @@ class ReportSubscriber extends CommonSubscriber
                 case 'mautic.asset.table.most.downloaded':
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $downloadRepo->getMostDownloaded($queryBuilder, $limit, $offset);
+                    $items                  = $this->downloadRepository->getMostDownloaded($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -255,7 +245,7 @@ class ReportSubscriber extends CommonSubscriber
                 case 'mautic.asset.table.top.referrers':
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $downloadRepo->getTopReferrers($queryBuilder, $limit, $offset);
+                    $items                  = $this->downloadRepository->getTopReferrers($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -264,7 +254,7 @@ class ReportSubscriber extends CommonSubscriber
                     $event->setGraph($g, $graphData);
                     break;
                 case 'mautic.asset.graph.pie.statuses':
-                    $items                  = $downloadRepo->getHttpStatuses($queryBuilder);
+                    $items                  = $this->downloadRepository->getHttpStatuses($queryBuilder);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;

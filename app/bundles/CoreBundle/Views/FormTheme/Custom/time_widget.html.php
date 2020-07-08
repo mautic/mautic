@@ -1,4 +1,4 @@
-<?php if ($widget == 'single_text'): ?>
+<?php if ('single_text' == $widget): ?>
     <?php echo $view['form']->block($form, 'form_widget_simple'); ?>
 <?php else: ?>
     <?php
@@ -9,8 +9,8 @@
         $size = 6;
     }
     ?>
-    <?php $vars = $widget == 'text' ? ['attr' => ['size' => 1, 'class' => 'not-chosen']] : ['attr' => ['class' => 'not-chosen']]; ?>
-    <div <?php echo $view['form']->block($form, 'widget_container_attributes') ?>>
+    <?php $vars = 'text' == $widget ? ['attr' => ['size' => 1, 'class' => 'not-chosen']] : ['attr' => ['class' => 'not-chosen']]; ?>
+    <div <?php echo $view['form']->block($form, 'widget_container_attributes'); ?>>
         <?php
         // There should be no spaces between the colons and the widgets, that's why
         // this block is written in a single PHP tag
@@ -27,4 +27,4 @@
         }
         ?>
     </div>
-<?php endif ?>
+<?php endif; ?>

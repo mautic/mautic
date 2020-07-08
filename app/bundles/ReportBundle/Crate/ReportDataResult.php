@@ -96,7 +96,14 @@ class ReportDataResult
         $row = $this->data[0];
         foreach ($row as $k => $v) {
             $dataColumn      = $data['dataColumns'][$k];
-            $this->headers[] = $data['columns'][$dataColumn]['label'];
+            $label           = $data['columns'][$dataColumn]['label'];
+
+            // Aggregated column
+            if (isset($data['aggregatorColumns'][$k])) {
+                $this->headers[] = str_replace($dataColumn, $label, $k);
+            } else {
+                $this->headers[] = $data['columns'][$dataColumn]['label'];
+            }
         }
     }
 
@@ -111,7 +118,7 @@ class ReportDataResult
 
         $row = $this->data[0];
         foreach ($row as $k => $v) {
-            if (array_key_exists($k, $data['aggregatorColumns'])) {
+            if (isset($data['aggregatorColumns']) && array_key_exists($k, $data['aggregatorColumns'])) {
                 $this->types[$k] = 'int';
             } else {
                 $dataColumn      = $data['dataColumns'][$k];
