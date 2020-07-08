@@ -312,6 +312,7 @@ Mautic.prepareCodeModeBlocksBeforeSave = function(themeHtml) {
             html = atob(mQuery(this).attr('encode'));
             var token = '{CODEMODEBLOCK'+index+'}';
             codeBlocks[token] = html;
+            mQuery(this).html(token);
         }
     })
 
