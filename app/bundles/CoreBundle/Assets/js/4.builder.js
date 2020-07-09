@@ -286,16 +286,16 @@ Mautic.isValidHtml = function (html) {
 
 Mautic.setCodeModeSlotContent = function (slot, content) {
     if (Mautic.isValidHtml(content)) {
-        slot.removeAttr('encode');
+        slot.removeAttr('data-encode');
     } else {
-        slot.attr('encode', btoa(content));
+        slot.attr('data-encode', btoa(content));
     }
 }
 
 Mautic.geCodeModetSlotContent = function (slot) {
     var html = slot.html();
-    if (slot.attr('encode')) {
-        html = atob(slot.attr('encode'));
+    if (slot.attr('data-encode')) {
+        html = atob(slot.attr('data-encode'));
     }
     return html;
 }
@@ -308,8 +308,8 @@ Mautic.prepareCodeModeBlocksBeforeSave = function(themeHtml) {
 
     $b.find('#codemodeHtmlContainer,.codemodeHtmlContainer').each(function (index) {
         var html = mQuery(this).html();
-        if (mQuery(this).attr('encode')) {
-            html = atob(mQuery(this).attr('encode'));
+        if (mQuery(this).attr('data-encode')) {
+            html = atob(mQuery(this).attr('data-encode'));
             var token = '{CODEMODEBLOCK'+index+'}';
             codeBlocks[token] = html;
             mQuery(this).html(token);
