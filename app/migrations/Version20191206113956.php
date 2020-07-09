@@ -35,7 +35,7 @@ class Version20191206113956 extends AbstractMauticMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE {$this->prefix}lead_lists ADD public_name VARCHAR(255) NOT NULL");
+        $this->addSql("ALTER TABLE {$this->prefix}lead_lists ADD public_name VARCHAR(255) DEFAULT '' NOT NULL");
         $this->addSql("UPDATE {$this->prefix}lead_lists SET public_name=name");
     }
 
