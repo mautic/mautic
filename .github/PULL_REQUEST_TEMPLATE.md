@@ -11,14 +11,14 @@ Any PR related to Mautic 2 issues is not relavant anymore, please consider upgra
 | Automated tests included?              | yes/no
 | Related user documentation PR URL      | mautic/mautic-documentation#... <!-- required for new features -->
 | Related developer documentation PR URL | mautic/developer-documentation#... <!-- required for developer-facing changes -->
-| Issue(s) addressed                     | Fix #... <!-- prefix each issue number with "Fix #", no need to create an issue if none exist, explain below instead -->
+| Issue(s) addressed                     | Fixes #... <!-- prefix each issue number with "Fixes #", no need to create an issue if none exists, explain below instead -->
 
 <!--
 Additionally (see https://contribute.mautic.org/contributing-to-mautic/developer/code/pull-requests#step-5-work-on-your-pull-request):
  - Always add tests and ensure they pass.
  - Bug fixes must be submitted against the lowest maintained branch where they apply
    (lowest branches are regularly merged to upper ones so they get the fixes too.)
- - Features and deprecations must be submitted against branch staging.
+ - Features and deprecations must be submitted against the staging branch.
 -->
 
 <!--
