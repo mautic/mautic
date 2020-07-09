@@ -10,10 +10,9 @@
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Migrations\AbortMigrationException;
-use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
+use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
@@ -22,42 +21,26 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 class Version20191206113956 extends AbstractMauticMigration
 {
     /**
-     * @param Schema $schema
-     *
-     * @throws SkipMigrationException
+     * @throws SkipMigration
      * @throws SchemaException
      */
-    public function preUp(Schema $schema)
+    public function preUp(Schema $schema): void
     {
         $table = $schema->getTable($this->prefix.'lead_lists');
 
         if ($table->hasColumn('public_name')) {
-            throw new SkipMigrationException('Schema includes this migration');
+            throw new SkipMigration('Schema includes this migration');
         }
     }
 
-    /**
-     * @param Schema $schema
-     *
-     * @throws AbortMigrationException
-     */
-    public function up(Schema $schema)
+    public function up(Schema $schema): void
     {
-        // this up() migration is auto-generated, please modify it to your needs
-        $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'mysql', 'Migration can only be executed safely on \'mysql\'.');
         $this->addSql("ALTER TABLE {$this->prefix}lead_lists ADD public_name VARCHAR(255) NOT NULL");
         $this->addSql("UPDATE {$this->prefix}lead_lists SET public_name=name");
     }
 
-    /**
-     * @param Schema $schema
-     *
-     * @throws AbortMigrationException
-     */
-    public function down(Schema $schema)
+    public function down(Schema $schema): void
     {
-        // this down() migration is auto-generated, please modify it to your needs
-        $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'mysql', 'Migration can only be executed safely on \'mysql\'.');
         $this->addSql("{$this->prefix}ALTER TABLE lead_lists DROP public_name");
     }
 }
