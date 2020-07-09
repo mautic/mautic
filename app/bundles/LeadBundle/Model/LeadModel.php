@@ -968,7 +968,7 @@ class LeadModel extends FormModel
 
         foreach ($cleanFields as $group) {
             foreach ($group as $key => $field) {
-                if (array_key_exists($key, $uniqueFields) && !empty($field['value'])) {
+                if (array_key_exists($key, $uniqueFields)) {
                     $uniqueFieldData[$key] = $field['value'];
                 }
             }
