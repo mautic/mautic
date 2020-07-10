@@ -18,14 +18,14 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class CompanyReportDataTest extends \PHPUnit_Framework_TestCase
+class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var TranslatorInterface
      */
     private $translator;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()

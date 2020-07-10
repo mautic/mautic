@@ -42,12 +42,6 @@ class ContactSegmentFilter
      */
     private $schemaCache;
 
-    /**
-     * @param ContactSegmentFilterCrate   $contactSegmentFilterCrate
-     * @param FilterDecoratorInterface    $filterDecorator
-     * @param TableSchemaColumnsCache     $cache
-     * @param FilterQueryBuilderInterface $filterQueryBuilder
-     */
     public function __construct(
         ContactSegmentFilterCrate $contactSegmentFilterCrate,
         FilterDecoratorInterface $filterDecorator,
@@ -131,7 +125,7 @@ class ContactSegmentFilter
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getWhere()
     {
@@ -139,7 +133,7 @@ class ContactSegmentFilter
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getGlue()
     {
@@ -163,8 +157,6 @@ class ContactSegmentFilter
     }
 
     /**
-     * @param QueryBuilder $queryBuilder
-     *
      * @return QueryBuilder
      */
     public function applyQuery(QueryBuilder $queryBuilder)
@@ -179,7 +171,7 @@ class ContactSegmentFilter
      */
     public function isContactSegmentReference()
     {
-        return $this->getField() === 'leadlist';
+        return 'leadlist' === $this->getField();
     }
 
     /**
@@ -216,7 +208,7 @@ class ContactSegmentFilter
 
     public function __toString()
     {
-        $debug = sprintf(
+        return sprintf(
             'table: %s,  %s on %s %s %s',
                 $this->getTable(),
             $this->getField(),
@@ -224,8 +216,6 @@ class ContactSegmentFilter
             $this->getOperator(),
             json_encode($this->getParameterValue())
         );
-
-        return $debug;
     }
 
     public function getRelationJoinTable()

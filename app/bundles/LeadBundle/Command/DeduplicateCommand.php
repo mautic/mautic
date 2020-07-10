@@ -32,9 +32,6 @@ class DeduplicateCommand extends ModeratedCommand
 
     /**
      * DeduplicateCommand constructor.
-     *
-     * @param ContactDeduper      $contactDeduper
-     * @param TranslatorInterface $translator
      */
     public function __construct(ContactDeduper $contactDeduper, TranslatorInterface $translator)
     {
@@ -65,10 +62,6 @@ EOT
             );
     }
 
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $newerIntoOlder = (bool) $input->getOption('newer-into-older');

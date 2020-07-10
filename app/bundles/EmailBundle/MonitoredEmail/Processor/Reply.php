@@ -21,6 +21,7 @@ use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply\Parser;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -58,32 +59,29 @@ class Reply implements ProcessorInterface
     private $message;
 
     /**
+     * @var ContactTracker
+     */
+    private $contactTracker;
+
+    /**
      * Reply constructor.
-     *
-     * @param StatRepository           $statRepository
-     * @param ContactFinder            $contactFinder
-     * @param LeadModel                $leadModel
-     * @param EventDispatcherInterface $dispatcher
-     * @param LoggerInterface          $logger
      */
     public function __construct(
         StatRepository $statRepository,
         ContactFinder $contactFinder,
         LeadModel $leadModel,
         EventDispatcherInterface $dispatcher,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ContactTracker $contactTracker
     ) {
-        $this->statRepo      = $statRepository;
-        $this->contactFinder = $contactFinder;
-        $this->leadModel     = $leadModel;
-        $this->dispatcher    = $dispatcher;
-        $this->logger        = $logger;
+        $this->statRepo         = $statRepository;
+        $this->contactFinder    = $contactFinder;
+        $this->leadModel        = $leadModel;
+        $this->dispatcher       = $dispatcher;
+        $this->logger           = $logger;
+        $this->contactTracker   = $contactTracker;
     }
 
-    /**
-     * @param $mailId
-     * @param $refid
-     */
     public function process(Message $message)
     {
         $this->message = $message;
@@ -123,7 +121,7 @@ class Reply implements ProcessorInterface
         $this->createReply($stat);
 
         if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_REPLY)) {
-            $this->leadModel->setSystemCurrentLead($stat->getLead());
+            $this->contactTracker->setSystemContact($stat->getLead());
 
             $event = new EmailReplyEvent($stat);
             $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_REPLY, $event);
@@ -134,9 +132,6 @@ class Reply implements ProcessorInterface
         $this->leadModel->clearEntities();
     }
 
-    /**
-     * @param Stat $stat
-     */
     protected function createReply(Stat $stat)
     {
         $replies = $stat->getReplies()->filter(

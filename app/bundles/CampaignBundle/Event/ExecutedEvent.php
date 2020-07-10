@@ -28,9 +28,6 @@ class ExecutedEvent extends \Symfony\Component\EventDispatcher\Event
 
     /**
      * ExecutedEvent constructor.
-     *
-     * @param AbstractEventAccessor $config
-     * @param LeadEventLog          $log
      */
     public function __construct(AbstractEventAccessor $config, LeadEventLog $log)
     {

@@ -16,8 +16,11 @@ use Mautic\EmailBundle\Helper\RequestStorageHelper;
 use Mautic\EmailBundle\Swiftmailer\Transport\MomentumTransport;
 use Symfony\Component\HttpFoundation\Request;
 
-class RequestStorageHelperTest extends \PHPUnit_Framework_TestCase
+class RequestStorageHelperTest extends \PHPUnit\Framework\TestCase
 {
+    private $cacheStorageMock;
+    private $helper;
+
     protected function setUp()
     {
         parent::setUp();

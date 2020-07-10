@@ -25,8 +25,6 @@ abstract class AbstractFormatter
     protected $name;
 
     /**
-     * @param Connection $db
-     *
      * @return AbstractFormatter
      */
     public static function createFormatter(Connection $db)
@@ -37,9 +35,6 @@ abstract class AbstractFormatter
         return new $class($db);
     }
 
-    /**
-     * @param Connection $db
-     */
     public function __construct(Connection $db)
     {
         $this->db       = $db;

@@ -47,10 +47,6 @@ class ReplyHelper
 
     /**
      * ReplyHelper constructor.
-     *
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param LoggerInterface          $logger
-     * @param ContactTracker           $contactTracker
      */
     public function __construct(EventDispatcherInterface $eventDispatcher, LoggerInterface $logger, ContactTracker $contactTracker)
     {
@@ -71,9 +67,6 @@ class ReplyHelper
     }
 
     /**
-     * @param CallbackInterface $handler
-     * @param Request           $request
-     *
      * @return Response
      *
      * @throws \Exception
@@ -120,10 +113,9 @@ class ReplyHelper
     }
 
     /**
-     * @param Lead   $contact
      * @param string $message
      *
-     * @return null|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\Response|null
      */
     private function dispatchReplyEvent(Lead $contact, $message)
     {
@@ -135,8 +127,6 @@ class ReplyHelper
     }
 
     /**
-     * @param CallbackInterface $handler
-     *
      * @return Response
      *
      * @throws \Exception

@@ -11,20 +11,23 @@
 
 namespace Mautic\PageBundle\Tests\EventListener;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PageBundle\Entity\Hit;
+use Mautic\PageBundle\Entity\HitRepository;
+use Mautic\PageBundle\Entity\PageRepository;
+use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\EventListener\PageSubscriber;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\QueueBundle\Event\QueueConsumerEvent;
 use Mautic\QueueBundle\Queue\QueueConsumerResults;
 use Mautic\QueueBundle\QueueEvents;
+use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,9 +36,7 @@ class PageSubscriberTest extends WebTestCase
 {
     public function testGetTokens_WhenCalled_ReturnsValidTokens()
     {
-        $translator = $this->getMockBuilder(Translator::class)->disableOriginalConstructor()
-            ->getMock();
-
+        $translator       = $this->createMock(Translator::class);
         $pageBuilderEvent = new PageBuilderEvent($translator);
         $pageBuilderEvent->addToken('{token_test}', 'TOKEN VALUE');
         $tokens = $pageBuilderEvent->getTokens();
@@ -84,10 +85,11 @@ class PageSubscriberTest extends WebTestCase
         $ipLookupHelperMock = $this->createMock(IpLookupHelper::class);
         $auditLogModelMock  = $this->createMock(AuditLogModel::class);
         $pageModelMock      = $this->createMock(PageModel::class);
-        $entityManagerMock  = $this->createMock(EntityManager::class);
-        $hitRepository      = $this->createMock(EntityRepository::class);
-        $pageRepository     = $this->createMock(EntityRepository::class);
-        $leadRepository     = $this->createMock(EntityRepository::class);
+        $logger             = $this->createMock(Logger::class);
+        $hitRepository      = $this->createMock(HitRepository::class);
+        $pageRepository     = $this->createMock(PageRepository::class);
+        $redirectRepository = $this->createMock(RedirectRepository::class);
+        $contactRepository  = $this->createMock(LeadRepository::class);
         $hitMock            = $this->createMock(Hit::class);
         $leadMock           = $this->createMock(Lead::class);
 
@@ -95,26 +97,21 @@ class PageSubscriberTest extends WebTestCase
             ->method('find')
             ->will($this->returnValue($hitMock));
 
-        $leadRepository->expects($this->any())
+        $contactRepository->expects($this->any())
             ->method('find')
             ->will($this->returnValue($leadMock));
-
-        $entityManagerMock->expects($this->any())
-            ->method('getRepository')
-            ->will($this->returnValueMap([
-                ['MauticPageBundle:Hit', $hitRepository],
-                ['MauticPageBundle:Page', $pageRepository],
-                ['MauticLeadBundle:Lead', $leadRepository],
-            ]));
 
         $pageSubscriber = new PageSubscriber(
             $assetsHelperMock,
             $ipLookupHelperMock,
             $auditLogModelMock,
-            $pageModelMock
+            $pageModelMock,
+            $logger,
+            $hitRepository,
+            $pageRepository,
+            $redirectRepository,
+            $contactRepository
         );
-
-        $pageSubscriber->setEntityManager($entityManagerMock);
 
         return $pageSubscriber;
     }

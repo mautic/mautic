@@ -14,9 +14,7 @@
  */
 
 // List of critical migrations
-$criticalMigrations = [
-    '20160225000000',
-];
+$criticalMigrations = [];
 
 $baseDir = __DIR__;
 
@@ -28,7 +26,8 @@ $gitSourceLocation = (isset($args['b'])) ? ' ' : ' tags/';
 require_once dirname(__DIR__).'/vendor/autoload.php';
 require_once dirname(__DIR__).'/app/AppKernel.php';
 
-$appVersion = AppKernel::MAJOR_VERSION.'.'.AppKernel::MINOR_VERSION.'.'.AppKernel::PATCH_VERSION.AppKernel::EXTRA_VERSION;
+$releaseMetadata = \Mautic\CoreBundle\Release\ThisRelease::getMetadata();
+$appVersion      = $releaseMetadata->getVersion();
 
 // Use branch if applicable otherwise a version tag
 $gitSource = (!empty($args['b'])) ? $args['b'] : $appVersion;
@@ -57,32 +56,25 @@ if (!isset($args['repackage'])) {
     passthru($systemGit.' ls-tree -r -t --name-only '.$gitSource, $releaseFiles);
     $releaseFiles = explode("\n", trim(ob_get_clean()));
 
-    if ($result !== 0) {
+    if (0 !== $result) {
         exit;
     }
 
     chdir(__DIR__);
     system('cd '.__DIR__.'/packaging && composer install --no-dev --no-scripts --optimize-autoloader && cd ..', $result);
-    if ($result !== 0) {
-        exit;
-    }
-
-    echo "Patching Doctrine ORM UnitOfWork.php for Mautic 2.x branch...\n";
-    // Fix for https://github.com/mautic/mautic/issues/7843 where Composer patch isn't applied in build stage because of --no-scripts
-    system('cp patches/UnitOfWork.php packaging/vendor/doctrine/orm/lib/Doctrine/ORM/UnitOfWork.php', $result);
-    if ($result !== 0) {
+    if (0 !== $result) {
         exit;
     }
 
     // Generate the bootstrap.php.cache file
     system(__DIR__.'/packaging/vendor/sensio/distribution-bundle/Resources/bin/build_bootstrap.php', $result);
-    if ($result !== 0) {
+    if (0 !== $result) {
         exit;
     }
 
     // Compile prod assets
-    system('cd '.__DIR__.'/packaging && php '.__DIR__.'/packaging/app/console mautic:assets:generate -e prod', $result);
-    if ($result !== 0) {
+    system('cd '.__DIR__.'/packaging && php '.__DIR__.'/packaging/bin/console mautic:assets:generate -e prod', $result);
+    if (0 !== $result) {
         exit;
     }
 
@@ -117,11 +109,11 @@ if (!isset($args['repackage'])) {
             $folderPath     = explode('/', $filename);
             $baseFolderName = $folderPath[0];
 
-            if (!$vendorsChanged && $filename == 'composer.lock') {
+            if (!$vendorsChanged && 'composer.lock' == $filename) {
                 $vendorsChanged = true;
             }
 
-            if (substr($file, 0, 1) == 'D') {
+            if ('D' == substr($file, 0, 1)) {
                 if (!in_array($filename, $releaseFiles)) {
                     $deletedFiles[$filename] = true;
                 }
@@ -165,10 +157,10 @@ chdir(__DIR__.'/packaging');
 system("rm -f ../packages/{$appVersion}.zip ../packages/{$appVersion}-update.zip");
 
 echo "Packaging Mautic Full Installation\n";
-system('zip -r ../packages/'.$appVersion.'.zip . -x@../excludefiles.txt > /dev/null');
+system('zip -r ../packages/'.$appVersion.'.zip . -x@../exclude_files.txt -x@../exclude_files_full.txt > /dev/null');
 
 echo "Packaging Mautic Update Package\n";
-system('zip -r ../packages/'.$appVersion.'-update.zip -x@../excludefiles.txt -@ < modified_files.txt > /dev/null');
+system('zip -r ../packages/'.$appVersion.'-update.zip -x@../exclude_files.txt -@ < modified_files.txt > /dev/null');
 
 system('openssl sha1 ../packages/'.$appVersion.'.zip');
 system('openssl sha1 ../packages/'.$appVersion.'-update.zip');

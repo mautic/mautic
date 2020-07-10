@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
@@ -23,19 +24,19 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 
-class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
+class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var array */
     private $configFrom = [
-        'id'                => 111,
-        'companyname'       => 'Mautic',
-        'companemail'       => 'mautic@mautic.com',
+        'id'          => 111,
+        'companyname' => 'Mautic',
+        'companemail' => 'mautic@mautic.com',
     ];
 
     private $configTo = [
-        'id'                => '112',
-        'companyname'       => 'Mautic2',
-        'companemail'       => 'mautic@mauticsecond.com',
+        'id'          => '112',
+        'companyname' => 'Mautic2',
+        'companemail' => 'mautic@mauticsecond.com',
     ];
 
     public function testOnCampaignTriggerActiononUpdateCompany()
@@ -45,8 +46,9 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
         $mockLeadFieldModel = $this->createMock(FieldModel::class);
         $mockListModel      = $this->createMock(ListModel::class);
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
+        $mockCampaignModel  = $this->createMock(CampaignModel::class);
+        $companyEntityFrom  = $this->createMock(Company::class);
 
-        $companyEntityFrom = $this->createMock(Company::class);
         $companyEntityFrom->method('getId')
             ->willReturn($this->configFrom['id']);
         $companyEntityFrom->method('getName')
@@ -71,9 +73,20 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getCompanyLeadRepository')
             ->willReturn($mockCompanyLeadRepo);
 
-        $mockCampaignModel = $this->createMock(CampaignModel::class);
+        $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $mockCoreParametersHelper->method('get')
+            ->with('default_timezone')
+            ->willReturn('UTC');
 
-        $subscriber = new CampaignSubscriber($mockIpLookupHelper, $mockLeadModel, $mockLeadFieldModel, $mockListModel, $mockCompanyModel, $mockCampaignModel);
+        $subscriber = new CampaignSubscriber(
+            $mockIpLookupHelper,
+            $mockLeadModel,
+            $mockLeadFieldModel,
+            $mockListModel,
+            $mockCompanyModel,
+            $mockCampaignModel,
+            $mockCoreParametersHelper
+        );
 
         /** @var LeadModel $leadModel */
         $lead = new Lead();

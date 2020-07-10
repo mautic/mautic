@@ -11,14 +11,12 @@
 
 namespace Mautic\AssetBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\AssetBundle\AssetEvents;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class EmailSubscriber.
- */
-class EmailSubscriber extends CommonSubscriber
+class EmailSubscriber implements EventSubscriberInterface
 {
     /**
      * {@inheritdoc}
@@ -30,9 +28,6 @@ class EmailSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param EmailBuilderEvent $event
-     */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
         if ($event->abTestWinnerCriteriaRequested()) {
@@ -40,7 +35,7 @@ class EmailSubscriber extends CommonSubscriber
             $formSubmissions = [
                 'group'    => 'mautic.asset.abtest.criteria',
                 'label'    => 'mautic.asset.abtest.criteria.downloads',
-                'callback' => '\Mautic\AssetBundle\Helper\AbTestHelper::determineDownloadWinner',
+                'event'    => AssetEvents::ON_DETERMINE_DOWNLOAD_RATE_WINNER,
             ];
             $event->addAbTestWinnerCriteria('asset.downloads', $formSubmissions);
         }

@@ -14,9 +14,6 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
-/**
- * Class CustomFieldRepositoryTrait.
- */
 trait CustomFieldRepositoryTrait
 {
     protected $useDistinctCount = false;
@@ -225,9 +222,7 @@ trait CustomFieldRepositoryTrait
                 ->setMaxResults($limit);
         }
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -237,7 +232,7 @@ trait CustomFieldRepositoryTrait
      */
     public function saveEntities($entities)
     {
-        foreach ($entities as $k => $entity) {
+        foreach ($entities as $entity) {
             // Leads cannot be batched due to requiring the ID to update the fields
             $this->saveEntity($entity);
         }

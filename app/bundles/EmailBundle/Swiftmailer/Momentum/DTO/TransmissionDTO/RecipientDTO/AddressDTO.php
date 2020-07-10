@@ -29,7 +29,7 @@ final class AddressDTO implements \JsonSerializable
     /**
      * @var string|null
      */
-    private $headerTo = null;
+    private $headerTo;
 
     /**
      * AddressDTO constructor.
@@ -42,7 +42,7 @@ final class AddressDTO implements \JsonSerializable
     {
         $this->email = $email;
         $this->name  = $name;
-        if ($bcc === false) {
+        if (false === $bcc) {
             $this->headerTo = $email;
         }
     }
@@ -56,7 +56,7 @@ final class AddressDTO implements \JsonSerializable
             'email' => $this->email,
             'name'  => $this->name,
         ];
-        if ($this->headerTo !== null) {
+        if (null !== $this->headerTo) {
             $json['header_to'] = $this->headerTo;
         }
 

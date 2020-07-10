@@ -13,11 +13,7 @@ namespace Mautic\ChannelBundle\Event;
 
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\Event\CommonEvent;
-use Mautic\LeadBundle\Model\LeadModel;
 
-/**
- * Class ChannelEvent.
- */
 class ChannelEvent extends CommonEvent
 {
     /**
@@ -112,29 +108,5 @@ class ChannelEvent extends CommonEvent
     public function getFeatureChannels()
     {
         return $this->featureChannels;
-    }
-
-    /**
-     * Set a preference center channel.
-     *
-     * @deprecated 2.4 to be removed 3.0; use addChannel()
-     *
-     * @param $channel
-     */
-    public function setChannel($channel)
-    {
-        $this->addChannel($channel, [LeadModel::CHANNEL_FEATURE => []]);
-    }
-
-    /**
-     * Returns a list of channels.
-     *
-     * @deprecated 2.4 to be removed 3.0; use getChannelConfigs()
-     *
-     * @return string
-     */
-    public function getChannels()
-    {
-        return array_keys($this->channels);
     }
 }

@@ -20,9 +20,6 @@ trait ChannelTrait
      */
     protected $modelFactory;
 
-    /**
-     * @param ModelFactory $modelFactory
-     */
     public function setModelFactory(ModelFactory $modelFactory)
     {
         $this->modelFactory = $modelFactory;
@@ -37,17 +34,8 @@ trait ChannelTrait
      */
     protected function getChannelModel($channel)
     {
-        if (null !== $this->modelFactory) {
-            if ($this->modelFactory->hasModel($channel)) {
-                return $this->modelFactory->getModel($channel);
-            }
-        } else {
-            // BC - @deprecated - to be removed in 3.0
-            try {
-                return $this->factory->getModel($channel);
-            } catch (\Exception $exception) {
-                // No model found
-            }
+        if ($this->modelFactory->hasModel($channel)) {
+            return $this->modelFactory->getModel($channel);
         }
 
         return false;
@@ -101,7 +89,7 @@ trait ChannelTrait
                 }
                 $routeSourceName = 'mautic_'.$baseRouteName.'_action';
 
-                if ($this->router->getRouteCollection()->get($routeSourceName) !== null) {
+                if (null !== $this->router->getRouteCollection()->get($routeSourceName)) {
                     $url = $this->router->generate(
                         $routeSourceName,
                         [

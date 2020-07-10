@@ -1,17 +1,18 @@
+[![codecov](https://codecov.io/gh/mautic/mautic/branch/staging/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
+
 Mautic Introduction
 ===========
 ![Mautic](.github/readme_image.png "Mautic Open Source Marketing Automation")
 
 ## Supported Versions
-Please note that the release dates indicated with * below are *estimations*, no rights can be derived from them.
 
-| Branch | Beta Release | Initial Release | Active Support Until | Security Support Until
+| Branch | Beta Release | Initial Release | Active Support Until | Security Support Until *
 |--|--|--|--|--|
 |2.15  | 27 Sep 2019 | 8 Oct 2019 | 8 Oct 2019 | 8 Oct 2019
-|2.16  | 30 Jan 2020* | 13 Feb 2020* | 13 Feb 2020 | June 2020? (TBD)**
-|3.0   | 27 Jan 2020* | 3 Feb 2020* | TBD | TBD
+|2.16  | 30 Jan 2020 | 13 Feb 2020 | 15 June 2020 | 15 December 2020
+|3.0   | 27 Jan 2020 | 15 June 2020 | 15 June 2021 | 15 December 2021
 
-** = Security Support for 2.16 will only be provided for Mautic itself, not for core dependencies that are EOL like Symfony 2.8.
+* = Security Support for 2.16 will only be provided for Mautic itself, not for core dependencies that are EOL like Symfony 2.8.
 
 ## Getting Started
 
@@ -56,7 +57,7 @@ Installing from source is only recommended if you are comfortable using the comm
 ## Ready to Install from Source and/or Contribute?
 That's fantastic! 
 
-If you want to contribute to Mautic's **code**, please read our [CONTRIBUTING.md](https://github.com/mautic/mautic/blob/staging/.github/CONTRIBUTING.md) or [Contributing Code](https://contribute.mautic.org/about/how-can-i-contribute/developer) docs. Then, check out the issues with the [L1 label](https://github.com/mautic/mautic/issues?q=is%3Aissue+is%3Aopen+label%3AL1) to get started quickly :rocket:
+If you want to contribute to Mautic's **code**, please read our [CONTRIBUTING.md](https://github.com/mautic/mautic/blob/staging/.github/CONTRIBUTING.md) or [Contributing Code](https://contribute.mautic.org/contributing-to-mautic/developer) docs. Then, check out the issues with the [L1 label](https://github.com/mautic/mautic/issues?q=is%3Aissue+is%3Aopen+label%3AL1) to get started quickly :rocket:
 
 If you want to contribute in **other areas** of Mautic, please read our general [Contributing](https://contribute.mautic.org/about/how-can-i-contribute) guide.
 
