@@ -49,7 +49,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * @var ExpressionBuilder|null
      */
-    private $filterExpression = null;
+    private $filterExpression;
 
     /**
      * @var ChannelListHelper
@@ -58,11 +58,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
 
     /**
      * ReportGeneratorEvent constructor.
-     *
-     * @param Report            $report
-     * @param array             $options
-     * @param QueryBuilder      $qb
-     * @param ChannelListHelper $channelListHelper
      */
     public function __construct(Report $report, array $options, QueryBuilder $qb, ChannelListHelper $channelListHelper)
     {
@@ -91,8 +86,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
 
     /**
      * Set the QueryBuilder object.
-     *
-     * @param QueryBuilder $queryBuilder
      *
      * @return $this
      */
@@ -145,8 +138,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Set custom select columns with aliases based on report settings.
      *
-     * @param array $selectColumns
-     *
      * @return $this
      */
     public function setSelectColumns(array $selectColumns)
@@ -165,8 +156,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
-     * @param array $options
-     *
      * @return $this
      */
     public function setOptions(array $options)
@@ -194,8 +183,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
-     * @param ExpressionBuilder $filterExpression
-     *
      * @return $this
      */
     public function setFilterExpression(ExpressionBuilder $filterExpression)
@@ -208,8 +195,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Add category left join.
      *
-     * @param QueryBuilder $queryBuilder
-     * @param              $prefix
+     * @param $prefix
      *
      * @return $this
      */
@@ -223,9 +209,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Add lead left join.
      *
-     * @param QueryBuilder $queryBuilder
-     * @param              $prefix
-     * @param string       $leadPrefix
+     * @param        $prefix
+     * @param string $leadPrefix
      *
      * @return $this
      */
@@ -239,9 +224,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Add IP left join.
      *
-     * @param QueryBuilder $queryBuilder
-     * @param              $prefix
-     * @param string       $ipPrefix
+     * @param        $prefix
+     * @param string $ipPrefix
      *
      * @return $this
      */
@@ -255,10 +239,9 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Add IP left join with lead join.
      *
-     * @param QueryBuilder $queryBuilder
-     * @param string       $ipXrefPrefix
-     * @param string       $ipPrefix
-     * @param string       $leadPrefix
+     * @param string $ipXrefPrefix
+     * @param string $ipPrefix
+     * @param string $leadPrefix
      *
      * @return $this
      */
@@ -273,10 +256,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Add IP left join.
      *
-     * @param QueryBuilder $queryBuilder
-     * @param              $prefix
-     * @param string       $ipPrefix
-     * @param string       $leadPrefix
+     * @param        $prefix
+     * @param string $leadPrefix
      *
      * @return $this
      */
@@ -305,8 +286,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Join channel columns.
      *
-     * @param QueryBuilder $queryBuilder
-     * @param              $prefix
+     * @param $prefix
      *
      * @return $this
      */
@@ -340,8 +320,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
 
     /**
      * Add company left join.
-     *
-     * @param QueryBuilder $queryBuilder
      */
     public function addCompanyLeftJoin(QueryBuilder $queryBuilder)
     {
@@ -352,9 +330,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Apply date filters to the query.
      *
-     * @param QueryBuilder $queryBuilder
-     * @param string       $dateColumn
-     * @param string       $tablePrefix
+     * @param string $dateColumn
+     * @param string $tablePrefix
      *
      * @return $this
      */
@@ -470,8 +447,21 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
-     * Check if the report has a groupBy columns selected.
+     * Get filter values from a specific filter.
      *
+     * @param string $column
+     *
+     * @return array
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function getFilterValues($column)
+    {
+        return $this->getReport()->getFilterValues($column);
+    }
+
+    /**
+     * Check if the report has a groupBy columns selected.
      *
      * @return bool
      */

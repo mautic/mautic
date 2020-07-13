@@ -23,7 +23,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
 
-class MailHelperTest extends \PHPUnit_Framework_TestCase
+class MailHelperTest extends \PHPUnit\Framework\TestCase
 {
     protected $contacts = [
         [
@@ -56,7 +56,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         ],
     ];
 
-    public function setUp()
+    protected function setUp()
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
     }
@@ -149,7 +149,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $from = $mailer->message->getFrom();
 
         $this->assertTrue(array_key_exists('override@nowhere.com', $from));
-        $this->assertTrue(count($from) === 1);
+        $this->assertTrue(1 === count($from));
 
         $mailer->reset();
         foreach ($this->contacts as $contact) {
@@ -161,7 +161,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $from = $mailer->message->getFrom();
 
         $this->assertTrue(array_key_exists('nobody@nowhere.com', $from));
-        $this->assertTrue(count($from) === 1);
+        $this->assertTrue(1 === count($from));
     }
 
     public function testBatchMode()
@@ -383,7 +383,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
 
         foreach ($addresses as $address) {
             // will throw Swift_RfcComplianceException if it will find the address invalid
-            $helper::validateEmail($address);
+            $this->assertNull($helper::validateEmail($address));
         }
     }
 
@@ -519,7 +519,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         /** @var \Swift_Mime_Headers_ParameterizedHeader[] $headers */
         $headers = $mailer->message->getHeaders()->getAll();
         foreach ($headers as $header) {
-            if (strpos($header->getFieldName(), 'X-Mautic-Test') !== false) {
+            if (false !== strpos($header->getFieldName(), 'X-Mautic-Test')) {
                 $customHeadersFounds[] = $header->getFieldName();
 
                 $this->assertEquals('test', $header->getValue());
@@ -551,9 +551,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         /** @var \Swift_Mime_Headers_ParameterizedHeader[] $headers */
         $headers = $mailer->message->getHeaders()->getAll();
         foreach ($headers as $header) {
-            if (strpos($header->getFieldName(), 'X-Mautic-Test') !== false) {
-                $this->fail('System headers were not supposed to be set');
-            }
+            $this->assertFalse(strpos($header->getFieldName(), 'X-Mautic-Test'), 'System headers were not supposed to be set');
         }
     }
 
@@ -582,7 +580,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         /** @var \Swift_Mime_Headers_ParameterizedHeader[] $headers */
         $headers = $mailer->message->getHeaders()->getAll();
         foreach ($headers as $header) {
-            if (strpos($header->getFieldName(), 'X-Mautic-Test') !== false) {
+            if (false !== strpos($header->getFieldName(), 'X-Mautic-Test')) {
                 $customHeadersFounds[] = $header->getFieldName();
 
                 $this->assertEquals('test2', $header->getValue());

@@ -37,10 +37,9 @@ class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Trans
     }
 
     /**
-     * @param \Swift_Mime_Message $message
-     * @param null                $failedRecipients
+     * @param null $failedRecipients
      */
-    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         $this->message         = $message;
         $this->fromAddresses[] = key($message->getFrom());
@@ -58,9 +57,8 @@ class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Trans
     }
 
     /**
-     * @param \Swift_Message $message
-     * @param int            $toBeAdded
-     * @param string         $type
+     * @param int    $toBeAdded
+     * @param string $type
      *
      * @return int
      */
@@ -106,9 +104,6 @@ class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Trans
         // ignore
     }
 
-    /**
-     * @param Swift_Events_EventListener $plugin
-     */
     public function registerPlugin(Swift_Events_EventListener $plugin)
     {
         // ignore
@@ -117,5 +112,13 @@ class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Trans
     public function start()
     {
         // ignore
+    }
+
+    /**
+     * @return bool
+     */
+    public function ping()
+    {
+        return true;
     }
 }

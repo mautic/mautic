@@ -17,39 +17,28 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\PageBundle\Entity\Page;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Mautic\PageBundle\Model\PageModel;
 
-/**
- * Class LoadPageData.
- */
-class LoadPageData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LoadPageData extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
-     * @var ContainerInterface
+     * @var PageModel
      */
-    private $container;
+    private $pageModel;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
+    public function __construct(PageModel $pageModel)
     {
-        $this->container = $container;
+        $this->pageModel = $pageModel;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
-        $repo  = $this->container->get('mautic.page.model.page')->getRepository();
         $pages = CsvHelper::csv_to_array(__DIR__.'/fakepagedata.csv');
         foreach ($pages as $count => $rows) {
             $page = new Page();
             $key  = $count + 1;
             foreach ($rows as $col => $val) {
-                if ($val != 'NULL') {
+                if ('NULL' != $val) {
                     $setter = 'set'.ucfirst($col);
                     if (in_array($col, ['translationParent', 'variantParent'])) {
                         $page->$setter($this->getReference('page-'.$val));
@@ -64,7 +53,7 @@ class LoadPageData extends AbstractFixture implements OrderedFixtureInterface, C
                 }
             }
             $page->setCategory($this->getReference('page-cat-1'));
-            $repo->saveEntity($page);
+            $this->pageModel->getRepository()->saveEntity($page);
 
             $this->setReference('page-'.$key, $page);
         }

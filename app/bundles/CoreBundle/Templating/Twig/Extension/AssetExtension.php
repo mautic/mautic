@@ -24,8 +24,6 @@ class AssetExtension extends Twig_Extension
 
     /**
      * AssetExtension constructor.
-     *
-     * @param AssetsHelper $assetsHelper
      */
     public function __construct(AssetsHelper $assetsHelper)
     {

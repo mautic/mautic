@@ -73,15 +73,12 @@ class LeadList extends FormEntity
         $this->leads = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_lists')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadListRepository');
+            ->setCustomRepositoryClass(LeadListRepository::class);
 
         $builder->addIdColumns();
 
@@ -104,9 +101,6 @@ class LeadList extends FormEntity
             ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
@@ -207,8 +201,6 @@ class LeadList extends FormEntity
 
     /**
      * Set filters.
-     *
-     * @param array $filters
      *
      * @return LeadList
      */

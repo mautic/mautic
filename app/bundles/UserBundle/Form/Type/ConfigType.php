@@ -22,9 +22,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\File;
 
-/**
- * Class ConfigType.
- */
 class ConfigType extends AbstractType
 {
     /**
@@ -37,21 +34,12 @@ class ConfigType extends AbstractType
      */
     protected $translator;
 
-    /**
-     * ConfigType constructor.
-     *
-     * @param CoreParametersHelper $parametersHelper
-     */
     public function __construct(CoreParametersHelper $parametersHelper, TranslatorInterface $translator)
     {
         $this->parameters = $parametersHelper;
         $this->translator = $translator;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -189,7 +177,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'saml_idp_default_role',
-            'role_list',
+            RoleListType::class,
             [
                 'label'      => 'mautic.user.config.form.saml.idp.default_role',
                 'label_attr' => ['class' => 'control-label'],
@@ -199,25 +187,20 @@ class ConfigType extends AbstractType
                     'tooltip'          => 'mautic.user.config.form.saml.idp.default_role.tooltip',
                 ],
                 'required'    => false,
-                'empty_value' => '',
+                'placeholder' => '',
             ]
         );
     }
 
-    /**
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['entityId'] = $this->parameters->getParameter('mautic.saml_idp_entity_id');
+        $view->vars['entityId'] = $this->parameters->get('mautic.saml_idp_entity_id');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'userconfig';
     }

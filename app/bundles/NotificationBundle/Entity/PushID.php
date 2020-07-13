@@ -42,9 +42,6 @@ class PushID
      */
     private $mobile;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -100,8 +97,6 @@ class PushID
     }
 
     /**
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
-     *
      * @return $this
      */
     public function setLead(Lead $lead)

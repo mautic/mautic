@@ -46,16 +46,10 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
     protected $integrationHelper;
 
     /**
-     * @var null|RequestStack
+     * @var RequestStack|null
      */
     protected $requestStack;
 
-    /**
-     * @param IntegrationHelper            $integrationHelper
-     * @param UserPasswordEncoderInterface $encoder
-     * @param EventDispatcherInterface     $dispatcher
-     * @param RequestStack                 $requestStack
-     */
     public function __construct(
         IntegrationHelper $integrationHelper,
         UserPasswordEncoderInterface $encoder,
@@ -69,9 +63,7 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
     }
 
     /**
-     * @param TokenInterface        $token
-     * @param UserProviderInterface $userProvider
-     * @param                       $providerKey
+     * @param $providerKey
      *
      * @return PluginToken
      *
@@ -149,8 +141,7 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
     }
 
     /**
-     * @param TokenInterface $token
-     * @param                $providerKey
+     * @param $providerKey
      *
      * @return bool
      */
@@ -160,10 +151,9 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
     }
 
     /**
-     * @param Request $request
-     * @param         $username
-     * @param         $password
-     * @param         $providerKey
+     * @param $username
+     * @param $password
+     * @param $providerKey
      *
      * @return UsernamePasswordToken
      */

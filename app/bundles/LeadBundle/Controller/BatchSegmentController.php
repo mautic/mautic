@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\LeadBundle\Form\Type\BatchType;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Model\SegmentActionModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,21 +20,13 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 class BatchSegmentController extends AbstractFormController
 {
-    /**
-     * @var SegmentActionModel;
-     */
     private $actionModel;
 
-    /**
-     * @var ListModel;
-     */
     private $segmentModel;
 
     /**
      * Initialize object props here to simulate constructor
      * and make the future controller refactoring easier.
-     *
-     * @param FilterControllerEvent $event
      */
     public function initialize(FilterControllerEvent $event)
     {
@@ -85,14 +78,14 @@ class BatchSegmentController extends AbstractFormController
         $items = [];
 
         foreach ($lists as $list) {
-            $items[$list['id']] = $list['name'];
+            $items[$list['name']] = $list['id'];
         }
 
         return $this->delegateView(
             [
                 'viewParameters' => [
                     'form' => $this->createForm(
-                        'lead_batch',
+                        BatchType::class,
                         [],
                         [
                             'items'  => $items,

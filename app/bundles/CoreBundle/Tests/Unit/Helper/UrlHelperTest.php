@@ -9,11 +9,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Helper;
+namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\UrlHelper;
 
-class UrlHelperTest extends \PHPUnit_Framework_TestCase
+class UrlHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testSanitizeAbsoluteUrlDoesNotModifyCorrectFullUrl()
     {
@@ -76,6 +76,14 @@ class UrlHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'http://username:password@hostname:9090/path?ar_g1=value&arg2=some+email%40address.com#anchor',
             UrlHelper::sanitizeAbsoluteUrl('http://username:password@hostname:9090/path?ar g1=value&arg2=some+email@address.com#anchor')
+        );
+    }
+
+    public function testSanitizeAbsoluteUrlSanitizePathWhitespace()
+    {
+        $this->assertEquals(
+            'http://username:password@hostname:9090/some%20path%20with%20whitespace',
+            UrlHelper::sanitizeAbsoluteUrl('http://username:password@hostname:9090/some path with whitespace')
         );
     }
 

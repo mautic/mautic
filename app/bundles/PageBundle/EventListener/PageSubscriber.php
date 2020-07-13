@@ -11,60 +11,89 @@
 
 namespace Mautic\PageBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\PageBundle\Entity\HitRepository;
+use Mautic\PageBundle\Entity\PageRepository;
+use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Event\QueueConsumerEvent;
 use Mautic\QueueBundle\Queue\QueueConsumerResults;
 use Mautic\QueueBundle\QueueEvents;
+use Monolog\Logger;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class PageSubscriber.
- */
-class PageSubscriber extends CommonSubscriber
+class PageSubscriber implements EventSubscriberInterface
 {
     /**
      * @var AssetsHelper
      */
-    protected $assetsHelper;
+    private $assetsHelper;
 
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
     /**
      * @var IpLookupHelper
      */
-    protected $ipLookupHelper;
+    private $ipLookupHelper;
 
     /**
      * @var PageModel
      */
-    protected $pageModel;
+    private $pageModel;
 
     /**
-     * PageSubscriber constructor.
-     *
-     * @param AssetsHelper   $assetsHelper
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     * @param PageModel      $pageModel
+     * @var Logger
      */
+    private $logger;
+
+    /**
+     * @var HitRepository
+     */
+    private $hitRepository;
+
+    /**
+     * @var PageRepository
+     */
+    private $pageRepository;
+
+    /**
+     * @var RedirectRepository
+     */
+    private $redirectRepository;
+
+    /**
+     * @var LeadRepository
+     */
+    private $contactRepository;
+
     public function __construct(
         AssetsHelper $assetsHelper,
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
-        PageModel $pageModel
+        PageModel $pageModel,
+        Logger $logger,
+        HitRepository $hitRepository,
+        PageRepository $pageRepository,
+        RedirectRepository $redirectRepository,
+        LeadRepository $contactRepository
     ) {
-        $this->assetsHelper   = $assetsHelper;
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
-        $this->pageModel      = $pageModel;
+        $this->assetsHelper       = $assetsHelper;
+        $this->ipLookupHelper     = $ipLookupHelper;
+        $this->auditLogModel      = $auditLogModel;
+        $this->pageModel          = $pageModel;
+        $this->logger             = $logger;
+        $this->hitRepository      = $hitRepository;
+        $this->pageRepository     = $pageRepository;
+        $this->redirectRepository = $redirectRepository;
+        $this->contactRepository  = $contactRepository;
     }
 
     /**
@@ -82,8 +111,6 @@ class PageSubscriber extends CommonSubscriber
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param Events\PageEvent $event
      */
     public function onPagePostSave(Events\PageEvent $event)
     {
@@ -103,8 +130,6 @@ class PageSubscriber extends CommonSubscriber
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param Events\PageEvent $event
      */
     public function onPageDelete(Events\PageEvent $event)
     {
@@ -125,8 +150,6 @@ class PageSubscriber extends CommonSubscriber
      * - </head> : onPageDisplay_headClose
      * - <body>  : onPageDisplay_bodyOpen
      * - </body> : onPageDisplay_bodyClose.
-     *
-     * @param Events\PageDisplayEvent $event
      */
     public function onPageDisplay(Events\PageDisplayEvent $event)
     {
@@ -178,9 +201,6 @@ class PageSubscriber extends CommonSubscriber
         $event->setContent($content);
     }
 
-    /**
-     * @param QueueConsumerEvent $event
-     */
     public function onPageHit(QueueConsumerEvent $event)
     {
         $payload                = $event->getPayload();
@@ -190,12 +210,8 @@ class PageSubscriber extends CommonSubscriber
         $pageId                 = $payload['pageId'];
         $leadId                 = $payload['leadId'];
         $isRedirect             = !empty($payload['isRedirect']);
-        $hitRepo                = $this->em->getRepository('MauticPageBundle:Hit');
-        $pageRepo               = $this->em->getRepository('MauticPageBundle:Page');
-        $redirectRepo           = $this->em->getRepository('MauticPageBundle:Redirect');
-        $leadRepo               = $this->em->getRepository('MauticLeadBundle:Lead');
-        $hit                    = $hitId ? $hitRepo->find((int) $hitId) : null;
-        $lead                   = $leadId ? $leadRepo->find((int) $leadId) : null;
+        $hit                    = $hitId ? $this->hitRepository->find((int) $hitId) : null;
+        $lead                   = $leadId ? $this->contactRepository->find((int) $leadId) : null;
 
         // On the off chance that the queue contains a message which does not
         // reference a valid Hit or Lead, discard it to avoid clogging the queue.
@@ -214,9 +230,9 @@ class PageSubscriber extends CommonSubscriber
         }
 
         if ($isRedirect) {
-            $page = $pageId ? $redirectRepo->find((int) $pageId) : null;
+            $page = $pageId ? $this->redirectRepository->find((int) $pageId) : null;
         } else {
-            $page = $pageId ? $pageRepo->find((int) $pageId) : null;
+            $page = $pageId ? $this->pageRepository->find((int) $pageId) : null;
         }
 
         // Also reject messages when processing causes any other exception.

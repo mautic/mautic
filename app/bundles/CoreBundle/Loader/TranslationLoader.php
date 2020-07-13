@@ -11,7 +11,8 @@
 
 namespace Mautic\CoreBundle\Loader;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\BundleHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\LoaderInterface;
@@ -23,16 +24,22 @@ use Symfony\Component\Translation\MessageCatalogue;
 class TranslationLoader extends ArrayLoader implements LoaderInterface
 {
     /**
-     * @var MauticFactory
+     * @var BundleHelper
      */
-    protected $factory;
+    private $bundleHelper;
 
     /**
-     * @param MauticFactory $factory
+     * @var PathsHelper
      */
-    public function __construct(MauticFactory $factory)
+    private $pathsHelper;
+
+    /**
+     * TranslationLoader constructor.
+     */
+    public function __construct(BundleHelper $bundleHelper, PathsHelper $pathsHelper)
     {
-        $this->factory = $factory;
+        $this->bundleHelper = $bundleHelper;
+        $this->pathsHelper  = $pathsHelper;
     }
 
     /**
@@ -40,11 +47,11 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
      */
     public function load($resource, $locale, $domain = 'messages')
     {
-        $bundles   = $this->factory->getMauticBundles(true);
+        $bundles   = $this->bundleHelper->getMauticBundles(true);
         $catalogue = new MessageCatalogue($locale);
 
         //Bundle translations
-        foreach ($bundles as $name => $bundle) {
+        foreach ($bundles as $bundle) {
             //load translations
             $translations = $bundle['directory'].'/Translations/'.$locale;
             if (file_exists($translations)) {
@@ -58,7 +65,7 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
         }
 
         //Theme translations
-        $themeDir = $this->factory->getSystemPath('current_theme', true);
+        $themeDir = $this->pathsHelper->getSystemPath('current_theme', true);
         if (file_exists($themeTranslation = $themeDir.'/translations/'.$locale)) {
             $iniFiles = new Finder();
             $iniFiles->files()->in($themeTranslation)->name('*.ini');
@@ -68,7 +75,7 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
         }
 
         //3rd Party translations
-        $translationsDir = $this->factory->getSystemPath('translations', true).'/'.$locale;
+        $translationsDir = $this->pathsHelper->getSystemPath('translations', true).'/'.$locale;
         if (file_exists($translationsDir)) {
             $iniFiles = new Finder();
             $iniFiles->files()->in($translationsDir)->name('*.ini');
@@ -79,7 +86,7 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
         }
 
         //Overrides
-        $overridesDir = $this->factory->getSystemPath('translations', true).'/overrides/'.$locale;
+        $overridesDir = $this->pathsHelper->getSystemPath('translations', true).'/overrides/'.$locale;
         if (file_exists($overridesDir)) {
             $iniFiles = new Finder();
             $iniFiles->files()->in($overridesDir)->name('*.ini');

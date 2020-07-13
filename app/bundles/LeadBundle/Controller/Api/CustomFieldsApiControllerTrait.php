@@ -135,6 +135,12 @@ trait CustomFieldsApiControllerTrait
             );
         }
 
-        $this->model->setFieldValues($entity, $parameters, !$isPostOrPatch);
+        $overwriteWithBlank = !$isPostOrPatch;
+        if (isset($parameters['overwriteWithBlank']) && !empty($parameters['overwriteWithBlank'])) {
+            $overwriteWithBlank = true;
+            unset($parameters['overwriteWithBlank']);
+        }
+
+        $this->model->setFieldValues($entity, $parameters, $overwriteWithBlank);
     }
 }

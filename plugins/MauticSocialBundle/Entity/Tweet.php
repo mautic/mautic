@@ -112,9 +112,6 @@ class Tweet extends FormEntity
      */
     private $stats;
 
-    /**
-     * Tweet constructor.
-     */
     public function __construct()
     {
         $this->stats = new ArrayCollection();
@@ -123,7 +120,6 @@ class Tweet extends FormEntity
     public function __clone()
     {
         $this->id            = null;
-        $this->tweetId       = null;
         $this->sentCount     = 0;
         $this->favoriteCount = 0;
         $this->retweetCount  = 0;
@@ -132,9 +128,6 @@ class Tweet extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -204,8 +197,6 @@ class Tweet extends FormEntity
 
     /**
      * Constraints for required fields.
-     *
-     * @param ClassMetadata $metadata
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
@@ -350,8 +341,6 @@ class Tweet extends FormEntity
     }
 
     /**
-     * @param DateTime $dateTweeted
-     *
      * @return $this
      */
     public function setSentCount($sentCount)
@@ -446,8 +435,6 @@ class Tweet extends FormEntity
     }
 
     /**
-     * @param Asset $asset
-     *
      * @return $this
      */
     public function setAsset(Asset $asset)
@@ -466,8 +453,6 @@ class Tweet extends FormEntity
     }
 
     /**
-     * @param Page $page
-     *
      * @return $this
      */
     public function setPage(Page $page)
@@ -486,8 +471,6 @@ class Tweet extends FormEntity
     }
 
     /**
-     * @param Category $page
-     *
      * @return $this
      */
     public function setCategory(Category $category)

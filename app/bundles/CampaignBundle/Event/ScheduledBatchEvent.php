@@ -25,10 +25,7 @@ class ScheduledBatchEvent extends AbstractLogCollectionEvent
     /**
      * ScheduledBatchEvent constructor.
      *
-     * @param AbstractEventAccessor $config
-     * @param Event                 $event
-     * @param ArrayCollection       $logs
-     * @param bool                  $isReschedule
+     * @param bool $isReschedule
      */
     public function __construct(AbstractEventAccessor $config, Event $event, ArrayCollection $logs, $isReschedule = false)
     {

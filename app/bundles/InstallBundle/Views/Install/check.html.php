@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticInstallBundle:Install:content.html.php');
 }
 
@@ -34,13 +34,13 @@ if ($tmpl == 'index') {
                 <?php foreach ($majors as $message) : ?>
                     <?php switch ($message) :
                         case 'mautic.install.cache.unwritable': ?>
-                            <li class="list-group-item"><?php echo $view['translator']->trans('mautic.install.directory.unwritable', ['%path%' => $appRoot.'/cache']); ?></li>
+                            <li class="list-group-item"><?php echo $view['translator']->trans('mautic.install.directory.unwritable', ['%path%' => $cacheDir]); ?></li>
                             <?php break;
                         case 'mautic.install.config.unwritable': ?>
                             <li class="list-group-item"><?php echo $view['translator']->trans($message, ['%path%' => $configFile]); ?></li>
                             <?php break;
                         case 'mautic.install.logs.unwritable': ?>
-                            <li class="list-group-item"><?php echo $view['translator']->trans('mautic.install.directory.unwritable', ['%path%' => $appRoot.'/logs']); ?></li>
+                            <li class="list-group-item"><?php echo $view['translator']->trans('mautic.install.directory.unwritable', ['%path%' => $logDir]); ?></li>
                             <?php break;
                         case 'mautic.install.apc.version': ?>
                             <?php $minAPCverison = version_compare(PHP_VERSION, '5.4.0', '>=') ? '3.1.13' : '3.0.17'; ?>

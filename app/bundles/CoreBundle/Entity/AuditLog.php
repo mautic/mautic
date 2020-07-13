@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
@@ -69,9 +70,6 @@ class AuditLog
      */
     protected $ipAddress;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -82,7 +80,7 @@ class AuditLog
             ->addIndex(['bundle', 'object', 'action', 'object_id'], 'timeline_search')
             ->addIndex(['date_added'], 'date_added_index');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createField('userId', 'integer')
             ->columnName('user_id')
@@ -100,9 +98,7 @@ class AuditLog
             ->length(50)
             ->build();
 
-        $builder->createField('objectId', 'integer')
-            ->columnName('object_id')
-            ->build();
+        $builder->addBigIntIdField('objectId', 'object_id', false);
 
         $builder->createField('action', 'string')
             ->length(50)
@@ -228,8 +224,6 @@ class AuditLog
 
     /**
      * Set details.
-     *
-     * @param array $details
      *
      * @return AuditLog
      */

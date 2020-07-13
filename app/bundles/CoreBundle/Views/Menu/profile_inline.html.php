@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($item->hasChildren() && $options['depth'] !== 0 && $item->getDisplayChildren()) {
+if ($item->hasChildren() && 0 !== $options['depth'] && $item->getDisplayChildren()) {
     foreach ($item->getChildren() as $child) {
         if (!$child->isDisplayed()) {
             continue;

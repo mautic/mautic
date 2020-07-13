@@ -26,8 +26,6 @@ class ConditionDispatcher
 
     /**
      * ConditionDispatcher constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
@@ -35,9 +33,6 @@ class ConditionDispatcher
     }
 
     /**
-     * @param ConditionAccessor $config
-     * @param LeadEventLog      $log
-     *
      * @return ConditionEvent
      */
     public function dispatchEvent(ConditionAccessor $config, LeadEventLog $log)

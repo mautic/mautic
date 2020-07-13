@@ -7,8 +7,11 @@
 /composer.phar
 
 /app/bootstrap*
+/app/console
 /app/tests.bootstrap*
 /app/phpunit.xml
+
+/var/bootstrap*
 
 /app/bundles/CoreBundle/Assets/css/app/less/**/*.css
 /app/bundles/CoreBundle/Assets/css/libraries/**/*.css
@@ -19,21 +22,34 @@
 
 /app/cache/*
 !/app/cache/.gitkeep
+/var/cache/*
+!/var/cache/.gitkeep
+
+/app/logs/*
+!/app/logs/.gitkeep
+/var/logs/*
+!/var/logs/.gitkeep
+
+/app/spool/*
+!/app/spool/.gitkeep
+/var/spool/*
+!/var/spool/.gitkeep
+
+/var/tmp/*
+!/var/tmp/.gitkeep
 
 /app/config/local*.php
 /app/config/config_local.php
 /app/config/paths_local.php
-
-/app/logs/*
-!/app/logs/.gitkeep
-
-/app/Resources/SensioGeneratorBundle
-/app/spool/*
+/app/config/parameters_defaults.php
 
 /vendor/*
 !/vendor/.htaccess
 
 /bin/*
+!/bin/.htaccess
+!/bin/console
+
 /bundles
 /node_modules
 /build/coverage
@@ -48,6 +64,7 @@
 !/media/dashboards/*.json
 /media/files/*
 !/media/files/.htaccess
+/media/assets/*
 /media/images/*
 !/media/images/flags
 !/media/images/mejs

@@ -19,32 +19,30 @@ use Symfony\Component\HttpFoundation\Request;
 class AjaxController extends CommonAjaxController
 {
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function getWebsiteSnapshotAction(Request $request)
     {
         $data = ['success' => 0];
 
-        if ($this->get('mautic.security')->isGranted('plugin:focus:items:create')) {
+        if ($this->get('mautic.security')->isGranted('focus:items:create')) {
             $website = InputHelper::url($request->request->get('website'));
 
             if ($website) {
                 // Let's try to extract colors from image
-                $id = InputHelper::int($request->request->get('id'));
+                $id = (int) $request->request->get('id');
                 if (!empty($id)) {
                     // Tell the JS to not populate with default colors
                     $data['ignoreDefaultColors'] = true;
                 }
 
-                $snapshotUrl = $this->get('mautic.helper.core_parameters')->getParameter('website_snapshot_url');
-                $snapshotKey = $this->get('mautic.helper.core_parameters')->getParameter('website_snapshot_key');
+                $snapshotUrl = $this->get('mautic.helper.core_parameters')->get('website_snapshot_url');
+                $snapshotKey = $this->get('mautic.helper.core_parameters')->get('website_snapshot_key');
 
                 $http     = $this->get('mautic.http.connector');
                 $response = $http->get($snapshotUrl.'?url='.urlencode($website).'&key='.$snapshotKey, [], 30);
 
-                if ($response->code === 200) {
+                if (200 === $response->code) {
                     $package = json_decode($response->body, true);
                     if (isset($package['images'])) {
                         $data['image']['desktop'] = $package['images']['desktop'];
@@ -66,8 +64,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function generatePreviewAction(Request $request)

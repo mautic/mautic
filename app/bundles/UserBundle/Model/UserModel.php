@@ -13,20 +13,18 @@ namespace Mautic\UserBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserToken;
 use Mautic\UserBundle\Enum\UserTokenAuthorizator;
-use Mautic\UserBundle\Event\StatusChangeEvent;
 use Mautic\UserBundle\Event\UserEvent;
+use Mautic\UserBundle\Form\Type\UserType;
 use Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
-/**
- * Class UserModel.
- */
 class UserModel extends FormModel
 {
     /**
@@ -39,33 +37,13 @@ class UserModel extends FormModel
      */
     private $userTokenService;
 
-    /**
-     * UserModel constructor.
-     *
-     * @param MailHelper                $mailHelper
-     * @param UserTokenServiceInterface $userTokenService
-     */
     public function __construct(
         MailHelper $mailHelper,
         UserTokenServiceInterface $userTokenService
     ) {
-        $this->mailHelper          = $mailHelper;
-        $this->userTokenService    = $userTokenService;
+        $this->mailHelper       = $mailHelper;
+        $this->userTokenService = $userTokenService;
     }
-
-    /**
-     * Define statuses that are supported.
-     *
-     * @var array
-     */
-    private $supportedOnlineStatuses = [
-        'online',
-        'idle',
-        'away',
-        'manualaway',
-        'dnd',
-        'offline',
-    ];
 
     /**
      * {@inheritdoc}
@@ -115,10 +93,8 @@ class UserModel extends FormModel
     /**
      * Checks for a new password and rehashes if necessary.
      *
-     * @param User                     $entity
-     * @param PasswordEncoderInterface $encoder
-     * @param string                   $submittedPassword
-     * @param bool|false               $validate
+     * @param string     $submittedPassword
+     * @param bool|false $validate
      *
      * @return string
      */
@@ -152,7 +128,7 @@ class UserModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('user', $entity, $options);
+        return $formFactory->create(UserType::class, $entity, $options);
     }
 
     /**
@@ -160,7 +136,7 @@ class UserModel extends FormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new User();
         }
 
@@ -246,13 +222,13 @@ class UserModel extends FormModel
         $results = [];
         switch ($type) {
             case 'role':
-                $results = $this->em->getRepository('MauticUserBundle:Role')->getRoleList($filter, $limit);
+                $results = $this->em->getRepository(Role::class)->getRoleList($filter, $limit);
                 break;
             case 'user':
-                $results = $this->em->getRepository('MauticUserBundle:User')->getUserList($filter, $limit);
+                $results = $this->em->getRepository(User::class)->getUserList($filter, $limit);
                 break;
             case 'position':
-                $results = $this->em->getRepository('MauticUserBundle:User')->getPositionList($filter, $limit);
+                $results = $this->em->getRepository(User::class)->getPositionList($filter, $limit);
                 break;
         }
 
@@ -262,9 +238,7 @@ class UserModel extends FormModel
     /**
      * Resets the user password and emails it.
      *
-     * @param User                     $user
-     * @param PasswordEncoderInterface $encoder
-     * @param string                   $newPassword
+     * @param string $newPassword
      */
     public function resetPassword(User $user, PasswordEncoderInterface $encoder, $newPassword)
     {
@@ -275,8 +249,6 @@ class UserModel extends FormModel
     }
 
     /**
-     * @param User $user
-     *
      * @return UserToken
      */
     protected function getResetToken(User $user)
@@ -291,7 +263,6 @@ class UserModel extends FormModel
     }
 
     /**
-     * @param User   $user
      * @param string $token
      *
      * @return bool
@@ -307,8 +278,6 @@ class UserModel extends FormModel
     }
 
     /**
-     * @param User $user
-     *
      * @throws \RuntimeException
      */
     public function sendResetEmail(User $user)
@@ -349,7 +318,7 @@ class UserModel extends FormModel
      */
     public function setPreference($key, $value = null, User $user = null)
     {
-        if ($user == null) {
+        if (null == $user) {
             $user = $this->userHelper->getUser();
         }
 
@@ -370,32 +339,12 @@ class UserModel extends FormModel
      */
     public function getPreference($key, $default = null, User $user = null)
     {
-        if ($user == null) {
+        if (null == $user) {
             $user = $this->userHelper->getUser();
         }
         $preferences = $user->getPreferences();
 
         return (isset($preferences[$key])) ? $preferences[$key] : $default;
-    }
-
-    /**
-     * @param $status
-     */
-    public function setOnlineStatus($status)
-    {
-        $status = strtolower($status);
-
-        if (in_array($status, $this->supportedOnlineStatuses)) {
-            if ($this->userHelper->getUser()->getId()) {
-                $this->userHelper->getUser()->setOnlineStatus($status);
-                $this->getRepository()->saveEntity($this->userHelper->getUser());
-
-                if ($this->dispatcher->hasListeners(UserEvents::STATUS_CHANGE)) {
-                    $event = new StatusChangeEvent($this->userHelper->getUser());
-                    $this->dispatcher->dispatch(UserEvents::STATUS_CHANGE, $event);
-                }
-            }
-        }
     }
 
     /**

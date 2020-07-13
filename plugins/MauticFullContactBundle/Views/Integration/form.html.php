@@ -18,5 +18,5 @@ echo $view['assets']->includeScript('plugins/MauticFullContactBundle/Assets/js/f
     <div class="alert alert-warning">
         <?php echo $view['translator']->trans('mautic.plugin.fullcontact.public_info'); ?>
     </div>
-    <input type="text" readonly="readonly" value="<?php echo $mauticUrl?>" class="form-control" title="url"/>
+    <input type="text" readonly="readonly" value="<?php echo $mauticUrl; ?>" class="form-control" title="url"/>
 </div>

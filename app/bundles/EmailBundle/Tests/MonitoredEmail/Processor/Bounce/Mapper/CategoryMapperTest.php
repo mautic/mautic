@@ -16,7 +16,7 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category as De
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\Category;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\CategoryMapper;
 
-class CategoryMapperTest extends \PHPUnit_Framework_TestCase
+class CategoryMapperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Test that the Category object is returned
