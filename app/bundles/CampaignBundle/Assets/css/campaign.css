@@ -390,6 +390,15 @@
 #CampaignCanvas .list-campaign-condition:hover {
     box-shadow: 0 0 10px 5px rgba(248, 107, 79, .25);
 }
+#CampaignCanvas .list-campaign-action > .campaign-event-content::before {
+    content: '\f0e7';
+}
+#CampaignCanvas .list-campaign-decision > .campaign-event-content::before {
+    content: '\f126';
+}
+#CampaignCanvas .list-campaign-condition > .campaign-event-content::before {
+    content: '\f277';
+}
 
 /* Buttons */
 .btn-apply-builder::before, .btn-close-campaign-builder::before {
@@ -402,7 +411,12 @@
 .btn-close-campaign-builder::before {
     content: '\f00d';
 }
-
+.btns-builder {
+	background: #FFF;
+	padding: 8px;
+	border-radius: 4px;
+	border: #EBF4F6 2px solid;
+}
 
 #CampaignCanvas .campaign-event-buttons {
     top: 0;
