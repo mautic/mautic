@@ -156,7 +156,7 @@ ul.tag-cloud li {
 }
 .history-search{
     overflow: visible!important;
-    height: 53px;
+    min-height: 53px;
 }
 .timeline-icon {
     width: 50px;

@@ -309,13 +309,14 @@ class LeadFieldRepository extends CommonRepository
      */
     public function compareDateValue($lead, $field, $value)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q        = $this->_em->getConnection()->createQueryBuilder();
+        $property = $this->getPropertyByField($field, $q);
         $q->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where(
                 $q->expr()->andX(
                     $q->expr()->eq('l.id', ':lead'),
-                    $q->expr()->eq('l.'.$field, ':value')
+                    $q->expr()->eq($property, ':value')
                 )
             )
             ->setParameter('lead', (int) $lead)

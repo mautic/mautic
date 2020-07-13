@@ -26,8 +26,8 @@
         <tr>
             <th scope="row"><?php echo $view['channel']->getChannelLabel($item['channelName']); ?></th>
             <td><?php echo $item['attempts']; ?></td>
-            <td><?php if ($item['dateAdded']) : echo $view['date']->toFullConcat($item['dateAdded']); endif; ?></td>
-            <td><?php  if ($item['scheduledDate']) : echo $view['date']->toFullConcat($item['scheduledDate']); endif; ?></td>
+            <td><?php if ($item['dateAdded']) : echo $view['date']->toFullConcat($item['dateAdded'], 'UTC'); endif; ?></td>
+            <td><?php  if ($item['scheduledDate']) : echo $view['date']->toFullConcat($item['scheduledDate'], 'UTC'); endif; ?></td>
             <td id="queued-status-<?php echo $item['id']; ?>">
                 <?php echo $view['translator']->trans('mautic.message.queue.status.'.$item['status'], [], 'javascript'); ?>
             </td>

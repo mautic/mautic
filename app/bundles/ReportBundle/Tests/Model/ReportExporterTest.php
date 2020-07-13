@@ -34,11 +34,15 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
 
         $report1    = new Report();
         $report2    = new Report();
+        $report3    = new Report();
+        $report3->setIsPublished(false);
         $scheduler1 = new Scheduler($report1, new \DateTime());
         $scheduler2 = new Scheduler($report2, new \DateTime());
+        $scheduler3 = new Scheduler($report3, new \DateTime());
         $schedulers = [
             $scheduler1,
             $scheduler2,
+            $scheduler3,
         ];
 
         $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
@@ -93,7 +97,7 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
         $eventDispatcher->expects($this->exactly(2))
             ->method('dispatch');
 
-        $schedulerModel->expects($this->exactly(2))
+        $schedulerModel->expects($this->exactly(3))
             ->method('reportWasScheduled');
 
         $reportExporter = new ReportExporter($schedulerModel, $reportDataAdapter, $reportExportOptions, $reportFileWriter, $eventDispatcher);
