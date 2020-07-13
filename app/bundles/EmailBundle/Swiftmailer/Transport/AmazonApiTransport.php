@@ -533,7 +533,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         ];
 
         if (isset($messageArray['returnPath'])) {
-          $amazonMessage['ReturnPath'] = $messageArray['returnPath'];
+            $amazonMessage['ReturnPath'] = $messageArray['returnPath'];
         }
 
         if (isset($messageArray['from']['name']) && '' !== trim($messageArray['from']['name'])) {
