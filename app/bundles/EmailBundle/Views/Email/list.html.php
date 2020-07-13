@@ -108,6 +108,11 @@ if ('index' == $tmpl) {
                 $hasTranslations            = $item->isTranslation();
                 $type                       = $item->getEmailType();
                 $mauticTemplateVars['item'] = $item;
+                $totalClicks                = 0;
+                $trackables                 = $model->getEmailClickStats($item->getId());
+                foreach ($trackables as $link) {
+                    $totalClicks += $link['hits'];
+                }
                 ?>
                 <tr>
                     <td>
@@ -247,6 +252,14 @@ if ('index' == $tmpl) {
                                title="<?php echo $view['translator']->trans('mautic.email.stat.tooltip'); ?>">
                                 <?php echo $view['translator']->trans('mautic.email.stat.readpercent', ['%count%' => $item->getReadPercentage(true)]); ?>
                             </a>
+                        </span>
+                        <span class="mt-xs label label-danger"
+                              id="clic-counts-<?php echo $item->getId(); ?>">
+                                <?php echo $view['translator']->trans('mautic.email.stat.clickcount', ['%count%' => $totalClicks]); ?>
+                        </span>
+                        <span class="mt-xs label label-info"
+                              id="click-through-rate-<?php echo $item->getId(); ?>">
+                                <?php echo $view['translator']->trans('mautic.email.stat.ctr', ['%count%' => 0 !== $item->getReadCount() ? round($totalClicks / $item->getReadCount() * 100) : 0]); ?>
                         </span>
                         <?php echo $view['content']->getCustomContent('email.stats', $mauticTemplateVars); ?>
                         <?php echo $view['content']->getCustomContent('email.stats.below', $mauticTemplateVars); ?>
