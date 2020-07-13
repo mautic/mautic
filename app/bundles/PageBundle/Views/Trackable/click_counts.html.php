@@ -45,7 +45,7 @@
                 <tr>
                     <td class="long-text"><?php echo $view['translator']->trans('mautic.trackable.total_clicks'); ?></td>
                     <td class="text-center"><?php echo $totalClicks; ?></td>
-                    <td class="text-center"><?php echo 0 !== $entity->getReadCount() ? $totalClicks / $entity->getReadCount() * 100 .'%' : '0%'; ?></td>
+                    <td class="text-center"><?php echo 0 !== $entity->getReadCount() ? round($totalClicks / $entity->getReadCount() * 100, 2).'%' : '0%'; ?></td>
                     <td class="text-center">
                         <span class="mt-xs label label-primary has-click-event clickable-stat">
                   <?php if (isset($channel) && isset($entity)): ?>
