@@ -20,8 +20,7 @@ use Mautic\LeadBundle\Entity\Import;
 class ImportEvent extends CommonEvent
 {
     /**
-     * @param Import $entity
-     * @param bool   $isNew
+     * @param bool $isNew
      */
     public function __construct(Import $entity, $isNew)
     {

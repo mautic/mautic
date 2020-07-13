@@ -11,34 +11,30 @@
 
 namespace Mautic\CampaignBundle\Model;
 
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Model\FormModel;
 
-/**
- * Class EventModel.
- */
-class EventModel extends LegacyEventModel
+class EventModel extends FormModel
 {
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\CampaignBundle\Entity\EventRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticCampaignBundle:Event');
+        return $this->em->getRepository(Event::class);
     }
 
     /**
-     * Get CampaignRepository.
-     *
      * @return \Mautic\CampaignBundle\Entity\CampaignRepository
      */
     public function getCampaignRepository()
     {
-        return $this->em->getRepository('MauticCampaignBundle:Campaign');
+        return $this->em->getRepository(Campaign::class);
     }
 
     /**
@@ -46,7 +42,7 @@ class EventModel extends LegacyEventModel
      */
     public function getLeadEventLogRepository()
     {
-        return $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
+        return $this->em->getRepository(LeadEventLog::class);
     }
 
     /**
@@ -64,22 +60,18 @@ class EventModel extends LegacyEventModel
      *
      * @param $id
      *
-     * @return null|object
+     * @return object|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Event();
         }
 
-        $entity = parent::getEntity($id);
-
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
-     * Delete events.
-     *
      * @param $currentEvents
      * @param $deletedEvents
      */
@@ -91,7 +83,7 @@ class EventModel extends LegacyEventModel
                 $deleteMe = $deleteMe->getId();
             }
 
-            if (strpos($deleteMe, 'new') === 0) {
+            if (0 === strpos($deleteMe, 'new')) {
                 unset($deletedEvents[$k]);
             }
 
@@ -116,12 +108,10 @@ class EventModel extends LegacyEventModel
     /**
      * Get line chart data of campaign events.
      *
-     * @param string    $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
-     * @param bool      $canViewOthers
+     * @param string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
+     * @param array  $filter
+     * @param bool   $canViewOthers
      *
      * @return array
      */

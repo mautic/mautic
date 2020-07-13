@@ -40,8 +40,6 @@ class Result
     }
 
     /**
-     * @param Stat $stat
-     *
      * @return Result
      */
     public function setStat(Stat $stat)
@@ -64,8 +62,6 @@ class Result
     }
 
     /**
-     * @param Lead $contact
-     *
      * @return Result
      */
     public function addContact(Lead $contact)
@@ -76,8 +72,6 @@ class Result
     }
 
     /**
-     * @param array $contacts
-     *
      * @return Lead[]
      */
     public function setContacts(array $contacts)

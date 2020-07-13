@@ -19,7 +19,7 @@ use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 abstract class AbstractTokenSmtpTransport extends \Swift_SmtpTransport implements TokenTransportInterface
 {
     /**
-     * @var \Swift_Mime_Message
+     * @var \Swift_Mime_SimpleMessage
      */
     protected $message;
 
@@ -29,14 +29,13 @@ abstract class AbstractTokenSmtpTransport extends \Swift_SmtpTransport implement
     abstract protected function prepareMessage();
 
     /**
-     * @param \Swift_Mime_Message $message
-     * @param null                $failedRecipients
+     * @param null $failedRecipients
      *
      * @return int
      *
      * @throws \Exception
      */
-    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         $this->message = $message;
 

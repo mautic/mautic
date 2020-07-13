@@ -13,7 +13,7 @@ namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
-class CustomFieldHelperTest extends \PHPUnit_Framework_TestCase
+class CustomFieldHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testFixValueTypeForBooleans()
     {

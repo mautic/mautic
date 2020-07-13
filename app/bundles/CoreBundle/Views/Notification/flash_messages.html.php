@@ -16,7 +16,7 @@ if (!isset($alertType)) {
     $alertType = 'growl';
 }
 
-$alertClasses = ($alertType == 'growl') ?
+$alertClasses = ('growl' == $alertType) ?
     ['notice' => 'alert-growl',   'warning' => 'alert-growl',   'error' => 'alert-growl'] :
     ['notice' => 'alert-success', 'warning' => 'alert-warning', 'error' => 'alert-danger'];
 

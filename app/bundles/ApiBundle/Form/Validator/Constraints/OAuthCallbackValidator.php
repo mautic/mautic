@@ -30,8 +30,7 @@ class OAuthCallbackValidator extends ConstraintValidator
     const PATTERN = '~^[0-9a-z].*://(.*?)(:[0-9]+)?(/?|/\S+)$~ixu';
 
     /**
-     * @param mixed      $value
-     * @param Constraint $constraint
+     * @param mixed $value
      */
     public function validate($value, Constraint $constraint)
     {
@@ -49,7 +48,7 @@ class OAuthCallbackValidator extends ConstraintValidator
 
         $value = (string) $value;
         if (!preg_match(static::PATTERN, $value)) {
-            $this->buildViolation($constraint->message)
+            $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->addViolation();
         }

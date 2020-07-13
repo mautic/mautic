@@ -41,9 +41,6 @@ class EmailReply
      */
     private $messageId;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -90,9 +87,7 @@ class EmailReply
     /**
      * EmailReply constructor.
      *
-     * @param Stat           $stat
-     * @param                $messageId
-     * @param \DateTime|null $dateReplied
+     * @param $messageId
      */
     public function __construct(Stat $stat, $messageId, \DateTime $dateReplied = null)
     {

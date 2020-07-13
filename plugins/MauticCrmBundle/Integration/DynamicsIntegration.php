@@ -21,6 +21,7 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 
 /**
@@ -80,20 +81,21 @@ class DynamicsIntegration extends CrmAbstractIntegration
     {
         $builder->add(
             'updateBlanks',
-            'choice',
+            ChoiceType::class,
             [
                 'choices' => [
-                    'updateBlanks' => 'mautic.integrations.blanks',
+                    'mautic.integrations.blanks' => 'updateBlanks',
                 ],
-                'expanded'    => true,
-                'multiple'    => true,
-                'label'       => 'mautic.integrations.form.blanks',
-                'label_attr'  => ['class' => 'control-label'],
-                'empty_value' => false,
-                'required'    => false,
+                'expanded'          => true,
+                'multiple'          => true,
+                'label'             => 'mautic.integrations.form.blanks',
+                'label_attr'        => ['class' => 'control-label'],
+                'placeholder'       => false,
+                'required'          => false,
             ]
         );
-        if ($formArea === 'features') {
+        if ('features' === $formArea) {
+
             $builder->add(
                 'push_object',
                 'button_group',
@@ -130,19 +132,19 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
             $builder->add(
                 'objects',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'leads'    => 'mautic.dynamics.object.lead',
-                        'contacts' => 'mautic.dynamics.object.contact',
-                        'company'  => 'mautic.dynamics.object.company',
+                        'mautic.dynamics.object.lead'    => 'leads',
+                        'mautic.dynamics.object.contact' => 'contacts',
+                        'mautic.dynamics.object.company' => 'company',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.dynamics.form.objects_to_pull_from',
-                    'label_attr'  => ['class' => ''],
-                    'empty_value' => false,
-                    'required'    => false,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.dynamics.form.objects_to_pull_from',
+                    'label_attr'        => ['class' => ''],
+                    'placeholder'       => false,
+                    'required'          => false,
                 ]
             );
         }
@@ -210,9 +212,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
     public function getAuthLoginUrl()
     {
         $url = parent::getAuthLoginUrl();
-        $url .= '&resource='.urlencode($this->keys['resource']);
 
-        return $url;
+        return $url.('&resource='.urlencode($this->keys['resource']));
     }
 
     /**
@@ -338,7 +339,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 if (!empty($dynamicsObjects) && is_array($dynamicsObjects)) {
-                    foreach ($dynamicsObjects as $key => $dynamicsObject) {
+                    foreach ($dynamicsObjects as $dynamicsObject) {
                         // Check the cache first
                         $settings['cache_suffix'] = $cacheSuffix = '.'.$dynamicsObject;
                         if ($fields = parent::getAvailableLeadFields($settings)) {
@@ -476,7 +477,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
     /**
      * @param array      $params
-     * @param null|array $query
+     * @param array|null $query
      *
      * @return int|null
      */

@@ -18,7 +18,7 @@ use Mautic\ReportBundle\Model\ReportExportOptions;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Tests\Fixtures;
 
-class ReportDataAdapterTest extends \PHPUnit_Framework_TestCase
+class ReportDataAdapterTest extends \PHPUnit\Framework\TestCase
 {
     public function testNoEmailsProvided()
     {
@@ -31,7 +31,7 @@ class ReportDataAdapterTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $coreParametersHelperMock->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('report_export_batch_size')
             ->willReturn(11);
 

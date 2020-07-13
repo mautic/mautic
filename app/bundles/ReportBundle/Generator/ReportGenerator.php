@@ -62,12 +62,6 @@ class ReportGenerator
 
     /**
      * ReportGenerator constructor.
-     *
-     * @param EventDispatcherInterface  $dispatcher
-     * @param Connection                $db
-     * @param Report                    $entity
-     * @param ChannelListHelper         $channelListHelper
-     * @param FormFactoryInterface|null $formFactory
      */
     public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity, ChannelListHelper $channelListHelper, FormFactoryInterface $formFactory = null)
     {
@@ -137,9 +131,7 @@ class ReportGenerator
         $reflection = new \ReflectionClass($className);
 
         if (!$reflection->implementsInterface($this->validInterface)) {
-            throw new RuntimeException(
-                sprintf("ReportBuilders have to implement %s, and %s doesn't implement it", $this->validInterface, $className)
-            );
+            throw new RuntimeException(sprintf("ReportBuilders have to implement %s, and %s doesn't implement it", $this->validInterface, $className));
         }
 
         return $reflection->newInstanceArgs([$this->dispatcher, $this->db, $this->entity, $this->channelListHelper]);

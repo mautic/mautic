@@ -18,7 +18,7 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Type;
 
-class BodyParserTest extends \PHPUnit_Framework_TestCase
+class BodyParserTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Test that a BouncedEmail is returned from a bounce detected in the body

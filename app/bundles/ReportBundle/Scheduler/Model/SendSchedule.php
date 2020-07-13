@@ -34,8 +34,7 @@ class SendSchedule
     }
 
     /**
-     * @param Scheduler $scheduler
-     * @param string    $filePath
+     * @param string $filePath
      */
     public function send(Scheduler $scheduler, $filePath)
     {

@@ -34,9 +34,6 @@ class Adder
 
     /**
      * Adder constructor.
-     *
-     * @param LeadRepository         $leadRepository
-     * @param LeadEventLogRepository $leadEventLogRepository
      */
     public function __construct(LeadRepository $leadRepository, LeadEventLogRepository $leadEventLogRepository)
     {
@@ -45,9 +42,7 @@ class Adder
     }
 
     /**
-     * @param Lead     $contact
-     * @param Campaign $campaign
-     * @param          $isManualAction
+     * @param $isManualAction
      *
      * @return CampaignMember
      */
@@ -73,8 +68,7 @@ class Adder
     }
 
     /**
-     * @param CampaignMember $campaignMember
-     * @param bool           $isManualAction
+     * @param bool $isManualAction
      *
      * @throws ContactCannotBeAddedToCampaignException
      */

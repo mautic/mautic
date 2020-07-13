@@ -20,9 +20,6 @@ use Recurr\Rule;
 class SchedulerDailyBuilder implements BuilderInterface
 {
     /**
-     * @param Rule               $rule
-     * @param SchedulerInterface $scheduler
-     *
      * @return Rule
      *
      * @throws InvalidSchedulerException

@@ -45,7 +45,7 @@ class TimezoneResolver
          *
          * Later we use toLocalString() method - it gives us midnight in UTC for first condition and midnight in local timezone for second option.
          */
-        $timezone = $hasTimePart ? 'UTC' : $this->coreParametersHelper->getParameter('default_timezone', 'UTC');
+        $timezone = $hasTimePart ? 'UTC' : $this->coreParametersHelper->get('default_timezone', 'UTC');
 
         $date = new \DateTime('midnight today', new \DateTimeZone($timezone));
 
