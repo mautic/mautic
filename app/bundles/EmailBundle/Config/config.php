@@ -398,6 +398,21 @@ return [
                     'setPassword' => ['%mautic.mailer_password%'],
                 ],
             ],
+            'mautic.transport.amazon_api' => [
+                'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\AmazonApiTransport',
+                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
+                'arguments'    => [
+                    'mautic.http.connector',
+                    'monolog.logger.mautic',
+                    'translator',
+                    'mautic.email.model.transport_callback',
+                ],
+                'methodCalls' => [
+                    'setUsername' => ['%mautic.mailer_user%'],
+                    'setPassword' => ['%mautic.mailer_password%'],
+                    'setRegion'   => ['%mautic.mailer_amazon_api_region%'],
+                ],
+            ],
             'mautic.transport.mandrill' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\MandrillTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
@@ -816,6 +831,7 @@ return [
         'mailer_encryption'            => null, //tls or ssl,
         'mailer_auth_mode'             => null, //plain, login or cram-md5
         'mailer_amazon_region'         => 'email-smtp.us-east-1.amazonaws.com',
+        'mailer_amazon_api_region'     => 'us-east-1',
         'mailer_custom_headers'        => [],
         'mailer_spool_type'            => 'memory', //memory = immediate; file = queue
         'mailer_spool_path'            => '%kernel.root_dir%/../var/spool',

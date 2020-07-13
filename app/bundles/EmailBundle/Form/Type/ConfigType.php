@@ -332,6 +332,34 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'mailer_amazon_api_region',
+            ChoiceType::class,
+            [
+                'choices'           => [
+                    'mautic.email.config.mailer.amazon_api_region.us_east_1'      => 'us-east-1',
+                    'mautic.email.config.mailer.amazon_api_region.us_west_2'      => 'us-west-2',
+                    'mautic.email.config.mailer.amazon_api_region.ap_south_1'     => 'ap-south-1',
+                    'mautic.email.config.mailer.amazon_api_region.ap_southeast_2' => 'ap-southeast-2',
+                    'mautic.email.config.mailer.amazon_api_region.ca_central_1'   => 'ca-central-1',
+                    'mautic.email.config.mailer.amazon_api_region.eu_central_1'   => 'eu-central-1',
+                    'mautic.email.config.mailer.amazon_api_region.eu_west_1'      => 'eu-west-1',
+                    'mautic.email.config.mailer.amazon_api_region.eu_west_2'      => 'eu-west-2',
+                    'mautic.email.config.mailer.amazon_api_region.sa_east_1'      => 'sa-east-1',
+                    'mautic.email.config.mailer.amazon_api_region.us_gov_west_1'  => 'us-gov-west-1',
+                ],
+                'label'       => 'mautic.email.config.mailer.amazon_api_region',
+                'required'    => false,
+                'attr'        => [
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getAmazonApiService().']}',
+                    'tooltip'      => 'mautic.email.config.mailer.amazon_api_region.tooltip',
+                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
+                ],
+                'placeholder' => false,
+            ]
+        );
+
+        $builder->add(
             'mailer_port',
             TextType::class,
             [
@@ -383,7 +411,7 @@ class ConfigType extends AbstractType
                             "plain",
                             "login",
                             "cram-md5"
-                        ], 
+                        ],
                         "config_emailconfig_mailer_transport":['.$this->transportType->getServiceRequiresUser().']
                     }',
                     'data-hide-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceDoNotNeedUser().']}',
@@ -410,7 +438,7 @@ class ConfigType extends AbstractType
                             "plain",
                             "login",
                             "cram-md5"
-                        ], 
+                        ],
                         "config_emailconfig_mailer_transport":['.$this->transportType->getServiceRequiresPassword().']
                     }',
                     'data-hide-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceDoNotNeedPassword().']}',

@@ -529,11 +529,12 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             'Destinations'         => $destinations,
             'Source'               => $messageArray['from']['email'],
             'ReplyToAddresses'     => $replyToAddresses,
-            'ReturnPath'           => $messageArray['ReturnPath'] ?? null,
             'Template'             => $amazonTemplate['TemplateName'],
         ];
 
-        error_log(print_r($messageArray, true));
+        if (isset($messageArray['returnPath'])) {
+          $amazonMessage['ReturnPath'] = $messageArray['returnPath'];
+        }
 
         if (isset($messageArray['from']['name']) && '' !== trim($messageArray['from']['name'])) {
             $amazonMessage['Source'] = '"'.$messageArray['from']['name'].'" <'.$messageArray['from']['email'].'>';
