@@ -5,6 +5,7 @@
             <tr>
                 <td><?php echo $view['translator']->trans('mautic.trackable.click_url'); ?></td>
                 <td><?php echo $view['translator']->trans('mautic.trackable.click_count'); ?></td>
+                <td><?php echo $view['translator']->trans('mautic.trackable.ctr'); ?></td>
                 <td><?php echo $view['translator']->trans('mautic.trackable.click_unique_count'); ?></td>
                 <?php echo $view['content']->getCustomContent('click_counts_headers', $mauticTemplateVars); ?>
                 <td><?php echo $view['translator']->trans('mautic.trackable.click_track_id'); ?></td>
@@ -44,6 +45,7 @@
                 <tr>
                     <td class="long-text"><?php echo $view['translator']->trans('mautic.trackable.total_clicks'); ?></td>
                     <td class="text-center"><?php echo $totalClicks; ?></td>
+                    <td class="text-center"><?php echo 0 !== $entity->getReadCount() ? $totalClicks / $entity->getReadCount() * 100 .'%' : '0%'; ?></td>
                     <td class="text-center">
                         <span class="mt-xs label label-primary has-click-event clickable-stat">
                   <?php if (isset($channel) && isset($entity)): ?>
