@@ -16,10 +16,19 @@ use Monolog\Logger;
 
 class UrlHelper
 {
+    /**
+     * @var Http
+     */
     protected $http;
 
+    /**
+     * @var string
+     */
     protected $shortnerServiceUrl;
 
+    /**
+     * @var Logger
+     */
     protected $logger;
 
     /**

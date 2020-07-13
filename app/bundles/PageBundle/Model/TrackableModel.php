@@ -23,28 +23,45 @@ class TrackableModel extends AbstractCommonModel
 {
     /**
      * Array of URLs and/or tokens that should not be converted to trackables.
+     *
+     * @var array
      */
     protected $doNotTrack = [];
 
     /**
      * Tokens with values that could be used as URLs.
+     *
+     * @var array
      */
     protected $contentTokens = [];
 
     /**
      * Stores content that needs to be replaced when URLs are parsed out of content.
+     *
+     * @var array
      */
     protected $contentReplacements = [];
 
     /**
      * Used to rebuild correct URLs when the tokenized URL contains query parameters.
+     *
+     * @var bool
      */
     protected $usingClickthrough = true;
 
+    /**
+     * @var RedirectModel
+     */
     protected $redirectModel;
 
+    /**
+     * @var LeadFieldRepository
+     */
     private $leadFieldRepository;
 
+    /**
+     * @var array|null
+     */
     private $contactFieldUrlTokens;
 
     /**
@@ -364,7 +381,7 @@ class TrackableModel extends AbstractCommonModel
             }
 
             if ($preparedUrl = $this->prepareUrlForTracking($url)) {
-                list($urlKey, $urlValue) = $preparedUrl;
+                [$urlKey, $urlValue] = $preparedUrl;
                 $trackableUrls[$urlKey]  = $urlValue;
             }
         }
@@ -390,7 +407,7 @@ class TrackableModel extends AbstractCommonModel
 
         foreach ($allUrls as $url) {
             if ($preparedUrl = $this->prepareUrlForTracking($url)) {
-                list($urlKey, $urlValue) = $preparedUrl;
+                [$urlKey, $urlValue] = $preparedUrl;
                 $trackableUrls[$urlKey]  = $urlValue;
             }
         }
@@ -603,7 +620,7 @@ class TrackableModel extends AbstractCommonModel
 
         // Check for tokens in the query
         if (!empty($urlParts['query'])) {
-            list($tokenizedParams, $untokenizedParams) = $this->parseTokenizedQuery($urlParts['query']);
+            [$tokenizedParams, $untokenizedParams] = $this->parseTokenizedQuery($urlParts['query']);
             if ($tokenizedParams) {
                 // Rebuild the query without the tokenized query params for now
                 $urlParts['query'] = $this->httpBuildQuery($untokenizedParams);

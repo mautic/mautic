@@ -456,7 +456,7 @@ class PublicController extends CommonFormController
         if (count($query)) {
             $url = UrlHelper::appendQueryToUrl($url, http_build_query($query));
         }
-
+        
         // If the IP address is not trackable, it means it came form a configured "do not track" IP or a "do not track" user agent
         // This prevents simulated clicks from 3rd party services such as URL shorteners from simulating clicks
         $ipAddress = $this->container->get('mautic.helper.ip_lookup')->getIpAddress();
@@ -503,6 +503,48 @@ class PublicController extends CommonFormController
         }
 
         return $this->redirect($url);
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return string
+     */
+    private function replaceAssetTokenUrl($url)
+    {
+        if ($this->urlIsToken($url)) {
+            $tokens = $this->get('mautic.asset.helper.token')->findAssetTokens($url);
+
+            return str_replace(array_keys($tokens), $tokens, $url);
+        }
+
+        return $url;
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return string
+     */
+    private function replacePageTokenUrl($url)
+    {
+        if ($this->urlIsToken($url)) {
+            $tokens = $this->get('mautic.page.helper.token')->findPageTokens($url);
+
+            return str_replace(array_keys($tokens), $tokens, $url);
+        }
+
+        return $url;
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return bool
+     */
+    private function urlIsToken($url)
+    {
+        return substr($url, 0, 1) === '{';
     }
 
     /**
