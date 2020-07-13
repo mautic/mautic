@@ -5,7 +5,7 @@
             <tr>
                 <td><?php echo $view['translator']->trans('mautic.trackable.click_url'); ?></td>
                 <td><?php echo $view['translator']->trans('mautic.trackable.click_count'); ?></td>
-                <td><?php echo $view['translator']->trans('mautic.trackable.ctr'); ?></td>
+                <td><?php echo $view['translator']->trans('mautic.email.abtest.criteria.clickthrough'); ?></td>
                 <td><?php echo $view['translator']->trans('mautic.trackable.click_unique_count'); ?></td>
                 <?php echo $view['content']->getCustomContent('click_counts_headers', $mauticTemplateVars); ?>
                 <td><?php echo $view['translator']->trans('mautic.trackable.click_track_id'); ?></td>
