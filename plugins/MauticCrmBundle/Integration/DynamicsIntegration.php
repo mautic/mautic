@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Joomla\Http\Response;
+use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
@@ -98,34 +99,34 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
             $builder->add(
                 'push_object',
-                'button_group',
+                ButtonGroupType::class,
                 [
                     'choices' => [
-                        'leads'    => 'mautic.dynamics.object.lead',
-                        'contacts' => 'mautic.dynamics.object.contact',
+                        'mautic.dynamics.object.lead'    => 'leads',
+                        'mautic.dynamics.object.contact' => 'contacts',
                     ],
                     'expanded'    => true,
                     'multiple'    => false,
                     'label'       => 'mautic.dynamics.form.objects_to_push_from',
                     'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
+                    'placeholder' => false,
                     'required'    => false,
                 ]
             );
 
             $builder->add(
                 'push_type',
-                'button_group',
+                ButtonGroupType::class,
                 [
                     'choices' => [
-                        'selected'    => 'mautic.dynamics.form.objects_to_push_merge.just.from',
-                        'both'        => 'mautic.dynamics.form.objects_to_push_merge.both',
+                        'mautic.dynamics.form.objects_to_push_merge.just.from' => 'selected',
+                        'mautic.dynamics.form.objects_to_push_merge.both'      => 'both',
                     ],
                     'expanded'    => true,
                     'multiple'    => false,
                     'label'       => 'mautic.dynamics.form.objects_to_push_merge',
                     'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
+                    'placeholder' => false,
                     'required'    => false,
                 ]
             );
@@ -303,10 +304,12 @@ class DynamicsIntegration extends CrmAbstractIntegration
         $contactFields = [];
         if (isset($settings['feature_settings']['objects'])) {
             $objects = $settings['feature_settings']['objects'];
-        } else {
+        } else if(isset($settings['objects'])) {
             $settings                                = $this->mergeConfigToFeatureSettings();
             $objects                                 = $settings['objects'];
             $settings['feature_settings']['objects'] = $objects;
+        }else{
+            return [];
         }
 
         if (in_array('leads', $objects)) {
