@@ -89,8 +89,8 @@ class AjaxController extends CommonAjaxController
                 $log->setIsScheduled(false);
 
                 /** @var EventLogModel $logModel */
-                $logModel = $this->getModel('campaign.event_log');
-                $metadata = $log->getMetadata();
+                $logModel           = $this->getModel('campaign.event_log');
+                $metadata           = $log->getMetadata();
                 $metadata['errors'] = $this->translator->trans(
                     'mautic.campaign.event.cancelled.time',
                     ['%date%' => $log->getTriggerDate()->format('Y-m-d H:i:s')]
