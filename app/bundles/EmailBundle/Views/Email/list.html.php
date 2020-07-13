@@ -259,7 +259,7 @@ if ('index' == $tmpl) {
                         </span>
                         <span class="mt-xs label label-info"
                               id="click-through-rate-<?php echo $item->getId(); ?>">
-                                <?php echo $view['translator']->trans('mautic.email.stat.ctr', ['%count%' => 0 !== $item->getReadCount() ? round($totalClicks / $item->getReadCount() * 100) : 0]); ?>
+                                <?php echo $view['translator']->trans('mautic.email.stat.ctr', ['%count%' => 0 !== $item->getReadCount() ? round($totalClicks / $item->getReadCount() * 100, 2) : 0]); ?>
                         </span>
                         <?php echo $view['content']->getCustomContent('email.stats', $mauticTemplateVars); ?>
                         <?php echo $view['content']->getCustomContent('email.stats.below', $mauticTemplateVars); ?>
