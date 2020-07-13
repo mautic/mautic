@@ -43,6 +43,13 @@ class ReportPermissions extends AbstractPermissions
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
         $this->addExtendedFormFields('report', 'reports', $builder, $data);
-        $this->addCustomFormFields($this->getName(), 'export', $builder, 'mautic.core.permissions.export', ['disable' => 'mautic.core.permissions.disable'], $data);
+        $this->addCustomFormFields(
+            $this->getName(),
+            'export',
+            $builder,
+            'mautic.core.permissions.export',
+            ['mautic.core.permissions.disable' => 'disable'],
+            $data
+        );
     }
 }

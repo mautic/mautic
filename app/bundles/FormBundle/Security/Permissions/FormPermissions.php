@@ -45,6 +45,13 @@ class FormPermissions extends AbstractPermissions
     {
         $this->addStandardFormFields($this->getName(), 'categories', $builder, $data);
         $this->addExtendedFormFields($this->getName(), 'forms', $builder, $data);
-        $this->addCustomFormFields($this->getName(), 'export', $builder, 'mautic.core.permissions.export', ['disable' => 'mautic.core.permissions.disable'], $data);
+        $this->addCustomFormFields(
+            $this->getName(),
+            'export',
+            $builder,
+            'mautic.core.permissions.export',
+            ['mautic.core.permissions.disable' => 'disable'],
+            $data
+        );
     }
 }
