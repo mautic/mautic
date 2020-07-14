@@ -114,7 +114,7 @@ if ('index' == $tmpl) {
                     $totalClicks += $link['hits'];
 
                     return $totalClicks;
-                });
+                }, 0);
                 ?>
                 <tr>
                     <td>
