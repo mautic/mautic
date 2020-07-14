@@ -154,7 +154,14 @@ if ('index' == $tmpl) {
                         <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: <?php echo $color; ?>;"> </span> <span><?php echo $catName; ?></span></span>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getHits(); ?></td>
-                    <td></td>
+                    <td class="visible-md visible-lg">
+                        <a href="<?php echo $view['router']->path(
+                            'mautic_page_action',
+                            ['objectAction' => 'results', 'objectId' => $item->getId()]
+                        ); ?>" data-toggle="ajax" data-menu-link="mautic_form_index" class="btn btn-primary btn-xs">
+                            View Submissions
+                        </a>
+                    </td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>
