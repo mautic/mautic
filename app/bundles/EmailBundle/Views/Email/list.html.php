@@ -108,7 +108,6 @@ if ('index' == $tmpl) {
                 $hasTranslations            = $item->isTranslation();
                 $type                       = $item->getEmailType();
                 $mauticTemplateVars['item'] = $item;
-                $totalClicks                = 0;
                 $trackables                 = $model->getEmailClickStats($item->getId());
                 $totalClicks                = array_reduce($trackables, function ($totalClicks, $link) {
                     $totalClicks += $link['hits'];
