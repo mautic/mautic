@@ -375,6 +375,24 @@ class SubmissionRepository extends CommonRepository
         return $q->execute()->fetchAll();
     }
 
+    public function getSubmissionCountsFromPage($pageId, \DateTime $fromDate = null)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('count(s.id) as total')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 's')
+            ->join('s', MAUTIC_TABLE_PREFIX.'pages', 'p', 's.page_id = p.id')
+            ->where($q->expr()->eq('s.page_id', ':page'))
+            ->setParameter('page', (int) $pageId);
+
+        if (null != $fromDate) {
+            $dh = new DateTimeHelper($fromDate);
+            $q->andWhere($q->expr()->gte('s.date_submitted', ':date'))
+                ->setParameter('date', $dh->toUtcString());
+        }
+
+        return $q->execute()->fetchAll();
+    }
+
     /**
      * Get submission count by email by linking emails that have been associated with a page hit that has the
      * same tracking ID as a form submission tracking ID and thus assumed happened in the same session.
