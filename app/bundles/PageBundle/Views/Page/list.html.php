@@ -86,6 +86,10 @@ if ('index' == $tmpl) {
             </thead>
             <tbody>
             <?php foreach ($items as $item): ?>
+            <?php
+                $submission       = $submissionModel->getSubmissionCountsFromPage($item->getId());
+                $submissionCounts = is_array($submission) ? $submission[0]['total'] : 0;
+            ?>
                 <tr>
                     <td>
                         <?php
@@ -156,10 +160,15 @@ if ('index' == $tmpl) {
                     <td class="visible-md visible-lg"><?php echo $item->getHits(); ?></td>
                     <td class="visible-md visible-lg">
                         <a href="<?php echo $view['router']->path(
-                            'mautic_page_action',
-                            ['objectAction' => 'results', 'objectId' => $item->getId()]
-                        ); ?>" data-toggle="ajax" data-menu-link="mautic_form_index" class="btn btn-primary btn-xs">
-                            View Submissions
+                            'mautic_page_results',
+                            ['objectId' => $item->getId(), 'page' => 2]
+                        ); ?>" data-toggle="ajax" data-menu-link="mautic_form_index" class="btn btn-primary btn-xs" <?php echo (0
+                        == $submissionCounts) ? 'disabled=disabled' : ''; ?>>
+                            <?php echo $view['translator']->transChoice(
+                                'mautic.form.form.viewresults',
+                                $submissionCounts,
+                                ['%count%' => $submissionCounts]
+                            ); ?>
                         </a>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
