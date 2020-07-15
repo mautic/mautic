@@ -37,6 +37,14 @@ $pageId = $activePage->getId();
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                     'sessionVar' => 'pageresult.'.$pageId,
+                    'orderBy'    => 's.form_id',
+                    'text'       => 'mautic.form.report.form_id',
+                    'class'      => 'col-pageresult-form-id',
+                    'filterBy'   => 's.form_id',
+                ]);
+
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
+                    'sessionVar' => 'pageresult.'.$pageId,
                     'orderBy'    => 's.date_submitted',
                     'text'       => 'mautic.form.result.thead.date',
                     'class'      => 'col-pageresult-date',
@@ -65,6 +73,13 @@ $pageId = $activePage->getId();
                     <?php if (!empty($item['leadId'])): ?>
                     <a href="<?php echo $view['router']->path('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $item['leadId']]); ?>" data-toggle="ajax">
                         <?php echo $view->escape($item['leadId']); ?>
+                    </a>
+                    <?php endif; ?>
+                </td>
+                <td>
+                    <?php if (!empty($item['formId'])): ?>
+                    <a href="<?php echo $view['router']->path('mautic_form_action', ['objectAction' => 'view', 'objectId' => $item['formId']]); ?>" data-toggle="ajax">
+                        <?php echo $view->escape($item['formId']); ?>
                     </a>
                     <?php endif; ?>
                 </td>
