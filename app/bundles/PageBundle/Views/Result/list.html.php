@@ -87,7 +87,7 @@ $pageId = $activePage->getId();
         'totalItems' => $totalCount,
         'page'       => $page,
         'limit'      => $limit,
-        'baseUrl'    => $view['router']->path('mautic_form_results', ['objectId' => $activePage->getId()]),
+        'baseUrl'    => $view['router']->path('mautic_page_results', ['objectId' => $activePage->getId()]),
         'sessionVar' => 'pageresult.'.$pageId,
     ]); ?>
 </div>
