@@ -161,7 +161,7 @@ if ('index' == $tmpl) {
                     <td class="visible-md visible-lg">
                         <a href="<?php echo $view['router']->path(
                             'mautic_page_results',
-                            ['objectId' => $item->getId(), 'page' => 2]
+                            ['objectId' => $item->getId()]
                         ); ?>" data-toggle="ajax" data-menu-link="mautic_form_index" class="btn btn-primary btn-xs" <?php echo (0
                         == $submissionCounts) ? 'disabled=disabled' : ''; ?>>
                             <?php echo $view['translator']->transChoice(
