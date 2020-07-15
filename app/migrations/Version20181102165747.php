@@ -21,8 +21,6 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 class Version20181102165747 extends AbstractMauticMigration
 {
     /**
-     * @param Schema $schema
-     *
      * @throws SkipMigrationException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
@@ -39,9 +37,6 @@ class Version20181102165747 extends AbstractMauticMigration
         }
     }
 
-    /**
-     * @param Schema $schema
-     */
     public function postUp(Schema $schema): void
     {
         // Check if there are even boolean fields to worry about
@@ -51,7 +46,7 @@ class Version20181102165747 extends AbstractMauticMigration
             ->where($qb->expr()->eq('type', $qb->expr()->literal('lead.updatelead')));
         $campaignEvents = $qb->execute()->fetchAll();
         if (count($campaignEvents)) {
-            foreach ($campaignEvents as $key => $event) {
+            foreach ($campaignEvents as $event) {
                 $propertiesColumn = unserialize($event['properties']);
                 $properties       = array_filter($propertiesColumn['properties']);
                 // skip If fields_to_update exist
@@ -71,9 +66,8 @@ class Version20181102165747 extends AbstractMauticMigration
     }
 
     /**
-     * @param QueryBuilder $qb
-     * @param              $id
-     * @param              $properties
+     * @param $id
+     * @param $properties
      */
     protected function fixRow(QueryBuilder $qb, $id, $properties)
     {

@@ -20,10 +20,6 @@ class UpdateActionType extends AbstractType
 {
     const FIELD_TYPE_TO_UPDATE_VALUES = ['multiselect'];
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $object = isset($options['object']) ? $options['object'] : 'lead';
@@ -59,8 +55,6 @@ class UpdateActionType extends AbstractType
     }
 
     /**
-     * @param OptionsResolver $resolver
-     *
      * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      */
     public function configureOptions(OptionsResolver $resolver)
