@@ -35,7 +35,6 @@ use Mautic\LeadBundle\Form\Type\PointActionType;
 use Mautic\LeadBundle\Form\Type\UpdateCompanyActionType;
 use Mautic\LeadBundle\Form\Type\UpdateLeadActionType;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
-use Mautic\LeadBundle\Helper\CustomFieldHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
