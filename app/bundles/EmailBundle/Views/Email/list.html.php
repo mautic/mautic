@@ -110,7 +110,7 @@ if ('index' == $tmpl) {
                 $mauticTemplateVars['item'] = $item;
                 $trackables                 = $model->getEmailClickStats($item->getId());
                 $totalClicks                = array_reduce($trackables, function ($totalClicks, $link) {
-                    $totalClicks += $link['hits'];
+                    $totalClicks += $link['unique_hits'];
 
                     return $totalClicks;
                 }, 0);
