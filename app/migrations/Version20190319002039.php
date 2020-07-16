@@ -10,8 +10,8 @@
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
@@ -20,7 +20,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 class Version20190319002039 extends AbstractMauticMigration
 {
     /**
-     * @throws SkipMigrationException
+     * @throws SkipMigration
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public function preUp(Schema $schema): void
@@ -28,7 +28,7 @@ class Version20190319002039 extends AbstractMauticMigration
         $table = $schema->getTable($this->prefix.'point_lead_action_log');
 
         if ($table->hasColumn('internal_id')) {
-            throw new SkipMigrationException('Schema includes this migration');
+            throw new SkipMigration('Schema includes this migration');
         }
     }
 
