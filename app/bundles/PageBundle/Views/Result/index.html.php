@@ -24,7 +24,7 @@ $buttons[] = [
         'target'      => '_new',
         'data-toggle' => '',
         'class'       => 'btn btn-default btn-nospin',
-        'href'        => $view['router']->path('mautic_form_export', ['objectId' => $activePage->getId(), 'format' => 'html']),
+        'href'        => $view['router']->path('mautic_page_export', ['objectId' => $activePage->getId(), 'format' => 'html']),
     ],
     'btnText'   => $view['translator']->trans('mautic.form.result.export.html'),
     'iconClass' => 'fa fa-file-code-o',
@@ -35,7 +35,7 @@ $buttons[] = [
     'attr' => [
         'data-toggle' => '',
         'class'       => 'btn btn-default btn-nospin',
-        'href'        => $view['router']->path('mautic_form_export', ['objectId' => $activePage->getId(), 'format' => 'csv']),
+        'href'        => $view['router']->path('mautic_page_export', ['objectId' => $activePage->getId(), 'format' => 'csv']),
     ],
     'btnText'   => $view['translator']->trans('mautic.form.result.export.csv'),
     'iconClass' => 'fa fa-file-text-o',
@@ -47,7 +47,7 @@ if (class_exists(Spreadsheet::class)) {
         'attr' => [
             'data-toggle' => '',
             'class'       => 'btn btn-default btn-nospin',
-            'href'        => $view['router']->path('mautic_form_export', ['objectId' => $activePage->getId(), 'format' => 'xlsx']),
+            'href'        => $view['router']->path('mautic_page_export', ['objectId' => $activePage->getId(), 'format' => 'xlsx']),
         ],
         'btnText'   => $view['translator']->trans('mautic.form.result.export.xlsx'),
         'iconClass' => 'fa fa-file-excel-o',
@@ -59,7 +59,7 @@ $buttons[] =
     [
         'attr' => [
                 'class'       => 'btn btn-default',
-                'href'        => $view['router']->path('mautic_form_action', ['objectAction' => 'view', 'objectId'=> $activePage->getId()]),
+                'href'        => $view['router']->path('mautic_page_action', ['objectAction' => 'view', 'objectId'=> $activePage->getId()]),
                 'data-toggle' => 'ajax',
             ],
         'iconClass' => 'fa fa-remove',
