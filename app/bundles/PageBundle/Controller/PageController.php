@@ -19,7 +19,6 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -146,15 +145,15 @@ class PageController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'searchValue'     => $search,
-                'items'           => $pages,
-                'categories'      => $this->getModel('page.page')->getLookupResults('category', '', 0),
-                'page'            => $page,
-                'limit'           => $limit,
-                'permissions'     => $permissions,
-                'model'           => $model,
-                'tmpl'            => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
-                'security'        => $this->get('mautic.security'),
+                'searchValue' => $search,
+                'items'       => $pages,
+                'categories'  => $this->getModel('page.page')->getLookupResults('category', '', 0),
+                'page'        => $page,
+                'limit'       => $limit,
+                'permissions' => $permissions,
+                'model'       => $model,
+                'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+                'security'    => $this->get('mautic.security'),
             ],
             'contentTemplate' => 'MauticPageBundle:Page:list.html.php',
             'passthroughVars' => [
@@ -1129,13 +1128,13 @@ class PageController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'items'          => $results,
-                    'filters'        => $filters,
-                    'activePage'     => $activePage,
-                    'page'           => $page,
-                    'totalCount'     => $count,
-                    'limit'          => $limit,
-                    'tmpl'           => $tmpl,
+                    'items'      => $results,
+                    'filters'    => $filters,
+                    'activePage' => $activePage,
+                    'page'       => $page,
+                    'totalCount' => $count,
+                    'limit'      => $limit,
+                    'tmpl'       => $tmpl,
                 ],
                 'contentTemplate' => 'MauticPageBundle:Result:list.html.php',
                 'passthroughVars' => [
