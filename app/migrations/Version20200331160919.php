@@ -10,8 +10,8 @@
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
@@ -20,9 +20,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 class Version20200331160919 extends AbstractMauticMigration
 {
     /**
-     * @param Schema $schema
-     *
-     * @throws SkipMigrationException
+     * @throws SkipMigration
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public function preUp(Schema $schema): void
@@ -31,13 +29,11 @@ class Version20200331160919 extends AbstractMauticMigration
         $fieldsTable = $schema->getTable($this->prefix.'form_fields');
 
         if ($formTable->hasColumn('progressive_profiling_limit') && $fieldsTable->hasColumn('always_display')) {
-            throw new SkipMigrationException('Schema includes this migration');
+            throw new SkipMigration('Schema includes this migration');
         }
     }
 
     /**
-     * @param Schema $schema
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public function up(Schema $schema): void
