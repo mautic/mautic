@@ -144,8 +144,6 @@ class PageController extends FormController
 
         $pageHelper->rememberPage($page);
 
-        $submissionModel = $this->getModel('form.submission');
-
         return $this->delegateView([
             'viewParameters' => [
                 'searchValue'     => $search,
@@ -157,7 +155,6 @@ class PageController extends FormController
                 'model'           => $model,
                 'tmpl'            => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'security'        => $this->get('mautic.security'),
-                'submissionModel' => $submissionModel,
             ],
             'contentTemplate' => 'MauticPageBundle:Page:list.html.php',
             'passthroughVars' => [
