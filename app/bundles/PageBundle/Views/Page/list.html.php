@@ -85,8 +85,8 @@ if ('index' == $tmpl) {
             </tr>
             </thead>
             <tbody>
-            <?php foreach ($items as $i): ?>
             <?php
+            foreach ($items as $i):
                 $item = $i[0];
             ?>
                 <tr>
