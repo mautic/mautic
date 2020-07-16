@@ -24,6 +24,13 @@ return [
                 'path'       => '/pages/results/{objectId}/{page}',
                 'controller' => 'MauticPageBundle:Page:results',
             ],
+            'mautic_page_export' => [
+                'path'       => '/pages/results/{objectId}/export/{format}',
+                'controller' => 'MauticPageBundle:Page:export',
+                'defaults'   => [
+                    'format' => 'csv',
+                ],
+            ],
         ],
         'public' => [
             'mautic_page_tracker' => [
