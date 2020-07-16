@@ -747,59 +747,59 @@ class SubmissionModel extends CommonFormModel
 
                 return new Response($content);
             case 'xlsx':
-                if (class_exists(Spreadsheet::class)) {
-                    $response = new StreamedResponse(
-                        function () use ($results, $translator, $name) {
-                            $objPHPExcel = new Spreadsheet();
-                            $objPHPExcel->getProperties()->setTitle($name);
+                if (!class_exists(Spreadsheet::class)) {
+                    throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
+                }
+                $response = new StreamedResponse(
+                    function () use ($results, $translator, $name) {
+                        $objPHPExcel = new Spreadsheet();
+                        $objPHPExcel->getProperties()->setTitle($name);
 
-                            $objPHPExcel->createSheet();
+                        $objPHPExcel->createSheet();
 
-                            $header = [
-                                $translator->trans('mautic.core.id'),
-                                $translator->trans('mautic.form.result.thead.date'),
-                                $translator->trans('mautic.core.ipaddress'),
-                                $translator->trans('mautic.form.result.thead.referrer'),
+                        $header = [
+                            $translator->trans('mautic.core.id'),
+                            $translator->trans('mautic.form.result.thead.date'),
+                            $translator->trans('mautic.core.ipaddress'),
+                            $translator->trans('mautic.form.result.thead.referrer'),
+                        ];
+
+                        //write the row
+                        $objPHPExcel->getActiveSheet()->fromArray($header, null, 'A1');
+
+                        //build the data rows
+                        $count = 2;
+                        foreach ($results as $k => $s) {
+                            $row = [
+                                $s['id'],
+                                $this->dateHelper->toFull($s['dateSubmitted'], 'UTC'),
+                                $s['ipAddress'],
+                                $s['referer'],
                             ];
 
-                            //write the row
-                            $objPHPExcel->getActiveSheet()->fromArray($header, null, 'A1');
+                            $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$count}");
 
-                            //build the data rows
-                            $count = 2;
-                            foreach ($results as $k => $s) {
-                                $row = [
-                                    $s['id'],
-                                    $this->dateHelper->toFull($s['dateSubmitted'], 'UTC'),
-                                    $s['ipAddress'],
-                                    $s['referer'],
-                                ];
+                            //free memory
+                            unset($row, $results[$k]);
 
-                                $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$count}");
-
-                                //free memory
-                                unset($row, $results[$k]);
-
-                                //increment letter
-                                ++$count;
-                            }
-
-                            $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
-                            $objWriter->setPreCalculateFormulas(false);
-
-                            $objWriter->save('php://output');
+                            //increment letter
+                            ++$count;
                         }
-                    );
-                    $response->headers->set('Content-Type', 'application/force-download');
-                    $response->headers->set('Content-Type', 'application/octet-stream');
-                    $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.xlsx"');
-                    $response->headers->set('Expires', 0);
-                    $response->headers->set('Cache-Control', 'must-revalidate');
-                    $response->headers->set('Pragma', 'public');
 
-                    return $response;
-                }
-                throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
+                        $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
+                        $objWriter->setPreCalculateFormulas(false);
+
+                        $objWriter->save('php://output');
+                    }
+                );
+                $response->headers->set('Content-Type', 'application/force-download');
+                $response->headers->set('Content-Type', 'application/octet-stream');
+                $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.xlsx"');
+                $response->headers->set('Expires', 0);
+                $response->headers->set('Cache-Control', 'must-revalidate');
+                $response->headers->set('Pragma', 'public');
+
+                return $response;
             default:
                 return new Response();
         }
