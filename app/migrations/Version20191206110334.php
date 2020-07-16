@@ -10,8 +10,8 @@
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
@@ -20,7 +20,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 class Version20191206110334 extends AbstractMauticMigration
 {
     /**
-     * @throws SkipMigrationException
+     * @throws SkipMigration
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public function preUp(Schema $schema): void
@@ -28,7 +28,7 @@ class Version20191206110334 extends AbstractMauticMigration
         // Test to see if this migration has already been applied
         $formTable = $schema->getTable($this->prefix.'form_fields');
         if ($formTable->hasColumn('lead_field_not_overwrite')) {
-            throw new SkipMigrationException('Schema includes this migration');
+            throw new SkipMigration('Schema includes this migration');
         }
     }
 
