@@ -318,8 +318,7 @@ class EventScheduler
     public function shouldScheduleEvent(Event $event, \DateTime $executionDate, \DateTime $now): bool
     {
         if (null !== $event) {
-            $eventProperties = $event->getProperties();
-            if (!empty($eventProperties['triggerRestrictedDaysOfWeek'])) {
+            if ($this->intervalScheduler->isContactSpecificExecutionDateRequired($event)) {
                 // Event has days in week specified. Needs to be recalculated to the next day configured
                 return true;
             }

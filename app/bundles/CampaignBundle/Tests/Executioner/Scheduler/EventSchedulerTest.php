@@ -119,21 +119,17 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $date  = new \DateTime();
         $now   = clone $date;
         $event = new Event();
+        $event->setTriggerIntervalUnit('d');
+        $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
 
         $this->assertFalse($this->scheduler->shouldScheduleEvent($event, $date, $now));
 
-        $event->setProperties([
-            'triggerRestrictedDaysOfWeek' => [],
-        ]);
+        $event->setTriggerRestrictedDaysOfWeek([]);
 
         $this->assertFalse($this->scheduler->shouldScheduleEvent($event, $date, $now));
 
-        $event->setProperties([
-            'triggerRestrictedDaysOfWeek' => [
-                0 => 1,
-                1 => 2,
-            ],
-        ]);
+        $event->setTriggerRestrictedStartHour('23:00');
+        $event->setTriggerRestrictedStopHour('23:30');
 
         $this->assertTrue($this->scheduler->shouldScheduleEvent($event, $date, $now));
 
