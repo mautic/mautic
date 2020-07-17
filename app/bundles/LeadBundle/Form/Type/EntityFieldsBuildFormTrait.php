@@ -130,7 +130,7 @@ trait EntityFieldsBuildFormTrait
                     ];
 
                 if (!empty($options['ignore_date_type'])) {
-                    $type = 'text';
+                    $type = TextType::class;
                 } else {
                     $opts['html5']  = false;
                     $opts['input']  = 'string';
