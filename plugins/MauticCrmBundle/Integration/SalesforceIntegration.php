@@ -473,6 +473,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 $dataObject['Email__Lead'] = InputHelper::email($dataObject['Email__Lead']);
                             }
 
+                            // normalize multiselect field
+                            foreach ($dataObject as &$dataO) {
+                                if (is_string($dataO)) {
+                                    $dataO = str_replace(';', '|', $dataO);
+                                }
+                            }
                             $entity                = $this->getMauticLead($dataObject, true, null, null, $object);
                             $mauticObjectReference = 'lead';
                             $detachClass           = Lead::class;
@@ -2575,6 +2581,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function amendLeadDataBeforePush(&$mappedData)
     {
+        // normalize for multiselect field
+        foreach ($mappedData as &$data) {
+            $data = str_replace('|', ';', $data);
+        }
+
         $mappedData = StateValidationHelper::validate($mappedData);
     }
 
