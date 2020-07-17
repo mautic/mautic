@@ -1355,21 +1355,21 @@ class LeadController extends FormController
                             empty($email['fromname']) ? null : $email['fromname']
                         );
 
-                        // Set Content
-                        $mailer->setBody($email['body']);
-                        $mailer->parsePlainText($email['body']);
-
                         // Set lead
                         $mailer->setLead($leadFields);
                         $mailer->setIdHash();
-
-                        $mailer->setSubject($email['subject']);
 
                         /** @var EmailModel $emailModel */
                         $emailModel = $this->getModel('email');
                         if (($emailEntity = $emailModel->getEntity((int) $email['templates']))) {
                             $mailer->setEmail($emailEntity);
                         }
+
+                        $mailer->setSubject($email['subject']);
+
+                        // Set Content
+                        $mailer->setBody($email['body']);
+                        $mailer->parsePlainText($email['body']);
 
                         // Ensure safe emoji for notification
                         $subject = EmojiHelper::toHtml($email['subject']);
