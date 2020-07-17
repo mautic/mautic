@@ -315,7 +315,7 @@ class EventScheduler
         return $executionDate > $now;
     }
 
-    public function shouldScheduleForInactive(Event $event, \DateTime $executionDate, \DateTime $now): bool
+    public function shouldScheduleEvent(Event $event, \DateTime $executionDate, \DateTime $now): bool
     {
         if (null !== $event) {
             $eventProperties = $event->getProperties();
