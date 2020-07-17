@@ -144,14 +144,14 @@ trait EntityFieldsBuildFormTrait
                         }
                     }
 
-                    if (DateTimeType::class === $type) {
+                    if ($type instanceof DateTimeType) {
                         $opts['model_timezone'] = 'UTC';
                         $opts['view_timezone']  = date_default_timezone_get();
                         $opts['format']         = 'yyyy-MM-dd HH:mm:ss';
                         $opts['with_seconds']   = true;
 
                         $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d H:i:s') : null;
-                    } elseif (DateType::class == $type) {
+                    } elseif ($type instanceof DateType) {
                         $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d') : null;
                     } else {
                         $opts['model_timezone'] = 'UTC';
