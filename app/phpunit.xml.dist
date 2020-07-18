@@ -27,11 +27,18 @@
     <filter>
         <whitelist>
             <directory>bundles</directory>
+            <directory>./../plugins</directory>
+            <directory>middlewares</directory>
             <exclude>
                 <directory>bundles/*Bundle/Config</directory>
                 <directory>bundles/*Bundle/Tests</directory>
                 <directory>bundles/*Bundle/Translations</directory>
                 <directory>bundles/*Bundle/Views</directory>
+                <directory>plugins/*Bundle/Config</directory>
+                <directory>plugins/*Bundle/Tests</directory>
+                <directory>plugins/*Bundle/Translations</directory>
+                <directory>plugins/*Bundle/Views</directory>
+                <directory>middlewares/Tests</directory>
             </exclude>
         </whitelist>
     </filter>
