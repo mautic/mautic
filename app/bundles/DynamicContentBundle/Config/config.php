@@ -55,22 +55,24 @@ return [
     'services' => [
         'events' => [
             'mautic.dynamicContent.campaignbundle.subscriber' => [
-                'class'     => 'Mautic\DynamicContentBundle\EventListener\CampaignSubscriber',
+                'class'     => \Mautic\DynamicContentBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
-                    'mautic.lead.model.lead',
                     'mautic.dynamicContent.model.dynamicContent',
                     'session',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.dynamicContent.js.subscriber' => [
-                'class'     => 'Mautic\DynamicContentBundle\EventListener\BuildJsSubscriber',
+                'class'     => \Mautic\DynamicContentBundle\EventListener\BuildJsSubscriber::class,
                 'arguments' => [
-                    'mautic.form.model.form',
                     'templating.helper.assets',
+                    'translator',
+                    'request_stack',
+                    'router',
                 ],
             ],
             'mautic.dynamicContent.subscriber' => [
-                'class'     => 'Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber',
+                'class'     => \Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber::class,
                 'arguments' => [
                     'mautic.page.model.trackable',
                     'mautic.page.helper.token',
@@ -78,9 +80,10 @@ return [
                     'mautic.form.helper.token',
                     'mautic.focus.helper.token',
                     'mautic.core.model.auditlog',
-                    'mautic.lead.model.lead',
                     'mautic.helper.dynamicContent',
                     'mautic.dynamicContent.model.dynamicContent',
+                    'mautic.security',
+                    'mautic.tracker.contact',
                 ],
             ],
             'mautic.dynamicContent.subscriber.channel' => [
@@ -89,7 +92,16 @@ return [
             'mautic.dynamicContent.stats.subscriber' => [
                 'class'     => \Mautic\DynamicContentBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
+                ],
+            ],
+            'mautic.dynamicContent.lead.subscriber' => [
+                'class'     => \Mautic\DynamicContentBundle\EventListener\LeadSubscriber::class,
+                'arguments' => [
+                    'translator',
+                    'router',
+                    'mautic.dynamicContent.repository.stat',
                 ],
             ],
         ],
@@ -102,11 +114,9 @@ return [
                     'translator',
                     'mautic.lead.model.lead',
                 ],
-                'alias' => 'dwc',
             ],
             'mautic.form.type.dwc_entry_filters' => [
                 'class'     => 'Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType',
-                'alias'     => 'dwc_entry_filters',
                 'arguments' => [
                     'translator',
                 ],
@@ -121,18 +131,15 @@ return [
                 'arguments' => [
                     'router',
                 ],
-                'alias' => 'dwcsend_list',
             ],
             'mautic.form.type.dwcdecision_list' => [
                 'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentDecisionType',
                 'arguments' => [
                     'router',
                 ],
-                'alias' => 'dwcdecision_list',
             ],
             'mautic.form.type.dwc_list' => [
                 'class' => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentListType',
-                'alias' => 'dwc_list',
             ],
         ],
         'models' => [
@@ -142,14 +149,22 @@ return [
                 ],
             ],
         ],
+        'repositories' => [
+            'mautic.dynamicContent.repository.stat' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => \Mautic\DynamicContentBundle\Entity\Stat::class,
+            ],
+        ],
         'other' => [
             'mautic.helper.dynamicContent' => [
-                'class'     => 'Mautic\DynamicContentBundle\Helper\DynamicContentHelper',
+                'class'     => \Mautic\DynamicContentBundle\Helper\DynamicContentHelper::class,
                 'arguments' => [
                     'mautic.dynamicContent.model.dynamicContent',
-                    'mautic.campaign.model.event',
+                    'mautic.campaign.executioner.realtime',
                     'event_dispatcher',
                 ],
-            ], ],
+            ],
+        ],
     ],
 ];

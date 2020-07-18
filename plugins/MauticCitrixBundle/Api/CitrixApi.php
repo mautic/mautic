@@ -8,8 +8,14 @@ use MauticPlugin\MauticCitrixBundle\Integration\CitrixAbstractIntegration;
 
 class CitrixApi
 {
+    /**
+     * @var CitrixAbstractIntegration
+     */
     protected $integration;
 
+    /**
+     * CitrixApi constructor.
+     */
     public function __construct(CitrixAbstractIntegration $integration)
     {
         $this->integration = $integration;
@@ -17,14 +23,14 @@ class CitrixApi
 
     /**
      * @param string $operation
-     * @param array  $settings
      * @param string $route
+     * @param bool   $refreshToken
      *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
-    protected function _request($operation, array $settings, $route = 'rest')
+    protected function _request($operation, array $settings, $route = 'rest', $refreshToken = true)
     {
         $requestSettings = [
             'encode_parameters'   => 'json',
@@ -52,6 +58,15 @@ class CitrixApi
         );
         $status  = $request->code;
         $message = '';
+
+        // Try refresh access_token with refresh_token (https://goto-developer.logmeininc.com/how-use-refresh-tokens)
+        if ($refreshToken && $this->isInvalidTokenFromReponse($request)) {
+            $error = $this->integration->authCallback(['use_refresh_token' => true]);
+            if (!$error) {
+                // keys changes, load new integration object
+                return $this->_request($operation, $settings, $route, false);
+            }
+        }
 
         switch ($status) {
             case 200:
@@ -85,5 +100,18 @@ class CitrixApi
         }
 
         return $this->integration->parseCallbackResponse($request->body);
+    }
+
+    /**
+     * @return bool
+     */
+    private function isInvalidTokenFromReponse(Response $request)
+    {
+        $responseData = $this->integration->parseCallbackResponse($request->body);
+        if (isset($responseData['int_err_code']) && 'InvalidToken' == $responseData['int_err_code']) {
+            return true;
+        }
+
+        return false;
     }
 }

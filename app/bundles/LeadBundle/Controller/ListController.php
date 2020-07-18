@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -22,6 +23,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ListController extends FormController
 {
@@ -57,8 +59,8 @@ class ListController extends FormController
         $this->setListFilters();
 
         //set limits
-        $limit = $session->get('mautic.segment.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $limit = $session->get('mautic.segment.limit', $this->coreParametersHelper->get('default_pagelimit'));
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -96,7 +98,7 @@ class ListController extends FormController
 
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            if ($count === 1) {
+            if (1 === $count) {
                 $lastPage = 1;
             } else {
                 $lastPage = (ceil($count / $limit)) ?: 1;
@@ -172,7 +174,7 @@ class ListController extends FormController
         $form = $model->createForm($list, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -297,10 +299,8 @@ class ListController extends FormController
     /**
      * Create modifying response for segments - edit/clone.
      *
-     * @param LeadList $segment
-     * @param array    $postActionVars
-     * @param string   $action
-     * @param bool     $ignorePost
+     * @param string $action
+     * @param bool   $ignorePost
      *
      * @return Response
      */
@@ -317,7 +317,7 @@ class ListController extends FormController
         $form = $segmentModel->createForm($segment, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && 'POST' == $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     //form is valid so process the data
@@ -449,7 +449,7 @@ class ListController extends FormController
     /**
      * Delete a list.
      *
-     * @param   $objectId
+     * @param $objectId
      *
      * @return JsonResponse | RedirectResponse
      */
@@ -487,12 +487,12 @@ class ListController extends FormController
             );
         }
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             /** @var ListModel $model */
             $model = $this->getModel('lead.list');
             $list  = $model->getEntity($objectId);
 
-            if ($list === null) {
+            if (null === $list) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.lead.list.error.notfound',
@@ -547,7 +547,7 @@ class ListController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             /** @var ListModel $model */
             $model           = $this->getModel('lead.list');
             $ids             = json_decode($this->request->query->get('ids', '{}'));
@@ -568,7 +568,7 @@ class ListController extends FormController
             foreach ($toBeDeleted as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if ($entity === null) {
+                if (null === $entity) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.lead.list.error.notfound',
@@ -649,7 +649,7 @@ class ListController extends FormController
         ];
 
         $leadId = $this->request->get('leadId');
-        if (!empty($leadId) && $this->request->getMethod() == 'POST') {
+        if (!empty($leadId) && 'POST' == $this->request->getMethod()) {
             /** @var ListModel $model */
             $model = $this->getModel('lead.list');
             /** @var LeadList $list */
@@ -658,7 +658,7 @@ class ListController extends FormController
             $leadModel = $this->getModel('lead');
             $lead      = $leadModel->getEntity($leadId);
 
-            if ($lead === null) {
+            if (null === $lead) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.lead.lead.error.notfound',
@@ -668,7 +668,7 @@ class ListController extends FormController
                 'lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser()
             )) {
                 return $this->accessDenied();
-            } elseif ($list === null) {
+            } elseif (null === $list) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.lead.list.error.notfound',
@@ -681,13 +681,13 @@ class ListController extends FormController
             } elseif ($model->isLocked($lead)) {
                 return $this->isLocked($postActionVars, $lead, 'lead');
             } else {
-                $function = ($action == 'remove') ? 'removeLead' : 'addLead';
+                $function = ('remove' == $action) ? 'removeLead' : 'addLead';
                 $model->$function($lead, $list, true);
 
                 $identifier = $this->get('translator')->trans($lead->getPrimaryIdentifier());
                 $flashes[]  = [
                     'type' => 'notice',
-                    'msg'  => ($action == 'remove') ? 'mautic.lead.lead.notice.removedfromlists' :
+                    'msg'  => ('remove' == $action) ? 'mautic.lead.lead.notice.removedfromlists' :
                         'mautic.lead.lead.notice.addedtolists',
                     'msgVars' => [
                         '%name%' => $identifier,
@@ -722,12 +722,12 @@ class ListController extends FormController
         $model    = $this->getModel('lead.list');
         $security = $this->get('mautic.security');
 
-        /** @var \Mautic\LeadBundle\Entity\LeadList $list */
+        /** @var LeadList $list */
         $list = $model->getEntity($objectId);
         //set the page we came from
         $page = $this->get('session')->get('mautic.segment.page', 1);
 
-        if ($this->request->getMethod() === 'POST' && $this->request->request->has('includeEvents')) {
+        if ('POST' === $this->request->getMethod() && $this->request->request->has('includeEvents')) {
             $filters = [
                 'includeEvents' => InputHelper::clean($this->request->get('includeEvents', [])),
             ];
@@ -736,7 +736,7 @@ class ListController extends FormController
             $filters = [];
         }
 
-        if ($list === null) {
+        if (null === $list) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
 
@@ -764,31 +764,42 @@ class ListController extends FormController
         ) {
             return $this->accessDenied();
         }
-        $translator      = $this->get('translator');
-        $dateRangeValues = $this->request->get('daterange', []);
-        $action          = $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
-        $stats           = $this->getModel('lead.list')->getSegmentContactsLineChartData(
+        /** @var TranslatorInterface $translator */
+        $translator = $this->get('translator');
+        /** @var ListModel $listModel */
+        $listModel                    = $this->getModel('lead.list');
+        $dateRangeValues              = $this->request->get('daterange', []);
+        $action                       = $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $objectId]);
+        $dateRangeForm                = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
+        $segmentContactsLineChartData = $listModel->getSegmentContactsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),
             new \DateTime($dateRangeForm->get('date_to')->getData()),
             null,
-           ['leadlist_id' => ['value'          => $objectId,
-                            'list_column_name' => 't.lead_id', ], 't.leadlist_id' => $objectId]
+            [
+                'leadlist_id'   => [
+                    'value'            => $objectId,
+                    'list_column_name' => 't.lead_id',
+                ],
+                't.leadlist_id' => $objectId,
+            ]
         );
 
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list->getId()]),
             'viewParameters' => [
-                'list'        => $list,
-                'permissions' => $security->isGranted([
+                'usageStats'     => $this->get('mautic.lead.segment.stat.dependencies')->getChannelsIds($list->getId()),
+                'campaignStats'  => $this->get('mautic.lead.segment.stat.campaign.share')->getCampaignList($list->getId()),
+                'stats'          => $segmentContactsLineChartData,
+                'list'           => $list,
+                'segmentCount'   => $listModel->getRepository()->getLeadCount($list->getId()),
+                'permissions'    => $security->isGranted([
                     'lead:leads:editown',
                     'lead:lists:viewother',
                     'lead:lists:editother',
                     'lead:lists:deleteother',
                 ], 'RETURN_ARRAY'),
                 'security'      => $security,
-                'stats'         => $stats,
                 'dateRangeForm' => $dateRangeForm->createView(),
                 'events'        => [
                     'filters' => $filters,
@@ -826,7 +837,7 @@ class ListController extends FormController
     {
         $manuallyRemoved = 0;
         $listFilters     = ['manually_removed' => $manuallyRemoved];
-        if ($this->request->getMethod() === 'POST' && $this->request->request->has('includeEvents')) {
+        if ('POST' === $this->request->getMethod() && $this->request->request->has('includeEvents')) {
             $filters = [
                 'includeEvents' => InputHelper::clean($this->request->get('includeEvents', [])),
             ];

@@ -14,7 +14,7 @@ namespace Mautic\EmailBundle\Swiftmailer\Transport;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Callback\SendGridApiCallback;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiFacade;
 use Swift_Events_EventListener;
-use Swift_Mime_Message;
+use Swift_Mime_SimpleMessage;
 use Symfony\Component\HttpFoundation\Request;
 
 class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface, CallbackTransportInterface
@@ -78,14 +78,13 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface,
      * Recipient/sender data will be retrieved from the Message API.
      * The return value is the number of recipients who were accepted for delivery.
      *
-     * @param Swift_Mime_Message $message
-     * @param string[]           $failedRecipients An array of failures by-reference
+     * @param string[] $failedRecipients An array of failures by-reference
      *
      * @return int
      *
      * @throws \Swift_TransportException
      */
-    public function send(Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         $this->sendGridApiFacade->send($message);
 
@@ -94,8 +93,6 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface,
 
     /**
      * Register a plugin in the Transport.
-     *
-     * @param Swift_Events_EventListener $plugin
      */
     public function registerPlugin(Swift_Events_EventListener $plugin)
     {
@@ -107,7 +104,7 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface,
      */
     private function getDispatcher()
     {
-        if ($this->swiftEventDispatcher === null) {
+        if (null === $this->swiftEventDispatcher) {
             $this->swiftEventDispatcher = new \Swift_Events_SimpleEventDispatcher();
         }
 
@@ -128,9 +125,8 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface,
     /**
      * Get the count for the max number of recipients per batch.
      *
-     * @param \Swift_Message $message
-     * @param int            $toBeAdded Number of emails about to be added
-     * @param string         $type      Type of emails being added (to, cc, bcc)
+     * @param int    $toBeAdded Number of emails about to be added
+     * @param string $type      Type of emails being added (to, cc, bcc)
      *
      * @return int
      */
@@ -138,7 +134,12 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface,
     {
         //Sengrid counts all email address (to, cc and bcc)
         //https://sendgrid.com/docs/API_Reference/Web_API_v3/Mail/errors.html#message.personalizations
-        return count($message->getTo()) + count($message->getCc()) + count($message->getBcc()) + $toBeAdded;
+
+        $toCount  = is_countable($message->getTo()) ? count($message->getTo()) : 0;
+        $ccCount  = is_countable($message->getCc()) ? count($message->getCc()) : 0;
+        $bccCount = is_countable($message->getBcc()) ? count($message->getBcc()) : 0;
+
+        return $toCount + $ccCount + $bccCount + $toBeAdded;
     }
 
     /**
@@ -163,11 +164,17 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface,
 
     /**
      * Processes the response.
-     *
-     * @param Request $request
      */
     public function processCallbackRequest(Request $request)
     {
         $this->sendGridApiCallback->processCallbackRequest($request);
+    }
+
+    /**
+     * @return bool
+     */
+    public function ping()
+    {
+        return true;
     }
 }

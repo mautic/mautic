@@ -14,7 +14,7 @@ namespace Mautic\LeadBundle\Tests\Helper;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use ReflectionProperty;
 
-class TokenHelperTest extends \PHPUnit_Framework_TestCase
+class TokenHelperTest extends \PHPUnit\Framework\TestCase
 {
     private $lead = [
         'firstname' => 'Bob',
@@ -28,7 +28,7 @@ class TokenHelperTest extends \PHPUnit_Framework_TestCase
         ],
     ];
 
-    public function setUp()
+    protected function setUp()
     {
         $reflectionProperty = new ReflectionProperty(TokenHelper::class, 'parameters');
         $reflectionProperty->setAccessible(true);

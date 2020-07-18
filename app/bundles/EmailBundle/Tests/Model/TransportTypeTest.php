@@ -9,11 +9,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Test\Model;
+namespace Mautic\EmailBundle\Tests\Model;
 
 use Mautic\EmailBundle\Model\TransportType;
 
-class TransportTypeTest extends \PHPUnit_Framework_TestCase
+class TransportTypeTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetTransportTypes()
     {
@@ -26,7 +26,6 @@ class TransportTypeTest extends \PHPUnit_Framework_TestCase
             'mautic.transport.mandrill'     => 'mautic.email.config.mailer_transport.mandrill',
             'mautic.transport.mailjet'      => 'mautic.email.config.mailer_transport.mailjet',
             'smtp'                          => 'mautic.email.config.mailer_transport.smtp',
-            'mail'                          => 'mautic.email.config.mailer_transport.mail',
             'mautic.transport.postmark'     => 'mautic.email.config.mailer_transport.postmark',
             'mautic.transport.sendgrid'     => 'mautic.email.config.mailer_transport.sendgrid',
             'mautic.transport.sendgrid_api' => 'mautic.email.config.mailer_transport.sendgrid_api',
@@ -77,7 +76,7 @@ class TransportTypeTest extends \PHPUnit_Framework_TestCase
     {
         $transportType = new TransportType();
 
-        $expected = '"mautic.transport.mandrill","mail","mautic.transport.sendgrid_api","sendmail","mautic.transport.sparkpost"';
+        $expected = '"mautic.transport.mandrill","mautic.transport.sendgrid_api","sendmail","mautic.transport.sparkpost"';
 
         $this->assertSame($expected, $transportType->getServiceDoNotNeedUser());
     }
@@ -95,7 +94,7 @@ class TransportTypeTest extends \PHPUnit_Framework_TestCase
     {
         $transportType = new TransportType();
 
-        $expected = '"mautic.transport.mandrill","mail","mautic.transport.sendgrid_api","sendmail","mautic.transport.sparkpost"';
+        $expected = '"mautic.transport.mandrill","mautic.transport.sendgrid_api","sendmail","mautic.transport.sparkpost"';
 
         $this->assertSame($expected, $transportType->getServiceDoNotNeedPassword());
     }

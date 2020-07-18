@@ -14,7 +14,7 @@ namespace Mautic\LeadBundle\Tests\Event;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListEvent;
 
-class LeadListEventTest extends \PHPUnit_Framework_TestCase
+class LeadListEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructGettersSetters()
     {

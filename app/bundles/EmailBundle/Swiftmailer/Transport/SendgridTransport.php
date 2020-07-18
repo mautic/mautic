@@ -11,17 +11,11 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
-/**
- * Class SendgridTransport.
- */
 class SendgridTransport extends \Swift_SmtpTransport
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct($host = 'localhost', $port = 25, $security = null)
+    public function __construct($host = 'smtp.sendgrid.net', $port = 587, $security = 'tls')
     {
-        parent::__construct('smtp.sendgrid.net', 587, 'tls');
+        parent::__construct($host, $port, $security);
 
         $this->setAuthMode('login');
     }

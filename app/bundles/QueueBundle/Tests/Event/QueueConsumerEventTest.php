@@ -13,7 +13,7 @@ namespace Mautic\QueueBundle\Tests\Event;
 
 use Mautic\QueueBundle\Event\QueueConsumerEvent;
 
-class QueueConsumerEventTest extends \PHPUnit_Framework_TestCase
+class QueueConsumerEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testCheckTransportIfNoTransport()
     {

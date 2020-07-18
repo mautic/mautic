@@ -87,7 +87,14 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                             ]);
                                             ?>
                                         </td>
-                                        <td><?php echo $log->getNote(); ?></td>
+                                        <td><?php
+                                            $note = $log->getNote();
+                                            if ($note) :
+                                                echo $note;
+                                            else :
+                                                echo $view['translator']->trans('mautic.webhook.webhook.logs.empty.response');
+                                            endif;
+                                        ?></td>
                                         <td><?php echo $log->getRuntime(); ?> s</td>
                                         <td><?php echo $view['date']->toFull($log->getDateAdded()); ?></td>
                                     </tr>

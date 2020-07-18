@@ -12,20 +12,15 @@
 namespace Mautic\AssetBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\AssetBundle\Entity\Download;
 use Mautic\CoreBundle\EventListener\CommonStatsSubscriber;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
-/**
- * Class StatsSubscriber.
- */
 class StatsSubscriber extends CommonStatsSubscriber
 {
-    /**
-     * StatsSubscriber constructor.
-     *
-     * @param EntityManager $em
-     */
-    public function __construct(EntityManager $em)
+    public function __construct(CorePermissions $security, EntityManager $entityManager)
     {
-        $this->addContactRestrictedRepositories($em, 'MauticAssetBundle:Download');
+        parent::__construct($security, $entityManager);
+        $this->addContactRestrictedRepositories([Download::class]);
     }
 }

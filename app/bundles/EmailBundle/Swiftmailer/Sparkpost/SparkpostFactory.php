@@ -12,9 +12,6 @@ final class SparkpostFactory implements SparkpostFactoryInterface
      */
     private $client;
 
-    /**
-     * @param GuzzleAdapter $client
-     */
     public function __construct(GuzzleAdapter $client)
     {
         $this->client = $client;
@@ -29,7 +26,7 @@ final class SparkpostFactory implements SparkpostFactoryInterface
      */
     public function create($host, $apiKey, $port = null)
     {
-        if ((strpos($host, '://') === false && substr($host, 0, 1) != '/')) {
+        if ((false === strpos($host, '://') && '/' != substr($host, 0, 1))) {
             $host = 'https://'.$host;
         }
 
@@ -46,7 +43,7 @@ final class SparkpostFactory implements SparkpostFactoryInterface
             $options['protocol'] =  $hostInfo['scheme'];
 
             if (empty($port)) {
-                $options['port'] = $hostInfo['scheme'] === 'https' ? 443 : 80;
+                $options['port'] = 'https' === $hostInfo['scheme'] ? 443 : 80;
             }
 
             $host = $hostInfo['host'];

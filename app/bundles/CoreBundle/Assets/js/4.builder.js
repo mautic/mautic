@@ -107,25 +107,35 @@ Mautic.launchBuilder = function (formName, actionName) {
 
     applyBtn.off('click').on('click', function(e) {
         Mautic.activateButtonLoadingIndicator(applyBtn);
-        Mautic.sendBuilderContentToTextarea(function() {
-            // Trigger slot:destroy event
-            if(typeof document.getElementById('builder-template-content').contentWindow.Mautic !== 'undefined') {
-                document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
-            }
-            // Clear the customize forms
-            mQuery('#slot-form-container, #section-form-container').html('');
-            Mautic.inBuilderSubmissionOn(form);
-            var bgApplyBtn = mQuery('.btn-apply');
-            if (0 === bgApplyBtn.length && ("1" === Mautic.getUrlParameter('contentOnly') || Mautic.isInBuilder)) {
-                var frm = mQuery('.btn-save').closest('form');
-                Mautic.inBuilderSubmissionOn(frm);
-                frm.submit();
+        try {
+            Mautic.sendBuilderContentToTextarea(function () {
+                // Trigger slot:destroy event
+                if (typeof document.getElementById('builder-template-content').contentWindow.Mautic !== 'undefined') {
+                    document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
+                }
+                // Clear the customize forms
+                mQuery('#slot-form-container, #section-form-container').html('');
+                Mautic.inBuilderSubmissionOn(form);
+                var bgApplyBtn = mQuery('.btn-apply');
+                if (0 === bgApplyBtn.length && ("1" === Mautic.getUrlParameter('contentOnly') || Mautic.isInBuilder)) {
+                    var frm = mQuery('.btn-save').closest('form');
+                    Mautic.inBuilderSubmissionOn(frm);
+                    frm.submit();
+                    Mautic.inBuilderSubmissionOff();
+                } else {
+                    bgApplyBtn.trigger('click');
+                }
                 Mautic.inBuilderSubmissionOff();
-            } else {
-                bgApplyBtn.trigger('click');
+            }, true);
+        } catch (error) {
+            Mautic.removeButtonLoadingIndicator(applyBtn);
+            if (/SYNTAX ERROR/.test(error.message.toUpperCase())) {
+                var errorMessage = 'Syntax error. Please check your HTML code.';
+                alert(errorMessage);
+                console.error(errorMessage);
             }
-            Mautic.inBuilderSubmissionOff();
-        }, true);
+            console.error(error.message);
+        }
     });
 
     // Blur and focus the focussed inputs to fix the browser autocomplete bug on scroll
@@ -209,7 +219,7 @@ Mautic.formatCode = function() {
  */
 Mautic.openMediaManager = function() {
     Mautic.openServerBrowser(
-        mauticBasePath + '/' + mauticAssetPrefix + 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/index.html?type=Images',
+        mauticBasePath + '/elfinder',
         screen.width * 0.7,
         screen.height * 0.7
     );
@@ -481,8 +491,17 @@ Mautic.closeBuilder = function(model) {
         }, false);
 
     } catch (error) {
+        overlay.addClass('hide');
+        closeBtn.prop('disabled', false);
+
+        if (/SYNTAX ERROR/.test(error.message.toUpperCase())) {
+            var errorMessage = 'Syntax error. Please check your HTML code.';
+            alert(errorMessage);
+            console.error(errorMessage);
+        }
+
         // prevent from being able to close builder
-        console.error(error);
+        console.error(error.message);
     }
 };
 
@@ -494,35 +513,30 @@ Mautic.closeBuilder = function(model) {
  */
 Mautic.sendBuilderContentToTextarea = function(callback, keepBuilderContent) {
     var customHtml;
-    try {
-        if (Mautic.codeMode) {
-            customHtml = Mautic.builderCodeMirror.getValue();
+    if (Mautic.codeMode) {
+        customHtml = Mautic.builderCodeMirror.getValue();
 
-            // Convert dynamic slot definitions into tokens
-            customHtml = Mautic.convertDynamicContentSlotsToTokens(customHtml);
+        // Convert dynamic slot definitions into tokens
+        customHtml = Mautic.convertDynamicContentSlotsToTokens(customHtml);
 
-            // Store the HTML content to the HTML textarea
-            mQuery('.builder-html').val(customHtml);
-            callback();
-        } else {
-            var builderHtml = mQuery('iframe#builder-template-content').contents();
+        // Store the HTML content to the HTML textarea
+        mQuery('.builder-html').val(customHtml);
+        callback();
+    } else {
+        var builderHtml = mQuery('iframe#builder-template-content').contents();
 
-            if (keepBuilderContent) {
-                // The content has to be cloned so the sanitization won't affect the HTML in the builder
-                Mautic.cloneHtmlContent(builderHtml, function(themeHtml) {
-                    Mautic.sanitizeHtmlAndStoreToTextarea(themeHtml);
-                    callback();
-                });
-            } else {
-                Mautic.sanitizeHtmlAndStoreToTextarea(builderHtml);
+        if (keepBuilderContent) {
+            // The content has to be cloned so the sanitization won't affect the HTML in the builder
+            Mautic.cloneHtmlContent(builderHtml, function(themeHtml) {
+                Mautic.sanitizeHtmlAndStoreToTextarea(themeHtml);
                 callback();
-            }
+            });
+        } else {
+            Mautic.sanitizeHtmlAndStoreToTextarea(builderHtml);
+            callback();
         }
-    } catch (error) {
-        // prevent from being able to close builder
-        console.error(error);
     }
-}
+};
 
 Mautic.sanitizeHtmlAndStoreToTextarea = function(html) {
     var cleanHtml = Mautic.sanitizeHtmlBeforeSave(html);
@@ -860,7 +874,7 @@ Mautic.initSections = function() {
         iframeFix: true,
         connectToSortable: 'body',
         revert: 'invalid',
-        iframeOffset: iframe.offset(),
+        iframeOffset: iframe.jQuery2Offset(),
         helper: function(e, ui) {
             // Fix body overflow that messes sortable up
             bodyOverflow.overflowX = mQuery('body', parent.document).css('overflow-x');
@@ -1017,7 +1031,7 @@ Mautic.initSlots = function(slotContainers) {
         iframeFix: true,
         connectToSortable: '[data-slot-container]',
         revert: 'invalid',
-        iframeOffset: iframe.offset(),
+        iframeOffset: iframe.jQuery2Offset(),
         helper: function(e, ui) {
             // fix for Uncaught TypeError: Cannot read property 'document' of null
             // Fix body overflow that messes sortable up
@@ -1168,6 +1182,18 @@ Mautic.isSlotInitiated = function(slot) {
     }) !== 'undefined';
 };
 
+Mautic.isCodeMode = function() {
+    return mQuery('a[data-theme=mautic_code_mode]').first().hasClass('hide');
+};
+
+window.document.fileManagerInsertImageCallback = function(selector, url) {
+    if (Mautic.isCodeMode()) {
+        Mautic.insertTextAtCMCursor(url);
+    } else {
+        mQuery(selector).froalaEditor('image.insert', url);
+    }
+};
+
 Mautic.initSlotListeners = function() {
     Mautic.activateGlobalFroalaOptions();
     Mautic.builderSlots = [];
@@ -1232,7 +1258,15 @@ Mautic.initSlotListeners = function() {
                 focus.remove();
             });
             cloneLink.click(function(e) {
-                slot.clone().insertAfter(slot);
+                if (type == 'dynamicContent') {
+                    var maxId = Mautic.getDynamicContentMaxId();
+
+                    slot.clone().attr('data-param-dec-id', maxId + 1).insertAfter(slot);
+                    Mautic.createNewDynamicContentItem(parent.mQuery);
+                } else {
+                    slot.clone().insertAfter(slot);
+                }
+
                 Mautic.initSlots(slot.closest('[data-slot-container="1"]'));
             });
 
@@ -1459,7 +1493,8 @@ Mautic.initSlotListeners = function() {
             var froalaOptions = mQuery.extend({}, Mautic.basicFroalaOptions, {
                     linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
                     imageEditButtons: ['imageReplace', 'imageAlign', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove'],
-                    useClasses: false
+                    useClasses: false,
+                    imageOutputSize: true
                 }
             );
             image.froalaEditor(froalaOptions);
@@ -1469,10 +1504,8 @@ Mautic.initSlotListeners = function() {
             });
         } else if (type === 'dynamicContent') {
             if (slot.html().match(/__dynamicContent__/)) {
-                var decs = mQuery('[data-slot="dynamicContent"]');
-                var ids = mQuery.map(decs, function(e){return mQuery(e).attr('data-param-dec-id');})
-                var maxId = Math.max.apply(Math, ids);
-                if (isNaN(maxId) || Number.NEGATIVE_INFINITY == maxId) maxId = 0;
+                var maxId = Mautic.getDynamicContentMaxId();
+
                 slot.attr('data-param-dec-id', maxId + 1);
                 slot.html('Dynamic Content');
                 Mautic.createNewDynamicContentItem(parent.mQuery);
@@ -1527,7 +1560,7 @@ Mautic.initSlotListeners = function() {
             params.slot.find('label.label3').text(params.field.val());
         } else if ('label-text4' === fieldParam) {
             params.slot.find('label.label4').text(params.field.val());
-        } else if ('glink' === fieldParam || 'flink' === fieldParam || 'tlink' === fieldParam) {
+        } else if ('flink' === fieldParam || 'tlink' === fieldParam) {
             params.slot.find('#'+fieldParam).attr('href', params.field.val());
         } else if (fieldParam === 'href') {
             params.slot.find('a').eq(0).attr('href', params.field.val());
@@ -1979,6 +2012,15 @@ Mautic.getPredefinedLinks = function(callback) {
         }
         return callback(linkList);
     });
+};
+
+Mautic.getDynamicContentMaxId = function() {
+    var decs = mQuery('[data-slot="dynamicContent"]');
+    var ids = mQuery.map(decs, function(e){return mQuery(e).attr('data-param-dec-id');});
+    var maxId = Math.max.apply(Math, ids);
+    if (isNaN(maxId) || Number.NEGATIVE_INFINITY === maxId) maxId = 0;
+
+    return maxId;
 };
 
 // Init inside the builder's iframe

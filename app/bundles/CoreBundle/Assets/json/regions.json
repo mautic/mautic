@@ -1464,6 +1464,7 @@
 		"Soria",
 		"Tarragona",
 		"Teruel",
+		"Toledo",
 		"Valencia",
 		"Valladolid",
 		"Vizcaya",
@@ -2829,12 +2830,15 @@
 	],
 	"Oman": [
 		"Ad Dakhillyah",
-		"Al Batinah",
-		"Al Janblyah",
+		"Ad Dhahirah",
+		"Al Batinah North",
+		"Al Batinah South",
+		"Al Buraymi",
 		"Al Wusta",
-		"Ash Sharqlyah",
-		"Az Zahirah",
-		"Masqat",
+		"Ash Sharqlyah North",
+		"Ash Sharqlyah South",
+		"Dhofar",
+		"Muscat",
 		"Musandam"
 	],
 	"Panama": [

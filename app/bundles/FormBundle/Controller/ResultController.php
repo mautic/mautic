@@ -55,7 +55,7 @@ class ResultController extends CommonFormController
         $returnUrl      = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
         $viewOnlyFields = $formModel->getCustomComponents()['viewOnlyFields'];
 
-        if ($form === null) {
+        if (null === $form) {
             //redirect back to form list
             return $this->postActionRedirect(
                 [
@@ -84,14 +84,14 @@ class ResultController extends CommonFormController
             return $this->accessDenied();
         }
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $this->setListFilters($this->request->query->get('name'));
         }
 
         //set limits
-        $limit = $session->get('mautic.formresult.'.$objectId.'.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
+        $limit = $session->get('mautic.formresult.'.$objectId.'.limit', $this->coreParametersHelper->get('default_pagelimit'));
 
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -134,7 +134,7 @@ class ResultController extends CommonFormController
 
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
+            $lastPage = (1 === $count) ? 1 : (ceil($count / $limit)) ?: 1;
             $session->set('mautic.formresult.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_form_results', ['objectId' => $objectId, 'page' => $lastPage]);
 
@@ -208,7 +208,7 @@ class ResultController extends CommonFormController
         $results     = $submission->getResults();
         $fieldEntity = $submission->getFieldByAlias($field);
 
-        if (empty($results[$field]) || $fieldEntity === null) {
+        if (empty($results[$field]) || null === $fieldEntity) {
             throw $this->createNotFoundException();
         }
 
@@ -257,7 +257,7 @@ class ResultController extends CommonFormController
         $formPage  = $session->get('mautic.form.page', 1);
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
 
-        if ($form === null) {
+        if (null === $form) {
             //redirect back to form list
             return $this->postActionRedirect(
                 [
@@ -317,13 +317,13 @@ class ResultController extends CommonFormController
         $page     = $session->get('mautic.formresult.page', 1);
         $flashes  = [];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $model = $this->getModel('form.submission');
 
             // Find the result
             $entity = $model->getEntity($objectId);
 
-            if ($entity === null) {
+            if (null === $entity) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.form.error.notfound',
@@ -418,8 +418,7 @@ class ResultController extends CommonFormController
     }
 
     /**
-     * @param array $args
-     * @param       $action
+     * @param $action
      */
     public function getPostActionRedirectArguments(array $args, $action)
     {
