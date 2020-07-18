@@ -80,7 +80,3 @@ install:
 
 script:
   - composer test
-
-notifications:
-    webhooks: https://www.travisbuddy.com/
-    on_success: never
