@@ -72,6 +72,20 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->connector->expects($this->once())
             ->method('post')
+            ->with('https://mautic.org', ['test'  => 'tee', 'email' => 'john@doe.email', 'IP' => '127.0.0.1,127.0.0.2'], ['test' => 'tee', 'company' => 'Mautic'], 10)
+            ->willReturn((object) ['code' => 200]);
+
+        $this->campaignHelper->fireWebhook($config, $this->contact);
+    }
+
+    public function testFireWebhookWithPostJson()
+    {
+        $config      = $this->provideSampleConfig('post');
+        $expectedUrl = 'https://mautic.org?test=tee&email=john%40doe.email&IP=127.0.0.1%2C127.0.0.2';
+
+        $config      = $this->provideSampleConfig('post', 'application/json');
+        $this->connector->expects($this->once())
+            ->method('post')
             ->with('https://mautic.org', json_encode(['test'  => 'tee', 'email' => 'john@doe.email', 'IP' => '127.0.0.1,127.0.0.2']), ['test' => 'tee', 'company' => 'Mautic', 'content-type' => 'application/json'], 10)
             ->willReturn((object) ['code' => 200]);
 
@@ -89,9 +103,9 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->campaignHelper->fireWebhook($this->provideSampleConfig(), $this->contact);
     }
 
-    private function provideSampleConfig($method = 'get')
+    private function provideSampleConfig($method = 'get', $type = 'application/x-www-form-urlencoded')
     {
-        return [
+        $sample = [
             'url'             => 'https://mautic.org',
             'method'          => $method,
             'timeout'         => 10,
@@ -124,5 +138,14 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
         ];
+        if ('application/json' == $type) {
+            array_push($sample['headers']['list'],
+            [
+                'label' => 'content-type',
+                'value' => 'application/json',
+            ]);
+        }
+
+        return $sample;
     }
 }
