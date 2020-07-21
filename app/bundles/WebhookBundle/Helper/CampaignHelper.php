@@ -93,7 +93,7 @@ class CampaignHelper
             case 'put':
             case 'patch':
                 $headers = array_change_key_case($headers);
-                if ('application/json' == strtolower($headers['content-type'])) {
+                if (array_key_exists('content-type', $headers) && 'application/json' == strtolower($headers['content-type'])) {
                     $payload                 = json_encode($payload);
                 }
                 $response = $this->connector->$method($url, $payload, $headers, $timeout);
