@@ -212,7 +212,7 @@ class SearchStringHelper
                         //found the matching character (accounts for nesting)
 
                         //does group have a negative?
-                        if (strpos($string, '!') === 0) {
+                        if (0 === strpos($string, '!')) {
                             $filters->{$baseName}[$keyCount]->not = 1;
                             $string                               = substr($string, 1);
                         }
