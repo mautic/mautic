@@ -173,7 +173,7 @@ class SearchStringHelper
                 //the string is a command
                 $command = trim(substr($string, 0, -1));
                 //does this have a negative?
-                if (0 === strpos($string, '!')) {
+                if (0 === strpos($command, '!')) {
                     $filters->{$baseName}[$keyCount]->not = 1;
                     $command                              = substr($command, 1);
                 }
