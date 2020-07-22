@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Tests;
+namespace Mautic\EmailBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\ChannelBundle\Entity\MessageRepository;
@@ -35,10 +35,10 @@ use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
-use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -46,15 +46,13 @@ use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 
-class EmailModelTest extends \PHPUnit_Framework_TestCase
+class EmailModelTest extends \PHPUnit\Framework\TestCase
 {
     private $ipLookupHelper;
     private $themeHelper;
     private $mailboxHelper;
     private $mailHelper;
     private $leadModel;
-    private $leadEntity;
-    private $leadRepository;
     private $trackableModel;
     private $userModel;
     private $translator;
@@ -72,7 +70,9 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
     private $deviceTrackerMock;
     private $redirectRepositoryMock;
     private $cacheStorageHelperMock;
+    private $contactTracker;
     private $emailModel;
+    private $doNotContact;
 
     protected function setUp()
     {
@@ -83,8 +83,6 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $this->mailboxHelper          = $this->createMock(Mailbox::class);
         $this->mailHelper             = $this->createMock(MailHelper::class);
         $this->leadModel              = $this->createMock(LeadModel::class);
-        $this->leadEntity             = $this->createMock(Lead::class);
-        $this->leadRepository         = $this->createMock(LeadRepository::class);
         $this->trackableModel         = $this->createMock(TrackableModel::class);
         $this->userModel              = $this->createMock(UserModel::class);
         $this->translator             = $this->createMock(Translator::class);
@@ -102,6 +100,8 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $this->deviceTrackerMock      = $this->createMock(DeviceTracker::class);
         $this->redirectRepositoryMock = $this->createMock(RedirectRepository::class);
         $this->cacheStorageHelperMock = $this->createMock(CacheStorageHelper::class);
+        $this->contactTracker         = $this->createMock(ContactTracker::class);
+        $this->doNotContact           = $this->createMock(DoNotContact::class);
 
         $this->emailModel = new EmailModel(
             $this->ipLookupHelper,
@@ -116,7 +116,9 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $this->sendToContactModel,
             $this->deviceTrackerMock,
             $this->redirectRepositoryMock,
-            $this->cacheStorageHelperMock
+            $this->cacheStorageHelperMock,
+            $this->contactTracker,
+            $this->doNotContact
         );
 
         $this->emailModel->setTranslator($this->translator);
@@ -405,129 +407,6 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test that processMailerCallback handles an array of emails correctly.
-     */
-    public function testProcessMailerCallbackWithEmails()
-    {
-        $this->leadModel->expects($this->once())
-            ->method('addDncForLead')
-            ->will($this->returnValue(true));
-
-        $this->translator->expects($this->any())
-            ->method('hasId')
-            ->will($this->returnValue(false));
-
-        $this->leadEntity->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue(1));
-
-        $this->leadRepository->expects($this->exactly(2))
-            ->method('getLeadByEmail')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['foo@bar.com', true, 1],
-                        ['notfound@nowhere.com', true, null],
-                    ]
-                )
-            );
-
-        $this->entityManager->expects($this->any())
-            ->method('getRepository')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['MauticLeadBundle:Lead', $this->leadRepository],
-                        ['MauticEmailBundle:Stat', $this->statRepository],
-                    ]
-                )
-            );
-        $this->entityManager->expects($this->any())
-            ->method('getReference')
-            ->will($this->returnValue($this->leadEntity));
-
-        $this->companyRepository->method('getCompaniesForContacts')
-            ->will($this->returnValue([]));
-        $this->companyModel->method('getRepository')
-            ->willReturn($this->companyRepository);
-
-        $response = $response = [
-            2 => [
-                'emails' => [
-                    'foo@bar.com'          => 'some reason',
-                    'notfound@nowhere.com' => 'some reason',
-                ],
-            ],
-        ];
-
-        $dnc = $this->emailModel->processMailerCallback($response);
-
-        $this->assertCount(1, $dnc);
-    }
-
-    /**
-     * Test that processMailerCallback handles an array of hashIds correctly.
-     */
-    public function testProcessMailerCallbackWithHashIds()
-    {
-        $this->translator->expects($this->any())
-            ->method('hasId')
-            ->will($this->returnValue(false));
-
-        $this->statRepository->expects($this->once())
-            ->method('getTableAlias')
-            ->will($this->returnValue('s'));
-
-        $this->leadEntity->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue(1));
-
-        $this->emailEntity->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue(1));
-
-        $statEntity = new Stat();
-        $statEntity->setTrackingHash('xyz123');
-        $statEntity->setLead($this->leadEntity);
-        $statEntity->setEmail($this->emailEntity);
-
-        $this->statRepository->expects($this->any())
-            ->method('getEntities')
-            ->will($this->returnValue([$statEntity]));
-
-        $this->entityManager->expects($this->any())
-            ->method('getRepository')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['MauticEmailBundle:Stat', $this->statRepository],
-                    ]
-                )
-            );
-        $this->entityManager->expects($this->any())
-            ->method('getReference')
-            ->will($this->returnValue($this->leadEntity));
-
-        $this->companyRepository->method('getCompaniesForContacts')
-            ->will($this->returnValue([]));
-        $this->companyModel->method('getRepository')
-            ->willReturn($this->companyRepository);
-
-        $response = [
-            2 => [
-                'hashIds' => [
-                    'xyz123' => 'some reason',
-                    '123xyz' => 'some reason', // not found
-                ],
-            ],
-        ];
-
-        $dnc = $this->emailModel->processMailerCallback($response);
-
-        $this->assertCount(1, $dnc);
-    }
-
-    /**
      * Test that DoNotContact is honored.
      */
     public function testDoNotContactIsHonored()
@@ -558,7 +437,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $this->emailEntity->method('getId')
             ->will($this->returnValue(1));
 
-        $this->assertTrue(count($this->emailModel->sendEmail($this->emailEntity, [1 => ['id' => 1, 'email' => 'someone@domain.com']])) === 0);
+        $this->assertTrue(0 === count($this->emailModel->sendEmail($this->emailEntity, [1 => ['id' => 1, 'email' => 'someone@domain.com']])));
     }
 
     /**
@@ -616,7 +495,9 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $this->sendToContactModel,
             $this->deviceTrackerMock,
             $this->redirectRepositoryMock,
-            $this->cacheStorageHelperMock
+            $this->cacheStorageHelperMock,
+            $this->contactTracker,
+            $this->doNotContact
         );
 
         $emailModel->setTranslator($this->translator);
@@ -637,7 +518,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ],
             ['email_type' => 'marketing']
         );
-        $this->assertTrue(count($result) === 0, print_r($result, true));
+        $this->assertTrue(0 === count($result), print_r($result, true));
     }
 
     public function testHitEmailSavesEmailStatAndDeviceStatInTwoTransactions()
@@ -661,7 +542,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
 
         $this->entityManager->expects($this->at(0))
             ->method('persist')
-            ->with($this->callback(function ($statDevice) use ($stat, $ipAddress) {
+            ->with($this->callback(function ($statDevice) {
                 $this->assertInstanceOf(Stat::class, $statDevice);
 
                 return true;

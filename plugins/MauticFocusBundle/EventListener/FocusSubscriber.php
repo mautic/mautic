@@ -13,11 +13,9 @@ namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Trackable;
@@ -26,68 +24,55 @@ use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
 
-/**
- * Class FocusSubscriber.
- */
-class FocusSubscriber extends CommonSubscriber
+class FocusSubscriber implements EventSubscriberInterface
 {
     /**
      * @var RouterInterface
      */
-    protected $router;
+    private $router;
 
     /**
      * @var IpLookupHelper
      */
-    protected $ipHelper;
+    private $ipHelper;
 
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
     /**
      * @var TrackableModel
      */
-    protected $trackableModel;
+    private $trackableModel;
 
     /**
      * @var PageTokenHelper
      */
-    protected $pageTokenHelper;
+    private $pageTokenHelper;
 
     /**
      * @var AssetTokenHelper
      */
-    protected $assetTokenHelper;
-
-    /**
-     * @var FormTokenHelper
-     */
-    protected $formTokenHelper;
+    private $assetTokenHelper;
 
     /**
      * @var FocusModel
      */
-    protected $focusModel;
+    private $focusModel;
 
     /**
-     * FocusSubscriber constructor.
-     *
-     * @param RouterInterface  $router
-     * @param IpLookupHelper   $ipLookupHelper
-     * @param AuditLogModel    $auditLogModel
-     * @param TrackableModel   $trackableModel
-     * @param PageTokenHelper  $pageTokenHelper
-     * @param AssetTokenHelper $assetTokenHelper
-     * @param FormTokenHelper  $formTokenHelper
-     * @param FocusModel       $focusModel
+     * @var RequestStack
      */
+    private $requestStack;
+
     public function __construct(
         RouterInterface $router,
         IpLookupHelper $ipLookupHelper,
@@ -95,8 +80,8 @@ class FocusSubscriber extends CommonSubscriber
         TrackableModel $trackableModel,
         PageTokenHelper $pageTokenHelper,
         AssetTokenHelper $assetTokenHelper,
-        FormTokenHelper $formTokenHelper,
-        FocusModel $focusModel
+        FocusModel $focusModel,
+        RequestStack $requestStack
     ) {
         $this->router           = $router;
         $this->ipHelper         = $ipLookupHelper;
@@ -104,8 +89,8 @@ class FocusSubscriber extends CommonSubscriber
         $this->trackableModel   = $trackableModel;
         $this->pageTokenHelper  = $pageTokenHelper;
         $this->assetTokenHelper = $assetTokenHelper;
-        $this->formTokenHelper  = $formTokenHelper;
         $this->focusModel       = $focusModel;
+        $this->requestStack     = $requestStack;
     }
 
     /**
@@ -133,9 +118,9 @@ class FocusSubscriber extends CommonSubscriber
 
             $formGenerateUrl = $this->router->generate('mautic_form_generateform');
 
-            if (strpos($requestUri, $formGenerateUrl) !== false) {
-                $id = InputHelper::_($this->request->get('id'));
-                if (strpos($id, 'mf-') === 0) {
+            if (false !== strpos($requestUri, $formGenerateUrl)) {
+                $id = InputHelper::_($this->requestStack->getCurrentRequest()->get('id'));
+                if (0 === strpos($id, 'mf-')) {
                     $mfId             = str_replace('mf-', '', $id);
                     $focusGenerateUrl = $this->router->generate('mautic_focus_generate', ['id' => $mfId]);
 
@@ -147,8 +132,6 @@ class FocusSubscriber extends CommonSubscriber
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param FocusEvent $event
      */
     public function onFocusPostSave(FocusEvent $event)
     {
@@ -168,8 +151,6 @@ class FocusSubscriber extends CommonSubscriber
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param FocusEvent $event
      */
     public function onFocusDelete(FocusEvent $event)
     {
@@ -185,9 +166,6 @@ class FocusSubscriber extends CommonSubscriber
         $this->auditLogModel->writeToLog($log);
     }
 
-    /**
-     * @param MauticEvents\TokenReplacementEvent $event
-     */
     public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event)
     {
         /** @var Lead $lead */

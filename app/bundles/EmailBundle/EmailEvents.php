@@ -234,4 +234,24 @@ final class EmailEvents
      * @var string
      */
     const ON_TRANSPORT_WEBHOOK = 'mautic.email.on_transport_webhook';
+
+    /**
+     * The mautic.email.on_open_rate_winner event is fired when there is a need to determine open rate winner.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundle\Event\DetermineWinnerEvent
+     *
+     * @var string
+     */
+    const ON_DETERMINE_OPEN_RATE_WINNER = 'mautic.email.on_open_rate_winner';
+
+    /**
+     * The mautic.email.on_open_rate_winner event is fired when there is a need to determine clickthrough rate winner.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundles\Event\DetermineWinnerEvent
+     *
+     * @var string
+     */
+    const ON_DETERMINE_CLICKTHROUGH_RATE_WINNER = 'mautic.email.on_clickthrough_rate_winner';
 }

@@ -84,7 +84,7 @@ class MauticCoreExtension extends Extension
                         }
 
                         // Setup default menu details
-                        if ($type == 'menus') {
+                        if ('menus' == $type) {
                             $details = array_merge(
                                 [
                                     'class'   => 'Knp\Menu\MenuItem',
@@ -168,7 +168,7 @@ class MauticCoreExtension extends Extension
                                 }
                             }
 
-                            if ($type == 'events') {
+                            if ('events' == $type) {
                                 $definition->addTag('mautic.event_subscriber');
                             }
                         }
@@ -206,7 +206,7 @@ class MauticCoreExtension extends Extension
                         // Set scope - Deprecated as of Symfony 2.8 and removed in 3.0
                         if (!empty($details['scope'])) {
                             $definition->setScope($details['scope']);
-                        } elseif ($type == 'templating') {
+                        } elseif ('templating' == $type) {
                             $definition->setScope('request');
                         }
 
@@ -240,12 +240,12 @@ class MauticCoreExtension extends Extension
                              *
                              * Services must always be prefaced with an @ symbol (similar to "normal" config files)
                              */
-                            if (is_string($factory) && strpos($factory, '::') !== false) {
+                            if (is_string($factory) && false !== strpos($factory, '::')) {
                                 $factory = explode('::', $factory, 2);
                             }
 
                             // Check if the first item in the factory array is a service and if so fetch its reference
-                            if (is_array($factory) && strpos($factory[0], '@') === 0) {
+                            if (is_array($factory) && 0 === strpos($factory[0], '@')) {
                                 // Exclude the leading @ character in the service ID
                                 $factory[0] = new Reference(substr($factory[0], 1));
                             }
@@ -286,11 +286,10 @@ class MauticCoreExtension extends Extension
 
         foreach ($menus as $alias => $options) {
             $container->setDefinition('mautic.menu_renderer.'.$alias, new Definition(
-                'Mautic\CoreBundle\Menu\MenuRenderer',
+                \Mautic\CoreBundle\Menu\MenuRenderer::class,
                 [
                     new Reference('knp_menu.matcher'),
-                    new Reference('mautic.factory'),
-                    '%kernel.charset%',
+                    new Reference('mautic.helper.templating'),
                     $options,
                 ]
             ))
@@ -311,32 +310,32 @@ class MauticCoreExtension extends Extension
      */
     private function processArgument($argument, $container, &$definitionArguments)
     {
-        if ($argument === '') {
+        if ('' === $argument) {
             // To be added during compilation
             $definitionArguments[] = '';
         } elseif (is_array($argument) || is_object($argument)) {
-            foreach ($argument as $k => &$v) {
-                if (strpos($v, '%') === 0) {
+            foreach ($argument as &$v) {
+                if (0 === strpos($v, '%')) {
                     $v = str_replace('%%', '%', $v);
                     $v = $container->getParameter(substr($v, 1, -1));
                 }
             }
             $definitionArguments[] = $argument;
-        } elseif (strpos($argument, '%') === 0) {
+        } elseif (0 === strpos($argument, '%')) {
             // Parameter
             $argument              = str_replace('%%', '%', $argument);
             $definitionArguments[] = $container->getParameter(substr($argument, 1, -1));
-        } elseif (is_bool($argument) || strpos($argument, '\\') !== false) {
+        } elseif (is_bool($argument) || false !== strpos($argument, '\\')) {
             // Parameter or Class
             $definitionArguments[] = $argument;
-        } elseif (strpos($argument, '"') === 0) {
+        } elseif (0 === strpos($argument, '"')) {
             // String
             $definitionArguments[] = substr($argument, 1, -1);
-        } elseif (strpos($argument, '@=') === 0) {
+        } elseif (0 === strpos($argument, '@=')) {
             // Expression
             $argument              = substr($argument, 2);
             $definitionArguments[] = new Expression($argument);
-        } elseif (strpos($argument, '@') === 0) {
+        } elseif (0 === strpos($argument, '@')) {
             // Service
             $argument              = substr($argument, 1);
             $definitionArguments[] = new Reference($argument);

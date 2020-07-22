@@ -11,8 +11,11 @@
 
 namespace Mautic\CoreBundle\Doctrine;
 
-use Doctrine\DBAL\Migrations\AbstractMigration;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\AbstractMigration;
+use Doctrine\Migrations\Exception\AbortMigration;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -45,16 +48,15 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     protected $platform;
 
     /**
-     * @var \Mautic\CoreBundle\Factory\MauticFactory
+     * @var EntityManagerInterface
      */
-    protected $factory;
+    protected $entityManager;
 
     /**
-     * @param Schema $schema
-     *
-     * @throws \Doctrine\DBAL\Migrations\AbortMigrationException
+     * @throws DBALException
+     * @throws AbortMigration
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema): void
     {
         $platform = $this->connection->getDatabasePlatform()->getName();
 
@@ -69,24 +71,24 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     }
 
     /**
-     * @param Schema $schema
-     *
-     * @throws \Doctrine\DBAL\Migrations\AbortMigrationException
+     * @throws AbortMigration
      */
-    public function down(Schema $schema)
+    public function down(Schema $schema): void
     {
         // Not supported
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @throws DBALException
      */
     public function setContainer(ContainerInterface $container = null)
     {
-        $this->container = $container;
-        $this->prefix    = $container->getParameter('mautic.db_table_prefix');
-        $this->platform  = $this->connection->getDatabasePlatform()->getName();
-        $this->factory   = $container->get('mautic.factory');
+        $this->container     = $container;
+        $this->prefix        = $container->getParameter('mautic.db_table_prefix');
+        $this->platform      = $this->connection->getDatabasePlatform()->getName();
+        $this->entityManager = $this->container->get('doctrine')->getManager();
     }
 
     /**
@@ -104,7 +106,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
         static $tables = [];
 
         if (empty($schemaManager)) {
-            $schemaManager = $this->factory->getDatabase()->getSchemaManager();
+            $schemaManager = $this->connection->getSchemaManager();
         }
 
         // Prepend prefix
@@ -148,9 +150,9 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
                         $isIdx  = stripos($name, 'idx');
                         $isUniq = stripos($name, 'uniq');
 
-                        if ($isIdx !== false || $isUniq !== false) {
+                        if (false !== $isIdx || false !== $isUniq) {
                             $key     = substr($name, -4);
-                            $keyType = ($isIdx !== false) ? 'idx' : 'uniq';
+                            $keyType = (false !== $isIdx) ? 'idx' : 'uniq';
 
                             $tables[$table]['idx'][$keyType][$key] = $name;
                         }
@@ -162,17 +164,14 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
                 break;
         }
 
-        $localName = strtoupper($localName);
-
-        return $localName;
+        return strtoupper($localName);
     }
 
     /**
      * Generate the  name for the property.
      *
-     * @param       $table
-     * @param       $type
-     * @param array $columnNames
+     * @param $table
+     * @param $type
      *
      * @return string
      */
@@ -195,8 +194,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     /**
      * Generate index and foreign constraint.
      *
-     * @param       $table
-     * @param array $columnNames
+     * @param $table
      *
      * @return array [idx, fk]
      */

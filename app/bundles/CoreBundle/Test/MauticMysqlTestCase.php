@@ -2,6 +2,11 @@
 
 namespace Mautic\CoreBundle\Test;
 
+use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
+use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
+use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
+use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
+
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 {
     /**
@@ -12,7 +17,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     /**
      * @throws \Exception
      */
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -69,7 +74,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     {
         $this->createDatabase();
         $this->applyMigrations();
-        $this->installDatabaseFixtures();
+        $this->installDatabaseFixtures([LeadFieldData::class, RoleData::class, LoadRoleData::class, LoadUserData::class]);
     }
 
     /**
@@ -116,7 +121,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
         $f         = fopen($this->sqlDumpFile, 'r');
         $firstLine = fgets($f);
-        if (strpos($firstLine, 'Using a password') !== false) {
+        if (false !== strpos($firstLine, 'Using a password')) {
             $file = file($this->sqlDumpFile);
             unset($file[0]);
             file_put_contents($this->sqlDumpFile, $file);

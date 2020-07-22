@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-class MultipleEmailsValidValidatorTest extends \PHPUnit_Framework_TestCase
+class MultipleEmailsValidValidatorTest extends \PHPUnit\Framework\TestCase
 {
     public function testNoEmailsProvided()
     {

@@ -2,12 +2,10 @@
 
 namespace Mautic\CoreBundle\Test;
 
-use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
-use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManager;
+use Liip\TestFixturesBundle\Test\FixturesTrait;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
-use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -19,9 +17,11 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Routing\RouterInterface;
 
 abstract class AbstractMauticTestCase extends WebTestCase
 {
+    use FixturesTrait;
     /**
      * @var EntityManager
      */
@@ -45,8 +45,16 @@ abstract class AbstractMauticTestCase extends WebTestCase
         'PHP_AUTH_PW'   => 'mautic',
     ];
 
-    public function setUp()
+    protected function setUp()
     {
+        $defaultConfig = json_encode(
+            [
+                'api_enabled'           => true,
+                'api_enable_basic_auth' => true,
+            ]
+        );
+        putenv('MAUTIC_CONFIG_PARAMETERS='.$defaultConfig);
+
         \Mautic\CoreBundle\ErrorHandler\ErrorHandler::register('prod');
 
         $this->client = static::createClient([], $this->clientServer);
@@ -55,6 +63,13 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
         $this->container = $this->client->getContainer();
         $this->em        = $this->container->get('doctrine')->getManager();
+
+        /** @var RouterInterface $router */
+        $router = $this->container->get('router');
+        $scheme = $router->getContext()->getScheme();
+        $secure = 0 === strcasecmp($scheme, 'https');
+
+        $this->client->setServerParameter('HTTPS', $secure);
 
         $this->mockServices();
     }
@@ -126,41 +141,9 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $application->run($input, $output);
     }
 
-    /**
-     * @param array|null $paths
-     */
-    protected function installDatabaseFixtures(array $paths = null)
+    protected function installDatabaseFixtures(array $classNames = [])
     {
-        if (null === $paths) {
-            $paths = [
-                dirname(__DIR__).'/../InstallBundle/InstallFixtures/ORM',
-                // Default user and roles
-                dirname(__DIR__).'/../UserBundle/DataFixtures/ORM',
-            ];
-        }
-
-        $loader = new ContainerAwareLoader($this->container);
-
-        foreach ($paths as $path) {
-            if (is_dir($path)) {
-                $loader->loadFromDirectory($path);
-            } elseif (file_exists($path)) {
-                $loader->loadFromFile($path);
-            }
-        }
-
-        $fixtures = $loader->getFixtures();
-
-        if (!$fixtures) {
-            throw new \InvalidArgumentException(
-                sprintf('Could not find any fixtures to load in: %s', "\n\n- ".implode("\n- ", $paths))
-            );
-        }
-
-        $purger = new ORMPurger($this->em);
-        $purger->setPurgeMode(ORMPurger::PURGE_MODE_DELETE);
-        $executor = new ORMExecutor($this->em, $purger);
-        $executor->execute($fixtures, true);
+        $this->loadFixtures($classNames);
     }
 
     /**
@@ -172,13 +155,23 @@ abstract class AbstractMauticTestCase extends WebTestCase
      */
     protected function getCsrfToken($intention)
     {
-        return $this->client->getContainer()->get('security.csrf.token_manager')->refreshToken($intention);
+        return $this->client->getContainer()->get('security.csrf.token_manager')->refreshToken($intention)->getValue();
     }
 
     /**
-     * @param              $name
-     * @param array        $params
-     * @param Command|null $command
+     * @return string[]
+     */
+    protected function createAjaxHeaders(): array
+    {
+        return [
+            'HTTP_Content-Type'     => 'application/x-www-form-urlencoded; charset=UTF-8',
+            'HTTP_X-Requested-With' => 'XMLHttpRequest',
+            'HTTP_X-CSRF-Token'     => $this->getCsrfToken('mautic_ajax_post'),
+        ];
+    }
+
+    /**
+     * @param $name
      *
      * @return string
      *

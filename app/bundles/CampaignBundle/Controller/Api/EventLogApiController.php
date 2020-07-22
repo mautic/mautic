@@ -11,7 +11,6 @@
 
 namespace Mautic\CampaignBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Serializer\Exclusion\FieldInclusionStrategy;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -96,13 +95,13 @@ class EventLogApiController extends CommonApiController
             if (null == $campaign || !$campaign->getId()) {
                 return $this->notFound();
             }
-            if (!$this->checkEntityAccess($campaign, 'view')) {
+            if (!$this->checkEntityAccess($campaign)) {
                 return $this->accessDenied();
             }
             // Check that contact is part of the campaign
             $membership = $campaign->getContactMembership($contact);
-            if (count($membership) === 0) {
-                return $this->returnError('mautic.campaign.error.contact_not_in_campaign', Codes::HTTP_CONFLICT);
+            if (0 === count($membership)) {
+                return $this->returnError('mautic.campaign.error.contact_not_in_campaign', Response::HTTP_CONFLICT);
             }
 
             $this->campaign           = $campaign;
@@ -156,7 +155,7 @@ class EventLogApiController extends CommonApiController
         $result = $this->model->updateContactEvent($event, $contact, $parameters);
 
         if (is_string($result)) {
-            return $this->returnError($result, Codes::HTTP_CONFLICT);
+            return $this->returnError($result, Response::HTTP_CONFLICT);
         } else {
             list($log, $created) = $result;
         }
@@ -166,7 +165,7 @@ class EventLogApiController extends CommonApiController
             [
                 $this->entityNameOne => $event,
             ],
-            ($created) ? Codes::HTTP_CREATED : Codes::HTTP_OK
+            ($created) ? Response::HTTP_CREATED : Response::HTTP_OK
         );
         $this->serializerGroups[] = 'campaignEventWithLogsDetails';
         $this->serializerGroups[] = 'campaignBasicList';
@@ -222,7 +221,7 @@ class EventLogApiController extends CommonApiController
             $result = $this->model->updateContactEvent($event, $contact, $params);
 
             if (is_string($result)) {
-                $errors[$key] = $this->returnError($result, Codes::HTTP_CONFLICT);
+                $errors[$key] = $this->returnError($result, Response::HTTP_CONFLICT);
             } else {
                 list($log, $created) = $result;
                 $event->addContactLog($log);
@@ -237,7 +236,7 @@ class EventLogApiController extends CommonApiController
             $payload['errors'] = $errors;
         }
 
-        $view                     = $this->view($payload, Codes::HTTP_OK);
+        $view                     = $this->view($payload, Response::HTTP_OK);
         $this->serializerGroups[] = 'campaignEventWithLogsList';
         $this->setSerializationContext($view);
 
@@ -245,9 +244,8 @@ class EventLogApiController extends CommonApiController
     }
 
     /**
-     * @param null  $data
-     * @param null  $statusCode
-     * @param array $headers
+     * @param null $data
+     * @param null $statusCode
      *
      * @return \FOS\RestBundle\View\View
      */

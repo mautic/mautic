@@ -61,7 +61,7 @@ class NotificationListType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'notification_list';
     }

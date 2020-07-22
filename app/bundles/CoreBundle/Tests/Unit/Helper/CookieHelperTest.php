@@ -1,21 +1,20 @@
 <?php
 
-namespace Mautic\CoreBundle\Tests\unit\Helper;
+namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CookieHelper;
-use PHPUnit_Framework_TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class CookieHelperTest extends PHPUnit_Framework_TestCase
+class CookieHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var RequestStack|\PHPUnit_Framework_MockObject_MockObject
+     * @var RequestStack|\PHPUnit\Framework\MockObject\MockObject
      */
     private $requestStackMock;
 
     /**
-     * @var Request|\PHPUnit_Framework_MockObject_MockObject
+     * @var Request|\PHPUnit\Framework\MockObject\MockObject
      */
     private $requestMock;
 
@@ -51,7 +50,7 @@ class CookieHelperTest extends PHPUnit_Framework_TestCase
         $cookieHelper->setCookie($cookieName, 'test');
 
         $cookie = $this->getCookie($cookieName);
-        $this->assertContains('samesite=none', $cookie);
+        $this->assertContains('SameSite=None', $cookie);
         $this->assertContains('secure', $cookie);
     }
 
@@ -76,7 +75,7 @@ class CookieHelperTest extends PHPUnit_Framework_TestCase
         $cookieHelper->setCookie($cookieName, 'test');
 
         $cookie = $this->getCookie($cookieName);
-        $this->assertNotContains('samesite=none', $cookie);
+        $this->assertNotContains('SameSite=None', $cookie);
         $this->assertNotContains('secure', $cookie);
     }
 
@@ -93,7 +92,7 @@ class CookieHelperTest extends PHPUnit_Framework_TestCase
         $headers = xdebug_get_headers();
         // see http://tools.ietf.org/html/rfc6265#section-4.1.1
         foreach ($headers as $header) {
-            if (strpos($header, 'Set-Cookie: ') === 0) {
+            if (0 === strpos($header, 'Set-Cookie: ')) {
                 $value = str_replace('&', urlencode('&'), substr($header, 12));
                 parse_str(current(explode(';', $value, 1)), $pair);
                 $cookies = array_merge_recursive($cookies, $pair);

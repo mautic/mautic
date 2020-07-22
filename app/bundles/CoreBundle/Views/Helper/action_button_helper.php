@@ -92,14 +92,4 @@ if (isset($groupType)) {
     $view['buttons']->setGroupType($groupType);
 }
 
-// @deprecated 2.3; to be removed in 3.0; use $view['button']->addButton/addButtons instead
-//Build pre template custom buttons
-if (!isset($preCustomButtons)) {
-    $preCustomButtons = [];
-}
-if (!isset($postCustomButtons)) {
-    $postCustomButtons = [];
-}
-
-$view['buttons']->setCustomButtons($preCustomButtons, $postCustomButtons);
 $buttonCount = $view['buttons']->getButtonCount();

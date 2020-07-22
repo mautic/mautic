@@ -22,7 +22,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\IpAddressModel;
 use Psr\Log\LoggerInterface;
 
-class IpAddressModelTest extends \PHPUnit_Framework_TestCase
+class IpAddressModelTest extends \PHPUnit\Framework\TestCase
 {
     private $entityManager;
     private $logger;

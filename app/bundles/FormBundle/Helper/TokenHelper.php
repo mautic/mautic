@@ -31,9 +31,6 @@ class TokenHelper
 
     /**
      * TokenHelper constructor.
-     *
-     * @param FormModel       $model
-     * @param CorePermissions $security
      */
     public function __construct(FormModel $formModel, CorePermissions $security)
     {
@@ -43,7 +40,6 @@ class TokenHelper
 
     /**
      * @param $content
-     * @param $clickthrough
      *
      * @return array
      */
@@ -61,7 +57,7 @@ class TokenHelper
                     continue;
                 }
                 $form = $this->formModel->getEntity($id);
-                if ($form !== null &&
+                if (null !== $form &&
                     (
                         $form->isPublished(false) ||
                         $this->security->hasEntityAccess(

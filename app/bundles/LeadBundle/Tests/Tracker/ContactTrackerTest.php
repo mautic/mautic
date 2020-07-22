@@ -28,7 +28,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ContactTrackerTest extends \PHPUnit_Framework_TestCase
+class ContactTrackerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var LeadRepository
@@ -80,7 +80,7 @@ class ContactTrackerTest extends \PHPUnit_Framework_TestCase
      */
     private $leadFieldModelMock;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->leadRepositoryMock = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
@@ -210,7 +210,7 @@ class ContactTrackerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(null);
 
         $this->coreParametersHelperMock->expects($this->any())
-            ->method('getParameter')
+            ->method('get')
             ->willReturn(true);
 
         $this->leadRepositoryMock->expects($this->once())
@@ -242,7 +242,7 @@ class ContactTrackerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(null);
 
         $this->coreParametersHelperMock->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->willReturn(false);
 
         $this->leadRepositoryMock->expects($this->never())

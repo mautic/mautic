@@ -20,9 +20,7 @@ use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 class SchedulerRepository extends EntityRepository
 {
     /**
-     * @param Report $report
-     *
-     * @return null|Report
+     * @return Report|null
      */
     public function getSchedulerByReport(Report $report)
     {
@@ -30,8 +28,6 @@ class SchedulerRepository extends EntityRepository
     }
 
     /**
-     * @param ExportOption $exportOption
-     *
      * @return array|Scheduler[]
      */
     public function getScheduledReportsForExport(ExportOption $exportOption)
