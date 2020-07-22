@@ -484,6 +484,21 @@ class ConfigType extends AbstractType
                 'required' => false,
             ]
         );
+        
+        $builder->add(
+            'transliterate_page_titles',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.core.config.form.transliterate.page.titles',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.form.transliterate.page.titles.tooltip',
+                ],
+                'data'     => isset($options['data']['transliterate_page_titles']) ? (bool) $options['data']['transliterate_page_titles'] : false,
+                'required' => false,
+            ]
+        );
 
         $ipLookupFactory = $this->ipLookupFactory;
         $formModifier    = function (FormEvent $event) use ($ipLookupFactory) {

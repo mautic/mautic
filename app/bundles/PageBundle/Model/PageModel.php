@@ -595,9 +595,15 @@ class PageModel extends FormModel
             $hit->setPageLanguage($query['page_language']);
         }
         if (isset($query['page_title'])) {
+          // Translitrate the page titles.
+          if($this->coreParametersHelper('transliterate_page_titles')) {
             $safeTitle = InputHelper::transliterate($query['page_title']);
             $hit->setUrlTitle($safeTitle);
             $query['page_title'] = $safeTitle;
+          } else {
+            $hit->setUrlTitle($query['page_title']);
+            $query['page_title'] = $query['page_title'];
+          }
         }
 
         $hit->setQuery($query);
