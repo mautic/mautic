@@ -83,7 +83,7 @@
         "friendsofsymfony/oauth-server-bundle": "1.5.2",
         "willdurand/oauth-server-bundle": "0.0.2",
         "jms/serializer-bundle": "~1.1",
-        "oneup/uploader-bundle": "~1.3",
+        "oneup/uploader-bundle": "^1.9.4",
 
         "phpoffice/phpexcel": "1.8.1",
         "joomla/http": "1.2.*",
