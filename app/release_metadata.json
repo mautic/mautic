@@ -1,6 +1,6 @@
 {
-  "version": "3.0.1",
-  "stability": "stable",
+  "version": "3.0.2-rc",
+  "stability": "rc",
   "minimum_php_version": "7.2.21",
   "maximum_php_version": "7.3.99",
   "minimum_mautic_version": "3.0.0-alpha",
