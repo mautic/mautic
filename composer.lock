@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e09408d23624dfd3451cee6e23c5815b",
+    "content-hash": "31c3e40179c18371297f6ef8597723dd",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -3592,17 +3592,17 @@
         },
         {
             "name": "oneup/uploader-bundle",
-            "version": "1.9.3",
+            "version": "1.9.4",
             "target-dir": "Oneup/UploaderBundle",
             "source": {
                 "type": "git",
                 "url": "https://github.com/1up-lab/OneupUploaderBundle.git",
-                "reference": "d59fcd2e5f675ee83c53965e16d21a942e90a9ef"
+                "reference": "8a6dc57c35e12fbc341e52e401a1d286475ec445"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/1up-lab/OneupUploaderBundle/zipball/d59fcd2e5f675ee83c53965e16d21a942e90a9ef",
-                "reference": "d59fcd2e5f675ee83c53965e16d21a942e90a9ef",
+                "url": "https://api.github.com/repos/1up-lab/OneupUploaderBundle/zipball/8a6dc57c35e12fbc341e52e401a1d286475ec445",
+                "reference": "8a6dc57c35e12fbc341e52e401a1d286475ec445",
                 "shasum": ""
             },
             "require": {
@@ -3663,7 +3663,7 @@
                 "plupload",
                 "upload"
             ],
-            "time": "2020-02-04T10:37:36+00:00"
+            "time": "2020-02-04T12:08:35+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -10853,5 +10853,6 @@
     "platform-dev": [],
     "platform-overrides": {
         "php": "5.6.19"
-    }
+    },
+    "plugin-api-version": "1.1.0"
 }
