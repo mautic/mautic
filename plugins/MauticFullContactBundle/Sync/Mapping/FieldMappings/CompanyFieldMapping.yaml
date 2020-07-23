@@ -3,6 +3,7 @@
     displayName: "Name"
     name: name
     type: text
+    required: true
 -
     displayName: "Location"
     name: location
@@ -11,6 +12,7 @@
     displayName: "Website"
     name: website
     type: text
+    required: true
 -
     displayName: "LinkedIn"
     name: linkedin

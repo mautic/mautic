@@ -3,6 +3,7 @@
     displayName: "Email Address"
     name: email
     type: text
+    required: true
 -
     displayName: "First Name"
     name: given
