@@ -1493,7 +1493,8 @@ Mautic.initSlotListeners = function() {
             var froalaOptions = mQuery.extend({}, Mautic.basicFroalaOptions, {
                     linkList: [], // TODO push here the list of tokens from Mautic.getPredefinedLinks
                     imageEditButtons: ['imageReplace', 'imageAlign', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove'],
-                    useClasses: false
+                    useClasses: false,
+                    imageOutputSize: true
                 }
             );
             image.froalaEditor(froalaOptions);

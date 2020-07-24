@@ -17,7 +17,7 @@ use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 class SocialMonitorEvent extends CommonEvent
 {
     /**
-     * @var
+     * @var string
      */
     protected $integrationName;
 

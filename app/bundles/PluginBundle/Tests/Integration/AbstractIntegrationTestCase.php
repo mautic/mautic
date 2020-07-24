@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
@@ -104,6 +105,11 @@ class AbstractIntegrationTestCase extends MauticMysqlTestCase
      */
     protected $integrationEntityModel;
 
+    /**
+     * @var DoNotContact|\PHPUnit\Framework\MockObject\MockObject
+     */
+    protected $doNotContact;
+
     protected function setUp()
     {
         parent::setUp();
@@ -123,5 +129,6 @@ class AbstractIntegrationTestCase extends MauticMysqlTestCase
         $this->notificationModel      = $this->createMock(NotificationModel::class);
         $this->fieldModel             = $this->createMock(FieldModel::class);
         $this->integrationEntityModel = $this->createMock(IntegrationEntityModel::class);
+        $this->doNotContact           = $this->createMock(DoNotContact::class);
     }
 }

@@ -289,6 +289,11 @@ class AppKernel extends Kernel
         return __DIR__;
     }
 
+    public function getProjectDir(): string
+    {
+        return dirname(__DIR__);
+    }
+
     /**
      * {@inheritdoc}
      *

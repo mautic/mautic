@@ -147,19 +147,19 @@ class Event implements ChannelInterface
     private $contactLog = [];
 
     /**
-     * @var
+     * @var string|null
      */
     private $channel;
 
     /**
-     * @var
+     * @var int|null
      */
     private $channelId;
 
     /**
-     * @var
+     * @var array
      */
-    private $changes;
+    private $changes = [];
 
     public function __construct()
     {
@@ -417,7 +417,7 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getChanges()
     {

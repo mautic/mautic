@@ -203,16 +203,19 @@ class PluginController extends FormController
                 if ($authorize || $valid) {
                     $em          = $this->get('doctrine.orm.entity_manager');
                     $integration = $entity->getName();
-                    $keys        = $form['apiKeys']->getData();
 
-                    // Prevent merged keys
-                    $secretKeys = $integrationObject->getSecretKeys();
-                    foreach ($secretKeys as $secretKey) {
-                        if (empty($keys[$secretKey]) && !empty($currentKeys[$secretKey])) {
-                            $keys[$secretKey] = $currentKeys[$secretKey];
+                    if (isset($form['apiKeys'])) {
+                        $keys = $form['apiKeys']->getData();
+
+                        // Prevent merged keys
+                        $secretKeys = $integrationObject->getSecretKeys();
+                        foreach ($secretKeys as $secretKey) {
+                            if (empty($keys[$secretKey]) && !empty($currentKeys[$secretKey])) {
+                                $keys[$secretKey] = $currentKeys[$secretKey];
+                            }
                         }
+                        $integrationObject->encryptAndSetApiKeys($keys, $entity);
                     }
-                    $integrationObject->encryptAndSetApiKeys($keys, $entity);
 
                     if (!$authorize) {
                         $features = $entity->getSupportedFeatures();

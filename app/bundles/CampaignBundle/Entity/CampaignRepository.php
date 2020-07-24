@@ -554,4 +554,31 @@ class CampaignRepository extends CommonRepository
             ->execute()
             ->fetch();
     }
+
+    /**
+     * @param int   $segmentId
+     * @param array $campaignIds
+     *
+     * @return array
+     */
+    public function getCampaignsSegmentShare($segmentId, $campaignIds = [])
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('c.id, c.name, ROUND(IFNULL(COUNT(DISTINCT t.lead_id)/COUNT(DISTINCT cl.lead_id)*100, 0),1) segmentCampaignShare');
+        $q->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c')
+            ->leftJoin('c', MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl', 'cl.campaign_id = c.id AND cl.manually_removed = 0')
+            ->leftJoin('cl',
+                '(SELECT lll.lead_id AS ll, lll.lead_id FROM lead_lists_leads lll WHERE lll.leadlist_id = '.$segmentId
+                .' AND lll.manually_removed = 0)',
+                't',
+                't.lead_id = cl.lead_id'
+            );
+        $q->groupBy('c.id');
+
+        if (!empty($campaignIds)) {
+            $q->where($q->expr()->in('c.id', $campaignIds));
+        }
+
+        return $q->execute()->fetchAll();
+    }
 }

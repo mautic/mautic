@@ -163,6 +163,7 @@ return [
                     'mautic.helper.ip_lookup',
                     'mautic.lead.model.lead',
                     'mautic.factory',
+                    'mautic.tracker.contact',
                 ],
             ],
             'mautic.point.model.triggerevent' => [
@@ -175,6 +176,7 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.point.model.triggerevent',
                     'mautic.factory',
+                    'mautic.tracker.contact',
                 ],
             ],
         ],

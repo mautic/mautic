@@ -22,7 +22,7 @@ abstract class AbstractCustomRequestEvent extends Event
     protected $request;
 
     /**
-     * @var
+     * @var string
      */
     protected $route;
 

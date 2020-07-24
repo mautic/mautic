@@ -25,7 +25,7 @@ use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\MockObject\MockBuilder;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -43,11 +43,6 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
     private $scheduler;
 
     /**
-     * @var MockBuilder|LeadModel
-     */
-    private $leadModel;
-
-    /**
      * @var MockBuilder|NotificationHelper
      */
     private $notificationHelper;
@@ -56,6 +51,11 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
      * @var MockBuilder|MauticFactory
      */
     private $mauticFactory;
+
+    /**
+     * @var MockBuilder|ContactTracker
+     */
+    private $contactTracker;
 
     protected function setUp()
     {
@@ -67,15 +67,15 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->leadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->notificationHelper = $this->getMockBuilder(NotificationHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->mauticFactory = $this->getMockBuilder(MauticFactory::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->contactTracker = $this->getMockBuilder(ContactTracker::class)
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -97,9 +97,6 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $pendingEvent->expects($this->once())
             ->method('failAll');
-
-        $this->leadModel->expects($this->never())
-            ->method('setSystemCurrentLead');
 
         $this->getLegacyEventDispatcher()->dispatchCustomEvent($config, $logs, false, $pendingEvent, $this->mauticFactory);
     }
@@ -130,8 +127,8 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $pendingEvent->expects($this->once())
             ->method('pass');
 
-        $this->leadModel->expects($this->exactly(2))
-            ->method('setSystemCurrentLead');
+        $this->contactTracker->expects($this->exactly(2))
+            ->method('setSystemContact');
 
         // Legacy custom event should dispatch
         $this->dispatcher->expects($this->at(0))
@@ -172,8 +169,8 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $pendingEvent->expects($this->once())
             ->method('pass');
 
-        $this->leadModel->expects($this->exactly(2))
-            ->method('setSystemCurrentLead');
+        $this->contactTracker->expects($this->exactly(2))
+            ->method('setSystemContact');
 
         // Legacy execution event should dispatch
         $this->dispatcher->expects($this->at(0))
@@ -211,8 +208,8 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $pendingEvent->expects($this->once())
             ->method('pass');
 
-        $this->leadModel->expects($this->exactly(2))
-            ->method('setSystemCurrentLead');
+        $this->contactTracker->expects($this->exactly(2))
+            ->method('setSystemContact');
 
         // Legacy custom event should dispatch
         $this->dispatcher->expects($this->at(0))
@@ -256,8 +253,8 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $pendingEvent->expects($this->once())
             ->method('fail');
 
-        $this->leadModel->expects($this->exactly(2))
-            ->method('setSystemCurrentLead');
+        $this->contactTracker->expects($this->exactly(2))
+            ->method('setSystemContact');
 
         // Legacy custom event should dispatch
         $this->dispatcher->expects($this->at(0))
@@ -308,8 +305,8 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $pendingEvent->expects($this->once())
             ->method('fail');
 
-        $this->leadModel->expects($this->exactly(2))
-            ->method('setSystemCurrentLead');
+        $this->contactTracker->expects($this->exactly(2))
+            ->method('setSystemContact');
 
         // Legacy custom event should dispatch
         $this->dispatcher->expects($this->at(0))
@@ -357,8 +354,8 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $pendingEvent->expects($this->once())
             ->method('passWithError');
 
-        $this->leadModel->expects($this->exactly(2))
-            ->method('setSystemCurrentLead');
+        $this->contactTracker->expects($this->exactly(2))
+            ->method('setSystemContact');
 
         // Legacy custom event should dispatch
         $this->dispatcher->expects($this->at(0))
@@ -402,8 +399,8 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $pendingEvent->expects($this->once())
             ->method('pass');
 
-        $this->leadModel->expects($this->exactly(2))
-            ->method('setSystemCurrentLead');
+        $this->contactTracker->expects($this->exactly(2))
+            ->method('setSystemContact');
 
         // Should pass
         $this->dispatcher->expects($this->at(0))
@@ -447,8 +444,8 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $pendingEvent->expects($this->never())
             ->method('pass');
 
-        $this->leadModel->expects($this->exactly(2))
-            ->method('setSystemCurrentLead');
+        $this->contactTracker->expects($this->exactly(2))
+            ->method('setSystemContact');
 
         $this->dispatcher->expects($this->at(0))
             ->method('dispatch')
@@ -469,9 +466,9 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
             $this->dispatcher,
             $this->scheduler,
             new NullLogger(),
-            $this->leadModel,
             $this->notificationHelper,
-            $this->mauticFactory
+            $this->mauticFactory,
+            $this->contactTracker
         );
     }
 

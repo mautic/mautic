@@ -21,6 +21,7 @@ use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Entity\WebhookRepository;
+use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -67,6 +68,8 @@ class WebhookModelTest extends \PHPUnit\Framework\TestCase
      */
     private $model;
 
+    private $httpClientMock;
+
     protected function setUp()
     {
         $this->parametersHelperMock  = $this->createMock(CoreParametersHelper::class);
@@ -76,6 +79,7 @@ class WebhookModelTest extends \PHPUnit\Framework\TestCase
         $this->userHelper            = $this->createMock(UserHelper::class);
         $this->dispatcher            = $this->createMock(EventDispatcherInterface::class);
         $this->webhookRepository     = $this->createMock(WebhookRepository::class);
+        $this->httpClientMock        = $this->createMock(Client::class);
         $this->model                 = $this->initModel();
     }
 
@@ -205,7 +209,8 @@ class WebhookModelTest extends \PHPUnit\Framework\TestCase
         $model = new WebhookModel(
             $this->parametersHelperMock,
             $this->serializerMock,
-            $this->notificationModelMock
+            $this->notificationModelMock,
+            $this->httpClientMock
         );
 
         $model->setEntityManager($this->entityManagerMock);

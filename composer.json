@@ -1,7 +1,7 @@
 {
     "name": "mautic/core",
     "license": "GPL-3.0",
-    "type": "project",
+    "type": "mautic-core",
     "description": "Mautic Open Source Distribution",
     "autoload": {
         "psr-4": {
@@ -67,6 +67,7 @@
         "doctrine/doctrine-migrations-bundle": "~2.1",
         "doctrine/annotations": "~1.8.0",
         "doctrine/data-fixtures": "~1.4.0",
+        "doctrine/orm": "2.7.0",
 
         "knplabs/gaufrette": "~0.9.0",
         "aws/aws-sdk-php": "~3.0",

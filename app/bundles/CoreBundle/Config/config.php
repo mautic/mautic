@@ -361,6 +361,7 @@ return [
                     '%mautic.date_format_dateonly%',
                     '%mautic.date_format_timeonly%',
                     'translator',
+                    'mautic.helper.core_parameters',
                 ],
                 'alias' => 'date',
             ],
@@ -372,7 +373,6 @@ return [
             'mautic.helper.template.gravatar' => [
                 'class'     => \Mautic\CoreBundle\Templating\Helper\GravatarHelper::class,
                 'arguments' => [
-                    'mautic.helper.paths',
                     'mautic.helper.template.default_avatar',
                     'mautic.helper.core_parameters',
                     'request_stack',

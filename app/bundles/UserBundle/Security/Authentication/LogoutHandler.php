@@ -55,8 +55,6 @@ class LogoutHandler implements LogoutHandlerInterface
      */
     public function logout(Request $request, Response $response, TokenInterface $token)
     {
-        $this->userModel->setOnlineStatus('offline');
-
         if ($this->dispatcher->hasListeners(UserEvents::USER_LOGOUT)) {
             $event = new LogoutEvent($this->user, $request);
             $this->dispatcher->dispatch(UserEvents::USER_LOGOUT, $event);

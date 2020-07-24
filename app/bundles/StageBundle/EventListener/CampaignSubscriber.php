@@ -62,7 +62,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->addAction('stage.change', $action);
     }
 
-    public function onCampaignTriggerActionChangeStage(CampaignExecutionEvent $event)
+    public function onCampaignTriggerActionChangeStage(CampaignExecutionEvent $event, $eventName)
     {
         $stageChange = false;
         $lead        = $event->getLead();
@@ -87,7 +87,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             $lead->stageChangeLogEntry(
                 $stageToChangeTo,
                 $stageToChangeTo->getId().': '.$stageToChangeTo->getName(),
-                $event->getName()
+                $eventName
             );
             $lead->setStage($stageToChangeTo);
 

@@ -16,9 +16,6 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\Event;
 
-/**
- * Class LeadTimelineEvent.
- */
 class LeadTimelineEvent extends Event
 {
     /**
@@ -109,9 +106,6 @@ class LeadTimelineEvent extends Event
      */
     protected $forTimeline = true;
 
-    /**
-     * @var
-     */
     protected $siteDomain;
 
     /**
@@ -127,8 +121,6 @@ class LeadTimelineEvent extends Event
     ];
 
     /**
-     * LeadTimelineEvent constructor.
-     *
      * @param int         $page
      * @param int         $limit       Limit per type
      * @param bool        $forTimeline

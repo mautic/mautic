@@ -65,7 +65,7 @@ class FormValidationSubscriber implements EventSubscriberInterface
             ]
         );
 
-        if (!empty($this->coreParametersHelper->getParameter('do_not_submit_emails'))) {
+        if (!empty($this->coreParametersHelper->get('do_not_submit_emails'))) {
             $event->addValidator(
                 'email.validation',
                 [
@@ -99,7 +99,7 @@ class FormValidationSubscriber implements EventSubscriberInterface
             $donotSubmitFilter = function ($doNotSubmitArray) use ($value) {
                 return fnmatch($doNotSubmitArray, $value, FNM_CASEFOLD);
             };
-            $notNotSubmitEmails = $this->coreParametersHelper->getParameter('do_not_submit_emails');
+            $notNotSubmitEmails = $this->coreParametersHelper->get('do_not_submit_emails');
             if (array_filter($notNotSubmitEmails, $donotSubmitFilter)) {
                 $event->failedValidation(ArrayHelper::getValue('donotsubmit_validationmsg', $field->getValidation()));
             }

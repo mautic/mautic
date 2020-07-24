@@ -15,13 +15,10 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference as BaseTemplateReference;
 
-/**
- * Class TemplateReference.
- */
 class TemplateReference extends BaseTemplateReference
 {
     /**
-     * @var
+     * @var string
      */
     protected $themeOverride;
 
@@ -48,16 +45,13 @@ class TemplateReference extends BaseTemplateReference
     /**
      * Set a template specific theme override.
      *
-     * @param $theme
+     * @param string $theme
      */
     public function setThemeOverride($theme)
     {
         $this->themeOverride = $theme;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPath()
     {
         $controller = str_replace('\\', '/', $this->get('controller'));
@@ -123,9 +117,6 @@ class TemplateReference extends BaseTemplateReference
         return $template;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLogicalName()
     {
         $logicalName = parent::getLogicalName();

@@ -294,6 +294,7 @@ return [
                     'mautic.queue.service',
                     'mautic.lead.model.company',
                     'mautic.tracker.device',
+                    'mautic.tracker.contact',
                 ],
                 'methodCalls' => [
                     'setCatInUrl' => [
@@ -317,8 +318,8 @@ return [
             'mautic.page.model.video' => [
                 'class'     => 'Mautic\PageBundle\Model\VideoModel',
                 'arguments' => [
-                    'mautic.lead.model.lead',
                     'mautic.helper.ip_lookup',
+                    'mautic.tracker.contact',
                 ],
             ],
         ],
@@ -370,10 +371,10 @@ return [
             'mautic.page.helper.tracking' => [
                 'class'     => 'Mautic\PageBundle\Helper\TrackingHelper',
                 'arguments' => [
-                    'mautic.lead.model.lead',
                     'session',
                     'mautic.helper.core_parameters',
                     'request_stack',
+                    'mautic.tracker.contact',
                 ],
             ],
         ],

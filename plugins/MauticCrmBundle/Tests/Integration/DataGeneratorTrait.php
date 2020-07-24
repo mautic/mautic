@@ -21,7 +21,7 @@ trait DataGeneratorTrait
     protected $page = 1;
 
     /**
-     * @var
+     * @var int
      */
     protected $id = 0;
 

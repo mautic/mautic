@@ -80,10 +80,10 @@ return [
                     'mautic.form.helper.token',
                     'mautic.focus.helper.token',
                     'mautic.core.model.auditlog',
-                    'mautic.lead.model.lead',
                     'mautic.helper.dynamicContent',
                     'mautic.dynamicContent.model.dynamicContent',
                     'mautic.security',
+                    'mautic.tracker.contact',
                 ],
             ],
             'mautic.dynamicContent.subscriber.channel' => [

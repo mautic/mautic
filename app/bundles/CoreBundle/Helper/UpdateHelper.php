@@ -13,6 +13,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use Joomla\Http\Http;
 use Mautic\CoreBundle\Helper\Update\Exception\CouldNotFetchLatestVersionException;
 use Mautic\CoreBundle\Helper\Update\Exception\LatestVersionSupportedException;
 use Mautic\CoreBundle\Helper\Update\Exception\UpdateCacheDataNeedsToBeRefreshedException;
@@ -152,13 +153,22 @@ class UpdateHelper
                 'message' => 'mautic.core.updater.error.fetching.updates',
             ];
         } catch (RequestException $exception) {
-            $this->logger->error(
-                sprintf(
-                    'UPDATE CHECK: Could not fetch a release list: %s (%s)',
-                    $exception->getResponse()->getStatusCode(),
-                    $exception->getResponse()->getReasonPhrase()
-                )
-            );
+            if (!empty($exception->getResponse())) {
+                $this->logger->error(
+                    sprintf(
+                        'UPDATE CHECK: Could not fetch a release list: %s (%s)',
+                        $exception->getResponse()->getStatusCode(),
+                        $exception->getResponse()->getReasonPhrase()
+                    )
+                );
+            } else {
+                $this->logger->error(
+                    sprintf(
+                        'UPDATE CHECK: Could not fetch a release list: %s',
+                        $exception->getMessage()
+                    )
+                );
+            }
 
             return [
                 'error'   => true,
@@ -219,19 +229,31 @@ class UpdateHelper
             );
 
             $options = [
-                'form_params'     => $data,
-                'connect_timeout' => 10,
+                \GuzzleHttp\RequestOptions::FORM_PARAMS     => $data,
+                \GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => 10,
+                \GuzzleHttp\RequestOptions::HEADERS         => [
+                    'Accept' => '*/*',
+                ],
             ];
 
             $this->client->request('POST', $statUrl, $options);
         } catch (RequestException $exception) {
-            $this->logger->error(
-                sprintf(
-                    'STAT UPDATE: Error communicating with the stat server: %s (%s)',
-                    $exception->getResponse()->getStatusCode(),
-                    $exception->getResponse()->getReasonPhrase()
-                )
-            );
+            if (!empty($exception->getResponse())) {
+                $this->logger->error(
+                    sprintf(
+                        'STAT UPDATE: Error communicating with the stat server: %s (%s)',
+                        $exception->getResponse()->getStatusCode(),
+                        $exception->getResponse()->getReasonPhrase()
+                    )
+                );
+            } else {
+                $this->logger->error(
+                    sprintf(
+                        'STAT UPDATE: Error communicating with the stat server: %s',
+                        $exception->getMessage()
+                    )
+                );
+            }
         } catch (\Exception $exception) {
             // Not so concerned about failures here, move along
             $this->logger->error(sprintf('STAT UPDATE: %s', $exception->getMessage()));

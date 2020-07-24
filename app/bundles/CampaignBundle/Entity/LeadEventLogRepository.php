@@ -399,7 +399,7 @@ class LeadEventLogRepository extends CommonRepository
         $q->select('o, e, c')
             ->indexBy('o', 'o.id')
             ->innerJoin('o.event', 'e')
-            ->innerJoin('o.campaign', 'c')
+            ->innerJoin('e.campaign', 'c')
             ->where(
                 $q->expr()->andX(
                     $q->expr()->eq('IDENTITY(o.event)', ':eventId'),
@@ -440,7 +440,7 @@ class LeadEventLogRepository extends CommonRepository
         $q->select('o, e, c')
             ->indexBy('o', 'o.id')
             ->innerJoin('o.event', 'e')
-            ->innerJoin('o.campaign', 'c')
+            ->innerJoin('e.campaign', 'c')
             ->where(
                 $q->expr()->andX(
                     $q->expr()->in('o.id', $ids),

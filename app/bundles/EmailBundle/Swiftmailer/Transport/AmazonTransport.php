@@ -135,11 +135,22 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
 
             // only deal with hard bounces
             if ('Bounce' == $message['notificationType'] && 'Permanent' == $message['bounce']['bounceType']) {
+                $emailId = null;
+
+                if (isset($message['mail']['headers'])) {
+                    foreach ($message['mail']['headers'] as $header) {
+                        if ('X-EMAIL-ID' === $header['name']) {
+                            $emailId = $header['value'];
+                        }
+                    }
+                }
+
                 // Get bounced recipients in an array
                 $bouncedRecipients = $message['bounce']['bouncedRecipients'];
                 foreach ($bouncedRecipients as $bouncedRecipient) {
-                    $this->transportCallback->addFailureByAddress($bouncedRecipient['emailAddress'], $bouncedRecipient['diagnosticCode']);
-                    $this->logger->debug("Mark email '".$bouncedRecipient['emailAddress']."' as bounced, reason: ".$bouncedRecipient['diagnosticCode']);
+                    $bounceCode = array_key_exists('diagnosticCode', $bouncedRecipient) ? $bouncedRecipient['diagnosticCode'] : 'unknown';
+                    $this->transportCallback->addFailureByAddress($bouncedRecipient['emailAddress'], $bounceCode, DoNotContact::BOUNCED, $emailId);
+                    $this->logger->debug("Mark email '".$bouncedRecipient['emailAddress']."' as bounced, reason: ".$bounceCode);
                 }
 
                 return;
