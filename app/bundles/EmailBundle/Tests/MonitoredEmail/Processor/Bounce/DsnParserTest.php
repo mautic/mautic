@@ -18,7 +18,7 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Type;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser;
 
-class DsnParserTest extends \PHPUnit_Framework_TestCase
+class DsnParserTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Test that a BouncedEmail is returned from a dsn report

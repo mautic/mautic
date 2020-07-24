@@ -60,9 +60,9 @@ EOT
         $skipClear  = $input->getOption('do-not-clear');
         $quiet      = $input->hasOption('quiet') ? $input->getOption('quiet') : false;
         $timeout    = $input->getOption('clear-timeout');
-        $queueMode  = $container->get('mautic.helper.core_parameters')->getParameter('mailer_spool_type');
+        $queueMode  = $container->get('mautic.helper.core_parameters')->get('mailer_spool_type');
 
-        if ($queueMode != 'file') {
+        if ('file' != $queueMode) {
             $output->writeln('Mautic is not set to queue email.');
 
             return 0;
@@ -103,7 +103,7 @@ EOT
                     rename($failedFile, $tmpFilename);
 
                     $message = unserialize(file_get_contents($tmpFilename));
-                    if ($message !== false && is_object($message) && get_class($message) === 'Swift_Message') {
+                    if (false !== $message && is_object($message) && 'Swift_Message' === get_class($message)) {
                         $tryAgain = false;
                         if ($dispatcher->hasListeners(EmailEvents::EMAIL_RESEND)) {
                             $event = new QueueEmailEvent($message);
@@ -173,7 +173,7 @@ EOT
 
         $this->completeRun();
 
-        if ($returnCode !== 0) {
+        if (0 !== $returnCode) {
             return $returnCode;
         }
 

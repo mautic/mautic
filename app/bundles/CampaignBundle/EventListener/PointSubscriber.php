@@ -11,14 +11,12 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CampaignBundle\Form\Type\CampaignEventAddRemoveLeadType;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\PointEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class PointSubscriber.
- */
-class PointSubscriber extends CommonSubscriber
+class PointSubscriber implements EventSubscriberInterface
 {
     /**
      * {@inheritdoc}
@@ -30,16 +28,13 @@ class PointSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param TriggerBuilderEvent $event
-     */
     public function onTriggerBuild(TriggerBuilderEvent $event)
     {
         $changeLists = [
             'group'    => 'mautic.campaign.point.trigger',
             'label'    => 'mautic.campaign.point.trigger.changecampaigns',
             'callback' => ['\\Mautic\\CampaignBundle\\Helper\\CampaignEventHelper', 'addRemoveLead'],
-            'formType' => 'campaignevent_addremovelead',
+            'formType' => CampaignEventAddRemoveLeadType::class,
         ];
 
         $event->addEvent('campaign.changecampaign', $changeLists);

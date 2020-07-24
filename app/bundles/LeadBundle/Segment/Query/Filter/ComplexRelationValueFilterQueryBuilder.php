@@ -116,7 +116,7 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 break;
             case 'multiselect':
             case '!multiselect':
-                $operator    = $filterOperator === 'multiselect' ? 'regexp' : 'notRegexp';
+                $operator    = 'multiselect' === $filterOperator ? 'regexp' : 'notRegexp';
                 $expressions = [];
                 foreach ($filterParametersHolder as $parameter) {
                     $expressions[] = $queryBuilder->expr()->$operator($tableAlias.'.'.$filter->getField(), $parameter);

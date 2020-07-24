@@ -9,23 +9,23 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Helper;
+namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\TrailingSlashHelper;
 use Symfony\Component\HttpFoundation\Request;
 
-class TrailingSlashHelperTest extends \PHPUnit_Framework_TestCase
+class TrailingSlashHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var CoreParametersHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $coreParametersHelper;
 
     protected function setUp()
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->coreParametersHelper->method('getParameter')
+        $this->coreParametersHelper->method('get')
             ->with('site_url')
             ->willReturn('https://test.com');
     }

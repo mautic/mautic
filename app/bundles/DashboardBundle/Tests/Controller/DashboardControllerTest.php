@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class DashboardControllerTest extends \PHPUnit_Framework_TestCase
+class DashboardControllerTest extends \PHPUnit\Framework\TestCase
 {
     private $requestMock;
     private $securityMock;

@@ -20,10 +20,6 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class SlotDwcType extends SlotType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -60,7 +56,7 @@ class SlotDwcType extends SlotType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'slot_dwc';
     }

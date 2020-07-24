@@ -40,9 +40,6 @@ class Interval implements ScheduleModeInterface
 
     /**
      * Interval constructor.
-     *
-     * @param LoggerInterface      $logger
-     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(LoggerInterface $logger, CoreParametersHelper $coreParametersHelper)
     {
@@ -51,10 +48,6 @@ class Interval implements ScheduleModeInterface
     }
 
     /**
-     * @param Event     $event
-     * @param \DateTime $compareFromDateTime
-     * @param \DateTime $comparedToDateTime
-     *
      * @return \DateTime
      *
      * @throws NotSchedulableException
@@ -94,9 +87,6 @@ class Interval implements ScheduleModeInterface
     }
 
     /**
-     * @param LeadEventLog $log
-     * @param \DateTime    $compareFromDateTime
-     *
      * @return \DateTime
      *
      * @throws NotSchedulableException
@@ -121,11 +111,6 @@ class Interval implements ScheduleModeInterface
     }
 
     /**
-     * @param Event           $event
-     * @param ArrayCollection $contacts
-     * @param \DateTime       $executionDate
-     * @param null|\DateTime  $compareFromDateTime
-     *
      * @return GroupExecutionDateDAO[]
      */
     public function groupContactsByDate(Event $event, ArrayCollection $contacts, \DateTime $executionDate, \DateTime $compareFromDateTime = null)
@@ -166,13 +151,16 @@ class Interval implements ScheduleModeInterface
     /**
      * Checks if an event has a relative time configured.
      *
-     * @param Event $event
-     *
      * @return bool
      */
     public function isContactSpecificExecutionDateRequired(Event $event)
     {
         if (Event::TRIGGER_MODE_INTERVAL !== $event->getTriggerMode()) {
+            return false;
+        }
+
+        // Restrict just for daily scheduling
+        if ('d' !== $event->getTriggerIntervalUnit()) {
             return false;
         }
 
@@ -188,14 +176,7 @@ class Interval implements ScheduleModeInterface
     }
 
     /**
-     * @param                $eventId
-     * @param Lead           $contact
-     * @param \DateInterval  $diff
-     * @param \DateTime      $compareFromDateTime
-     * @param \DateTime|null $hour
-     * @param \DateTime|null $startTime
-     * @param \DateTime|null $endTime
-     * @param array          $daysOfWeek
+     * @param $eventId
      *
      * @return \DateTime
      */
@@ -259,11 +240,7 @@ class Interval implements ScheduleModeInterface
     }
 
     /**
-     * @param Lead          $contact
-     * @param \DateTime     $hour
-     * @param \DateInterval $diff
-     * @param               $eventId
-     * @param \DateTime     $compareFromDateTime
+     * @param $eventId
      *
      * @return \DateTime
      */
@@ -308,12 +285,7 @@ class Interval implements ScheduleModeInterface
     }
 
     /**
-     * @param Lead          $contact
-     * @param \DateTime     $startTime
-     * @param \DateTime     $endTime
-     * @param \DateInterval $diff
-     * @param               $eventId
-     * @param \DateTime     $compareFromDateTime
+     * @param $eventId
      *
      * @return \DateTime
      */
@@ -395,7 +367,7 @@ class Interval implements ScheduleModeInterface
         }
 
         $this->defaultTimezone = new \DateTimeZone(
-            $this->coreParametersHelper->getParameter('default_timezone', 'UTC')
+            $this->coreParametersHelper->get('default_timezone', 'UTC')
         );
 
         return $this->defaultTimezone;

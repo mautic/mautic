@@ -18,9 +18,6 @@ use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
 class SegmentChartQueryFactory
 {
     /**
-     * @param SegmentContactsLineChartQuery $query
-     * @param ListModel                     $listModel
-     *
      * @return array
      */
     public function getContactsTotal(SegmentContactsLineChartQuery $query, ListModel $listModel)
@@ -31,8 +28,6 @@ class SegmentChartQueryFactory
     }
 
     /**
-     * @param SegmentContactsLineChartQuery $query
-     *
      * @return array
      */
     public function getContactsAdded(SegmentContactsLineChartQuery $query)
@@ -41,8 +36,6 @@ class SegmentChartQueryFactory
     }
 
     /**
-     * @param SegmentContactsLineChartQuery $query
-     *
      * @return array
      */
     public function getContactsRemoved(SegmentContactsLineChartQuery $query)

@@ -34,10 +34,6 @@ class SegmentCampaignShare
 
     /**
      * SegmentCampaignShare constructor.
-     *
-     * @param CampaignModel      $campaignModel
-     * @param CacheStorageHelper $cacheStorageHelper
-     * @param EntityManager      $entityManager
      */
     public function __construct(CampaignModel $campaignModel, CacheStorageHelper $cacheStorageHelper, EntityManager $entityManager)
     {

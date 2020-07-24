@@ -16,9 +16,6 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class Field.
- */
 class Field
 {
     /**
@@ -131,9 +128,6 @@ class Field
      */
     private $changes;
 
-    /**
-     * @var
-     */
     private $sessionId;
 
     /**
@@ -155,9 +149,6 @@ class Field
         $this->form = null;
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -542,8 +533,6 @@ class Field
     /**
      * Set form.
      *
-     * @param Form $form
-     *
      * @return Field
      */
     public function setForm(Form $form)
@@ -867,7 +856,7 @@ class Field
     public function showForContact($submissions = null, Lead $lead = null, Form $form = null)
     {
         // Always show in the kiosk mode
-        if ($form !== null && $form->getInKioskMode() === true) {
+        if (null !== $form && true === $form->getInKioskMode()) {
             return true;
         }
 
@@ -876,7 +865,7 @@ class Field
             return false;
         }
 
-        if ($this->showWhenValueExists === false) {
+        if (false === $this->showWhenValueExists) {
             // Hide the field if there is the value condition and if we already know the value for this field
             if ($submissions) {
                 foreach ($submissions as $submission) {
@@ -887,7 +876,7 @@ class Field
             }
 
             // Hide the field if the value is already known from the lead profile
-            if ($lead !== null && $this->leadField && !empty($lead->getFieldValue($this->leadField)) && !$this->isAutoFill) {
+            if (null !== $lead && $this->leadField && !empty($lead->getFieldValue($this->leadField)) && !$this->isAutoFill) {
                 return false;
             }
         }
@@ -900,7 +889,7 @@ class Field
      */
     public function isCaptchaType()
     {
-        return $this->type === 'captcha';
+        return 'captcha' === $this->type;
     }
 
     /**
@@ -908,6 +897,6 @@ class Field
      */
     public function isFileType()
     {
-        return $this->type === 'file';
+        return 'file' === $this->type;
     }
 }

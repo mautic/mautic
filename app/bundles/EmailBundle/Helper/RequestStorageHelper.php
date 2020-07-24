@@ -29,9 +29,6 @@ class RequestStorageHelper
      */
     private $cacheStorage;
 
-    /**
-     * @param CacheStorageHelper $cacheStorage
-     */
     public function __construct(CacheStorageHelper $cacheStorage)
     {
         $this->cacheStorage = $cacheStorage;
@@ -40,8 +37,7 @@ class RequestStorageHelper
     /**
      * Stores the request content into cache and returns the unique key under which it's stored.
      *
-     * @param string  $transportName
-     * @param Request $request
+     * @param string $transportName
      *
      * @return string
      */
@@ -114,7 +110,7 @@ class RequestStorageHelper
      */
     private function removeCachePrefix($key)
     {
-        if (strpos($key, 'mautic:') === 0) {
+        if (0 === strpos($key, 'mautic:')) {
             $key = ltrim($key, 'mautic:');
         }
 
@@ -135,7 +131,7 @@ class RequestStorageHelper
         $key       = uniqid($transportName.self::KEY_SEPARATOR, true);
         $keyLength = strlen($key);
 
-        if ($keyLength > 255) {
+        if ($keyLength > 191) {
             throw new \LengthException(sprintf('Key %s must be shorter than 256 characters. It has %d characters', $key, $keyLength));
         }
 

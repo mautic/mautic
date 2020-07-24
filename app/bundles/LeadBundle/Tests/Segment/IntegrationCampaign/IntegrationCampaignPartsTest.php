@@ -13,7 +13,7 @@ namespace Mautic\LeadBundle\Tests\Segment\IntegrationCampaign;
 
 use Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts;
 
-class IntegrationCampaignPartsTest extends \PHPUnit_Framework_TestCase
+class IntegrationCampaignPartsTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers \Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts::getIntegrationName()

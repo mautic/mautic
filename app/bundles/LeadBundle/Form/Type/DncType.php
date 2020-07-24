@@ -11,20 +11,19 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class DncType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
             'reason',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.lead.batch.dnc_reason',
                 'required'   => false,
@@ -35,12 +34,12 @@ class DncType extends AbstractType
 
         $builder->add(
             'ids',
-            'hidden'
+            HiddenType::class
         );
 
         $builder->add(
             'buttons',
-            'form_buttons',
+            FormButtonsType::class,
             [
                 'apply_text'     => false,
                 'save_text'      => 'mautic.core.form.save',
@@ -59,7 +58,7 @@ class DncType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'lead_batch_dnc';
     }

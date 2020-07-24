@@ -14,9 +14,9 @@ namespace Mautic\CoreBundle\Templating\Engine;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
+use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 use Symfony\Bundle\FrameworkBundle\Templating\PhpEngine as BasePhpEngine;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -34,7 +34,7 @@ use Symfony\Component\Templating\TemplateNameParserInterface;
 class PhpEngine extends BasePhpEngine
 {
     /**
-     * @var
+     * @var Storage|null
      */
     private $evalTemplate;
 
@@ -63,19 +63,10 @@ class PhpEngine extends BasePhpEngine
      */
     private $request;
 
-    /**
-     * @var
-     */
     private $jsLoadMethodPrefix;
 
     /**
-     * PhpEngine constructor.
-     *
-     * @param TemplateNameParserInterface $parser
-     * @param ContainerInterface          $container
-     * @param LoaderInterface             $loader
-     * @param Stopwatch|GlobalVariables   $delegateStopWatch
-     * @param GlobalVariables|null        $globals
+     * @param Stopwatch|GlobalVariables $delegateStopWatch
      */
     public function __construct(
         TemplateNameParserInterface $parser,
@@ -93,17 +84,11 @@ class PhpEngine extends BasePhpEngine
         parent::__construct($parser, $container, $loader, $globals);
     }
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * @param RequestStack $requestStack
-     */
     public function setRequestStack(RequestStack $requestStack)
     {
         $this->request = $requestStack->getCurrentRequest();
@@ -111,7 +96,6 @@ class PhpEngine extends BasePhpEngine
 
     /**
      * @param string|\Symfony\Component\Templating\TemplateReferenceInterface $name
-     * @param array                                                           $parameters
      *
      * @return false|string
      */
@@ -151,9 +135,6 @@ class PhpEngine extends BasePhpEngine
     }
 
     /**
-     * @param Storage $template
-     * @param array   $mauticTemplateVars
-     *
      * @return false|string
      *
      * @throws \Exception
@@ -194,8 +175,6 @@ class PhpEngine extends BasePhpEngine
     }
 
     /**
-     * @param \Exception $exception
-     *
      * @return false|string
      */
     protected function generateErrorContent(\Exception $exception)
@@ -210,11 +189,6 @@ class PhpEngine extends BasePhpEngine
                         'code'    => 500,
                         'type'    => null,
                     ],
-                ],
-                // @deprecated 2.6.0 to be removed in 3.0
-                'error' => [
-                    'message' => $exception->getMessage().' (`error` is deprecated as of 2.6.0 and will be removed in 3.0. Use the `errors` array instead.)',
-                    'code'    => 500,
                 ],
             ];
             if ('dev' === MAUTIC_ENV) {

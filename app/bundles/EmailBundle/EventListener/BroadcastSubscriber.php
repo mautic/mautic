@@ -14,14 +14,10 @@ namespace Mautic\EmailBundle\EventListener;
 use Doctrine\ORM\EntityManager;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
-use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class BroadcastSubscriber.
- */
 class BroadcastSubscriber implements EventSubscriberInterface
 {
     /**
@@ -39,13 +35,6 @@ class BroadcastSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    /**
-     * BroadcastSubscriber constructor.
-     *
-     * @param EmailModel          $emailModel
-     * @param EntityManager       $em
-     * @param TranslatorInterface $translator
-     */
     public function __construct(EmailModel $emailModel, EntityManager $em, TranslatorInterface $translator)
     {
         $this->model      = $emailModel;
@@ -63,9 +52,6 @@ class BroadcastSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ChannelBroadcastEvent $event
-     */
     public function onBroadcast(ChannelBroadcastEvent $event)
     {
         if (!$event->checkContext('email')) {
@@ -75,7 +61,7 @@ class BroadcastSubscriber implements EventSubscriberInterface
         // Get list of published broadcasts or broadcast if there is only a single ID
         $emails = $this->model->getRepository()->getPublishedBroadcasts($event->getId());
 
-        while (($email = $emails->next()) !== false) {
+        while (false !== ($email = $emails->next())) {
             $emailEntity                                            = $email[0];
             list($sentCount, $failedCount, $failedRecipientsByList) = $this->model->sendEmailToLists(
                 $emailEntity,

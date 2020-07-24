@@ -13,27 +13,21 @@ namespace Mautic\CoreBundle\Helper;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class CookieHelper.
- */
 class CookieHelper
 {
     const SAME_SITE       = '; SameSite=';
     const SAME_SITE_VALUE = 'None';
-    private $path         = null;
-    private $domain       = null;
+    private $path;
+    private $domain;
     private $secure       = false;
     private $httponly     = false;
-    private $request      = null;
+    private $request;
 
     /**
-     * CookieHelper constructor.
-     *
-     * @param              $cookiePath
-     * @param              $cookieDomain
-     * @param              $cookieSecure
-     * @param              $cookieHttp
-     * @param RequestStack $requestStack
+     * @param $cookiePath
+     * @param $cookieDomain
+     * @param $cookieSecure
+     * @param $cookieHttp
      */
     public function __construct($cookiePath, $cookieDomain, $cookieSecure, $cookieHttp, RequestStack $requestStack)
     {
@@ -56,7 +50,7 @@ class CookieHelper
      */
     public function getCookie($key, $default = null)
     {
-        if ($this->request === null) {
+        if (null === $this->request) {
             return $default;
         }
 
@@ -74,14 +68,14 @@ class CookieHelper
      */
     public function setCookie($name, $value, $expire = 1800, $path = null, $domain = null, $secure = null, $httponly = null)
     {
-        if ($this->request == null || (defined('MAUTIC_TEST_ENV') && MAUTIC_TEST_ENV)) {
+        if (null == $this->request || (defined('MAUTIC_TEST_ENV') && MAUTIC_TEST_ENV)) {
             return true;
         }
 
         // If https, SameSite equals None
         $sameSiteNoneText             = '';
         $sameSiteNoneTextGreaterPhp73 = null;
-        if ($secure === true or ($secure === null and $this->secure === true)) {
+        if (true === $secure or (null === $secure and true === $this->secure)) {
             $sameSiteNoneText             = self::SAME_SITE.self::SAME_SITE_VALUE;
             $sameSiteNoneTextGreaterPhp73 = self::SAME_SITE_VALUE;
         }
@@ -92,10 +86,10 @@ class CookieHelper
                 $value,
                 [
                     'expires'  => ($expire) ? (int) (time() + $expire) : null,
-                    'path'     => (($path == null) ? $this->path : $path),
-                    'domain'   => ($domain == null) ? $this->domain : $domain,
-                    'secure'   => ($secure == null) ? $this->secure : $secure,
-                    'httponly' => ($httponly == null) ? $this->httponly : $httponly,
+                    'path'     => ((null == $path) ? $this->path : $path),
+                    'domain'   => (null == $domain) ? $this->domain : $domain,
+                    'secure'   => (null == $secure) ? $this->secure : $secure,
+                    'httponly' => (null == $httponly) ? $this->httponly : $httponly,
                     'samesite' => $sameSiteNoneTextGreaterPhp73,
                 ]
             );
@@ -104,10 +98,10 @@ class CookieHelper
                 $name,
                 $value,
                 ($expire) ? (int) (time() + $expire) : null,
-                (($path == null) ? $this->path : $path).$sameSiteNoneText,
-                ($domain == null) ? $this->domain : $domain,
-                ($secure == null) ? $this->secure : $secure,
-                ($httponly == null) ? $this->httponly : $httponly
+                ((null == $path) ? $this->path : $path).$sameSiteNoneText,
+                (null == $domain) ? $this->domain : $domain,
+                (null == $secure) ? $this->secure : $secure,
+                (null == $httponly) ? $this->httponly : $httponly
             );
         }
     }

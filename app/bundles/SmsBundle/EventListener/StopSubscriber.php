@@ -34,9 +34,6 @@ class StopSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ReplyEvent $event
-     */
     public function onReply(ReplyEvent $event)
     {
         $message = $event->getMessage();

@@ -35,9 +35,9 @@ class CommonEntity
      */
     public function __call($name, $arguments)
     {
-        if (strpos($name, 'is') === 0 && method_exists($this, 'get'.ucfirst($name))) {
+        if (0 === strpos($name, 'is') && method_exists($this, 'get'.ucfirst($name))) {
             return $this->{'get'.ucfirst($name)}();
-        } elseif ($name == 'getName' && method_exists($this, 'getTitle')) {
+        } elseif ('getName' == $name && method_exists($this, 'getTitle')) {
             return $this->getTitle();
         }
 
@@ -65,7 +65,7 @@ class CommonEntity
     {
         $getter  = (method_exists($this, $prop)) ? $prop : 'get'.ucfirst($prop);
         $current = $this->$getter();
-        if ($prop == 'category') {
+        if ('category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -142,9 +142,6 @@ class CommonEntity
         $this->changes     = [];
     }
 
-    /**
-     * @param array $changes
-     */
     public function setChanges(array $changes)
     {
         $this->changes = $changes;

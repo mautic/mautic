@@ -22,8 +22,6 @@ class CategoryRepository extends CommonRepository
     /**
      * Get a list of entities.
      *
-     * @param array $args
-     *
      * @return Paginator
      */
     public function getEntities(array $args = [])
@@ -78,9 +76,7 @@ class CategoryRepository extends CommonRepository
                 ->setMaxResults($limit);
         }
 
-        $results = $q->getQuery()->getArrayResult();
-
-        return $results;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**

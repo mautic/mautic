@@ -35,7 +35,7 @@ class UserRepository extends CommonRepository
 
         $result = $q->getQuery()->getResult();
 
-        return ($result != null) ? $result[0] : null;
+        return (null != $result) ? $result[0] : null;
     }
 
     /**
@@ -60,35 +60,6 @@ class UserRepository extends CommonRepository
         $now  = new DateTimeHelper();
         $conn = $this->_em->getConnection();
         $conn->update(MAUTIC_TABLE_PREFIX.'users', ['last_active' => $now->toUtcString()], ['id' => (int) $user->getId()]);
-    }
-
-    /**
-     * @param $userId
-     * @param $status
-     */
-    public function setOnlineStatus($userId, $status)
-    {
-        $conn = $this->_em->getConnection();
-        $conn->update(MAUTIC_TABLE_PREFIX.'users', ['online_status' => $status], ['id' => (int) $userId]);
-    }
-
-    /**
-     * Last active updates every 2 minutes. If it didn't get updated, it means the user closed their browser and are thus
-     * now offline.
-     */
-    public function updateOnlineStatuses()
-    {
-        $dt           = new DateTimeHelper();
-        $offlineDelay = $dt->getUtcDateTime();
-        $offlineDelay->setTimestamp(strtotime('15 minutes ago'));
-
-        $q = $this->_em->createQueryBuilder()
-            ->update('MauticUserBundle:User', 'u')
-            ->set('u.onlineStatus', ':status')
-            ->where('u.lastActive <= :delay')
-            ->setParameter('delay', $offlineDelay)
-            ->setParameter('status', 'offline');
-        $q->getQuery()->execute();
     }
 
     /**
@@ -117,8 +88,6 @@ class UserRepository extends CommonRepository
 
     /**
      * Get a list of users.
-     *
-     * @param array $args
      *
      * @return Paginator
      */
@@ -221,7 +190,7 @@ class UserRepository extends CommonRepository
         $result = [];
         /** @var User $user */
         foreach ($users as $user) {
-            $result[$user->getId()] = $user->getName(true);
+            $result[$user->getName(true)] = $user->getId();
         }
 
         return $result;
