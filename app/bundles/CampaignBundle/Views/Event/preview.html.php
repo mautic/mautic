@@ -21,12 +21,8 @@ $eventName = ('dev' === MAUTIC_ENV) ? "{$event['name']} <small>{$event['id']}</s
 <div id="CampaignEvent_<?php echo $event['id']; ?>" data-type="<?php echo $event['eventType']; ?>" class="draggable list-campaign-event list-campaign-<?php echo $event['eventType']; ?>" data-event="<?php echo $event['type']; ?>" data-event-id="<?php echo $event['id']; ?>">
 <?php endif; ?>
     <div class="campaign-event-content">
-        <div>
-          <span class="campaign-event-name ellipsis" title="<?php echo $view['translator']->trans('mautic.campaign.'.$event['type']); ?>">
-            <i class="fa fa-info-circle"></i>
-            <?php echo $eventName; ?>
-          </span>
-        </div>
+        <div><span class="campaign-event-name ellipsis"><?php echo $eventName; ?></span></div>
+        <span class="campaign-event-logic" title="<?php echo $view['translator']->trans('mautic.campaign.'.$event['type']); ?>"><i class="fa fa-info-circle"></i></span>
     </div>
 <?php if (empty($update)): ?>
     <div class="campaign-event-buttons hide">
