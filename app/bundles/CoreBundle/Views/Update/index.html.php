@@ -47,11 +47,15 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.core.updat
                             </tbody>
                         </table>
                         <div class="text-right">
-                            <?php if (isset($updateData['isMautic3Upgrade']) && $updateData['isMautic3Upgrade'] === true) { ?>
+                            <?php if (isset($updateData['isMautic3Upgrade']) && $updateData['isMautic3Upgrade'] === true) {
+    ?>
                                 <a class="btn btn-primary" href="<?php echo $updateData['mautic3UpgradeUrl'] ?>"><?php echo $view['translator']->trans('mautic.core.update.now'); ?></a>
-                            <?php } else { ?>
+                            <?php
+} else {
+        ?>
                                 <button class="btn btn-primary" onclick="Mautic.processUpdate('update-panel', 1, '<?php echo base64_encode(json_encode([])); ?>');"><?php echo $view['translator']->trans('mautic.core.update.now'); ?></button>
-                            <?php } ?>
+                            <?php
+    } ?>
                         </div>
                     </div>
                 </div>
