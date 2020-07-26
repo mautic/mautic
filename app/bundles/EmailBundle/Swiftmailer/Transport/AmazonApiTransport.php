@@ -493,8 +493,8 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         }
 
         $ConfigurationSetName = null;
-        if (isset($messageArray['headers']['ConfigurationSetName'])) {
-            $ConfigurationSetName = $messageArray['headers']['ConfigurationSetName'];
+        if (isset($messageArray['headers']['X-SES-CONFIGURATION-SET'])) {
+            $ConfigurationSetName = $messageArray['headers']['X-SES-CONFIGURATION-SET'];
         }
 
         //build amazon ses template array
