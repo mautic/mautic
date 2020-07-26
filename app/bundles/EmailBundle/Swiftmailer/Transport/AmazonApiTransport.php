@@ -635,10 +635,10 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             $message .= 'Bcc: '.implode(',', array_keys($msg['recipients']['bcc']))."\n";
         }
         if (isset($msg['replyTo'])) {
-          $message .= 'Reply-To: '.$msg['replyTo']['email']."\n";
+            $message .= 'Reply-To: '.$msg['replyTo']['email']."\n";
         }
         if (isset($msg['returnPath'])) {
-          $message .= 'Return-Path: '.$msg['returnPath']."\n";
+            $message .= 'Return-Path: '.$msg['returnPath']."\n";
         }
         $message .= "Content-Type: multipart/mixed; boundary=\"$separator_multipart\"\n";
         if (isset($msg['headers'])) {
