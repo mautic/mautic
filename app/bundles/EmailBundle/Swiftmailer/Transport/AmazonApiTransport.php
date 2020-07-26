@@ -483,7 +483,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         }
 
         $BccAddresses = [];
-        if (count($messageArray['recipients']['cc']) > 0) {
+        if (count($messageArray['recipients']['bcc']) > 0) {
             $BccAddresses = array_keys($messageArray['recipients']['bcc']);
         }
 
