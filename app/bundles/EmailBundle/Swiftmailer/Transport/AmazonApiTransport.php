@@ -634,6 +634,12 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         if (count($msg['recipients']['bcc']) > 0) {
             $message .= 'Bcc: '.implode(',', array_keys($msg['recipients']['bcc']))."\n";
         }
+        if (isset($msg['replyTo'])) {
+          $message .= 'Reply-To: '.$msg['replyTo']['email']."\n";
+        }
+        if (isset($msg['returnPath'])) {
+          $message .= 'Return-Path: '.$msg['returnPath']."\n";
+        }
         $message .= "Content-Type: multipart/mixed; boundary=\"$separator_multipart\"\n";
         if (isset($msg['headers'])) {
             foreach ($msg['headers'] as $key => $value) {
