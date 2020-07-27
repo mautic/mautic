@@ -21,22 +21,12 @@ use bandwidthThrottle\tokenBucket\Rate;
 use bandwidthThrottle\tokenBucket\storage\SingleProcessStorage;
 use bandwidthThrottle\tokenBucket\storage\StorageException;
 use bandwidthThrottle\tokenBucket\TokenBucket;
-use Exception;
-use Joomla\Http\Exception\UnexpectedResponseException;
 use Joomla\Http\Http;
-use Mautic\EmailBundle\Model\TransportCallback;
-use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
-use Mautic\EmailBundle\MonitoredEmail\Exception\UnsubscriptionNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
-use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
-use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
-use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Type;
-use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail;
-use Mautic\LeadBundle\Entity\DoNotContact;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback;
 
 /**
  * Class AmazonApiTransport.
@@ -89,9 +79,9 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     private $translator;
 
     /**
-     * @var TransportCallback
+     * @var AmazonCallback
      */
-    private $transportCallback;
+    private $amazonCallback;
 
     /**
      * @var BlockingConsumer
@@ -111,14 +101,13 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     /**
      * AmazonApiTransport constructor.
      */
-    public function __construct(Http $httpClient, LoggerInterface $logger, TranslatorInterface $translator, TransportCallback $transportCallback)
+    public function __construct(Http $httpClient, LoggerInterface $logger, TranslatorInterface $translator, AmazonCallback $amazonCallback)
     {
-        $this->logger            = $logger;
-        $this->translator        = $translator;
-        $this->httpClient        = $httpClient;
-        $this->transportCallback = $transportCallback;
-
-        $this->templateCache     = [];
+        $this->logger         = $logger;
+        $this->translator     = $translator;
+        $this->httpClient     = $httpClient;
+        $this->amazonCallback = $amazonCallback;
+        $this->templateCache  = [];
     }
 
     public function __destruct()
@@ -672,11 +661,32 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
+     * Return the max number of to addresses allowed per batch.
+     *
      * @return int
+     * @see https://docs.aws.amazon.com/ses/latest/DeveloperGuide/quotas.html
      */
     public function getMaxBatchLimit()
     {
         return 50;
+    }
+
+    /**
+     * Get the count for the max number of recipients per batch.
+     *
+     * @param \Swift_Message $message
+     * @param int    $toBeAdded Number of emails about to be added
+     * @param string $type      Type of emails being added (to, cc, bcc)
+     *
+     * @return int
+     */
+    public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
+    {
+        $toCount  = is_countable($message->getTo()) ? count($message->getTo()) : 0;
+        $ccCount  = is_countable($message->getCc()) ? count($message->getCc()) : 0;
+        $bccCount = is_countable($message->getBcc()) ? count($message->getBcc()) : 0;
+
+        return $toCount + $ccCount + $bccCount + $toBeAdded;
     }
 
     /**
@@ -690,194 +700,35 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
-     * @param int    $toBeAdded
-     * @param string $type
-     *
-     * @return int
-     */
-    public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
-    {
-        if ($message->getTo()) {
-            $getTo = count($message->getTo());
-        } else {
-            $getTo = 0;
-        }
-
-        if ($message->getCc()) {
-            $getCc = count($message->getCc());
-        } else {
-            $getCc = 0;
-        }
-
-        if ($message->getBcc()) {
-            $getBcc = count($message->getBcc());
-        } else {
-            $getBcc = 0;
-        }
-
-        return $getTo + $getCc + $getBcc + $toBeAdded;
-    }
-
-    /**
-     * Handle bounces & complaints from Amazon.
-     *
-     * @return array
-     */
+    * Handle bounces & complaints from Amazon.
+    */
     public function processCallbackRequest(Request $request)
     {
-        $this->logger->debug('Receiving webhook from Amazon');
-
-        $payload = json_decode($request->getContent(), true);
-
-        return $this->processJsonPayload($payload);
+        $this->amazonCallback->processCallbackRequest($request);
     }
 
     /**
-     * Process json request from Amazon SES.
-     *
-     * http://docs.aws.amazon.com/ses/latest/DeveloperGuide/best-practices-bounces-complaints.html
-     *
-     * @param array $payload from Amazon SES
-     */
+    * Process json request from Amazon SES.
+    */
     public function processJsonPayload(array $payload)
     {
-        if (!isset($payload['Type'])) {
-            throw new HttpException(400, "Key 'Type' not found in payload ");
-        }
-
-        if ('SubscriptionConfirmation' == $payload['Type']) {
-            // Confirm Amazon SNS subscription by calling back the SubscribeURL from the playload
-            try {
-                $response = $this->httpClient->get($payload['SubscribeURL']);
-                if (200 == $response->code) {
-                    $this->logger->info('Callback to SubscribeURL from Amazon SNS successfully');
-
-                    return;
-                }
-
-                $reason = 'HTTP Code '.$response->code.', '.$response->body;
-            } catch (UnexpectedResponseException $e) {
-                $reason = $e->getMessage();
-            }
-
-            $this->logger->error('Callback to SubscribeURL from Amazon SNS failed, reason: '.$reason);
-
-            return;
-        }
-
-        if ('Notification' == $payload['Type']) {
-            $message = json_decode($payload['Message'], true);
-
-            // only deal with hard bounces
-            if ('Bounce' == $message['notificationType'] && 'Permanent' == $message['bounce']['bounceType']) {
-                $emailId = null;
-
-                if (isset($message['mail']['headers'])) {
-                    foreach ($message['mail']['headers'] as $header) {
-                        if ('X-EMAIL-ID' === $header['name']) {
-                            $emailId = $header['value'];
-                        }
-                    }
-                }
-
-                // Get bounced recipients in an array
-                $bouncedRecipients = $message['bounce']['bouncedRecipients'];
-                foreach ($bouncedRecipients as $bouncedRecipient) {
-                    $bounceCode = array_key_exists('diagnosticCode', $bouncedRecipient) ? $bouncedRecipient['diagnosticCode'] : 'unknown';
-                    $this->transportCallback->addFailureByAddress($bouncedRecipient['emailAddress'], $bounceCode, DoNotContact::BOUNCED, $emailId);
-                    $this->logger->debug("Mark email '".$bouncedRecipient['emailAddress']."' as bounced, reason: ".$bounceCode);
-                }
-
-                return;
-            }
-
-            // unsubscribe customer that complain about spam at their mail provider
-            if ('Complaint' == $message['notificationType']) {
-                foreach ($message['complaint']['complainedRecipients'] as $complainedRecipient) {
-                    $reason = null;
-                    if (isset($message['complaint']['complaintFeedbackType'])) {
-                        // http://docs.aws.amazon.com/ses/latest/DeveloperGuide/notification-contents.html#complaint-object
-                        switch ($message['complaint']['complaintFeedbackType']) {
-                            case 'abuse':
-                                $reason = $this->translator->trans('mautic.email.complaint.reason.abuse');
-                                break;
-                            case 'fraud':
-                                $reason = $this->translator->trans('mautic.email.complaint.reason.fraud');
-                                break;
-                            case 'virus':
-                                $reason = $this->translator->trans('mautic.email.complaint.reason.virus');
-                                break;
-                        }
-                    }
-
-                    if (null == $reason) {
-                        $reason = $this->translator->trans('mautic.email.complaint.reason.unknown');
-                    }
-
-                    $this->transportCallback->addFailureByAddress($complainedRecipient['emailAddress'], $reason, DoNotContact::UNSUBSCRIBED);
-
-                    $this->logger->debug("Unsubscribe email '".$complainedRecipient['emailAddress']."'");
-                }
-
-                return;
-            }
-        }
-
-        $this->logger->warn("Received SES webhook of type '$payload[Type]' but couldn't understand payload");
-        $this->logger->debug('SES webhook payload: '.json_encode($payload));
+        $this->amazonCallback->processJsonPayload($payload);
     }
 
-    /**
-     * @throws BounceNotFound
-     */
     public function processBounce(Message $message)
     {
-        if (self::SNS_ADDRESS !== $message->fromAddress) {
-            throw new BounceNotFound();
-        }
-
-        $message = $this->getSnsPayload($message->textPlain);
-        if ('Bounce' !== $message['notificationType']) {
-            throw new BounceNotFound();
-        }
-
-        $bounce = new BouncedEmail();
-        $bounce->setContactEmail($message['bounce']['bouncedRecipients'][0]['emailAddress'])
-            ->setBounceAddress($message['mail']['source'])
-            ->setType(Type::UNKNOWN)
-            ->setRuleCategory(Category::UNKNOWN)
-            ->setRuleNumber('0013')
-            ->setIsFinal(true);
-
-        return $bounce;
+        $this->amazonCallback->processBounce($message);
     }
 
-    /**
-     * @return UnsubscribedEmail
-     *
-     * @throws UnsubscriptionNotFound
-     */
     public function processUnsubscription(Message $message)
     {
-        if (self::SNS_ADDRESS !== $message->fromAddress) {
-            throw new UnsubscriptionNotFound();
-        }
-
-        $message = $this->getSnsPayload($message->textPlain);
-        if ('Complaint' !== $message['notificationType']) {
-            throw new UnsubscriptionNotFound();
-        }
-
-        return new UnsubscribedEmail($message['complaint']['complainedRecipients'][0]['emailAddress'], $message['mail']['source']);
+        $this->amazonCallback->processUnsubscription($message);
     }
 
-    /**
-     * @param string $body
-     *
-     * @return array
-     */
-    protected function getSnsPayload($body)
+    public function getSnsPayload($body)
     {
-        return json_decode(strtok($body, "\n"), true);
+        $this->amazonCallback->getSnsPayload($body);
     }
+
+
 }

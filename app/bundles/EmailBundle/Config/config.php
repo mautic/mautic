@@ -391,7 +391,7 @@ return [
                     'mautic.http.connector',
                     'monolog.logger.mautic',
                     'translator',
-                    'mautic.email.model.transport_callback',
+                    'mautic.transport.amazon.callback',
                 ],
                 'methodCalls' => [
                     'setUsername' => ['%mautic.mailer_user%'],
@@ -405,7 +405,7 @@ return [
                     'mautic.http.connector',
                     'monolog.logger.mautic',
                     'translator',
-                    'mautic.email.model.transport_callback',
+                    'mautic.transport.amazon.callback',
                 ],
                 'methodCalls' => [
                     'setUsername' => ['%mautic.mailer_user%'],
@@ -561,6 +561,14 @@ return [
             'mautic.transport.sendgrid_api.calback' => [
                 'class'     => \Mautic\EmailBundle\Swiftmailer\SendGrid\Callback\SendGridApiCallback::class,
                 'arguments' => [
+                    'mautic.email.model.transport_callback',
+                ],
+            ],
+            'mautic.transport.amazon.callback' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback::class,
+                'arguments' => [
+                    'monolog.logger.mautic',
+                    'translator',
                     'mautic.email.model.transport_callback',
                 ],
             ],
