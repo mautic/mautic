@@ -364,6 +364,9 @@ trait LeadDetailsTrait
                 continue;
             }
             $lead            = $model->getEntity($contact['lead_id']);
+            if (!$lead instanceof Lead) {
+                continue;
+            }
             $engagementsData = $this->getStatsCount($lead);
 
             $engagements = array_map(function ($a, $b) {
