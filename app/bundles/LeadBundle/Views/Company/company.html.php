@@ -97,6 +97,7 @@ $view['slots']->set(
         ]
     )
 );
+
 ?>
 
 <!-- start: box layout -->
@@ -212,6 +213,7 @@ $view['slots']->set(
                                 'company'     => $company,
                                 'tmpl'        => 'index',
                                 'permissions' => $permissions,
+                                'security'    => $security,
                                 'page'        => $page,
                                 'limit'       => $limit,
                                 'totalItems'  => $totalItems,
