@@ -8,6 +8,67 @@ $baseUrl = $view['router']->path(
     ]
 );
 
+$customButtons = [];
+if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) {
+    $customButtons = [
+        [
+            'attr' => [
+                'class'       => 'btn btn-default btn-sm btn-nospin',
+                'data-toggle' => 'ajaxmodal',
+                'data-target' => '#MauticSharedModal',
+                'href'        => $view['router']->path('mautic_segment_batch_contact_view'),
+                'data-header' => $view['translator']->trans('mautic.lead.batch.lists'),
+            ],
+            'btnText'   => $view['translator']->trans('mautic.lead.batch.lists'),
+            'iconClass' => 'fa fa-pie-chart',
+        ],
+        [
+            'attr' => [
+                'class'       => 'btn btn-default btn-sm btn-nospin',
+                'data-toggle' => 'ajaxmodal',
+                'data-target' => '#MauticSharedModal',
+                'href'        => $view['router']->path('mautic_contact_action', ['objectAction' => 'batchStages']),
+                'data-header' => $view['translator']->trans('mautic.lead.batch.stages'),
+            ],
+            'btnText'   => $view['translator']->trans('mautic.lead.batch.stages'),
+            'iconClass' => 'fa fa-tachometer',
+        ],
+        [
+            'attr' => [
+                'class'       => 'btn btn-default btn-sm btn-nospin',
+                'data-toggle' => 'ajaxmodal',
+                'data-target' => '#MauticSharedModal',
+                'href'        => $view['router']->path('mautic_contact_action', ['objectAction' => 'batchCampaigns']),
+                'data-header' => $view['translator']->trans('mautic.lead.batch.campaigns'),
+            ],
+            'btnText'   => $view['translator']->trans('mautic.lead.batch.campaigns'),
+            'iconClass' => 'fa fa-clock-o',
+        ],
+        [
+            'attr' => [
+                'class'       => 'btn btn-default btn-sm btn-nospin',
+                'data-toggle' => 'ajaxmodal',
+                'data-target' => '#MauticSharedModal',
+                'href'        => $view['router']->path('mautic_contact_action', ['objectAction' => 'batchOwners']),
+                'data-header' => $view['translator']->trans('mautic.lead.batch.owner'),
+            ],
+            'btnText'   => $view['translator']->trans('mautic.lead.batch.owner'),
+            'iconClass' => 'fa fa-user',
+        ],
+        [
+            'attr' => [
+                'class'       => 'btn btn-default btn-sm btn-nospin',
+                'data-toggle' => 'ajaxmodal',
+                'data-target' => '#MauticSharedModal',
+                'href'        => $view['router']->path('mautic_contact_action', ['objectAction' => 'batchDnc']),
+                'data-header' => $view['translator']->trans('mautic.lead.batch.dnc'),
+            ],
+            'btnText'   => $view['translator']->trans('mautic.lead.batch.dnc'),
+            'iconClass' => 'fa fa-ban text-danger',
+        ],
+    ];
+}
+
 ?>
 
 <?php if (count($contacts)): ?>
@@ -16,6 +77,18 @@ $baseUrl = $view['router']->path(
             <thead>
                 <tr>
                     <?php
+                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
+                        'checkall'        => 'true',
+                        'target'          => '#contacts-table',
+                        'templateButtons' => [
+                            'delete' => $permissions['lead:leads:deleteown'] || $permissions['lead:leads:deleteother'],
+                        ],
+                        'customButtons' => $customButtons,
+                        'langVar'       => 'lead.lead',
+                        'routeBase'     => 'contact',
+                        'tooltip'       => $view['translator']->trans('mautic.lead.list.checkall.help'),
+                    ]);
+
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                         'sessionVar' => 'company.'.$company->getId().'.contacts',
                         'orderBy'    => 'l.lastname, l.firstname, l.company, l.email',
@@ -84,6 +157,57 @@ $baseUrl = $view['router']->path(
             <?php foreach ($contacts as $contact) : ?>
                 <?php $fields = $contact->getFields(); ?>
                 <tr>
+                    <td>
+                        <?php
+                        $hasEditAccess = $security->hasEntityAccess(
+                            $permissions['lead:leads:editown'],
+                            $permissions['lead:leads:editother'],
+                            $contact->getPermissionUser()
+                        );
+
+                        $custom = [];
+                        if ($hasEditAccess && !empty($currentList)) {
+                            //this lead was manually added to a list so give an option to remove them
+                            $custom[] = [
+                                'attr' => [
+                                    'href' => $view['router']->path('mautic_segment_action', [
+                                        'objectAction' => 'removeLead',
+                                        'objectId'     => $currentList['id'],
+                                        'leadId'       => $contact->getId(),
+                                    ]),
+                                    'data-toggle' => 'ajax',
+                                    'data-method' => 'POST',
+                                ],
+                                'btnText'   => 'mautic.lead.lead.remove.fromlist',
+                                'iconClass' => 'fa fa-remove',
+                            ];
+                        }
+
+                        if (!empty($fields['core']['email']['value'])) {
+                            $custom[] = [
+                                'attr' => [
+                                    'data-toggle' => 'ajaxmodal',
+                                    'data-target' => '#MauticSharedModal',
+                                    'data-header' => $view['translator']->trans('mautic.lead.email.send_email.header', ['%email%' => $fields['core']['email']['value']]),
+                                    'href'        => $view['router']->path('mautic_contact_action', ['objectId' => $contact->getId(), 'objectAction' => 'email', 'list' => 1]),
+                                ],
+                                'btnText'   => 'mautic.lead.email.send_email',
+                                'iconClass' => 'fa fa-send',
+                            ];
+                        }
+
+                        echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', [
+                            'item'            => $contact,
+                            'templateButtons' => [
+                                'edit'   => $hasEditAccess,
+                                'delete' => $security->hasEntityAccess($permissions['lead:leads:deleteown'], $permissions['lead:leads:deleteother'], $contact->getPermissionUser()),
+                            ],
+                            'routeBase'     => 'contact',
+                            'langVar'       => 'lead.lead',
+                            'customButtons' => $custom,
+                        ]);
+                        ?>
+                    </td>
                     <td>
                         <a href="<?php echo $view['router']->path('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $contact->getId()]); ?>" data-toggle="ajax">
 
