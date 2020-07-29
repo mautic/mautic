@@ -142,6 +142,20 @@ class CompanyController extends FormController
             return $this->accessDenied();
         }
 
+        //set some permissions
+        $permissions = $this->get('mautic.security')->isGranted(
+            [
+                'lead:leads:viewown',
+                'lead:leads:viewother',
+                'lead:leads:create',
+                'lead:leads:editown',
+                'lead:leads:editother',
+                'lead:leads:deleteown',
+                'lead:leads:deleteother',
+            ],
+            'RETURN_ARRAY'
+        );
+
         /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
         $model  = $this->getModel('lead.company');
 
@@ -162,11 +176,13 @@ class CompanyController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'company'    => $company,
-                    'page'       => $data['page'],
-                    'contacts'   => $data['items'],
-                    'totalItems' => $data['count'],
-                    'limit'      => $data['limit'],
+                    'company'     => $company,
+                    'page'        => $data['page'],
+                    'contacts'    => $data['items'],
+                    'totalItems'  => $data['count'],
+                    'limit'       => $data['limit'],
+                    'permissions' => $permissions,
+                    'security'    => $this->get('mautic.security'),
                 ],
                 'contentTemplate' => 'MauticLeadBundle:Company:list_rows_contacts.html.php',
             ]
