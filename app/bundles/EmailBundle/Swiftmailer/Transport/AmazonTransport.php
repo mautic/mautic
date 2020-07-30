@@ -13,6 +13,7 @@ namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 use Joomla\Http\Http;
 use Mautic\EmailBundle\MonitoredEmail\Message;
+use Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -28,21 +29,6 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
     const SNS_ADDRESS = 'no-reply@sns.amazonaws.com';
 
     /**
-     * @var Http
-     */
-    private $httpClient;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * @var AmazonCallback
      */
     private $amazonCallback;
@@ -56,10 +42,6 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
     {
         parent::__construct($host, 2587, 'tls');
         $this->setAuthMode('login');
-
-        $this->logger         = $logger;
-        $this->translator     = $translator;
-        $this->httpClient     = $httpClient;
         $this->amazonCallback = $amazonCallback;
     }
 
@@ -74,16 +56,16 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
     }
 
     /**
-    * Handle bounces & complaints from Amazon.
-    */
+     * Handle bounces & complaints from Amazon.
+     */
     public function processCallbackRequest(Request $request)
     {
         $this->amazonCallback->processCallbackRequest($request);
     }
 
     /**
-    * Process json request from Amazon SES.
-    */
+     * Process json request from Amazon SES.
+     */
     public function processJsonPayload(array $payload)
     {
         $this->amazonCallback->processJsonPayload($payload);

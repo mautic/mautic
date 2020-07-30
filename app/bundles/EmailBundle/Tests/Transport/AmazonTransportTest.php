@@ -14,6 +14,7 @@ namespace Mautic\EmailBundle\Tests\Transport;
 use Joomla\Http\Http;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Model\TransportCallback;
+use Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback;
 use Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport;
 use Monolog\Logger;
 
@@ -32,6 +33,11 @@ class AmazonTransportTest extends \PHPUnit\Framework\TestCase
      */
     private $translator;
 
+    /**
+     * @var mockHttp
+     */
+    private $mockHttp;
+
     protected function setUp()
     {
         $this->logger = $this->getMockBuilder(Logger::class)
@@ -48,6 +54,10 @@ class AmazonTransportTest extends \PHPUnit\Framework\TestCase
                     return $key;
                 }
             );
+        // Mock http connector
+        $this->mockHttp = $this->getMockBuilder('Joomla\Http\Http')
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 
     /**
@@ -59,17 +69,14 @@ class AmazonTransportTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        // Mock http connector
-        $mockHttp = $this->getMockBuilder('Joomla\Http\Http')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $amazonTransport = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $transportCallback);
 
         // Mock a successful response
         $mockResponse       = $this->getMockBuilder('Joomla\Http\Response')
             ->getMock();
         $mockResponse->code = 200;
 
-        $mockHttp->expects($this->once())
+        $this->mockHttp->expects($this->once())
             ->method('get')
             ->willReturn($mockResponse);
 
@@ -91,7 +98,7 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonTransport('localhost', $mockHttp, $this->logger, $this->translator, $transportCallback);
+        $transport = new AmazonTransport('localhost', $this->mockHttp, $this->logger, $this->translator, $amazonTransport);
         $transport->processJsonPayload($jsonPayload);
     }
 
@@ -103,6 +110,8 @@ PAYLOAD;
         $transportCallback = $this->getMockBuilder(TransportCallback::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $amazonTransport = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $transportCallback);
 
         $transportCallback->expects($this->once())
             ->method('addFailureByAddress')
@@ -125,7 +134,7 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonTransport('localhost', new Http(), $this->logger, $this->translator, $transportCallback);
+        $transport = new AmazonTransport('localhost', new Http(), $this->logger, $this->translator, $amazonTransport);
         $transport->processJsonPayload($jsonPayload);
     }
 
@@ -137,6 +146,8 @@ PAYLOAD;
         $transportCallback = $this->getMockBuilder(TransportCallback::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $amazonTransport = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $transportCallback);
 
         $transportCallback->expects($this->once())
             ->method('addFailureByAddress')
@@ -159,7 +170,7 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonTransport('localhost', new Http(), $this->logger, $this->translator, $transportCallback);
+        $transport = new AmazonTransport('localhost', new Http(), $this->logger, $this->translator, $amazonTransport);
         $transport->processJsonPayload($jsonPayload);
     }
 
@@ -171,6 +182,8 @@ PAYLOAD;
         $transportCallback = $this->getMockBuilder(TransportCallback::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $amazonTransport = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $transportCallback);
 
         $transportCallback->expects($this->once())
             ->method('addFailureByAddress')
@@ -193,7 +206,7 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonTransport('localhost', new Http(), $this->logger, $this->translator, $transportCallback);
+        $transport = new AmazonTransport('localhost', new Http(), $this->logger, $this->translator, $amazonTransport);
         $transport->processJsonPayload($jsonPayload);
     }
 }

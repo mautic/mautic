@@ -23,10 +23,10 @@ use bandwidthThrottle\tokenBucket\storage\StorageException;
 use bandwidthThrottle\tokenBucket\TokenBucket;
 use Joomla\Http\Http;
 use Mautic\EmailBundle\MonitoredEmail\Message;
+use Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
-use Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback;
 
 /**
  * Class AmazonApiTransport.
@@ -64,19 +64,9 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     private $client;
 
     /**
-     * @var Http
-     */
-    private $httpClient;
-
-    /**
      * @var LoggerInterface
      */
     private $logger;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
 
     /**
      * @var AmazonCallback
@@ -104,8 +94,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     public function __construct(Http $httpClient, LoggerInterface $logger, TranslatorInterface $translator, AmazonCallback $amazonCallback)
     {
         $this->logger         = $logger;
-        $this->translator     = $translator;
-        $this->httpClient     = $httpClient;
         $this->amazonCallback = $amazonCallback;
         $this->templateCache  = [];
     }
@@ -664,6 +652,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
      * Return the max number of to addresses allowed per batch.
      *
      * @return int
+     *
      * @see https://docs.aws.amazon.com/ses/latest/DeveloperGuide/quotas.html
      */
     public function getMaxBatchLimit()
@@ -674,7 +663,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     /**
      * Get the count for the max number of recipients per batch.
      *
-     * @param \Swift_Message $message
      * @param int    $toBeAdded Number of emails about to be added
      * @param string $type      Type of emails being added (to, cc, bcc)
      *
@@ -700,16 +688,16 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
-    * Handle bounces & complaints from Amazon.
-    */
+     * Handle bounces & complaints from Amazon.
+     */
     public function processCallbackRequest(Request $request)
     {
         $this->amazonCallback->processCallbackRequest($request);
     }
 
     /**
-    * Process json request from Amazon SES.
-    */
+     * Process json request from Amazon SES.
+     */
     public function processJsonPayload(array $payload)
     {
         $this->amazonCallback->processJsonPayload($payload);
@@ -729,6 +717,4 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     {
         $this->amazonCallback->getSnsPayload($body);
     }
-
-
 }

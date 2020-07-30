@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Amazon;
 
+use Joomla\Http\Http;
 use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Exception\UnsubscriptionNotFound;
@@ -20,13 +21,12 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Type;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Symfony\Component\HttpFoundation\Request;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class AmazonCallback
 {
-
     /**
      * @var TranslatorInterface
      */
@@ -40,14 +40,14 @@ class AmazonCallback
     /**
      * @var TransportCallback
      */
-
     private $transportCallback;
 
-    public function __construct(TranslatorInterface $translator, LoggerInterface $logger, TransportCallback $transportCallback)
+    public function __construct(TranslatorInterface $translator, LoggerInterface $logger, Http $httpClient, TransportCallback $transportCallback)
     {
         $this->translator        = $translator;
         $this->logger            = $logger;
         $this->transportCallback = $transportCallback;
+        $this->httpClient        = $httpClient;
     }
 
     /**
