@@ -11,7 +11,7 @@
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Types;
+use Doctrine\DBAL\Types\TextType;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
@@ -30,7 +30,7 @@ class Version20200729170800 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema): void
     {
-        if ($schema->getTable($this->prefix.$this->table)->getColumn('column_value')->getType() instanceof Doctrine\DBAL\Types\TextType) {
+        if ($schema->getTable($this->prefix.$this->table)->getColumn('column_value')->getType() instanceof TextType) {
             throw new SkipMigration('column_value is already the correct type.');
         }
     }
