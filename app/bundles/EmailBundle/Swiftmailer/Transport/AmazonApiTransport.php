@@ -91,7 +91,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     /**
      * AmazonApiTransport constructor.
      */
-    public function __construct(Http $httpClient, LoggerInterface $logger, TranslatorInterface $translator, AmazonCallback $amazonCallback)
+    public function __construct(LoggerInterface $logger, AmazonCallback $amazonCallback)
     {
         $this->logger         = $logger;
         $this->amazonCallback = $amazonCallback;
@@ -160,7 +160,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
      * SES authorization and choice of region
      * Initializing of TokenBucket.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function start()
     {
@@ -187,7 +187,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
 
             if ($emailQuotaRemaining <= 0) {
                 $this->logger->error('Your AWS SES quota is currently exceeded, used '.$quota->get('SentLast24Hours').' of '.$quota->get('Max24HourSend'));
-                throw new Exception('Your AWS SES quota is currently exceeded');
+                throw new \Exception('Your AWS SES quota is currently exceeded');
             }
 
             /*
@@ -247,7 +247,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             $message->generateId();
 
             $this->throwException($e->getAwsErrorMessage());
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->triggerSendError($evt, $failedRecipients);
             $message->generateId();
 
@@ -279,7 +279,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     /**
      * Initialize the token buckets for throttling.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     private function initializeThrottles()
     {
@@ -303,11 +303,11 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             $bucketSend->bootstrap($this->concurrency);
         } catch (\InvalidArgumentException $e) {
             $this->logger->error('error configuring token buckets: '.$e->getMessage());
-            throw new Exception($e->getMessage());
+            throw new \Exception($e->getMessage());
         } catch (StorageException $e) {
             $this->logger->error('error bootstrapping token buckets: '.$e->getMessage());
-            throw new Exception($e->getMessage());
-        } catch (Exception $e) {
+            throw new \Exception($e->getMessage());
+        } catch (\Exception $e) {
             $this->logger->error('error initializing token buckets: '.$e->getMessage());
             throw $e;
         }
@@ -318,7 +318,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
      *
      * @return \Aws\Result
      *
-     * @throws Exception
+     * @throws \Exception
      *
      * @see https://docs.aws.amazon.com/ses/latest/APIReference/API_GetSendQuota.html
      */
@@ -329,7 +329,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             return $this->client->getSendQuota();
         } catch (AwsException $e) {
             $this->logger->error('Error retrieving AWS SES quota info: '.$e->getMessage());
-            throw new Exception($e->getMessage());
+            throw new \Exception($e->getMessage());
         }
     }
 
@@ -338,7 +338,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
      *
      * @return \Aws\Result|null
      *
-     * @throws Exception
+     * @throws \Exception
      *
      * @see https://docs.aws.amazon.com/ses/latest/APIReference/API_CreateTemplate.html
      */
@@ -367,11 +367,11 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         } catch (AwsException $e) {
             switch ($e->getAwsErrorCode()) {
                 case 'AlreadyExists':
-                    $this->logger->debug('Exception creating template: '.$templateName.', '.$e->getAwsErrorCode().', '.$e->getAwsErrorMessage().', ignoring');
+                    $this->logger->debug('\Exception creating template: '.$templateName.', '.$e->getAwsErrorCode().', '.$e->getAwsErrorMessage().', ignoring');
                     break;
                 default:
-                    $this->logger->error('Exception creating template: '.$templateName.', '.$e->getAwsErrorCode().', '.$e->getAwsErrorMessage());
-                    throw new Exception($e->getMessage());
+                    $this->logger->error('\Exception creating template: '.$templateName.', '.$e->getAwsErrorCode().', '.$e->getAwsErrorMessage());
+                    throw new \Exception($e->getMessage());
             }
         }
 
@@ -388,7 +388,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
      *
      * @return \Aws\Result
      *
-     * @throws Exception
+     * @throws \Exception
      *
      * @see https://docs.aws.amazon.com/ses/latest/APIReference/API_DeleteTemplate.html
      */
@@ -399,8 +399,8 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         try {
             return $this->client->deleteTemplate(['TemplateName' => $templateName]);
         } catch (AwsException $e) {
-            $this->logger->error('Exception deleting template: '.$templateName.', '.$e->getAwsErrorCode().', '.$e->getAwsErrorMessage());
-            throw new Exception($e->getMessage());
+            $this->logger->error('\Exception deleting template: '.$templateName.', '.$e->getAwsErrorCode().', '.$e->getAwsErrorMessage());
+            throw new \Exception($e->getMessage());
         }
     }
 
@@ -410,7 +410,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
      *
      * @return \Aws\Result
      *
-     * @throws Exception
+     * @throws \Exception
      *
      * @see https://docs.aws.amazon.com/ses/latest/APIReference/API_SendBulkTemplatedEmail.html
      */
@@ -424,8 +424,8 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         try {
             return $this->client->sendBulkTemplatedEmail($message);
         } catch (AwsException $e) {
-            $this->logger->error('Exception sending email template: '.$e->getAwsErrorCode().', '.$e->getAwsErrorMessage());
-            throw new Exception($e->getMessage());
+            $this->logger->error('\Exception sending email template: '.$e->getAwsErrorCode().', '.$e->getAwsErrorMessage());
+            throw new \Exception($e->getMessage());
         }
     }
 
@@ -551,7 +551,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             $promise->wait();
 
             return count($commands);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->triggerSendError($evt, $failedRecipients);
             $message->generateId();
             $this->throwException($e->getMessage());

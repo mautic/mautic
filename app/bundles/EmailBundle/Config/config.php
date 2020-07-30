@@ -388,9 +388,6 @@ return [
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'arguments'    => [
                     '%mautic.mailer_amazon_region%',
-                    'mautic.http.connector',
-                    'monolog.logger.mautic',
-                    'translator',
                     'mautic.transport.amazon.callback',
                 ],
                 'methodCalls' => [
@@ -402,9 +399,7 @@ return [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\AmazonApiTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'arguments'    => [
-                    'mautic.http.connector',
                     'monolog.logger.mautic',
-                    'translator',
                     'mautic.transport.amazon.callback',
                 ],
                 'methodCalls' => [

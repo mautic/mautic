@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Amazon;
 
+use Joomla\Http\Exception\UnexpectedResponseException;
 use Joomla\Http\Http;
 use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
@@ -23,10 +24,16 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class AmazonCallback
 {
+    /**
+     * From address for SNS email.
+     */
+    const SNS_ADDRESS = 'no-reply@sns.amazonaws.com';
+
     /**
      * @var TranslatorInterface
      */
@@ -36,6 +43,11 @@ class AmazonCallback
      * @var LoggerInterface
      */
     private $logger;
+
+    /**
+     * @var Http
+     */
+    private $httpClient;
 
     /**
      * @var TransportCallback

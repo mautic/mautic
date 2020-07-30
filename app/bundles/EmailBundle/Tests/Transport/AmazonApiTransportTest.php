@@ -98,7 +98,7 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonApiTransport($this->mockHttp, $this->logger, $this->translator, $amazonTransport);
+        $transport = new AmazonApiTransport($this->logger, $amazonTransport);
         $transport->processJsonPayload($jsonPayload);
     }
 
@@ -134,7 +134,7 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonApiTransport(new Http(), $this->logger, $this->translator, $amazonTransport);
+        $transport = new AmazonApiTransport($this->logger, $amazonTransport);
         $transport->processJsonPayload($jsonPayload);
     }
 
@@ -170,7 +170,7 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonApiTransport(new Http(), $this->logger, $this->translator, $amazonTransport);
+        $transport = new AmazonApiTransport($this->logger, $amazonTransport);
         $transport->processJsonPayload($jsonPayload);
     }
 
@@ -206,7 +206,7 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonApiTransport(new Http(), $this->logger, $this->translator, $amazonTransport);
+        $transport = new AmazonApiTransport($this->logger, $amazonTransport);
         $transport->processJsonPayload($jsonPayload);
     }
 }

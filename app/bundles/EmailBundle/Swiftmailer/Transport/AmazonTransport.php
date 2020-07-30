@@ -38,7 +38,7 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
      *
      * @param string $host
      */
-    public function __construct($host, Http $httpClient, LoggerInterface $logger, TranslatorInterface $translator, AmazonCallback $amazonCallback)
+    public function __construct($host, AmazonCallback $amazonCallback)
     {
         parent::__construct($host, 2587, 'tls');
         $this->setAuthMode('login');
@@ -68,7 +68,7 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
      */
     public function processJsonPayload(array $payload)
     {
-        $this->amazonCallback->processJsonPayload($payload);
+        return $this->amazonCallback->processJsonPayload($payload);
     }
 
     public function processBounce(Message $message)
