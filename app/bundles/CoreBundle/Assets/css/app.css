@@ -235,7 +235,7 @@ body > #app-wrapper {
   position: static;
 }
 #app-header.navbar .navbar-nocollapse .navbar-nav .dropdown-custom .dropdown-menu {
-  width: 320px;
+  width: auto;
   overflow: hidden;
 }
 @media (max-width: 480px) {
@@ -4834,4 +4834,17 @@ ul.media-list.media-list-feed div.media-object {
 }
 .ui-sortable-handle:active {
   cursor: grabbing;
+}
+
+.notification {
+  width: inherit !important;
+}
+
+.notification-title {
+  display: block !important;
+}
+
+.notification-empty {
+  width: 100px;
+  margin: 50px;
 }
