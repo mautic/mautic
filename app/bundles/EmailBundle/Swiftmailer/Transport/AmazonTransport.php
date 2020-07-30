@@ -11,7 +11,6 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
-use Joomla\Http\Http;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback;
 use Psr\Log\LoggerInterface;

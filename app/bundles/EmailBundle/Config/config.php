@@ -562,8 +562,9 @@ return [
             'mautic.transport.amazon.callback' => [
                 'class'     => \Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback::class,
                 'arguments' => [
-                    'monolog.logger.mautic',
                     'translator',
+                    'monolog.logger.mautic',
+                    'mautic.http.connector',
                     'mautic.email.model.transport_callback',
                 ],
             ],
