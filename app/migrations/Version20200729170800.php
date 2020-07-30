@@ -30,7 +30,7 @@ class Version20200729170800 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema): void
     {
-        if (Types::TEXT === $schema->getTable($this->prefix.$this->table)->getColumn('column_value')->getType()) {
+        if ($schema->getTable($this->prefix.$this->table)->getColumn('column_value')->getType() instanceof Doctrine\DBAL\Types\TextType) {
             throw new SkipMigration('column_value is already the correct type.');
         }
     }
