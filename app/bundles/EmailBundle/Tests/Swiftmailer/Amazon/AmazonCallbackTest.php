@@ -73,7 +73,7 @@ class AmazonCallbackTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->amazonCallback = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $transportCallback);
+        $this->amazonCallback = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
     }
 
     /**
