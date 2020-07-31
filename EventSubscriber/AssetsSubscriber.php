@@ -6,10 +6,10 @@ namespace MauticPlugin\GrapesJsBuilderBundle\EventSubscriber;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomAssetsEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class AssetsSubscriber extends CommonSubscriber
+class AssetsSubscriber implements EventSubscriberInterface
 {
     /**
      * @var Config
@@ -28,9 +28,6 @@ class AssetsSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param CustomAssetsEvent $assetsEvent
-     */
     public function injectAssets(CustomAssetsEvent $assetsEvent)
     {
         if ($this->config->isPublished()) {

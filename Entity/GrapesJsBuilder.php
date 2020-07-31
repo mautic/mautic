@@ -26,9 +26,6 @@ class GrapesJsBuilder
      */
     private $customMjml;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -62,8 +59,6 @@ class GrapesJsBuilder
     }
 
     /**
-     * @param Email $email
-     *
      * @return GrapesJsBuilder
      */
     public function setEmail(Email $email)

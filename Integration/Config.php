@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\Integration;
 
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\PluginBundle\Entity\Integration;
-use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
-use MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper;
 
 class Config
 {

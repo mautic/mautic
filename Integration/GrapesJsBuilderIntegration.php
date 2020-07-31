@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\Integration;
 
-use MauticPlugin\IntegrationsBundle\Integration\BasicIntegration;
-use MauticPlugin\IntegrationsBundle\Integration\ConfigurationTrait;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\BasicInterface;
+use Mautic\IntegrationsBundle\Integration\BasicIntegration;
+use Mautic\IntegrationsBundle\Integration\ConfigurationTrait;
+use Mautic\IntegrationsBundle\Integration\Interfaces\BasicInterface;
 
 class GrapesJsBuilderIntegration extends BasicIntegration implements BasicInterface
 {
@@ -15,17 +15,11 @@ class GrapesJsBuilderIntegration extends BasicIntegration implements BasicInterf
     public const NAME         = 'grapesjsbuilder';
     public const DISPLAY_NAME = 'GrapesJS';
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return self::NAME;
     }
 
-    /**
-     * @return string
-     */
     public function getDisplayName(): string
     {
         return self::DISPLAY_NAME;
@@ -34,9 +28,5 @@ class GrapesJsBuilderIntegration extends BasicIntegration implements BasicInterf
     public function getIcon(): string
     {
         return 'plugins/GrapesJsBuilderBundle/Assets/img/grapesjsbuilder.png';
-    }
-
-    public function __call($name, $arguments)
-    {
     }
 }

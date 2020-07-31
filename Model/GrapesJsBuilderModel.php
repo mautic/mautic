@@ -26,14 +26,11 @@ class GrapesJsBuilderModel extends AbstractCommonModel
 
     /**
      * GrapesJsBuilderModel constructor.
-     *
-     * @param RequestStack $requestStack
-     * @param EmailModel   $emailModel
      */
     public function __construct(RequestStack $requestStack, EmailModel $emailModel)
     {
         $this->requestStack = $requestStack;
-        $this->emailModel = $emailModel;
+        $this->emailModel   = $emailModel;
     }
 
     /**
@@ -53,8 +50,6 @@ class GrapesJsBuilderModel extends AbstractCommonModel
 
     /**
      * Add or edit email settings entity based on request.
-     *
-     * @param Email $email
      */
     public function addOrEditEntity(Email $email)
     {
@@ -75,7 +70,7 @@ class GrapesJsBuilderModel extends AbstractCommonModel
 
         $this->getRepository()->saveEntity($grapesJsBuilder);
 
-        $customHtml = ArrayHelper::getValue('customHtml',$this->requestStack->getCurrentRequest()->get('emailform'));
+        $customHtml = ArrayHelper::getValue('customHtml', $this->requestStack->getCurrentRequest()->get('emailform'));
         $email->setCustomHtml($customHtml);
         $this->emailModel->getRepository()->saveEntity($email);
     }

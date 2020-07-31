@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\EventSubscriber;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event as Events;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class EmailSubscriber extends CommonSubscriber
+class EmailSubscriber implements EventSubscriberInterface
 {
     /**
      * @var Config
@@ -24,9 +24,6 @@ class EmailSubscriber extends CommonSubscriber
 
     /**
      * EmailSubscriber constructor.
-     *
-     * @param Config               $config
-     * @param GrapesJsBuilderModel $grapesJsBuilderModel
      */
     public function __construct(Config $config, GrapesJsBuilderModel $grapesJsBuilderModel)
     {
@@ -47,8 +44,6 @@ class EmailSubscriber extends CommonSubscriber
 
     /**
      * Add an entry.
-     *
-     * @param Events\EmailEvent $event
      */
     public function onEmailPostSave(Events\EmailEvent $event)
     {
@@ -61,8 +56,6 @@ class EmailSubscriber extends CommonSubscriber
 
     /**
      * Delete an entry.
-     *
-     * @param Events\EmailEvent $event
      */
     public function onEmailDelete(Events\EmailEvent $event)
     {

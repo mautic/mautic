@@ -20,7 +20,7 @@ class GrapesJsController extends CommonController
      * Activate the custom builder.
      *
      * @param string $objectType
-     * @param int $objectId
+     * @param int    $objectId
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -34,12 +34,12 @@ class GrapesJsController extends CommonController
         $model      = $this->getModel($objectType);
         $aclToCheck = 'email:emails:';
 
-        if ($objectType === 'page') {
+        if ('page' === $objectType) {
             $aclToCheck = 'page:pages:';
         }
 
         //permission check
-        if (strpos($objectId, 'new') !== false) {
+        if (false !== strpos($objectId, 'new')) {
             $isNew = true;
 
             if (!$this->get('mautic.security')->isGranted($aclToCheck.'create')) {
@@ -54,7 +54,7 @@ class GrapesJsController extends CommonController
             $entity = $model->getEntity($objectId);
             $isNew  = false;
 
-            if ($entity == null
+            if (null == $entity
                 || !$this->get('mautic.security')->hasEntityAccess(
                     $aclToCheck.'viewown',
                     $aclToCheck.'viewother',
@@ -89,7 +89,7 @@ class GrapesJsController extends CommonController
                 $entity->setContent($content);
             }
 
-            if ($objectType === 'page') {
+            if ('page' === $objectType) {
                 $this->processPageSlots($slots, $entity);
             } else {
                 $this->processEmailSlots($slots, $entity);
@@ -111,8 +111,8 @@ class GrapesJsController extends CommonController
             ]
         );
 
-        $renderedTemplateHtml = ($type === 'html') ? $renderedTemplate : '';
-        $renderedTemplateMjml = ($type === 'mjml') ? $renderedTemplate : '';
+        $renderedTemplateHtml = ('html' === $type) ? $renderedTemplate : '';
+        $renderedTemplateMjml = ('mjml' === $type) ? $renderedTemplate : '';
 
         return $this->render(
             'GrapesJsBuilderBundle:Builder:template.html.php',
@@ -190,7 +190,7 @@ class GrapesJsController extends CommonController
 
             $value = isset($content[$slot]) ? $content[$slot] : '';
 
-            if ($slotConfig['type'] == 'slideshow') {
+            if ('slideshow' == $slotConfig['type']) {
                 if (isset($content[$slot])) {
                     $options = json_decode($content[$slot], true);
                 } else {
