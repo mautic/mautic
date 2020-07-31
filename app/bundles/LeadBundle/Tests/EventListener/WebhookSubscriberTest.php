@@ -122,6 +122,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
                     'userList',
                     'publishDetails',
                     'ipAddress',
+                    'doNotContactList',
                     'tagList',
                 ]
             );
