@@ -11,12 +11,11 @@
 
 namespace Mautic\EmailBundle\Tests\Swiftmailer\Amazon;
 
-use Monolog\Logger;
-use Mautic\CoreBundle\Translation\Translator;
 use Joomla\Http\Http;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback;
-
+use Monolog\Logger;
 
 /**
  * Class AmazonCallbacktTest.
