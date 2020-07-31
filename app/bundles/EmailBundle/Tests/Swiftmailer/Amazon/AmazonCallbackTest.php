@@ -9,14 +9,14 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Tests\Transport;
+namespace Mautic\EmailBundle\Tests\Swiftmailer\Amazon;
 
-use Joomla\Http\Http;
+use Monolog\Logger;
 use Mautic\CoreBundle\Translation\Translator;
+use Joomla\Http\Http;
 use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback;
-use Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport;
-use Monolog\Logger;
+
 
 /**
  * Class AmazonTransportTest.
@@ -38,6 +38,16 @@ class AmazonTransportTest extends \PHPUnit\Framework\TestCase
      */
     private $mockHttp;
 
+    /**
+     * @var TransportCallback
+     */
+    private $transportCallback;
+
+    /**
+     * @var AmazonCallback
+     */
+    private $amazonCallback;
+
     protected function setUp()
     {
         $this->logger = $this->getMockBuilder(Logger::class)
@@ -58,6 +68,12 @@ class AmazonTransportTest extends \PHPUnit\Framework\TestCase
         $this->mockHttp = $this->getMockBuilder('Joomla\Http\Http')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $transportCallback = $this->getMockBuilder(TransportCallback::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $amazonCallback = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $transportCallback);
     }
 
     /**
@@ -65,11 +81,7 @@ class AmazonTransportTest extends \PHPUnit\Framework\TestCase
      */
     public function testConfirmationCallbackSuccessfull()
     {
-        $transportCallback = $this->getMockBuilder(TransportCallback::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $amazonTransport = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $transportCallback);
+        $transportCallback = $this->transportCallback;
 
         // Mock a successful response
         $mockResponse       = $this->getMockBuilder('Joomla\Http\Response')
@@ -98,8 +110,7 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonTransport('localhost', $amazonTransport);
-        $transport->processJsonPayload($jsonPayload);
+        $this->amazonCallback->processJsonPayload($jsonPayload);
     }
 
     /**
@@ -107,11 +118,7 @@ PAYLOAD;
      */
     public function testSingleBounceCallbackSuccessfull()
     {
-        $transportCallback = $this->getMockBuilder(TransportCallback::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $amazonTransport = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $transportCallback);
+        $transportCallback = $this->transportCallback;
 
         $transportCallback->expects($this->once())
             ->method('addFailureByAddress')
@@ -134,8 +141,7 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonTransport('localhost', $amazonTransport);
-        $transport->processJsonPayload($jsonPayload);
+        $this->amazonCallback->processJsonPayload($jsonPayload);
     }
 
     /**
@@ -143,11 +149,7 @@ PAYLOAD;
      */
     public function testSingleComplaintWithoutFeedbackCallbackSuccessfull()
     {
-        $transportCallback = $this->getMockBuilder(TransportCallback::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $amazonTransport = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $transportCallback);
+        $transportCallback = $this->transportCallback;
 
         $transportCallback->expects($this->once())
             ->method('addFailureByAddress')
@@ -170,8 +172,7 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonTransport('localhost', $amazonTransport);
-        $transport->processJsonPayload($jsonPayload);
+        $this->amazonCallback->processJsonPayload($jsonPayload);
     }
 
     /**
@@ -179,11 +180,7 @@ PAYLOAD;
      */
     public function testSingleComplaintWithFeedbackCallbackSuccessfull()
     {
-        $transportCallback = $this->getMockBuilder(TransportCallback::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $amazonTransport = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $transportCallback);
+        $transportCallback = $this->transportCallback;
 
         $transportCallback->expects($this->once())
             ->method('addFailureByAddress')
@@ -206,7 +203,6 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonTransport('localhost', $amazonTransport);
-        $transport->processJsonPayload($jsonPayload);
+        $this->amazonCallback->processJsonPayload($jsonPayload);
     }
 }
