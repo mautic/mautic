@@ -13,20 +13,13 @@ namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class AmazonTransport.
  */
 class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportInterface, BounceProcessorInterface, UnsubscriptionProcessorInterface
 {
-    /**
-     * From address for SNS email.
-     */
-    const SNS_ADDRESS = 'no-reply@sns.amazonaws.com';
-
     /**
      * @var AmazonCallback
      */
@@ -36,6 +29,7 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
      * AmazonTransport constructor.
      *
      * @param string $host
+     * @param AmazonCallback $amazonCallback
      */
     public function __construct($host, AmazonCallback $amazonCallback)
     {
@@ -56,18 +50,11 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
 
     /**
      * Handle bounces & complaints from Amazon.
+     * @param Request $request
      */
     public function processCallbackRequest(Request $request)
     {
         $this->amazonCallback->processCallbackRequest($request);
-    }
-
-    /**
-     * Process json request from Amazon SES.
-     */
-    public function processJsonPayload(array $payload)
-    {
-        return $this->amazonCallback->processJsonPayload($payload);
     }
 
     public function processBounce(Message $message)
@@ -78,10 +65,5 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
     public function processUnsubscription(Message $message)
     {
         $this->amazonCallback->processUnsubscription($message);
-    }
-
-    public function getSnsPayload($body)
-    {
-        $this->amazonCallback->getSnsPayload($body);
     }
 }

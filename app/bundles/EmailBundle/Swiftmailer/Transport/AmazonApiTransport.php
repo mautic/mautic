@@ -21,23 +21,16 @@ use bandwidthThrottle\tokenBucket\Rate;
 use bandwidthThrottle\tokenBucket\storage\SingleProcessStorage;
 use bandwidthThrottle\tokenBucket\storage\StorageException;
 use bandwidthThrottle\tokenBucket\TokenBucket;
-use Joomla\Http\Http;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class AmazonApiTransport.
  */
 class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_Transport, TokenTransportInterface, CallbackTransportInterface, BounceProcessorInterface, UnsubscriptionProcessorInterface
 {
-    /**
-     * From address for SNS email.
-     */
-    const SNS_ADDRESS = 'no-reply@sns.amazonaws.com';
-
     /**
      * @var string
      */
@@ -524,7 +517,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
      * @param \Swift_Events_SendEvent @evt
      * @param null $failedRecipients
      *
-     * @return array
+     * @return int
      */
     public function sendRawEmail(\Swift_Mime_SimpleMessage $message, \Swift_Events_SendEvent $evt, &$failedRecipients = null)
     {
@@ -544,7 +537,8 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                     }
                 },
                 'rejected' => function (AwsException $reason, $iteratorId) use ($evt) {
-                    $this->triggerSendError($evt, []);
+                    $failedRecipients = [];
+                    $this->triggerSendError($evt, $failedRecipients);
                 },
             ]);
             $promise = $pool->promise();
@@ -592,8 +586,9 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
-     * @param type $msg
-     * @param type $recipient
+     *
+     * @param $msg
+     * @param $recipient
      *
      * @return string
      */
@@ -695,14 +690,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         $this->amazonCallback->processCallbackRequest($request);
     }
 
-    /**
-     * Process json request from Amazon SES.
-     */
-    public function processJsonPayload(array $payload)
-    {
-        $this->amazonCallback->processJsonPayload($payload);
-    }
-
     public function processBounce(Message $message)
     {
         $this->amazonCallback->processBounce($message);
@@ -711,10 +698,5 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     public function processUnsubscription(Message $message)
     {
         $this->amazonCallback->processUnsubscription($message);
-    }
-
-    public function getSnsPayload($body)
-    {
-        $this->amazonCallback->getSnsPayload($body);
     }
 }
