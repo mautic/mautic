@@ -19,9 +19,9 @@ use Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback;
 
 
 /**
- * Class AmazonTransportTest.
+ * Class AmazonCallbacktTest.
  */
-class AmazonTransportTest extends \PHPUnit\Framework\TestCase
+class AmazonCallbackTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Logger
