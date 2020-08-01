@@ -29,7 +29,6 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
      * AmazonTransport constructor.
      *
      * @param string $host
-     * @param AmazonCallback $amazonCallback
      */
     public function __construct($host, AmazonCallback $amazonCallback)
     {
@@ -50,7 +49,6 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
 
     /**
      * Handle bounces & complaints from Amazon.
-     * @param Request $request
      */
     public function processCallbackRequest(Request $request)
     {
