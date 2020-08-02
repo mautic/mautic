@@ -37,6 +37,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class InstallService
 {
+    const CHECK_STEP    = 0;
+    const DOCTRINE_STEP = 1;
+    const USER_STEP     = 2;
+    const EMAIL_STEP    = 3;
+
     private $configurator;
 
     private $cacheHelper;
@@ -80,7 +85,7 @@ class InstallService
      *
      * @param int $index The step number to retrieve
      *
-     * @return int|StepInterface the valid
+     * @return bool|StepInterface the valid step given installation status
      *
      * @throws \InvalidArgumentException
      */
@@ -99,11 +104,13 @@ class InstallService
         $params = $this->configurator->getParameters();
 
         // Check to ensure the installer is in the right place
-        if ((empty($params) || empty($params['db_driver'])) && $index > 1) {
-            return 1;
+        if ((empty($params)
+                || !isset($params['db_driver'])
+                || empty($params['db_driver'])) && $index > 1) {
+            return $this->configurator->getStep(self::DOCTRINE_STEP);
         }
 
-        return $this->configurator->getStep($index)[0];
+        return $this->configurator->getStep($index);
     }
 
     /**
@@ -113,7 +120,7 @@ class InstallService
      */
     private function localConfig()
     {
-        return $this->pathsHelper->getSystemPath('local_config');
+        return $this->pathsHelper->getSystemPath('local_config', false);
     }
 
     /**

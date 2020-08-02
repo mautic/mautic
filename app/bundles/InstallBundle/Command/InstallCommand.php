@@ -28,11 +28,6 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
  */
 class InstallCommand extends ContainerAwareCommand
 {
-    const CHECK_STEP    = 0;
-    const DOCTRINE_STEP = 1;
-    const USER_STEP     = 2;
-    const EMAIL_STEP    = 3;
-
     /**
      * {@inheritdoc}
      */
@@ -249,18 +244,18 @@ class InstallCommand extends ContainerAwareCommand
         /** @var \Mautic\InstallBundle\Install\InstallService $installer */
         $installer = $container->get('mautic.install.service');
 
-        $output->writeln([
-            'Mautic Install',
-            '==============',
-            '',
-        ]);
-
         // Check Mautic is not already installed
         if ($installer->checkIfInstalled()) {
             $output->writeln('Mautic already installed');
 
             return 0;
         }
+
+        $output->writeln([
+            'Mautic Install',
+            '==============',
+            '',
+        ]);
 
         // Build objects to pass to the install service from local.php or command line options
         $output->writeln('Parsing options and arguments...');
@@ -303,7 +298,7 @@ class InstallCommand extends ContainerAwareCommand
 
         switch ($step) {
             default:
-            case self::CHECK_STEP:
+            case InstallService::CHECK_STEP:
                 $output->writeln($step.' - Checking installation requirements...');
                 $messages = $this->stepAction($installer, ['site_url' => $siteUrl], $step);
                 if (is_array($messages) && !empty($messages)) {
@@ -331,10 +326,10 @@ class InstallCommand extends ContainerAwareCommand
                 }
                 $output->writeln('Ready to Install!');
                 // Keep on with next step
-                $step = self::DOCTRINE_STEP;
+                $step = InstallService::DOCTRINE_STEP;
 
                 // no break
-            case self::DOCTRINE_STEP:
+            case InstallService::DOCTRINE_STEP:
                 $output->writeln($step.' - Creating database...');
                 $messages = $this->stepAction($installer, $dbParams, $step);
                 if (is_array($messages) && !empty($messages)) {
@@ -345,7 +340,7 @@ class InstallCommand extends ContainerAwareCommand
 
                     return -$step;
                 }
-                $step = self::DOCTRINE_STEP + .1;
+                $step = InstallService::DOCTRINE_STEP + .1;
 
                 $output->writeln($step.' - Creating schema...');
                 $messages = $this->stepAction($installer, $dbParams, $step);
@@ -355,9 +350,9 @@ class InstallCommand extends ContainerAwareCommand
 
                     $output->writeln('Install canceled');
 
-                    return -self::DOCTRINE_STEP;
+                    return -InstallService::DOCTRINE_STEP;
                 }
-                $step = self::DOCTRINE_STEP + .2;
+                $step = InstallService::DOCTRINE_STEP + .2;
 
                 $output->writeln($step.' - Loading fixtures...');
                 $messages = $this->stepAction($installer, $dbParams, $step);
@@ -367,13 +362,13 @@ class InstallCommand extends ContainerAwareCommand
 
                     $output->writeln('Install canceled');
 
-                    return -self::DOCTRINE_STEP;
+                    return -InstallService::DOCTRINE_STEP;
                 }
                 // Keep on with next step
-                $step = self::USER_STEP;
+                $step = InstallService::USER_STEP;
 
                 // no break
-            case self::USER_STEP:
+            case InstallService::USER_STEP:
                 $output->writeln($step.' - Creating admin user...');
                 $messages = $this->stepAction($installer, $adminParam, $step);
                 if (is_array($messages) && !empty($messages)) {
@@ -385,10 +380,10 @@ class InstallCommand extends ContainerAwareCommand
                     return -$step;
                 }
                 // Keep on with next step
-                $step = self::EMAIL_STEP;
+                $step = InstallService::EMAIL_STEP;
 
                 // no break
-            case self::EMAIL_STEP:
+            case InstallService::EMAIL_STEP:
                 $output->writeln($step.' - Email configuration and final steps...');
                 $messages = $this->stepAction($installer, $allParams, $step);
                 if (is_array($messages) && !empty($messages)) {
@@ -432,7 +427,7 @@ class InstallCommand extends ContainerAwareCommand
 
         $messages = false;
         switch ($index) {
-            case self::CHECK_STEP:
+            case InstallService::CHECK_STEP:
                 // Check installation requirements
                 if ($step instanceof CheckStep) {
                     // Set all step fields based on parameters
@@ -444,7 +439,7 @@ class InstallCommand extends ContainerAwareCommand
                 $messages['optional']     = $installer->checkOptionalSettings($step);
                 break;
 
-            case self::DOCTRINE_STEP:
+            case InstallService::DOCTRINE_STEP:
                 if ($step instanceof DoctrineStep) {
                     // Set all step fields based on parameters
                     foreach ($step as $key => $value) {
@@ -471,12 +466,12 @@ class InstallCommand extends ContainerAwareCommand
                 }
                 break;
 
-            case self::USER_STEP:
+            case InstallService::USER_STEP:
                 // Create admin user
                 $messages = $installer->createAdminUserStep($params);
                 break;
 
-            case self::EMAIL_STEP:
+            case InstallService::EMAIL_STEP:
                 // Save email configuration
                 if ($step instanceof EmailStep) {
                     // Set all step fields based on parameters

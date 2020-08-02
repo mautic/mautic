@@ -22,25 +22,36 @@ class CheckStep implements StepInterface
 {
     /**
      * Flag if the configuration file is writable.
+     *
+     * @var bool
      */
     private $configIsWritable;
 
     /**
      * Path to the kernel root.
+     *
+     * @var string
      */
     private $kernelRoot;
 
+    /**
+     * @var OpenSSLCipher
+     */
     private $openSSLCipher;
 
     /**
      * Absolute path to cache directory.
      * Required in step.
+     *
+     * @var string
      */
     public $cache_path = '%kernel.root_dir%/../var/cache';
 
     /**
      * Absolute path to log directory.
      * Required in step.
+     *
+     * @var string
      */
     public $log_path = '%kernel.root_dir%/../var/logs';
 
@@ -51,6 +62,8 @@ class CheckStep implements StepInterface
 
     /**
      * Recommended minimum memory limit for Mautic.
+     *
+     * @var string
      */
     public static $memory_limit = '512M';
 

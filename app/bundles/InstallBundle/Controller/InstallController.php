@@ -25,11 +25,6 @@ use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
 class InstallController extends CommonController
 {
-    const CHECK_STEP    = 0;
-    const DOCTRINE_STEP = 1;
-    const USER_STEP     = 2;
-    const EMAIL_STEP    = 3;
-
     private $configurator;
 
     private $installer;
@@ -76,8 +71,8 @@ class InstallController extends CommonController
             return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => 1]));
         }
 
-        /** @var \Mautic\CoreBundle\Configurator\Step\StepInterface|array $step */
-        $step   = $this->configurator->getStep($index)[0];
+        /** @var \Mautic\CoreBundle\Configurator\Step\StepInterface $step */
+        $step   = $this->configurator->getStep($index);
         $action = $this->generateUrl('mautic_installer_step', ['index' => $index]);
 
         $form = $this->createForm($step->getFormType(), $step, ['action' => $action]);
@@ -93,11 +88,11 @@ class InstallController extends CommonController
                 $formData = $form->getData();
 
                 switch ($index) {
-                    case self::CHECK_STEP:
+                    case InstallService::CHECK_STEP:
                         $complete = true;
 
                         break;
-                    case self::DOCTRINE_STEP:
+                    case InstallService::DOCTRINE_STEP:
                         // password field does not retain configured defaults
                         if (empty($formData->password) && !empty($params['db_password'])) {
                             $formData->password = $params['db_password'];
@@ -117,7 +112,7 @@ class InstallController extends CommonController
                         }
                         break;
 
-                    case self::USER_STEP:
+                    case InstallService::USER_STEP:
                         $adminParam = (array) $formData;
                         $messages   = $this->installer->createAdminUserStep($adminParam);
 
@@ -132,7 +127,7 @@ class InstallController extends CommonController
                         }
                         break;
 
-                    case self::EMAIL_STEP:
+                    case InstallService::EMAIL_STEP:
                         $emailParam = (array) $formData;
                         $messages   = $this->installer->setupEmailStep($step, $emailParam);
                         if (is_bool($messages)) {
@@ -145,7 +140,7 @@ class InstallController extends CommonController
             }
         } elseif (!empty($subIndex)) {
             switch ($index) {
-                case self::DOCTRINE_STEP:
+                case InstallService::DOCTRINE_STEP:
                     $dbParams = (array) $step;
 
                     switch ((int) $subIndex) {
