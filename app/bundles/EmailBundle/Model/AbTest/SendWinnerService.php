@@ -17,8 +17,6 @@ use Mautic\EmailBundle\Exception\NotReadyToSendWinnerException;
 use Mautic\EmailBundle\Model\EmailModel;
 
 /**
- * Class SendWinnerService.
- *
  * Service for sending a winner variant email to remaining contacts.
  */
 class SendWinnerService
@@ -48,13 +46,6 @@ class SendWinnerService
      */
     private $tryAgain = false;
 
-    /**
-     * SendWinnerService constructor.
-     *
-     * @param EmailModel            $emailModel
-     * @param AbTestResultService   $abTestResultService
-     * @param AbTestSettingsService $abTestSettingsService
-     */
     public function __construct(
         EmailModel $emailModel,
         AbTestResultService $abTestResultService,
@@ -66,7 +57,7 @@ class SendWinnerService
     }
 
     /**
-     * @param int $emailId
+     * @param int|null $emailId
      *
      * @throws \ReflectionException
      * @throws \Exception
@@ -200,7 +191,7 @@ class SendWinnerService
             throw new NotReadyToSendWinnerException('No winner yet.');
         }
 
-        $this->addOutputMessage('Winner ids: '.implode($winners, ','));
+        $this->addOutputMessage('Winner ids: '.implode(',', $winners));
 
         $winner = $this->emailModel->getEntity($winners[0]);
 
