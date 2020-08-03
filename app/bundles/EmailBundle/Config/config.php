@@ -382,9 +382,8 @@ return [
                     'mautic.spool.delegator',
                 ],
             ],
-
             'mautic.transport.amazon' => [
-                'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport',
+                'class'        => \Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport::class,
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'arguments'    => [
                     '%mautic.mailer_amazon_region%',
@@ -398,7 +397,7 @@ return [
                 ],
             ],
             'mautic.transport.amazon_api' => [
-                'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\AmazonApiTransport',
+                'class'        => \Mautic\EmailBundle\Swiftmailer\Transport\AmazonApiTransport::class,
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'arguments'    => [
                     'monolog.logger.mautic',
