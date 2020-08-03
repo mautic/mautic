@@ -27,6 +27,8 @@ class SendWinnerEmailCommand extends ContainerAwareCommand
 
     public function __construct(SendWinnerService $sendWinnerService)
     {
+        parent::__construct();
+
         $this->sendWinnerService = $sendWinnerService;
     }
 
