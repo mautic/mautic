@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\QueueEmailEvent;
 use Swift_Transport;
@@ -56,9 +57,6 @@ EOT
         parent::configure();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $options     = $input->getOptions();
@@ -72,11 +70,11 @@ EOT
         if ('file' !== $queueMode) {
             $output->writeln('Mautic is not set to queue email.');
 
-            return 0;
+            return ExitCode::SUCCESS;
         }
 
         if (!$this->checkRunStatus($input, $output, $lockName)) {
-            return 0;
+            return ExitCode::SUCCESS;
         }
 
         if (empty($timeout)) {
@@ -187,10 +185,6 @@ EOT
 
         $this->completeRun();
 
-        if (0 !== $returnCode) {
-            return $returnCode;
-        }
-
-        return 0;
+        return $returnCode;
     }
 }

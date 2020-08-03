@@ -896,6 +896,13 @@ return [
                 ],
                 'tag' => 'console.command',
             ],
+            'mautic.email.command.send_winner_email' => [
+                'class'     => \Mautic\EmailBundle\Command\SendWinnerEmailCommand::class,
+                'arguments' => [
+                    'mautic.email.variant.send_winner',
+                ],
+                'tag' => 'console.command',
+            ],
         ],
         'validator' => [
             'mautic.email.validator.multiple_emails_valid_validator' => [

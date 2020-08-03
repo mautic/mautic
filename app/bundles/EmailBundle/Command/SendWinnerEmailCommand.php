@@ -11,6 +11,8 @@
 
 namespace Mautic\EmailBundle\Command;
 
+use Mautic\CoreBundle\Helper\ExitCode;
+use Mautic\EmailBundle\Model\AbTest\SendWinnerService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -21,9 +23,13 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class SendWinnerEmailCommand extends ContainerAwareCommand
 {
-    /**
-     * {@inheritdoc}
-     */
+    private $sendWinnerService;
+
+    public function __construct(SendWinnerService $sendWinnerService)
+    {
+        $this->sendWinnerService = $sendWinnerService;
+    }
+
     protected function configure()
     {
         $this
@@ -50,20 +56,14 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container         = $this->getContainer();
-        $sendWinnerService = $container->get('mautic.email.variant.send_winner');
-        $emailId           = $input->getOption('id');
+        $this->sendWinnerService->processWinnerEmails($input->getOption('id'));
 
-        $sendWinnerService->processWinnerEmails($emailId);
+        $output->writeln($this->sendWinnerService->getOutputMessages());
 
-        $output->write($sendWinnerService->getOutputMessages());
-            $output->writeln($message);
+        if (true === $this->sendWinnerService->shouldTryAgain()) {
+            return ExitCode::TEMPORARY_FAILURE;
         }
 
-        if ($sendWinnerService->shouldTryAgain() === true) {
-            return 1;
-        }
-
-        return 0;
+        return ExitCode::SUCCESS;
     }
 }
