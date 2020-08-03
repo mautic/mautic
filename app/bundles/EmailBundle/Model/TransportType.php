@@ -43,6 +43,7 @@ class TransportType
      */
     private $showPort = [
         'smtp',
+        'mautic.transport.amazon'
     ];
 
     /**
@@ -148,6 +149,31 @@ class TransportType
     public function getServiceRequiresUser()
     {
         return $this->getString($this->showUser);
+    }
+
+    /**
+     * @return string
+     */
+    public function getServiceDoNotNeedHost()
+    {
+        $tempTransports = $this->transportTypes;
+        unset($tempTransports['mautic.transport.amazon']);
+
+        $transports       = array_keys($tempTransports);
+        $doNotRequireHost = array_diff($transports, $this->showHost);
+        return $this->getString($doNotRequireHost);
+    }
+
+    /**
+     * @return string
+     */
+    public function getServiceDoNotNeedAmazonApiRegion()
+    {
+        $tempTransports = $this->transportTypes;
+        unset($tempTransports['mautic.transport.amazon_api']);
+
+        $doNotRequireRegion = array_keys($tempTransports);
+        return $this->getString($doNotRequireRegion);
     }
 
     /**

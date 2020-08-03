@@ -111,10 +111,11 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
 
     /**
      * @param string $region
+     * @param string $otherRegion
      */
-    public function setRegion($region)
+    public function setRegion($region, $otherRegion = null)
     {
-        $this->region = $region;
+        $this->region = ('other' === $region) ? $otherRegion : $region;
     }
 
     /**
@@ -586,6 +587,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
+     *
      * @param $msg
      * @param $recipient
      *

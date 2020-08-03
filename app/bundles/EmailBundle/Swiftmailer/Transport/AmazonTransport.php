@@ -29,10 +29,12 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
      * AmazonTransport constructor.
      *
      * @param string $host
+     * @param AmazonCallback $amazonCallback
      */
-    public function __construct($host, AmazonCallback $amazonCallback)
+    public function __construct($host, $otherHost, $port = 2587,  AmazonCallback $amazonCallback)
     {
-        parent::__construct($host, 2587, 'tls');
+        $host = ('other' === $host) ? $otherHost : $host;
+        parent::__construct($host, $port, 'tls');
         $this->setAuthMode('login');
         $this->amazonCallback = $amazonCallback;
     }

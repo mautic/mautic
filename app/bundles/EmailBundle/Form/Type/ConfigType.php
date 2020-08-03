@@ -302,7 +302,13 @@ class ConfigType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
-                    'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceRequiresHost().']}',
+                    'data-show-on' => '{
+                        "config_emailconfig_mailer_transport":[
+                            '.$this->transportType->getServiceRequiresHost().'
+                        ],
+                        "config_emailconfig_mailer_amazon_region":["other"]
+                    }',
+                    'data-hide-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceDoNotNeedHost().']}',
                     'tooltip'      => 'mautic.email.config.mailer.host.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],
@@ -329,6 +335,7 @@ class ConfigType extends AbstractType
                     'mautic.email.config.mailer.amazon_region.eu_west_2'      => 'email-smtp.eu-west-2.amazonaws.com',
                     'mautic.email.config.mailer.amazon_region.sa_east_1'      => 'email-smtp.sa-east-1.amazonaws.com',
                     'mautic.email.config.mailer.amazon_region.us_gov_west_1'  => 'email-smtp.us-gov-west-1.amazonaws.com',
+                    'mautic.email.config.mailer.amazon_region.other'          => 'other',
                 ],
                 'label'       => 'mautic.email.config.mailer.amazon_region',
                 'required'    => false,
@@ -361,6 +368,7 @@ class ConfigType extends AbstractType
                     'mautic.email.config.mailer.amazon_region.eu_west_2'      => 'eu-west-2',
                     'mautic.email.config.mailer.amazon_region.sa_east_1'      => 'sa-east-1',
                     'mautic.email.config.mailer.amazon_region.us_gov_west_1'  => 'us-gov-west-1',
+                    'mautic.email.config.mailer.amazon_region.other'          => 'other',
                 ],
                 'label'       => 'mautic.email.config.mailer.amazon_region',
                 'required'    => false,
@@ -371,6 +379,23 @@ class ConfigType extends AbstractType
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],
                 'placeholder' => false,
+            ]
+        );
+
+        $builder->add(
+            'mailer_amazon_api_other_region',
+            TextType::class,
+            [
+                'label'      => 'mautic.email.config.mailer.amazon_api_region.other',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"config_emailconfig_mailer_amazon_api_region":["other"]}',
+                    'data-hide-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getServiceDoNotNeedAmazonApiRegion().']}',
+                    'tooltip'      => 'mautic.email.config.mailer.amazon_api_region.other.tooltip',
+                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
+                ],
+                'required'   => false,
             ]
         );
 

@@ -388,6 +388,8 @@ return [
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'arguments'    => [
                     '%mautic.mailer_amazon_region%',
+                    '%mautic.mailer_host%',
+                    '%mautic.mailer_port%',
                     'mautic.transport.amazon.callback',
                 ],
                 'methodCalls' => [
@@ -405,7 +407,10 @@ return [
                 'methodCalls' => [
                     'setUsername' => ['%mautic.mailer_user%'],
                     'setPassword' => ['%mautic.mailer_password%'],
-                    'setRegion'   => ['%mautic.mailer_amazon_api_region%'],
+                    'setRegion'  => [
+                        '%mautic.mailer_amazon_api_region%',
+                        '%mautic.mailer_amazon_api_other_region%'
+                    ],
                 ],
             ],
             'mautic.transport.mandrill' => [
@@ -821,32 +826,33 @@ return [
         ],
     ],
     'parameters' => [
-        'mailer_api_key'               => null, // Api key from mail delivery provider.
-        'mailer_from_name'             => 'Mautic',
-        'mailer_from_email'            => 'email@yoursite.com',
-        'mailer_return_path'           => null,
-        'mailer_transport'             => 'smtp',
-        'mailer_append_tracking_pixel' => true,
-        'mailer_convert_embed_images'  => false,
-        'mailer_host'                  => '',
-        'mailer_port'                  => null,
-        'mailer_user'                  => null,
-        'mailer_password'              => null,
-        'mailer_encryption'            => null, //tls or ssl,
-        'mailer_auth_mode'             => null, //plain, login or cram-md5
-        'mailer_amazon_region'         => 'email-smtp.us-east-1.amazonaws.com',
-        'mailer_amazon_api_region'     => 'us-east-1',
-        'mailer_custom_headers'        => [],
-        'mailer_spool_type'            => 'memory', //memory = immediate; file = queue
-        'mailer_spool_path'            => '%kernel.root_dir%/../var/spool',
-        'mailer_spool_msg_limit'       => null,
-        'mailer_spool_time_limit'      => null,
-        'mailer_spool_recover_timeout' => 900,
-        'mailer_spool_clear_timeout'   => 1800,
-        'unsubscribe_text'             => null,
-        'webview_text'                 => null,
-        'unsubscribe_message'          => null,
-        'resubscribe_message'          => null,
+        'mailer_api_key'                 => null, // Api key from mail delivery provider.
+        'mailer_from_name'               => 'Mautic',
+        'mailer_from_email'              => 'email@yoursite.com',
+        'mailer_return_path'             => null,
+        'mailer_transport'               => 'smtp',
+        'mailer_append_tracking_pixel'   => true,
+        'mailer_convert_embed_images'    => false,
+        'mailer_host'                    => '',
+        'mailer_port'                    => null,
+        'mailer_user'                    => null,
+        'mailer_password'                => null,
+        'mailer_encryption'              => null, //tls or ssl,
+        'mailer_auth_mode'               => null, //plain, login or cram-md5
+        'mailer_amazon_region'           => 'email-smtp.us-east-1.amazonaws.com',
+        'mailer_amazon_api_region'       => 'us-east-1',
+        'mailer_amazon_api_other_region' => null,
+        'mailer_custom_headers'          => [],
+        'mailer_spool_type'              => 'memory', //memory = immediate; file = queue
+        'mailer_spool_path'              => '%kernel.root_dir%/../var/spool',
+        'mailer_spool_msg_limit'         => null,
+        'mailer_spool_time_limit'        => null,
+        'mailer_spool_recover_timeout'   => 900,
+        'mailer_spool_clear_timeout'     => 1800,
+        'unsubscribe_text'               => null,
+        'webview_text'                   => null,
+        'unsubscribe_message'            => null,
+        'resubscribe_message'            => null,
         'monitored_email'              => [
             'general' => [
                 'address'         => null,
