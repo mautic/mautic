@@ -409,7 +409,7 @@ return [
                     'setPassword' => ['%mautic.mailer_password%'],
                     'setRegion'  => [
                         '%mautic.mailer_amazon_api_region%',
-                        '%mautic.mailer_amazon_api_other_region%'
+                        '%mautic.mailer_amazon_api_other_region%',
                     ],
                 ],
             ],
@@ -853,7 +853,7 @@ return [
         'webview_text'                   => null,
         'unsubscribe_message'            => null,
         'resubscribe_message'            => null,
-        'monitored_email'              => [
+        'monitored_email'                => [
             'general' => [
                 'address'         => null,
                 'host'            => null,
