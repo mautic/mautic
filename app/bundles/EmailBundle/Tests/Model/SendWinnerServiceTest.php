@@ -137,7 +137,6 @@ class SendWinnerServiceTest extends \PHPUnit\Framework\TestCase
 
         $this->sendWinnerService->processWinnerEmails($emailId);
 
-        Assert::assertSame(1, $this->sendWinnerService->getOutputCode());
         Assert::assertSame(
             [
                 "\n\nProcessing email id #5",
@@ -233,7 +232,6 @@ class SendWinnerServiceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($variantSettings['totalWeight'], AbTestSettingsService::DEFAULT_TOTAL_WEIGHT);
         $this->assertEquals($variantSettings['winnerCriteria'], $winnerCriteria);
 
-        Assert::assertSame(0, $this->sendWinnerService->getOutputCode());
         Assert::assertSame(
             [
                 "\n\nProcessing email id #5",
