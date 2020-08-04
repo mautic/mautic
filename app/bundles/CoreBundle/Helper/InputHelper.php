@@ -513,6 +513,6 @@ class InputHelper
             return $trans->transliterate($value);
         }
 
-        return \URLify::transliterate($value);
+        return \URLify::transliterate((string) $value);
     }
 }
