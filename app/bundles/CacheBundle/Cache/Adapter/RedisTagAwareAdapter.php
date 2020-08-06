@@ -12,6 +12,7 @@
 namespace Mautic\CacheBundle\Cache\Adapter;
 
 use Mautic\CacheBundle\Exceptions\InvalidArgumentException;
+use Mautic\CoreBundle\Helper\PRedisConnectionHelper;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 
@@ -25,7 +26,7 @@ class RedisTagAwareAdapter extends TagAwareAdapter
 
         $options = array_key_exists('options', $servers) ? $servers['options'] : [];
 
-        $client = \Predis\Client([$servers['dsn']], $options);
+        $client = new \Predis\Client(PRedisConnectionHelper::getRedisEndpoints($servers['dsn']), $options);
 
         parent::__construct(
             new RedisAdapter($client, $namespace, $lifetime),
