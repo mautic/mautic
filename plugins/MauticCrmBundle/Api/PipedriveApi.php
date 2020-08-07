@@ -102,27 +102,6 @@ class PipedriveApi extends CrmApi
     }
 
     /**
-     * @param string $name
-     *
-     * @return array
-     */
-    public function findByCompanyName($companyName)
-    {
-        $url = sprintf('%s/%s/search', $this->integration->getApiUrl(), self::ORGANIZATIONS_API_ENDPOINT);
-
-        $params = [
-            'query' => array_merge($this->getAuthQuery(), [
-                'term'            => $companyName,
-                'exact_match'     => true,
-            ]),
-        ];
-
-        $response = $this->transport->get($url, $params);
-
-        return $this->getResponseData($response);
-    }
-
-    /**
      * @param string $email
      *
      * @return array
@@ -150,7 +129,7 @@ class PipedriveApi extends CrmApi
      *
      * @return array
      */
-    public function findCompanyByName($name, $start = 0, $limit = 1)
+    public function findCompanyByName($name, $start = 0, $limit = 10)
     {
         $url = sprintf('%s/%s/find', $this->integration->getApiUrl(), self::ORGANIZATIONS_API_ENDPOINT);
 

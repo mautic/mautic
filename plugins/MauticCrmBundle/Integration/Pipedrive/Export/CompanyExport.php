@@ -62,7 +62,7 @@ class CompanyExport extends AbstractPipedrive
             return false; // company has integration
         }
 
-        $companyData = $this->getIntegration()->getApiHelper()->findByCompanyName($company->getName());
+        $companyData = $this->getIntegration()->getApiHelper()->findCompanyByName($company->getName());
 
         if (!empty($companyData) && isset($companyData[0]['id'])) {
             $integrationEntityCreate = $this->createIntegrationCompanyEntity(new \DateTime(), $companyData[0]['id'], $company->getId());
