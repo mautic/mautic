@@ -45,9 +45,6 @@ class CompanyImport extends AbstractImport
 
         $company = new Company();
 
-        // prevent listeners from exporting
-        $company->setEventData('pipedrive.webhook', 1);
-
         $data       = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields(self::ORGANIZATION_ENTITY_TYPE));
         $mappedData = $this->getMappedCompanyData($data);
 
@@ -55,13 +52,15 @@ class CompanyImport extends AbstractImport
         $findCompany = IdentifyCompanyHelper::findCompany($mappedData, $this->companyModel);
         if (isset($findCompany[0]['id'])) {
             $company =  $findCompany[1][$findCompany[0]['id']];
-        } else {
-            $this->companyModel->setFieldValues($company, $mappedData);
-            $this->companyModel->saveEntity($company);
+        }
 
-            if ($data['owner_id']) {
-                $this->addOwnerToCompany($data['owner_id'], $company);
-            }
+        // prevent listeners from exporting
+        $company->setEventData('pipedrive.webhook', 1);
+        $this->companyModel->setFieldValues($company, $mappedData);
+        $this->companyModel->saveEntity($company);
+
+        if ($data['owner_id']) {
+            $this->addOwnerToCompany($data['owner_id'], $company);
         }
 
         $integrationEntity = $this->getCompanyIntegrationEntity(['integrationEntityId' => $data['id']]);
