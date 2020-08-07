@@ -54,14 +54,14 @@ class CompanyImport extends AbstractImport
         // find company exists
         $findCompany = IdentifyCompanyHelper::findCompany($mappedData, $this->companyModel);
         if (isset($findCompany[0]['id'])) {
-            throw new \Exception('Company already exist', Response::HTTP_CONFLICT);
-        }
+            $company =  $findCompany[1][$findCompany[0]['id']];
+        } else {
+            $this->companyModel->setFieldValues($company, $mappedData);
+            $this->companyModel->saveEntity($company);
 
-        $this->companyModel->setFieldValues($company, $mappedData);
-        $this->companyModel->saveEntity($company);
-
-        if ($data['owner_id']) {
-            $this->addOwnerToCompany($data['owner_id'], $company);
+            if ($data['owner_id']) {
+                $this->addOwnerToCompany($data['owner_id'], $company);
+            }
         }
 
         $integrationEntity = $this->getCompanyIntegrationEntity(['integrationEntityId' => $data['id']]);

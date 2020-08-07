@@ -2,7 +2,9 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveOwner;
 use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\AbstractPipedrive;
@@ -10,6 +12,20 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class CompanyExport extends AbstractPipedrive
 {
+    /**
+     * @var CompanyModel
+     */
+    private $companyModel;
+
+    /**
+     * CompanyExport constructor.
+     */
+    public function __construct(EntityManager $em, CompanyModel $companyModel)
+    {
+        $this->em           = $em;
+        $this->companyModel = $companyModel;
+    }
+
     /**
      * @return bool
      */
@@ -46,6 +62,16 @@ class CompanyExport extends AbstractPipedrive
             return false; // company has integration
         }
 
+        $companyData = $this->getIntegration()->getApiHelper()->findByCompanyName($company->getName());
+
+        if (!empty($companyData) && isset($companyData[0]['id'])) {
+            $integrationEntityCreate = $this->createIntegrationCompanyEntity(new \DateTime(), $companyData[0]['id'], $company->getId());
+            $integrationEntity       = clone $integrationEntityCreate;
+            $this->em->persist($integrationEntityCreate);
+            $this->em->flush();
+
+            return $this->update($integrationEntity, $mappedData);
+        }
         try {
             $createdData       = $this->getIntegration()->getApiHelper()->createCompany($mappedData);
             if (empty($createdData['id'])) {
@@ -129,6 +155,11 @@ class CompanyExport extends AbstractPipedrive
 
         if (empty($this->getIntegration()->getIntegrationSettings()->getFeatureSettings()['companyFields'])) {
             return [];
+        }
+
+        // empty profile leads, assume entity was not loaded by model
+        if (empty($company->getProfileFields())) {
+            $company = $this->companyModel->getEntity($company->getId());
         }
 
         $companyFields = $this->getIntegration()->getIntegrationSettings()->getFeatureSettings()['companyFields'];

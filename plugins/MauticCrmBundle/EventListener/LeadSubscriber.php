@@ -67,6 +67,11 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->leadExport->setIntegration($integrationObject);
 
         $changes = $lead->getChanges(true);
+
+        if (empty($changes)) {
+            return;
+        }
+
         if (!empty($changes['dateIdentified'])) {
             $this->leadExport->create($lead);
         } else {
