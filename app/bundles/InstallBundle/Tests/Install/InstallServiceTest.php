@@ -101,7 +101,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $this->configurator->expects($this->once())
             ->method('getStep')
             ->with($index)
-            ->willReturn($step);
+            ->willReturn([$step]);
 
         $this->assertEquals($step, $this->installer->getStep($index));
     }
@@ -127,7 +127,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $this->configurator->expects($this->once())
             ->method('getStep')
             ->with($index)
-            ->willReturn($step);
+            ->willReturn([$step]);
 
         $this->assertEquals($step, $this->installer->getStep($index));
     }
