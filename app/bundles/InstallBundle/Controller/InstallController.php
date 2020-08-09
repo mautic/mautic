@@ -72,7 +72,7 @@ class InstallController extends CommonController
         }
 
         /** @var \Mautic\CoreBundle\Configurator\Step\StepInterface $step */
-        $step   = $this->configurator->getStep($index);
+        $step   = $this->configurator->getStep($index)[0];
         $action = $this->generateUrl('mautic_installer_step', ['index' => $index]);
 
         $form = $this->createForm($step->getFormType(), $step, ['action' => $action]);

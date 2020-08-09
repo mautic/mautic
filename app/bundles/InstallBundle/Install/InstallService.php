@@ -110,7 +110,7 @@ class InstallService
             return $this->configurator->getStep(self::DOCTRINE_STEP);
         }
 
-        return $this->configurator->getStep($index);
+        return $this->configurator->getStep($index)[0];
     }
 
     /**
