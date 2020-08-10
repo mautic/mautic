@@ -407,7 +407,7 @@ return [
                 'methodCalls' => [
                     'setUsername' => ['%mautic.mailer_user%'],
                     'setPassword' => ['%mautic.mailer_password%'],
-                    'setRegion'  => [
+                    'setRegion'   => [
                         '%mautic.mailer_amazon_api_region%',
                         '%mautic.mailer_amazon_api_other_region%',
                     ],

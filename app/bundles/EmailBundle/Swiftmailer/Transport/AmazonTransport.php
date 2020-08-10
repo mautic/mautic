@@ -29,7 +29,7 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
      * AmazonTransport constructor.
      *
      * @param string $host
-     * @param AmazonCallback $amazonCallback
+     * @param string $otherHost
      */
     public function __construct($host, $otherHost, $port = 2587, AmazonCallback $amazonCallback)
     {

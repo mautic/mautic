@@ -43,7 +43,7 @@ class TransportType
      */
     private $showPort = [
         'smtp',
-        'mautic.transport.amazon',
+        'mautic.transport.amazon'
     ];
 
     /**
@@ -161,6 +161,7 @@ class TransportType
 
         $transports       = array_keys($tempTransports);
         $doNotRequireHost = array_diff($transports, $this->showHost);
+
         return $this->getString($doNotRequireHost);
     }
 
@@ -173,6 +174,7 @@ class TransportType
         unset($tempTransports['mautic.transport.amazon_api']);
 
         $doNotRequireRegion = array_keys($tempTransports);
+
         return $this->getString($doNotRequireRegion);
     }
 
