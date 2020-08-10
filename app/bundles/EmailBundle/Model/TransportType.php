@@ -43,7 +43,7 @@ class TransportType
      */
     private $showPort = [
         'smtp',
-        'mautic.transport.amazon'
+        'mautic.transport.amazon',
     ];
 
     /**
