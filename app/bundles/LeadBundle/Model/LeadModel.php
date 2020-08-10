@@ -64,6 +64,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\Provider\UserProvider;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactory;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Intl\Intl;
@@ -911,7 +912,14 @@ class LeadModel extends FormModel
     {
         // @todo Instantiate here until we can remove circular dependency on LeadModel in order to make it a service
         $requestStack = new RequestStack();
-        $requestStack->push($this->request);
+        if (empty($this->request)) {
+            // likely in a test as the request is not populated for outside the container
+            $request      = Request::createFromGlobals();
+            $requestStack = new RequestStack();
+            $requestStack->push($request);
+        } else {
+            $requestStack->push($this->request);
+        }
         $contactRequestHelper = new ContactRequestHelper(
             $this,
             $this->contactTracker,
