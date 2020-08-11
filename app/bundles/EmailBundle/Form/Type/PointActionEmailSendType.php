@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -31,12 +32,12 @@ class PointActionEmailSendType extends AbstractType
 
         $builder->add(
             'categories',
-            'category',
+            CategoryListType::class,
             [
                 'label'           => 'mautic.email.open.limittocategories',
                 'bundle'          => 'email',
                 'multiple'        => true,
-                'empty_value'     => true,
+                'placeholder'     => true,
                 'with_create_new' => false,
                 'return_entity'   => false,
                 'attr'            => [
