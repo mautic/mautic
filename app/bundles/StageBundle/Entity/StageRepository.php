@@ -214,7 +214,7 @@ class StageRepository extends CommonRepository
 
         if (is_numeric($value)) {
             // This is numeric value so check id and name
-            $qb->where('s.id = :value')
+            $qb->where('s.id = :value');
         } else {
             // This is string, no need to check IDs
             $qb->where('s.name = :value');
