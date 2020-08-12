@@ -127,13 +127,6 @@ $template  = '<div class="col-md-6">{content}</div>';
             <?php echo $view['form']->rowIfExists($fields, 'max_entity_lock_time', $template); ?>
         </div>
         <?php endif; ?>
-        
-        <?php if (isset($fields['transliterate_page_titles'])): ?>
-        <hr class="text-muted" />
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'transliterate_page_titles', $template); ?>
-        </div>
-        <?php endif; ?>
 
       <?php if (isset($fields['transliterate_page_title'])): ?>
           <hr class="text-muted" />

@@ -1101,7 +1101,6 @@ return [
         'ip_lookup_auth'                  => '',
         'ip_lookup_config'                => [],
         'ip_lookup_create_organization'   => false,
-        'transliterate_page_titles'       => false,
         'transifex_username'              => '',
         'transifex_password'              => '',
         'update_stability'                => 'stable',
