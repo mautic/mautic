@@ -18,6 +18,8 @@ cache:
 
 before_install:
   # Create mautictest database
+  - mysql --version
+  - mysql -e 'DROP DATABASE IF EXISTS mautictest;'
   - mysql -e 'CREATE DATABASE mautictest;'
 
   # increase memory limit for all PHP processes
@@ -35,12 +37,27 @@ before_install:
 install:
   - composer install
 
+  # Clobber is needed because PCOV normally only works with PHPUnit 8+. Needed only to run test coverage.
+  - if [ ${TRAVIS_PHP_VERSION:0:3} == "7.3" ]; then pecl install pcov && composer require --dev pcov/clobber && bin/pcov clobber; fi
+
 script:
-  - composer test
+  - if [ ${TRAVIS_PHP_VERSION:0:3} == "7.3" ]; 
+    then composer test -- --coverage-clover=coverage.xml && bash <(curl -s https://codecov.io/bash); 
+    else composer test; fi
 
 jobs:
   include:
     - stage: test
+      php: 7.2
+      env: DB=mariadb
+      addons:
+        mariadb: '10.2'
+    - 
+      php: 7.3
+      env: DB=mariadb
+      addons:
+        mariadb: '10.2'
+    - 
       name: PHPSTAN
       script: composer phpstan
     -

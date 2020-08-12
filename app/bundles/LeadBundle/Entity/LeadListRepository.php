@@ -465,6 +465,11 @@ class LeadListRepository extends CommonRepository
                 $expr            = $q->expr()->like('l.name', ':'.$unique);
                 $returnParameter = true;
                 break;
+            case $this->translator->trans('mautic.core.searchcommand.ismine'):
+            case $this->translator->trans('mautic.core.searchcommand.ismine', [], null, 'en_US'):
+                $expr            = $q->expr()->eq('l.createdBy', ":$unique");
+                $forceParameters = [$unique => $this->currentUser->getId()];
+                break;
         }
 
         if (!empty($forceParameters)) {
@@ -490,6 +495,7 @@ class LeadListRepository extends CommonRepository
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.name',
+            'mautic.core.searchcommand.ismine',
         ];
 
         return array_merge($commands, parent::getSearchCommands());

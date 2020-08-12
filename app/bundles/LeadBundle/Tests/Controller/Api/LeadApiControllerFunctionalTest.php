@@ -70,10 +70,12 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload[1]['firstname'], $response['contacts'][1]['fields']['all']['firstname']);
         $this->assertEquals($payload[2]['firstname'], $response['contacts'][2]['fields']['all']['firstname']);
 
-        // Assert points
-        $this->assertEquals(4, $response['contacts'][0]['points']);
-        $this->assertEquals(0, $response['contacts'][1]['points']);
-        $this->assertEquals(0, $response['contacts'][2]['points']);
+        // Assert points while also testing empty precision as points is treated as a custom field
+        $this->assertSame(4, $response['contacts'][0]['points']);
+        $this->assertSame(4, $response['contacts'][0]['fields']['all']['points']);
+        $this->assertSame(0, $response['contacts'][1]['points']);
+        $this->assertSame(0, $response['contacts'][2]['points']);
+        $this->assertSame(0, $response['contacts'][2]['fields']['all']['points']);
 
         // Assert tags
         $this->assertEquals(2, count($response['contacts'][0]['tags']));
@@ -158,9 +160,12 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload[2]['firstname'], $response['contacts'][2]['fields']['all']['firstname']);
 
         // Assert points
-        $this->assertEquals(4, $response['contacts'][0]['points']);
-        $this->assertEquals(3, $response['contacts'][1]['points']);
-        $this->assertEquals(0, $response['contacts'][2]['points']);
+        $this->assertSame(4, $response['contacts'][0]['points']);
+        $this->assertSame(4, $response['contacts'][0]['fields']['all']['points']);
+        $this->assertSame(3, $response['contacts'][1]['points']);
+        $this->assertSame(3, $response['contacts'][1]['fields']['all']['points']);
+        $this->assertSame(0, $response['contacts'][2]['points']);
+        $this->assertSame(0, $response['contacts'][2]['fields']['all']['points']);
 
         // Assert tags
         $this->assertEquals(2, count($response['contacts'][0]['tags']));
@@ -259,7 +264,8 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['email'], $response['contact']['fields']['all']['email']);
         $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
         $this->assertEmpty($response['contact']['fields']['all']['lastname']);
-        $this->assertEquals(4, $response['contact']['points']);
+        $this->assertSame(4, $response['contact']['points']);
+        $this->assertSame(4, $response['contact']['fields']['all']['points']);
         $this->assertEquals(2, count($response['contact']['tags']));
         $this->assertEquals($payload['city'], $response['contact']['fields']['all']['city']);
         $this->assertEquals($payload['state'], $response['contact']['fields']['all']['state']);
@@ -285,7 +291,8 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($updatedValues['email'], $response['contact']['fields']['all']['email']);
         $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
         $this->assertEquals($updatedValues['lastname'], $response['contact']['fields']['all']['lastname']);
-        $this->assertEquals(4, $response['contact']['points']);
+        $this->assertSame(4, $response['contact']['points']);
+        $this->assertSame(4, $response['contact']['fields']['all']['points']);
         $this->assertEquals(2, count($response['contact']['tags']));
         $this->assertEquals($updatedValues['city'], $response['contact']['fields']['all']['city']);
         $this->assertEquals($updatedValues['state'], $response['contact']['fields']['all']['state']);
@@ -294,12 +301,53 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['timezone'], $response['contact']['fields']['all']['timezone']);
         $this->assertEquals($updatedValues['owner'], $response['contact']['owner']['id']);
 
+        // Test getting a contact
+        $this->client->request(
+            'GET', '/api/contacts/'.$contactId);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals($contactId, $response['contact']['id']);
+        $this->assertEquals($payload['email'], $response['contact']['fields']['all']['email']);
+        $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
+        $this->assertSame(4, $response['contact']['points']);
+        $this->assertSame(4, $response['contact']['fields']['all']['points']);
+        $this->assertEquals(2, count($response['contact']['tags']));
+        $this->assertEquals($updatedValues['city'], $response['contact']['fields']['all']['city']);
+        $this->assertEquals($updatedValues['state'], $response['contact']['fields']['all']['state']);
+        $this->assertEquals($payload['country'], $response['contact']['fields']['all']['country']);
+        $this->assertEquals($payload['preferred_locale'], $response['contact']['fields']['all']['preferred_locale']);
+        $this->assertEquals($payload['timezone'], $response['contact']['fields']['all']['timezone']);
+        $this->assertEquals($updatedValues['owner'], $response['contact']['owner']['id']);
+
+        // Test fetching the batch of contacts
+        $this->client->request(
+            'GET', '/api/contacts');
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertTrue(isset($response['contacts'][$contactId]));
+        $contact = $response['contacts'][$contactId];
+        $this->assertEquals($contactId, $contact['id']);
+        $this->assertEquals($payload['email'], $contact['fields']['all']['email']);
+        $this->assertEquals($payload['firstname'], $contact['fields']['all']['firstname']);
+        $this->assertSame(4, $contact['points']);
+        $this->assertSame(4, $contact['fields']['all']['points']);
+        $this->assertEquals(2, count($contact['tags']));
+        $this->assertEquals($updatedValues['city'], $contact['fields']['all']['city']);
+        $this->assertEquals($updatedValues['state'], $contact['fields']['all']['state']);
+        $this->assertEquals($payload['country'], $contact['fields']['all']['country']);
+        $this->assertEquals($payload['preferred_locale'], $contact['fields']['all']['preferred_locale']);
+        $this->assertEquals($payload['timezone'], $contact['fields']['all']['timezone']);
+        $this->assertEquals($updatedValues['owner'], $contact['owner']['id']);
+
         // Test patch and values should be updated
         $updatedValues = [
-            'email' => 'apiemail1@email.com',
-            'city'  => 'Boston',
-            'state' => 'Massachusetts',
-            'owner' => 2,
+            'email'  => 'apiemail1@email.com',
+            'city'   => 'Boston',
+            'state'  => 'Massachusetts',
+            'owner'  => 2,
+            'points' => 1,
         ];
 
         $this->client->request(
@@ -313,7 +361,8 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($contactId, $response['contact']['id']);
         $this->assertEquals($updatedValues['email'], $response['contact']['fields']['all']['email']);
         $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
-        $this->assertEquals(4, $response['contact']['points']);
+        $this->assertSame(1, $response['contact']['points']);
+        $this->assertSame(1, $response['contact']['fields']['all']['points']);
         $this->assertEquals(2, count($response['contact']['tags']));
         $this->assertEquals($updatedValues['city'], $response['contact']['fields']['all']['city']);
         $this->assertEquals($updatedValues['state'], $response['contact']['fields']['all']['state']);
