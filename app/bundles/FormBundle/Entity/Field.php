@@ -893,9 +893,7 @@ class Field
         }
 
         if ($displayManager && $displayManager->useProgressiveProfilingLimit()) {
-            if ($displayManager->showForField($this)) {
-                return true;
-            } else {
+            if (!$displayManager->showForField($this)) {
                 return false;
             }
         }
