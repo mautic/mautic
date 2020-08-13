@@ -980,7 +980,7 @@ class MailHelper
         $content = strtr($content, $this->embedImagesReplaces);
         if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
             foreach ($matches[1] as $match) {
-                if (false === strpos($match, 'cid:') and !array_key_exists($match,$this->embedImagesReplaces)) {
+                if (false === strpos($match, 'cid:') and !array_key_exists($match, $this->embedImagesReplaces)) {
                     $this->embedImagesReplaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
                 }
             }
