@@ -76,6 +76,11 @@ class LeadList extends FormEntity
      */
     private $leads;
 
+    /**
+     * @var \DateTime|null
+     */
+    private $lastBuildDate;
+
     public function __construct()
     {
         $this->leads = new ArrayCollection();
@@ -112,6 +117,11 @@ class LeadList extends FormEntity
             ->setIndexBy('id')
             ->mappedBy('list')
             ->fetchExtraLazy()
+            ->build();
+
+        $builder->createField('lastBuildDate', 'datetime')
+            ->columnName('last_build_date')
+            ->nullable()
             ->build();
     }
 
@@ -341,6 +351,7 @@ class LeadList extends FormEntity
         $this->leads = new ArrayCollection();
         $this->setIsPublished(false);
         $this->setAlias('');
+        $this->lastBuildDate = null;
     }
 
     /**
@@ -377,5 +388,15 @@ class LeadList extends FormEntity
             },
             $filters
         );
+    }
+
+    public function getLastBuildDate(): ?\DateTime
+    {
+        return $this->lastBuildDate;
+    }
+
+    public function setLastBuildDate(?\DateTime $lastBuildDate): void
+    {
+        $this->lastBuildDate = $lastBuildDate;
     }
 }
