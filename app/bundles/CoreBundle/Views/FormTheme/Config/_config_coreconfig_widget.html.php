@@ -130,10 +130,8 @@ $template  = '<div class="col-md-6">{content}</div>';
 
       <?php if (isset($fields['transliterate_page_title'])): ?>
           <hr class="text-muted" />
-          <div class="panel-body">
-              <div class="row">
-                <?php echo $view['form']->rowIfExists($fields, 'transliterate_page_title', $template); ?>
-              </div>
+          <div class="row">
+              <?php echo $view['form']->rowIfExists($fields, 'transliterate_page_title', $template); ?>
           </div>
       <?php endif; ?>
     </div>
