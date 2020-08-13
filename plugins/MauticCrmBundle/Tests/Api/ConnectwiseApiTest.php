@@ -9,13 +9,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticCrmBundle\Tests\Api;
+namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
 use MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi;
 use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
 use MauticPlugin\MauticCrmBundle\Tests\Integration\DataGeneratorTrait;
 
-class ConnectwiseApiTest extends \PHPUnit_Framework_TestCase
+class ConnectwiseApiTest extends \PHPUnit\Framework\TestCase
 {
     use DataGeneratorTrait;
 

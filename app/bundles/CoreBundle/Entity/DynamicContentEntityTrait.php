@@ -48,9 +48,6 @@ trait DynamicContentEntityTrait
      */
     private $dynamicContent = [];
 
-    /**
-     * @param ClassMetadataBuilder $builder
-     */
     protected static function addDynamicContentMetadata(ClassMetadataBuilder $builder)
     {
         $builder->createField('dynamicContent', 'array')

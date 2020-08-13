@@ -9,12 +9,30 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Helper;
+namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\UrlHelper;
 
-class UrlHelperTest extends \PHPUnit_Framework_TestCase
+class UrlHelperTest extends \PHPUnit\Framework\TestCase
 {
+    public function testAppendQueryToUrl()
+    {
+        $appendQueryString = 'utm_source=mautic.org';
+
+        $urls = [
+            'https://mautic.org'               => 'https://mautic.org?'.$appendQueryString,
+            'https://mautic.org?'              => 'https://mautic.org?'.$appendQueryString,
+            'https://mautic.org?test=1'        => 'https://mautic.org?test=1&'.$appendQueryString,
+            'https://mautic.org?test=1&'       => 'https://mautic.org?test=1&'.$appendQueryString,
+            'https://mautic.org?test=1#anchor' => 'https://mautic.org?test=1&'.$appendQueryString.'#anchor',
+            'https://mautic.org?#anchor'       => 'https://mautic.org?'.$appendQueryString.'#anchor',
+            'https://mautic.org#anchor'        => 'https://mautic.org?'.$appendQueryString.'#anchor',
+        ];
+        foreach ($urls as $url=>$expectedUrl) {
+            $this->assertEquals(UrlHelper::appendQueryToUrl($url, $appendQueryString), $expectedUrl);
+        }
+    }
+
     public function testSanitizeAbsoluteUrlDoesNotModifyCorrectFullUrl()
     {
         $this->assertEquals(
@@ -75,7 +93,17 @@ class UrlHelperTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             'http://username:password@hostname:9090/path?ar_g1=value&arg2=some+email%40address.com#anchor',
-            UrlHelper::sanitizeAbsoluteUrl('http://username:password@hostname:9090/path?ar g1=value&arg2=some+email@address.com#anchor')
+            UrlHelper::sanitizeAbsoluteUrl(
+                'http://username:password@hostname:9090/path?ar g1=value&arg2=some+email@address.com#anchor'
+            )
+        );
+    }
+
+    public function testSanitizeAbsoluteUrlSanitizePathWhitespace()
+    {
+        $this->assertEquals(
+            'http://username:password@hostname:9090/some%20path%20with%20whitespace',
+            UrlHelper::sanitizeAbsoluteUrl('http://username:password@hostname:9090/some path with whitespace')
         );
     }
 
@@ -90,9 +118,11 @@ class UrlHelperTest extends \PHPUnit_Framework_TestCase
     public function testGetUrlsFromPlaintextSkipDefaultTokenValues()
     {
         $this->assertEquals(
-            // 1 is skipped because it's set as the token default
+        // 1 is skipped because it's set as the token default
             [0 => 'https://find.this', 2 => '{contactfield=website|http://skip.this}'],
-            UrlHelper::getUrlsFromPlaintext('Find this url: https://find.this, but allow this token because we know its a url: {contactfield=website|http://skip.this}! ')
+            UrlHelper::getUrlsFromPlaintext(
+                'Find this url: https://find.this, but allow this token because we know its a url: {contactfield=website|http://skip.this}! '
+            )
         );
     }
 
@@ -100,7 +130,9 @@ class UrlHelperTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             ['http://mautic.org', 'http://mucktick.org'],
-            UrlHelper::getUrlsFromPlaintext('Hello there, http://mautic.org is the correct URL. Not http://mucktick.org.')
+            UrlHelper::getUrlsFromPlaintext(
+                'Hello there, http://mautic.org is the correct URL. Not http://mucktick.org.'
+            )
         );
     }
 

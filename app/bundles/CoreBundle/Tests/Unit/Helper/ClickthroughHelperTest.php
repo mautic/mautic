@@ -14,7 +14,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Tests\Unit\Helper\TestResources\WakeupCall;
 
-class ClickthroughHelperTest extends \PHPUnit_Framework_TestCase
+class ClickthroughHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testEncodingCanBeDecoded()
     {

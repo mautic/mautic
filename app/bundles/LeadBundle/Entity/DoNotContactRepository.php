@@ -24,7 +24,6 @@ class DoNotContactRepository extends CommonRepository
     /**
      * Get a list of DNC entries based on channel and lead_id.
      *
-     * @param Lead   $lead
      * @param string $channel
      *
      * @return \Mautic\LeadBundle\Entity\DoNotContact[]
@@ -35,12 +34,11 @@ class DoNotContactRepository extends CommonRepository
     }
 
     /**
-     * @param null            $channel
-     * @param null            $ids
-     * @param null            $reason
-     * @param null            $listId
-     * @param ChartQuery|null $chartQuery
-     * @param bool            $combined
+     * @param null $channel
+     * @param null $ids
+     * @param null $reason
+     * @param null $listId
+     * @param bool $combined
      *
      * @return array|int
      */
@@ -122,8 +120,7 @@ class DoNotContactRepository extends CommonRepository
     }
 
     /**
-     * @param null  $leadId
-     * @param array $options
+     * @param null $leadId
      *
      * @return array
      */

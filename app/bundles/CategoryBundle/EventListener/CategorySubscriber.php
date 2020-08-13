@@ -14,38 +14,28 @@ namespace Mautic\CategoryBundle\EventListener;
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event as Events;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CategorySubscriber.
- */
-class CategorySubscriber extends CommonSubscriber
+class CategorySubscriber implements EventSubscriberInterface
 {
     /**
      * @var BundleHelper
      */
-    protected $bundleHelper;
+    private $bundleHelper;
 
     /**
      * @var IpLookupHelper
      */
-    protected $ipLookupHelper;
+    private $ipLookupHelper;
 
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
-    /**
-     * CategorySubscriber constructor.
-     *
-     * @param BundleHelper   $bundleHelper
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     */
     public function __construct(BundleHelper $bundleHelper, IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {
         $this->bundleHelper   = $bundleHelper;
@@ -67,8 +57,6 @@ class CategorySubscriber extends CommonSubscriber
 
     /**
      * Add bundle to the category.
-     *
-     * @param CategoryTypesEvent $event
      */
     public function onCategoryBundleListBuild(CategoryTypesEvent $event)
     {
@@ -85,8 +73,6 @@ class CategorySubscriber extends CommonSubscriber
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param Events\CategoryEvent $event
      */
     public function onCategoryPostSave(Events\CategoryEvent $event)
     {
@@ -106,8 +92,6 @@ class CategorySubscriber extends CommonSubscriber
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param Events\CategoryEvent $event
      */
     public function onCategoryDelete(Events\CategoryEvent $event)
     {

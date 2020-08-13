@@ -15,7 +15,7 @@ use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer;
 
-class MailboxContainerTest extends \PHPUnit_Framework_TestCase
+class MailboxContainerTest extends \PHPUnit\Framework\TestCase
 {
     protected $config = [
         'imap_path' => 'path',

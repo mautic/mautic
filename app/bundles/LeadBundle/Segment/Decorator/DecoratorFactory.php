@@ -47,12 +47,6 @@ class DecoratorFactory
 
     /**
      * DecoratorFactory constructor.
-     *
-     * @param ContactSegmentFilterDictionary $contactSegmentFilterDictionary
-     * @param BaseDecorator                  $baseDecorator
-     * @param CustomMappedDecorator          $customMappedDecorator
-     * @param DateOptionFactory              $dateOptionFactory
-     * @param CompanyDecorator               $companyDecorator
      */
     public function __construct(
         ContactSegmentFilterDictionary $contactSegmentFilterDictionary,
@@ -69,8 +63,6 @@ class DecoratorFactory
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return FilterDecoratorInterface
      */
     public function getDecoratorForFilter(ContactSegmentFilterCrate $contactSegmentFilterCrate)

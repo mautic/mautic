@@ -14,20 +14,9 @@ namespace Mautic\ChannelBundle\PreferenceBuilder;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Psr\Log\LoggerInterface;
 
 class ChannelPreferences
 {
-    /**
-     * @var
-     */
-    private $channel;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
     /**
      * @var Event
      */
@@ -38,17 +27,8 @@ class ChannelPreferences
      */
     private $organizedByPriority = [];
 
-    /**
-     * ChannelPreferences constructor.
-     *
-     * @param string          $channel
-     * @param Event           $event
-     * @param LoggerInterface $logger
-     */
-    public function __construct($channel, Event $event, LoggerInterface $logger)
+    public function __construct(Event $event)
     {
-        $this->channel = $channel;
-        $this->logger  = $logger;
         $this->event   = $event;
     }
 
@@ -69,8 +49,7 @@ class ChannelPreferences
     }
 
     /**
-     * @param LeadEventLog $log
-     * @param int          $priority
+     * @param int $priority
      *
      * @return $this
      */
@@ -94,8 +73,6 @@ class ChannelPreferences
     /**
      * Removes a log from all prioritized groups.
      *
-     * @param LeadEventLog $log
-     *
      * @return $this
      */
     public function removeLog(LeadEventLog $log)
@@ -104,7 +81,7 @@ class ChannelPreferences
          * @var int
          * @var ArrayCollection|LeadEventLog[] $logs
          */
-        foreach ($this->organizedByPriority as $priority => $logs) {
+        foreach ($this->organizedByPriority as $logs) {
             $logs->remove($log->getId());
         }
 

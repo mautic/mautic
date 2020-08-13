@@ -26,10 +26,9 @@ class InvalidEmailException extends \Exception
     /**
      * InvalidEmailException constructor.
      *
-     * @param string         $emailAddress
-     * @param string         $message
-     * @param int            $code
-     * @param Throwable|null $previous
+     * @param string $emailAddress
+     * @param string $message
+     * @param int    $code
      */
     public function __construct($emailAddress, $message = '', $code = 0, Throwable $previous = null)
     {

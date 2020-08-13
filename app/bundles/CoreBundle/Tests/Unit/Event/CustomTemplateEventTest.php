@@ -9,20 +9,21 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Event;
+namespace Mautic\CoreBundle\Tests\Unit\Event;
 
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
 
-class CustomTemplateEventTest extends \PHPUnit_Framework_TestCase
+class CustomTemplateEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testNullRequestDoesNotThrowException()
     {
-        new CustomTemplateEvent(null, 'test');
+        $event = new CustomTemplateEvent(null, 'test');
+        $this->assertSame('test', $event->getTemplate());
     }
 
     public function testEmptyTemplateThrowsException()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         new CustomTemplateEvent();
     }

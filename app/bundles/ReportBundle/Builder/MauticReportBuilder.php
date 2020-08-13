@@ -21,9 +21,6 @@ use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-/**
- * Mautic Report Builder class.
- */
 final class MauticReportBuilder implements ReportBuilderInterface
 {
     /**
@@ -115,11 +112,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
     /**
      * MauticReportBuilder constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
-     * @param Connection               $db
-     * @param Report                   $entity
-     * @param ChannelListHelper        $channelListHelper
      */
     public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity, ChannelListHelper $channelListHelper)
     {
@@ -138,7 +130,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     {
         $queryBuilder = $this->configureBuilder($options);
 
-        if ($queryBuilder->getType() !== QueryBuilder::SELECT) {
+        if (QueryBuilder::SELECT !== $queryBuilder->getType()) {
             throw new InvalidReportQueryException('Only SELECT statements are valid');
         }
 
@@ -200,7 +192,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             case 'like':
                             case 'notLike':
                             case 'contains':
-                                if ($condition === 'notLike') {
+                                if ('notLike' === $condition) {
                                     $dynamicFilter['expr'] = 'notLike';
                                 }
 
@@ -229,7 +221,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // Build ORDER BY clause
         if (!empty($options['order'])) {
             if (is_array($options['order'])) {
-                if (isset($o['column'])) {
+                if (isset($options['order']['column'])) {
                     $queryBuilder->orderBy($options['order']['column'], $options['order']['direction']);
                 } elseif (!empty($options['order'][0][1])) {
                     list($column, $dir) = $options['order'];
@@ -295,8 +287,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Build SELECT clause
         if (!$selectOptions = $event->getSelectColumns()) {
-            $fields         = $this->entity->getColumns();
-            $groupByColumns = $queryBuilder->getQueryPart('groupBy');
+            $fields             = $this->entity->getColumns();
+            $groupByColumns     = $queryBuilder->getQueryPart('groupBy');
+            $groupByColumnsKeys = array_flip($groupByColumns);
 
             foreach ($fields as $field) {
                 if (isset($options['columns'][$field])) {
@@ -306,7 +299,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         $selectText = $this->buildCaseSelect($fieldOptions['channelData']);
                     } else {
                         // If there is a group by, and this field has groupByFormula
-                        if (isset($groupByColumns) && isset($fieldOptions['groupByFormula'])) {
+                        if (isset($fieldOptions['groupByFormula']) && isset($groupByColumnsKeys[$fieldOptions['groupByFormula']])) {
                             $selectText = $fieldOptions['groupByFormula'];
                         } elseif (isset($fieldOptions['formula'])) {
                             $selectText = $fieldOptions['formula'];
@@ -339,7 +332,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Replace {{count}} with the count query
         array_walk($selectColumns, function (&$columnValue, $columnIndex) use ($countSql) {
-            if (strpos($columnValue, '{{count}}') !== false) {
+            if (false !== strpos($columnValue, '{{count}}')) {
                 $columnValue = str_replace('{{count}}', $countSql, $columnValue);
             }
         });
@@ -360,7 +353,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
                 $selectText = sprintf('%s(%s)', $aggregator['function'], $columnSelect);
 
-                if ($aggregator['function'] === 'AVG') {
+                if ('AVG' === $aggregator['function']) {
                     $selectText = sprintf('ROUND(%s)', $selectText);
                 }
 
@@ -384,20 +377,14 @@ final class MauticReportBuilder implements ReportBuilderInterface
     {
         $case = 'CASE';
 
-        foreach ($channelData as $channel => $data) {
+        foreach ($channelData as $data) {
             $case .= ' WHEN '.$data['column'].' IS NOT NULL THEN '.$data['column'];
         }
 
-        $case .= ' ELSE NULL END ';
-
-        return $case;
+        return $case.' ELSE NULL END ';
     }
 
     /**
-     * @param array        $filters
-     * @param QueryBuilder $queryBuilder
-     * @param array        $filterDefinitions
-     *
      * @return bool
      */
     private function applyFilters(array $filters, QueryBuilder $queryBuilder, array $filterDefinitions)
@@ -411,7 +398,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 $exprFunction = isset($filter['expr']) ? $filter['expr'] : $filter['condition'];
                 $paramName    = sprintf('i%dc%s', $i, InputHelper::alphanum($filter['column']));
 
-                if (array_key_exists('glue', $filter) && $filter['glue'] === 'or') {
+                if (array_key_exists('glue', $filter) && 'or' === $filter['glue']) {
                     if ($groupExpr->count()) {
                         $groups[]  = $groupExpr;
                         $groupExpr = $queryBuilder->expr()->andX();
@@ -428,15 +415,17 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         );
                         break;
                     case 'empty':
-                        $groupExpr->add(
-                            $expr->isNull($filter['column'])
+                        $expression = $queryBuilder->expr()->orX(
+                            $queryBuilder->expr()->isNull($filter['column']),
+                            $queryBuilder->expr()->eq($filter['column'], $expr->literal(''))
                         );
+
                         $groupExpr->add(
-                            $expr->eq($filter['column'], $expr->literal(''))
+                            $expression
                         );
                         break;
                     default:
-                        if (trim($filter['value']) == '') {
+                        if ('' == trim($filter['value'])) {
                             // Ignore empty
                             break;
                         }
@@ -504,7 +493,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
             $groups[] = $groupExpr;
         }
 
-        if (count($groups) === 1) {
+        if (1 === count($groups)) {
             // Only one andX expression
             $filterExpr = $groups[0];
         } elseif (count($groups) > 1) {

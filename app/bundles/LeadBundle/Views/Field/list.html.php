@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticLeadBundle:Field:index.html.php');
 }
 ?>
@@ -66,7 +66,7 @@ if ($tmpl == 'index') {
                     <span class="ellipsis">
                         <?php echo $view->render(
                             'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                            ['item' => $item, 'model' => 'lead.field', 'disableToggle' => ($item->getAlias() == 'email')]
+                            ['item' => $item, 'model' => 'lead.field', 'disableToggle' => ('email' == $item->getAlias())]
                         ); ?>
                         <a href="<?php echo $view['router']->path(
                             'mautic_contactfield_action',

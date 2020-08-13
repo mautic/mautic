@@ -1102,11 +1102,11 @@ var datetimepickerFactory = function ($) {
                         $(this).parent().parent().hide();
 
                         datetimepicker.trigger('xchange.xdsoft');
-                        if (options.onChangeMonth && $.isFunction(options.onChangeMonth)) {
+                        if (options.onChangeMonth && (typeof options.onChangeMonth === 'function')) {
                             options.onChangeMonth.call(datetimepicker, _xdsoft_datetime.currentTime, datetimepicker.data('input'));
                         }
 
-                        if (year !== _xdsoft_datetime.currentTime.getFullYear() && $.isFunction(options.onChangeYear)) {
+                        if (year !== _xdsoft_datetime.currentTime.getFullYear() && (typeof options.onChangeYear === 'function')) {
                             options.onChangeYear.call(datetimepicker, _xdsoft_datetime.currentTime, datetimepicker.data('input'));
                         }
                     }
@@ -1437,11 +1437,11 @@ var datetimepickerFactory = function ($) {
                     );
                     _this.currentTime.setMonth(month);
 
-                    if (options.onChangeMonth && $.isFunction(options.onChangeMonth)) {
+                    if (options.onChangeMonth && (typeof options.onChangeMonth === 'function')) {
                         options.onChangeMonth.call(datetimepicker, _xdsoft_datetime.currentTime, datetimepicker.data('input'));
                     }
 
-                    if (year !== _this.currentTime.getFullYear() && $.isFunction(options.onChangeYear)) {
+                    if (year !== _this.currentTime.getFullYear() && (typeof options.onChangeYear === 'function')) {
                         options.onChangeYear.call(datetimepicker, _xdsoft_datetime.currentTime, datetimepicker.data('input'));
                     }
 
@@ -1467,7 +1467,7 @@ var datetimepickerFactory = function ($) {
                         )
                     );
                     _this.currentTime.setMonth(month);
-                    if (options.onChangeMonth && $.isFunction(options.onChangeMonth)) {
+                    if (options.onChangeMonth && (typeof options.onChangeMonth === 'function')) {
                         options.onChangeMonth.call(datetimepicker, _xdsoft_datetime.currentTime, datetimepicker.data('input'));
                     }
                     datetimepicker.trigger('xchange.xdsoft');
@@ -1475,7 +1475,7 @@ var datetimepickerFactory = function ($) {
                 };
 
                 _this.getWeekOfYear = function (datetime) {
-                    if (options.onGetWeekOfYear && $.isFunction(options.onGetWeekOfYear)) {
+                    if (options.onGetWeekOfYear && (typeof options.onGetWeekOfYear === 'function')) {
                         var week = options.onGetWeekOfYear.call(datetimepicker, datetime);
                         if (typeof week !== 'undefined') {
                             return week;
@@ -1743,7 +1743,7 @@ var datetimepickerFactory = function ($) {
 
                             classes.push('xdsoft_date');
 
-                            if (options.beforeShowDay && $.isFunction(options.beforeShowDay.call)) {
+                            if (options.beforeShowDay && (typeof options.beforeShowDay.call === 'function')) {
                                 customDateSettings = options.beforeShowDay.call(datetimepicker, start);
                             } else {
                                 customDateSettings = null;
@@ -1804,7 +1804,7 @@ var datetimepickerFactory = function ($) {
                                 description = hDate.desc === undefined ? '' : hDate.desc;
                             }
 
-                            if (options.beforeShowDay && $.isFunction(options.beforeShowDay)) {
+                            if (options.beforeShowDay && (typeof options.beforeShowDay === 'function')) {
                                 classes.push(options.beforeShowDay(start));
                             }
 
@@ -1987,7 +1987,7 @@ var datetimepickerFactory = function ($) {
 
                     input.val(_xdsoft_datetime.str());
 
-                    if (options.onSelectDate &&	$.isFunction(options.onSelectDate)) {
+                    if (options.onSelectDate &&	(typeof options.onSelectDate === 'function')) {
                         options.onSelectDate.call(datetimepicker, _xdsoft_datetime.currentTime, datetimepicker.data('input'), xdevent);
                     }
 
@@ -2027,7 +2027,7 @@ var datetimepickerFactory = function ($) {
 
                         datetimepicker.data('input').val(_xdsoft_datetime.str());
 
-                        if (options.onSelectTime && $.isFunction(options.onSelectTime)) {
+                        if (options.onSelectTime && (typeof options.onSelectTime === 'function')) {
                             options.onSelectTime.call(datetimepicker, _xdsoft_datetime.currentTime, datetimepicker.data('input'), xdevent);
                         }
                         datetimepicker.data('changed', true);
@@ -2079,7 +2079,7 @@ var datetimepickerFactory = function ($) {
 
             datetimepicker
                 .on('changedatetime.xdsoft', function (event) {
-                    if (options.onChangeDateTime && $.isFunction(options.onChangeDateTime)) {
+                    if (options.onChangeDateTime && (typeof options.onChangeDateTime === 'function')) {
                         var $input = datetimepicker.data('input');
                         options.onChangeDateTime.call(datetimepicker, _xdsoft_datetime.currentTime, $input, event);
                         delete options.value;
@@ -2087,7 +2087,7 @@ var datetimepickerFactory = function ($) {
                     }
                 })
                 .on('generate.xdsoft', function () {
-                    if (options.onGenerate && $.isFunction(options.onGenerate)) {
+                    if (options.onGenerate && (typeof options.onGenerate === 'function')) {
                         options.onGenerate.call(datetimepicker, _xdsoft_datetime.currentTime, datetimepicker.data('input'));
                     }
                     if (triggerAfterOpen) {
@@ -2233,7 +2233,7 @@ var datetimepickerFactory = function ($) {
             datetimepicker
                 .on('open.xdsoft', function (event) {
                     var onShow = true;
-                    if (options.onShow && $.isFunction(options.onShow)) {
+                    if (options.onShow && (typeof options.onShow === 'function')) {
                         onShow = options.onShow.call(datetimepicker, _xdsoft_datetime.currentTime, datetimepicker.data('input'), event);
                     }
                     if (onShow !== false) {
@@ -2257,7 +2257,7 @@ var datetimepickerFactory = function ($) {
                         .find('.xdsoft_month,.xdsoft_year')
                         .find('.xdsoft_select')
                         .hide();
-                    if (options.onClose && $.isFunction(options.onClose)) {
+                    if (options.onClose && (typeof options.onClose === 'function')) {
                         onClose = options.onClose.call(datetimepicker, _xdsoft_datetime.currentTime, datetimepicker.data('input'), event);
                     }
                     if (onClose !== false && !options.opened && !options.inline) {
@@ -2618,7 +2618,7 @@ var datetimepickerFactory = function ($) {
                             $input.trigger('blur.xdsoft');
                             break;
                         default:
-                            if (datetimepicker[opt] && $.isFunction(datetimepicker[opt])) {
+                            if (datetimepicker[opt] && (typeof datetimepicker[opt] === 'function')) {
                                 result = datetimepicker[opt](opt2);
                             }
                     }
@@ -2665,77 +2665,80 @@ var datetimepickerFactory = function ($) {
 
 /*!
  * jQuery Mousewheel 3.1.13
- *
- * Copyright jQuery Foundation and other contributors
- * Released under the MIT license
- * http://jquery.org/license
+ * Copyright OpenJS Foundation and other contributors
  */
 
-(function (factory) {
-    if ( typeof define === 'function' && define.amd ) {
+( function( factory ) {
+    if ( typeof define === "function" && define.amd ) {
+
         // AMD. Register as an anonymous module.
-        define(['jquery'], factory);
-    } else if (typeof exports === 'object') {
+        define( [ "jquery" ], factory );
+    } else if ( typeof exports === "object" ) {
+
         // Node/CommonJS style for Browserify
         module.exports = factory;
     } else {
-        // Browser globals
-        factory(jQuery);
-    }
-}(function ($) {
 
-    var toFix  = ['wheel', 'mousewheel', 'DOMMouseScroll', 'MozMousePixelScroll'],
-        toBind = ( 'onwheel' in document || document.documentMode >= 9 ) ?
-            ['wheel'] : ['mousewheel', 'DomMouseScroll', 'MozMousePixelScroll'],
+        // Browser globals
+        factory( jQuery );
+    }
+} )( function( $ ) {
+
+    var toFix  = [ "wheel", "mousewheel", "DOMMouseScroll", "MozMousePixelScroll" ],
+        toBind = ( "onwheel" in window.document || window.document.documentMode >= 9 ) ?
+            [ "wheel" ] : [ "mousewheel", "DomMouseScroll", "MozMousePixelScroll" ],
         slice  = Array.prototype.slice,
         nullLowestDeltaTimeout, lowestDelta;
 
     if ( $.event.fixHooks ) {
         for ( var i = toFix.length; i; ) {
-            $.event.fixHooks[ toFix[--i] ] = $.event.mouseHooks;
+            $.event.fixHooks[ toFix[ --i ] ] = $.event.mouseHooks;
         }
     }
 
     var special = $.event.special.mousewheel = {
-        version: '3.1.12',
+        version: "3.1.12",
 
         setup: function() {
             if ( this.addEventListener ) {
                 for ( var i = toBind.length; i; ) {
-                    this.addEventListener( toBind[--i], handler, false );
+                    this.addEventListener( toBind[ --i ], handler, false );
                 }
             } else {
                 this.onmousewheel = handler;
             }
+
             // Store the line height and page height for this particular element
-            $.data(this, 'mousewheel-line-height', special.getLineHeight(this));
-            $.data(this, 'mousewheel-page-height', special.getPageHeight(this));
+            $.data( this, "mousewheel-line-height", special.getLineHeight( this ) );
+            $.data( this, "mousewheel-page-height", special.getPageHeight( this ) );
         },
 
         teardown: function() {
             if ( this.removeEventListener ) {
                 for ( var i = toBind.length; i; ) {
-                    this.removeEventListener( toBind[--i], handler, false );
+                    this.removeEventListener( toBind[ --i ], handler, false );
                 }
             } else {
                 this.onmousewheel = null;
             }
+
             // Clean up the data we added to the element
-            $.removeData(this, 'mousewheel-line-height');
-            $.removeData(this, 'mousewheel-page-height');
+            $.removeData( this, "mousewheel-line-height" );
+            $.removeData( this, "mousewheel-page-height" );
         },
 
-        getLineHeight: function(elem) {
-            var $elem = $(elem),
-                $parent = $elem['offsetParent' in $.fn ? 'offsetParent' : 'parent']();
-            if (!$parent.length) {
-                $parent = $('body');
+        getLineHeight: function( elem ) {
+            var $elem = $( elem ),
+                $parent = $elem[ "offsetParent" in $.fn ? "offsetParent" : "parent" ]();
+            if ( !$parent.length ) {
+                $parent = $( "body" );
             }
-            return parseInt($parent.css('fontSize'), 10) || parseInt($elem.css('fontSize'), 10) || 16;
+            return parseInt( $parent.css( "fontSize" ), 10 ) ||
+                parseInt( $elem.css( "fontSize" ), 10 ) || 16;
         },
 
-        getPageHeight: function(elem) {
-            return $(elem).height();
+        getPageHeight: function( elem ) {
+            return $( elem ).height();
         },
 
         settings: {
@@ -2744,37 +2747,43 @@ var datetimepickerFactory = function ($) {
         }
     };
 
-    $.fn.extend({
-        mousewheel: function(fn) {
-            return fn ? this.bind('mousewheel', fn) : this.trigger('mousewheel');
+    $.fn.extend( {
+        mousewheel: function( fn ) {
+            return fn ? this.on( "mousewheel", fn ) : this.trigger( "mousewheel" );
         },
 
-        unmousewheel: function(fn) {
-            return this.unbind('mousewheel', fn);
+        unmousewheel: function( fn ) {
+            return this.off( "mousewheel", fn );
         }
-    });
+    } );
 
 
-    function handler(event) {
+    function handler( event ) {
         var orgEvent   = event || window.event,
-            args       = slice.call(arguments, 1),
+            args       = slice.call( arguments, 1 ),
             delta      = 0,
             deltaX     = 0,
             deltaY     = 0,
-            absDelta   = 0,
-            offsetX    = 0,
-            offsetY    = 0;
-        event = $.event.fix(orgEvent);
-        event.type = 'mousewheel';
+            absDelta   = 0;
+        event = $.event.fix( orgEvent );
+        event.type = "mousewheel";
 
         // Old school scrollwheel delta
-        if ( 'detail'      in orgEvent ) { deltaY = orgEvent.detail * -1;      }
-        if ( 'wheelDelta'  in orgEvent ) { deltaY = orgEvent.wheelDelta;       }
-        if ( 'wheelDeltaY' in orgEvent ) { deltaY = orgEvent.wheelDeltaY;      }
-        if ( 'wheelDeltaX' in orgEvent ) { deltaX = orgEvent.wheelDeltaX * -1; }
+        if ( "detail" in orgEvent ) {
+            deltaY = orgEvent.detail * -1;
+        }
+        if ( "wheelDelta" in orgEvent ) {
+            deltaY = orgEvent.wheelDelta;
+        }
+        if ( "wheelDeltaY" in orgEvent ) {
+            deltaY = orgEvent.wheelDeltaY;
+        }
+        if ( "wheelDeltaX" in orgEvent ) {
+            deltaX = orgEvent.wheelDeltaX * -1;
+        }
 
         // Firefox < 17 horizontal scrolling related to DOMMouseScroll event
-        if ( 'axis' in orgEvent && orgEvent.axis === orgEvent.HORIZONTAL_AXIS ) {
+        if ( "axis" in orgEvent && orgEvent.axis === orgEvent.HORIZONTAL_AXIS ) {
             deltaX = deltaY * -1;
             deltaY = 0;
         }
@@ -2783,17 +2792,21 @@ var datetimepickerFactory = function ($) {
         delta = deltaY === 0 ? deltaX : deltaY;
 
         // New school wheel delta (wheel event)
-        if ( 'deltaY' in orgEvent ) {
+        if ( "deltaY" in orgEvent ) {
             deltaY = orgEvent.deltaY * -1;
             delta  = deltaY;
         }
-        if ( 'deltaX' in orgEvent ) {
+        if ( "deltaX" in orgEvent ) {
             deltaX = orgEvent.deltaX;
-            if ( deltaY === 0 ) { delta  = deltaX * -1; }
+            if ( deltaY === 0 ) {
+                delta  = deltaX * -1;
+            }
         }
 
         // No change actually happened, no reason to go any further
-        if ( deltaY === 0 && deltaX === 0 ) { return; }
+        if ( deltaY === 0 && deltaX === 0 ) {
+            return;
+        }
 
         // Need to convert lines and pages to pixels if we aren't already in pixels
         // There are three delta modes:
@@ -2801,31 +2814,32 @@ var datetimepickerFactory = function ($) {
         //   * deltaMode 1 is by lines
         //   * deltaMode 2 is by pages
         if ( orgEvent.deltaMode === 1 ) {
-            var lineHeight = $.data(this, 'mousewheel-line-height');
+            var lineHeight = $.data( this, "mousewheel-line-height" );
             delta  *= lineHeight;
             deltaY *= lineHeight;
             deltaX *= lineHeight;
         } else if ( orgEvent.deltaMode === 2 ) {
-            var pageHeight = $.data(this, 'mousewheel-page-height');
+            var pageHeight = $.data( this, "mousewheel-page-height" );
             delta  *= pageHeight;
             deltaY *= pageHeight;
             deltaX *= pageHeight;
         }
 
         // Store lowest absolute delta to normalize the delta values
-        absDelta = Math.max( Math.abs(deltaY), Math.abs(deltaX) );
+        absDelta = Math.max( Math.abs( deltaY ), Math.abs( deltaX ) );
 
         if ( !lowestDelta || absDelta < lowestDelta ) {
             lowestDelta = absDelta;
 
             // Adjust older deltas if necessary
-            if ( shouldAdjustOldDeltas(orgEvent, absDelta) ) {
+            if ( shouldAdjustOldDeltas( orgEvent, absDelta ) ) {
                 lowestDelta /= 40;
             }
         }
 
         // Adjust older deltas if necessary
-        if ( shouldAdjustOldDeltas(orgEvent, absDelta) ) {
+        if ( shouldAdjustOldDeltas( orgEvent, absDelta ) ) {
+
             // Divide all the things by 40!
             delta  /= 40;
             deltaX /= 40;
@@ -2833,46 +2847,48 @@ var datetimepickerFactory = function ($) {
         }
 
         // Get a whole, normalized value for the deltas
-        delta  = Math[ delta  >= 1 ? 'floor' : 'ceil' ](delta  / lowestDelta);
-        deltaX = Math[ deltaX >= 1 ? 'floor' : 'ceil' ](deltaX / lowestDelta);
-        deltaY = Math[ deltaY >= 1 ? 'floor' : 'ceil' ](deltaY / lowestDelta);
+        delta  = Math[ delta  >= 1 ? "floor" : "ceil" ]( delta  / lowestDelta );
+        deltaX = Math[ deltaX >= 1 ? "floor" : "ceil" ]( deltaX / lowestDelta );
+        deltaY = Math[ deltaY >= 1 ? "floor" : "ceil" ]( deltaY / lowestDelta );
 
         // Normalise offsetX and offsetY properties
         if ( special.settings.normalizeOffset && this.getBoundingClientRect ) {
             var boundingRect = this.getBoundingClientRect();
-            offsetX = event.clientX - boundingRect.left;
-            offsetY = event.clientY - boundingRect.top;
+            event.offsetX = event.clientX - boundingRect.left;
+            event.offsetY = event.clientY - boundingRect.top;
         }
 
         // Add information to the event object
         event.deltaX = deltaX;
         event.deltaY = deltaY;
         event.deltaFactor = lowestDelta;
-        event.offsetX = offsetX;
-        event.offsetY = offsetY;
+
         // Go ahead and set deltaMode to 0 since we converted to pixels
         // Although this is a little odd since we overwrite the deltaX/Y
         // properties with normalized deltas.
         event.deltaMode = 0;
 
         // Add event and delta to the front of the arguments
-        args.unshift(event, delta, deltaX, deltaY);
+        args.unshift( event, delta, deltaX, deltaY );
 
         // Clearout lowestDelta after sometime to better
         // handle multiple device types that give different
         // a different lowestDelta
         // Ex: trackpad = 3 and mouse wheel = 120
-        if (nullLowestDeltaTimeout) { clearTimeout(nullLowestDeltaTimeout); }
-        nullLowestDeltaTimeout = setTimeout(nullLowestDelta, 200);
+        if ( nullLowestDeltaTimeout ) {
+            window.clearTimeout( nullLowestDeltaTimeout );
+        }
+        nullLowestDeltaTimeout = window.setTimeout( nullLowestDelta, 200 );
 
-        return ($.event.dispatch || $.event.handle).apply(this, args);
+        return ( $.event.dispatch || $.event.handle ).apply( this, args );
     }
 
     function nullLowestDelta() {
         lowestDelta = null;
     }
 
-    function shouldAdjustOldDeltas(orgEvent, absDelta) {
+    function shouldAdjustOldDeltas( orgEvent, absDelta ) {
+
         // If this is an older event and the delta is divisable by 120,
         // then we are assuming that the browser is treating this as an
         // older mouse wheel event and that we should divide the deltas
@@ -2880,7 +2896,8 @@ var datetimepickerFactory = function ($) {
         // Side note, this actually impacts the reported scroll distance
         // in older browsers and can cause scrolling to be slower than native.
         // Turn this off by setting $.event.special.mousewheel.settings.adjustOldDeltas to false.
-        return special.settings.adjustOldDeltas && orgEvent.type === 'mousewheel' && absDelta % 120 === 0;
+        return special.settings.adjustOldDeltas && orgEvent.type === "mousewheel" &&
+            absDelta % 120 === 0;
     }
 
-}));
+} );

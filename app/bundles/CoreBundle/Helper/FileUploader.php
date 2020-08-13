@@ -29,8 +29,7 @@ class FileUploader
     }
 
     /**
-     * @param string       $uploadDir
-     * @param UploadedFile $file
+     * @param string $uploadDir
      *
      * @return string
      *
