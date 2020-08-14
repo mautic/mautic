@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /*
  * @copyright   2020 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -14,6 +17,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
  * Migration for changing column_value to a longtext from varchar.
@@ -31,13 +35,24 @@ class Version20200812180900 extends AbstractMauticMigration
         }
     }
 
+    private function getTable(): string
+    {
+        return $this->prefix.'lead_lists';
+    }
+
     public function up(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE `{$this->prefix}lead_lists` ADD COLUMN `last_build_date` DATETIME NULL DEFAULT NOW() AFTER `checked_out_by_user`");
+        $now = (new DateTimeHelper())
+            ->getUtcDateTime()
+            ->format('Y-m-d H:i:s');
+
+        $table = $this->getTable();
+        $this->addSql(sprintf('ALTER TABLE `%s` ADD COLUMN `last_build_date` DATETIME NULL DEFAULT NULL AFTER `checked_out_by_user`', $table));
+        $this->addSql(sprintf("UPDATE `%s` SET last_build_date = '%s'", $table, $now));
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE {$this->prefix}email_copies DROP COLUMN `last_build_date`");
+        $this->addSql(sprintf('ALTER TABLE `%s` DROP COLUMN `last_build_date`', $this->getTable()));
     }
 }
