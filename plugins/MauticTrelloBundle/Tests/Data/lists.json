@@ -1,0 +1,27 @@
+[
+    {
+        "id": "2ea7a6abd29eb82731ac281a",
+        "name": "Backlog",
+        "pos": 32767.2
+    },
+    {
+        "id": "2a33c3812e188278a1b828b3",
+        "name": "To Do",
+        "pos": 49121.22
+    },
+    {
+        "id": "2e2c1a8a89c26a3ee8b6eba8",
+        "name": "Doing",
+        "pos": 62232
+    },
+    {
+        "id": "2e2c1a1e8ba1p9816169a3a8",
+        "name": "Review",
+        "pos": 196617
+    },
+    {
+        "id": "2e2c1a9aa8ae23862i918ceb",
+        "name": "Done",
+        "pos": 229372
+    }
+]
