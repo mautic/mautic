@@ -3,12 +3,12 @@
 declare(strict_types=1);
 
 /**
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
+ * @author    Mautic
+ * @copyright 2020 Mautic Contributors. All rights reserved
  *
- * @see        http://mautic.org
+ * @see http://mautic.org
  *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticTrelloBundle\Controller;
