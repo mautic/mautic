@@ -348,7 +348,7 @@ class AjaxController extends CommonAjaxController
         if (!empty($leadId) && !empty($channel) && in_array($action, ['remove', 'add'])) {
             $leadModel = $this->getModel('lead');
             /** @var DoNotContactModel $doNotContact */
-            $doNotContact = $this->getModel('mautic.lead.model.dnc');
+            $doNotContact = $this->getModel('lead.dnc');
 
             $lead = $leadModel->getEntity($leadId);
 
