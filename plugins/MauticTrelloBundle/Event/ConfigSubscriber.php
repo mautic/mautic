@@ -7,13 +7,15 @@ use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticTrelloBundle\Form\ConfigType;
+Mautic\PluginBundle\Integration\AbstractIntegration;
+use MauticPlugin\MauticTrelloBundle\Integration\TrelloIntegration;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var bool|TrelloIntegration
+     * @var TrelloIntegration|AbstractIntegration
      */
     protected $integration;
 

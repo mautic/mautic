@@ -76,9 +76,9 @@ class ConfigType extends AbstractType
     /**
      * Get all Trello boards.
      *
-     * @return void
+     * @return array
      */
-    protected function getBoards()
+    protected function getBoards(): array
     {
         return array_flip($this->apiService->getBoardsArray());
     }

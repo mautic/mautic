@@ -23,8 +23,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
  */
 class TrelloIntegration extends AbstractIntegration
 {
-    private $authorzationError = '';
-
     /**
      * Check if plugin is published.
      */
@@ -82,7 +80,7 @@ class TrelloIntegration extends AbstractIntegration
      *
      * @return void
      */
-    public function getSecretKeys()
+    public function getSecretKeys(): array
     {
         return [
             'apitoken',
@@ -94,11 +92,10 @@ class TrelloIntegration extends AbstractIntegration
      *
      * @param $section
      *
-     * @return string
+     * @return array
      */
-    public function getFormNotes($section)
+    public function getFormNotes($section): array
     {
-        $router     = $this->router;
         $translator = $this->getTranslator();
 
         if ('authorization' === $section) {
