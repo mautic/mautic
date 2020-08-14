@@ -1,0 +1,278 @@
+openapi: 3.0.0
+info:
+  title: Mautic Trello API
+  description: Create or update a card via the Trello API
+  version: 0.1.1
+servers:
+  - url: https://api.trello.com/1
+    description: Production Trello server
+paths:
+  /card:
+    post:
+      operationId: addCard
+      description: Creates a new Trello card
+      requestBody:
+        description: Card to be added
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewCard"
+      responses:
+        "200":
+          $ref: "#/components/responses/Ok"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /members/me/boards:
+    get:
+      operationId: getBoards
+      description: Get all boards the user has access to
+      parameters:
+        - in: query
+          name: fields
+          required: false
+          schema:
+            type: string
+          example: id,name
+        - in: query
+          name: filter
+          required: false
+          schema:
+            type: string
+            enum:
+              - starred
+              - open
+              - closed
+          example: open
+      responses:
+        "200":
+          description: All boards based on the filter criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/TrelloBoard" }
+  /boards/{boardId}/lists:
+    get:
+      operationId: getLists
+      description: Get all lists on a board
+      parameters:
+        - in: path
+          name: boardId
+          schema:
+            type: string
+          required: true
+          example: "5e5c1f7d35b240381adccdcb"
+        - in: query
+          name: cards
+          schema:
+            type: string
+            enum:
+              - all
+              - closed
+              - none
+              - open
+          required: false
+          example: "none"
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum:
+              - all
+              - closed
+              - none
+              - open
+          required: false
+          example: "open"
+        - in: query
+          name: fields
+          schema:
+            type: string
+            description: Comma separated list of fields
+          required: false
+          example: "id,name,pos"
+      responses:
+        "200":
+          description: All lists on a board
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/TrelloList" }
+components:
+  schemas:
+    Card:
+      allOf:
+        - $ref: "#/components/schemas/NewCard"
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: string
+              minLength: 1
+            dateLastActivity:
+              type: string
+              format: date-time
+              description: full-date notation as defined by RFC 3339, section 5.6. Default Timezone is UTC
+              example: "2019-09-21T00:00:00Z"
+            labels:
+              type: array
+              items:
+                type: object
+            due:
+              type: string
+              format: date-time
+              description: full-date notation as defined by RFC 3339, section 5.6. Default Timezone is UTC
+              example: "2019-09-21T00:00:00Z"
+            url:
+              type: string
+              format: uri
+              example: "https://trello.com/c/aJidRx3k/9-123"
+            idMembers:
+              type: array
+              description: Array of memebr ids as strings
+              items:
+                type: string
+            attachments:
+              type: array
+              items:
+                type: object
+    NewCard:
+      type: object
+      required:
+        - name
+        - idList
+      properties:
+        name:
+          type: string
+          minLength: 1
+          description: Card Name
+        idList:
+          type: string
+          minLength: 1
+          description: The ID of the list the card should be created in
+        desc:
+          type: string
+          description: Card Description
+        pos:
+          type: string
+          example: top
+        due:
+          type: string
+          format: date-time
+          description: full-date notation as defined by RFC 3339, section 5.6. Default Timezone is UTC
+          example: "2019-09-21"
+        urlSource:
+          type: string
+          format: uri
+          example: https://www.example.com
+        contactId:
+          type: integer
+          minimum: 0
+          description: "The ID of the Mautic contact (Lead)."
+        keepFromSource:
+          description: "If using idCardSource you can specify which properties to copy over."
+          type: string
+    TrelloBoard:
+      type: object
+      required:
+        - id
+        - name
+        - post
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        desc:
+          type: string
+        starred:
+          type: boolean
+        url:
+          type: string
+          format: uri
+          example: "https://trello.com/b/rSfj8a5F/weekly"
+        closed:
+          type: boolean
+        idOrganization:
+          type: string
+        
+    TrelloList:
+      type: object
+      required:
+        - id
+        - name
+        - post
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        pos:
+          type: integer
+    CardError:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: short error code
+          example: rest_no_route
+        message:
+          type: string
+          description: plain text error message for displaying to user
+          example: No route was found matching the URL and request method
+        data:
+          type: object
+          properties:
+            status:
+              type: integer
+              minimum: 299
+              maximum: 600
+              description: http error code
+              example: 404
+  responses:
+    Ok:
+      description: A Trello Card
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Card"
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CardError"
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CardError"
+    UnauthorizedError:
+      description: Authentication information is missing or invalid
+      headers:
+        WWW_Authenticate:
+          schema:
+            type: string
+  securitySchemes:
+    appKey:
+      type: apiKey
+      in: query
+      name: key
+    apiToken:
+      type: apiKey
+      in: query
+      name: token
+security:
+  - appKey: []
+    apiToken:  []

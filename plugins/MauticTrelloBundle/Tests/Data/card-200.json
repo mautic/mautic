@@ -1,0 +1,77 @@
+{
+  "id": "2a3408ac8dc06e432432a6c8",
+  "checkItemStates": [],
+  "closed": false,
+  "dateLastActivity": "2020-08-12T12:20:12.662Z",
+  "desc": "user@example.com",
+  "descData": {
+    "emoji": {}
+  },
+  "dueReminder": null,
+  "idBoard": "2c020a66d32dc2d3e46d34a1",
+  "idList": "2e2c6832668eac03e129a6ca",
+  "idMembersVoted": [],
+  "idShort": 11,
+  "idAttachmentCover": null,
+  "idLacels": [],
+  "manualCoverAttachment": false,
+  "name": "test",
+  "pos": 211.9921872,
+  "shortLink": "2AzaAa4D",
+  "isTemplate": false,
+  "dueComplete": false,
+  "due": "2020-02-01T00:00:00.000Z",
+  "email": null,
+  "labels": [],
+  "shortUrl": "https://trello.com/c/2AzaAa4D",
+  "url": "https://trello.com/c/2AzaAa4D/11-test",
+  "cover": {
+    "idAttachment": null,
+    "color": null,
+    "idUploadedBackground": null,
+    "size": "normal",
+    "brightness": "light"
+  },
+  "idMembers": [],
+  "idChecklists": [],
+  "badges": {
+    "attachmentsByType": {
+      "trello": {
+        "board": 0,
+        "card": 0
+      }
+    },
+    "location": false,
+    "votes": 0,
+    "viewingMemberVoted": false,
+    "subscribed": false,
+    "fogbugz": "",
+    "checkItems": 0,
+    "checkItemsChecked": 0,
+    "checkItemsEarliestDue": null,
+    "comments": 0,
+    "attachments": 1,
+    "description": true,
+    "due": "2020-02-01T00:00:00.000Z",
+    "dueComplete": false
+  },
+  "subscribed": false,
+  "attachments": [
+    {
+      "id": "2a3408ac8dc06e432432a6c2",
+      "bytes": null,
+      "date": "2020-08-12T12:20:12.622Z",
+      "edgeColor": null,
+      "idMember": "222d6cd912722662d06cc4d3",
+      "isUpload": false,
+      "mimeType": "",
+      "name": "https://www.mautic.com/mautic",
+      "previews": [],
+      "url": "https://www.mautic.com/mautic",
+      "pos": 16384,
+      "fileName": null
+    }
+  ],
+  "stickers": [],
+  "limits": {}
+}
