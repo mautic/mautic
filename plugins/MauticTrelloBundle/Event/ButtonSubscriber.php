@@ -8,12 +8,13 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\MauticTrelloBundle\Integration\TrelloIntegration;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-
 /**
  * Add a Trello button.
  */
@@ -32,7 +33,17 @@ class ButtonSubscriber implements EventSubscriberInterface
     private $translator;
 
     /**
-     * init.
+     * @var TrelloIntegration|AbstractIntegration
+     */
+    private $integration;
+
+    /**
+     * Set up Button Subscriper class
+     *
+     * @param RouterInterface     $router
+     * @param TranslatorInterface $translator
+     * @param RequestStack        $requestStack
+     * @param IntegrationHelper   $integrationHelper
      */
     public function __construct(RouterInterface $router, TranslatorInterface $translator, RequestStack $requestStack, IntegrationHelper $integrationHelper)
     {
@@ -85,23 +96,19 @@ class ButtonSubscriber implements EventSubscriberInterface
                 'iconClass' => 'fa fa-trello',
             ];
 
-            $addToTrelloBulkBtn = $addToTrelloBtn;
-
-            // Inject a button into the page actions for the specified route (in this case /s/contacts/view/{contactId})
             $event
+                // Inject a button into /s/contacts/view/{contactId})
                 ->addButton(
                     $addToTrelloBtn,
-                    // Location of where to inject the button; this can be an array of multiple locations
                     ButtonHelper::LOCATION_PAGE_ACTIONS,
                     ['mautic_contact_action', ['objectAction' => 'view']]
                 )
-                // Inject a button into the list actions for each contact on the /s/contacts page
+                // Inject a button into the list actions for contacts on the /s/contacts page
                 ->addButton(
                     $addToTrelloBtn,
                     [ButtonHelper::LOCATION_LIST_ACTIONS],
                     'mautic_contact_index'
-                )
-            ;
+                );
         }
         // // is it a contact list
         // if (0 === strpos($event->getRoute(), 'mautic_contact_index')) {

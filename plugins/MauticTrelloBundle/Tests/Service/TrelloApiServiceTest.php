@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 /**
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
+ * @copyright 2020 Mautic Contributors. All rights reserved
+ * @author    Mautic
  *
- * @see        http://mautic.org
+ * @see http://mautic.org
  *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticTrelloBundle\Tests\Service;
@@ -23,6 +23,7 @@ use MauticPlugin\MauticTrelloBundle\Service\TrelloApiService;
 use MauticPlugin\MauticTrelloBundle\Tests\Mock\DefaultApiMock;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Test the Mautic Trello API Services.
@@ -35,7 +36,7 @@ class TrellApiServiceTest extends TestCase
     const MOCK_FAV_BOARD = '6e5a1f9d35b240384adcddcq';
 
     /**
-     * @var TrelloApiService
+     * @var MockObject
      */
     protected $apiService;
 
@@ -48,11 +49,13 @@ class TrellApiServiceTest extends TestCase
 
         $this->apiService = $this->getMockBuilder(TrelloApiService::class)
             ->setMethods(['getApi', 'getFavouriteBoard'])
-            ->setConstructorArgs([
+            ->setConstructorArgs(
+                [
                 $this->createMock(IntegrationHelper::class),
                 $this->createMock(CoreParametersHelper::class),
                 $this->createMock(Logger::class),
-            ])
+                ]
+            )
             ->getMock();
 
         // use with Prism mock server
@@ -121,6 +124,8 @@ class TrellApiServiceTest extends TestCase
 
         $card = $this->apiService->addNewCard($newCard);
         $this->assertInstanceOf(Card::class, $card);
-        $this->assertTrue($card->valid());
+        if ($card instanceof Card) {
+            $this->assertTrue($card->valid());
+        }
     }
 }

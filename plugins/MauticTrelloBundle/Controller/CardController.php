@@ -13,33 +13,34 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticTrelloBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticTrelloBundle\Form\NewCardType;
 use MauticPlugin\MauticTrelloBundle\Openapi\lib\Model\Card;
 use MauticPlugin\MauticTrelloBundle\Openapi\lib\Model\NewCard;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\Forms;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Setup a a form and send it to Trello to create a new card.
  */
-class CardController extends FormController
+class CardController extends AbstractFormController
 {
     use LeadAccessTrait;
 
     /**
      * Logger.
      *
-     * @var Monolog\Logger
+     * @var \Monolog\Logger
      */
     protected $logger;
 
     /**
-     * @var MauticPlugin\MauticTrelloBundle\Service\TrelloApiService
+     * @var \MauticPlugin\MauticTrelloBundle\Service\TrelloApiService
      */
     private $apiService;
 
@@ -73,6 +74,8 @@ class CardController extends FormController
 
     /**
      * Add a new card by POST or handle the cancelation of the form.
+     *
+     * @return JsonResponse|RedirectResponse
      */
     public function addAction(): JsonResponse
     {
@@ -140,7 +143,7 @@ class CardController extends FormController
     /**
      * Close the modal after adding a card in Trello.
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     protected function closeAndRedirect(string $returnRoute, int $contactId)
     {
@@ -193,11 +196,11 @@ class CardController extends FormController
     /**
      * Build the form.
      *
-     * @param int $contactId
+     * @param  integer $contactId
      *
-     * @return Forms
+     * @return FormInterface
      */
-    protected function getForm(int $contactId = null): Form
+    protected function getForm(int $contactId = null): FormInterface
     {
         $returnRoute = $this->request->get('returnRoute');
         if (empty($returnRoute)) {
@@ -210,14 +213,14 @@ class CardController extends FormController
             if (empty($contact)) {
                 $this->logger->warning('no contact found for id', [$contactId]);
 
-                return null;
+                return new FormInterface();
             }
             $card = $this->contactToCard($contact);
         }
 
         $action = $this->generateUrl('plugin_trello_card_add', ['returnRoute' => $returnRoute]);
 
-        return $form = $this->createForm(NewCardType::class, $card, ['action' => $action]);
+        return $this->createForm(NewCardType::class, $card, ['action' => $action]);
     }
 
     /**
@@ -247,7 +250,7 @@ class CardController extends FormController
                 'name'      => $contact->getName(),
                 'desc'      => null,
                 'idList'    => $this->getListForContact($contact),
-                'urlSource' => $this->coreParametersHelper->getParameter('site_url').'/s/contacts/view/'.$contact->getId(),
+                'urlSource' => $this->coreParametersHelper->get('site_url').'/s/contacts/view/'.$contact->getId(),
                 'contactId' => $contact->getId(),
                 // 'due' => new \DateTime('next week'),
             ]
