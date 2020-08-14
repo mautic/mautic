@@ -8,11 +8,15 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+
 //Check to see if the entire page should be displayed or just main content
 if ('index' == $tmpl):
     $view->extend('MauticLeadBundle:List:index.html.php');
 endif;
 $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list');
+$now         = (new DateTimeHelper())->getUtcDateTime();
 ?>
 
 <?php if (count($items)): ?>
@@ -97,7 +101,16 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
             </tr>
             </thead>
             <tbody>
+            <?php /** @var \Mautic\LeadBundle\Entity\LeadList $item */?>
             <?php foreach ($items as $item): ?>
+                <?php
+                    $lastBuildDateDifference = null;
+                    if ($item->getLastBuildDate() instanceof \DateTime) {
+                        $lastBuildDateDifferenceInterval = $now->diff($item->getLastBuildDate());
+                        // Calculate difference between now and last_build_date in hours
+                        $lastBuildDateDifference = (int) abs((new \DateTime())->setTimestamp(0)->add($lastBuildDateDifferenceInterval)->getTimestamp() / 3600);
+                    }
+                ?>
                 <?php $mauticTemplateVars['item'] = $item; ?>
                 <tr>
                     <td>
@@ -154,6 +167,12 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                             <?php endif; ?>
                             <?php if ($item->isGlobal()): ?>
                                 <i class="fa fa-fw fa-globe"></i>
+                            <?php endif; ?>
+                            <?php if ($lastBuildDateDifference >= 30): ?>
+                                <label class="control-label" data-toggle="tooltip"
+                                       data-container="body" data-placement="top" title=""
+                                       data-original-title="<?php echo sprintf('This segment hasn\'t been rebuilt for %s hours.', $lastBuildDateDifference); ?>">
+                                    <i class="fa text-danger fa-exclamation-circle"></i></label>
                             <?php endif; ?>
                             <?php echo $view['content']->getCustomContent('segment.name', $mauticTemplateVars); ?>
                         </div>
