@@ -271,11 +271,58 @@ Mautic.keepPreviewAlive = function(iframeId, slot) {
     window.setInterval(function() {
         if (codeChanged) {
             var value = (Mautic.builderCodeMirror)?Mautic.builderCodeMirror.getValue():'';
+            Mautic.setCodeModeSlotContent(slot, value);
             Mautic.livePreviewInterval = Mautic.updateIframeContent(iframeId, value, slot);
             codeChanged = false;
         }
     }, 2000);
 };
+
+Mautic.isValidHtml = function (html) {
+    var doc = document.createElement('div');
+    doc.innerHTML = html;
+    return (doc.innerHTML === html);
+}
+
+Mautic.setCodeModeSlotContent = function (slot, content) {
+    if (Mautic.isValidHtml(content)) {
+        slot.removeAttr('data-encode');
+    } else {
+        slot.attr('data-encode', btoa(content));
+    }
+}
+
+Mautic.geCodeModetSlotContent = function (slot) {
+    var html = slot.html();
+    if (slot.attr('data-encode')) {
+        html = atob(slot.attr('data-encode'));
+    }
+    return html;
+}
+
+Mautic.prepareCodeModeBlocksBeforeSave = function(themeHtml) {
+    var parser = new DOMParser();
+    var el = parser.parseFromString(themeHtml, "text/html");
+    var $b = mQuery(el);
+    var codeBlocks = {};
+
+    $b.find('#codemodeHtmlContainer,.codemodeHtmlContainer').each(function (index) {
+        var html = mQuery(this).html();
+        if (mQuery(this).attr('data-encode')) {
+            html = atob(mQuery(this).attr('data-encode'));
+            var token = '{CODEMODEBLOCK'+index+'}';
+            codeBlocks[token] = html;
+            mQuery(this).html(token);
+        }
+    })
+
+    themeHtml = Mautic.domToString($b);
+    for (codeBlock in codeBlocks) {
+        themeHtml = themeHtml.replace(codeBlock, codeBlocks[codeBlock]);
+    }
+
+    return themeHtml;
+}
 
 Mautic.killLivePreview = function() {
     window.clearInterval(Mautic.livePreviewInterval);
@@ -577,7 +624,9 @@ Mautic.sanitizeHtmlBeforeSave = function(htmlContent) {
     var customHtml = Mautic.domToString(htmlContent).replace(/url\(&quot;(.+)&quot;\)/g, 'url(\'$1\')');
 
     // Convert dynamic slot definitions into tokens
-    return Mautic.convertDynamicContentSlotsToTokens(customHtml);
+    customHtml = Mautic.convertDynamicContentSlotsToTokens(customHtml);
+
+    return Mautic.prepareCodeModeBlocksBeforeSave(customHtml);
 };
 
 /**
@@ -1418,8 +1467,10 @@ Mautic.initSlotListeners = function() {
                             extraKeys: {"Ctrl-Space": "autocomplete"},
                             lineWrapping: true,
                         });
-                        Mautic.builderCodeMirror.getDoc().setValue(slot.find('#codemodeHtmlContainer,.codemodeHtmlContainer').html());
-                        Mautic.keepPreviewAlive(null, slot.find('#codemodeHtmlContainer,.codemodeHtmlContainer'));
+                        var elem = slot.find('#codemodeHtmlContainer,.codemodeHtmlContainer');
+                        html = Mautic.geCodeModetSlotContent(elem);
+                        Mautic.builderCodeMirror.getDoc().setValue(html);
+                        Mautic.keepPreviewAlive(null, elem);
                     }
                     break;
                 }
