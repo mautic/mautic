@@ -60,7 +60,7 @@ class TransportTypeTest extends \PHPUnit\Framework\TestCase
     {
         $transportType = new TransportType();
 
-        $expected = '"mautic.transport.elasticemail","gmail","mautic.transport.mandrill","mautic.transport.mailjet","smtp","mautic.transport.postmark","mautic.transport.sendgrid","mautic.transport.sendgrid_api","sendmail","mautic.transport.sparkpost","mautic.transport.momentum"';
+        $expected = '"mautic.transport.elasticemail","gmail","mautic.transport.mandrill","mautic.transport.mailjet","smtp","mautic.transport.postmark","mautic.transport.sendgrid","mautic.transport.sendgrid_api","sendmail","mautic.transport.sparkpost"';
 
         $this->assertSame($expected, $transportType->getServiceDoNotNeedAmazonRegion());
     }

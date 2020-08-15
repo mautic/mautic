@@ -25,7 +25,6 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
      */
     private $amazonCallback;
 
-
     /**
      * AmazonTransport constructor.
      *
