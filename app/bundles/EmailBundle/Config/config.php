@@ -48,6 +48,11 @@ return [
                 'controller' => 'MauticEmailBundle:Api\EmailApi:sendLead',
                 'method'     => 'POST',
             ],
+            'mautic_api_reply' => [
+                'path'       => '/emails/reply/{trackingHash}',
+                'controller' => 'MauticEmailBundle:Api\EmailApi:reply',
+                'method'     => 'POST',
+            ],
         ],
         'public' => [
             'mautic_plugin_tracker' => [
