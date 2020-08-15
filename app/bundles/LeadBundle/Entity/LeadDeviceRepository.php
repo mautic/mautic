@@ -175,4 +175,19 @@ class LeadDeviceRepository extends CommonRepository
             ->execute()
             ->fetchAll();
     }
+
+    /**
+     * Updates lead ID (e.g. after a lead merge).
+     *
+     * @param $fromLeadId
+     * @param $toLeadId
+     */
+    public function updateLead($fromLeadId, $toLeadId)
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->update(MAUTIC_TABLE_PREFIX.'lead_devices')
+            ->set('lead_id', (int) $toLeadId)
+            ->where('lead_id = '.(int) $fromLeadId)
+            ->execute();
+    }
 }

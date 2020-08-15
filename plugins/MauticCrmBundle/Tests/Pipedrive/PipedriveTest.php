@@ -186,7 +186,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
 
     protected function createLeadIntegrationEntity($integrationEntityId, $internalEntityId)
     {
-        $date = (new DateTimeHelper('-3 years'))->getDateTime();
+        $date = (new DateTimeHelper('2017-05-15 00:00:00'))->getDateTime();
 
         $integrationEntity = new IntegrationEntity();
 
@@ -206,7 +206,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
 
     protected function createCompanyIntegrationEntity($integrationEntityId, $internalEntityId)
     {
-        $date = (new DateTimeHelper('-3 years'))->getDateTime();
+        $date = (new DateTimeHelper('2017-05-15 00:00:00'))->getDateTime();
 
         $integrationEntity = new IntegrationEntity();
 
