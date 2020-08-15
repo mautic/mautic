@@ -6,8 +6,8 @@ use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use MauticPlugin\MauticTrelloBundle\Form\ConfigType;
-Mautic\PluginBundle\Integration\AbstractIntegration;
 use MauticPlugin\MauticTrelloBundle\Integration\TrelloIntegration;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -67,7 +67,9 @@ class ConfigSubscriber implements EventSubscriberInterface
      */
     public function onConfigSave(ConfigEvent $event)
     {
-        /** @var array $values */
+        /**
+         * @var array $values
+         */
         $config = $event->getConfig('trello_config');
 
         // Set updated values

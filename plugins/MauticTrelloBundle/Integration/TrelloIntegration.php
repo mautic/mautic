@@ -77,8 +77,6 @@ class TrelloIntegration extends AbstractIntegration
 
     /**
      * Configure the name of the secret key.
-     *
-     * @return void
      */
     public function getSecretKeys(): array
     {
@@ -92,7 +90,9 @@ class TrelloIntegration extends AbstractIntegration
      *
      * @param $section
      *
-     * @return array
+     * @todo  parent::getFormNotes should have the documented return type array
+     *
+     * @return array\string
      */
     public function getFormNotes($section): array
     {

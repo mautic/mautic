@@ -2,19 +2,20 @@
 
 declare(strict_types=1);
 /**
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
+ * @copyright 2020 Mautic Contributors. All rights reserved
+ * @author    Mautic
  *
- * @see        http://mautic.org
+ * @see http://mautic.org
  *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticTrelloBundle\Service;
 
+use Error;
 use Exception;
-use InvalidArgumentException;
 use GuzzleHttp\Client as HttpClient;
+use InvalidArgumentException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticTrelloBundle\Integration\TrelloIntegration;
@@ -22,6 +23,7 @@ use MauticPlugin\MauticTrelloBundle\Openapi\lib\Api\DefaultApi;
 use MauticPlugin\MauticTrelloBundle\Openapi\lib\ApiException;
 use MauticPlugin\MauticTrelloBundle\Openapi\lib\Configuration;
 use MauticPlugin\MauticTrelloBundle\Openapi\lib\Model\Card;
+use MauticPlugin\MauticTrelloBundle\Openapi\lib\Model\CardError;
 use Monolog\Logger;
 
 /**
@@ -149,8 +151,6 @@ class TrelloApiService
 
     /**
      * Get the user specific auth params of the Trello API to add to the post part.
-     *
-     * @return array
      */
     public function getAuthParams(): array
     {
@@ -176,7 +176,7 @@ class TrelloApiService
     /**
      * * All the business logic for a submitted form.
      *
-     * @return Card | Exception
+     * @return Card|Exception|CardError
      */
     public function addNewCard(array $card)
     {
@@ -187,7 +187,9 @@ class TrelloApiService
 
         try {
             $card = $api->addCard($card);
-            $this->logger->debug('Successfully added card to Trello', [$card->getIdList(), $card->getId(), $card->getName()]);
+            if ($card instanceof Card) {
+                $this->logger->debug('Successfully added card to Trello', [$card->getIdList(), $card->getId(), $card->getName()]);
+            }
 
             return $card;
         } catch (InvalidArgumentException $e) {
