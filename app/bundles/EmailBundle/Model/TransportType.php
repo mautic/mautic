@@ -43,7 +43,7 @@ class TransportType
      */
     private $showPort = [
         'smtp',
-        'mautic.transport.amazon',
+        'mautic.transport.amazon'
     ];
 
     /**
@@ -83,6 +83,14 @@ class TransportType
         'mautic.transport.sparkpost',
         'mautic.transport.mandrill',
         'mautic.transport.sendgrid_api',
+    ];
+
+    /**
+     * @var array
+     */
+    private $showAmazonRegion = [
+        'mautic.transport.amazon',
+        'mautic.transport.amazon_api',
     ];
 
     /**
@@ -154,28 +162,14 @@ class TransportType
     /**
      * @return string
      */
-    public function getServiceDoNotNeedHost()
+    public function getServiceDoNotNeedAmazonRegion()
     {
-        $tempTransports = $this->transportTypes;
-        unset($tempTransports['mautic.transport.amazon']);
+        $tempTransports     = $this->transportTypes;
 
-        $transports       = array_keys($tempTransports);
-        $doNotRequireHost = array_diff($transports, $this->showHost);
+        $transports               = array_keys($tempTransports);
+        $doNotRequireAmazonRegion = array_diff($transports, $this->showAmazonRegion);
 
-        return $this->getString($doNotRequireHost);
-    }
-
-    /**
-     * @return string
-     */
-    public function getServiceDoNotNeedAmazonApiRegion()
-    {
-        $tempTransports = $this->transportTypes;
-        unset($tempTransports['mautic.transport.amazon_api']);
-
-        $doNotRequireRegion = array_keys($tempTransports);
-
-        return $this->getString($doNotRequireRegion);
+        return $this->getString($doNotRequireAmazonRegion);
     }
 
     /**
@@ -234,15 +228,7 @@ class TransportType
      */
     public function getAmazonService()
     {
-        return '"mautic.transport.amazon"';
-    }
-
-    /**
-     * @return string
-     */
-    public function getAmazonApiService()
-    {
-        return '"mautic.transport.amazon_api"';
+        return $this->getString($this->showAmazonRegion);
     }
 
     /**

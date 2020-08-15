@@ -64,15 +64,11 @@ if ('index' === $tmpl) {
     </div>
     <div id="amazonRegion">
         <div class="row">
-            <div class="col-sm-12">
+            <div class="col-sm-6">
                 <?php echo $view['form']->row($form['mailer_amazon_region']); ?>
             </div>
-        </div>
-    </div>
-    <div id="amazonApiRegion">
-        <div class="row">
-            <div class="col-sm-12">
-                <?php echo $view['form']->row($form['mailer_amazon_api_region']); ?>
+            <div class="col-sm-6">
+                <?php echo $view['form']->row($form['mailer_amazon_other_region']); ?>
             </div>
         </div>
     </div>

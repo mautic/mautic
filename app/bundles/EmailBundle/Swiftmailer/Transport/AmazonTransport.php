@@ -25,18 +25,45 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
      */
     private $amazonCallback;
 
+
     /**
      * AmazonTransport constructor.
      *
      * @param string $host
      * @param string $otherHost
+     * @param int    $port
      */
-    public function __construct($host, $otherHost, $port = 2587, AmazonCallback $amazonCallback)
+    public function __construct($region, $otherRegion, $port,  AmazonCallback $amazonCallback)
     {
-        $host = ('other' === $host) ? $otherHost : $host;
-        parent::__construct($host, $port, 'tls');
-        $this->setAuthMode('login');
+        $port = $port ?: 2587;
+        $host = $this->buildHost($region, $otherRegion);
         $this->amazonCallback = $amazonCallback;
+
+        parent::__construct($host, $port, 'tls');
+
+        $this->setAuthMode('login');
+    }
+
+    /**
+     * Switch statement used to avoid breaking change
+     *
+     * @param string $region
+     * @param string $otherRegion
+     *
+     * @return string
+     */
+    public function buildHost($region, $otherRegion)
+    {
+        $sesRegion = ('other' === $region) ? $otherRegion : $region;
+
+        switch($sesRegion) {
+            case 'email-smtp.eu-west-1.amazonaws.com':
+            case 'email-smtp.us-east-1.amazonaws.com':
+            case 'email-smtp.us-west-2.amazonaws.com':
+                return $sesRegion;
+            default:
+                return 'email-smtp.' . $sesRegion . '.amazonaws.com';
+        }
     }
 
     /**

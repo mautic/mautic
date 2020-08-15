@@ -70,18 +70,18 @@ class EmailStep implements StepInterface
     public $mailer_password;
 
     /**
-     * Amazon API Region.
+     * Amazon Region.
      *
      * @var string
      */
-    public $mailer_amazon_api_region = 'us-east-1';
+    public $mailer_amazon_region = 'us-east-1';
 
     /**
-     * Amazon SMTP Host.
+     * Amazon Region.
      *
      * @var string
      */
-    public $mailer_amazon_region = 'email-smtp.us-east-1.amazonaws.com';
+    public $mailer_amazon_other_region;
 
     /**
      * Mailer API key if applicable.

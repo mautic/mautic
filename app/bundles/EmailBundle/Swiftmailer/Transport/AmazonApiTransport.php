@@ -102,14 +102,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
-     * @return string $region
-     */
-    public function getRegion()
-    {
-        return $this->region;
-    }
-
-    /**
      * @param string $region
      * @param string $otherRegion
      */
@@ -119,27 +111,11 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
-     * @return mixed
-     */
-    public function getUsername()
-    {
-        return $this->username;
-    }
-
-    /**
      * @param $username
      */
     public function setUsername($username)
     {
         $this->username = $username;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPassword()
-    {
-        return $this->password;
     }
 
     /**
@@ -161,10 +137,10 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         if (!$this->started) {
             $this->client = new SesClient([
                 'credentials' => new Credentials(
-                    $this->getUsername(),
-                    $this->getPassword()
+                    $this->username,
+                    $this->password
                 ),
-                'region'  => $this->getRegion(),
+                'region'  => $this->region,
                 'version' => '2010-12-01',
                 'http'    => [
                     'verify'    => false,

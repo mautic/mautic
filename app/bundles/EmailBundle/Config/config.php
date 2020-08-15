@@ -384,11 +384,11 @@ return [
             ],
 
             'mautic.transport.amazon' => [
-                'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport',
+                'class'        => \Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport::class,
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'arguments'    => [
                     '%mautic.mailer_amazon_region%',
-                    '%mautic.mailer_host%',
+                    '%mautic.mailer_amazon_other_region%',
                     '%mautic.mailer_port%',
                     'mautic.transport.amazon.callback',
                 ],
@@ -398,7 +398,7 @@ return [
                 ],
             ],
             'mautic.transport.amazon_api' => [
-                'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\AmazonApiTransport',
+                'class'        => \Mautic\EmailBundle\Swiftmailer\Transport\AmazonApiTransport::class,
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'arguments'    => [
                     'monolog.logger.mautic',
@@ -408,8 +408,8 @@ return [
                     'setUsername' => ['%mautic.mailer_user%'],
                     'setPassword' => ['%mautic.mailer_password%'],
                     'setRegion'   => [
-                        '%mautic.mailer_amazon_api_region%',
-                        '%mautic.mailer_amazon_api_other_region%',
+                        '%mautic.mailer_amazon_region%',
+                        '%mautic.mailer_amazon_other_region%',
                     ],
                 ],
             ],
@@ -839,9 +839,8 @@ return [
         'mailer_password'                => null,
         'mailer_encryption'              => null, //tls or ssl,
         'mailer_auth_mode'               => null, //plain, login or cram-md5
-        'mailer_amazon_region'           => 'email-smtp.us-east-1.amazonaws.com',
-        'mailer_amazon_api_region'       => 'us-east-1',
-        'mailer_amazon_api_other_region' => null,
+        'mailer_amazon_region'           => 'us-east-1',
+        'mailer_amazon_other_region'     => null,
         'mailer_custom_headers'          => [],
         'mailer_spool_type'              => 'memory', //memory = immediate; file = queue
         'mailer_spool_path'              => '%kernel.root_dir%/../var/spool',

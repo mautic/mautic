@@ -53,17 +53,12 @@ $template  = '<div class="col-md-6">{content}</div>';
 
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_amazon_region', $template); ?>
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_port', $template); ?>
-            </div>
-
-            <div class="row">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_amazon_api_region', $template); ?>
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_amazon_api_other_region', $template); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_amazon_other_region', $template); ?>
             </div>
 
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_host', $template); ?>
-
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_port', $template); ?>
             </div>
 
             <div class="row">

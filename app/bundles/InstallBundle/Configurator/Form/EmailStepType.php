@@ -131,38 +131,6 @@ class EmailStepType extends AbstractType
             ChoiceType::class,
             [
                 'choices'           => [
-                    'mautic.email.config.mailer.amazon_region.us_east_1'      => 'email-smtp.us-east-1.amazonaws.com',
-                    'mautic.email.config.mailer.amazon_region.us_east_2'      => 'email-smtp.us-east-2.amazonaws.com',
-                    'mautic.email.config.mailer.amazon_region.us_west_2'      => 'email-smtp.us-west-2.amazonaws.com',
-                    'mautic.email.config.mailer.amazon_region.ap_south_1'     => 'email-smtp.ap-south-1.amazonaws.com',
-                    'mautic.email.config.mailer.amazon_region.ap_northeast_2' => 'email-smtp.ap-northeast-2.amazonaws.com',
-                    'mautic.email.config.mailer.amazon_region.ap_southeast_1' => 'email-smtp.ap-southeast-1.amazonaws.com',
-                    'mautic.email.config.mailer.amazon_region.ap_southeast_2' => 'email-smtp.ap-southeast-2.amazonaws.com',
-                    'mautic.email.config.mailer.amazon_region.ap_northeast_1' => 'email-smtp.ap-northeast-1.amazonaws.com',
-                    'mautic.email.config.mailer.amazon_region.ca_central_1'   => 'email-smtp.ca-central-1.amazonaws.com',
-                    'mautic.email.config.mailer.amazon_region.eu_central_1'   => 'email-smtp.eu-central-1.amazonaws.com',
-                    'mautic.email.config.mailer.amazon_region.eu_west_1'      => 'email-smtp.eu-west-1.amazonaws.com',
-                    'mautic.email.config.mailer.amazon_region.eu_west_2'      => 'email-smtp.eu-west-2.amazonaws.com',
-                    'mautic.email.config.mailer.amazon_region.sa_east_1'      => 'email-smtp.sa-east-1.amazonaws.com',
-                    'mautic.email.config.mailer.amazon_region.us_gov_west_1'  => 'email-smtp.us-gov-west-1.amazonaws.com',
-                ],
-                'label'       => 'mautic.email.config.mailer.amazon_region',
-                'required'    => false,
-                'attr'        => [
-                    'class'        => 'form-control',
-                    'data-show-on' => '{"install_email_step_mailer_transport":['.$this->transportType->getAmazonService().']}',
-                    'tooltip'      => 'mautic.email.config.mailer.amazon_region.tooltip',
-                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
-                ],
-                'placeholder' => false,
-            ]
-        );
-
-        $builder->add(
-            'mailer_amazon_api_region',
-            ChoiceType::class,
-            [
-                'choices'           => [
                     'mautic.email.config.mailer.amazon_region.us_east_1'      => 'us-east-1',
                     'mautic.email.config.mailer.amazon_region.us_east_2'      => 'us-east-2',
                     'mautic.email.config.mailer.amazon_region.us_west_2'      => 'us-west-2',
@@ -177,16 +145,34 @@ class EmailStepType extends AbstractType
                     'mautic.email.config.mailer.amazon_region.eu_west_2'      => 'eu-west-2',
                     'mautic.email.config.mailer.amazon_region.sa_east_1'      => 'sa-east-1',
                     'mautic.email.config.mailer.amazon_region.us_gov_west_1'  => 'us-gov-west-1',
+                    'mautic.email.config.mailer.amazon_region.other'          => 'other',
                 ],
                 'label'       => 'mautic.email.config.mailer.amazon_region',
                 'required'    => false,
                 'attr'        => [
                     'class'        => 'form-control',
-                    'data-show-on' => '{"install_email_step_mailer_transport":['.$this->transportType->getAmazonApiService().']}',
+                    'data-show-on' => '{"install_email_step_mailer_transport":['.$this->transportType->getAmazonService().']}',
                     'tooltip'      => 'mautic.email.config.mailer.amazon_region.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],
                 'placeholder' => false,
+            ]
+        );
+
+        $builder->add(
+            'mailer_amazon_other_region',
+            TextType::class,
+            [
+                'label'      => 'mautic.email.config.mailer.amazon_region.other',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"install_email_step_mailer_amazon_region":["other"]}',
+                    'data-hide-on' => '{"install_email_step_mailer_transport":['.$this->transportType->getServiceDoNotNeedAmazonRegion().']}',
+                    'tooltip'      => 'mautic.email.config.mailer.amazon_region.other.tooltip',
+                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
+                ],
+                'required'   => false,
             ]
         );
 
