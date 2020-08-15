@@ -78,7 +78,7 @@
         "jms/serializer-bundle": "~3.5.0",
         "joomla/http": "~1.3.3",
         "joomla/filter": "~1.3.5",
-        "oneup/uploader-bundle": "~2.0",
+        "oneup/uploader-bundle": "^2.1.5",
         "phpoffice/phpspreadsheet": "^1.10",
         "mrclay/minify": "2.2.0",
         "jbroadway/urlify": "^1.0",
@@ -142,17 +142,17 @@
         }
     ],
     "scripts": {
-        "post-install-cmd": [
+        "auto-scripts": [
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
             "php -r \"if(file_exists('./.git')&&file_exists('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''))){copy('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''),'./.git/hooks/pre-commit');}\"",
             "php -r \"if(file_exists('./.git/hooks/pre-commit')&&(PHP_OS!='WINNT')){chmod('./.git/hooks/pre-commit',0755);}\""
         ],
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
         "post-update-cmd": [
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
-            "php -r \"if(file_exists('./.git')&&file_exists('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''))){copy('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''),'./.git/hooks/pre-commit');}\"",
-            "php -r \"if(file_exists('./.git/hooks/pre-commit')&&(PHP_OS!='WINNT')){chmod('./.git/hooks/pre-commit',0755);}\""
+            "@auto-scripts"
         ],
         "test": "bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
         "phpstan": "bin/phpstan analyse app/bundles plugins",

@@ -13,6 +13,7 @@ namespace Mautic\PageBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CookieHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -49,7 +50,7 @@ class PageTestAbstract extends WebTestCase
     /**
      * @return PageModel
      */
-    protected function getPageModel()
+    protected function getPageModel($transliterationEnabled = true)
     {
         $cookieHelper = $this
             ->getMockBuilder(CookieHelper::class)
@@ -105,6 +106,11 @@ class PageTestAbstract extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $coreParametersHelper = $this
+            ->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $hitRepository = $this->createMock(HitRepository::class);
         $userHelper    = $this->createMock(UserHelper::class);
 
@@ -141,6 +147,11 @@ class PageTestAbstract extends WebTestCase
                 )
             );
 
+        $coreParametersHelper->expects($this->any())
+                ->method('get')
+                ->with('transliterate_page_title')
+                ->willReturn($transliterationEnabled);
+
         $deviceTrackerMock = $this->createMock(DeviceTracker::class);
 
         $pageModel = new PageModel(
@@ -153,7 +164,8 @@ class PageTestAbstract extends WebTestCase
             $queueService,
             $companyModel,
             $deviceTrackerMock,
-            $contactTracker
+            $contactTracker,
+            $coreParametersHelper
         );
 
         $pageModel->setDispatcher($dispatcher);
