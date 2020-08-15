@@ -68,28 +68,28 @@ class InstallCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Database host.',
-                'localhost'
+                null
             )
             ->addOption(
                 '--db_port',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Database host.',
-                3306
+                'Database port.',
+                null
             )
             ->addOption(
                 '--db_name',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Database name.',
-                'mautic'
+                null
             )
             ->addOption(
                 '--db_user',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Database user.',
-                'mautic'
+                null
             )
             ->addOption(
                 '--db_password',
@@ -173,7 +173,7 @@ class InstallCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Mail transport.',
-                'mail'
+                null
             )
             ->addOption(
                 '--mailer_host',
@@ -222,14 +222,14 @@ class InstallCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Spool mode (file|memory).',
-                'memory'
+                null
             )
             ->addOption(
                 '--mailer_spool_path',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Spool path.',
-                '%kernel.root_dir%/spool'
+                null
             )
         ;
         parent::configure();
@@ -264,6 +264,17 @@ class InstallCommand extends ContainerAwareCommand
         $dbParams   = [];
         $adminParam = [];
         $allParams  = $installer->localConfigParameters();
+
+        // Initialize DB and admin params from local.php
+        foreach ($allParams as $opt => $value) {
+            if (0 === strpos($opt, 'db_')) {
+                $dbParams[substr($opt, 3)] = $value;
+            } elseif (0 === strpos($opt, 'admin_')) {
+                $adminParam[substr($opt, 6)] = $value;
+            }
+        }
+
+        // Initialize DB and admin params from cli options
         foreach ($options as $opt => $value) {
             if (!empty($value)) {
                 if (0 === strpos($opt, 'db_')) {
