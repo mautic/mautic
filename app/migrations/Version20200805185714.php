@@ -22,7 +22,6 @@ final class Version20200805185714 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema): void
     {
-        $shouldRunMigration = false; // Please modify to your needs
         $tweetsTable        = $schema->getTable($this->prefix.'tweets');
 
         if (!$tweetsTable->hasIndex('tweet_text_index')) {
