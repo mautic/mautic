@@ -48,6 +48,11 @@ return [
                 'controller' => 'MauticEmailBundle:Api\EmailApi:sendLead',
                 'method'     => 'POST',
             ],
+            'mautic_api_reply' => [
+                'path'       => '/emails/reply/{trackingHash}',
+                'controller' => 'MauticEmailBundle:Api\EmailApi:reply',
+                'method'     => 'POST',
+            ],
         ],
         'public' => [
             'mautic_plugin_tracker' => [
@@ -553,6 +558,19 @@ return [
                 ],
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'methodCalls'  => [
+                    'setUsername' => ['%mautic.mailer_user%'],
+                    'setPassword' => ['%mautic.mailer_password%'],
+                ],
+            ],
+            'mautic.transport.pepipost' => [
+                'class'        => \Mautic\EmailBundle\Swiftmailer\Transport\PepipostTransport::class,
+                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
+                'arguments'    => [
+                    'translator',
+                    'monolog.logger.mautic',
+                    'mautic.email.model.transport_callback',
+                ],
+                'methodCalls' => [
                     'setUsername' => ['%mautic.mailer_user%'],
                     'setPassword' => ['%mautic.mailer_password%'],
                 ],
