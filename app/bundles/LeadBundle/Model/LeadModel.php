@@ -658,7 +658,7 @@ class LeadModel extends FormModel
             // Unset stage and owner from the form because it's already been handled
             unset($data['stage'], $data['owner'], $data['tags']);
             // Prepare special fields
-            $this->prepareParametersFromRequest($form, $data, $lead);
+            $this->prepareParametersFromRequest($form, $data, $lead, [], $this->fieldsByGroup);
             // Submit the data
             $form->submit($data);
 
