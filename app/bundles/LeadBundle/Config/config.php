@@ -347,6 +347,13 @@ return [
                     'mautic.helper.token_builder.factory',
                 ],
             ],
+            'mautic.lead.emailbundle.subscriber.owner' => [
+                'class'     => \Mautic\LeadBundle\EventListener\OwnerSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'translator',
+                ],
+            ],
             'mautic.lead.formbundle.subscriber' => [
                 'class'     => Mautic\LeadBundle\EventListener\FormSubscriber::class,
                 'arguments' => [
