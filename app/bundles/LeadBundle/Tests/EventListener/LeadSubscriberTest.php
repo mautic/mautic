@@ -12,7 +12,6 @@
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use DateTime;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -41,7 +40,7 @@ class LeadSubscriberTest extends CommonMocks
     /**
      * @var AuditLogModel|MockObject
      */
-    private $autidLogModel;
+    private $auditLogModel;
 
     /**
      * @var LeadChangeEventDispatcher|MockObject
