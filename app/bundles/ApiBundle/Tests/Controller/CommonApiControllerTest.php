@@ -24,6 +24,13 @@ class CommonApiControllerTest extends CampaignTestAbstract
         $this->assertEquals('f.dateAdded', $result);
     }
 
+    public function testAddAliasIfNotPresentWithOneColumnWithDifferentAlias()
+    {
+        $result = $this->getResultFromProtectedMethod('addAliasIfNotPresent', ['s.date_submitted', 'fs']);
+
+        $this->assertEquals('s.date_submitted', $result);
+    }
+
     public function testAddAliasIfNotPresentWithOneColumnWithAlias()
     {
         $result = $this->getResultFromProtectedMethod('addAliasIfNotPresent', ['f.dateAdded', 'f']);
