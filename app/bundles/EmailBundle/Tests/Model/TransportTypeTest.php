@@ -28,6 +28,7 @@ class TransportTypeTest extends \PHPUnit\Framework\TestCase
             'smtp'                          => 'mautic.email.config.mailer_transport.smtp',
             'mautic.transport.postmark'     => 'mautic.email.config.mailer_transport.postmark',
             'mautic.transport.sendgrid'     => 'mautic.email.config.mailer_transport.sendgrid',
+            'mautic.transport.pepipost'     => 'mautic.email.config.mailer_transport.pepipost',
             'mautic.transport.sendgrid_api' => 'mautic.email.config.mailer_transport.sendgrid_api',
             'sendmail'                      => 'mautic.email.config.mailer_transport.sendmail',
             'mautic.transport.sparkpost'    => 'mautic.email.config.mailer_transport.sparkpost',
@@ -67,7 +68,7 @@ class TransportTypeTest extends \PHPUnit\Framework\TestCase
     {
         $transportType = new TransportType();
 
-        $expected = '"mautic.transport.mailjet","mautic.transport.sendgrid","mautic.transport.elasticemail","mautic.transport.amazon","mautic.transport.postmark","gmail"';
+        $expected = '"mautic.transport.mailjet","mautic.transport.sendgrid","mautic.transport.pepipost","mautic.transport.elasticemail","mautic.transport.amazon","mautic.transport.postmark","gmail"';
 
         $this->assertSame($expected, $transportType->getServiceRequiresUser());
     }
@@ -85,7 +86,7 @@ class TransportTypeTest extends \PHPUnit\Framework\TestCase
     {
         $transportType = new TransportType();
 
-        $expected = '"mautic.transport.mailjet","mautic.transport.sendgrid","mautic.transport.elasticemail","mautic.transport.amazon","mautic.transport.postmark","gmail"';
+        $expected = '"mautic.transport.mailjet","mautic.transport.sendgrid","mautic.transport.pepipost","mautic.transport.elasticemail","mautic.transport.amazon","mautic.transport.postmark","gmail"';
 
         $this->assertSame($expected, $transportType->getServiceRequiresPassword());
     }

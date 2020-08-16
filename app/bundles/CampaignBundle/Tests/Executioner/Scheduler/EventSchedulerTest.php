@@ -119,27 +119,23 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $date  = new \DateTime();
         $now   = clone $date;
         $event = new Event();
+        $event->setTriggerIntervalUnit('d');
+        $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
 
-        $this->assertFalse($this->scheduler->shouldScheduleForInactive($event, $date, $now));
+        $this->assertFalse($this->scheduler->shouldScheduleEvent($event, $date, $now));
 
-        $event->setProperties([
-            'triggerRestrictedDaysOfWeek' => [],
-        ]);
+        $event->setTriggerRestrictedDaysOfWeek([]);
 
-        $this->assertFalse($this->scheduler->shouldScheduleForInactive($event, $date, $now));
+        $this->assertFalse($this->scheduler->shouldScheduleEvent($event, $date, $now));
 
-        $event->setProperties([
-            'triggerRestrictedDaysOfWeek' => [
-                0 => 1,
-                1 => 2,
-            ],
-        ]);
+        $event->setTriggerRestrictedStartHour('23:00');
+        $event->setTriggerRestrictedStopHour('23:30');
 
-        $this->assertTrue($this->scheduler->shouldScheduleForInactive($event, $date, $now));
+        $this->assertTrue($this->scheduler->shouldScheduleEvent($event, $date, $now));
 
         $date->add(new \DateInterval('P2D'));
         $event = new Event();
-        $this->assertTrue($this->scheduler->shouldScheduleForInactive($event, $date, $now));
+        $this->assertTrue($this->scheduler->shouldScheduleEvent($event, $date, $now));
     }
 
     public function testGetExecutionDateForInactivity()

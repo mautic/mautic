@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Controller\LeadDetailsTrait;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
@@ -565,6 +566,15 @@ class LeadApiController extends CommonApiController
             // new endpoints will leverage getNewEntity in order to return the correct status codes
             $entity = $this->model->checkForDuplicateContact($this->entityRequestParameters, $entity);
         }
+
+        $manipulatorObject = $this->inBatchMode ? 'api-batch' : 'api-single';
+
+        $entity->setManipulator(new LeadManipulator(
+            'lead',
+            $manipulatorObject,
+            null,
+            $this->get('mautic.helper.user')->getUser()->getName()
+        ));
 
         if (isset($parameters['companies'])) {
             $this->model->modifyCompanies($entity, $parameters['companies']);
