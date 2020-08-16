@@ -63,8 +63,6 @@ class PepipostTransport extends \Swift_SmtpTransport implements CallbackTranspor
 
     /**
      * Handle bounces & complaints from Pepipost.
-     *
-     * @param Request $request
      */
     public function processCallbackRequest(Request $request)
     {
@@ -73,20 +71,20 @@ class PepipostTransport extends \Swift_SmtpTransport implements CallbackTranspor
         $email    = rawurldecode($request->get(0)['EMAIL']);
         $event    = rawurldecode($request->get(0)['EVENT']);
 
-        if ($event == 'unsubscribed') {
+        if ('unsubscribed' == $event) {
             $this->transportCallback->addFailureByAddress($email, $this->translator->trans('mautic.email.bounce.reason.unsubscribed'), DoNotContact::UNSUBSCRIBED);
-        } elseif ($event == 'invalid') {
+        } elseif ('invalid' == $event) {
             $this->transportCallback->addFailureByAddress($email, $this->translator->trans('mautic.email.bounce.reason.invalid'));
-        } elseif ($event == 'bounced') {
+        } elseif ('bounced' == $event) {
             $type = rawurldecode($request->get(0)['BOUNCE_TYPE']);
-            if ($type == 'HARDBOUNCE') {
+            if ('HARDBOUNCE' == $type) {
                 $this->transportCallback->addFailureByAddress($email, $this->translator->trans('mautic.email.bounce.reason.hard_bounce'));
-            } elseif ($type == 'SOFTBOUNCE') {
+            } elseif ('SOFTBOUNCE' == $type) {
                 $this->transportCallback->addFailureByAddress($email, $this->translator->trans('mautic.email.bounce.reason.soft_bounce'));
             }
-        } elseif ($event == 'spam') {
+        } elseif ('spam' == $event) {
             $this->transportCallback->addFailureByAddress($email, $this->translator->trans('mautic.email.bounce.reason.spam'));
-        } elseif ($event == 'dropped') {
+        } elseif ('dropped' == $event) {
             $this->transportCallback->addFailureByAddress($email, $this->translator->trans('mautic.email.bounce.reason.dropped'));
         }
     }
