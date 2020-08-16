@@ -72,6 +72,13 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $router;
 
+    /**
+     * Whether or not we're running in a test environment.
+     *
+     * @var bool
+     */
+    private $isTest;
+
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
@@ -79,7 +86,8 @@ class LeadSubscriber implements EventSubscriberInterface
         DncReasonHelper $dncReasonHelper,
         EntityManager $entityManager,
         TranslatorInterface $translator,
-        RouterInterface $router
+        RouterInterface $router,
+        $isTest = false
     ) {
         $this->ipLookupHelper      = $ipLookupHelper;
         $this->auditLogModel       = $auditLogModel;
@@ -88,6 +96,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->entityManager       = $entityManager;
         $this->translator          = $translator;
         $this->router              = $router;
+        $this->isTest              = $isTest;
     }
 
     /**
@@ -324,6 +333,13 @@ class LeadSubscriber implements EventSubscriberInterface
         }
 
         $filters = $event->getEventFilters();
+
+        // Temporary measure as the other event types don't have tests yet
+        if ($this->isTest) {
+            $eventTypes = [
+                'lead.apiadded' => 'mautic.lead.event.apiadded',
+            ];
+        }
 
         foreach ($eventTypes as $type => $label) {
             $name = $this->translator->trans($label);
