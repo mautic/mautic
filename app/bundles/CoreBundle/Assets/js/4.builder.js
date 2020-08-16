@@ -271,11 +271,58 @@ Mautic.keepPreviewAlive = function(iframeId, slot) {
     window.setInterval(function() {
         if (codeChanged) {
             var value = (Mautic.builderCodeMirror)?Mautic.builderCodeMirror.getValue():'';
+            Mautic.setCodeModeSlotContent(slot, value);
             Mautic.livePreviewInterval = Mautic.updateIframeContent(iframeId, value, slot);
             codeChanged = false;
         }
     }, 2000);
 };
+
+Mautic.isValidHtml = function (html) {
+    var doc = document.createElement('div');
+    doc.innerHTML = html;
+    return (doc.innerHTML === html);
+}
+
+Mautic.setCodeModeSlotContent = function (slot, content) {
+    if (Mautic.isValidHtml(content)) {
+        slot.removeAttr('data-encode');
+    } else {
+        slot.attr('data-encode', btoa(content));
+    }
+}
+
+Mautic.geCodeModetSlotContent = function (slot) {
+    var html = slot.html();
+    if (slot.attr('data-encode')) {
+        html = atob(slot.attr('data-encode'));
+    }
+    return html;
+}
+
+Mautic.prepareCodeModeBlocksBeforeSave = function(themeHtml) {
+    var parser = new DOMParser();
+    var el = parser.parseFromString(themeHtml, "text/html");
+    var $b = mQuery(el);
+    var codeBlocks = {};
+
+    $b.find('#codemodeHtmlContainer,.codemodeHtmlContainer').each(function (index) {
+        var html = mQuery(this).html();
+        if (mQuery(this).attr('data-encode')) {
+            html = atob(mQuery(this).attr('data-encode'));
+            var token = '{CODEMODEBLOCK'+index+'}';
+            codeBlocks[token] = html;
+            mQuery(this).html(token);
+        }
+    })
+
+    themeHtml = Mautic.domToString($b);
+    for (codeBlock in codeBlocks) {
+        themeHtml = themeHtml.replace(codeBlock, codeBlocks[codeBlock]);
+    }
+
+    return themeHtml;
+}
 
 Mautic.killLivePreview = function() {
     window.clearInterval(Mautic.livePreviewInterval);
@@ -424,6 +471,7 @@ Mautic.updateIframeContent = function(iframeId, content, slot) {
         }
     } else if (slot) {
         slot.html(content);
+        Mautic.setEmptySlotPlaceholder(slot.parent());
     }
 };
 
@@ -577,12 +625,13 @@ Mautic.sanitizeHtmlBeforeSave = function(htmlContent) {
     var customHtml = Mautic.domToString(htmlContent).replace(/url\(&quot;(.+)&quot;\)/g, 'url(\'$1\')');
 
     // Convert dynamic slot definitions into tokens
-    return Mautic.convertDynamicContentSlotsToTokens(customHtml);
+    customHtml = Mautic.convertDynamicContentSlotsToTokens(customHtml);
+
+    return Mautic.prepareCodeModeBlocksBeforeSave(customHtml);
 };
 
 /**
- * Clones full HTML document by creating a virtual iframe, putting the HTML into it and
- * reading it back. This is async process.
+ * Clones full HTML document by creating a virtual iframe, putting the HTML into it and reading it back. This is async process.
  *
  * @param  object   content
  * @param  Function callback(clonedContent)
@@ -1278,6 +1327,7 @@ Mautic.initSlotListeners = function() {
             }
 
             slot.append(slotToolbar);
+            Mautic.setEmptySlotPlaceholder(slot);
         }, function() {
             if (Mautic.sortActive) {
                 // don't activate while sorting
@@ -1418,8 +1468,10 @@ Mautic.initSlotListeners = function() {
                             extraKeys: {"Ctrl-Space": "autocomplete"},
                             lineWrapping: true,
                         });
-                        Mautic.builderCodeMirror.getDoc().setValue(slot.find('#codemodeHtmlContainer,.codemodeHtmlContainer').html());
-                        Mautic.keepPreviewAlive(null, slot.find('#codemodeHtmlContainer,.codemodeHtmlContainer'));
+                        var elem = slot.find('#codemodeHtmlContainer,.codemodeHtmlContainer');
+                        html = Mautic.geCodeModetSlotContent(elem);
+                        Mautic.builderCodeMirror.getDoc().setValue(html);
+                        Mautic.keepPreviewAlive(null, elem);
                     }
                     break;
                 }
@@ -1466,6 +1518,7 @@ Mautic.initSlotListeners = function() {
                     // replace DEC with content from the first editor
                     if (!(focusType == 'dynamicContent' && mQuery(this).attr('id').match(/filters/))) {
                         clickedSlot.html(slotHtml.html());
+                        Mautic.setEmptySlotPlaceholder(clickedSlot);
                     }
                 });
 
@@ -2021,6 +2074,18 @@ Mautic.getDynamicContentMaxId = function() {
     if (isNaN(maxId) || Number.NEGATIVE_INFINITY === maxId) maxId = 0;
 
     return maxId;
+};
+
+Mautic.setEmptySlotPlaceholder = function (slot) {
+    var clonedSlot = slot.clone();
+    clonedSlot.find('div[data-slot-focus="true"]').remove()
+    clonedSlot.find('div[data-slot-toolbar="true"]').remove()
+
+    if ((clonedSlot.text()).trim() == '' && !clonedSlot.find('img').length) {
+        slot.addClass('empty');
+    } else {
+        slot.removeClass('empty');
+    }
 };
 
 // Init inside the builder's iframe
