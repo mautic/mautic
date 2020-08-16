@@ -109,7 +109,8 @@
         "leezy/pheanstalk-bundle": "^4.0",
         "tightenco/collect": "^6.13",
         "kamermans/guzzle-oauth2-subscriber": "^1.0",
-        "barryvdh/elfinder-flysystem-driver": "^0.2.1"
+        "barryvdh/elfinder-flysystem-driver": "^0.2.1",
+        "bandwidth-throttle/token-bucket": "^2.0"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~3.4.0",
