@@ -128,6 +128,7 @@ class WebhookSubscriber implements EventSubscriberInterface
                 'userList',
                 'publishDetails',
                 'ipAddress',
+                'doNotContactList',
                 'tagList',
             ]
         );
@@ -149,6 +150,7 @@ class WebhookSubscriber implements EventSubscriberInterface
                 'userList',
                 'publishDetails',
                 'ipAddress',
+                'doNotContactList',
                 'tagList',
             ]
         );
@@ -167,6 +169,7 @@ class WebhookSubscriber implements EventSubscriberInterface
                 'leadDetails',
                 'userList',
                 'publishDetails',
+                'doNotContactList',
                 'ipAddress',
             ]
         );
@@ -187,6 +190,7 @@ class WebhookSubscriber implements EventSubscriberInterface
                 'userList',
                 'publishDetails',
                 'ipAddress',
+                'doNotContactList',
                 'tagList',
             ]
         );
