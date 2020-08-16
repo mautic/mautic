@@ -562,6 +562,19 @@ return [
                     'setPassword' => ['%mautic.mailer_password%'],
                 ],
             ],
+            'mautic.transport.pepipost' => [
+                'class'        => \Mautic\EmailBundle\Swiftmailer\Transport\PepipostTransport::class,
+                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
+                'arguments'    => [
+                    'translator',
+                    'monolog.logger.mautic',
+                    'mautic.email.model.transport_callback',
+                ],
+                'methodCalls' => [
+                    'setUsername' => ['%mautic.mailer_user%'],
+                    'setPassword' => ['%mautic.mailer_password%'],
+                ],
+            ],
             'mautic.transport.postmark' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\PostmarkTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
