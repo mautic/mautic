@@ -40,6 +40,7 @@ use Mautic\LeadBundle\Entity\LeadCategory;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
@@ -242,13 +243,12 @@ class LeadModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return \Mautic\LeadBundle\Entity\LeadRepository
+     * @return LeadRepository
      */
     public function getRepository()
     {
-        $repo = $this->em->getRepository('MauticLeadBundle:Lead');
+        /** @var LeadRepository $repo */
+        $repo = $this->em->getRepository(Lead::class);
         $repo->setDispatcher($this->dispatcher);
 
         if (!$this->repoSetup) {
@@ -2347,7 +2347,7 @@ class LeadModel extends FormModel
         if ($lead->isNewlyCreated() || $lead->wasAnonymous()) {
             // Only store an entry once for created and once for identified, not every time the lead is saved
             $manipulator = $lead->getManipulator();
-            if (null !== $manipulator) {
+            if (null !== $manipulator && !$manipulator->wasLogged()) {
                 $manipulationLog = new LeadEventLog();
                 $manipulationLog->setLead($lead)
                     ->setBundle($manipulator->getBundleName())
@@ -2362,7 +2362,7 @@ class LeadModel extends FormModel
                 $manipulationLog->setProperties(['object_description' => $description]);
 
                 $lead->addEventLog($manipulationLog);
-                $lead->setManipulator(null);
+                $manipulator->setAsLogged();
             }
         }
     }
