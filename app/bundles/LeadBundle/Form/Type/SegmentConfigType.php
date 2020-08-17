@@ -12,7 +12,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class SegmentConfigType extends AbstractType
@@ -20,14 +20,16 @@ class SegmentConfigType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
-            'twitter_handle_field',
-            ChoiceType::class,
+            'segment_rebuild_time_warning',
+            NumberType::class,
             [
-                'choices'           => array_flip([]),
-                'label'             => 'mautic.social.config.twitter.field.label',
-                'required'          => false,
-                'label_attr'        => ['class' => 'control-label'],
-                'attr'              => ['class' => 'form-control'],
+                'label'      => 'mautic.lead.list.form.config.segment_rebuild_time_warning',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.lead.list.form.config.segment_rebuild_time_warning.tooltip',
+                ],
+                'required' => false,
             ]
         );
     }
