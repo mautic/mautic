@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\CoreBundle\Tests\unit\Helper;
+namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\MaxMindDoNotSellDownloadHelper;

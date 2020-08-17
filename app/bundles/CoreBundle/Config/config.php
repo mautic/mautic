@@ -533,24 +533,6 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
-            'mautic.helper.token_builder' => [
-                'class'     => \Mautic\CoreBundle\Helper\BuilderTokenHelper::class,
-                'arguments' => [
-                    'mautic.security',
-                    'mautic.model.factory',
-                    'database_connection',
-                    'mautic.helper.user',
-                ],
-            ],
-            'mautic.helper.token_builder.factory' => [
-                'class'     => \Mautic\CoreBundle\Helper\BuilderTokenHelperFactory::class,
-                'arguments' => [
-                    'mautic.security',
-                    'mautic.model.factory',
-                    'database_connection',
-                    'mautic.helper.user',
-                ],
-            ],
         ],
         'menus' => [
             'mautic.menu.main' => [
