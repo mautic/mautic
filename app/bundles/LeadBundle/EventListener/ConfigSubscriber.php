@@ -15,6 +15,7 @@ use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\LeadBundle\Form\Type\ConfigCompanyType;
 use Mautic\LeadBundle\Form\Type\ConfigType;
+use Mautic\LeadBundle\Form\Type\SegmentConfigType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
@@ -56,6 +57,13 @@ class ConfigSubscriber implements EventSubscriberInterface
             'parameters' => [
                 'company_unique_identifiers_operator' => $parameters['company_unique_identifiers_operator'],
             ],
+        ]);
+
+        $event->addForm([
+            'formAlias'  => 'segment_config',
+            'formType'   => SegmentConfigType::class,
+            'formTheme'  => 'MauticLeadBundle:FormTheme\Config',
+            'parameters' => $event->getParametersFromConfig('MauticLeadBundle'),
         ]);
     }
 }

@@ -803,6 +803,9 @@ return [
                     'mautic.lead.model.lead',
                 ],
             ],
+            'mautic.segment.config' => [
+                'class' => 'MauticPlugin\LeadBundle\Form\Type\ConfigType',
+            ],
         ],
         'other' => [
             'mautic.lead.doctrine.subscriber' => [
