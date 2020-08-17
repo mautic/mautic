@@ -176,7 +176,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->dispatch(LeadEvents::LEAD_COMPANY_CHANGE, $event);
     }
 
-    public function testOnCompanySave()
+    public function testOnCompanySaveAndDelete()
     {
         $dispatcher = new EventDispatcher();
         $mockModel  = $this->createMock(WebhookModel::class);
