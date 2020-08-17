@@ -36,6 +36,19 @@ class ConfigType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        // TODO very dirty quick fix for https://github.com/mautic/mautic/issues/8854
+        if (isset($options['data']['apiconfig']['parameters']['api_oauth2_access_token_lifetime'])
+            && 3600 === $options['data']['apiconfig']['parameters']['api_oauth2_access_token_lifetime']
+        ) {
+            $options['data']['apiconfig']['parameters']['api_oauth2_access_token_lifetime'] = 60;
+        }
+
+        if (isset($options['data']['apiconfig']['parameters']['api_oauth2_refresh_token_lifetime'])
+            && 1209600 === $options['data']['apiconfig']['parameters']['api_oauth2_refresh_token_lifetime']
+        ) {
+            $options['data']['apiconfig']['parameters']['api_oauth2_refresh_token_lifetime'] = 14;
+        }
+
         foreach ($options['data'] as $config) {
             if (isset($config['formAlias']) && !empty($config['parameters'])) {
                 $checkThese = array_intersect(array_keys($config['parameters']), $options['fileFields']);

@@ -14,12 +14,10 @@ namespace Mautic\WebhookBundle\Model;
 use Doctrine\Common\Collections\Criteria;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
-use Joomla\Http\Http;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\EventRepository;
 use Mautic\WebhookBundle\Entity\Log;
@@ -31,8 +29,10 @@ use Mautic\WebhookBundle\Entity\WebhookRepository;
 use Mautic\WebhookBundle\Event as Events;
 use Mautic\WebhookBundle\Event\WebhookEvent;
 use Mautic\WebhookBundle\Form\Type\WebhookType;
+use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class WebhookModel extends FormModel
@@ -91,11 +91,6 @@ class WebhookModel extends FormModel
     protected $serializer;
 
     /**
-     * @var NotificationModel
-     */
-    protected $notificationModel;
-
-    /**
      * Queued events default order by dir
      * Possible values: ['ASC', 'DESC'].
      *
@@ -103,14 +98,26 @@ class WebhookModel extends FormModel
      */
     protected $eventsOrderByDir;
 
+    /**
+     * @var Client
+     */
+    private $httpClient;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         SerializerInterface $serializer,
-        NotificationModel $notificationModel
+        Client $httpClient,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->setConfigProps($coreParametersHelper);
         $this->serializer        = $serializer;
-        $this->notificationModel = $notificationModel;
+        $this->httpClient        = $httpClient;
+        $this->eventDispatcher   = $eventDispatcher;
     }
 
     /**
@@ -286,9 +293,6 @@ class WebhookModel extends FormModel
      */
     public function processWebhook(Webhook $webhook, WebhookQueue $queue = null)
     {
-        // instantiate new http class
-        $http = new Http();
-
         // get the webhook payload
         $payload = $this->getWebhookPayload($webhook, $queue);
 
@@ -297,39 +301,33 @@ class WebhookModel extends FormModel
             return false;
         }
 
-        if (is_array($payload)) {
-            $payload = json_encode($payload);
-        }
-
-        // generate a base64 encoded HMAC-SHA256 signature of the payload
-        $secret    = $webhook->getSecret();
-        $signature = base64_encode(hash_hmac('sha256', $payload, $secret, true));
-
-        // Set up custom headers
-        $headers = [
-            'Content-Type'      => 'application/json',
-            'Webhook-Signature' => $signature,
-        ];
-        $start   = microtime(true);
+        $start = microtime(true);
 
         try {
-            $response = $http->post($webhook->getWebhookUrl(), $payload, $headers, $this->webhookTimeout);
+            $response = $this->httpClient->post($webhook->getWebhookUrl(), $payload, $webhook->getSecret());
 
             // remove successfully processed queues from the Webhook object so they won't get stored again
             foreach ($this->webhookQueueIdList as $queue) {
                 $webhook->removeQueue($queue);
             }
 
-            $this->addLog($webhook, $response->code, (microtime(true) - $start), $response->body);
+            $responseBody = $response->getBody()->getContents();
+            if (!$responseBody) {
+                $responseBody = null; // Save null value to database
+            }
+
+            $responseStatusCode = $response->getStatusCode();
+
+            $this->addLog($webhook, $response->getStatusCode(), (microtime(true) - $start), $responseBody);
 
             // throw an error exception if we don't get a 200 back
-            if ($response->code >= 300 || $response->code < 200) {
-                // The reciever of the webhook is telling us to stop bothering him with our requests by code 410
-                if (410 == $response->code) {
+            if ($responseStatusCode >= 300 || $responseStatusCode < 200) {
+                // The receiver of the webhook is telling us to stop bothering him with our requests by code 410
+                if (410 === $responseStatusCode) {
                     $this->killWebhook($webhook, 'mautic.webhook.stopped.reason.410');
                 }
 
-                throw new \ErrorException($webhook->getWebhookUrl().' returned '.$response->code);
+                throw new \ErrorException($webhook->getWebhookUrl().' returned '.$responseStatusCode);
             }
         } catch (\Exception $e) {
             $message = $e->getMessage();
@@ -397,30 +395,16 @@ class WebhookModel extends FormModel
     /**
      * Unpublish the webhook so it will stop emit the requests
      * and notify user about it.
+     *
+     * @param string $reason
      */
     public function killWebhook(Webhook $webhook, $reason = 'mautic.webhook.stopped.reason')
     {
         $webhook->setIsPublished(false);
         $this->saveEntity($webhook);
 
-        $this->notificationModel->addNotification(
-            $this->translator->trans(
-                'mautic.webhook.stopped.details',
-                [
-                    '%reason%'  => $this->translator->trans($reason),
-                    '%webhook%' => '<a href="'.$this->router->generate(
-                        'mautic_webhook_action',
-                        ['objectAction' => 'view', 'objectId' => $webhook->getId()]
-                    ).'" data-toggle="ajax">'.$webhook->getName().'</a>',
-                ]
-            ),
-            'error',
-            false,
-            $this->translator->trans('mautic.webhook.stopped'),
-            null,
-            null,
-            $this->em->getReference('MauticUserBundle:User', $webhook->getCreatedBy())
-        );
+        $event = new WebhookEvent($webhook, false, $reason);
+        $this->eventDispatcher->dispatch(WebhookEvents::WEBHOOK_KILL, $event);
     }
 
     /**

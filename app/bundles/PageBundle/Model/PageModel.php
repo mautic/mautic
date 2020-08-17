@@ -31,6 +31,7 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
@@ -108,6 +109,11 @@ class PageModel extends FormModel
     private $companyModel;
 
     /**
+     * @var ContactTracker
+     */
+    private $contactTracker;
+
+    /**
      * PageModel constructor.
      */
     public function __construct(
@@ -119,7 +125,8 @@ class PageModel extends FormModel
         TrackableModel $pageTrackableModel,
         QueueService $queueService,
         CompanyModel $companyModel,
-        DeviceTracker $deviceTracker
+        DeviceTracker $deviceTracker,
+        ContactTracker $contactTracker
     ) {
         $this->cookieHelper       = $cookieHelper;
         $this->ipLookupHelper     = $ipLookupHelper;
@@ -131,6 +138,7 @@ class PageModel extends FormModel
         $this->queueService       = $queueService;
         $this->companyModel       = $companyModel;
         $this->deviceTracker      = $deviceTracker;
+        $this->contactTracker     = $contactTracker;
     }
 
     /**
@@ -603,7 +611,7 @@ class PageModel extends FormModel
 
         if (!$activeRequest) {
             // Queue is consuming this hit outside of the lead's active request so this must be set in order for listeners to know who the request belongs to
-            $this->leadModel->setSystemCurrentLead($lead);
+            $this->contactTracker->setSystemContact($lead);
         }
         $trackingId = $hit->getTrackingId();
         if (!$trackingNewlyGenerated) {

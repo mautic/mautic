@@ -47,6 +47,7 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -132,6 +133,11 @@ class SubmissionModel extends CommonFormModel
      */
     private $dateHelper;
 
+    /**
+     * @var ContactTracker
+     */
+    private $contactTracker;
+
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         TemplatingHelper $templatingHelper,
@@ -147,7 +153,8 @@ class SubmissionModel extends CommonFormModel
         FormUploader $formUploader,
         DeviceTrackingServiceInterface $deviceTrackingService,
         FieldValueTransformer $fieldValueTransformer,
-        DateHelper $dateHelper
+        DateHelper $dateHelper,
+        ContactTracker $contactTracker
     ) {
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->templatingHelper       = $templatingHelper;
@@ -164,6 +171,7 @@ class SubmissionModel extends CommonFormModel
         $this->deviceTrackingService  = $deviceTrackingService;
         $this->fieldValueTransformer  = $fieldValueTransformer;
         $this->dateHelper             = $dateHelper;
+        $this->contactTracker         = $contactTracker;
     }
 
     /**
@@ -356,7 +364,7 @@ class SubmissionModel extends CommonFormModel
             ->setResults($results)
             ->setContactFieldMatches($leadFieldMatches);
 
-        $lead = $this->leadModel->getCurrentLead();
+        $lead = $this->contactTracker->getContact();
 
         // Remove validation errors if the field is not visible
         if ($lead && $form->usesProgressiveProfiling()) {
@@ -781,7 +789,7 @@ class SubmissionModel extends CommonFormModel
 
         if (!$inKioskMode) {
             // Default to currently tracked lead
-            if ($currentLead = $this->leadModel->getCurrentLead()) {
+            if ($currentLead = $this->contactTracker->getContact()) {
                 $lead          = $currentLead;
                 $leadId        = $lead->getId();
                 $currentFields = $lead->getProfileFields();
@@ -874,7 +882,7 @@ class SubmissionModel extends CommonFormModel
             $this->logger->debug('FORM: Testing contact ID# '.$foundLead->getId().' for conflicts');
 
             // Check for a conflict with the currently tracked lead
-            $foundLeadFields = $this->leadModel->flattenFields($foundLead->getFields());
+            $foundLeadFields = $foundLead->getProfileFields();
 
             // Get unique identifier fields for the found lead then compare with the lead currently tracked
             $uniqueFieldsFound             = $getData($foundLeadFields, true);
@@ -959,10 +967,10 @@ class SubmissionModel extends CommonFormModel
 
         if (!$inKioskMode) {
             // Set the current lead which will generate tracking cookies
-            $this->leadModel->setCurrentLead($lead);
+            $this->contactTracker->setTrackedContact($lead);
         } else {
             // Set system current lead which will still allow execution of events without generating tracking cookies
-            $this->leadModel->setSystemCurrentLead($lead);
+            $this->contactTracker->setSystemContact($lead);
         }
 
         $companyFieldMatches = $getCompanyData($leadFieldMatches);

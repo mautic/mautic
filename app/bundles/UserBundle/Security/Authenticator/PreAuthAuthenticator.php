@@ -32,9 +32,6 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
      */
     protected $dispatcher;
 
-    /**
-     * @var
-     */
     protected $providerKey;
 
     /**

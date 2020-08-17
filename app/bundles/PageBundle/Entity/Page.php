@@ -26,9 +26,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Page.
- */
 class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface
 {
     use TranslationEntityTrait;
@@ -126,8 +123,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
     /**
      * Used to identify the page for the builder.
-     *
-     * @var
      */
     private $sessionId;
 

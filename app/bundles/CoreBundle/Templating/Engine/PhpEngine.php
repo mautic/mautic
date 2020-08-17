@@ -34,7 +34,7 @@ use Symfony\Component\Templating\TemplateNameParserInterface;
 class PhpEngine extends BasePhpEngine
 {
     /**
-     * @var
+     * @var Storage|null
      */
     private $evalTemplate;
 
@@ -63,14 +63,9 @@ class PhpEngine extends BasePhpEngine
      */
     private $request;
 
-    /**
-     * @var
-     */
     private $jsLoadMethodPrefix;
 
     /**
-     * PhpEngine constructor.
-     *
      * @param Stopwatch|GlobalVariables $delegateStopWatch
      */
     public function __construct(

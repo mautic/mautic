@@ -38,7 +38,7 @@ abstract class AbstractPluginBundle extends PluginBundleBase
         $migrationEngine = new Engine(
             $entityManager,
             $tablePrefix,
-            __DIR__.'/../../'.$plugin->getBundle(),
+            __DIR__.'/../../../../plugins/'.$plugin->getBundle(),
             $plugin->getBundle()
         );
 

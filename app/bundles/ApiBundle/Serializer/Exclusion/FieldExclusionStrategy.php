@@ -17,9 +17,7 @@ use JMS\Serializer\Metadata\ClassMetadata;
 use JMS\Serializer\Metadata\PropertyMetadata;
 
 /**
- * Class FieldExclusionStrategy.
- *
- * Exclude specific fields at a specific level
+ * Exclude specific fields at a specific level.
  */
 class FieldExclusionStrategy implements ExclusionStrategyInterface
 {
@@ -34,15 +32,13 @@ class FieldExclusionStrategy implements ExclusionStrategyInterface
     private $level;
 
     /**
-     * @var
+     * @var string|null
      */
     private $path;
 
     /**
-     * FieldExclusionStrategy constructor.
-     *
-     * @param int  $level
-     * @param null $path
+     * @param int         $level
+     * @param string|null $path
      */
     public function __construct(array $fields, $level = 3, $path = null)
     {

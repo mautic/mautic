@@ -35,7 +35,13 @@ class FieldModel extends FormModel
         // Listed according to $order for installation
         'title' => [
             'type'       => 'lookup',
-            'properties' => ['list' => 'Mr|Mrs|Miss'],
+            'properties' => [
+                'list' => [
+                    'Mr',
+                    'Mrs',
+                    'Miss',
+                ],
+            ],
             'fixed'      => true,
             'listable'   => true,
             'object'     => 'lead',
@@ -276,7 +282,134 @@ class FieldModel extends FormModel
         'companyindustry' => [
             'type'       => 'select',
             'group'      => 'professional',
-            'properties' => ['list' => 'Agriculture|Apparel|Banking|Biotechnology|Chemicals|Communications|Construction|Education|Electronics|Energy|Engineering|Entertainment|Environmental|Finance|Food & Beverage|Government|Healthcare|Hospitality|Insurance|Machinery|Manufacturing|Media|Not for Profit|Recreation|Retail|Shipping|Technology|Telecommunications|Transportation|Utilities|Other'],
+            'properties' => [
+                'list' => [
+                    [
+                        'label' => 'Agriculture',
+                        'value' => 'Agriculture',
+                    ],
+                    [
+                        'label' => 'Apparel',
+                        'value' => 'Apparel',
+                    ],
+                    [
+                        'label' => 'Banking',
+                        'value' => 'Banking',
+                    ],
+                    [
+                        'label' => 'Biotechnology',
+                        'value' => 'Biotechnology',
+                    ],
+                    [
+                        'label' => 'Chemicals',
+                        'value' => 'Chemicals',
+                    ],
+                    [
+                        'label' => 'Communications',
+                        'value' => 'Communications',
+                    ],
+                    [
+                        'label' => 'Construction',
+                        'value' => 'Construction',
+                    ],
+                    [
+                        'label' => 'Education',
+                        'value' => 'Education',
+                    ],
+                    [
+                        'label' => 'Electronics',
+                        'value' => 'Electronics',
+                    ],
+                    [
+                        'label' => 'Energy',
+                        'value' => 'Energy',
+                    ],
+                    [
+                        'label' => 'Engineering',
+                        'value' => 'Engineering',
+                    ],
+                    [
+                        'label' => 'Entertainment',
+                        'value' => 'Entertainment',
+                    ],
+                    [
+                        'label' => 'Environmental',
+                        'value' => 'Environmental',
+                    ],
+                    [
+                        'label' => 'Finance',
+                        'value' => 'Finance',
+                    ],
+                    [
+                        'label' => 'Food & Beverage',
+                        'value' => 'Food & Beverage',
+                    ],
+                    [
+                        'label' => 'Government',
+                        'value' => 'Government',
+                    ],
+                    [
+                        'label' => 'Healthcare',
+                        'value' => 'Healthcare',
+                    ],
+                    [
+                        'label' => 'Hospitality',
+                        'value' => 'Hospitality',
+                    ],
+                    [
+                        'label' => 'Insurance',
+                        'value' => 'Insurance',
+                    ],
+                    [
+                        'label' => 'Machinery',
+                        'value' => 'Machinery',
+                    ],
+                    [
+                        'label' => 'Manufacturing',
+                        'value' => 'Manufacturing',
+                    ],
+                    [
+                        'label' => 'Media',
+                        'value' => 'Media',
+                    ],
+                    [
+                        'label' => 'Not for Profit',
+                        'value' => 'Not for Profit',
+                    ],
+                    [
+                        'label' => 'Recreation',
+                        'value' => 'Recreation',
+                    ],
+                    [
+                        'label' => 'Retail',
+                        'value' => 'Retail',
+                    ],
+                    [
+                        'label' => 'Shipping',
+                        'value' => 'Shipping',
+                    ],
+                    [
+                        'label' => 'Technology',
+                        'value' => 'Technology',
+                    ],
+                    [
+                        'label' => 'Telecommunications',
+                        'value' => 'Telecommunications',
+                    ],
+                    [
+                        'label' => 'Transportation',
+                        'value' => 'Transportation',
+                    ],
+                    [
+                        'label' => 'Utilities',
+                        'value' => 'Utilities',
+                    ],
+                    [
+                        'label' => 'Other',
+                        'value' => 'Other',
+                    ],
+                ],
+            ],
             'fixed'      => true,
             'listable'   => true,
             'object'     => 'company',
@@ -983,6 +1116,7 @@ class FieldModel extends FormModel
             ];
         }
 
+        $schemaLength = null;
         switch ($type) {
             case 'datetime':
             case 'date':
@@ -999,13 +1133,16 @@ class FieldModel extends FormModel
             case 'email':
             case 'lookup':
             case 'select':
-            case 'multiselect':
             case 'region':
             case 'tel':
                 $schemaType = 'string';
                 break;
             case 'text':
                 $schemaType = (false !== strpos($alias, 'description')) ? 'text' : 'string';
+                break;
+            case 'multiselect':
+                $schemaType   = 'text';
+                $schemaLength = 65535;
                 break;
             default:
                 $schemaType = 'text';
@@ -1014,7 +1151,7 @@ class FieldModel extends FormModel
         return [
             'name'    => $alias,
             'type'    => $schemaType,
-            'options' => ['notnull' => false],
+            'options' => ['notnull' => false, 'length' => $schemaLength],
         ];
     }
 

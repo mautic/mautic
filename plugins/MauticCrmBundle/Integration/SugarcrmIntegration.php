@@ -93,7 +93,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $pathsHelper,
             $notificationModel,
             $fieldModel,
-            $integrationEntityModel
+            $integrationEntityModel,
+            $doNotContactModel
         );
     }
 
@@ -538,8 +539,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         $object,
                         'lead',
                         null,
-                        $startDate->format('Y-m-d H:m:s'),
-                        $endDate->format('Y-m-d H:m:s'),
+                        $startDate->format('Y-m-d H:i:s'),
+                        $endDate->format('Y-m-d H:i:s'),
                         true,
                         $start,
                         $limit
@@ -588,8 +589,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             $object,
                             'lead',
                             null,
-                            $startDate->format('Y-m-d H:m:s'),
-                            $endDate->format('Y-m-d H:m:s'),
+                            $startDate->format('Y-m-d H:i:s'),
+                            $endDate->format('Y-m-d H:i:s'),
                             true,
                             $start,
                             $limit
@@ -1116,19 +1117,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
-     */
-    public function getFormSettings()
-    {
-        $settings                           = parent::getFormSettings();
-        $settings['requires_callback']      = false;
-        $settings['requires_authorization'] = true;
-        //'requires_callback'      => false,
-        //'requires_authorization' => true,
-        return $settings;
-    }
-
-    /**
      * @param \Mautic\LeadBundle\Entity\Lead $lead
      * @param array                          $config
      *
@@ -1439,8 +1427,12 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
     }
 
-    private function fetchDncToMautic(Lead $lead, array $data)
+    private function fetchDncToMautic(Lead $lead = null, array $data)
     {
+        if (is_null($lead)) {
+            return;
+        }
+
         $features = $this->settings->getFeatureSettings();
         if (empty($features['updateDnc'])) {
             return;

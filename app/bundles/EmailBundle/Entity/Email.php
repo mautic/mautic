@@ -110,7 +110,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $customHtml;
 
     /**
-     * @var
+     * @var string
      */
     private $emailType = 'template';
 
@@ -186,8 +186,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * Used to identify the page for the builder.
-     *
-     * @var
      */
     private $sessionId;
 

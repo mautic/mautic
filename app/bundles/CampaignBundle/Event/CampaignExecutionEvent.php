@@ -66,18 +66,16 @@ class CampaignExecutionEvent extends Event
     protected $logUpdatedByListener = false;
 
     /**
-     * @var
+     * @var string
      */
     protected $channel;
 
     /**
-     * @var
+     * @var int
      */
     protected $channelId;
 
     /**
-     * CampaignExecutionEvent constructor.
-     *
      * @param bool $result
      */
     public function __construct(array $args, $result, LeadEventLog $log = null)

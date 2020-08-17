@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Unit\EventListener;
 
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
+use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\EventListener\LeadSubscriber;
 use Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
@@ -25,13 +26,44 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class LeadSubscriberTest extends TestCase
 {
+    /**
+     * @var MockObject|FieldChangeRepository
+     */
     private $fieldChangeRepository;
+
+    /**
+     * @var MockObject|ObjectMappingRepository
+     */
+    private $objectMappingRepository;
+
+    /**
+     * @var MockObject|VariableExpresserHelperInterface
+     */
     private $variableExpresserHelper;
+
+    /**
+     * @var MockObject|SyncIntegrationsHelper
+     */
     private $syncIntegrationsHelper;
+
+    /**
+     * @var MockObject|LeadEvent
+     */
+    private $leadEvent;
+
+    /**
+     * @var MockObject|CompanyEvent
+     */
+    private $companyEvent;
+
+    /**
+     * @var LeadSubscriber
+     */
     private $subscriber;
 
     public function setUp(): void
@@ -39,10 +71,14 @@ class LeadSubscriberTest extends TestCase
         parent::setUp();
 
         $this->fieldChangeRepository   = $this->createMock(FieldChangeRepository::class);
+        $this->objectMappingRepository = $this->createMock(ObjectMappingRepository::class);
         $this->variableExpresserHelper = $this->createMock(VariableExpresserHelperInterface::class);
         $this->syncIntegrationsHelper  = $this->createMock(SyncIntegrationsHelper::class);
+        $this->leadEvent               = $this->createMock(LeadEvent::class);
+        $this->companyEvent            = $this->createMock(CompanyEvent::class);
         $this->subscriber              = new LeadSubscriber(
             $this->fieldChangeRepository,
+            $this->objectMappingRepository,
             $this->variableExpresserHelper,
             $this->syncIntegrationsHelper
         );
@@ -56,6 +92,7 @@ class LeadSubscriberTest extends TestCase
                 LeadEvents::LEAD_POST_DELETE    => ['onLeadPostDelete', 255],
                 LeadEvents::COMPANY_POST_SAVE   => ['onCompanyPostSave', 0],
                 LeadEvents::COMPANY_POST_DELETE => ['onCompanyPostDelete', 255],
+                LeadEvents::LEAD_COMPANY_CHANGE => ['onLeadCompanyChange', 128],
             ],
             LeadSubscriber::getSubscribedEvents()
         );
@@ -70,15 +107,14 @@ class LeadSubscriberTest extends TestCase
         $lead->expects($this->never())
             ->method('getChanges');
 
-        $event = $this->createMock(LeadEvent::class);
-        $event->expects($this->once())
+        $this->leadEvent->expects($this->once())
             ->method('getLead')
             ->willReturn($lead);
 
         $this->syncIntegrationsHelper->expects($this->never())
             ->method('hasObjectSyncEnabled');
 
-        $this->subscriber->onLeadPostSave($event);
+        $this->subscriber->onLeadPostSave($this->leadEvent);
     }
 
     public function testOnLeadPostSaveLeadObjectSyncNotEnabled(): void
@@ -90,8 +126,7 @@ class LeadSubscriberTest extends TestCase
         $lead->expects($this->never())
             ->method('getChanges');
 
-        $event = $this->createMock(LeadEvent::class);
-        $event->expects($this->once())
+        $this->leadEvent->expects($this->once())
             ->method('getLead')
             ->willReturn($lead);
 
@@ -100,7 +135,27 @@ class LeadSubscriberTest extends TestCase
             ->with(Contact::NAME)
             ->willReturn(false);
 
-        $this->subscriber->onLeadPostSave($event);
+        $this->subscriber->onLeadPostSave($this->leadEvent);
+    }
+
+    public function testOnLeadCompanyChange(): void
+    {
+        $leadId      = 3;
+        $companyName = 'Dell';
+
+        $lead = $this->createMock(Lead::class);
+        $lead->expects($this->at(0))
+            ->method('getCompany')
+            ->willReturn($companyName);
+        $lead->expects($this->at(0))
+            ->method('getId')
+            ->willReturn($leadId);
+
+        $this->leadEvent->expects($this->once())
+            ->method('getLead')
+            ->willReturn($lead);
+
+        $this->subscriber->onLeadPostSave($this->leadEvent);
     }
 
     public function testOnLeadPostSaveNoAction(): void
@@ -115,8 +170,7 @@ class LeadSubscriberTest extends TestCase
             ->method('getChanges')
             ->willReturn($fieldChanges);
 
-        $event = $this->createMock(LeadEvent::class);
-        $event->expects($this->once())
+        $this->leadEvent->expects($this->once())
             ->method('getLead')
             ->willReturn($lead);
 
@@ -125,7 +179,7 @@ class LeadSubscriberTest extends TestCase
             ->with(Contact::NAME)
             ->willReturn(true);
 
-        $this->subscriber->onLeadPostSave($event);
+        $this->subscriber->onLeadPostSave($this->leadEvent);
     }
 
     public function testOnLeadPostSaveRecordChanges(): void
@@ -155,8 +209,7 @@ class LeadSubscriberTest extends TestCase
             ->method('getId')
             ->willReturn($objectId);
 
-        $event = $this->createMock(LeadEvent::class);
-        $event->expects($this->once())
+        $this->leadEvent->expects($this->once())
             ->method('getLead')
             ->willReturn($lead);
 
@@ -167,7 +220,7 @@ class LeadSubscriberTest extends TestCase
 
         $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $objectType);
 
-        $this->subscriber->onLeadPostSave($event);
+        $this->subscriber->onLeadPostSave($this->leadEvent);
     }
 
     public function testOnLeadPostSaveRecordChangesWithOwnerChange(): void
@@ -193,8 +246,7 @@ class LeadSubscriberTest extends TestCase
             ->method('getId')
             ->willReturn($objectId);
 
-        $event = $this->createMock(LeadEvent::class);
-        $event->expects($this->once())
+        $this->leadEvent->expects($this->once())
             ->method('getLead')
             ->willReturn($lead);
 
@@ -207,7 +259,7 @@ class LeadSubscriberTest extends TestCase
 
         $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $objectType);
 
-        $this->subscriber->onLeadPostSave($event);
+        $this->subscriber->onLeadPostSave($this->leadEvent);
     }
 
     public function testOnLeadPostSaveRecordChangesWithPointChange(): void
@@ -233,8 +285,7 @@ class LeadSubscriberTest extends TestCase
             ->method('getId')
             ->willReturn($objectId);
 
-        $event = $this->createMock(LeadEvent::class);
-        $event->expects($this->once())
+        $this->leadEvent->expects($this->once())
             ->method('getLead')
             ->willReturn($lead);
 
@@ -247,41 +298,41 @@ class LeadSubscriberTest extends TestCase
 
         $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $objectType);
 
-        $this->subscriber->onLeadPostSave($event);
+        $this->subscriber->onLeadPostSave($this->leadEvent);
     }
 
     public function testOnLeadPostDelete(): void
     {
-        $deletedId = '5';
-
+        $deletedId       = '5';
         $lead            = new Lead();
         $lead->deletedId = $deletedId;
 
-        $event = $this->createMock(LeadEvent::class);
-        $event->expects($this->once())
+        $this->leadEvent->expects($this->exactly(2))
             ->method('getLead')
             ->willReturn($lead);
 
         $this->fieldChangeRepository->expects($this->once())
             ->method('deleteEntitiesForObject')
-            ->with((int) $deletedId, Lead::class);
+            ->with((int) $deletedId, MauticSyncDataExchange::OBJECT_CONTACT);
 
-        $this->subscriber->onLeadPostDelete($event);
+        $this->objectMappingRepository->expects($this->once())
+            ->method('deleteEntitiesForObject')
+            ->with((int) $deletedId, MauticSyncDataExchange::OBJECT_CONTACT);
+
+        $this->subscriber->onLeadPostDelete($this->leadEvent);
     }
 
     public function testOnCompanyPostSaveSyncNotEnabled(): void
     {
-        $event = $this->createMock(CompanyEvent::class);
-
         $this->syncIntegrationsHelper->expects($this->once())
             ->method('hasObjectSyncEnabled')
             ->with(MauticSyncDataExchange::OBJECT_COMPANY)
             ->willReturn(false);
 
-        $event->expects($this->never())
+        $this->companyEvent->expects($this->never())
             ->method('getCompany');
 
-        $this->subscriber->onCompanyPostSave($event);
+        $this->subscriber->onCompanyPostSave($this->companyEvent);
     }
 
     public function testOnCompanyPostSaveSyncNoAction(): void
@@ -293,8 +344,7 @@ class LeadSubscriberTest extends TestCase
             ->method('getChanges')
             ->willReturn($fieldChanges);
 
-        $event = $this->createMock(CompanyEvent::class);
-        $event->expects($this->once())
+        $this->companyEvent->expects($this->once())
             ->method('getCompany')
             ->willReturn($company);
 
@@ -303,7 +353,7 @@ class LeadSubscriberTest extends TestCase
             ->with(MauticSyncDataExchange::OBJECT_COMPANY)
             ->willReturn(true);
 
-        $this->subscriber->onCompanyPostSave($event);
+        $this->subscriber->onCompanyPostSave($this->companyEvent);
     }
 
     public function testOnCompanyPostSaveSyncRecordChanges(): void
@@ -333,8 +383,7 @@ class LeadSubscriberTest extends TestCase
             ->method('getId')
             ->willReturn($objectId);
 
-        $event = $this->createMock(CompanyEvent::class);
-        $event->expects($this->once())
+        $this->companyEvent->expects($this->once())
             ->method('getCompany')
             ->willReturn($company);
 
@@ -345,7 +394,7 @@ class LeadSubscriberTest extends TestCase
 
         $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $objectType);
 
-        $this->subscriber->onCompanyPostSave($event);
+        $this->subscriber->onCompanyPostSave($this->companyEvent);
     }
 
     public function testOnCompanyPostSaveRecordChangesWithOwnerChange(): void
@@ -368,8 +417,7 @@ class LeadSubscriberTest extends TestCase
             ->method('getId')
             ->willReturn($objectId);
 
-        $event = $this->createMock(CompanyEvent::class);
-        $event->expects($this->once())
+        $this->companyEvent->expects($this->once())
             ->method('getCompany')
             ->willReturn($company);
 
@@ -382,26 +430,28 @@ class LeadSubscriberTest extends TestCase
 
         $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $objectType);
 
-        $this->subscriber->onCompanyPostSave($event);
+        $this->subscriber->onCompanyPostSave($this->companyEvent);
     }
 
     public function testOnCompanyPostDelete(): void
     {
-        $deletedId = '5';
-
+        $deletedId       = '5';
         $lead            = new Company();
         $lead->deletedId = $deletedId;
 
-        $event = $this->createMock(CompanyEvent::class);
-        $event->expects($this->once())
+        $this->companyEvent->expects($this->exactly(2))
             ->method('getCompany')
             ->willReturn($lead);
 
         $this->fieldChangeRepository->expects($this->once())
             ->method('deleteEntitiesForObject')
-            ->with((int) $deletedId, Company::class);
+            ->with((int) $deletedId, MauticSyncDataExchange::OBJECT_COMPANY);
 
-        $this->subscriber->onCompanyPostDelete($event);
+        $this->objectMappingRepository->expects($this->once())
+            ->method('deleteEntitiesForObject')
+            ->with((int) $deletedId, MauticSyncDataExchange::OBJECT_COMPANY);
+
+        $this->subscriber->onCompanyPostDelete($this->companyEvent);
     }
 
     private function handleRecordFieldChanges(array $fieldChanges, int $objectId, string $objectType): void

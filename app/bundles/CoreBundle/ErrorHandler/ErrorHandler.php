@@ -26,7 +26,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         public static $handler;
 
         /**
-         * @var
+         * @var string
          */
         private static $environment;
 
@@ -45,9 +45,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         private $logger;
 
-        /**
-         * @var
-         */
         private $mainLogger;
 
         /**
@@ -337,7 +334,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param $environment
+         * @param string $environment
          *
          * @return ErrorHandler
          */
@@ -376,7 +373,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param mixed $environment
+         * @param string $environment
          *
          * @return ErrorHandler
          */

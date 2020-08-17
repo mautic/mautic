@@ -123,9 +123,23 @@ return [
                 'path'       => '/companies/{page}',
                 'controller' => 'MauticLeadBundle:Company:index',
             ],
+            'mautic_company_contacts_list' => [
+                'path'         => '/company/{objectId}/contacts/{page}',
+                'controller'   => 'MauticLeadBundle:Company:contactsList',
+                'requirements' => [
+                    'objectId' => '\d+',
+                ],
+            ],
             'mautic_company_action' => [
                 'path'       => '/companies/{objectAction}/{objectId}',
                 'controller' => 'MauticLeadBundle:Company:execute',
+            ],
+            'mautic_company_export_action' => [
+                'path'         => '/companies/company/export/{companyId}',
+                'controller'   => 'MauticLeadBundle:Company:companyExport',
+                'requirements' => [
+                    'companyId' => '\d+',
+                ],
             ],
             'mautic_segment_contacts' => [
                 'path'       => '/segment/view/{objectId}/contact/{page}',
@@ -333,6 +347,13 @@ return [
                     'mautic.helper.token_builder.factory',
                 ],
             ],
+            'mautic.lead.emailbundle.subscriber.owner' => [
+                'class'     => \Mautic\LeadBundle\EventListener\OwnerSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'translator',
+                ],
+            ],
             'mautic.lead.formbundle.subscriber' => [
                 'class'     => Mautic\LeadBundle\EventListener\FormSubscriber::class,
                 'arguments' => [
@@ -511,6 +532,12 @@ return [
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
+                ],
+            ],
+            'mautic.lead.subscriber.donotcontact' => [
+                'class'     => \Mautic\LeadBundle\EventListener\DoNotContactSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.dnc',
                 ],
             ],
         ],

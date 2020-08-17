@@ -5,17 +5,15 @@ namespace Mautic\PageBundle\Tests\Controller;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
-/**
- * Class PageControllerTest.
- */
 class PageControllerTest extends MauticMysqlTestCase
 {
     /**
      * @var Connection
      */
     private $db;
+
     /**
-     * @var
+     * @var string
      */
     private $prefix;
 

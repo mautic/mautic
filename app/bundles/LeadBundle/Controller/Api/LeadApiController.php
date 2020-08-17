@@ -17,8 +17,10 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Controller\LeadDetailsTrait;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
@@ -411,7 +413,9 @@ class LeadApiController extends CommonApiController
         $reason   = (int) $this->request->request->get('reason');
         $comments = InputHelper::clean($this->request->request->get('comments'));
 
-        $this->model->addDncForLead($entity, $channel, $comments, $reason);
+        /** @var \Mautic\LeadBundle\Model\DoNotContact $doNotContact */
+        $doNotContact = $this->get('mautic.lead.model.dnc');
+        $doNotContact->addDncForContact($entity->getId(), $channel, $reason, $comments);
         $view = $this->view([$this->entityNameOne => $entity]);
 
         return $this->handleView($view);
@@ -427,6 +431,9 @@ class LeadApiController extends CommonApiController
      */
     public function removeDncAction($id, $channel)
     {
+        /** @var \Mautic\LeadBundle\Model\DoNotContact $doNotContact */
+        $doNotContact = $this->get('mautic.lead.model.dnc');
+
         $entity = $this->model->getEntity((int) $id);
 
         if (null === $entity) {
@@ -437,7 +444,7 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $result = $this->model->removeDncForLead($entity, $channel);
+        $result = $doNotContact->removeDncForContact($entity->getId(), $channel);
         $view   = $this->view(
             [
                 'recordFound'        => $result,
@@ -560,6 +567,15 @@ class LeadApiController extends CommonApiController
             $entity = $this->model->checkForDuplicateContact($this->entityRequestParameters, $entity);
         }
 
+        $manipulatorObject = $this->inBatchMode ? 'api-batch' : 'api-single';
+
+        $entity->setManipulator(new LeadManipulator(
+            'lead',
+            $manipulatorObject,
+            null,
+            $this->get('mautic.helper.user')->getUser()->getName()
+        ));
+
         if (isset($parameters['companies'])) {
             $this->model->modifyCompanies($entity, $parameters['companies']);
             unset($parameters['companies']);
@@ -607,12 +623,15 @@ class LeadApiController extends CommonApiController
 
                 $reason = (int) ArrayHelper::getValue('reason', $dnc, DoNotContact::MANUAL);
 
+                /** @var DoNotContactModel $doNotContact */
+                $doNotContact = $this->get('mautic.lead.model.dnc');
+
                 if (DoNotContact::IS_CONTACTABLE === $reason) {
                     // Remove DNC record
-                    $this->model->removeDncForLead($entity, $channel, false);
+                    $doNotContact->removeDncForContact($entity->getId(), $channel, false);
                 } else {
                     // Add DNC record
-                    $this->model->addDncForLead($entity, $channel, $comments, $reason, false);
+                    $doNotContact->addDncForContact($entity->getId(), $channel, $reason, $comments, false);
                 }
             }
             unset($parameters['doNotContact']);

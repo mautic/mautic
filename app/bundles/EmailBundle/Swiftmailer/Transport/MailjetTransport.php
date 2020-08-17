@@ -72,7 +72,7 @@ class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransport
             $message->setTo($this->getSandboxMail());
         }
 
-        parent::send($message, $failedRecipients);
+        return parent::send($message, $failedRecipients);
     }
 
     /**

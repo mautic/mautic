@@ -41,13 +41,11 @@ class GravatarHelper extends Helper
     private $requestStack;
 
     public function __construct(
-        PathsHelper $pathsHelper,
         DefaultAvatarHelper $defaultAvatarHelper,
         CoreParametersHelper $coreParametersHelper,
         RequestStack $requestStack
     ) {
         $this->devMode             = MAUTIC_ENV === 'dev';
-        $pathsHelper->getSystemPath('images');
         $this->defaultAvatarHelper = $defaultAvatarHelper;
         $this->requestStack        = $requestStack;
         $this->devHosts            = (array) $coreParametersHelper->get('dev_hosts');
@@ -70,7 +68,7 @@ class GravatarHelper extends Helper
                     array_merge($this->devHosts, ['127.0.0.1', 'fe80::1', '::1'])
                 )))
             ?
-            'https://www.mautic.org/media/images/default_avatar.png'
+            'mp'
             :
             $this->defaultAvatarHelper->getDefaultAvatar(true);
 

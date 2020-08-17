@@ -21,6 +21,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
@@ -61,6 +62,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         NotificationModel $notificationModel,
         FieldModel $fieldModel,
         IntegrationEntityModel $integrationEntityModel,
+        DoNotContact $doNotContact,
         UserHelper $userHelper
     ) {
         $this->userHelper = $userHelper;
@@ -80,7 +82,8 @@ class HubspotIntegration extends CrmAbstractIntegration
             $pathsHelper,
             $notificationModel,
             $fieldModel,
-            $integrationEntityModel
+            $integrationEntityModel,
+            $doNotContact
         );
     }
 
@@ -130,21 +133,6 @@ class HubspotIntegration extends CrmAbstractIntegration
     public function getSupportedFeatures()
     {
         return ['push_lead', 'get_leads'];
-    }
-
-    /**
-     * @return array
-     */
-    public function getFormSettings()
-    {
-        $enableDataPriority = $this->getDataPriority();
-
-        return [
-            'requires_callback'      => false,
-            'requires_authorization' => false,
-            'default_features'       => [],
-            'enable_data_priority'   => $enableDataPriority,
-        ];
     }
 
     /**

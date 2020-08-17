@@ -10,6 +10,7 @@
  */
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
+use Mautic\CoreBundle\Release\ThisRelease;
 use Mautic\QueueBundle\Queue\QueueProtocol;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -23,37 +24,6 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 class AppKernel extends Kernel
 {
-    /**
-     * Major version number.
-     *
-     * @const integer
-     */
-    const MAJOR_VERSION = 3;
-
-    /**
-     * Minor version number.
-     *
-     * @const integer
-     */
-    const MINOR_VERSION = 0;
-
-    /**
-     * Patch version number.
-     *
-     * @const integer
-     */
-    const PATCH_VERSION = 0;
-
-    /**
-     * Extra version identifier.
-     *
-     * This constant is used to define additional version segments such as development
-     * or beta status.
-     *
-     * @const string
-     */
-    const EXTRA_VERSION = '-beta';
-
     /**
      * @var bool|null
      */
@@ -74,11 +44,10 @@ class AppKernel extends Kernel
      */
     public function __construct($environment, $debug)
     {
+        $metadata = ThisRelease::getMetadata();
+
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', $environment);
-        defined('MAUTIC_VERSION') or define(
-            'MAUTIC_VERSION',
-            self::MAJOR_VERSION.'.'.self::MINOR_VERSION.'.'.self::PATCH_VERSION.self::EXTRA_VERSION
-        );
+        defined('MAUTIC_VERSION') or define('MAUTIC_VERSION', $metadata->getVersion());
 
         parent::__construct($environment, $debug);
     }
@@ -235,6 +204,7 @@ class AppKernel extends Kernel
             $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
             $bundles[] = new Sensio\Bundle\DistributionBundle\SensioDistributionBundle();
             $bundles[] = new Webfactory\Bundle\ExceptionsBundle\WebfactoryExceptionsBundle();
+            $bundles[] = new Fidry\PsyshBundle\PsyshBundle();
         }
 
         if (in_array($this->getEnvironment(), ['test'])) {
@@ -318,6 +288,11 @@ class AppKernel extends Kernel
     public function getRootDir(): string
     {
         return __DIR__;
+    }
+
+    public function getProjectDir(): string
+    {
+        return dirname(__DIR__);
     }
 
     /**

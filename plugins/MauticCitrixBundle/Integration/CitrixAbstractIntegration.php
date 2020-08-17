@@ -90,17 +90,6 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @return array
-     */
-    public function getFormSettings()
-    {
-        return [
-            'requires_callback'      => true,
-            'requires_authorization' => true,
-        ];
-    }
-
-    /**
      * @return string
      */
     public function getApiUrl()

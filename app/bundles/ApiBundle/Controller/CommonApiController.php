@@ -486,7 +486,7 @@ class CommonApiController extends FOSRestController implements MauticController
             $columns,
             function (&$column, $key, $prefix) {
                 $column = trim($column);
-                if (false === strpos($column, $prefix)) {
+                if (1 === count(explode('.', $column))) {
                     $column = $prefix.$column;
                 }
             },

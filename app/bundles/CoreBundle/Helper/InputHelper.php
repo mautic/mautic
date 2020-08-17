@@ -13,9 +13,6 @@ namespace Mautic\CoreBundle\Helper;
 
 use Joomla\Filter\InputFilter;
 
-/**
- * Class InputHelper.
- */
 class InputHelper
 {
     /**
@@ -33,7 +30,7 @@ class InputHelper
     private static $htmlFilter;
 
     /**
-     * @var
+     * @var InputFilter
      */
     private static $strictHtmlFilter;
 

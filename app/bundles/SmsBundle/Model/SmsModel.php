@@ -33,10 +33,6 @@ use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class SmsModel
- * {@inheritdoc}
- */
 class SmsModel extends FormModel implements AjaxLookupModelInterface
 {
     /**
@@ -55,13 +51,10 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     protected $messageQueueModel;
 
     /**
-     * @var
+     * @var TransportChain
      */
     protected $transport;
 
-    /**
-     * SmsModel constructor.
-     */
     public function __construct(TrackableModel $pageTrackableModel, LeadModel $leadModel, MessageQueueModel $messageQueueModel, TransportChain $transport)
     {
         $this->pageTrackableModel = $pageTrackableModel;

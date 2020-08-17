@@ -73,9 +73,6 @@ class AuthenticationEvent extends Event
      */
     protected $authenticatingService;
 
-    /**
-     * @var
-     */
     protected $integrations;
 
     /**
