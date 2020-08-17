@@ -32,7 +32,7 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
      *
      * @see https://mariadb.com/kb/en/library/generated-columns
      */
-    const MARIADB_MINIMUM_VERSION = '5.2';
+    const MARIADB_MINIMUM_VERSION = '10.2.6';
 
     /**
      * @var VersionProviderInterface
