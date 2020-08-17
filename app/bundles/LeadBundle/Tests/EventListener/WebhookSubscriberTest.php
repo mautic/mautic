@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
+use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\EventListener\WebhookSubscriber;
@@ -173,5 +174,24 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $event = new LeadChangeCompanyEvent($lead, $company);
         $this->dispatcher->dispatch(LeadEvents::LEAD_COMPANY_CHANGE, $event);
+    }
+
+    public function testOnCompanySaveAndDelete()
+    {
+        $dispatcher = new EventDispatcher();
+        $mockModel  = $this->createMock(WebhookModel::class);
+
+        $mockModel->expects($this->exactly(2))
+            ->method('queueWebhooksByType');
+
+        $webhookSubscriber = new WebhookSubscriber($mockModel);
+
+        $dispatcher->addSubscriber($webhookSubscriber);
+
+        $company = new Company();
+        $company->setName('company');
+        $event = new CompanyEvent($company);
+        $dispatcher->dispatch(LeadEvents::COMPANY_POST_SAVE, $event);
+        $dispatcher->dispatch(LeadEvents::COMPANY_POST_DELETE, $event);
     }
 }
