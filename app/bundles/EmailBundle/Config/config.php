@@ -169,6 +169,9 @@ return [
                     'mautic.lead.helper.primary_company',
                 ],
             ],
+            'mautic.email.generated_columns.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\GeneratedColumnSubscriber::class,
+            ],
             'mautic.email.campaignbundle.subscriber' => [
                 'class'     => \Mautic\EmailBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
@@ -197,6 +200,7 @@ return [
                     'doctrine.dbal.default_connection',
                     'mautic.lead.model.company_report_data',
                     'mautic.email.repository.stat',
+                    'mautic.generated.columns.provider',
                 ],
             ],
             'mautic.email.leadbundle.subscriber' => [
@@ -745,6 +749,7 @@ return [
                     'mautic.helper.cache_storage',
                     'mautic.tracker.contact',
                     'mautic.lead.model.dnc',
+                    'mautic.generated.columns.provider',
                 ],
             ],
             'mautic.email.model.send_email_to_user' => [
