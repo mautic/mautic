@@ -107,7 +107,7 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                     $lastBuiltDateDifference = null;
                     if ($item->getLastBuiltDate() instanceof \DateTime) {
                         $lastBuiltDateDifferenceInterval = $now->diff($item->getLastBuiltDate());
-                        // Calculate difference between now and last_build_date in hours
+                        // Calculate difference between now and last_built_date in hours
                         $lastBuiltDateDifference = (int) abs((new \DateTime())->setTimestamp(0)->add($lastBuiltDateDifferenceInterval)->getTimestamp() / 3600);
                     }
                 ?>
