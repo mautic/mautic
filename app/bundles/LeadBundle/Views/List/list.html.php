@@ -168,7 +168,7 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                             <?php if ($item->isGlobal()): ?>
                                 <i class="fa fa-fw fa-globe"></i>
                             <?php endif; ?>
-                            <?php if ($lastBuildDateDifference >= 30): ?>
+                            <?php if ($lastBuildDateDifference >= $segmentRebuildWarningThreshold): ?>
                                 <label class="control-label" data-toggle="tooltip"
                                        data-container="body" data-placement="top" title=""
                                        data-original-title="<?php echo sprintf('This segment hasn\'t been rebuilt for %s hours.', $lastBuildDateDifference); ?>">
