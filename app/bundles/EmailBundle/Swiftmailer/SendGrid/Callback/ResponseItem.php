@@ -31,6 +31,11 @@ class ResponseItem
     private $dncReason;
 
     /**
+     * @var string
+     */
+    private $channel;
+
+    /**
      * @throws ResponseItemException
      */
     public function __construct(array $item)
@@ -41,6 +46,7 @@ class ResponseItem
         $this->email     = $item['email'];
         $this->reason    = !empty($item['reason']) ? $item['reason'] : null;
         $this->dncReason = CallbackEnum::convertEventToDncReason($item['event']);
+        $this->channel    = isset($item['channel']) ? $item['channel'] : null;
     }
 
     /**
@@ -65,5 +71,13 @@ class ResponseItem
     public function getDncReason()
     {
         return $this->dncReason;
+    }
+    
+    /**
+     * @return mixed|null|string
+     */
+    public function getChannel()
+    {
+        return  $this->channel;
     }
 }

@@ -28,6 +28,7 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\EventListener\BuilderSubscriber;
 use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Queue\QueueName;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends CommonFormController
@@ -420,6 +421,30 @@ class PublicController extends CommonFormController
 
         if (!$realTransport instanceof CallbackTransportInterface || $realTransport->getCallbackPath() !== $transport) {
             return $this->notFound();
+        }
+
+        $payload = $this->request->request->all();
+
+        if($payload){
+            $newPayload = [];
+            $updateRequestFlag = false;
+            foreach ($payload as $key => $item) {
+                $newPayload[$key] = $item;
+                if (isset($item['email']) && isset($item['timestamp']) && in_array($item['event'],['dropped','bounce'])) {
+                    $channelId = null;
+                    $time = date('Y-m-d H:i:s', $item['timestamp']);
+                    $model = $this->get('mautic.email.model.email');
+                    $stat = $model->getStatRepository()->getChannelDetails($item['email'], $time);
+                    if ($stat && isset($stat['email_id'])) {
+                        $channelId = $stat['email_id'];
+                    }
+                    $newPayload[$key]['channel'] = $channelId;
+                    $updateRequestFlag = true;
+                }
+            }
+            if($updateRequestFlag){
+                $this->request = new Request($_GET, $newPayload, $this->request->attributes->all(), $_COOKIE, $_FILES, $_SERVER);
+            }
         }
 
         $event = new TransportWebhookEvent($realTransport, $this->request);
