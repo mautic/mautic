@@ -12,6 +12,8 @@
 namespace Mautic\LeadBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -89,6 +91,11 @@ class UpdateLeadListsCommand extends ModeratedCommand
                     $processed = 0;
                     try {
                         $processed = $listModel->rebuildListLeads($list, $batch, $max, $output);
+                        if (0 >= $max) {
+                            // Only full rebuild counts
+                            $this->updateLastBuiltDate($list);
+                            $listModel->saveEntity($list);
+                        }
                     } catch (QueryException $e) {
                         $this->getContainer()->get('monolog.logger.mautic')->error('Query Builder Exception: '.$e->getMessage());
                     }
@@ -116,6 +123,11 @@ class UpdateLeadListsCommand extends ModeratedCommand
 
                     $startTimeForSingleSegment = time();
                     $processed                 = $listModel->rebuildListLeads($l, $batch, $max, $output);
+                    if (0 >= $max) {
+                        // Only full rebuild counts
+                        $this->updateLastBuiltDate($l);
+                        $listModel->saveEntity($l);
+                    }
                     $output->writeln(
                         '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'
                     );
@@ -139,5 +151,11 @@ class UpdateLeadListsCommand extends ModeratedCommand
         }
 
         return 0;
+    }
+
+    private function updateLastBuiltDate(LeadList $leadList): void
+    {
+        $now = (new DateTimeHelper())->getUtcDateTime();
+        $leadList->setLastBuiltDate($now);
     }
 }

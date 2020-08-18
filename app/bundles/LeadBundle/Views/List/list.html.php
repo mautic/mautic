@@ -104,11 +104,11 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
             <?php /** @var \Mautic\LeadBundle\Entity\LeadList $item */?>
             <?php foreach ($items as $item): ?>
                 <?php
-                    $lastBuildDateDifference = null;
-                    if ($item->getLastBuildDate() instanceof \DateTime) {
-                        $lastBuildDateDifferenceInterval = $now->diff($item->getLastBuildDate());
+                    $lastBuiltDateDifference = null;
+                    if ($item->getLastBuiltDate() instanceof \DateTime) {
+                        $lastBuiltDateDifferenceInterval = $now->diff($item->getLastBuiltDate());
                         // Calculate difference between now and last_build_date in hours
-                        $lastBuildDateDifference = (int) abs((new \DateTime())->setTimestamp(0)->add($lastBuildDateDifferenceInterval)->getTimestamp() / 3600);
+                        $lastBuiltDateDifference = (int) abs((new \DateTime())->setTimestamp(0)->add($lastBuiltDateDifferenceInterval)->getTimestamp() / 3600);
                     }
                 ?>
                 <?php $mauticTemplateVars['item'] = $item; ?>
@@ -168,10 +168,10 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                             <?php if ($item->isGlobal()): ?>
                                 <i class="fa fa-fw fa-globe"></i>
                             <?php endif; ?>
-                            <?php if ($lastBuildDateDifference >= $segmentRebuildWarningThreshold): ?>
+                            <?php if ($lastBuiltDateDifference >= $segmentRebuildWarningThreshold): ?>
                                 <label class="control-label" data-toggle="tooltip"
                                        data-container="body" data-placement="top" title=""
-                                       data-original-title="<?php echo sprintf('This segment hasn\'t been rebuilt for %s hours.', $lastBuildDateDifference); ?>">
+                                       data-original-title="<?php echo sprintf('This segment hasn\'t been rebuilt for %s hours.', $lastBuiltDateDifference); ?>">
                                     <i class="fa text-danger fa-exclamation-circle"></i></label>
                             <?php endif; ?>
                             <?php echo $view['content']->getCustomContent('segment.name', $mauticTemplateVars); ?>

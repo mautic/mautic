@@ -30,8 +30,8 @@ class Version20200812180900 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema): void
     {
-        if ($schema->getTable("{$this->prefix}lead_lists")->hasColumn('last_build_date')) {
-            throw new SkipMigration("The last_build_date column has already been added to the {$this->prefix}lead_lists table.");
+        if ($schema->getTable("{$this->prefix}lead_lists")->hasColumn('last_built_date')) {
+            throw new SkipMigration("The last_built_date column has already been added to the {$this->prefix}lead_lists table.");
         }
     }
 
@@ -47,12 +47,12 @@ class Version20200812180900 extends AbstractMauticMigration
             ->format('Y-m-d H:i:s');
 
         $table = $this->getTable();
-        $this->addSql(sprintf('ALTER TABLE `%s` ADD COLUMN `last_build_date` DATETIME NULL DEFAULT NULL AFTER `checked_out_by_user`', $table));
-        $this->addSql(sprintf("UPDATE `%s` SET last_build_date = '%s'", $table, $now));
+        $this->addSql(sprintf('ALTER TABLE `%s` ADD COLUMN `last_built_date` DATETIME NULL DEFAULT NULL AFTER `checked_out_by_user`', $table));
+        $this->addSql(sprintf("UPDATE `%s` SET last_built_date = '%s'", $table, $now));
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql(sprintf('ALTER TABLE `%s` DROP COLUMN `last_build_date`', $this->getTable()));
+        $this->addSql(sprintf('ALTER TABLE `%s` DROP COLUMN `last_built_date`', $this->getTable()));
     }
 }
