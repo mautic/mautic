@@ -701,9 +701,9 @@ class StatRepository extends CommonRepository
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
-        $query->select('email_id')
+        $query->select('s.email_id')
             ->where('s.email_address = :email')
-            ->andWhere('(s.date_sent  = :time')
+            ->andWhere('s.date_sent  = :time')
             ->setParameter(':email', $emailId)
             ->setParameter(':time', $time);
 
@@ -711,10 +711,11 @@ class StatRepository extends CommonRepository
         if(!$results){
             $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
             $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
-            $query->select('email_id')
+            $query->select('s.email_id')
                 ->where('s.email_address = :email')
-                ->andWhere('(s.date_sent  < :time')
+                ->andWhere('s.date_sent  < :time')
                 ->setParameter(':email', $emailId)
+                ->setParameter(':time', $time)
                 ->orderBy('s.id','Desc');
 
             $results = $query->execute()->fetch();
