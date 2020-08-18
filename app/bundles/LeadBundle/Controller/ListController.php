@@ -127,16 +127,16 @@ class ListController extends FormController
         $leadCounts = (!empty($listIds)) ? $model->getRepository()->getLeadCount($listIds) : [];
 
         $parameters = [
-            'items'                         => $items,
-            'leadCounts'                    => $leadCounts,
-            'page'                          => $page,
-            'limit'                         => $limit,
-            'permissions'                   => $permissions,
-            'security'                      => $this->get('mautic.security'),
-            'tmpl'                          => $tmpl,
-            'currentUser'                   => $this->user,
-            'searchValue'                   => $search,
-            'segmentRebuildWarningThreshold'=> $this->coreParametersHelper->get('segment_rebuild_time_warning'),
+            'items'                          => $items,
+            'leadCounts'                     => $leadCounts,
+            'page'                           => $page,
+            'limit'                          => $limit,
+            'permissions'                    => $permissions,
+            'security'                       => $this->get('mautic.security'),
+            'tmpl'                           => $tmpl,
+            'currentUser'                    => $this->user,
+            'searchValue'                    => $search,
+            'segmentRebuildWarningThreshold' => $this->coreParametersHelper->get('segment_rebuild_time_warning'),
         ];
 
         return $this->delegateView(
