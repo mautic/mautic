@@ -29,7 +29,7 @@ class RedisTagAwareAdapter extends TagAwareAdapter
 
         parent::__construct(
             new RedisAdapter($client, $namespace, $lifetime),
-            new RedisAdapter($client, $namespace.'-tags', $lifetime)
+            new RedisAdapter($client, $namespace.'.tags.', $lifetime)
         );
     }
 }
