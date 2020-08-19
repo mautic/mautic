@@ -71,7 +71,7 @@ return [
 
     'parameters' => [
         'cache_adapter'           => 'mautic.cache.adapter.filesystem',
-        'cache_prefix'            => getenv('DB_NAME') ?: '%mautic.db_name%',
+        'cache_prefix'            => '',
         'cache_lifetime'          => 86400,
         'cache_adapter_memcached' => [
             'servers' => ['memcached://localhost'],
