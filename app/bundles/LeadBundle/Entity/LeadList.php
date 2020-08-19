@@ -93,7 +93,7 @@ class LeadList extends FormEntity
 
         $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(LeadListRepository::class)
-            ->addLifecycleEvent('updateLastBuiltDate', 'prePersist');
+            ->addLifecycleEvent('initializeLastBuiltDate', 'prePersist');
 
         $builder->addIdColumns();
 
@@ -406,5 +406,14 @@ class LeadList extends FormEntity
     {
         $now = (new DateTimeHelper())->getUtcDateTime();
         $this->setLastBuiltDate($now);
+    }
+
+    public function initializeLastBuiltDate()
+    {
+        if ($this->getLastBuiltDate() instanceof \DateTime) {
+            return;
+        }
+
+        $this->updateLastBuiltDate();
     }
 }
