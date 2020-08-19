@@ -6,11 +6,11 @@ use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 
-class LeadListModelTest extends \PHPUnit_Framework_TestCase
+class LeadListModelTest extends \PHPUnit\Framework\TestCase
 {
     protected $fixture;
 
-    public function setUp()
+    protected function setUp()
     {
         $mockListModel = $this->getMockBuilder(ListModel::class)
             ->disableOriginalConstructor()

@@ -10,7 +10,7 @@
  */
 ?>
 
-<div class="tab-pane dynamic-content bdr-w-0<?php echo $form->vars['name'] === '0' ? ' active' : ' fade'; ?>" id="<?php echo $form->vars['id'] ?>">
+<div class="tab-pane dynamic-content bdr-w-0<?php echo '0' === $form->vars['name'] ? ' active' : ' fade'; ?>" id="<?php echo $form->vars['id']; ?>">
     <div class="panel">
         <?php
         $tabHtml = '<ul class="bg-auto nav nav-tabs pr-md pl-md" id="dynamicContentFilterTabs_'.$form->vars['name'].'">';
@@ -29,7 +29,7 @@
         $tabContentHtml .= '</div>';
 
         foreach ($form['filters'] as $i => $filter) {
-            $isFirst = $i === 0 ? ' active' : '';
+            $isFirst = 0 === $i ? ' active' : '';
             $tabHtml .= '<li><a role="tab" data-toggle="tab" href="#'.$filter->vars['id'].'">'.$view['translator']->trans('mautic.core.dynamicContent.tab').' '.($i + 1).'</a></li>';
 
             $tabContentHtml .= $view['form']->widget($filter);

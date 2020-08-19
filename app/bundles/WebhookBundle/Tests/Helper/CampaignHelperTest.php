@@ -17,7 +17,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
 
-class CampaignHelperTest extends \PHPUnit_Framework_TestCase
+class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 {
     private $contact;
     private $connector;

@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekNext;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
-class DateWeekNextTest extends \PHPUnit_Framework_TestCase
+class DateWeekNextTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast::getOperator

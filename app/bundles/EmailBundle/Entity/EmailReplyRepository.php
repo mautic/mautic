@@ -60,4 +60,9 @@ final class EmailReplyRepository extends EntityRepository implements EmailReplyR
             ['date_replied']
         );
     }
+
+    private function getTableAlias(): string
+    {
+        return 'reply';
+    }
 }

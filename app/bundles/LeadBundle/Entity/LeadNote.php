@@ -48,9 +48,6 @@ class LeadNote extends FormEntity
      */
     private $dateTime;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -157,8 +154,6 @@ class LeadNote extends FormEntity
 
     /**
      * Form validation rules.
-     *
-     * @param ClassMetadata $metadata
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
@@ -175,9 +170,6 @@ class LeadNote extends FormEntity
         return $this->lead;
     }
 
-    /**
-     * @param Lead $lead
-     */
     public function setLead(Lead $lead)
     {
         $this->lead = $lead;

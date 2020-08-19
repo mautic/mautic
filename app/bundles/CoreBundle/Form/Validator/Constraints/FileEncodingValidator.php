@@ -21,8 +21,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 class FileEncodingValidator extends ConstraintValidator
 {
     /**
-     * @param LeadField  $field
-     * @param Constraint $constraint
+     * @param LeadField $field
      */
     public function validate($field, Constraint $constraint)
     {

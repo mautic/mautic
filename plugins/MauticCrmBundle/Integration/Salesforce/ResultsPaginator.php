@@ -37,12 +37,12 @@ class ResultsPaginator
     private $recordCount = 0;
 
     /**
-     * @var
+     * @var int
      */
     private $retryCount = 0;
 
     /**
-     * @var
+     * @var string|null
      */
     private $nextRecordsUrl;
 
@@ -52,10 +52,7 @@ class ResultsPaginator
     private $salesforceBaseUrl;
 
     /**
-     * ResultsPaginator constructor.
-     *
-     * @param LoggerInterface $logger
-     * @param string          $salesforceBaseUrl
+     * @param string $salesforceBaseUrl
      */
     public function __construct(LoggerInterface $logger, $salesforceBaseUrl)
     {
@@ -64,8 +61,6 @@ class ResultsPaginator
     }
 
     /**
-     * @param array $results
-     *
      * @return $this
      *
      * @throws ApiErrorException
@@ -94,7 +89,7 @@ class ResultsPaginator
             $this->retryCount     = 0;
             $this->nextRecordsUrl = $this->results['nextRecordsUrl'];
 
-            if (strpos($this->nextRecordsUrl, $this->salesforceBaseUrl) === false) {
+            if (false === strpos($this->nextRecordsUrl, $this->salesforceBaseUrl)) {
                 $this->nextRecordsUrl = $this->salesforceBaseUrl.$this->nextRecordsUrl;
             }
 

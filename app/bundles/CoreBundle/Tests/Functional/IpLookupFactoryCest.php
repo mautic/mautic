@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\CoreBundle;
+namespace Mautic\CoreBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Factory\IpLookupFactory;
 

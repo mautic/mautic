@@ -34,9 +34,6 @@ class DecisionDispatcher
 
     /**
      * DecisionDispatcher constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
-     * @param LegacyEventDispatcher    $legacyDispatcher
      */
     public function __construct(
         EventDispatcherInterface $dispatcher,
@@ -47,9 +44,7 @@ class DecisionDispatcher
     }
 
     /**
-     * @param DecisionAccessor $config
-     * @param LeadEventLog     $log
-     * @param mixed            $passthrough
+     * @param mixed $passthrough
      *
      * @return DecisionEvent
      */
@@ -62,9 +57,6 @@ class DecisionDispatcher
     }
 
     /**
-     * @param DecisionAccessor $config
-     * @param LeadEventLog     $log
-     *
      * @return DecisionEvent
      */
     public function dispatchEvaluationEvent(DecisionAccessor $config, LeadEventLog $log)
@@ -77,11 +69,6 @@ class DecisionDispatcher
         return $event;
     }
 
-    /**
-     * @param DecisionAccessor  $config
-     * @param ArrayCollection   $logs
-     * @param EvaluatedContacts $evaluatedContacts
-     */
     public function dispatchDecisionResultsEvent(DecisionAccessor $config, ArrayCollection $logs, EvaluatedContacts $evaluatedContacts)
     {
         if (!$logs->count()) {

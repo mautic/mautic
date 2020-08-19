@@ -19,7 +19,7 @@ use Mautic\ReportBundle\Model\ScheduleModel;
 use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 
-class ScheduleModelTest extends \PHPUnit_Framework_TestCase
+class ScheduleModelTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetScheduledReportsForExport()
     {

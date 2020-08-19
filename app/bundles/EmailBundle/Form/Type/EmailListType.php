@@ -16,9 +16,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class EmailListType.
- */
 class EmailListType extends AbstractType
 {
     /**
@@ -28,7 +25,6 @@ class EmailListType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'multiple'    => true,
                 'required'    => false,
                 'modal_route' => 'mautic_email_action',
                 // Email form UI too complicated for a modal so force a popup
@@ -72,7 +68,7 @@ class EmailListType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'email_list';
     }

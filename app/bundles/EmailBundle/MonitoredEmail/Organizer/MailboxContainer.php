@@ -37,8 +37,6 @@ class MailboxContainer
 
     /**
      * MailboxAccessor constructor.
-     *
-     * @param ConfigAccessor $config
      */
     public function __construct(ConfigAccessor $config)
     {

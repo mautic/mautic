@@ -9,14 +9,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\IpLookup;
+namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
 use Mautic\CoreBundle\IpLookup\MaxmindDownloadLookup;
 
-/**
- * Class MaxmindDownloadTest.
- */
-class MaxmindDownloadLookupTest extends \PHPUnit_Framework_TestCase
+class MaxmindDownloadLookupTest extends \PHPUnit\Framework\TestCase
 {
     public function testDownloadDataStore()
     {

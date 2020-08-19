@@ -11,18 +11,16 @@
 
 namespace Mautic\FormBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ReportSubscriber.
- */
-class ReportSubscriber extends CommonSubscriber
+class ReportSubscriber implements EventSubscriberInterface
 {
     const CONTEXT_FORMS           = 'forms';
     const CONTEXT_FORM_SUBMISSION = 'form.submissions';
@@ -32,9 +30,15 @@ class ReportSubscriber extends CommonSubscriber
      */
     private $companyReportData;
 
-    public function __construct(CompanyReportData $companyReportData)
+    /**
+     * @var SubmissionRepository
+     */
+    private $submissionRepository;
+
+    public function __construct(CompanyReportData $companyReportData, SubmissionRepository $submissionRepository)
     {
-        $this->companyReportData = $companyReportData;
+        $this->companyReportData    = $companyReportData;
+        $this->submissionRepository = $submissionRepository;
     }
 
     /**
@@ -51,8 +55,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Add available tables and columns to the report builder lookup.
-     *
-     * @param ReportBuilderEvent $event
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
@@ -131,8 +133,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGeneratorEvent $event
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
@@ -171,8 +171,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGraphEvent $event
      */
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
@@ -181,9 +179,8 @@ class ReportSubscriber extends CommonSubscriber
             return;
         }
 
-        $graphs         = $event->getRequestedGraphs();
-        $qb             = $event->getQueryBuilder();
-        $submissionRepo = $this->em->getRepository('MauticFormBundle:Submission');
+        $graphs = $event->getRequestedGraphs();
+        $qb     = $event->getQueryBuilder();
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
@@ -202,12 +199,11 @@ class ReportSubscriber extends CommonSubscriber
 
                     $event->setGraph($g, $data);
                     break;
-                    break;
 
                 case 'mautic.form.table.top.referrers':
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $submissionRepo->getTopReferrers($queryBuilder, $limit, $offset);
+                    $items                  = $this->submissionRepository->getTopReferrers($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -219,7 +215,7 @@ class ReportSubscriber extends CommonSubscriber
                 case 'mautic.form.table.most.submitted':
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $submissionRepo->getMostSubmitted($queryBuilder, $limit, $offset);
+                    $items                  = $this->submissionRepository->getMostSubmitted($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;

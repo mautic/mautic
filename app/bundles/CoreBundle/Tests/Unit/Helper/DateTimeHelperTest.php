@@ -9,14 +9,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Helper;
+namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
-/**
- * Class DateTimeHelper test.
- */
-class DateTimeHelperTest extends \PHPUnit_Framework_TestCase
+class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox The guessTimezoneFromOffset returns correct values
@@ -38,7 +35,7 @@ class DateTimeHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildIntervalWithBadUnit()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $helper = new DateTimeHelper();
         $helper->buildInterval(4, 'j');
     }
@@ -71,5 +68,7 @@ class DateTimeHelperTest extends \PHPUnit_Framework_TestCase
         DateTimeHelper::validateMysqlDateTimeUnit('W');
         DateTimeHelper::validateMysqlDateTimeUnit('m');
         DateTimeHelper::validateMysqlDateTimeUnit('Y');
+
+        $this->assertTrue(true, 'Just to avoid the risky test warning...');
     }
 }

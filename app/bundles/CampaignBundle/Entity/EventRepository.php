@@ -11,15 +11,12 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
-/**
- * EventRepository.
- */
-class EventRepository extends LegacyEventRepository
+use Mautic\CoreBundle\Entity\CommonRepository;
+
+class EventRepository extends CommonRepository
 {
     /**
      * Get a list of entities.
-     *
-     * @param array $args
      *
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
@@ -199,9 +196,7 @@ class EventRepository extends LegacyEventRepository
             );
         }
 
-        $events = $q->getQuery()->getArrayResult();
-
-        return $events;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**
@@ -288,9 +283,35 @@ class EventRepository extends LegacyEventRepository
 
         $q->where($expr);
 
-        $results = $q->getQuery()->getResult();
+        return $q->getQuery()->getResult();
+    }
 
-        return $results;
+    /**
+     * Get an array of events that have been triggered by this lead.
+     *
+     * @param $leadId
+     *
+     * @return array
+     */
+    public function getLeadTriggeredEvents($leadId)
+    {
+        $q = $this->getEntityManager()->createQueryBuilder()
+            ->select('e, c, l')
+            ->from('MauticCampaignBundle:Event', 'e')
+            ->join('e.campaign', 'c')
+            ->join('e.log', 'l');
+
+        //make sure the published up and down dates are good
+        $q->where($q->expr()->eq('IDENTITY(l.lead)', (int) $leadId));
+
+        $results = $q->getQuery()->getArrayResult();
+
+        $return = [];
+        foreach ($results as $r) {
+            $return[$r['id']] = $r;
+        }
+
+        return $return;
     }
 
     /**

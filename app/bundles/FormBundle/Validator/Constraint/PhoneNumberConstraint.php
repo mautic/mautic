@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class PhoneNumberConstraint extends Constraint
 {
-    public $message       = null;
+    public $message;
 
     public function getMessage()
     {

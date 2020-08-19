@@ -58,11 +58,6 @@ class EntityLookupType extends AbstractType
 
     /**
      * EntityLookupType constructor.
-     *
-     * @param ModelFactory        $modelFactory
-     * @param TranslatorInterface $translator
-     * @param Connection          $connection
-     * @param Router              $router
      */
     public function __construct(ModelFactory $modelFactory, TranslatorInterface $translator, Connection $connection, Router $router)
     {
@@ -72,10 +67,6 @@ class EntityLookupType extends AbstractType
         $this->modelFactory = $modelFactory;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Let the form builder notify us about initial/submitted choices
@@ -128,7 +119,7 @@ class EntityLookupType extends AbstractType
                 'expanded'                  => false,
                 'multiple'                  => false,
                 'required'                  => false,
-                'empty_value'               => '',
+                'placeholder'               => '',
             ]
         );
     }
@@ -141,11 +132,6 @@ class EntityLookupType extends AbstractType
         return ChoiceType::class;
     }
 
-    /**
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $attr =

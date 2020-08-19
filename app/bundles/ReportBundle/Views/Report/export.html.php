@@ -8,16 +8,19 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+use Mautic\ReportBundle\Crate\ReportDataResult;
+
 $view->extend('MauticCoreBundle:Default:slim.html.php');
 $view['slots']->set('pageTitle', $pageTitle);
 $view['slots']->set('headerTitle', $report->getName());
 $view['slots']->set('mauticContent', 'report');
 
-$showGraphsAboveTable = (!empty($report->getSettings()['showGraphsAboveTable']) === true);
+$showGraphsAboveTable = (true === !empty($report->getSettings()['showGraphsAboveTable']));
 $dataCount            = count($data);
 $columnOrder          = $report->getColumns();
 $graphOrder           = $report->getGraphs();
-$startCount           = 1;
+$reportDataResult     = new ReportDataResult($reportData);
 ?>
 <style>
     #app-content.content-only.container {
@@ -39,42 +42,43 @@ $startCount           = 1;
             'graphOrder' => $graphOrder,
             'graphs'     => $graphs,
             'report'     => $report,
-        ]);
+        ]
+    );
     ?>
 <?php endif; ?>
 
 
-<?php if (!empty($columnOrder)):?>
-<table class="table table-hover table-striped table-bordered report-list" id="reportTable">
-    <thead>
-    <tr>
-        <th class="col-report-count"></th>
-        <?php foreach ($columnOrder as $key): ?>
-            <th class="col-report-<?php echo $columns[$key]['type']; ?>"><?php echo $columns[$key]['label']; ?></th>
-        <?php endforeach; ?>
-    </tr>
-    </thead>
-    <tbody>
-    <?php if ($dataCount): ?>
-        <?php foreach ($data as $row): ?>
-            <tr>
-                <td><?php echo $startCount; ?></td>
-                <?php foreach ($columnOrder as $key): ?>
-                    <td><?php echo $view['formatter']->_($row[$columns[$key]['alias']], $columns[$key]['type']); ?></td>
-                <?php endforeach; ?>
-            </tr>
-            <?php ++$startCount; ?>
-        <?php endforeach; ?>
-    <?php else: ?>
+<?php if (!empty($columnOrder)): ?>
+    <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
+        <thead>
         <tr>
-            <td>&nbsp;</td>
-            <?php foreach ($columnOrder as $key): ?>
-                <td>&nbsp;</td>
+            <th class="col-report-count"></th>
+
+            <?php foreach ($reportDataResult->getHeaders() as $header):?>
+                <th><?php echo $header; ?></th>
             <?php endforeach; ?>
         </tr>
-    <?php endif; ?>
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+        <?php if ($dataCount): ?>
+            <?php foreach ($reportDataResult->getData() as $count => $data):?>
+                <tr>
+                    <td><?php echo $count + 1; ?></td>
+                    <?php foreach ($data as $k => $v): ?>
+                        <td><?php echo $view['formatter']->_($v, $reportDataResult->getType($k)); ?></td>
+                    <?php endforeach; ?>
+                </tr>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr>
+                <td>&nbsp;</td>
+                <?php foreach ($columnOrder as $key): ?>
+                    <td>&nbsp;</td>
+                <?php endforeach; ?>
+            </tr>
+        <?php endif; ?>
+        </tbody>
+    </table>
 <?php endif; ?>
 
 <?php if (empty($showGraphsAboveTable)): ?>
@@ -84,6 +88,7 @@ $startCount           = 1;
             'graphOrder' => $graphOrder,
             'graphs'     => $graphs,
             'report'     => $report,
-        ]);
+        ]
+    );
     ?>
 <?php endif; ?>
