@@ -77,7 +77,7 @@ class CardController extends AbstractFormController
      *
      * @return JsonResponse|RedirectResponse
      */
-    public function addAction(): JsonResponse
+    public function addAction()
     {
         $this->logger     = $this->get('monolog.logger.mautic');
         $this->apiService = $this->get('mautic.trello.service.trello_api');
@@ -91,9 +91,9 @@ class CardController extends AbstractFormController
         }
 
         // returns the Contact or an error Response to show to the user
-        $contact = $this->checkLeadAccess($contactId, 'view');
-        if ($contact instanceof Response) {
-            return $contact;
+        $response = $this->checkLeadAccess($contactId, 'view');
+        if ($response instanceof RedirectResponse) {
+            return $response;
         }
 
         // Check for a submitted form and process it
