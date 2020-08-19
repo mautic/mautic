@@ -51,7 +51,7 @@ class ConfigType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $leadFields = $this->fieldModel->getFieldList(false, false);
+        $this->fieldModel->getFieldList(false, false);
 
         $builder->add(
             'favorite_board',
@@ -75,8 +75,6 @@ class ConfigType extends AbstractType
 
     /**
      * Get all Trello boards.
-     *
-     * @return array
      */
     protected function getBoards(): array
     {
