@@ -195,11 +195,8 @@ class TrelloApiService
             return $card;
         } catch (InvalidArgumentException $e) {
             $this->logger->warning($e->getMessage(), $e->getTrace());
-            $error = new Error();
-            $error->setCode('InvalidArgument');
-            $error->setMessage($e->getMessage());
 
-            return new Exception($error);
+            return new Exception('InvalidArgument: '.$e->getMessage());
         } catch (Exception $e) {
             $this->logger->error($e->getMessage(), $e->getTrace());
 

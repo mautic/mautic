@@ -92,7 +92,7 @@ class TrelloIntegration extends AbstractIntegration
      *
      * @todo  parent::getFormNotes should have the documented return type array
      *
-     * @return array\string
+     * @return array|string
      */
     public function getFormNotes($section): array
     {
