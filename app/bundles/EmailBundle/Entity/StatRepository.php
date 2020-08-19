@@ -695,6 +695,7 @@ class StatRepository extends CommonRepository
     /**
      * @param $emailId
      * @param $time
+     *
      * @return mixed
      */
     public function getChannelDetails($emailId, $time)
@@ -716,7 +717,7 @@ class StatRepository extends CommonRepository
                 ->andWhere('s.date_sent  < :time')
                 ->setParameter(':email', $emailId)
                 ->setParameter(':time', $time)
-                ->orderBy('s.id','Desc');
+                ->orderBy('s.id', 'Desc');
 
             $results = $query->execute()->fetch();
         }
