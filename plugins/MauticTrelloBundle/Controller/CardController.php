@@ -22,8 +22,8 @@ use MauticPlugin\MauticTrelloBundle\Openapi\lib\Model\NewCard;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Setup a a form and send it to Trello to create a new card.
@@ -196,9 +196,7 @@ class CardController extends AbstractFormController
     /**
      * Build the form.
      *
-     * @param  integer $contactId
-     *
-     * @return FormInterface
+     * @param int $contactId
      */
     protected function getForm(int $contactId = null): FormInterface
     {
