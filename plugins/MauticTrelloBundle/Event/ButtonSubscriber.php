@@ -4,17 +4,19 @@
 
 namespace MauticPlugin\MauticTrelloBundle\Event;
 
+use Exception;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use MauticPlugin\MauticTrelloBundle\Integration\TrelloIntegration;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+
 /**
  * Add a Trello button.
  */
@@ -33,24 +35,23 @@ class ButtonSubscriber implements EventSubscriberInterface
     private $translator;
 
     /**
-     * @var TrelloIntegration|AbstractIntegration
+     * @var TrelloIntegration
      */
     private $integration;
 
     /**
-     * Set up Button Subscriper class
-     *
-     * @param RouterInterface     $router
-     * @param TranslatorInterface $translator
-     * @param RequestStack        $requestStack
-     * @param IntegrationHelper   $integrationHelper
+     * Set up Button Subscriper class.
      */
     public function __construct(RouterInterface $router, TranslatorInterface $translator, RequestStack $requestStack, IntegrationHelper $integrationHelper)
     {
         $this->router       = $router;
         $this->translator   = $translator;
         $this->requestStack = $requestStack;
-        $this->integration  = $integrationHelper->getIntegrationObject('Trello');
+        $integration        = $integrationHelper->getIntegrationObject('Trello');
+        if (!$integration instanceof TrelloIntegration) {
+            throw new Exception('No TrelloIntegration instance provided');
+        }
+        $this->integration = $integration;
     }
 
     /**

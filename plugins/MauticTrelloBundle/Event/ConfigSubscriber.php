@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticTrelloBundle\Event;
 
+use Exception;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
@@ -15,7 +16,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ConfigSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var TrelloIntegration|AbstractIntegration
+     * @var TrelloIntegration|AbstractIntegration|bool
      */
     protected $integration;
 
@@ -29,8 +30,12 @@ class ConfigSubscriber implements EventSubscriberInterface
      */
     public function __construct(IntegrationHelper $integrationHelper, Logger $logger)
     {
-        $this->integration = $integrationHelper->getIntegrationObject('Trello');
         $this->logger      = $logger;
+        $integration       = $integrationHelper->getIntegrationObject('Trello');
+        if (!$integration instanceof TrelloIntegration) {
+            throw new Exception('No TrelloIntegration instance provided');
+        }
+        $this->integration = $integration;
     }
 
     /**
@@ -44,7 +49,10 @@ class ConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onConfigGenerate(ConfigBuilderEvent $event)
+    /**
+     * setup the configuration for Trello.
+     */
+    public function onConfigGenerate(ConfigBuilderEvent $event): bool
     {
         if (!$this->integration->isPublished()) {
             return false;
@@ -58,6 +66,8 @@ class ConfigSubscriber implements EventSubscriberInterface
                 'parameters' => $event->getParametersFromConfig('MauticTrelloBundle'),
             ]
         );
+
+        return true;
     }
 
     /**
