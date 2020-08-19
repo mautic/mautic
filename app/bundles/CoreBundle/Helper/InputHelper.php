@@ -437,7 +437,13 @@ class InputHelper
             // Special handling for HTML comments
             $value = str_replace(['<!-->', '<!--', '-->'], ['<mcomment></mcomment>', '<mcomment>', '</mcomment>'], $value, $commentCount);
 
+            // Encode the incoming value before cleaning, it convert unicode to encoded strings
+            $value = rawurlencode($value);
+
             $value = self::getFilter(true)->clean($value, 'html');
+
+            // After cleaning encode the value
+            $value = rawurldecode($value);
 
             // Was a doctype found?
             if ($doctypeFound) {
