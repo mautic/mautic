@@ -425,24 +425,24 @@ class PublicController extends CommonFormController
 
         $payload = $this->request->request->all();
 
-        if($payload){
-            $newPayload = [];
+        if (!empty($payload)) {
+            $newPayload        = [];
             $updateRequestFlag = false;
             foreach ($payload as $key => $item) {
                 $newPayload[$key] = $item;
-                if (isset($item['email']) && isset($item['timestamp']) && in_array($item['event'],['dropped','bounce'])) {
+                if (isset($item['email']) && isset($item['timestamp']) && in_array($item['event'], ['dropped', 'bounce'])) {
                     $channelId = null;
-                    $time = date('Y-m-d H:i:s', $item['timestamp']);
-                    $model = $this->get('mautic.email.model.email');
-                    $stat = $model->getStatRepository()->getChannelDetails($item['email'], $time);
+                    $time      = date('Y-m-d H:i:s', $item['timestamp']);
+                    $model     = $this->get('mautic.email.model.email');
+                    $stat      = $model->getStatRepository()->getChannelDetails($item['email'], $time);
                     if ($stat && isset($stat['email_id'])) {
                         $channelId = $stat['email_id'];
                     }
                     $newPayload[$key]['channel'] = $channelId;
-                    $updateRequestFlag = true;
+                    $updateRequestFlag           = true;
                 }
             }
-            if($updateRequestFlag){
+            if ($updateRequestFlag) {
                 $this->request = new Request($_GET, $newPayload, $this->request->attributes->all(), $_COOKIE, $_FILES, $_SERVER);
             }
         }

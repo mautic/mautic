@@ -43,9 +43,9 @@ class ResponseItem
         if (empty($item['email'])) {
             throw new ResponseItemException();
         }
-        $this->email     = $item['email'];
-        $this->reason    = !empty($item['reason']) ? $item['reason'] : null;
-        $this->dncReason = CallbackEnum::convertEventToDncReason($item['event']);
+        $this->email      = $item['email'];
+        $this->reason     = !empty($item['reason']) ? $item['reason'] : null;
+        $this->dncReason  = CallbackEnum::convertEventToDncReason($item['event']);
         $this->channel    = isset($item['channel']) ? $item['channel'] : null;
     }
 
@@ -72,12 +72,12 @@ class ResponseItem
     {
         return $this->dncReason;
     }
-    
+
     /**
-     * @return mixed|null|string
+     *  @return mixed|string|null
      */
     public function getChannel()
     {
-        return  $this->channel;
+        return $this->channel;
     }
 }
