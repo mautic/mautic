@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\Query\Expr;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -579,5 +580,47 @@ class CampaignRepository extends CommonRepository
         }
 
         return $q->execute()->fetchAll();
+    }
+
+    /**
+     * Searches for emails assigned to campaign and returns associative array of email ids in format:.
+     *
+     *  array (size=1)
+     *      0 =>
+     *          array (size=2)
+     *              'channelId' => int 18
+     *
+     * or empty array if nothing found.
+     *
+     * @param int $id
+     *
+     * @return array
+     */
+    public function fetchEmailIdsById($id)
+    {
+        $emails = $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select('e.channelId')
+            ->from('MauticCampaignBundle:Campaign', $this->getTableAlias(), $this->getTableAlias().'.id')
+            ->leftJoin(
+                $this->getTableAlias().'.events',
+                'e',
+                Expr\Join::WITH,
+                "e.channel = '".Event::CHANNEL_EMAIL."'"
+            )
+            ->where($this->getTableAlias().'.id = :id')
+            ->setParameter('id', $id)
+            ->andWhere('e.channelId IS NOT NULL')
+            ->getQuery()
+            ->setHydrationMode(\Doctrine\ORM\Query::HYDRATE_ARRAY)
+            ->getResult();
+
+        $return = [];
+        foreach ($emails as $email) {
+            // Every channelId represents e-mail ID
+            $return[] = $email['channelId']; // mautic_campaign_events.channel_id
+        }
+
+        return $return;
     }
 }
