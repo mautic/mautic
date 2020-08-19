@@ -18,6 +18,7 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Form\Validator\Constraints\SegmentInUse;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -91,7 +92,8 @@ class LeadList extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(LeadListRepository::class);
+            ->setCustomRepositoryClass(LeadListRepository::class)
+            ->addLifecycleEvent('updateLastBuiltDate', 'prePersist');
 
         $builder->addIdColumns();
 
@@ -398,5 +400,11 @@ class LeadList extends FormEntity
     public function setLastBuiltDate(?\DateTime $lastBuiltDate): void
     {
         $this->lastBuiltDate = $lastBuiltDate;
+    }
+
+    public function updateLastBuiltDate(): void
+    {
+        $now = (new DateTimeHelper())->getUtcDateTime();
+        $this->setLastBuiltDate($now);
     }
 }

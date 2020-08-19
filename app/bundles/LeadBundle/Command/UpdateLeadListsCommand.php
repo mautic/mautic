@@ -12,8 +12,6 @@
 namespace Mautic\LeadBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -93,7 +91,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
                         $processed = $listModel->rebuildListLeads($list, $batch, $max, $output);
                         if (0 >= $max) {
                             // Only full segment rebuilds count
-                            $this->updateLastBuiltDate($list);
+                            $list->updateLastBuiltDate();
                             $listModel->saveEntity($list);
                         }
                     } catch (QueryException $e) {
@@ -151,11 +149,5 @@ class UpdateLeadListsCommand extends ModeratedCommand
         }
 
         return 0;
-    }
-
-    private function updateLastBuiltDate(LeadList $leadList): void
-    {
-        $now = (new DateTimeHelper())->getUtcDateTime();
-        $leadList->setLastBuiltDate($now);
     }
 }
