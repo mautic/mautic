@@ -78,6 +78,8 @@ class ConfigType extends AbstractType
      */
     protected function getBoards(): array
     {
-        return array_flip($this->apiService->getBoardsArray());
+        $boards = array_flip($this->apiService->getBoardsArray());
+
+        return null !== $boards ? $boards : [];
     }
 }
