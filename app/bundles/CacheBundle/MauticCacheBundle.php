@@ -11,17 +11,8 @@
 
 namespace Mautic\CacheBundle;
 
-use Mautic\CacheBundle\DependencyInjection\Compiler\AppCachePass;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class MauticCacheBundle extends Bundle
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function build(ContainerBuilder $container)
-    {
-        $container->addCompilerPass(new AppCachePass());
-    }
 }

@@ -15,7 +15,7 @@ use Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter;
 use Mautic\CacheBundle\EventListener\CacheClearSubscriber;
 use Monolog\Logger;
 
-class CacheClearSubscriberTest extends \PHPUnit_Framework_TestCase
+class CacheClearSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var FilesystemTagAwareAdapter

@@ -25,7 +25,6 @@ class CacheClearSubscriber implements CacheClearerInterface
      * @var CacheProvider
      */
     private $cacheProvider;
-
     /**
      * @var LoggerInterface
      */
@@ -51,9 +50,12 @@ class CacheClearSubscriber implements CacheClearerInterface
             $adapter = 'unknown';
         }
 
-        if (!$this->cacheProvider->clear()) {
-            $this->logger->emergency('Failed to clear Mautic cache.', ['adapter' => $adapter]);
-            throw new \Exception('Failed to clear '.$adapter);
+        try {
+            if (!$this->cacheProvider->clear()) {
+                $this->logger->emergency('Failed to clear Mautic cache.', ['adapter' => $adapter]);
+                throw new \Exception('Failed to clear '.$adapter);
+            }
+        } catch (\PDOException $e) {
         }
     }
 }

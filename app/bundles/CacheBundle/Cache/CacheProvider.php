@@ -11,12 +11,14 @@
 
 namespace Mautic\CacheBundle\Cache;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Psr\Cache\CacheItemInterface;
-use Psr\Cache\InvalidArgumentException;
+use Psr\Cache\InvalidArgumentException as Psr6CacheInterface;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\Cache\CacheItem;
-use Symfony\Component\Cache\PruneableInterface;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Simple\Psr6Cache;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class CacheProvider provides caching mechanism using adapters, it provides both PSR-6 and PSR-16.
@@ -24,36 +26,42 @@ use Symfony\Component\Cache\Simple\Psr6Cache;
 final class CacheProvider implements CacheProviderInterface
 {
     /**
-     * @var TagAwareAdapterInterface
-     */
-    private $adapter;
-
-    /**
      * @var Psr6Cache
      */
     private $psr16;
 
-    public function setCacheAdapter(TagAwareAdapterInterface $adapter)
-    {
-        $this->adapter = $adapter;
+    /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
 
-        if ($this->adapter instanceof PruneableInterface) {
-            $this->adapter->prune();
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    public function __construct(CoreParametersHelper $coreParametersHelper, ContainerInterface $container)
+    {
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->container            = $container;
+    }
+
+    public function getCacheAdapter(): TagAwareAdapterInterface
+    {
+        $selectedAdapter = $this->coreParametersHelper->get('cache_adapter');
+        if (!$selectedAdapter || !$this->container->has($selectedAdapter)) {
+            throw new InvalidArgumentException('Requested cache adapter "'.$selectedAdapter.'" is not available');
         }
+
+        $adaptor = $this->container->get($selectedAdapter);
+        if (!$adaptor instanceof TagAwareAdapterInterface) {
+            throw new InvalidArgumentException(sprintf('Requested cache adapter "%s" is not a %s', $selectedAdapter, TagAwareAdapterInterface::class));
+        }
+
+        return $adaptor;
     }
 
-    /**
-     * @return TagAwareAdapterInterface
-     */
-    public function getCacheAdapter()
-    {
-        return $this->adapter;
-    }
-
-    /**
-     * @return Psr6Cache
-     */
-    public function getSimpleCache()
+    public function getSimpleCache(): Psr6Cache
     {
         if (is_null($this->psr16)) {
             $this->psr16 = new Psr6Cache($this->getCacheAdapter());
@@ -63,13 +71,11 @@ final class CacheProvider implements CacheProviderInterface
     }
 
     /**
-     * @param $key
+     * @param string $key
      *
-     * @return CacheItem
-     *
-     * @throws InvalidArgumentException
+     * @throws Psr6CacheInterface
      */
-    public function getItem($key)
+    public function getItem($key): CacheItem
     {
         return $this->getCacheAdapter()->getItem($key);
     }
@@ -77,9 +83,9 @@ final class CacheProvider implements CacheProviderInterface
     /**
      * @return CacheItem[]|\Traversable
      *
-     * @throws InvalidArgumentException
+     * @throws Psr6CacheInterface
      */
-    public function getItems(array $keys = [])
+    public function getItems(array $keys = []): \Traversable
     {
         return $this->getCacheAdapter()->getItems($keys);
     }
@@ -87,24 +93,19 @@ final class CacheProvider implements CacheProviderInterface
     /**
      * @param string $key
      *
-     * @return bool
-     *
-     * @throws InvalidArgumentException
+     * @throws Psr6CacheInterface
      */
-    public function hasItem($key)
+    public function hasItem($key): bool
     {
         return $this->getCacheAdapter()->hasItem($key);
     }
 
-    /**
-     * @return bool
-     */
-    public function clear()
+    public function clear(): bool
     {
         return $this->getCacheAdapter()->clear();
     }
 
-    public function deleteItem($key)
+    public function deleteItem($key): bool
     {
         return $this->getCacheAdapter()->deleteItem($key);
     }
@@ -112,17 +113,14 @@ final class CacheProvider implements CacheProviderInterface
     /**
      * Removes multiple items from the pool.
      *
-     * @param string[] $keys
-     *                       An array of keys that should be removed from the pool
+     * @param string[] $keys An array of keys that should be removed from the pool
      *
-     * @throws invalidArgumentException
-     *                                  If any of the keys in $keys are not a legal value a \Psr\Cache\InvalidArgumentException
-     *                                  MUST be thrown
+     * @return bool True if the items were successfully removed. False if there was an error.
      *
-     * @return bool
-     *              True if the items were successfully removed. False if there was an error.
+     * @throws Psr6CacheInterface If any of the keys in $keys are not a legal value a \Psr\Cache\InvalidArgumentException
+     *                            MUST be thrown
      */
-    public function deleteItems(array $keys)
+    public function deleteItems(array $keys): bool
     {
         return $this->getCacheAdapter()->deleteItems($keys);
     }
@@ -130,13 +128,11 @@ final class CacheProvider implements CacheProviderInterface
     /**
      * Persists a cache item immediately.
      *
-     * @param cacheItemInterface $item
-     *                                 The cache item to save
+     * @param cacheItemInterface $item The cache item to save
      *
-     * @return bool
-     *              True if the item was successfully persisted. False if there was an error.
+     * @return bool True if the item was successfully persisted. False if there was an error.
      */
-    public function save(CacheItemInterface $item)
+    public function save(CacheItemInterface $item): bool
     {
         return $this->getCacheAdapter()->save($item);
     }
@@ -144,13 +140,11 @@ final class CacheProvider implements CacheProviderInterface
     /**
      * Sets a cache item to be persisted later.
      *
-     * @param cacheItemInterface $item
-     *                                 The cache item to save
+     * @param cacheItemInterface $item The cache item to save
      *
-     * @return bool
-     *              False if the item could not be queued or if a commit was attempted and failed. True otherwise.
+     * @return bool False if the item could not be queued or if a commit was attempted and failed. True otherwise.
      */
-    public function saveDeferred(CacheItemInterface $item)
+    public function saveDeferred(CacheItemInterface $item): bool
     {
         return $this->getCacheAdapter()->saveDeferred($item);
     }
@@ -158,10 +152,9 @@ final class CacheProvider implements CacheProviderInterface
     /**
      * Persists any deferred cache items.
      *
-     * @return bool
-     *              True if all not-yet-saved items were successfully saved or there were none. False otherwise.
+     * @return bool True if all not-yet-saved items were successfully saved or there were none. False otherwise.
      */
-    public function commit()
+    public function commit(): bool
     {
         return $this->getCacheAdapter()->commit();
     }
@@ -173,9 +166,9 @@ final class CacheProvider implements CacheProviderInterface
      *
      * @return bool True on success
      *
-     * @throws InvalidArgumentException When $tags is not valid
+     * @throws Psr6CacheInterface When $tags is not valid
      */
-    public function invalidateTags(array $tags)
+    public function invalidateTags(array $tags): bool
     {
         return $this->getCacheAdapter()->invalidateTags($tags);
     }
