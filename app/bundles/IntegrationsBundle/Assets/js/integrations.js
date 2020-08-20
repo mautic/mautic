@@ -1,19 +1,17 @@
 Mautic.integrationsConfigOnLoad = function () {
     mQuery('.integration-keyword-filter').each(function() {
-        mQuery(this).off("keydown.integration-filter").on("keydown.integration-filter", function (event) {
-            if (event.which == 13) {
-                var integration = mQuery(this).attr('data-integration');
-                var object = mQuery(this).attr('data-object');
-                Mautic.getPaginatedIntegrationFields(
-                    {
-                        'integration': integration,
-                        'object': object,
-                        'keyword': mQuery(this).val()
-                    },
-                    1,
-                    this
-                );
-            }
+        mQuery(this).off("keyup.integration-filter").on("keyup.integration-filter", function (event) {
+            var integration = mQuery(this).attr('data-integration');
+            var object = mQuery(this).attr('data-object');
+            Mautic.getPaginatedIntegrationFields(
+                {
+                    'integration': integration,
+                    'object': object,
+                    'keyword': mQuery(this).val()
+                },
+                1,
+                this
+            );
         });
     });
 
