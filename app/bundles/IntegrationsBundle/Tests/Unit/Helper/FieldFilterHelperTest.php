@@ -65,19 +65,19 @@ class FieldFilterHelperTest extends TestCase
     private function getIntegrationObject()
     {
         $field1 = $this->createMock(MappedFieldInfoInterface::class);
-        $field1->method('getName')
+        $field1->method('getLabel')
             ->willReturn('field one');
         $field2 = $this->createMock(MappedFieldInfoInterface::class);
-        $field2->method('getName')
+        $field2->method('getLabel')
             ->willReturn('field two');
         $field3 = $this->createMock(MappedFieldInfoInterface::class);
-        $field3->method('getName')
+        $field3->method('getLabel')
             ->willReturn('field three');
         $field4 = $this->createMock(MappedFieldInfoInterface::class);
-        $field4->method('getName')
+        $field4->method('getLabel')
             ->willReturn('field four');
         $field5 = $this->createMock(MappedFieldInfoInterface::class);
-        $field5->method('getName')
+        $field5->method('getLabel')
             ->willReturn('field five');
 
         $integrationObject = $this->createMock(ConfigFormSyncInterface::class);
