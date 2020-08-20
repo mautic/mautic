@@ -804,7 +804,7 @@ return [
                 ],
             ],
             'mautic.segment.config' => [
-                'class' => 'MauticPlugin\LeadBundle\Form\Type\ConfigType',
+                'class' => \Mautic\LeadBundle\Form\Type\SegmentConfigType::class,
             ],
         ],
         'other' => [
