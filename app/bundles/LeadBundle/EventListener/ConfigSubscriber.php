@@ -60,6 +60,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         ]);
 
         $event->addForm([
+            'bundle'     => 'LeadBundle',
             'formAlias'  => 'segment_config',
             'formType'   => SegmentConfigType::class,
             'formTheme'  => 'MauticLeadBundle:FormTheme\Config',
