@@ -171,7 +171,7 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                             <?php if ($lastBuiltDateDifference >= $segmentRebuildWarningThreshold): ?>
                                 <label class="control-label" data-toggle="tooltip"
                                        data-container="body" data-placement="top" title=""
-                                       data-original-title="<?php echo sprintf('This segment hasn\'t been rebuilt for %s hours.', $lastBuiltDateDifference); ?>">
+                                       data-original-title="<?php echo $view['translator']->transChoice('mautic.lead.list.form.config.segment_rebuild_time.message', $lastBuiltDateDifference, ['%hours%' => $lastBuiltDateDifference]); ?>">
                                     <i class="fa text-danger fa-exclamation-circle"></i></label>
                             <?php endif; ?>
                             <?php echo $view['content']->getCustomContent('segment.name', $mauticTemplateVars); ?>
