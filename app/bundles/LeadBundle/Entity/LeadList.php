@@ -408,7 +408,7 @@ class LeadList extends FormEntity
         $this->setLastBuiltDate($now);
     }
 
-    public function initializeLastBuiltDate()
+    public function initializeLastBuiltDate(): void
     {
         if ($this->getLastBuiltDate() instanceof \DateTime) {
             return;
