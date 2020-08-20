@@ -709,7 +709,7 @@ class StatRepository extends CommonRepository
             ->setParameter(':time', $time);
 
         $results = $query->execute()->fetch();
-        if(!$results){
+        if (!$results) {
             $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
             $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
             $query->select('s.email_id')
