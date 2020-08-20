@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -112,6 +113,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
                 ]
             );
 
+            /** @var LeadList $l */
             while (false !== ($l = $lists->next())) {
                 // Get first item; using reset as the key will be the ID and not 0
                 $l = reset($l);
@@ -123,7 +125,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
                     $processed                 = $listModel->rebuildListLeads($l, $batch, $max, $output);
                     if (0 >= $max) {
                         // Only full segment rebuilds count
-                        $this->updateLastBuiltDate($l);
+                        $l->updateLastBuiltDate();
                         $listModel->saveEntity($l);
                     }
                     $output->writeln(
