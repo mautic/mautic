@@ -77,7 +77,7 @@ class FieldFilterHelper
         $found = [];
 
         foreach ($fields as $name => $field) {
-            if (!stristr($field->getName(), $keyword)) {
+            if (!stristr($field->getLabel(), $keyword)) {
                 continue;
             }
 
