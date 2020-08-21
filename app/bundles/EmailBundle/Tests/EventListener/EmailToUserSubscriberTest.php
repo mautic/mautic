@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Test\EventListener;
+namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\EmailBundle\EventListener\EmailToUserSubscriber;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Event\TriggerExecutedEvent;
 
-class EmailToUserSubscriberTest extends \PHPUnit_Framework_TestCase
+class EmailToUserSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var array */
     private $config = [

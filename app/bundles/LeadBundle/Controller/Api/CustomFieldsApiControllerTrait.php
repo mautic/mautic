@@ -68,8 +68,50 @@ trait CustomFieldsApiControllerTrait
         if ($entity instanceof CustomFieldEntityInterface) {
             $fields        = $entity->getFields();
             $fields['all'] = $entity->getProfileFields();
+
+            // Temporary hack to address numbers being type casted to float which broke some API implementations because M2 used to return
+            // these as strings and values are normalized in a dozen differneet ways throughout LeadModel::setFieldValues methods and became
+            // too risky to hotfix
+            $fields = $this->fixNumbers($fields);
+
             $entity->setFields($fields);
         }
+    }
+
+    private function fixNumbers(array $fields): array
+    {
+        $numberFields = [];
+        foreach ($fields as $group => $groupFields) {
+            if ('all' === $group) {
+                continue;
+            }
+
+            foreach ($groupFields as $field => $fieldDefinition) {
+                if ('points' === $field) {
+                    // Points were always a number in M2
+                    $numberFields[$field] = (int) $fields[$group][$field]['value'];
+                }
+
+                if ('number' !== $fieldDefinition['type'] || null === $fields[$group][$field]['value']) {
+                    continue;
+                }
+
+                // Some requests don't seem to have properties unserialized by default (even in M2)
+                $properties = is_string($fieldDefinition['properties']) ? unserialize($fieldDefinition['properties']) : $fieldDefinition['properties'];
+
+                $fields[$group][$field]['value']           = empty($properties['scale']) ? (int) $fields[$group][$field]['value']
+                    : (float) $fields[$group][$field]['value'];
+                $fields[$group][$field]['normalizedValue'] = empty($properties['scale']) ? (int) $fields[$group][$field]['normalizedValue']
+                    : (float) $fields[$group][$field]['normalizedValue'];
+
+                $numberFields[$field] = $fields[$group][$field]['value'];
+            }
+        }
+
+        // Fix "all" fields
+        $fields['all'] = array_merge($fields['all'], $numberFields);
+
+        return $fields;
     }
 
     /**
@@ -135,6 +177,12 @@ trait CustomFieldsApiControllerTrait
             );
         }
 
-        $this->model->setFieldValues($entity, $parameters, !$isPostOrPatch);
+        $overwriteWithBlank = !$isPostOrPatch;
+        if (isset($parameters['overwriteWithBlank']) && !empty($parameters['overwriteWithBlank'])) {
+            $overwriteWithBlank = true;
+            unset($parameters['overwriteWithBlank']);
+        }
+
+        $this->model->setFieldValues($entity, $parameters, $overwriteWithBlank);
     }
 }

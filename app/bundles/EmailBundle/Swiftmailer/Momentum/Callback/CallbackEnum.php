@@ -67,7 +67,6 @@ class CallbackEnum
 
     /**
      * @param string $event
-     * @param array  $item
      *
      * @return string|null
      */

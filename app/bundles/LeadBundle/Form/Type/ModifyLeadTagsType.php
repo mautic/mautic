@@ -22,23 +22,16 @@ class ModifyLeadTagsType extends AbstractType
      */
     private $translator;
 
-    /**
-     * @param TranslatorInterface $factory
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
             'add_tags',
-            'lead_tag',
+            TagType::class,
             [
                 'label' => 'mautic.lead.tags.add',
                 'attr'  => [
@@ -54,7 +47,7 @@ class ModifyLeadTagsType extends AbstractType
 
         $builder->add(
             'remove_tags',
-            'lead_tag',
+            TagType::class,
             [
                 'label' => 'mautic.lead.tags.remove',
                 'attr'  => [
@@ -72,7 +65,7 @@ class ModifyLeadTagsType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'modify_lead_tags';
     }

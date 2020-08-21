@@ -12,10 +12,13 @@ if [ -x $PHP_CS_FIXER ]; then
 fi
 
 if $HAS_PHP_CS_FIXER; then
-    git status --porcelain | grep -e '^[AM]\(.*\).php$' | cut -c 3- | while read line; do
-        $PHP_CS_FIXER fix --config=$ROOT/.php_cs --verbose "$line";
-        git add "$line";
-    done
+
+    # Fix changed (indexed) files
+    $PHP_CS_FIXER fix --config=$ROOT/.php_cs --verbose --using-cache=no $(git diff --cached --name-only)
+
+    # Add the changes from CS Fixer back to the git index:
+    git add $(git diff --cached --name-only)
+
 else
     echo ""
     echo "Please install php-cs-fixer, e.g.:"

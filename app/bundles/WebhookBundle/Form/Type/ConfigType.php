@@ -13,6 +13,7 @@ namespace Mautic\WebhookBundle\Form\Type;
 
 use Doctrine\Common\Collections\Criteria;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -21,23 +22,19 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class ConfigType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('queue_mode', 'choice', [
+        $builder->add('queue_mode', ChoiceType::class, [
             'choices' => [
-                'immediate_process' => 'mautic.webhook.config.immediate_process',
-                'command_process'   => 'mautic.webhook.config.cron_process',
+                'mautic.webhook.config.immediate_process' => 'immediate_process',
+                'mautic.webhook.config.cron_process'      => 'command_process',
             ],
             'label' => 'mautic.webhook.config.form.queue.mode',
             'attr'  => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.webhook.config.form.queue.mode.tooltip',
             ],
-            'empty_value' => false,
+            'placeholder' => false,
             'constraints' => [
                 new NotBlank(
                     [
@@ -45,26 +42,26 @@ class ConfigType extends AbstractType
                     ]
                 ),
             ],
-        ]);
+            ]);
 
-        $builder->add('events_orderby_dir', 'choice', [
+        $builder->add('events_orderby_dir', ChoiceType::class, [
             'choices' => [
-                Criteria::ASC  => 'mautic.webhook.config.event.orderby.chronological',
-                Criteria::DESC => 'mautic.webhook.config.event.orderby.reverse.chronological',
+                'mautic.webhook.config.event.orderby.chronological'         => Criteria::ASC,
+                'mautic.webhook.config.event.orderby.reverse.chronological' => Criteria::DESC,
             ],
             'label' => 'mautic.webhook.config.event.orderby',
             'attr'  => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.webhook.config.event.orderby.tooltip',
             ],
-            'required' => false,
-        ]);
+            'required'          => false,
+            ]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'webhookconfig';
     }

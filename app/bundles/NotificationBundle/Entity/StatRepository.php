@@ -147,8 +147,7 @@ class StatRepository extends CommonRepository
     /**
      * Get a contact's notifications stat.
      *
-     * @param int   $leadId
-     * @param array $options
+     * @param int $leadId
      *
      * @return array
      *
@@ -228,9 +227,7 @@ class StatRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
+        return $query->execute()->fetchAll();
     }
 
     /**
@@ -249,7 +246,7 @@ class StatRepository extends CommonRepository
                 $q->expr()->in('s.notification_id', $notificationIds)
             );
 
-        if ($fromDate !== null) {
+        if (null !== $fromDate) {
             //make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $q->andWhere(

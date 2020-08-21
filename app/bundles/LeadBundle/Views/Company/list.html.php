@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticLeadBundle:Company:index.html.php');
 }
 ?>
@@ -115,9 +115,9 @@ if ($tmpl == 'index') {
                                        )
                                    ): ?>
 
-                            <a href="<?php echo $view['router']->generate(
+                            <a href="<?php echo $view['router']->url(
                                 'mautic_company_action',
-                                ['objectAction' => 'edit', 'objectId' => $item->getId()]
+                                ['objectAction' => 'view', 'objectId' => $item->getId()]
                             ); ?>" data-toggle="ajax">
                                 <?php if (isset($fields['core']['companyname'])) : ?>
                                     <?php echo $view->escape($fields['core']['companyname']['value']); ?>
@@ -153,9 +153,9 @@ if ($tmpl == 'index') {
                             'mautic_contact_index',
                             [
                                 'search' => $view['translator']->trans('mautic.lead.lead.searchcommand.company').':"'
-                                    .$view->escape($fields['core']['companyname']['value']).'"',
+                                    .$fields['core']['companyname']['value'].'"',
                             ]
-                        ); ?>" data-toggle="ajax"<?php echo ($leadCounts[$item->getId()] == 0) ? 'disabled=disabled' : ''; ?>>
+                        ); ?>" data-toggle="ajax"<?php echo (0 == $leadCounts[$item->getId()]) ? 'disabled=disabled' : ''; ?>>
                             <?php echo $view['translator']->transChoice(
                                 'mautic.lead.company.viewleads_count',
                                 $leadCounts[$item->getId()],
@@ -177,7 +177,7 @@ if ($tmpl == 'index') {
                 'page'       => $page,
                 'limit'      => $limit,
                 'menuLinkId' => 'mautic_company_index',
-                'baseUrl'    => $view['router']->generate('mautic_company_index'),
+                'baseUrl'    => $view['router']->url('mautic_company_index'),
                 'sessionVar' => 'company',
             ]
         ); ?>

@@ -96,9 +96,6 @@ class Widget extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -113,9 +110,6 @@ class Widget extends FormEntity
         $builder->addNullableField('params', Type::TARRAY);
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('type', new NotBlank([
@@ -296,8 +290,6 @@ class Widget extends FormEntity
     /**
      * Set params.
      *
-     * @param array $params
-     *
      * @return Widget
      */
     public function setParams(array $params)
@@ -345,8 +337,6 @@ class Widget extends FormEntity
 
     /**
      * Set template data.
-     *
-     * @param array $templateData
      *
      * @return Widget
      */

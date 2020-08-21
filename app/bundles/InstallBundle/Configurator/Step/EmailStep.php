@@ -4,7 +4,7 @@
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
- * @link        http://mautic.org
+ * @see        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -15,62 +15,84 @@ use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\InstallBundle\Configurator\Form\EmailStepType;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-/**
- * Email Step.
- */
 class EmailStep implements StepInterface
 {
-    /*
-     * From name for email sent from Mautic
+    /**
+     * From name for email sent from Mautic.
      *
      * @var string
      */
     public $mailer_from_name;
 
-    /*
-     * From email sent from Mautic
+    /**
+     * From email sent from Mautic.
      *
      * @var string
      */
     public $mailer_from_email;
 
-    /*
-     * Mail transport
+    /**
+     * Mail transport.
      *
      * @var string
      */
-    public $mailer_transport = 'mail';
+    public $mailer_transport = 'smtp';
 
-    /*
+    /**
      * SMTP host
+     * Required in step.
      *
      * @var string
      */
     public $mailer_host;
 
-    /*
+    /**
      * SMTP port
+     * Required in step.
      *
      * @var string
      */
     public $mailer_port;
 
-    /*
-     * SMTP username
+    /**
+     * Mailer username
+     * Required in step.
      *
      * @var string
      */
     public $mailer_user;
 
-    /*
-     * SMTP password
+    /**
+     * Mailer password.
      *
      * @var string
      */
     public $mailer_password;
 
-    /*
+    /**
+     * Amazon Region.
+     *
+     * @var string
+     */
+    public $mailer_amazon_region = 'us-east-1';
+
+    /**
+     * Amazon Region.
+     *
+     * @var string
+     */
+    public $mailer_amazon_other_region;
+
+    /**
+     * Mailer API key if applicable.
+     *
+     * @var string
+     */
+    public $mailer_api_key;
+
+    /**
      * SMTP encryption
+     * Required in step.
      *
      * @var string
      */
@@ -83,23 +105,20 @@ class EmailStep implements StepInterface
      */
     public $mailer_auth_mode; //  null|plain|login|cram-md5
 
-    /*
-     * Spool mode
+    /**
+     * Spool mode.
      *
      * @var string
      */
     public $mailer_spool_type = 'memory'; // file|memory
 
-    /*
-     * Spool path
+    /**
+     * Spool path.
      *
      * @var string
      */
-    public $mailer_spool_path = '%kernel.root_dir%/spool';
+    public $mailer_spool_path = '%kernel.root_dir%/../var/spool';
 
-    /**
-     * @param Session $session
-     */
     public function __construct(Session $session)
     {
         $user = $session->get('mautic.installer.user');
@@ -114,7 +133,7 @@ class EmailStep implements StepInterface
      */
     public function getFormType()
     {
-        return new EmailStepType();
+        return EmailStepType::class;
     }
 
     /**

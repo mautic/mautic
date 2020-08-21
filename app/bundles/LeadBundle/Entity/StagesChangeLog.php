@@ -50,9 +50,6 @@ class StagesChangeLog
      */
     private $dateAdded;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -165,8 +162,6 @@ class StagesChangeLog
     /**
      * Set lead.
      *
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
-     *
      * @return StagesChangeLog
      */
     public function setLead(\Mautic\LeadBundle\Entity\Lead $lead)
@@ -188,8 +183,6 @@ class StagesChangeLog
 
     /**
      * Set stage.
-     *
-     * @param \Mautic\StageBundle\Entity\Stage $stage
      *
      * @return StagesChangeLog
      */
