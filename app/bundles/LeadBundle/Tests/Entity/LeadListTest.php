@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\LeadList;
 use PHPUnit\Framework\Assert;
 
@@ -204,5 +205,21 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
         yield ['', false, []];
         yield [0, false, []];
         yield ['string', true, ['isPreferenceCenter' => [false, true]]];
+    }
+    
+    public function testThatInitializeLastBuiltTimeMethodWorks(): void
+    {
+        $leadList = new LeadList();
+        $leadList->initializeLastBuiltDate();
+        $this->assertInstanceOf(\DateTime::class, $leadList->getLastBuiltDate());
+    }
+
+    public function testThatInitializeLastBuiltTimeMethodDoesntOverwriteExistingValue(): void
+    {
+        $leadList = new LeadList();
+        $now      = (new DateTimeHelper())->getUtcDateTime();
+        $leadList->setLastBuiltDate($now);
+        $leadList->initializeLastBuiltDate();
+        $this->assertSame($now, $leadList->getLastBuiltDate());
     }
 }
