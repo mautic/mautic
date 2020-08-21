@@ -27,11 +27,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var PointModel
+     */
     private $pointModel;
 
+    /**
+     * @var EntityManager
+     */
     private $entityManager;
-
-    private $triggered = [];
 
     public function __construct(PointModel $pointModel, EntityManager $entityManager)
     {
@@ -39,9 +43,6 @@ class PointSubscriber implements EventSubscriberInterface
         $this->entityManager = $entityManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [
