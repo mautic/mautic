@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Security\Permissions;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Exception\PermissionBadFormatException;
 use Mautic\CoreBundle\Security\Exception\PermissionNotFoundException;
@@ -35,9 +36,9 @@ class CorePermissions
     protected $userHelper;
 
     /**
-     * @var array
+     * @var CoreParametersHelper
      */
-    private $params;
+    private $coreParametersHelper;
 
     /**
      * @var array
@@ -69,21 +70,18 @@ class CorePermissions
      */
     private $checkedPermissions = [];
 
-    /**
-     * CorePermissions constructor.
-     *
-     * @param Translator $translator
-     * @param array      $parameters
-     * @param            $bundles
-     * @param            $pluginBundles
-     */
-    public function __construct(UserHelper $userHelper, TranslatorInterface $translator, array $parameters, $bundles, $pluginBundles)
-    {
-        $this->translator    = $translator;
-        $this->params        = $parameters;
-        $this->bundles       = $bundles;
-        $this->pluginBundles = $pluginBundles;
-        $this->userHelper    = $userHelper;
+    public function __construct(
+        UserHelper $userHelper,
+        TranslatorInterface $translator,
+        CoreParametersHelper $coreParametersHelper,
+        array $bundles,
+        array $pluginBundles
+    ) {
+        $this->userHelper           = $userHelper;
+        $this->translator           = $translator;
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->bundles              = $bundles;
+        $this->pluginBundles        = $pluginBundles;
 
         $this->registerPermissionClasses();
     }
@@ -140,8 +138,6 @@ class CorePermissions
     /**
      * Generates the bit value for the bundle's permission.
      *
-     * @param array $permissions
-     *
      * @return array
      *
      * @throws \InvalidArgumentException
@@ -156,7 +152,7 @@ class CorePermissions
         //bust out permissions into their respective bundles
         $bundlePermissions = [];
         foreach ($permissions as $permission => $perms) {
-            list($bundle, $level)               = explode(':', $permission);
+            [$bundle, $level]                   = explode(':', $permission);
             $bundlePermissions[$bundle][$level] = $perms;
         }
 
@@ -190,7 +186,7 @@ class CorePermissions
                 $entity->setName($name);
 
                 $bit   = 0;
-                $class = $this->getPermissionObject($bundle, true);
+                $class = $this->getPermissionObject($bundle);
 
                 foreach ($perms as $perm) {
                     //get the bit for the perm
@@ -231,7 +227,7 @@ class CorePermissions
      */
     public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false)
     {
-        if ($userEntity === null) {
+        if (null === $userEntity) {
             $userEntity = $this->userHelper->getUser();
         }
 
@@ -247,19 +243,8 @@ class CorePermissions
             }
 
             $parts = explode(':', $permission);
-
-            if ($parts[0] == 'plugin' && count($parts) == 4) {
-                // @deprecated - no longer used; to be removed in 3.0
-                array_shift($parts);
-            }
-
-            if (count($parts) != 3) {
-                throw new PermissionBadFormatException(
-                    $this->getTranslator()->trans(
-                        'mautic.core.permissions.badformat',
-                        ['%permission%' => $permission]
-                    )
-                );
+            if (false === in_array(count($parts), [3, 4])) {
+                throw new PermissionBadFormatException($this->getTranslator()->trans('mautic.core.permissions.badformat', ['%permission%' => $permission]));
             }
 
             if ($userEntity->isAdmin()) {
@@ -276,14 +261,9 @@ class CorePermissions
                     if ($allowUnknown) {
                         $permissions[$permission] = false;
                     } else {
-                        throw new PermissionNotFoundException(
-                            $this->getTranslator()->trans(
-                                'mautic.core.permissions.notfound',
-                                ['%permission%' => $permission]
-                            )
-                        );
+                        throw new PermissionNotFoundException($this->getTranslator()->trans('mautic.core.permissions.notfound', ['%permission%' => $permission]));
                     }
-                } elseif ($userEntity == 'anon.') {
+                } elseif ('anon.' == $userEntity) {
                     //anon user or session timeout
                     $permissions[$permission] = false;
                 } elseif (!isset($activePermissions[$parts[0]])) {
@@ -297,21 +277,16 @@ class CorePermissions
             $this->grantedPermissions[$permission] = $permissions[$permission];
         }
 
-        if ($mode == 'MATCH_ALL') {
+        if ('MATCH_ALL' == $mode) {
             //deny if any of the permissions are denied
             return in_array(0, $permissions) ? false : true;
-        } elseif ($mode == 'MATCH_ONE') {
+        } elseif ('MATCH_ONE' == $mode) {
             //grant if any of the permissions were granted
             return in_array(1, $permissions) ? true : false;
-        } elseif ($mode == 'RETURN_ARRAY') {
+        } elseif ('RETURN_ARRAY' == $mode) {
             return $permissions;
         } else {
-            throw new PermissionNotFoundException(
-                $this->getTranslator()->trans(
-                    'mautic.core.permissions.mode.notfound',
-                    ['%mode%' => $mode]
-                )
-            );
+            throw new PermissionNotFoundException($this->getTranslator()->trans('mautic.core.permissions.mode.notfound', ['%mode%' => $mode]));
         }
     }
 
@@ -334,13 +309,7 @@ class CorePermissions
             }
 
             $parts = explode(':', $p);
-
-            if ($parts[0] == 'plugin' && count($parts) == 4) {
-                // @deprecated - no longer used; to be removed in 3.0
-                array_shift($parts);
-            }
-
-            if (count($parts) != 3) {
+            if (3 != count($parts)) {
                 $result[$p] = false;
             } else {
                 //check against bundle permissions class
@@ -397,7 +366,7 @@ class CorePermissions
 
         $ownerId = (int) $ownerId;
 
-        if ($ownerId === 0) {
+        if (0 === $ownerId) {
             if ($other) {
                 return true;
             } else {
@@ -478,7 +447,7 @@ class CorePermissions
      */
     protected function getParams()
     {
-        return $this->params;
+        return $this->coreParametersHelper->all();
     }
 
     /**

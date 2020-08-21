@@ -15,7 +15,7 @@ use Mautic\EmailBundle\Swiftmailer\SendGrid\Callback\ResponseItem;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Exception\ResponseItemException;
 use Mautic\LeadBundle\Entity\DoNotContact;
 
-class ResponseItemTest extends \PHPUnit_Framework_TestCase
+class ResponseItemTest extends \PHPUnit\Framework\TestCase
 {
     public function testFullResponseItem()
     {

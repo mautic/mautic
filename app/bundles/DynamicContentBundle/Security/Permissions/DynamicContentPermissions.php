@@ -42,9 +42,6 @@ class DynamicContentPermissions extends AbstractPermissions
 
     /**
      * {@inheritdoc}
-     *
-     * @param FormBuilderInterface $builder
-     * @param array                $options
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {

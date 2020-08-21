@@ -53,9 +53,6 @@ class Channel extends CommonEntity
      */
     private $isEnabled = false;
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadMetadata(ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -187,8 +184,6 @@ class Channel extends CommonEntity
     }
 
     /**
-     * @param Message $message
-     *
      * @return Channel
      */
     public function setMessage(Message $message)
@@ -207,8 +202,6 @@ class Channel extends CommonEntity
     }
 
     /**
-     * @param array $properties
-     *
      * @return Channel
      */
     public function setProperties(array $properties)

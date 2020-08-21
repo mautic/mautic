@@ -2,8 +2,8 @@
 
 namespace MauticPlugin\MauticFullContactBundle\Services;
 
-use MauticPlugin\MauticFullContactBundle\Exception\FullContact_Exception_API;
-use MauticPlugin\MauticFullContactBundle\Exception\FullContact_Exception_Base;
+use MauticPlugin\MauticFullContactBundle\Exception\ApiException;
+use MauticPlugin\MauticFullContactBundle\Exception\BaseException;
 
 class FullContact_API extends FullContact_Person
 {
@@ -30,7 +30,7 @@ class FullContact_API extends FullContact_Person
     public function doLookup($search = null, $type = 'email', $timeout = 30)
     {
         if (is_null($search)) {
-            throw new FullContact_Exception_Base('To search, you must supply a search term.');
+            throw new BaseException('To search, you must supply a search term.');
         }
 
         switch ($type) {
@@ -44,8 +44,7 @@ class FullContact_API extends FullContact_Person
                 $this->lookupByTwitter($search);
                 break;
             default:
-                throw new FullContact_Exception_API("UnsupportedLookupMethodException: Invalid lookup method specified [{$type}]");
-                break;
+                throw new ApiException("UnsupportedLookupMethodException: Invalid lookup method specified [{$type}]");
         }
 
         $result             = json_decode($this->response_json, true);

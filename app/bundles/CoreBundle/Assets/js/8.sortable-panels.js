@@ -125,7 +125,7 @@ Mautic.appendSortablePanel = function(sortablesContainer, modal) {
     var selectedPanel = mQuery(sortablesContainer).find('.available-panel-selector').children('option:selected');
     var placeholders  = selectedPanel.attr('data-placeholders');
     if (placeholders) {
-        placeholders = mQuery.parseJSON(placeholders);
+        placeholders = JSON.parse(placeholders);
         var newPanelContent = mQuery(newPanel).html();
 
         mQuery.each(placeholders, function(key, val) {

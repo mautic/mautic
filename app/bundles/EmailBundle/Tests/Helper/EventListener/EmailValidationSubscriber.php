@@ -30,9 +30,6 @@ class EmailValidationSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param EmailValidationEvent $event
-     */
     public function onEmailValidation(EmailValidationEvent $event)
     {
         if ('bad@gmail.com' === $event->getAddress()) {

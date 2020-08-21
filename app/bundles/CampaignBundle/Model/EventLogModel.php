@@ -46,10 +46,6 @@ class EventLogModel extends AbstractCommonModel
 
     /**
      * EventLogModel constructor.
-     *
-     * @param EventModel     $eventModel
-     * @param CampaignModel  $campaignModel
-     * @param IpLookupHelper $ipLookupHelper
      */
     public function __construct(EventModel $eventModel, CampaignModel $campaignModel, IpLookupHelper $ipLookupHelper, EventScheduler $eventScheduler)
     {
@@ -79,9 +75,6 @@ class EventLogModel extends AbstractCommonModel
         return 'campaign:campaigns';
     }
 
-    /**
-     * @param array $args
-     */
     public function getEntities(array $args = [])
     {
         /** @var LeadEventLog[] $logs */
@@ -110,10 +103,6 @@ class EventLogModel extends AbstractCommonModel
     }
 
     /**
-     * @param Event $event
-     * @param Lead  $contact
-     * @param array $parameters
-     *
      * @return string|LeadEventLog
      */
     public function updateContactEvent(Event $event, Lead $contact, array $parameters)
@@ -122,7 +111,7 @@ class EventLogModel extends AbstractCommonModel
 
         // Check that contact is part of the campaign
         $membership = $campaign->getContactMembership($contact);
-        if (count($membership) === 0) {
+        if (0 === count($membership)) {
             return 'mautic.campaign.error.contact_not_in_campaign';
         }
 
@@ -168,9 +157,11 @@ class EventLogModel extends AbstractCommonModel
                     );
                     break;
                 case 'ipAddress':
-                    $log->setIpAddress(
-                        $this->ipLookupHelper->getIpAddress($value)
-                    );
+                    if (!defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED')) {
+                        $log->setIpAddress(
+                            $this->ipLookupHelper->getIpAddress($value)
+                        );
+                    }
                     break;
                 case 'metadata':
                     $metadata = $log->getMetadata();
@@ -202,9 +193,6 @@ class EventLogModel extends AbstractCommonModel
         return [$log, $created];
     }
 
-    /**
-     * @param LeadEventLog $entity
-     */
     public function saveEntity(LeadEventLog $entity)
     {
         $triggerDate = $entity->getTriggerDate();

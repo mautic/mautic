@@ -14,7 +14,7 @@ namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid\Callback;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Callback\CallbackEnum;
 use Mautic\LeadBundle\Entity\DoNotContact;
 
-class CallbackEnumTest extends \PHPUnit_Framework_TestCase
+class CallbackEnumTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider supportedEventsProvider

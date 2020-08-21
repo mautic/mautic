@@ -24,9 +24,6 @@ class LoginEvent extends Event
      */
     private $user;
 
-    /**
-     * @param User $user
-     */
     public function __construct(User $user)
     {
         $this->user = $user;

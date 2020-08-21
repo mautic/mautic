@@ -35,10 +35,9 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
     }
 
     /**
-     * @param \Swift_Mime_Message $message
-     * @param null                $failedRecipients
+     * @param null $failedRecipients
      */
-    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         $this->message         = $message;
         $from                  = $message->getFrom();
@@ -73,9 +72,8 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
     }
 
     /**
-     * @param \Swift_Message $message
-     * @param int            $toBeAdded
-     * @param string         $type
+     * @param int    $toBeAdded
+     * @param string $type
      *
      * @return int
      */
@@ -109,5 +107,13 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
     public function getMetadatas()
     {
         return $this->metadatas;
+    }
+
+    /**
+     * @return bool
+     */
+    public function ping()
+    {
+        return true;
     }
 }
