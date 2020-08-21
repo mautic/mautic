@@ -13,7 +13,7 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\Tag;
 
-class TagTest extends \PHPUnit_Framework_TestCase
+class TagTest extends \PHPUnit\Framework\TestCase
 {
     public function testSetTagByConstructor()
     {
@@ -22,9 +22,6 @@ class TagTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('tagA', $entity->getTag());
     }
 
-    /**
-     * @deprecated as the setter is deprecated
-     */
     public function testSetTagBySetter()
     {
         $entity = new Tag();
@@ -37,12 +34,27 @@ class TagTest extends \PHPUnit_Framework_TestCase
     {
         $sampleTags = [
             'hello world'                                         => 'hello world',
+            'hello&#34; world'                                    => 'hello" world',
             '&#60;script&#62;console.log(hello)&#60;/script&#62;' => '<script>console.log(hello)</script>',
             'oěř§ůú.'                                             => 'oěř§ůú.',
         ];
 
         foreach ($sampleTags as $expected => $tag) {
             $entity = new Tag($tag);
+            $this->assertSame($expected, $entity->getTag());
+        }
+    }
+
+    public function testDisabledValidation()
+    {
+        $sampleTags = [
+            'hello world'      => 'hello world',
+            'hello&#34; world' => 'hello&#34; world',
+            'oěř§ůú.'          => 'oěř§ůú.',
+        ];
+
+        foreach ($sampleTags as $expected => $tag) {
+            $entity = new Tag($tag, false);
             $this->assertSame($expected, $entity->getTag());
         }
     }

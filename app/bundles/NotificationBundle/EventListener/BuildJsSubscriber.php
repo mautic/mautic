@@ -13,36 +13,34 @@ namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\NotificationBundle\Helper\NotificationHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
-/**
- * Class BuildJsSubscriber.
- */
-class BuildJsSubscriber extends CommonSubscriber
+class BuildJsSubscriber implements EventSubscriberInterface
 {
     /**
      * @var NotificationHelper
      */
-    protected $notificationHelper;
+    private $notificationHelper;
 
     /**
      * @var IntegrationHelper
      */
-    protected $integrationHelper;
+    private $integrationHelper;
 
     /**
-     * BuildJsSubscriber constructor.
-     *
-     * @param NotificationHelper $notificationHelper
-     * @param IntegrationHelper  $integrationHelper
+     * @var RouterInterface
      */
-    public function __construct(NotificationHelper $notificationHelper, IntegrationHelper $integrationHelper)
+    private $router;
+
+    public function __construct(NotificationHelper $notificationHelper, IntegrationHelper $integrationHelper, RouterInterface $router)
     {
         $this->notificationHelper = $notificationHelper;
         $this->integrationHelper  = $integrationHelper;
+        $this->router             = $router;
     }
 
     /**
@@ -55,14 +53,11 @@ class BuildJsSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param BuildJsEvent $event
-     */
     public function onBuildJs(BuildJsEvent $event)
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
-        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+        if (!$integration || false === $integration->getIntegrationSettings()->getIsPublished()) {
             return;
         }
 

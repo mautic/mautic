@@ -20,8 +20,7 @@ use Mautic\ReportBundle\Entity\Report;
 class ReportEvent extends CommonEvent
 {
     /**
-     * @param Report $report
-     * @param bool   $isNew
+     * @param bool $isNew
      */
     public function __construct(Report $report, $isNew = false)
     {
@@ -41,8 +40,6 @@ class ReportEvent extends CommonEvent
 
     /**
      * Sets the Report entity.
-     *
-     * @param Report $report
      */
     public function setReport(Report $report)
     {

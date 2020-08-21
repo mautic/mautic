@@ -110,7 +110,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $customHtml;
 
     /**
-     * @var
+     * @var string
      */
     private $emailType = 'template';
 
@@ -186,8 +186,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * Used to identify the page for the builder.
-     *
-     * @var
      */
     private $sessionId;
 
@@ -244,9 +242,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->stats = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -315,9 +310,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->addNullableField('publicPreview', Type::BOOLEAN, 'public_preview');
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint(
@@ -370,7 +362,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                 $type = $email->getEmailType();
                 $translationParent = $email->getTranslationParent();
 
-                if ($type == 'list' && null == $translationParent) {
+                if ('list' == $type && null == $translationParent) {
                     $validator = $context->getValidator();
                     $violations = $validator->validate(
                         $email->getLists(),
@@ -472,7 +464,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
 
-        if ($prop == 'variantParent' || $prop == 'translationParent' || $prop == 'category' || $prop == 'list') {
+        if ('variantParent' == $prop || 'translationParent' == $prop || 'category' == $prop || 'list' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -874,8 +866,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Add list.
      *
-     * @param LeadList $list
-     *
      * @return Email
      */
     public function addList(LeadList $list)
@@ -887,8 +877,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * Set the lists for this translation.
-     *
-     * @param array $lists
      */
     public function setLists(array $lists = [])
     {
@@ -899,8 +887,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * Remove list.
-     *
-     * @param LeadList $list
      */
     public function removeList(LeadList $list)
     {
@@ -1038,8 +1024,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Add asset.
      *
-     * @param Asset $asset
-     *
      * @return Email
      */
     public function addAssetAttachment(Asset $asset)
@@ -1051,8 +1035,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * Remove asset.
-     *
-     * @param Asset $asset
      */
     public function removeAssetAttachment(Asset $asset)
     {
@@ -1110,7 +1092,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             foreach ($matches[0] as $url) {
                 $newUrl = $url;
 
-                while (strpos($newUrl, '&amp;') !== false) {
+                while (false !== strpos($newUrl, '&amp;')) {
                     $newUrl = str_replace('&amp;', '&', $newUrl);
                 }
 

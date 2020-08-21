@@ -13,7 +13,7 @@ if (!isset($alertType)) {
 }
 
 ?>
-<div id="flashes"<?php echo ($alertType == 'growl') ? ' class="alert-growl-container"' : ''; ?>>
+<div id="flashes"<?php echo ('growl' == $alertType) ? ' class="alert-growl-container"' : ''; ?>>
     <?php echo $view->render('MauticCoreBundle:Notification:flash_messages.html.php', [
         'dismissible' => (empty($notdismissible)) ? ' alert-dismissible' : '',
         'alertType'   => $alertType,

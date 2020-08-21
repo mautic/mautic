@@ -30,8 +30,6 @@ class LegacyLeadModel
 
     /**
      * LegacyContactMerger constructor.
-     *
-     * @param Container $container
      */
     public function __construct(Container $container)
     {
@@ -39,8 +37,6 @@ class LegacyLeadModel
     }
 
     /**
-     * @param Lead $lead
-     * @param Lead $lead2
      * @param bool $autoMode
      *
      * @return Lead

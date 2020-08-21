@@ -24,8 +24,6 @@ class Parser
 
     /**
      * Parser constructor.
-     *
-     * @param Message $message
      */
     public function __construct(Message $message)
     {
@@ -33,7 +31,7 @@ class Parser
     }
 
     /**
-     * @return null|string
+     * @return string|null
      *
      * @throws FeedbackLoopNotFound
      */
@@ -58,7 +56,7 @@ class Parser
      * @param string $content
      * @param string $pattern
      *
-     * @return null|string
+     * @return string|null
      */
     protected function searchMessage($pattern, $content)
     {

@@ -111,4 +111,14 @@ final class FormEvents
      * @var string
      */
     const ON_EXECUTE_SUBMIT_ACTION = 'mautic.form.on_execute_submit_action';
+
+    /**
+     * The mautic.form.on_submission_rate_winner event is fired when there is a need to determine submission rate winner.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundles\Event\DetermineWinnerEvent
+     *
+     * @var string
+     */
+    const ON_DETERMINE_SUBMISSION_RATE_WINNER = 'mautic.form.on_submission_rate_winner';
 }

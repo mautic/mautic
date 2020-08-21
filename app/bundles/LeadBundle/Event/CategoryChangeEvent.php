@@ -28,9 +28,8 @@ class CategoryChangeEvent extends Event
     /**
      * CategoryChangeEvent constructor.
      *
-     * @param          $leads
-     * @param Category $category
-     * @param bool     $added
+     * @param      $leads
+     * @param bool $added
      */
     public function __construct($leads, Category $category, $added = true)
     {
