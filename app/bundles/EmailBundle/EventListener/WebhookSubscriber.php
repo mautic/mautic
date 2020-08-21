@@ -66,7 +66,7 @@ class WebhookSubscriber implements EventSubscriberInterface
     public function onEmailSend(EmailSendEvent $event)
     {
         // Ignore test email sends.
-        if ($event->isInternalSend()) {
+        if ($event->isInternalSend() || null === $event->getLead()) {
             return;
         }
 
