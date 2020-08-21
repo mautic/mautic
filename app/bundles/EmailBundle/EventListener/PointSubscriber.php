@@ -118,21 +118,6 @@ class PointSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($this->shouldTriggerPointEmailSendAction($event, $lead)) {
-            $this->pointModel->triggerAction('email.send', $event->getEmail(), null, $lead, true);
-        }
-    }
-
-    private function shouldTriggerPointEmailSendAction(EmailSendEvent $event, Lead $lead)
-    {
-        if ($event->getEmail()) {
-            if (!isset($this->triggered[$lead->getId()][$event->getEmail()->getId()])) {
-                $this->triggered[$lead->getId()][$event->getEmail()->getId()] = true;
-
-                return true;
-            }
-        }
-
-        return false;
+        $this->pointModel->triggerAction('email.send', $event->getEmail(), null, $lead, true);
     }
 }
