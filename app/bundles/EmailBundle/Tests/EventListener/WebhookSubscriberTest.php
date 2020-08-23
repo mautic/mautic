@@ -97,11 +97,11 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getEmail')
             ->willReturn($email);
 
-        $event->expects($this->once())
+        $event->expects($this->any())
             ->method('getLead')
             ->willReturn($contact);
 
-        $event->expects($this->any())
+        $event->expects($this->once())
             ->method('getTokens')
             ->willReturn($tokens);
 
