@@ -107,26 +107,26 @@ class UpdateLeadListsCommand extends ModeratedCommand
                 $output->writeln('<error>'.$translator->trans('mautic.lead.list.rebuild.not_found', ['%id%' => $id]).'</error>');
             }
         } else {
-            $lists = $listModel->getEntities(
+            $leadLists = $listModel->getEntities(
                 [
                     'iterator_mode' => true,
                 ]
             );
 
-            /** @var LeadList $l */
-            while (false !== ($l = $lists->next())) {
+            /** @var LeadList $leadList */
+            while (false !== ($leadList = $leadLists->next())) {
                 // Get first item; using reset as the key will be the ID and not 0
-                $l = reset($l);
+                $leadList = reset($leadList);
 
-                if ($l->isPublished()) {
-                    $output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $l->getId()]).'</info>');
+                if ($leadList->isPublished()) {
+                    $output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $leadList->getId()]).'</info>');
 
                     $startTimeForSingleSegment = time();
-                    $processed                 = $listModel->rebuildListLeads($l, $batch, $max, $output);
+                    $processed                 = $listModel->rebuildListLeads($leadList, $batch, $max, $output);
                     if (0 >= $max) {
                         // Only full segment rebuilds count
-                        $l->updateLastBuiltDate();
-                        $listModel->saveEntity($l);
+                        $leadList->updateLastBuiltDate();
+                        $listModel->saveEntity($leadList);
                     }
                     $output->writeln(
                         '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'
@@ -137,10 +137,10 @@ class UpdateLeadListsCommand extends ModeratedCommand
                     }
                 }
 
-                unset($l);
+                unset($leadList);
             }
 
-            unset($lists);
+            unset($leadLists);
         }
 
         $this->completeRun();
