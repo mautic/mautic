@@ -31,9 +31,6 @@ class ContentHelper extends Helper
 
     /**
      * UIHelper constructor.
-     *
-     * @param DelegatingEngine         $templating
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(DelegatingEngine $templating, EventDispatcherInterface $dispatcher)
     {
@@ -87,7 +84,13 @@ class ContentHelper extends Helper
      */
     public function showScriptTags($html)
     {
-        return str_replace(['<script>', '</script>'], ['[script]', '[/script]'], $html);
+        $tagsToShow = ['script', 'style'];
+
+        foreach ($tagsToShow as $tag) {
+            $html = preg_replace('/<'.$tag.'(.*?)>(.*?)<\/'.$tag.'>/s', '['.$tag.'$1]$2[/'.$tag.']', $html);
+        }
+
+        return $html;
     }
 
     /**

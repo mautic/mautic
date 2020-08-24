@@ -28,9 +28,6 @@ class EvaluatedContacts
 
     /**
      * EvaluatedContacts constructor.
-     *
-     * @param ArrayCollection|null $passed
-     * @param ArrayCollection|null $failed
      */
     public function __construct(ArrayCollection $passed = null, ArrayCollection $failed = null)
     {
@@ -38,17 +35,11 @@ class EvaluatedContacts
         $this->failed = (null === $failed) ? new ArrayCollection() : $failed;
     }
 
-    /**
-     * @param Lead $contact
-     */
     public function pass(Lead $contact)
     {
         $this->passed->set($contact->getId(), $contact);
     }
 
-    /**
-     * @param Lead $contact
-     */
     public function fail(Lead $contact)
     {
         $this->failed->set($contact->getId(), $contact);

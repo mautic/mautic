@@ -33,9 +33,6 @@ class CampaignActionDeleteContactSubscriber implements EventSubscriberInterface
 
     /**
      * CampaignActionDeleteContactSubscriber constructor.
-     *
-     * @param LeadModel             $leadModel
-     * @param RemovedContactTracker $removedContactTracker
      */
     public function __construct(LeadModel $leadModel, RemovedContactTracker $removedContactTracker)
     {
@@ -54,9 +51,6 @@ class CampaignActionDeleteContactSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function configureAction(CampaignBuilderEvent $event)
     {
         $event->addAction(
@@ -78,9 +72,6 @@ class CampaignActionDeleteContactSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param PendingEvent $event
-     */
     public function deleteContacts(PendingEvent $event)
     {
         $contactIds = $event->getContactIds();

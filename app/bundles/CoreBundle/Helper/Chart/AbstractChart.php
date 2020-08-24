@@ -13,9 +13,6 @@ namespace Mautic\CoreBundle\Helper\Chart;
 
 use Mautic\CoreBundle\Helper\ColorHelper;
 
-/**
- * Class AbstractChart.
- */
 abstract class AbstractChart
 {
     /**
@@ -49,7 +46,7 @@ abstract class AbstractChart
     /**
      * Timezone data is requested to be in.
      *
-     * @var
+     * @var \DateTimeZone
      */
     protected $timezone;
 
@@ -93,10 +90,10 @@ abstract class AbstractChart
         if (!$unit) {
             $unit = $this->unit;
         }
-        $isTime  = in_array($unit, ['H', 'i', 's']) ? 'T' : '';
-        $toUpper = ['d', 'i'];
 
-        if ($unit == 'i') {
+        $isTime = in_array($unit, ['H', 'i', 's']) ? 'T' : '';
+
+        if ('i' == $unit) {
             $unit = 'M';
         }
 
@@ -127,9 +124,6 @@ abstract class AbstractChart
 
     /**
      * Sets the clones of the date range and validates it.
-     *
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
      */
     public function setDateRange(\DateTime $dateFrom, \DateTime $dateTo)
     {
@@ -155,8 +149,6 @@ abstract class AbstractChart
     /**
      * Modify the date to add one current time unit to it and subtract 1 second.
      * Can be used to get the current day results.
-     *
-     * @param \DateTime $date
      */
     public function addOneUnitMinusOneSec(\DateTime &$date)
     {

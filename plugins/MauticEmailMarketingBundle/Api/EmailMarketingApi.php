@@ -18,11 +18,6 @@ class EmailMarketingApi
     protected $integration;
     protected $keys;
 
-    /**
-     * EmailMarketingApi constructor.
-     *
-     * @param UnifiedIntegrationInterface $integration
-     */
     public function __construct(UnifiedIntegrationInterface $integration)
     {
         $this->integration = $integration;

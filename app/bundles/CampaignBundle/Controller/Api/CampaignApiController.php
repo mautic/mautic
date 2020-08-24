@@ -11,28 +11,32 @@
 
 namespace Mautic\CampaignBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
-/**
- * Class CampaignApiController.
- */
 class CampaignApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
+    /**
+     * @var MembershipManager
+     */
+    private $membershipManager;
+
     public function initialize(FilterControllerEvent $event)
     {
-        $this->model            = $this->getModel('campaign');
-        $this->entityClass      = 'Mautic\CampaignBundle\Entity\Campaign';
-        $this->entityNameOne    = 'campaign';
-        $this->entityNameMulti  = 'campaigns';
-        $this->permissionBase   = 'campaign:campaigns';
-        $this->serializerGroups = ['campaignDetails', 'campaignEventDetails', 'categoryList', 'publishDetails', 'leadListList', 'formList'];
+        $this->model             = $this->getModel('campaign');
+        $this->membershipManager = $this->get('mautic.campaign.membership.manager');
+        $this->entityClass       = Campaign::class;
+        $this->entityNameOne     = 'campaign';
+        $this->entityNameMulti   = 'campaigns';
+        $this->permissionBase    = 'campaign:campaigns';
+        $this->serializerGroups  = ['campaignDetails', 'campaignEventDetails', 'categoryList', 'publishDetails', 'leadListList', 'formList'];
 
         parent::initialize($event);
     }
@@ -54,15 +58,15 @@ class CampaignApiController extends CommonApiController
             $leadModel = $this->getModel('lead');
             $lead      = $leadModel->getEntity($leadId);
 
-            if ($lead == null) {
+            if (null == $lead) {
                 return $this->notFound();
             } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
                 return $this->accessDenied();
             }
 
-            $this->model->addLead($entity, $leadId);
+            $this->membershipManager->addContact($lead, $entity);
 
-            $view = $this->view(['success' => 1], Codes::HTTP_OK);
+            $view = $this->view(['success' => 1], Response::HTTP_OK);
 
             return $this->handleView($view);
         }
@@ -89,9 +93,9 @@ class CampaignApiController extends CommonApiController
                 return $lead;
             }
 
-            $this->model->removeLead($entity, $leadId);
+            $this->membershipManager->removeContact($lead, $entity);
 
-            $view = $this->view(['success' => 1], Codes::HTTP_OK);
+            $view = $this->view(['success' => 1], Response::HTTP_OK);
 
             return $this->handleView($view);
         }
@@ -111,15 +115,15 @@ class CampaignApiController extends CommonApiController
     {
         $method = $this->request->getMethod();
 
-        if ($method === 'POST' || $method === 'PUT') {
+        if ('POST' === $method || 'PUT' === $method) {
             if (empty($parameters['events'])) {
                 $msg = $this->get('translator')->trans('mautic.campaign.form.events.notempty', [], 'validators');
 
-                return $this->returnError($msg, Codes::HTTP_BAD_REQUEST);
+                return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
             } elseif (empty($parameters['lists']) && empty($parameters['forms'])) {
                 $msg = $this->get('translator')->trans('mautic.campaign.form.sources.notempty', [], 'validators');
 
-                return $this->returnError($msg, Codes::HTTP_BAD_REQUEST);
+                return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
             }
         }
 
@@ -131,14 +135,14 @@ class CampaignApiController extends CommonApiController
         ];
 
         // delete events and sources which does not exist in the PUT request
-        if ($method === 'PUT') {
+        if ('PUT' === $method) {
             $requestEventIds   = [];
             $requestSegmentIds = [];
             $requestFormIds    = [];
 
             foreach ($parameters['events'] as $key => $requestEvent) {
                 if (!isset($requestEvent['id'])) {
-                    return $this->returnError('$campaign[events]['.$key.']["id"] is missing', Codes::HTTP_BAD_REQUEST);
+                    return $this->returnError('$campaign[events]['.$key.']["id"] is missing', Response::HTTP_BAD_REQUEST);
                 }
                 $requestEventIds[] = $requestEvent['id'];
             }
@@ -152,7 +156,7 @@ class CampaignApiController extends CommonApiController
             if (isset($parameters['lists'])) {
                 foreach ($parameters['lists'] as $requestSegment) {
                     if (!isset($requestSegment['id'])) {
-                        return $this->returnError('$campaign[lists]['.$key.']["id"] is missing', Codes::HTTP_BAD_REQUEST);
+                        return $this->returnError('$campaign[lists]['.$key.']["id"] is missing', Response::HTTP_BAD_REQUEST);
                     }
                     $requestSegmentIds[] = $requestSegment['id'];
                 }
@@ -167,7 +171,7 @@ class CampaignApiController extends CommonApiController
             if (isset($parameters['forms'])) {
                 foreach ($parameters['forms'] as $requestForm) {
                     if (!isset($requestForm['id'])) {
-                        return $this->returnError('$campaign[forms]['.$key.']["id"] is missing', Codes::HTTP_BAD_REQUEST);
+                        return $this->returnError('$campaign[forms]['.$key.']["id"] is missing', Response::HTTP_BAD_REQUEST);
                     }
                     $requestFormIds[] = $requestForm['id'];
                 }
@@ -196,7 +200,7 @@ class CampaignApiController extends CommonApiController
             $this->model->setCanvasSettings($entity, $parameters['canvasSettings']);
         }
 
-        if ($method === 'PUT' && !empty($deletedEvents)) {
+        if ('PUT' === $method && !empty($deletedEvents)) {
             $this->getModel('campaign.event')->deleteEvents($entity->getEvents()->toArray(), $deletedEvents);
         }
     }
@@ -234,11 +238,11 @@ class CampaignApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
-        if (!$this->checkEntityAccess($entity, 'view')) {
+        if (!$this->checkEntityAccess($entity)) {
             return $this->accessDenied();
         }
 
@@ -274,7 +278,7 @@ class CampaignApiController extends CommonApiController
 
     public function cloneCampaignAction($campaignId)
     {
-        if (empty($campaignId) || intval($campaignId) == false) {
+        if (empty($campaignId) || false == intval($campaignId)) {
             return $this->notFound();
         }
 
@@ -300,7 +304,7 @@ class CampaignApiController extends CommonApiController
             true
         );
 
-        $view = $this->view([$this->entityNameOne => $entity], Codes::HTTP_OK, $headers);
+        $view = $this->view([$this->entityNameOne => $entity], Response::HTTP_OK, $headers);
 
         $this->setSerializationContext($view);
 

@@ -24,8 +24,6 @@ class PublicController extends CommonController
     /**
      * This proxy is used for the GoToTraining API requests in order to bypass the CORS restrictions in AJAX.
      *
-     * @param Request $request
-     *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
@@ -76,7 +74,7 @@ class PublicController extends CommonController
         $response->headers->set('Content-type', 'application/'.($request->isXmlHttpRequest() ? 'json' : 'x-javascript'));
 
         // Allow CORS requests only from dev machines
-        $allowedIps = $this->coreParametersHelper->getParameter('dev_hosts') ?: [];
+        $allowedIps = $this->coreParametersHelper->get('dev_hosts') ?: [];
         if (in_array($request->getClientIp(), $allowedIps, true)) {
             $response->headers->set('Access-Control-Allow-Origin', '*');
         }
@@ -88,8 +86,6 @@ class PublicController extends CommonController
      * This action will receive a POST when the session status changes.
      * A POST will also be made when a customer joins the session and when the session ends
      * (whether or not a customer joined).
-     *
-     * @param Request $request
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      *

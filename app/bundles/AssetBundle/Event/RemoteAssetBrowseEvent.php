@@ -31,11 +31,6 @@ class RemoteAssetBrowseEvent extends CommonEvent
      */
     private $integration;
 
-    /**
-     * RemoteAssetBrowseEvent constructor.
-     *
-     * @param UnifiedIntegrationInterface $integration
-     */
     public function __construct(UnifiedIntegrationInterface $integration)
     {
         $this->integration = $integration;
@@ -58,8 +53,6 @@ class RemoteAssetBrowseEvent extends CommonEvent
     }
 
     /**
-     * @param Adapter $adapter
-     *
      * @return $this
      */
     public function setAdapter(Adapter $adapter)

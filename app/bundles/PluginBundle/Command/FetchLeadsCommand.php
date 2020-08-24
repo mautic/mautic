@@ -152,7 +152,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
         define('MAUTIC_DATE_MODIFIED_OVERRIDE', time());
 
         if (isset($supportedFeatures) && in_array('get_leads', $supportedFeatures)) {
-            if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && isset($config['objects'])) {
+            if (null !== $integrationObject && method_exists($integrationObject, 'getLeads') && isset($config['objects'])) {
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
                 $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
 
@@ -214,7 +214,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 }
             }
 
-            if ($integrationObject !== null && method_exists($integrationObject, 'getCompanies') && isset($config['objects'])
+            if (null !== $integrationObject && method_exists($integrationObject, 'getCompanies') && isset($config['objects'])
                 && in_array(
                     'company',
                     $config['objects']

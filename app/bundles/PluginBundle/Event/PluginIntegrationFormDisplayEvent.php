@@ -23,12 +23,6 @@ class PluginIntegrationFormDisplayEvent extends AbstractPluginIntegrationEvent
      */
     private $settings = [];
 
-    /**
-     * PluginIntegrationFormDisplayEvent constructor.
-     *
-     * @param UnifiedIntegrationInterface $integration
-     * @param array                       $settings
-     */
     public function __construct(UnifiedIntegrationInterface $integration, array $settings)
     {
         $this->integration = $integration;
@@ -43,9 +37,6 @@ class PluginIntegrationFormDisplayEvent extends AbstractPluginIntegrationEvent
         return $this->settings;
     }
 
-    /**
-     * @param array $settings
-     */
     public function setSettings(array $settings)
     {
         $this->settings = $settings;

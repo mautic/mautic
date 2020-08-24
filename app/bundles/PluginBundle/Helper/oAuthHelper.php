@@ -35,13 +35,6 @@ class oAuthHelper
 
     private $request;
 
-    /**
-     * oAuthHelper constructor.
-     *
-     * @param UnifiedIntegrationInterface $integration
-     * @param Request|null                $request
-     * @param array                       $settings
-     */
     public function __construct(UnifiedIntegrationInterface $integration, Request $request = null, $settings = [])
     {
         $clientId                = $integration->getClientIdKey();
@@ -166,9 +159,8 @@ class oAuthHelper
     {
         $r      = 'Authorization: OAuth ';
         $values = $this->normalizeParameters($oauth, true, true);
-        $r .= implode(', ', $values);
 
-        return $r;
+        return $r.implode(', ', $values);
     }
 
     /**
@@ -229,14 +221,14 @@ class oAuthHelper
         $result          = '';
         $accumulatedBits = 0;
         $random          = mt_getrandmax();
-        for ($totalBits = 0; $random != 0; $random >>= 1) {
+        for ($totalBits = 0; 0 != $random; $random >>= 1) {
             ++$totalBits;
         }
         $usableBits = intval($totalBits / 8) * 8;
 
         while ($accumulatedBits < $bits) {
             $bitsToAdd = min($totalBits - $usableBits, $bits - $accumulatedBits);
-            if ($bitsToAdd % 4 != 0) {
+            if (0 != $bitsToAdd % 4) {
                 // add bits in whole increments of 4
                 $bitsToAdd += 4 - $bitsToAdd % 4;
             }

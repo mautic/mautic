@@ -31,8 +31,6 @@ class IntegrationRequestSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param PluginIntegrationRequestEvent $requestEvent
-     *
      * @throws \Exception
      */
     public function getParameters(PluginIntegrationRequestEvent $requestEvent)
@@ -47,13 +45,11 @@ class IntegrationRequestSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array $parameters
-     *
      * @return string
      *
      * @throws \Exception
      */
-    protected function getAuthorization(array $parameters)
+    private function getAuthorization(array $parameters)
     {
         if (empty($parameters['client_id'])) {
             throw new \Exception('No client ID given.');

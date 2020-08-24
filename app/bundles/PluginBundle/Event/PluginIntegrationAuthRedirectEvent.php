@@ -23,12 +23,6 @@ class PluginIntegrationAuthRedirectEvent extends AbstractPluginIntegrationEvent
      */
     private $authUrl;
 
-    /**
-     * PluginIntegrationAuthRedirectEvent constructor.
-     *
-     * @param UnifiedIntegrationInterface $integration
-     * @param                             $authUrl
-     */
     public function __construct(UnifiedIntegrationInterface $integration, $authUrl)
     {
         $this->integration = $integration;

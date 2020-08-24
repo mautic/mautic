@@ -26,8 +26,6 @@ class UserHelper
 
     /**
      * UserHelper constructor.
-     *
-     * @param TokenStorage $tokenStorage
      */
     public function __construct(TokenStorage $tokenStorage)
     {
@@ -44,7 +42,7 @@ class UserHelper
         $user  = null;
         $token = $this->tokenStorage->getToken();
 
-        if ($token !== null) {
+        if (null !== $token) {
             $user = $token->getUser();
         }
 

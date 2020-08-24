@@ -30,11 +30,6 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
 class TemplateNameParser extends BaseTemplateNameParser
 {
     /**
-     * @var \Mautic\CoreBundle\Factory\MauticFactory
-     */
-    protected $factory;
-
-    /**
      * @var \Symfony\Component\DependencyInjection\ContainerInterface
      */
     protected $container;

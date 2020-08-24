@@ -47,24 +47,9 @@ class SendEmailToContact
     private $translator;
 
     /**
-     * @var null|string
+     * @var string|null
      */
-    private $singleEmailMode = null;
-
-    /**
-     * @var Stat[]
-     */
-    private $statEntities = [];
-
-    /**
-     * @var Stat[]
-     */
-    private $saveEntities = [];
-
-    /**
-     * @var Stat[]
-     */
-    private $deleteEntities = [];
+    private $singleEmailMode;
 
     /**
      * @var array
@@ -87,17 +72,17 @@ class SendEmailToContact
     private $emailSentCounts = [];
 
     /**
-     * @var
+     * @var array|null
      */
     private $emailEntityErrors;
 
     /**
-     * @var null|int
+     * @var int|null
      */
     private $emailEntityId;
 
     /**
-     * @var null|int
+     * @var int|null
      */
     private $listId;
 
@@ -113,11 +98,6 @@ class SendEmailToContact
 
     /**
      * SendEmailToContact constructor.
-     *
-     * @param MailHelper          $mailer
-     * @param StatRepository      $statRepository
-     * @param DoNotContact        $dncModel
-     * @param TranslatorInterface $translator
      */
     public function __construct(MailHelper $mailer, StatHelper $statHelper, DoNotContact $dncModel, TranslatorInterface $translator)
     {
@@ -168,14 +148,11 @@ class SendEmailToContact
     /**
      * Use an Email entity to populate content, from, etc.
      *
-     * @param Email $email
-     * @param array $channel          ['channelName', 'channelId']
-     * @param array $assetAttachments
-     * @param array $slots            @deprecated to be removed in 3.0; support for old email template format
+     * @param array $channel ['channelName', 'channelId']
      *
      * @return $this
      */
-    public function setEmail(Email $email, array $channel = [], array $customHeaders = [], array $assetAttachments = [], array $slots = [])
+    public function setEmail(Email $email, array $channel = [], array $customHeaders = [], array $assetAttachments = [])
     {
         // Flush anything that's pending from a previous email
         $this->flush();
@@ -183,7 +160,7 @@ class SendEmailToContact
         // Enable the queue if applicable to the transport
         $this->mailer->enableQueue();
 
-        if ($this->mailer->setEmail($email, true, $slots, $assetAttachments)) {
+        if ($this->mailer->setEmail($email, true, [], $assetAttachments)) {
             $this->mailer->setSource($channel);
             $this->mailer->setCustomHeaders($customHeaders);
 
@@ -199,7 +176,7 @@ class SendEmailToContact
     }
 
     /**
-     * @param null|int $id
+     * @param int|null $id
      *
      * @return $this
      */
@@ -211,9 +188,6 @@ class SendEmailToContact
     }
 
     /**
-     * @param array $contact
-     * @param array $tokens
-     *
      * @return $this
      *
      * @throws FailedToSendToContactException
@@ -270,9 +244,9 @@ class SendEmailToContact
      */
     public function reset()
     {
-        $this->saveEntities      = [];
-        $this->deleteEntities    = [];
-        $this->statEntities      = [];
+        [];
+        [];
+        [];
         $this->badEmails         = [];
         $this->errorMessages     = [];
         $this->failedContacts    = [];

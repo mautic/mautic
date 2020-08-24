@@ -24,54 +24,40 @@ use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class ContactMergerTest extends \PHPUnit_Framework_TestCase
+class ContactMergerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|LeadModel
+     * @var \PHPUnit\Framework\MockObject\MockObject|LeadModel
      */
     private $leadModel;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|MergeRecordRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject|MergeRecordRepository
      */
     private $leadRepo;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|MergeRecordRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject|MergeRecordRepository
      */
     private $mergeRecordRepo;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcher
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcher
      */
     private $dispatcher;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Logger
+     * @var \PHPUnit\Framework\MockObject\MockObject|Logger
      */
     private $logger;
 
     protected function setUp()
     {
-        $this->leadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->leadRepo = $this->getMockBuilder(LeadRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->mergeRecordRepo = $this->getMockBuilder(MergeRecordRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->dispatcher = $this->getMockBuilder(EventDispatcher::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->logger = $this->getMockBuilder(Logger::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->leadModel       = $this->createMock(LeadModel::class);
+        $this->leadRepo        = $this->createMock(LeadRepository::class);
+        $this->mergeRecordRepo = $this->createMock(MergeRecordRepository::class);
+        $this->dispatcher      = $this->createMock(EventDispatcher::class);
+        $this->logger          = $this->createMock(Logger::class);
 
         $this->leadModel->method('getRepository')->willReturn($this->leadRepo);
     }
@@ -183,6 +169,21 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
             ->with('email')
             ->willReturn('winner@test.com');
 
+        $winner->expects($this->once())
+            ->method('getField')
+            ->with('email')
+            ->willReturn([
+                'value'         => 'winner@test.com',
+                'id'            => 22,
+                'label'         => 'Email',
+                'alias'         => 'email',
+                'type'          => 'email',
+                'group'         => 'core',
+                'object'        => 'lead',
+                'is_fixed'      => true,
+                'default_value' => null,
+            ]);
+
         $winner->expects($this->exactly(3))
             ->method('getId')
             ->willReturn(1);
@@ -233,6 +234,22 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
         $winner->expects($this->exactly(2))
             ->method('getDateModified')
             ->willReturn($winnerDateModified);
+
+        $winner->expects($this->once())
+            ->method('getField')
+            ->with('email')
+            ->willReturn([
+                'value'         => 'winner@test.com',
+                'id'            => 22,
+                'label'         => 'Email',
+                'alias'         => 'email',
+                'type'          => 'email',
+                'group'         => 'core',
+                'object'        => 'lead',
+                'is_fixed'      => true,
+                'default_value' => null,
+            ]);
+
         $winner->expects($this->once())
             ->method('getFieldValue')
             ->with('email')
@@ -290,6 +307,22 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
         $winner->expects($this->exactly(2))
             ->method('getDateModified')
             ->willReturn($winnerDateModified);
+
+        $winner->expects($this->once())
+            ->method('getField')
+            ->with('email')
+            ->willReturn([
+                'value'         => 'winner@test.com',
+                'id'            => 22,
+                'label'         => 'Email',
+                'alias'         => 'email',
+                'type'          => 'email',
+                'group'         => 'core',
+                'object'        => 'lead',
+                'is_fixed'      => true,
+                'default_value' => null,
+            ]);
+
         $winner->expects($this->once())
             ->method('getFieldValue')
             ->with('email')
@@ -355,6 +388,22 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
         $winner->expects($this->once())
             ->method('getDateAdded')
             ->willReturn($winnerDateModified);
+
+        $winner->expects($this->once())
+            ->method('getField')
+            ->with('email')
+            ->willReturn([
+                'value'         => 'winner@test.com',
+                'id'            => 22,
+                'label'         => 'Email',
+                'alias'         => 'email',
+                'type'          => 'email',
+                'group'         => 'core',
+                'object'        => 'lead',
+                'is_fixed'      => true,
+                'default_value' => null,
+            ]);
+
         $winner->expects($this->once())
             ->method('getFieldValue')
             ->with('email')
@@ -375,6 +424,92 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
         // addUpdatedField should never be called as they aren't different values
         $winner->expects($this->never())
             ->method('addUpdatedField');
+
+        $merger->mergeFieldData($winner, $loser);
+    }
+
+    /**
+     * Scenario: A contact clicks on a tracked email link that goes to a tracked page.
+     * The browser must contain no Mautic cookies. A new contact is created with only default values.
+     * If default values from the new contact overwrite the values of the original contact then data are lost.
+     */
+    public function testMergeFieldDataWithDefaultValues()
+    {
+        $winner = $this->createMock(Lead::class);
+        $loser  = $this->createMock(Lead::class);
+        $merger = $this->getMerger();
+
+        $winnerDateModified = new \DateTime('-30 minutes');
+        $loserDateModified  = new \DateTime();
+
+        $winner->expects($this->once())
+            ->method('getProfileFields')
+            ->willReturn([
+                'id'      => 1,
+                'email'   => 'winner@test.com',
+                'consent' => 'Yes',
+                'boolean' => 1,
+            ]);
+
+        $loser->expects($this->once())
+            ->method('getProfileFields')
+            ->willReturn([
+                'id'      => 2,
+                'email'   => null,
+                'consent' => 'No',
+                'boolean' => 0,
+            ]);
+
+        $winner->method('getDateModified')->willReturn($winnerDateModified);
+        $winner->method('getId')->willReturn(1);
+        $loser->method('getDateModified')->willReturn($loserDateModified);
+        $loser->method('getId')->willReturn(2);
+        $loser->method('isAnonymous')->willReturn(true);
+
+        $winner->expects($this->exactly(3))
+            ->method('getFieldValue')
+            ->withConsecutive(['email'], ['consent'], ['boolean'])
+            ->will($this->onConsecutiveCalls('winner@test.com', 'Yes', 1));
+
+        $winner->expects($this->exactly(3))
+            ->method('getField')
+            ->withConsecutive(['email'], ['consent'], ['boolean'])
+            ->will($this->onConsecutiveCalls([
+                'id'            => 22,
+                'label'         => 'Email',
+                'alias'         => 'email',
+                'type'          => 'email',
+                'group'         => 'core',
+                'object'        => 'lead',
+                'is_fixed'      => true,
+                'default_value' => null,
+            ], [
+                'id'            => 44,
+                'label'         => 'Email Consent',
+                'alias'         => 'consent',
+                'type'          => 'select',
+                'group'         => 'core',
+                'object'        => 'lead',
+                'is_fixed'      => true,
+                'default_value' => 'No',
+            ], [
+                'id'            => 45,
+                'label'         => 'Boolean Field',
+                'alias'         => 'boolean',
+                'type'          => 'boolean',
+                'group'         => 'core',
+                'object'        => 'lead',
+                'is_fixed'      => true,
+                'default_value' => 0,
+            ]));
+
+        $winner->expects($this->exactly(3))
+            ->method('addUpdatedField')
+            ->withConsecutive(
+                ['email', 'winner@test.com'],
+                ['consent', 'Yes'],
+                ['boolean', 1]
+            );
 
         $merger->mergeFieldData($winner, $loser);
     }
@@ -506,6 +641,22 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
             ->method('getFieldValue')
             ->with('email')
             ->willReturn('winner@test.com');
+
+        $winner->expects($this->once())
+            ->method('getField')
+            ->with('email')
+            ->willReturn([
+                'value'         => 'winner@test.com',
+                'id'            => 22,
+                'label'         => 'Email',
+                'alias'         => 'email',
+                'type'          => 'email',
+                'group'         => 'core',
+                'object'        => 'lead',
+                'is_fixed'      => true,
+                'default_value' => null,
+            ]);
+
         $winner->expects($this->once())
             ->method('addUpdatedField')
             ->with('email', 'loser@test.com');
@@ -531,6 +682,45 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
             ->with($winner, [], null, false);
 
         $this->getMerger()->merge($winner, $loser);
+    }
+
+    public function testMergeFieldWithEmptyFieldData()
+    {
+        $loser  = $this->createMock(Lead::class);
+        $winner = $this->createMock(Lead::class);
+
+        $loser->expects($this->exactly(2))
+            ->method('getDateModified')
+            ->willReturn(new \DateTime('-10 minutes'));
+
+        $winner->expects($this->exactly(2))
+            ->method('getDateModified')
+            ->willReturn(new \DateTime());
+
+        $winner->expects($this->exactly(4))
+            ->method('getId')
+            ->willReturn(1);
+
+        $loser->expects($this->once())
+            ->method('getId')
+            ->willReturn(2);
+
+        $winner->expects($this->once())
+            ->method('getProfileFields')
+            ->willReturn([
+                'email'  => 'winner@test.com',
+            ]);
+
+        $winner->expects($this->once())
+            ->method('getField')
+            ->with('email')
+            ->willReturn(false);
+
+        $this->logger->expects($this->once())
+            ->method('info')
+            ->with('CONTACT: email is not mergeable for 1 - ');
+
+        $this->getMerger()->mergeFieldData($winner, $loser);
     }
 
     /**

@@ -23,12 +23,6 @@ class PluginIntegrationKeyEvent extends AbstractPluginIntegrationEvent
      */
     private $keys;
 
-    /**
-     * PluginIntegrationKeyEvent constructor.
-     *
-     * @param UnifiedIntegrationInterface $integration
-     * @param array|null                  $keys
-     */
     public function __construct(UnifiedIntegrationInterface $integration, array $keys = null)
     {
         $this->integration = $integration;
