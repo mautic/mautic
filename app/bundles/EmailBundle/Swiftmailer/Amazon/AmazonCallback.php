@@ -73,6 +73,10 @@ class AmazonCallback
 
         $payload = json_decode($request->getContent(), true);
 
+        if (0 !== json_last_error()) {
+            throw new HttpException(400, 'AmazonCallback: Invalid JSON Payload');
+        }
+
         return $this->processJsonPayload($payload);
     }
 
