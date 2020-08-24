@@ -92,7 +92,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
                         $processed = $listModel->rebuildListLeads($list, $batch, $max, $output);
                         if (0 >= $max) {
                             // Only full segment rebuilds count
-                            $list->updateLastBuiltDate();
+                            $list->setLastBuiltDateToCurrentDatetime();
                             $listModel->saveEntity($list);
                         }
                     } catch (QueryException $e) {
@@ -125,7 +125,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
                     $processed                 = $listModel->rebuildListLeads($leadList, $batch, $max, $output);
                     if (0 >= $max) {
                         // Only full segment rebuilds count
-                        $leadList->updateLastBuiltDate();
+                        $leadList->setLastBuiltDateToCurrentDatetime();
                         $listModel->saveEntity($leadList);
                     }
                     $output->writeln(

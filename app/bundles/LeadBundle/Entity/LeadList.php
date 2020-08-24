@@ -402,7 +402,7 @@ class LeadList extends FormEntity
         $this->lastBuiltDate = $lastBuiltDate;
     }
 
-    public function updateLastBuiltDate(): void
+    public function setLastBuiltDateToCurrentDatetime(): void
     {
         $now = (new DateTimeHelper())->getUtcDateTime();
         $this->setLastBuiltDate($now);
@@ -414,6 +414,6 @@ class LeadList extends FormEntity
             return;
         }
 
-        $this->updateLastBuiltDate();
+        $this->setLastBuiltDateToCurrentDatetime();
     }
 }
