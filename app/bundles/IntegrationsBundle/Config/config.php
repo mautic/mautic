@@ -284,6 +284,21 @@ return [
                     'mautic.integrations.helper.sync_mapping',
                     'event_dispatcher',
                     'mautic.integrations.internal.object_provider',
+                    'mautic.integrations.internal.reference_resolver',
+                    'mautic.integrations.internal.field_validator',
+                ],
+            ],
+            'mautic.integrations.internal.field_validator' => [
+                'class'     => \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\FieldValidator::class,
+                'arguments' => [
+                    'mautic.lead.repository.field',
+                    'mautic.integrations.sync.notification.helper_user_notification',
+                ],
+            ],
+            'mautic.integrations.internal.reference_resolver' => [
+                'class'     => \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\ReferenceResolver::class,
+                'arguments' => [
+                    'doctrine.dbal.default_connection',
                 ],
             ],
             'mautic.integrations.sync.data_exchange.mautic.field_helper' => [

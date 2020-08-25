@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Field;
 
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+
 class SchemaDefinition
 {
     /**
@@ -13,14 +15,14 @@ class SchemaDefinition
      */
     public static function getSchemaDefinition(string $alias, string $type, bool $isUnique = false): array
     {
+        $options = ['notnull' => false];
+
         // Unique is always a string in order to control index length
         if ($isUnique) {
             return [
                 'name'    => $alias,
                 'type'    => 'string',
-                'options' => [
-                    'notnull' => false,
-                ],
+                'options' => $options,
             ];
         }
         $schemaLength = null;
@@ -40,15 +42,17 @@ class SchemaDefinition
             case 'email':
             case 'lookup':
             case 'select':
-            case 'multiselect':
             case 'region':
             case 'tel':
-            case 'url':
-                $schemaType = 'string';
+                $schemaType        = 'string';
+                $options['length'] = $length;
                 break;
             case 'text':
-                $schemaType = (false !== strpos($alias, 'description')) ? 'text' : 'string';
+                $schemaType        = (false !== strpos($alias, 'description')) ? 'text' : 'string';
+                $options['length'] = $length;
                 break;
+            case 'multiselect':
+            case 'html':
             default:
                 $schemaType = 'text';
         }
@@ -60,15 +64,31 @@ class SchemaDefinition
         return [
             'name'    => $alias,
             'type'    => $schemaType,
-            'options' => ['notnull' => false, 'length' => $schemaLength],
+            'options' => $options,
         ];
+    }
+
+    public static function getFieldCharLengthLimit(array $schemaDefinition): ?int
+    {
+        $length = $schemaDefinition['options']['length'] ?? null;
+        $type   = $schemaDefinition['type'] ?? null;
+
+        switch ($type) {
+            case 'string':
+                return $length ?? ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH;
+
+            case 'text':
+                return $length;
+        }
+
+        return null;
     }
 
     /**
      * Get the MySQL database type based on the field type.
      */
-    public function getSchemaDefinitionNonStatic(string $alias, string $type, bool $isUnique = false): array
+    public function getSchemaDefinitionNonStatic(string $alias, string $type, bool $isUnique = false, $length = null)
     {
-        return self::getSchemaDefinition($alias, $type, $isUnique);
+        return self::getSchemaDefinition($alias, $type, $isUnique, $length);
     }
 }
