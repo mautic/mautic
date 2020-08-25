@@ -16,7 +16,7 @@ use Mautic\LeadBundle\Exception\UnknownDncReasonException;
 use Mautic\LeadBundle\Templating\Helper\DncReasonHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class DncReasonHelperTest extends \PHPUnit_Framework_TestCase
+class DncReasonHelperTest extends \PHPUnit\Framework\TestCase
 {
     private $reasonTo = [
         DoNotContact::IS_CONTACTABLE => 'mautic.lead.event.donotcontact_contactable',

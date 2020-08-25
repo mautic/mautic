@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Test\EventListener;
+namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\EventListener\MomentumSubscriber;
@@ -23,7 +23,7 @@ use Mautic\QueueBundle\Queue\QueueService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class MomentumSubscriberTest extends \PHPUnit_Framework_TestCase
+class MomentumSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private $queueServiceMock;
     private $momentumCallbackMock;

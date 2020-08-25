@@ -48,9 +48,8 @@ class CustomFormEvent extends Event
     /**
      * CustomFormEvent constructor.
      *
-     * @param string               $formName
-     * @param string               $formType
-     * @param FormBuilderInterface $formBuilder
+     * @param string $formName
+     * @param string $formType
      */
     public function __construct($formName, $formType, FormBuilderInterface $formBuilder)
     {
@@ -112,9 +111,6 @@ class CustomFormEvent extends Event
         $this->listeners[$eventName][] = $listener;
     }
 
-    /**
-     * @param EventSubscriberInterface $subscriber
-     */
     public function addSubscriber(EventSubscriberInterface $subscriber)
     {
         $this->subscribers[] = $subscriber;

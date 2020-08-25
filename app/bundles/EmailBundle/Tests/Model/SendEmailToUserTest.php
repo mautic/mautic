@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Test\Model;
+namespace Mautic\EmailBundle\Tests\Model;
 
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -19,7 +19,7 @@ use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 
-class SendEmailToUserTest extends \PHPUnit_Framework_TestCase
+class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
 {
     public function testEmailNotFound()
     {
@@ -39,7 +39,7 @@ class SendEmailToUserTest extends \PHPUnit_Framework_TestCase
         $config                       = [];
         $config['useremail']['email'] = 100;
 
-        $this->setExpectedException(EmailCouldNotBeSentException::class);
+        $this->expectException(EmailCouldNotBeSentException::class);
 
         $sendEmailToUser->sendEmailToUsers($config, $lead);
     }
@@ -65,7 +65,7 @@ class SendEmailToUserTest extends \PHPUnit_Framework_TestCase
         $config                       = [];
         $config['useremail']['email'] = 100;
 
-        $this->setExpectedException(EmailCouldNotBeSentException::class);
+        $this->expectException(EmailCouldNotBeSentException::class);
 
         $sendEmailToUser->sendEmailToUsers($config, $lead);
     }
@@ -119,12 +119,12 @@ class SendEmailToUserTest extends \PHPUnit_Framework_TestCase
                     ['id' => 7],
                     ['id' => 10], // owner ID
                 ];
-                \PHPUnit_Framework_Assert::assertTrue($email instanceof Email);
-                \PHPUnit_Framework_Assert::assertEquals($expectedUsers, $users);
-                \PHPUnit_Framework_Assert::assertFalse($saveStat);
-                \PHPUnit_Framework_Assert::assertEquals(['hello@there.com', 'bob@bobek.cz'], $to);
-                \PHPUnit_Framework_Assert::assertEquals([], $cc);
-                \PHPUnit_Framework_Assert::assertEquals(['hidden@translation.in'], $bcc);
+                $this->assertInstanceOf(Email::class, $email);
+                $this->assertEquals($expectedUsers, $users);
+                $this->assertFalse($saveStat);
+                $this->assertEquals(['hello@there.com', 'bob@bobek.cz'], $to);
+                $this->assertEquals([], $cc);
+                $this->assertEquals(['hidden@translation.in'], $bcc);
             }));
 
         $sendEmailToUser = new SendEmailToUser($mockEmailModel);

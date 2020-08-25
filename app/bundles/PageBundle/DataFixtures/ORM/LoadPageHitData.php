@@ -17,45 +17,34 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\PageBundle\Entity\Hit;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Mautic\PageBundle\Model\PageModel;
 
-/**
- * Class LoadPageHitData.
- */
-class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
-     * @var ContainerInterface
+     * @var PageModel
      */
-    private $container;
+    private $pageModel;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
+    public function __construct(PageModel $pageModel)
     {
-        $this->container = $container;
+        $this->pageModel = $pageModel;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
-        $repo = $this->container->get('mautic.page.model.page')->getRepository();
         $hits = CsvHelper::csv_to_array(__DIR__.'/fakepagehitdata.csv');
 
-        foreach ($hits as $count => $rows) {
+        foreach ($hits as $rows) {
             $hit = new Hit();
             foreach ($rows as $col => $val) {
-                if ($val != 'NULL') {
+                if ('NULL' != $val) {
                     $setter = 'set'.ucfirst($col);
                     if (in_array($col, ['page', 'ipAddress'])) {
                         $hit->$setter($this->getReference($col.'-'.$val));
                     } elseif (in_array($col, ['dateHit', 'dateLeft'])) {
                         $hit->$setter(new \DateTime($val));
-                    } elseif ($col == 'browserLanguages') {
+                    } elseif ('browserLanguages' == $col) {
                         $val = Serializer::decode(stripslashes($val));
                         $hit->$setter($val);
                     } else {
@@ -63,7 +52,7 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
                     }
                 }
             }
-            $repo->saveEntity($hit);
+            $this->pageModel->getRepository()->saveEntity($hit);
         }
     }
 

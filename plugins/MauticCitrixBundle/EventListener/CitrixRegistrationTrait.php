@@ -21,7 +21,6 @@ trait CitrixRegistrationTrait
     /**
      * @param string $product
      * @param Lead   $currentLead
-     * @param array  $productsToRegister
      *
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException

@@ -11,37 +11,38 @@
 
 namespace Mautic\WebhookBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\WebhookBundle\Event\WebhookEvent;
-use Mautic\WebhookBundle\WebhookEvents as WebhookEvents;
+use Mautic\WebhookBundle\Notificator\WebhookKillNotificator;
+use Mautic\WebhookBundle\WebhookEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class WebhookSubscriber.
- */
-class WebhookSubscriber extends CommonSubscriber
+class WebhookSubscriber implements EventSubscriberInterface
 {
     /**
      * @var IpLookupHelper
      */
-    protected $ipLookupHelper;
+    private $ipLookupHelper;
 
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
     /**
-     * WebhookSubscriber constructor.
-     *
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
+     * @var WebhookKillNotificator
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
-    {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
+    private $webhookKillNotificator;
+
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        AuditLogModel $auditLogModel,
+        WebhookKillNotificator $webhookKillNotificator
+    ) {
+        $this->ipLookupHelper         = $ipLookupHelper;
+        $this->auditLogModel          = $auditLogModel;
+        $this->webhookKillNotificator = $webhookKillNotificator;
     }
 
     /**
@@ -52,13 +53,12 @@ class WebhookSubscriber extends CommonSubscriber
         return [
             WebhookEvents::WEBHOOK_POST_SAVE   => ['onWebhookSave', 0],
             WebhookEvents::WEBHOOK_POST_DELETE => ['onWebhookDelete', 0],
+            WebhookEvents::WEBHOOK_KILL        => ['onWebhookKill', 0],
         ];
     }
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param WebhookEvent $event
      */
     public function onWebhookSave(WebhookEvent $event)
     {
@@ -79,8 +79,6 @@ class WebhookSubscriber extends CommonSubscriber
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param WebhookEvent $event
      */
     public function onWebhookDelete(WebhookEvent $event)
     {
@@ -94,5 +92,13 @@ class WebhookSubscriber extends CommonSubscriber
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
+    }
+
+    /**
+     * Send notification about killed webhook.
+     */
+    public function onWebhookKill(WebhookEvent $event)
+    {
+        $this->webhookKillNotificator->send($event->getWebhook(), $event->getReason());
     }
 }

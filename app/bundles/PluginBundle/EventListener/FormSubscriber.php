@@ -11,16 +11,14 @@
 
 namespace Mautic\PluginBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
-use Mautic\PluginBundle\PluginEvents;
+use Mautic\PluginBundle\Form\Type\IntegrationsListType;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class FormSubscriber.
- */
-class FormSubscriber extends CommonSubscriber
+class FormSubscriber implements EventSubscriberInterface
 {
     use PushToIntegrationTrait;
 
@@ -30,37 +28,32 @@ class FormSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            FormEvents::FORM_ON_BUILD                     => ['onFormBuild', 0],
-            PluginEvents::ON_FORM_SUBMIT_ACTION_TRIGGERED => ['onFormSubmitActionTriggered', 0],
+            FormEvents::FORM_ON_BUILD            => ['onFormBuild', 0],
+            FormEvents::ON_EXECUTE_SUBMIT_ACTION => ['onFormSubmitActionTriggered', 0],
         ];
     }
 
-    /**
-     * @param FormBuilderEvent $event
-     */
     public function onFormBuild(FormBuilderEvent $event)
     {
-        $action = [
+        $event->addSubmitAction('plugin.leadpush', [
             'group'       => 'mautic.plugin.actions',
             'description' => 'mautic.plugin.actions.tooltip',
             'label'       => 'mautic.plugin.actions.push_lead',
-            'formType'    => 'integration_list',
+            'formType'    => IntegrationsListType::class,
             'formTheme'   => 'MauticPluginBundle:FormTheme\Integration',
-            'eventName'   => PluginEvents::ON_FORM_SUBMIT_ACTION_TRIGGERED,
-        ];
-        $event->addSubmitAction('plugin.leadpush', $action);
+            'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+        ]);
     }
 
     /**
-     * @param SubmissionEvent $event
-     *
      * @return mixed
      */
-    public function onFormSubmitActionTriggered(SubmissionEvent $event)
+    public function onFormSubmitActionTriggered(SubmissionEvent $event): void
     {
-        $config = $event->getActionConfig();
-        $lead   = $event->getLead();
+        if (false === $event->checkContext('plugin.leadpush')) {
+            return;
+        }
 
-        $this->pushToIntegration($config, $lead);
+        $this->pushToIntegration($event->getActionConfig(), $event->getSubmission()->getLead());
     }
 }

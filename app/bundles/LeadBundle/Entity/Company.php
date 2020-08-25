@@ -47,64 +47,28 @@ class Company extends FormEntity implements CustomFieldEntityInterface
      */
     private $socialCache = [];
 
-    /**
-     * @var
-     */
     private $email;
 
-    /**
-     * @var
-     */
     private $address1;
 
-    /**
-     * @var
-     */
     private $address2;
 
-    /**
-     * @var
-     */
     private $phone;
 
-    /**
-     * @var
-     */
     private $city;
 
-    /**
-     * @var
-     */
     private $state;
 
-    /**
-     * @var
-     */
     private $zipcode;
 
-    /**
-     * @var
-     */
     private $country;
 
-    /**
-     * @var
-     */
     private $name;
 
-    /**
-     * @var
-     */
     private $website;
 
-    /**
-     * @var
-     */
     private $industry;
 
-    /**
-     * @var
-     */
     private $description;
 
     public function __clone()
@@ -134,9 +98,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface
         $this->socialCache = $cache;
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -228,7 +189,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
-        if ($prop == 'owner') {
+        if ('owner' == $prop) {
             if ($current && !$val) {
                 $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $val];
             } elseif (!$current && $val) {
@@ -291,6 +252,16 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     public function getOwner()
     {
         return $this->owner;
+    }
+
+    /**
+     * Returns the user to be used for permissions.
+     *
+     * @return User|int
+     */
+    public function getPermissionUser()
+    {
+        return (null === $this->getOwner()) ? $this->getCreatedBy() : $this->getOwner();
     }
 
     /**

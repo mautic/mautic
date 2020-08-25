@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**

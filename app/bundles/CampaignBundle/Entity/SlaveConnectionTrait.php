@@ -26,8 +26,6 @@ trait SlaveConnectionTrait
      * If a query is being executed with a limiter with specific contacts
      * then this could be a real-time request being handled so we should avoid forcing a slave connection.
      *
-     * @param ContactLimiter|null $limiter
-     *
      * @return Connection
      */
     private function getSlaveConnection(ContactLimiter $limiter = null)

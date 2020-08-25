@@ -115,9 +115,9 @@ if ('index' == $tmpl) {
                                        )
                                    ): ?>
 
-                            <a href="<?php echo $view['router']->generate(
+                            <a href="<?php echo $view['router']->url(
                                 'mautic_company_action',
-                                ['objectAction' => 'edit', 'objectId' => $item->getId()]
+                                ['objectAction' => 'view', 'objectId' => $item->getId()]
                             ); ?>" data-toggle="ajax">
                                 <?php if (isset($fields['core']['companyname'])) : ?>
                                     <?php echo $view->escape($fields['core']['companyname']['value']); ?>
@@ -177,7 +177,7 @@ if ('index' == $tmpl) {
                 'page'       => $page,
                 'limit'      => $limit,
                 'menuLinkId' => 'mautic_company_index',
-                'baseUrl'    => $view['router']->generate('mautic_company_index'),
+                'baseUrl'    => $view['router']->url('mautic_company_index'),
                 'sessionVar' => 'company',
             ]
         ); ?>

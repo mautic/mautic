@@ -32,7 +32,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearThis;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\RelativeDate;
 
-class DateOptionFactoryTest extends \PHPUnit_Framework_TestCase
+class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption

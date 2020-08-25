@@ -11,21 +11,20 @@
 
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ContentType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
             'headline',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.focus.form.headline',
                 'label_attr' => ['class' => 'control-label'],
@@ -40,7 +39,7 @@ class ContentType extends AbstractType
 
         $builder->add(
             'tagline',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.focus.form.tagline',
                 'label_attr' => ['class' => 'control-label'],
@@ -56,7 +55,7 @@ class ContentType extends AbstractType
 
         $builder->add(
             'link_text',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.focus.form.link_text',
                 'label_attr' => ['class' => 'control-label'],
@@ -70,7 +69,7 @@ class ContentType extends AbstractType
 
         $builder->add(
             'link_url',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.focus.form.link_url',
                 'label_attr' => ['class' => 'control-label'],
@@ -84,7 +83,7 @@ class ContentType extends AbstractType
 
         $builder->add(
             'link_new_window',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.focus.form.link_new_window',
                 'data'  => (isset($options['link_new_window'])) ? $options['link_new_window'] : true,
@@ -97,34 +96,34 @@ class ContentType extends AbstractType
 
         $builder->add(
             'font',
-            'choice',
+            ChoiceType::class,
             [
-                'choices' => [
-                    'Arial, Helvetica, sans-serif'                             => 'Arial',
-                    '\'Arial Black\', Gadget, sans-serif'                      => 'Arial Black',
-                    '\'Arial Narrow\', sans-serif'                             => 'Arial Narrow',
-                    'Century Gothic, sans-serif'                               => 'Century Gothic',
-                    'Copperplate / Copperplate Gothic Light, sans-serif'       => 'Copperplate Gothic Light',
-                    '\'Courier New\', Courier, monospace'                      => 'Courier New',
-                    'Georgia, Serif'                                           => 'Georgia',
-                    'Impact, Charcoal, sans-serif'                             => 'Impact',
-                    '\'Lucida Console\', Monaco, monospace'                    => 'Lucida Console',
-                    '\'Lucida Sans Unicode\', \'Lucida Grande\', sans-serif'   => 'Lucida Sans Unicode',
-                    '\'Palatino Linotype\', \'Book Antiqua\', Palatino, serif' => 'Palatino',
-                    'Tahoma, Geneva, sans-serif'                               => 'Tahoma',
-                    '\'Times New Roman\', Times, serif'                        => 'Times New Roman',
-                    '\'Trebuchet MS\', Helvetica, sans-serif'                  => 'Trebuchet MS',
-                    'Verdana, Geneva, sans-serif'                              => 'Verdana',
+                'choices'           => [
+                    'Arial'                    => 'Arial, Helvetica, sans-serif',
+                    'Arial Black'              => '\'Arial Black\', Gadget, sans-serif',
+                    'Arial Narrow'             => '\'Arial Narrow\', sans-serif',
+                    'Century Gothic'           => 'Century Gothic, sans-serif',
+                    'Copperplate Gothic Light' => 'Copperplate / Copperplate Gothic Light, sans-serif',
+                    'Courier New'              => '\'Courier New\', Courier, monospace',
+                    'Georgia'                  => 'Georgia, Serif',
+                    'Impact'                   => 'Impact, Charcoal, sans-serif',
+                    'Lucida Console'           => '\'Lucida Console\', Monaco, monospace',
+                    'Lucida Sans Unicode'      => '\'Lucida Sans Unicode\', \'Lucida Grande\', sans-serif',
+                    'Palatino'                 => '\'Palatino Linotype\', \'Book Antiqua\', Palatino, serif',
+                    'Tahoma'                   => 'Tahoma, Geneva, sans-serif',
+                    'Times New Roman'          => '\'Times New Roman\', Times, serif',
+                    'Trebuchet MS'             => '\'Trebuchet MS\', Helvetica, sans-serif',
+                    'Verdana'                  => 'Verdana, Geneva, sans-serif',
                 ],
-                'label'      => 'mautic.focus.form.font',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
+                'label'            => 'mautic.focus.form.font',
+                'label_attr'       => ['class' => 'control-label'],
+                'attr'             => [
                     'class'        => 'form-control',
                     'onchange'     => 'Mautic.focusUpdatePreview()',
                     'data-show-on' => '{"focus_html_mode_0":"checked"}',
                 ],
                 'required'    => false,
-                'empty_value' => false,
+                'placeholder' => false,
             ]
         );
     }
@@ -132,7 +131,7 @@ class ContentType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'focus_content';
     }
@@ -140,7 +139,7 @@ class ContentType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
