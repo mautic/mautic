@@ -108,7 +108,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         // Check to see if we have a match
         $internalObjectDAO = $this->mappingHelper->findMauticObject($mappingManualDAO, $internalObjectName, $integrationObjectDAO);
 
-        if (!$internalObjectDAO) {
+        if (!$internalObjectDAO->getObjectId()) {
             return new ReportObjectDAO($internalObjectName, null);
         }
 
