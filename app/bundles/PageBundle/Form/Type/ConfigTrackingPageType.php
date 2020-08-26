@@ -102,18 +102,6 @@ class ConfigTrackingPageType extends AbstractType
         );
 
         $builder->add(
-            'google_tag_manager_id',
-            TextType::class,
-            [
-                'label' => 'mautic.page.config.form.google.tagmanager.id',
-                'attr'  => [
-                    'class' => 'form-control',
-                ],
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
             'google_analytics_trackingpage_enabled',
             YesNoButtonGroupType::class,
             [
@@ -140,6 +128,36 @@ class ConfigTrackingPageType extends AbstractType
                 'attr'  => [
                     'tooltip' => 'mautic.page.config.form.tracking.anonymize.ip.enabled.tooltip',
                 ],
+            ]
+        );
+
+        $builder->add(
+            'google_tag_manager_id',
+            TextType::class,
+            [
+                'label' => 'mautic.page.config.form.google.tagmanager.id',
+                'attr'  => [
+                    'class' => 'form-control',
+                ],
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'google_tag_manager_trackingpage_enabled',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.page.config.form.tracking.trackingpage.enabled',
+                'data'  => isset($options['data']['google_tag_manager_trackingpage_enabled']) ? (bool) $options['data']['google_tag_manager_trackingpage_enabled'] : false,
+            ]
+        );
+
+        $builder->add(
+            'google_tag_manager_landingpage_enabled',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.page.config.form.tracking.landingpage.enabled',
+                'data'  => isset($options['data']['google_tag_manager_landingpage_enabled']) ? (bool) $options['data']['google_tag_manager_landingpage_enabled'] : false,
             ]
         );
     }
