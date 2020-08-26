@@ -102,6 +102,18 @@ class ConfigTrackingPageType extends AbstractType
         );
 
         $builder->add(
+            'google_tag_manager_id',
+            TextType::class,
+            [
+                'label' => 'mautic.page.config.form.google.tagmanager.id',
+                'attr'  => [
+                    'class' => 'form-control',
+                ],
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
             'google_analytics_trackingpage_enabled',
             YesNoButtonGroupType::class,
             [

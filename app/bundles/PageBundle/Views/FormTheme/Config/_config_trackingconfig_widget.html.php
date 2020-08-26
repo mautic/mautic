@@ -57,6 +57,7 @@
     </div>
     <div class="panel-body">
         <?php echo $view['form']->row($form['google_analytics_id']); ?>
+        <?php echo $view['form']->row($form['google_tag_manager_id']); ?>
         <div class="row">
             <?php foreach ($form->children as $name => $f): ?>
                 <?php if (in_array($name, ['google_analytics_trackingpage_enabled', 'google_analytics_landingpage_enabled', 'google_analytics_anonymize_ip'])) : ?>

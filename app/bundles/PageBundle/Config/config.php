@@ -402,6 +402,7 @@ return [
             '302' => 'mautic.page.form.redirecttype.temporary',
         ],
         'google_analytics_id'                   => null,
+        'google_tag_manager_id'                 => null,
         'google_analytics_trackingpage_enabled' => false,
         'google_analytics_landingpage_enabled'  => false,
         'google_analytics_anonymize_ip'         => false,
