@@ -246,6 +246,11 @@ class PublicController extends CommonFormController
                     $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
                 }
 
+                if (!empty($gtmHeadCode) && !empty($gtmBodyCode)) {
+                    $this->factory->getHelper('template.assets')->addCustomDeclaration($gtmHeadCode);
+                    $this->factory->getHelper('template.assets')->addCustomDeclaration($gtmBodyCode, 'body');
+                }
+
                 $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':page.html.php');
 
                 $response = $this->render(
@@ -332,6 +337,11 @@ class PublicController extends CommonFormController
             // Add the GA code to the template assets
             if (!empty($analytics)) {
                 $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
+            }
+
+            if (!empty($gtmHeadCode) && !empty($gtmBodyCode)) {
+                $this->factory->getHelper('template.assets')->addCustomDeclaration($gtmHeadCode);
+                $this->factory->getHelper('template.assets')->addCustomDeclaration($gtmBodyCode, 'body');
             }
 
             $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':page.html.php');
