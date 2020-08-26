@@ -14,6 +14,7 @@ namespace Mautic\EmailBundle\Model;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
@@ -56,10 +57,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class EmailModel
- * {@inheritdoc}
- */
 class EmailModel extends FormModel implements AjaxLookupModelInterface
 {
     use VariantModelTrait;
@@ -152,8 +149,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     private $doNotContact;
 
     /**
-     * EmailModel constructor.
+     * @var GeneratedColumnsProviderInterface
      */
+    private $generatedColumnsProvider;
+
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         ThemeHelper $themeHelper,
@@ -169,23 +168,25 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         RedirectRepository $redirectRepository,
         CacheStorageHelper $cacheStorageHelper,
         ContactTracker $contactTracker,
-        DNC $doNotContact
+        DNC $doNotContact,
+        GeneratedColumnsProviderInterface $generatedColumnsProvider
     ) {
-        $this->ipLookupHelper        = $ipLookupHelper;
-        $this->themeHelper           = $themeHelper;
-        $this->mailboxHelper         = $mailboxHelper;
-        $this->mailHelper            = $mailHelper;
-        $this->leadModel             = $leadModel;
-        $this->companyModel          = $companyModel;
-        $this->pageTrackableModel    = $pageTrackableModel;
-        $this->userModel             = $userModel;
-        $this->messageQueueModel     = $messageQueueModel;
-        $this->sendModel             = $sendModel;
-        $this->deviceTracker         = $deviceTracker;
-        $this->redirectRepository    = $redirectRepository;
-        $this->cacheStorageHelper    = $cacheStorageHelper;
-        $this->contactTracker        = $contactTracker;
-        $this->doNotContact          = $doNotContact;
+        $this->ipLookupHelper           = $ipLookupHelper;
+        $this->themeHelper              = $themeHelper;
+        $this->mailboxHelper            = $mailboxHelper;
+        $this->mailHelper               = $mailHelper;
+        $this->leadModel                = $leadModel;
+        $this->companyModel             = $companyModel;
+        $this->pageTrackableModel       = $pageTrackableModel;
+        $this->userModel                = $userModel;
+        $this->messageQueueModel        = $messageQueueModel;
+        $this->sendModel                = $sendModel;
+        $this->deviceTracker            = $deviceTracker;
+        $this->redirectRepository       = $redirectRepository;
+        $this->cacheStorageHelper       = $cacheStorageHelper;
+        $this->contactTracker           = $contactTracker;
+        $this->doNotContact             = $doNotContact;
+        $this->generatedColumnsProvider = $generatedColumnsProvider;
     }
 
     /**
@@ -1818,6 +1819,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $segmentId  = ArrayHelper::pickValue('segmentId', $filter);
         $chart      = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query      = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $unit);
+
+        $query->setGeneratedColumnProvider($this->generatedColumnsProvider);
 
         if ('sent_and_opened_and_failed' == $flag || 'all' == $flag || 'sent_and_opened' == $flag || !$flag || in_array('sent', $datasets)) {
             $q = $query->prepareTimeDataQuery('email_stats', 'date_sent', $filter);

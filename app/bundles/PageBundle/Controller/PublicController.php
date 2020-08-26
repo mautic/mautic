@@ -453,8 +453,7 @@ class PublicController extends CommonFormController
 
         // Tak on anything left to the URL
         if (count($query)) {
-            $url .= (false !== strpos($url, '?')) ? '&' : '?';
-            $url .= http_build_query($query);
+            $url = UrlHelper::appendQueryToUrl($url, http_build_query($query));
         }
 
         // If the IP address is not trackable, it means it came form a configured "do not track" IP or a "do not track" user agent
