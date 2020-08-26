@@ -162,16 +162,20 @@ class InputHelper
      *
      * @return mixed|string
      */
-    public static function clean($value, $urldecode = false)
+    public static function clean($value, $urldecode = false, $trim = false)
     {
         if (is_array($value)) {
             foreach ($value as &$v) {
-                $v = self::clean($v, $urldecode);
+                $v = self::clean($v, $urldecode, $trim);
             }
 
             return $value;
         } elseif ($urldecode) {
             $value = urldecode($value);
+        }
+
+        if ($trim) {
+            $value = trim($value);
         }
 
         return filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);

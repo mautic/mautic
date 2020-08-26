@@ -846,7 +846,7 @@ class FieldModel extends FormModel
         }
 
         if (!empty($properties) && is_array($properties)) {
-            $properties = InputHelper::clean($properties);
+            $properties = InputHelper::clean($properties, false, true);
         } else {
             $properties = [];
         }
