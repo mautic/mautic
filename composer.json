@@ -1,5 +1,5 @@
 {
-  "name": "mautic/grapesjsbuilder-bundle",
+  "name": "mautic/grapes-js-builder-bundle",
   "description": "GrapesJS Builder with MJML support for Mautic",
   "type": "mautic-plugin",
   "version": "1.0.1",
