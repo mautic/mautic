@@ -181,16 +181,16 @@ class FormSubscriber implements EventSubscriberInterface
         ]);
 
         $analytics   = $this->analyticsHelper->getCode();
-        $gtmHeadCode = $this->$gtmHelper->getHeadGTMCode();
-        $gtmBodyCode = $this->$gtmHelper->getBodyGTMCode();
+        $gtmHeadCode = $this->gtmHelper->getHeadGTMCode();
+        $gtmBodyCode = $this->gtmHelper->getBodyGTMCode();
 
         if (!empty($analytics)) {
             $this->assetsHelper->addCustomDeclaration($analytics);
         }
 
         if (!empty($gtmHeadCode) && !empty($gtmBodyCode)) {
-            $this->$assetsHelper->addCustomDeclaration($gtmHeadCode);
-            $this->$assetsHelper->addCustomDeclaration($gtmBodyCode, 'bodyOpen');
+            $this->assetsHelper->addCustomDeclaration($gtmHeadCode);
+            $this->assetsHelper->addCustomDeclaration($gtmBodyCode, 'bodyOpen');
         }
 
         $event->setPostSubmitResponse(new Response(
