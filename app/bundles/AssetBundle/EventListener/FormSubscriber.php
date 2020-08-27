@@ -181,8 +181,8 @@ class FormSubscriber implements EventSubscriberInterface
         ]);
 
         $analytics   = $this->analyticsHelper->getCode();
-        $gtmHeadCode = $gtmHelper->getHeadGTMCode();
-        $gtmBodyCode = $gtmHelper->getBodyGTMCode();
+        $gtmHeadCode = $this->$gtmHelper->getHeadGTMCode();
+        $gtmBodyCode = $this->$gtmHelper->getBodyGTMCode();
 
         if (!empty($analytics)) {
             $this->assetsHelper->addCustomDeclaration($analytics);
