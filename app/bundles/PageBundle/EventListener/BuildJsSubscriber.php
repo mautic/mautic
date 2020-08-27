@@ -535,8 +535,8 @@ fbq('init', '{$id}'); // Insert your pixel ID here.
 fbq('track', 'PageView', {$customMatch});
 JS;
         }
-
-        if ($id = $this->trackingHelper->displayInitCode('google_tag_manager') && !$this->trackingHelper->isLandingPage()) {
+        $id = $this->trackingHelper->displayInitCode('google_tag_manager');
+        if ($id && !$this->trackingHelper->isLandingPage()) {
             $js .= <<<JS
             (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
