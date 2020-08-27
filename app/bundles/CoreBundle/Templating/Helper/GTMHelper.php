@@ -27,8 +27,6 @@ class GTMHelper extends Helper
     public function __construct(CoreParametersHelper $parametersHelper)
     {
         $this->code        = $parametersHelper->get('google_tag_manager_id', '');
-        $this->gtmHeadCode = $this->getHeadGTMCode();
-        $this->gtmBodyCode = $this->getBodyGTMCode();
     }
 
     /**
