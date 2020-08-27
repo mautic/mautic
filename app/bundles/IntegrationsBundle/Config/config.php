@@ -105,9 +105,8 @@ return [
                     'mautic.helper.integration',
                 ],
             ],
-
             'mautic.integrations.subscriber.pseudo_fields' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\EventListener\ContactPseudoFieldsSubscriber::class,
+                'class'     => \Mautic\IntegrationsBundle\EventListener\ContactPseudoFieldsSubscriber::class,
                 'arguments' => [
                     'mautic.integrations.helper.contact_object',
                 ],
