@@ -135,7 +135,7 @@ final class IntegrationEvents
     /**
      * The mautic.integration.INTEGRATION_CONTACT_PROCESS_PSEUDO_FIELDS event is dispatched when a process of pseudo (custom) fields are dispatched.
      *
-     * The event listener receives a MauticPlugin\IntegrationsBundle\Event\InternalContactProcessPseudFieldsEvent instance.
+     * The event listener receives a Mautic\IntegrationsBundle\Event\InternalContactProcessPseudFieldsEvent instance.
      *
      * @var string
      */

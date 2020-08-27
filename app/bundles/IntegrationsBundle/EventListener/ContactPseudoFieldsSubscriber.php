@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\EventListener;
 
-use MauticPlugin\IntegrationsBundle\Event\InternalContactProcessPseudFieldsEvent;
-use MauticPlugin\IntegrationsBundle\IntegrationEvents;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
+use Mautic\IntegrationsBundle\Event\InternalContactProcessPseudFieldsEvent;
+use Mautic\IntegrationsBundle\IntegrationEvents;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ContactPseudoFieldsSubscriber implements EventSubscriberInterface

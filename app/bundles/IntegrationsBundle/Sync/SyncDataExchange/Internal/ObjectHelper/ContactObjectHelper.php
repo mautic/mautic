@@ -15,6 +15,8 @@ namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper;
 
 use Doctrine\DBAL\Connection;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
+use Mautic\IntegrationsBundle\Event\InternalContactProcessPseudFieldsEvent;
+use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
@@ -29,8 +31,6 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use MauticPlugin\IntegrationsBundle\Event\InternalContactProcessPseudFieldsEvent;
-use MauticPlugin\IntegrationsBundle\IntegrationEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ContactObjectHelper implements ObjectHelperInterface
