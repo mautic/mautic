@@ -22,11 +22,17 @@ class GTMHelper extends Helper
     private $code;
 
     /**
+     * @var bool
+     */
+    private $landingpage_enabled;
+
+    /**
      * GTMHelper constructor.
      */
     public function __construct(CoreParametersHelper $parametersHelper)
     {
-        $this->code        = $parametersHelper->get('google_tag_manager_id', '');
+        $this->code                = $parametersHelper->get('google_tag_manager_id', '');
+        $this->landingpage_enabled = $parametersHelper->get('google_tag_manager_landingpage_enabled', '');
     }
 
     /**
@@ -35,6 +41,14 @@ class GTMHelper extends Helper
     public function getCode()
     {
         return $this->code;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getLandingPageEnabled()
+    {
+        return $this->landingpage_enabled;
     }
 
     /**
