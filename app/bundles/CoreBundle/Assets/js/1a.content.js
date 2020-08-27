@@ -1636,7 +1636,7 @@ Mautic.activateTypeahead = function (el, options) {
     }
 
     var noRrecordMessage = (options.noRrecordMessage) ? options.noRrecordMessage : mQuery(el).data('no-record-message');
-    var theName = el.replace(/[^a-z0-9\s]/gi, '').replace(/[-\s]/g, '_');	    var theName = el.replace(/[^a-z0-9\s]/gi, '').replace(/[-\s]/g, '_');
+    var theName = el.replace(/[^a-z0-9\s]/gi, '').replace(/[-\s]/g, '_');
     var dataset = {
         name: theName,
         displayKey: options.displayKey,
