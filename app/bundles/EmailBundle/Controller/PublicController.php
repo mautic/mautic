@@ -67,6 +67,9 @@ class PublicController extends CommonFormController
 
             $content = $this->get('mautic.helper.template.analytics')->addCode($content);
 
+            $gtmHeadCode = $this->get('mautic.helper.template.gtm')->getHeadGTMCode();
+            $gtmBodyCode = $this->get('mautic.helper.template.gtm')->getBodyGTMCode();
+
             // Add subject as title
             if (!empty($subject)) {
                 if (false !== strpos($content, '<title></title>')) {
@@ -377,10 +380,19 @@ class PublicController extends CommonFormController
             $template = $this->coreParametersHelper->get('theme');
         }
 
-        $analytics = $this->factory->getHelper('template.analytics')->getCode();
+        $analytics   = $this->factory->getHelper('template.analytics')->getCode();
+        $gtmHeadCode = $this->get('mautic.helper.template.gtm')->getHeadGTMCode();
+        $gtmBodyCode = $this->get('mautic.helper.template.gtm')->getBodyGTMCode();
+
+        $assetsHelper = $this->factory->getHelper('template.assets');
 
         if (!empty($analytics)) {
-            $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
+            $assetsHelper->addCustomDeclaration($analytics);
+        }
+
+        if (!empty($gtmHeadCode) && !empty($gtmBodyCode)) {
+            $assetsHelper->addCustomDeclaration($gtmHeadCode);
+            $assetsHelper->addCustomDeclaration($gtmBodyCode, 'bodyOpen');
         }
 
         $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.php');

@@ -223,9 +223,11 @@ class PublicController extends CommonFormController
             }
 
             // Generate contents
+            $gtmHelper = $this->get('mautic.helper.template.gtm');
+
             $analytics   = $this->get('mautic.helper.template.analytics')->getCode();
-            $gtmHeadCode = $this->get('mautic.helper.template.gtm')->getHeadGTMCode();
-            $gtmBodyCode = $this->get('mautic.helper.template.gtm')->getBodyGTMCode();
+            $gtmHeadCode = $gtmHelper->getLandingPageEnabled() ? $gtmHelper->getHeadGTMCode() : '';
+            $gtmBodyCode = $gtmHelper->getLandingPageEnabled() ? $gtmHelper->getBodyGTMCode() : '';
 
             $BCcontent = $entity->getContent();
             $content   = $entity->getCustomHtml();
@@ -322,9 +324,11 @@ class PublicController extends CommonFormController
             return $this->notFound();
         }
 
+        $gtmHelper = $this->get('mautic.helper.template.gtm');
+
         $analytics   = $this->factory->getHelper('template.analytics')->getCode();
-        $gtmHeadCode = $this->get('mautic.helper.template.gtm')->getHeadGTMCode();
-        $gtmBodyCode = $this->get('mautic.helper.template.gtm')->getBodyGTMCode();
+        $gtmHeadCode = $gtmHelper->getLandingPageEnabled() ? $gtmHelper->getHeadGTMCode() : '';
+        $gtmBodyCode = $gtmHelper->getLandingPageEnabled() ? $gtmHelper->getBodyGTMCode() : '';
 
         $BCcontent = $entity->getContent();
         $content   = $entity->getCustomHtml();
