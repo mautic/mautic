@@ -558,12 +558,12 @@ class ThemeHelper
 
         $archive = $zipper->open($tmpPath, \ZipArchive::CREATE);
 
-        $$this->finder->files()->in($themePath);
+        $this->finder->files()->in($themePath);
 
         if (true !== $archive) {
             throw new \Exception($this->getExtractError($archive));
         } else {
-            foreach ($$this->finder as $file) {
+            foreach ($this->finder as $file) {
                 $filePath  = $file->getRealPath();
                 $localPath = $file->getRelativePathname();
                 $zipper->addFile($filePath, $localPath);
