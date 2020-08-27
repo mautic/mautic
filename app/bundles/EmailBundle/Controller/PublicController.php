@@ -66,9 +66,7 @@ class PublicController extends CommonFormController
             }
 
             $content = $this->get('mautic.helper.template.analytics')->addCode($content);
-
-            $gtmHeadCode = $this->get('mautic.helper.template.gtm')->getHeadGTMCode();
-            $gtmBodyCode = $this->get('mautic.helper.template.gtm')->getBodyGTMCode();
+            $content = $this->get('mautic.helper.template.gtm')->addCode($content);
 
             // Add subject as title
             if (!empty($subject)) {
