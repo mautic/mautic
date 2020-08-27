@@ -29,6 +29,9 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use MauticPlugin\IntegrationsBundle\Event\InternalContactProcessPseudFieldsEvent;
+use MauticPlugin\IntegrationsBundle\IntegrationEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ContactObjectHelper implements ObjectHelperInterface
 {
@@ -62,13 +65,16 @@ class ContactObjectHelper implements ObjectHelperInterface
      */
     private $dncModel;
 
-    public function __construct(LeadModel $model, LeadRepository $repository, Connection $connection, FieldModel $fieldModel, DoNotContactModel $dncModel)
+    private $dispatcher;
+
+    public function __construct(LeadModel $model, LeadRepository $repository, Connection $connection, FieldModel $fieldModel, DoNotContactModel $dncModel, EventDispatcherInterface $dispatcher)
     {
         $this->model      = $model;
         $this->repository = $repository;
         $this->connection = $connection;
         $this->fieldModel = $fieldModel;
         $this->dncModel   = $dncModel;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -358,6 +364,12 @@ class ContactObjectHelper implements ObjectHelperInterface
      */
     private function processPseudoFields(Lead $contact, array $fields, string $integration): void
     {
+        $event = new InternalContactProcessPseudFieldsEvent($contact, $fields, $integration);
+        $this->dispatcher->dispatch(IntegrationEvents::INTEGRATION_CONTACT_PROCESS_PSEUDO_FIELDS, $event);
+    }
+
+    public function processStandardPseudoFields(Lead $contact, array $fields, string $integration)
+    {
         foreach ($fields as $name => $field) {
             if (0 === strpos($name, 'mautic_internal_dnc_')) {
                 $channel   = str_replace('mautic_internal_dnc_', '', $name);
@@ -384,8 +396,6 @@ class ContactObjectHelper implements ObjectHelperInterface
                 $ownerId = $field->getValue()->getNormalizedValue();
                 $this->model->updateLeadOwner($contact, $ownerId);
             }
-
-            // Ignore all others as unrecognized
         }
     }
 
