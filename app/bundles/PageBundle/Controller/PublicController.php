@@ -248,7 +248,7 @@ class PublicController extends CommonFormController
 
                 if (!empty($gtmHeadCode) && !empty($gtmBodyCode)) {
                     $this->factory->getHelper('template.assets')->addCustomDeclaration($gtmHeadCode);
-                    $this->factory->getHelper('template.assets')->addCustomDeclaration($gtmBodyCode, 'body');
+                    $this->factory->getHelper('template.assets')->addCustomDeclaration($gtmBodyCode, 'bodyOpen');
                 }
 
                 $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':page.html.php');
@@ -343,7 +343,7 @@ class PublicController extends CommonFormController
 
             if (!empty($gtmHeadCode) && !empty($gtmBodyCode)) {
                 $this->factory->getHelper('template.assets')->addCustomDeclaration($gtmHeadCode);
-                $this->factory->getHelper('template.assets')->addCustomDeclaration($gtmBodyCode, 'body');
+                $this->factory->getHelper('template.assets')->addCustomDeclaration($gtmBodyCode, 'bodyOpen');
             }
 
             $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':page.html.php');
