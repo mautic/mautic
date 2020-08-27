@@ -189,8 +189,8 @@ class FormSubscriber implements EventSubscriberInterface
         }
 
         if (!empty($gtmHeadCode) && !empty($gtmBodyCode)) {
-            $this->factory->getHelper('template.assets')->addCustomDeclaration($gtmHeadCode);
-            $this->factory->getHelper('template.assets')->addCustomDeclaration($gtmBodyCode, 'bodyOpen');
+            $this->$assetsHelper->addCustomDeclaration($gtmHeadCode);
+            $this->$assetsHelper->addCustomDeclaration($gtmBodyCode, 'bodyOpen');
         }
 
         $event->setPostSubmitResponse(new Response(
