@@ -211,7 +211,10 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             'data-field-callback' => isset($properties['callback']) ? $properties['callback'] : 'activateSegmentFilterTypeahead',
             'data-target'         => $event->getFieldAlias(),
             'placeholder'         => $this->translator->trans(
-                'mautic.lead.list.form.filtervalue'
+                'mautic.lead.list.form.startTyping'
+            ),
+            'data-no-record-message'=> $this->translator->trans(
+                'mautic.core.form.nomatches'
             ),
         ];
 

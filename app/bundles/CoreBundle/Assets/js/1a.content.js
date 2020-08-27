@@ -1040,6 +1040,10 @@ Mautic.activateFieldTypeahead = function (field, target, options, action) {
             typeAheadOptions.limit = options.limit;
         }
 
+        if (('undefined' !== typeof options) && ('undefined' !== typeof options.noRrecordMessage)) {
+            typeAheadOptions.noRrecordMessage = options.noRrecordMessage;
+        }
+
         var fieldTypeahead = Mautic.activateTypeahead(fieldId, typeAheadOptions);
     }
 
@@ -1631,7 +1635,19 @@ Mautic.activateTypeahead = function (el, options) {
         }
     }
 
-    var theName = el.replace(/[^a-z0-9\s]/gi, '').replace(/[-\s]/g, '_');
+    var noRrecordMessage = (options.noRrecordMessage) ? options.noRrecordMessage : mQuery(el).data('no-record-message');
+    var theName = el.replace(/[^a-z0-9\s]/gi, '').replace(/[-\s]/g, '_');	    var theName = el.replace(/[^a-z0-9\s]/gi, '').replace(/[-\s]/g, '_');
+    var dataset = {
+        name: theName,
+        displayKey: options.displayKey,
+        source: (typeof theBloodhound != 'undefined') ? theBloodhound.ttAdapter() : substringMatcher(lookupOptions, lookupKeys)
+    };
+
+    if (noRrecordMessage) {
+        dataset.templates = {
+            empty: "<p>" + noRrecordMessage + "<p>"
+        }
+    }
 
     var theTypeahead = mQuery(el).typeahead(
         {
@@ -1640,11 +1656,7 @@ Mautic.activateTypeahead = function (el, options) {
             minLength: options.minLength,
             multiple: options.multiple
         },
-        {
-            name: theName,
-            displayKey: options.displayKey,
-            source: (typeof theBloodhound != 'undefined') ? theBloodhound.ttAdapter() : substringMatcher(lookupOptions, lookupKeys)
-        }
+        dataset
     ).on('keypress', function (event) {
         if ((event.keyCode || event.which) == 13) {
             mQuery(el).typeahead('close');
