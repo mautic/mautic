@@ -271,7 +271,9 @@ Mautic.keepPreviewAlive = function(iframeId, slot) {
     window.setInterval(function() {
         if (codeChanged) {
             var value = (Mautic.builderCodeMirror)?Mautic.builderCodeMirror.getValue():'';
-            Mautic.setCodeModeSlotContent(slot, value);
+            if (!Mautic.isCodeMode()) {
+                Mautic.setCodeModeSlotContent(slot, value);
+            }
             Mautic.livePreviewInterval = Mautic.updateIframeContent(iframeId, value, slot);
             codeChanged = false;
         }
