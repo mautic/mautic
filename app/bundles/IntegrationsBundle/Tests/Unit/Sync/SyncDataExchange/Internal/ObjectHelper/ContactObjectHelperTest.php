@@ -29,6 +29,7 @@ use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ContactObjectHelperTest extends TestCase
 {
@@ -57,6 +58,11 @@ class ContactObjectHelperTest extends TestCase
      */
     private $doNotContactModel;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
     protected function setUp(): void
     {
         defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
@@ -66,6 +72,7 @@ class ContactObjectHelperTest extends TestCase
         $this->connection        = $this->createMock(Connection::class);
         $this->fieldModel        = $this->createMock(FieldModel::class);
         $this->doNotContactModel = $this->createMock(DoNotContact::class);
+        $this->eventDispatcher   = $this->createMock(EventDispatcherInterface::class);
 
         $this->fieldModel->method('getFieldList')
             ->willReturn(
@@ -175,9 +182,8 @@ class ContactObjectHelperTest extends TestCase
 
     public function testDoNotContactIsAdded(): void
     {
-        $this->doNotContactModel->expects($this->once())
-            ->method('addDncForContact')
-            ->with(1, 'email', 1, 'Test', true, true, true);
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch');
 
         $objectChangeDAO = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new \DateTime());
         $objectChangeDAO->addField(new FieldDAO('mautic_internal_dnc_email', new NormalizedValueDAO(NormalizedValueDAO::INT_TYPE, 1)));
@@ -198,9 +204,8 @@ class ContactObjectHelperTest extends TestCase
 
     public function testDoNotContactIsRemoved(): void
     {
-        $this->doNotContactModel->expects($this->once())
-            ->method('removeDncForContact')
-            ->with(1, 'email');
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch');
 
         $objectChangeDAO = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new \DateTime());
         $objectChangeDAO->addField(new FieldDAO('mautic_internal_dnc_email', new NormalizedValueDAO(NormalizedValueDAO::INT_TYPE, 0)));
@@ -221,9 +226,8 @@ class ContactObjectHelperTest extends TestCase
 
     public function testUnrecognizedDoNotContactDefaultsToManualDNC(): void
     {
-        $this->doNotContactModel->expects($this->once())
-            ->method('addDncForContact')
-            ->with(1, 'email', 3, 'Test', true, true, true);
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch');
 
         $objectChangeDAO = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new \DateTime());
         $objectChangeDAO->addField(new FieldDAO('mautic_internal_dnc_email', new NormalizedValueDAO(NormalizedValueDAO::INT_TYPE, 4)));
@@ -247,6 +251,6 @@ class ContactObjectHelperTest extends TestCase
      */
     private function getObjectHelper()
     {
-        return new ContactObjectHelper($this->model, $this->repository, $this->connection, $this->fieldModel, $this->doNotContactModel);
+        return new ContactObjectHelper($this->model, $this->repository, $this->connection, $this->fieldModel, $this->doNotContactModel, $this->eventDispatcher);
     }
 }
