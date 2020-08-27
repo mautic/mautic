@@ -535,6 +535,17 @@ fbq('init', '{$id}'); // Insert your pixel ID here.
 fbq('track', 'PageView', {$customMatch});
 JS;
         }
+
+        if ($id = $this->trackingHelper->displayInitCode('google_tag_manager')) {
+            $js .= <<<JS
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','{$id}');
+JS;
+        }
+
         $js .= <<<'JS'
         MauticJS.mtcEventSet=false;
         document.addEventListener('mauticPageEventDelivered', function(e) {
