@@ -271,7 +271,7 @@ Mautic.keepPreviewAlive = function(iframeId, slot) {
     window.setInterval(function() {
         if (codeChanged) {
             var value = (Mautic.builderCodeMirror)?Mautic.builderCodeMirror.getValue():'';
-            if (!Mautic.isCodeMode()) {
+            if (!Mautic.codeMode) {
                 Mautic.setCodeModeSlotContent(slot, value);
             }
             Mautic.livePreviewInterval = Mautic.updateIframeContent(iframeId, value, slot);
