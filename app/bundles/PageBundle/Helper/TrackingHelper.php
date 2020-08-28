@@ -53,7 +53,6 @@ class TrackingHelper
     {
         $keys = [
             'google_analytics'   => 'Google Analytics',
-            'google_tag_manager' => 'Google Tag Manager',
             'facebook_pixel'     => 'Facebook Pixel',
         ];
         $result = [];
