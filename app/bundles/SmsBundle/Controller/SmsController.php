@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\SmsBundle\Entity\Sms;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-
+use Mautic\SmsBundle\Form\Type\ExampleSendType;
 class SmsController extends FormController
 {
     use EntityContactsTrait;
@@ -744,6 +744,108 @@ class SmsController extends FormController
             'sms_message_stats',
             'sms',
             'sms_id'
+        );
+    }
+    /**
+     * Generating the modal box content for
+     * the send multiple example email option.
+     */
+    public function sendExampleAction($objectId)
+    {
+        $model  = $this->getModel('sms');
+        $entity = $model->getEntity($objectId);
+
+        //not found or not allowed
+        if ($entity === null
+            || (!$this->get('mautic.security')->hasEntityAccess(
+                'sms:smses:viewown',
+                'sms:smses:viewother',
+                $entity->getCreatedBy()
+            ))
+        ) {
+            return $this->postActionRedirect(
+                [
+                    'passthroughVars' => [
+                        'closeModal' => 1,
+                        'route'      => false,
+                    ],
+                ]
+            );
+        }
+
+        // Get the quick add form
+        $action = $this->generateUrl('mautic_sms_action', ['objectAction' => 'sendExample', 'objectId' => $objectId]);
+        $user   = $this->get('mautic.helper.user')->getUser();
+
+        $form = $this->createForm(ExampleSendType::class, ['emails' => ['list' => [$user->getEmail()]]], ['action' => $action]);
+        /* @var \Mautic\EmailBundle\Model\EmailModel $model */
+
+        if ($this->request->getMethod() == 'POST') {
+            $isCancelled = $this->isFormCancelled($form);
+            $isValid     = $this->isFormValid($form);
+            if (!$isCancelled && $isValid) {
+                $phoneNumbers = $form['number']->getData()['list'];
+
+                // Prepare a fake lead
+                /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
+                $fieldModel = $this->getModel('lead.field');
+                $fields     = $fieldModel->getFieldList(false, false);
+                array_walk(
+                    $fields,
+                    function (&$field) {
+                        $field = "[$field]";
+                    }
+                );
+                $fields['id'] = 0;
+
+                $errors = [];
+                foreach ($phoneNumbers as $phoneN) {
+                    if (!empty($phoneN)) {
+                        $users = [
+                            [
+                                // Setting the id, firstname and lastname to null as this is a unknown user
+                                'id'        => '',
+                                'firstname' => '',
+                                'lastname'  => '',
+                                'phone'     => $phoneN,
+                                'email'     => '',
+                            ],
+                        ];
+
+                        // Send to current user
+                        $error = $model->sendSampleSmsToUser($entity, $users);
+                        if (count($error)) {
+                            array_push($errors, $error[0]);
+                        }
+                    }
+                }
+
+                if (count($errors) != 0) {
+                    $this->addFlash(implode('; ', $errors));
+                } else {
+                    $this->addFlash('mautic.email.notice.test_sent_multiple.success');
+                }
+            }
+
+            if ($isValid || $isCancelled) {
+                return $this->postActionRedirect(
+                    [
+                        'passthroughVars' => [
+                            'closeModal' => 1,
+                            'route'      => false,
+                        ],
+                    ]
+                );
+            }
+        }
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'form' => $form->createView(),
+                ],
+                'contentTemplate' => 'MauticSmsBundle:Sms:recipients.html.php',
+            ]
         );
     }
 }

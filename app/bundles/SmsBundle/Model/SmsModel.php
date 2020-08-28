@@ -329,7 +329,123 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
 
         return $results;
     }
+    /**
+     * Send an SMS to lead(s).
+     *
+          * @param Sms   $sms
+     * @param       $sendTo
+     * @param array $options
+     *
+     * @return array
+     */
+    public function sendSampleSmsToUser(Sms $sms, $sendTo, $options = [])
+    {
+        $channel = (isset($options['channel'])) ? $options['channel'] : null;
+        $listId  = (isset($options['listId'])) ? $options['listId'] : null;
 
+        if ($sendTo instanceof Lead) {
+            $sendTo = [$sendTo];
+        } elseif (!is_array($sendTo)) {
+            $sendTo = [$sendTo];
+        }
+        $sentCount       = 0;
+        $failedCount     = 0;
+        $results         = [];
+        $contacts        = [];
+        $fetchContacts   = [];
+        foreach ($sendTo as $lead) {
+            if (!$lead instanceof Lead) {
+                $fetchContacts[] = $lead;
+            } else {
+                $contacts[$lead->getId()] = $lead;
+            }
+        }
+        if ($fetchContacts) {
+            $foundContacts = $this->leadModel->getEntities(
+                [
+                    'ids' => $fetchContacts,
+                ]
+            );
+
+            foreach ($foundContacts as $contact) {
+                $contacts[$contact->getId()] = $contact;
+            }
+        }
+        
+        if (!empty($contacts)) {
+            $stats = [];
+            // @todo we should allow batch sending based on transport, MessageBird does support 20 SMS at once
+            // the transport chain is already prepared for it
+            if (count($contacts)) {
+                /** @var Lead $lead */
+                foreach ($contacts as $lead) {
+                    $leadId          = $lead->getId();
+                    $stat            = $this->createStatEntry($sms, $lead, $channel, false, $listId);
+
+                    $leadPhoneNumber = $lead->getLeadPhoneNumber();
+
+                    if (empty($leadPhoneNumber)) {
+                        $results[$leadId] = [
+                            'sent'   => false,
+                            'status' => 'mautic.sms.campaign.failed.missing_number',
+                        ];
+
+                        continue;
+                    }
+
+                    $smsEvent = new SmsSendEvent($sms->getMessage(), $lead);
+                    $smsEvent->setSmsId($sms->getId());
+                    $this->dispatcher->dispatch(SmsEvents::SMS_ON_SEND, $smsEvent);
+
+                    $tokenEvent = $this->dispatcher->dispatch(
+                        SmsEvents::TOKEN_REPLACEMENT,
+                        new TokenReplacementEvent(
+                            $smsEvent->getContent(),
+                            $lead,
+                            [
+                                'channel' => [
+                                    'sms',          // Keep BC pre 2.14.1
+                                    $sms->getId(),  // Keep BC pre 2.14.1
+                                    'sms' => $sms->getId(),
+                                ],
+                                'stat'    => $stat->getTrackingHash(),
+                            ]
+                        )
+                    );
+
+                    $sendResult = [
+                        'sent'    => false,
+                        'type'    => 'mautic.sms.sms',
+                        'status'  => 'mautic.sms.timeline.status.delivered',
+                        'id'      => $sms->getId(),
+                        'name'    => $sms->getName(),
+                        'content' => $tokenEvent->getContent(),
+                    ];
+
+                    $metadata = $this->transport->sendSms($lead, $tokenEvent->getContent(), $stat);
+                    if (true !== $metadata) {
+                        $sendResult['status'] = $metadata;
+                        $stat->setIsFailed(true);
+                        if (is_string($metadata)) {
+                            $stat->addDetail('failed', $metadata);
+                        }
+                        ++$failedCount;
+                    } else {
+                        $sendResult['sent'] = true;
+                        ++$sentCount;
+                    }
+
+                    $stats[]            = $stat;
+                    unset($stat);
+                    $results[$leadId] = $sendResult;
+
+                    unset($smsEvent, $tokenEvent, $sendResult, $metadata);
+                }
+            }
+        }
+        return $results;
+    } 
+    
     /**
      * @param null $source
      * @param bool $persist
