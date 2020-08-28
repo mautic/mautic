@@ -16,11 +16,6 @@ use Aws\Credentials\Credentials;
 use Aws\Exception\AwsException;
 use Aws\ResultInterface;
 use Aws\Ses\SesClient;
-use bandwidthThrottle\tokenBucket\BlockingConsumer;
-use bandwidthThrottle\tokenBucket\Rate;
-use bandwidthThrottle\tokenBucket\storage\SingleProcessStorage;
-use bandwidthThrottle\tokenBucket\storage\StorageException;
-use bandwidthThrottle\tokenBucket\TokenBucket;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback;
 use Psr\Log\LoggerInterface;
@@ -29,7 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Class AmazonApiTransport.
  */
-class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_Transport, TokenTransportInterface, CallbackTransportInterface, BounceProcessorInterface, UnsubscriptionProcessorInterface
+class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_Transport, CallbackTransportInterface, BounceProcessorInterface, UnsubscriptionProcessorInterface
 {
     /**
      * @var string
@@ -67,38 +62,12 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     private $amazonCallback;
 
     /**
-     * @var BlockingConsumer
-     */
-    private $createTemplateBucketConsumer;
-
-    /**
-     * @var BlockingConsumer
-     */
-    private $sendTemplateBucketConsumer;
-
-    /**
-     * @var array
-     */
-    private $templateCache;
-
-    /**
      * AmazonApiTransport constructor.
      */
     public function __construct(LoggerInterface $logger, AmazonCallback $amazonCallback)
     {
         $this->logger         = $logger;
         $this->amazonCallback = $amazonCallback;
-        $this->templateCache  = [];
-    }
-
-    public function __destruct()
-    {
-        if (count($this->templateCache)) {
-            $this->logger->debug('Deleting SES templates that were created in this session');
-            foreach ($this->templateCache as $templateName) {
-                $this->deleteSesTemplate($templateName);
-            }
-        }
     }
 
     /**
@@ -128,7 +97,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
 
     /**
      * SES authorization and choice of region
-     * Initializing of TokenBucket.
      *
      * @throws \Exception
      */
@@ -160,11 +128,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                 throw new \Exception('Your AWS SES quota is currently exceeded');
             }
 
-            /*
-             * initialize throttle token buckets
-             */
-            $this->initializeThrottles();
-
             $this->started = true;
         }
     }
@@ -186,45 +149,8 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                 return 0;
             }
         }
-        $count = $this->getBatchRecipientCount($message);
 
-        /*
-         * If there is an attachment, send mail using sendRawEmail method
-         * current sendBulkTemplatedEmail method doesn't support attachments
-         */
-        if (!empty($message->getAttachments())) {
-            return $this->sendRawEmail($message, $evt, $failedRecipients);
-        }
-
-        list($amazonTemplate, $amazonMessage) = $this->constructSesTemplateAndMessage($message);
-
-        try {
-            $this->start();
-
-            $this->createSesTemplate($amazonTemplate);
-
-            $this->sendSesBulkTemplatedEmail($count, $amazonMessage);
-
-            if ($evt) {
-                $evt->setResult(\Swift_Events_SendEvent::RESULT_SUCCESS);
-                $evt->setFailedRecipients($failedRecipients);
-                $this->getDispatcher()->dispatchEvent($evt, 'sendPerformed');
-            }
-
-            return $count;
-        } catch (AwsException $e) {
-            $this->triggerSendError($evt, $failedRecipients);
-            $message->generateId();
-
-            $this->throwException($e->getAwsErrorMessage());
-        } catch (\Exception $e) {
-            $this->triggerSendError($evt, $failedRecipients);
-            $message->generateId();
-
-            $this->throwException($e->getMessage());
-        }
-
-        return 0;
+        return $this->sendRawEmail($message, $evt, $failedRecipients);
     }
 
     /**
@@ -247,43 +173,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
-     * Initialize the token buckets for throttling.
-     *
-     * @throws \Exception
-     */
-    private function initializeThrottles()
-    {
-        try {
-            /**
-             * SES limits creating templates to approximately one per second.
-             */
-            $storageCreate                      = new SingleProcessStorage();
-            $rateCreate                         = new Rate(1, Rate::SECOND);
-            $bucketCreate                       = new TokenBucket(1, $rateCreate, $storageCreate);
-            $this->createTemplateBucketConsumer = new BlockingConsumer($bucketCreate);
-            $bucketCreate->bootstrap(1);
-
-            /**
-             * SES limits sending emails based on requested account-level limits.
-             */
-            $storageSend                      = new SingleProcessStorage();
-            $rateSend                         = new Rate($this->concurrency, Rate::SECOND);
-            $bucketSend                       = new TokenBucket($this->concurrency, $rateSend, $storageSend);
-            $this->sendTemplateBucketConsumer = new BlockingConsumer($bucketSend);
-            $bucketSend->bootstrap($this->concurrency);
-        } catch (\InvalidArgumentException $e) {
-            $this->logger->error('error configuring token buckets: '.$e->getMessage());
-            throw new \Exception($e->getMessage());
-        } catch (StorageException $e) {
-            $this->logger->error('error bootstrapping token buckets: '.$e->getMessage());
-            throw new \Exception($e->getMessage());
-        } catch (\Exception $e) {
-            $this->logger->error('error initializing token buckets: '.$e->getMessage());
-            throw $e;
-        }
-    }
-
-    /**
      * Retrieve the send quota from SES.
      *
      * @return \Aws\Result
@@ -301,193 +190,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             $this->logger->error('Error retrieving AWS SES quota info: '.$e->getMessage());
             throw new \Exception($e->getMessage());
         }
-    }
-
-    /**
-     * @param array $template
-     *
-     * @return \Aws\Result|null
-     *
-     * @throws \Exception
-     *
-     * @see https://docs.aws.amazon.com/ses/latest/APIReference/API_CreateTemplate.html
-     */
-    private function createSesTemplate($template)
-    {
-        $templateName = $template['TemplateName'];
-
-        $this->logger->debug('Creating SES template: '.$templateName);
-
-        /*
-         * reuse an existing template if we have created one
-         */
-        if (false !== array_search($templateName, $this->templateCache)) {
-            $this->logger->debug('Template '.$templateName.' already exists in cache');
-
-            return null;
-        }
-
-        /*
-         * wait for a throttle token
-         */
-        $this->createTemplateBucketConsumer->consume(1);
-
-        try {
-            $result = $this->client->createTemplate(['Template' => $template]);
-        } catch (AwsException $e) {
-            switch ($e->getAwsErrorCode()) {
-                case 'AlreadyExists':
-                    $this->logger->debug('\Exception creating template: '.$templateName.', '.$e->getAwsErrorCode().', '.$e->getAwsErrorMessage().', ignoring');
-                    break;
-                default:
-                    $this->logger->error('\Exception creating template: '.$templateName.', '.$e->getAwsErrorCode().', '.$e->getAwsErrorMessage());
-                    throw new \Exception($e->getMessage());
-            }
-        }
-
-        /*
-         * store the name of this template so that we can delete it when we are done sending
-         */
-        $this->templateCache[] = $templateName;
-
-        return $result;
-    }
-
-    /**
-     * @param string $templateName
-     *
-     * @return \Aws\Result
-     *
-     * @throws \Exception
-     *
-     * @see https://docs.aws.amazon.com/ses/latest/APIReference/API_DeleteTemplate.html
-     */
-    private function deleteSesTemplate($templateName)
-    {
-        $this->logger->debug('Deleting SES template: '.$templateName);
-
-        try {
-            return $this->client->deleteTemplate(['TemplateName' => $templateName]);
-        } catch (AwsException $e) {
-            $this->logger->error('\Exception deleting template: '.$templateName.', '.$e->getAwsErrorCode().', '.$e->getAwsErrorMessage());
-            throw new \Exception($e->getMessage());
-        }
-    }
-
-    /**
-     * @param int   $count   number of recipients for us to consume from the ticket bucket
-     * @param array $message
-     *
-     * @return \Aws\Result
-     *
-     * @throws \Exception
-     *
-     * @see https://docs.aws.amazon.com/ses/latest/APIReference/API_SendBulkTemplatedEmail.html
-     */
-    private function sendSesBulkTemplatedEmail($count, $message)
-    {
-        $this->logger->debug('Sending SES template: '.$message['Template'].' to '.$count.' recipients');
-
-        // wait for a throttle token
-        $this->sendTemplateBucketConsumer->consume($count);
-
-        try {
-            return $this->client->sendBulkTemplatedEmail($message);
-        } catch (AwsException $e) {
-            $this->logger->error('\Exception sending email template: '.$e->getAwsErrorCode().', '.$e->getAwsErrorMessage());
-            throw new \Exception($e->getMessage());
-        }
-    }
-
-    /**
-     * Parse message into a template and recipients with their respective replacement tokens.
-     *
-     * @return array of a template and a message
-     */
-    private function constructSesTemplateAndMessage(\Swift_Mime_SimpleMessage $message)
-    {
-        $this->message = $message;
-        $metadata      = $this->getMetadata();
-        $messageArray  = [];
-
-        if (!empty($metadata)) {
-            $metadataSet  = reset($metadata);
-            $emailId      = $metadataSet['emailId'];
-            $tokens       = (!empty($metadataSet['tokens'])) ? $metadataSet['tokens'] : [];
-            $mauticTokens = array_keys($tokens);
-            $tokenReplace = $amazonTokens = [];
-            foreach ($tokens as $search => $token) {
-                $tokenKey              = preg_replace('/[^\da-z]/i', '_', trim($search, '{}'));
-                $tokenReplace[$search] = '{{'.$tokenKey.'}}';
-                $amazonTokens[$search] = $tokenKey;
-            }
-            $messageArray = $this->messageToArray($mauticTokens, $tokenReplace, true);
-        }
-
-        $CcAddresses = [];
-        if (count($messageArray['recipients']['cc']) > 0) {
-            $CcAddresses = array_keys($messageArray['recipients']['cc']);
-        }
-
-        $BccAddresses = [];
-        if (count($messageArray['recipients']['bcc']) > 0) {
-            $BccAddresses = array_keys($messageArray['recipients']['bcc']);
-        }
-
-        $replyToAddresses = [];
-        if (isset($messageArray['replyTo']['email'])) {
-            $replyToAddresses = [$messageArray['replyTo']['email']];
-        }
-
-        $ConfigurationSetName = null;
-        if (isset($messageArray['headers']['X-SES-CONFIGURATION-SET'])) {
-            $ConfigurationSetName = $messageArray['headers']['X-SES-CONFIGURATION-SET'];
-        }
-
-        //build amazon ses template array
-        $amazonTemplate = [
-            'TemplateName' => 'MauticTemplate-'.$emailId.'-'.md5($messageArray['subject'].$messageArray['html'].'-'.getmypid()), //unique template name
-            'SubjectPart'  => $messageArray['subject'],
-            'TextPart'     => $messageArray['text'],
-            'HtmlPart'     => $messageArray['html'],
-        ];
-
-        $destinations = [];
-        foreach ($metadata as $recipient => $mailData) {
-            $ReplacementTemplateData = [];
-            foreach ($mailData['tokens'] as $token => $tokenData) {
-                $ReplacementTemplateData[$amazonTokens[$token]] = $tokenData;
-            }
-
-            $destinations[] = [
-                'Destination' => [
-                    'BccAddresses' => $BccAddresses,
-                    'CcAddresses'  => $CcAddresses,
-                    'ToAddresses'  => [$recipient],
-                ],
-                'ReplacementTemplateData' => \GuzzleHttp\json_encode($ReplacementTemplateData),
-            ];
-        }
-
-        //build amazon ses message array
-        $amazonMessage = [
-            'ConfigurationSetName' => $ConfigurationSetName,
-            'DefaultTemplateData'  => $destinations[0]['ReplacementTemplateData'],
-            'Destinations'         => $destinations,
-            'Source'               => $messageArray['from']['email'],
-            'ReplyToAddresses'     => $replyToAddresses,
-            'Template'             => $amazonTemplate['TemplateName'],
-        ];
-
-        if (isset($messageArray['returnPath'])) {
-            $amazonMessage['ReturnPath'] = $messageArray['returnPath'];
-        }
-
-        if (isset($messageArray['from']['name']) && '' !== trim($messageArray['from']['name'])) {
-            $amazonMessage['Source'] = '"'.$messageArray['from']['name'].'" <'.$messageArray['from']['email'].'>';
-        }
-
-        return [$amazonTemplate, $amazonMessage];
     }
 
     /**
@@ -563,6 +265,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
+     *
      * @param $msg
      * @param $recipient
      *
@@ -620,15 +323,14 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
-     * Return the max number of to addresses allowed per batch.
+     * Return the max number of to addresses allowed per batch
+     * No limit used since CommandPool handles the rate limiting.
      *
      * @return int
-     *
-     * @see https://docs.aws.amazon.com/ses/latest/DeveloperGuide/quotas.html
      */
     public function getMaxBatchLimit()
     {
-        return 50;
+        return 0;
     }
 
     /**
