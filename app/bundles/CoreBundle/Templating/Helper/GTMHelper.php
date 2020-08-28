@@ -46,7 +46,7 @@ class GTMHelper extends Helper
     /**
      * @return bool
      */
-    public function getLandingPageEnabled()
+    public function hasLandingPageEnabled()
     {
         return $this->landingpage_enabled;
     }
