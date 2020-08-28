@@ -96,7 +96,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
-     * SES authorization and choice of region
+     * SES authorization and choice of region.
      *
      * @throws \Exception
      */
