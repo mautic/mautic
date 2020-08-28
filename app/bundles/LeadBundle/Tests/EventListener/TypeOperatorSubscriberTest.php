@@ -284,10 +284,11 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                             $this->assertSame('', $options['data']);
                             $this->assertSame(
                                 [
-                                    'class'               => 'form-control',
-                                    'data-field-callback' => 'activateSegmentFilterTypeahead',
-                                    'data-target'         => 'owner',
-                                    'placeholder'         => 'mautic.lead.list.form.filtervalue',
+                                    'class'                 => 'form-control',
+                                    'data-field-callback'   => 'activateSegmentFilterTypeahead',
+                                    'data-target'           => 'owner',
+                                    'placeholder'           => 'mautic.lead.list.form.startTyping',
+                                    'data-no-record-message'=> 'mautic.core.form.nomatches',
                                 ],
                                 $options['attr']
                             );
@@ -339,11 +340,12 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                             $this->assertSame('', $options['data']);
                             $this->assertSame(
                                 [
-                                    'class'               => 'form-control',
-                                    'data-field-callback' => 'fooBarCallback',
-                                    'data-target'         => 'custom',
-                                    'placeholder'         => 'mautic.lead.list.form.filtervalue',
-                                    'data-action'         => 'foo.bar',
+                                    'class'                  => 'form-control',
+                                    'data-field-callback'    => 'fooBarCallback',
+                                    'data-target'            => 'custom',
+                                    'placeholder'            => 'mautic.lead.list.form.startTyping',
+                                    'data-no-record-message' => 'mautic.core.form.nomatches',
+                                    'data-action'            => 'foo.bar',
                                 ],
                                 $options['attr']
                             );
