@@ -114,6 +114,21 @@ class ObjectChangeGenerator
      */
     private function addFieldToObjectChange(FieldMappingDAO $fieldMappingDAO): void
     {
+        // Skip adding fields for the pull process that should sync to integration only.
+        if (ObjectMappingDAO::SYNC_TO_INTEGRATION === $fieldMappingDAO->getSyncDirection()) {
+            DebugLogger::log(
+                $this->mappingManual->getIntegration(),
+                sprintf(
+                    "Integration to Mautic; the %s object's field %s was skipped because it's configured to sync to the integration",
+                    $this->internalObject->getObject(),
+                    $fieldMappingDAO->getInternalField()
+                ),
+                __CLASS__.':'.__FUNCTION__
+            );
+
+            return;
+        }
+
         try {
             $integrationFieldState = $this->integrationObject->getField($fieldMappingDAO->getIntegrationField())->getState();
             $internalFieldState    = $this->getFieldState(
@@ -154,34 +169,14 @@ class ObjectChangeGenerator
             $internalFieldState
         );
 
-        /*
-         * Below here is just debug logging
-         */
-
         // ObjectMappingDAO::SYNC_TO_MAUTIC
-        if (ObjectMappingDAO::SYNC_TO_MAUTIC === $fieldMappingDAO->getSyncDirection()) {
-            DebugLogger::log(
-                $this->mappingManual->getIntegration(),
-                sprintf(
-                    'Integration to Mautic; syncing %s %s with a value of %s',
-                    $internalFieldState,
-                    $fieldMappingDAO->getInternalField(),
-                    var_export($newValue->getNormalizedValue(), true)
-                ),
-                self::class.':'.__FUNCTION__
-            );
-
-            return;
-        }
-
-        // ObjectMappingDAO::SYNC_TO_INTEGRATION:
         DebugLogger::log(
             $this->mappingManual->getIntegration(),
             sprintf(
-                "Integration to Mautic; the %s object's %s field %s was added to the list of required fields because it's configured to sync to the integration",
-                $this->internalObject->getObject(),
+                'Integration to Mautic; syncing %s %s with a value of %s',
                 $internalFieldState,
-                $fieldMappingDAO->getInternalField()
+                $fieldMappingDAO->getInternalField(),
+                var_export($newValue->getNormalizedValue(), true)
             ),
             self::class.':'.__FUNCTION__
         );
