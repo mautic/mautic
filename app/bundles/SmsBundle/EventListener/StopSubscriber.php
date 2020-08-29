@@ -25,6 +25,14 @@ class StopSubscriber implements EventSubscriberInterface
     private $doNotContactModel;
 
     /**
+     * StopSubscriber constructor.
+     */
+    public function __construct($doNotContactModel)
+    {
+        $this->doNotContactModel         = $doNotContactModel;
+    }
+
+    /**
      * @return array
      */
     public static function getSubscribedEvents()
