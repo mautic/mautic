@@ -265,7 +265,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
-     *
      * @param $msg
      * @param $recipient
      *
