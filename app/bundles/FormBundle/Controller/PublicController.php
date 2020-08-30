@@ -254,10 +254,8 @@ class PublicController extends CommonFormController
 
         $analytics = $this->factory->getHelper('template.analytics')->getCode();
 
-        $assetsHelper = $this->factory->getHelper('template.assets');
-
         if (!empty($analytics)) {
-            $assetsHelper->addCustomDeclaration($analytics);
+            $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
         }
 
         $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$this->coreParametersHelper->get('theme').':message.html.php');
@@ -339,7 +337,6 @@ class PublicController extends CommonFormController
             if (!empty($analytics)) {
                 $assetsHelper->addCustomDeclaration($analytics);
             }
-
             if ($form->getNoIndex()) {
                 $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
             }
