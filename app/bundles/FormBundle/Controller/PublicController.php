@@ -252,19 +252,12 @@ class PublicController extends CommonFormController
         $msg     = (!empty($message['message'])) ? $message['message'] : '';
         $msgType = (!empty($message['type'])) ? $message['type'] : 'notice';
 
-        $analytics   = $this->factory->getHelper('template.analytics')->getCode();
-        $gtmHeadCode = $this->get('mautic.helper.template.gtm')->getHeadGTMCode();
-        $gtmBodyCode = $this->get('mautic.helper.template.gtm')->getBodyGTMCode();
+        $analytics = $this->factory->getHelper('template.analytics')->getCode();
 
         $assetsHelper = $this->factory->getHelper('template.assets');
 
         if (!empty($analytics)) {
             $assetsHelper->addCustomDeclaration($analytics);
-        }
-
-        if (!empty($gtmHeadCode) && !empty($gtmBodyCode)) {
-            $assetsHelper->addCustomDeclaration($gtmHeadCode);
-            $assetsHelper->addCustomDeclaration($gtmBodyCode, 'bodyOpen');
         }
 
         $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$this->coreParametersHelper->get('theme').':message.html.php');
@@ -334,8 +327,6 @@ class PublicController extends CommonFormController
             $logicalName  = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':form.html.php');
             $assetsHelper = $this->factory->getHelper('template.assets');
             $analytics    = $this->factory->getHelper('template.analytics')->getCode();
-            $gtmHeadCode  = $this->get('mautic.helper.template.gtm')->getHeadGTMCode();
-            $gtmBodyCode  = $this->get('mautic.helper.template.gtm')->getBodyGTMCode();
 
             if (!empty($customStylesheets)) {
                 foreach ($customStylesheets as $css) {
@@ -347,11 +338,6 @@ class PublicController extends CommonFormController
 
             if (!empty($analytics)) {
                 $assetsHelper->addCustomDeclaration($analytics);
-            }
-
-            if (!empty($gtmHeadCode) && !empty($gtmBodyCode)) {
-                $assetsHelper->addCustomDeclaration($gtmHeadCode);
-                $assetsHelper->addCustomDeclaration($gtmBodyCode, 'bodyOpen');
             }
 
             if ($form->getNoIndex()) {

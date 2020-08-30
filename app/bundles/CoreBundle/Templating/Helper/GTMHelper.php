@@ -52,26 +52,6 @@ class GTMHelper extends Helper
     }
 
     /**
-     * @param string $content
-     */
-    public function addCode($content)
-    {
-        // Add Google Tag Manager
-        $gtmHead = $this->getHeadGTMCode();
-        $gtmBody = $this->getBodyGTMCode();
-        // Check for html doc
-        if (false === strpos($content, '<html')) {
-            $content = "<html>\n<head>{$gtmHead}</head>\n<body>{$gtmBody}\n{$content}</body>\n</html>";
-        } elseif (false === strpos($content, '<head>')) {
-            $content = str_replace('<html>', "<html>\n<head>\n{$gtmHead}\n</head>", $content);
-        } elseif (!empty($gtmHead)) {
-            $content = str_replace('</head>', $gtmHead."\n</head>", $content);
-        }
-
-        return $content;
-    }
-
-    /**
      * @return string
      */
     public function getHeadGTMCode()

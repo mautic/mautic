@@ -947,26 +947,18 @@ class FormController extends CommonFormController
         }
 
         $viewParams['template'] = $template;
-
         if (!empty($template)) {
             $logicalName     = $this->get('mautic.helper.theme')->checkForTwigTemplate(':'.$template.':form.html.php');
             $assetsHelper    = $this->get('templating.helper.assets');
             $slotsHelper     = $this->get('templating.helper.slots');
             $analyticsHelper = $this->get('mautic.helper.template.analytics');
-            $gtmHelper       = $this->get('mautic.helper.template.gtm');
 
             $slotsHelper->set('pageTitle', $form->getName());
 
             $analytics   = $analyticsHelper->getCode();
-            $gtmHeadCode = $gtmHelper->getHeadGTMCode();
-            $gtmBodyCode = $gtmHelper->getBodyGTMCode();
 
             if (!empty($analytics)) {
                 $assetsHelper->addCustomDeclaration($analytics);
-            }
-            if (!empty($gtmHeadCode) && !empty($gtmBodyCode)) {
-                $assetsHelper->addCustomDeclaration($gtmHeadCode);
-                $assetsHelper->addCustomDeclaration($gtmBodyCode, 'bodyOpen');
             }
             if ($form->getNoIndex()) {
                 $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
