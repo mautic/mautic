@@ -148,7 +148,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lists'),
                 'properties' => [
                     'type' => 'leadlist',
-                    'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'leadlist'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'leadlist', $event->getSearch()),
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
@@ -325,7 +325,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_asset_download'),
                 'properties' => [
                     'type' => 'assets',
-                    'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'lead_asset_download'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'lead_asset_download', $event->getSearch()),
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
