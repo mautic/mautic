@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\EmailBundle\Swiftmailer\Sparkpost\SparkpostFactoryInterface;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -16,6 +17,11 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
      * @var string|null
      */
     private $apiKey;
+
+    /**
+     * @var string|null
+     */
+    private $host;
 
     /**
      * @var TranslatorInterface
@@ -38,6 +44,11 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     private $logger;
 
     /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    /**
      * @param string $apiKey
      */
     public function __construct(
@@ -45,14 +56,16 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         TranslatorInterface $translator,
         TransportCallback $transportCallback,
         SparkpostFactoryInterface $sparkpostFactory,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        CoreParametersHelper $coreParametersHelper
     ) {
         $this->setApiKey($apiKey);
 
-        $this->translator        = $translator;
-        $this->transportCallback = $transportCallback;
-        $this->sparkpostFactory  = $sparkpostFactory;
-        $this->logger            = $logger;
+        $this->translator           = $translator;
+        $this->transportCallback    = $transportCallback;
+        $this->sparkpostFactory     = $sparkpostFactory;
+        $this->logger               = $logger;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -69,6 +82,19 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     public function getApiKey()
     {
         return $this->apiKey;
+    }
+
+    public function setHost(string $host)
+    {
+        $this->host = $host;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getHost()
+    {
+        return $this->host;
     }
 
     /**
@@ -88,16 +114,23 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
      * If no API key is provided then the default one is used.
      *
      * @param string $apiKey
+     * @param string $host
      *
      * @return SparkPost
      */
-    protected function createSparkPost($apiKey = null)
+    protected function createSparkPost($apiKey = null, $host = '')
     {
         if (null === $apiKey) {
             $apiKey = $this->apiKey;
         }
 
-        return $this->sparkpostFactory->create('', $apiKey);
+        if ('' === $host) {
+            if ('eu' === $this->coreParametersHelper->get('mailer_sparkpost_region')) {
+                $host = $this->setHost('api.eu.sparkpost.com');
+            }
+        }
+
+        return $this->sparkpostFactory->create($host, $apiKey);
     }
 
     /**
