@@ -185,7 +185,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     public function getContactIdsByEmails(array $emails): array
     {
-        $result =  $this->getEntityManager()
+        $result = $this->getEntityManager()
             ->createQuery("
                 SELECT c.id 
                 FROM Mautic\LeadBundle\Entity\Lead c
