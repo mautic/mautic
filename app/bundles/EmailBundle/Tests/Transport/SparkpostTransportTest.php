@@ -98,6 +98,7 @@ class SparkpostTransportTest extends \PHPUnit\Framework\TestCase
         $this->sparkpostClient    = new SparkPost($this->httpClient, ['key' => '1234']);
         $this->sparkpostTransport = new SparkpostTransport(
             '1234',
+            'us',
             $this->translator,
             $this->transportCallback,
             $this->sparkpostFactory,
@@ -258,7 +259,7 @@ class SparkpostTransportTest extends \PHPUnit\Framework\TestCase
         $message->setSubject('Test Email');
         $message->setBody('Hello');
 
-        $sparkpost = new SparkpostTransport('abc123', $this->translator, $this->transportCallback, $this->sparkpostFactory, $this->logger);
+        $sparkpost = new SparkpostTransport('abc123', 'us', $this->translator, $this->transportCallback, $this->sparkpostFactory, $this->logger);
 
         $message = $sparkpost->getSparkPostMessage($message);
 
@@ -303,7 +304,7 @@ class SparkpostTransportTest extends \PHPUnit\Framework\TestCase
         $message->setSubject('Test Email');
         $message->setBody('Hello');
 
-        $sparkpost = new SparkpostTransport('abc123', $this->translator, $this->transportCallback, $this->sparkpostFactory, $this->logger);
+        $sparkpost = new SparkpostTransport('abc123', 'us', $this->translator, $this->transportCallback, $this->sparkpostFactory, $this->logger);
 
         $message = $sparkpost->getSparkPostMessage($message);
 

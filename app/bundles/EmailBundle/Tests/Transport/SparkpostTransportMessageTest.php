@@ -48,7 +48,7 @@ class SparkpostTransportMessageTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $sparkpost = new SparkpostTransport('1234', $translator, $transportCallback, $sparkpostFactory, $logger);
+        $sparkpost = new SparkpostTransport('1234', 'us', $translator, $transportCallback, $sparkpostFactory, $logger);
 
         $sparkpostMessage = $sparkpost->getSparkPostMessage($message);
 
