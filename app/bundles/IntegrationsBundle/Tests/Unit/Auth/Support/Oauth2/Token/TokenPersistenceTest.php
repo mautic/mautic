@@ -186,4 +186,94 @@ class TokenPersistenceTest extends TestCase
         $this->tokenPersistence->saveToken($token);
         $this->assertFalse($this->tokenPersistence->hasToken());
     }
+
+    public function testRestoreTokenSetsExpirationIfKnown(): void
+    {
+        $accessToken  = 'access_token';
+        $refreshToken = 'refresh_token';
+        $expiresAt    = time() + 100;
+        $apiKeys      = [
+            'access_token'  => $accessToken,
+            'refresh_token' => $refreshToken,
+            'expires_at'    => $expiresAt,
+        ];
+
+        $factory      = new RawTokenFactory();
+        $tokenFromApi = $factory([
+            'access_token'  => $accessToken,
+            'refresh_token' => $refreshToken,
+            'expires_at'    => $expiresAt,
+        ]);
+
+        $integration = $this->createMock(Integration::class);
+        $integration->expects($this->once())
+            ->method('getApiKeys')
+            ->willReturn($apiKeys);
+
+        $this->tokenPersistence->setIntegration($integration);
+
+        $newToken = $this->tokenPersistence->restoreToken($tokenFromApi);
+
+        $this->assertSame($apiKeys['expires_at'], $newToken->getExpiresAt());
+        $this->assertFalse($newToken->isExpired());
+    }
+
+    public function testRestoreTokenRestoresExpirationToNotExpiredWhenNotExplicitlyDefined(): void
+    {
+        $accessToken  = 'access_token';
+        $refreshToken = 'refresh_token';
+        $apiKeys      = [
+            'access_token'  => $accessToken,
+            'refresh_token' => $refreshToken,
+        ];
+
+        $factory      = new RawTokenFactory();
+        $tokenFromApi = $factory([
+            'access_token'  => $accessToken,
+            'refresh_token' => $refreshToken,
+        ]);
+
+        $integration = $this->createMock(Integration::class);
+        $integration->expects($this->once())
+            ->method('getApiKeys')
+            ->willReturn($apiKeys);
+
+        $this->tokenPersistence->setIntegration($integration);
+
+        $newToken = $this->tokenPersistence->restoreToken($tokenFromApi);
+
+        $this->assertSame(0, $newToken->getExpiresAt());
+        $this->assertFalse($newToken->isExpired());
+    }
+
+    public function testRestoreTokenExpiresTokenIfApplicable(): void
+    {
+        $accessToken  = 'access_token';
+        $refreshToken = 'refresh_token';
+        $expiresAt    = time() - 100;
+        $apiKeys      = [
+            'access_token'  => $accessToken,
+            'refresh_token' => $refreshToken,
+            'expires_at'    => $expiresAt,
+        ];
+
+        $factory      = new RawTokenFactory();
+        $tokenFromApi = $factory([
+            'access_token'  => $accessToken,
+            'refresh_token' => $refreshToken,
+            'expires_at'    => $expiresAt,
+        ]);
+
+        $integration = $this->createMock(Integration::class);
+        $integration->expects($this->once())
+            ->method('getApiKeys')
+            ->willReturn($apiKeys);
+
+        $this->tokenPersistence->setIntegration($integration);
+
+        $newToken = $this->tokenPersistence->restoreToken($tokenFromApi);
+
+        $this->assertSame($apiKeys['expires_at'], $newToken->getExpiresAt());
+        $this->assertTrue($newToken->isExpired());
+    }
 }
