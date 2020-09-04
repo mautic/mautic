@@ -74,7 +74,8 @@ class TokenPersistence implements TokenPersistenceInterface
 
         $apiKeys = $integration->getApiKeys();
 
-        unset($apiKeys['access_token']);
+        // Must delete both the access token and the expiration in order for the middleware to refresh
+        unset($apiKeys['access_token'], $apiKeys['expires_at']);
 
         $integration->setApiKeys($apiKeys);
 

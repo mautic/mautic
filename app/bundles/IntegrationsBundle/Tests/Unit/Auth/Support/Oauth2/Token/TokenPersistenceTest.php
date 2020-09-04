@@ -143,9 +143,8 @@ class TokenPersistenceTest extends TestCase
             $expected
         );
 
-        $integration = $this->createMock(Integration::class);
-        $integration->method('getApiKeys')
-            ->willReturn($apiKeys, $apiKeys);
+        $integration = new Integration();
+        $integration->setApiKeys($apiKeys);
 
         $this->tokenPersistence->setIntegration($integration);
 
@@ -156,8 +155,15 @@ class TokenPersistenceTest extends TestCase
         $this->assertTrue($this->tokenPersistence->hasToken());
 
         $this->tokenPersistence->deleteToken();
-
         $this->assertFalse($this->tokenPersistence->hasToken());
+
+        $apiKeys = $integration->getApiKeys();
+        $this->assertFalse(isset($apiKeys['access_token']));
+        $this->assertFalse(isset($apiKeys['expires_in']));
+
+        $newToken = $this->tokenPersistence->restoreToken($token);
+        $this->assertTrue($newToken->isExpired());
+        $this->assertEmpty($newToken->getAccessToken());
     }
 
     public function testHasToken(): void
