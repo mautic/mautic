@@ -801,6 +801,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
             $headers    = $event->getHeaders();
             $parameters = $event->getParameters();
+            $settings = $event->getSettings();
         }
 
         if (!isset($settings['query'])) {
