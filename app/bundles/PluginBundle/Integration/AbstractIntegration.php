@@ -948,6 +948,7 @@ abstract class AbstractIntegration
 
             $headers    = $event->getHeaders();
             $parameters = $event->getParameters();
+            $settings = $event->getSettings();
         }
 
         if (!isset($settings['query'])) {
