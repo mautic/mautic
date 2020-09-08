@@ -29,46 +29,18 @@ class RedirectListTypeTest extends TestCase
         $this->assertSame(ChoiceType::class, $this->form->getParent());
     }
 
-    public function testConfigureOptionsChoicesUndefined(): void
-    {
-        $resolver = new OptionsResolver();
-        $this->form->configureOptions($resolver);
-
-        $expectedOptions = [
-            'choices'    => [],
-            'expanded'   => false,
-            'multiple'   => false,
-            'label'      => 'mautic.page.form.redirecttype',
-            'label_attr' => [
-                'class' => 'control-label',
-            ],
-            'placeholder' => false,
-            'required'    => false,
-            'attr'        => [
-                'class' => 'form-control',
-            ],
-            'feature' => 'all',
-        ];
-
-        $this->assertSame($expectedOptions, $resolver->resolve());
-    }
-
-    public function testConfigureOptionsChoicesDefined(): void
+    public function testConfigureOptionsChoicesDefined()
     {
         $choices = [
-            '1' => 'Jarda',
-            '2' => 'Pepa',
+            301 => 'mautic.page.form.redirecttype.permanent',
+            302 => 'mautic.page.form.redirecttype.temporary',
         ];
-
-        $this->coreParametersHelper->expects($this->once())
-            ->method('get')
-            ->willReturn($choices);
 
         $resolver = new OptionsResolver();
         $this->form->configureOptions($resolver);
 
         $expectedOptions = [
-            'choices'    => array_flip($choices),
+            'choices'    => $choices,
             'expanded'   => false,
             'multiple'   => false,
             'label'      => 'mautic.page.form.redirecttype',
