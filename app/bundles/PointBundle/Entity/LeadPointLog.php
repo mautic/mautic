@@ -64,7 +64,6 @@ class LeadPointLog
         $builder->createField('internalId', 'string')
             ->columnName('internal_id')
             ->length(191)
-            ->nullable()
             ->makePrimaryKey()
             ->build();
     }

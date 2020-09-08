@@ -34,7 +34,7 @@ class Version20190319002039 extends AbstractMauticMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE {$this->prefix}point_lead_action_log ADD internal_id VARCHAR(255) DEFAULT NULL");
+        $this->addSql("ALTER TABLE {$this->prefix}point_lead_action_log ADD internal_id VARCHAR(255)");
         $this->addSql('ALTER TABLE '.$this->prefix.'`point_lead_action_log`
 	DROP PRIMARY KEY,
 	ADD PRIMARY KEY (`point_id`, `lead_id`, `internal_id`)');
