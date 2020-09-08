@@ -360,7 +360,9 @@ class ReportSubscriber implements EventSubscriberInterface
                         $event->setColumnFormula('e.sent_count', 'stats.sent_count');
                         $event->setColumnFormula('e.read_count', 'stats.read_count');
                         $event->setColumnFormula('read_ratio', 'ROUND((stats.read_count/stats.sent_count)*100,1)');
+                    }
 
+                    if ($event->hasColumn($clickColumns) || $event->hasFilter($clickColumns)) {
                         // clicks stats with date range
                         $subQuery = $this->db->createQueryBuilder();
                         $subQuery->select(
