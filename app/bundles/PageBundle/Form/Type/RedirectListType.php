@@ -27,8 +27,10 @@ class RedirectListType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $choices = $this->coreParametersHelper->get('redirect_list_types');
-        $choices = (null === $choices) ? [] : array_flip($choices);
+        $choices = [
+            301 => 'mautic.page.form.redirecttype.permanent',
+            302 => 'mautic.page.form.redirecttype.temporary',
+        ];
 
         $resolver->setDefaults([
             'choices'     => $choices,
