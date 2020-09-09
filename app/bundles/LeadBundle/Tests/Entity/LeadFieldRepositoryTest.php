@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Portability\Statement;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
@@ -9,27 +10,27 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Query;
-use Mautic\LeadBundle\Entity\LeadField;
+use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LeadFieldRepositoryTest extends \PHPUnit\Framework\TestCase
+final class LeadFieldRepositoryTest extends TestCase
 {
     /**
-     * @var MockObject|EntityManager
+     * @var EntityManager|MockObject
      */
     private $entityManager;
 
     /**
-     * @var MockObject|ClassMetadata
-     */
-    private $classMetadata;
-
-    /**
-     * @var MockObject|Connection
+     * @var Connection|MockObject
      */
     private $connection;
+
+    /**
+     * @var AbstractQuery|MockObject
+     */
+    private $query;
 
     /**
      * @var LeadFieldRepository
@@ -43,9 +44,24 @@ class LeadFieldRepositoryTest extends \PHPUnit\Framework\TestCase
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
         $this->entityManager = $this->createMock(EntityManager::class);
-        $this->classMetadata = $this->createMock(ClassMetadata::class);
         $this->connection    = $this->createMock(Connection::class);
-        $this->repository    = new LeadFieldRepository($this->entityManager, $this->classMetadata);
+
+        /** @var ClassMetadata|MockObject $classMetadata */
+        $classMetadata    = $this->createMock(ClassMetadata::class);
+        $this->repository = new LeadFieldRepository($this->entityManager, $classMetadata);
+
+        // This is terrible, but the Query class is final and AbstractQuery doesn't have some methods used.
+        $this->query = $this->getMockBuilder(AbstractQuery::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['setParameters', 'setFirstResult', 'setMaxResults', 'getSingleResult', 'getSQL', '_doExecute', 'execute'])
+            ->getMock();
+
+        $ormBuilder = new OrmQueryBuilder($this->entityManager);
+        $this->entityManager->method('createQueryBuilder')->willReturn($ormBuilder);
+        $this->entityManager->method('createQuery')->willReturn($this->query);
+        $this->query->method('setParameters')->willReturnSelf();
+        $this->query->method('setFirstResult')->willReturnSelf();
+        $this->query->method('setMaxResults')->willReturnSelf();
     }
 
     public function testCompareDateValueForContactField()
@@ -239,6 +255,31 @@ class LeadFieldRepositoryTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['id' => 456]);
 
         $this->assertTrue($this->repository->compareDateValue($contactId, $fieldAlias, $value));
+    }
+
+    public function testGetListablePublishedFields(): void
+    {
+        $this->entityManager->expects($this->once())
+            ->method('createQuery')
+            ->with('SELECT f FROM  f INDEX BY f.id WHERE f.isListable = 1 AND f.isPublished = 1 ORDER BY f.object ASC')
+            ->willReturn($this->query);
+
+        $this->query->method('execute')->willReturn([]);
+
+        $this->assertInstanceOf(ArrayCollection::class, $this->repository->getListablePublishedFields());
+    }
+
+    public function testGetFieldSchemaData(): void
+    {
+        $this->entityManager->expects($this->once())
+            ->method('createQuery')
+            ->with('SELECT f.alias, f.label, f.type, f.isUniqueIdentifer, f.charLengthLimit FROM  f INDEX BY f.alias WHERE f.object = :object')
+            ->willReturn($this->query);
+
+        $result = [];
+        $this->query->method('execute')->willReturn($result);
+
+        $this->assertSame($result, $this->repository->getFieldSchemaData('lead'));
     }
 
     public function testGetFieldThatIsMissingColumnWhenMutlipleColumsMissing(): void
