@@ -50,9 +50,11 @@ class CommonRepository extends EntityRepository
      * `generateRandomParameterName()`. This eliminates chances
      * for parameter name collision.
      *
-     * @var array
+     * @see CommonRepository::generateRandomParameterName()
+     *
+     * @var int
      */
-    protected $usedParameterNames = [];
+    protected $lastUsedParameterId = 0;
 
     /**
      * @var ExpressionBuilder|null
@@ -1574,21 +1576,22 @@ class CommonRepository extends EntityRepository
     /**
      * Generate a unique parameter name.
      *
-     * @return string
+     * @see https://blog.jgrossi.com/2013/generating-ids-like-youtube-or-bit-ly-using-php/
      */
-    protected function generateRandomParameterName()
+    protected function generateRandomParameterName(): string
     {
-        $alpha_numeric = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+        $base  = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        ++$this->lastUsedParameterId;
+        $value = $this->lastUsedParameterId;
 
-        $paramName = substr(str_shuffle($alpha_numeric), 0, 8);
+        $limit  = strlen($value);
+        $result = strpos($base, $value[0]);
 
-        if (!in_array($paramName, $this->usedParameterNames)) {
-            $this->usedParameterNames[] = $paramName;
-
-            return $paramName;
+        for ($i = 1; $i < $limit; ++$i) {
+            $result = 32 * $result + strpos($base, $value[$i]);
         }
 
-        return $this->generateRandomParameterName();
+        return $result;
     }
 
     /**
