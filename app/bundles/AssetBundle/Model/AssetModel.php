@@ -34,6 +34,7 @@ use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactor
 use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorServiceInterface;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -472,6 +473,11 @@ class AssetModel extends FormModel
                 $viewOther = $this->security->isGranted('asset:assets:viewother');
                 $repo      = $this->getRepository();
                 $repo->setCurrentUser($this->userHelper->getUser());
+                // During the form submit & edit, make sure that the data is checked against available assets
+                if ('mautic_segment_action' == $this->request->get('_route') &&
+                    (Request::METHOD_POST == $this->request->getMethod() || 'edit' == $this->request->get('objectAction'))) {
+                    $limit = 0;
+                }
                 $results = $repo->getAssetList($filter, $limit, 0, $viewOther);
                 break;
             case 'category':
