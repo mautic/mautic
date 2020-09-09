@@ -111,6 +111,7 @@ class ReferenceResolverTest extends TestCase
 
     /**
      * @param mixed ...$returnValues
+     *
      * @return QueryBuilder|MockObject
      */
     private function createQueryBuilder(...$returnValues)
