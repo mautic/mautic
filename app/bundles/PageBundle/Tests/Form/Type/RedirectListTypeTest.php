@@ -32,8 +32,8 @@ class RedirectListTypeTest extends TestCase
     public function testConfigureOptionsChoicesDefined()
     {
         $choices = [
-            301 => 'mautic.page.form.redirecttype.permanent',
-            302 => 'mautic.page.form.redirecttype.temporary',
+            'mautic.page.form.redirecttype.permanent' => 301,
+            'mautic.page.form.redirecttype.temporary' => 302,
         ];
 
         $resolver = new OptionsResolver();
