@@ -303,7 +303,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             $message .= "\n--$separator\n";
             $message .= "Content-Type: text/plain; charset=\"UTF-8\"\n";
             $message .= "Content-Transfer-Encoding: base64\n";
-            $message .= "\n".wordwrap(base64_encode($msg['text']), 78, "\n", true)."\n";
+            $message .= "\n".wordwrap(base64_encode($msg['text']), 76, "\n", true)."\n";
         }
         $message .= "\n--$separator\n";
         $message .= "Content-Type: text/html; charset=\"UTF-8\"\n";
