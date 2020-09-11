@@ -917,5 +917,6 @@ return [
         'mailer_mailjet_sandbox'              => false,
         'mailer_mailjet_sandbox_default_mail' => null,
         'disable_trackable_urls'              => false,
+        'theme_email_default'                 => 'blank',
     ],
 ];
