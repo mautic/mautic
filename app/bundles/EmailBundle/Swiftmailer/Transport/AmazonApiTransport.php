@@ -290,13 +290,16 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         if (isset($msg['returnPath'])) {
             $message .= 'Return-Path: '.$msg['returnPath']."\n";
         }
-        $message .= "Content-Type: multipart/mixed; boundary=\"$separator_multipart\"\n";
         if (isset($msg['headers'])) {
             foreach ($msg['headers'] as $key => $value) {
                 $message .= "$key: ".$value."\n";
             }
         }
-        $message .= "\n--$separator_multipart\n";
+
+        if (count($msg['attachments']) > 0) {
+            $message .= "Content-Type: multipart/mixed; boundary=\"$separator_multipart\"\n";
+            $message .= "\n--$separator_multipart\n";
+        }
 
         $message .= "Content-Type: multipart/alternative; boundary=\"$separator\"\n";
         if (isset($msg['text']) && strlen($msg['text']) > 0) {
@@ -310,14 +313,16 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         $message .= "\n".$msg['html']."\n";
         $message .= "\n--$separator--\n";
 
-        foreach ($msg['attachments'] as $attachment) {
-            $message .= "--$separator_multipart\n";
-            $message .= 'Content-Type: '.$attachment['type'].'; name="'.$attachment['name']."\"\n";
-            $message .= 'Content-Disposition: attachment; filename="'.$attachment['name']."\"\n";
-            $message .= "Content-Transfer-Encoding: base64\n";
-            $message .= "\n".$attachment['content']."\n";
+        if (count($msg['attachments']) > 0) {
+            foreach ($msg['attachments'] as $attachment) {
+                $message .= "--$separator_multipart\n";
+                $message .= 'Content-Type: '.$attachment['type'].'; name="'.$attachment['name']."\"\n";
+                $message .= 'Content-Disposition: attachment; filename="'.$attachment['name']."\"\n";
+                $message .= "Content-Transfer-Encoding: base64\n";
+                $message .= "\n".$attachment['content']."\n";
+            }
         }
-
+        
         return $message."--$separator_multipart--";
     }
 
