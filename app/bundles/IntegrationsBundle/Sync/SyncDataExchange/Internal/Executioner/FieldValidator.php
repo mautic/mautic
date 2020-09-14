@@ -16,10 +16,11 @@ namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationHelper;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\Exception\FieldSchemaNotFoundException;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 
-class FieldValidator
+final class FieldValidator implements FieldValidatorInterface
 {
     /**
      * @var LeadFieldRepository
@@ -50,9 +51,10 @@ class FieldValidator
         foreach ($changedObjects as $changedObject) {
             foreach ($changedObject->getFields() as $field) {
                 $fieldName = $field->getName();
-                $schema    = $this->getFieldSchema($objectName, $fieldName);
 
-                if (null === $schema) {
+                try {
+                    $schema = $this->getFieldSchema($objectName, $fieldName);
+                } catch (FieldSchemaNotFoundException $e) {
                     continue;
                 }
 
@@ -82,7 +84,7 @@ class FieldValidator
         }
     }
 
-    private function isFieldLengthValid(array $schemaDefinition, $normalizedValue): bool
+    private function isFieldLengthValid(array $schemaDefinition, string $normalizedValue): bool
     {
         $schemaLength = SchemaDefinition::getFieldCharLengthLimit($schemaDefinition);
 
@@ -105,9 +107,9 @@ class FieldValidator
                     NormalizedValueDAO::DATETIME_TYPE,
                 ]);
             case 'time':
-                return NormalizedValueDAO::TIME_TYPE == $field->getType();
+                return NormalizedValueDAO::TIME_TYPE === $field->getType();
             case 'boolean':
-                return NormalizedValueDAO::BOOLEAN_TYPE == $field->getType();
+                return NormalizedValueDAO::BOOLEAN_TYPE === $field->getType();
             case 'float':
                 return in_array($field->getType(), [
                     NormalizedValueDAO::DOUBLE_TYPE,
@@ -119,13 +121,20 @@ class FieldValidator
         }
     }
 
-    private function getFieldSchema(string $object, string $alias): ?array
+    /**
+     * @throws FieldSchemaNotFoundException
+     */
+    private function getFieldSchema(string $object, string $alias): array
     {
         if (!isset($this->fieldSchemaData[$object])) {
             $this->fieldSchemaData[$object] = $this->leadFieldRepository->getFieldSchemaData($object);
         }
 
-        return $this->fieldSchemaData[$object][$alias] ?? null;
+        if (!isset($this->fieldSchemaData[$object][$alias])) {
+            throw new FieldSchemaNotFoundException($object, $alias);
+        }
+
+        return $this->fieldSchemaData[$object][$alias];
     }
 
     private function writeNotification(string $message, ObjectChangeDAO $changedObject): void

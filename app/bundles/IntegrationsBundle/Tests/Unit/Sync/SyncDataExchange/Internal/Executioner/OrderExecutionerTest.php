@@ -24,9 +24,9 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Helper\MappingHelper;
-use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\FieldValidator;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\FieldValidatorInterface;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\OrderExecutioner;
-use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\ReferenceResolver;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\ReferenceResolverInterface;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface;
@@ -61,12 +61,12 @@ class OrderExecutionerTest extends TestCase
     private $orderExecutioner;
 
     /**
-     * @var ReferenceResolver|MockObject
+     * @var ReferenceResolverInterface|MockObject
      */
     private $referenceResolver;
 
     /**
-     * @var FieldValidator|MockObject
+     * @var FieldValidatorInterface|MockObject
      */
     private $fieldValidator;
 
@@ -75,8 +75,8 @@ class OrderExecutionerTest extends TestCase
         $this->mappingHelper     = $this->createMock(MappingHelper::class);
         $this->dispatcher        = $this->createMock(EventDispatcherInterface::class);
         $this->objectProvider    = $this->createMock(ObjectProvider::class);
-        $this->referenceResolver = $this->createMock(ReferenceResolver::class);
-        $this->fieldValidator    = $this->createMock(FieldValidator::class);
+        $this->referenceResolver = $this->createMock(ReferenceResolverInterface::class);
+        $this->fieldValidator    = $this->createMock(FieldValidatorInterface::class);
         $this->orderExecutioner  = new OrderExecutioner(
             $this->mappingHelper,
             $this->dispatcher,

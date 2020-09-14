@@ -48,8 +48,8 @@ class OrderExecutioner
         MappingHelper $mappingHelper,
         EventDispatcherInterface $dispatcher,
         ObjectProvider $objectProvider,
-        ReferenceResolver $referenceResolver,
-        FieldValidator $fieldValidator
+        ReferenceResolverInterface $referenceResolver,
+        FieldValidatorInterface $fieldValidator
     ) {
         $this->mappingHelper     = $mappingHelper;
         $this->dispatcher        = $dispatcher;

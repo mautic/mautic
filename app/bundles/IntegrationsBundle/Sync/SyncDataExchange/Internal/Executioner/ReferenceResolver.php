@@ -18,10 +18,11 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\Exception\ReferenceNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
-class ReferenceResolver
+final class ReferenceResolver implements ReferenceResolverInterface
 {
     /**
      * @var Connection
@@ -52,8 +53,13 @@ class ReferenceResolver
                     continue;
                 }
 
-                $resolvedReference = $this->resolveReference($normalizedValue);
-                $resolvedValue     = new NormalizedValueDAO($value->getType(), $value->getOriginalValue(), $resolvedReference);
+                try {
+                    $resolvedReference = $this->resolveReference($normalizedValue);
+                } catch (ReferenceNotFoundException $e) {
+                    $resolvedReference = null;
+                }
+
+                $resolvedValue = new NormalizedValueDAO($value->getType(), $value->getOriginalValue(), $resolvedReference);
                 $changedObject->addField(new FieldDAO($field->getName(), $resolvedValue));
             }
         }
@@ -61,6 +67,8 @@ class ReferenceResolver
 
     /**
      * @return mixed
+     *
+     * @throws ReferenceNotFoundException
      */
     private function resolveReference(ReferenceValueDAO $value)
     {
@@ -71,7 +79,10 @@ class ReferenceResolver
         return null;
     }
 
-    private function getCompanyNameById(int $id): ?string
+    /**
+     * @throws ReferenceNotFoundException
+     */
+    private function getCompanyNameById(int $id): string
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->select('c.companyname');
@@ -82,7 +93,7 @@ class ReferenceResolver
         $name = $qb->execute()->fetchColumn();
 
         if (false === $name) {
-            return null;
+            throw new ReferenceNotFoundException(sprintf('Company reference for ID "%d" not found', $id));
         }
 
         return $name;
