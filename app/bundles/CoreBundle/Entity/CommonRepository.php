@@ -1582,7 +1582,7 @@ class CommonRepository extends EntityRepository
     {
         $base  = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         ++$this->lastUsedParameterId;
-        $value = $this->lastUsedParameterId;
+        $value = (string) $this->lastUsedParameterId;
 
         $limit  = strlen($value);
         $result = strpos($base, $value[0]);
@@ -1591,7 +1591,7 @@ class CommonRepository extends EntityRepository
             $result = 32 * $result + strpos($base, $value[$i]);
         }
 
-        return $result;
+        return 'par'.$result;
     }
 
     /**
