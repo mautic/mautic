@@ -22,21 +22,14 @@ class RandomParameterName
      * Generate a unique parameter name from int to base32 conversion.
      * This eliminates chance for parameter name collision.
      *
-     * @see https://blog.jgrossi.com/2013/generating-ids-like-youtube-or-bit-ly-using-php/
+     * @see https://stackoverflow.com/questions/307486/short-unique-id-in-php/1516430#1516430
      */
     public function generateRandomParameterName(): string
     {
-        $base  = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $value = base_convert($this->lastUsedParameterId, 10, 36);
+
         ++$this->lastUsedParameterId;
-        $value = (string) $this->lastUsedParameterId;
 
-        $limit  = strlen($value);
-        $result = strpos($base, $value[0]);
-
-        for ($i = 1; $i < $limit; ++$i) {
-            $result = 32 * $result + strpos($base, $value[$i]);
-        }
-
-        return 'par'.$result;
+        return 'par'.$value;
     }
 }
