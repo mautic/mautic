@@ -76,6 +76,16 @@ class MailHelper
     /**
      * @var string
      */
+    protected $replyTo;
+
+    /**
+     * @var string
+     */
+    protected $systemReplyTo;
+
+    /**
+     * @var string
+     */
     protected $returnPath;
 
     /**
@@ -252,11 +262,13 @@ class MailHelper
             $this->logError($e);
         }
 
-        $systemFromEmail  = $factory->getParameter('mailer_from_email');
-        $systemFromName   = $this->cleanName(
+        $systemFromEmail    = $factory->getParameter('mailer_from_email');
+        $systemReplyToEmail = $factory->getParameter('mailer_reply_to_email');
+        $systemFromName     = $this->cleanName(
             $factory->getParameter('mailer_from_name')
         );
         $this->setDefaultFrom($from, [$systemFromEmail => $systemFromName]);
+        $this->setDefaultReplyTo($systemReplyToEmail, $systemFromEmail);
 
         $this->returnPath = $factory->getParameter('mailer_return_path');
 
@@ -672,6 +684,7 @@ class MailHelper
             $this->appendTrackingPixel = false;
             $this->queueEnabled        = false;
             $this->from                = $this->systemFrom;
+            $this->replyTo             = $this->systemReplyTo;
             $this->headers             = [];
             [];
             $this->source              = [];
@@ -1373,9 +1386,12 @@ class MailHelper
             $this->from = $this->systemFrom;
         }
 
-        $replyTo = $email->getReplyToAddress();
-        if (!empty($replyTo)) {
-            $addresses = explode(',', $replyTo);
+        $this->replyTo = $email->getReplyToAddress();
+        if (empty($this->replyTo)) {
+            $this->replyTo = $this->systemReplyTo;
+        }
+        if (!empty($this->replyTo)) {
+            $addresses = explode(',', $this->replyTo);
 
             // Only a single email is supported
             $this->setReplyTo($addresses[0]);
@@ -2188,5 +2204,15 @@ class MailHelper
 
         $this->systemFrom = $overrideFrom ?: $systemFrom;
         $this->from       = $this->systemFrom;
+    }
+
+    /**
+     * @param $systemReplyToEmail
+     * @param $systemFromEmail
+     */
+    private function setDefaultReplyTo($systemReplyToEmail, $systemFromEmail)
+    {
+        $this->systemReplyTo = $systemReplyToEmail ?: $systemFromEmail;
+        $this->replyTo       = $this->systemReplyTo;
     }
 }
