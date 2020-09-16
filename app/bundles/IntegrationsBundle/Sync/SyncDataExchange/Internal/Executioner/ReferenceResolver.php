@@ -59,7 +59,7 @@ final class ReferenceResolver implements ReferenceResolverInterface
                     $resolvedReference = null;
                 }
 
-                $resolvedValue = new NormalizedValueDAO($value->getType(), $value->getOriginalValue(), $resolvedReference);
+                $resolvedValue = new NormalizedValueDAO($value->getType(), $resolvedReference, $resolvedReference);
                 $changedObject->addField(new FieldDAO($field->getName(), $resolvedValue));
             }
         }
