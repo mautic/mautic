@@ -19,8 +19,8 @@ class RandomParameterName
     protected $lastUsedParameterId = 0;
 
     /**
-     * Generate a unique parameter name from int to base32 conversion.
-     * This eliminates chance for parameter name collision.
+     * Generate a unique parameter name from int using base conversion.
+     * This eliminates chance for parameter name collision and provides unique result for each number.
      *
      * @see https://stackoverflow.com/questions/307486/short-unique-id-in-php/1516430#1516430
      */
