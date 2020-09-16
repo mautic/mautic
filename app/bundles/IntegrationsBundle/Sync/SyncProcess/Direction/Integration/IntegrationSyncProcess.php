@@ -47,9 +47,32 @@ class IntegrationSyncProcess
     {
         $integrationRequestDAO   = new RequestDAO(MauticSyncDataExchange::NAME, $syncIteration, $this->inputOptionsDAO);
         $integrationObjectsNames = $this->mappingManualDAO->getIntegrationObjectNames();
-        foreach ($integrationObjectsNames as $integrationObjectName) {
-            $integrationObjectFields = $this->mappingManualDAO->getIntegrationObjectFieldsToSyncToMautic($integrationObjectName);
+        $mauticObjectTypes       = $integrationRequestDAO->getInputOptionsDAO()->getMauticObjectIds() ?
+            $integrationRequestDAO->getInputOptionsDAO()->getMauticObjectIds()->getObjectTypes() : [];
+        $hasMauticObjectIDs = 0 < count($mauticObjectTypes);
 
+        foreach ($integrationObjectsNames as $integrationObjectName) {
+            if ($hasMauticObjectIDs) {
+                $mappedInternalObjectsNames = [];
+                try {
+                    $mappedInternalObjectsNames = $this->mappingManualDAO->getMappedInternalObjectsNames($integrationObjectName);
+                } catch (ObjectNotFoundException $e) {
+                }
+
+                if (1 > count(array_intersect($mauticObjectTypes, $mappedInternalObjectsNames))) {
+                    DebugLogger::log(
+                        $this->mappingManualDAO->getIntegration(),
+                        sprintf(
+                            'Integration to Mautic; skipping sync for the %s object because object IDs have been explicitly specified for other objects',
+                            $integrationObjectName
+                        ),
+                        __CLASS__.':'.__FUNCTION__
+                    );
+                    continue;
+                }
+            }
+
+            $integrationObjectFields = $this->mappingManualDAO->getIntegrationObjectFieldsToSyncToMautic($integrationObjectName);
             if (0 === count($integrationObjectFields)) {
                 // No fields configured for a sync
                 DebugLogger::log(
