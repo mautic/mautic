@@ -63,13 +63,13 @@ class ReferenceResolverTest extends TestCase
 
         $companyField = $changedObject->getField('company');
         Assert::assertInstanceOf(FieldDAO::class, $companyField);
-        Assert::assertSame($companyReference, $companyField->getValue()->getOriginalValue());
+        Assert::assertSame('Company name', $companyField->getValue()->getOriginalValue());
         Assert::assertSame('Company name', $companyField->getValue()->getNormalizedValue());
 
         $userField = $changedObject->getField('user');
         Assert::assertInstanceOf(FieldDAO::class, $userField);
-        Assert::assertSame($userReference, $userField->getValue()->getOriginalValue());
-        Assert::assertSame($userReference, $userField->getValue()->getNormalizedValue());
+        Assert::assertSame(null, $userField->getValue()->getOriginalValue());
+        Assert::assertSame(null, $userField->getValue()->getNormalizedValue());
 
         $cityField = $changedObject->getField('city');
         Assert::assertInstanceOf(FieldDAO::class, $cityField);
@@ -78,8 +78,8 @@ class ReferenceResolverTest extends TestCase
 
         $managerField = $changedObject->getField('manager');
         Assert::assertInstanceOf(FieldDAO::class, $managerField);
-        Assert::assertSame($notFoundReference, $managerField->getValue()->getOriginalValue());
-        Assert::assertSame($notFoundReference, $managerField->getValue()->getNormalizedValue());
+        Assert::assertSame(null, $managerField->getValue()->getOriginalValue());
+        Assert::assertSame(null, $managerField->getValue()->getNormalizedValue());
     }
 
     public function testResolveCompanyReferences(): void
