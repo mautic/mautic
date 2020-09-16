@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
@@ -48,6 +49,8 @@ class FieldType extends AbstractType
         'phone',
         'url',
         'email',
+        'textarea',
+        'html',
     ];
 
     public function __construct(
@@ -671,11 +674,22 @@ class FieldType extends AbstractType
     public static function validateDefaultValue(?string $value, ExecutionContextInterface $context): void
     {
         if (!empty($value)) {
-            $root  = $context->getRoot();
-            $limit = $root->getViewData()->getCharLengthLimit();
+            $root                    = $context->getRoot();
+            $limit                   = $root->getViewData()->getCharLengthLimit();
+            $defaultValueLength      = mb_strlen($value);
+            $defaultValueLengthLimit = ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH;
 
-            if (strlen($value) > $limit) {
+            if ($defaultValueLength > $limit) {
                 $context->buildViolation('mautic.lead.defaultValue.invalid')->addViolation();
+            }
+
+            $translationParameters = [
+                '%currentLength%'           => $defaultValueLength,
+                '%defaultValueLengthLimit%' => $defaultValueLengthLimit,
+            ];
+
+            if ($defaultValueLength > $defaultValueLengthLimit) {
+                $context->buildViolation('mautic.lead.defaultValue.maxlengthexceeded', $translationParameters)->addViolation();
             }
         }
     }
