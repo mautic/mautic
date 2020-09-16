@@ -132,12 +132,15 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      */
     public function cleanupProcessedObjects(array $objectChanges): void
     {
-        foreach ($objectChanges as $changedObjectDAO) {
+        foreach ($objectChanges as $key => $changedObjectDAO) {
             try {
                 $object   = $this->fieldHelper->getFieldObjectName($changedObjectDAO->getMappedObject());
                 $objectId = $changedObjectDAO->getMappedObjectId();
 
                 $this->fieldChangeRepository->deleteEntitiesForObject((int) $objectId, $object, $changedObjectDAO->getIntegration());
+
+                // Clean up memory
+                unset($objectChanges[$key]);
             } catch (ObjectNotSupportedException $exception) {
                 DebugLogger::log(
                     self::NAME,
