@@ -4,7 +4,6 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
@@ -49,6 +48,12 @@ class FieldType extends AbstractType
         'phone',
         'url',
         'email',
+    ];
+
+    /**
+     * @var string[]
+     */
+    private static $fieldsWithNoLengthLimit = [
         'textarea',
         'html',
     ];
@@ -673,24 +678,20 @@ class FieldType extends AbstractType
 
     public static function validateDefaultValue(?string $value, ExecutionContextInterface $context): void
     {
-        if (!empty($value)) {
-            $root                    = $context->getRoot();
-            $limit                   = $root->getViewData()->getCharLengthLimit();
-            $defaultValueLength      = mb_strlen($value);
-            $defaultValueLengthLimit = ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH;
+        if (empty($value)) {
+            return;
+        }
 
-            if ($defaultValueLength > $limit) {
-                $context->buildViolation('mautic.lead.defaultValue.invalid')->addViolation();
-            }
+        /** @var LeadField $field */
+        $field = $context->getRoot()->getViewData();
 
-            $translationParameters = [
-                '%currentLength%'           => $defaultValueLength,
-                '%defaultValueLengthLimit%' => $defaultValueLengthLimit,
-            ];
+        if (in_array($field->getType(), static::$fieldsWithNoLengthLimit)) {
+            return;
+        }
 
-            if ($defaultValueLength > $defaultValueLengthLimit) {
-                $context->buildViolation('mautic.lead.defaultValue.maxlengthexceeded', $translationParameters)->addViolation();
-            }
+        $limit = $field->getCharLengthLimit();
+        if (mb_strlen($value) > $limit) {
+            $context->buildViolation('mautic.lead.defaultValue.invalid')->addViolation();
         }
     }
 
