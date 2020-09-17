@@ -92,7 +92,7 @@ class FieldTypeTest extends TestCase
         $limit = 100;
         $leadField->setCharLengthLimit($limit);
 
-        $this->executionContext->expects($this->once(1))
+        $this->executionContext->expects($this->once())
             ->method('buildViolation')
             ->willReturn($this->constraintViolationBuilder);
 
