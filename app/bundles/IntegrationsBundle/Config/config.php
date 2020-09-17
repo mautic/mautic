@@ -292,7 +292,7 @@ return [
                 'class'     => \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\FieldValidator::class,
                 'arguments' => [
                     'mautic.lead.repository.field',
-                    'mautic.integrations.sync.notification.helper_user_notification',
+                    'mautic.integrations.sync.notification.bulk_notification',
                 ],
             ],
             'mautic.integrations.internal.reference_resolver' => [
@@ -481,10 +481,7 @@ return [
                 'class'     => \Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationHelper::class,
                 'arguments' => [
                     'mautic.integrations.sync.notification.writer',
-                    'mautic.integrations.sync.notification.helper_user',
-                    'mautic.integrations.sync.notification.helper.owner_provider',
-                    'mautic.integrations.sync.notification.helper_route',
-                    'translator',
+                    'mautic.integrations.sync.notification.user_notification_builder',
                 ],
             ],
             'mautic.integrations.sync.notification.helper_user_summary_notification' => [

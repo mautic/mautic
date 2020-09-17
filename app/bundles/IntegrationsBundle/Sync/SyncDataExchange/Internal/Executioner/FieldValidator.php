@@ -15,7 +15,7 @@ namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
-use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationHelper;
+use Mautic\IntegrationsBundle\Sync\Notification\BulkNotification;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\Exception\FieldSchemaNotFoundException;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Field\SchemaDefinition;
@@ -28,19 +28,19 @@ final class FieldValidator implements FieldValidatorInterface
     private $leadFieldRepository;
 
     /**
-     * @var UserNotificationHelper
+     * @var BulkNotification
      */
-    private $notificationHelper;
+    private $bulkNotification;
 
     /**
      * @var array
      */
     private $fieldSchemaData = [];
 
-    public function __construct(LeadFieldRepository $leadFieldRepository, UserNotificationHelper $notificationHelper)
+    public function __construct(LeadFieldRepository $leadFieldRepository, BulkNotification $bulkNotification)
     {
         $this->leadFieldRepository = $leadFieldRepository;
-        $this->notificationHelper  = $notificationHelper;
+        $this->bulkNotification    = $bulkNotification;
     }
 
     /**
@@ -70,18 +70,20 @@ final class FieldValidator implements FieldValidatorInterface
                 if (is_string($normalizedValue) && !$this->isFieldLengthValid($schemaDefinition, $normalizedValue)) {
                     $changedObject->removeField($fieldName);
                     $message = sprintf("Field '%s' with value '%s' exceeded maximum allowed length and was ignored during the sync", $schema['label'], $normalizedValue);
-                    $this->writeNotification($message, $changedObject);
+                    $this->addNotification($message, $changedObject, $fieldName, 'length');
                     continue;
                 }
 
                 if (!$this->isFieldTypeValid($schemaDefinition, $fieldValue)) {
                     $changedObject->removeField($fieldName);
                     $message = sprintf("Field '%s' of type '%s' did not match type '%s' and was ignored during the sync", $schema['label'], $schema['type'], $fieldValue->getType());
-                    $this->writeNotification($message, $changedObject);
+                    $this->addNotification($message, $changedObject, $fieldName, 'type');
                     continue;
                 }
             }
         }
+
+        $this->bulkNotification->flush();
     }
 
     private function isFieldLengthValid(array $schemaDefinition, string $normalizedValue): bool
@@ -137,9 +139,12 @@ final class FieldValidator implements FieldValidatorInterface
         return $this->fieldSchemaData[$object][$alias];
     }
 
-    private function writeNotification(string $message, ObjectChangeDAO $changedObject): void
+    private function addNotification(string $message, ObjectChangeDAO $changedObject, string $fieldName, string $type): void
     {
-        $this->notificationHelper->writeNotification(
+        $deduplicateValue = $changedObject->getIntegration().'-'.$changedObject->getObject().'-'.$fieldName.'-'.$type;
+
+        $this->bulkNotification->addNotification(
+            $deduplicateValue,
             $message,
             $changedObject->getIntegration(),
             $changedObject->getMappedObjectId(),

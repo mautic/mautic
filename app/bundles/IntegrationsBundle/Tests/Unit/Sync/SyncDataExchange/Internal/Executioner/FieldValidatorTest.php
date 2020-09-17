@@ -16,7 +16,7 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\Ex
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
-use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationHelper;
+use Mautic\IntegrationsBundle\Sync\Notification\BulkNotification;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\FieldValidator;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use PHPUnit\Framework\Assert;
@@ -31,9 +31,9 @@ class FieldValidatorTest extends TestCase
     private $leadFieldRepository;
 
     /**
-     * @var UserNotificationHelper|MockObject
+     * @var BulkNotification|MockObject
      */
-    private $userNotificationHelper;
+    private $bulkNotification;
 
     /**
      * @var FieldValidator
@@ -42,9 +42,9 @@ class FieldValidatorTest extends TestCase
 
     protected function setup(): void
     {
-        $this->leadFieldRepository    = $this->createMock(LeadFieldRepository::class);
-        $this->userNotificationHelper = $this->createMock(UserNotificationHelper::class);
-        $this->fieldValidator         = new FieldValidator($this->leadFieldRepository, $this->userNotificationHelper);
+        $this->leadFieldRepository = $this->createMock(LeadFieldRepository::class);
+        $this->bulkNotification    = $this->createMock(BulkNotification::class);
+        $this->fieldValidator      = new FieldValidator($this->leadFieldRepository, $this->bulkNotification);
     }
 
     public function testValidateFields(): void
@@ -109,13 +109,16 @@ class FieldValidatorTest extends TestCase
             $secondChangedObject,
         ];
 
-        $this->userNotificationHelper->expects($this->exactly(3))
-            ->method('writeNotification')
+        $this->bulkNotification->expects($this->exactly(3))
+            ->method('addNotification')
             ->withConsecutive(
-                $this->getNotificationAssertion("Field 'Company' with value 'Some company' exceeded maximum allowed length and was ignored during the sync", $firstChangedObject),
-                $this->getNotificationAssertion("Field 'Time' of type 'time' did not match type 'date' and was ignored during the sync", $secondChangedObject),
-                $this->getNotificationAssertion("Field 'Number' of type 'number' did not match type 'url' and was ignored during the sync", $secondChangedObject)
+                $this->getNotificationAssertion("Field 'Company' with value 'Some company' exceeded maximum allowed length and was ignored during the sync", $firstChangedObject, 'company', 'length'),
+                $this->getNotificationAssertion("Field 'Time' of type 'time' did not match type 'date' and was ignored during the sync", $secondChangedObject, 'time', 'type'),
+                $this->getNotificationAssertion("Field 'Number' of type 'number' did not match type 'url' and was ignored during the sync", $secondChangedObject, 'number', 'type')
             );
+
+        $this->bulkNotification->expects($this->once())
+            ->method('flush');
 
         $this->fieldValidator->validateFields('lead', $changedObjects);
 
@@ -128,9 +131,10 @@ class FieldValidatorTest extends TestCase
         Assert::assertInstanceOf(FieldDAO::class, $secondChangedObject->getField('bool'));
     }
 
-    private function getNotificationAssertion(string $message, ObjectChangeDAO $changedObject): array
+    private function getNotificationAssertion(string $message, ObjectChangeDAO $changedObject, string $fieldName, string $type): array
     {
         return [
+            $this->identicalTo($changedObject->getIntegration().'-'.$changedObject->getObject().'-'.$fieldName.'-'.$type),
             $this->identicalTo($message),
             $this->identicalTo($changedObject->getIntegration()),
             $this->identicalTo($changedObject->getMappedObjectId()),
