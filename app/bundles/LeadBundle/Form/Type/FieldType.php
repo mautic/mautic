@@ -689,10 +689,21 @@ class FieldType extends AbstractType
             return;
         }
 
-        $limit = $field->getCharLengthLimit();
-        if (mb_strlen($value) > $limit) {
-            $context->buildViolation('mautic.lead.defaultValue.invalid')->addViolation();
+        $limit              = $field->getCharLengthLimit();
+        $defaultValueLength = mb_strlen($value);
+
+        if ($defaultValueLength <= $limit) {
+            return;
         }
+
+        $translationParameters = [
+            '%currentLength%'           => $defaultValueLength,
+            '%defaultValueLengthLimit%' => $limit,
+        ];
+
+        $context
+            ->buildViolation('mautic.lead.defaultValue.maxlengthexceeded', $translationParameters)
+            ->addViolation();
     }
 
     private function addLengthValidationField(FormInterface $form, bool $new = true): void

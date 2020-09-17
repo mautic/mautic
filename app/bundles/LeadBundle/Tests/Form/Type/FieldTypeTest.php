@@ -79,7 +79,7 @@ class FieldTypeTest extends TestCase
         $this->fieldType                  = new FieldType($this->leadFieldRepository, $this->translator, $this->identifierFields, $this->indexHelper);
     }
 
-    public function testThatItValidatesDefaultValueAndAddsTwoViolations(): void
+    public function testThatItFailsValidationIfTheDefaultValueExceedsTheFieldLengthLimit(): void
     {
         $this->executionContext->expects($this->once())
             ->method('getRoot')
@@ -90,15 +90,93 @@ class FieldTypeTest extends TestCase
             ->method('getViewData')
             ->willReturn($leadField);
 
-        $leadField->setCharLengthLimit(ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH - 10);
+        $limit = 100;
+        $leadField->setCharLengthLimit($limit);
 
-        $this->executionContext->expects($this->exactly(2))
+        $this->executionContext->expects($this->once(1))
             ->method('buildViolation')
             ->willReturn($this->constraintViolationBuilder);
 
-        $value = str_repeat('a', ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH + 10);
+        $value = str_repeat('a', $limit + 10);
 
-        $this->constraintViolationBuilder->expects($this->exactly(2))
+        $this->constraintViolationBuilder->expects($this->once())
+            ->method('addViolation');
+
+        FieldType::validateDefaultValue($value, $this->executionContext);
+    }
+
+    public function testThatItPassesValidationIfTheFieldHasCorrectLength(): void
+    {
+        $this->executionContext->expects($this->exactly(2))
+            ->method('getRoot')
+            ->willReturn($this->formInterface);
+
+        $leadField = new LeadField();
+        $this->formInterface->expects($this->exactly(2))
+            ->method('getViewData')
+            ->willReturn($leadField);
+
+        $limit = 100;
+        $leadField->setCharLengthLimit($limit);
+
+        $this->executionContext->expects($this->never())
+            ->method('buildViolation')
+            ->willReturn($this->constraintViolationBuilder);
+
+        $value = str_repeat('a', $limit);
+
+        $this->constraintViolationBuilder->expects($this->never())
+            ->method('addViolation');
+
+        FieldType::validateDefaultValue($value, $this->executionContext);
+
+        $value = str_repeat('a', $limit - 1);
+        FieldType::validateDefaultValue($value, $this->executionContext);
+    }
+
+    public function testThatItDoesntValidateLengthForHtmlFields(): void
+    {
+        $this->executionContext->expects($this->once())
+            ->method('getRoot')
+            ->willReturn($this->formInterface);
+
+        $leadField = new LeadField();
+        $leadField->setType('html');
+        $this->formInterface->expects($this->once())
+            ->method('getViewData')
+            ->willReturn($leadField);
+
+        $this->executionContext->expects($this->never())
+            ->method('buildViolation')
+            ->willReturn($this->constraintViolationBuilder);
+
+        $value = str_repeat('a', 1000000);
+
+        $this->constraintViolationBuilder->expects($this->never())
+            ->method('addViolation');
+
+        FieldType::validateDefaultValue($value, $this->executionContext);
+    }
+
+    public function testThatItDoesntValidateLengthForTextareaFields(): void
+    {
+        $this->executionContext->expects($this->once())
+            ->method('getRoot')
+            ->willReturn($this->formInterface);
+
+        $leadField = new LeadField();
+        $leadField->setType('textarea');
+        $this->formInterface->expects($this->once())
+            ->method('getViewData')
+            ->willReturn($leadField);
+
+        $this->executionContext->expects($this->never())
+            ->method('buildViolation')
+            ->willReturn($this->constraintViolationBuilder);
+
+        $value = str_repeat('a', 1000000);
+
+        $this->constraintViolationBuilder->expects($this->never())
             ->method('addViolation');
 
         FieldType::validateDefaultValue($value, $this->executionContext);
