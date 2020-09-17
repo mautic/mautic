@@ -11,7 +11,7 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\WebhookBundle\Tests\Unit\Entity;
+namespace Mautic\WebhookBundle\Tests\Entity;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Statement as DriverStatement;
@@ -40,7 +40,7 @@ class WebhookQueueRepositoryTest extends TestCase
      */
     private $repository;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         parent::setUp();
 
@@ -109,7 +109,7 @@ class WebhookQueueRepositoryTest extends TestCase
         self::assertSame(0, $this->repository->getQueueCountByWebhookId(0));
     }
 
-    public function testExistsExists(): void
+    public function testWebhookExistsExists()
     {
         $id = 1;
 
@@ -138,9 +138,6 @@ class WebhookQueueRepositoryTest extends TestCase
             ->with('id', $id)
             ->willReturn($queryBuilder);
         $queryBuilder->expects(self::once())
-            ->method('setMaxResults')
-            ->willReturn($queryBuilder);
-        $queryBuilder->expects(self::once())
             ->method('execute')
             ->willReturn($statement);
 
@@ -153,10 +150,10 @@ class WebhookQueueRepositoryTest extends TestCase
             ->method('getConnection')
             ->willReturn($connection);
 
-        self::assertTrue($this->repository->exists($id));
+        self::assertTrue($this->repository->webhookExists($id));
     }
 
-    public function testExistsNotExists(): void
+    public function testWebhookExistsNotExists()
     {
         $id = 1;
 
@@ -185,9 +182,6 @@ class WebhookQueueRepositoryTest extends TestCase
             ->with('id', $id)
             ->willReturn($queryBuilder);
         $queryBuilder->expects(self::once())
-            ->method('setMaxResults')
-            ->willReturn($queryBuilder);
-        $queryBuilder->expects(self::once())
             ->method('execute')
             ->willReturn($statement);
 
@@ -200,10 +194,10 @@ class WebhookQueueRepositoryTest extends TestCase
             ->method('getConnection')
             ->willReturn($connection);
 
-        self::assertFalse($this->repository->exists($id));
+        self::assertFalse($this->repository->webhookExists($id));
     }
 
-    public function testGetConsecutiveIDsAsRanges(): void
+    public function testGetConsecutiveIDsAsRanges()
     {
         $webhookId      = 1;
         $expectedResult = [];
@@ -233,7 +227,7 @@ class WebhookQueueRepositoryTest extends TestCase
         $this->assertSame($expectedResult, $this->repository->getConsecutiveIDsAsRanges((string) $webhookId));
     }
 
-    public function testGetConsecutiveIDsAsRangesInvalidArgumentException(): void
+    public function testGetConsecutiveIDsAsRangesInvalidArgumentException()
     {
         self::expectException(\InvalidArgumentException::class);
 
