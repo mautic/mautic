@@ -33,6 +33,8 @@ class WebhookQueueRepository extends CommonRepository
      * Gets a count of the webhook queues filtered by the webhook id.
      *
      * @param $id int (for Webhooks)
+     *
+     * @deprecated
      */
     public function getQueueCountByWebhookId($id): int
     {
@@ -49,5 +51,64 @@ class WebhookQueueRepository extends CommonRepository
             ->setParameter('id', $id)
             ->executeQuery()
             ->fetchOne();
+    }
+
+    /**
+     * Check if there is webhook to process.
+     */
+    public function webhookExists(int $id): bool
+    {
+        $qb     = $this->_em->getConnection()->createQueryBuilder();
+        $result = $qb->select($this->getTableAlias().'.id')
+            ->from(MAUTIC_TABLE_PREFIX.'webhook_queue', $this->getTableAlias())
+            ->where($this->getTableAlias().'.webhook_id = :id')
+            ->setParameter('id', $id)
+            ->execute()
+            ->fetch();
+
+        return (bool) $result;
+    }
+
+    /**
+     * Gets consecutive queue IDs as ranges.
+     *
+     * @param $webhookId
+     *
+     * @return array
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function getConsecutiveIDsAsRanges($webhookId)
+    {
+        $webhookId = (int) $webhookId;
+        if (1 > $webhookId) {
+            throw new \InvalidArgumentException('webhook ID must be greater than zero');
+        }
+
+        $connection = $this->_em->getConnection();
+        $query      = sprintf('SELECT 
+            MIN(id) AS min_id,
+            MAX(id) AS max_id
+        FROM
+            (SELECT 
+                @row_number:=CASE
+                        WHEN @id = webhook_id THEN @row_number
+                        ELSE @row_number + 1
+                    END AS webhook_id_group,
+                    @id:=webhook_id AS webhook_id,
+                    id
+            FROM
+                %swebhook_queue, (SELECT @row_number:=0, @id:=1) AS t
+            ORDER BY id) AS MWQ
+        WHERE
+            MWQ.webhook_id = :webhookId
+        GROUP BY webhook_id_group', MAUTIC_TABLE_PREFIX);
+
+        $statement = $connection->prepare($query);
+        $statement->execute([
+            ':webhookId' => $webhookId,
+        ]);
+
+        return $statement->fetchAll();
     }
 }

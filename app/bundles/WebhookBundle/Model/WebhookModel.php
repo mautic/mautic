@@ -348,14 +348,14 @@ class WebhookModel extends FormModel
         if (!empty($this->webhookQueueIdList)) {
             // delete all the queued items we just processed
             $webhookQueueRepo->deleteQueuesById(array_keys($this->webhookQueueIdList));
-            $queueCount = $webhookQueueRepo->getQueueCountByWebhookId($webhook->getId());
+            $nextWebhookExists = $webhookQueueRepo->webhookExists($webhook->getId());
 
             // reset the array to blank so none of the IDs are repeated
             $this->webhookQueueIdList = [];
 
             // if there are still items in the queue after processing we re-process
             // WARNING: this is recursive
-            if ($queueCount > 0 && !$this->isProcessingExpired()) {
+            if ($nextWebhookExists && !$this->isProcessingExpired()) {
                 $this->processWebhook($webhook);
             }
         }
