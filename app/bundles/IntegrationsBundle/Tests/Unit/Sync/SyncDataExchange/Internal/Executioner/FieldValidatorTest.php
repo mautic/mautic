@@ -112,9 +112,9 @@ class FieldValidatorTest extends TestCase
         $this->bulkNotification->expects($this->exactly(3))
             ->method('addNotification')
             ->withConsecutive(
-                $this->getNotificationAssertion("Field 'Company' with value 'Some company' exceeded maximum allowed length and was ignored during the sync", $firstChangedObject, 'company', 'length'),
-                $this->getNotificationAssertion("Field 'Time' of type 'time' did not match type 'date' and was ignored during the sync", $secondChangedObject, 'time', 'type'),
-                $this->getNotificationAssertion("Field 'Number' of type 'number' did not match type 'url' and was ignored during the sync", $secondChangedObject, 'number', 'type')
+                $this->getNotificationAssertion("Custom field 'Company' with value 'Some company' exceeded maximum allowed length and was ignored during the sync", $firstChangedObject, 'company', 'length'),
+                $this->getNotificationAssertion("Custom field 'Time' of type 'time' did not match integration type 'date' and was ignored during the sync", $secondChangedObject, 'time', 'type'),
+                $this->getNotificationAssertion("Custom field 'Number' of type 'number' did not match integration type 'url' and was ignored during the sync", $secondChangedObject, 'number', 'type')
             );
 
         $this->bulkNotification->expects($this->once())

@@ -69,14 +69,14 @@ final class FieldValidator implements FieldValidatorInterface
 
                 if (is_string($normalizedValue) && !$this->isFieldLengthValid($schemaDefinition, $normalizedValue)) {
                     $changedObject->removeField($fieldName);
-                    $message = sprintf("Field '%s' with value '%s' exceeded maximum allowed length and was ignored during the sync", $schema['label'], $normalizedValue);
+                    $message = sprintf("Custom field '%s' with value '%s' exceeded maximum allowed length and was ignored during the sync", $schema['label'], $normalizedValue);
                     $this->addNotification($message, $changedObject, $fieldName, 'length');
                     continue;
                 }
 
                 if (!$this->isFieldTypeValid($schemaDefinition, $fieldValue)) {
                     $changedObject->removeField($fieldName);
-                    $message = sprintf("Field '%s' of type '%s' did not match type '%s' and was ignored during the sync", $schema['label'], $schema['type'], $fieldValue->getType());
+                    $message = sprintf("Custom field '%s' of type '%s' did not match integration type '%s' and was ignored during the sync", $schema['label'], $schema['type'], $fieldValue->getType());
                     $this->addNotification($message, $changedObject, $fieldName, 'type');
                     continue;
                 }
