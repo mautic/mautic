@@ -367,6 +367,8 @@ class MailHelper
             }
         } // from is set in flushQueue
 
+        $this->setReplyTo($this->replyTo);
+
         // Set system return path if applicable
         if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail())) {
             $this->message->setReturnPath($bounceEmail);

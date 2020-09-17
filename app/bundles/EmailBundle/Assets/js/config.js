@@ -73,7 +73,6 @@ Mautic.testEmailServerConnection = function() {
         encryption:          mQuery('#config_emailconfig_mailer_encryption').val(),
         from_email:          mQuery('#config_emailconfig_mailer_from_email').val(),
         from_name:           mQuery('#config_emailconfig_mailer_from_name').val(),
-        reply_to_email:      mQuery('#config_emailconfig_mailer_reply_to_email').val(),
         password:            mQuery('#config_emailconfig_mailer_password').val(),
         port:                mQuery('#config_emailconfig_mailer_port').val(),
         transport:           mQuery('#config_emailconfig_mailer_transport').val(),
