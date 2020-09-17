@@ -268,7 +268,7 @@ class MailHelper
             $factory->getParameter('mailer_from_name')
         );
         $this->setDefaultFrom($from, [$systemFromEmail => $systemFromName]);
-        $this->setDefaultReplyTo($systemReplyToEmail, $systemFromEmail);
+        $this->setDefaultReplyTo($systemReplyToEmail, $this->from);
 
         $this->returnPath = $factory->getParameter('mailer_return_path');
 
@@ -367,8 +367,9 @@ class MailHelper
             }
         } // from is set in flushQueue
 
-        $this->setReplyTo($this->replyTo);
-
+        if (!empty($this->replyTo)) {
+            $this->setReplyTo($this->replyTo);
+        }
         // Set system return path if applicable
         if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail())) {
             $this->message->setReturnPath($bounceEmail);
@@ -2212,9 +2213,16 @@ class MailHelper
      * @param $systemReplyToEmail
      * @param $systemFromEmail
      */
-    private function setDefaultReplyTo($systemReplyToEmail, $systemFromEmail)
+    private function setDefaultReplyTo($systemReplyToEmail =null, $systemFromEmail = null)
     {
-        $this->systemReplyTo = $systemReplyToEmail ?: $systemFromEmail;
+        $fromEmail = null;
+        if (is_array($systemFromEmail)) {
+            $fromEmail    = key($systemFromEmail);
+        } elseif (!empty($systemFromEmail)) {
+            $fromEmail = $systemFromEmail;
+        }
+
+        $this->systemReplyTo = $systemReplyToEmail ?: $fromEmail;
         $this->replyTo       = $this->systemReplyTo;
     }
 }
