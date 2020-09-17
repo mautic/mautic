@@ -23,16 +23,24 @@ class SegmentContactsLineChartQuery extends ChartQuery
      */
     private $filters;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     private $segmentId;
 
-    /** @var bool|string */
+    /**
+     * @var bool|string
+     */
     private $firstEventLog;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     private $addedEventLogStats;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     private $removedEventLogStats;
 
     /**
@@ -46,13 +54,11 @@ class SegmentContactsLineChartQuery extends ChartQuery
     private $statsFromEventLog;
 
     /**
-     * SegmentChartQuery constructor.
-     *
-     * @param null $unit
+     * @param string|null $unit
      *
      * @throws SegmentNotFoundException
      */
-    public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, array $filters = [], $unit= null)
+    public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, array $filters = [], $unit = null)
     {
         $this->connection = $connection;
         $this->dateFrom   = $dateFrom;
@@ -99,10 +105,8 @@ class SegmentContactsLineChartQuery extends ChartQuery
 
     /**
      * Return total of contact to date end of graph.
-     *
-     * @return int
      */
-    private function getTotalToDateRange(int $total)
+    private function getTotalToDateRange(int $total): int
     {
         $queryForTotal = clone $this;
         // try figure out total count in dateTo
@@ -114,7 +118,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
     /**
      * Get data about add/remove from segment based on LeadEventLog.
      *
-     * @param $action
+     * @param string $action
      *
      * @return array
      */
@@ -159,7 +163,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
      */
     public function getDataFromLeadListLeads()
     {
-        $q        = $this->prepareTimeDataQuery('lead_lists_leads', 'date_added', $this->filters);
+        $q = $this->prepareTimeDataQuery('lead_lists_leads', 'date_added', $this->filters);
         if ($this->firstEventLog) {
             $q->andWhere($q->expr()->lt('t.date_added', $q->expr()->literal($this->firstEventLog)));
         }
@@ -167,11 +171,9 @@ class SegmentContactsLineChartQuery extends ChartQuery
         return  $this->loadAndBuildTimeData($q);
     }
 
-    /*
-    * @param int $segmentId
-    *
-    * @return bool|string
-    */
+    /**
+     * @return bool|string
+     */
     private function getFirstDateAddedSegmentEventLog()
     {
         $subQuery = $this->connection->createQueryBuilder();
@@ -197,8 +199,6 @@ class SegmentContactsLineChartQuery extends ChartQuery
     }
 
     /**
-     *      *.
-     *
      * @return bool
      */
     public function isStatsFromEventLog()
@@ -225,13 +225,16 @@ class SegmentContactsLineChartQuery extends ChartQuery
     /**
      * Init basic stats.
      */
-    private function init()
+    private function init(): void
     {
         $this->firstEventLog        = $this->getFirstDateAddedSegmentEventLog();
         $this->addedLeadListStats   = $this->getDataFromLeadListLeads();
         $this->addedEventLogStats   = $this->getDataFromLeadEventLog('added');
         $this->removedEventLogStats = $this->getDataFromLeadEventLog('removed');
-
-        $this->statsFromEventLog = (empty(array_filter($this->addedLeadListStats)) && (!empty(array_filter($this->addedEventLogStats)) || !empty(array_filter($this->removedEventLogStats))));
+        $this->statsFromEventLog    = (
+            empty(array_filter($this->addedLeadListStats))
+            && (!empty(array_filter($this->addedEventLogStats))
+            || !empty(array_filter($this->removedEventLogStats)))
+        );
     }
 }
