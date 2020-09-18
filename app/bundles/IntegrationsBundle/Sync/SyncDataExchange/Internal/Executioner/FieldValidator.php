@@ -69,14 +69,14 @@ final class FieldValidator implements FieldValidatorInterface
 
                 if (is_string($normalizedValue) && !$this->isFieldLengthValid($schemaDefinition, $normalizedValue)) {
                     $changedObject->removeField($fieldName);
-                    $message = sprintf("Custom field '%s' with value '%s' exceeded maximum allowed length and was ignored during the sync", $schema['label'], $normalizedValue);
+                    $message = sprintf("Custom field '%s' with value '%s' exceeded maximum allowed length and was ignored during the sync.", $schema['label'], $normalizedValue);
                     $this->addNotification($message, $changedObject, $fieldName, 'length');
                     continue;
                 }
 
                 if (!$this->isFieldTypeValid($schemaDefinition, $fieldValue)) {
                     $changedObject->removeField($fieldName);
-                    $message = sprintf("Custom field '%s' of type '%s' did not match integration type '%s' and was ignored during the sync", $schema['label'], $schema['type'], $fieldValue->getType());
+                    $message = sprintf("Custom field '%s' of type '%s' did not match integration type '%s' and was ignored during the sync.", $schema['label'], $schema['type'], $fieldValue->getType());
                     $this->addNotification($message, $changedObject, $fieldName, 'type');
                     continue;
                 }
@@ -141,16 +141,19 @@ final class FieldValidator implements FieldValidatorInterface
 
     private function addNotification(string $message, ObjectChangeDAO $changedObject, string $fieldName, string $type): void
     {
-        $deduplicateValue = $changedObject->getIntegration().'-'.$changedObject->getObject().'-'.$fieldName.'-'.$type;
+        $integrationName       = $changedObject->getIntegration();
+        $integrationObjectName = $changedObject->getObject();
+        $integrationObjectId   = $changedObject->getMappedObjectId();
+        $deduplicateValue      = $integrationName.'-'.$integrationObjectName.'-'.$fieldName.'-'.$type;
 
         $this->bulkNotification->addNotification(
             $deduplicateValue,
-            $message,
-            $changedObject->getIntegration(),
-            $changedObject->getMappedObjectId(),
-            $changedObject->getObject(),
+            sprintf('%s Your %s integration plugin may be configured improperly.', $message, $integrationName),
+            $integrationName,
+            sprintf('%s %s', $integrationObjectId, $integrationObjectName),
+            $integrationObjectName,
             0,
-            sprintf('SF object %s', $changedObject->getMappedObjectId())
+            sprintf('%s %s %s', $integrationName, $integrationObjectName, $integrationObjectId)
         );
     }
 }

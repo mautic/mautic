@@ -218,4 +218,9 @@ class NotificationModel extends FormModel
 
         return [$notifications, $showNewIndicator, ['isNew' => $newUpdate, 'message' => $updateMessage]];
     }
+
+    private function isDuplicate(int $userId, string $deduplicate, DateTime $from = null): bool
+    {
+        return $this->getRepository()->isDuplicate($userId, $deduplicate, $from ?? new DateTime('-1 day'));
+    }
 }

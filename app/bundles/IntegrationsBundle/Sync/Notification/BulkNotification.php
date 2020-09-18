@@ -15,14 +15,14 @@ namespace Mautic\IntegrationsBundle\Sync\Notification;
 
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Service\BulkNotification as CoreBulkNotification;
+use Mautic\CoreBundle\Service\BulkNotificationInterface;
 use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationBuilder;
 use Mautic\UserBundle\Entity\User;
 
 class BulkNotification
 {
     /**
-     * @var CoreBulkNotification
+     * @var BulkNotificationInterface
      */
     private $bulkNotification;
 
@@ -37,7 +37,7 @@ class BulkNotification
     private $entityManager;
 
     public function __construct(
-        CoreBulkNotification $bulkNotification,
+        BulkNotificationInterface $bulkNotification,
         UserNotificationBuilder $userNotificationBuilder,
         EntityManagerInterface $entityManager
     ) {

@@ -46,13 +46,12 @@ class BulkNotificationTest extends MauticMysqlTestCase
 
         $notifications = $notificationRepository->findAll();
         Assert::assertCount(2, $notifications);
-        $this->assertNotification($notifications[0], 'dup1', 'message 1', 'link 1');
-        $this->assertNotification($notifications[1], 'dup2', 'message 2', 'link 2');
+        $this->assertNotification($notifications[0], 'message 1', 'link 1');
+        $this->assertNotification($notifications[1], 'message 2', 'link 2');
     }
 
-    private function assertNotification(Notification $notification, string $deduplicate, string $message, string $link): void
+    private function assertNotification(Notification $notification, string $message, string $link): void
     {
-        Assert::assertSame(md5($deduplicate), $notification->getDeduplicate());
         Assert::assertSame(sprintf('<a href="/s/contacts/view">%s</a> failed to sync with message, &quot;%s&quot;', $link, $message), $notification->getMessage());
     }
 }
