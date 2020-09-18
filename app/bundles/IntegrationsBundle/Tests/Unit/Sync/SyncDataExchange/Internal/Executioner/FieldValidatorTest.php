@@ -112,9 +112,9 @@ class FieldValidatorTest extends TestCase
         $this->bulkNotification->expects($this->exactly(3))
             ->method('addNotification')
             ->withConsecutive(
-                $this->getNotificationAssertion("Custom field 'Company' with value 'Some company' exceeded maximum allowed length and was ignored during the sync", $firstChangedObject, 'company', 'length'),
-                $this->getNotificationAssertion("Custom field 'Time' of type 'time' did not match integration type 'date' and was ignored during the sync", $secondChangedObject, 'time', 'type'),
-                $this->getNotificationAssertion("Custom field 'Number' of type 'number' did not match integration type 'url' and was ignored during the sync", $secondChangedObject, 'number', 'type')
+                $this->getNotificationAssertion("Custom field 'Company' with value 'Some company' exceeded maximum allowed length and was ignored during the sync. Your integration integration plugin may be configured improperly.", $firstChangedObject, 'company', 'length'),
+                $this->getNotificationAssertion("Custom field 'Time' of type 'time' did not match integration type 'date' and was ignored during the sync. Your integration integration plugin may be configured improperly.", $secondChangedObject, 'time', 'type'),
+                $this->getNotificationAssertion("Custom field 'Number' of type 'number' did not match integration type 'url' and was ignored during the sync. Your integration integration plugin may be configured improperly.", $secondChangedObject, 'number', 'type')
             );
 
         $this->bulkNotification->expects($this->once())
@@ -137,10 +137,10 @@ class FieldValidatorTest extends TestCase
             $this->identicalTo($changedObject->getIntegration().'-'.$changedObject->getObject().'-'.$fieldName.'-'.$type),
             $this->identicalTo($message),
             $this->identicalTo($changedObject->getIntegration()),
-            $this->identicalTo($changedObject->getMappedObjectId()),
+            $this->identicalTo(sprintf('%s %s', $changedObject->getMappedObjectId(), $changedObject->getObject())),
             $this->identicalTo($changedObject->getObject()),
             $this->identicalTo(0),
-            $this->identicalTo(sprintf('SF object %s', $changedObject->getMappedObjectId())),
+            $this->identicalTo(sprintf('%s %s %s', $changedObject->getIntegration(), $changedObject->getObject(), $changedObject->getMappedObjectId())),
         ];
     }
 }
