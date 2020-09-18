@@ -76,8 +76,8 @@ class BulkNotification
     /**
      * @param DateTime|null $deduplicateDateTimeFrom If last 24 hours for deduplication does not fit, change it here
      */
-    public function flush(DateTime $deduplicateDateFrom = null): void
+    public function flush(DateTime $deduplicateDateTimeFrom = null): void
     {
-        $this->bulkNotification->flush($deduplicateDateFrom);
+        $this->bulkNotification->flush($deduplicateDateTimeFrom);
     }
 }

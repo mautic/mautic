@@ -39,7 +39,7 @@ class UserNotificationHelper
         int $id,
         string $linkText,
         string $deduplicateValue = null,
-        DateTime $deduplicateDateFrom = null
+        DateTime $deduplicateDateTimeFrom = null
     ): void {
         $link    = $this->userNotificationBuilder->buildLink($mauticObject, $id, $linkText);
         $userIds = $this->userNotificationBuilder->getUserIds($mauticObject, $id);
@@ -50,7 +50,7 @@ class UserNotificationHelper
                 $this->userNotificationBuilder->formatMessage($message, $link),
                 $userId,
                 $deduplicateValue,
-                $deduplicateDateFrom
+                $deduplicateDateTimeFrom
             );
         }
     }
