@@ -17,7 +17,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 
-class MessageQueueModelTest extends \PHPUnit_Framework_TestCase
+class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
 {
     /** @var string */
     const DATE = '2019-07-07 15:00:00';
