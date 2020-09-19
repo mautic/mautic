@@ -275,7 +275,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         $separator           = md5(time());
         $separator_multipart = md5($msg['subject'].time());
         $message             = "MIME-Version: 1.0\n";
-        $message .= 'Subject: '. mb_encode_mimeheader($msg['subject'], 'UTF-8') ."\n";
+        $message .= 'Subject: '.mb_encode_mimeheader($msg['subject'], 'UTF-8')."\n";
         $message .= 'From: '.mb_encode_mimeheader($msg['from']['name']).' <'.$msg['from']['email'].">\n";
         $message .= "To: $recipient\n";
         if (count($msg['recipients']['cc']) > 0) {
