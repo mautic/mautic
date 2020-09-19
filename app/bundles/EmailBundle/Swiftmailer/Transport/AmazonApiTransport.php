@@ -270,61 +270,61 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
      *
      * @return string
      */
-     public function buildRawMessage($msg, $recipient)
-     {
-       $separator           = md5(time());
-       $separator_multipart = md5($msg['subject'].time());
-       $message             = "MIME-Version: 1.0\n";
-       $message .= 'Subject: '. mb_encode_mimeheader($msg['subject'], 'UTF-8') ."\n";
-       $message .= 'From: '.mb_encode_mimeheader($msg['from']['name']).' <'.$msg['from']['email'].">\n";
-       $message .= "To: $recipient\n";
-       if (count($msg['recipients']['cc']) > 0) {
-         $message .= 'Cc: '.implode(',', array_keys($msg['recipients']['cc']))."\n";
-       }
-       if (count($msg['recipients']['bcc']) > 0) {
-         $message .= 'Bcc: '.implode(',', array_keys($msg['recipients']['bcc']))."\n";
-       }
-       if (isset($msg['replyTo'])) {
-         $message .= 'Reply-To: '.$msg['replyTo']['email']."\n";
-       }
-       if (isset($msg['returnPath'])) {
-         $message .= 'Return-Path: '.$msg['returnPath']."\n";
-       }
-       if (isset($msg['headers'])) {
-         foreach ($msg['headers'] as $key => $value) {
-           $message .= "$key: ".$value."\n";
-         }
-       }
-       
-       if (count($msg['attachments']) > 0) {
-         $message .= "Content-Type: multipart/mixed; boundary=\"$separator_multipart\"\n";
-         $message .= "\n--$separator_multipart\n";
-       }
-       
-       $message .= "Content-Type: multipart/alternative; boundary=\"$separator\"\n";
-       if (isset($msg['text']) && strlen($msg['text']) > 0) {
-         $message .= "\n--$separator\n";
-         $message .= "Content-Type: text/plain; charset=\"UTF-8\"\n";
-         $message .= "Content-Transfer-Encoding: base64\n";
-         $message .= "\n".wordwrap(base64_encode($msg['text']), 76, "\n", true)."\n";
-       }
-       $message .= "\n--$separator\n";
-       $message .= "Content-Type: text/html; charset=\"UTF-8\"\n";
-       $message .= "\n".$msg['html']."\n";
-       $message .= "\n--$separator--\n";
-       
-       if (count($msg['attachments']) > 0) {
-         foreach ($msg['attachments'] as $attachment) {
-           $message .= "--$separator_multipart\n";
-           $message .= 'Content-Type: '.$attachment['type'].'; name="'.$attachment['name']."\"\n";
-           $message .= 'Content-Disposition: attachment; filename="'.$attachment['name']."\"\n";
-           $message .= "Content-Transfer-Encoding: base64\n";
-           $message .= "\n".$attachment['content']."\n";
-         }
-       }
-       
-       return $message."--$separator_multipart--";
-     }
+    public function buildRawMessage($msg, $recipient)
+    {
+        $separator           = md5(time());
+        $separator_multipart = md5($msg['subject'].time());
+        $message             = "MIME-Version: 1.0\n";
+        $message .= 'Subject: '. mb_encode_mimeheader($msg['subject'], 'UTF-8') ."\n";
+        $message .= 'From: '.mb_encode_mimeheader($msg['from']['name']).' <'.$msg['from']['email'].">\n";
+        $message .= "To: $recipient\n";
+        if (count($msg['recipients']['cc']) > 0) {
+            $message .= 'Cc: '.implode(',', array_keys($msg['recipients']['cc']))."\n";
+        }
+        if (count($msg['recipients']['bcc']) > 0) {
+            $message .= 'Bcc: '.implode(',', array_keys($msg['recipients']['bcc']))."\n";
+        }
+        if (isset($msg['replyTo'])) {
+            $message .= 'Reply-To: '.$msg['replyTo']['email']."\n";
+        }
+        if (isset($msg['returnPath'])) {
+            $message .= 'Return-Path: '.$msg['returnPath']."\n";
+        }
+        if (isset($msg['headers'])) {
+            foreach ($msg['headers'] as $key => $value) {
+                $message .= "$key: ".$value."\n";
+            }
+        }
+
+        if (count($msg['attachments']) > 0) {
+            $message .= "Content-Type: multipart/mixed; boundary=\"$separator_multipart\"\n";
+            $message .= "\n--$separator_multipart\n";
+        }
+
+        $message .= "Content-Type: multipart/alternative; boundary=\"$separator\"\n";
+        if (isset($msg['text']) && strlen($msg['text']) > 0) {
+            $message .= "\n--$separator\n";
+            $message .= "Content-Type: text/plain; charset=\"UTF-8\"\n";
+            $message .= "Content-Transfer-Encoding: base64\n";
+            $message .= "\n".wordwrap(base64_encode($msg['text']), 76, "\n", true)."\n";
+        }
+        $message .= "\n--$separator\n";
+        $message .= "Content-Type: text/html; charset=\"UTF-8\"\n";
+        $message .= "\n".$msg['html']."\n";
+        $message .= "\n--$separator--\n";
+
+        if (count($msg['attachments']) > 0) {
+            foreach ($msg['attachments'] as $attachment) {
+                $message .= "--$separator_multipart\n";
+                $message .= 'Content-Type: '.$attachment['type'].'; name="'.$attachment['name']."\"\n";
+                $message .= 'Content-Disposition: attachment; filename="'.$attachment['name']."\"\n";
+                $message .= "Content-Transfer-Encoding: base64\n";
+                $message .= "\n".$attachment['content']."\n";
+            }
+        }
+
+        return $message."--$separator_multipart--";
+    }
 
     /**
      * Return the max number of to addresses allowed per batch
