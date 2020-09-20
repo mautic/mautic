@@ -34,7 +34,7 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
      */
     public function __construct($region, $otherRegion, $port, AmazonCallback $amazonCallback)
     {
-        $port                 = $port ?: 2587;
+        $port                 = $port ?: 587;
         $host                 = $this->buildHost($region, $otherRegion);
         $this->amazonCallback = $amazonCallback;
 
