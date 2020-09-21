@@ -71,7 +71,6 @@ class SegmentContactsLineChartQuery extends ChartQuery
         }
         $this->segmentId  = $this->filters['leadlist_id']['value'];
         parent::__construct($connection, $dateFrom, $dateTo, $unit);
-        $this->init();
     }
 
     public function setDateRange(\DateTime $dateFrom, \DateTime $dateTo)
