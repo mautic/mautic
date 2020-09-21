@@ -83,7 +83,7 @@ class DoNotContact
     public function addDncForContact(
         int $contactId,
         $channel,
-        string $reason = DNC::BOUNCED,
+        int $reason = DNC::BOUNCED,
         string $comments = '',
         bool $persist = true,
         bool $checkCurrentStatus = true,
