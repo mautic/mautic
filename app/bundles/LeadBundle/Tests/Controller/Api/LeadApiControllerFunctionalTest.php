@@ -435,4 +435,54 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
+
+    public function testAddAndRemoveDncToExistingContact()
+    {
+        // Create contact
+        $payload = [
+            'email' => 'addDncDemo@mautic.org',
+        ];
+
+        $this->client->request('POST', '/api/contacts/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $contactId      = $response['contact']['id'];
+
+        // Ensure that doNotContact is empty after creating the contact
+        $this->assertSame([], $response['contact']['doNotContact']);
+
+        // Check with a DNC payload that has an empty reasoncode in it, this should throw a 400 Bad Request error
+        $dncPayload = [
+            'reason' => 0,
+        ];
+        $dncChannel = 'email';
+
+        $this->client->request('POST', "/api/contacts/$contactId/dnc/$dncChannel/add", $dncPayload);
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode());
+
+        // Leave the DNC payload empty to ensure it takes default values for channel and reason.
+        $dncPayload = [];
+
+        // Add DNC to the contact.
+        $this->client->request('POST', "/api/contacts/$contactId/dnc/$dncChannel/add", $dncPayload);
+        $clientResponse = $this->client->getResponse();
+        $dncResponse    = json_decode($clientResponse->getContent(), true);
+
+        // MANUAL (3) is the default value according to the dev docs: https://developer.mautic.org/#add-do-not-contact
+        $this->assertSame(DoNotContact::MANUAL, $dncResponse['contact']['doNotContact'][0]['reason']);
+        $this->assertSame($dncChannel, $dncResponse['contact']['doNotContact'][0]['channel']);
+
+        // Remove DNC from the contact.
+        $this->client->request('POST', "/api/contacts/$contactId/dnc/$dncChannel/remove");
+        $clientResponse    = $this->client->getResponse();
+        $dncRemoveResponse = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame([], $dncRemoveResponse['contact']['doNotContact']);
+
+        // Remove the contact.
+        $this->client->request('DELETE', "/api/contacts/$contactId/delete");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+    }
 }

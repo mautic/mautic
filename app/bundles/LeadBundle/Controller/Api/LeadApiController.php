@@ -410,7 +410,19 @@ class LeadApiController extends CommonApiController
         if ($channelId) {
             $channel = [$channel => $channelId];
         }
-        $reason   = (int) $this->request->request->get('reason');
+
+        // If no reason is set, default to 3 (manual)
+        $reason = (int) $this->request->request->get('reason', DoNotContact::MANUAL);
+
+        // If a reason is set, but it's empty or 0, show an error.
+        if (0 === $reason) {
+            return $this->returnError(
+                'Invalid reason code given',
+                Response::HTTP_BAD_REQUEST,
+                'Reason code needs to be an integer and higher than 0.'
+            );
+        }
+
         $comments = InputHelper::clean($this->request->request->get('comments'));
 
         /** @var \Mautic\LeadBundle\Model\DoNotContact $doNotContact */
