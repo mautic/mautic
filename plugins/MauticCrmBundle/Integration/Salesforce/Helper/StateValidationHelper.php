@@ -29,8 +29,6 @@ class StateValidationHelper
      * Out of the box SF only supports states for the following countries. So in order to prevent SF from rejecting the entire payload, we'll
      * only send state if it is supported out of the box by SF.
      *
-     * @param array $mappedData
-     *
      * @return array
      */
     public static function validate(array $mappedData)

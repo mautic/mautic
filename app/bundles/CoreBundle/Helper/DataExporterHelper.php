@@ -18,10 +18,7 @@ class DataExporterHelper
      *
      * Overwrite in your controller if required.
      *
-     * @param AbstractCommonModel $model
-     * @param array               $args
-     * @param callable|null       $resultsCallback
-     * @param int|null            $start
+     * @param int|null $start
      *
      * @return array
      */
@@ -32,7 +29,7 @@ class DataExporterHelper
 
         $results = $model->getEntities($args);
         $items   = $results['results'];
-        if (count($items) === 0) {
+        if (0 === count($items)) {
             return null;
         }
         unset($results);
@@ -61,8 +58,6 @@ class DataExporterHelper
     }
 
     /**
-     * @param array $row
-     *
      * @return array
      */
     private function secureAgainstCsvInjection(array $row)

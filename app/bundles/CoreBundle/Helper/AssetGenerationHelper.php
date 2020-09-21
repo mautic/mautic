@@ -11,7 +11,6 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -20,22 +19,28 @@ use Symfony\Component\Finder\Finder;
 class AssetGenerationHelper
 {
     /**
-     * @var MauticFactory
+     * @var BundleHelper
      */
-    private $factory;
+    private $bundleHelper;
 
     /**
-     * @var
+     * @var PathsHelper
+     */
+    private $pathsHelper;
+
+    /**
+     * @var string
      */
     private $version;
 
     /**
-     * @param MauticFactory $factory
+     * AssetGenerationHelper constructor.
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(CoreParametersHelper $coreParametersHelper, BundleHelper $bundleHelper, PathsHelper $pathsHelper, AppVersion $version)
     {
-        $this->factory = $factory;
-        $this->version = substr(hash('sha1', $this->factory->getParameter('secret_key').$this->factory->getVersion()), 0, 8);
+        $this->bundleHelper         = $bundleHelper;
+        $this->pathsHelper          = $pathsHelper;
+        $this->version              = substr(hash('sha1', $coreParametersHelper->get('secret_key').$version->getVersion()), 0, 8);
     }
 
     /**
@@ -51,12 +56,12 @@ class AssetGenerationHelper
 
         if (empty($assets)) {
             $loadAll    = true;
-            $env        = ($forceRegeneration) ? 'prod' : $this->factory->getEnvironment();
-            $rootPath   = $this->factory->getSystemPath('assets_root');
-            $assetsPath = $this->factory->getSystemPath('assets');
+            $env        = ($forceRegeneration) ? 'prod' : MAUTIC_ENV;
+            $rootPath   = $this->pathsHelper->getSystemPath('assets_root');
+            $assetsPath = $this->pathsHelper->getSystemPath('assets');
 
             $assetsFullPath = "$rootPath/$assetsPath";
-            if ($env == 'prod') {
+            if ('prod' == $env) {
                 $loadAll = false; //by default, loading should not be required
 
                 //check for libraries and app files and generate them if they don't exist if in prod environment
@@ -76,7 +81,7 @@ class AssetGenerationHelper
             }
 
             if ($loadAll || $forceRegeneration) {
-                if ($env == 'prod') {
+                if ('prod' == $env) {
                     ini_set('max_execution_time', 300);
 
                     $inProgressFile = "$assetsFullPath/generation_in_progress.txt";
@@ -92,7 +97,7 @@ class AssetGenerationHelper
                 $modifiedLast = [];
 
                 //get a list of all core asset files
-                $bundles = $this->factory->getParameter('bundles');
+                $bundles = $this->bundleHelper->getMauticBundles();
 
                 $fileTypes = ['css', 'js'];
                 foreach ($bundles as $bundle) {
@@ -109,7 +114,7 @@ class AssetGenerationHelper
                 $modifiedLast = array_merge($modifiedLast, $this->findOverrides($env, $assets));
 
                 //combine the files into their corresponding name and put in the root media folder
-                if ($env == 'prod') {
+                if ('prod' == $env) {
                     $checkPaths = [
                         $assetsFullPath,
                         "$assetsFullPath/css",
@@ -136,7 +141,7 @@ class AssetGenerationHelper
                                     unlink($assetFile);
                                 }
 
-                                if ($type == 'css') {
+                                if ('css' == $type) {
                                     $out = fopen($assetFile, 'w');
 
                                     foreach ($files as $relPath => $details) {
@@ -176,7 +181,7 @@ class AssetGenerationHelper
                 }
             }
 
-            if ($env == 'prod') {
+            if ('prod' == $env) {
                 //return prod generated assets
                 $assets = [
                     'css' => [
@@ -189,7 +194,7 @@ class AssetGenerationHelper
                     ],
                 ];
             } else {
-                foreach ($assets as $type => &$typeAssets) {
+                foreach ($assets as &$typeAssets) {
                     $typeAssets = array_keys($typeAssets);
                 }
             }
@@ -210,7 +215,7 @@ class AssetGenerationHelper
      */
     protected function findAssets($dir, $ext, $env, &$assets)
     {
-        $rootPath    = str_replace('\\', '/', $this->factory->getSystemPath('assets_root').'/');
+        $rootPath    = str_replace('\\', '/', $this->pathsHelper->getSystemPath('assets_root').'/');
         $directories = new Finder();
         $directories->directories()->exclude('*less')->depth('0')->ignoreDotFiles(true)->in($dir);
 
@@ -237,7 +242,7 @@ class AssetGenerationHelper
                 foreach ($files as $file) {
                     $fullPath = $file->getPathname();
                     $relPath  = str_replace($rootPath, '', $file->getPathname());
-                    if (strpos($relPath, '/') === 0) {
+                    if (0 === strpos($relPath, '/')) {
                         $relPath = substr($relPath, 1);
                     }
 
@@ -246,7 +251,7 @@ class AssetGenerationHelper
                         'relPath'  => $relPath,
                     ];
 
-                    if ($env == 'prod') {
+                    if ('prod' == $env) {
                         $lastModified = filemtime($fullPath);
                         if (!isset($modifiedLast[$group]) || $lastModified > $modifiedLast[$group]) {
                             $modifiedLast[$group] = $lastModified;
@@ -278,7 +283,7 @@ class AssetGenerationHelper
                 'relPath'  => $relPath,
             ];
 
-            if ($env == 'prod') {
+            if ('prod' == $env) {
                 $lastModified = filemtime($fullPath);
                 if (!isset($modifiedLast['app']) || $lastModified > $modifiedLast['app']) {
                     $modifiedLast['app'] = $lastModified;
@@ -303,8 +308,8 @@ class AssetGenerationHelper
      */
     protected function findOverrides($env, &$assets)
     {
-        $rootPath      = $this->factory->getSystemPath('assets_root');
-        $currentTheme  = $this->factory->getSystemPath('current_theme');
+        $rootPath      = $this->pathsHelper->getSystemPath('assets_root');
+        $currentTheme  = $this->pathsHelper->getSystemPath('current_theme');
         $modifiedLast  = [];
         $types         = ['css', 'js'];
         $overrideFiles = [
@@ -323,7 +328,7 @@ class AssetGenerationHelper
                         'relPath'  => $relPath,
                     ];
 
-                    if ($env == 'prod') {
+                    if ('prod' == $env) {
                         $lastModified = filemtime($fullPath);
                         if (!isset($modifiedLast[$ext][$group]) || $lastModified > $modifiedLast[$ext][$group]) {
                             $modifiedLast[$ext][$group] = $lastModified;

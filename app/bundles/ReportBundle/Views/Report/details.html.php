@@ -8,14 +8,17 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+
 $header = $view['translator']->trans(
     'mautic.report.report.header.view',
-    ['%name%' => $view['translator']->trans($report->getName())]
+    ['%name%' => $view->escape($view['translator']->trans($report->getName()))]
 );
 
-if ($tmpl == 'index') {
-    $showDynamicFilters  = (!empty($report->getSettings()['showDynamicFilters']) === true);
-    $hideDateRangeFilter = (!empty($report->getSettings()['hideDateRangeFilter']) === true);
+if ('index' == $tmpl) {
+    $showDynamicFilters  = (true === !empty($report->getSettings()['showDynamicFilters']));
+    $hideDateRangeFilter = (true === !empty($report->getSettings()['hideDateRangeFilter']));
 
     $view->extend('MauticCoreBundle:Default:content.html.php');
     $view['slots']->set('mauticContent', 'report');
@@ -52,7 +55,7 @@ if ($tmpl == 'index') {
                 'iconClass' => 'fa fa-file-text-o',
             ];
 
-            if (class_exists('PHPExcel')) {
+            if (class_exists(Spreadsheet::class)) {
                 $buttons[] = [
                     'attr' => [
                         'data-toggle' => 'download',
@@ -94,7 +97,7 @@ if ($tmpl == 'index') {
                 ],
                 'routeBase'         => 'report',
                 'langVar'           => 'report.report',
-                'postCustomButtons' => $buttons,
+                'customButtons'     => $buttons,
             ]
         )
     );
@@ -109,7 +112,7 @@ if ($tmpl == 'index') {
 <!-- report detail header -->
 <?php if ($report->getDescription()): ?>
 <div class="pr-md pl-md pt-lg pb-lg">
-    <div class="text-white dark-sm mb-0"><?php echo $report->getDescription(); ?></div>
+    <div class="text-white dark-sm mb-0"><?php echo $view->escape($report->getDescription()); ?></div>
 </div>
 <?php endif; ?>
 <!--/ report detail header -->
@@ -138,7 +141,7 @@ if ($tmpl == 'index') {
                     </div>
                     <?php $view['form']->start($dynamicFilterForm); ?>
                     <?php foreach ($dynamicFilterForm->children as $filter): ?>
-                    <?php if ($filter->vars['block_prefixes'][1] == 'hidden') {
+                    <?php if ('hidden' == $filter->vars['block_prefixes'][1]) {
                         continue;
                     } ?>
                     <div class="col-sm-4">
@@ -169,7 +172,7 @@ if ($tmpl == 'index') {
 <div class="report-content">
     <?php $view['slots']->output('_content'); ?>
 </div>
-<?php if (!empty($debug)): ?>
+<?php if (!empty($debug) && isset($debug['count_query'])): ?>
 <div class="well">
     <h4>Debug: <?php echo $debug['query_time']; ?></h4>
     <div><?php echo $debug['count_query']; ?></div>

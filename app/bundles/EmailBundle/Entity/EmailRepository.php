@@ -76,7 +76,7 @@ class EmailRepository extends CommonRepository
         $results = $q->execute()->fetchAll();
         $dnc     = count($results) ? $results[0] : null;
 
-        if ($dnc === null) {
+        if (null === $dnc) {
             return false;
         }
 
@@ -84,37 +84,11 @@ class EmailRepository extends CommonRepository
 
         return [
             'id'           => $dnc['id'],
-            'unsubscribed' => ($dnc['reason'] === DoNotContact::UNSUBSCRIBED),
-            'bounced'      => ($dnc['reason'] === DoNotContact::BOUNCED),
-            'manual'       => ($dnc['reason'] === DoNotContact::MANUAL),
+            'unsubscribed' => (DoNotContact::UNSUBSCRIBED === $dnc['reason']),
+            'bounced'      => (DoNotContact::BOUNCED === $dnc['reason']),
+            'manual'       => (DoNotContact::MANUAL === $dnc['reason']),
             'comments'     => $dnc['comments'],
         ];
-    }
-
-    /**
-     * Remove email from DNE list.
-     *
-     * @param $email
-     */
-    public function removeFromDoNotEmailList($email)
-    {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->factory->getModel('lead.lead');
-
-        /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
-        $leadRepo = $this->getEntityManager()->getRepository('MauticLeadBundle:Lead');
-        $leadId   = (array) $leadRepo->getLeadByEmail($email, true);
-
-        /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
-        $leads = [];
-
-        foreach ($leadId as $lead) {
-            $leads[] = $leadRepo->getEntity($lead['id']);
-        }
-
-        foreach ($leads as $lead) {
-            $leadModel->removeDncForLead($lead, 'email');
-        }
     }
 
     /**
@@ -130,8 +104,6 @@ class EmailRepository extends CommonRepository
     /**
      * Get a list of entities.
      *
-     * @param array $args
-     *
      * @return Paginator
      */
     public function getEntities(array $args = [])
@@ -143,7 +115,7 @@ class EmailRepository extends CommonRepository
         if (empty($args['iterator_mode'])) {
             $q->leftJoin('e.category', 'c');
 
-            if (empty($args['ignoreListJoin']) && (!isset($args['email_type']) || $args['email_type'] == 'list')) {
+            if (empty($args['ignoreListJoin']) && (!isset($args['email_type']) || 'list' == $args['email_type'])) {
                 $q->leftJoin('e.lists', 'l');
             }
         }
@@ -371,7 +343,6 @@ class EmailRepository extends CommonRepository
      * @param bool   $viewOther
      * @param bool   $topLevel
      * @param null   $emailType
-     * @param array  $ignoreIds
      * @param null   $variantParentId
      *
      * @return array
@@ -398,9 +369,9 @@ class EmailRepository extends CommonRepository
         }
 
         if ($topLevel) {
-            if (true === $topLevel || $topLevel == 'variant') {
+            if (true === $topLevel || 'variant' == $topLevel) {
                 $q->andWhere($q->expr()->isNull('e.variantParent'));
-            } elseif ($topLevel == 'translation') {
+            } elseif ('translation' == $topLevel) {
                 $q->andWhere($q->expr()->isNull('e.translationParent'));
             }
         }
@@ -624,10 +595,9 @@ class EmailRepository extends CommonRepository
     /**
      * Set Max and/or Min ID where conditions to the query builder.
      *
-     * @param QueryBuilder $q
-     * @param string       $column
-     * @param int          $minContactId
-     * @param int          $maxContactId
+     * @param string $column
+     * @param int    $minContactId
+     * @param int    $maxContactId
      *
      * @return QueryBuilder
      */
@@ -644,5 +614,26 @@ class EmailRepository extends CommonRepository
         }
 
         return $q;
+    }
+
+    /**
+     * Is one of emails unpublished?
+     *
+     * @return bool
+     */
+    public function isOneUnpublished(array $ids)
+    {
+        $result = $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select($this->getTableAlias().'.id')
+            ->from('MauticEmailBundle:Email', $this->getTableAlias(), $this->getTableAlias().'.id')
+            ->where($this->getTableAlias().'.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->andWhere('e.isPublished = 0')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return (bool) $result;
     }
 }

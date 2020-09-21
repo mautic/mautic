@@ -84,9 +84,6 @@ class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormH
     /**
      * Checks to see if the form and its children has an error.
      *
-     * @param FormView $form
-     * @param array    $exluding
-     *
      * @return bool
      */
     public function containsErrors(FormView $form, array $exluding = [])

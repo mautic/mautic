@@ -13,7 +13,7 @@ namespace Mautic\CampaignBundle\Tests\EventCollector\Accessor\Event;
 
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 
-class DecisionAccessorTest extends \PHPUnit_Framework_TestCase
+class DecisionAccessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testEventNameIsReturned()
     {

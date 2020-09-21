@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\UserBundle\Model\UserModel;
 
-class FieldsBuilderTest extends \PHPUnit_Framework_TestCase
+class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetLeadColumns()
     {

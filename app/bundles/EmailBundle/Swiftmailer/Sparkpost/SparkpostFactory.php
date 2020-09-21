@@ -5,9 +5,6 @@ namespace Mautic\EmailBundle\Swiftmailer\Sparkpost;
 use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
 use SparkPost\SparkPost;
 
-/**
- * Class SparkpostFactory.
- */
 final class SparkpostFactory implements SparkpostFactoryInterface
 {
     /**
@@ -15,42 +12,38 @@ final class SparkpostFactory implements SparkpostFactoryInterface
      */
     private $client;
 
-    /**
-     * SparkpostFactory constructor.
-     *
-     * @param GuzzleAdapter $client
-     */
     public function __construct(GuzzleAdapter $client)
     {
         $this->client = $client;
     }
 
     /**
-     * @param      $host
-     * @param      $apiKey
-     * @param null $port
+     * @param string   $host
+     * @param string   $apiKey
+     * @param int|null $port
      *
-     * @return mixed|SparkPost
+     * @return SparkPost
      */
     public function create($host, $apiKey, $port = null)
     {
-        if ((strpos($host, '://') === false && substr($host, 0, 1) != '/')) {
+        if ((false === strpos($host, '://') && '/' != substr($host, 0, 1))) {
             $host = 'https://'.$host;
         }
 
         $options = [
-            'host'     => '',
-            'protocol' => 'https',
-            'port'     => $port,
-            'key'      => ($apiKey) ?: 1234, // prevent Exception: You must provide an API key
+            'key' => ($apiKey) ?: 1234, // prevent Exception: You must provide an API key
         ];
+
+        if ($port) {
+            $options['port'] = $port;
+        }
 
         $hostInfo = parse_url($host);
         if ($hostInfo) {
             $options['protocol'] =  $hostInfo['scheme'];
 
             if (empty($port)) {
-                $options['port'] = $hostInfo['scheme'] === 'https' ? 443 : 80;
+                $options['port'] = 'https' === $hostInfo['scheme'] ? 443 : 80;
             }
 
             $host = $hostInfo['host'];

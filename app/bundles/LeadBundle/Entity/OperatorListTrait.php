@@ -93,7 +93,7 @@ trait OperatorListTrait
     }
 
     /**
-     * @param null|string|array $type
+     * @param string|array|null $type
      * @param array             $overrideHiddenTypes
      *
      * @return array
@@ -159,7 +159,7 @@ trait OperatorListTrait
             }
         }
 
-        return $choices;
+        return array_flip($choices);
     }
 
     /**
@@ -173,13 +173,13 @@ trait OperatorListTrait
             return;
         }
 
-        if ($type === 'boolean') {
+        if ('boolean' === $type) {
             $type = 'bool';
         } elseif (in_array($type, ['country', 'timezone', 'region', 'locale'])) {
             $type = 'select';
         } elseif (in_array($type, ['lookup',  'text', 'email', 'url', 'email', 'tel'])) {
             $type = 'text';
-        } elseif ($type === 'datetime') {
+        } elseif ('datetime' === $type) {
             $type = 'date';
         } elseif (!array_key_exists($type, $this->typeOperators)) {
             $type = 'default';

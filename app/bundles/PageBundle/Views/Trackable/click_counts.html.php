@@ -10,7 +10,7 @@
             </tr>
             </thead>
             <tbody>
-                <?php 
+                <?php
                     $totalClicks       = 0;
                     $totalUniqueClicks = 0;
                     foreach ($trackables as $link):

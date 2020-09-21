@@ -18,14 +18,14 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class CompanyReportDataTest extends \PHPUnit_Framework_TestCase
+class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var TranslatorInterface
      */
     private $translator;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()
@@ -81,6 +81,10 @@ class CompanyReportDataTest extends \PHPUnit_Framework_TestCase
             'companies_lead.is_primary' => [
                 'label' => 'mautic.lead.report.company.is_primary',
                 'type'  => 'bool',
+            ],
+            'companies_lead.date_added' => [
+                'label' => 'mautic.lead.report.company.date_added',
+                'type'  => 'datetime',
             ],
             'comp.boolField' => [
                 'label' => 'mautic.report.field.company.label',

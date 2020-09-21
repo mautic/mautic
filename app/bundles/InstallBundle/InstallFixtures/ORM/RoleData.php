@@ -11,6 +11,7 @@
 
 namespace Mautic\InstallBundle\InstallFixtures\ORM;
 
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -18,10 +19,7 @@ use Mautic\UserBundle\Entity\Role;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- * Class RoleData.
- */
-class RoleData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class RoleData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface, FixtureGroupInterface
 {
     /**
      * @var ContainerInterface
@@ -31,14 +29,19 @@ class RoleData extends AbstractFixture implements OrderedFixtureInterface, Conta
     /**
      * {@inheritdoc}
      */
+    public static function getGroups(): array
+    {
+        return ['group_install', 'group_mautic_install_data'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         if ($this->hasReference('admin-role')) {

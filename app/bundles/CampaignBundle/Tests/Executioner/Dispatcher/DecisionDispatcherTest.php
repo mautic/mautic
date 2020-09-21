@@ -20,17 +20,18 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\DecisionDispatcher;
 use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
+use PHPUnit\Framework\MockObject\MockBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class DecisionDispatcherTest extends \PHPUnit_Framework_TestCase
+class DecisionDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockBuilder|EventDispatcherInterface
+     * @var MockBuilder|EventDispatcherInterface
      */
     private $dispatcher;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockBuilder|LegacyEventDispatcher
+     * @var MockBuilder|LegacyEventDispatcher
      */
     private $legacyDispatcher;
 

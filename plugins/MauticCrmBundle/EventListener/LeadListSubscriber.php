@@ -11,7 +11,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
@@ -19,28 +18,31 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class LeadListsSubscriber.
- */
-class LeadListSubscriber extends CommonSubscriber
+class LeadListSubscriber implements EventSubscriberInterface
 {
     /**
      * @var IntegrationHelper
      */
-    protected $helper;
-
-    protected $listModel;
+    private $helper;
 
     /**
-     * ChannelSubscriber constructor.
-     *
-     * @param IntegrationHelper $helper
+     * @var ListModel
      */
-    public function __construct(IntegrationHelper $helper, ListModel $listModel)
+    private $listModel;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    public function __construct(IntegrationHelper $helper, ListModel $listModel, TranslatorInterface $translator)
     {
-        $this->helper    = $helper;
-        $this->listModel = $listModel;
+        $this->helper     = $helper;
+        $this->listModel  = $listModel;
+        $this->translator = $translator;
     }
 
     /**
@@ -54,9 +56,6 @@ class LeadListSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param LeadListFiltersChoicesEvent $event
-     */
     public function onFilterChoiceFieldsGenerate(LeadListFiltersChoicesEvent $event)
     {
         $services = $this->helper->getIntegrationObjects();
@@ -117,8 +116,8 @@ class LeadListSubscriber extends CommonSubscriber
         $filters = ($list instanceof LeadList) ? $list->getFilters() : $list['filters'];
 
         foreach ($filters as $filter) {
-            if ($filter['field'] == 'integration_campaigns') {
-                if (strpos($filter['filter'], '::') !== false) {
+            if ('integration_campaigns' == $filter['field']) {
+                if (false !== strpos($filter['filter'], '::')) {
                     list($integrationName, $campaignId) = explode('::', $filter['filter']);
                 } else {
                     // Assuming this is a Salesforce integration for BC with pre 2.11.0

@@ -44,12 +44,12 @@ class Campaign extends FormEntity
     private $description;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $publishUp;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $publishDown;
 
@@ -110,9 +110,6 @@ class Campaign extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -162,9 +159,6 @@ class Campaign extends FormEntity
         $builder->addNamedField('allowRestart', 'integer', 'allow_restart');
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint(
@@ -235,7 +229,7 @@ class Campaign extends FormEntity
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
-        if ($prop == 'category') {
+        if ('category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -309,8 +303,6 @@ class Campaign extends FormEntity
     /**
      * Calls $this->addEvent on every item in the collection.
      *
-     * @param array $events
-     *
      * @return Campaign
      */
     public function addEvents(array $events)
@@ -342,8 +334,6 @@ class Campaign extends FormEntity
 
     /**
      * Remove events.
-     *
-     * @param \Mautic\CampaignBundle\Entity\Event $event
      */
     public function removeEvent(\Mautic\CampaignBundle\Entity\Event $event)
     {
@@ -495,8 +485,7 @@ class Campaign extends FormEntity
     /**
      * Add lead.
      *
-     * @param      $key
-     * @param Lead $lead
+     * @param $key
      *
      * @return Campaign
      */
@@ -513,8 +502,6 @@ class Campaign extends FormEntity
 
     /**
      * Remove lead.
-     *
-     * @param Lead $lead
      */
     public function removeLead(Lead $lead)
     {
@@ -544,8 +531,6 @@ class Campaign extends FormEntity
     /**
      * Add list.
      *
-     * @param LeadList $list
-     *
      * @return Campaign
      */
     public function addList(LeadList $list)
@@ -559,8 +544,6 @@ class Campaign extends FormEntity
 
     /**
      * Remove list.
-     *
-     * @param LeadList $list
      */
     public function removeList(LeadList $list)
     {
@@ -579,13 +562,11 @@ class Campaign extends FormEntity
     /**
      * Add form.
      *
-     * @param Form $form
-     *
      * @return Campaign
      */
     public function addForm(Form $form)
     {
-        $this->forms[] = $form;
+        $this->forms[$form->getId()] = $form;
 
         $this->changes['forms']['added'][$form->getId()] = $form->getName();
 
@@ -594,8 +575,6 @@ class Campaign extends FormEntity
 
     /**
      * Remove form.
-     *
-     * @param Form $form
      */
     public function removeForm(Form $form)
     {
@@ -611,9 +590,6 @@ class Campaign extends FormEntity
         return $this->canvasSettings;
     }
 
-    /**
-     * @param array $canvasSettings
-     */
     public function setCanvasSettings(array $canvasSettings)
     {
         $this->canvasSettings = $canvasSettings;
@@ -651,8 +627,6 @@ class Campaign extends FormEntity
 
     /**
      * Get contact membership.
-     *
-     * @param Contact $contact
      *
      * @return \Doctrine\Common\Collections\Collection
      */

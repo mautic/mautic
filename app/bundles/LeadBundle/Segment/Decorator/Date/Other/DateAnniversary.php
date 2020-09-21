@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Segment\Decorator\Date\Other;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
+use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 
@@ -23,17 +24,18 @@ class DateAnniversary implements FilterDecoratorInterface
     private $dateDecorator;
 
     /**
-     * @param DateDecorator $dateDecorator
+     * @var DateOptionParameters
      */
-    public function __construct(DateDecorator $dateDecorator)
+    private $dateOptionParameters;
+
+    public function __construct(DateDecorator $dateDecorator, DateOptionParameters $dateOptionParameters)
     {
-        $this->dateDecorator = $dateDecorator;
+        $this->dateDecorator        = $dateDecorator;
+        $this->dateOptionParameters = $dateOptionParameters;
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
-     * @return null|string
+     * @return string|null
      */
     public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
@@ -41,8 +43,6 @@ class DateAnniversary implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string
      */
     public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate)
@@ -51,8 +51,6 @@ class DateAnniversary implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string
      */
     public function getOperator(ContactSegmentFilterCrate $contactSegmentFilterCrate)
@@ -61,8 +59,7 @@ class DateAnniversary implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     * @param array|string              $argument
+     * @param array|string $argument
      *
      * @return array|string
      */
@@ -72,22 +69,22 @@ class DateAnniversary implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
-     * @return array|bool|float|null|string
+     * @return array|bool|float|string|null
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
+        $date           = $this->dateOptionParameters->getDefaultDate();
         $filter         =  $contactSegmentFilterCrate->getFilter();
         $relativeFilter =  trim(str_replace(['anniversary', 'birthday'], '', $filter));
-        $dateTimeHelper = $this->dateDecorator->getDefaultDate($relativeFilter);
 
-        return $dateTimeHelper->toUtcString('%-m-d');
+        if ($relativeFilter) {
+            $date->modify($relativeFilter);
+        }
+
+        return $date->toLocalString('%-m-d');
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string
      */
     public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
@@ -96,8 +93,6 @@ class DateAnniversary implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return bool|string
      */
     public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
@@ -106,9 +101,7 @@ class DateAnniversary implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
-     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|null|string
+     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string|null
      */
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {

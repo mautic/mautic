@@ -14,7 +14,7 @@ namespace Mautic\LeadBundle\Tests\Helper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 
-class IdentifyCompanyHelperTest extends \PHPUnit_Framework_TestCase
+class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testDomainExistsRealDomain()
     {

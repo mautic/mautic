@@ -368,7 +368,7 @@ Mautic.getHighestIndex = function (selector) {
     var selectorChildren = mQuery('#' + selector + ' > div');
 
     selectorChildren.each(function() {
-        var index = mQuery(this).attr('id').split('_')[2];
+        var index = parseInt(mQuery(this).attr('id').split('_')[2]);
         highestIndex = (index > highestIndex) ? index : highestIndex;
     });
 

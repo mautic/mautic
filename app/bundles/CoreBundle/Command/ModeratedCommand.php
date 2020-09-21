@@ -51,7 +51,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
                 '--timeout',
                 '-t',
                 InputOption::VALUE_REQUIRED,
-                'If getmypid() is disabled on this system, lock files will be used. This option will assume the process is dead afer the specified number of seconds and will execute anyway. This is disabled by default.',
+                'If getmypid() is disabled on this system, lock files will be used. This option will assume the process is dead after the specified number of seconds and will execute anyway. This is disabled by default.',
                 false
             )
             ->addOption(
@@ -64,9 +64,6 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
      * @return bool
      */
     protected function checkRunStatus(InputInterface $input, OutputInterface $output, $moderationKey = '')
@@ -93,7 +90,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
         // Setup the run directory for lock/pid files
         $this->runDirectory = $this->getContainer()->getParameter('kernel.cache_dir').'/../run';
         if (!file_exists($this->runDirectory)) {
-            if (!mkdir($this->runDirectory, 0755)) {
+            if (!mkdir($this->runDirectory)) {
                 $output->writeln('<error>'.$this->runDirectory.' could not be created.</error>');
 
                 return false;
@@ -148,7 +145,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     private function checkStatus($force = false, $lockMode = null)
     {
         // getmypid may be disabled and posix_getpgid is not available on Windows machines
-        if ((is_null($lockMode) || $lockMode === 'pid') && function_exists('getmypid') && function_exists('posix_getpgid')) {
+        if ((is_null($lockMode) || 'pid' === $lockMode) && function_exists('getmypid') && function_exists('posix_getpgid')) {
             $disabled = explode(',', ini_get('disable_functions'));
             if (!in_array('getmypid', $disabled) && !in_array('posix_getpgid', $disabled)) {
                 $this->moderationMode = self::MODE_PID;
@@ -183,7 +180,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
 
                 return true;
             }
-        } elseif ($lockMode === self::MODE_FLOCK && !$force) {
+        } elseif (self::MODE_FLOCK === $lockMode && !$force) {
             $this->moderationMode = self::MODE_FLOCK;
             $error                = null;
             // Silence error reporting

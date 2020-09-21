@@ -30,7 +30,7 @@ class ExportHandler
 
     public function __construct(CoreParametersHelper $coreParametersHelper, FilePathResolver $filePathResolver)
     {
-        $this->dir              = $coreParametersHelper->getParameter('report_temp_dir');
+        $this->dir              = $coreParametersHelper->get('report_temp_dir');
         $this->filePathResolver = $filePathResolver;
     }
 
@@ -45,7 +45,7 @@ class ExportHandler
     {
         $path = $this->getPath($fileName);
 
-        if (($handler = @fopen($path, 'a')) === false) {
+        if (false === ($handler = @fopen($path, 'a'))) {
             throw new FileIOException('Could not open file '.$path);
         }
 

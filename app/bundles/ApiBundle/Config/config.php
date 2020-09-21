@@ -97,26 +97,51 @@ return [
     ],
 
     'services' => [
+        'controllers' => [
+            'mautic.api' => [
+                'class'     => \Mautic\ApiBundle\Controller\oAuth2\AuthorizeController::class,
+                'arguments' => [
+                    'request_stack',
+                    'fos_oauth_server.authorize.form',
+                    'fos_oauth_server.authorize.form.handler.default',
+                    'fos_oauth_server.server',
+                    'templating',
+                    'security.token_storage',
+                    'router',
+                    'fos_oauth_server.client_manager.default',
+                    'event_dispatcher',
+                    'session',
+                ],
+            ],
+        ],
         'events' => [
             'mautic.api.subscriber' => [
-                'class'     => 'Mautic\ApiBundle\EventListener\ApiSubscriber',
+                'class'     => \Mautic\ApiBundle\EventListener\ApiSubscriber::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'translator',
+                ],
+            ],
+            'mautic.api.client.subscriber' => [
+                'class'     => \Mautic\ApiBundle\EventListener\ClientSubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
-                    'mautic.helper.core_parameters',
                     'mautic.core.model.auditlog',
                 ],
             ],
             'mautic.api.configbundle.subscriber' => [
-                'class' => 'Mautic\ApiBundle\EventListener\ConfigSubscriber',
+                'class' => \Mautic\ApiBundle\EventListener\ConfigSubscriber::class,
             ],
             'mautic.api.search.subscriber' => [
-                'class'     => 'Mautic\ApiBundle\EventListener\SearchSubscriber',
+                'class'     => \Mautic\ApiBundle\EventListener\SearchSubscriber::class,
                 'arguments' => [
                     'mautic.api.model.client',
+                    'mautic.security',
+                    'mautic.helper.templating',
                 ],
             ],
             'mautic.api.rate_limit_generate_key.subscriber' => [
-              'class'     => 'Mautic\ApiBundle\EventListener\RateLimitGenerateKeySubscriber',
+              'class'     => \Mautic\ApiBundle\EventListener\RateLimitGenerateKeySubscriber::class,
               'arguments' => [
                 'mautic.helper.core_parameters',
               ],
@@ -124,13 +149,17 @@ return [
         ],
         'forms' => [
             'mautic.form.type.apiclients' => [
-                'class'     => 'Mautic\ApiBundle\Form\Type\ClientType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'client',
+                'class'     => \Mautic\ApiBundle\Form\Type\ClientType::class,
+                'arguments' => [
+                    'request_stack',
+                    'translator',
+                    'validator',
+                    'session',
+                    'router',
+                ],
             ],
             'mautic.form.type.apiconfig' => [
                 'class' => 'Mautic\ApiBundle\Form\Type\ConfigType',
-                'alias' => 'apiconfig',
             ],
         ],
         'other' => [
@@ -164,13 +193,13 @@ return [
             'bazinga.oauth.security.authentication.listener.class'    => 'Mautic\ApiBundle\Security\OAuth1\Firewall\OAuthListener',
             'bazinga.oauth.event_listener.request.class'              => 'Mautic\ApiBundle\EventListener\OAuth1\OAuthRequestListener',
             'fos_oauth_server.security.authentication.listener.class' => 'Mautic\ApiBundle\Security\OAuth2\Firewall\OAuthListener',
-            'jms_serializer.metadata.annotation_driver.class'         => 'Mautic\ApiBundle\Serializer\Driver\AnnotationDriver',
-            'jms_serializer.metadata.php_driver.class'                => 'Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver',
-
+            'jms_serializer.metadata.annotation_driver'               => 'Mautic\ApiBundle\Serializer\Driver\AnnotationDriver',
+            'jms_serializer.metadata.api_metadata_driver'             => [
+                'class' => 'Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver',
+            ],
             'mautic.validator.oauthcallback' => [
                 'class' => 'Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator',
                 'tag'   => 'validator.constraint_validator',
-                'alias' => 'oauth_callback',
             ],
         ],
         'models' => [
@@ -191,7 +220,7 @@ return [
         'api_batch_max_limit'               => 200,
         'api_rate_limiter_limit'            => 0,
         'api_rate_limiter_cache'            => [
-          'type'      => 'file_system',
+            'adapter' => 'cache.adapter.filesystem',
         ],
     ],
 ];
