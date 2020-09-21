@@ -872,7 +872,7 @@ class Field
         }
 
         // Hide the field if there is the submission count limit and hide it until the limit is overcame
-        if (!$this->alwaysDisplay && $this->showAfterXSubmissions > 0 && $this->showAfterXSubmissions > count($submissions)) {
+        if (!$this->alwaysDisplay && $this->showAfterXSubmissions > 0 && $submissions && $this->showAfterXSubmissions > count($submissions)) {
             return false;
         }
 
