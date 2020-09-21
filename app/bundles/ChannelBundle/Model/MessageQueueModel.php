@@ -23,9 +23,6 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\Event;
 
-/**
- * Class MessageQueueModel.
- */
 class MessageQueueModel extends FormModel
 {
     /** @var string A default message reschedule interval */
@@ -46,9 +43,6 @@ class MessageQueueModel extends FormModel
      */
     protected $coreParametersHelper;
 
-    /**
-     * MessageQueueModel constructor.
-     */
     public function __construct(LeadModel $leadModel, CompanyModel $companyModel, CoreParametersHelper $coreParametersHelper)
     {
         $this->leadModel            = $leadModel;
@@ -137,14 +131,13 @@ class MessageQueueModel extends FormModel
     /**
      * Adds messages to the queue.
      *
-     * @param $leads
-     * @param $channel
-     * @param $channelId
-     * @param \DateInterval $scheduledInterval
-     * @param int           $maxAttempts
-     * @param int           $priority
-     * @param null          $campaignEventId
-     * @param array         $options
+     * @param array    $leads
+     * @param string   $channel
+     * @param int      $channelId
+     * @param int      $maxAttempts
+     * @param int      $priority
+     * @param int|null $campaignEventId
+     * @param array    $options
      *
      * @return bool
      */
@@ -379,12 +372,7 @@ class MessageQueueModel extends FormModel
     }
 
     /**
-     * @param               $message
-     * @param \DateInterval $rescheduleInterval
-     * @param null          $leadId
-     * @param null          $channel
-     * @param null          $channelId
-     * @param bool          $persist
+     * @param bool $persist
      */
     public function reschedule($message, \DateInterval $rescheduleInterval, $leadId = null, $channel = null, $channelId = null, $persist = false)
     {
