@@ -63,6 +63,7 @@ class WebhookQueueRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'webhook_queue', $this->getTableAlias())
             ->where($this->getTableAlias().'.webhook_id = :id')
             ->setParameter('id', $id)
+            ->setMaxResults(1)
             ->execute()
             ->fetch();
 

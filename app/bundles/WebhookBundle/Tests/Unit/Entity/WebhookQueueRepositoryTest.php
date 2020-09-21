@@ -138,6 +138,9 @@ class WebhookQueueRepositoryTest extends TestCase
             ->with('id', $id)
             ->willReturn($queryBuilder);
         $queryBuilder->expects(self::once())
+            ->method('setMaxResults')
+            ->willReturn($queryBuilder);
+        $queryBuilder->expects(self::once())
             ->method('execute')
             ->willReturn($statement);
 
@@ -180,6 +183,9 @@ class WebhookQueueRepositoryTest extends TestCase
         $queryBuilder->expects(self::once())
             ->method('setParameter')
             ->with('id', $id)
+            ->willReturn($queryBuilder);
+        $queryBuilder->expects(self::once())
+            ->method('setMaxResults')
             ->willReturn($queryBuilder);
         $queryBuilder->expects(self::once())
             ->method('execute')
