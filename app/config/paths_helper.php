@@ -9,9 +9,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-// Include path settings
-$root = $container->getParameter('kernel.root_dir');
-
 // Include local paths
 include 'paths.php';
 
@@ -21,7 +18,7 @@ $replaceRootPlaceholder = function (&$value) use ($root, &$replaceRootPlaceholde
         foreach ($value as &$v) {
             $replaceRootPlaceholder($v);
         }
-    } elseif (strpos($value, '%kernel.root_dir%') !== false) {
+    } elseif (false !== strpos($value, '%kernel.root_dir%')) {
         $value = str_replace('%kernel.root_dir%', $root, $value);
     }
 };

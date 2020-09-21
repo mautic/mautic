@@ -112,8 +112,7 @@ class StatRepository extends CommonRepository
     /**
      * Get a lead's email stat.
      *
-     * @param int   $leadId
-     * @param array $options
+     * @param int $leadId
      *
      * @return array
      *
@@ -168,9 +167,7 @@ class StatRepository extends CommonRepository
             );
         }
 
-        $stats = $query->getQuery()->getArrayResult();
-
-        return $stats;
+        return $query->getQuery()->getArrayResult();
     }
 
     /**

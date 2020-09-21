@@ -11,8 +11,6 @@ use Http\Adapter\Guzzle6\Client;
 interface ClientFactoryInterface
 {
     /**
-     * @param ClientInterface|null $client
-     *
      * @return Client
      */
     public function create(ClientInterface $client = null);

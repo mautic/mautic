@@ -14,48 +14,53 @@ namespace Mautic\LeadBundle\DataFixtures\ORM;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Mautic\LeadBundle\Entity\LeadRepository;
 
-/**
- * Class LoadLeadData.
- */
-class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
-     * @var ContainerInterface
+     * @var EntityManagerInterface
      */
-    private $container;
+    private $entityManager;
+
+    /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
 
     /**
      * {@inheritdoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function __construct(EntityManagerInterface $entityManager, CoreParametersHelper $coreParametersHelper)
     {
-        $this->container = $container;
+        $this->entityManager        = $entityManager;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
-        $leadRepo        = $this->container->get('doctrine.orm.default_entity_manager')->getRepository(Lead::class);
-        $companyLeadRepo = $this->container->get('doctrine.orm.default_entity_manager')->getRepository(CompanyLead::class);
+        /** @var LeadRepository $leadRepo */
+        $leadRepo        = $this->entityManager->getRepository(Lead::class);
 
-        $today    = new \DateTime();
+        /** @var CompanyLeadRepository $companyLeadRepo */
+        $companyLeadRepo = $this->entityManager->getRepository(CompanyLead::class);
 
+        $today = new \DateTime();
         $leads = CsvHelper::csv_to_array(__DIR__.'/fakeleaddata.csv');
+
         foreach ($leads as $count => $l) {
             $key  = $count + 1;
             $lead = new Lead();
             $lead->setDateAdded($today);
             $ipAddress = new IpAddress();
-            $ipAddress->setIpAddress($l['ip'], $this->container->get('mautic.helper.core_parameters')->getParameter('parameters'));
+            $ipAddress->setIpAddress($l['ip'], $this->coreParametersHelper->get('parameters'));
             $this->setReference('ipAddress-'.$key, $ipAddress);
             unset($l['ip']);
             $lead->addIpAddress($ipAddress);

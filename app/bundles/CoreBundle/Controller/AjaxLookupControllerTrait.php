@@ -20,8 +20,6 @@ use Symfony\Component\HttpFoundation\Request;
 trait AjaxLookupControllerTrait
 {
     /**
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     protected function getLookupChoiceListAction(Request $request)

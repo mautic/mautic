@@ -279,7 +279,20 @@ Mautic.leadEmailOnLoad = function(container, response) {
     });
 }
 
-Mautic.leadlistOnLoad = function(container) {
+Mautic.leadlistOnLoad = function(container, response) {
+
+    mQuery('#campaign-share-tab').hover(function () {
+        if (Mautic.shareTableLoaded != true) {
+            Mautic.loadAjaxColumn('campaign-share-stat', 'lead:getCampaignShareStats', 'afterStatsLoad');
+            Mautic.shareTableLoaded = true;
+        }
+    })
+
+    Mautic.afterStatsLoad = function () {
+        Mautic.sortTableByColumn('#campaign-share-table', '.campaign-share-stat', true)
+    }
+
+
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'lead.list');
     }
@@ -498,6 +511,8 @@ Mautic.updateLookupListFilter = function(field, datum) {
 
 Mautic.activateSegmentFilterTypeahead = function(displayId, filterId, fieldOptions, mQueryObject) {
 
+    var mQueryBackup = mQuery;
+
     if(typeof mQueryObject == 'function'){
         mQuery = mQueryObject;
     }
@@ -505,6 +520,8 @@ Mautic.activateSegmentFilterTypeahead = function(displayId, filterId, fieldOptio
     mQuery('#' + displayId).attr('data-lookup-callback', 'updateLookupListFilter');
 
     Mautic.activateFieldTypeahead(displayId, filterId, [], 'lead:fieldList')
+
+    mQuery = mQueryBackup;
 };
 
 Mautic.addLeadListFilter = function (elId, elObj) {
@@ -665,7 +682,7 @@ Mautic.addLeadListFilter = function (elId, elObj) {
 
     var operators = filterOption.data('field-operators');
     mQuery('#' + filterIdBase + 'operator').html('');
-    mQuery.each(operators, function (value, label) {
+    mQuery.each(operators, function (label, value) {
         var newOption = mQuery('<option/>').val(value).text(label);
         newOption.appendTo(mQuery('#' + filterIdBase + 'operator'));
     });
@@ -1153,10 +1170,21 @@ Mautic.updateLeadList = function () {
                 if (response.indexMode == 'list') {
                     mQuery('#leadTable tbody').prepend(response.leads);
                 } else {
-                    var items = mQuery(response.leads);
-                    mQuery('.shuffle-grid').prepend(items);
-                    mQuery('.shuffle-grid').shuffle('appended', items);
-                    mQuery('.shuffle-grid').shuffle('update');
+                    if (mQuery('.shuffle-grid').length) {
+                        //give a slight delay in order for images to load so that shuffle starts out with correct dimensions
+                        var Shuffle = window.Shuffle,
+                            element = document.querySelector('.shuffle-grid'),
+                            shuffleOptions = {
+                                itemSelector: '.shuffle-item'
+                            };
+
+                        // Using global variable to make it available outside of the scope of this function
+                        window.leadsShuffleInstance = new Shuffle(element, shuffleOptions);
+                        var items = mQuery(response.leads);
+                        mQuery('.shuffle-grid').prepend(items);
+                        window.leadsShuffleInstance.shuffle('appended', items.children(shuffleOptions.itemSelector).toArray());
+                        window.leadsShuffleInstance.shuffle('update');
+                    }
 
                     mQuery('#liveModeButton').data('max-id', response.maxId);
                 }

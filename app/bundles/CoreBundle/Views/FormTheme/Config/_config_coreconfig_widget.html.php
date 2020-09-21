@@ -13,7 +13,7 @@ $fieldKeys = array_keys($fields);
 $template  = '<div class="col-md-6">{content}</div>';
 ?>
 
-<?php if (count(array_intersect($fieldKeys, ['site_url', 'update_stability', 'cache_path', 'log_path', 'theme', 'image_path']))): ?>
+<?php if (count(array_intersect($fieldKeys, ['site_url', 'webroot', 'update_stability', 'cache_path', 'log_path', 'theme', 'image_path']))): ?>
 <div class="panel panel-primary">
     <div class="panel-heading">
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.general'); ?></h3>
@@ -73,7 +73,7 @@ $template  = '<div class="col-md-6">{content}</div>';
 </div>
 <?php endif; ?>
 
-<?php if (count(array_intersect($fieldKeys, ['trusted_hosts', 'trusted_proxies', 'ip_lookup_service', 'transifex_username', 'do_not_track_ips', 'do_not_track_bots']))): ?>
+<?php if (count(array_intersect($fieldKeys, ['trusted_hosts', 'trusted_proxies', 'ip_lookup_service', 'do_not_track_ips', 'do_not_track_bots']))): ?>
 <div class="panel panel-primary">
     <div class="panel-heading">
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.misc'); ?></h3>
@@ -91,6 +91,7 @@ $template  = '<div class="col-md-6">{content}</div>';
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_service', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_auth', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_create_organization', $template); ?>
             <div id="ip_lookup_config_container">
             <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_config', '<div class="col-md-12">{content}</div>'); ?>
             </div>
@@ -110,14 +111,6 @@ $template  = '<div class="col-md-6">{content}</div>';
             <?php if (isset($fields['do_not_track_bots'])): ?>
                     <?php echo $view['form']->rowIfExists($fields, 'do_not_track_bots', $template); ?>
             <?php endif; ?>
-        </div>
-        <?php endif; ?>
-
-        <?php if (isset($fields['transifex_username'])): ?>
-        <hr class="text-muted" />
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'transifex_username', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'transifex_password', $template); ?>
         </div>
         <?php endif; ?>
 

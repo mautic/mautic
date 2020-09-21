@@ -23,8 +23,6 @@ interface UnsubscriptionProcessorInterface
     /**
      * Get the email address that unsubscribed.
      *
-     * @param Message $message
-     *
      * @return UnsubscribedEmail
      *
      * @throws UnsubscriptionNotFound

@@ -108,6 +108,10 @@ div[data-section-focus="delete"] {
   line-height: 25px;
 }
 
+div[data-section-focus="handle"], div[data-section-focus="clone"], div[data-section-focus="delete"] {
+    z-index: 1000;
+}
+
 div[data-slot-toolbar] {
     position: absolute;
     top: -24px;
@@ -261,13 +265,13 @@ div[data-slot].ui-sortable-helper {
         font: normal normal normal 14px/1 FontAwesome;
     }
 }
-div:empty[data-slot],div.empty[data-slot],.codemodeHtmlContainer:empty {
+div:empty[data-slot],div.empty[data-slot] {
     padding:1em 0 0em 0;
     display:block;
     position:relative;
     margin-bottom:2px;
 }
-div:empty[data-slot]:before,div.empty[data-slot]:before,.codemodeHtmlContainer:empty:before {
+div:empty[data-slot]:before,div.empty[data-slot]:before {
     content: "\f044";
     font: normal normal normal 14px/1 FontAwesome;
     position:absolute;

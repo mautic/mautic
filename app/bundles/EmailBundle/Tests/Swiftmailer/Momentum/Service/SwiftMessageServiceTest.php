@@ -6,13 +6,10 @@ use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Service\SwiftMessageService;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class SwiftMessageServiceTest.
- */
-class SwiftMessageServiceTest extends \PHPUnit_Framework_TestCase
+class SwiftMessageServiceTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $translatorInterfaceMock;
 
@@ -22,14 +19,13 @@ class SwiftMessageServiceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param MauticMessage $mauticMessage
-     * @param string        $expectedTransmissionJson
+     * @param string $expectedTransmissionJson
      *
      * @dataProvider dataTransformToTransmission
      */
     public function testTransformToTransmission(MauticMessage $mauticMessage, $expectedTransmissionJson)
     {
-        $service         = $this->getSwiftMessageService();
+        $service         = new SwiftMessageService();
         $transmissionDTO = $service->transformToTransmission($mauticMessage);
 
         $this->assertJsonStringEqualsJsonString($expectedTransmissionJson, json_encode($transmissionDTO));
@@ -72,40 +68,46 @@ class SwiftMessageServiceTest extends \PHPUnit_Framework_TestCase
                         "email":"to1@test.local",
                         "name":"To1 test",
                         "header_to":"to1@test.local"
-                     }
+                     },
+                     "substitution_data": {}
                   },
                   {
                      "address":{
                         "email":"to2@test.local",
                         "name":"To2 test",
                         "header_to":"to2@test.local"
-                     }
+                     },
+                     "substitution_data": {}
                   },
                   {
                      "address":{
                         "email":"cc1@test.local",
                         "name":"CC1 test",
                         "header_to":"cc1@test.local"
-                     }
+                     },
+                     "substitution_data": {}
                   },
                   {
                      "address":{
                         "email":"cc2@test.local",
                         "name":"CC2 test",
                         "header_to":"cc2@test.local"
-                     }
+                     },
+                     "substitution_data": {}
                   },
                   {
                      "address":{
                         "email":"bcc1@test.local",
                         "name":"BCC1 test"
-                     }
+                     },
+                     "substitution_data": {}
                   },
                   {
                      "address":{
                         "email":"bcc2@test.local",
                         "name":"BCC2 test"
-                     }
+                     },
+                     "substitution_data": {}
                   }
                ],
                "content":{
@@ -208,26 +210,30 @@ class SwiftMessageServiceTest extends \PHPUnit_Framework_TestCase
                         "email":"cc1@test.local",
                         "name":"CC1 test",
                         "header_to":"cc1@test.local"
-                     }
+                     },
+                     "substitution_data": {}
                   },
                   {
                      "address":{
                         "email":"cc2@test.local",
                         "name":"CC2 test",
                         "header_to":"cc2@test.local"
-                     }
+                     },
+                     "substitution_data": {}
                   },
                   {
                      "address":{
                         "email":"bcc1@test.local",
                         "name":"BCC1 test"
-                     }
+                     },
+                     "substitution_data": {}
                   },
                   {
                      "address":{
                         "email":"bcc2@test.local",
                         "name":"BCC2 test"
-                     }
+                     },
+                     "substitution_data": {}
                   }
                ],
                "content":{
@@ -344,26 +350,30 @@ class SwiftMessageServiceTest extends \PHPUnit_Framework_TestCase
                         "email":"cc1@test.local",
                         "name":"CC1 test",
                         "header_to":"cc1@test.local"
-                     }
+                     },
+                     "substitution_data": {}
                   },
                   {
                      "address":{
                         "email":"cc2@test.local",
                         "name":"CC2 test",
                         "header_to":"cc2@test.local"
-                     }
+                     },
+                     "substitution_data": {}
                   },
                   {
                      "address":{
                         "email":"bcc1@test.local",
                         "name":"BCC1 test"
-                     }
+                     },
+                     "substitution_data": {}
                   },
                   {
                      "address":{
                         "email":"bcc2@test.local",
                         "name":"BCC2 test"
-                     }
+                     },
+                     "substitution_data": {}
                   }
                ],
                "content":{
@@ -389,15 +399,5 @@ class SwiftMessageServiceTest extends \PHPUnit_Framework_TestCase
         ';
 
         return [$mauticMessage, $json];
-    }
-
-    /**
-     * @return SwiftMessageService
-     */
-    private function getSwiftMessageService()
-    {
-        return new SwiftMessageService(
-            $this->translatorInterfaceMock
-        );
     }
 }

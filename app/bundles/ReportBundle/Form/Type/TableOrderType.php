@@ -11,26 +11,24 @@
 
 namespace Mautic\ReportBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class FilterSelectorType.
- */
 class TableOrderType extends AbstractType
 {
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
-    public function __construct(MauticFactory $factory)
+    public function __construct(TranslatorInterface $translator)
     {
-        $this->translator = $factory->getTranslator();
+        $this->translator = $translator;
     }
 
     /**
@@ -39,35 +37,43 @@ class TableOrderType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Build a list of columns
-        $builder->add('column', 'choice', [
-            'choices'     => $options['columnList'],
-            'expanded'    => false,
-            'multiple'    => false,
-            'label'       => 'mautic.report.report.label.filtercolumn',
-            'label_attr'  => ['class' => 'control-label'],
-            'empty_value' => false,
-            'required'    => false,
-            'attr'        => [
-                'class' => 'form-control filter-columns',
-            ],
-        ]);
+        $builder->add(
+            'column',
+            ChoiceType::class,
+            [
+                'choices'           => array_flip($options['columnList']),
+                'expanded'          => false,
+                'multiple'          => false,
+                'label'             => 'mautic.report.report.label.filtercolumn',
+                'label_attr'        => ['class' => 'control-label'],
+                'placeholder'       => false,
+                'required'          => false,
+                'attr'              => [
+                    'class' => 'form-control',
+                ],
+            ]
+        );
 
         // Direction
-        $builder->add('direction', 'choice', [
-            'choices' => [
-                'ASC'  => $this->translator->trans('mautic.report.report.label.tableorder_dir.asc'),
-                'DESC' => $this->translator->trans('mautic.report.report.label.tableorder_dir.desc'),
-            ],
-            'expanded'    => false,
-            'multiple'    => false,
-            'label'       => 'mautic.core.order',
-            'label_attr'  => ['class' => 'control-label'],
-            'empty_value' => false,
-            'required'    => false,
-            'attr'        => [
-                'class' => 'form-control not-chosen',
-            ],
-        ]);
+        $builder->add(
+            'direction',
+            ChoiceType::class,
+            [
+                'choices'           => [
+                    $this->translator->trans('mautic.report.report.label.tableorder_dir.asc')  => 'ASC',
+                    $this->translator->trans('mautic.report.report.label.tableorder_dir.desc') => 'DESC',
+                ],
+                'expanded'    => false,
+                'multiple'    => false,
+                'label'       => 'mautic.core.order',
+                'label_attr'  => ['class' => 'control-label'],
+                'placeholder' => false,
+                'required'    => false,
+                'attr'        => [
+                    'class' => 'form-control not-chosen',
+                ],
+            ]
+        );
     }
 
     /**
@@ -83,7 +89,7 @@ class TableOrderType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'table_order';
     }
@@ -91,7 +97,7 @@ class TableOrderType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'columnList' => [],

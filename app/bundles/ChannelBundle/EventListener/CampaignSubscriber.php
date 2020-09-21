@@ -22,21 +22,19 @@ use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\ChannelBundle\ChannelEvents;
+use Mautic\ChannelBundle\Form\Type\MessageSendType;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\ChannelBundle\PreferenceBuilder\PreferenceBuilder;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class CampaignSubscriber.
- */
 class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
      * @var MessageModel
      */
-    protected $messageModel;
+    private $messageModel;
 
     /**
      * @var ActionDispatcher
@@ -76,16 +74,10 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * @var array
      */
-    protected $messageChannels = [];
+    private $messageChannels = [];
 
     /**
      * CampaignSubscriber constructor.
-     *
-     * @param MessageModel        $messageModel
-     * @param ActionDispatcher    $actionDispatcher
-     * @param EventCollector      $collector
-     * @param LoggerInterface     $logger
-     * @param TranslatorInterface $translator
      */
     public function __construct(
         MessageModel $messageModel,
@@ -112,9 +104,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $channels  = $this->messageModel->getChannels();
@@ -128,9 +117,8 @@ class CampaignSubscriber implements EventSubscriberInterface
         $action = [
             'label'                  => 'mautic.channel.message.send.marketing.message',
             'description'            => 'mautic.channel.message.send.marketing.message.descr',
-            'eventName'              => ChannelEvents::ON_CAMPAIGN_TRIGGER_ACTION,
             'batchEventName'         => ChannelEvents::ON_CAMPAIGN_BATCH_ACTION,
-            'formType'               => 'message_send',
+            'formType'               => MessageSendType::class,
             'formTheme'              => 'MauticChannelBundle:FormTheme\MessageSend',
             'channel'                => 'channel.message',
             'channelIdField'         => 'marketingMessage',
@@ -148,8 +136,6 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param PendingEvent $pendingEvent
-     *
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      * @throws \ReflectionException
@@ -206,9 +192,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param ArrayCollection $logs
-     * @param string          $channel
-     * @param array           $messageChannel
+     * @param string $channel
      *
      * @return bool|ArrayCollection
      *
@@ -216,7 +200,7 @@ class CampaignSubscriber implements EventSubscriberInterface
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      * @throws \ReflectionException
      */
-    protected function sendChannelMessage(ArrayCollection $logs, $channel, array $messageChannel)
+    private function sendChannelMessage(ArrayCollection $logs, $channel, array $messageChannel)
     {
         /** @var ActionAccessor $config */
         $config = $this->eventCollector->getEventConfig($this->pseudoEvent);
@@ -251,10 +235,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $success;
     }
 
-    /**
-     * @param ArrayCollection   $logs
-     * @param PreferenceBuilder $channelPreferences
-     */
     private function passExecutedLogs(ArrayCollection $logs, PreferenceBuilder $channelPreferences)
     {
         /** @var LeadEventLog $log */
@@ -270,9 +250,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param ArrayCollection $success
-     */
     private function removePsuedoFailures(ArrayCollection $success)
     {
         /**
@@ -287,9 +264,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param PendingEvent    $pendingEvent
-     * @param ArrayCollection $mmLogs
-     * @param                 $channel
+     * @param $channel
      */
     private function recordChannelMetadata(PendingEvent $pendingEvent, $channel)
     {
