@@ -372,6 +372,48 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($updatedValues['owner'], $response['contact']['owner']['id']);
     }
 
+    /**
+     * Test creating a new contact with doNotContact information.
+     * The API response should include DNC information.
+     *
+     * @return void
+     */
+    public function testSingleNewEndpointCreateAndDeleteWithDnc()
+    {
+        $payload = [
+            'email'            => 'apidnc@email.com',
+            'firstname'        => 'API',
+            'lastname'         => 'DNC test',
+            'points'           => 4,
+            'tags'             => ['apitest', 'testapi'],
+            'city'             => 'Houston',
+            'state'            => 'Texas',
+            'country'          => 'United States',
+            'preferred_locale' => 'es_SV',
+            'timezone'         => 'America/Chicago',
+            'owner'            => 1,
+            'doNotContact'     => [
+                [
+                    'channel' => 'email',
+                    'reason'  => DoNotContact::BOUNCED,
+                ],
+            ],
+        ];
+        $this->client->request('POST', '/api/contacts/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $contactId      = $response['contact']['id'];
+
+        $this->assertEquals(1, count($response['contact']['doNotContact']));
+        $this->assertEquals($payload['doNotContact'][0]['channel'], $response['contact']['doNotContact'][0]['channel']);
+        $this->assertEquals($payload['doNotContact'][0]['reason'], $response['contact']['doNotContact'][0]['reason']);
+
+        // Remove contact
+        $this->client->request('DELETE', "/api/contacts/$contactId/delete");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+    }
+
     public function testBachdDncAddAndRemove()
     {
         // Create contact
