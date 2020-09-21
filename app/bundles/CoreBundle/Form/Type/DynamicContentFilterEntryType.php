@@ -70,7 +70,7 @@ class DynamicContentFilterEntryType extends AbstractType
                     'entry_type'    => DynamicContentFilterEntryFiltersType::class,
                     'entry_options' => [
                         'label' => false,
-                        'attr' => [
+                        'attr'  => [
                             'class' => 'form-control',
                         ],
                         'countries' => $this->countryChoices,
@@ -90,9 +90,6 @@ class DynamicContentFilterEntryType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['fields'] = $this->fieldChoices;
