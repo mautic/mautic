@@ -74,25 +74,20 @@ class DoNotContact
     /**
      * Create a DNC entry for a lead.
      *
-     * @param int          $contactId
-     * @param string|array $channel                  If an array with an ID, use the structure ['email' => 123]
-     * @param string       $comments
-     * @param int          $reason                   Must be a class constant from the DoNotContact class
-     * @param bool         $persist
-     * @param bool         $checkCurrentStatus
-     * @param bool         $allowUnsubscribeOverride
+     * @param string|array $channel If an array with an ID, use the structure ['email' => 123]
+     * @param int          $reason  Must be a class constant from the DoNotContact class
      *
      * @return bool|DNC If a DNC entry is added or updated, returns the DoNotContact object. If a DNC is already present
      *                  and has the specified reason, nothing is done and this returns false
      */
     public function addDncForContact(
-        $contactId,
+        int $contactId,
         $channel,
-        $reason = DNC::BOUNCED,
-        $comments = '',
-        $persist = true,
-        $checkCurrentStatus = true,
-        $allowUnsubscribeOverride = false
+        string $reason = DNC::BOUNCED,
+        string $comments = '',
+        bool $persist = true,
+        bool $checkCurrentStatus = true,
+        bool $allowUnsubscribeOverride = false
     ) {
         $dnc     = false;
         $contact = $this->leadModel->getEntity($contactId);

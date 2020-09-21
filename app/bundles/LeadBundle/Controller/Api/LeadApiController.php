@@ -626,12 +626,17 @@ class LeadApiController extends CommonApiController
                 /** @var DoNotContactModel $doNotContact */
                 $doNotContact = $this->get('mautic.lead.model.dnc');
 
-                if (DoNotContact::IS_CONTACTABLE === $reason) {
-                    // Remove DNC record
-                    $doNotContact->removeDncForContact($entity->getId(), $channel, false);
+                if (empty($entity->getId())) {
+                    // Contact doesn't exist yet. Directly create a DNC record on the entity.
+                    $doNotContact->createDncRecord($entity, $channel, $reason, $comments);
                 } else {
-                    // Add DNC record
-                    $doNotContact->addDncForContact($entity->getId(), $channel, $reason, $comments, false);
+                    if (DoNotContact::IS_CONTACTABLE === $reason) {
+                        // Remove DNC record
+                        $doNotContact->removeDncForContact($entity->getId(), $channel, false);
+                    } else {
+                        // Add DNC record
+                        $doNotContact->addDncForContact($entity->getId(), $channel, $reason, $comments, false);
+                    }
                 }
             }
             unset($parameters['doNotContact']);
