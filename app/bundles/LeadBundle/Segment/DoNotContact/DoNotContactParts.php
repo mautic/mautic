@@ -34,11 +34,11 @@ class DoNotContactParts
         switch (true) {
             case preg_match('/_manually$/', $field):
                 $this->type    = DoNotContact::MANUAL;
-                $this->channel = count($parts) === 4 ? $parts[2] : 'email';
+                $this->channel = 4 === count($parts) ? $parts[2] : 'email';
                 break;
             default:
-                $this->type    = $parts[1] === 'bounced' ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED;
-                $this->channel = count($parts) === 3 ? $parts[2] : 'email';
+                $this->type    = 'bounced' === $parts[1] ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED;
+                $this->channel = 3 === count($parts) ? $parts[2] : 'email';
         }
     }
 
