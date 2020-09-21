@@ -104,14 +104,9 @@ final class FieldValidator implements FieldValidatorInterface
         switch ($schemaDefinition['type']) {
             case 'date':
             case 'datetime':
-                return in_array($field->getType(), [
-                    NormalizedValueDAO::DATE_TYPE,
-                    NormalizedValueDAO::DATETIME_TYPE,
-                ]);
             case 'time':
-                return NormalizedValueDAO::TIME_TYPE === $field->getType();
             case 'boolean':
-                return NormalizedValueDAO::BOOLEAN_TYPE === $field->getType();
+                return $field->getType() === $schemaDefinition['type'];
             case 'float':
                 return in_array($field->getType(), [
                     NormalizedValueDAO::DOUBLE_TYPE,

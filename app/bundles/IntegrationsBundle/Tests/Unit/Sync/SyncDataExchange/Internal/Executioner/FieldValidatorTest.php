@@ -100,7 +100,7 @@ class FieldValidatorTest extends TestCase
             ->addField(new FieldDAO('email', new NormalizedValueDAO('string', 'email@domain.tld', 'email@domain.tld')))
             ->addField(new FieldDAO('unknown', new NormalizedValueDAO('string', 'something', 'something')));
         $secondChangedObject = (new ObjectChangeDAO('integration', 'lead', '1', 'Lead', '00Q4H00000juXes'))
-            ->addField(new FieldDAO('date', new NormalizedValueDAO('datetime', '2020-09-08 10:05:35', '2020-09-08 10:05:35')))
+            ->addField(new FieldDAO('date', new NormalizedValueDAO('date', '2020-09-08 10:05:35', '2020-09-08 10:05:35')))
             ->addField(new FieldDAO('time', new NormalizedValueDAO('date', '2020-09-08', '2020-09-08')))
             ->addField(new FieldDAO('number', new NormalizedValueDAO('url', 'https://url', 'https://url')))
             ->addField(new FieldDAO('bool', new NormalizedValueDAO('boolean', 1, true)));
