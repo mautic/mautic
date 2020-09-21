@@ -56,7 +56,7 @@ class WebhookQueueRepository extends CommonRepository
     /**
      * Check if there is webhook to process.
      */
-    public function webhookExists(int $id): bool
+    public function exists(int $id): bool
     {
         $qb     = $this->_em->getConnection()->createQueryBuilder();
         $result = $qb->select($this->getTableAlias().'.id')

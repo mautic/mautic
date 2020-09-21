@@ -109,7 +109,7 @@ class WebhookQueueRepositoryTest extends TestCase
         self::assertSame(0, $this->repository->getQueueCountByWebhookId(0));
     }
 
-    public function testWebhookExistsExists()
+    public function testExistsExists()
     {
         $id = 1;
 
@@ -153,10 +153,10 @@ class WebhookQueueRepositoryTest extends TestCase
             ->method('getConnection')
             ->willReturn($connection);
 
-        self::assertTrue($this->repository->webhookExists($id));
+        self::assertTrue($this->repository->exists($id));
     }
 
-    public function testWebhookExistsNotExists()
+    public function testExistsNotExists()
     {
         $id = 1;
 
@@ -200,7 +200,7 @@ class WebhookQueueRepositoryTest extends TestCase
             ->method('getConnection')
             ->willReturn($connection);
 
-        self::assertFalse($this->repository->webhookExists($id));
+        self::assertFalse($this->repository->exists($id));
     }
 
     public function testGetConsecutiveIDsAsRanges()
