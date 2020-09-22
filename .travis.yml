@@ -53,7 +53,7 @@ jobs:
         # Clobber is needed because PCOV normally only works with PHPUnit 8+. Needed only to run test coverage.
         - pecl install pcov
         - composer require --dev pcov/clobber
-        - vendor/bin/pcov clobber
+        - bin/pcov clobber
       script:
         - composer test -- --coverage-clover=coverage.xml
       after_script:
