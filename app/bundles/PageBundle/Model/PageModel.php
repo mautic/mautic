@@ -454,7 +454,7 @@ class PageModel extends FormModel
         }
 
         // Process the query
-        if (empty($query)) {
+        if (empty($query) || !is_array($query)) {
             $query = $this->getHitQuery($request, $page);
         }
 
@@ -770,16 +770,16 @@ class PageModel extends FormModel
      */
     public function getHitQuery(Request $request, $page = null)
     {
-        $get  = $request->query->all();
-        $post = $request->request->all();
-
-        $query = \array_merge($get, $post);
+        // get all post params
+        $query = $request->request->all();
 
         // Set generated page url
         $query['page_url'] = $this->getPageUrl($request, $page);
 
-        $utmTags = $this->getUtmFromUrl($query['page_url']);
-        $query   = \array_merge($utmTags, $query);
+        // get all params from the url (actual url or passed in as page_url)
+        $queryUrl = $this->getQueryFromUrl($query['page_url']);
+        $query    = \array_merge($queryUrl, $query);
+
         // Process clickthrough if applicable
         if (!empty($query['ct'])) {
             $query['ct'] = $this->decodeArrayFromUrl($query['ct']);
@@ -1041,25 +1041,24 @@ class PageModel extends FormModel
     }
 
     /**
-     * Get all UTM tags from a url.
+     * Get all params (e.g. UTM tags) from a url.
      */
-    protected function getUtmFromUrl(string $pageUrl): array
+    protected function getQueryFromUrl(string $pageUrl): array
     {
-        $utmTags           = [];
-        $urlParts          = parse_url($pageUrl);
-        if (empty($urlParts['query'])) {
-            return $utmTags;
+        $query             = [];
+        $urlQuery          = parse_url($pageUrl, PHP_URL_QUERY);
+        parse_str($urlQuery, $urlQueryArray);
+
+        if (empty($urlQueryArray)) {
+            return $query;
         }
 
-        parse_str($urlParts['query'], $queryUrl);
-        foreach ($queryUrl as $key => $value) {
-            $key = strtolower($key);
-            if (0 === strpos($key, 'utm_')) {
-                $utmTags[$key] = $value;
-            }
+        foreach ($urlQueryArray as $key => $value) {
+            $key           = strtolower($key);
+            $query[$key]   = urldecode($value);
         }
 
-        return $utmTags;
+        return $query;
     }
 
     /**
@@ -1188,9 +1187,8 @@ class PageModel extends FormModel
      *
      * @return array
      */
-    private function cleanQuery($query)
+    private function cleanQuery(array $query)
     {
-        dump($query);
         foreach ($query as $key => $value) {
             if (filter_var($value, FILTER_VALIDATE_URL)) {
                 $query[$key] = InputHelper::url($value);
