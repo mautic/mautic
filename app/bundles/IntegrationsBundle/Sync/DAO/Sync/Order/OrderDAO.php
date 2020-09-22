@@ -125,18 +125,12 @@ class OrderDAO
     }
 
     /**
-     * Note that changed objects are removed from memory, when getter is used.
-     *
      * @throws UnexpectedValueException
      */
     public function getChangedObjectsByObjectType(string $objectType): array
     {
         if (isset($this->changedObjects[$objectType])) {
-            $changedObjects = $this->changedObjects[$objectType];
-            // Cleanup memory
-            unset($this->changedObjects[$objectType]);
-
-            return $changedObjects;
+            return $this->changedObjects[$objectType];
         }
 
         throw new UnexpectedValueException("There are no change objects for object type '$objectType'");
