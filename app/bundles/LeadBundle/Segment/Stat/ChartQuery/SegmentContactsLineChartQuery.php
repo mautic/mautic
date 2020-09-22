@@ -90,8 +90,8 @@ class SegmentContactsLineChartQuery extends ChartQuery
         $sums     = array_reverse(ArrayHelper::sub($this->getAddedEventLogStats(), $this->getRemovedEventLogStats()));
         $totalSum = 0;
         $totals   = array_map(function ($sum) use ($totalCountDateTo, &$totalSum) {
-            $totalSum += $sum;
             $total = $totalCountDateTo - $totalSum;
+            $totalSum += $sum;
             if ($total > -1) {
                 return $total;
             } else {

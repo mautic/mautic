@@ -310,6 +310,9 @@ class ChartQuery extends AbstractChart
         $previousDate  = clone $this->dateFrom;
         $utcTz         = new \DateTimeZone('UTC');
 
+        // Do not let hours to mess with date comparisions.
+        $previousDate->setTime(0, 0, 0);
+
         if ('Y' === $this->unit) {
             $previousDate->modify('first day of January');
         } elseif ('m' == $this->unit) {

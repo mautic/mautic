@@ -61,15 +61,14 @@ class ListModelFunctionalTest extends MauticMysqlTestCase
 
         $segmentModel->saveEntity($segment);
 
-        $contactA = new Lead();
-        $contactB = new Lead();
-        $contactC = new Lead();
+        $contacts = [new Lead(), new Lead(), new Lead(), new Lead()];
 
-        $contactRepository->saveEntities([$contactA, $contactB, $contactC]);
+        $contactRepository->saveEntities($contacts);
 
-        $segmentModel->addLead($contactA, $segment); // Emulating adding by a filter.
-        $segmentModel->addLead($contactB, $segment); // Emulating adding by a filter.
-        $segmentModel->addLead($contactC, $segment, true); // Manually added.
+        $segmentModel->addLead($contacts[0], $segment); // Emulating adding by a filter.
+        $segmentModel->addLead($contacts[1], $segment); // Emulating adding by a filter.
+        $segmentModel->addLead($contacts[2], $segment, true); // Manually added.
+        $segmentModel->addLead($contacts[3], $segment, true); // Manually added.
 
         $data = $segmentModel->getSegmentContactsLineChartData(
             'd',
@@ -78,7 +77,25 @@ class ListModelFunctionalTest extends MauticMysqlTestCase
             null,
             ['leadlist_id' => ['value' => $segment->getId(), 'list_column_name' => 't.lead_id']]
         );
-        dump($data);
-        Assert::assertSame(3, $data['datasets'][0]['data'][31]); // Total count for today.
+
+        Assert::assertSame(4, $data['datasets'][0]['data'][31]); // Added for today.
+        Assert::assertSame(0, $data['datasets'][1]['data'][31]); // Removed for today.
+        Assert::assertSame(4, $data['datasets'][2]['data'][31]); // Total for today.
+
+        // To make this interesting, lets' remove some contacts to see what happens.
+        $segmentModel->removeLead($contacts[1], $segment); // Emulating removing by a filter.
+        $segmentModel->removeLead($contacts[2], $segment, true); // Manually removed.
+
+        $data = $segmentModel->getSegmentContactsLineChartData(
+            'd',
+            new \DateTime('1 month ago', new \DateTimeZone('UTC')),
+            new \DateTime('now', new \DateTimeZone('UTC')),
+            null,
+            ['leadlist_id' => ['value' => $segment->getId(), 'list_column_name' => 't.lead_id']]
+        );
+
+        Assert::assertSame(4, $data['datasets'][0]['data'][31]); // Added for today.
+        Assert::assertSame('2', $data['datasets'][1]['data'][31]); // Removed for today.
+        Assert::assertSame(2, $data['datasets'][2]['data'][31]); // Total for today.
     }
 }
