@@ -17,8 +17,9 @@ cache:
     - "${HOME}/.composer/cache"
 
 env:
-  # Set to test environment for Symfony's commands in post install commands
-  - SYMFONY_ENV="test"
+  global:
+    # Set to test environment for Symfony's commands in post install commands
+    - SYMFONY_ENV="test"
 
 jobs:
   include:
