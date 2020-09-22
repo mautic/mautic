@@ -778,6 +778,8 @@ class PageModel extends FormModel
         // Set generated page url
         $query['page_url'] = $this->getPageUrl($request, $page);
 
+        $utmTags = $this->getUtmFromUrl($query['page_url']);
+        $query   = \array_merge($utmTags, $query);
         // Process clickthrough if applicable
         if (!empty($query['ct'])) {
             $query['ct'] = $this->decodeArrayFromUrl($query['ct']);
@@ -1039,6 +1041,28 @@ class PageModel extends FormModel
     }
 
     /**
+     * Get all UTM tags from a url.
+     */
+    protected function getUtmFromUrl(string $pageUrl): array
+    {
+        $utmTags           = [];
+        $urlParts          = parse_url($pageUrl);
+        if (empty($urlParts['query'])) {
+            return $utmTags;
+        }
+
+        parse_str($urlParts['query'], $queryUrl);
+        foreach ($queryUrl as $key => $value) {
+            $key = strtolower($key);
+            if (0 === strpos($key, 'utm_')) {
+                $utmTags[$key] = $value;
+            }
+        }
+
+        return $utmTags;
+    }
+
+    /**
      * @param $page
      */
     private function setLeadManipulator($page, Hit $hit, Lead $lead)
@@ -1166,6 +1190,7 @@ class PageModel extends FormModel
      */
     private function cleanQuery($query)
     {
+        dump($query);
         foreach ($query as $key => $value) {
             if (filter_var($value, FILTER_VALIDATE_URL)) {
                 $query[$key] = InputHelper::url($value);
