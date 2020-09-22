@@ -123,36 +123,18 @@ class SegmentContactsLineChartQuery extends ChartQuery
      */
     public function getDataFromLeadEventLog($action)
     {
-        $actionInverted = ('added' == $action) ? 'removed' : 'added';
-        // for added stats we check not existed removed stats greater than date_added
-        // for removed stats we check not existed added stats less than date_removed
-        $conditionForNonExistedQuery = ('added' === $action) ? 'gt' : 'lt';
-
-        $filter              = [];
-        $filter['object']    = 'segment';
-        $filter['bundle']    = 'lead';
-        $filter['action']    = $action;
-        $filter['object_id'] = $this->segmentId;
-
-        $q = $this->prepareTimeDataQuery('lead_event_log', 'date_added', $filter);
-        $q->select('DATE_FORMAT(t.date_added, \''.$this->translateTimeUnit().'\') AS date, (COUNT(DISTINCT t.lead_id)) as count');
-
-        $subQuery = $this->connection->createQueryBuilder();
-        $subQuery->select('null')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_event_log', 'el')
-            ->where(
-                $subQuery->expr()->andX(
-                    $subQuery->expr()->eq('el.lead_id', 't.lead_id'),
-                    $subQuery->expr()->eq('el.object', $subQuery->expr()->literal('segment')),
-                    $subQuery->expr()->eq('el.bundle', $subQuery->expr()->literal('lead')),
-                    $subQuery->expr()->eq('el.action', $subQuery->expr()->literal($actionInverted)),
-                    $subQuery->expr()->eq('el.object_id', $this->segmentId),
-                    $subQuery->expr()->eq('DATE_FORMAT(el.date_added, \''.$this->translateTimeUnit().'\')', 'DATE_FORMAT(t.date_added, \''.$this->translateTimeUnit().'\')'),
-                    $subQuery->expr()->$conditionForNonExistedQuery('el.date_added', 't.date_added')
-                ));
-        $q->andWhere(sprintf('NOT EXISTS (%s)', $subQuery->getSQL()));
-
-        return $this->loadAndBuildTimeData($q);
+        return $this->loadAndBuildTimeData(
+            $this->prepareTimeDataQuery(
+                'lead_event_log',
+                'date_added',
+                [
+                    'object'    => 'segment',
+                    'bundle'    => 'lead',
+                    'action'    => $action,
+                    'object_id' => $this->segmentId,
+                ]
+            )
+        );
     }
 
     /**
