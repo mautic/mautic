@@ -3,7 +3,8 @@
 language: php
 os:
   - linux
-dist: bionic
+#dist: bionic
+dist: xenial
 
 services:
   - mysql
