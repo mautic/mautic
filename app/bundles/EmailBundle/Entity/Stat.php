@@ -126,6 +126,11 @@ class Stat
      */
     private $replies;
 
+    /**
+     * @var bool
+     */
+    private $isSoft = false;
+
     public function __construct()
     {
         $this->replies = new ArrayCollection();
@@ -223,6 +228,10 @@ class Stat
             ->mappedBy('stat')
             ->fetchExtraLazy()
             ->cascadeAll()
+            ->build();
+
+        $builder->createField('isSoft', 'boolean')
+            ->columnName('is_soft')
             ->build();
     }
 
@@ -346,6 +355,14 @@ class Stat
     public function setIsRead($isRead)
     {
         $this->isRead = $isRead;
+    }
+
+    /**
+     * @param bool $isSoft
+     */
+    public function setIsSoft($isSoft)
+    {
+        $this->isSoft = $isSoft;
     }
 
     /**
