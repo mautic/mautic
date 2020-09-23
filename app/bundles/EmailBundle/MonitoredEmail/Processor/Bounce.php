@@ -25,6 +25,7 @@ use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 
 class Bounce implements ProcessorInterface
 {
@@ -129,6 +130,9 @@ class Bounce implements ProcessorInterface
 
         $stat    = $searchResult->getStat();
         $channel = 'email';
+        $retryCount = 0;
+        $globalRetryCount = 0;
+
         if ($stat) {
             // Update stat entry
             $this->updateStat($stat, $bounce);
@@ -136,12 +140,16 @@ class Bounce implements ProcessorInterface
             if ($stat->getEmail() instanceof Email) {
                 // We know the email ID so set it to append to the the DNC record
                 $channel = ['email' => $stat->getEmail()->getId()];
+                $retryCount = $stat->getRetryCount();
+                $globalRetryCount=$this->contactFinder->findSoftbyLead($stat->getLead()->getId());
             }
         }
 
         $comments = $this->translator->trans('mautic.email.bounce.reason.'.$bounce->getRuleCategory());
-        foreach ($contacts as $contact) {
-            $this->doNotContact->addDncForContact($contact->getId(), $channel, $comments);
+        if ($fail = $bounce->isFinal() || $retryCount >= 5 || $globalRetryCount >= 5) {
+            foreach ($contacts as $contact) {
+                $this->doNotContact->addDncForContact($contact->getId(), $channel, DNC::BOUNCED, $comments);
+            }
         }
 
         return true;
@@ -171,6 +179,8 @@ class Bounce implements ProcessorInterface
 
         if ($fail = $bouncedEmail->isFinal() || $retryCount >= 5) {
             $stat->setIsFailed(true);
+        } else {
+            $stat->setIsSoft(true);
         }
 
         $this->statRepository->saveEntity($stat);
