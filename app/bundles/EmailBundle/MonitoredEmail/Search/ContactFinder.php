@@ -103,4 +103,17 @@ class ContactFinder
 
         return $result;
     }
+
+    /*
+    * @param $leadId
+    *
+    * @return Result
+    */
+    public function findSoftbyLead($leadId)
+    {
+        $result = new Result();
+        // Search by email address
+        $contacts = $this->leadRepository->getSoftByLead($leadId);
+        return $contacts;
+    }
 }
