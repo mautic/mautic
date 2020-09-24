@@ -81,6 +81,7 @@ class Notification
             ->build();
 
         $builder->createField('header', Types::STRING)
+            ->nullable()
             ->length(512)
             ->build();
 

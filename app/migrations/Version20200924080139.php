@@ -30,6 +30,6 @@ final class Version20200924080138 extends AbstractMauticMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE {$this->prefix}notifications MODIFY header VARCHAR(512) NOT NULL");
+        $this->addSql("ALTER TABLE {$this->prefix}notifications MODIFY header VARCHAR(512) DEFAULT NULL");
     }
 }
