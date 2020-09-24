@@ -51,7 +51,6 @@ class ConfigType extends AbstractType
             new CleanFormSubscriber(
                 [
                     'mailer_from_email'      => 'email',
-                    'mailer_reply_to_email'  => 'email',
                     'mailer_return_path'     => 'email',
                     'default_signature_text' => 'html',
                     'unsubscribe_text'       => 'html',
@@ -213,6 +212,7 @@ class ConfigType extends AbstractType
                     new Email(
                         [
                             'message' => 'mautic.core.email.required',
+                            'strict'  => true,
                         ]
                     ),
                 ],
