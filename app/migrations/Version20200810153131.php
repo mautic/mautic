@@ -47,7 +47,13 @@ final class Version20200810153131 extends AbstractMauticMigration
 
         // Modify `user_id` column in `oauth2_accesstokens` table to allow null values
         $accessTokenTable = $schema->getTable("{$this->prefix}oauth2_accesstokens");
-        $accessTokenTable->changeColumn('user_id', ['unsigned' => true, 'notnull' => false]);
+        $userIdColumn     = $accessTokenTable->getColumn('user_id');
+        // Some of the instances still use signed id field in user table, and we have to respect that during migration.
+        if (true === $userIdColumn->getUnsigned()) {
+            $accessTokenTable->changeColumn('user_id', ['unsigned' => true, 'notnull' => false]);
+        } else {
+            $accessTokenTable->changeColumn('user_id', ['notnull' => false]);
+        }
     }
 
     public function down(Schema $schema): void
