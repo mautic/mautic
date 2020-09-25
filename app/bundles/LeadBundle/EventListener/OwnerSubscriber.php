@@ -78,7 +78,9 @@ class OwnerSubscriber implements EventSubscriberInterface
 
     public function onEmailGenerate(EmailSendEvent $event)
     {
-        $event->addTokens($this->getGeneratedTokens($event));
+        if (!empty($contact)) {
+            $event->addTokens($this->getGeneratedTokens($contact));
+        }
     }
 
     /**
