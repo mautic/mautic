@@ -21,7 +21,7 @@ use PHPUnit\Framework\Assert;
 
 class NotificationRepositoryTest extends MauticMysqlTestCase
 {
-    public function testIsNotificationDuplicate(): void
+    public function testIsDuplicate(): void
     {
         $this->createNotification(2, 'dup1', new DateTime('-1 day'));
         $this->createNotification(1, 'dup2', new DateTime('-1 day'));
