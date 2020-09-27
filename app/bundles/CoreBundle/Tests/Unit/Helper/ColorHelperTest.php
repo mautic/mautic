@@ -23,9 +23,9 @@ class ColorHelperTest extends \PHPUnit\Framework\TestCase
     public function testTheHelperIsInstantiatedWithoutAttributeCorrectly()
     {
         $helper = new ColorHelper();
-        $this->assertAttributeSame(0, 'red', $helper);
-        $this->assertAttributeSame(0, 'green', $helper);
-        $this->assertAttributeSame(0, 'blue', $helper);
+        $this->assertEquals(0, $helper->getRed());
+        $this->assertEquals(0, $helper->getGreen());
+        $this->assertEquals(0, $helper->getBlue());
     }
 
     /**
@@ -46,9 +46,9 @@ class ColorHelperTest extends \PHPUnit\Framework\TestCase
 
         foreach ($colors as $hex => $rgb) {
             $helper = new ColorHelper($hex);
-            $this->assertAttributeSame($rgb[0], 'red', $helper);
-            $this->assertAttributeSame($rgb[1], 'green', $helper);
-            $this->assertAttributeSame($rgb[2], 'blue', $helper);
+            $this->assertEquals($rgb[0], $helper->getRed());
+            $this->assertEquals($rgb[1], $helper->getGreen());
+            $this->assertEquals($rgb[2], $helper->getBlue());
         }
     }
 
