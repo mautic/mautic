@@ -44,11 +44,6 @@ class DateTimeHelper
     private $datetime;
 
     /**
-     * @var string
-     */
-    private $localTimezone;
-
-    /**
      * @param \DateTimeInterface|string $string
      * @param string                    $fromFormat Format the string is in
      * @param string                    $timezone   Timezone the string is in
@@ -59,7 +54,6 @@ class DateTimeHelper
         if (empty($localTimezone) || null === $localTimezone) {
             $this->localTimezone = date_default_timezone_get();
         }
-        $this->localTimezone = ArrayHelper::getValue('default_timezone', (new ParamsLoaderHelper())->getParameters(), date_default_timezone_get());
         $this->setDateTime($string, $fromFormat, $timezone);
     }
 
@@ -72,8 +66,10 @@ class DateTimeHelper
      */
     public function setDateTime($datetime = '', $fromFormat = 'Y-m-d H:i:s', $timezone = 'local')
     {
+        $localTimezone = ArrayHelper::getValue('default_timezone', (new ParamsLoaderHelper())->getParameters(), date_default_timezone_get());
+
         if ('local' == $timezone) {
-            $timezone = $this->localTimezone;
+            $timezone = $localTimezone;
         } elseif (empty($timezone)) {
             $timezone = 'UTC';
         }
@@ -81,7 +77,7 @@ class DateTimeHelper
         $this->format   = (empty($fromFormat)) ? 'Y-m-d H:i:s' : $fromFormat;
         $this->timezone = $timezone;
         $this->utc      = new \DateTimeZone('UTC');
-        $this->local    = new \DateTimeZone($this->localTimezone);
+        $this->local    = new \DateTimeZone($localTimezone);
 
         if ($datetime instanceof \DateTimeInterface) {
             $this->datetime = $datetime;
