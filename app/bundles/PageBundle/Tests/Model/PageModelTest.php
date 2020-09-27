@@ -131,7 +131,6 @@ class PageModelTest extends PageTestAbstract
             $querystring .= sprintf('&%s=%s', $key, $value);
         }
 
-        $encoded  = 'YTo1OntzOjY6InNvdXJjZSI7YToyOntpOjA7czoxNDoiY2FtcGFpZ24uZXZlbnQiO2k6MTtpOjEwNTt9czo1OiJlbWFpbCI7aTozNztzOjQ6InN0YXQiO3M6MjI6IjVmNDNhYTFkY2ZhZWQzNTA3MDk4MzYiO3M6NDoibGVhZCI7aToyMDA1O3M6NzoiY2hhbm5lbCI7YToxOntzOjU6ImVtYWlsIjtpOjM3O319';
         $ctParams = [
             'source'  => ['email', '4'],
             'email'   => 4,
