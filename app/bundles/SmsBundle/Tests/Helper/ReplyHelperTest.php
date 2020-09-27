@@ -40,7 +40,7 @@ class ReplyHelperTest extends \PHPUnit\Framework\TestCase
      */
     private $contactTracker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->logger          = new NullLogger();

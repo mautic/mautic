@@ -64,7 +64,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     private $entityManagerMock;
     private $leadModel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

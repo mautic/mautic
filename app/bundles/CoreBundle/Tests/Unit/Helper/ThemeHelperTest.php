@@ -44,7 +44,7 @@ class ThemeHelperTest extends \PHPUnit\Framework\TestCase
      */
     private $coreParameterHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->pathsHelper         = $this->createMock(PathsHelper::class);
         $this->templatingHelper    = $this->createMock(TemplatingHelper::class);

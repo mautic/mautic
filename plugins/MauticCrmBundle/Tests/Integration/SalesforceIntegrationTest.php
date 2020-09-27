@@ -110,7 +110,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
      */
     protected $leadsCreatedCounter = 0;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -120,7 +120,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     /**
      * Reset.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->returnedSfEntities           = [];
         $this->persistedIntegrationEntities = [];

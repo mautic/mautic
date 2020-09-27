@@ -18,7 +18,7 @@ class CookieHelperTest extends \PHPUnit\Framework\TestCase
      */
     private $requestMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!function_exists('xdebug_get_headers')) {
             $this->markTestSkipped('This test needs xdebug.');
