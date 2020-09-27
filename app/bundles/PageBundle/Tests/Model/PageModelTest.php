@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\Model;
 
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
@@ -71,7 +72,11 @@ class PageModelTest extends PageTestAbstract
         ]);
     }
 
-    public function testGetHitQueryRequest()
+    /**
+     * Test getHitQuery when the hit is a Request
+     * (e.g. POST Ajax or Landingpage hit).
+     */
+    public function testGetHitQueryRequest(): void
     {
         $pageModel         = $this->getPageModel();
 
@@ -79,11 +84,14 @@ class PageModelTest extends PageTestAbstract
             $request = new Request($params);
 
             $query = $pageModel->getHitQuery($request);
-            $this->assertQuery($query);
+            $this->assertUtmQuery($query);
         }
     }
 
-    public function testGetHitQueryRedirect()
+    /**
+     * Test getHitQuery when the hit is a Redirect.
+     */
+    public function testGetHitQueryRedirect(): void
     {
         $pageModel         = $this->getPageModel();
         $request           = new Request();
@@ -92,11 +100,11 @@ class PageModelTest extends PageTestAbstract
         foreach ($this->getQueryParams() as $params) {
             $redirect->setUrl($params['page_url']);
             $query = $pageModel->getHitQuery($request, $redirect);
-            $this->assertQuery($query);
+            $this->assertUtmQuery($query);
         }
     }
 
-    private function assertQuery(array $query)
+    private function assertUtmQuery(array $query)
     {
         $this->assertArrayHasKey('utm_source', $query, 'utm_source not found');
         $this->assertArrayHasKey('utm_medium', $query, 'utm_medium not found');
@@ -110,13 +118,36 @@ class PageModelTest extends PageTestAbstract
         }
     }
 
-    private function getQueryParams()
+    private function getQueryParams(): array
     {
-        return [[
+        $utm = [
+            'utm_source'  => 'test-utm_source',
+            'utm_medium'  => 'test-utm_medium',
+            'utm_campaign'=> 'test-utm_campaign',
+            'utm_content' => 'test-utm_content',
+        ];
+        $querystring = '';
+        foreach ($utm as $key => $value) {
+            $querystring .= sprintf('&%s=%s', $key, $value);
+        }
+
+        $encoded  = 'YTo1OntzOjY6InNvdXJjZSI7YToyOntpOjA7czoxNDoiY2FtcGFpZ24uZXZlbnQiO2k6MTtpOjEwNTt9czo1OiJlbWFpbCI7aTozNztzOjQ6InN0YXQiO3M6MjI6IjVmNDNhYTFkY2ZhZWQzNTA3MDk4MzYiO3M6NDoibGVhZCI7aToyMDA1O3M6NzoiY2hhbm5lbCI7YToxOntzOjU6ImVtYWlsIjtpOjM3O319';
+        $ctParams = [
+            'source'  => ['email', '4'],
+            'email'   => 4,
+            'stat'    => '5f5dedc3b0dc0366144010',
+            'lead'    => 2,
+            'channel' => [
+                            'email' => 4,
+                        ],
+            ];
+        $ct      = ClickthroughHelper::encodeArrayForUrl($ctParams);
+
+        $params = [[
             'page_title'      => 'Testpage',
             'page_language'   => 'en-GB',
             'page_referrer'   => '',
-            'page_url'        => 'https://www.domain.com/testpage/?utm_source=test-utm_source&utm_medium=test-utm_medium&utm_campaign=test-utm_campaign&utm_content=test-utm_content',
+            'page_url'        => sprintf('https://www.domain.com/testpage/?%s', $querystring),
             'counter'         => 0,
             'mautic_device_id'=> 'nowvkqdf6113236eokcg7qs',
             'resolution'      => '1792x1120',
@@ -138,6 +169,21 @@ class PageModelTest extends PageTestAbstract
             'do_not_track'    => 1,
             'adblock'         => false,
             'fingerprint'     => 'fec25ab2d659c4153c7f1d5724841132',
+        ], [
+            'page_title'      => 'Testpage With Encoded Params',
+            'page_language'   => 'en-GB',
+            'page_referrer'   => '',
+            'page_url'        => sprintf('https://www.domain.com/testpage/?ct=%s&%s', $ct, $querystring),
+            'counter'         => 0,
+            'mautic_device_id'=> 'nowvkqdf6113236eokcg7qs',
+            'resolution'      => '1792x1120',
+            'timezone_offset' => -120,
+            'platform'        => 'MacIntel',
+            'do_not_track'    => 1,
+            'adblock'         => false,
+            'fingerprint'     => 'fec25ab2d659c4153c7f1d5724841132',
         ]];
+
+        return $params;
     }
 }
