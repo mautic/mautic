@@ -513,7 +513,7 @@ class InstallCommand extends ContainerAwareCommand
 
             case InstallService::FINAL_STEP:
                 // Save final configuration
-                $siteUrl  = $allParams['site_url'];
+                $siteUrl  = $params['site_url'];
                 $messages = $installer->createFinalConfigStep($siteUrl);
                 if (is_bool($messages) && true === $messages) {
                     $installer->finalMigrationStep();
