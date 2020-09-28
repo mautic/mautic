@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\SmsBundle\Callback\CallbackInterface;
+use Mautic\SmsBundle\Callback\CallbackResponseInterface;
 use Mautic\SmsBundle\Callback\ResponseInterface;
 use Mautic\SmsBundle\Exception\NumberNotFoundException;
 use Mautic\SmsBundle\Helper\ReplyHelper;
@@ -65,7 +66,7 @@ class ReplyHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testHandlerResponseIsReturnedIfResponseInterface()
     {
-        $handler = $this->createMock([CallbackInterface::class, ResponseInterface::class]);
+        $handler = $this->createMock(CallbackResponseInterface::class);
 
         $handlerResponse = new Response('hi');
         $handler->expects($this->once())

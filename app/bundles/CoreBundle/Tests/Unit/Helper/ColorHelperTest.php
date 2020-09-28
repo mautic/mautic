@@ -98,6 +98,34 @@ class ColorHelperTest extends \PHPUnit\Framework\TestCase
         }
     }
 
+    public function testThatRgbColorsAreReturnedCorrectly()
+    {
+        $colors = [
+            '#ccc'    => [
+                'red'   => 204,
+                'green' => 204,
+                'blue'  => 204,
+            ],
+            '#369'    => [
+                'red'   => 51,
+                'green' => 102,
+                'blue'  => 153,
+            ],
+            '#f8Ac30' => [
+                'red'   => 248,
+                'green' => 172,
+                'blue'  => 48,
+            ],
+        ];
+
+        foreach ($colors as $hex => $colors) {
+            $helper = new ColorHelper($hex);
+            $this->assertEquals($colors['red'], $helper->getRed());
+            $this->assertEquals($colors['green'], $helper->getGreen());
+            $this->assertEquals($colors['blue'], $helper->getBlue());
+        }
+    }
+
     /**
      * @testdox A color hex hash can be set and received in the correct and valid rgba format
      *
