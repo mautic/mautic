@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticCitrixBundle\Helper;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use MauticPlugin\MauticCitrixBundle\Api\GotoassistApi;
@@ -133,10 +134,16 @@ class CitrixHelper
      */
     public static function getKeyPairs($results, $key, $value)
     {
+        $dateTimeHelper = new DateTimeHelper();
         /** @var array $results */
         foreach ($results as $result) {
             if (array_key_exists($key, $result) && array_key_exists($value, $result)) {
-                yield $result[$key] => $result[$value];
+                if (isset($result['times'][0]['startTime'])) {
+                    $dateTimeHelper->setDateTime($result['times'][0]['startTime']);
+                    yield $result[$key] => sprintf('%s / %s', $result[$value], $dateTimeHelper->getString());
+                } else {
+                    yield $result[$key] => $result[$value];
+                }
             }
         }
     }
@@ -228,6 +235,21 @@ class CitrixHelper
         }
 
         return [];
+    }
+
+    public static function appendStartDateTimeToEventName($listType, array $eventNames = [])
+    {
+        $choices = self::getCitrixChoices($listType, false);
+
+        foreach ($eventNames as $eventName=> $eventDesc) {
+            // filter events with same id
+            $eventDetails    = explode('_#', $eventName);
+            if (isset($eventDetails[1]) && isset($choices[$eventDetails[1]])) {
+                $eventNames[$eventName] = $choices[$eventDetails[1]];
+            }
+        }
+
+        return $eventNames;
     }
 
     /**

@@ -144,8 +144,8 @@ class LeadSubscriber implements EventSubscriberInterface
         }
 
         foreach ($activeProducts as $product) {
-            $eventNames = $this->model->getDistinctEventNamesDesc($product);
-
+            $eventNames           = $this->model->getDistinctEventNamesDesc($product);
+            $eventNames           = CitrixHelper::appendStartDateTimeToEventName($product, $eventNames);
             $eventNamesWithoutAny = array_merge(
                 [
                     '-' => '-',

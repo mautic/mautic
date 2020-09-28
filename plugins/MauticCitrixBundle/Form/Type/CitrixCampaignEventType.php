@@ -60,7 +60,8 @@ class CitrixCampaignEventType extends AbstractType
         }
 
         $product        = $options['attr']['data-product'];
-        $eventNamesDesc = $this->model->getDistinctEventNamesDesc($options['attr']['data-product']);
+        $eventNamesDesc = $this->model->getDistinctEventNamesDesc($product);
+        $eventNamesDesc = CitrixHelper::appendStartDateTimeToEventName($product, $eventNamesDesc);
 
         $choices = [
             'attendedToAtLeast' => $this->translator->trans('plugin.citrix.criteria.'.$product.'.attended'),
