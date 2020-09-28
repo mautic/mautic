@@ -76,11 +76,8 @@ class SendGridApiFacade implements SwiftmailerFacadeInterface
 
     /**
      * Dispatch GET_MAIL_MESSAGE event.
-     *
-     * @param Mail                $mail
-     * @param \Swift_Mime_Message $message
      */
-    private function dispatchGetMailMessageEvent(Mail $mail, \Swift_Mime_Message $message)
+    private function dispatchGetMailMessageEvent(Mail $mail, \Swift_Mime_SimpleMessage $message)
     {
         $event = new Event\GetMailMessageEvent($mail, $message);
 
@@ -89,12 +86,8 @@ class SendGridApiFacade implements SwiftmailerFacadeInterface
 
     /**
      * Dispatch MAIL_SEND_RESPONSE event.
-     *
-     * @param Response            $response
-     * @param Mail                $mail
-     * @param \Swift_Mime_Message $message
      */
-    private function dispatchMailSendResponseEvent(Response $response, Mail $mail, \Swift_Mime_Message $message)
+    private function dispatchMailSendResponseEvent(Response $response, Mail $mail, \Swift_Mime_SimpleMessage $message)
     {
         $event = new Event\MailSendResponseEvent($response, $mail, $message);
 

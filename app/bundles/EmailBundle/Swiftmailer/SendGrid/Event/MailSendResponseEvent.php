@@ -13,7 +13,7 @@ namespace Mautic\EmailBundle\Swiftmailer\SendGrid\Event;
 
 use SendGrid\Mail;
 use SendGrid\Response;
-use Swift_Mime_Message;
+use Swift_Mime_SimpleMessage;
 
 class MailSendResponseEvent extends GetMailMessageEvent
 {
@@ -22,12 +22,8 @@ class MailSendResponseEvent extends GetMailMessageEvent
 
     /**
      * Constructor.
-     *
-     * @param Response           $response
-     * @param Mail               $mail
-     * @param Swift_Mime_Message $message
      */
-    public function __construct(Response $response, Mail $mail, Swift_Mime_Message $message)
+    public function __construct(Response $response, Mail $mail, Swift_Mime_SimpleMessage $message)
     {
         $this->response = $response;
 

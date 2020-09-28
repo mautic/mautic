@@ -20,7 +20,7 @@ use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridMailEvents;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridWrapper;
 use SendGrid\Mail;
 use SendGrid\Response;
-use Swift_Mime_Message;
+use Swift_Mime_SimpleMessage;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -102,15 +102,11 @@ class GetMailMessageEventTest extends \PHPUnit_Framework_TestCase
     /**
      * Create sendgrid api facade.
      *
-     * @param Mail                     $mail
-     * @param Swift_Mime_Message       $message
-     * @param EventDispatcherInterface $dispatcher
-     *
      * @return SendGridApiFacade
      */
     protected function createSendGridApiFacade(
         Mail $mail,
-        Swift_Mime_Message $message,
+        Swift_Mime_SimpleMessage $message,
         EventDispatcherInterface $dispatcher
     ) {
         $response = $this->getMockBuilder(Response::class)
@@ -177,9 +173,6 @@ class TestGetMailMessageSubscriber implements EventSubscriberInterface
         $this->customArgs = $customArgs;
     }
 
-    /**
-     * @param GetMailMessageEvent $event
-     */
     public function onGetMailMessage(GetMailMessageEvent $event)
     {
         $mail = $event->getMail();

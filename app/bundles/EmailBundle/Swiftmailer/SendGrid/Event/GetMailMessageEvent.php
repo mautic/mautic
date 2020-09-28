@@ -12,7 +12,7 @@
 namespace Mautic\EmailBundle\Swiftmailer\SendGrid\Event;
 
 use SendGrid\Mail;
-use Swift_Mime_Message;
+use Swift_Mime_SimpleMessage;
 use Symfony\Component\EventDispatcher\Event;
 
 class GetMailMessageEvent extends Event
@@ -20,16 +20,13 @@ class GetMailMessageEvent extends Event
     /** @var Mail */
     private $mail;
 
-    /** @var Swift_Mime_Message */
+    /** @var Swift_Mime_SimpleMessage */
     private $message;
 
     /**
      * Constructor.
-     *
-     * @param Mail               $mail
-     * @param Swift_Mime_Message $message
      */
-    public function __construct(Mail $mail, Swift_Mime_Message $message)
+    public function __construct(Mail $mail, Swift_Mime_SimpleMessage $message)
     {
         $this->mail    = $mail;
         $this->message = $message;
@@ -48,7 +45,7 @@ class GetMailMessageEvent extends Event
     /**
      * Get message.
      *
-     * @return Swift_Mime_Message
+     * @return Swift_Mime_SimpleMessage
      */
     public function getMessage()
     {
