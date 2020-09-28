@@ -25,7 +25,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class MailSendResponseEventTest extends \PHPUnit_Framework_TestCase
+class MailSendResponseEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Tests that a subscriber to the SendGridMailEvents::MAIL_SEND_RESPONSE
@@ -71,8 +71,7 @@ class MailSendResponseEventTest extends \PHPUnit_Framework_TestCase
     /**
      * Create SendGridApiFacade and send message with specified success.
      *
-     * @param EventDispatcherInterface $dispatcher
-     * @param bool                     $success    Whether response is successful
+     * @param bool $success Whether response is successful
      */
     protected function createFacadeAndSendMessage(
         EventDispatcherInterface $dispatcher,
@@ -143,9 +142,6 @@ class TestMailSendResponseSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param MailSendResponseEvent $event
-     */
     public function onSendMailResponse(MailSendResponseEvent $event)
     {
         $this->called   = true;

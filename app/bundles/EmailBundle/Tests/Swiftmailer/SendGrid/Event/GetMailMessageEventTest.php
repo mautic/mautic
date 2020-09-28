@@ -25,7 +25,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class GetMailMessageEventTest extends \PHPUnit_Framework_TestCase
+class GetMailMessageEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Tests that a subscriber with nothing to add will not call any methods
