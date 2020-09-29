@@ -126,11 +126,6 @@ class Stat
      */
     private $replies;
 
-    /**
-     * @var bool
-     */
-    private $isSoft = false;
-
     public function __construct()
     {
         $this->replies = new ArrayCollection();
@@ -362,7 +357,6 @@ class Stat
      */
     public function setIsSoft($isSoft)
     {
-        $this->isSoft = $isSoft;
     }
 
     /**
