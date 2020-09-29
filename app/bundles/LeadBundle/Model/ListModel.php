@@ -64,16 +64,16 @@ class ListModel extends FormModel
     private $segmentChartQueryFactory;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\Request|null
+     * @var RequestStack
      */
-    private $request;
+    private $requestStack;
 
     public function __construct(CoreParametersHelper $coreParametersHelper, ContactSegmentService $leadSegment, SegmentChartQueryFactory $segmentChartQueryFactory, RequestStack $requestStack)
     {
         $this->coreParametersHelper     = $coreParametersHelper;
         $this->leadSegmentService       = $leadSegment;
         $this->segmentChartQueryFactory = $segmentChartQueryFactory;
-        $this->request                  = $requestStack->getCurrentRequest();
+        $this->requestStack             = $requestStack;
     }
 
     /**
@@ -308,7 +308,7 @@ class ListModel extends FormModel
 
         // Add custom choices
         if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE)) {
-            $event = new LeadListFiltersChoicesEvent($choices, $this->getOperatorsForFieldType(), $this->translator, $this->request);
+            $event = new LeadListFiltersChoicesEvent($choices, $this->getOperatorsForFieldType(), $this->translator, $this->requestStack->getCurrentRequest());
             $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE, $event);
             $choices = $event->getChoices();
         }
