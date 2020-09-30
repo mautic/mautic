@@ -22,6 +22,23 @@
                     );
 
                     $custom = [];
+
+                    $custom[] = [
+                        'attr'      => [
+                            'href'        => $view['router']->path(
+                                'mautic_contact_action',
+                                [
+                                    'objectAction' => 'view',
+                                    'objectId'     => $item->getId(),
+                                ]
+                            ),
+                            'data-toggle' => 'ajax',
+                            'data-method' => 'POST',
+                        ],
+                        'btnText'   => 'mautic.core.details',
+                        'iconClass' => 'fa fa-info-circle',
+                    ];
+
                     if ($hasEditAccess && !empty($currentList)) {
                         //this lead was manually added to a list so give an option to remove them
                         $custom[] = [
