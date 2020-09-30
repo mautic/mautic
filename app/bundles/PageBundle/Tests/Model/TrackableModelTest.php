@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Test;
+namespace Mautic\PageBundle\Tests\Model;
 
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\PageBundle\Entity\Redirect;
@@ -434,7 +434,7 @@ class TrackableModelTest extends WebTestCase
             1
         );
 
-        $this->assertTrue((strpos($content, $url) !== false), $content);
+        $this->assertTrue((false !== strpos($content, $url)), $content);
     }
 
     /**
@@ -597,7 +597,7 @@ TEXT;
      * @param array $doNotTrack
      * @param array $urlFieldsForPlaintext
      *
-     * @return TrackableModel|\PHPUnit_Framework_MockObject_MockObject
+     * @return TrackableModel|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getModel($doNotTrack = [], $urlFieldsForPlaintext = [])
     {
@@ -679,7 +679,7 @@ TEXT;
         }
 
         foreach ($urls as $url) {
-            if ($type == 'html') {
+            if ('html' == $type) {
                 $dnc = ($doNotTrack) ? ' mautic:disable-tracking' : '';
 
                 $content .= <<<CONTENT

@@ -43,11 +43,6 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
 
     /**
      * SegmentReferenceFilterQueryBuilder constructor.
-     *
-     * @param RandomParameterName         $randomParameterNameService
-     * @param ContactSegmentQueryBuilder  $leadSegmentQueryBuilder
-     * @param EntityManager               $entityManager
-     * @param ContactSegmentFilterFactory $leadSegmentFilterFactory
      */
     public function __construct(
         RandomParameterName $randomParameterNameService,
@@ -71,9 +66,6 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
     }
 
     /**
-     * @param QueryBuilder         $queryBuilder
-     * @param ContactSegmentFilter $filter
-     *
      * @return QueryBuilder
      *
      * @throws \Doctrine\DBAL\Query\QueryException

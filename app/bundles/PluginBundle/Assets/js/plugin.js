@@ -8,15 +8,19 @@ Mautic.matchedFields = function (index, object, integration) {
     var integrationField = mQuery('#integration_details_featureSettings_'+object+'Fields_i_' + index).attr('data-value');
     var mauticField = mQuery('#integration_details_featureSettings_'+object+'Fields_m_' + index + ' option:selected').val();
 
-    if (mQuery.inArray(mauticField, compoundMauticFields) >= 0) {
-        mQuery('.btn-arrow' + index).removeClass('active');
-        mQuery('#integration_details_featureSettings_'+object+'Fields_update_mautic'+ index +'_0').attr('checked', 'checked');
-        mQuery('input[name="integration_details[featureSettings]['+object+'Fields][update_mautic' + index + ']"]').prop('disabled', true).trigger("chosen:updated");
-        mQuery('.btn-arrow' + index).addClass('disabled');
-    } else {
-        mQuery('input[name="integration_details[featureSettings]['+object+'Fields][update_mautic' + index + ']"]').prop('disabled', false).trigger("chosen:updated");
-        mQuery('.btn-arrow' + index).removeClass('disabled');
+    if(mQuery('.btn-arrow' + index).parent().attr('data-force-direction') != 1) {
+        if (mQuery.inArray(mauticField, compoundMauticFields) >= 0) {
+            mQuery('.btn-arrow' + index).removeClass('active');
+            mQuery('#integration_details_featureSettings_' + object + 'Fields_update_mautic' + index + '_0').attr('checked', 'checked');
+            mQuery('input[name="integration_details[featureSettings][' + object + 'Fields][update_mautic' + index + ']"]').prop('disabled', true).trigger("chosen:updated");
+            mQuery('.btn-arrow' + index).addClass('disabled');
+        }
+        else {
+            mQuery('input[name="integration_details[featureSettings][' + object + 'Fields][update_mautic' + index + ']"]').prop('disabled', false).trigger("chosen:updated");
+            mQuery('.btn-arrow' + index).removeClass('disabled');
+        }
     }
+
     if (object == 'lead') {
         var updateMauticField = mQuery('input[name="integration_details[featureSettings]['+object+'Fields][update_mautic' + index + ']"]:checked').val();
     } else {
@@ -136,27 +140,48 @@ Mautic.filterIntegrations = function(update) {
     }
 
     //activate shuffles
-    if (mQuery('.shuffle-integrations').length) {
-        var grid = mQuery(".shuffle-integrations");
-
+    if (mQuery('.native-integrations').length) {
         //give a slight delay in order for images to load so that shuffle starts out with correct dimensions
         setTimeout(function () {
-            grid.shuffle('shuffle', function($el, shuffle) {
+            var Shuffle = window.Shuffle,
+                element = document.querySelector('.native-integrations'),
+                shuffleOptions = {
+                    itemSelector: '.shuffle-item'
+                };
+
+            // Using global variable to make it available outside of the scope of this function
+            window.nativeIntegrationsShuffleInstance = new Shuffle(element, shuffleOptions);
+
+            window.nativeIntegrationsShuffleInstance.filter(function($el) {
                 if (filter) {
-                    return $el.hasClass('plugin' + filter);
+                    return mQuery($el).hasClass('plugin' + filter);
                 } else {
+                    // Shuffle.js has a bug. It hides the first item when we reset the filter.
+                    // This fixes it.
+                    mQuery(shuffleOptions.itemSelector).first().css('transform', '');
                     return true;
                 }
             });
 
             // Update shuffle on sidebar minimize/maximize
             mQuery("html")
-                .on("fa.sidebar.minimize", function () {
-                    grid.shuffle("update");
+                .on("fa.sidebar.minimize", function() {
+                    setTimeout(function() {
+                        window.nativeIntegrationsShuffleInstance.update();
+                    }, 1000);
                 })
-                .on("fa.sidebar.maximize", function () {
-                    grid.shuffle("update");
+                .on("fa.sidebar.maximize", function() {
+                    setTimeout(function() {
+                        window.nativeIntegrationsShuffleInstance.update();
+                    }, 1000);
                 });
+
+            // This delay is needed so that the tab has time to render and the sizes are correctly calculated
+            mQuery('#plugin-nav-tabs a').click(function () {
+                setTimeout(function() {
+                    window.nativeIntegrationsShuffleInstance.update();
+                }, 500);
+            });
         }, 500);
     }
 };

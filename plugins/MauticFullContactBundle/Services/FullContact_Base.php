@@ -16,8 +16,8 @@
 
 namespace MauticPlugin\MauticFullContactBundle\Services;
 
-use MauticPlugin\MauticFullContactBundle\Exception\FullContact_Exception_NoCredit;
-use MauticPlugin\MauticFullContactBundle\Exception\FullContact_Exception_NotImplemented;
+use MauticPlugin\MauticFullContactBundle\Exception\NoCreditException;
+use MauticPlugin\MauticFullContactBundle\Exception\NotImplementedException;
 
 /**
  * This class handles the actually HTTP request to the FullContact endpoint.
@@ -30,21 +30,22 @@ class FullContact_Base
     const REQUEST_LATENCY = 0.2;
     const USER_AGENT      = 'caseysoftware/fullcontact-php-0.9.0';
 
-    private $_next_req_time = null;
+    private $_next_req_time;
 
 //    protected $_baseUri = 'https://requestbin.fullcontact.com/1ailj6d1?';
-    protected $_baseUri = 'https://api.fullcontact.com/';
-    protected $_version = 'v2';
+    protected $_baseUri     = 'https://api.fullcontact.com/';
+    protected $_version     = 'v2';
+    protected $_resourceUri = '';
 
-    protected $_apiKey           = null;
-    protected $_webhookUrl       = null;
-    protected $_webhookId        = null;
+    protected $_apiKey;
+    protected $_webhookUrl;
+    protected $_webhookId;
     protected $_webhookJson      = false;
     protected $_supportedMethods = [];
 
-    public $response_obj  = null;
-    public $response_code = null;
-    public $response_json = null;
+    public $response_obj;
+    public $response_code;
+    public $response_json;
 
     /**
      * Slow down calls to the FullContact API if needed.
@@ -115,16 +116,13 @@ class FullContact_Base
      *
      * @return object
      *
-     * @throws FullContact_Exception_NoCredit
-     * @throws FullContact_Exception_NotImplemented
+     * @throws NoCreditException
+     * @throws NotImplementedException
      */
     protected function _execute($params = [], $postData = null)
     {
         if (null === $postData && !in_array($params['method'], $this->_supportedMethods, true)) {
-            throw new FullContact_Exception_NotImplemented(
-                __CLASS__.
-                ' does not support the ['.$params['method'].'] method'
-            );
+            throw new NotImplementedException(__CLASS__.' does not support the ['.$params['method'].'] method');
         }
 
         if (array_key_exists('method', $params)) {
@@ -172,7 +170,7 @@ class FullContact_Base
         $headers = [];
 
         foreach (explode("\r\n", $response_headers) as $i => $line) {
-            if ($i === 0) {
+            if (0 === $i) {
                 $headers['http_code'] = $line;
             } else {
                 list($key, $value) = explode(': ', $line);
@@ -184,7 +182,7 @@ class FullContact_Base
         $this->response_obj  = json_decode($this->response_json);
 
         if ('403' === $this->response_code) {
-            throw new FullContact_Exception_NoCredit($this->response_obj->message);
+            throw new NoCreditException($this->response_obj->message);
         } else {
             if ('200' === $this->response_code) {
                 $this->_update_rate_limit($headers);

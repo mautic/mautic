@@ -26,15 +26,10 @@ class Reference
     private $leadId = 0;
 
     /**
-     * @var
+     * @var int|null
      */
     private $statId;
 
-    /**
-     * Reference constructor.
-     *
-     * @param Stat $stat
-     */
     public function __construct(Stat $stat)
     {
         $this->statId  = $stat->getId();

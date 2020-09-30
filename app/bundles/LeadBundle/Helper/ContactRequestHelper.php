@@ -16,7 +16,6 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 use Mautic\LeadBundle\Exception\ContactNotFoundException;
 use Mautic\LeadBundle\LeadEvents;
@@ -44,11 +43,6 @@ class ContactRequestHelper
     private $eventDispatcher;
 
     /**
-     * @var LeadDeviceRepository
-     */
-    private $leadDeviceRepository;
-
-    /**
      * @var IpLookupHelper
      */
     private $ipLookupHelper;
@@ -59,7 +53,7 @@ class ContactRequestHelper
     private $contactTracker;
 
     /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
+     * @var \Symfony\Component\HttpFoundation\Request|null
      */
     private $request;
 
@@ -83,24 +77,11 @@ class ContactRequestHelper
      */
     private $publiclyUpdatableFieldValues = [];
 
-    /**
-     * ContactRequestHelper constructor.
-     *
-     * @param LeadModel                $leadModel
-     * @param ContactTracker           $contactTracker
-     * @param CoreParametersHelper     $coreParametersHelper
-     * @param IpLookupHelper           $ipLookupHelper
-     * @param LeadDeviceRepository     $leadDeviceRepository
-     * @param RequestStack             $requestStack
-     * @param Logger                   $logger
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
         LeadModel $leadModel,
         ContactTracker $contactTracker,
         CoreParametersHelper $coreParametersHelper,
         IpLookupHelper $ipLookupHelper,
-        LeadDeviceRepository $leadDeviceRepository,
         RequestStack $requestStack,
         Logger $logger,
         EventDispatcherInterface $eventDispatcher
@@ -109,26 +90,32 @@ class ContactRequestHelper
         $this->contactTracker       = $contactTracker;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->ipLookupHelper       = $ipLookupHelper;
-        $this->leadDeviceRepository = $leadDeviceRepository;
         $this->request              = $requestStack->getCurrentRequest();
         $this->logger               = $logger;
         $this->eventDispatcher      = $eventDispatcher;
     }
 
     /**
-     * @param array $queryFields
-     *
      * @return Lead
      */
     public function getContactFromQuery(array $queryFields = [])
     {
-        $this->trackedContact = $this->contactTracker->getContact();
+        unset($queryFields['page_url']); // This is set now automatically by PageModel
         $this->queryFields    = $queryFields;
+
         try {
             $foundContact         = $this->getContactFromUrl();
             $this->trackedContact = $foundContact;
             $this->contactTracker->setTrackedContact($this->trackedContact);
         } catch (ContactNotFoundException $exception) {
+        }
+
+        if (!$this->trackedContact) {
+            $this->trackedContact = $this->contactTracker->getContact();
+        }
+
+        if (!$this->trackedContact) {
+            return null;
         }
 
         $this->prepareContactFromRequest();
@@ -155,9 +142,7 @@ class ContactRequestHelper
         }
 
         try {
-            $contact = $this->getContactFromClickthrough($clickthrough);
-
-            return $contact;
+            return $this->getContactFromClickthrough($clickthrough);
         } catch (ContactNotFoundException $exception) {
         }
 
@@ -165,25 +150,25 @@ class ContactRequestHelper
 
         /* @var Lead $foundContact */
         if (!empty($this->queryFields)) {
-            list($foundContact, $this->publiclyUpdatableFieldValues) = $this->leadModel->checkForDuplicateContact(
+            [$foundContact, $this->publiclyUpdatableFieldValues] = $this->leadModel->checkForDuplicateContact(
                 $this->queryFields,
                 $this->trackedContact,
                 true,
                 true
             );
-            if ($foundContact->getId() !== $this->trackedContact->getId()) {
+            if (is_null($this->trackedContact) or $foundContact->getId() !== $this->trackedContact->getId()) {
                 // A contact was found by a publicly updatable field
-                return $foundContact;
+                if (!$foundContact->isNew()) {
+                    return $foundContact;
+                }
             }
         }
 
-        return $this->getContactByFingerprint();
+        throw new ContactNotFoundException();
     }
 
     /**
      * Identify a contact through a clickthrough URL.
-     *
-     * @param array $clickthrough
      *
      * @return Lead
      *
@@ -204,12 +189,9 @@ class ContactRequestHelper
         throw new ContactNotFoundException();
     }
 
-    /**
-     * @param array $clickthrough
-     */
     private function setEmailFromClickthroughIdentification(array $clickthrough)
     {
-        if (!$this->coreParametersHelper->getParameter('track_by_tracking_url') || !empty($queryFields['email'])) {
+        if (!$this->coreParametersHelper->get('track_by_tracking_url') || !empty($queryFields['email'])) {
             return;
         }
 
@@ -225,35 +207,6 @@ class ContactRequestHelper
 
             return;
         }
-    }
-
-    /**
-     * @return Lead
-     *
-     * @throws ContactNotFoundException
-     */
-    private function getContactByFingerprint()
-    {
-        if (!$this->coreParametersHelper->getParameter('track_by_fingerprint')) {
-            // Track by fingerprint is disabled so just use tracked lead
-            throw new ContactNotFoundException();
-        }
-
-        if (!$this->trackedContact->isAnonymous() || empty($this->queryFields['fingerprint'])) {
-            // We already know who this is or fingerprint is not available so just use tracked lead
-            throw new ContactNotFoundException();
-        }
-
-        if ($device = $this->leadDeviceRepository->getDeviceByFingerprint($this->queryFields['fingerprint'])) {
-            $deviceLead = $this->leadModel->getEntity($device['lead_id']);
-
-            $this->logger->addDebug("LEAD: Contact ID# {$deviceLead->getId()} tracked through fingerprint.");
-
-            // Merge tracked visitor into the contact found by fingerprint
-            return $this->mergeWithTrackedContact($deviceLead);
-        }
-
-        throw new ContactNotFoundException();
     }
 
     private function prepareContactFromRequest()
@@ -290,8 +243,6 @@ class ContactRequestHelper
     }
 
     /**
-     * @param Lead $foundContact
-     *
      * @return Lead
      */
     private function mergeWithTrackedContact(Lead $foundContact)

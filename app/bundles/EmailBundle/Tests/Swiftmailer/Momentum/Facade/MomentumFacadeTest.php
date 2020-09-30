@@ -17,30 +17,30 @@ use SparkPost\SparkPostResponse;
 /**
  * Class MomentumFacadeTest.
  */
-class MomentumFacadeTest extends \PHPUnit_Framework_TestCase
+class MomentumFacadeTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $adapterMock;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $swiftMessageServiceMock;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $swiftMessageValidatorMock;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $momentumCallbackMock;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $loggerMock;
 
@@ -56,7 +56,7 @@ class MomentumFacadeTest extends \PHPUnit_Framework_TestCase
 
     public function testSendOk()
     {
-        $swiftMessageMock = $this->createMock(\Swift_Mime_Message::class);
+        $swiftMessageMock = $this->createMock(\Swift_Mime_SimpleMessage::class);
         $this->swiftMessageValidatorMock->expects($this->at(0))
             ->method('validate')
             ->with($swiftMessageMock);
@@ -98,7 +98,7 @@ class MomentumFacadeTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendValidatorError()
     {
-        $swiftMessageMock                    = $this->createMock(\Swift_Mime_Message::class);
+        $swiftMessageMock                    = $this->createMock(\Swift_Mime_SimpleMessage::class);
         $exceptionMessage                    = 'Example exception message';
         $swiftMessageValidationExceptionMock = new SwiftMessageValidationException($exceptionMessage);
         $this->swiftMessageValidatorMock->expects($this->at(0))
@@ -120,7 +120,7 @@ class MomentumFacadeTest extends \PHPUnit_Framework_TestCase
      */
     public function testSend500FirstAttempt()
     {
-        $swiftMessageMock    = $this->createMock(\Swift_Mime_Message::class);
+        $swiftMessageMock    = $this->createMock(\Swift_Mime_SimpleMessage::class);
         $transmissionDTOMock = $this->createMock(TransmissionDTO::class);
         $this->swiftMessageServiceMock->expects($this->at(0))
             ->method('transformToTransmission')
@@ -170,7 +170,7 @@ class MomentumFacadeTest extends \PHPUnit_Framework_TestCase
      */
     public function testSend500Repeated()
     {
-        $swiftMessageMock    = $this->createMock(\Swift_Mime_Message::class);
+        $swiftMessageMock    = $this->createMock(\Swift_Mime_SimpleMessage::class);
         $transmissionDTOMock = $this->createMock(TransmissionDTO::class);
         $this->swiftMessageServiceMock->expects($this->at(0))
             ->method('transformToTransmission')

@@ -16,8 +16,6 @@ class RabbitMqConsumer implements ConsumerInterface
 
     /**
      * RabbitMqConsumer constructor.
-     *
-     * @param QueueService $queueService
      */
     public function __construct(QueueService $queueService)
     {
@@ -31,11 +29,11 @@ class RabbitMqConsumer implements ConsumerInterface
     {
         $event = $this->queueService->dispatchConsumerEventFromPayload($msg->body);
 
-        if ($event->getResult() === QueueConsumerResults::TEMPORARY_REJECT) {
+        if (QueueConsumerResults::TEMPORARY_REJECT === $event->getResult()) {
             return static::MSG_REJECT_REQUEUE;
-        } elseif ($event->getResult() === QueueConsumerResults::ACKNOWLEDGE) {
+        } elseif (QueueConsumerResults::ACKNOWLEDGE === $event->getResult()) {
             return static::MSG_ACK;
-        } elseif ($event->getResult() === QueueConsumerResults::REJECT) {
+        } elseif (QueueConsumerResults::REJECT === $event->getResult()) {
             return static::MSG_REJECT;
         } else {
             return static::MSG_SINGLE_NACK_REQUEUE;

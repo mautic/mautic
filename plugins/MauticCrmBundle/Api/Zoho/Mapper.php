@@ -11,41 +11,46 @@
 
 namespace MauticPlugin\MauticCrmBundle\Api\Zoho;
 
-use MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Writer;
+use MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException;
 
 class Mapper
 {
     /**
-     * @var Writer
+     * @var array
      */
-    protected $writer;
+    private $contact = [];
 
     /**
      * @var array
      */
-    protected $contact = [];
+    private $fields = [];
 
     /**
      * @var array
      */
-    protected $fields = [];
+    private $mappedFields = [];
+
+    private $object;
 
     /**
-     * @var array
+     * @var array[]
      */
-    protected $mappedFields = [];
+    private $objectMappedValues = [];
 
     /**
-     * @var
-     */
-    protected $object;
-
-    /**
-     * Mapper constructor.
+     * Used to keep track of the key used to map contact ID with the response Zoho returns.
      *
-     * @param       $object
-     * @param array $fields
+     * @var int
      */
+    private $objectCounter = 0;
+
+    /**
+     * Used to map contact ID with the response Zoho returns.
+     *
+     * @var array
+     */
+    private $contactMapper = [];
+
     public function __construct(array $fields)
     {
         $this->fields = $fields;
@@ -58,15 +63,12 @@ class Mapper
      */
     public function setObject($object)
     {
-        $this->writer = new Writer($object);
         $this->object = $object;
 
         return $this;
     }
 
     /**
-     * @param array $contact
-     *
      * @return $this
      */
     public function setContact(array $contact)
@@ -77,8 +79,6 @@ class Mapper
     }
 
     /**
-     * @param array $fields
-     *
      * @return $this
      */
     public function setMappedFields(array $fields)
@@ -89,39 +89,61 @@ class Mapper
     }
 
     /**
-     * @param $id
+     * @param int      $mauticContactId Mautic Contact ID
+     * @param int|null $zohoId          Zoho ID if known
      *
      * @return int If any single field is mapped, return 1 to count as one contact to be updated
      */
-    public function map($id, $zohoId = null)
+    public function map($mauticContactId, $zohoId = null)
     {
-        $mapped = 0;
-        $row    = $this->writer->row($id);
-
-        if ($zohoId) {
-            $row->add('Id', $zohoId);
-        }
+        $mapped             = 0;
+        $objectMappedValues = [];
 
         foreach ($this->mappedFields as $zohoField => $mauticField) {
             $field = $this->getField($zohoField);
             if ($field && isset($this->contact[$mauticField]) && $this->contact[$mauticField]) {
                 $mapped   = 1;
-                $apiField = $field['dv'];
+                $apiField = $field['api_name'];
                 $apiValue = $this->contact[$mauticField];
 
-                $row->add($apiField, $apiValue);
+                $objectMappedValues[$apiField] = $apiValue;
+            }
+
+            if ($zohoId) {
+                $objectMappedValues['id'] = $zohoId;
             }
         }
+
+        $this->objectMappedValues[$this->objectCounter] = $objectMappedValues;
+        $this->contactMapper[$this->objectCounter]      = $mauticContactId;
+
+        ++$this->objectCounter;
 
         return $mapped;
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getXml()
+    public function getArray()
     {
-        return $this->writer->write();
+        return $this->objectMappedValues;
+    }
+
+    /**
+     * @param int $key
+     *
+     * @return int
+     *
+     * @throws MatchingKeyNotFoundException
+     */
+    public function getContactIdByKey($key)
+    {
+        if (isset($this->contactMapper[$key])) {
+            return $this->contactMapper[$key];
+        }
+
+        throw new MatchingKeyNotFoundException();
     }
 
     /**
@@ -129,10 +151,12 @@ class Mapper
      *
      * @return mixed
      */
-    protected function getField($fieldName)
+    private function getField($fieldName)
     {
-        return isset($this->fields[$this->object][$fieldName]) ?
-            $this->fields[$this->object][$fieldName] :
+        return isset($this->fields[$this->object][$fieldName])
+            ?
+            $this->fields[$this->object][$fieldName]
+            :
             null;
     }
 }

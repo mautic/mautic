@@ -31,14 +31,14 @@ if (empty($preview)):
     <script>
         var MauticFocusHandler = function (messageType, message) {
             // Store the HTML
-            var wrapper = document.getElementById('mauticform_wrapper<?php echo $formName ?>');
+            var wrapper = document.getElementById('mauticform_wrapper<?php echo $formName; ?>');
             var innerForm = wrapper.getElementsByClassName('mauticform-innerform');
             innerForm[0].style.display = "none";
 
-            <?php if ($style == 'page'): ?>
-            document.getElementById('mauticform<?php echo $formName ?>_' + messageType).style.fontSize = "2em";
-            <?php elseif ($style != 'bar'): ?>
-            document.getElementById('mauticform<?php echo $formName ?>_' + messageType).style.fontSize = "1.1em";
+            <?php if ('page' == $style): ?>
+            document.getElementById('mauticform<?php echo $formName; ?>_' + messageType).style.fontSize = "2em";
+            <?php elseif ('bar' != $style): ?>
+            document.getElementById('mauticform<?php echo $formName; ?>_' + messageType).style.fontSize = "1.1em";
             <?php endif; ?>
 
             var headline = document.getElementsByClassName('mf-headline');
@@ -52,12 +52,12 @@ if (empty($preview)):
             }
 
             if (message) {
-                document.getElementById('mauticform<?php echo $formName ?>_' + messageType).innerHTML = message;
+                document.getElementById('mauticform<?php echo $formName; ?>_' + messageType).innerHTML = message;
             }
 
             setTimeout(function () {
                 if (headline.length) {
-                    <?php if ($style == 'bar'): ?>
+                    <?php if ('bar' == $style): ?>
                     headline[0].style.display = "inline-block";
                     <?php else : ?>
                     headline[0].style.display = "block";
@@ -68,7 +68,7 @@ if (empty($preview)):
                 }
 
                 innerForm[0].style.display = "inherit";
-                document.getElementById('mauticform<?php echo $formName ?>_' + messageType).innerHTML = '';
+                document.getElementById('mauticform<?php echo $formName; ?>_' + messageType).innerHTML = '';
             }, (messageType == 'error') ? 1500 : 5000);
         }
         if (typeof MauticFormCallback == 'undefined') {

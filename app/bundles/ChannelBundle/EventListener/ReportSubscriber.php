@@ -11,17 +11,15 @@
 
 namespace Mautic\ChannelBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
 
-/**
- * Class ReportSubscriber.
- */
-class ReportSubscriber extends CommonSubscriber
+class ReportSubscriber implements EventSubscriberInterface
 {
     const CONTEXT_MESSAGE_CHANNEL = 'message.channel';
 
@@ -30,9 +28,15 @@ class ReportSubscriber extends CommonSubscriber
      */
     private $companyReportData;
 
-    public function __construct(CompanyReportData $companyReportData)
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    public function __construct(CompanyReportData $companyReportData, RouterInterface $router)
     {
         $this->companyReportData = $companyReportData;
+        $this->router            = $router;
     }
 
     /**
@@ -49,8 +53,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Add available tables and columns to the report builder lookup.
-     *
-     * @param ReportBuilderEvent $event
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
@@ -126,8 +128,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGeneratorEvent $event
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
@@ -146,15 +146,12 @@ class ReportSubscriber extends CommonSubscriber
         $event->setQueryBuilder($queryBuilder);
     }
 
-    /**
-     * @param ReportDataEvent $event
-     */
     public function onReportDisplay(ReportDataEvent $event)
     {
         $data = $event->getData();
         if ($event->checkContext([self::CONTEXT_MESSAGE_CHANNEL])) {
             if (isset($data[0]['channel']) && isset($data[0]['channel_id'])) {
-                foreach ($data as $key => &$row) {
+                foreach ($data as &$row) {
                     $href = $this->router->generate('mautic_'.$row['channel'].'_action', ['objectAction' => 'view', 'objectId' => $row['channel_id']]);
                     if (isset($row['channel'])) {
                         $row['channel'] = '<a href="'.$href.'">'.$row['channel'].'</a>';
