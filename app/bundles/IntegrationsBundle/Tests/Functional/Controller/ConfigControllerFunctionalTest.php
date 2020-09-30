@@ -77,9 +77,9 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
     /**
      * For authorized user the validation should break on form validation if the form is not valid.
-     * ConfigFormAuthorizeButtonInterface is not used interface in ConfigSupport class.
+     * ConfigFormAuthorizeButtonInterface is used interface in ConfigSupport class.
      */
-    public function testSubmitFormWhenAuthorizedConfigFormAuthorizeButtonInterfaceNotUsed(): void
+    public function testSubmitFormWhenAuthorizedConfigFormAuthorizeButtonInterfaceUsed(): void
     {
         // Payload
         $payload                                   = $this->payload;
@@ -98,11 +98,11 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $salesforce = new Integration();
         $salesforce->setIsPublished(true)
             ->setApiKeys($apiKeys)
-            ->setName('BrightTalk');
+            ->setName('Salesforce2');
         $model->saveEntity($salesforce);
 
         // Request
-        $this->client->request('POST', '/s/integration/BrightTalk/config', $payload);
+        $this->client->request('POST', '/s/integration/Salesforce2/config', $payload);
         $clientResponse  = $this->client->getResponse();
         $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
         $this->assertStringNotContainsString('closeModal', $clientResponse, 'The return must not contain key closeModal');
@@ -110,9 +110,9 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
     /**
      * For authorized user the validation should break on form validation if the form is not valid.
-     * ConfigFormAuthorizeButtonInterface is used interface in ConfigSupport class.
+     * ConfigFormAuthorizeButtonInterface is not used interface in ConfigSupport class.
      */
-    public function testSubmitFormWhenAuthorizedConfigFormAuthorizeButtonInterfaceUsed(): void
+    public function testSubmitFormWhenAuthorizedConfigFormAuthorizeButtonInterfaceNotUsed(): void
     {
         $this->markTestSkipped();
 
@@ -136,12 +136,12 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $model      = $this->container->get('mautic.plugin.model.integration_entity');
         $salesforce = new Integration();
         $salesforce->setIsPublished(true)
-                  ->setApiKeys($apiKeys)
-                  ->setName('Salesforce2');
+            ->setApiKeys($apiKeys)
+            ->setName('BrightTalk');
         $model->saveEntity($salesforce);
 
         // Request
-        $this->client->request('POST', '/s/integration/Salesforce2/config', $payload);
+        $this->client->request('POST', '/s/integration/BrightTalk/config', $payload);
         $clientResponse  = $this->client->getResponse();
         $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
         $this->assertStringNotContainsString('closeModal', $clientResponse, 'The return must not contain key closeModal');
