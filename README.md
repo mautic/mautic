@@ -59,7 +59,7 @@ That's fantastic!
 
 If you want to contribute to Mautic's **code**, please read our [CONTRIBUTING.md](https://github.com/mautic/mautic/blob/staging/.github/CONTRIBUTING.md) or [Contributing Code](https://contribute.mautic.org/contributing-to-mautic/developer) docs. Then, check out the issues with the [L1 label](https://github.com/mautic/mautic/issues?q=is%3Aissue+is%3Aopen+label%3AL1) to get started quickly :rocket:
 
-If you want to contribute in **other areas** of Mautic, please read our general [Contributing](https://contribute.mautic.org/about/how-can-i-contribute) guide.
+If you want to contribute in **other areas** of Mautic, please read our general [Contributing](https://contribute.mautic.org/contributing-to-mautic) guide.
 
 ## FAQ and Contact Information
 Marketing automation has historically been a difficult tool to implement in a business. The Mautic community is a rich environment for you to learn from others and share your knowledge as well. Open source means more than open code. Open source is providing equality for all and a chance to improve. If you have questions then the Mautic community can help provide the answers.
