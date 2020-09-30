@@ -10,4 +10,8 @@
  */
 
 ?>
-<td class="<?php echo $class ?>"><?php echo $item->getId(); ?></td>
+<td class="<?php echo $class; ?>">
+    <a href="<?php echo $view['router']->path('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $item->getId()]); ?>" data-toggle="ajax">
+    <?php echo $item->getId(); ?>
+    </a>
+</td>

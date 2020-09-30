@@ -54,7 +54,7 @@ class ContactColumnsDictionary
     public function getFields()
     {
         if (empty($this->fieldList)) {
-            $this->fieldList['name']        = $this->translator->trans('mautic.core.name');
+            $this->fieldList['name']        = $this->translator->trans('mautic.core.full_name');
             $this->fieldList['email']       = $this->translator->trans('mautic.core.type.email');
             $this->fieldList['location']    = $this->translator->trans('mautic.lead.lead.thead.location');
             $this->fieldList['stage']       = $this->translator->trans('mautic.lead.stage.label');
