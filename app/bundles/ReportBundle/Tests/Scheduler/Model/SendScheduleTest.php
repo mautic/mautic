@@ -18,6 +18,7 @@ use Mautic\ReportBundle\Exception\FileTooBigException;
 use Mautic\ReportBundle\Scheduler\Model\FileHandler;
 use Mautic\ReportBundle\Scheduler\Model\MessageSchedule;
 use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class SendScheduleTest extends \PHPUnit\Framework\TestCase
 {
@@ -36,8 +37,19 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
      */
     private $sendSchedule;
 
+    /**
+     * @var MockObject|MailHelper
+     */
     private $mailHelperMock;
+
+    /**
+     * @var MockObject|MessageSchedule
+     */
     private $messageSchedule;
+
+    /**
+     * @var MockObject|FileHandler
+     */
     private $fileHandler;
 
     protected function setUp()
@@ -131,7 +143,7 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
                 null
             ));
 
-            $this->fileHandler->expects($this->once())
+        $this->fileHandler->expects($this->once())
             ->method('zipIt')
             ->with('/path/to/report.csv')
             ->willReturn('/path/to/report.zip');

@@ -65,7 +65,7 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
         $scheduler2       = new Scheduler($report2, new \DateTime());
         $scheduler3       = new Scheduler($report3, new \DateTime());
         $schedulerNow     = new Scheduler($reportNow, new \DateTime());
-        
+
         $report3->setIsPublished(false);
         $reportNow->setScheduleUnit(SchedulerEnum::UNIT_NOW);
 
