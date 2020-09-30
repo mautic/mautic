@@ -14,15 +14,31 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Helper\InputHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FilePathResolverTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|Filesystem
+     */
     private $filesystemMock;
+
+    /**
+     * @var MockObject|UploadedFile
+     */
     private $fileMock;
+
+    /**
+     * @var InputHelper
+     */
     private $inputHelper;
+
+    /**
+     * @var FilePathResolver
+     */
     private $filePathResolver;
 
     protected function setUp()
@@ -85,7 +101,7 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
         $extension     = 'jpg';
         $dirtyFileName = 'fileName_x./-u'.$extension;
 
-        $this->filesystemMock->expects($this->exactly(100))
+        $this->filesystemMock->expects($this->exactly(1000))
             ->method('exists')
             ->willReturn(true);
 
