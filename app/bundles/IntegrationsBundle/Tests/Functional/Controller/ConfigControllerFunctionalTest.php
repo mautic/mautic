@@ -124,12 +124,9 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $payload                                   = $this->payload;
         $payload['integration_details']['in_auth'] = 0;
         $apiKeys                                   = [
-            'consumer_id'     => 'secretId',
-            'consumer_secret' => 'secretSecret',
-            'access_token'    => '123',
-            'refresh_token'   => '456',
-            'expires_at'      => 10,
-            'instance_url'    => 'url',
+            'key'     => 'secretId',
+            'secret'  => 'secretSecret',
+            'host'    => 'https://api.stage.brighttalk.com',
         ];
         // Salesforce setting
         /** @var IntegrationEntityModel $model */
