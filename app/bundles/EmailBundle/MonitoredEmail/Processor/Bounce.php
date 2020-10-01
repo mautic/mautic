@@ -21,11 +21,11 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Parser;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\EmailBundle\Swiftmailer\Transport\BounceProcessorInterface;
+use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 
 class Bounce implements ProcessorInterface
 {
@@ -128,9 +128,9 @@ class Bounce implements ProcessorInterface
             return false;
         }
 
-        $stat    = $searchResult->getStat();
-        $channel = 'email';
-        $retryCount = 0;
+        $stat             = $searchResult->getStat();
+        $channel          = 'email';
+        $retryCount       = 0;
         $globalRetryCount = 0;
 
         if ($stat) {
@@ -139,8 +139,8 @@ class Bounce implements ProcessorInterface
 
             if ($stat->getEmail() instanceof Email) {
                 // We know the email ID so set it to append to the the DNC record
-                $channel = ['email' => $stat->getEmail()->getId()];
-                $retryCount = $stat->getRetryCount();
+                $channel         = ['email' => $stat->getEmail()->getId()];
+                $retryCount      = $stat->getRetryCount();
                 $globalRetryCount=$this->contactFinder->findSoftbyLead($stat->getLead()->getId());
             }
         }

@@ -749,9 +749,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $sentCounts         = $statRepo->getSentCount($emailIds, $lists->getKeys(), $query);
             $readCounts         = $statRepo->getReadCount($emailIds, $lists->getKeys(), $query);
             $failedCounts       = $statRepo->getFailedCount($emailIds, $lists->getKeys(), $query);
-            $clickCounts        = $trackableRepo->getCount('email', $emailIds, $lists->getKeys(), $query, false, 'DISTINCT .ph.lead_id');
+            $clickCounts        = $trackableRepo->getCount('email', $emailIds, $lists->getKeys(), $query);
             $unsubscribedCounts = $dncRepo->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, $lists->getKeys(), $query);
-            $bouncedCounts      = $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, $lists->getKeys(), $query);
+            $bouncedCounts      = $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, $lists->getKeys(), $query) + $statRepo->getSoftCount($emailIds, $lists->getKeys(), $query);
 
             foreach ($lists as $l) {
                 $sentCount         = isset($sentCounts[$l->getId()]) ? $sentCounts[$l->getId()] : 0;
@@ -1547,7 +1547,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             return false;
         }
 
-        $mailer            = $this->mailHelper->getMailer();
+        $mailer = $this->mailHelper->getMailer();
         if (!isset($lead['companies'])) {
             $lead['companies'] = $this->companyModel->getRepository()->getCompaniesByLeadId($lead['id']);
         }
@@ -2344,9 +2344,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getEmailsIdsWithDependenciesOnSegment($segmentId)
     {
-        $entities =  $this->getEntities(
+        $entities = $this->getEntities(
             [
-                'filter'         => [
+                'filter' => [
                     'force' => [
                         [
                             'column' => 'l.id',

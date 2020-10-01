@@ -114,6 +114,7 @@ class ContactFinder
         $result = new Result();
         // Search by email address
         $contacts = $this->leadRepository->getSoftByLead($leadId);
+
         return $contacts;
     }
 }

@@ -25,15 +25,15 @@ final class Version20200923103019 extends AbstractMauticMigration
     /**
      * @throws SkipMigrationException
      */
-    public function preUp(Schema $schema) :void
+    public function preUp(Schema $schema): void
     {
         if ($schema->getTable($this->prefix.'email_stats')->hasColumn('is_soft')) {
             throw new SkipMigration('Schema includes this migration');
         }
     }
 
-    public function up(Schema $schema) :void
+    public function up(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE ".$this->prefix."email_stats ADD is_soft BOOLEAN DEFAULT 0 NOT NULL");
+        $this->addSql('ALTER TABLE '.$this->prefix.'email_stats ADD is_soft BOOLEAN DEFAULT 0 NOT NULL');
     }
 }
