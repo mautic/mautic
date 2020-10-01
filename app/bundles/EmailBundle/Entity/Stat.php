@@ -358,6 +358,22 @@ class Stat
     }
 
     /**
+     * @return bool
+     */
+    public function getIsSoft()
+    {
+        return $this->isSoft;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSoft()
+    {
+        return $this->getIsSoft();
+    }
+
+    /**
      * @param bool $isSoft
      */
     public function setIsSoft($isSoft)
