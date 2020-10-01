@@ -107,40 +107,4 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
         $this->assertStringNotContainsString('closeModal', $clientResponse, 'The return must not contain key closeModal');
     }
-
-    /**
-     * For authorized user the validation should break on form validation if the form is not valid.
-     * ConfigFormAuthorizeButtonInterface is not used interface in ConfigSupport class.
-     */
-    public function testSubmitFormWhenAuthorizedConfigFormAuthorizeButtonInterfaceNotUsed(): void
-    {
-        $this->markTestSkipped();
-
-        // When running complete test I'm getting
-        // 2020-09-30 14:12:37] mautic.ERROR: SCHEMA ERROR: An exception occurred while executing 'SELECT f.alias, f.is_unique_identifer as is_unique, f.is_index, f.type, f.object FROM lead_fields f WHERE f.object = 'lead' ORDER BY f.field_order ASC':
-        // SQLSTATE[42S02]: Base table or view not found: 1146 Table 'mautictest.lead_fields' doesn't exist
-
-        // Payload
-        $payload                                   = $this->payload;
-        $payload['integration_details']['in_auth'] = 0;
-        $apiKeys                                   = [
-            'key'     => 'secretId',
-            'secret'  => 'secretSecret',
-            'host'    => 'https://api.stage.brighttalk.com',
-        ];
-        // Salesforce setting
-        /** @var IntegrationEntityModel $model */
-        $model      = $this->container->get('mautic.plugin.model.integration_entity');
-        $salesforce = new Integration();
-        $salesforce->setIsPublished(true)
-            ->setApiKeys($apiKeys)
-            ->setName('BrightTalk');
-        $model->saveEntity($salesforce);
-
-        // Request
-        $this->client->request('POST', '/s/integration/BrightTalk/config', $payload);
-        $clientResponse  = $this->client->getResponse();
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
-        $this->assertStringNotContainsString('closeModal', $clientResponse, 'The return must not contain key closeModal');
-    }
 }
