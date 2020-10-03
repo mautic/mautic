@@ -21,6 +21,8 @@ before_install:
   - mysql --version
   - mysql -e 'DROP DATABASE IF EXISTS mautictest;'
   - mysql -e 'CREATE DATABASE mautictest;'
+  - mysql -e 'DROP USER IF EXISTS travis@localhost;'
+  - mysql -e 'CREATE USER travis@localhost;'
   - mysql -e 'GRANT ALL ON *.* TO travis@localhost;' || true
 
   # increase memory limit for all PHP processes
