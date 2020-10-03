@@ -196,6 +196,8 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
     public function testCheckForDuplicateContact()
     {
+        $this->coreParametersHelperMock->expects($this->once())->method('get')->with('set_join_condition_unique_fields', 'OR')->willReturn('OR');
+
         $this->fieldModelMock->expects($this->at(0))
             ->method('getFieldList')
             ->with(false, false, ['isPublished' => true, 'object' => 'lead'])
@@ -243,6 +245,8 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
     public function testCheckForDuplicateContactForOnlyPubliclyUpdatable()
     {
+        $this->coreParametersHelperMock->expects($this->once())->method('get')->with('set_join_condition_unique_fields', 'OR')->willReturn('OR');
+
         $this->fieldModelMock->expects($this->at(0))
             ->method('getFieldList')
             ->with(false, false, ['isPublished' => true, 'object' => 'lead', 'isPubliclyUpdatable' => true])
