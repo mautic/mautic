@@ -568,6 +568,24 @@ class ConfigType extends AbstractType
             );
 
         $builder->add(
+            'set_join_condition_unique_fields',
+            ChoiceType::class,
+            [
+                'choices'           => [
+                    'mautic.core.config.set_join_condition_unique_fields.or'    => 'OR',
+                    'mautic.core.config.set_join_condition_unique_fields.and'   => 'AND',
+                ],
+                'label'             => 'mautic.core.config.set_join_condition_unique_fields',
+                'required'          => false,
+                'attr'              => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.set_join_condition_unique_fields.tooltip',
+                ],
+                'placeholder'       => false,
+            ]
+        );
+
+        $builder->add(
             'cors_restrict_domains',
             YesNoButtonGroupType::class,
             [

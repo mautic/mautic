@@ -186,18 +186,25 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @return array
      */
-    public function getLeadsByUniqueFields($uniqueFieldsWithData, $leadId = null, $limit = null)
+    public function getLeadsByUniqueFields($uniqueFieldsWithData, $leadId = null, $limit = null, $join_condition = 'OR')
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('l.*')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
         // loop through the fields and
-        foreach ($uniqueFieldsWithData as $col => $val) {
-            if (is_null($val)) {
-                $q->andWhere("l.$col IS NULL");
-            } else {
-                $q->andWhere("l.$col = :".$col)
+        if ('AND' == $join_condition) {
+            foreach ($uniqueFieldsWithData as $col => $val) {
+                if (is_null($val)) {
+                    $q->andWhere("l.$col IS NULL");
+                } else {
+                    $q->andWhere("l.$col = :".$col)
+                        ->setParameter($col, $val);
+                }
+            }
+        } else {
+            foreach ($uniqueFieldsWithData as $col => $val) {
+                $q->orWhere("l.$col = :".$col)
                     ->setParameter($col, $val);
             }
         }
@@ -258,16 +265,27 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @return array
      */
-    public function getLeadIdsByUniqueFields($uniqueFieldsWithData, $leadId = null)
+    public function getLeadIdsByUniqueFields($uniqueFieldsWithData, $leadId = null, $join_condition = 'OR')
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
         // loop through the fields and
-        foreach ($uniqueFieldsWithData as $col => $val) {
-            $q->orWhere("l.$col = :".$col)
-                ->setParameter($col, $val);
+        if ('AND' == $join_condition) {
+            foreach ($uniqueFieldsWithData as $col => $val) {
+                if (is_null($val)) {
+                    $q->andWhere("l.$col IS NULL");
+                } else {
+                    $q->andWhere("l.$col = :".$col)
+                        ->setParameter($col, $val);
+                }
+            }
+        } else {
+            foreach ($uniqueFieldsWithData as $col => $val) {
+                $q->orWhere("l.$col = :".$col)
+                    ->setParameter($col, $val);
+            }
         }
 
         // if we have a lead ID lets use it

@@ -127,6 +127,13 @@ $template  = '<div class="col-md-6">{content}</div>';
             <?php echo $view['form']->rowIfExists($fields, 'max_entity_lock_time', $template); ?>
         </div>
         <?php endif; ?>
+
+        <?php if (isset($fields['set_join_condition_unique_fields'])): ?>
+        <hr class="text-muted" />
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'set_join_condition_unique_fields', $template); ?>
+        </div>
+        <?php endif; ?>
     </div>
 </div>
 <?php endif; ?>
