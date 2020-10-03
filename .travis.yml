@@ -1,4 +1,4 @@
-dist: trusty
+dist: xenial
 language: php
 
 services:
@@ -9,7 +9,7 @@ notifications:
     on_success: never
 
 php:
-  - 7.2
+  - 7.2.33
   - 7.3
 
 cache:
@@ -48,7 +48,7 @@ script:
 jobs:
   include:
     - stage: test
-      php: 7.2
+      php: 7.2.33
       env: DB=mariadb
       addons:
         mariadb: '10.2'
