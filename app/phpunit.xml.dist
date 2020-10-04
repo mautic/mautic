@@ -8,14 +8,13 @@
     convertErrorsToExceptions   = "true"
     convertNoticesToExceptions  = "true"
     convertWarningsToExceptions = "true"
-    processIsolation            = "false"
+    processIsolation            = "true"
     stopOnFailure               = "false"
     bootstrap                   = "autoload.php" >
 
     <testsuites>
         <testsuite name="Project Test Suite">
             <directory>bundles/*Bundle/Tests</directory>
-            <exclude>bundles/LeadBundle/Tests/Segment</exclude>
         </testsuite>
         <testsuite name="Plugin tests">
             <directory>./../plugins/*Bundle/Tests</directory>

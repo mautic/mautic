@@ -266,7 +266,7 @@ class InstallCommand extends ContainerAwareCommand
         $allParams  = $installer->localConfigParameters();
 
         // Initialize DB and admin params from local.php
-        foreach ($allParams as $opt => $value) {
+        foreach ((array) $allParams as $opt => $value) {
             if (0 === strpos($opt, 'db_')) {
                 $dbParams[substr($opt, 3)] = $value;
             } elseif (0 === strpos($opt, 'admin_')) {
