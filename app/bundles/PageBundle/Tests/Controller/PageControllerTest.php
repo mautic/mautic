@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
 /**
  * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
+ * @preserveGlobalState enabled
  */
 class PageControllerTest extends MauticMysqlTestCase
 {
