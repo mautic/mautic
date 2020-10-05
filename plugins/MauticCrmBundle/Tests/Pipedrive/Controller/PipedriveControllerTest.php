@@ -6,7 +6,7 @@ use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\PipedriveTest;
 
 /**
  * @runTestsInSeparateProcesses
- * @preserveGlobalState enabled
+ * @preserveGlobalState disabled
  */
 class PipedriveControllerTest extends PipedriveTest
 {
