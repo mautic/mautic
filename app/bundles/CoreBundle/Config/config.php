@@ -766,6 +766,8 @@ return [
                     'router',
                     '"MauticCoreBundle:Exception:show"',
                     'monolog.logger.mautic',
+                    'mautic.helper.core_parameters',
+                    'mautic.model.factory',
                 ],
                 'tag'          => 'kernel.event_listener',
                 'tagArguments' => [
