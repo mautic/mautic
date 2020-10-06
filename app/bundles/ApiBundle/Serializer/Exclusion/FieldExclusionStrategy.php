@@ -17,9 +17,7 @@ use JMS\Serializer\Metadata\ClassMetadata;
 use JMS\Serializer\Metadata\PropertyMetadata;
 
 /**
- * Class FieldExclusionStrategy.
- *
- * Exclude specific fields at a specific level
+ * Exclude specific fields at a specific level.
  */
 class FieldExclusionStrategy implements ExclusionStrategyInterface
 {
@@ -34,16 +32,13 @@ class FieldExclusionStrategy implements ExclusionStrategyInterface
     private $level;
 
     /**
-     * @var
+     * @var string|null
      */
     private $path;
 
     /**
-     * FieldExclusionStrategy constructor.
-     *
-     * @param array $fields
-     * @param int   $level
-     * @param null  $path
+     * @param int         $level
+     * @param string|null $path
      */
     public function __construct(array $fields, $level = 3, $path = null)
     {
@@ -55,7 +50,7 @@ class FieldExclusionStrategy implements ExclusionStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function shouldSkipClass(ClassMetadata $metadata, Context $navigatorContext)
+    public function shouldSkipClass(ClassMetadata $metadata, Context $navigatorContext): bool
     {
         return false;
     }
@@ -63,7 +58,7 @@ class FieldExclusionStrategy implements ExclusionStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function shouldSkipProperty(PropertyMetadata $property, Context $navigatorContext)
+    public function shouldSkipProperty(PropertyMetadata $property, Context $navigatorContext): bool
     {
         if ($this->path) {
             $path = implode('.', $navigatorContext->getCurrentPath());

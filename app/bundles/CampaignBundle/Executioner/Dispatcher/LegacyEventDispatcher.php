@@ -13,7 +13,6 @@ namespace Mautic\CampaignBundle\Executioner\Dispatcher;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\CampaignEvents;
-use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignDecisionEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
@@ -27,7 +26,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -56,11 +55,6 @@ class LegacyEventDispatcher
     private $logger;
 
     /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
      * @var NotificationHelper
      */
     private $notificationHelper;
@@ -71,34 +65,31 @@ class LegacyEventDispatcher
     private $factory;
 
     /**
+     * @var ContactTracker
+     */
+    private $contactTracker;
+
+    /**
      * LegacyEventDispatcher constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
-     * @param EventScheduler           $scheduler
-     * @param LoggerInterface          $logger
-     * @param MauticFactory            $factory
      */
     public function __construct(
         EventDispatcherInterface $dispatcher,
         EventScheduler $scheduler,
         LoggerInterface $logger,
-        LeadModel $leadModel,
         NotificationHelper $notificationHelper,
-        MauticFactory $factory
+        MauticFactory $factory,
+        ContactTracker $contactTracker
     ) {
         $this->dispatcher         = $dispatcher;
         $this->scheduler          = $scheduler;
         $this->logger             = $logger;
-        $this->leadModel          = $leadModel;
         $this->notificationHelper = $notificationHelper;
         $this->factory            = $factory;
+        $this->contactTracker     = $contactTracker;
     }
 
     /**
-     * @param AbstractEventAccessor $config
-     * @param ArrayCollection       $logs
-     * @param                       $wasBatchProcessed
-     * @param PendingEvent          $pendingEvent
+     * @param $wasBatchProcessed
      */
     public function dispatchCustomEvent(
         AbstractEventAccessor $config,
@@ -121,7 +112,7 @@ class LegacyEventDispatcher
 
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
-            $this->leadModel->setSystemCurrentLead($log->getLead());
+            $this->contactTracker->setSystemContact($log->getLead());
 
             if (isset($settings['eventName'])) {
                 $result = $this->dispatchEventName($settings['eventName'], $settings, $log);
@@ -167,15 +158,11 @@ class LegacyEventDispatcher
             $this->scheduler->rescheduleFailures($rescheduleFailures);
         }
 
-        $this->leadModel->setSystemCurrentLead(null);
+        $this->contactTracker->setSystemContact(null);
     }
 
     /**
      * Execute the new ON_EVENT_FAILED and ON_EVENT_EXECUTED events for logs processed by BC code.
-     *
-     * @param AbstractEventAccessor $config
-     * @param ArrayCollection       $success
-     * @param ArrayCollection       $failures
      */
     public function dispatchExecutionEvents(AbstractEventAccessor $config, ArrayCollection $success, ArrayCollection $failures)
     {
@@ -188,9 +175,6 @@ class LegacyEventDispatcher
         }
     }
 
-    /**
-     * @param DecisionEvent $decisionEvent
-     */
     public function dispatchDecisionEvent(DecisionEvent $decisionEvent)
     {
         if ($this->dispatcher->hasListeners(CampaignEvents::ON_EVENT_DECISION_TRIGGER)) {
@@ -217,9 +201,7 @@ class LegacyEventDispatcher
     }
 
     /**
-     * @param              $eventName
-     * @param array        $settings
-     * @param LeadEventLog $log
+     * @param $eventName
      *
      * @return bool
      */
@@ -246,15 +228,10 @@ class LegacyEventDispatcher
                 ->setChannelId($campaignEvent->getChannelId());
         }
 
-        $result = $campaignEvent->getResult();
-
-        return $result;
+        return $campaignEvent->getResult();
     }
 
     /**
-     * @param array        $settings
-     * @param LeadEventLog $log
-     *
      * @return mixed
      */
     private function dispatchCallback(array $settings, LeadEventLog $log)
@@ -275,7 +252,7 @@ class LegacyEventDispatcher
         try {
             if (is_array($settings['callback'])) {
                 $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
-            } elseif (strpos($settings['callback'], '::') !== false) {
+            } elseif (false !== strpos($settings['callback'], '::')) {
                 $parts      = explode('::', $settings['callback']);
                 $reflection = new \ReflectionMethod($parts[0], $parts[1]);
             } else {
@@ -298,9 +275,7 @@ class LegacyEventDispatcher
     }
 
     /**
-     * @param AbstractEventAccessor $config
-     * @param LeadEventLog          $log
-     * @param                       $result
+     * @param $result
      */
     private function dispatchExecutionEvent(AbstractEventAccessor $config, LeadEventLog $log, $result)
     {
@@ -323,10 +298,6 @@ class LegacyEventDispatcher
         );
     }
 
-    /**
-     * @param AbstractEventAccessor $config
-     * @param LeadEventLog          $log
-     */
     private function dispatchExecutedEvent(AbstractEventAccessor $config, LeadEventLog $log)
     {
         $this->dispatcher->dispatch(
@@ -342,10 +313,6 @@ class LegacyEventDispatcher
         );
     }
 
-    /**
-     * @param AbstractEventAccessor $config
-     * @param LeadEventLog          $log
-     */
     private function dispatchFailedEvent(AbstractEventAccessor $config, LeadEventLog $log)
     {
         $this->dispatcher->dispatch(
@@ -369,9 +336,7 @@ class LegacyEventDispatcher
     }
 
     /**
-     * @param              $result
-     * @param LeadEventLog $log
-     * @param PendingEvent $pendingEvent
+     * @param $result
      */
     private function processFailedLog($result, LeadEventLog $log, PendingEvent $pendingEvent)
     {

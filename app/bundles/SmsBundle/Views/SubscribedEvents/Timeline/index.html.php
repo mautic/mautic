@@ -38,4 +38,22 @@ if ($item = ((isset($event['extra'])) ? $event['extra']['stat'] : false)):
             <br /><?php echo $view['translator']->trans('mautic.sms.timeline.event.list', ['%list%' => $item['list_name']]); ?>
         <?php endif; ?>
     </p>
+
+<?php if ($errors): ?>
+<p class="text-danger mt-0 mb-10">
+    <i class="fa fa-warning"></i> <?php echo $view['translator']->trans('mautic.campaign.event.last_error').': '.$errors; ?>
+</p>
+<?php else: ?>
+<dl class="dl-horizontal">
+    <dt><?php echo $view['translator']->trans('mautic.sms.timeline.status'); ?></dt>
+    <dd><?php echo $view['translator']->trans($data['status']); ?></dd>
+    <dt><?php echo $view['translator']->trans('mautic.sms.timeline.type'); ?></dt>
+    <dd><?php echo $view['translator']->trans($data['type']); ?></dd>
+</dl>
+<div class="small">
+    <hr />
+    <strong><?php echo $view['translator']->trans('mautic.sms.timeline.content.heading'); ?></strong>
+    <br />
+    <?php echo $data['content']; ?>
+</div>
 <?php endif; ?>

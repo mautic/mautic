@@ -19,17 +19,15 @@ class PlainTextMessageHelper
     /**
      * Extract plain text from message.
      *
-     * @param \Swift_Mime_Message $message
-     *
      * @return string
      */
-    public static function getPlainTextFromMessage(\Swift_Mime_Message $message)
+    public static function getPlainTextFromMessage(\Swift_Mime_SimpleMessage $message)
     {
         $children = (array) $message->getChildren();
 
         foreach ($children as $child) {
             $childType = $child->getContentType();
-            if ($childType === 'text/plain' && $child instanceof \Swift_MimePart) {
+            if ('text/plain' === $childType && $child instanceof \Swift_MimePart) {
                 return $child->getBody();
             }
         }
@@ -40,11 +38,9 @@ class PlainTextMessageHelper
     /**
      * Extract plain text from message.
      *
-     * @param \Swift_Mime_Message $message
-     *
      * @return string
      */
-    public function getPlainTextFromMessageNotStatic(\Swift_Mime_Message $message)
+    public function getPlainTextFromMessageNotStatic(\Swift_Mime_SimpleMessage $message)
     {
         return self::getPlainTextFromMessage($message);
     }

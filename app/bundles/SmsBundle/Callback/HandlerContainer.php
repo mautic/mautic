@@ -20,9 +20,6 @@ class HandlerContainer
      */
     private $handlers;
 
-    /**
-     * @param CallbackInterface $handler
-     */
     public function registerHandler(CallbackInterface $handler)
     {
         $this->handlers[$handler->getTransportName()] = $handler;

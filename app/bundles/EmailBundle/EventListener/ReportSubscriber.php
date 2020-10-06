@@ -13,22 +13,20 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
-use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ReportSubscriber.
- */
-class ReportSubscriber extends CommonSubscriber
+class ReportSubscriber implements EventSubscriberInterface
 {
     const CONTEXT_EMAILS      = 'emails';
     const CONTEXT_EMAIL_STATS = 'email.stats';
@@ -36,7 +34,7 @@ class ReportSubscriber extends CommonSubscriber
     /**
      * @var Connection
      */
-    protected $db;
+    private $db;
 
     /**
      * @var CompanyReportData
@@ -44,15 +42,25 @@ class ReportSubscriber extends CommonSubscriber
     private $companyReportData;
 
     /**
-     * ReportSubscriber constructor.
-     *
-     * @param Connection        $db
-     * @param CompanyReportData $companyReportData
+     * @var GeneratedColumnsProviderInterface
      */
-    public function __construct(Connection $db, CompanyReportData $companyReportData)
-    {
-        $this->db                = $db;
-        $this->companyReportData = $companyReportData;
+    private $generatedColumnsProvider;
+
+    /**
+     * @var StatRepository
+     */
+    private $statRepository;
+
+    public function __construct(
+        Connection $db,
+        CompanyReportData $companyReportData,
+        StatRepository $statRepository,
+        GeneratedColumnsProviderInterface $generatedColumnsProvider
+    ) {
+        $this->db                       = $db;
+        $this->companyReportData        = $companyReportData;
+        $this->statRepository           = $statRepository;
+        $this->generatedColumnsProvider = $generatedColumnsProvider;
     }
 
     /**
@@ -69,8 +77,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Add available tables and columns to the report builder lookup.
-     *
-     * @param ReportBuilderEvent $event
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
@@ -136,26 +142,26 @@ class ReportSubscriber extends CommonSubscriber
                 'alias'   => 'unsubscribed',
                 'label'   => 'mautic.email.report.unsubscribed',
                 'type'    => 'string',
-                'formula' => 'IFNULL((SELECT ROUND(SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::UNSUBSCRIBED.', 1, 0)), 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
+                'formula' => 'IFNULL((SELECT SUM(IF('.$doNotContact.'id IS NOT NULL AND '.$doNotContact.'channel_id='.$prefix.'id AND '.$doNotContact.'reason='.DoNotContact::UNSUBSCRIBED.', 1, 0)) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
             ],
             'unsubscribed_ratio' => [
                 'alias'   => 'unsubscribed_ratio',
                 'label'   => 'mautic.email.report.unsubscribed_ratio',
                 'type'    => 'string',
-                'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::UNSUBSCRIBED.', 1, 0))/'.$prefix.'sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
+                'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.$doNotContact.'id IS NOT NULL AND '.$doNotContact.'channel_id='.$prefix.'id AND '.$doNotContact.'reason='.DoNotContact::UNSUBSCRIBED.', 1, 0))/'.$prefix.'sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
                 'suffix'  => '%',
             ],
             'bounced' => [
                 'alias'   => 'bounced',
                 'label'   => 'mautic.email.report.bounced',
                 'type'    => 'string',
-                'formula' => 'IFNULL((SELECT ROUND(SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::BOUNCED.' , 1, 0)), 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
+                'formula' => 'IFNULL((SELECT SUM(IF('.$doNotContact.'id IS NOT NULL AND '.$doNotContact.'channel_id='.$prefix.'id AND '.$doNotContact.'reason='.DoNotContact::BOUNCED.' , 1, 0)) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
             ],
             'bounced_ratio' => [
                 'alias'   => 'bounced_ratio',
                 'label'   => 'mautic.email.report.bounced_ratio',
                 'type'    => 'string',
-                'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::BOUNCED.', 1, 0))/'.$prefix.'sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
+                'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.$doNotContact.'id IS NOT NULL AND '.$doNotContact.'channel_id='.$prefix.'id AND '.$doNotContact.'reason='.DoNotContact::BOUNCED.', 1, 0))/'.$prefix.'sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
                 'suffix'  => '%',
             ],
             $prefix.'revision' => [
@@ -300,8 +306,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGeneratorEvent $event
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
@@ -406,8 +410,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGraphEvent $event
      */
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
@@ -421,8 +423,7 @@ class ReportSubscriber extends CommonSubscriber
             return;
         }
 
-        $qb       = $event->getQueryBuilder();
-        $statRepo = $this->em->getRepository(Stat::class);
+        $qb = $event->getQueryBuilder();
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
             $queryBuilder = clone $qb;
@@ -436,6 +437,7 @@ class ReportSubscriber extends CommonSubscriber
 
             switch ($g) {
                 case 'mautic.email.graph.line.stats':
+                    $chartQuery->setGeneratedColumnProvider($this->generatedColumnsProvider);
                     $chart     = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     $sendQuery = clone $queryBuilder;
                     $readQuery = clone $origQuery;
@@ -460,7 +462,7 @@ class ReportSubscriber extends CommonSubscriber
                     break;
 
                 case 'mautic.email.graph.pie.ignored.read.failed':
-                    $counts = $statRepo->getIgnoredReadFailed($queryBuilder);
+                    $counts = $this->statRepository->getIgnoredReadFailed($queryBuilder);
                     $chart  = new PieChart();
                     $chart->setDataset($options['translator']->trans('mautic.email.read.emails'), $counts['read']);
                     $chart->setDataset($options['translator']->trans('mautic.email.failed.emails'), $counts['failed']);
@@ -512,7 +514,7 @@ class ReportSubscriber extends CommonSubscriber
                         ->orderBy('sent', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
+                    $items                  = $this->statRepository->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -527,7 +529,7 @@ class ReportSubscriber extends CommonSubscriber
                         ->orderBy('opens', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
+                    $items                  = $this->statRepository->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -545,7 +547,7 @@ class ReportSubscriber extends CommonSubscriber
                         ->orderBy('failed', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
+                    $items                  = $this->statRepository->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -567,7 +569,7 @@ class ReportSubscriber extends CommonSubscriber
 
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
+                    $items                  = $this->statRepository->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -588,7 +590,7 @@ class ReportSubscriber extends CommonSubscriber
                         ->orderBy('bounced', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
+                    $items                  = $this->statRepository->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -603,7 +605,7 @@ class ReportSubscriber extends CommonSubscriber
                         ->orderBy('ratio', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
+                    $items                  = $this->statRepository->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -618,8 +620,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Add the Do Not Contact table to the query builder.
-     *
-     * @param QueryBuilder $qb
      */
     private function addDNCTable(QueryBuilder $qb)
     {

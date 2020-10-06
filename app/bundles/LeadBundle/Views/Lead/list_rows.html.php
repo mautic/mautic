@@ -106,7 +106,7 @@
                     ?>
                     <?php if ($item->getStage()):?>
                     <span class="label label-default"<?php echo $style; ?>><?php echo $view->escape($item->getStage()->getName()); ?></span>
-                    <?php endif?>
+                    <?php endif; ?>
                 </td>
                 <td class="visible-md visible-lg text-center">
                     <?php

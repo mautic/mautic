@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticSmsBundle:Sms:index.html.php');
 }
 
@@ -132,7 +132,7 @@ if (count($items)):
                                 ['objectAction' => 'view', 'objectId' => $item->getId()]
                             ); ?>">
                                 <?php echo $item->getName(); ?>
-                                <?php if ($type == 'list'): ?>
+                                <?php if ('list' == $type): ?>
                                     <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.sms.icon_tooltip.list_sms'); ?>"><i class="fa fa-fw fa-pie-chart"></i></span>
                                 <?php endif; ?>
                             </a>

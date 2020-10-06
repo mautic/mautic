@@ -2,14 +2,14 @@
 
 namespace Mautic\EmailBundle\Entity;
 
-use Doctrine\ORM\EntityRepository;
+use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
  * Class EmailReplyRepository.
  */
-final class EmailReplyRepository extends EntityRepository implements EmailReplyRepositoryInterface
+final class EmailReplyRepository extends CommonRepository implements EmailReplyRepositoryInterface
 {
     use TimelineTrait;
 
@@ -59,5 +59,10 @@ final class EmailReplyRepository extends EntityRepository implements EmailReplyR
             [],
             ['date_replied']
         );
+    }
+
+    public function getTableAlias(): string
+    {
+        return 'reply';
     }
 }

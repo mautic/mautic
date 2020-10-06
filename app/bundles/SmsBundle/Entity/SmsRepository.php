@@ -23,8 +23,6 @@ class SmsRepository extends CommonRepository
     /**
      * Get a list of entities.
      *
-     * @param array $args
-     *
      * @return Paginator
      */
     public function getEntities(array $args = [])
@@ -68,8 +66,6 @@ class SmsRepository extends CommonRepository
     }
 
     /**
-     * @param int $smsId
-     *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
     public function getSegmentsContactsQuery(int $smsId)

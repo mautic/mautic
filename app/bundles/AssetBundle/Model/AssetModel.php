@@ -17,16 +17,19 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\Event\AssetEvent;
 use Mautic\AssetBundle\Event\AssetLoadEvent;
+use Mautic\AssetBundle\Form\Type\AssetType;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorServiceInterface;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
@@ -34,9 +37,6 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class AssetModel.
- */
 class AssetModel extends FormModel
 {
     /**
@@ -50,7 +50,7 @@ class AssetModel extends FormModel
     protected $leadModel;
 
     /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
+     * @var \Symfony\Component\HttpFoundation\Request|null
      */
     protected $request;
 
@@ -80,16 +80,12 @@ class AssetModel extends FormModel
     private $deviceTrackingService;
 
     /**
+     * @var ContactTracker
+     */
+    private $contactTracker;
+
+    /**
      * AssetModel constructor.
-     *
-     * @param LeadModel                      $leadModel
-     * @param CategoryModel                  $categoryModel
-     * @param RequestStack                   $requestStack
-     * @param IpLookupHelper                 $ipLookupHelper
-     * @param CoreParametersHelper           $coreParametersHelper
-     * @param DeviceCreatorServiceInterface  $deviceCreatorService
-     * @param DeviceDetectorFactoryInterface $deviceDetectorFactory
-     * @param DeviceTrackingServiceInterface $deviceTrackingService
      */
     public function __construct(
         LeadModel $leadModel,
@@ -99,7 +95,8 @@ class AssetModel extends FormModel
         CoreParametersHelper $coreParametersHelper,
         DeviceCreatorServiceInterface $deviceCreatorService,
         DeviceDetectorFactoryInterface $deviceDetectorFactory,
-        DeviceTrackingServiceInterface $deviceTrackingService
+        DeviceTrackingServiceInterface $deviceTrackingService,
+        ContactTracker $contactTracker
     ) {
         $this->leadModel              = $leadModel;
         $this->categoryModel          = $categoryModel;
@@ -108,7 +105,8 @@ class AssetModel extends FormModel
         $this->deviceCreatorService   = $deviceCreatorService;
         $this->deviceDetectorFactory  = $deviceDetectorFactory;
         $this->deviceTrackingService  = $deviceTrackingService;
-        $this->maxAssetSize           = $coreParametersHelper->getParameter('mautic.max_size');
+        $this->contactTracker         = $contactTracker;
+        $this->maxAssetSize           = $coreParametersHelper->get('max_size');
     }
 
     /**
@@ -166,7 +164,7 @@ class AssetModel extends FormModel
             return;
         }
 
-        if ($request == null) {
+        if (null == $request) {
             $request = $this->request;
         }
 
@@ -182,7 +180,7 @@ class AssetModel extends FormModel
 
                 if (!empty($clickthrough['lead'])) {
                     $lead = $this->leadModel->getEntity($clickthrough['lead']);
-                    if ($lead !== null) {
+                    if (null !== $lead) {
                         $wasTrackedAlready                    = $this->deviceTrackingService->isTracked();
                         $deviceDetector                       = $this->deviceDetectorFactory->create($request->server->get('HTTP_USER_AGENT'));
                         $deviceDetector->parse();
@@ -192,11 +190,11 @@ class AssetModel extends FormModel
                         $trackingNewlyGenerated                    = !$wasTrackedAlready;
                         $leadClickthrough                          = true;
 
-                        $this->leadModel->setCurrentLead($lead);
+                        $this->contactTracker->setTrackedContact($lead);
                     }
                 }
                 if (!empty($clickthrough['channel'])) {
-                    if (count($clickthrough['channel']) === 1) {
+                    if (1 === count($clickthrough['channel'])) {
                         $channelId = reset($clickthrough['channel']);
                         $channel   = key($clickthrough['channel']);
                     } else {
@@ -220,11 +218,11 @@ class AssetModel extends FormModel
 
             if (empty($leadClickthrough)) {
                 $wasTrackedAlready         = $this->deviceTrackingService->isTracked();
-                $lead                      = $this->leadModel->getCurrentLead();
+                $lead                      = $this->contactTracker->getContact();
                 $trackedDevice             = $this->deviceTrackingService->getTrackedDevice();
                 $trackingId                = null;
                 $trackingNewlyGenerated    = false;
-                if ($trackedDevice !== null) {
+                if (null !== $trackedDevice) {
                     $trackingId             = $trackedDevice->getTrackingId();
                     $trackingNewlyGenerated = !$wasTrackedAlready;
                 }
@@ -298,7 +296,7 @@ class AssetModel extends FormModel
         $download->setCode($code);
         $download->setIpAddress($ipAddress);
 
-        if ($request !== null) {
+        if (null !== $request) {
             $download->setReferer($request->server->get('HTTP_REFERER'));
         }
 
@@ -384,7 +382,7 @@ class AssetModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('asset', $entity, $options);
+        return $formFactory->create(AssetType::class, $entity, $options);
     }
 
     /**
@@ -392,11 +390,11 @@ class AssetModel extends FormModel
      *
      * @param $id
      *
-     * @return null|Asset
+     * @return Asset|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             $entity = new Asset();
         } else {
             $entity = parent::getEntity($id);
@@ -510,7 +508,7 @@ class AssetModel extends FormModel
     public function getMaxUploadSize($unit = 'M', $humanReadable = false)
     {
         $maxAssetSize  = $this->maxAssetSize;
-        $maxAssetSize  = ($maxAssetSize == -1 || $maxAssetSize === 0) ? PHP_INT_MAX : Asset::convertSizeToBytes($maxAssetSize.'M');
+        $maxAssetSize  = (-1 == $maxAssetSize || 0 === $maxAssetSize) ? PHP_INT_MAX : FileHelper::convertMegabytesToBytes($maxAssetSize);
         $maxPostSize   = Asset::getIniValue('post_max_size');
         $maxUploadSize = Asset::getIniValue('upload_max_filesize');
         $memoryLimit   = Asset::getIniValue('memory_limit');
@@ -562,12 +560,10 @@ class AssetModel extends FormModel
     /**
      * Get line chart data of downloads.
      *
-     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
-     * @param bool      $canViewOthers
+     * @param char   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
+     * @param array  $filter
+     * @param bool   $canViewOthers
      *
      * @return array
      */
@@ -657,9 +653,7 @@ class AssetModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_download');
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -689,8 +683,6 @@ class AssetModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 }

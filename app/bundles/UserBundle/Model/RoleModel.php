@@ -14,6 +14,7 @@ namespace Mautic\UserBundle\Model;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Event\RoleEvent;
+use Mautic\UserBundle\Form\Type\RoleType;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -64,7 +65,6 @@ class RoleModel extends FormModel
     /**
      * Generate the role's permissions.
      *
-     * @param Role  $entity
      * @param array $rawPermissions (i.e. from request)
      */
     public function setRolePermissions(Role &$entity, $rawPermissions)
@@ -98,9 +98,7 @@ class RoleModel extends FormModel
 
         $users = $this->em->getRepository('MauticUserBundle:User')->findByRole($entity);
         if (count($users)) {
-            throw new PreconditionRequiredHttpException(
-                $this->translator->trans('mautic.user.role.error.deletenotallowed', ['%name%' => $entity->getName()], 'flashes')
-            );
+            throw new PreconditionRequiredHttpException($this->translator->trans('mautic.user.role.error.deletenotallowed', ['%name%' => $entity->getName()], 'flashes'));
         }
 
         parent::deleteEntity($entity);
@@ -121,7 +119,7 @@ class RoleModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('role', $entity, $options);
+        return $formFactory->create(RoleType::class, $entity, $options);
     }
 
     /**
@@ -129,7 +127,7 @@ class RoleModel extends FormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Role();
         }
 

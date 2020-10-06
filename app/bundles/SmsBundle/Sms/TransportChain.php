@@ -14,7 +14,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Exception\PrimaryTransportNotEnabledException;
-use Monolog\Logger;
 
 class TransportChain
 {
@@ -34,30 +33,19 @@ class TransportChain
     private $integrationHelper;
 
     /**
-     * @var Logger
+     * @param string $primaryTransport
      */
-    private $logger;
-
-    /**
-     * TransportChain constructor.
-     *
-     * @param string            $primaryTransport
-     * @param IntegrationHelper $integrationHelper
-     * @param Logger            $logger
-     */
-    public function __construct($primaryTransport, IntegrationHelper $integrationHelper, Logger $logger)
+    public function __construct($primaryTransport, IntegrationHelper $integrationHelper)
     {
         $this->primaryTransport  = $primaryTransport;
         $this->transports        = [];
         $this->integrationHelper = $integrationHelper;
-        $this->logger            = $logger;
     }
 
     /**
-     * @param string             $alias
-     * @param TransportInterface $transport
-     * @param string             $translatableAlias
-     * @param string             $integrationAlias
+     * @param string $alias
+     * @param string $translatableAlias
+     * @param string $integrationAlias
      *
      * @return $this
      */
@@ -82,11 +70,11 @@ class TransportChain
         $enabled = $this->getEnabledTransports();
 
         // If there no primary transport selected and there is just one available we will use it as primary
-        if (count($enabled) === 1) {
+        if (1 === count($enabled)) {
             return array_shift($enabled);
         }
 
-        if (count($enabled) === 0) {
+        if (0 === count($enabled)) {
             throw new PrimaryTransportNotEnabledException('Primary SMS transport is not enabled');
         }
 
@@ -98,9 +86,7 @@ class TransportChain
     }
 
     /**
-     * @param Lead      $lead
-     * @param string    $content
-     * @param Stat|null $stat
+     * @param string $content
      *
      * @return mixed
      *
@@ -108,9 +94,7 @@ class TransportChain
      */
     public function sendSms(Lead $lead, $content, Stat $stat = null)
     {
-        $response = $this->getPrimaryTransport()->sendSms($lead, $content, $stat);
-
-        return $response;
+        return $this->getPrimaryTransport()->sendSms($lead, $content, $stat);
     }
 
     /**

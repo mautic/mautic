@@ -39,9 +39,50 @@ return [
     ],
 
     'services' => [
+        'fixtures' => [
+            'mautic.install.fixture.lead_field' => [
+                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => [],
+            ],
+            'mautic.install.fixture.role' => [
+                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\RoleData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => [],
+            ],
+            'mautic.install.fixture.page_hit' => [
+                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\PageHitIndex::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => [],
+            ],
+            'mautic.install.fixture.report_data' => [
+                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\LoadReportData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => [],
+            ],
+        ],
+        'forms' => [
+            \Mautic\InstallBundle\Configurator\Form\CheckStepType::class => [
+                'class' => \Mautic\InstallBundle\Configurator\Form\CheckStepType::class,
+            ],
+            \Mautic\InstallBundle\Configurator\Form\DoctrineStepType::class => [
+                'class' => \Mautic\InstallBundle\Configurator\Form\DoctrineStepType::class,
+            ],
+            \Mautic\InstallBundle\Configurator\Form\EmailStepType::class => [
+                'class'     => \Mautic\InstallBundle\Configurator\Form\EmailStepType::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.email.transport_type',
+                ],
+            ],
+            \Mautic\InstallBundle\Configurator\Form\UserStepType::class => [
+                'class'     => \Mautic\InstallBundle\Configurator\Form\UserStepType::class,
+                'arguments' => ['session'],
+            ],
+        ],
         'other' => [
             'mautic.install.configurator.step.check' => [
-                'class'     => 'Mautic\InstallBundle\Configurator\Step\CheckStep',
+                'class'     => \Mautic\InstallBundle\Configurator\Step\CheckStep::class,
                 'arguments' => [
                     'mautic.configurator',
                     '%kernel.root_dir%',
@@ -54,7 +95,7 @@ return [
                 ],
             ],
             'mautic.install.configurator.step.doctrine' => [
-                'class'     => 'Mautic\InstallBundle\Configurator\Step\DoctrineStep',
+                'class'     => \Mautic\InstallBundle\Configurator\Step\DoctrineStep::class,
                 'arguments' => [
                     'mautic.configurator',
                 ],
@@ -64,7 +105,7 @@ return [
                 ],
             ],
             'mautic.install.configurator.step.email' => [
-                'class'     => 'Mautic\InstallBundle\Configurator\Step\EmailStep',
+                'class'     => \Mautic\InstallBundle\Configurator\Step\EmailStep::class,
                 'arguments' => [
                     'session',
                 ],
@@ -74,13 +115,23 @@ return [
                 ],
             ],
             'mautic.install.configurator.step.user' => [
-                'class'     => 'Mautic\InstallBundle\Configurator\Step\UserStep',
-                'arguments' => [
-                    'session',
-                ],
+                'class'        => \Mautic\InstallBundle\Configurator\Step\UserStep::class,
                 'tag'          => 'mautic.configurator.step',
                 'tagArguments' => [
                     'priority' => 2,
+                ],
+            ],
+            'mautic.install.service' => [
+                'class'     => 'Mautic\InstallBundle\Install\InstallService',
+                'arguments' => [
+                    'mautic.configurator',
+                    'mautic.helper.cache',
+                    'mautic.helper.paths',
+                    'doctrine.orm.entity_manager',
+                    'translator',
+                    'kernel',
+                    'validator',
+                    'security.encoder_factory',
                 ],
             ],
         ],

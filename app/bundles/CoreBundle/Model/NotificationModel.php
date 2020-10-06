@@ -60,11 +60,6 @@ class NotificationModel extends FormModel
 
     /**
      * NotificationModel constructor.
-     *
-     * @param PathsHelper          $pathsHelper
-     * @param UpdateHelper         $updateHelper
-     * @param FeedReader           $rssReader
-     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(
         PathsHelper $pathsHelper,
@@ -78,9 +73,6 @@ class NotificationModel extends FormModel
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    /**
-     * @param Session $session
-     */
     public function setSession(Session $session)
     {
         $this->session = $session;
@@ -124,11 +116,11 @@ class NotificationModel extends FormModel
         \DateTime $datetime = null,
         User $user = null
     ) {
-        if ($user === null) {
+        if (null === $user) {
             $user = $this->userHelper->getUser();
         }
 
-        if ($user === null || !$user->getId()) {
+        if (null === $user || !$user->getId()) {
             //ensure notifications aren't written for non users
             return;
         }
@@ -140,7 +132,7 @@ class NotificationModel extends FormModel
         $notification->setMessage(EmojiHelper::toHtml(InputHelper::strict_html($message)));
         $notification->setIconClass($iconClass);
         $notification->setUser($user);
-        if ($datetime == null) {
+        if (null == $datetime) {
             $datetime = new \DateTime();
         }
         $notification->setDateAdded($datetime);
@@ -244,7 +236,7 @@ class NotificationModel extends FormModel
      */
     public function updateUpstreamNotifications()
     {
-        $url = $this->coreParametersHelper->getParameter('rss_notification_url');
+        $url = $this->coreParametersHelper->get('rss_notification_url');
 
         if (empty($url)) {
             return;

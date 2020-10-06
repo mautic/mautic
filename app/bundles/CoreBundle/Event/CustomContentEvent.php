@@ -13,23 +13,20 @@ namespace Mautic\CoreBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
-/**
- * Class CustomContentEvent.
- */
 class CustomContentEvent extends Event
 {
     /**
-     * @var
+     * @var string
      */
     protected $viewName;
 
     /**
-     * @var
+     * @var string|null
      */
     protected $context;
 
     /**
-     * @var
+     * @var array
      */
     protected $vars;
 
@@ -44,11 +41,8 @@ class CustomContentEvent extends Event
     protected $templates = [];
 
     /**
-     * CustomContentEvent constructor.
-     *
-     * @param       $viewName
-     * @param       $context
-     * @param array $vars
+     * @param string      $viewName
+     * @param string|null $context
      */
     public function __construct($viewName, $context = null, array $vars = [])
     {
@@ -60,8 +54,8 @@ class CustomContentEvent extends Event
     /**
      * Check if the context is applicable.
      *
-     * @param $viewName
-     * @param $context
+     * @param string      $viewName
+     * @param string|null $context
      *
      * @return bool
      */
@@ -71,7 +65,7 @@ class CustomContentEvent extends Event
     }
 
     /**
-     * @param $content
+     * @param string $content
      */
     public function addContent($content)
     {
@@ -79,8 +73,7 @@ class CustomContentEvent extends Event
     }
 
     /**
-     * @param       $template
-     * @param array $vars
+     * @param string $template
      */
     public function addTemplate($template, array $vars = [])
     {
@@ -99,7 +92,7 @@ class CustomContentEvent extends Event
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getContext()
     {
@@ -107,7 +100,7 @@ class CustomContentEvent extends Event
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getVars()
     {

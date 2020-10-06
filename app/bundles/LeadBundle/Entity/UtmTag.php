@@ -48,9 +48,6 @@ class UtmTag
      */
     private $remoteHost;
 
-    /**
-     * @var
-     */
     private $url;
 
     /**
@@ -83,9 +80,6 @@ class UtmTag
      */
     private $utmTerm;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -147,8 +141,6 @@ class UtmTag
     /**
      * Set date added.
      *
-     * @param \DateTime $dateHit
-     *
      * @return UtmTag
      */
     public function setDateAdded(\DateTime $date)
@@ -177,8 +169,6 @@ class UtmTag
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return UtmTag
      */
     public function setLead(Lead $lead)

@@ -13,13 +13,11 @@ namespace Mautic\InstallBundle\Configurator\Step;
 
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
+use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher;
 use Mautic\InstallBundle\Configurator\Form\CheckStepType;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Check Step.
- */
 class CheckStep implements StepInterface
 {
     /**
@@ -36,22 +34,26 @@ class CheckStep implements StepInterface
      */
     private $kernelRoot;
 
-    /** @var OpenSSLCipher */
+    /**
+     * @var OpenSSLCipher
+     */
     private $openSSLCipher;
 
     /**
      * Absolute path to cache directory.
+     * Required in step.
      *
      * @var string
      */
-    public $cache_path = '%kernel.root_dir%/cache';
+    public $cache_path = '%kernel.root_dir%/../var/cache';
 
     /**
      * Absolute path to log directory.
+     * Required in step.
      *
      * @var string
      */
-    public $log_path = '%kernel.root_dir%/logs';
+    public $log_path = '%kernel.root_dir%/../var/logs';
 
     /**
      * Set the domain URL for use in getting the absolute URL for cli/cronjob generated URLs.
@@ -61,19 +63,16 @@ class CheckStep implements StepInterface
     public $site_url;
 
     /**
-     * Set the name of the source that installed Mautic.
+     * Recommended minimum memory limit for Mautic.
      *
      * @var string
      */
-    public $install_source = 'Mautic';
+    public static $memory_limit = '512M';
 
     /**
-     * Constructor.
-     *
-     * @param Configurator  $configurator  Configurator service
-     * @param string        $kernelRoot    Kernel root path
-     * @param RequestStack  $requestStack  Request stack
-     * @param OpenSSLCipher $openSSLCipher
+     * @param Configurator $configurator Configurator service
+     * @param string       $kernelRoot   Kernel root path
+     * @param RequestStack $requestStack Request stack
      */
     public function __construct(
         Configurator $configurator,
@@ -85,7 +84,9 @@ class CheckStep implements StepInterface
 
         $this->configIsWritable = $configurator->isFileWritable();
         $this->kernelRoot       = $kernelRoot;
-        $this->site_url         = $request->getSchemeAndHttpHost().$request->getBasePath();
+        if (!empty($request)) {
+            $this->site_url     = $request->getSchemeAndHttpHost().$request->getBasePath();
+        }
         $this->openSSLCipher    = $openSSLCipher;
     }
 
@@ -94,7 +95,7 @@ class CheckStep implements StepInterface
      */
     public function getFormType()
     {
-        return new CheckStepType();
+        return CheckStepType::class;
     }
 
     /**
@@ -104,7 +105,7 @@ class CheckStep implements StepInterface
     {
         $messages = [];
 
-        if (version_compare(PHP_VERSION, '5.6.19', '<')) {
+        if (version_compare(PHP_VERSION, '7.2.21', '<')) {
             $messages[] = 'mautic.install.php.version.not.supported';
         }
 
@@ -116,11 +117,11 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.config.unwritable';
         }
 
-        if (!is_writable($this->kernelRoot.'/cache')) {
+        if (!is_writable(str_replace('%kernel.root_dir%', $this->kernelRoot, $this->cache_path))) {
             $messages[] = 'mautic.install.cache.unwritable';
         }
 
-        if (!is_writable($this->kernelRoot.'/logs')) {
+        if (!is_writable(str_replace('%kernel.root_dir%', $this->kernelRoot, $this->log_path))) {
             $messages[] = 'mautic.install.logs.unwritable';
         }
 
@@ -134,20 +135,6 @@ class CheckStep implements StepInterface
 
         if (!isset($timezones[date_default_timezone_get()])) {
             $messages[] = 'mautic.install.timezone.not.supported';
-        }
-
-        if (get_magic_quotes_gpc()) {
-            $messages[] = 'mautic.install.magic_quotes_enabled';
-        }
-
-        if (
-            version_compare(PHP_VERSION, '5.6.0', '>=')
-            &&
-            version_compare(PHP_VERSION, '7', '<')
-            &&
-            ini_get('always_populate_raw_post_data') != -1
-        ) {
-            $messages[] = 'mautic.install.always_populate_raw_post_data_enabled';
         }
 
         if (!function_exists('json_encode')) {
@@ -170,7 +157,7 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.function.simplexml';
         }
 
-        if ($this->openSSLCipher->isSupported() === false) {
+        if (false === $this->openSSLCipher->isSupported()) {
             $messages[] = 'mautic.install.extension.openssl';
         }
 
@@ -186,22 +173,6 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.extension.mbstring';
         }
 
-        if (extension_loaded('eaccelerator') && ini_get('eaccelerator.enable')) {
-            $messages[] = 'mautic.install.extension.eaccelerator';
-        }
-
-        if (function_exists('apc_store') && ini_get('apc.enabled')) {
-            if (!version_compare(phpversion('apc'), '3.1.13', '>=')) {
-                $messages[] = 'mautic.install.apc.version';
-            }
-        }
-
-        if (extension_loaded('suhosin')) {
-            if (stripos(ini_get('suhosin.executor.include.whitelist'), 'phar')) {
-                $messages[] = 'mautic.install.suhosin.whitelist';
-            }
-        }
-
         if (extension_loaded('xdebug')) {
             if (ini_get('xdebug.show_exception_trace')) {
                 $messages[] = 'mautic.install.xdebug.exception.trace';
@@ -210,12 +181,6 @@ class CheckStep implements StepInterface
             if (ini_get('xdebug.scream')) {
                 $messages[] = 'mautic.install.xdebug.scream';
             }
-        }
-
-        $pcreVersion = defined('PCRE_VERSION') ? (float) PCRE_VERSION : null;
-
-        if (is_null($pcreVersion)) {
-            $messages[] = 'mautic.install.function.pcre';
         }
 
         return $messages;
@@ -227,14 +192,6 @@ class CheckStep implements StepInterface
     public function checkOptionalSettings()
     {
         $messages = [];
-
-        $pcreVersion = defined('PCRE_VERSION') ? (float) PCRE_VERSION : null;
-
-        if (!is_null($pcreVersion)) {
-            if (version_compare($pcreVersion, '8.0', '<')) {
-                $messages[] = 'mautic.install.pcre.version';
-            }
-        }
 
         if (extension_loaded('xdebug')) {
             $cfgValue = ini_get('xdebug.max_nesting_level');
@@ -269,19 +226,18 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.extension.imap';
         }
 
-        if (substr($this->site_url, 0, 5) !== 'https') {
+        if ('https' !== substr($this->site_url, 0, 5)) {
             $messages[] = 'mautic.install.ssl.certificate';
         }
 
         if (!defined('PHP_WINDOWS_VERSION_BUILD')) {
             if (!function_exists('posix_isatty')) {
-                $messages[] = 'mautic.install.function.posix';
+                $messages[] = 'mautic.install.function.posix.enable';
             }
         }
 
-        $memoryLimit    = $this->toBytes(ini_get('memory_limit'));
-        $suggestedLimit = 128 * 1024 * 1024;
-
+        $memoryLimit    = FileHelper::convertPHPSizeToBytes(ini_get('memory_limit'));
+        $suggestedLimit = FileHelper::convertPHPSizeToBytes(self::$memory_limit);
         if ($memoryLimit < $suggestedLimit) {
             $messages[] = 'mautic.install.memory.limit';
         }
@@ -297,32 +253,6 @@ class CheckStep implements StepInterface
                 }
             } catch (\Exception $exception) {
                 $messages[] = 'mautic.install.intl.config';
-            }
-        }
-
-        if (class_exists('\\Locale')) {
-            if (defined('INTL_ICU_VERSION')) {
-                $version = INTL_ICU_VERSION;
-            } else {
-                try {
-                    $reflector = new \ReflectionExtension('intl');
-
-                    ob_start();
-                    $reflector->info();
-                    $output = strip_tags(ob_get_clean());
-
-                    preg_match('/^ICU version +(?:=> )?(.*)$/m', $output, $matches);
-                    $version = $matches[1];
-                } catch (\ReflectionException $exception) {
-                    $messages[] = 'mautic.install.module.intl';
-
-                    // Fake the version here for the next check
-                    $version = '4.0';
-                }
-            }
-
-            if (version_compare($version, '4.0', '<')) {
-                $messages[] = 'mautic.install.intl.icu.version';
             }
         }
 
@@ -352,36 +282,5 @@ class CheckStep implements StepInterface
         }
 
         return $parameters;
-    }
-
-    /**
-     * Takes the memory limit string form php.ini and returns numeric value in bytes.
-     *
-     * @param string $val
-     *
-     * @return int
-     */
-    public function toBytes($val)
-    {
-        $val = trim($val);
-
-        if ($val == -1) {
-            return PHP_INT_MAX;
-        }
-
-        $last = strtolower($val[strlen($val) - 1]);
-        $val  = (int) $val;
-
-        switch ($last) {
-            // The 'G' modifier is available since PHP 5.1.0
-            case 'g':
-                $val *= 1024;
-            case 'm':
-                $val *= 1024;
-            case 'k':
-                $val *= 1024;
-        }
-
-        return $val;
     }
 }

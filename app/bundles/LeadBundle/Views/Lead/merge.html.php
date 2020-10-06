@@ -10,7 +10,7 @@
  */
 ?>
 
-<?php if ($tmpl == 'index'): ?>
+<?php if ('index' == $tmpl): ?>
 <div class="lead-merge-form">
     <?php echo $view->render('MauticCoreBundle:Helper:search.html.php', [
         'searchId'    => (empty($searchId)) ? null : $searchId,
@@ -31,7 +31,7 @@
 
         <?php echo $view['form']->end($form); ?>
 
-<?php if ($tmpl == 'index'): ?>
+<?php if ('index' == $tmpl): ?>
     </div>
 </div>
 <?php endif; ?>

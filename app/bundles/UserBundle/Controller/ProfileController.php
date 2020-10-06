@@ -12,6 +12,8 @@
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Helper\LanguageHelper;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 /**
  * Class ProfileController.
@@ -31,7 +33,7 @@ class ProfileController extends FormController
 
         //set some permissions
         $permissions = [
-            'apiAccess' => ($this->get('mautic.helper.core_parameters')->getParameter('api_enabled')) ?
+            'apiAccess' => ($this->get('mautic.helper.core_parameters')->get('api_enabled')) ?
                 $this->get('mautic.security')->isGranted('api:access:full')
                 : 0,
             'editName'     => $this->get('mautic.security')->isGranted('user:profile:editname'),
@@ -47,7 +49,7 @@ class ProfileController extends FormController
 
         //make sure this user has access to edit privileged fields
         foreach ($permissions as $permName => $hasAccess) {
-            if ($permName == 'apiAccess') {
+            if ('apiAccess' == $permName) {
                 continue;
             }
 
@@ -60,7 +62,7 @@ class ProfileController extends FormController
                         $form->remove('firstName');
                         $form->add(
                             'firstName_unbound',
-                            'text',
+                            TextType::class,
                             [
                                 'label'      => 'mautic.core.firstname',
                                 'label_attr' => ['class' => 'control-label'],
@@ -75,7 +77,7 @@ class ProfileController extends FormController
                         $form->remove('lastName');
                         $form->add(
                             'lastName_unbound',
-                            'text',
+                            TextType::class,
                             [
                                 'label'      => 'mautic.core.lastname',
                                 'label_attr' => ['class' => 'control-label'],
@@ -93,7 +95,7 @@ class ProfileController extends FormController
                         $form->remove('username');
                         $form->add(
                             'username_unbound',
-                            'text',
+                            TextType::class,
                             [
                                 'label'      => 'mautic.core.username',
                                 'label_attr' => ['class' => 'control-label'],
@@ -110,7 +112,7 @@ class ProfileController extends FormController
                         $form->remove('position');
                         $form->add(
                             'position_unbound',
-                            'text',
+                            TextType::class,
                             [
                                 'label'      => 'mautic.core.position',
                                 'label_attr' => ['class' => 'control-label'],
@@ -127,7 +129,7 @@ class ProfileController extends FormController
                         $form->remove('email');
                         $form->add(
                             'email_unbound',
-                            'text',
+                            TextType::class,
                             [
                                 'label'      => 'mautic.core.type.email',
                                 'label_attr' => ['class' => 'control-label'],
@@ -145,11 +147,12 @@ class ProfileController extends FormController
 
         //Check for a submitted form and process it
         $submitted = $this->get('session')->get('formProcessed', 0);
-        if ($this->request->getMethod() == 'POST' && !$submitted) {
+        if ('POST' == $this->request->getMethod() && !$submitted) {
             $this->get('session')->set('formProcessed', 1);
 
             //check to see if the password needs to be rehashed
-            $submittedPassword     = $this->request->request->get('user[plainPassword][password]', null, true);
+            $formUser              = $this->request->request->get('user', []);
+            $submittedPassword     = $formUser['plainPassword']['password'] ?? null;
             $encoder               = $this->get('security.encoder_factory')->getEncoder($me);
             $overrides['password'] = $model->checkNewPassword($me, $encoder, $submittedPassword);
             if (!$cancelled = $this->isFormCancelled($form)) {
@@ -163,12 +166,11 @@ class ProfileController extends FormController
                     $model->saveEntity($me);
 
                     //check if the user's locale has been downloaded already, fetch it if not
-                    $installedLanguages = $this->get('mautic.helper.core_parameters')->getParameter('supported_languages');
+                    /** @var LanguageHelper $languageHelper */
+                    $languageHelper     = $this->container->get('mautic.helper.language');
+                    $installedLanguages = $languageHelper->getSupportedLanguages();
 
                     if ($me->getLocale() && !array_key_exists($me->getLocale(), $installedLanguages)) {
-                        /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
-                        $languageHelper = $this->get('mautic.helper.language');
-
                         $fetchLanguage = $languageHelper->extractLanguagePackage($me->getLocale());
 
                         // If there is an error, we need to reset the user's locale to the default
@@ -193,13 +195,13 @@ class ProfileController extends FormController
                     // Update timezone and locale
                     $tz = $me->getTimezone();
                     if (empty($tz)) {
-                        $tz = $this->get('mautic.helper.core_parameters')->getParameter('default_timezone');
+                        $tz = $this->get('mautic.helper.core_parameters')->get('default_timezone');
                     }
                     $this->get('session')->set('_timezone', $tz);
 
                     $locale = $me->getLocale();
                     if (empty($locale)) {
-                        $locale = $this->get('mautic.helper.core_parameters')->getParameter('locale');
+                        $locale = $this->get('mautic.helper.core_parameters')->get('locale');
                     }
                     $this->get('session')->set('_locale', $locale);
 

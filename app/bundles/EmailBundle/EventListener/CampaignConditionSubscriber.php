@@ -20,21 +20,13 @@ use Mautic\EmailBundle\Helper\EmailValidator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignConditionSubscriber.
- */
 class CampaignConditionSubscriber implements EventSubscriberInterface
 {
     /**
      * @var EmailValidator
      */
-    protected $validator;
+    private $validator;
 
-    /**
-     * CampaignCondition constructor.
-     *
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(EmailValidator $validator)
     {
         $this->validator = $validator;
@@ -51,9 +43,6 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $event->addCondition(
@@ -66,13 +55,10 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerCondition(CampaignExecutionEvent $event)
     {
         try {
-            $this->validator->validate($event->getLead()->getEmail());
+            $this->validator->validate($event->getLead()->getEmail(), true);
         } catch (InvalidEmailException $exception) {
             return $event->setResult(false);
         }

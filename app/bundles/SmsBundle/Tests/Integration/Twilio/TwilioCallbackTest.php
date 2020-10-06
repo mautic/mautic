@@ -18,15 +18,15 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class TwilioCallbackTest extends \PHPUnit_Framework_TestCase
+class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ContactHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContactHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $contactHelper;
 
     /**
-     * @var Configuration|\PHPUnit_Framework_MockObject_MockObject
+     * @var Configuration|\PHPUnit\Framework\MockObject\MockObject
      */
     private $configuration;
 

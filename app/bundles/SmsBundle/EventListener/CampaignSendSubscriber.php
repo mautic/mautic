@@ -14,38 +14,30 @@ namespace Mautic\SmsBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\SmsBundle\Form\Type\SmsSendType;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/***
- * Class CampaignSendSubscriber
- */
-class CampaignSendSubscriber extends CommonSubscriber
+class CampaignSendSubscriber implements EventSubscriberInterface
 {
     /**
      * @var SmsModel
      */
-    protected $smsModel;
+    private $smsModel;
 
     /**
      * @var TransportChain
      */
-    protected $transportChain;
+    private $transportChain;
 
-    /**
-     * CampaignSubscriber constructor.
-     *
-     * @param SmsModel       $smsModel
-     * @param TransportChain $transportChain
-     */
     public function __construct(
         SmsModel $smsModel,
         TransportChain $transportChain
     ) {
-        $this->smsModel          = $smsModel;
-        $this->transportChain    = $transportChain;
+        $this->smsModel       = $smsModel;
+        $this->transportChain = $transportChain;
     }
 
     /**
@@ -59,9 +51,6 @@ class CampaignSendSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         if (count($this->transportChain->getEnabledTransports()) > 0) {
@@ -71,7 +60,7 @@ class CampaignSendSubscriber extends CommonSubscriber
                     'label'            => 'mautic.campaign.sms.send_text_sms',
                     'description'      => 'mautic.campaign.sms.send_text_sms.tooltip',
                     'eventName'        => SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-                    'formType'         => 'smssend_list',
+                    'formType'         => SmsSendType::class,
                     'formTypeOptions'  => ['update_select' => 'campaignevent_properties_sms'],
                     'formTheme'        => 'MauticSmsBundle:FormTheme\SmsSendList',
                     'channel'          => 'sms',
@@ -82,8 +71,6 @@ class CampaignSendSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param CampaignExecutionEvent $event
-     *
      * @return $this
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)

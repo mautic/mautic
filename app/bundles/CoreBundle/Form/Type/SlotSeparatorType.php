@@ -11,6 +11,8 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -18,30 +20,36 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class SlotSeparatorType extends SlotType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('color', 'text', [
-            'label'      => 'mautic.core.separator.color',
-            'label_attr' => ['class' => 'control-label'],
-            'required'   => false,
-            'attr'       => [
-                'class'           => 'form-control',
-                'data-toggle'     => 'color',
-                'data-slot-param' => 'separator-color',
-            ],
-        ])->add('thickness', 'number', [
-            'label'      => 'mautic.core.separator.thickness',
-            'label_attr' => ['class' => 'control-label'],
-            'required'   => false,
-            'attr'       => [
-                'class'           => 'form-control',
-                'data-slot-param' => 'separator-thickness',
-            ],
-        ]);
+        $builder->add(
+            'color',
+            TextType::class,
+            [
+                'label'      => 'mautic.core.separator.color',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'class'           => 'form-control',
+                    'data-toggle'     => 'color',
+                    'data-slot-param' => 'separator-color',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'thickness',
+            NumberType::class,
+            [
+                'label'      => 'mautic.core.separator.thickness',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'class'           => 'form-control',
+                    'data-slot-param' => 'separator-thickness',
+                ],
+            ]
+        );
 
         parent::buildForm($builder, $options);
     }
@@ -49,7 +57,7 @@ class SlotSeparatorType extends SlotType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'slot_separator';
     }

@@ -11,8 +11,6 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 class CompanyExport extends AbstractPipedrive
 {
     /**
-     * @param Company $company
-     *
      * @return bool
      */
     public function pushCompany(Company $company)
@@ -32,9 +30,6 @@ class CompanyExport extends AbstractPipedrive
     }
 
     /**
-     * @param Company $company
-     * @param array   $mappedData
-     *
      * @return bool
      */
     public function create(Company $company, array $mappedData = [])
@@ -70,9 +65,6 @@ class CompanyExport extends AbstractPipedrive
     }
 
     /**
-     * @param IntegrationEntity $integrationEntity
-     * @param array             $mappedData
-     *
      * @return bool
      */
     public function update(IntegrationEntity $integrationEntity, array $mappedData = [])
@@ -96,8 +88,6 @@ class CompanyExport extends AbstractPipedrive
     }
 
     /**
-     * @param Company $company
-     *
      * @return bool
      */
     public function delete(Company $company)
@@ -131,8 +121,6 @@ class CompanyExport extends AbstractPipedrive
     }
 
     /**
-     * @param Company $company
-     *
      * @return array
      */
     private function getMappedCompanyData(Company $company)
@@ -148,7 +136,7 @@ class CompanyExport extends AbstractPipedrive
         $accessor = PropertyAccess::createPropertyAccessor();
 
         foreach ($companyFields as $externalField => $internalField) {
-            if (strpos($internalField, $company::FIELD_ALIAS, 0) !== false && method_exists($company, 'get'.ucfirst(substr($internalField, strlen($company::FIELD_ALIAS))))) {
+            if (false !== strpos($internalField, $company::FIELD_ALIAS, 0) && method_exists($company, 'get'.ucfirst(substr($internalField, strlen($company::FIELD_ALIAS))))) {
                 //for core company field
                 $fieldName = substr($internalField, strlen($company::FIELD_ALIAS));
             } else {
@@ -165,9 +153,6 @@ class CompanyExport extends AbstractPipedrive
         return $mappedData;
     }
 
-    /**
-     * @param Company $company
-     */
     private function getCompanyIntegrationOwnerId(Company $company)
     {
         $mauticOwner = $company->getOwner();

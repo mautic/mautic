@@ -12,36 +12,47 @@
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Event as Events;
+use Mautic\CampaignBundle\Service\Campaign as CampaignService;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Service\FlashBag;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
      * @var IpLookupHelper
      */
-    protected $ipLookupHelper;
+    private $ipLookupHelper;
 
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
     /**
-     * CampaignSubscriber constructor.
-     *
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
+     * @var CampaignService
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
-    {
+    private $campaignService;
+
+    /**
+     * @var FlashBag
+     */
+    private $flashBag;
+
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        AuditLogModel $auditLogModel,
+        CampaignService $campaignService,
+        FlashBag $flashBag
+    ) {
         $this->ipLookupHelper   = $ipLookupHelper;
         $this->auditLogModel    = $auditLogModel;
+        $this->campaignService  = $campaignService;
+        $this->flashBag         = $flashBag;
     }
 
     /**
@@ -57,13 +68,15 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param Events\CampaignEvent $event
      */
     public function onCampaignPostSave(Events\CampaignEvent $event)
     {
         $campaign = $event->getCampaign();
         $details  = $event->getChanges();
+
+        if ($campaign->isPublished() && $this->campaignService->hasUnpublishedEmail($campaign->getId())) {
+            $this->setUnpublishedMailFlashMessage($campaign);
+        }
 
         //don't set leads
         unset($details['leads']);
@@ -83,8 +96,6 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param Events\CampaignEvent $event
      */
     public function onCampaignDelete(Events\CampaignEvent $event)
     {
@@ -98,5 +109,15 @@ class CampaignSubscriber extends CommonSubscriber
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
+    }
+
+    private function setUnpublishedMailFlashMessage(Campaign $campaign)
+    {
+        $this->flashBag->add(
+            'mautic.core.notice.campaign.unpublished.email',
+            [
+                '%name%' => $campaign->getName(),
+            ]
+        );
     }
 }

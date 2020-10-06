@@ -14,33 +14,25 @@ namespace Mautic\StageBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\StageBundle\Form\Type\StageActionChangeType;
 use Mautic\StageBundle\Model\StageModel;
 use Mautic\StageBundle\StageEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
      * @var StageModel
      */
-    protected $stageModel;
+    private $stageModel;
 
-    /**
-     * CampaignSubscriber constructor.
-     *
-     * @param LeadModel  $leadModel
-     * @param StageModel $stageModel
-     */
     public function __construct(LeadModel $leadModel, StageModel $stageModel)
     {
         $this->leadModel  = $leadModel;
@@ -58,25 +50,19 @@ class CampaignSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $action = [
             'label'       => 'mautic.stage.campaign.event.change',
             'description' => 'mautic.stage.campaign.event.change_descr',
             'eventName'   => StageEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-            'formType'    => 'stageaction_change',
+            'formType'    => StageActionChangeType::class,
             'formTheme'   => 'MauticStageBundle:FormTheme\StageActionChange',
         ];
         $event->addAction('stage.change', $action);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
-    public function onCampaignTriggerActionChangeStage(CampaignExecutionEvent $event)
+    public function onCampaignTriggerActionChangeStage(CampaignExecutionEvent $event, $eventName)
     {
         $stageChange = false;
         $lead        = $event->getLead();
@@ -89,7 +75,7 @@ class CampaignSubscriber extends CommonSubscriber
         $stageId         = (int) $event->getConfig()['stage'];
         $stageToChangeTo = $this->stageModel->getEntity($stageId);
 
-        if ($stageToChangeTo != null && $stageToChangeTo->isPublished()) {
+        if (null != $stageToChangeTo && $stageToChangeTo->isPublished()) {
             if ($leadStage && $leadStage->getWeight() <= $stageToChangeTo->getWeight()) {
                 $stageChange = true;
             } elseif (!$leadStage) {
@@ -101,7 +87,7 @@ class CampaignSubscriber extends CommonSubscriber
             $lead->stageChangeLogEntry(
                 $stageToChangeTo,
                 $stageToChangeTo->getId().': '.$stageToChangeTo->getName(),
-                $event->getName()
+                $eventName
             );
             $lead->setStage($stageToChangeTo);
 
