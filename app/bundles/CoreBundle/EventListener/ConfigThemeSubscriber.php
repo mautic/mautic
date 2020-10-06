@@ -13,11 +13,10 @@ namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
+use Mautic\CoreBundle\Form\Type\ConfigThemeType;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ConfigSubscriber.
- */
-class ConfigThemeSubscriber extends CommonSubscriber
+class ConfigThemeSubscriber implements EventSubscriberInterface
 {
     /**
      * @return array
@@ -31,14 +30,17 @@ class ConfigThemeSubscriber extends CommonSubscriber
 
     public function onConfigGenerate(ConfigBuilderEvent $event)
     {
-        $event->addForm([
-            'bundle'     => 'CoreBundle',
-            'formAlias'  => 'themeconfig',
-            'formTheme'  => 'MauticCoreBundle:FormTheme\Config',
-            'parameters' => [
+        $event->addForm(
+            [
+                'bundle'     => 'CoreBundle',
+                'formAlias'  => 'themeconfig',
+                'formType'   => ConfigThemeType::class,
+                'formTheme'  => 'MauticCoreBundle:FormTheme\Config',
+                'parameters' => [
                     'theme'                           => $event->getParametersFromConfig('MauticCoreBundle')['theme'],
                     'theme_import_allowed_extensions' => $event->getParametersFromConfig('MauticCoreBundle')['theme_import_allowed_extensions'],
                 ],
-        ]);
+            ]
+        );
     }
 }

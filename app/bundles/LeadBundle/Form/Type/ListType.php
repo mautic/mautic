@@ -18,25 +18,28 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class ListType.
- */
 class ListType extends AbstractType
 {
     private $translator;
@@ -56,20 +59,6 @@ class ListType extends AbstractType
     private $localeChoices       = [];
     private $categoriesChoices   = [];
 
-    /**
-     * ListType constructor.
-     *
-     * @param TranslatorInterface $translator
-     * @param ListModel           $listModel
-     * @param EmailModel          $emailModel
-     * @param CorePermissions     $security
-     * @param LeadModel           $leadModel
-     * @param StageModel          $stageModel
-     * @param CategoryModel       $categoryModel
-     * @param UserHelper          $userHelper
-     * @param CampaignModel       $campaignModel
-     * @param AssetModel          $assetModel
-     */
     public function __construct(TranslatorInterface $translator, ListModel $listModel, EmailModel $emailModel, CorePermissions $security, LeadModel $leadModel, StageModel $stageModel, CategoryModel $categoryModel, UserHelper $userHelper, CampaignModel $campaignModel, AssetModel $assetModel)
     {
         $this->translator = $translator;
@@ -85,13 +74,13 @@ class ListType extends AbstractType
         // Segments
         $lists = $listModel->getUserLists();
         foreach ($lists as $list) {
-            $this->listChoices[$list['id']] = $list['name'];
+            $this->listChoices[$list['name']] = $list['id'];
         }
 
         // Campaigns
         $campaigns = $campaignModel->getPublishedCampaigns(true);
         foreach ($campaigns as $campaign) {
-            $this->campaignChoices[$campaign['id']] = $campaign['name'];
+            $this->campaignChoices[$campaign['name']] = $campaign['id'];
         }
 
         $viewOther   = $security->isGranted('email:emails:viewother');
@@ -103,41 +92,37 @@ class ListType extends AbstractType
         $emails = $emailRepo->getEmailList('', 0, 0, $viewOther, true);
 
         foreach ($emails as $email) {
-            $this->emailChoices[$email['language']][$email['id']] = $email['name'];
+            $this->emailChoices[$email['language']][$email['name']] = $email['id'];
         }
         ksort($this->emailChoices);
 
         // Get assets without 'filter' or 'limit'
         $assets = $assetModel->getLookupResults('asset', null, 0);
         foreach ($assets as $asset) {
-            $this->assetChoices[$asset['language']][$asset['id']] = $asset['title'];
+            $this->assetChoices[$asset['language']][$asset['title']] = $asset['id'];
         }
         ksort($this->assetChoices);
 
         $tags = $leadModel->getTagList();
         foreach ($tags as $tag) {
-            $this->tagChoices[$tag['value']] = $tag['label'];
+            $this->tagChoices[$tag['label']] = $tag['value'];
         }
 
         $stages = $stageModel->getRepository()->getSimpleList();
         foreach ($stages as $stage) {
-            $this->stageChoices[$stage['value']] = $stage['label'];
+            $this->stageChoices[$stage['label']] = $stage['value'];
         }
 
-        $categories = $categoryModel->getLookupResults('global');
+        $categories = $categoryModel->getLookupResults('global', null, 0);
 
         foreach ($categories as $category) {
-            $this->categoriesChoices[$category['id']] = $category['title'];
+            $this->categoriesChoices[$category['title']] = $category['id'];
         }
         $this->deviceTypesChoices  = array_combine((DeviceParser::getAvailableDeviceTypeNames()), (DeviceParser::getAvailableDeviceTypeNames()));
-        $this->deviceBrandsChoices = DeviceParser::$deviceBrands;
+        $this->deviceBrandsChoices = array_flip(DeviceParser::$deviceBrands);
         $this->deviceOsChoices     = array_combine((array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())), array_keys(OperatingSystem::getAvailableOperatingSystemFamilies()));
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
@@ -145,7 +130,7 @@ class ListType extends AbstractType
 
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.name',
                 'label_attr' => ['class' => 'control-label'],
@@ -155,7 +140,7 @@ class ListType extends AbstractType
 
         $builder->add(
             'alias',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.alias',
                 'label_attr' => ['class' => 'control-label'],
@@ -170,7 +155,7 @@ class ListType extends AbstractType
 
         $builder->add(
             'description',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.core.description',
                 'label_attr' => ['class' => 'control-label'],
@@ -181,7 +166,7 @@ class ListType extends AbstractType
 
         $builder->add(
             'isGlobal',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.lead.list.form.isglobal',
                 'attr'       => [
@@ -192,7 +177,7 @@ class ListType extends AbstractType
 
         $builder->add(
             'isPreferenceCenter',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.lead.list.form.isPreferenceCenter',
                 'attr'       => [
@@ -201,16 +186,16 @@ class ListType extends AbstractType
             ]
         );
 
-        $builder->add('isPublished', 'yesno_button_group');
+        $builder->add('isPublished', YesNoButtonGroupType::class);
 
         $filterModalTransformer = new FieldFilterTransformer($this->translator, ['object'=>'lead']);
         $builder->add(
             $builder->create(
                 'filters',
-                'collection',
+                CollectionType::class,
                 [
-                    'type'    => 'leadlist_filter',
-                    'options' => [
+                    'entry_type'    => FilterType::class,
+                    'entry_options' => [
                         'label'          => false,
                         'timezones'      => $this->timezoneChoices,
                         'countries'      => $this->countryChoices,
@@ -242,21 +227,18 @@ class ListType extends AbstractType
             )->addModelTransformer($filterModalTransformer)
         );
 
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('buttons', FormButtonsType::class);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Mautic\LeadBundle\Entity\LeadList',
+                'data_class' => LeadList::class,
             ]
         );
     }
@@ -286,7 +268,7 @@ class ListType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'leadlist';
     }

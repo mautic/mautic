@@ -36,9 +36,6 @@ class TwilioCallback implements CallbackInterface
 
     /**
      * TwilioCallback constructor.
-     *
-     * @param ContactHelper $contactHelper
-     * @param Configuration $configuration
      */
     public function __construct(ContactHelper $contactHelper, Configuration $configuration)
     {
@@ -55,8 +52,6 @@ class TwilioCallback implements CallbackInterface
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Doctrine\Common\Collections\ArrayCollection
      *
      * @throws NumberNotFoundException
@@ -71,8 +66,6 @@ class TwilioCallback implements CallbackInterface
     }
 
     /**
-     * @param Request $request
-     *
      * @return DeliveryEvent|ReplyEvent
      */
     public function getEvent(Request $request)
@@ -85,9 +78,6 @@ class TwilioCallback implements CallbackInterface
         return $replyEvent;
     }
 
-    /**
-     * @param ParameterBag $request
-     */
     private function validateRequest(ParameterBag $request)
     {
         try {

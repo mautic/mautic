@@ -15,7 +15,6 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Exception\PrimaryTransportNotEnabledException;
-use Monolog\Logger;
 
 class TransportChain
 {
@@ -45,13 +44,9 @@ class TransportChain
     private $settings;
 
     /**
-     * TransportChain constructor.
-     *
-     * @param string            $primaryTransport
-     * @param IntegrationHelper $integrationHelper
-     * @param Logger            $logger
+     * @param string $primaryTransport
      */
-    public function __construct($primaryTransport, IntegrationHelper $integrationHelper, Logger $logger)
+    public function __construct($primaryTransport, IntegrationHelper $integrationHelper)
     {
         $this->primaryTransport  = $primaryTransport;
         $this->transports        = [];
@@ -60,10 +55,9 @@ class TransportChain
     }
 
     /**
-     * @param string             $alias
-     * @param TransportInterface $transport
-     * @param string             $translatableAlias
-     * @param string             $integrationAlias
+     * @param string $alias
+     * @param string $translatableAlias
+     * @param string $integrationAlias
      *
      * @return $this
      */
@@ -88,11 +82,11 @@ class TransportChain
         $enabled = $this->getEnabledTransports();
 
         // If there no primary transport selected and there is just one available we will use it as primary
-        if (count($enabled) === 1) {
+        if (1 === count($enabled)) {
             return array_shift($enabled);
         }
 
-        if (count($enabled) === 0) {
+        if (0 === count($enabled)) {
             throw new PrimaryTransportNotEnabledException('Primary SMS transport is not enabled');
         }
 
@@ -104,19 +98,15 @@ class TransportChain
     }
 
     /**
-     * @param Lead      $lead
-     * @param string    $content
-     * @param Stat|null $stat
+     * @param string $content
      *
      * @return mixed
      *
      * @throws PrimaryTransportNotEnabledException
      */
-    public function sendSms(Lead $lead, $content, Stat $stat= null)
+    public function sendSms(Lead $lead, $content, Stat $stat= null, Stat $stat= null)
     {
-        $response = $this->getPrimaryTransport()->sendSms($lead, $content, $stat);
-
-        return $response;
+        return $this->getPrimaryTransport()->sendSms($lead, $content, $stat);
     }
 
     /**

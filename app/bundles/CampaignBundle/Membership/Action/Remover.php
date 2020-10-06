@@ -39,11 +39,6 @@ class Remover
 
     /**
      * Remover constructor.
-     *
-     * @param LeadRepository         $leadRepository
-     * @param LeadEventLogRepository $leadEventLogRepository
-     * @param TranslatorInterface    $translator
-     * @param DateHelper             $dateHelper
      */
     public function __construct(
         LeadRepository $leadRepository,
@@ -59,8 +54,7 @@ class Remover
     }
 
     /**
-     * @param CampaignMember $campaignMember
-     * @param bool           $isExit
+     * @param bool $isExit
      *
      * @throws ContactAlreadyRemovedFromCampaignException
      */

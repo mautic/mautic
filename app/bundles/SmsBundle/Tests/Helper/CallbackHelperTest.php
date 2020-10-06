@@ -24,10 +24,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CallbackHelperTest extends \PHPUnit_Framework_TestCase
+class CallbackHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $eventDispatcher;
 
@@ -37,7 +37,7 @@ class CallbackHelperTest extends \PHPUnit_Framework_TestCase
     private $logger;
 
     /**
-     * @var ContactTracker|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContactTracker|\PHPUnit\Framework\MockObject\MockObject
      */
     private $contactTracker;
 

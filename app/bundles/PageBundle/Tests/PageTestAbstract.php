@@ -21,6 +21,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\PageRepository;
@@ -94,12 +95,6 @@ class PageTestAbstract extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $leadModel->expects($this
-            ->any())
-            ->method('getCurrentLead')
-            ->willReturn($this
-                ->returnValue(['id' => self::$mockId, 'name' => self::$mockName]));
-
         $entityManager = $this
             ->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
@@ -117,6 +112,15 @@ class PageTestAbstract extends WebTestCase
             ->getMockBuilder(QueueService::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $contactTracker = $this->createMock(ContactTracker::class);
+
+        $contactTracker->expects($this
+            ->any())
+            ->method('getContact')
+            ->willReturn($this
+                ->returnValue(['id' => self::$mockId, 'name' => self::$mockName])
+            );
 
         $queueService->expects($this
             ->any())
@@ -148,7 +152,8 @@ class PageTestAbstract extends WebTestCase
             $trackableModel,
             $queueService,
             $companyModel,
-            $deviceTrackerMock
+            $deviceTrackerMock,
+            $contactTracker
         );
 
         $pageModel->setDispatcher($dispatcher);
@@ -158,11 +163,6 @@ class PageTestAbstract extends WebTestCase
         $pageModel->setUserHelper($userHelper);
 
         return $pageModel;
-    }
-
-    public function getCurrentLead($tracking)
-    {
-        return $tracking ? [new Lead(), $this->mockTrackingId, true] : new Lead();
     }
 
     /**

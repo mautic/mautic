@@ -11,20 +11,19 @@
 
 namespace Mautic\PageBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class ReportSubscriber.
- */
-class ReportSubscriber extends CommonSubscriber
+class ReportSubscriber implements EventSubscriberInterface
 {
     const CONTEXT_PAGES      = 'pages';
     const CONTEXT_PAGE_HITS  = 'page.hits';
@@ -35,9 +34,24 @@ class ReportSubscriber extends CommonSubscriber
      */
     private $companyReportData;
 
-    public function __construct(CompanyReportData $companyReportData)
-    {
+    /**
+     * @var HitRepository
+     */
+    private $hitRepository;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    public function __construct(
+        CompanyReportData $companyReportData,
+        HitRepository $hitRepository,
+        TranslatorInterface $translator
+    ) {
         $this->companyReportData = $companyReportData;
+        $this->hitRepository     = $hitRepository;
+        $this->translator        = $translator;
     }
 
     /**
@@ -54,8 +68,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Add available tables and columns to the report builder lookup.
-     *
-     * @param ReportBuilderEvent $event
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
@@ -360,8 +372,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGeneratorEvent $event
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
@@ -413,8 +423,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGraphEvent $event
      */
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
@@ -423,9 +431,8 @@ class ReportSubscriber extends CommonSubscriber
             return;
         }
 
-        $graphs  = $event->getRequestedGraphs();
-        $qb      = $event->getQueryBuilder();
-        $hitRepo = $this->em->getRepository('MauticPageBundle:Hit');
+        $graphs = $event->getRequestedGraphs();
+        $qb     = $event->getQueryBuilder();
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
@@ -461,7 +468,7 @@ class ReportSubscriber extends CommonSubscriber
                     break;
 
                 case 'mautic.page.graph.pie.time.on.site':
-                    $timesOnSite = $hitRepo->getDwellTimeLabels();
+                    $timesOnSite = $this->hitRepository->getDwellTimeLabels();
                     $chart       = new PieChart();
 
                     foreach ($timesOnSite as $time) {
@@ -546,7 +553,7 @@ class ReportSubscriber extends CommonSubscriber
                 case 'mautic.page.table.referrers':
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $hitRepo->getReferers($queryBuilder, $limit, $offset);
+                    $items                  = $this->hitRepository->getReferers($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -557,7 +564,7 @@ class ReportSubscriber extends CommonSubscriber
                 case 'mautic.page.table.most.visited':
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $hitRepo->getMostVisited($queryBuilder, $limit, $offset);
+                    $items                  = $this->hitRepository->getMostVisited($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -569,7 +576,7 @@ class ReportSubscriber extends CommonSubscriber
                 case 'mautic.page.table.most.visited.unique':
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $hitRepo->getMostVisited($queryBuilder, $limit, $offset, 'p.unique_hits', 'sessions');
+                    $items                  = $this->hitRepository->getMostVisited($queryBuilder, $limit, $offset, 'p.unique_hits', 'sessions');
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;

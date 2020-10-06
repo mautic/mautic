@@ -19,10 +19,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
  */
 class Version20190724110039 extends AbstractMauticMigration
 {
-    /**
-     * @param Schema $schema
-     */
-    public function up(Schema $schema)
+    public function up(Schema $schema): void
     {
         // Change multiselect custom fields from VARCHAR(255) to TEXT
         $qb = $this->connection->createQueryBuilder();
@@ -36,7 +33,7 @@ class Version20190724110039 extends AbstractMauticMigration
         $leadsTable = $schema->getTable($this->prefix.'leads');
 
         if (!empty($multiselectFields)) {
-            foreach ($multiselectFields as $key => $field) {
+            foreach ($multiselectFields as $field) {
                 if ($leadsTable->hasColumn($field['alias'])) {
                     if ($leadsTable->hasIndex("{$this->prefix}{$field['alias']}_search")) {
                         $this->addSql("DROP INDEX `{$this->prefix}{$field['alias']}_search` ON `{$this->prefix}leads`");
@@ -47,10 +44,7 @@ class Version20190724110039 extends AbstractMauticMigration
         }
     }
 
-    /**
-     * @param Schema $schema
-     */
-    public function down(Schema $schema)
+    public function down(Schema $schema): void
     {
         // Change multiselect custom fields from VARCHAR(255) to TEXT
         $qb = $this->connection->createQueryBuilder();
@@ -64,7 +58,7 @@ class Version20190724110039 extends AbstractMauticMigration
         $leadsTable = $schema->getTable($this->prefix.'leads');
 
         if (!empty($multiselectFields)) {
-            foreach ($multiselectFields as $key => $field) {
+            foreach ($multiselectFields as $field) {
                 if ($leadsTable->hasColumn($field['alias'])) {
                     $this->addSql("ALTER TABLE `{$this->prefix}leads` CHANGE `{$field['alias']}` `{$field['alias']}` VARCHAR(255)");
                     if (!$leadsTable->hasIndex("{$this->prefix}{$field['alias']}_search")) {

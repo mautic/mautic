@@ -63,7 +63,7 @@ return [
     ],
 
     'categories' => [
-        'messages',
+        'messages' => null,
     ],
 
     'services' => [
@@ -79,18 +79,24 @@ return [
                 ],
             ],
             'mautic.channel.channelbundle.subscriber' => [
-                'class'     => 'Mautic\ChannelBundle\EventListener\MessageSubscriber',
+                'class'     => \Mautic\ChannelBundle\EventListener\MessageSubscriber::class,
                 'arguments' => [
                     'mautic.core.model.auditlog',
                 ],
             ],
             'mautic.channel.channelbundle.lead.subscriber' => [
-                'class' => Mautic\ChannelBundle\EventListener\LeadSubscriber::class,
+                'class'     => Mautic\ChannelBundle\EventListener\LeadSubscriber::class,
+                'arguments' => [
+                    'translator',
+                    'router',
+                    'mautic.channel.repository.message_queue',
+                ],
             ],
             'mautic.channel.reportbundle.subscriber' => [
                 'class'     => Mautic\ChannelBundle\EventListener\ReportSubscriber::class,
                 'arguments' => [
                     'mautic.lead.model.company_report_data',
+                    'router',
                 ],
             ],
             'mautic.channel.button.subscriber' => [
@@ -112,13 +118,11 @@ return [
                 ],
             ],
             'mautic.form.type.message_list' => [
-                'class' => 'Mautic\ChannelBundle\Form\Type\MessageListType',
-                'alias' => 'message_list',
+                'class' => \Mautic\ChannelBundle\Form\Type\MessageListType::class,
             ],
             'mautic.form.type.message_send' => [
-                'class'     => 'Mautic\ChannelBundle\Form\Type\MessageSendType',
+                'class'     => \Mautic\ChannelBundle\Form\Type\MessageSendType::class,
                 'arguments' => ['router', 'mautic.channel.model.message'],
-                'alias'     => 'message_send',
             ],
         ],
         'helpers' => [
@@ -161,6 +165,13 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.lead.repository.frequency_rule',
                 ],
+            ],
+        ],
+        'repositories' => [
+            'mautic.channel.repository.message_queue' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => \Mautic\ChannelBundle\Entity\MessageQueue::class,
             ],
         ],
     ],

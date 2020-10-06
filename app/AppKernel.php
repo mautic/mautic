@@ -9,11 +9,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use Mautic\CoreBundle\Loader\ParameterLoader;
+use Mautic\CoreBundle\Release\ThisRelease;
+use Mautic\QueueBundle\Queue\QueueProtocol;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Config\EnvParametersResource;
-use Symfony\Component\HttpKernel\DependencyInjection;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -23,40 +25,14 @@ use Symfony\Component\HttpKernel\Kernel;
 class AppKernel extends Kernel
 {
     /**
-     * Major version number.
-     *
-     * @const integer
+     * @var bool|null
      */
-    const MAJOR_VERSION = 2;
+    private $installed;
 
     /**
-     * Minor version number.
-     *
-     * @const integer
+     * @var ParameterLoader|null
      */
-    const MINOR_VERSION = 16;
-
-    /**
-     * Patch version number.
-     *
-     * @const integer
-     */
-    const PATCH_VERSION = 2;
-
-    /**
-     * Extra version identifier.
-     *
-     * This constant is used to define additional version segments such as development
-     * or beta status.
-     *
-     * @const string
-     */
-    const EXTRA_VERSION = '';
-
-    /**
-     * @var array
-     */
-    private $pluginBundles = [];
+    private $parameterLoader;
 
     /**
      * Constructor.
@@ -68,36 +44,32 @@ class AppKernel extends Kernel
      */
     public function __construct($environment, $debug)
     {
+        $metadata = ThisRelease::getMetadata();
+
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', $environment);
-        defined('MAUTIC_VERSION') or define(
-            'MAUTIC_VERSION',
-            self::MAJOR_VERSION.'.'.self::MINOR_VERSION.'.'.self::PATCH_VERSION.self::EXTRA_VERSION
-        );
+        defined('MAUTIC_VERSION') or define('MAUTIC_VERSION', $metadata->getVersion());
 
         parent::__construct($environment, $debug);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true): Response
     {
-        if (strpos($request->getRequestUri(), 'installer') !== false || !$this->isInstalled()) {
+        if (false !== strpos($request->getRequestUri(), 'installer') || !$this->isInstalled()) {
             defined('MAUTIC_INSTALLER') or define('MAUTIC_INSTALLER', 1);
         }
 
         if (defined('MAUTIC_INSTALLER')) {
             $uri = $request->getRequestUri();
-            if (strpos($uri, 'installer') === false) {
+            if (false === strpos($uri, 'installer')) {
                 $base   = $request->getBaseUrl();
                 $prefix = '';
                 //check to see if the .htaccess file exists or if not running under apache
-                if (stripos($request->server->get('SERVER_SOFTWARE', ''), 'apache') === false
+                if (false === stripos($request->server->get('SERVER_SOFTWARE', ''), 'apache')
                     || !file_exists(__DIR__.'../.htaccess')
-                    && strpos(
+                    && false === strpos(
                         $base,
                         'index'
-                    ) === false
+                    )
                 ) {
                     $prefix .= '/index.php';
                 }
@@ -125,26 +97,14 @@ class AppKernel extends Kernel
                 $db->connect();
             } catch (\Exception $e) {
                 error_log($e);
-                throw new \Mautic\CoreBundle\Exception\DatabaseConnectionException(
-                    $this->getContainer()->get('translator')->trans(
-                        'mautic.core.db.connection.error',
-                        [
-                            '%code%' => $e->getCode(),
-                        ]
-                    ),
-                    0,
-                    $e
-                );
+                throw new \Mautic\CoreBundle\Exception\DatabaseConnectionException($this->getContainer()->get('translator')->trans('mautic.core.db.connection.error', ['%code%' => $e->getCode()]), 0, $e);
             }
         }
 
         return parent::handle($request, $type, $catch);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function registerBundles()
+    public function registerBundles(): array
     {
         $bundles = [
             // Symfony/Core Bundles
@@ -165,6 +125,12 @@ class AppKernel extends Kernel
             new Symfony\Bundle\TwigBundle\TwigBundle(),
             new Debril\RssAtomBundle\DebrilRssAtomBundle(),
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
+            new LightSaml\SymfonyBridgeBundle\LightSamlSymfonyBridgeBundle(),
+            new LightSaml\SpBundle\LightSamlSpBundle(),
+            new Ivory\OrderedFormBundle\IvoryOrderedFormBundle(),
+            new Noxlogic\RateLimitBundle\NoxlogicRateLimitBundle(),
+            new FM\ElfinderBundle\FMElfinderBundle(),
+
             // Mautic Bundles
             new Mautic\ApiBundle\MauticApiBundle(),
             new Mautic\AssetBundle\MauticAssetBundle(),
@@ -179,27 +145,31 @@ class AppKernel extends Kernel
             new Mautic\EmailBundle\MauticEmailBundle(),
             new Mautic\FormBundle\MauticFormBundle(),
             new Mautic\InstallBundle\MauticInstallBundle(),
+            new Mautic\IntegrationsBundle\IntegrationsBundle(),
             new Mautic\LeadBundle\MauticLeadBundle(),
             new Mautic\NotificationBundle\MauticNotificationBundle(),
             new Mautic\PageBundle\MauticPageBundle(),
             new Mautic\PluginBundle\MauticPluginBundle(),
             new Mautic\PointBundle\MauticPointBundle(),
-            new Mautic\QueueBundle\MauticQueueBundle(),
             new Mautic\ReportBundle\MauticReportBundle(),
             new Mautic\SmsBundle\MauticSmsBundle(),
             new Mautic\StageBundle\MauticStageBundle(),
             new Mautic\UserBundle\MauticUserBundle(),
             new Mautic\WebhookBundle\MauticWebhookBundle(),
-            new LightSaml\SymfonyBridgeBundle\LightSamlSymfonyBridgeBundle(),
-            new LightSaml\SpBundle\LightSamlSpBundle(),
-            new Ivory\OrderedFormBundle\IvoryOrderedFormBundle(),
-            new Noxlogic\RateLimitBundle\NoxlogicRateLimitBundle(),
-            // These two bundles do DI based on config, so they need to be loaded after config is declared in MauticQueueBundle
-            new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
-            new Leezy\PheanstalkBundle\LeezyPheanstalkBundle(),
         ];
 
-        //dynamically register Mautic Plugin Bundles
+        $queueProtocol = $this->getParameterLoader()->getLocalParameterBag()->get('queue_protocol', '');
+        $bundles[]     = new Mautic\QueueBundle\MauticQueueBundle($queueProtocol);
+        switch ($queueProtocol) {
+            case QueueProtocol::RABBITMQ:
+                $bundles[] = new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle();
+                break;
+            case QueueProtocol::BEANSTALKD:
+                $bundles[] = new Leezy\PheanstalkBundle\LeezyPheanstalkBundle();
+                break;
+        }
+
+        // dynamically register Mautic Plugin Bundles
         $searchPath = dirname(__DIR__).'/plugins';
         $finder     = new \Symfony\Component\Finder\Finder();
         $finder->files()
@@ -233,12 +203,13 @@ class AppKernel extends Kernel
         if (in_array($this->getEnvironment(), ['dev', 'test'])) {
             $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
             $bundles[] = new Sensio\Bundle\DistributionBundle\SensioDistributionBundle();
-            $bundles[] = new Sensio\Bundle\GeneratorBundle\SensioGeneratorBundle();
             $bundles[] = new Webfactory\Bundle\ExceptionsBundle\WebfactoryExceptionsBundle();
+            $bundles[] = new Fidry\PsyshBundle\PsyshBundle();
         }
 
         if (in_array($this->getEnvironment(), ['test'])) {
             $bundles[] = new Liip\FunctionalTestBundle\LiipFunctionalTestBundle();
+            $bundles[] = new Liip\TestFixturesBundle\LiipTestFixturesBundle();
         }
 
         // Check for local bundle inclusion
@@ -252,21 +223,19 @@ class AppKernel extends Kernel
     /**
      * {@inheritdoc}
      */
-    public function boot()
+    public function boot(): void
     {
         if (true === $this->booted) {
             return;
         }
 
+        // load parameters with defaults into the environment
+        $parameterLoader = $this->getParameterLoader();
+        $parameterLoader->loadIntoEnvironment();
+
         if (!defined('MAUTIC_TABLE_PREFIX')) {
             //set the table prefix before boot
-            $localParams = $this->getLocalParams();
-            $prefix      = isset($localParams['db_table_prefix']) ? $localParams['db_table_prefix'] : '';
-            define('MAUTIC_TABLE_PREFIX', $prefix);
-        }
-
-        if ($this->loadClassCache) {
-            $this->doLoadClassCache($this->loadClassCache[0], $this->loadClassCache[1]);
+            define('MAUTIC_TABLE_PREFIX', $parameterLoader->getLocalParameterBag()->get('db_table_prefix', ''));
         }
 
         // init bundles
@@ -275,104 +244,55 @@ class AppKernel extends Kernel
         // init container
         $this->initializeContainer();
 
-        // If in console, set the table prefix since handle() is not executed
-        if (defined('IN_MAUTIC_CONSOLE') && !defined('MAUTIC_TABLE_PREFIX')) {
-            $localParams = $this->getLocalParams();
-            $prefix      = isset($localParams['db_table_prefix']) ? $localParams['db_table_prefix'] : '';
-            define('MAUTIC_TABLE_PREFIX', $prefix);
-        }
-
-        $registeredPluginBundles = $this->container->getParameter('mautic.plugin.bundles');
-
+        // boot bundles
         foreach ($this->getBundles() as $name => $bundle) {
             $bundle->setContainer($this->container);
             $bundle->boot();
         }
 
-        $this->pluginBundles = $registeredPluginBundles;
-
         $this->booted = true;
-    }
-
-    /**
-     * Returns a list of addon bundles that are enabled.
-     *
-     * @return array
-     */
-    public function getPluginBundles()
-    {
-        return $this->pluginBundles;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.php');
     }
 
     /**
      * Retrieves the application's version number.
-     *
-     * @return string
      */
-    public function getVersion()
+    public function getVersion(): string
     {
         return MAUTIC_VERSION;
     }
 
     /**
      * Checks if the application has been installed.
-     *
-     * @return bool
      */
-    protected function isInstalled()
+    protected function isInstalled(): bool
     {
-        static $isInstalled = null;
+        if (null === $this->installed) {
+            $localParameters = $this->getParameterLoader()->getLocalParameterBag();
+            $dbDriver        = $localParameters->get('db_driver');
+            $mailerFromName  = $localParameters->get('mailer_from_name');
 
-        if ($isInstalled === null) {
-            $params      = $this->getLocalParams();
-            $isInstalled = (is_array($params) && !empty($params['db_driver']) && !empty($params['mailer_from_name']));
+            $this->installed = !empty($dbDriver) && !empty($mailerFromName);
         }
 
-        return $isInstalled;
+        return $this->installed;
     }
 
-    /**
-     * @param array $params
-     *
-     * @return \Doctrine\DBAL\Connection
-     *
-     * @throws Exception
-     * @throws \Doctrine\DBAL\DBALException
-     */
-    public function getDatabaseConnection($params = [])
+    public function getRootDir(): string
     {
-        if (empty($params)) {
-            $params = $this->getLocalParams();
-        }
+        return __DIR__;
+    }
 
-        if (!empty($params) && !empty($params['db_driver'])) {
-            $testParams = ['driver', 'host', 'port', 'name', 'user', 'password', 'path'];
-            $dbParams   = [];
-            foreach ($testParams as &$p) {
-                $param = (isset($params["db_{$p}"])) ? $params["db_{$p}"] : '';
-                if ($p == 'port') {
-                    $param = (int) $param;
-                }
-                $name            = ($p == 'name') ? 'dbname' : $p;
-                $dbParams[$name] = $param;
-            }
-
-            // Test a database connection and existence of a user
-            $db = \Doctrine\DBAL\DriverManager::getConnection($dbParams);
-            $db->connect();
-
-            return $db;
-        } else {
-            throw new \Exception('not configured');
-        }
+    public function getProjectDir(): string
+    {
+        return dirname(__DIR__);
     }
 
     /**
@@ -380,195 +300,43 @@ class AppKernel extends Kernel
      *
      * @api
      */
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
-        $parameters = $this->getLocalParams();
-        if (isset($parameters['cache_path'])) {
-            $envFolder = (substr($parameters['cache_path'], -1) != '/') ? '/'.$this->environment : $this->environment;
+        if ($cachePath = $this->getParameterLoader()->getLocalParameterBag()->get('cache_path')) {
+            $envFolder = ('/' != substr($cachePath, -1)) ? '/'.$this->environment : $this->environment;
 
-            return str_replace('%kernel.root_dir%', $this->getRootDir(), $parameters['cache_path'].$envFolder);
-        } else {
-            return parent::getCacheDir();
+            return str_replace('%kernel.root_dir%', $this->getRootDir(), $cachePath.$envFolder);
         }
+
+        return dirname(__DIR__).'/var/cache/'.$this->getEnvironment();
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @api
-     */
-    public function getLogDir()
+    public function getLogDir(): string
     {
-        $parameters = $this->getLocalParams();
-        if (isset($parameters['log_path'])) {
-            return str_replace('%kernel.root_dir%', $this->getRootDir(), $parameters['log_path']);
-        } else {
-            return parent::getLogDir();
-        }
-    }
-
-    /**
-     * Get Mautic's local configuration file.
-     *
-     * @return array
-     */
-    public function getLocalParams()
-    {
-        static $localParameters;
-
-        if (!is_array($localParameters)) {
-            /** @var $paths */
-            $root = $this->getRootDir();
-            include $root.'/config/paths.php';
-
-            if ($configFile = $this->getLocalConfigFile()) {
-                /** @var $parameters */
-                include $configFile;
-                $localParameters = (isset($parameters) && is_array($parameters)) ? $parameters : [];
-            } else {
-                $localParameters = [];
-            }
-
-            //check for parameter overrides
-            if (file_exists($root.'/config/parameters_local.php')) {
-                /** @var $parameters */
-                include $root.'/config/parameters_local.php';
-                $localParameters = array_merge($localParameters, $parameters);
-            }
-
-            foreach ($localParameters as $k => &$v) {
-                if (!empty($v) && is_string($v) && preg_match('/getenv\((.*?)\)/', $v, $match)) {
-                    $v = (string) getenv($match[1]);
-                }
-            }
+        if ($logPath = $this->getParameterLoader()->getLocalParameterBag()->get('log_path')) {
+            return str_replace('%kernel.root_dir%', $this->getRootDir(), $logPath);
         }
 
-        return $localParameters;
+        return dirname(__DIR__).'/var/logs';
     }
 
     /**
      * Get local config file.
-     *
-     * @param bool $checkExists If true, then return false if the file doesn't exist
-     *
-     * @return bool
      */
-    public function getLocalConfigFile($checkExists = true)
+    public function getLocalConfigFile(): string
     {
         /** @var $paths */
         $root = $this->getRootDir();
-        include $root.'/config/paths.php';
 
-        if (isset($paths['local_config'])) {
-            $paths['local_config'] = str_replace('%kernel.root_dir%', $root, $paths['local_config']);
-            if (!$checkExists || file_exists($paths['local_config'])) {
-                return $paths['local_config'];
-            }
-        }
-
-        return false;
+        return ParameterLoader::getLocalConfigFile($root);
     }
 
-    /**
-     * Get the container file name or path.
-     *
-     * @param bool|true $fullPath
-     *
-     * @return string
-     */
-    public function getContainerFile($fullPath = true)
+    private function getParameterLoader(): ParameterLoader
     {
-        $fileName = $this->getContainerClass().'.php';
-
-        if ($fullPath) {
-            // Override the container class for the local instance
-            $params        = $this->getLocalParams();
-            $containerPath = (isset($params['container_path'])) ? $params['container_path'] : $this->getCacheDir();
-
-            if (!file_exists($containerPath)) {
-                @mkdir($containerPath, 0755, true);
-            }
-
-            $containerPath = (isset($params['container_path'])) ? $params['container_path'] : $this->getCacheDir();
-
-            $fileName = $containerPath.'/'.$fileName;
+        if ($this->parameterLoader) {
+            return $this->parameterLoader;
         }
 
-        return $fileName;
-    }
-
-    /**
-     * Initializes the service container.
-     *
-     * The cached version of the service container is used when fresh, otherwise the
-     * container is built.
-     */
-    protected function initializeContainer()
-    {
-        $class = $this->getContainerClass();
-
-        $cache = new \Symfony\Component\Config\ConfigCache($this->getContainerFile(true), $this->debug);
-
-        $fresh = file_exists($this->getCacheDir().'/classes.php');
-        if (!$cache->isFresh()) {
-            $container = $this->buildContainer();
-            $container->compile();
-            $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
-
-            if ($this->debug) {
-                $fresh = false;
-            }
-        }
-
-        require_once $cache->getPath();
-
-        $this->container = new $class();
-        $this->container->set('kernel', $this);
-
-        // Warm up the cache if classes.php is missing or in dev mode
-        if (!$fresh && $this->container->has('cache_warmer')) {
-            $warmer = $this->container->get('cache_warmer');
-            $warmer->enableOptionalWarmers();
-            $warmer->warmUp($this->container->getParameter('kernel.cache_dir'));
-        }
-    }
-
-    /**
-     * Builds the service container.
-     *
-     * @return \Symfony\Component\DependencyInjection\ContainerBuilder The compiled service container
-     *
-     * @throws \RuntimeException
-     */
-    protected function buildContainer()
-    {
-        foreach (['cache' => $this->getCacheDir(), 'logs' => $this->getLogDir()] as $name => $dir) {
-            if (!is_dir($dir)) {
-                if (false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
-                    throw new \RuntimeException(sprintf("Unable to create the %s directory (%s)\n", $name, $dir));
-                }
-            } elseif (!is_writable($dir)) {
-                throw new \RuntimeException(sprintf("Unable to write in the %s directory (%s)\n", $name, $dir));
-            }
-        }
-
-        $container = $this->getContainerBuilder();
-        $container->addObjectResource($this);
-        $this->prepareContainer($container);
-
-        if (null !== $cont = $this->registerContainerConfiguration($this->getContainerLoader($container))) {
-            $container->merge($cont);
-        }
-
-        // Only rebuild the classes if it doesn't exist or if the kernel is booted through the console meaning likely cache:clear is used
-        if (defined('IN_MAUTIC_CONSOLE') || !file_exists($this->getCacheDir().'/classes.php')) {
-            $container->addCompilerPass(new DependencyInjection\AddClassesToCachePass($this));
-        }
-
-        // Environmentally set parameters
-        $container->addResource(new EnvParametersResource('SYMFONY__'));
-        $container->addResource(new EnvParametersResource('MAUTIC__'));
-
-        return $container;
+        return $this->parameterLoader = new ParameterLoader();
     }
 }

@@ -110,12 +110,14 @@ class Sms extends FormEntity
 
     public function __clone()
     {
-        $this->id               = null;
-        $this->stats            = new ArrayCollection();
-        $this->sentCount        = 0;
-        $this->deliveredCount   = 0;
-        $this->readCount        = 0;
-        $this->failedCount      = 0;
+        $this->id             = null;
+        $this->stats          = new ArrayCollection();
+        $this->sentCount      = 0;
+        $this->readCount      = 0;
+        $this->deliveredCount = 0;
+        $this->readCount      = 0;
+        $this->failedCount    = 0;
+
         parent::__clone();
     }
 
@@ -133,9 +135,6 @@ class Sms extends FormEntity
         $this->stats = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -195,9 +194,6 @@ class Sms extends FormEntity
             ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint(
@@ -212,7 +208,7 @@ class Sms extends FormEntity
         $metadata->addConstraint(new Callback([
             'callback' => function (Sms $sms, ExecutionContextInterface $context) {
                 $type = $sms->getSmsType();
-                if ($type == 'list') {
+                if ('list' == $type) {
                     $validator = $context->getValidator();
                     $violations = $validator->validate(
                         $sms->getLists(),
@@ -281,7 +277,7 @@ class Sms extends FormEntity
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
 
-        if ($prop == 'category' || $prop == 'list') {
+        if ('category' == $prop || 'list' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -472,8 +468,6 @@ class Sms extends FormEntity
     /**
      * Add list.
      *
-     * @param LeadList $list
-     *
      * @return Sms
      */
     public function addList(LeadList $list)
@@ -485,8 +479,6 @@ class Sms extends FormEntity
 
     /**
      * Remove list.
-     *
-     * @param LeadList $list
      */
     public function removeList(LeadList $list)
     {

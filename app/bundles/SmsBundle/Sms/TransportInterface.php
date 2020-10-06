@@ -18,7 +18,6 @@ use Mautic\SmsBundle\Entity\Stat;
 interface TransportInterface
 {
     /**
-     * @param Lead   $lead
      * @param string $content
      * @param Sms    $sms
      * @param Stat   $stat

@@ -12,9 +12,14 @@
 namespace Mautic\CampaignBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\CoreBundle\Form\Type\ButtonGroupType;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\PropertiesTrait;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -27,17 +32,13 @@ class EventType extends AbstractType
 {
     use PropertiesTrait;
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $masks = [];
 
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.name',
                 'label_attr' => ['class' => 'control-label'],
@@ -48,7 +49,7 @@ class EventType extends AbstractType
 
         $builder->add(
             'anchor',
-            'hidden',
+            HiddenType::class,
             [
                 'label' => false,
             ]
@@ -79,16 +80,16 @@ class EventType extends AbstractType
             $triggerMode = (empty($options['data']['triggerMode'])) ? $default : $options['data']['triggerMode'];
             $builder->add(
                 'triggerMode',
-                'button_group',
+                ButtonGroupType::class,
                 [
-                    'choices'     => $choices,
-                    'expanded'    => true,
-                    'multiple'    => false,
-                    'label_attr'  => ['class' => 'control-label'],
-                    'label'       => $label,
-                    'empty_value' => false,
-                    'required'    => false,
-                    'attr'        => [
+                    'choices'           => array_flip($choices),
+                    'expanded'          => true,
+                    'multiple'          => false,
+                    'label_attr'        => ['class' => 'control-label'],
+                    'label'             => $label,
+                    'placeholder'       => false,
+                    'required'          => false,
+                    'attr'              => [
                         'onchange' => 'Mautic.campaignToggleTimeframes();',
                         'tooltip'  => 'mautic.campaign.form.type.help',
                     ],
@@ -98,7 +99,7 @@ class EventType extends AbstractType
 
             $builder->add(
                 'triggerDate',
-                'datetime',
+                DateTimeType::class,
                 [
                     'label'  => false,
                     'attr'   => [
@@ -115,7 +116,7 @@ class EventType extends AbstractType
                 || null === $options['data']['triggerInterval']) ? 1 : (int) $options['data']['triggerInterval'];
             $builder->add(
                 'triggerInterval',
-                'number',
+                NumberType::class,
                 [
                     'label' => false,
                     'attr'  => [
@@ -129,22 +130,22 @@ class EventType extends AbstractType
             $data = (!empty($options['data']['triggerIntervalUnit'])) ? $options['data']['triggerIntervalUnit'] : 'd';
             $builder->add(
                 'triggerIntervalUnit',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices'     => [
-                        'i' => 'mautic.campaign.event.intervalunit.choice.i',
-                        'h' => 'mautic.campaign.event.intervalunit.choice.h',
-                        'd' => 'mautic.campaign.event.intervalunit.choice.d',
-                        'm' => 'mautic.campaign.event.intervalunit.choice.m',
-                        'y' => 'mautic.campaign.event.intervalunit.choice.y',
+                        'mautic.campaign.event.intervalunit.choice.i' => 'i',
+                        'mautic.campaign.event.intervalunit.choice.h' => 'h',
+                        'mautic.campaign.event.intervalunit.choice.d' => 'd',
+                        'mautic.campaign.event.intervalunit.choice.m' => 'm',
+                        'mautic.campaign.event.intervalunit.choice.y' => 'y',
                     ],
-                    'multiple'    => false,
-                    'label_attr'  => ['class' => 'control-label'],
-                    'label'       => false,
-                    'attr'        => [
+                    'multiple'          => false,
+                    'label_attr'        => ['class' => 'control-label'],
+                    'label'             => false,
+                    'attr'              => [
                         'class' => 'form-control',
                     ],
-                    'empty_value' => false,
+                    'placeholder' => false,
                     'required'    => false,
                     'data'        => $data,
                 ]
@@ -209,18 +210,18 @@ class EventType extends AbstractType
                         'data-format' => 'H:i',
                     ],
                     'choices'  => [
-                        1  => 'mautic.report.schedule.day.monday',
-                        2  => 'mautic.report.schedule.day.tuesday',
-                        3  => 'mautic.report.schedule.day.wednesday',
-                        4  => 'mautic.report.schedule.day.thursday',
-                        5  => 'mautic.report.schedule.day.friday',
-                        6  => 'mautic.report.schedule.day.saturday',
-                        0  => 'mautic.report.schedule.day.sunday',
-                        -1 => 'mautic.report.schedule.day.week_days',
+                        'mautic.report.schedule.day.monday'     => 1,
+                        'mautic.report.schedule.day.tuesday'    => 2,
+                        'mautic.report.schedule.day.wednesday'  => 3,
+                        'mautic.report.schedule.day.thursday'   => 4,
+                        'mautic.report.schedule.day.friday'     => 5,
+                        'mautic.report.schedule.day.saturday'   => 6,
+                        'mautic.report.schedule.day.sunday'     => 0,
+                        'mautic.report.schedule.day.week_days'  => -1,
                     ],
-                    'expanded' => true,
-                    'multiple' => true,
-                    'required' => false,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'required'          => false,
                 ]
             );
         }
@@ -229,11 +230,11 @@ class EventType extends AbstractType
             $this->addPropertiesType($builder, $options, $masks);
         }
 
-        $builder->add('type', 'hidden');
-        $builder->add('eventType', 'hidden');
+        $builder->add('type', HiddenType::class);
+        $builder->add('eventType', HiddenType::class);
         $builder->add(
             'anchorEventType',
-            'hidden',
+            HiddenType::class,
             [
                 'mapped' => false,
                 'data'   => (isset($options['data']['anchorEventType'])) ? $options['data']['anchorEventType'] : '',
@@ -242,7 +243,7 @@ class EventType extends AbstractType
 
         $builder->add(
             'canvasSettings',
-            'campaignevent_canvassettings',
+            EventCanvasSettingsType::class,
             [
                 'label' => false,
             ]
@@ -259,7 +260,7 @@ class EventType extends AbstractType
 
         $builder->add(
             'buttons',
-            'form_buttons',
+            FormButtonsType::class,
             [
                 'save_text'       => $btnValue,
                 'save_icon'       => $btnIcon,
@@ -271,7 +272,7 @@ class EventType extends AbstractType
 
         $builder->add(
             'campaignId',
-            'hidden',
+            HiddenType::class,
             [
                 'mapped' => false,
             ]
@@ -284,25 +285,13 @@ class EventType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['settings']);
     }
 
     /**
-     * @return string
-     */
-    public function getName()
-    {
-        return 'campaignevent';
-    }
-
-    /**
-     * @param array $data
-     * @param       $name
+     * @param $name
      *
      * @return \DateTime|mixed|null
      */
@@ -317,5 +306,10 @@ class EventType extends AbstractType
         }
 
         return new \DateTime($data[$name]);
+    }
+
+    public function getBlockPrefix()
+    {
+        return 'campaignevent';
     }
 }

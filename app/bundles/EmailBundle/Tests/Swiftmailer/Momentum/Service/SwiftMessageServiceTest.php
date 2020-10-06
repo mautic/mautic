@@ -6,13 +6,10 @@ use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Service\SwiftMessageService;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class SwiftMessageServiceTest.
- */
-class SwiftMessageServiceTest extends \PHPUnit_Framework_TestCase
+class SwiftMessageServiceTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $translatorInterfaceMock;
 
@@ -22,14 +19,13 @@ class SwiftMessageServiceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param MauticMessage $mauticMessage
-     * @param string        $expectedTransmissionJson
+     * @param string $expectedTransmissionJson
      *
      * @dataProvider dataTransformToTransmission
      */
     public function testTransformToTransmission(MauticMessage $mauticMessage, $expectedTransmissionJson)
     {
-        $service         = $this->getSwiftMessageService();
+        $service         = new SwiftMessageService();
         $transmissionDTO = $service->transformToTransmission($mauticMessage);
 
         $this->assertJsonStringEqualsJsonString($expectedTransmissionJson, json_encode($transmissionDTO));
@@ -403,15 +399,5 @@ class SwiftMessageServiceTest extends \PHPUnit_Framework_TestCase
         ';
 
         return [$mauticMessage, $json];
-    }
-
-    /**
-     * @return SwiftMessageService
-     */
-    private function getSwiftMessageService()
-    {
-        return new SwiftMessageService(
-            $this->translatorInterfaceMock
-        );
     }
 }

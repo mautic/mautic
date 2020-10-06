@@ -9,14 +9,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Helper;
+namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\ColorHelper;
 
-/**
- * Class ColorHelper test.
- */
-class ColorHelperTest extends \PHPUnit_Framework_TestCase
+class ColorHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox The helper is instantiated correctly

@@ -43,9 +43,8 @@ class CampaignLeadChangeEvent extends Event
     /**
      * CampaignLeadChangeEvent constructor.
      *
-     * @param Campaign $campaign
-     * @param          $leads
-     * @param          $action
+     * @param $leads
+     * @param $action
      */
     public function __construct(Campaign $campaign, $leads, $action)
     {
@@ -105,7 +104,7 @@ class CampaignLeadChangeEvent extends Event
      */
     public function wasRemoved()
     {
-        return $this->action == 'removed';
+        return 'removed' == $this->action;
     }
 
     /**
@@ -115,6 +114,6 @@ class CampaignLeadChangeEvent extends Event
      */
     public function wasAdded()
     {
-        return $this->action == 'added';
+        return 'added' == $this->action;
     }
 }

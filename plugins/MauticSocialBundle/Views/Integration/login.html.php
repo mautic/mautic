@@ -37,7 +37,7 @@ $label = (!$field['showLabel'])
 <label $labelAttr>{$view->escape($field['label'])}</label>
 HTML;
 
-$script = '<script src="'.$view['router']->generate('mautic_social_js_generate', ['formName' => $formName], true)
+$script = '<script src="'.$view['router']->url('mautic_social_js_generate', ['formName' => $formName], true)
     .'" type="text/javascript" charset="utf-8" async="async"></script>';
 
 $html = <<<HTML

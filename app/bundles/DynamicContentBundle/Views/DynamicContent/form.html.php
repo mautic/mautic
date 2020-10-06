@@ -89,7 +89,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                 <?php echo $view['form']->errors($form['filters']); ?>
                             </div>
                         <?php endif; ?>
-                        <div class="dwc-filter bdr-w-0" id="<?php echo $form->vars['id'] ?>">
+                        <div class="dwc-filter bdr-w-0" id="<?php echo $form->vars['id']; ?>">
                             <div class="row">
                                 <div class="col-xs-7">
                                     <label><?php echo $view['translator']->trans('Filters'); ?></label>
@@ -104,16 +104,16 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                                 <?php
                                                 foreach ($fields as $object => $field):
                                                     $header = $object;
-                                                    $icon   = ($object == 'company') ? 'building' : 'user';
+                                                    $icon   = ('company' == $object) ? 'building' : 'user';
                                                     ?>
                                                     <optgroup label="<?php echo $view['translator']->trans('mautic.lead.'.$header); ?>">
                                                         <?php foreach ($field as $value => $params):
-                                                            $list    = (!empty($params['properties']['list'])) ? $params['properties']['list'] : [];
-                                                            $choices = \Mautic\LeadBundle\Helper\FormFieldHelper::parseList(
-                                                                $list,
-                                                                true,
-                                                                ('boolean' === $params['properties']['type'])
-                                                            );
+                                                            $list      = (!empty($params['properties']['list'])) ? $params['properties']['list'] : [];
+                                                            $choices   = ('boolean' === $params['properties']['type'])
+                                                                ?
+                                                                \Mautic\LeadBundle\Helper\FormFieldHelper::parseBooleanList($list)
+                                                                :
+                                                                \Mautic\LeadBundle\Helper\FormFieldHelper::parseList($list);
                                                             $list     = json_encode($choices);
                                                             $callback = (!empty($params['properties']['callback']))
                                                                 ? $params['properties']['callback'] : '';
@@ -163,7 +163,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
             </div>
             <?php if (!isset($form['updateSelect'])) : ?>
                 <?php echo $view['form']->row($form['isCampaignBased']); ?>
-            <?php endif ?>
+            <?php endif; ?>
             <div id="slotNameDiv" class="<?php echo $form->vars['value']->isCampaignBased() ? 'hide' : ''; ?>">
                 <?php echo $view['form']->row($form['slotName']); ?>
             </div>
@@ -187,7 +187,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
 
 <div class="hide" id="templates">
     <?php foreach ($templates as $dataKey => $template): ?>
-        <?php $attr = ($dataKey == 'tags') ? ' data-placeholder="'.$view['translator']->trans('mautic.lead.tags.select_or_create')
+        <?php $attr = ('tags' == $dataKey) ? ' data-placeholder="'.$view['translator']->trans('mautic.lead.tags.select_or_create')
             .'" data-no-results-text="'.$view['translator']->trans('mautic.lead.tags.enter_to_create')
             .'" data-allow-add="true" onchange="Mautic.createLeadTag(this)"' : ''; ?>
         <select class="form-control not-chosen <?php echo $template; ?>" name="dwc[filters][__name__][filter]"
@@ -202,7 +202,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                         endforeach;
                         echo "</optgroup>\n";
                     else:
-                        if ($dataKey == 'lists' && (isset($currentListId) && (int) $value === (int) $currentListId)) {
+                        if ('lists' == $dataKey && (isset($currentListId) && (int) $value === (int) $currentListId)) {
                             continue;
                         }
                         echo "<option value=\"$value\">$label</option>\n";

@@ -26,8 +26,6 @@ class FormFieldEmailType extends AbstractType
 
     /**
      * FormFieldTelType constructor.
-     *
-     * @param TranslatorInterface $translator
      */
     public function __construct(TranslatorInterface $translator)
     {

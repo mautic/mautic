@@ -34,18 +34,12 @@ class DwcEntryFiltersType extends AbstractType
 
     /**
      * DwcEntryFiltersType constructor.
-     *
-     * @param TranslatorInterface $translator
      */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -54,10 +48,10 @@ class DwcEntryFiltersType extends AbstractType
             [
                 'label'   => false,
                 'choices' => [
-                    'and' => 'mautic.lead.list.form.glue.and',
-                    'or'  => 'mautic.lead.list.form.glue.or',
+                    'mautic.lead.list.form.glue.and' => 'and',
+                    'mautic.lead.list.form.glue.or'  => 'or',
                 ],
-                'attr' => [
+                'attr'              => [
                     'class'    => 'form-control not-chosen glue-select',
                     'onchange' => 'Mautic.updateFilterPositioning(this)',
                 ],
@@ -88,8 +82,6 @@ class DwcEntryFiltersType extends AbstractType
     }
 
     /**
-     * @param OptionsResolver $resolver
-     *
      * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      */
     public function configureOptions(OptionsResolver $resolver)
@@ -119,7 +111,7 @@ class DwcEntryFiltersType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'dwc_entry_filters';
     }

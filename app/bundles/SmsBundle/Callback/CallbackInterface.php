@@ -32,8 +32,6 @@ interface CallbackInterface
     /**
      * Return all contacts that match whatever identifiers the service provides (likely number).
      *
-     * @param Request $request
-     *
      * @return ArrayCollection
      *
      * @throws NumberNotFoundException
@@ -45,9 +43,7 @@ interface CallbackInterface
     /**
      * Get callback event.
      *
-     * @param Request $request
-     *
-     * @return ReplyEvent|DeliveryEvent
+     * @return string
      *
      * @throws BadRequestHttpException
      * @throws NotFoundHttpException

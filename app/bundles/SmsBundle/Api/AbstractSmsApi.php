@@ -24,14 +24,12 @@ use Mautic\SmsBundle\Sms\TransportInterface;
 abstract class AbstractSmsApi implements TransportInterface
 {
     /**
-     * @var MauticFactory
+     * @var TrackableModel
      */
     protected $pageTrackableModel;
 
     /**
      * AbstractSmsApi constructor.
-     *
-     * @param TrackableModel $pageTrackableModel
      */
     public function __construct(TrackableModel $pageTrackableModel)
     {
@@ -39,7 +37,6 @@ abstract class AbstractSmsApi implements TransportInterface
     }
 
     /**
-     * @param Lead   $lead
      * @param string $content
      *
      * @return mixed
@@ -50,7 +47,6 @@ abstract class AbstractSmsApi implements TransportInterface
      * Convert a non-tracked url to a tracked url.
      *
      * @param string $url
-     * @param array  $clickthrough
      *
      * @return string
      */

@@ -25,6 +25,14 @@ class StopSubscriber implements EventSubscriberInterface
     private $doNotContactModel;
 
     /**
+     * StopSubscriber constructor.
+     */
+    public function __construct(DoNotContactModel $doNotContactModel)
+    {
+        $this->doNotContactModel         = $doNotContactModel;
+    }
+
+    /**
      * @return array
      */
     public static function getSubscribedEvents()
@@ -34,9 +42,6 @@ class StopSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ReplyEvent $event
-     */
     public function onReply(ReplyEvent $event)
     {
         $message = $event->getMessage();

@@ -27,9 +27,6 @@ class CustomMappedDecorator extends BaseDecorator
 
     /**
      * CustomMappedDecorator constructor.
-     *
-     * @param ContactSegmentFilterOperator   $contactSegmentFilterOperator
-     * @param ContactSegmentFilterDictionary $contactSegmentFilterDictionary
      */
     public function __construct(
         ContactSegmentFilterOperator $contactSegmentFilterOperator,
@@ -40,9 +37,7 @@ class CustomMappedDecorator extends BaseDecorator
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
-     * @return null|string
+     * @return string|null
      */
     public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
@@ -56,8 +51,6 @@ class CustomMappedDecorator extends BaseDecorator
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string
      */
     public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate)
@@ -72,8 +65,6 @@ class CustomMappedDecorator extends BaseDecorator
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string
      */
     public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
@@ -88,8 +79,6 @@ class CustomMappedDecorator extends BaseDecorator
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string|bool if no func needed
      */
     public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
@@ -101,9 +90,7 @@ class CustomMappedDecorator extends BaseDecorator
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
-     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|null|string
+     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string|null
      */
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {

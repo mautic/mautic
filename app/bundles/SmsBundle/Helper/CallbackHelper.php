@@ -52,12 +52,7 @@ class CallbackHelper
     private $smsModel;
 
     /**
-     * CallbackHelper constructor.
-     *
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param LoggerInterface          $logger
-     * @param ContactTracker           $contactTracker
-     * @param SmsModel                 $smsModel
+     * ReplyHelper constructor.
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -83,9 +78,6 @@ class CallbackHelper
     }
 
     /**
-     * @param CallbackInterface $handler
-     * @param Request           $request
-     *
      * @return Response
      *
      * @throws \Exception
@@ -139,9 +131,7 @@ class CallbackHelper
     }
 
     /**
-     * @param ReplyEvent $replyEvent
-     *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response|null
      */
     public function dispatchReplyEvent(ReplyEvent $replyEvent)
     {
@@ -151,8 +141,6 @@ class CallbackHelper
     }
 
     /**
-     * @param DeliveryEvent $deliveryEvent
-     *
      * @return Response|null
      */
     public function dispatchDeliveryEvent(DeliveryEvent $deliveryEvent)
@@ -168,8 +156,6 @@ class CallbackHelper
     }
 
     /**
-     * @param CallbackInterface $handler
-     *
      * @return Response
      *
      * @throws \Exception

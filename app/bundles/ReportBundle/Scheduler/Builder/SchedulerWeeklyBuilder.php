@@ -22,9 +22,6 @@ use Recurr\Rule;
 class SchedulerWeeklyBuilder implements BuilderInterface
 {
     /**
-     * @param Rule               $rule
-     * @param SchedulerInterface $scheduler
-     *
      * @return Rule
      *
      * @throws InvalidSchedulerException

@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -23,19 +24,11 @@ class PreferenceChannelsType extends AbstractType
      */
     private $leadModel;
 
-    /**
-     * ModifyDNCActionType constructor.
-     *
-     * @param LeadModel $leadModel
-     */
     public function __construct(LeadModel $leadModel)
     {
         $this->leadModel = $leadModel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $model = $this->leadModel;
@@ -43,9 +36,9 @@ class PreferenceChannelsType extends AbstractType
         $resolver->setDefaults(
             [
                 'choices'     => function (Options $options) use ($model) {
-                    return array_flip($model->getPreferenceChannels());
+                    return $model->getPreferenceChannels();
                 },
-                'empty_value' => '',
+                'placeholder' => '',
                 'attr'        => ['class' => 'form-control'],
                 'label_attr'  => ['class' => 'control-label'],
                 'multiple'    => false,
@@ -55,11 +48,8 @@ class PreferenceChannelsType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

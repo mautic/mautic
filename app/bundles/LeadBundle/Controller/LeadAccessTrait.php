@@ -26,7 +26,7 @@ trait LeadAccessTrait
      * @param bool   $isPlugin
      * @param string $intgegration
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Lead
      */
     protected function checkLeadAccess($leadId, $action, $isPlugin = false, $integration = '')
     {
@@ -39,7 +39,7 @@ trait LeadAccessTrait
             $leadId = $lead->getId();
         }
 
-        if ($lead === null || !$lead->getId()) {
+        if (null === $lead || !$lead->getId()) {
             if (method_exists($this, 'postActionRedirect')) {
                 //set the return URL
                 $page      = $this->get('session')->get($isPlugin ? 'mautic.'.$integration.'.page' : 'mautic.lead.page', 1);
@@ -110,7 +110,7 @@ trait LeadAccessTrait
                 'hydration_mode' => 'HYDRATE_ARRAY',
             ]);
 
-        if ($leads === null) {
+        if (null === $leads) {
             return $this->accessDenied();
         }
 

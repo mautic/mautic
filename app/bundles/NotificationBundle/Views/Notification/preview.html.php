@@ -21,7 +21,7 @@ $button = $notification->getButton();
             </div>
             <div class="text height-auto bg-white">
                 <h4>
-                    <?php 
+                    <?php
                     if ($notification->getHeading()) {
                         echo $notification->getHeading();
                     } else {
@@ -30,7 +30,7 @@ $button = $notification->getButton();
                     ?>  
                 </h4>
                 <p>
-                    <?php 
+                    <?php
                     if ($notification->getMessage()) {
                         echo $notification->getMessage();
                     } else {
@@ -42,7 +42,7 @@ $button = $notification->getButton();
         </div>
         <?php if ($url && $button) : ?>
             <hr>
-            <a href="<?php echo $url ?>"><?php echo $button ?></a>
+            <a href="<?php echo $url; ?>"><?php echo $button; ?></a>
         <?php endif; ?>
     </div>
 </div>
