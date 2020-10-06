@@ -14,6 +14,11 @@ return [
         'events' => [
             'mautic.sms.lead.subscriber' => [
                 'class'     => \Mautic\SmsBundle\EventListener\LeadSubscriber::class,
+                'arguments' => [
+                    'translator',
+                    'router',
+                    'doctrine.orm.entity_manager',
+                ],
             ],
             'mautic.sms.broadcast.subscriber' => [
                 'class'     => \Mautic\SmsBundle\EventListener\BroadcastSubscriber::class,
@@ -91,6 +96,9 @@ return [
         'forms' => [
             'mautic.form.type.sms' => [
                 'class'     => \Mautic\SmsBundle\Form\Type\SmsType::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
             ],
             'mautic.form.type.smsconfig' => [
                 'class' => \Mautic\SmsBundle\Form\Type\ConfigType::class,

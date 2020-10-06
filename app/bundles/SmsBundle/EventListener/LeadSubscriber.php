@@ -11,12 +11,37 @@
 
 namespace Mautic\SmsBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    /**
+     * @var EntityManager
+     */
+    private $em;
+
+    public function __construct(TranslatorInterface $translator, RouterInterface $router, EntityManager $em)
+    {
+        $this->translator = $translator;
+        $this->router     = $router;
+        $this->em         = $em;
+    }
+
     /**
      * @return array
      */
@@ -29,8 +54,6 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
@@ -91,7 +114,7 @@ class LeadSubscriber extends CommonSubscriber
                             'type' => $state,
                         ],
                         'contentTemplate' => 'MauticSmsBundle:SubscribedEvents\Timeline:index.html.php',
-                        'icon'            => ($state == 'read') ? 'fa-message-o' : 'fa-commenting',
+                        'icon'            => ('read' == $state) ? 'fa-message-o' : 'fa-commenting',
                         'contactId'       => $contactId,
                     ]
                 );
