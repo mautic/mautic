@@ -12,10 +12,8 @@ namespace Mautic\SmsBundle\Sms;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Exception\PrimaryTransportNotEnabledException;
-use Monolog\Logger;
 
 class TransportChain
 {
@@ -35,11 +33,6 @@ class TransportChain
     private $integrationHelper;
 
     /**
-     * @var Logger
-     */
-    private $logger;
-
-    /**
      * @var TransportSettings
      */
     private $settings;
@@ -47,12 +40,11 @@ class TransportChain
     /**
      * @param string $primaryTransport
      */
-    public function __construct($primaryTransport, IntegrationHelper $integrationHelper, Logger $logger)
+    public function __construct($primaryTransport, IntegrationHelper $integrationHelper)
     {
         $this->primaryTransport  = $primaryTransport;
         $this->transports        = [];
         $this->integrationHelper = $integrationHelper;
-        $this->logger            = $logger;
     }
 
     /**
