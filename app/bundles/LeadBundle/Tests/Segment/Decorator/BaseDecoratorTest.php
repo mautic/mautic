@@ -423,6 +423,19 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         ]);
 
         $this->assertSame($expected, $baseDecorator->getParameterValue($contactSegmentFilterCrate));
+
+        $expected = [
+            '(([|]|^)Value \(1\)([|]|$))',
+            '(([|]|^)Value 2([|]|$))',
+        ];
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'type'     => 'multiselect',
+            'filter'   => ['Value (1)', 'Value 2'],
+            'operator' => 'in',
+        ]);
+
+        $this->assertSame($expected, $baseDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
     /**
