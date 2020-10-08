@@ -20,12 +20,10 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 class Version20191017140848 extends AbstractMauticMigration
 {
     /**
-     * @param Schema $schema
-     *
      * @throws SkipMigrationException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public function preUp(Schema $schema)
+    public function preUp(Schema $schema): void
     {
         $smsStatsTable = $schema->getTable(MAUTIC_TABLE_PREFIX.'sms_message_stats');
         if ($smsStatsTable->hasColumn('is_failed') && $smsStatsTable->hasColumn('details')) {
@@ -34,11 +32,9 @@ class Version20191017140848 extends AbstractMauticMigration
     }
 
     /**
-     * @param Schema $schema
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema): void
     {
         $smsStatsTable = $schema->getTable(MAUTIC_TABLE_PREFIX.'sms_message_stats');
         if (!$smsStatsTable->hasColumn('is_failed')) {

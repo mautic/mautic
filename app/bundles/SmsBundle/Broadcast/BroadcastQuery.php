@@ -39,9 +39,6 @@ class BroadcastQuery
 
     /**
      * BroadcastQuery constructor.
-     *
-     * @param EntityManager $entityManager
-     * @param SmsModel      $smsModel
      */
     public function __construct(EntityManager $entityManager, SmsModel $smsModel)
     {
@@ -50,9 +47,6 @@ class BroadcastQuery
     }
 
     /**
-     * @param Sms            $sms
-     * @param ContactLimiter $contactLimiter
-     *
      * @return array
      */
     public function getPendingContacts(Sms $sms, ContactLimiter $contactLimiter)
@@ -60,14 +54,11 @@ class BroadcastQuery
         $query = $this->getBasicQuery($sms);
         $query->select('DISTINCT l.id, ll.id as listId');
         $this->updateQueryFromContactLimiter('lll', $query, $contactLimiter);
-        $contacts = $query->execute()->fetchAll();
 
-        return $contacts;
+        return $query->execute()->fetchAll();
     }
 
     /**
-     * @param Sms $sms
-     *
      * @return bool|string
      */
     public function getPendingCount(Sms $sms)
@@ -79,8 +70,6 @@ class BroadcastQuery
     }
 
     /**
-     * @param Sms $sms
-     *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
     private function getBasicQuery(Sms $sms)
@@ -105,9 +94,6 @@ class BroadcastQuery
         return $this->query;
     }
 
-    /**
-     * @param int $smsId
-     */
     private function excludeStatsRecords(int $smsId)
     {
         // Do not include leads that have already received text message

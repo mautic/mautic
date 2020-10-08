@@ -46,10 +46,6 @@ class BroadcastExecutioner
 
     /**
      * BroadcastExecutioner constructor.
-     *
-     * @param SmsModel            $smsModel
-     * @param BroadcastQuery      $broadcastQuery
-     * @param TranslatorInterface $translator
      */
     public function __construct(SmsModel $smsModel, BroadcastQuery $broadcastQuery, TranslatorInterface $translator)
     {
@@ -58,14 +54,11 @@ class BroadcastExecutioner
         $this->translator     = $translator;
     }
 
-    /**
-     * @param ChannelBroadcastEvent $event
-     */
     public function execute(ChannelBroadcastEvent $event)
     {
         // Get list of published broadcasts or broadcast if there is only a single ID
         $smses = $this->smsModel->getRepository()->getPublishedBroadcasts($event->getId());
-        while (($next = $smses->next()) !== false) {
+        while (false !== ($next = $smses->next())) {
             $sms                  = reset($next);
             $this->contactLimiter = new ContactLimiter($event->getBatch(), null, $event->getMinContactIdFilter(), $event->getMaxContactIdFilter(), [], null, null, $event->getLimit());
             $this->result         = new BroadcastResult();
@@ -83,8 +76,6 @@ class BroadcastExecutioner
     }
 
     /**
-     * @param Sms $sms
-     *
      * @throws LimitQuotaException
      * @throws \Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException
      */

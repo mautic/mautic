@@ -23,13 +23,10 @@ class BroadcastResult
      */
     private $failedCount = 0;
 
-    /**
-     * @param array $results
-     */
     public function process(array $results)
     {
         foreach ($results as $result) {
-            if (isset($result['sent']) && $result['sent'] === true) {
+            if (isset($result['sent']) && true === $result['sent']) {
                 $this->sent();
             } else {
                 $this->failed();

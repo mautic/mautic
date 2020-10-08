@@ -36,7 +36,7 @@ $isExisting = $sms->getId();
 <?php echo $view['form']->row($form['language']); ?>
 <?php echo $view['form']->row($form['isPublished']); ?>
 
-<div id="leadList"<?php echo ($type == 'template') ? ' class="hide"' : ''; ?>>
+<div id="leadList"<?php echo ('template' == $type) ? ' class="hide"' : ''; ?>>
     <?php echo $view['form']->row($form['lists']); ?>
     <?php echo $view['form']->row($form['publishUp']); ?>
     <?php echo $view['form']->row($form['publishDown']); ?>

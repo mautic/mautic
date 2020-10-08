@@ -14,6 +14,6 @@
     $dncTitle = $view['translator']->trans('mautic.lead.event.donotcontact_channel', ['%channel%' => $channnel]);
     ?>
     <span class="label label-danger">
-    <i title="<?php echo $dncTitle; ?>" class="fa fa-ban ico-<?php echo $channnel ?>"> </i>
+    <i title="<?php echo $dncTitle; ?>" class="fa fa-ban ico-<?php echo $channnel; ?>"> </i>
    </span>
 <?php endforeach; ?>

@@ -22,9 +22,6 @@ class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
 
-    /**
-     * @param Request $request
-     */
     protected function getSmsCountStatsAction(Request $request)
     {
         /** @var SmsModel $model */

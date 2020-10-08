@@ -28,8 +28,6 @@ class BroadcastSubscriber implements EventSubscriberInterface
 
     /**
      * BroadcastSubscriber constructor.
-     *
-     * @param BroadcastExecutioner $broadcastExecutioner
      */
     public function __construct(BroadcastExecutioner $broadcastExecutioner)
     {
@@ -46,9 +44,6 @@ class BroadcastSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ChannelBroadcastEvent $event
-     */
     public function onBroadcast(ChannelBroadcastEvent $event)
     {
         if (!$event->checkContext('sms')) {
