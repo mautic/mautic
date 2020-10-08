@@ -19,7 +19,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
  */
 class Version20190818100048 extends AbstractMauticMigration
 {
-    public function preUp(Schema $schema)
+    public function preUp(Schema $schema): void
     {
         $smsTable      = $schema->getTable(MAUTIC_TABLE_PREFIX.'sms_messages');
         $smsStatsTable = $schema->getTable(MAUTIC_TABLE_PREFIX.'sms_message_stats');
@@ -29,11 +29,9 @@ class Version20190818100048 extends AbstractMauticMigration
     }
 
     /**
-     * @param Schema $schema
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema): void
     {
         $smsStatsTable = $schema->getTable(MAUTIC_TABLE_PREFIX.'sms_message_stats');
         if (!$smsStatsTable->hasColumn('is_delivered')) {

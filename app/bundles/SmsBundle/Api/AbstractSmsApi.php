@@ -11,7 +11,6 @@
 
 namespace Mautic\SmsBundle\Api;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\SmsBundle\Sms\TransportInterface;
