@@ -11,6 +11,8 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\SortableListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -21,7 +23,7 @@ class ExampleSendType extends AbstractType
     {
         $builder->add(
             'emails',
-            'sortablelist',
+            SortableListType::class,
             [
                 'entry_type'       => EmailType::class,
                 'label'            => 'mautic.email.example_recipients',
@@ -32,7 +34,7 @@ class ExampleSendType extends AbstractType
 
         $builder->add(
             'buttons',
-            'form_buttons',
+            FormButtonsType::class,
             [
                 'apply_text' => false,
                 'save_text'  => 'mautic.email.send',

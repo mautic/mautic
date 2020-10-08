@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ReportBundle\Tests\Model;
+namespace Mautic\ReportBundle\Tests\Scheduler\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileProperties;
@@ -18,10 +18,10 @@ use Mautic\ReportBundle\Scheduler\Model\MessageSchedule;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class MessageScheduleTest extends \PHPUnit_Framework_TestCase
+class MessageScheduleTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @dataProvider testSendFileProvider
+     * @dataProvider sendFileProvider
      *
      * @param int $fileSize
      * @param int $limit
@@ -55,7 +55,7 @@ class MessageScheduleTest extends \PHPUnit_Framework_TestCase
             ->willReturn($fileSize);
 
         $coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('report_export_max_filesize_in_bytes')
             ->willReturn($limit);
 
@@ -69,7 +69,7 @@ class MessageScheduleTest extends \PHPUnit_Framework_TestCase
         $messageSchedule->getMessage($report, 'path-to-a-file');
     }
 
-    public function testSendFileProvider()
+    public function sendFileProvider()
     {
         return [
             [10, 100],
@@ -80,7 +80,7 @@ class MessageScheduleTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider testDoSendFileProvider
+     * @dataProvider doSendFileProvider
      *
      * @param int $fileSize
      * @param int $limit
@@ -114,7 +114,7 @@ class MessageScheduleTest extends \PHPUnit_Framework_TestCase
             ->willReturn($fileSize);
 
         $coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('report_export_max_filesize_in_bytes')
             ->willReturn($limit);
 
@@ -129,7 +129,7 @@ class MessageScheduleTest extends \PHPUnit_Framework_TestCase
         $messageSchedule->getMessage($report, 'path-to-a-file');
     }
 
-    public function testDoSendFileProvider()
+    public function doSendFileProvider()
     {
         return [
             [100, 10],
@@ -138,7 +138,7 @@ class MessageScheduleTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider testSendFileProvider
+     * @dataProvider sendFileProvider
      *
      * @param int $fileSize
      * @param int $limit
@@ -167,7 +167,7 @@ class MessageScheduleTest extends \PHPUnit_Framework_TestCase
             ->willReturn($fileSize);
 
         $coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('report_export_max_filesize_in_bytes')
             ->willReturn($limit);
 
@@ -179,7 +179,7 @@ class MessageScheduleTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider testDoSendFileProvider
+     * @dataProvider doSendFileProvider
      *
      * @param int $fileSize
      * @param int $limit
@@ -208,7 +208,7 @@ class MessageScheduleTest extends \PHPUnit_Framework_TestCase
             ->willReturn($fileSize);
 
         $coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('report_export_max_filesize_in_bytes')
             ->willReturn($limit);
 

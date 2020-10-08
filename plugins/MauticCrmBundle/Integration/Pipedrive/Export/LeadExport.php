@@ -18,9 +18,6 @@ class LeadExport extends AbstractPipedrive
 
     /**
      * LeadExport constructor.
-     *
-     * @param EntityManager $em
-     * @param CompanyExport $companyExport
      */
     public function __construct(EntityManager $em, CompanyExport $companyExport)
     {
@@ -29,8 +26,6 @@ class LeadExport extends AbstractPipedrive
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return bool
      */
     public function create(Lead $lead)
@@ -78,8 +73,6 @@ class LeadExport extends AbstractPipedrive
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return bool
      */
     public function update(Lead $lead)
@@ -110,8 +103,6 @@ class LeadExport extends AbstractPipedrive
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return bool
      */
     public function delete(Lead $lead)
@@ -137,8 +128,6 @@ class LeadExport extends AbstractPipedrive
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return mixed
      */
     private function getMappedLeadData(Lead $lead)
@@ -167,8 +156,7 @@ class LeadExport extends AbstractPipedrive
     private function getLeadIntegrationCompanyId(Lead $lead)
     {
         $leadCompanies = $this->em->getRepository(CompanyLead::class)->findBy([
-            'lead'            => $lead,
-            'manuallyRemoved' => false,
+            'lead' => $lead,
         ]);
 
         if (!$leadCompanies) {

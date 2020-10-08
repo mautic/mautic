@@ -14,7 +14,7 @@ namespace Mautic\LeadBundle\Tests\Deduplicate\Helper;
 use Mautic\LeadBundle\Deduplicate\Exception\ValueNotMergeableException;
 use Mautic\LeadBundle\Deduplicate\Helper\MergeValueHelper;
 
-class MergeValueHelperTest extends \PHPUnit_Framework_TestCase
+class MergeValueHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetMergeValueWhenNewAndOldValuesAreIdentical()
     {

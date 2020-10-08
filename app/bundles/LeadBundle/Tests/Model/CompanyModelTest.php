@@ -14,7 +14,7 @@ namespace Mautic\LeadBundle\Tests\Model;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Model\CompanyModel;
 
-class CompanyModelTest extends \PHPUnit_Framework_TestCase
+class CompanyModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Ensure that an array value is flattened before saving

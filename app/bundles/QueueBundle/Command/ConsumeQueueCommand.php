@@ -11,6 +11,7 @@
 
 namespace Mautic\QueueBundle\Command;
 
+use Mautic\QueueBundle\Queue\QueueService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -52,6 +53,7 @@ class ConsumeQueueCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $container    = $this->getContainer();
+        /** @var QueueService $queueService */
         $queueService = $container->get('mautic.queue.service');
 
         if (!$queueService->isQueueEnabled()) {

@@ -52,11 +52,6 @@ class DeviceTracker
 
     /**
      * DeviceTracker constructor.
-     *
-     * @param DeviceCreatorServiceInterface  $deviceCreatorService
-     * @param DeviceDetectorFactoryInterface $deviceDetectorFactory
-     * @param DeviceTrackingServiceInterface $deviceTrackingService
-     * @param Logger                         $logger
      */
     public function __construct(
         DeviceCreatorServiceInterface $deviceCreatorService,
@@ -71,8 +66,7 @@ class DeviceTracker
     }
 
     /**
-     * @param Lead $trackedContact
-     * @param      $userAgent
+     * @param $userAgent
      *
      * @return \Mautic\LeadBundle\Entity\LeadDevice|null
      */
@@ -116,7 +110,7 @@ class DeviceTracker
     {
         $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
 
-        if ($trackedDevice !== null) {
+        if (null !== $trackedDevice) {
             $this->logger->addDebug("LEAD: Tracking ID for this device is {$trackedDevice->getTrackingId()}");
         }
 

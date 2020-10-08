@@ -48,11 +48,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
     /**
      * SegmentChartQuery constructor.
      *
-     * @param Connection $connection
-     * @param \DateTime  $dateFrom
-     * @param \DateTime  $dateTo
-     * @param null       $unit
-     * @param array      $filters
+     * @param null $unit
      *
      * @throws SegmentNotFoundException
      */
@@ -72,10 +68,6 @@ class SegmentContactsLineChartQuery extends ChartQuery
         $this->init();
     }
 
-    /**
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     */
     public function setDateRange(\DateTime $dateFrom, \DateTime $dateTo)
     {
         parent::setDateRange($dateFrom, $dateTo);
@@ -83,8 +75,6 @@ class SegmentContactsLineChartQuery extends ChartQuery
     }
 
     /**
-     * @param int $total
-     *
      * @return array
      */
     public function getTotalStats(int $total)
@@ -110,8 +100,6 @@ class SegmentContactsLineChartQuery extends ChartQuery
     /**
      * Return total of contact to date end of graph.
      *
-     * @param int $total
-     *
      * @return int
      */
     private function getTotalToDateRange(int $total)
@@ -132,7 +120,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
      */
     public function getDataFromLeadEventLog($action)
     {
-        $actionInverted = ($action == 'added') ? 'removed' : 'added';
+        $actionInverted = ('added' == $action) ? 'removed' : 'added';
 
         $filter              = [];
         $filter['object']    = 'segment';

@@ -91,11 +91,6 @@ class ThemeHelper
 
     /**
      * ThemeHelper constructor.
-     *
-     * @param PathsHelper          $pathsHelper
-     * @param TemplatingHelper     $templatingHelper
-     * @param TranslatorInterface  $translator
-     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(PathsHelper $pathsHelper, TemplatingHelper $templatingHelper, TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
     {
@@ -133,13 +128,11 @@ class ThemeHelper
      */
     public function createThemeHelper($themeName)
     {
-        if ($themeName === 'current') {
+        if ('current' === $themeName) {
             $themeName = $this->defaultTheme;
         }
 
-        $themeHelper = new TemplatingThemeHelper($this->pathsHelper, $themeName);
-
-        return $themeHelper;
+        return new TemplatingThemeHelper($this->pathsHelper, $themeName);
     }
 
     /**
@@ -420,39 +413,37 @@ class ThemeHelper
      */
     public function install($zipFile)
     {
-        if (file_exists($zipFile) === false) {
+        if (false === file_exists($zipFile)) {
             throw new MauticException\FileNotFoundException();
         }
 
-        if (class_exists('ZipArchive') === false) {
+        if (false === class_exists('ZipArchive')) {
             throw new \Exception('mautic.core.ziparchive.not.installed');
         }
 
         $themeName = basename($zipFile, '.zip');
 
         if (in_array($themeName, $this->getDefaultThemes())) {
-            throw new \Exception(
-                $this->translator->trans('mautic.core.theme.default.cannot.overwrite', ['%name%' => $themeName], 'validators')
-            );
+            throw new \Exception($this->translator->trans('mautic.core.theme.default.cannot.overwrite', ['%name%' => $themeName], 'validators'));
         }
 
         $themePath = $this->pathsHelper->getSystemPath('themes', true).'/'.$themeName;
         $zipper    = new \ZipArchive();
         $archive   = $zipper->open($zipFile);
 
-        if ($archive !== true) {
+        if (true !== $archive) {
             throw new \Exception($this->getExtractError($archive));
         }
 
         $requiredFiles      = ['config.json', 'html/message.html.twig'];
         $foundRequiredFiles = [];
         $allowedFiles       = [];
-        $allowedExtensions  = $this->coreParametersHelper->getParameter('theme_import_allowed_extensions');
+        $allowedExtensions  = $this->coreParametersHelper->get('theme_import_allowed_extensions');
 
         $config = [];
         for ($i = 0; $i < $zipper->numFiles; ++$i) {
             $entry = $zipper->getNameIndex($i);
-            if (strpos($entry, '/') === 0) {
+            if (0 === strpos($entry, '/')) {
                 $entry = substr($entry, 1);
             }
 
@@ -485,15 +476,7 @@ class ThemeHelper
         }
 
         if ($missingFiles = array_diff($requiredFiles, $foundRequiredFiles)) {
-            throw new MauticException\FileNotFoundException(
-                $this->translator->trans(
-                    'mautic.core.theme.missing.files',
-                    [
-                        '%files%' => implode(', ', $missingFiles),
-                    ],
-                    'validators'
-                )
-            );
+            throw new MauticException\FileNotFoundException($this->translator->trans('mautic.core.theme.missing.files', ['%files%' => implode(', ', $missingFiles)], 'validators'));
         }
 
         // Extract the archive file now
@@ -566,7 +549,7 @@ class ThemeHelper
 
         $finder->files()->in($themePath);
 
-        if ($archive !== true) {
+        if (true !== $archive) {
             throw new \Exception($this->getExtractError($archive));
         } else {
             foreach ($finder as $file) {
@@ -583,9 +566,6 @@ class ThemeHelper
     }
 
     /**
-     * @param EngineInterface   $templating
-     * @param TemplateReference $template
-     *
      * @throws MauticException\BadConfigurationException
      * @throws MauticException\FileNotFoundException
      */
@@ -607,7 +587,7 @@ class ThemeHelper
         $themes = $this->getInstalledThemes('all', true);
         foreach ($themes as $theme) {
             // Already handled the default
-            if ($theme['name'] === $defaultTheme->getTheme()) {
+            if ($theme['key'] === $defaultTheme->getTheme()) {
                 continue;
             }
 

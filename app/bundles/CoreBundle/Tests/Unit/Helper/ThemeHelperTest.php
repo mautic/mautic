@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Helper;
+namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -22,25 +22,25 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Templating\DelegatingEngine;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class ThemeHelperTest extends \PHPUnit_Framework_TestCase
+class ThemeHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var PathsHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var PathsHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $pathsHelper;
 
     /**
-     * @var TemplatingHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var TemplatingHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $templatingHelper;
 
     /**
-     * @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $translator;
 
     /**
-     * @var CoreParametersHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $coreParameterHelper;
 
@@ -50,7 +50,7 @@ class ThemeHelperTest extends \PHPUnit_Framework_TestCase
         $this->templatingHelper    = $this->createMock(TemplatingHelper::class);
         $this->translator          = $this->createMock(TranslatorInterface::class);
         $this->coreParameterHelper = $this->createMock(CoreParametersHelper::class);
-        $this->coreParameterHelper->method('getParameter')
+        $this->coreParameterHelper->method('get')
             ->with('theme_import_allowed_extensions')
             ->willReturn(['json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif']);
     }

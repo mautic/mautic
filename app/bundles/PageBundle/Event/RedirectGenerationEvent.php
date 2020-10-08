@@ -26,10 +26,6 @@ class RedirectGenerationEvent extends CommonEvent
      */
     private $redirect;
 
-    /**
-     * @param Redirect $redirect
-     * @param array    $clickthrough
-     */
     public function __construct(Redirect $redirect, array $clickthrough)
     {
         $this->redirect     = $redirect;

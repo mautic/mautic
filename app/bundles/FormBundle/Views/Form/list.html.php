@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticFormBundle:Form:index.html.php');
 }
 
@@ -155,7 +155,7 @@ if ($tmpl == 'index') {
                                 ['objectAction' => 'view', 'objectId' => $item->getId()]
                             ); ?>" data-toggle="ajax" data-menu-link="mautic_form_index">
                                 <?php echo $item->getName(); ?>
-                                <?php if ($item->getFormType() == 'campaign'): ?>
+                                <?php if ('campaign' == $item->getFormType()): ?>
                                     <span data-toggle="tooltip" title="<?php echo $view['translator']->trans(
                                         'mautic.form.icon_tooltip.campaign_form'
                                     ); ?>"><i class="fa fa-fw fa-cube"></i></span>
@@ -178,8 +178,8 @@ if ($tmpl == 'index') {
                         <a href="<?php echo $view['router']->path(
                             'mautic_form_action',
                             ['objectAction' => 'results', 'objectId' => $item->getId()]
-                        ); ?>" data-toggle="ajax" data-menu-link="mautic_form_index" class="btn btn-primary btn-xs" <?php echo ($i['submission_count']
-                            == 0) ? 'disabled=disabled' : ''; ?>>
+                        ); ?>" data-toggle="ajax" data-menu-link="mautic_form_index" class="btn btn-primary btn-xs" <?php echo (0
+                            == $i['submission_count']) ? 'disabled=disabled' : ''; ?>>
                             <?php echo $view['translator']->transChoice(
                                 'mautic.form.form.viewresults',
                                 $i['submission_count'],

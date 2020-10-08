@@ -76,11 +76,6 @@
     width: 75px;
 }
 
-.panel-googleplus .panel-heading {
-    background: #dd4b39;
-    color: #FFFFFF;
-}
-
 .panel-foursquare .panel-heading {
     background: #0072b1;
     color: #FFFFFF;
@@ -161,7 +156,7 @@ ul.tag-cloud li {
 }
 .history-search{
     overflow: visible!important;
-    height: 53px;
+    min-height: 53px;
 }
 .timeline-icon {
     width: 50px;

@@ -13,21 +13,13 @@ namespace Mautic\PageBundle\Helper;
 
 use Mautic\PageBundle\Model\PageModel;
 
-/**
- * Class TokenHelper.
- */
 class TokenHelper
 {
     /**
-     * @var
+     * @var PageModel
      */
     protected $model;
 
-    /**
-     * TokenHelper constructor.
-     *
-     * @param PageModel $model
-     */
     public function __construct(PageModel $model)
     {
         $this->model = $model;

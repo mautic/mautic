@@ -12,18 +12,17 @@
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\ChannelBundle\Entity\MessageQueue;
-use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class EmailSendType.
- */
 class EmailSendType extends AbstractType
 {
     /**
@@ -42,15 +41,11 @@ class EmailSendType extends AbstractType
         $this->router               = $router;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
             'email',
-            'email_list',
+            EmailListType::class,
             [
                 'label'      => 'mautic.email.send.selectemails',
                 'label_attr' => ['class' => 'control-label'],
@@ -72,11 +67,11 @@ class EmailSendType extends AbstractType
         if (!empty($options['with_email_types'])) {
             $builder->add(
                 'email_type',
-                'button_group',
+                ButtonGroupType::class,
                 [
-                    'choices' => [
-                        'transactional' => 'mautic.email.send.emailtype.transactional',
-                        'marketing'     => 'mautic.email.send.emailtype.marketing',
+                    'choices'           => [
+                        'mautic.email.send.emailtype.transactional' => 'transactional',
+                        'mautic.email.send.emailtype.marketing'     => 'marketing',
                     ],
                     'label'      => 'mautic.email.send.emailtype',
                     'label_attr' => ['class' => 'control-label'],
@@ -101,13 +96,13 @@ class EmailSendType extends AbstractType
 
             $builder->add(
                 'newEmailButton',
-                'button',
+                ButtonType::class,
                 [
                     'attr' => [
                         'class'   => 'btn btn-primary btn-nospin',
                         'onclick' => 'Mautic.loadNewWindow({
-                        "windowUrl": "'.$windowUrl.'"
-                    })',
+                            "windowUrl": "'.$windowUrl.'"
+                        })',
                         'icon' => 'fa fa-plus',
                     ],
                     'label' => 'mautic.email.send.new.email',
@@ -127,7 +122,7 @@ class EmailSendType extends AbstractType
 
             $builder->add(
                 'editEmailButton',
-                'button',
+                ButtonType::class,
                 [
                     'attr' => [
                         'class'    => 'btn btn-primary btn-nospin',
@@ -144,7 +139,7 @@ class EmailSendType extends AbstractType
 
             $builder->add(
                 'previewEmailButton',
-                'button',
+                ButtonType::class,
                 [
                     'attr' => [
                         'class'    => 'btn btn-primary btn-nospin',
@@ -159,11 +154,11 @@ class EmailSendType extends AbstractType
                 $data = (!isset($options['data']['priority'])) ? 2 : (int) $options['data']['priority'];
                 $builder->add(
                     'priority',
-                    'choice',
+                    ChoiceType::class,
                     [
-                        'choices' => [
-                            MessageQueue::PRIORITY_NORMAL => 'mautic.channel.message.send.priority.normal',
-                            MessageQueue::PRIORITY_HIGH   => 'mautic.channel.message.send.priority.high',
+                        'choices'           => [
+                            'mautic.channel.message.send.priority.normal' => MessageQueue::PRIORITY_NORMAL,
+                            'mautic.channel.message.send.priority.high'   => MessageQueue::PRIORITY_HIGH,
                         ],
                         'label'    => 'mautic.channel.message.send.priority',
                         'required' => false,
@@ -173,14 +168,14 @@ class EmailSendType extends AbstractType
                             'data-show-on' => '{"campaignevent_properties_email_type_1":"checked"}',
                         ],
                         'data'        => $data,
-                        'empty_value' => false,
+                        'placeholder' => false,
                     ]
                 );
 
                 $data = (!isset($options['data']['attempts'])) ? 3 : (int) $options['data']['attempts'];
                 $builder->add(
                     'attempts',
-                    'number',
+                    NumberType::class,
                     [
                         'label' => 'mautic.channel.message.send.attempts',
                         'attr'  => [
@@ -196,7 +191,7 @@ class EmailSendType extends AbstractType
             }
         }
         if (!empty($options['with_immediately'])) {
-            if ($this->coreParametersHelper->getParameter('mailer_spool_type') === 'file') {
+            if ('file' === $this->coreParametersHelper->getParameter('mailer_spool_type')) {
                 $default = (isset($options['data']['immediately'])) ? $options['data']['immediately'] : false;
                 $builder->add(
                 'immediately',
@@ -221,9 +216,6 @@ class EmailSendType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -239,7 +231,7 @@ class EmailSendType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'emailsend_list';
     }

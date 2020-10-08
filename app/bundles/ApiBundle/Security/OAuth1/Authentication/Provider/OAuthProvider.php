@@ -12,9 +12,9 @@
 namespace Mautic\ApiBundle\Security\OAuth1\Authentication\Provider;
 
 use Bazinga\OAuthServerBundle\Security\Authentification\Token\OAuthToken;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class OAuthProvider.
@@ -22,16 +22,13 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 class OAuthProvider extends \Bazinga\OAuthServerBundle\Security\Authentification\Provider\OAuthProvider
 {
     /**
-     * @var MauticFactory
+     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
      */
-    private $factory;
+    private $translator;
 
-    /**
-     * @param MauticFactory $factory
-     */
-    public function setFactory(MauticFactory $factory)
+    public function setTranslator(TranslatorInterface $translator)
     {
-        $this->factory = $factory;
+        $this->translator = $translator;
     }
 
     /**
@@ -42,8 +39,6 @@ class OAuthProvider extends \Bazinga\OAuthServerBundle\Security\Authentification
         if (!$this->supports($token)) {
             return null;
         }
-
-        $translator = $this->factory->getTranslator();
 
         $requestParameters = $token->getRequestParameters();
         $requestMethod     = $token->getRequestMethod();
@@ -66,7 +61,7 @@ class OAuthProvider extends \Bazinga\OAuthServerBundle\Security\Authentification
             return $token;
         }
 
-        throw new AuthenticationException($translator->trans('mautic.api.oauth.auth.failed'));
+        throw new AuthenticationException($this->translator->trans('mautic.api.oauth.auth.failed'));
     }
 
     /**

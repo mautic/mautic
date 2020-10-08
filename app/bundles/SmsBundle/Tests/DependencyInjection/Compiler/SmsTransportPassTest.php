@@ -8,9 +8,10 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\SmsBundle\DependencyInjection\Compiler;
+namespace Mautic\SmsBundle\Tests\DependencyInjection\Compiler;
 
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\SmsBundle\DependencyInjection\Compiler\SmsTransportPass;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -38,9 +39,9 @@ class SmsTransportPassTest extends AbstractMauticTestCase
             ->addTag('mautic.sms_transport');
 
         $transport = $this->getMockBuilder(TransportChain::class)
-                          ->disableOriginalConstructor()
-                          ->setMethods(['addTransport'])
-                          ->getMock();
+            ->disableOriginalConstructor()
+            ->setMethods(['addTransport'])
+            ->getMock();
 
         $container
             ->register('mautic.sms.transport_chain')

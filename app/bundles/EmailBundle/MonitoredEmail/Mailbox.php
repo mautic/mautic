@@ -173,13 +173,10 @@ class Mailbox
 
     /**
      * Mailbox constructor.
-     *
-     * @param CoreParametersHelper $parametersHelper
-     * @param PathsHelper          $pathsHelper
      */
     public function __construct(CoreParametersHelper $parametersHelper, PathsHelper $pathsHelper)
     {
-        $this->mailboxes = $parametersHelper->getParameter('monitored_email', []);
+        $this->mailboxes = $parametersHelper->get('monitored_email', []);
 
         if (isset($this->mailboxes['general'])) {
             $this->settings = $this->mailboxes['general'];
@@ -196,7 +193,7 @@ class Mailbox
 
         $this->createAttachmentsDir($pathsHelper);
 
-        if ($this->settings['host'] == 'imap.gmail.com') {
+        if ('imap.gmail.com' == $this->settings['host']) {
             $this->isGmail = true;
         }
     }
@@ -213,7 +210,7 @@ class Mailbox
      */
     public function isConfigured($bundleKey = null, $folderKey = null)
     {
-        if ($bundleKey !== null) {
+        if (null !== $bundleKey) {
             try {
                 $this->switchMailbox($bundleKey, $folderKey);
             } catch (MailboxException $e) {
@@ -284,21 +281,14 @@ class Mailbox
      */
     public function getImapPath($settings)
     {
-        /* @var string $host */
-        /* @var int $port */
-        /* @var string $encryption */
-        /* @var string $folder */
-        /* @var string $user */
-        /* @var string $password */
-        extract($settings);
-        if (!isset($encryption)) {
-            $encryption = (!empty($ssl)) ? '/ssl' : '';
+        if (!isset($settings['encryption'])) {
+            $settings['encryption'] = (!empty($settings['ssl'])) ? '/ssl' : '';
         }
-        $path     = "{{$host}:{$port}/imap{$encryption}}";
+        $path     = "{{$settings['host']}:{$settings['port']}/imap{$settings['encryption']}}";
         $fullPath = $path;
 
-        if (isset($folder)) {
-            $fullPath .= $folder;
+        if (isset($settings['folder'])) {
+            $fullPath .= $settings['folder'];
         }
 
         return ['path' => $path, 'full' => $fullPath];
@@ -306,14 +296,12 @@ class Mailbox
 
     /**
      * Override mailbox settings.
-     *
-     * @param array $settings
      */
     public function setMailboxSettings(array $settings)
     {
         $this->settings = array_merge($this->settings, $settings);
 
-        $this->isGmail = ($this->settings['host'] == 'imap.gmail.com');
+        $this->isGmail = ('imap.gmail.com' == $this->settings['host']);
 
         $this->setImapPath();
     }
@@ -330,7 +318,7 @@ class Mailbox
      */
     public function getMailboxSettings($bundle = null, $mailbox = '')
     {
-        if ($bundle == null) {
+        if (null == $bundle) {
             return $this->settings;
         }
 
@@ -383,7 +371,7 @@ class Mailbox
     /**
      * Get IMAP mailbox connection stream.
      *
-     * @return null|resource
+     * @return resource|null
      */
     public function getImapStream()
     {
@@ -514,7 +502,7 @@ class Mailbox
      */
     public function fetchUnread($folder = null)
     {
-        if ($folder !== null) {
+        if (null !== $folder) {
             $this->switchFolder($folder);
         }
 
@@ -696,8 +684,7 @@ class Mailbox
     /**
      * Causes a store to add the specified flag to the flags set for the mails in the specified sequence.
      *
-     * @param array  $mailsIds
-     * @param string $flag     which you can set are \Seen, \Answered, \Flagged, \Deleted, and \Draft as defined by RFC2060
+     * @param string $flag which you can set are \Seen, \Answered, \Flagged, \Deleted, and \Draft as defined by RFC2060
      *
      * @return bool
      */
@@ -709,8 +696,7 @@ class Mailbox
     /**
      * Cause a store to delete the specified flag to the flags set for the mails in the specified sequence.
      *
-     * @param array  $mailsIds
-     * @param string $flag     which you can set are \Seen, \Answered, \Flagged, \Deleted, and \Draft as defined by RFC2060
+     * @param string $flag which you can set are \Seen, \Answered, \Flagged, \Deleted, and \Draft as defined by RFC2060
      *
      * @return bool
      */
@@ -739,8 +725,6 @@ class Mailbox
      *  deleted - this mail is flagged for deletion
      *  seen - this mail is flagged as already read
      *  draft - this mail is flagged as being a draft
-     *
-     * @param array $mailsIds
      *
      * @return array
      */
@@ -944,7 +928,6 @@ class Mailbox
     }
 
     /**
-     * @param Message    $mail
      * @param            $partStructure
      * @param            $partNum
      * @param bool|true  $markAsSeen
@@ -965,13 +948,13 @@ class Mailbox
                 $options
             );
 
-        if ($partStructure->encoding == 1) {
+        if (1 == $partStructure->encoding) {
             $data = imap_utf8($data);
-        } elseif ($partStructure->encoding == 2) {
+        } elseif (2 == $partStructure->encoding) {
             $data = imap_binary($data);
-        } elseif ($partStructure->encoding == 3) {
+        } elseif (3 == $partStructure->encoding) {
             $data = imap_base64($data);
-        } elseif ($partStructure->encoding == 4) {
+        } elseif (4 == $partStructure->encoding) {
             $data = quoted_printable_decode($data);
         }
 
@@ -1033,7 +1016,7 @@ class Mailbox
                         break;
                     case TYPEMULTIPART:
                         if (
-                            $subtype != 'report'
+                            'report' != $subtype
                             ||
                             empty($params['report-type'])
                         ) {
@@ -1054,9 +1037,9 @@ class Mailbox
                         }
                         break;
                     case TYPEMESSAGE:
-                        if ($isDsn || ($subtype == 'delivery-status')) {
+                        if ($isDsn || ('delivery-status' == $subtype)) {
                             $mail->dsnReport = $data;
-                        } elseif ($isFbl || ($subtype == 'feedback-report')) {
+                        } elseif ($isFbl || ('feedback-report' == $subtype)) {
                             $mail->fblReport = $data;
                         } else {
                             $mail->textPlain .= trim($data);
@@ -1069,7 +1052,7 @@ class Mailbox
         }
         if (!empty($partStructure->parts)) {
             foreach ($partStructure->parts as $subPartNum => $subPartStructure) {
-                if ($partStructure->type == 2 && $partStructure->subtype == 'RFC822') {
+                if (2 == $partStructure->type && 'RFC822' == $partStructure->subtype) {
                     $this->initMailPart($mail, $subPartStructure, $partNum, $markAsSeen, $isDsn, $isFbl);
                 } else {
                     $this->initMailPart($mail, $subPartStructure, $partNum.'.'.($subPartNum + 1), $markAsSeen, $isDsn, $isFbl);
@@ -1116,7 +1099,7 @@ class Mailbox
         $newString = '';
         $elements  = imap_mime_header_decode($string);
         for ($i = 0; $i < count($elements); ++$i) {
-            if ($elements[$i]->charset == 'default') {
+            if ('default' == $elements[$i]->charset) {
                 $elements[$i]->charset = 'iso-8859-1';
             }
             $newString .= $this->convertStringEncoding($elements[$i]->text, $elements[$i]->charset, $charset);
@@ -1193,9 +1176,6 @@ class Mailbox
         }
     }
 
-    /**
-     * @param PathsHelper $pathsHelper
-     */
     private function createAttachmentsDir(PathsHelper $pathsHelper)
     {
         if (!isset($this->settings['use_attachments']) || !$this->settings['use_attachments']) {

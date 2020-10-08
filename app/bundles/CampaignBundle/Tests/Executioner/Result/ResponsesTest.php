@@ -16,7 +16,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\Result\Responses;
 
-class ResponsesTest extends \PHPUnit_Framework_TestCase
+class ResponsesTest extends \PHPUnit\Framework\TestCase
 {
     public function testExtractingResponsesFromLog()
     {
@@ -89,14 +89,6 @@ class ResponsesTest extends \PHPUnit_Framework_TestCase
                 ],
             ],
         ];
-
-        $this->assertEquals(
-            [
-                'action'    => $actions,
-                'condition' => $conditions,
-            ],
-            $responses->getResponseArray()
-        );
 
         $this->assertEquals($actions, $responses->getActionResponses());
         $this->assertEquals($conditions, $responses->getConditionResponses());

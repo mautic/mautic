@@ -39,17 +39,12 @@ class SidebarCanvasHelper extends Helper
 
     /**
      * SidebarCanvasHelper constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * @param PhpEngine $templating
-     */
     public function renderCanvasContent(PhpEngine $templating)
     {
         if ($this->dispatcher->hasListeners(CoreEvents::BUILD_CANVAS_CONTENT)) {

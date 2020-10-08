@@ -21,9 +21,9 @@ $animate = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '';
             <?php echo html_entity_decode($focus[$htmlMode]); ?>
         <?php else: ?>
         <div class="mf-headline"><?php echo $props['content']['headline']; ?></div>
-        <?php if ($focus['type'] == 'form'): ?>
+        <?php if ('form' == $focus['type']): ?>
             {focus_form}
-        <?php elseif ($focus['type'] == 'link'): ?>
+        <?php elseif ('link' == $focus['type']): ?>
             <a href="<?php echo (empty($preview)) ? $clickUrl : '#'; ?>" class="mf-link" target="<?php echo ($props['content']['link_new_window'])
                 ? '_new' : '_parent'; ?>">
                 <?php echo $props['content']['link_text']; ?>
@@ -51,10 +51,10 @@ if ($props['bar']['allow_hide']): ?>
         <a class="mf-bar-collapser-icon" href="javascript:void(0)"<?php if (!empty($preview)) {
                     echo ' onclick="Mautic.toggleBarCollapse()"';
                 } ?>>
-            <?php $size          = ($props['bar']['size'] == 'large') ? 40 : 24; ?>
-            <?php $transformSize = ($props['bar']['size'] == 'large') ? 20 : 20; ?>
-            <?php $scale         = ($props['bar']['size'] == 'large') ? 1 : 0.6; ?>
-            <?php $direction     = ($props['bar']['placement'] == 'top') ? '-90' : '90'; ?>
+            <?php $size          = ('large' == $props['bar']['size']) ? 40 : 24; ?>
+            <?php $transformSize = ('large' == $props['bar']['size']) ? 20 : 20; ?>
+            <?php $scale         = ('large' == $props['bar']['size']) ? 1 : 0.6; ?>
+            <?php $direction     = ('top' == $props['bar']['placement']) ? '-90' : '90'; ?>
             <svg style="overflow: hidden;" xmlns="http://www.w3.org/2000/svg" width="<?php echo $size; ?>" version="1.1"
                  height="<?php echo $size; ?>" data-transform-size="<?php echo $transformSize; ?>" data-transform-direction="<?php echo $direction; ?>" data-transform-scale="<?php echo $scale; ?>">
                 <g transform="scale(<?php echo $scale; ?>) rotate(<?php echo $direction; ?> <?php echo $transformSize; ?> <?php echo $transformSize; ?>)">
@@ -80,6 +80,6 @@ if ($props['bar']['allow_hide']): ?>
         </a>
     </div>
 <?php endif; ?>
-<?php if ($props['bar']['push_page'] && $props['bar']['placement'] == 'top'): ?>
+<?php if ($props['bar']['push_page'] && 'top' == $props['bar']['placement']): ?>
     <div class="mf-move-to-parent mf-bar-spacer mf-bar-spacer-<?php echo $props['bar']['size']; ?> mf-bar-spacer-<?php echo $focus['id']; ?>"></div>
 <?php endif; ?>

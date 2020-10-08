@@ -15,30 +15,23 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\LeadBundle\Entity\LeadList;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Mautic\LeadBundle\Model\ListModel;
 
-/**
- * Class LoadLeadListData.
- */
-class LoadLeadListData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LoadLeadListData extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
-     * @var ContainerInterface
+     * @var ListModel
      */
-    private $container;
+    private $segmentModel;
 
     /**
      * {@inheritdoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function __construct(ListModel $segmentModel)
     {
-        $this->container = $container;
+        $this->segmentModel = $segmentModel;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $adminUser = $this->getReference('admin-user');
@@ -63,7 +56,7 @@ class LoadLeadListData extends AbstractFixture implements OrderedFixtureInterfac
         $manager->persist($list);
         $manager->flush();
 
-        $this->container->get('mautic.lead.model.list')->rebuildListLeads($list);
+        $this->segmentModel->rebuildListLeads($list);
     }
 
     /**

@@ -65,7 +65,7 @@ EOT
 
         /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
         $translator = $container->get('translator');
-        $translator->setLocale($container->get('mautic.helper.core_parameters')->getParameter('locale'));
+        $translator->setLocale($container->get('mautic.helper.core_parameters')->get('locale'));
 
         // Update successful
         $output->writeln('<info>'.$translator->trans('mautic.core.command.asset_generate_success').'</info>');
