@@ -156,6 +156,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testCloneAction()
     {
+        // Create a segment and email
         $segment = new LeadList();
         $segment->setName('Segment B');
         $segment->setAlias('segment-B');
@@ -170,6 +171,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($email);
         $this->em->flush();
 
+        // request for email clone
         $crawler        = $this->client->request(Request::METHOD_GET, "/s/emails/clone/{$email->getId()}");
         $buttonCrawler  =  $crawler->selectButton('Save & Close');
         $form           = $buttonCrawler->form();
@@ -187,6 +189,5 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($email->getId(), $firstEmail->getId());
         Assert::assertNotSame($email->getId(), $secondEmail->getId());
         Assert::assertSame($firstEmail->getName(), $secondEmail->getName());
-        // todo make other assertion ...
     }
 }
