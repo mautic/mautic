@@ -153,4 +153,26 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         return $email;
     }
+
+    public function testCloneAction()
+    {
+        $segment = new LeadList();
+        $segment->setName('Segment B');
+        $segment->setAlias('segment-B');
+        $email = new Email();
+        $email->setName('Email B');
+        $email->setSubject('Email B Subject');
+        $email->setEmailType('list');
+        $email->setTemplate('beefree-empty');
+        $email->setCustomHtml('Test html');
+        $email->addList($segment);
+        $this->em->persist($segment);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/clone/{$email->getId()}");
+        $button  =  $crawler->selectButton('Select')->eq(2)->link();
+        $crawler = $this->client->click($button);
+        echo $crawler->filterXPath('//*[@id="app-content"]')->html();
+    }
 }
