@@ -99,7 +99,7 @@ class SendEmailToContact
     /**
      * @var MailHelper
      */
-    private $temporaryMailer = null;
+    private $temporaryMailer;
 
     /**
      * SendEmailToContact constructor.
