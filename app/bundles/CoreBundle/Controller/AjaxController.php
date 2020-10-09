@@ -301,6 +301,8 @@ class AjaxController extends CommonController
             }
         }
 
+        $dataArray['flashes'] = $this->getFlashContent();
+
         return $this->sendJsonResponse($dataArray);
     }
 
