@@ -12,15 +12,11 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use LightSaml\Error\LightSamlException;
-use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\EventListener\ExceptionListener as KernelExceptionListener;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\Router;
@@ -35,16 +31,6 @@ use Symfony\Component\Security\Core\Security;
 class ExceptionListener extends KernelExceptionListener
 {
     /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var ModelFactory
-     */
-    protected $modelFactory;
-
-    /**
      * @var Router
      */
     protected $router;
@@ -54,33 +40,16 @@ class ExceptionListener extends KernelExceptionListener
      *
      * @param LoggerInterface $controller
      */
-    public function __construct(Router $router, $controller, LoggerInterface $logger = null, CoreParametersHelper $coreParametersHelper, ModelFactory $modelFactory)
+    public function __construct(Router $router, $controller, LoggerInterface $logger = null)
     {
         parent::__construct($controller, $logger);
 
-        $this->router               = $router;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->modelFactory         = $modelFactory;
+        $this->router = $router;
     }
 
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();
-
-        if ($exception instanceof NotFoundHttpException) {
-            $page_404 = $this->coreParametersHelper->get('404_page');
-            if (!empty($page_404)) {
-                $pageModel = $this->modelFactory->getModel('page');
-                $page      = $pageModel->getEntity($page_404);
-                $html      = $page->getCustomHtml();
-                if (!empty($page) && 1 == $page->getIsPublished() && !empty($html)) {
-                    $slug = $pageModel->generateSlug($page);
-                    $event->setResponse(new RedirectResponse($this->router->generate('mautic_page_public', ['slug' => $slug])));
-
-                    return;
-                }
-            }
-        }
 
         if ($exception instanceof LightSamlException) {
             // Redirect to login page with message
@@ -92,7 +61,7 @@ class ExceptionListener extends KernelExceptionListener
 
         // Check for exceptions we don't want to handle
         if ($exception instanceof AuthenticationException || $exception instanceof AccessDeniedException || $exception instanceof LogoutException
-        ) {
+            ) {
             return;
         }
 
@@ -105,18 +74,19 @@ class ExceptionListener extends KernelExceptionListener
         $request   = $this->duplicateRequest($exception, $request);
         try {
             $response = $event->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST, false);
+
             $event->setResponse($response);
         } catch (\Exception $e) {
             $this->logException(
-                $e,
-                sprintf(
-                    'Exception thrown when handling an exception (%s: %s at %s line %s)',
-                    get_class($e),
-                    $e->getMessage(),
-                    $e->getFile(),
-                    $e->getLine()
-                )
-            );
+                    $e,
+                    sprintf(
+                        'Exception thrown when handling an exception (%s: %s at %s line %s)',
+                        get_class($e),
+                        $e->getMessage(),
+                        $e->getFile(),
+                        $e->getLine()
+                        )
+                    );
 
             $wrapper = $e;
 
