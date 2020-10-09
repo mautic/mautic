@@ -579,121 +579,64 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
      */
     public function testImmediatelyIsTrue()
     {
-        // Setup dependencies
-        $ipLookupHelper = $this->getMockBuilder(IpLookupHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $themeHelper = $this->getMockBuilder(ThemeHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mailboxHelper = $this->getMockBuilder(Mailbox::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         /** @var MailHelper $mailHelper */
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $leadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $trackableModel = $this->getMockBuilder(TrackableModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $userModel = $this->getMockBuilder(UserModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        // Setup the translator
-        $translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $translator->expects($this->any())
+        $this->translator->expects($this->any())
             ->method('hasId')
             ->will($this->returnValue(false));
 
         // Setup the repositories
-        $emailRepository = $this->getMockBuilder(EmailRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $emailRepository->method('getDoNotEmailList')
+        $this->emailRepository->method('getDoNotEmailList')
             ->will($this->returnValue([1 => 'someone@domain.com']));
-        $statRepository = $this->getMockBuilder(StatRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $frequencyRepository = $this->getMockBuilder(FrequencyRuleRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
 
-        // Setup the EntityManager
-        $entityManager = $this
-            ->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $entityManager->expects($this->any())
+        $this->entityManager->expects($this->any())
             ->method('getRepository')
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticEmailBundle:Email', $emailRepository],
-                        ['MauticEmailBundle:Stat', $statRepository],
-                        ['MauticLeadBundle:FrequencyRule', $frequencyRepository],
+                        ['MauticEmailBundle:Email', $this->emailRepository],
+                        ['MauticEmailBundle:Stat', $this->statRepository],
+                        ['MauticLeadBundle:FrequencyRule', $this->frequencyRepository],
                     ]
                 )
             );
-
-        $messageModel = $this->getMockBuilder(MessageQueueModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $companyModel = $this->getMockBuilder(CompanyModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        // If it makes it to the point of calling getContactCompanies then DNC failed
-        $companyModel->expects($this->exactly(0))
-            ->method('getRepository');
 
         /** @var SendEmailToContact $sendToContactModel */
         $sendToContactModel = $this->getMockBuilder(SendEmailToContact::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->sendToContactModel->method('setSampleMailer')
+        $sendToContactModel->method('setSampleMailer')
             ->will($this->returnCallback(function () use ($mailHelper) {
                 $mailHelper
                     ->method('getMailer')
                     ->willReturn('immediately');
             }));
 
-        $deviceTrackerMock  = $this->createMock(DeviceTracker::class);
-
-        $redirectRepositoryMock = $this->createMock(RedirectRepository::class);
-        $cacheStorageHelperMock = $this->createMock(CacheStorageHelper::class);
-
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
-                $ipLookupHelper,
-                $themeHelper,
-                $mailboxHelper,
-                $mailHelper,
-                $leadModel,
-                $companyModel,
-                $trackableModel,
-                $userModel,
-                $messageModel,
-                $sendToContactModel,
-                $deviceTrackerMock,
-                $redirectRepositoryMock,
-                $cacheStorageHelperMock
-            );
+            $this->ipLookupHelper,
+            $this->themeHelper,
+            $this->mailboxHelper,
+            $mailHelper,
+            $this->leadModel,
+            $this->companyModel,
+            $this->trackableModel,
+            $this->userModel,
+            $this->messageModel,
+            $sendToContactModel,
+            $this->deviceTrackerMock,
+            $this->redirectRepositoryMock,
+            $this->cacheStorageHelperMock,
+            $this->contactTracker,
+            $this->doNotContact,
+            $this->generatedColumnsProvider
+        );
 
-        $emailModel->setTranslator($translator);
-        $emailModel->setEntityManager($entityManager);
+        $emailModel->setTranslator($this->translator);
+        $emailModel->setEntityManager($this->entityManager);
 
         $emailEntity = $this->getMockBuilder(Email::class)
             ->disableOriginalConstructor()
@@ -715,50 +658,27 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        // Setup the translator
-        $translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $translator->expects($this->any())
+        $this->translator->expects($this->any())
             ->method('hasId')
             ->will($this->returnValue(false));
 
-        // Setup the repositories
-        $emailRepository = $this->getMockBuilder(EmailRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $emailRepository->method('getDoNotEmailList')
+        $this->emailRepository->method('getDoNotEmailList')
             ->will($this->returnValue([1 => 'someone@domain.com']));
-        $statRepository = $this->getMockBuilder(StatRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $frequencyRepository = $this->getMockBuilder(FrequencyRuleRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
 
-        // Setup the EntityManager
-        $entityManager = $this
-            ->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $entityManager->expects($this->any())
+        $this->entityManager->expects($this->any())
             ->method('getRepository')
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticEmailBundle:Email', $emailRepository],
-                        ['MauticEmailBundle:Stat', $statRepository],
-                        ['MauticLeadBundle:FrequencyRule', $frequencyRepository],
+                        ['MauticEmailBundle:Email', $this->emailRepository],
+                        ['MauticEmailBundle:Stat', $this->statRepository],
+                        ['MauticLeadBundle:FrequencyRule', $this->frequencyRepository],
                     ]
                 )
             );
-        $companyModel = $this->getMockBuilder(CompanyModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
 
         // If it makes it to the point of calling getContactCompanies then DNC failed
-        $companyModel->expects($this->exactly(0))
+        $this->companyModel->expects($this->exactly(0))
             ->method('getRepository');
 
         /** @var SendEmailToContact $sendToContactModel */
@@ -773,10 +693,27 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
                     ->willReturn('immediately');
             }));
 
-        $emailModel = $this->emailModel;
+        $emailModel =  new \Mautic\EmailBundle\Model\EmailModel(
+            $this->ipLookupHelper,
+            $this->themeHelper,
+            $this->mailboxHelper,
+            $mailHelper,
+            $this->leadModel,
+            $this->companyModel,
+            $this->trackableModel,
+            $this->userModel,
+            $this->messageModel,
+            $sendToContactModel,
+            $this->deviceTrackerMock,
+            $this->redirectRepositoryMock,
+            $this->cacheStorageHelperMock,
+            $this->contactTracker,
+            $this->doNotContact,
+            $this->generatedColumnsProvider
+        );
 
-        $emailModel->setTranslator($translator);
-        $emailModel->setEntityManager($entityManager);
+        $emailModel->setTranslator($this->translator);
+        $emailModel->setEntityManager($this->entityManager);
 
         $emailEntity = $this->getMockBuilder(Email::class)
             ->disableOriginalConstructor()
@@ -785,6 +722,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue(1));
 
         $emailModel->sendEmail($emailEntity, [1 => ['id' => 1, 'email' => 'someone@domain.com']], ['immediately'=> false]);
-        $this->assertNotEquals($mailHelper->getMailer(), 'immediately');
+        $this->assertNotEquals($this->mailHelper->getMailer(), 'immediately');
     }
 }
