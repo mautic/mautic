@@ -170,9 +170,23 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($email);
         $this->em->flush();
 
-        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/clone/{$email->getId()}");
-        $button  =  $crawler->selectButton('Select')->eq(2)->link();
-        $crawler = $this->client->click($button);
-        echo $crawler->filterXPath('//*[@id="app-content"]')->html();
+        $crawler        = $this->client->request(Request::METHOD_GET, "/s/emails/clone/{$email->getId()}");
+        $buttonCrawler  =  $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+        $form['emailform[emailType]']->setValue('list');
+
+        $this->client->submit($form);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+
+        $emails = $this->em->getRepository(Email::class)->findBy([], ['id' => 'ASC']);
+        Assert::assertCount(2, $emails);
+
+        $firstEmail  = $emails[0];
+        $secondEmail = $emails[1];
+
+        Assert::assertSame($email->getId(), $firstEmail->getId());
+        Assert::assertNotSame($email->getId(), $secondEmail->getId());
+        Assert::assertSame($firstEmail->getName(), $secondEmail->getName());
+        // todo make other assertion ...
     }
 }
