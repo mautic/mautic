@@ -176,6 +176,9 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $buttonCrawler  =  $crawler->selectButton('Save & Close');
         $form           = $buttonCrawler->form();
         $form['emailform[emailType]']->setValue('list');
+        $form['emailform[subject]']->setValue('Email B Subject clone');
+        $form['emailform[name]']->setValue('Email B clone');
+        $form['emailform[isPublished]']->setValue(1);
 
         $this->client->submit($form);
         Assert::assertTrue($this->client->getResponse()->isOk());
@@ -188,6 +191,12 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertSame($email->getId(), $firstEmail->getId());
         Assert::assertNotSame($email->getId(), $secondEmail->getId());
-        Assert::assertSame($firstEmail->getName(), $secondEmail->getName());
+        Assert::assertEquals('list', $secondEmail->getEmailType());
+        Assert::assertEquals('Email B Subject', $firstEmail->getSubject());
+        Assert::assertEquals('Email B', $firstEmail->getName());
+        Assert::assertEquals('Email B Subject clone', $secondEmail->getSubject());
+        Assert::assertEquals('Email B clone', $secondEmail->getName());
+        Assert::assertEquals('beefree-empty', $secondEmail->getTemplate());
+        Assert::assertEquals('Test html', $secondEmail->getCustomHtml());
     }
 }
