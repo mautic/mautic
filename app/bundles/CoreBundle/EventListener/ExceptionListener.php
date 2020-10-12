@@ -85,8 +85,8 @@ class ExceptionListener extends KernelExceptionListener
                     $e->getMessage(),
                     $e->getFile(),
                     $e->getLine()
-                    )
-                );
+                )
+            );
 
             $wrapper = $e;
 
