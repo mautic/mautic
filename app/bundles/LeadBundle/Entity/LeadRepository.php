@@ -1000,7 +1000,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('u.id, u.first_name, u.last_name, u.email, u.signature')
+            ->select('u.id, u.first_name, u.last_name, u.email, u.position, u.signature')
             ->from(MAUTIC_TABLE_PREFIX.'users', 'u')
             ->where('u.id = :ownerId')
             ->setParameter('ownerId', (int) $ownerId);
