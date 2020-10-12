@@ -53,7 +53,9 @@ class FormUploader
                 $uploadDir       = $this->getUploadDir($field);
                 $fileName        = $this->fileUploader->upload($uploadDir, $fileFieldCrate->getUploadedFile());
                 $result[$alias]  = $fileName;
-                $uploadedFiles[] = $uploadDir.DIRECTORY_SEPARATOR.$fileName;
+                $uploadedFile    = $uploadDir.DIRECTORY_SEPARATOR.$fileName;
+                $this->fixRotationJPG($uploadedFile);
+                $uploadedFiles[] =$uploadedFile;
             }
             $submission->setResults($result);
         } catch (FileUploadException $e) {
@@ -139,5 +141,40 @@ class FormUploader
         $uploadDir = $this->coreParametersHelper->get('form_upload_dir');
 
         return $uploadDir.DIRECTORY_SEPARATOR.$formId;
+    }
+
+    /**
+     * Fix iOS picture orientation after upload PHP
+     * https://stackoverflow.com/questions/22308921/fix-ios-picture-orientation-after-upload-php.
+     *
+     * @param $filename
+     */
+    private function fixRotationJPG($filename)
+    {
+        if (exif_imagetype($filename) != IMAGETYPE_JPEG) {
+            return;
+        }
+        $exif = exif_read_data($filename);
+        $ort  = $exif['Orientation']; /*STORES ORIENTATION FROM IMAGE */
+        $ort1 = $ort;
+        $exif = exif_read_data($filename, 0, true);
+        if (!empty($ort1)) {
+            $image = imagecreatefromjpeg($filename);
+            $ort   = $ort1;
+            switch ($ort) {
+                case 3:
+                    $image = imagerotate($image, 180, 0);
+                    break;
+
+                case 6:
+                    $image = imagerotate($image, -90, 0);
+                    break;
+
+                case 8:
+                    $image = imagerotate($image, 90, 0);
+                    break;
+            }
+        }
+        imagejpeg($image, $filename, 90);
     }
 }
