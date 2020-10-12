@@ -12,6 +12,7 @@
 namespace Mautic\ChannelBundle\Form\Type;
 
 use Mautic\ChannelBundle\Model\MessageModel;
+use Mautic\CoreBundle\Form\Type\SortableListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -40,51 +41,44 @@ class ChannelsItemsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $channels = $this->messageModel->getChannels();
+        foreach ($channels as $channel=>$channelConfig) {
+            $builder->add(
+                $channel,
+                $channelConfig['lookupFormType'],
+                [
+                    'multiple'    => true,
+                    'label'       => $channelConfig['label'],
+                ]
+            );
+        }
 
         $builder->add(
-            'channel',
-            ChoiceType::class,
+            'includeUrls',
+            SortableListType::class,
             [
-                'label'       => 'mautic.core.channel',
-                'choices'     => array_flip(array_combine(array_keys($channels), array_column($channels, 'label'))),
-                'attr'        => [
-                    'onchange' => 'Mautic.reloadChannelItems(this.value)',
+                'label'           => 'mautic.page.include.urls',
+                'attr'            => [
+                    'tooltip' => 'mautic.page.urls.desc',
                 ],
-                'placeholder' => '',
-                'constraints' => new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    ),
+                'option_required' => false,
+                'with_labels'     => false,
+                'required'        => false,
             ]
         );
 
-        $func = function (FormEvent $e) use ($channels) {
-            $data    = $e->getData();
-            $form    = $e->getForm();
-            if (!empty($data['channel']) && !empty($channels[$data['channel']])) {
-                $channelConfig =  $channels[$data['channel']];
-                if (isset($channelConfig['lookupFormType'])) {
-                    $form->add(
-                        'channelId',
-                        $channelConfig['lookupFormType'],
-                        [
-                            'multiple'    => false,
-                            'label'       => $channelConfig['label'],
-                            'constraints' => new NotBlank(
-                                    [
-                                        'message' => 'mautic.core.value.required',
-                                    ]
-                                ),
-                        ]
-                    );
-                }
-            }
-        };
-
-        // Register the function above as EventListener on PreSet and PreBind
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, $func);
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, $func);
+        $builder->add(
+            'excludeUrls',
+            SortableListType::class,
+            [
+                'label'           => 'mautic.page.exclude.urls',
+                'attr'            => [
+                    'tooltip' => 'mautic.page.urls.desc',
+                ],
+                'option_required' => false,
+                'with_labels'     => false,
+                'required'        => false,
+            ]
+        );
     }
 
     /**
