@@ -61,7 +61,7 @@ class ExceptionListener extends KernelExceptionListener
 
         // Check for exceptions we don't want to handle
         if ($exception instanceof AuthenticationException || $exception instanceof AccessDeniedException || $exception instanceof LogoutException
-            ) {
+        ) {
             return;
         }
 
@@ -78,15 +78,15 @@ class ExceptionListener extends KernelExceptionListener
             $event->setResponse($response);
         } catch (\Exception $e) {
             $this->logException(
-                    $e,
-                    sprintf(
-                        'Exception thrown when handling an exception (%s: %s at %s line %s)',
-                        get_class($e),
-                        $e->getMessage(),
-                        $e->getFile(),
-                        $e->getLine()
-                        )
-                    );
+                $e,
+                sprintf(
+                    'Exception thrown when handling an exception (%s: %s at %s line %s)',
+                    get_class($e),
+                    $e->getMessage(),
+                    $e->getFile(),
+                    $e->getLine()
+                    )
+                );
 
             $wrapper = $e;
 
