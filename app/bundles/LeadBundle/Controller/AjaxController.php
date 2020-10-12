@@ -354,7 +354,7 @@ class AjaxController extends CommonAjaxController
 
             if (null !== $lead && null !== $channel) {
                 if ('remove' === $action) {
-                    $doNotContact->addDncForContact($leadId, $channel, 'user', DoNotContact::MANUAL);
+                    $doNotContact->addDncForContact($leadId, $channel, DoNotContact::MANUAL, 'user');
                 } elseif ('add' === $action) {
                     $doNotContact->removeDncForContact($leadId, $channel);
                 }
