@@ -498,7 +498,7 @@ class CommonController extends Controller implements MauticController
         if (!empty($page_404)) {
             $pageModel = $this->getModel('page');
             $page      = $pageModel->getEntity($page_404);
-            if (!empty($page) && true == $page->getIsPublished() && !empty($page->getCustomHtml())) {
+            if (!empty($page) && $page->getIsPublished() && !empty($page->getCustomHtml())) {
                 $slug = $pageModel->generateSlug($page);
 
                 return $this->redirectToRoute('mautic_page_public', ['slug' => $slug]);
