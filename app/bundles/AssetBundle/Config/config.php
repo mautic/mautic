@@ -66,7 +66,7 @@ return [
             'mautic.asset.permissions' => [
                 'class'     => \Mautic\AssetBundle\Security\Permissions\AssetPermissions::class,
                 'arguments' => [
-                    '%mautic.parameters%',
+                    'mautic.helper.core_parameters',
                 ],
             ],
         ],
