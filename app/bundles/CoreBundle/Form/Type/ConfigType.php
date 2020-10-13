@@ -133,7 +133,6 @@ class ConfigType extends AbstractType
                 ],
                 'multiple'       => false,
                 'placeholder'    => '',
-                'required'       => false,
                 'published_only' => true,
             ]
         );
