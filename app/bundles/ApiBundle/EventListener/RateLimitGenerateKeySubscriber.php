@@ -40,7 +40,7 @@ class RateLimitGenerateKeySubscriber implements EventSubscriberInterface
 
     public function onGenerateKey(GenerateKeyEvent $event)
     {
-        $suffix = rawurlencode($this->coreParametersHelper->get('site_url'));
+        $suffix = $this->coreParametersHelper->get('site_url');
         $event->addToKey($suffix);
     }
 }
