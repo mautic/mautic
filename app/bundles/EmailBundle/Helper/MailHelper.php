@@ -945,7 +945,7 @@ class MailHelper
      */
     public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false)
     {
-        if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_convert_embed_images')) {
+        if ($this->factory->getParameter('mailer_convert_embed_images')) {
             $content = $this->convertEmbedImages($content);
         }
 

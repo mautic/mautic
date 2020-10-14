@@ -1,36 +1,40 @@
-**Please be sure you are submitting this against the _staging_ branch.**
+<!--
+Any PR related to Mautic 2 issues is not relavant anymore, please consider upgrading your code to the Mautic 3 series (staging/3.0 branch).
+-->
+| Q                                      | A
+| -------------------------------------- | ---
+| Branch?                                | staging for features or enhancements / 3.0 for bug fixes <!-- see below -->
+| Bug fix?                               | yes/no
+| New feature?                           | yes/no
+| Deprecations?                          | yes/no
+| BC breaks?                             | yes/no
+| Automated tests included?              | yes/no
+| Related user documentation PR URL      | mautic/mautic-documentation#... <!-- required for new features -->
+| Related developer documentation PR URL | mautic/developer-documentation#... <!-- required for developer-facing changes -->
+| Issue(s) addressed                     | Fixes #... <!-- prefix each issue number with "Fixes #", no need to create an issue if none exists, explain below instead -->
 
-[//]: # ( Please answer the following questions: )
+<!--
+Additionally (see https://contribute.mautic.org/contributing-to-mautic/developer/code/pull-requests#step-5-work-on-your-pull-request):
+ - Always add tests and ensure they pass.
+ - Bug fixes must be submitted against the lowest maintained branch where they apply
+   (lowest branches are regularly merged to upper ones so they get the fixes too.)
+ - Features and deprecations must be submitted against the staging branch.
+-->
 
-| Q  | A
-| --- | ---
-| Bug fix? | 
-| New feature? | 
-| Automated tests included? |
-| Related user documentation PR URL | 
-| Related developer documentation PR URL | 
-| Issues addressed (#s or URLs) | 
-| BC breaks? | 
-| Deprecations? | 
-
-[//]: # ( Note that all new features should have a related user and/or developer documentation PR in their respective repositories. )
-
-[//]: # ( Required: )
+<!--
+Please write a short README for your feature/bugfix. This will help people understand your PR and what it aims to do.
+-->
 #### Description:
 
-[//]: # ( As applicable: )
-#### Steps to reproduce the bug:
-1. 
-2. 
+<!--
+If you are fixing a bug and if there is no linked issue already, please provide steps to reproduce the issue here.
+-->
 
 #### Steps to test this PR:
-1. Load up [this PR](https://m3.mautibox.com)
+1. Load up [this PR](https://mautibox.com)
 2. 
 
-#### List deprecations along with the new alternative:
-1. 
-2. 
-
-#### List backwards compatibility breaks:
-1. 
-2. 
+<!--
+If you have any deprecations, list them here along with the new alternative.
+If you have any backwards compatibility breaks, list them here.
+-->

@@ -50,8 +50,10 @@ $template  = '<div class="col-md-6">{content}</div>';
                     </div>
                 </div>
             <?php endif; ?>
+
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_amazon_region', $template); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_amazon_other_region', $template); ?>
             </div>
 
             <div class="row">
@@ -180,4 +182,3 @@ $template  = '<div class="col-md-6">{content}</div>';
         </div>
     </div>
 </div>
-
