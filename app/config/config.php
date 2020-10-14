@@ -97,8 +97,9 @@ $dbalSettings = [
         'row_format' => 'DYNAMIC',
     ],
     'types'    => [
-        'array'    => 'Mautic\CoreBundle\Doctrine\Type\ArrayType',
-        'datetime' => 'Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType',
+        'array'     => \Mautic\CoreBundle\Doctrine\Type\ArrayType::class,
+        'datetime'  => \Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType::class,
+        'generated' => \Mautic\CoreBundle\Doctrine\Type\GeneratedType::class,
     ],
     // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
     'mapping_types' => [
