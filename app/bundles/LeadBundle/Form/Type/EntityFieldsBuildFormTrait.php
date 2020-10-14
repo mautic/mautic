@@ -220,7 +220,7 @@ trait EntityFieldsBuildFormTrait
                     }
 
                     $typeProperties['data']        = MultiselectType::class === $type ? FormFieldHelper::parseList($value) : $value;
-                    $typeProperties['placeholder'] = $emptyValue;
+                    $typeProperties['placeholder'] = isset($options['placeholder'][$alias]) ? $options['placeholder'][$alias] : $emptyValue;
                     $builder->add(
                         $alias,
                         $type,

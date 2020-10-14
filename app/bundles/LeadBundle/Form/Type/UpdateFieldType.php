@@ -11,6 +11,9 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\BooleanType;
+use Mautic\LeadBundle\Exception\FieldNotFoundException;
+use Mautic\LeadBundle\Form\FieldAliasToFqcnMap;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -23,13 +26,23 @@ class UpdateFieldType extends AbstractType
     {
         $options['ignore_required_constraints'] = true;
 
-        $disabled = [];
-        foreach ($options['fields'] as $field) {
+        $disabled    = [];
+        $placeholder = [];
+        foreach ($options['fields'] as &$field) {
             if (isset($options['actions']) && isset($options['actions'][$field['alias']]) && 'empty' == $options['actions'][$field['alias']]) {
                 $disabled[$field['alias']] = true;
             }
+            try {
+                $type = FieldAliasToFqcnMap::getFqcn($field['type']);
+                if (BooleanType::class === $type) {
+                    $placeholder[$field['alias']] = false;
+                }
+            } catch (FieldNotFoundException $e) {
+            }
         }
-        $options['disabled']  = $disabled;
+
+        $options['placeholder']  = $placeholder;
+        $options['disabled']     = $disabled;
 
         $this->getFormFields($builder, $options, isset($options['object']) ? $options['object'] : 'lead');
     }
