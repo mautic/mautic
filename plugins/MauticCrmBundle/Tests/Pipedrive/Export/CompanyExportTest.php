@@ -31,18 +31,16 @@ class CompanyExportTest extends PipedriveTest
             ]
         );
 
-        $this->client->request(
-            Request::METHOD_POST,
-            '/s/companies/new?mauticUserLastActive=1&mauticLastNotificationId=',
-            [
-                'company' => [
-                    'companyname'     => 'Test Name',
-                    'companyaddress1' => 'Test Address',
-                ],
-            ],
-            [],
-            $this->createAjaxHeaders()
-        );
+        $crawler     = $this->client->request(Request::METHOD_GET, '/s/companies/new');
+        $formCrawler = $crawler->filter('form[name=company]');
+        $this->assertSame(1, $formCrawler->count());
+
+        $form = $formCrawler->form();
+        $form->setValues([
+            'company[companyname]'     => 'Test Name',
+            'company[companyaddress1]' => 'Test Address',
+        ]);
+        $this->client->submit($form);
 
         /** @var Company $company */
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
@@ -73,18 +71,16 @@ class CompanyExportTest extends PipedriveTest
             ]
         );
 
-        $this->client->request(
-            Request::METHOD_POST,
-            '/s/companies/new?mauticUserLastActive=1&mauticLastNotificationId=',
-            [
-                'company' => [
-                    'companyname'     => $testName,
-                    'companyaddress1' => $testAddress1,
-                ],
-            ],
-            [],
-            $this->createAjaxHeaders()
-        );
+        $crawler     = $this->client->request(Request::METHOD_GET, '/s/companies/new');
+        $formCrawler = $crawler->filter('form[name=company]');
+        $this->assertSame(1, $formCrawler->count());
+
+        $form = $formCrawler->form();
+        $form->setValues([
+            'company[companyname]'     => $testName,
+            'company[companyaddress1]' => $testAddress1,
+        ]);
+        $this->client->submit($form);
 
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
         $company             = $this->em->getRepository(Company::class)->findOneById(1);
@@ -121,18 +117,16 @@ class CompanyExportTest extends PipedriveTest
 
         $company = $this->createCompany();
 
-        $this->client->request(
-            Request::METHOD_POST,
-            's/companies/edit/'.$company->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
-            [
-                'company' => [
-                    'companyname'     => $testName,
-                    'companyaddress1' => $testAddress1,
-                ],
-            ],
-            [],
-            $this->createAjaxHeaders()
-        );
+        $crawler     = $this->client->request(Request::METHOD_GET, '/s/companies/edit/'.$company->getId());
+        $formCrawler = $crawler->filter('form[name=company]');
+        $this->assertSame(1, $formCrawler->count());
+
+        $form = $formCrawler->form();
+        $form->setValues([
+            'company[companyname]'     => $testName,
+            'company[companyaddress1]' => $testAddress1,
+        ]);
+        $this->client->submit($form);
 
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
         $companies           = $this->em->getRepository(Company::class)->findAll();
@@ -164,18 +158,16 @@ class CompanyExportTest extends PipedriveTest
         $company = $this->createCompany();
         $this->createCompanyIntegrationEntity($integrationId, $company->getId());
 
-        $this->client->request(
-            Request::METHOD_POST,
-            's/companies/edit/'.$company->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
-            [
-                'company' => [
-                    'companyname'     => $testName,
-                    'companyaddress1' => $testAddress1,
-                ],
-            ],
-            [],
-            $this->createAjaxHeaders()
-        );
+        $crawler     = $this->client->request(Request::METHOD_GET, '/s/companies/edit/'.$company->getId());
+        $formCrawler = $crawler->filter('form[name=company]');
+        $this->assertSame(1, $formCrawler->count());
+
+        $form = $formCrawler->form();
+        $form->setValues([
+            'company[companyname]'     => $testName,
+            'company[companyaddress1]' => $testAddress1,
+        ]);
+        $this->client->submit($form);
 
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
         $companies           = $this->em->getRepository(Company::class)->findAll();

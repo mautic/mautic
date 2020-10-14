@@ -6,6 +6,7 @@
 .gitignore
 .php_cs
 .travis.yml
+codecov.yml
 Gruntfile.js
 README.md
 UPGRADE*.md

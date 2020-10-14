@@ -68,30 +68,30 @@ class ChannelSubscriber implements EventSubscriberInterface
                     ],
                 ]
             );
-        }
 
-        $supportedFeatures = $integration->getSupportedFeatures();
+            $supportedFeatures = $integration->getSupportedFeatures();
 
-        if (in_array('mobile', $supportedFeatures)) {
-            $event->addChannel(
-                'mobile_notification',
-                [
-                    MessageModel::CHANNEL_FEATURE => [
-                        'campaignAction'             => 'notification.send_mobile_notification',
-                        'campaignDecisionsSupported' => [
-                            'page.pagehit',
-                            'asset.download',
-                            'form.submit',
+            if (in_array('mobile', $supportedFeatures)) {
+                $event->addChannel(
+                    'mobile_notification',
+                    [
+                        MessageModel::CHANNEL_FEATURE => [
+                            'campaignAction'             => 'notification.send_mobile_notification',
+                            'campaignDecisionsSupported' => [
+                                'page.pagehit',
+                                'asset.download',
+                                'form.submit',
+                            ],
+                            'lookupFormType'             => NotificationListType::class,
+                            'repository'                 => 'MauticNotificationBundle:Notification',
+                            'lookupOptions'              => [
+                                'mobile'  => true,
+                                'desktop' => false,
+                            ],
                         ],
-                        'lookupFormType' => NotificationListType::class,
-                        'repository'     => 'MauticNotificationBundle:Notification',
-                        'lookupOptions'  => [
-                            'mobile'  => true,
-                            'desktop' => false,
-                        ],
-                    ],
-                ]
-            );
+                    ]
+                );
+            }
         }
     }
 }

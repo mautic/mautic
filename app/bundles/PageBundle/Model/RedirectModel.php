@@ -82,14 +82,9 @@ class RedirectModel extends FormModel
         );
 
         if (!empty($utmTags)) {
-            $utmTags   = $this->getUtmTagsForUrl($utmTags);
-            $query     = parse_url($url, PHP_URL_QUERY);
-            $urlString = http_build_query($utmTags, '', '&');
-            if ($query) {
-                $url .= '&'.$urlString;
-            } else {
-                $url .= '?'.$urlString;
-            }
+            $utmTags         = $this->getUtmTagsForUrl($utmTags);
+            $appendUtmString = http_build_query($utmTags, '', '&');
+            $url             = UrlHelper::appendQueryToUrl($url, $appendUtmString);
         }
 
         if ($shortenUrl) {
