@@ -105,7 +105,9 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
         $qb->setParameter(':dateFrom', $event->getOptions()['dateFrom']->format('Y-m-d H:i:s'));
         $qb->setParameter(':dateTo', $event->getOptions()['dateTo']->format('Y-m-d H:i:s'));
 
-        $qb->groupBy('l.id,log_added.object_id');
+        if (!$event->hasGroupBy()) {
+            $qb->groupBy('l.id,log_added.object_id');
+        }
 
         if ($event->hasColumn(['u.first_name', 'u.last_name']) || $event->hasFilter(['u.first_name', 'u.last_name'])) {
             $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
