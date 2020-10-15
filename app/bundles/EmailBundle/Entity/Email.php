@@ -204,8 +204,14 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     private $queuedCount = 0;
 
+    /**
+     * @var int
+     */
+    private $clonedId;
+
     public function __clone()
     {
+        $this->clonedId         = $this->id;
         $this->id               = null;
         $this->sentCount        = 0;
         $this->readCount        = 0;
@@ -1182,5 +1188,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function getPendingCount()
     {
         return $this->pendingCount;
+    }
+
+    public function getClonedId(): ?int
+    {
+        return $this->clonedId;
     }
 }
