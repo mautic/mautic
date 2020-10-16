@@ -89,11 +89,10 @@ class CorePermissions
         $this->coreParametersHelper = $coreParametersHelper;
         $this->bundles              = $bundles;
         $this->pluginBundles        = $pluginBundles;
+
+        $this->registerPermissionClasses();
     }
 
-    /**
-     * @param AbstractPermissions $permissionObject
-     */
     public function setPermissionObject(AbstractPermissions $permissionObject)
     {
         $this->permissionObjectsByClass[get_class($permissionObject)] = $permissionObject;
@@ -512,7 +511,7 @@ class CorePermissions
             throw new \InvalidArgumentException("Permission class not found for {$class} in permissions classes");
         }
 
-        $permissionClass  = '\\'.$this->getPermissionClasses()[$class];
+        $permissionClass  = $this->getPermissionClasses()[$class];
         $permissionObject = new $permissionClass($this->getParams());
 
         return $permissionObject;
