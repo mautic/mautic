@@ -17,13 +17,29 @@ use Mautic\CampaignBundle\Security\Permissions\CampaignPermissions;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use MauticPlugin\MauticFocusBundle\Security\Permissions\FocusPermissions;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class CorePermissionsTest extends \PHPUnit_Framework_TestCase
+class CorePermissionsTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|UserHelper
+     */
     private $userHelper;
+
+    /**
+     * @var CorePermissions
+     */
     private $corePermissions;
+
+    /**
+     * @var MockObject|TranslatorInterface
+     */
     private $translator;
+
+    /**
+     * @var array
+     */
     private $permissions;
 
     protected function setUp()
@@ -47,7 +63,7 @@ class CorePermissionsTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSettingPermissionObject()
+    public function testSettingPermissionObject(): void
     {
         $assetPermissions = new AssetPermissions($this->permissions);
         $this->corePermissions->setPermissionObject($assetPermissions);
@@ -63,12 +79,7 @@ class CorePermissionsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($permissionObjects['campaign'], $this->corePermissions->getPermissionObject(CampaignPermissions::class));
     }
 
-    /**
-     * @param string $permissionClass
-     *
-     * @return array
-     */
-    private function mockBundleArray($permissionClass)
+    private function mockBundleArray(string $permissionClass): array
     {
         return ['permissionClasses' => [$permissionClass => $permissionClass]];
     }
