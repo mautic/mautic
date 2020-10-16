@@ -46,7 +46,7 @@ class InstallCommand extends ContainerAwareCommand
             ->addArgument(
                 'step',
                 InputArgument::OPTIONAL,
-                'Install process start index. 0 for requirements check, 1 for database, 2 for admin, 3 for configuration. Each successful step will trigger the next until completion.',
+                'Install process start index. 0 for requirements check, 1 for database, 2 for admin, 3 for configuration, 4 for final step. Each successful step will trigger the next until completion.',
                 0
             )
             ->addOption(
@@ -395,10 +395,26 @@ class InstallCommand extends ContainerAwareCommand
 
                 // no break
             case InstallService::EMAIL_STEP:
-                $output->writeln($step.' - Email configuration and final steps...');
+                $output->writeln($step.' - Email configuration...');
                 $messages = $this->stepAction($installer, $allParams, $step);
                 if (is_array($messages) && !empty($messages)) {
-                    $output->writeln('Errors in email configuration or final migration:');
+                    $output->writeln('Errors in email configuration:');
+                    $this->handleInstallerErrors($output, $messages);
+
+                    $output->writeln('Install canceled');
+
+                    return -$step;
+                }
+                // Keep on with next step
+                $step = InstallService::FINAL_STEP;
+
+                // no break
+            case InstallService::FINAL_STEP:
+                $output->writeln($step.' - Final steps...');
+                $messages = $this->stepAction($installer, $allParams, $step);
+
+                if (is_array($messages) && !empty($messages)) {
+                    $output->writeln('Errors in final migration:');
                     $this->handleInstallerErrors($output, $messages);
 
                     $output->writeln('Install canceled');
@@ -494,15 +510,15 @@ class InstallCommand extends ContainerAwareCommand
                 }
                 $messages = $installer->setupEmailStep($step, $params);
                 break;
-        }
 
-        if (is_bool($messages) && true === $messages) {
-            $siteUrl  = $params['site_url'];
-            $messages = $installer->createFinalConfigStep($siteUrl);
-
-            if (is_bool($messages) && true === $messages) {
-                $installer->finalMigrationStep();
-            }
+            case InstallService::FINAL_STEP:
+                // Save final configuration
+                $siteUrl  = $params['site_url'];
+                $messages = $installer->createFinalConfigStep($siteUrl);
+                if (is_bool($messages) && true === $messages) {
+                    $installer->finalMigrationStep();
+                }
+                break;
         }
 
         return $messages;
