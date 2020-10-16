@@ -11,6 +11,7 @@
 
 namespace Mautic\InstallBundle\InstallFixtures\ORM;
 
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -22,15 +23,20 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- * Class LeadFieldData.
- */
-class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface, FixtureGroupInterface
 {
     /**
      * @var ContainerInterface
      */
     private $container;
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getGroups(): array
+    {
+        return ['group_install', 'group_mautic_install_data'];
+    }
 
     /**
      * {@inheritdoc}
@@ -41,7 +47,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
     }
 
     /**
-     * @param ObjectManager $manager
+     * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public function load(ObjectManager $manager)
     {
@@ -51,12 +57,12 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
         $translator   = $this->container->get('translator');
         $indexesToAdd = [];
         foreach ($fieldGroups as $object => $fields) {
-            if ($object == 'company') {
+            if ('company' === $object) {
                 /** @var ColumnSchemaHelper $schema */
-                $schema = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('column', 'companies');
+                $schema = $this->container->get('mautic.schema.helper.column')->setName('companies');
             } else {
                 /** @var ColumnSchemaHelper $schema */
-                $schema = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('column', 'leads');
+                $schema = $this->container->get('mautic.schema.helper.column')->setName('leads');
             }
 
             $order = 1;
@@ -93,8 +99,9 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
                 }
 
                 $indexesToAdd[$object][$alias] = $field;
-
-                $this->addReference('leadfield-'.$alias, $entity);
+                if (!$this->hasReference('leadfield-'.$alias)) {
+                    $this->addReference('leadfield-'.$alias, $entity);
+                }
                 ++$order;
             }
 
@@ -102,21 +109,21 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
         }
 
         foreach ($indexesToAdd as $object => $indexes) {
-            if ($object == 'company') {
+            if ('company' === $object) {
                 /** @var IndexSchemaHelper $indexHelper */
-                $indexHelper = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('index', 'companies');
+                $indexHelper = $this->container->get('mautic.schema.helper.index')->setName('companies');
             } else {
                 /** @var IndexSchemaHelper $indexHelper */
-                $indexHelper = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('index', 'leads');
+                $indexHelper = $this->container->get('mautic.schema.helper.index')->setName('leads');
             }
 
             foreach ($indexes as $name => $field) {
                 $type = (isset($field['type'])) ? $field['type'] : 'text';
-                if ('textarea' != $type) {
+                if ('textarea' !== $type) {
                     $indexHelper->addIndex([$name], $name.'_search');
                 }
             }
-            if ($object == 'lead') {
+            if ('lead' === $object) {
                 // Add an attribution index
                 $indexHelper->addIndex(['attribution', 'attribution_date'], 'contact_attribution');
                 //Add date added and country index

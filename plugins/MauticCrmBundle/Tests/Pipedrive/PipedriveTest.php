@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\Plugin;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveOwner;
@@ -19,16 +20,21 @@ abstract class PipedriveTest extends MauticMysqlTestCase
     const WEBHOOK_USER     = 'user';
     const WEBHOOK_PASSWORD = 'pa$$word';
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
-        $GLOBALS['requests'] = [];
+        // Simulate request.
+        $GLOBALS['requests']        = [];
+        $_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.1';
+        $_SERVER['SERVER_PORT']     = 80;
+        $_SERVER['SERVER_NAME']     = 'www.example.com';
+        $_SERVER['REQUEST_URI']     = '/index.php';
     }
 
     public function tearDown()
     {
-        unset($GLOBALS['requests']);
+        unset($GLOBALS['requests'], $_SERVER['SERVER_PROTOCOL'], $_SERVER['SERVER_PORT'], $_SERVER['SERVER_NAME']);
 
         parent::tearDown();
     }
@@ -180,7 +186,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
 
     protected function createLeadIntegrationEntity($integrationEntityId, $internalEntityId)
     {
-        $date = (new DateTimeHelper('-3 years'))->getDateTime();
+        $date = (new DateTimeHelper('2017-05-15 00:00:00'))->getDateTime();
 
         $integrationEntity = new IntegrationEntity();
 
@@ -200,7 +206,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
 
     protected function createCompanyIntegrationEntity($integrationEntityId, $internalEntityId)
     {
-        $date = (new DateTimeHelper('-3 years'))->getDateTime();
+        $date = (new DateTimeHelper('2017-05-15 00:00:00'))->getDateTime();
 
         $integrationEntity = new IntegrationEntity();
 
@@ -220,6 +226,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
 
     protected function getIntegrationObject()
     {
+        /** @var IntegrationHelper $integrationHelper */
         $integrationHelper = $this->container->get('mautic.helper.integration');
 
         /** @var Integration $integration */

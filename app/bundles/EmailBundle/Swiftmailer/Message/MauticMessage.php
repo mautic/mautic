@@ -39,8 +39,7 @@ class MauticMessage extends \Swift_Message
     }
 
     /**
-     * @param       $email
-     * @param array $metadata
+     * @param $email
      */
     public function addMetadata($email, array $metadata)
     {

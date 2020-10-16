@@ -16,8 +16,6 @@ class RestrictionHelper
     /**
      * Ensure that the array has string indexes for congruency with a nested array similar to ['db_host', 'monitored_email' => ['EmailBundle_bounces'];.
      *
-     * @param array $restrictedParameters
-     *
      * @return array
      */
     public static function prepareRestrictions(array $restrictedParameters)
@@ -33,9 +31,6 @@ class RestrictionHelper
 
     /**
      * Remove fields that are restricted.
-     *
-     * @param array $configParameters
-     * @param array $restrictedParameters
      *
      * @return array
      */

@@ -22,8 +22,6 @@ class TrailingSlashHelper
 
     /**
      * TrailingSlashHelper constructor.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
@@ -31,13 +29,11 @@ class TrailingSlashHelper
     }
 
     /**
-     * @param Request $request
-     *
      * @return string
      */
     public function getSafeRedirectUrl(Request $request)
     {
-        $siteUrl  = $this->coreParametersHelper->getParameter('site_url');
+        $siteUrl  = $this->coreParametersHelper->get('site_url');
         $pathInfo = substr($request->getPathInfo(), 0, -1);
 
         return $siteUrl.$pathInfo;

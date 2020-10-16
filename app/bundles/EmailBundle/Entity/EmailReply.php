@@ -16,9 +16,6 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Ramsey\Uuid\Uuid;
 
-/**
- * Class EmailReply.
- */
 class EmailReply
 {
     /**
@@ -41,9 +38,6 @@ class EmailReply
      */
     private $messageId;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -88,11 +82,7 @@ class EmailReply
     }
 
     /**
-     * EmailReply constructor.
-     *
-     * @param Stat           $stat
-     * @param                $messageId
-     * @param \DateTime|null $dateReplied
+     * @param string $messageId
      */
     public function __construct(Stat $stat, $messageId, \DateTime $dateReplied = null)
     {

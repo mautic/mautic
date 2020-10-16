@@ -194,7 +194,7 @@ class FormModelTest extends FormTestAbstract
     {
         $formField = $this->standardSyncListStaticFieldTest('locale');
 
-        $this->assertArrayHasKey('cs_CZ', $formField->getProperties()['list']['list']);
+        $this->assertArrayHasKey('Czech (Czechia)', $formField->getProperties()['list']['list']);
     }
 
     public function testGetEntityForLinkedSyncListFields()

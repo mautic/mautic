@@ -85,7 +85,7 @@ PHP
 
     Password-compat - MIT - Copyright (c) 2012 Anthony Ferrara
 
-    PHPExcel - LGPL - Copyright (c) 2006 - 2014 PHPExcel
+    PhpSpreadsheet - MIT - Copyright (c) 2019 PhpSpreadsheet Authors
 
     Symfony - MIT - Copyright (c) 2004-2013 Fabien Potencier
 

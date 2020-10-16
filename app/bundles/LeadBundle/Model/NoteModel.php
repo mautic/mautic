@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\LeadBundle\Event\LeadNoteEvent;
+use Mautic\LeadBundle\Form\Type\NoteType;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -31,9 +32,6 @@ class NoteModel extends FormModel
      */
     protected $session;
 
-    /**
-     * @param Session $session
-     */
     public function setSession(Session $session)
     {
         $this->session = $session;
@@ -64,11 +62,11 @@ class NoteModel extends FormModel
      *
      * @param $id
      *
-     * @return null|object
+     * @return object|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new LeadNote();
         }
 
@@ -97,7 +95,7 @@ class NoteModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('leadnote', $entity, $options);
+        return $formFactory->create(NoteType::class, $entity, $options);
     }
 
     /**
@@ -148,8 +146,7 @@ class NoteModel extends FormModel
     }
 
     /**
-     * @param Lead $lead
-     * @param      $useFilters
+     * @param $useFilters
      *
      * @return mixed
      */

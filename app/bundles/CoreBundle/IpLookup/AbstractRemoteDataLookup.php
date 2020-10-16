@@ -11,9 +11,6 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-/**
- * Class AbstractRemoteDataLookup.
- */
 abstract class AbstractRemoteDataLookup extends AbstractLookup
 {
     /**

@@ -23,6 +23,10 @@ class MauticCitrixBundle extends PluginBundleBase
     {
         parent::boot();
 
-        CitrixHelper::init($this->container->get('mautic.helper.integration'), $this->container->get('monolog.logger.mautic'));
+        CitrixHelper::init(
+            $this->container->get('mautic.helper.integration'),
+            $this->container->get('monolog.logger.mautic'),
+            $this->container->get('router')
+        );
     }
 }

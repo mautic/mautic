@@ -13,11 +13,7 @@ namespace Mautic\InstallBundle\Configurator\Step;
 
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\InstallBundle\Configurator\Form\UserStepType;
-use Symfony\Component\HttpFoundation\Session\Session;
 
-/**
- * User Step.
- */
 class UserStep implements StepInterface
 {
     /**
@@ -46,21 +42,11 @@ class UserStep implements StepInterface
     public $password;
 
     /**
-     * @var Session
-     */
-    private $session;
-
-    public function __construct(Session $session)
-    {
-        $this->session = $session;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getFormType()
     {
-        return new UserStepType($this->session);
+        return UserStepType::class;
     }
 
     /**

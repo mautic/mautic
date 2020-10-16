@@ -9,13 +9,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\MauticCrmBundle\Tests\Api;
+namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 
-class SalesforceApiTest extends \PHPUnit_Framework_TestCase
+class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Test that a locked record request is retried up to 3 times

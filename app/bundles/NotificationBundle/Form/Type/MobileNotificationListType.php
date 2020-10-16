@@ -61,7 +61,7 @@ class MobileNotificationListType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'mobilenotification_list';
     }

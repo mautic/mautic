@@ -66,7 +66,7 @@ if (!isset($colSize)) {
                         <?php foreach ($groupPanels as $panelId => $panel): ?>
                         <option id="<?php echo $panelId; ?>" value="<?php echo $view->escape($panel['value']); ?>"
                                 data-default-label="<?php echo $view->escape($panel['label']); ?>"
-                            <?php if (isset($panel['attr'])): echo $panel['attr']; endif ?>
+                            <?php if (isset($panel['attr'])): echo $panel['attr']; endif; ?>
                             <?php if (!empty($panel['prototypeTemplatePlaceholders'])):
                                 echo ' data-placeholders="'.$view->escape(json_encode($panel['prototypeTemplatePlaceholders'])).'"';
                             endif; ?>

@@ -11,21 +11,20 @@
 
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PropertiesType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
             'bar',
-            'focus_properties',
+            FocusPropertiesType::class,
             [
                 'focus_style' => 'bar',
                 'data'        => (isset($options['data']['bar'])) ? $options['data']['bar'] : [],
@@ -34,7 +33,7 @@ class PropertiesType extends AbstractType
 
         $builder->add(
             'modal',
-            'focus_properties',
+            FocusPropertiesType::class,
             [
                 'focus_style' => 'modal',
                 'data'        => (isset($options['data']['modal'])) ? $options['data']['modal'] : [],
@@ -43,7 +42,7 @@ class PropertiesType extends AbstractType
 
         $builder->add(
             'notification',
-            'focus_properties',
+            FocusPropertiesType::class,
             [
                 'focus_style' => 'notification',
                 'data'        => (isset($options['data']['notification'])) ? $options['data']['notification'] : [],
@@ -52,7 +51,7 @@ class PropertiesType extends AbstractType
 
         $builder->add(
             'page',
-            'focus_properties',
+            FocusPropertiesType::class,
             [
                 'focus_style' => 'page',
                 'data'        => (isset($options['data']['page'])) ? $options['data']['page'] : [],
@@ -61,7 +60,7 @@ class PropertiesType extends AbstractType
 
         $builder->add(
             'animate',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.focus.form.animate',
                 'data'  => (isset($options['data']['animate'])) ? $options['data']['animate'] : true,
@@ -73,7 +72,7 @@ class PropertiesType extends AbstractType
 
         $builder->add(
             'link_activation',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.focus.form.activate_for_links',
                 'data'  => (isset($options['data']['link_activation'])) ? $options['data']['link_activation'] : true,
@@ -85,7 +84,7 @@ class PropertiesType extends AbstractType
 
         $builder->add(
             'colors',
-            'focus_color',
+            ColorType::class,
             [
                 'label' => false,
             ]
@@ -93,7 +92,7 @@ class PropertiesType extends AbstractType
 
         $builder->add(
             'content',
-            'focus_content',
+            ContentType::class,
             [
                 'label' => false,
             ]
@@ -101,14 +100,14 @@ class PropertiesType extends AbstractType
 
         $builder->add(
             'when',
-            'choice',
+            ChoiceType::class,
             [
-                'choices' => [
-                    'immediately'   => 'mautic.focus.form.when.immediately',
-                    'scroll_slight' => 'mautic.focus.form.when.scroll_slight',
-                    'scroll_middle' => 'mautic.focus.form.when.scroll_middle',
-                    'scroll_bottom' => 'mautic.focus.form.when.scroll_bottom',
-                    'leave'         => 'mautic.focus.form.when.leave',
+                'choices'           => [
+                    'mautic.focus.form.when.immediately'   => 'immediately',
+                    'mautic.focus.form.when.scroll_slight' => 'scroll_slight',
+                    'mautic.focus.form.when.scroll_middle' => 'scroll_middle',
+                    'mautic.focus.form.when.scroll_bottom' => 'scroll_bottom',
+                    'mautic.focus.form.when.leave'         => 'leave',
                 ],
                 'label'       => 'mautic.focus.form.when',
                 'label_attr'  => ['class' => 'control-label'],
@@ -116,13 +115,13 @@ class PropertiesType extends AbstractType
                 'expanded'    => false,
                 'multiple'    => false,
                 'required'    => false,
-                'empty_value' => false,
+                'placeholder' => false,
             ]
         );
 
         $builder->add(
             'timeout',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.focus.form.timeout',
                 'label_attr' => ['class' => 'control-label'],
@@ -136,15 +135,15 @@ class PropertiesType extends AbstractType
 
         $builder->add(
             'frequency',
-            'choice',
+            ChoiceType::class,
             [
-                'choices' => [
-                    'everypage' => 'mautic.focus.form.frequency.everypage',
-                    'once'      => 'mautic.focus.form.frequency.once',
-                    'q2min'     => 'mautic.focus.form.frequency.q2m',
-                    'q15min'    => 'mautic.focus.form.frequency.q15m',
-                    'hourly'    => 'mautic.focus.form.frequency.hourly',
-                    'daily'     => 'mautic.focus.form.frequency.daily',
+                'choices'           => [
+                    'mautic.focus.form.frequency.everypage' => 'everypage',
+                    'mautic.focus.form.frequency.once'      => 'once',
+                    'mautic.focus.form.frequency.q2m'       => 'q2min',
+                    'mautic.focus.form.frequency.q15m'      => 'q15min',
+                    'mautic.focus.form.frequency.hourly'    => 'hourly',
+                    'mautic.focus.form.frequency.daily'     => 'daily',
                 ],
                 'label'       => 'mautic.focus.form.frequency',
                 'label_attr'  => ['class' => 'control-label'],
@@ -152,13 +151,13 @@ class PropertiesType extends AbstractType
                 'expanded'    => false,
                 'multiple'    => false,
                 'required'    => false,
-                'empty_value' => false,
+                'placeholder' => false,
             ]
         );
 
         $builder->add(
             'stop_after_conversion',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.focus.form.engage_after_conversion',
                 'data'  => (isset($options['data']['stop_after_conversion'])) ? $options['data']['stop_after_conversion'] : true,
@@ -172,7 +171,7 @@ class PropertiesType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'focus_entity_properties';
     }
@@ -180,7 +179,7 @@ class PropertiesType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
