@@ -42,7 +42,7 @@ foreach ($templateButtons as $action => $enabled) {
                 'objectId' => ('abtest' == $action && method_exists($item, 'getVariantParent') && $item->getVariantParent())
                     ? $item->getVariantParent()->getId() : $item->getId(),
             ];
-            $icon = ($action == 'clone') ? 'copy' : 'sitemap';
+            $icon = ('clone' == $action) ? 'copy' : 'sitemap';
             $path = $view['router']->path($actionRoute, array_merge(['objectAction' => $action], $actionQuery, $query));
             break;
         case 'close':

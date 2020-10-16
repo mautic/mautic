@@ -2,14 +2,15 @@
 
 namespace Mautic\LeadBundle\Tests\Model;
 
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 
-class LeadListModelTest extends \PHPUnit_Framework_TestCase
+class LeadListModelTest extends \PHPUnit\Framework\TestCase
 {
     protected $fixture;
 
-    public function setUp()
+    protected function setUp()
     {
         $mockListModel = $this->getMockBuilder(ListModel::class)
             ->disableOriginalConstructor()
@@ -50,7 +51,7 @@ class LeadListModelTest extends \PHPUnit_Framework_TestCase
         $mockEntity2 = clone $mockEntity;
         $mockEntity2->expects($this->once())
             ->method('getFilters')
-            ->willReturn(unserialize($filters));
+            ->willReturn(Serializer::decode($filters));
         $mockEntity2->expects($this->any())
             ->method('getId')
             ->willReturn(2);
@@ -66,7 +67,7 @@ class LeadListModelTest extends \PHPUnit_Framework_TestCase
         $mockEntity4 = clone $mockEntity;
         $mockEntity4->expects($this->once())
             ->method('getFilters')
-            ->willReturn(unserialize($filters4));
+            ->willReturn(Serializer::decode($filters4));
         $mockEntity4->expects($this->any())
             ->method('getId')
             ->willReturn(4);

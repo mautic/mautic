@@ -59,8 +59,8 @@
       > .mautic-brand > .mautic-logo-text {
         opacity: 1;
         margin-left: 3px;
-        .transition(opacity .3s ease .1s, margin-left 0s ease .2s);
-        .transition(opacity .3s ease .1s, margin-left 0s ease .2s);
+        .transition(~"opacity .3s ease .1s, margin-left 0s ease .2s");
+        .transition(~"opacity .3s ease .1s, margin-left 0s ease .2s");
       }
       > .mautic-brand {
         .transition(padding-left .3s ease);
@@ -211,7 +211,7 @@
           padding: 12px 20px;
           .transition(all .15s ease);
           .text {
-            .transition(opacity .3s ease .1s, margin-left 0s ease .2s);
+            .transition(~"opacity .3s ease .1s, margin-left 0s ease .2s");
             opacity: 1;
             margin-left: 0;
             position: relative;
@@ -226,7 +226,7 @@
             display: block;
           }
           .arrow {
-            .transition(opacity .3s ease .1s, margin-left 0s ease .2s);
+            .transition(~"opacity .3s ease .1s, margin-left 0s ease .2s");
             opacity: 1;
             margin-left: 0;
             font-family: 'FontAwesome';

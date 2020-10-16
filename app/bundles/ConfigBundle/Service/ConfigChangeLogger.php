@@ -13,6 +13,7 @@ namespace Mautic\ConfigBundle\Service;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Compare normalized for data and log changes.
@@ -45,10 +46,6 @@ class ConfigChangeLogger
      */
     private $originalNormData;
 
-    /**
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     */
     public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {
         $this->ipLookupHelper = $ipLookupHelper;
@@ -56,8 +53,6 @@ class ConfigChangeLogger
     }
 
     /**
-     * @param array $originalNormData
-     *
      * @return ConfigChangeLogger
      */
     public function setOriginalNormData(array $originalNormData)
@@ -72,12 +67,10 @@ class ConfigChangeLogger
      * Diff is based on form normalized data before and after post.
      *
      * @see Form::getNormData()
-     *
-     * @param array $postNormData
      */
     public function log(array $postNormData)
     {
-        if ($this->originalNormData === null) {
+        if (null === $this->originalNormData) {
             throw new \RuntimeException('Set original normalized data at first');
         }
 
@@ -87,6 +80,10 @@ class ConfigChangeLogger
         $diff = [];
         foreach ($postData as $key => $value) {
             if (array_key_exists($key, $originalData) && $originalData[$key] != $value) {
+                if ($value instanceof UploadedFile) {
+                    $value = $value->getFilename();
+                }
+
                 $diff[$key] = $value;
             }
         }
@@ -95,7 +92,7 @@ class ConfigChangeLogger
             return;
         }
 
-        $log     = [
+        $log = [
             'bundle'    => 'config',
             'object'    => 'config',
             'objectId'  => 0,
@@ -110,8 +107,6 @@ class ConfigChangeLogger
     /**
      * Some form data (AssetBundle) has 'parameters' inside array too.
      * Normalize all.
-     *
-     * @param array $data
      *
      * @return array
      */
@@ -133,8 +128,6 @@ class ConfigChangeLogger
 
     /**
      * Filter unused keys from post data.
-     *
-     * @param array $data
      *
      * @return array
      */

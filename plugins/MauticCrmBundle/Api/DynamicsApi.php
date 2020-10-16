@@ -20,7 +20,6 @@ class DynamicsApi extends CrmApi
 
     /**
      * @param $operation
-     * @param array  $parameters
      * @param string $method
      * @param string $moduleobject
      *
@@ -116,21 +115,16 @@ class DynamicsApi extends CrmApi
     /**
      * gets leads.
      *
-     * @param array $params
-     *
      * @return mixed
      */
     public function getLeads(array $params)
     {
-        $data = $this->request('', $params, 'GET', 'contacts');
-
-        return $data;
+        return $this->request('', $params, 'GET', 'contacts');
     }
 
     /**
      * gets companies.
      *
-     * @param array  $params
      * @param string $id
      *
      * @return mixed
@@ -226,8 +220,6 @@ class DynamicsApi extends CrmApi
     /**
      * @see https://stackoverflow.com/questions/5483851/manually-parse-raw-http-data-with-php
      *
-     * @param Response $response
-     *
      * @return array
      */
     public function parseRawHttpResponse(Response $response)
@@ -245,7 +237,7 @@ class DynamicsApi extends CrmApi
         $input                = array_pop($a_blocks);
         list($header, $input) = explode("\r\n\r\n", $input, 2);
         foreach (explode("\r\n", $header) as $r) {
-            if (stripos($r, 'Content-Type:') === 0) {
+            if (0 === stripos($r, 'Content-Type:')) {
                 list($headername, $contentType) = explode(':', $r, 2);
             }
         }
@@ -256,7 +248,7 @@ class DynamicsApi extends CrmApi
         $a_blocks = preg_split("/-+$boundary/", $input);
         array_pop($a_blocks);
         // loop data blocks
-        foreach ($a_blocks as $id => $block) {
+        foreach ($a_blocks as $block) {
             if (empty($block)) {
                 continue;
             }

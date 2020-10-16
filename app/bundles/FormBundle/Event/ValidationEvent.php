@@ -15,9 +15,6 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 
-/**
- * Class ValidationEvent.
- */
 class ValidationEvent extends CommonEvent
 {
     /**
@@ -31,7 +28,7 @@ class ValidationEvent extends CommonEvent
     private $value;
 
     /**
-     * @var
+     * @var bool
      */
     private $valid = true;
 

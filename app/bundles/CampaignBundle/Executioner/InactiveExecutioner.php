@@ -92,13 +92,6 @@ class InactiveExecutioner implements ExecutionerInterface
 
     /**
      * InactiveExecutioner constructor.
-     *
-     * @param InactiveContactFinder $inactiveContactFinder
-     * @param LoggerInterface       $logger
-     * @param TranslatorInterface   $translator
-     * @param EventScheduler        $scheduler
-     * @param InactiveHelper        $helper
-     * @param EventExecutioner      $executioner
      */
     public function __construct(
         InactiveContactFinder $inactiveContactFinder,
@@ -117,10 +110,6 @@ class InactiveExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @param Campaign             $campaign
-     * @param ContactLimiter       $limiter
-     * @param OutputInterface|null $output
-     *
      * @return Counter
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
@@ -154,9 +143,7 @@ class InactiveExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @param int                  $decisionId
-     * @param ContactLimiter       $limiter
-     * @param OutputInterface|null $output
+     * @param int $decisionId
      *
      * @return Counter
      *
@@ -315,11 +302,6 @@ class InactiveExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @param ArrayCollection $events
-     * @param ArrayCollection $contacts
-     * @param Counter         $childrenCounter
-     * @param \DateTime       $earliestLastActiveDateTime
-     *
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
@@ -352,10 +334,10 @@ class InactiveExecutioner implements ExecutionerInterface
 
             $this->logger->debug(
                 'CAMPAIGN: Event ID# '.$event->getId().
-                ' to be executed on '.$eventExecutionDate->format('Y-m-d H:i:s')
+                ' to be executed on '.$eventExecutionDate->format('Y-m-d H:i:s e')
             );
 
-            if ($this->scheduler->shouldSchedule($eventExecutionDate, $executionDate)) {
+            if ($this->scheduler->shouldScheduleEvent($event, $eventExecutionDate, $executionDate)) {
                 $childrenCounter->advanceTotalScheduled($contacts->count());
                 $this->scheduler->schedule($event, $eventExecutionDate, $contacts, true);
 

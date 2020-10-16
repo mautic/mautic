@@ -6,6 +6,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
 use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\PipedriveTest;
+use Symfony\Component\HttpFoundation\Request;
 
 class CompanyExportTest extends PipedriveTest
 {
@@ -30,23 +31,26 @@ class CompanyExportTest extends PipedriveTest
             ]
         );
 
-        $this->client->request(
-            'POST',
-            '/s/companies/new?mauticUserLastActive=1&mauticLastNotificationId=',
-            [
-                'company' => [
-                    'companyname'     => 'Test Name',
-                    'companyaddress1' => 'Test Address',
-                    '_token'          => $this->getCsrfToken('company'),
-                ],
-            ]
-        );
+        $crawler     = $this->client->request(Request::METHOD_GET, '/s/companies/new');
+        $formCrawler = $crawler->filter('form[name=company]');
+        $this->assertSame(1, $formCrawler->count());
 
+        $form = $formCrawler->form();
+        $form->setValues([
+            'company[companyname]'     => 'Test Name',
+            'company[companyaddress1]' => 'Test Address',
+        ]);
+        $this->client->submit($form);
+
+        /** @var Company $company */
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
-        $company             = $this->em->getRepository(Company::class)->findOneById(1);
+
+        /** @var Company $company */
+        $company = $this->em->getRepository(Company::class)->findOneById(1);
 
         $requests = $GLOBALS['requests'];
 
+        $this->assertNotNull($company, 'Company failed to be created');
         $this->assertSame(count($requests), 0);
         $this->assertSame(count($integrationEntities), 0);
         $this->assertEquals($company->getName(), 'Test Name');
@@ -67,24 +71,22 @@ class CompanyExportTest extends PipedriveTest
             ]
         );
 
-        $this->client->request(
-            'POST',
-            '/s/companies/new?mauticUserLastActive=1&mauticLastNotificationId=',
-            [
-                'company' => [
-                    'companyname'     => $testName,
-                    'companyaddress1' => $testAddress1,
-                    '_token'          => $this->getCsrfToken('company'),
-                ],
-            ]
-        );
+        $crawler     = $this->client->request(Request::METHOD_GET, '/s/companies/new');
+        $formCrawler = $crawler->filter('form[name=company]');
+        $this->assertSame(1, $formCrawler->count());
+
+        $form = $formCrawler->form();
+        $form->setValues([
+            'company[companyname]'     => $testName,
+            'company[companyaddress1]' => $testAddress1,
+        ]);
+        $this->client->submit($form);
 
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
         $company             = $this->em->getRepository(Company::class)->findOneById(1);
         $integrationEntity   = $integrationEntities[0];
-
-        $requests = $GLOBALS['requests'];
-        $request  = $requests['POST/Api/Post/organizations'][0];
+        $requests            = $GLOBALS['requests'];
+        $request             = $requests['POST/Api/Post/organizations'][0];
 
         $this->assertSame(count($requests), 1);
         $this->assertSame(count($integrationEntities), 1);
@@ -115,23 +117,21 @@ class CompanyExportTest extends PipedriveTest
 
         $company = $this->createCompany();
 
-        $this->client->request(
-            'POST',
-            's/companies/edit/'.$company->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
-            [
-                'company' => [
-                    'companyname'     => $testName,
-                    'companyaddress1' => $testAddress1,
-                    '_token'          => $this->getCsrfToken('company'),
-                ],
-            ]
-        );
+        $crawler     = $this->client->request(Request::METHOD_GET, '/s/companies/edit/'.$company->getId());
+        $formCrawler = $crawler->filter('form[name=company]');
+        $this->assertSame(1, $formCrawler->count());
+
+        $form = $formCrawler->form();
+        $form->setValues([
+            'company[companyname]'     => $testName,
+            'company[companyaddress1]' => $testAddress1,
+        ]);
+        $this->client->submit($form);
 
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
         $companies           = $this->em->getRepository(Company::class)->findAll();
         $company             = $companies[0];
-
-        $requests = $GLOBALS['requests'];
+        $requests            = $GLOBALS['requests'];
 
         $this->assertSame(count($requests), 0);
         $this->assertSame(count($integrationEntities), 0);
@@ -158,23 +158,21 @@ class CompanyExportTest extends PipedriveTest
         $company = $this->createCompany();
         $this->createCompanyIntegrationEntity($integrationId, $company->getId());
 
-        $this->client->request(
-            'POST',
-            's/companies/edit/'.$company->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
-            [
-                'company' => [
-                    'companyname'     => $testName,
-                    'companyaddress1' => $testAddress1,
-                    '_token'          => $this->getCsrfToken('company'),
-                ],
-            ]
-        );
+        $crawler     = $this->client->request(Request::METHOD_GET, '/s/companies/edit/'.$company->getId());
+        $formCrawler = $crawler->filter('form[name=company]');
+        $this->assertSame(1, $formCrawler->count());
+
+        $form = $formCrawler->form();
+        $form->setValues([
+            'company[companyname]'     => $testName,
+            'company[companyaddress1]' => $testAddress1,
+        ]);
+        $this->client->submit($form);
 
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
         $companies           = $this->em->getRepository(Company::class)->findAll();
         $company             = $companies[0];
-
-        $requests = $GLOBALS['requests'];
+        $requests            = $GLOBALS['requests'];
 
         $this->assertSame(count($requests), 1);
         $this->assertSame(count($integrationEntities), 1);
@@ -198,7 +196,7 @@ class CompanyExportTest extends PipedriveTest
         $this->createCompanyIntegrationEntity(567, $company->getId());
 
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             's/companies/delete/'.$company->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
             []
         );
@@ -230,7 +228,7 @@ class CompanyExportTest extends PipedriveTest
         $this->createCompanyIntegrationEntity($integrationId, $company->getId());
 
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             's/companies/delete/'.$company->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
             []
         );

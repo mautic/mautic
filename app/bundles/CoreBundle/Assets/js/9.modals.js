@@ -406,7 +406,7 @@ Mautic.showModal = function(target) {
                 }
 
                 if (mQuery(modal).attr('data-modal-moved')) {
-                    mQuery('[data-modal-placeholder').replaceWith(mQuery(modal));
+                    mQuery('[data-modal-placeholder]').replaceWith(mQuery(modal));
                     mQuery(modal).attr('data-modal-moved', undefined);
                 }
             });

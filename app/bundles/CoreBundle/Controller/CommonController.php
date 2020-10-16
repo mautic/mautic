@@ -20,7 +20,9 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DataExporterHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\TrailingSlashHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Debug\Exception\FlattenException;
@@ -74,56 +76,45 @@ class CommonController extends Controller implements MauticController
     protected $translator;
 
     /**
-     * @param Request $request
+     * @var FlashBag
      */
+    private $flashBag;
+
     public function setRequest(Request $request)
     {
         $this->request = $request;
     }
 
-    /**
-     * @param MauticFactory $factory
-     */
     public function setFactory(MauticFactory $factory)
     {
         $this->factory = $factory;
     }
 
-    /**
-     * @param User $user
-     */
     public function setUser(User $user)
     {
         $this->user = $user;
     }
 
-    /**
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function setCoreParametersHelper(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function setTranslator(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @param FilterControllerEvent $event
-     */
+    public function setFlashBag(FlashBag $flashBag)
+    {
+        $this->flashBag = $flashBag;
+    }
+
     public function initialize(FilterControllerEvent $event)
     {
     }
@@ -252,18 +243,14 @@ class CommonController extends Controller implements MauticController
     /**
      * Redirects URLs with trailing slashes in order to prevent 404s.
      *
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function removeTrailingSlashAction(Request $request)
     {
-        $pathInfo   = $request->getPathInfo();
-        $requestUri = $request->getRequestUri();
+        /** @var TrailingSlashHelper $trailingSlashHelper */
+        $trailingSlashHelper = $this->get('mautic.helper.trailing_slash');
 
-        $url = str_replace($pathInfo, rtrim($pathInfo, ' /'), $requestUri);
-
-        return $this->redirect($url, 301);
+        return $this->redirect($trailingSlashHelper->getSafeRedirectUrl($request), 301);
     }
 
     /**
@@ -416,7 +403,7 @@ class CommonController extends Controller implements MauticController
         $this->get('session')->set('mautic.browser.notifications', []);
 
         $tmpl = (isset($parameters['tmpl'])) ? $parameters['tmpl'] : $this->request->get('tmpl', 'index');
-        if ($tmpl == 'index') {
+        if ('index' == $tmpl) {
             $updatedContent = [];
             if (!empty($newContent)) {
                 $updatedContent['newContent'] = $newContent;
@@ -445,8 +432,6 @@ class CommonController extends Controller implements MauticController
 
     /**
      * Get's the content of error page.
-     *
-     * @param \Exception $e
      *
      * @return Response
      */
@@ -493,13 +478,7 @@ class CommonController extends Controller implements MauticController
         $anonymous = $this->get('mautic.security')->isAnonymous();
 
         if ($anonymous || !$batch) {
-            throw new AccessDeniedHttpException(
-                $this->translator->trans($msg,
-                    [
-                        '%url%' => $this->request->getRequestUri(),
-                    ]
-                )
-            );
+            throw new AccessDeniedHttpException($this->translator->trans($msg, ['%url%' => $this->request->getRequestUri()]));
         }
 
         if ($batch) {
@@ -561,13 +540,13 @@ class CommonController extends Controller implements MauticController
         if ($this->request->query->has('orderby')) {
             $orderBy = InputHelper::clean($this->request->query->get('orderby'), true);
             $dir     = $session->get("$name.orderbydir", 'ASC');
-            $dir     = ($dir == 'ASC') ? 'DESC' : 'ASC';
+            $dir     = ('ASC' == $dir) ? 'DESC' : 'ASC';
             $session->set("$name.orderby", $orderBy);
             $session->set("$name.orderbydir", $dir);
         }
 
         if ($this->request->query->has('limit')) {
-            $limit = InputHelper::int($this->request->query->get('limit'));
+            $limit = (int) $this->request->query->get('limit');
             $session->set("$name.limit", $limit);
         }
 
@@ -576,7 +555,7 @@ class CommonController extends Controller implements MauticController
             $value   = InputHelper::clean($this->request->query->get('value'), true);
             $filters = $session->get("$name.filters", []);
 
-            if ($value == '') {
+            if ('' == $value) {
                 if (isset($filters[$filter])) {
                     unset($filters[$filter]);
                 }
@@ -612,7 +591,7 @@ class CommonController extends Controller implements MauticController
      */
     protected function getNotificationContent(Request $request = null)
     {
-        if ($request == null) {
+        if (null == $request) {
             $request = $this->request;
         }
 
@@ -637,12 +616,13 @@ class CommonController extends Controller implements MauticController
     }
 
     /**
-     * @param                $message
-     * @param null           $type
-     * @param bool|true      $isRead
-     * @param null           $header
-     * @param null           $iconClass
-     * @param \DateTime|null $datetime
+     * @param           $message
+     * @param null      $type
+     * @param bool|true $isRead
+     * @param null      $header
+     * @param null      $iconClass
+     *
+     * @deprecated Will be removed in Mautic 3.0 as unused.
      */
     public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null)
     {
@@ -652,51 +632,17 @@ class CommonController extends Controller implements MauticController
     }
 
     /**
-     * @param        $message
-     * @param array  $messageVars
-     * @param string $type
-     * @param string $domain
-     * @param bool   $addNotification
+     * @param string      $message
+     * @param array|null  $messageVars
+     * @param string|null $level
+     * @param string|null $domain
+     * @param bool|null   $addNotification
+     *
+     * @deprecated Will be removed in Mautic 3.0. Use CommonController::flashBag->addFlash() instead.
      */
-    public function addFlash($message, $messageVars = [], $type = 'notice', $domain = 'flashes', $addNotification = false)
+    public function addFlash($message, $messageVars = [], $level = FlashBag::LEVEL_NOTICE, $domain = 'flashes', $addNotification = false)
     {
-        if ($domain == null) {
-            $domain = 'flashes';
-        }
-
-        if ($domain === false) {
-            //message is already translated
-            $translatedMessage = $message;
-        } else {
-            if (isset($messageVars['pluralCount'])) {
-                $translatedMessage = $this->get('translator')->transChoice($message, $messageVars['pluralCount'], $messageVars, $domain);
-            } else {
-                $translatedMessage = $this->get('translator')->trans($message, $messageVars, $domain);
-            }
-        }
-
-        $this->get('session')->getFlashBag()->add($type, $translatedMessage);
-
-        if (!defined('MAUTIC_INSTALLER') && $addNotification) {
-            switch ($type) {
-                case 'warning':
-                    $iconClass = 'text-warning fa-exclamation-triangle';
-                    break;
-                case 'error':
-                    $iconClass = 'text-danger fa-exclamation-circle';
-                    break;
-                case 'notice':
-                    $iconClass = 'fa-info-circle';
-                default:
-                    break;
-            }
-
-            //If the user has not interacted with the browser for the last 30 seconds, consider the message unread
-            $lastActive = $this->request->get('mauticUserLastActive', 0);
-            $isRead     = $lastActive > 30 ? 0 : 1;
-
-            $this->addNotification($translatedMessage, null, $isRead, null, $iconClass);
-        }
+        $this->flashBag->add($message, $messageVars, $level, $domain, $addNotification);
     }
 
     /**
@@ -707,16 +653,18 @@ class CommonController extends Controller implements MauticController
      * @param null   $icon
      * @param bool   $addNotification
      * @param string $type
+     *
+     * @deprecated Will be removed in Mautic 3.0 as unused
      */
     public function addBrowserNotification($message, $messageVars = [], $domain = 'flashes', $title = null, $icon = null, $addNotification = true, $type = 'notice')
     {
-        if ($domain == null) {
+        if (null == $domain) {
             $domain = 'flashes';
         }
 
         $translator = $this->translator;
 
-        if ($domain === false) {
+        if (false === $domain) {
             //message is already translated
             $translatedMessage = $message;
         } else {
@@ -727,17 +675,17 @@ class CommonController extends Controller implements MauticController
             }
         }
 
-        if ($title !== null) {
+        if (null !== $title) {
             $title = $translator->trans($title);
         } else {
             $title = 'Mautic';
         }
 
-        if ($icon == null) {
+        if (null == $icon) {
             $icon = 'media/images/favicon.ico';
         }
 
-        if (strpos($icon, 'http') !== 0) {
+        if (0 !== strpos($icon, 'http')) {
             $assetHelper = $this->factory->getHelper('template.assets');
             $icon        = $assetHelper->getUrl($icon, null, null, true);
         }
@@ -762,6 +710,7 @@ class CommonController extends Controller implements MauticController
                     break;
                 case 'notice':
                     $iconClass = 'fa-info-circle';
+                    // no break
                 default:
                     break;
             }
@@ -793,10 +742,10 @@ class CommonController extends Controller implements MauticController
             $sourceIterator = new ArraySourceIterator($toExport);
         }
 
-        $dateFormat  = $this->coreParametersHelper->getParameter('date_format_dateonly');
+        $dateFormat  = $this->coreParametersHelper->get('date_format_dateonly');
         $dateFormat  = str_replace('--', '-', preg_replace('/[^a-zA-Z]/', '-', $dateFormat));
-        $writer      = $type === 'xlsx' ? new XlsWriter('php://output') : new CsvWriter('php://output');
-        $contentType = $type === 'xlsx' ? 'application/vnd.ms-excel' : 'text/csv';
+        $writer      = 'xlsx' === $type ? new XlsWriter('php://output') : new CsvWriter('php://output');
+        $contentType = 'xlsx' === $type ? 'application/vnd.ms-excel' : 'text/csv';
         $filename    = strtolower($filename.'_'.((new \DateTime())->format($dateFormat)).'.'.$type);
         $handler     = Handler::create($sourceIterator, $writer);
 
@@ -810,10 +759,7 @@ class CommonController extends Controller implements MauticController
      *
      * Overwrite in your controller if required.
      *
-     * @param AbstractCommonModel $model
-     * @param array               $args
-     * @param callable|null       $resultsCallback
-     * @param int|null            $start
+     * @param int|null $start
      *
      * @return array
      */

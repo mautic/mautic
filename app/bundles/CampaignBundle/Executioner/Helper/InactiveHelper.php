@@ -53,12 +53,6 @@ class InactiveHelper
 
     /**
      * InactiveHelper constructor.
-     *
-     * @param EventScheduler         $scheduler
-     * @param InactiveContactFinder  $inactiveContactFinder
-     * @param LeadEventLogRepository $eventLogRepository
-     * @param EventRepository        $eventRepository
-     * @param LoggerInterface        $logger
      */
     public function __construct(
         EventScheduler $scheduler,
@@ -92,10 +86,7 @@ class InactiveHelper
     }
 
     /**
-     * @param \DateTime       $now
-     * @param ArrayCollection $contacts
-     * @param int             $lastActiveEventId
-     * @param ArrayCollection $negativeChildren
+     * @param int $lastActiveEventId
      *
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
@@ -169,9 +160,6 @@ class InactiveHelper
     }
 
     /**
-     * @param ArrayCollection $negativeChildren
-     * @param \DateTime       $lastActiveDate
-     *
      * @return \DateTime|null
      *
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
@@ -190,8 +178,7 @@ class InactiveHelper
     }
 
     /**
-     * @param       $lastActiveEventId
-     * @param array $contactIds
+     * @param $lastActiveEventId
      *
      * @return array|ArrayCollection
      */

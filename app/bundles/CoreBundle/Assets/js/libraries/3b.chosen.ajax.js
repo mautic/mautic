@@ -28,7 +28,7 @@
         }
 
         return this.each(function () {
-            return $(this).next('.chosen-container').find(".search-field > input, .chosen-search > input").bind('keyup', function (event) {
+            return $(this).next('.chosen-container').find(".search-field > input, .chosen-search > input").on('keyup', function (event) {
                 if (event.which === 8 || event.which === 93 || event.which === 17 || event.which === 18) {
                     return false;
                 }
@@ -82,7 +82,7 @@
                         nbItems++;
                         if (element.group) {
                             group = select.find("optgroup[label='" + element.text + "']");
-                            if (!group.size()) {
+                            if (!group.length) {
                                 group = $("<optgroup />");
                             }
                             group.attr('label', element.text).appendTo(select);

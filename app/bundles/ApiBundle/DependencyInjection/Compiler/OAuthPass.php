@@ -28,21 +28,7 @@ class OAuthPass implements CompilerPassInterface
         if ($container->hasDefinition('bazinga.oauth.security.authentication.provider')) {
             //Add a addMethodCall to set factory
             $container->getDefinition('bazinga.oauth.security.authentication.provider')->addMethodCall(
-                'setFactory', [new Reference('mautic.factory')]
-            );
-        }
-
-        if ($container->hasDefinition('bazinga.oauth.security.authentication.listener')) {
-            //Add a addMethodCall to set factory
-            $container->getDefinition('bazinga.oauth.security.authentication.listener')->addMethodCall(
-                'setFactory', [new Reference('mautic.factory')]
-            );
-        }
-
-        if ($container->hasDefinition('fos_oauth_server.security.authentication.listener')) {
-            //Add a addMethodCall to set factory
-            $container->getDefinition('fos_oauth_server.security.authentication.listener')->addMethodCall(
-                'setFactory', [new Reference('mautic.factory')]
+                'setTranslator', [new Reference('translator')]
             );
         }
     }

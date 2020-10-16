@@ -11,12 +11,29 @@
 
 namespace Mautic\PageBundle\EventListener;
 
+use Doctrine\DBAL\Connection;
 use DOMDocument;
 use DOMXPath;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Form\Type\GatedVideoType;
+use Mautic\CoreBundle\Form\Type\SlotButtonType;
+use Mautic\CoreBundle\Form\Type\SlotCategoryListType;
+use Mautic\CoreBundle\Form\Type\SlotChannelFrequencyType;
+use Mautic\CoreBundle\Form\Type\SlotCodeModeType;
+use Mautic\CoreBundle\Form\Type\SlotDwcType;
+use Mautic\CoreBundle\Form\Type\SlotImageCaptionType;
+use Mautic\CoreBundle\Form\Type\SlotImageCardType;
+use Mautic\CoreBundle\Form\Type\SlotImageType;
+use Mautic\CoreBundle\Form\Type\SlotPreferredChannelType;
+use Mautic\CoreBundle\Form\Type\SlotSavePrefsButtonType;
+use Mautic\CoreBundle\Form\Type\SlotSegmentListType;
+use Mautic\CoreBundle\Form\Type\SlotSeparatorType;
+use Mautic\CoreBundle\Form\Type\SlotSocialFollowType;
+use Mautic\CoreBundle\Form\Type\SlotSocialShareType;
+use Mautic\CoreBundle\Form\Type\SlotSuccessMessageType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -25,34 +42,56 @@ use Mautic\PageBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class BuilderSubscriber.
- */
-class BuilderSubscriber extends CommonSubscriber
+class BuilderSubscriber implements EventSubscriberInterface
 {
     /**
      * @var TokenHelper
      */
-    protected $tokenHelper;
+    private $tokenHelper;
 
     /**
      * @var IntegrationHelper
      */
-    protected $integrationHelper;
+    private $integrationHelper;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var Connection
+     */
+    private $connection;
+
+    /**
+     * @var CorePermissions
+     */
+    private $security;
+
+    /**
+     * @var TemplatingHelper
+     */
+    private $templating;
+
+    /**
+     * @var BuilderTokenHelperFactory
+     */
+    private $builderTokenHelperFactory;
 
     /**
      * @var PageModel
      */
-    protected $pageModel;
-    protected $pageTokenRegex      = '{pagelink=(.*?)}';
-    protected $dwcTokenRegex       = '{dwc=(.*?)}';
-    protected $langBarRegex        = '{langbar}';
-    protected $shareButtonsRegex   = '{sharebuttons}';
-    protected $titleRegex          = '{pagetitle}';
-    protected $descriptionRegex    = '{pagemetadescription}';
-    protected $emailIsInternalSend = false;
-    protected $emailEntity         = null;
+    private $pageModel;
+    private $pageTokenRegex      = '{pagelink=(.*?)}';
+    private $dwcTokenRegex       = '{dwc=(.*?)}';
+    private $langBarRegex        = '{langbar}';
+    private $shareButtonsRegex   = '{sharebuttons}';
+    private $titleRegex          = '{pagetitle}';
+    private $descriptionRegex    = '{pagemetadescription}';
 
     const segmentListRegex  = '{segmentlist}';
     const categoryListRegex = '{categorylist}';
@@ -64,16 +103,25 @@ class BuilderSubscriber extends CommonSubscriber
 
     /**
      * BuilderSubscriber constructor.
-     *
-     * @param TokenHelper       $tokenHelper
-     * @param IntegrationHelper $integrationHelper
-     * @param PageModel         $pageModel
      */
-    public function __construct(TokenHelper $tokenHelper, IntegrationHelper $integrationHelper, PageModel $pageModel)
-    {
-        $this->tokenHelper       = $tokenHelper;
-        $this->integrationHelper = $integrationHelper;
-        $this->pageModel         = $pageModel;
+    public function __construct(
+        CorePermissions $security,
+        TokenHelper $tokenHelper,
+        IntegrationHelper $integrationHelper,
+        PageModel $pageModel,
+        BuilderTokenHelperFactory $builderTokenHelperFactory,
+        TranslatorInterface $translator,
+        Connection $connection,
+        TemplatingHelper $templating
+    ) {
+        $this->security                  = $security;
+        $this->tokenHelper               = $tokenHelper;
+        $this->integrationHelper         = $integrationHelper;
+        $this->pageModel                 = $pageModel;
+        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
+        $this->translator                = $translator;
+        $this->connection                = $connection;
+        $this->templating                = $templating;
     }
 
     /**
@@ -92,36 +140,34 @@ class BuilderSubscriber extends CommonSubscriber
 
     /**
      * Add forms to available page tokens.
-     *
-     * @param Events\PageBuilderEvent $event
      */
     public function onPageBuild(Events\PageBuilderEvent $event)
     {
-        $tokenHelper = new BuilderTokenHelper($this->factory, 'page');
+        $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
 
         if ($event->abTestWinnerCriteriaRequested()) {
             //add AB Test Winner Criteria
             $bounceRate = [
                 'group'    => 'mautic.page.abtest.criteria',
                 'label'    => 'mautic.page.abtest.criteria.bounce',
-                'callback' => '\Mautic\PageBundle\Helper\AbTestHelper::determineBounceTestWinner',
+                'event'    => PageEvents::ON_DETERMINE_BOUNCE_RATE_WINNER,
             ];
             $event->addAbTestWinnerCriteria('page.bouncerate', $bounceRate);
 
             $dwellTime = [
                 'group'    => 'mautic.page.abtest.criteria',
                 'label'    => 'mautic.page.abtest.criteria.dwelltime',
-                'callback' => '\Mautic\PageBundle\Helper\AbTestHelper::determineDwellTimeTestWinner',
+                'event'    => PageEvents::ON_DETERMINE_DWELL_TIME_WINNER,
             ];
             $event->addAbTestWinnerCriteria('page.dwelltime', $dwellTime);
         }
 
         if ($event->tokensRequested([$this->pageTokenRegex, $this->dwcTokenRegex])) {
-            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', false, true);
+            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', true);
 
             // add only filter based dwc tokens
-            $dwcTokenHelper = new BuilderTokenHelper($this->factory, 'dynamicContent', 'dynamiccontent:dynamiccontents');
-            $expr           = $this->factory->getDatabase()->getExpressionBuilder()->andX('e.is_campaign_based <> 1 and e.slot_name is not null');
+            $dwcTokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('dynamicContent', 'dynamiccontent:dynamiccontents');
+            $expr           = $this->connection->getExpressionBuilder()->andX('e.is_campaign_based <> 1 and e.slot_name is not null');
             $tokens         = $dwcTokenHelper->getTokens(
                 $this->dwcTokenRegex,
                 '',
@@ -164,7 +210,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.image'),
                 'image',
                 'MauticCoreBundle:Slots:image.html.php',
-                'slot_image',
+                SlotImageType::class,
                 900
             );
             $event->addSlotType(
@@ -172,7 +218,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.imagecard'),
                 'id-card-o',
                 'MauticCoreBundle:Slots:imagecard.html.php',
-                'slot_imagecard',
+                SlotImageCardType::class,
                 870
             );
             $event->addSlotType(
@@ -180,7 +226,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.imagecaption'),
                 'image',
                 'MauticCoreBundle:Slots:imagecaption.html.php',
-                'slot_imagecaption',
+                SlotImageCaptionType::class,
                 850
             );
             $event->addSlotType(
@@ -188,7 +234,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.button'),
                 'external-link',
                 'MauticCoreBundle:Slots:button.html.php',
-                'slot_button',
+                SlotButtonType::class,
                 800
             );
             $event->addSlotType(
@@ -196,7 +242,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.socialshare'),
                 'share-alt',
                 'MauticCoreBundle:Slots:socialshare.html.php',
-                'slot_socialshare',
+                SlotSocialShareType::class,
                 700
             );
             $event->addSlotType(
@@ -204,7 +250,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.socialfollow'),
                 'twitter',
                 'MauticCoreBundle:Slots:socialfollow.html.php',
-                'slot_socialfollow',
+                SlotSocialFollowType::class,
                 600
             );
             if ($this->security->isGranted(['page:preference_center:editown', 'page:preference_center:editother'], 'MATCH_ONE')) {
@@ -213,7 +259,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $this->translator->trans('mautic.core.slot.label.segmentlist'),
                     'list-alt',
                     'MauticCoreBundle:Slots:segmentlist.html.php',
-                    'slot_segmentlist',
+                    SlotSegmentListType::class,
                     590
                 );
                 $event->addSlotType(
@@ -221,7 +267,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $this->translator->trans('mautic.core.slot.label.categorylist'),
                     'bookmark-o',
                     'MauticCoreBundle:Slots:categorylist.html.php',
-                    'slot_categorylist',
+                    SlotCategoryListType::class,
                     580
                 );
                 $event->addSlotType(
@@ -229,7 +275,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $this->translator->trans('mautic.core.slot.label.preferredchannel'),
                     'envelope-o',
                     'MauticCoreBundle:Slots:preferredchannel.html.php',
-                    'slot_preferredchannel',
+                    SlotPreferredChannelType::class,
                     570
                 );
                 $event->addSlotType(
@@ -237,7 +283,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $this->translator->trans('mautic.core.slot.label.channelfrequency'),
                     'calendar',
                     'MauticCoreBundle:Slots:channelfrequency.html.php',
-                    'slot_channelfrequency',
+                    SlotChannelFrequencyType::class,
                     560
                 );
                 $event->addSlotType(
@@ -245,7 +291,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $this->translator->trans('mautic.core.slot.label.saveprefsbutton'),
                     'floppy-o',
                     'MauticCoreBundle:Slots:saveprefsbutton.html.php',
-                    'slot_saveprefsbutton',
+                    SlotSavePrefsButtonType::class,
                     540
                 );
 
@@ -254,7 +300,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $this->translator->trans('mautic.core.slot.label.successmessage'),
                     'check',
                     'MauticCoreBundle:Slots:successmessage.html.php',
-                    'slot_successmessage',
+                    SlotSuccessMessageType::class,
                     540
                 );
             }
@@ -263,7 +309,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.codemode'),
                 'code',
                 'MauticCoreBundle:Slots:codemode.html.php',
-                'slot_codemode',
+                SlotCodeModeType::class,
                 500
             );
             $event->addSlotType(
@@ -271,7 +317,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.separator'),
                 'minus',
                 'MauticCoreBundle:Slots:separator.html.php',
-                'slot_separator',
+                SlotSeparatorType::class,
                 400
             );
             $event->addSlotType(
@@ -287,7 +333,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.dynamiccontent'),
                 'sticky-note-o',
                 'MauticCoreBundle:Slots:dwc.html.php',
-                'slot_dwc',
+                SlotDwcType::class,
                 200
             );
         }
@@ -320,30 +366,27 @@ class BuilderSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param Events\PageDisplayEvent $event
-     */
     public function onPageDisplay(Events\PageDisplayEvent $event)
     {
         $content = $event->getContent();
         $page    = $event->getPage();
         $params  = $event->getParams();
 
-        if (strpos($content, $this->langBarRegex) !== false) {
+        if (false !== strpos($content, $this->langBarRegex)) {
             $langbar = $this->renderLanguageBar($page);
             $content = str_ireplace($this->langBarRegex, $langbar, $content);
         }
 
-        if (strpos($content, $this->shareButtonsRegex) !== false) {
+        if (false !== strpos($content, $this->shareButtonsRegex)) {
             $buttons = $this->renderSocialShareButtons();
             $content = str_ireplace($this->shareButtonsRegex, $buttons, $content);
         }
 
-        if (strpos($content, $this->titleRegex) !== false) {
+        if (false !== strpos($content, $this->titleRegex)) {
             $content = str_ireplace($this->titleRegex, $page->getTitle(), $content);
         }
 
-        if (strpos($content, $this->descriptionRegex) !== false) {
+        if (false !== strpos($content, $this->descriptionRegex)) {
             $content = str_ireplace($this->descriptionRegex, $page->getMetaDescription(), $content);
         }
 
@@ -358,6 +401,7 @@ class BuilderSubscriber extends CommonSubscriber
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
                     $slot->nodeValue = self::segmentListRegex;
+                    $slot->setAttribute('data-prefs-center', '1');
                     $content         = $dom->saveHTML();
                 }
 
@@ -365,6 +409,7 @@ class BuilderSubscriber extends CommonSubscriber
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
                     $slot->nodeValue = self::categoryListRegex;
+                    $slot->setAttribute('data-prefs-center', '1');
                     $content         = $dom->saveHTML();
                 }
 
@@ -372,6 +417,7 @@ class BuilderSubscriber extends CommonSubscriber
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
                     $slot->nodeValue = self::preferredchannel;
+                    $slot->setAttribute('data-prefs-center', '1');
                     $content         = $dom->saveHTML();
                 }
 
@@ -379,6 +425,7 @@ class BuilderSubscriber extends CommonSubscriber
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
                     $slot->nodeValue = self::channelfrequency;
+                    $slot->setAttribute('data-prefs-center', '1');
                     $content         = $dom->saveHTML();
                 }
 
@@ -387,6 +434,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $slot            = $divContent->item($i);
                     $saveButton      = $xpath->query('//*[@data-slot="saveprefsbutton"]//a')->item(0);
                     $slot->nodeValue = self::saveprefsRegex;
+                    $slot->setAttribute('data-prefs-center', '1');
                     $content         = $dom->saveHTML();
 
                     $params['saveprefsbutton'] = [
@@ -422,6 +470,26 @@ class BuilderSubscriber extends CommonSubscriber
                 $savePrefs = $this->renderSavePrefs($params);
                 $content   = str_ireplace(self::saveprefsRegex, $savePrefs, $content);
             }
+            // add form before first block of prefs center
+            if (isset($params['startform']) && false !== strpos($content, 'data-prefs-center')) {
+                $dom = new DOMDocument('1.0', 'utf-8');
+                $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
+                $xpath      = new DOMXPath($dom);
+                // If use slots
+                $divContent = $xpath->query('//*[@data-prefs-center="1"]');
+                if (!$divContent->length) {
+                    // If use tokens
+                    $divContent = $xpath->query('//*[@data-prefs-center-first="1"]');
+                }
+
+                if ($divContent->length) {
+                    $slot    = $divContent->item(0);
+                    $newnode = $dom->createElement('startform');
+                    $slot->parentNode->insertBefore($newnode, $slot);
+                    $content = $dom->saveHTML();
+                    $content = str_replace('<startform></startform>', $params['startform'], $content);
+                }
+            }
 
             if (false !== strpos($content, self::successmessage)) {
                 $successMessage = $this->renderSuccessMessage($params);
@@ -444,7 +512,7 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @return string
      */
-    protected function renderSocialShareButtons()
+    private function renderSocialShareButtons()
     {
         static $content = '';
 
@@ -452,32 +520,38 @@ class BuilderSubscriber extends CommonSubscriber
             $shareButtons = $this->integrationHelper->getShareButtons();
 
             $content = "<div class='share-buttons'>\n";
-            foreach ($shareButtons as $network => $button) {
+            foreach ($shareButtons as $button) {
                 $content .= $button;
             }
             $content .= "</div>\n";
 
             //load the css into the header by calling the sharebtn_css view
-            $this->templating->render('MauticPageBundle:SubscribedEvents\PageToken:sharebtn_css.html.php');
+            $this->templating->getTemplating()->render('MauticPageBundle:SubscribedEvents\PageToken:sharebtn_css.html.php');
         }
 
         return $content;
+    }
+
+    /**
+     * @return string
+     */
+    private function getAttributeForFirtSlot()
+    {
+        return 'data-prefs-center-first="1"';
     }
 
     /**
      * Renders the HTML for the segment list.
      *
-     * @param array $params
-     *
      * @return string
      */
-    protected function renderSegmentList(array $params = [])
+    private function renderSegmentList(array $params = [])
     {
         static $content = '';
 
         if (empty($content)) {
-            $content = "<div class='pref-segmentlist'>\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:segmentlist.html.php', $params);
+            $content = "<div class='pref-segmentlist' ".$this->getAttributeForFirtSlot().">\n";
+            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:segmentlist.html.php', $params);
             $content .= "</div>\n";
         }
 
@@ -485,17 +559,15 @@ class BuilderSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param array $params
-     *
      * @return string
      */
-    protected function renderCategoryList(array $params = [])
+    private function renderCategoryList(array $params = [])
     {
         static $content = '';
 
         if (empty($content)) {
-            $content = "<div class='pref-categorylist'>\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:categorylist.html.php', $params);
+            $content = "<div class='pref-categorylist ' ".$this->getAttributeForFirtSlot().">\n";
+            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:categorylist.html.php', $params);
             $content .= "</div>\n";
         }
 
@@ -503,17 +575,15 @@ class BuilderSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param array $params
-     *
      * @return string
      */
-    protected function renderPreferredChannel(array $params = [])
+    private function renderPreferredChannel(array $params = [])
     {
         static $content = '';
 
         if (empty($content)) {
             $content = "<div class='pref-preferredchannel'>\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:preferredchannel.html.php', $params);
+            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:preferredchannel.html.php', $params);
             $content .= "</div>\n";
         }
 
@@ -521,17 +591,15 @@ class BuilderSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param array $params
-     *
      * @return string
      */
-    protected function renderChannelFrequency(array $params = [])
+    private function renderChannelFrequency(array $params = [])
     {
         static $content = '';
 
         if (empty($content)) {
             $content = "<div class='pref-channelfrequency'>\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:channelfrequency.html.php', $params);
+            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:channelfrequency.html.php', $params);
             $content .= "</div>\n";
         }
 
@@ -539,17 +607,15 @@ class BuilderSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param array $params
-     *
      * @return string
      */
-    protected function renderSavePrefs(array $params = [])
+    private function renderSavePrefs(array $params = [])
     {
         static $content = '';
 
         if (empty($content)) {
-            $content = "<div class='pref-saveprefs'>\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:saveprefsbutton.html.php', $params);
+            $content = "<div class='pref-saveprefs ' ".$this->getAttributeForFirtSlot().">\n";
+            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:saveprefsbutton.html.php', $params);
             $content .= "</div>\n";
         }
 
@@ -557,17 +623,15 @@ class BuilderSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param array $params
-     *
      * @return string
      */
-    protected function renderSuccessMessage(array $params = [])
+    private function renderSuccessMessage(array $params = [])
     {
         static $content = '';
 
         if (empty($content)) {
             $content = "<div class=\"pref-successmessage\">\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:successmessage.html.php', $params);
+            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:successmessage.html.php', $params);
             $content .= "</div>\n";
         }
 
@@ -581,7 +645,7 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @return string
      */
-    protected function renderLanguageBar($page)
+    private function renderLanguageBar($page)
     {
         static $langbar = '';
 
@@ -612,7 +676,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $related[$parent->getId()] = [
                     'lang' => $trans,
                     // Add ntrd to not auto redirect to another language
-                    'url' => $this->pageModel->generateUrl($parent, false).'?ntrd=1',
+                    'url'  => $this->pageModel->generateUrl($parent, false).'?ntrd=1',
                 ];
                 foreach ($children as $c) {
                     $lang  = $c->getLanguage();
@@ -623,7 +687,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $related[$c->getId()] = [
                         'lang' => $trans,
                         // Add ntrd to not auto redirect to another language
-                        'url' => $this->pageModel->generateUrl($c, false).'?ntrd=1',
+                        'url'  => $this->pageModel->generateUrl($c, false).'?ntrd=1',
                     ];
                 }
             }
@@ -640,36 +704,26 @@ class BuilderSubscriber extends CommonSubscriber
                 return;
             }
 
-            $langbar = $this->templating->render('MauticPageBundle:SubscribedEvents\PageToken:langbar.html.php', ['pages' => $related]);
+            $langbar = $this->templating->getTemplating()->render('MauticPageBundle:SubscribedEvents\PageToken:langbar.html.php', ['pages' => $related]);
         }
 
         return $langbar;
     }
 
-    /**
-     * @param EmailBuilderEvent $event
-     */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
         if ($event->tokensRequested([$this->pageTokenRegex])) {
-            $tokenHelper = new BuilderTokenHelper($this->factory, 'page');
-            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', false, true);
+            $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
+            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', true);
         }
     }
 
-    /**
-     * @param EmailSendEvent $event
-     */
     public function onEmailGenerate(EmailSendEvent $event)
     {
         $content      = $event->getContent();
         $plainText    = $event->getPlainText();
-        $clickthrough = ($event->shouldAppendClickthrough()) ? $event->generateClickthrough() : [];
-
-        $this->emailIsInternalSend = $event->isInternalSend();
-        $this->emailEntity         = $event->getEmail();
-
-        $tokens = $this->tokenHelper->findPageTokens($content.$plainText, $clickthrough);
+        $clickthrough = $event->shouldAppendClickthrough() ? $event->generateClickthrough() : [];
+        $tokens       = $this->tokenHelper->findPageTokens($content.$plainText, $clickthrough);
 
         $event->addTokens($tokens);
     }

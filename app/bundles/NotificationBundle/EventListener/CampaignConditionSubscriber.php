@@ -34,9 +34,6 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $event->addCondition(
@@ -49,9 +46,6 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerHasActiveCondition(CampaignExecutionEvent $event)
     {
         if (!$event->checkContext('notification.has.active')) {

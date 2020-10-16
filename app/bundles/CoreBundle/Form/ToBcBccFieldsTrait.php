@@ -17,9 +17,6 @@ use Symfony\Component\Validator\Constraints\Email;
 
 trait ToBcBccFieldsTrait
 {
-    /**
-     * @param FormBuilderInterface $builder
-     */
     protected function addToBcBccFields(FormBuilderInterface $builder)
     {
         $builder->add(

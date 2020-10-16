@@ -23,8 +23,6 @@ class Parser
 
     /**
      * Parser constructor.
-     *
-     * @param Message $message
      */
     public function __construct(Message $message)
     {
@@ -40,7 +38,7 @@ class Parser
      */
     public function parse()
     {
-        if (!preg_match('/email\/(.*?)\.gif/', $this->message->textHtml, $parts)) {
+        if (!preg_match('/email\/([a-zA-Z0-9]+)\.gif/', $this->message->textHtml, $parts)) {
             throw new ReplyNotFound();
         }
 

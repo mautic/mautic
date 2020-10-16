@@ -38,9 +38,6 @@ class FormUploader
     }
 
     /**
-     * @param UploadFileCrate $filesToUpload
-     * @param Submission      $submission
-     *
      * @throws FileUploadException
      */
     public function uploadFiles(UploadFileCrate $filesToUpload, Submission $submission)
@@ -56,7 +53,9 @@ class FormUploader
                 $uploadDir       = $this->getUploadDir($field);
                 $fileName        = $this->fileUploader->upload($uploadDir, $fileFieldCrate->getUploadedFile());
                 $result[$alias]  = $fileName;
-                $uploadedFiles[] = $uploadDir.DIRECTORY_SEPARATOR.$fileName;
+                $uploadedFile    = $uploadDir.DIRECTORY_SEPARATOR.$fileName;
+                $this->fixRotationJPG($uploadedFile);
+                $uploadedFiles[] =$uploadedFile;
             }
             $submission->setResults($result);
         } catch (FileUploadException $e) {
@@ -68,7 +67,6 @@ class FormUploader
     }
 
     /**
-     * @param Field  $field
      * @param string $fileName
      *
      * @return string
@@ -92,13 +90,12 @@ class FormUploader
 
     public function deleteFilesOfForm(Form $form)
     {
-        $formUploadDir = $this->getUploadDirOfForm($form);
+        $formId        = $form->getId() ?: $form->deletedId;
+        $formUploadDir = $this->getUploadDirOfForm($formId);
         $this->fileUploader->delete($formUploadDir);
     }
 
     /**
-     * @param Submission $submission
-     *
      * @todo Refactor code that result can be accessed normally and not only as a array of values
      */
     public function deleteUploadedFiles(Submission $submission)
@@ -124,33 +121,60 @@ class FormUploader
     }
 
     /**
-     * @param Field $field
-     *
      * @return string
      */
     private function getUploadDir(Field $field)
     {
         $fieldId       = $field->getId();
-        $formUploadDir = $this->getUploadDirOfForm($field->getForm());
+        $formUploadDir = $this->getUploadDirOfForm($field->getForm()->getId());
 
         return $formUploadDir.DIRECTORY_SEPARATOR.$fieldId;
     }
 
     /**
-     * @param Form $form
-     *
      * @return string
      *
      * @throws \LogicException If formId is null
      */
-    private function getUploadDirOfForm(Form $form)
+    private function getUploadDirOfForm(int $formId)
     {
-        $formId    = $form->getId();
-        $uploadDir = $this->coreParametersHelper->getParameter('form_upload_dir');
-        if ($formId === null) {
-            throw new \LogicException('FormID can\'t be null');
-        }
+        $uploadDir = $this->coreParametersHelper->get('form_upload_dir');
 
         return $uploadDir.DIRECTORY_SEPARATOR.$formId;
+    }
+
+    /**
+     * Fix iOS picture orientation after upload PHP
+     * https://stackoverflow.com/questions/22308921/fix-ios-picture-orientation-after-upload-php.
+     *
+     * @param $filename
+     */
+    private function fixRotationJPG($filename)
+    {
+        if (exif_imagetype($filename) != IMAGETYPE_JPEG) {
+            return;
+        }
+        $exif = exif_read_data($filename);
+        $ort  = $exif['Orientation']; /*STORES ORIENTATION FROM IMAGE */
+        $ort1 = $ort;
+        $exif = exif_read_data($filename, 0, true);
+        if (!empty($ort1)) {
+            $image = imagecreatefromjpeg($filename);
+            $ort   = $ort1;
+            switch ($ort) {
+                case 3:
+                    $image = imagerotate($image, 180, 0);
+                    break;
+
+                case 6:
+                    $image = imagerotate($image, -90, 0);
+                    break;
+
+                case 8:
+                    $image = imagerotate($image, 90, 0);
+                    break;
+            }
+        }
+        imagejpeg($image, $filename, 90);
     }
 }

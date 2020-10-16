@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' === $tmpl) {
     $view->extend('MauticInstallBundle:Install:content.html.php');
 }
 ?>
@@ -43,8 +43,7 @@ if ($tmpl == 'index') {
             <?php echo $view['form']->row($form['mailer_transport']); ?>
         </div>
     </div>
-    <?php $hide = ($form['mailer_transport']->vars['data'] == 'smtp') ? '' : ' class="hide"'; ?>
-    <div id="smtpSettings"<?php echo $hide; ?>>
+    <div id="smtpSettings">
         <div class="row">
             <div class="col-sm-9">
                 <?php echo $view['form']->row($form['mailer_host']); ?>
@@ -63,18 +62,28 @@ if ($tmpl == 'index') {
             </div>
         </div>
     </div>
-    <?php
-    $authMode = $form['mailer_auth_mode']->vars['data'];
-    $mailer   = $form['mailer_transport']->vars['data'];
-    $hide     = (!in_array($mailer, ['mail', 'sendmail']) || ($mailer == 'smtp' && !empty($authMode))) ? '' : ' class="hide"';
-    ?>
-    <div id="authDetails"<?php echo $hide; ?>>
+    <div id="amazonRegion">
+        <div class="row">
+            <div class="col-sm-6">
+                <?php echo $view['form']->row($form['mailer_amazon_region']); ?>
+            </div>
+            <div class="col-sm-6">
+                <?php echo $view['form']->row($form['mailer_amazon_other_region']); ?>
+            </div>
+        </div>
+    </div>
+    <div id="authDetails">
         <div class="row">
             <div class="col-sm-6">
                 <?php echo $view['form']->row($form['mailer_user']); ?>
             </div>
             <div class="col-sm-6">
                 <?php echo $view['form']->row($form['mailer_password']); ?>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <?php echo $view['form']->row($form['mailer_api_key']); ?>
             </div>
         </div>
     </div>
@@ -87,4 +96,7 @@ if ($tmpl == 'index') {
         </div>
     </div>
     <?php echo $view['form']->end($form); ?>
+    <script>
+        Mautic.initializeFormFieldVisibilitySwitcher('install_email_step');
+    </script>
 </div>

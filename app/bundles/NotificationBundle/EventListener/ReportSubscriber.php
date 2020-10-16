@@ -12,18 +12,16 @@
 namespace Mautic\NotificationBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\NotificationBundle\Entity\StatRepository;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ReportSubscriber.
- */
-class ReportSubscriber extends CommonSubscriber
+class ReportSubscriber implements EventSubscriberInterface
 {
     const MOBILE_NOTIFICATIONS       = 'mobile_notifications';
     const MOBILE_NOTIFICATIONS_STATS = 'mobile_notifications.stats';
@@ -31,7 +29,7 @@ class ReportSubscriber extends CommonSubscriber
     /**
      * @var Connection
      */
-    protected $db;
+    private $db;
 
     /**
      * @var CompanyReportData
@@ -39,15 +37,15 @@ class ReportSubscriber extends CommonSubscriber
     private $companyReportData;
 
     /**
-     * ReportSubscriber constructor.
-     *
-     * @param Connection        $db
-     * @param CompanyReportData $companyReportData
+     * @var StatRepository
      */
-    public function __construct(Connection $db, CompanyReportData $companyReportData)
+    private $statRepository;
+
+    public function __construct(Connection $db, CompanyReportData $companyReportData, StatRepository $statRepository)
     {
         $this->db                = $db;
         $this->companyReportData = $companyReportData;
+        $this->statRepository    = $statRepository;
     }
 
     /**
@@ -64,8 +62,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Add available tables and columns to the report builder lookup.
-     *
-     * @param ReportBuilderEvent $event
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
@@ -196,8 +192,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGeneratorEvent $event
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
@@ -266,8 +260,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGraphEvent $event
      */
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
@@ -276,9 +268,8 @@ class ReportSubscriber extends CommonSubscriber
             return;
         }
 
-        $graphs   = $event->getRequestedGraphs();
-        $qb       = $event->getQueryBuilder();
-        $statRepo = $this->em->getRepository('MauticNotificationBundle:Stat');
+        $graphs = $event->getRequestedGraphs();
+        $qb     = $event->getQueryBuilder();
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
@@ -315,7 +306,7 @@ class ReportSubscriber extends CommonSubscriber
                         ->orderBy('sent', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $statRepo->getMostNotifications($queryBuilder, $limit, $offset);
+                    $items                  = $this->statRepository->getMostNotifications($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -330,7 +321,7 @@ class ReportSubscriber extends CommonSubscriber
                         ->orderBy('"read"', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $statRepo->getMostNotifications($queryBuilder, $limit, $offset);
+                    $items                  = $this->statRepository->getMostNotifications($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -345,7 +336,7 @@ class ReportSubscriber extends CommonSubscriber
                         ->orderBy('ratio', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $statRepo->getMostNotifications($queryBuilder, $limit, $offset);
+                    $items                  = $this->statRepository->getMostNotifications($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;

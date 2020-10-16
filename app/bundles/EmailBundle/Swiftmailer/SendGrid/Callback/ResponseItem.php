@@ -31,8 +31,6 @@ class ResponseItem
     private $dncReason;
 
     /**
-     * @param array $item
-     *
      * @throws ResponseItemException
      */
     public function __construct(array $item)
