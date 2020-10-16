@@ -1474,6 +1474,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->sendModel->finalFlush();
 
         // Get the errors to return
+
+        // Don't use array_merge or it will reset contact ID based keys
         $errorMessages  = $errors + $this->sendModel->getErrors();
         $failedContacts = $this->sendModel->getFailedContacts();
 
