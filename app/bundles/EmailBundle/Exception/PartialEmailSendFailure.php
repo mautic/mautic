@@ -23,10 +23,9 @@ class PartialEmailSendFailure extends \Exception
     /**
      * PartialEmailSendFailure constructor.
      *
-     * @param int            $sentCount
-     * @param string         $failureReason
-     * @param int            $code
-     * @param Throwable|null $previous
+     * @param int    $sentCount
+     * @param string $failureReason
+     * @param int    $code
      */
     public function __construct($sentCount, $failureReason, $code = 0, Throwable $previous = null)
     {
