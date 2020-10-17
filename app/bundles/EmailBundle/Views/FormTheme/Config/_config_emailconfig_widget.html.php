@@ -76,6 +76,8 @@ $template  = '<div class="col-md-6">{content}</div>';
                 <div class="row">
                     <?php echo $view['form']->rowIfExists($fields, 'mailer_mailjet_sandbox', $template); ?>
                     <?php echo $view['form']->rowIfExists($fields, 'mailer_mailjet_sandbox_default_mail', $template); ?>
+                    <?php echo $view['form']->rowIfExists($fields, 'mailer_mailgun_endpoint', $template); ?>
+                    <?php echo $view['form']->rowIfExists($fields, 'mailer_mailgun_domain', $template); ?>
                 </div>
             <?php endif; ?>
 

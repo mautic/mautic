@@ -29,6 +29,7 @@ class TransportType
         'mautic.transport.sendgrid_api' => 'mautic.email.config.mailer_transport.sendgrid_api',
         'sendmail'                      => 'mautic.email.config.mailer_transport.sendmail',
         'mautic.transport.sparkpost'    => 'mautic.email.config.mailer_transport.sparkpost',
+        'mautic.transport.mailgun'      => 'mautic.email.config.mailer_transport.mailgun',
     ];
 
     /**
@@ -83,6 +84,7 @@ class TransportType
         'mautic.transport.sparkpost',
         'mautic.transport.mandrill',
         'mautic.transport.sendgrid_api',
+        'mautic.transport.mailgun',
     ];
 
     /**
@@ -237,6 +239,14 @@ class TransportType
     public function getMailjetService()
     {
         return '"mautic.transport.mailjet"';
+    }
+
+    /**
+     * @return string
+     */
+    public function getMailgunService()
+    {
+        return '"mautic.transport.mailgun"';
     }
 
     /**

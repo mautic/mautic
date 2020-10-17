@@ -108,10 +108,14 @@
         "kamermans/guzzle-oauth2-subscriber": "^1.0",
         "barryvdh/elfinder-flysystem-driver": "^0.2.1",
         "bandwidth-throttle/token-bucket": "^2.0",
+<<<<<<< HEAD
         "gaufrette/extras": "^0.1.0",
         "gaufrette/aws-s3-adapter": "^0.4.0",
         "phpoffice/phpspreadsheet": "^1.15",
         "predis/predis": "^1.1"
+=======
+        "mailgun/mailgun-php": "^3.1"
+>>>>>>> inital Mailgun Transport Setup
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~3.4.0",

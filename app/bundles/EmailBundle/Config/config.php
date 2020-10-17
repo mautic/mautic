@@ -386,7 +386,6 @@ return [
                     'mautic.spool.delegator',
                 ],
             ],
-
             'mautic.transport.amazon' => [
                 'class'        => \Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport::class,
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
@@ -636,6 +635,74 @@ return [
                 'class'     => \Http\Adapter\Guzzle6\Client::class,
                 'factory'   => ['@mautic.guzzle.client.factory', 'create'],
             ],
+            'mautic.transport.mailgun' => [
+                'class'        => \Mautic\EmailBundle\Swiftmailer\Transport\MailgunTransport::class,
+                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
+                'arguments'    => [
+                    'mautic.transport.mailgun.facade',
+                    'mautic.transport.mailgun.calback',
+                ],
+                'methodCalls'  => [
+                    'setDomain' => ['%mailer_mailgun_domain%'],
+                ],
+            ],
+            'mautic.transport.mailgun.facade' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Mailgun\MailgunFacade::class,
+                'arguments' => [
+                    'mautic.transport.mailgun.mailgun_wrapper',
+                    'mautic.transport.mailgun.message',
+                    'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.transport.mailgun.mailgun_wrapper' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Mailgun\MailgunWrapper::class,
+                'arguments' => [
+                    'mautic.transport.mailgun.mailgun',
+                ],
+            ],
+            'mautic.transport.mailgun.mail.base' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Mailgun\Mail\MailgunMailBase::class,
+                'arguments' => [
+                    'mautic.helper.plain_text_message',
+                ],
+            ],
+            'mautic.transport.mailgun.mail.personalization' => [
+                'class' => \Mautic\EmailBundle\Swiftmailer\Mailgun\Mail\MailgunMailPersonalization::class,
+            ],
+            'mautic.transport.mailgun.mail.metadata' => [
+                'class' => \Mautic\EmailBundle\Swiftmailer\Mailgun\Mail\MailgunMailMetadata::class,
+            ],
+            'mautic.transport.mailgun.mail.attachment' => [
+                'class' => \Mautic\EmailBundle\Swiftmailer\Mailgun\Mail\MailgunMailAttachment::class,
+            ],
+            'mautic.transport.mailgun.message' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Mailgun\MailgunMessage::class,
+                'arguments' => [
+                    'mautic.transport.mailgun.mail.base',
+                    'mautic.transport.mailgun.mail.personalization',
+                    'mautic.transport.mailgun.mail.metadata',
+                    'mautic.transport.mailgun.mail.attachment',
+                ],
+            ],
+            'mautic.transport.mailgun.mailgun' => [
+                'class'     => \Mailgun\Mailgun::class,
+                'arguments' => [
+                    'mautic.transport.mailgun.configurator',
+                ],
+            ],
+            'mautic.transport.mailgun.configurator' => [
+                'class'        => \Mailgun\HttpClient\HttpClientConfigurator::class,
+                'methodCalls'  => [
+                    'setApiKey'   => ['%mautic.mailer_api_key%'],
+                    'setEndPoint' => ['%mautic.mailer_mailgun_endpoint%'],
+                ],
+            ],
+            'mautic.transport.mailgun.calback' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Mailgun\Callback\MailgunCallback::class,
+                'arguments' => [
+                    'mautic.email.model.transport_callback',
+                ],
+            ],
             'mautic.helper.mailbox' => [
                 'class'     => 'Mautic\EmailBundle\MonitoredEmail\Mailbox',
                 'arguments' => [
@@ -832,33 +899,35 @@ return [
         ],
     ],
     'parameters' => [
-        'mailer_api_key'                 => null, // Api key from mail delivery provider.
-        'mailer_from_name'               => 'Mautic',
-        'mailer_from_email'              => 'email@yoursite.com',
-        'mailer_return_path'             => null,
-        'mailer_transport'               => 'smtp',
-        'mailer_append_tracking_pixel'   => true,
-        'mailer_convert_embed_images'    => false,
-        'mailer_host'                    => '',
-        'mailer_port'                    => null,
-        'mailer_user'                    => null,
-        'mailer_password'                => null,
-        'mailer_encryption'              => null, //tls or ssl,
-        'mailer_auth_mode'               => null, //plain, login or cram-md5
-        'mailer_amazon_region'           => 'us-east-1',
-        'mailer_amazon_other_region'     => null,
-        'mailer_custom_headers'          => [],
-        'mailer_spool_type'              => 'memory', //memory = immediate; file = queue
-        'mailer_spool_path'              => '%kernel.root_dir%/../var/spool',
-        'mailer_spool_msg_limit'         => null,
-        'mailer_spool_time_limit'        => null,
-        'mailer_spool_recover_timeout'   => 900,
-        'mailer_spool_clear_timeout'     => 1800,
-        'unsubscribe_text'               => null,
-        'webview_text'                   => null,
-        'unsubscribe_message'            => null,
-        'resubscribe_message'            => null,
-        'monitored_email'                => [
+        'mailer_api_key'                    => null, // Api key from mail delivery provider.
+        'mailer_from_name'                  => 'Mautic',
+        'mailer_from_email'                 => 'email@yoursite.com',
+        'mailer_return_path'                => null,
+        'mailer_transport'                  => 'smtp',
+        'mailer_append_tracking_pixel'      => true,
+        'mailer_convert_embed_images'       => false,
+        'mailer_host'                       => '',
+        'mailer_port'                       => null,
+        'mailer_user'                       => null,
+        'mailer_password'                   => null,
+        'mailer_encryption'                 => null, //tls or ssl,
+        'mailer_auth_mode'                  => null, //plain, login or cram-md5
+        'mailer_amazon_region'              => 'us-east-1',
+        'mailer_amazon_other_region'        => null,
+        'mailer_mailgun_endpoint'           => 'https://api.mailgun.net',
+        'mailer_mailgun_domain'             => null,
+        'mailer_custom_headers'             => [],
+        'mailer_spool_type'                 => 'memory', //memory = immediate; file = queue
+        'mailer_spool_path'                 => '%kernel.root_dir%/../var/spool',
+        'mailer_spool_msg_limit'            => null,
+        'mailer_spool_time_limit'           => null,
+        'mailer_spool_recover_timeout'      => 900,
+        'mailer_spool_clear_timeout'        => 1800,
+        'unsubscribe_text'                  => null,
+        'webview_text'                      => null,
+        'unsubscribe_message'               => null,
+        'resubscribe_message'               => null,
+        'monitored_email'                   => [
             'general' => [
                 'address'         => null,
                 'host'            => null,

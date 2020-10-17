@@ -76,7 +76,8 @@ Mautic.testEmailServerConnection = function() {
         password:            mQuery('#config_emailconfig_mailer_password').val(),
         port:                mQuery('#config_emailconfig_mailer_port').val(),
         transport:           mQuery('#config_emailconfig_mailer_transport').val(),
-        user:                mQuery('#config_emailconfig_mailer_user').val()
+        user:                mQuery('#config_emailconfig_mailer_user').val(),
+        mailgun_domain:      mQuery('#config_emailconfig_mailer_mailgun_domain').val()
     };
 
     mQuery('#mailerTestButtonContainer .fa-spinner').removeClass('hide');

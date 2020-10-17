@@ -33,6 +33,7 @@ class TransportTypeTest extends \PHPUnit\Framework\TestCase
             'mautic.transport.sendgrid_api' => 'mautic.email.config.mailer_transport.sendgrid_api',
             'sendmail'                      => 'mautic.email.config.mailer_transport.sendmail',
             'mautic.transport.sparkpost'    => 'mautic.email.config.mailer_transport.sparkpost',
+            'mautic.transport.mailgun'      => 'mautic.email.config.mailer_transport.mailgun',
         ];
 
         $this->assertSame($expected, $transportType->getTransportTypes());
@@ -72,6 +73,15 @@ class TransportTypeTest extends \PHPUnit\Framework\TestCase
         $expected = '"mautic.transport.mailjet"';
 
         $this->assertSame($expected, $transportType->getMailjetService());
+    }
+
+    public function testMailgunService()
+    {
+        $transportType = new TransportType();
+
+        $expected = '"mautic.transport.mailgun"';
+
+        $this->assertSame($expected, $transportType->getMailgunService());
     }
 
     public function testRequiresLogin()
@@ -114,7 +124,7 @@ class TransportTypeTest extends \PHPUnit\Framework\TestCase
     {
         $transportType = new TransportType();
 
-        $expected = '"mautic.transport.sparkpost","mautic.transport.mandrill","mautic.transport.sendgrid_api"';
+        $expected = '"mautic.transport.sparkpost","mautic.transport.mandrill","mautic.transport.sendgrid_api","mautic.transport.mailgun"';
 
         $this->assertSame($expected, $transportType->getServiceRequiresApiKey());
     }

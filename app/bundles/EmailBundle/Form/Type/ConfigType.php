@@ -556,6 +556,39 @@ class ConfigType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'mailer_mailgun_endpoint',
+            TextType::class,
+            [
+                'label'       => 'mautic.email.config.mailer.mailgun.endpoint',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'        => 'form-control',
+                    'placeholder'  => 'mautic.email.config.mailer.mailgun.default.endpoint',
+                    'tooltip'      => 'mautic.email.config.mailer.mailgun.endpoint',
+                    'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getMailgunService().']}',
+                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
+                ],
+                'required'    => true,
+            ]
+        );
+
+        $builder->add(
+            'mailer_mailgun_domain',
+            TextType::class,
+            [
+                'label'       => 'mautic.email.config.mailer.mailgun.domain',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.email.config.mailer.mailgun.domain',
+                    'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getMailgunService().']}',
+                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
+                ],
+                'required'    => true,
+            ]
+        );
+
         $spoolConditions = '{"config_emailconfig_mailer_spool_type":["memory"]}';
 
         $builder->add(

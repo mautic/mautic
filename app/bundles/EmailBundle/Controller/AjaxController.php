@@ -215,6 +215,10 @@ class AjaxController extends CommonAjaxController
                         if ('mautic.transport.amazon_api' == $transport) {
                             $mailer->setRegion($settings['amazon_region'], $settings['amazon_other_region']);
                         }
+
+                        if ('mautic.transport.mailgun' == $transport) {
+                            $mailer->setDomain($settings['mailgun_domain']);
+                        }
                     }
             }
 
