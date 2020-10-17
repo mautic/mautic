@@ -229,6 +229,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn([]);
 
         $this->setProperty($mockLeadModel, LeadModel::class, 'leadFieldModel', $this->fieldModelMock);
+        $this->setProperty($mockLeadModel, LeadModel::class, 'coreParametersHelper', $this->coreParametersHelperMock);
 
         $this->assertAttributeEquals(
             [],
@@ -278,6 +279,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn([]);
 
         $this->setProperty($mockLeadModel, LeadModel::class, 'leadFieldModel', $this->fieldModelMock);
+        $this->setProperty($mockLeadModel, LeadModel::class, 'coreParametersHelper', $this->coreParametersHelperMock);
 
         $this->assertAttributeEquals(
             [],
