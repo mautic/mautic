@@ -5,6 +5,10 @@ namespace Mautic\PageBundle\Tests\Controller;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
+/**
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
 class PageControllerTest extends MauticMysqlTestCase
 {
     /**
