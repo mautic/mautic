@@ -22,7 +22,7 @@ use Doctrine\DBAL\Types\TextType;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 
-class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
+class LeadListRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testIncludeSegmentFilterWithFiltersAppendInOrGroups()
     {
