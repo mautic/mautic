@@ -151,4 +151,29 @@ class InputHelperTest extends \PHPUnit\Framework\TestCase
             InputHelper::filename('29NIDJi  dsfjh(#*RO85T784šěíáčýžěé+ěšéřář', 'txt')
         );
     }
+
+    /**
+     * @testdox Test filename with extension
+     *
+     * @covers \Mautic\CoreBundle\Helper\InputHelper::filename
+     */
+    public function testCleanWithTrim()
+    {
+        $tests = [
+            'custom string'  => 'custom string',
+            ' custom string' => 'custom string',
+       ];
+        foreach ($tests as $input=>$expected) {
+            $this->assertSame(InputHelper::clean($input, false, true), $expected);
+        }
+        $inputArray = [
+            'custom string',
+            ' custom string custom string with empty space',
+        ];
+        $expectedArray = [
+            'custom string',
+            'custom string custom string with empty space',
+        ];
+        $this->assertSame(InputHelper::clean($inputArray, false, true), $expectedArray);
+    }
 }
