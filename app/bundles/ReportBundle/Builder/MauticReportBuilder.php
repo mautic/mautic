@@ -91,7 +91,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     private $db;
 
     /**
-     * @var \Mautic\ReportBundle\Entity\Report
+     * @var Report
      */
     private $entity;
 
@@ -110,9 +110,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
      */
     private $channelListHelper;
 
-    /**
-     * MauticReportBuilder constructor.
-     */
     public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity, ChannelListHelper $channelListHelper)
     {
         $this->entity            = $entity;
@@ -122,7 +119,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return QueryBuilder
      *
      * @throws InvalidReportQueryException
      */
@@ -148,22 +145,18 @@ final class MauticReportBuilder implements ReportBuilderInterface
     }
 
     /**
-     * Configures builder.
-     *
      * This method configures the ReportBuilder. It has to return a configured Doctrine DBAL QueryBuilder.
      *
      * @param array $options Options array
      *
-     * @return \Doctrine\DBAL\Query\QueryBuilder
+     * @return QueryBuilder
      */
     private function configureBuilder(array $options)
     {
+        $event = new ReportGeneratorEvent($this->entity, $options, $this->db->createQueryBuilder(), $this->channelListHelper);
+
         // Trigger the REPORT_ON_GENERATE event to initialize the QueryBuilder
-        /** @var ReportGeneratorEvent $event */
-        $event = $this->dispatcher->dispatch(
-            ReportEvents::REPORT_ON_GENERATE,
-            new ReportGeneratorEvent($this->entity, $options, $this->db->createQueryBuilder(), $this->channelListHelper)
-        );
+        $this->dispatcher->dispatch(ReportEvents::REPORT_ON_GENERATE, $event);
 
         // Build the QUERY
         $queryBuilder = $event->getQueryBuilder();
@@ -286,7 +279,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $selectColumns = [];
 
         // Build SELECT clause
-        if (!$selectOptions = $event->getSelectColumns()) {
+        if (!$event->getSelectColumns()) {
             $fields             = $this->entity->getColumns();
             $groupByColumns     = $queryBuilder->getQueryPart('groupBy');
             $groupByColumnsKeys = array_flip($groupByColumns);
@@ -304,7 +297,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         } elseif (isset($fieldOptions['formula'])) {
                             $selectText = $fieldOptions['formula'];
                         } else {
-                            $selectText = $field;
+                            $selectText = $this->sanitizeColumnName($field);
                         }
                     }
 
@@ -514,5 +507,17 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         return false;
+    }
+
+    /**
+     * We must sanitize the table aliases as they might be auto generated.
+     * Aliases like "8e296a06" makes MySql to think it is a number.
+     * Expects param in format "table_alias.column_name".
+     */
+    private function sanitizeColumnName(string $fullCollumnName): string
+    {
+        [$tableAlias, $columnName] = explode('.', $fullCollumnName);
+
+        return "`{$tableAlias}`.`{$columnName}`";
     }
 }
