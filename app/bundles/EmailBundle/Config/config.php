@@ -643,7 +643,7 @@ return [
                     'mautic.transport.mailgun.calback',
                 ],
                 'methodCalls'  => [
-                    'setDomain' => ['%mailer_mailgun_domain%'],
+                    'setDomain' => ['%mautic.mailer_mailgun_domain%'],
                 ],
             ],
             'mautic.transport.mailgun.facade' => [
