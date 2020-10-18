@@ -89,4 +89,15 @@ class MailgunFacadeTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($mailgunFacade->checkConnection('domain.com'));
     }
+
+    public function testSend()
+    {
+        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
+        ->disableOriginalConstructor()
+        ->getMock();
+
+        $mailgunFacade = new MailgunFacade($this->mailgunWrapper, $this->mailgunMessage, $this->logger);
+
+        $this->assertTrue($mailgunFacade->send($message));
+    }
 }

@@ -11,7 +11,8 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Mailgun;
 
-use Mailgun\Mailgun;
+use  Mailgun\Mailgun;
+use Mailgun\Message\MessageBuilder;
 
 class MailgunWrapper
 {
@@ -28,9 +29,9 @@ class MailgunWrapper
     /**
      * @return Response
      */
-    public function send()
+    public function send(MessageBuilder $mail)
     {
-        return $this->mailGun->client->mail()->send()->post($mail);
+        return $this->mailGun->messages()->send()($mail);
     }
 
     /**

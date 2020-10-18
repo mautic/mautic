@@ -47,8 +47,9 @@ class MailgunFacade implements SwiftmailerFacadeInterface
      */
     public function send(\Swift_Mime_SimpleMessage $message)
     {
-        $mail     = $this->mailgunApiMessage->getMessage($message);
-        $response = $this->mailgunWrapper->send($mail);
+        $mail     = $this->mailgunMessage->getMessage($message);
+
+        //      $response = $this->mailgunWrapper->send($mail);
     }
 
     public function checkConnection(string $domain)

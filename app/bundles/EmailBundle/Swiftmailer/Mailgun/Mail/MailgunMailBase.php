@@ -11,7 +11,8 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Mailgun\Mail;
 
-use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
+use Mailgun\Message\MessageBuilder;
+use  Mautic\EmailBundle\Helper\PlainTextMessageHelper;
 
 class MailgunMailBase
 {
@@ -30,33 +31,24 @@ class MailgunMailBase
      */
     public function getMailgunMail(\Swift_Mime_SimpleMessage $message)
     {
-        /*        $froms       = $message->getFrom();
-                $from        = new Email(current($froms), key($froms));
-                $subject     = $message->getSubject();
+        $mail        = new MessageBuilder();
+        $froms       = $message->getFrom();
+        $name        = explode(' ', current($froms));
+        $mail->setFromAddress(key($froms), ['first' => $name[0], 'last' => $name[1]]);
+        $mail->setSubject($message->getSubject());
+        $type = $this->getContentType($message);
 
-                $contentMain   = new Content($this->getContentType($message), $message->getBody());
-                $contentSecond = null;
+        if ('text/html' == $type) {
+            $mail->setHtmlBody($message->getBody());
+            $plainText = $this->plainTextMessageHelper->getPlainTextFromMessageNotStatic($message);
+            if ($plainText) {
+                $mail->setTextBody($plainText);
+            }
+        } elseif ('text/plain' == $type) {
+            $mail->setTextBody($message->getBody());
+        }
 
-                // Plain text message must be first if present
-                if ('text/plain' !== $contentMain->getType()) {
-                    $plainText = $this->plainTextMessageHelper->getPlainTextFromMessageNotStatic($message);
-                    if ($plainText) {
-                        $contentSecond = $contentMain;
-                        $contentMain   = new Content('text/plain', $plainText);
-                    }
-                }
-
-                // Sendgrid class requires to pass an TO email even if we do not have any general one
-                // Pass a dummy email and clear it in the next 2 lines
-                $to                    = 'dummy-email-to-be-deleted@example.com';
-                $mail                  = new Mail($from, $subject, $to, $contentMain);
-                $mail->personalization = [];
-
-                if ($contentSecond) {
-                    $mail->addContent($contentSecond);
-                }
-
-                return $mail;*/
+        return $mail;
     }
 
     /**

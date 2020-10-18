@@ -55,11 +55,12 @@ class MailgunMessage
      */
     public function getMessage(\Swift_Mime_SimpleMessage $message)
     {
+        dd('sss');
         $mail = $this->mailgunMailBase->getMailgundMail($message);
 
-        $this->mailgunMailPersonalization->addPersonalizedDataToMail($mail, $message);
-        $this->mailgundMailMetadata->addMetadataToMail($mail, $message);
-        $this->mailgunMailAttachment->addAttachmentsToMail($mail, $message);
+        //$this->mailgunMailPersonalization->addPersonalizedDataToMail($mail, $message);
+        //$this->mailgundMailMetadata->addMetadataToMail($mail, $message);
+        //$this->mailgunMailAttachment->addAttachmentsToMail($mail, $message);
 
         return $mail;
     }
