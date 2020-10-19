@@ -7,6 +7,7 @@
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ *
  */
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
@@ -15,46 +16,36 @@ use Aws\CommandPool;
 use Aws\Credentials\Credentials;
 use Aws\Exception\AwsException;
 use Aws\ResultInterface;
-use Aws\Ses\SesClient;
-use bandwidthThrottle\tokenBucket\BlockingConsumer;
-use bandwidthThrottle\tokenBucket\Rate;
-use bandwidthThrottle\tokenBucket\storage\SingleProcessStorage;
-use bandwidthThrottle\tokenBucket\storage\StorageException;
-use bandwidthThrottle\tokenBucket\TokenBucket;
-use Mautic\EmailBundle\MonitoredEmail\Message;
+use Aws\SesV2\Exception\SesV2Exception;
+use Aws\SesV2\SesV2Client;
+use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
 use Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class AmazonApiTransport.
- */
-class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_Transport, TokenTransportInterface, CallbackTransportInterface, BounceProcessorInterface, UnsubscriptionProcessorInterface
+class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_Transport, TokenTransportInterface, CallbackTransportInterface
 {
     /**
-     * @var string
+     * @var string|null
      */
     private $region;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $username;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $password;
 
     /**
-     * @var int
+     * @var TranslatorInterface
      */
-    private $concurrency;
-
-    /**
-     * @var SesClient
-     */
-    private $client;
+    private $translator;
 
     /**
      * @var LoggerInterface
@@ -62,44 +53,29 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     private $logger;
 
     /**
+     * @var SesV2Client
+     */
+    private $amazonClient;
+
+    /**
      * @var AmazonCallback
      */
     private $amazonCallback;
 
     /**
-     * @var BlockingConsumer
+     * @var int
      */
-    private $createTemplateBucketConsumer;
+    private $concurrency;
 
     /**
-     * @var BlockingConsumer
+     * @var Aws\CommandInterface | Psr\Http\Message\RequestInterface
      */
-    private $sendTemplateBucketConsumer;
+    private $handler;
 
     /**
-     * @var array
+     * @var bool
      */
-    private $templateCache;
-
-    /**
-     * AmazonApiTransport constructor.
-     */
-    public function __construct(LoggerInterface $logger, AmazonCallback $amazonCallback)
-    {
-        $this->logger         = $logger;
-        $this->amazonCallback = $amazonCallback;
-        $this->templateCache  = [];
-    }
-
-    public function __destruct()
-    {
-        if (count($this->templateCache)) {
-            $this->logger->debug('Deleting SES templates that were created in this session');
-            foreach ($this->templateCache as $templateName) {
-                $this->deleteSesTemplate($templateName);
-            }
-        }
-    }
+    private $debug = false;
 
     /**
      * @param string $region
@@ -111,11 +87,27 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
+     * @return string|null
+     */
+    public function getRegion()
+    {
+        return $this->region;
+    }
+
+    /**
      * @param $username
      */
     public function setUsername($username)
     {
         $this->username = $username;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getUsername()
+    {
+        return $this->username;
     }
 
     /**
@@ -127,111 +119,175 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
-     * SES authorization and choice of region
-     * Initializing of TokenBucket.
-     *
-     * @throws \Exception
+     * @return string|null
      */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
+     * @param $handler
+     */
+    public function setHandler($handler)
+    {
+        $this->handler = $handler;
+    }
+
+    /**
+     * @return object|null
+     */
+    public function getHandler()
+    {
+        return $this->handler;
+    }
+
+    /**
+     * @param $debug
+     */
+    public function setDebug($debug)
+    {
+        $this->debug = $debug;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getDebug()
+    {
+        return $this->debug;
+    }
+
+    public function __construct(
+        TranslatorInterface $translator,
+        AmazonCallback $amazonCallback,
+        LoggerInterface $logger
+    ) {
+        $this->amazonCallback    = $amazonCallback;
+        $this->translator        = $translator;
+        $this->logger            = $logger;
+    }
+
     public function start()
     {
-        if (!$this->started) {
-            $this->client = new SesClient([
-                'credentials' => new Credentials(
-                    $this->username,
-                    $this->password
-                ),
-                'region'  => $this->region,
-                'version' => '2010-12-01',
-                'http'    => [
-                    'verify'    => false,
-                ],
-            ]);
+        if (empty($this->region) || empty($this->username) || empty($this->password)) {
+            $this->throwException($this->translator->trans('mautic.email.api_key_required', [], 'validators'));
+        }
 
-            /**
-             * AWS SES has a limit of how many messages can be sent in a 24h time slot. The remaining messages are calculated
-             * from the api. The transport will fail when the quota is exceeded.
-             */
-            $quota               = $this->getSesSendQuota();
-            $this->concurrency   = floor($quota->get('MaxSendRate'));
-            $emailQuotaRemaining = $quota->get('Max24HourSend') - $quota->get('SentLast24Hours');
+        if (!$this->started) {
+            $this->amazonClient  = $this->createAmazonClient();
+
+            $account             = $this->amazonClient->getAccount();
+            $emailQuotaRemaining = $account->get('SendQuota')['Max24HourSend'] - $account->get('SendQuota')['SentLast24Hours'];
+
+            if (!$account->get('SendingEnabled')) {
+                $this->logger->error('Your AWS SES is not enabled for sending');
+                throw new \Exception('Your AWS SES is not enabled for sending');
+            }
+
+            if (!$account->get('ProductionAccessEnabled')) {
+                $this->logger->info('Your AWS SES is in sandbox mode, consider moving it to production state');
+            }
 
             if ($emailQuotaRemaining <= 0) {
-                $this->logger->error('Your AWS SES quota is currently exceeded, used '.$quota->get('SentLast24Hours').' of '.$quota->get('Max24HourSend'));
+                $this->logger->error('Your AWS SES quota is currently exceeded, used '.$account->get('SentLast24Hours').' of '.$account->get('Max24HourSend'));
                 throw new \Exception('Your AWS SES quota is currently exceeded');
             }
 
-            /*
-             * initialize throttle token buckets
-             */
-            $this->initializeThrottles();
+            $this->concurrency   = floor($account->get('SendQuota')['MaxSendRate']);
 
             $this->started = true;
         }
     }
 
+    public function createAmazonClient()
+    {
+        $config  = [
+            'version'     => '2019-09-27',
+            'region'      => $this->region,
+            'credentials' => new Credentials(
+                $this->username,
+                $this->password
+            ),
+        ];
+
+        if ($this->handler) {
+            $config['handler'] = $this->handler;
+        }
+
+        if ($this->debug) {
+            $config['debug'] = [
+                'logfn' => function ($msg) {
+                    $this->logger->debug($msg);
+                },
+                'http'        => true,
+                'stream_size' => '0',
+            ];
+        }
+
+        return new SesV2Client($config);
+    }
+
     /**
      * @param null $failedRecipients
      *
-     * @return int count of recipients
+     * @return int Number of messages sent
+     *
+     * @throws \Exception
      */
-    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
+    public function send(\Swift_Mime_SimpleMessage $toSendMessage, &$failedRecipients = null)
     {
-        $this->message = $message;
-
+        $this->message    = $toSendMessage;
         $failedRecipients = (array) $failedRecipients;
 
-        if ($evt = $this->getDispatcher()->createSendEvent($this, $message)) {
+        if ($evt = $this->getDispatcher()->createSendEvent($this, $toSendMessage)) {
             $this->getDispatcher()->dispatchEvent($evt, 'beforeSendPerformed');
             if ($evt->bubbleCancelled()) {
                 return 0;
             }
         }
-        $count = $this->getBatchRecipientCount($message);
-
-        /*
-         * If there is an attachment, send mail using sendRawEmail method
-         * current sendBulkTemplatedEmail method doesn't support attachments
-         */
-        if (!empty($message->getAttachments())) {
-            return $this->sendRawEmail($message, $evt, $failedRecipients);
-        }
-
-        list($amazonTemplate, $amazonMessage) = $this->constructSesTemplateAndMessage($message);
+        $count = $this->getBatchRecipientCount($toSendMessage);
 
         try {
             $this->start();
-
-            $this->createSesTemplate($amazonTemplate);
-
-            $this->sendSesBulkTemplatedEmail($count, $amazonMessage);
-
-            if ($evt) {
-                $evt->setResult(\Swift_Events_SendEvent::RESULT_SUCCESS);
-                $evt->setFailedRecipients($failedRecipients);
-                $this->getDispatcher()->dispatchEvent($evt, 'sendPerformed');
+            $commands = [];
+            foreach ($this->getAmazonMessage($toSendMessage) as $rawEmail) {
+                $commands[] = $this->amazonClient->getCommand('sendEmail', $rawEmail);
             }
+            $pool = new CommandPool($this->amazonClient, $commands, [
+                'concurrency' => $this->concurrency,
+                'fulfilled'   => function (ResultInterface $result, $iteratorId) use ($evt, $failedRecipients) {
+                    if ($evt) {
+                        // $this->logger->info("SES Result: " . $result->get('MessageId'));
+                        $evt->setResult(\Swift_Events_SendEvent::RESULT_SUCCESS);
+                        $evt->setFailedRecipients($failedRecipients);
+                        $this->getDispatcher()->dispatchEvent($evt, 'sendPerformed');
+                    }
+                },
+                'rejected' => function (AwsException $reason, $iteratorId) use ($evt) {
+                    $failedRecipients = [];
+                    $this->triggerSendError($evt, $failedRecipients, $reason->getAwsErrorMessage());
+                },
+            ]);
+            $promise = $pool->promise();
+            $promise->wait();
 
-            return $count;
-        } catch (AwsException $e) {
-            $this->triggerSendError($evt, $failedRecipients);
-            $message->generateId();
-
-            $this->throwException($e->getAwsErrorMessage());
+            return count($commands);
+        } catch (SesV2Exception $e) {
+            $this->triggerSendError($evt, $failedRecipients, $e->getMessage());
+            $this->throwException($e->getMessage());
         } catch (\Exception $e) {
-            $this->triggerSendError($evt, $failedRecipients);
-            $message->generateId();
-
+            $this->triggerSendError($evt, $failedRecipients, $e->getMessage());
             $this->throwException($e->getMessage());
         }
 
-        return 0;
+        return 1;
     }
 
-    /**
-     * @param array $failedRecipients
-     */
-    private function triggerSendError(\Swift_Events_SendEvent $evt, &$failedRecipients)
+    private function triggerSendError(\Swift_Events_SendEvent $evt, &$failedRecipients, $reason)
     {
+        $this->logger->error('SES API Error: '.$reason);
+
         $failedRecipients = array_merge(
             $failedRecipients,
             array_keys((array) $this->message->getTo()),
@@ -246,404 +302,177 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         }
     }
 
-    /**
-     * Initialize the token buckets for throttling.
+    /*
+     * @return array Amazon Send Message
      *
      * @throws \Exception
      */
-    private function initializeThrottles()
+    public function getAmazonMessage(\Swift_Mime_SimpleMessage $toSendMessage)
     {
-        try {
+        /**
+         * Three ways to send the email
+         * Simple:  A standard email message. When you create this type of message, you specify the sender, the recipient, and the message body, and Amazon SES assembles the message for you.
+         * Raw : A raw, MIME-formatted email message. When you send this type of email, you have to specify all of the message headers, as well as the message body. You can use this message type to send messages that contain attachments. The message that you specify has to be a valid MIME message.
+         * Template: A message that contains personalization tags. When you send this type of email, Amazon SES API v2 automatically replaces the tags with values that you specify.
+         *
+         * In Mautic we need to use RAW all the time because we inject custom headers all the time, so templates and simple are not useful
+         * If in the future AWS allow custom headers in templates or simple emails we should consider them
+         *
+         * Since we are using SES RAW method, we need to create a seperate message each time we send out an email
+         * In case SES changes their API this is the only function that needs to be changed to accomrdate sending a template
+         */
+        $this->message    = $message;
+        $metadata         = $this->getMetadata();
+        $emailBody        = $this->message->getBody();
+        $emailSubject     = $this->message->getSubject();
+        $emailText        = PlainTextMessageHelper::getPlainTextFromMessage($this->message);
+        $sesArray         = [];
+
+        if (empty($metadata)) {
             /**
-             * SES limits creating templates to approximately one per second.
+             * This is a queued message, all the information are included
+             * in the $message object
+             * just construct the $sesArray.
              */
-            $storageCreate                      = new SingleProcessStorage();
-            $rateCreate                         = new Rate(1, Rate::SECOND);
-            $bucketCreate                       = new TokenBucket(1, $rateCreate, $storageCreate);
-            $this->createTemplateBucketConsumer = new BlockingConsumer($bucketCreate);
-            $bucketCreate->bootstrap(1);
+            $from      = $message->getFrom();
+            $fromEmail = current(array_keys($from));
+            $fromName  = $from[$fromEmail];
 
+            $sesArray['FromEmailAddress'] =  (!empty($fromName)) ? $fromName.' <'.$fromEmail.'>' : $fromEmail;
+            $to                           = $message->getTo();
+            if (!empty($to)) {
+                $sesArray['Destination']['ToAddresses'] = array_keys($to);
+            }
+
+            $cc = $message->getCc();
+            if (!empty($cc)) {
+                $sesArray['Destination']['CcAddresses'] = array_keys($cc);
+            }
+            $bcc = $message->getBcc();
+            if (!empty($bcc)) {
+                $sesArray['Destination']['BccAddresses'] = array_keys($bcc);
+            }
+            $replyTo = $message->getReplyTo();
+            if (!empty($replyTo)) {
+                $sesArray['ReplyToAddresses'] = [key($replyTo)];
+            }
+            $headers            = $message->getHeaders();
+            if ($headers->has('X-SES-CONFIGURATION-SET')) {
+                $sesArray['ConfigurationSetName'] = $headers->get('X-SES-CONFIGURATION-SET');
+            }
+
+            $sesArray['Content']['Raw']['Data'] = $message->toString();
+            yield $sesArray;
+        } else {
             /**
-             * SES limits sending emails based on requested account-level limits.
+             * This is a message with tokens.
              */
-            $storageSend                      = new SingleProcessStorage();
-            $rateSend                         = new Rate($this->concurrency, Rate::SECOND);
-            $bucketSend                       = new TokenBucket($this->concurrency, $rateSend, $storageSend);
-            $this->sendTemplateBucketConsumer = new BlockingConsumer($bucketSend);
-            $bucketSend->bootstrap($this->concurrency);
-        } catch (\InvalidArgumentException $e) {
-            $this->logger->error('error configuring token buckets: '.$e->getMessage());
-            throw new \Exception($e->getMessage());
-        } catch (StorageException $e) {
-            $this->logger->error('error bootstrapping token buckets: '.$e->getMessage());
-            throw new \Exception($e->getMessage());
-        } catch (\Exception $e) {
-            $this->logger->error('error initializing token buckets: '.$e->getMessage());
-            throw $e;
-        }
-    }
+            $mauticTokens  = [];
+            $metadataSet   = reset($metadata);
+            $tokens        = (!empty($metadataSet['tokens'])) ? $metadataSet['tokens'] : [];
+            $mauticTokens  = array_keys($tokens);
+            foreach ($metadata as $recipient => $mailData) {
+                // Reset the parts of the email that has tokens
+                $this->message->setSubject($emailSubject);
+                $this->message->setBody($emailBody);
+                $this->setPlainTextToMessage($this->message, $emailText);
+                // Convert the message to array to get the values
+                $tokenizedMessage                                = $this->messageToArray($mauticTokens, $mailData['tokens'], false);
+                $toSendMessage                                   = (new \Swift_Message());
+                $toSendMessage->setSubject($tokenizedMessage['subject']);
+                $toSendMessage->setFrom([$tokenizedMessage['from']['email'] => $tokenizedMessage['from']['name']]);
+                $sesArray['FromEmailAddress'] =  (!empty($tokenizedMessage['from']['name'])) ? $tokenizedMessage['from']['name'].' <'.$tokenizedMessage['from']['email'].'>' : $tokenizedMessage['from']['email'];
+                $toSendMessage->setTo([$recipient]);
+                $sesArray['Destination']['ToAddresses'] = [$recipient];
+                if (isset($tokenizedMessage['text']) && strlen($tokenizedMessage['text']) > 0) {
+                    $toSendMessage->addPart($tokenizedMessage['text'], 'text/plain');
+                }
 
-    /**
-     * Retrieve the send quota from SES.
-     *
-     * @return \Aws\Result
-     *
-     * @throws \Exception
-     *
-     * @see https://docs.aws.amazon.com/ses/latest/APIReference/API_GetSendQuota.html
-     */
-    private function getSesSendQuota()
-    {
-        $this->logger->debug('Retrieving SES quota');
-        try {
-            return $this->client->getSendQuota();
-        } catch (AwsException $e) {
-            $this->logger->error('Error retrieving AWS SES quota info: '.$e->getMessage());
-            throw new \Exception($e->getMessage());
-        }
-    }
-
-    /**
-     * @param array $template
-     *
-     * @return \Aws\Result|null
-     *
-     * @throws \Exception
-     *
-     * @see https://docs.aws.amazon.com/ses/latest/APIReference/API_CreateTemplate.html
-     */
-    private function createSesTemplate($template)
-    {
-        $templateName = $template['TemplateName'];
-
-        $this->logger->debug('Creating SES template: '.$templateName);
-
-        /*
-         * reuse an existing template if we have created one
-         */
-        if (false !== array_search($templateName, $this->templateCache)) {
-            $this->logger->debug('Template '.$templateName.' already exists in cache');
-
-            return null;
-        }
-
-        /*
-         * wait for a throttle token
-         */
-        $this->createTemplateBucketConsumer->consume(1);
-
-        try {
-            $result = $this->client->createTemplate(['Template' => $template]);
-        } catch (AwsException $e) {
-            switch ($e->getAwsErrorCode()) {
-                case 'AlreadyExists':
-                    $this->logger->debug('\Exception creating template: '.$templateName.', '.$e->getAwsErrorCode().', '.$e->getAwsErrorMessage().', ignoring');
-                    break;
-                default:
-                    $this->logger->error('\Exception creating template: '.$templateName.', '.$e->getAwsErrorCode().', '.$e->getAwsErrorMessage());
-                    throw new \Exception($e->getMessage());
-            }
-        }
-
-        /*
-         * store the name of this template so that we can delete it when we are done sending
-         */
-        $this->templateCache[] = $templateName;
-
-        return $result;
-    }
-
-    /**
-     * @param string $templateName
-     *
-     * @return \Aws\Result
-     *
-     * @throws \Exception
-     *
-     * @see https://docs.aws.amazon.com/ses/latest/APIReference/API_DeleteTemplate.html
-     */
-    private function deleteSesTemplate($templateName)
-    {
-        $this->logger->debug('Deleting SES template: '.$templateName);
-
-        try {
-            return $this->client->deleteTemplate(['TemplateName' => $templateName]);
-        } catch (AwsException $e) {
-            $this->logger->error('\Exception deleting template: '.$templateName.', '.$e->getAwsErrorCode().', '.$e->getAwsErrorMessage());
-            throw new \Exception($e->getMessage());
-        }
-    }
-
-    /**
-     * @param int   $count   number of recipients for us to consume from the ticket bucket
-     * @param array $message
-     *
-     * @return \Aws\Result
-     *
-     * @throws \Exception
-     *
-     * @see https://docs.aws.amazon.com/ses/latest/APIReference/API_SendBulkTemplatedEmail.html
-     */
-    private function sendSesBulkTemplatedEmail($count, $message)
-    {
-        $this->logger->debug('Sending SES template: '.$message['Template'].' to '.$count.' recipients');
-
-        // wait for a throttle token
-        $this->sendTemplateBucketConsumer->consume($count);
-
-        try {
-            return $this->client->sendBulkTemplatedEmail($message);
-        } catch (AwsException $e) {
-            $this->logger->error('\Exception sending email template: '.$e->getAwsErrorCode().', '.$e->getAwsErrorMessage());
-            throw new \Exception($e->getMessage());
-        }
-    }
-
-    /**
-     * Parse message into a template and recipients with their respective replacement tokens.
-     *
-     * @return array of a template and a message
-     */
-    private function constructSesTemplateAndMessage(\Swift_Mime_SimpleMessage $message)
-    {
-        $this->message = $message;
-        $metadata      = $this->getMetadata();
-        $messageArray  = [];
-
-        if (!empty($metadata)) {
-            $metadataSet  = reset($metadata);
-            $emailId      = $metadataSet['emailId'];
-            $tokens       = (!empty($metadataSet['tokens'])) ? $metadataSet['tokens'] : [];
-            $mauticTokens = array_keys($tokens);
-            $tokenReplace = $amazonTokens = [];
-            foreach ($tokens as $search => $token) {
-                $tokenKey              = preg_replace('/[^\da-z]/i', '_', trim($search, '{}'));
-                $tokenReplace[$search] = '{{'.$tokenKey.'}}';
-                $amazonTokens[$search] = $tokenKey;
-            }
-            $messageArray = $this->messageToArray($mauticTokens, $tokenReplace, true);
-        }
-
-        $CcAddresses = [];
-        if (count($messageArray['recipients']['cc']) > 0) {
-            $CcAddresses = array_keys($messageArray['recipients']['cc']);
-        }
-
-        $BccAddresses = [];
-        if (count($messageArray['recipients']['bcc']) > 0) {
-            $BccAddresses = array_keys($messageArray['recipients']['bcc']);
-        }
-
-        $replyToAddresses = [];
-        if (isset($messageArray['replyTo']['email'])) {
-            $replyToAddresses = [$messageArray['replyTo']['email']];
-        }
-
-        $ConfigurationSetName = null;
-        if (isset($messageArray['headers']['X-SES-CONFIGURATION-SET'])) {
-            $ConfigurationSetName = $messageArray['headers']['X-SES-CONFIGURATION-SET'];
-        }
-
-        //build amazon ses template array
-        $amazonTemplate = [
-            'TemplateName' => 'MauticTemplate-'.$emailId.'-'.md5($messageArray['subject'].$messageArray['html'].'-'.getmypid()), //unique template name
-            'SubjectPart'  => $messageArray['subject'],
-            'TextPart'     => $messageArray['text'],
-            'HtmlPart'     => $messageArray['html'],
-        ];
-
-        $destinations = [];
-        foreach ($metadata as $recipient => $mailData) {
-            $ReplacementTemplateData = [];
-            foreach ($mailData['tokens'] as $token => $tokenData) {
-                $ReplacementTemplateData[$amazonTokens[$token]] = $tokenData;
-            }
-
-            $destinations[] = [
-                'Destination' => [
-                    'BccAddresses' => $BccAddresses,
-                    'CcAddresses'  => $CcAddresses,
-                    'ToAddresses'  => [$recipient],
-                ],
-                'ReplacementTemplateData' => \GuzzleHttp\json_encode($ReplacementTemplateData),
-            ];
-        }
-
-        //build amazon ses message array
-        $amazonMessage = [
-            'ConfigurationSetName' => $ConfigurationSetName,
-            'DefaultTemplateData'  => $destinations[0]['ReplacementTemplateData'],
-            'Destinations'         => $destinations,
-            'Source'               => $messageArray['from']['email'],
-            'ReplyToAddresses'     => $replyToAddresses,
-            'Template'             => $amazonTemplate['TemplateName'],
-        ];
-
-        if (isset($messageArray['returnPath'])) {
-            $amazonMessage['ReturnPath'] = $messageArray['returnPath'];
-        }
-
-        if (isset($messageArray['from']['name']) && '' !== trim($messageArray['from']['name'])) {
-            $amazonMessage['Source'] = '"'.$messageArray['from']['name'].'" <'.$messageArray['from']['email'].'>';
-        }
-
-        return [$amazonTemplate, $amazonMessage];
-    }
-
-    /**
-     * @param \Swift_Events_SendEvent @evt
-     * @param null $failedRecipients
-     *
-     * @return int
-     */
-    public function sendRawEmail(\Swift_Mime_SimpleMessage $message, \Swift_Events_SendEvent $evt, &$failedRecipients = null)
-    {
-        try {
-            $this->start();
-            $commands = [];
-            foreach ($this->getAmazonMessage($message) as $rawEmail) {
-                $commands[] = $this->client->getCommand('sendRawEmail', $rawEmail);
-            }
-            $pool = new CommandPool($this->client, $commands, [
-                'concurrency' => $this->concurrency,
-                'fulfilled'   => function (ResultInterface $result, $iteratorId) use ($evt, $failedRecipients) {
-                    if ($evt) {
-                        $evt->setResult(\Swift_Events_SendEvent::RESULT_SUCCESS);
-                        $evt->setFailedRecipients($failedRecipients);
-                        $this->getDispatcher()->dispatchEvent($evt, 'sendPerformed');
+                if (isset($tokenizedMessage['html']) && strlen($tokenizedMessage['html']) > 0) {
+                    $toSendMessage->addPart($tokenizedMessage['html'], 'text/html');
+                }
+                if (isset($tokenizedMessage['headers'])) {
+                    $headers = $toSendMessage->getHeaders();
+                    foreach ($tokenizedMessage['headers'] as $key => $value) {
+                        $headers->addTextHeader($key, $value);
                     }
-                },
-                'rejected' => function (AwsException $reason, $iteratorId) use ($evt) {
-                    $failedRecipients = [];
-                    $this->triggerSendError($evt, $failedRecipients);
-                },
-            ]);
-            $promise = $pool->promise();
-            $promise->wait();
+                }
 
-            return count($commands);
-        } catch (\Exception $e) {
-            $this->triggerSendError($evt, $failedRecipients);
-            $message->generateId();
-            $this->throwException($e->getMessage());
-        }
+                if (count($tokenizedMessage['recipients']['cc']) > 0) {
+                    $cc = array_keys($tokenizedMessage['recipients']['cc']);
+                    $toSendMessage->setCc($cc);
+                    $sesArray['Destination']['CcAddresses'] = $cc;
+                }
 
-        return 1;
-    }
+                if (count($tokenizedMessage['recipients']['bcc']) > 0) {
+                    $bcc = array_keys($tokenizedMessage['recipients']['bcc']);
+                    $toSendMessage->setBcc($bcc);
+                    $sesArray['Destination']['BccAddresses'] = $bcc;
+                }
 
-    /**
-     * @return array
-     */
-    public function getAmazonMessage(\Swift_Mime_SimpleMessage $message)
-    {
-        $this->message = $message;
-        $metadata      = $this->getMetadata();
-        $emailBody     = $this->message->getBody();
+                if (isset($tokenizedMessage['replyTo'])) {
+                    $toSendMessage->setReplyTo([$tokenizedMessage['replyTo']['email']]);
+                    $sesArray['ReplyToAddresses'] = [$tokenizedMessage['replyTo']['email']];
+                }
+                if (isset($tokenizedMessage['headers']['X-SES-CONFIGURATION-SET'])) {
+                    $sesArray['ConfigurationSetName'] = $tokenizedMessage['headers']['X-SES-CONFIGURATION-SET'];
+                }
 
-        if (!empty($metadata)) {
-            $metadataSet  = reset($metadata);
-            $tokens       = (!empty($metadataSet['tokens'])) ? $metadataSet['tokens'] : [];
-            $mauticTokens = array_keys($tokens);
-        }
-
-        foreach ($metadata as $recipient => $mailData) {
-            $this->message->setBody($emailBody);
-            $msg        = $this->messageToArray($mauticTokens, $mailData['tokens'], true);
-            $rawMessage = $this->buildRawMessage($msg, $recipient);
-            $payload    = [
-                'Source'       => $msg['from']['email'],
-                'Destinations' => [$recipient],
-                'RawMessage'   => [
-                    'Data' => $rawMessage,
-                ],
-            ];
-
-            yield $payload;
-        }
-    }
-
-    /**
-     * @param $msg
-     * @param $recipient
-     *
-     * @return string
-     */
-    public function buildRawMessage($msg, $recipient)
-    {
-        $separator           = md5(time());
-        $separator_multipart = md5($msg['subject'].time());
-        $message             = "MIME-Version: 1.0\n";
-        $message .= 'Subject: '.$msg['subject']."\n";
-        $message .= 'From: '.$msg['from']['name'].' <'.$msg['from']['email'].">\n";
-        $message .= "To: $recipient\n";
-        if (count($msg['recipients']['cc']) > 0) {
-            $message .= 'Cc: '.implode(',', array_keys($msg['recipients']['cc']))."\n";
-        }
-        if (count($msg['recipients']['bcc']) > 0) {
-            $message .= 'Bcc: '.implode(',', array_keys($msg['recipients']['bcc']))."\n";
-        }
-        if (isset($msg['replyTo'])) {
-            $message .= 'Reply-To: '.$msg['replyTo']['email']."\n";
-        }
-        if (isset($msg['returnPath'])) {
-            $message .= 'Return-Path: '.$msg['returnPath']."\n";
-        }
-        $message .= "Content-Type: multipart/mixed; boundary=\"$separator_multipart\"\n";
-        if (isset($msg['headers'])) {
-            foreach ($msg['headers'] as $key => $value) {
-                $message .= "$key: ".$value."\n";
+                if (count($tokenizedMessage['file_attachments']) > 0) {
+                    foreach ($tokenizedMessage['file_attachments'] as $attachment) {
+                        $fileAttach = \Swift_Attachment::fromPath($attachment['filePath']);
+                        $fileAttach->setFilename($attachment['fileName']);
+                        $fileAttach->setContentType($attachment['contentType']);
+                        $toSendMessage->attach($fileAttach);
+                    }
+                }
+                if (count($tokenizedMessage['binary_attachments']) > 0) {
+                    foreach ($tokenizedMessage['binary_attachments'] as $attachment) {
+                        $fileAttach = new \Swift_Attachment($attachment['content'], $attachment['name'], $attachment['type']);
+                        $toSendMessage->attach($fileAttach);
+                    }
+                }
+                $sesArray['Content']['Raw']['Data'] = $toSendMessage->toString();
+                yield $sesArray;
             }
         }
-        $message .= "\n--$separator_multipart\n";
-
-        $message .= "Content-Type: multipart/alternative; boundary=\"$separator\"\n";
-        if (isset($msg['text']) && strlen($msg['text']) > 0) {
-            $message .= "\n--$separator\n";
-            $message .= "Content-Type: text/plain; charset=\"UTF-8\"\n";
-            $message .= "Content-Transfer-Encoding: base64\n";
-            $message .= "\n".wordwrap(base64_encode($msg['text']), 78, "\n", true)."\n";
-        }
-        $message .= "\n--$separator\n";
-        $message .= "Content-Type: text/html; charset=\"UTF-8\"\n";
-        $message .= "\n".$msg['html']."\n";
-        $message .= "\n--$separator--\n";
-
-        foreach ($msg['attachments'] as $attachment) {
-            $message .= "--$separator_multipart\n";
-            $message .= 'Content-Type: '.$attachment['type'].'; name="'.$attachment['name']."\"\n";
-            $message .= 'Content-Disposition: attachment; filename="'.$attachment['name']."\"\n";
-            $message .= "Content-Transfer-Encoding: base64\n";
-            $message .= "\n".$attachment['content']."\n";
-        }
-
-        return $message."--$separator_multipart--";
     }
 
     /**
-     * Return the max number of to addresses allowed per batch.
+     * Set plain text to a message.
      *
+     * @return bool
+     */
+    private function setPlainTextToMessage(\Swift_Mime_SimpleMessage $message, $text)
+    {
+        $children = (array) $message->getChildren();
+
+        foreach ($children as $child) {
+            $childType = $child->getContentType();
+            if ('text/plain' === $childType && $child instanceof \Swift_MimePart) {
+                $child->setBody($text);
+            }
+        }
+    }
+
+    /**
      * @return int
-     *
-     * @see https://docs.aws.amazon.com/ses/latest/DeveloperGuide/quotas.html
      */
     public function getMaxBatchLimit()
     {
-        return 50;
+        return 0;
     }
 
     /**
-     * Get the count for the max number of recipients per batch.
-     *
-     * @param int    $toBeAdded Number of emails about to be added
-     * @param string $type      Type of emails being added (to, cc, bcc)
-     *
-     * @return int
+     * @param int    $toBeAdded
+     * @param string $type
      */
-    public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
+    public function getBatchRecipientCount(\Swift_Message $toSendMessage, $toBeAdded = 1, $type = 'to'): int
     {
-        $toCount  = is_countable($message->getTo()) ? count($message->getTo()) : 0;
-        $ccCount  = is_countable($message->getCc()) ? count($message->getCc()) : 0;
-        $bccCount = is_countable($message->getBcc()) ? count($message->getBcc()) : 0;
+        // These getters could return null
+        $toCount  = $toSendMessage->getTo() ? count($toSendMessage->getTo()) : 0;
+        $ccCount  = $toSendMessage->getCc() ? count($toSendMessage->getCc()) : 0;
+        $bccCount = $toSendMessage->getBcc() ? count($toSendMessage->getBcc()) : 0;
 
         return $toCount + $ccCount + $bccCount + $toBeAdded;
     }
@@ -651,7 +480,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     /**
      * Returns a "transport" string to match the URL path /mailer/{transport}/callback.
      *
-     * @return string
+     * @return mixed
      */
     public function getCallbackPath()
     {
@@ -659,20 +488,18 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
-     * Handle bounces & complaints from Amazon.
+     * Handle response.
      */
     public function processCallbackRequest(Request $request)
     {
         $this->amazonCallback->processCallbackRequest($request);
     }
 
-    public function processBounce(Message $message)
+    /**
+     * @return bool
+     */
+    public function ping()
     {
-        $this->amazonCallback->processBounce($message);
-    }
-
-    public function processUnsubscription(Message $message)
-    {
-        $this->amazonCallback->processUnsubscription($message);
+        return true;
     }
 }
