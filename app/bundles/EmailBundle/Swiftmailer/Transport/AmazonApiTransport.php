@@ -307,7 +307,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
      *
      * @throws \Exception
      */
-    public function getAmazonMessage(\Swift_Mime_SimpleMessage $toSendMessage)
+    public function getAmazonMessage(\Swift_Mime_SimpleMessage $message)
     {
         /**
          * Three ways to send the email
@@ -325,7 +325,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         $metadata         = $this->getMetadata();
         $emailBody        = $this->message->getBody();
         $emailSubject     = $this->message->getSubject();
-        $emailText        = PlainTextMessageHelper::getPlainTextFromMessage($this->message);
+        $emailText        = PlainTextMessageHelper::getPlainTextFromMessage($message);
         $sesArray         = [];
 
         if (empty($metadata)) {
