@@ -454,7 +454,7 @@ class PageModel extends FormModel
         }
 
         // Process the query
-        if (empty($query)) {
+        if (empty($query) || !is_array($query)) {
             $query = $this->getHitQuery($request, $page);
         }
 
@@ -765,10 +765,8 @@ class PageModel extends FormModel
 
     /**
      * @param Redirect|Page|null $page
-     *
-     * @return array
      */
-    public function getHitQuery(Request $request, $page = null)
+    public function getHitQuery(Request $request, $page = null): array
     {
         $get  = $request->query->all();
         $post = $request->request->all();
