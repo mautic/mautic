@@ -12,21 +12,24 @@ trait TranslationEntityTrait
      * Set by AbstractCommonModel::getEntityBySlugs() if a language slug was used to fetch the entity.
      *
      * @var string
+     *
+     * @Groups({"page:read", "download:read", "email:read"})
      */
     public $languageSlug;
 
     /**
-     * @var mixed
+     * @var ArrayCollection
+     *
+     * @Groups({"page:read", "download:read", "email:read"})
      **/
     private $translationChildren;
 
-    /**
-     * @var mixed
-     **/
     private $translationParent;
 
     /**
      * @var string
+     *
+     * @Groups({"page:read", "download:read", "email:read"})
      */
     private $language = 'en';
 
@@ -77,7 +80,7 @@ trait TranslationEntityTrait
     /**
      * Get translated items.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection
      */
     public function getTranslationChildren()
     {
@@ -89,7 +92,7 @@ trait TranslationEntityTrait
      *
      * @return $this
      */
-    public function setTranslationParent(TranslationEntityInterface $parent = null)
+    public function setTranslationParent(?TranslationEntityInterface $parent = null)
     {
         if (method_exists($this, 'isChanged')) {
             $this->isChanged('translationParent', $parent);
@@ -102,8 +105,6 @@ trait TranslationEntityTrait
 
     /**
      * Get translation parent.
-     *
-     * @return mixed
      */
     public function getTranslationParent()
     {
@@ -193,7 +194,7 @@ trait TranslationEntityTrait
      *
      * @param bool $onlyChildren
      *
-     * @return array|\Doctrine\Common\Collections\ArrayCollection
+     * @return array|ArrayCollection
      */
     public function getTranslations($onlyChildren = false)
     {
@@ -220,9 +221,6 @@ trait TranslationEntityTrait
         return [$parent, $children];
     }
 
-    /**
-     * @return mixed
-     */
     protected function getAccumulativeTranslationCount($getter, $variantParent = null)
     {
         $count = 0;
