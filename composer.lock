@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bcfd058cb626a4ddb81454306b8bfb94",
+    "content-hash": "f83c30599d78dd304fcfdd29102b9993",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -1670,16 +1670,16 @@
         },
         {
             "name": "doctrine/orm",
-            "version": "v2.7.1",
+            "version": "v2.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/orm.git",
-                "reference": "445796af0e873d9bd04f2502d322a7d5009b6846"
+                "reference": "4d763ca4c925f647b248b9fa01b5f47aa3685d62"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/orm/zipball/445796af0e873d9bd04f2502d322a7d5009b6846",
-                "reference": "445796af0e873d9bd04f2502d322a7d5009b6846",
+                "url": "https://api.github.com/repos/doctrine/orm/zipball/4d763ca4c925f647b248b9fa01b5f47aa3685d62",
+                "reference": "4d763ca4c925f647b248b9fa01b5f47aa3685d62",
                 "shasum": ""
             },
             "require": {
@@ -1692,7 +1692,6 @@
                 "doctrine/instantiator": "^1.3",
                 "doctrine/persistence": "^1.2",
                 "ext-pdo": "*",
-                "ocramius/package-versions": "^1.2",
                 "php": "^7.1",
                 "symfony/console": "^3.0|^4.0|^5.0"
             },
@@ -1750,7 +1749,7 @@
                 "database",
                 "orm"
             ],
-            "time": "2020-02-15T14:35:56+00:00"
+            "time": "2019-11-19T08:38:05+00:00"
         },
         {
             "name": "doctrine/persistence",
@@ -13466,6 +13465,7 @@
             "keywords": [
                 "tokenizer"
             ],
+            "abandoned": true,
             "time": "2019-09-17T06:23:10+00:00"
         },
         {
