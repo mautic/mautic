@@ -357,10 +357,6 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function testRequestQueryAllAndHandle()
-    {
-    }
-
     /**
      * @testdox Test that a backslash and a single quote are escaped for SF queries
      *
