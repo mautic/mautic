@@ -575,11 +575,10 @@ ul{height:115px}#report_filters
 auto;background:#fff}.mautic-logo > svg.mautic-logo-figure
 .circle{fill:#4e5e9e}.mautic-logo > svg.mautic-logo-figure .m,
 .mautic-logo > svg.mautic-logo-figure .m-arrow{fill:#fdb933}input:-webkit-autofill{-webkit-box-shadow:0 0 0px 1000px white inset}span.input-group-addon
-i.fa{width:20px}.inline-login .login-form{margin:20px}.citrix-start-button{font-size:16px;color:#fff;text-decoration:none;border-radius:3px;padding:12px
-18px;background-color:#4e5e9e;display:inline-block}.focus-builder .website-preview .viewport-switcher{position:absolute;left:0;top:75px;z-index:1025}.focus-builder .website-preview .viewport-switcher .btn-viewport{height:50px;width:50px;display:table}.focus-builder .website-preview .viewport-switcher .btn-viewport
+i.fa{width:20px}.inline-login .login-form{margin:20px}.focus-builder .website-preview .viewport-switcher{position:absolute;left:0;top:75px;z-index:1025}.focus-builder .website-preview .viewport-switcher .btn-viewport{height:50px;width:50px;display:table}.focus-builder .website-preview .viewport-switcher .btn-viewport
 i{display:table-cell;vertical-align:middle}.focus-builder .website-preview .website-placeholder{z-index:1020}.focus-builder .website-preview .website-placeholder.has-error input, .focus-builder .website-preview .website-placeholder.has-error
 button{border-color:#a94442}.focus-builder
-#websiteScreenshot{position:absolute;top:0;bottom:0;right:0;left:0;margin:auto;z-index:0}.focus-builder #websiteScreenshot.css-device .screenshot-container{height:392px}.builder-panel-focus{overflow-y:scroll}.builder-panel-focus
+#websiteScreenshot{position:absolute;top:0;bottom:0;right:0;left:0;margin:auto}.focus-builder #websiteScreenshot.css-device .screenshot-container{height:392px}.builder-panel-focus{overflow-y:scroll}.builder-panel-focus
 #focusFormContent{min-height:1000px}.builder-panel-focus .panel-title
 a{display:block}.builder-panel-focus .nav>li>a{padding:8px
 16px}.builder-panel-focus .focus-hide{display:none}.builder-panel-focus .focus-style.list-group-item,
@@ -590,4 +589,5 @@ auto}.css-device__image{display:block;margin:0;padding:0;width:100%;height:auto}
 #websiteCanvas{margin:0;padding:0;border:none;overflow:hidden;pointer-events:none;position:absolute;z-index:2;left:-50%;width:320px;height:568px}#websiteScreenshot.mobile
 #websiteCanvas{z-index:0;border:1px
 solid #000}#websiteScreenshot.mobile  #websiteCanvas
-iframe{height:100%;width:320px;border:0}
+iframe{height:100%;width:320px;border:0}.citrix-start-button{font-size:16px;color:#fff;text-decoration:none;border-radius:3px;padding:12px
+18px;background-color:#4e5e9e;display:inline-block}
