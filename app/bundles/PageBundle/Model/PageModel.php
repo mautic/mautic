@@ -1164,7 +1164,7 @@ class PageModel extends FormModel
      *
      * @return array
      */
-    private function cleanQuery($query)
+    private function cleanQuery(array $query): array
     {
         foreach ($query as $key => $value) {
             if (filter_var($value, FILTER_VALIDATE_URL)) {
