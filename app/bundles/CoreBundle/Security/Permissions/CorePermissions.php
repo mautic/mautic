@@ -511,10 +511,9 @@ class CorePermissions
             throw new \InvalidArgumentException("Permission class not found for {$class} in permissions classes");
         }
 
-        $permissionClass  = $this->getPermissionClasses()[$class];
-        $permissionObject = new $permissionClass($this->getParams());
+        $permissionClass = $this->getPermissionClasses()[$class];
 
-        return $permissionObject;
+        return new $permissionClass($this->getParams());
     }
 
     /**

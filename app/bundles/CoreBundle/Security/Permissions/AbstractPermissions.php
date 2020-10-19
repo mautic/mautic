@@ -396,7 +396,7 @@ abstract class AbstractPermissions
      */
     protected function getLabel($bundle, $level)
     {
-        return ($level == 'categories') ? 'mautic.category.permissions.categories' : "mautic.$bundle.permissions.$level";
+        return ('categories' === $level) ? 'mautic.category.permissions.categories' : "mautic.{$bundle}.permissions.{$level}";
     }
 
     /**
