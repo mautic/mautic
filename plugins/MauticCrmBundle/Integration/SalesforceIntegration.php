@@ -430,10 +430,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $mauticObjectReference = null;
         $integrationMapping    = [];
 
-
         $DNCUpdates = [];
         if (isset($data['records']) and 'Activity' !== $object) {
-
             foreach ($data['records'] as $record) {
                 $this->logger->debug('SALESFORCE: amendLeadDataBeforeMauticPopulate record '.var_export($record, true));
                 if (isset($params['progress'])) {
@@ -1047,14 +1045,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $userRepository = $this->getEntityManager()->getRepository(User::class);
         $adminRole      = $this->getEntityManager()->getRepository('MauticUserBundle:Role')->findOneBy(['isAdmin' => true]);
 
-        $admins = $userRepository->findBy(
+        return $userRepository->findBy(
             [
                 'role'        => $adminRole,
                 'isPublished' => true,
             ]
         );
-
-        return $admins;
     }
 
     /**
@@ -2847,7 +2843,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
             } elseif ($newDncValue == false) {
                 $this->doNotContact->removeDncForContact($lead->getId(), 'email', true);
             }
-
         }
     }
 
