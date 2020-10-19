@@ -8,9 +8,6 @@ dist: bionic
 services:
   - mysql
 
-php:
-  - 7.2
-
 cache:
   directories:
     - "${HOME}/.composer/cache"
@@ -23,6 +20,9 @@ env:
 jobs:
   include:
     - stage: test
+      name: "PHP 7.2"
+      php: 7.2
+    -
       name: "MariaDB, PHP 7.2"
       php: 7.2
       env: DB="mariadb"
@@ -46,7 +46,7 @@ jobs:
         bin/php-cs-fixer fix --config=.php_cs -v --dry-run --using-cache=no --show-progress=dots \
           --diff $(git diff -- '*.php' --name-only --diff-filter=ACMRTUXB "${TRAVIS_COMMIT_RANGE}")
     - stage: coverage
-      name: "Coverage"
+      name: "Coverage on PHP 7.3"
       php: 7.3
       install:
         - composer install --no-suggest
