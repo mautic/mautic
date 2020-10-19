@@ -1605,10 +1605,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param Lead       $lead
      * @param int        $campaignId
      * @param string     $status
-     * @param null|array $personIds
+     * @param array|null $personIds
      *
      * @return bool
      *
@@ -2838,9 +2837,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
         foreach ($leadIds as $leadId) {
             $lead = $this->leadModel->getEntity($leadId);
 
-            if ($newDncValue == true) {
+            if (true == $newDncValue) {
                 $this->doNotContact->addDncForContact($lead->getId(), 'email', 'Set by Salesforce', DoNotContact::MANUAL, true, false, true);
-            } elseif ($newDncValue == false) {
+            } elseif (false == $newDncValue) {
                 $this->doNotContact->removeDncForContact($lead->getId(), 'email', true);
             }
         }
