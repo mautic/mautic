@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a4f40507d5062af239218e828e955885",
+    "content-hash": "bcfd058cb626a4ddb81454306b8bfb94",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -7553,6 +7553,7 @@
                 "configuration",
                 "distribution"
             ],
+            "abandoned": true,
             "time": "2019-06-18T15:43:58+00:00"
         },
         {
@@ -11495,12 +11496,12 @@
             "version": "v6.18.6",
             "source": {
                 "type": "git",
-                "url": "https://github.com/tightenco/collect.git",
+                "url": "https://github.com/tighten/collect.git",
                 "reference": "1a1378fda47c964b53523d3e1f30a08d8f97adc8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tightenco/collect/zipball/1a1378fda47c964b53523d3e1f30a08d8f97adc8",
+                "url": "https://api.github.com/repos/tighten/collect/zipball/1a1378fda47c964b53523d3e1f30a08d8f97adc8",
                 "reference": "1a1378fda47c964b53523d3e1f30a08d8f97adc8",
                 "shasum": ""
             },
