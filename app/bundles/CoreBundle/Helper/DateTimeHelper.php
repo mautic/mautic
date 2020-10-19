@@ -50,10 +50,6 @@ class DateTimeHelper
      */
     public function __construct($string = '', $fromFormat = 'Y-m-d H:i:s', $timezone = 'UTC')
     {
-        $localTimezone = ArrayHelper::getValue('default_timezone', (new ParamsLoaderHelper())->getParameters(), date_default_timezone_get());
-        if (empty($localTimezone) || null === $localTimezone) {
-            $this->localTimezone = date_default_timezone_get();
-        }
         $this->setDateTime($string, $fromFormat, $timezone);
     }
 
