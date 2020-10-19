@@ -410,7 +410,19 @@ class LeadApiController extends CommonApiController
         if ($channelId) {
             $channel = [$channel => $channelId];
         }
-        $reason   = (int) $this->request->request->get('reason');
+
+        // If no reason is set, default to 3 (manual)
+        $reason = (int) $this->request->request->get('reason', DoNotContact::MANUAL);
+
+        // If a reason is set, but it's empty or 0, show an error.
+        if (0 === $reason) {
+            return $this->returnError(
+                'Invalid reason code given',
+                Response::HTTP_BAD_REQUEST,
+                'Reason code needs to be an integer and higher than 0.'
+            );
+        }
+
         $comments = InputHelper::clean($this->request->request->get('comments'));
 
         /** @var \Mautic\LeadBundle\Model\DoNotContact $doNotContact */
@@ -627,10 +639,15 @@ class LeadApiController extends CommonApiController
                 $doNotContact = $this->get('mautic.lead.model.dnc');
 
                 if (DoNotContact::IS_CONTACTABLE === $reason) {
-                    // Remove DNC record
-                    $doNotContact->removeDncForContact($entity->getId(), $channel, false);
+                    if (!empty($entity->getId())) {
+                        // Remove DNC record
+                        $doNotContact->removeDncForContact($entity->getId(), $channel, false);
+                    }
+                } elseif (empty($entity->getId())) {
+                    // Contact doesn't exist yet. Directly create a DNC record on the entity.
+                    $doNotContact->createDncRecord($entity, $channel, $reason, $comments);
                 } else {
-                    // Add DNC record
+                    // Add DNC record to existing contact
                     $doNotContact->addDncForContact($entity->getId(), $channel, $reason, $comments, false);
                 }
             }

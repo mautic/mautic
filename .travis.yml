@@ -3,8 +3,7 @@
 language: php
 os:
   - linux
-#dist: bionic
-dist: trusty
+dist: bionic
 
 services:
   - mysql
@@ -66,6 +65,7 @@ before_install:
   - mysql --version
   - mysql -e 'DROP DATABASE IF EXISTS mautictest;'
   - mysql -e 'CREATE DATABASE mautictest;'
+  - mysql -u root -e 'CREATE USER IF NOT EXISTS travis@localhost; GRANT ALL ON *.* TO travis@localhost;'
 
   # Increase memory limit for all PHP processes
   - echo "memory_limit=4G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
