@@ -14,6 +14,7 @@ namespace Mautic\CoreBundle\Tests\Security\Permissions;
 use Mautic\ApiBundle\Security\Permissions\ApiPermissions;
 use Mautic\AssetBundle\Security\Permissions\AssetPermissions;
 use Mautic\CampaignBundle\Security\Permissions\CampaignPermissions;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use MauticPlugin\MauticFocusBundle\Security\Permissions\FocusPermissions;
@@ -38,20 +39,20 @@ class CorePermissionsTest extends \PHPUnit\Framework\TestCase
     private $translator;
 
     /**
-     * @var array
+     * @var MockObject|CoreParametersHelper
      */
-    private $permissions;
+    private $coreParametersHelper;
 
     protected function setUp()
     {
         parent::setUp();
-        $this->userHelper      = $this->createMock(UserHelper::class);
-        $this->translator      = $this->createMock(TranslatorInterface::class);
-        $this->permissions     = ['parameter_a' => 'value_a'];
-        $this->corePermissions = new CorePermissions(
+        $this->userHelper           = $this->createMock(UserHelper::class);
+        $this->translator           = $this->createMock(TranslatorInterface::class);
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->corePermissions      = new CorePermissions(
             $this->userHelper,
             $this->translator,
-            $this->permissions,
+            $this->coreParametersHelper,
             [
                 $this->mockBundleArray(ApiPermissions::class),
                 $this->mockBundleArray(AssetPermissions::class),
@@ -65,7 +66,10 @@ class CorePermissionsTest extends \PHPUnit\Framework\TestCase
 
     public function testSettingPermissionObject(): void
     {
-        $assetPermissions = new AssetPermissions($this->permissions);
+        $this->coreParametersHelper->method('all')
+            ->willReturn(['parameter_a' => 'value_a']);
+
+        $assetPermissions = new AssetPermissions($this->coreParametersHelper);
         $this->corePermissions->setPermissionObject($assetPermissions);
         $permissionObjects = $this->corePermissions->getPermissionObjects();
 
