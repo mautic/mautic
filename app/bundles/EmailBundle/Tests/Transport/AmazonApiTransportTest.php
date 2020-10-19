@@ -82,7 +82,7 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
         $this->amazonTransport = new AmazonApiTransport(
             $this->translator,
             $this->amazonCallback,
-            $this->logger,
+            $this->logger
         );
 
         $this->amazonTransport->setRegion('us-east-1', '');
