@@ -359,9 +359,7 @@ class SalesforceApi extends CrmApi
      * Perform queryAll request and retry if HasOptedOutOfEmail is not accessible.
      *
      * @param string $queryUrl
-     * @param array  $fields
      * @param        $object
-     * @param array  $query
      *
      * @return mixed|string
      *
@@ -370,14 +368,14 @@ class SalesforceApi extends CrmApi
     private function requestQueryAllAndHandle($queryUrl, array $fields, $object, array $query)
     {
         $config = $this->integration->mergeConfigToFeatureSettings([]);
-        if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner') {
+        if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && 'updateOwner' == $config['updateOwner'][0]) {
             $fields[] = 'Owner.Name';
             $fields[] = 'Owner.Email';
         }
 
         $fields = array_unique($fields);
 
-        $ignoreConvertedLeads = ($object == 'Lead') ? ' and ConvertedContactId = NULL' : '';
+        $ignoreConvertedLeads = ('Lead' == $object) ? ' and ConvertedContactId = NULL' : '';
 
         if (!$this->isOptOutFieldAccessible()) { // If not opt-out is supported; unset it
             unset($fields[array_search('HasOptedOutOfEmail', $fields)]);
