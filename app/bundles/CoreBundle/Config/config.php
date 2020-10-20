@@ -681,6 +681,13 @@ return [
                     '%mautic.plugin.bundles%',
                 ],
             ],
+            'mautic.page.helper.factory' => [
+                'class'     => \Mautic\CoreBundle\Factory\PageHelperFactory::class,
+                'arguments' => [
+                    'session',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
             'mautic.translation.loader' => [
                 'class'     => \Mautic\CoreBundle\Loader\TranslationLoader::class,
                 'arguments' => [

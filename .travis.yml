@@ -23,6 +23,9 @@ jobs:
       name: "PHP 7.2"
       php: 7.2
     -
+      name: "PHP 7.4"
+      php: 7.4
+    -
       name: "MariaDB, PHP 7.2"
       php: 7.2
       env: DB="mariadb"
@@ -31,6 +34,12 @@ jobs:
     -
       name: "MariaDB, PHP 7.3"
       php: 7.3
+      env: DB="mariadb"
+      addons:
+        mariadb: 10.2
+    -
+      name: "MariaDB, PHP 7.4"
+      php: 7.4
       env: DB="mariadb"
       addons:
         mariadb: 10.2
