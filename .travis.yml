@@ -1,20 +1,63 @@
-dist: bionic
+# TravisCI configuration for mautic/mautic
+
 language: php
+os:
+  - linux
+dist: bionic
 
 services:
   - mysql
 
-notifications:
-    webhooks: https://www.travisbuddy.com/
-    on_success: never
-
-php:
-  - 7.2
-  - 7.3
-
 cache:
   directories:
-    - $HOME/.composer/cache
+    - "${HOME}/.composer/cache"
+
+env:
+  global:
+    # Set to test environment for Symfony's commands in post install commands
+    - SYMFONY_ENV="test"
+
+jobs:
+  include:
+    - stage: test
+      name: "PHP 7.2"
+      php: 7.2
+    -
+      name: "MariaDB, PHP 7.2"
+      php: 7.2
+      env: DB="mariadb"
+      addons:
+        mariadb: 10.2
+    -
+      name: "MariaDB, PHP 7.3"
+      php: 7.3
+      env: DB="mariadb"
+      addons:
+        mariadb: 10.2
+    -
+      name: "PHPStan"
+      script: composer phpstan
+    -
+      name: "Rector"
+      script: composer rector -- --dry-run --no-progress-bar
+    -
+      name: "CS Fixer"
+      script: |
+        bin/php-cs-fixer fix --config=.php_cs -v --dry-run --using-cache=no --show-progress=dots \
+          --diff $(git diff -- '*.php' --name-only --diff-filter=ACMRTUXB "${TRAVIS_COMMIT_RANGE}")
+    - stage: coverage
+      name: "Coverage on PHP 7.3"
+      php: 7.3
+      install:
+        - composer install --no-suggest
+        # Clobber is needed because PCOV normally only works with PHPUnit 8+. Needed only to run test coverage.
+        - pecl install pcov
+        - composer require --dev pcov/clobber
+        - bin/pcov clobber
+      script:
+        - composer test -- --coverage-clover=coverage.xml
+      after_script:
+        - bash <(curl -s https://codecov.io/bash)
 
 before_install:
   # Create mautictest database
@@ -23,50 +66,21 @@ before_install:
   - mysql -e 'CREATE DATABASE mautictest;'
   - mysql -u root -e 'CREATE USER IF NOT EXISTS travis@localhost; GRANT ALL ON *.* TO travis@localhost;'
 
-  # increase memory limit for all PHP processes
+  # Increase memory limit for all PHP processes
   - echo "memory_limit=4G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
 
-  # turn off XDebug
-  - phpenv config-rm xdebug.ini || return
+  # Turn off XDebug extension
+  - phpenv config-rm xdebug.ini || true
 
-  # install dependencies in parallel
+  # Install dependencies in parallel
   - travis_retry composer global require hirak/prestissimo
 
-  # set to test environment for Symfony's commands in post install commands
-  - export SYMFONY_ENV="test"
-
 install:
-  - composer install
-
-  # Clobber is needed because PCOV normally only works with PHPUnit 8+. Needed only to run test coverage.
-  - if [ ${TRAVIS_PHP_VERSION:0:3} == "7.3" ]; then pecl install pcov && composer require --dev pcov/clobber && bin/pcov clobber; fi
+  - travis_retry composer install --no-suggest
 
 script:
-  - if [ ${TRAVIS_PHP_VERSION:0:3} == "7.3" ]; 
-    then composer test -- --coverage-clover=coverage.xml; 
-    else composer test; fi
+  - composer test
 
-jobs:
-  include:
-    - stage: test
-      php: 7.2
-      env: DB=mariadb
-      addons:
-        mariadb: '10.2'
-    - 
-      php: 7.3
-      env: DB=mariadb
-      addons:
-        mariadb: '10.2'
-    - 
-      name: PHPSTAN
-      script: composer phpstan
-    -
-      name: Rector
-      script: composer rector -- --dry-run --no-progress-bar
-    -
-      name: CS Fixer
-      script: bin/php-cs-fixer fix --config=.php_cs -v --dry-run --using-cache=no --show-progress=dots --diff $(git diff -- '*.php' --name-only --diff-filter=ACMRTUXB "${TRAVIS_COMMIT_RANGE}")
-
-after_success:
-  - bash <(curl -s https://codecov.io/bash);
+notifications:
+    webhooks: https://www.travisbuddy.com/
+    on_success: never
