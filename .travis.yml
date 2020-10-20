@@ -23,6 +23,9 @@ jobs:
       name: "PHP 7.2"
       php: 7.2
     -
+      name: "PHP 7.4"
+      php: 7.4
+    -
       name: "MariaDB, PHP 7.2"
       php: 7.2
       env: DB="mariadb"
@@ -31,6 +34,12 @@ jobs:
     -
       name: "MariaDB, PHP 7.3"
       php: 7.3
+      env: DB="mariadb"
+      addons:
+        mariadb: 10.2
+    -
+      name: "MariaDB, PHP 7.4"
+      php: 7.4
       env: DB="mariadb"
       addons:
         mariadb: 10.2
@@ -64,6 +73,7 @@ before_install:
   - mysql --version
   - mysql -e 'DROP DATABASE IF EXISTS mautictest;'
   - mysql -e 'CREATE DATABASE mautictest;'
+  - mysql -u root -e 'CREATE USER IF NOT EXISTS travis@localhost; GRANT ALL ON *.* TO travis@localhost;'
 
   # Increase memory limit for all PHP processes
   - echo "memory_limit=4G" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
@@ -79,3 +89,7 @@ install:
 
 script:
   - composer test
+
+notifications:
+    webhooks: https://www.travisbuddy.com/
+    on_success: never
