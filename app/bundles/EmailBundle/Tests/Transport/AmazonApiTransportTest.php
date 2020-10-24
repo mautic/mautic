@@ -356,4 +356,87 @@ PAYLOAD;
         $unsubscribe              = new UnsubscribedEmail('nope@nope.com', 'unknown');
         $this->assertEquals($unsubscribe, $amazonCallback->processUnsubscription($messageMock));
     }
+
+    public function testprocessNotificationBounceRequestConfigSet()
+    {
+        $payload = <<< 'PAYLOAD'
+        {"eventType":"Bounce","bounce":{"bounceType":"Permanent","bounceSubType":"General","bouncedRecipients":[{"emailAddress":"recipient@example.com","action":"failed","status":"5.1.1","diagnosticCode":"smtp; 550 5.1.1 user unknown"}],"timestamp":"2017-08-05T00:41:02.669Z","feedbackId":"01000157c44f053b-61b59c11-9236-11e6-8f96-7be8aexample-000000","reportingMTA":"dsn; mta.example.com"},"mail":{"timestamp":"2017-08-05T00:40:02.012Z","source":"Sender Name <sender@example.com>","sourceArn":"arn:aws:ses:us-east-1:123456789012:identity/sender@example.com","sendingAccountId":"123456789012","messageId":"EXAMPLE7c191be45-e9aedb9a-02f9-4d12-a87d-dd0099a07f8a-000000","destination":["recipient@example.com"],"headersTruncated":false,"headers":[{"name":"From","value":"Sender Name <sender@example.com>"},{"name":"To","value":"recipient@example.com"},{"name":"Subject","value":"Message sent from Amazon SES"},{"name":"MIME-Version","value":"1.0"},{"name":"Content-Type","value":"multipart/alternative; boundary=\"----=_Part_7307378_1629847660.1516840721503\""}],"commonHeaders":{"from":["Sender Name <sender@example.com>"],"to":["recipient@example.com"],"messageId":"EXAMPLE7c191be45-e9aedb9a-02f9-4d12-a87d-dd0099a07f8a-000000","subject":"Message sent from Amazon SES"},"tags":{"ses:configuration-set":["ConfigSet"],"ses:source-ip":["192.0.2.0"],"ses:from-domain":["example.com"],"ses:caller-identity":["ses_user"]}}}
+PAYLOAD;
+
+        $amazonCallback = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
+
+        $request = $this->getMockBuilder(Request::class)
+        ->disableOriginalConstructor()
+        ->getMock();
+
+        $request->expects($this->any())
+            ->method('getContent')
+            ->will($this->returnValue($payload));
+
+        // Mock a successful response
+        $mockResponse       = $this->getMockBuilder(Response::class)->getMock();
+        $mockResponse->code = 200;
+
+        $this->transportCallback->expects($this->once())
+            ->method('addFailureByAddress');
+
+        $amazonCallback->processCallbackRequest($request);
+    }
+
+    public function testprocessNotificationComplaintRequestConfigSet()
+    {
+        $payload = <<< 'PAYLOAD'
+        {"eventType":"Complaint","complaint":{"complainedRecipients":[{"emailAddress":"recipient@example.com"}],"timestamp":"2017-08-05T00:41:02.669Z","feedbackId":"01000157c44f053b-61b59c11-9236-11e6-8f96-7be8aexample-000000","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36","complaintFeedbackType":"abuse","arrivalDate":"2017-08-05T00:41:02.669Z"},"mail":{"timestamp":"2017-08-05T00:40:01.123Z","source":"Sender Name <sender@example.com>","sourceArn":"arn:aws:ses:us-east-1:123456789012:identity/sender@example.com","sendingAccountId":"123456789012","messageId":"EXAMPLE7c191be45-e9aedb9a-02f9-4d12-a87d-dd0099a07f8a-000000","destination":["recipient@example.com"],"headersTruncated":false,"headers":[{"name":"From","value":"Sender Name <sender@example.com>"},{"name":"To","value":"recipient@example.com"},{"name":"Subject","value":"Message sent from Amazon SES"},{"name":"MIME-Version","value":"1.0"},{"name":"Content-Type","value":"multipart/alternative; boundary=\"----=_Part_7298998_679725522.1516840859643\""}],"commonHeaders":{"from":["Sender Name <sender@example.com>"],"to":["recipient@example.com"],"messageId":"EXAMPLE7c191be45-e9aedb9a-02f9-4d12-a87d-dd0099a07f8a-000000","subject":"Message sent from Amazon SES"},"tags":{"ses:configuration-set":["ConfigSet"],"ses:source-ip":["192.0.2.0"],"ses:from-domain":["example.com"],"ses:caller-identity":["ses_user"]}}}
+PAYLOAD;
+
+        $amazonCallback = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
+
+        $request = $this->getMockBuilder(Request::class)
+        ->disableOriginalConstructor()
+        ->getMock();
+
+        $request->expects($this->any())
+            ->method('getContent')
+            ->will($this->returnValue($payload));
+
+        // Mock a successful response
+        $mockResponse       = $this->getMockBuilder(Response::class)->getMock();
+        $mockResponse->code = 200;
+
+        $this->transportCallback->expects($this->once())
+            ->method('addFailureByAddress');
+
+        $amazonCallback->processCallbackRequest($request);
+    }
+
+    public function testprocessBounceConfigSet()
+    {
+        $messageMock = $this->getMockBuilder(Message::class)
+                        ->disableOriginalConstructor()
+                        ->getMock();
+        $messageMock->fromAddress = 'no-reply@sns.amazonaws.com';
+        $messageMock->textPlain   = '{"eventType":"Bounce","bounce":{"bounceType":"Permanent","bounceSubType":"General","bouncedRecipients":[{"emailAddress":"nope@nope.com","action":"failed","status":"5.1.1","diagnosticCode":"smtp; 550 5.1.1 <nope@nope.com>: Recipient address rejected: User unknown in virtual alias table"}],"timestamp":"2016-08-17T07:43:12.776Z","feedbackId":"0102015697743d4c-619f1aa8-763f-4bea-8648-0b3bbdedd1ea-000000","reportingMTA":"dsn; a4-24.smtp-out.eu-west-1.amazonses.com"},"mail":{"timestamp":"2016-08-17T07:43:11.000Z","source":"admin@55hubs.ch","sourceArn":"arn:aws:ses:eu-west-1:918057160339:identity/nope.com","sendingAccountId":"918057160339","messageId":"010201569774384f-81311784-10dd-48a8-921f-8316c145e64d-000000","destination":["nope@nope.com"]}}';
+        $amazonCallback           = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
+        $bounce                   = new BouncedEmail();
+        $bounce->setContactEmail('nope@nope.com')
+            ->setBounceAddress('admin@55hubs.ch')
+            ->setType('unknown')
+            ->setRuleCategory('unknown')
+            ->setRuleNumber('0013')
+            ->setIsFinal(true);
+
+        $this->assertEquals($bounce, $amazonCallback->processBounce($messageMock));
+    }
+
+    public function testprocessUnsubscriptionConfigSet()
+    {
+        $messageMock = $this->getMockBuilder(Message::class)
+                        ->disableOriginalConstructor()
+                        ->getMock();
+        $messageMock->fromAddress = 'no-reply@sns.amazonaws.com';
+        $messageMock->textPlain   = '{"eventType":"Complaint", "complaint":{ "complainedRecipients":[ { "emailAddress":"nope@nope.com" } ], "timestamp":"2016-01-27T14:59:38.237Z", "feedbackId":"0000013786031775-fea503bc-7497-49e1-881b-a0379bb037d3-000000" }, "mail":{"source": "unknown"} }';
+        $amazonCallback           = new AmazonCallback($this->translator, $this->logger, $this->mockHttp, $this->transportCallback);
+        $unsubscribe              = new UnsubscribedEmail('nope@nope.com', 'unknown');
+        $this->assertEquals($unsubscribe, $amazonCallback->processUnsubscription($messageMock));
+    }
 }
