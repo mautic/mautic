@@ -104,8 +104,7 @@ class AmazonCallback
                         $response = $this->httpClient->get($payload['SubscribeURL']);
                         if (200 == $response->code) {
                             $this->logger->info('Callback to SubscribeURL from Amazon SNS successfully');
-
-                            return;
+                            break;
                         }
 
                         $reason = 'HTTP Code '.$response->code.', '.$response->body;
@@ -114,9 +113,6 @@ class AmazonCallback
                     }
 
                     $this->logger->error('Callback to SubscribeURL from Amazon SNS failed, reason: '.$reason);
-
-                    return;
-
             break;
             case 'Notification':
                 $message = json_decode($payload['Message'], true);
@@ -150,7 +146,6 @@ class AmazonCallback
                     $this->logger->debug("Unsubscribe email '".$complainedRecipient['emailAddress']."'");
                 }
 
-                return;
             break;
             case 'Bounce':
 
@@ -172,8 +167,6 @@ class AmazonCallback
                         $this->transportCallback->addFailureByAddress($bouncedRecipient['emailAddress'], $bounceCode, DoNotContact::BOUNCED, $emailId);
                         $this->logger->debug("Mark email '".$bouncedRecipient['emailAddress']."' as bounced, reason: ".$bounceCode);
                     }
-
-                    return;
                 }
             break;
             default:
