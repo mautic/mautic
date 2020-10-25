@@ -16,6 +16,7 @@ use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Service\ConfigChangeLogger;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -65,6 +66,7 @@ class ConfigSubscriber implements EventSubscriberInterface
                 $this->container->getParameter($reference[1]);
 
                 return $reference[0];
+            } catch (InvalidArgumentException $exception) {
             } catch (ParameterNotFoundException $exception) {
             }
 
