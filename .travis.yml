@@ -85,6 +85,7 @@ before_install:
   - travis_retry composer global require hirak/prestissimo
 
 install:
+  - composer self-update --1
   - travis_retry composer install --no-suggest
 
 script:
