@@ -36,6 +36,7 @@ before_install:
   - export SYMFONY_ENV="test"
 
 install:
+  - composer self-update --1
   - composer install
 
   # Clobber is needed because PCOV normally only works with PHPUnit 8+. Needed only to run test coverage.
