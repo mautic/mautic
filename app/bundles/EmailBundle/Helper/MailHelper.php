@@ -1215,9 +1215,6 @@ class MailHelper
 
         $subject = $email->getSubject();
 
-        // Convert short codes to emoji
-        $subject = EmojiHelper::toEmoji($subject ?? '', 'short');
-
         // Set message settings from the email
         $this->setSubject($subject);
 
@@ -1258,9 +1255,6 @@ class MailHelper
                 'template' => $template,
             ], true);
         }
-
-        // Convert short codes to emoji
-        $customHtml = EmojiHelper::toEmoji($customHtml ?? '', 'short');
 
         $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel);
 
