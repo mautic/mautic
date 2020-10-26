@@ -487,16 +487,22 @@ class ReportSubscriber implements EventSubscriberInterface
                     $queryBuilder->resetQueryPart('groupBy');
                     $counts = $queryBuilder->execute()->fetch();
                     $chart  = new PieChart();
-                    $chart->setDataset($options['translator']->trans('mautic.email.stat.read'), $counts['read_count']);
+                    $chart->setDataset(
+                        $options['translator']->trans('mautic.email.stat.read'),
+                        $counts['read_count'] ?? 0
+                    );
                     $chart->setDataset(
                         $options['translator']->trans('mautic.email.graph.pie.ignored.read.failed.ignored'),
-                        ($counts['sent_count'] - $counts['read_count'])
+                        (($counts['sent_count'] ?? 0) - ($counts['read_count'] ?? 0))
                     );
                     $chart->setDataset(
                         $options['translator']->trans('mautic.email.unsubscribed'),
-                        $counts['unsubscribed']
+                        $counts['unsubscribed'] ?? 0
                     );
-                    $chart->setDataset($options['translator']->trans('mautic.email.bounced'), $counts['bounced']);
+                    $chart->setDataset(
+                        $options['translator']->trans('mautic.email.bounced'),
+                        $counts['bounced'] ?? 0
+                    );
 
                     $event->setGraph(
                         $g,
