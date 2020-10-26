@@ -433,14 +433,9 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     }
 
     /**
-     * Add partial index.
-     *
-     * @param $name
-     * @param $where
-     *
-     * @return $this
+     * @param string $name
      */
-    public function addPartialIndex(array $columns, $name, $where)
+    public function addIndex(array $columns, $name, array $flags = null, array $options = null): self
     {
         $cm = $this->getClassMetadata();
 
@@ -448,14 +443,37 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
             $cm->table['indexes'] = [];
         }
 
-        $cm->table['indexes'][$name] = ['
-            columns'  => $columns,
-            'options' => [
-                'where' => $where,
-            ],
-        ];
+        $definition = ['columns' => $columns];
+
+        if (null !== $flags) {
+            $definition['flags'] = $flags;
+        }
+
+        if (null !== $options) {
+            $definition['options'] = $options;
+        }
+
+        $cm->table['indexes'][$name] = $definition;
 
         return $this;
+    }
+
+    /**
+     * @deprecated this method will be removed as MySQL does not support partial indices whatsoever
+     *
+     * @param string $name
+     * @param string $where
+     *
+     * @return $this
+     */
+    public function addPartialIndex(array $columns, $name, $where)
+    {
+        return $this->addIndex($columns, $name, null, ['where' => $where]);
+    }
+
+    public function addFulltextIndex(array $columns, string $name): self
+    {
+        return $this->addIndex($columns, $name, ['fulltext']);
     }
 
     /**
