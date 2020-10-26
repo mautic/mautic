@@ -29,6 +29,9 @@ before_install:
   # turn off XDebug
   - phpenv config-rm xdebug.ini || return
 
+  # Temp downgrade Composer to v1 (see https://github.com/mautic/mautic/pull/9315 for details)
+  - composer self-update --1
+
   # install dependencies in parallel
   - travis_retry composer global require hirak/prestissimo
 
