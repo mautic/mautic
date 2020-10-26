@@ -1,0 +1,9 @@
+{
+  "projectId": "",
+  "baseUrl" : "http://your-mautic-instance",
+  "defaultCommandTimeout": 10000,
+  "execTimeout":	10000,
+  "taskTimeout":	10000	,
+  "requestTimeout":	10000,
+  "responseTimeout": 10000	
+}
