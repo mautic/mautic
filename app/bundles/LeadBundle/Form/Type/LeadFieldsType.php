@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -33,7 +34,7 @@ class LeadFieldsType extends AbstractType
     {
         $resolver->setDefaults([
             'choices' => function (Options $options) {
-                $fieldList = $this->flipSubarrays($this->fieldModel->getFieldList());
+                $fieldList = ArrayHelper::flipArray($this->fieldModel->getFieldList());
                 if ($options['with_tags']) {
                     $fieldList['Core']['mautic.lead.field.tags'] = 'tags';
                 }
@@ -72,15 +73,5 @@ class LeadFieldsType extends AbstractType
     public function getBlockPrefix()
     {
         return 'leadfields_choices';
-    }
-
-    private function flipSubarrays(array $masterArrays): array
-    {
-        return array_map(
-            function (array $subArray) {
-                return array_flip($subArray);
-            },
-            $masterArrays
-        );
     }
 }
