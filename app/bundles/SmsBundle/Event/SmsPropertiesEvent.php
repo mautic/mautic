@@ -31,10 +31,6 @@ class SmsPropertiesEvent extends Event
      */
     private $fields = [];
 
-    /**
-     * @param FormBuilder $builder
-     * @param array       $data
-     */
     public function __construct(FormBuilder $builder, array $data)
     {
         $this->formBuilder = $builder;
@@ -62,7 +58,6 @@ class SmsPropertiesEvent extends Event
     /**
      * @param string      $child
      * @param string|null $type
-     * @param array       $options
      */
     public function addField($child, $type = null, array $options = [])
     {

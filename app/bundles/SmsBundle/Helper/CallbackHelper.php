@@ -95,7 +95,6 @@ class CallbackHelper
             foreach ($contacts as $contact) {
                 // Set the contact for campaign decisions
                 $this->contactTracker->setSystemContact($contact);
-
                 if ($event instanceof DeliveryEvent) {
                     $this->logger->debug(sprintf('SMS DELIVERY: Processing delivery callback'));
                     $this->logger->debug(sprintf('SMS DELIVERY: Found IDs %s', implode(',', $contacts->getKeys())));
@@ -119,10 +118,10 @@ class CallbackHelper
         } catch (NumberNotFoundException $exception) {
             $this->logger->debug(
                 sprintf(
-                    '%s: %s was not found. The message sent was "%s"',
+                    '%s: %s was not found',
                     $handler->getTransportName(),
                     $exception->getNumber(),
-                    isset($message) ? $message : 'unknown'
+                    'unknown'
                 )
             );
         }

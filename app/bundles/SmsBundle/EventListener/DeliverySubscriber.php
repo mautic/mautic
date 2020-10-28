@@ -25,8 +25,6 @@ class DeliverySubscriber implements EventSubscriberInterface
 
     /**
      * CampaignReplySubscriber constructor.
-     *
-     * @param StatModel $statModel
      */
     public function __construct(StatModel $statModel)
     {
@@ -45,8 +43,6 @@ class DeliverySubscriber implements EventSubscriberInterface
 
     /**
      * Update count of Sms and Stat entity.
-     *
-     * @param DeliveryEvent $event
      */
     public function onDelivery(DeliveryEvent $event)
     {

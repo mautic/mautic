@@ -34,17 +34,12 @@ class StatModel
 
     /**
      * StatModel constructor.
-     *
-     * @param SmsModel $smsModel
      */
     public function __construct(SmsModel $smsModel)
     {
         $this->smsModel = $smsModel;
     }
 
-    /**
-     * @param DeliveryEvent $deliveryEvent
-     */
     public function updateStatsFromDeliveryEvent(DeliveryEvent $deliveryEvent)
     {
         $smsStatRepository = $this->smsModel->getStatRepository();
