@@ -120,8 +120,7 @@ class CallbackHelper
                 sprintf(
                     '%s: %s was not found',
                     $handler->getTransportName(),
-                    $exception->getNumber(),
-                    'unknown'
+                    $exception->getNumber()
                 )
             );
         }

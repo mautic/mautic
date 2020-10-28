@@ -11,14 +11,12 @@
 
 namespace Mautic\SmsBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\SmsBundle\Entity\Sms;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -26,40 +24,13 @@ use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class SmsType.
  */
 class SmsType extends AbstractType
 {
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    /**
-     * @var RequestStack
-     */
-    private $request;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
-    public function __construct(EntityManager $entityManager, RequestStack $request, TranslatorInterface $translator)
-    {
-        $this->em         = $entityManager;
-        $this->request    = $request;
-        $this->translator = $translator;
-    }
-
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html']));

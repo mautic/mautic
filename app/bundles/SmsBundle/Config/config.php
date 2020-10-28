@@ -88,11 +88,6 @@ return [
         'forms' => [
             'mautic.form.type.sms' => [
                 'class'     => 'Mautic\SmsBundle\Form\Type\SmsType',
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                    'request_stack',
-                    'translator',
-                ],
             ],
             'mautic.form.type.sms.properties' => [
                 'class'     => \Mautic\SmsBundle\Form\Type\SmsPropertiesType::class,
