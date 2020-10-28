@@ -13,7 +13,7 @@ if ($item = ((isset($event['extra'])) ? $event['extra']['stat'] : false)):
     $type = isset($event['extra']['type']) ? $event['extra']['type'] : null;
     ?>
     <p>
-        <?php if (!empty($item['isFailed']) && $type == 'failed') :
+        <?php if (!empty($item['isFailed']) && 'failed' == $type) :
             $details = json_decode($item['details'], true);
             $errors  = '';
             if (isset($details['failed'])) {
@@ -34,10 +34,11 @@ if ($item = ((isset($event['extra'])) ? $event['extra']['stat'] : false)):
         ?></span>
 
         <?php endif; ?>
-        <?php if (!empty($item['list_name']) && $type != 'failed') : ?>
+        <?php if (!empty($item['list_name']) && 'failed' != $type) : ?>
             <br /><?php echo $view['translator']->trans('mautic.sms.timeline.event.list', ['%list%' => $item['list_name']]); ?>
         <?php endif; ?>
     </p>
+<?php endif; ?>
 
 <?php if ($errors): ?>
 <p class="text-danger mt-0 mb-10">
