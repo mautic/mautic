@@ -24,14 +24,29 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class EmailSubscriber implements EventSubscriberInterface
 {
+    /**	
+     * @var AuditLogModel	
+     */
     private $auditLogModel;
 
+    /**	
+     * @var IpLookupHelper	
+     */
     private $ipLookupHelper;
 
+    /**	
+     * @var EmailModel	
+     */
     private $emailModel;
 
+    /**	
+     * @var TranslatorInterface	
+     */
     private $translator;
 
+    /**	
+     * @var EntityManager	
+     */
     private $entityManager;
 
     public function __construct(
