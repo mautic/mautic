@@ -13,6 +13,7 @@ namespace Mautic\EmailBundle\Tests\Swiftmailer\Spool;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Swiftmailer\Spool\DelegatingSpool;
+use Mautic\EmailBundle\Swiftmailer\Transport\MomentumTransport;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
@@ -96,6 +97,41 @@ class DelegatingSpoolTest extends TestCase
         $this->assertEquals(1, $sent);
 
         rmdir($spoolPath);
+    }
+
+    public function testThatTokenizationIsDisabledIfFileSpoolIsEnabled()
+    {
+        $this->realTransport = $this->createMock(MomentumTransport::class);
+        $this->coreParametersHelper->expects($this->exactly(2))
+            ->method('get')
+            ->withConsecutive(['mailer_spool_type'], ['mailer_spool_path'])
+            ->willReturnOnConsecutiveCalls('file', null);
+
+        $spool = new DelegatingSpool($this->coreParametersHelper, $this->realTransport);
+        $this->assertFalse($spool->isTokenizationEnabled());
+    }
+
+    public function testThatTokenizationIsEnabledIfFileSpoolIsDisabled()
+    {
+        $this->realTransport = $this->createMock(MomentumTransport::class);
+        $this->coreParametersHelper->expects($this->exactly(2))
+            ->method('get')
+            ->withConsecutive(['mailer_spool_type'], ['mailer_spool_path'])
+            ->willReturnOnConsecutiveCalls('notFile', null);
+
+        $spool = new DelegatingSpool($this->coreParametersHelper, $this->realTransport);
+        $this->assertTrue($spool->isTokenizationEnabled());
+    }
+
+    public function testThatTokenizationIsDisabledIfRealTransposrtDoesNotImplementTokenTransportInterface()
+    {
+        $this->coreParametersHelper->expects($this->exactly(2))
+            ->method('get')
+            ->withConsecutive(['mailer_spool_type'], ['mailer_spool_path'])
+            ->willReturnOnConsecutiveCalls('notFile', null);
+
+        $spool = new DelegatingSpool($this->coreParametersHelper, $this->realTransport);
+        $this->assertFalse($spool->isTokenizationEnabled());
     }
 
     public function testDelegateMessageWillReturnIntEvenIfTransportWillNot()

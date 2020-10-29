@@ -262,7 +262,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         ];
 
         if (!empty($message['headers'])) {
-            $content['headers'] = $message['headers'];
+            $content['headers'] = array_map('strval', $message['headers']);
         }
 
         // Sparkpost will set parts regardless if they are empty or not

@@ -27,15 +27,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var PointModel
-     */
     private $pointModel;
 
-    /**
-     * @var EntityManager
-     */
     private $entityManager;
+
+    private $triggered = [];
 
     public function __construct(PointModel $pointModel, EntityManager $entityManager)
     {
@@ -115,12 +111,28 @@ class PointSubscriber implements EventSubscriberInterface
      */
     public function onEmailSend(EmailSendEvent $event)
     {
-        if ($leadArray = $event->getLead()) {
+        $leadArray = $event->getLead();
+        if ($leadArray && is_array($leadArray) && !empty($leadArray['id'])) {
             $lead = $this->entityManager->getReference(Lead::class, $leadArray['id']);
         } else {
             return;
         }
 
-        $this->pointModel->triggerAction('email.send', $event->getEmail(), null, $lead);
+        if ($this->shouldTriggerPointEmailSendAction($event, $lead)) {
+            $this->pointModel->triggerAction('email.send', $event->getEmail(), null, $lead, true);
+        }
+    }
+
+    private function shouldTriggerPointEmailSendAction(EmailSendEvent $event, Lead $lead)
+    {
+        if ($event->getEmail()) {
+            if (!isset($this->triggered[$lead->getId()][$event->getEmail()->getId()])) {
+                $this->triggered[$lead->getId()][$event->getEmail()->getId()] = true;
+
+                return true;
+            }
+        }
+
+        return false;
     }
 }

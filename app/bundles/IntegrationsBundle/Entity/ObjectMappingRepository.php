@@ -145,6 +145,17 @@ class ObjectMappingRepository extends CommonRepository
         return $qb->execute();
     }
 
+    public function deleteEntitiesForObject(int $internalObjectId, string $internalObject): void
+    {
+        $qb = $this->_em->createQueryBuilder();
+        $qb->delete(ObjectMapping::class, 'm');
+        $qb->where('m.internalObjectName = :internalObject');
+        $qb->andWhere('m.internalObjectId = :internalObjectId');
+        $qb->setParameter('internalObject', $internalObject);
+        $qb->setParameter('internalObjectId', $internalObjectId);
+        $qb->getQuery()->execute();
+    }
+
     /**
      * @return ObjectMapping[]
      */

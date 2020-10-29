@@ -4,6 +4,10 @@ namespace MauticPlugin\MauticCrmBundle\Tests\Pipedrive\Controller;
 
 use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\PipedriveTest;
 
+/**
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
 class PipedriveControllerTest extends PipedriveTest
 {
     public function testWithoutIntegration()
