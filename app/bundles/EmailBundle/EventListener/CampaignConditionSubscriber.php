@@ -58,7 +58,7 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
     public function onCampaignTriggerCondition(CampaignExecutionEvent $event)
     {
         try {
-            $this->validator->validate($event->getLead()->getEmail());
+            $this->validator->validate($event->getLead()->getEmail(), true);
         } catch (InvalidEmailException $exception) {
             return $event->setResult(false);
         }

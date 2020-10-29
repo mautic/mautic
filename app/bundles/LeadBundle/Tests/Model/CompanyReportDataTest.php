@@ -82,6 +82,10 @@ class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
                 'label' => 'mautic.lead.report.company.is_primary',
                 'type'  => 'bool',
             ],
+            'companies_lead.date_added' => [
+                'label' => 'mautic.lead.report.company.date_added',
+                'type'  => 'datetime',
+            ],
             'comp.boolField' => [
                 'label' => 'mautic.report.field.company.label',
                 'type'  => 'bool',
