@@ -1640,7 +1640,7 @@ class LeadController extends FormController
                 $persistEntities = [];
                 foreach ($entities as $lead) {
                     if ($this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-                        if ($doNotContact->addDncForContact($lead->getId(), 'email', $data['reason'], DoNotContact::MANUAL)) {
+                        if ($doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, $data['reason'])) {
                             $persistEntities[] = $lead;
                         }
                     }
