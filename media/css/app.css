@@ -743,4 +743,4 @@ auto}.css-device__image{display:block;margin:0;padding:0;width:100%;height:auto}
 #websiteCanvas{margin:0;padding:0;border:none;overflow:hidden;pointer-events:none;position:absolute;z-index:2;left:-50%;width:320px;height:568px}#websiteScreenshot.mobile
 #websiteCanvas{z-index:0;border:1px
 solid #000}#websiteScreenshot.mobile  #websiteCanvas
-iframe{height:100%;width:320px;border:0}
+iframe{height:100%;width:320px;border:0}.citrix-start-button{font-size:16px;color:#fff;text-decoration:none;border-radius:3px;padding:12px 18px;background-color:#4e5e9e;display:inline-block}
