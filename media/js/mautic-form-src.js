@@ -297,7 +297,6 @@
                     optGroup.style.display = 'none';
                 } else {
                     optGroup.style.display = 'block';
-                    optGroup.children[0].selected = 'selected';
                     optGroupFound = true;
                 }
             }
