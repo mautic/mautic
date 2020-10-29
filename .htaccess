@@ -104,7 +104,7 @@
         Require all denied
     </FilesMatch>
 
-    # Deny access via HTTP requests to composers files.
+    # Deny access via HTTP requests to composer files.
     <FilesMatch "^(composer\.json|composer\.lock)$">
         Require all denied
     </FilesMatch>
@@ -123,7 +123,7 @@
         Deny from all
     </FilesMatch>
 
-    # Deny access via HTTP requests to all PHP files.
+    # Deny access via HTTP requests to composer files
     <FilesMatch "^(composer\.json|composer\.lock)$">
         Order deny,allow
         Deny from all
