@@ -20,7 +20,7 @@ use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\EmailBundle\Validator\EmailOrEmailTokenList;
 use Mautic\LeadBundle\DataObject\ContactFieldToken;
-use Mautic\LeadBundle\Validator\CustomFieldTokenValidator;
+use Mautic\LeadBundle\Validator\CustomFieldValidator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -33,9 +33,9 @@ final class EmailOrEmailTokenListValidator extends ConstraintValidator
     private $emailValidator;
 
     /**
-     * @var CustomFieldTokeValidator
+     * @var CustomFieldValidator
      */
-    private $customFieldTokenValidator;
+    private $customFieldValidator;
 
     /**
      * @var ArrayStringTransformer
@@ -44,11 +44,11 @@ final class EmailOrEmailTokenListValidator extends ConstraintValidator
 
     public function __construct(
         EmailValidator $emailValidator,
-        CustomFieldTokenValidator $customFieldTokenValidator
+        CustomFieldValidator $customFieldValidator
     ) {
-        $this->transformer               = new ArrayStringTransformer();
-        $this->emailValidator            = $emailValidator;
-        $this->customFieldTokenValidator = $customFieldTokenValidator;
+        $this->transformer          = new ArrayStringTransformer();
+        $this->emailValidator       = $emailValidator;
+        $this->customFieldValidator = $customFieldValidator;
     }
 
     public function validate($csv, Constraint $constraint)
@@ -82,18 +82,18 @@ final class EmailOrEmailTokenListValidator extends ConstraintValidator
                     // The token syntax is validated during creation of new ContactFieldToken object.
                     $contactFieldToken = new ContactFieldToken($emailOrToken);
 
-                    // Validate that the contact field exists and is type of email.
-                    $this->customFieldTokenValidator->validateFieldType($contactFieldToken, 'email');
-
                     // Validate that the token default value is a valid email address if set.
                     if ($contactFieldToken->getDefaultValue()) {
                         $this->emailValidator->validate($contactFieldToken->getDefaultValue());
                     }
+
+                    // Validate that the contact field exists and is type of email.
+                    $this->customFieldValidator->validateFieldType($contactFieldToken->getFieldAlias(), 'email');
                 } catch (RecordNotFoundException | InvalidValueException $tokenException) {
-                    $this->context->buildViolation(
+                    $this->context->addViolation(
                         'mautic.email.email_or_token.not_valid',
                         ['%value%' => $emailOrToken, '%details%' => $tokenException->getMessage()]
-                    )->addViolation();
+                    );
                 }
             }
         };

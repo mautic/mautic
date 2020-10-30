@@ -787,7 +787,7 @@ return [
                 'alias'     => 'uniqueleadlist',
             ],
             'mautic.lead.validator.custom_field_token' => [
-                'class'     => \Mautic\LeadBundle\Validator\CustomFieldTokenValidator::class,
+                'class'     => \Mautic\LeadBundle\Validator\CustomFieldValidator::class,
                 'arguments' => ['mautic.lead.model.field'],
             ],
             'mautic.lead.event.dispatcher' => [

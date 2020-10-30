@@ -1,0 +1,247 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * @copyright   2020 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        https://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace Mautic\EmailBundle\Tests\Validator;
+
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Helper\EmailValidator;
+use Mautic\EmailBundle\Validator\EmailOrEmailTokenList;
+use Mautic\EmailBundle\Validator\EmailOrEmailTokenListValidator;
+use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Validator\CustomFieldValidator;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Validator\Context\ExecutionContext;
+
+final class EmailOrEmailTokenListValidatorTest extends TestCase
+{
+    /**
+     * @dataProvider provider
+     */
+    public function testNoEmailsProvided($value, callable $getFieldMocker, callable $violationResult)
+    {
+        $context = new class($violationResult) extends ExecutionContext {
+            /** @var callable */
+            private $violationResult;
+
+            public function __construct(callable $violationResult)
+            {
+                $this->violationResult = $violationResult;
+            }
+
+            public function addViolation($message, array $parameters = [])
+            {
+                ($this->violationResult)($message, $parameters);
+            }
+        };
+
+        $ranslator = new class() extends Translator {
+            public function __construct()
+            {
+            }
+
+            public function trans($id, array $parameters = [], $domain = null, $locale = null)
+            {
+                return $id;
+            }
+        };
+
+        $dispatcher = new class() extends EventDispatcher {
+            public function __construct()
+            {
+            }
+
+            public function dispatch($eventName, ?Event $event = null)
+            {
+                return $event;
+            }
+        };
+
+        $fieldModel = new class($getFieldMocker) extends FieldModel {
+            /** @var callable */
+            private $getFieldMocker;
+
+            public function __construct(callable $getFieldMocker)
+            {
+                $this->getFieldMocker = $getFieldMocker;
+            }
+
+            public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
+            {
+                return ($this->getFieldMocker)($alias);
+            }
+        };
+
+        $emaiOrEmailTokenListValidator = new EmailOrEmailTokenListValidator(
+            new EmailValidator($ranslator, $dispatcher),
+            new CustomFieldValidator($fieldModel)
+        );
+
+        $emaiOrEmailTokenListValidator->initialize($context);
+
+        Assert::assertNull($emaiOrEmailTokenListValidator->validate($value, new EmailOrEmailTokenList()));
+    }
+
+    public function provider(): \Generator
+    {
+        // Test null value.
+        yield [
+            null,
+            function () {
+                $this->fail('Field should not be fetched');
+            },
+            function () {
+                $this->fail('Null value should not be validated.');
+            },
+        ];
+
+        // Test empty value.
+        yield [
+            '',
+            function () {
+                $this->fail('Field should not be fetched');
+            },
+            function () {
+                $this->fail('Empty string value should not be validated.');
+            },
+        ];
+
+        // Test invalid email and invalid token.
+        yield [
+            'somestring',
+            function () {
+                $this->fail('Field should not be fetched');
+            },
+            function ($message, array $parameters = []) {
+                Assert::assertSame('mautic.email.email_or_token.not_valid', $message);
+                Assert::assertSame(
+                    [
+                        '%value%'   => 'somestring',
+                        '%details%' => '\'somestring\' is not a valid contact field token. A valid token example: \'{contactfield=firstname|John}\'',
+                    ],
+                    $parameters
+                );
+            },
+        ];
+
+        // Test that valid email address do not add any violation.
+        yield [
+            'john@doe.com',
+            function () {
+                $this->fail('Field should not be fetched');
+            },
+            function () {
+                $this->fail('Valid email address value should not add violation.');
+            },
+        ];
+
+        // Test valid email address with invalid token.
+        yield [
+            'john@doe.com, somestring',
+            function () {
+                $this->fail('Field should not be fetched');
+            },
+            function ($message, array $parameters = []) {
+                Assert::assertSame('mautic.email.email_or_token.not_valid', $message);
+                Assert::assertSame(
+                    [
+                        '%value%'   => 'somestring',
+                        '%details%' => '\'somestring\' is not a valid contact field token. A valid token example: \'{contactfield=firstname|John}\'',
+                    ],
+                    $parameters
+                );
+            },
+        ];
+
+        yield [
+            'john@doe.com, {contactfield=somefield | invalid-default-email-address}',
+            function () {
+                $this->fail('Field should not be fetched');
+            },
+            function ($message, array $parameters = []) {
+                Assert::assertSame('mautic.email.email_or_token.not_valid', $message);
+                Assert::assertSame(
+                    [
+                        '%value%'   => '{contactfield=somefield | invalid-default-email-address}',
+                        '%details%' => 'mautic.email.address.invalid_format',
+                    ],
+                    $parameters
+                );
+            },
+        ];
+
+        // Test error when the field is not found in the database.
+        yield [
+            'john@doe.com, {contactfield=somefield|jane@doe.com}',
+            function (string $alias) {
+                Assert::assertSame('somefield', $alias);
+
+                return null;
+            },
+            function ($message, array $parameters = []) {
+                Assert::assertSame('mautic.email.email_or_token.not_valid', $message);
+                Assert::assertSame(
+                    [
+                        '%value%'   => '{contactfield=somefield|jane@doe.com}',
+                        '%details%' => 'Contact field with alias \'somefield\' was not found.',
+                    ],
+                    $parameters
+                );
+            },
+        ];
+
+        // Test error when the field is found but is not type of email.
+        yield [
+            'john@doe.com, {contactfield=somefield}',
+            function (string $alias) {
+                Assert::assertSame('somefield', $alias);
+
+                $field = new LeadField();
+                $field->setAlias($alias);
+                $field->setType('unicorn');
+
+                return $field;
+            },
+            function ($message, array $parameters = []) {
+                Assert::assertSame('mautic.email.email_or_token.not_valid', $message);
+                Assert::assertSame(
+                    [
+                        '%value%'   => '{contactfield=somefield}',
+                        '%details%' => 'Contact field \'somefield\' is type of \'unicorn\' but must be type of \'email\'',
+                    ],
+                    $parameters
+                );
+            },
+        ];
+
+        // Test valid email addresses and valid tokens.
+        yield [
+            'john@doe.com, {contactfield=somefield|jane@doe.com}, jone@doe.email, {contactfield=somefield}',
+            function (string $alias) {
+                Assert::assertSame('somefield', $alias);
+
+                $field = new LeadField();
+                $field->setAlias($alias);
+                $field->setType('email');
+
+                return $field;
+            },
+            function () {
+                $this->fail('There is no violation');
+            },
+        ];
+    }
+}
