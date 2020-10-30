@@ -1,0 +1,65 @@
+name: Mautic PHPUnit tests
+
+on:
+  push:
+    branches: [ staging ]
+  pull_request:
+    branches: [ staging ]
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+        fail-fast: false
+        matrix:
+          php-versions: ['7.2', '7.3', '7.4']
+  
+    name: PHP ${{ matrix.php-versions }} Test
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: mautictest
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Setup PHP, with composer and extensions
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-versions }}
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+        #coverage: xdebug #optional
+    
+    - name: Set SYMFONY_ENV to test
+      run: echo "::set-env name=SYMFONY_ENV::test"
+        
+    - name: Validate composer.json and composer.lock
+      run: composer validate
+
+    #- name: Cache Composer packages
+    #  id: composer-cache
+    #  uses: actions/cache@v2
+    #  with:
+    #    path: vendor
+    #    key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+    #    restore-keys: |
+    #      ${{ runner.os }}-php-
+
+    - name: Install dependencies
+    #  if: steps.composer-cache.outputs.cache-hit != 'true'
+      run: |
+        composer global require hirak/prestissimo
+        composer install --prefer-dist --no-progress --no-suggest
+    
+    - name: Run tests
+      run: composer test
+      env:
+        DB_PORT: ${{ job.services.mysql.ports[3306] }}
