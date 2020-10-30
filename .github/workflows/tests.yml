@@ -20,11 +20,10 @@ jobs:
 
     services:
       mysql:
-        image: bitnami/mysql:8.0
+        image: mysql:5.7
         env:
-          ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: mautictest
-          MYSQL_AUTHENTICATION_PLUGIN: mysql_native_password
         ports:
           - 3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
