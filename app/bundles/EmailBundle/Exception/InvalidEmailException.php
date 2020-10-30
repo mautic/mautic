@@ -11,12 +11,10 @@
 
 namespace Mautic\EmailBundle\Exception;
 
+use Mautic\CoreBundle\Exception\InvalidValueException;
 use Throwable;
 
-/**
- * Class InvalidEmailException.
- */
-class InvalidEmailException extends \Exception
+class InvalidEmailException extends InvalidValueException
 {
     /**
      * @var string
@@ -24,8 +22,6 @@ class InvalidEmailException extends \Exception
     protected $emailAddress;
 
     /**
-     * InvalidEmailException constructor.
-     *
      * @param string $emailAddress
      * @param string $message
      * @param int    $code
