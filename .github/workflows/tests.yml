@@ -102,7 +102,7 @@ jobs:
           composer rector -- --dry-run --no-progress-bar
         elif [[ "${{ matrix.commands }}" == "CS Fixer" ]]; then
           bin/php-cs-fixer fix --config=.php_cs -v --dry-run --using-cache=no --show-progress=dots \
-          --diff $(git diff -- '*.php' --name-only --diff-filter=ACMRTUXB "${TRAVIS_COMMIT_RANGE}")
+          --diff $(git diff -- '*.php' --name-only --diff-filter=ACMRTUXB "HEAD~..HEAD")
         else
           echo "Invalid command"
           exit 1
