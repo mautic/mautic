@@ -1,10 +1,6 @@
 name: Mautic tests and validations
 
-on:
-  push:
-    branches: [ staging ]
-  pull_request:
-    branches: [ staging ]
+on: [push, pull_request]
 
 jobs:
   phpunit:
