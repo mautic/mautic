@@ -17,7 +17,7 @@ jobs:
           php-versions: ['7.2', '7.3', '7.4']
           db-types: ['mysql', 'mariadb']
   
-    name: PHP ${{ matrix.php-versions }} ${{ matrix.db-types }} Test
+    name: PHP ${{ matrix.php-versions }} ${{ matrix.db-types }} test
 
     services:
       mysql:
@@ -54,17 +54,7 @@ jobs:
     - name: Validate composer.json and composer.lock
       run: composer validate
 
-    #- name: Cache Composer packages
-    #  id: composer-cache
-    #  uses: actions/cache@v2
-    #  with:
-    #    path: vendor
-    #    key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-    #    restore-keys: |
-    #      ${{ runner.os }}-php-
-
     - name: Install dependencies
-    #  if: steps.composer-cache.outputs.cache-hit != 'true'
       # Force Composer to v1.10
       run: |
         composer self-update --1
@@ -74,7 +64,7 @@ jobs:
     - name: Run tests - database = ${{ matrix.db-types }}
       run: |
         export DB_PORT_STRING="${{ matrix.db-types }}_port"
-        export DB_PORT=$!{$DB_PORT_STRING}
+        export DB_PORT=${!DB_PORT_STRING}
         composer test
       env:
         mysql_port: ${{ job.services.mysql.ports[3306] }}
