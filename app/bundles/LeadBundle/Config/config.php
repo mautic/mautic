@@ -786,6 +786,10 @@ return [
                 'tag'       => 'validator.constraint_validator',
                 'alias'     => 'uniqueleadlist',
             ],
+            'mautic.lead.validator.custom_field_token' => [
+                'class'     => \Mautic\LeadBundle\Validator\CustomFieldTokenValidator::class,
+                'arguments' => ['mautic.lead.model.field'],
+            ],
             'mautic.lead.event.dispatcher' => [
                 'class'     => \Mautic\LeadBundle\Helper\LeadChangeEventDispatcher::class,
                 'arguments' => [

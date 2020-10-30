@@ -799,6 +799,14 @@ return [
                 ],
                 'tag' => 'validator.constraint_validator',
             ],
+            'mautic.email.validator.email_or_token_list_validator' => [
+                'class'     => \Mautic\EmailBundle\Validator\EmailOrEmailTokenListValidator::class,
+                'arguments' => [
+                    'mautic.validator.email',
+                    'mautic.lead.validator.custom_field_token',
+                ],
+                'tag' => 'validator.constraint_validator',
+            ],
         ],
         'repositories' => [
             'mautic.email.repository.email' => [
