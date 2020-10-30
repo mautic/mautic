@@ -96,11 +96,11 @@ jobs:
     
     - name: Run ${{ matrix.commands }}
       run: |
-        if [[ ${{ matrix.commands }} == 'PHPSTAN' ]]; then
+        if [[ "${{ matrix.commands }}" == "PHPSTAN" ]]; then
           composer phpstan
-        elif [[ ${{ matrix.commands }} == 'Rector' ]]; then
+        elif [[ "${{ matrix.commands }}" == "Rector" ]]; then
           composer rector -- --dry-run --no-progress-bar
-        elif [[ ${{ matrix.commands }} == 'CS Fixer' ]]; then
+        elif [[ "${{ matrix.commands }}" == "CS Fixer" ]]; then
           bin/php-cs-fixer fix --config=.php_cs -v --dry-run --using-cache=no --show-progress=dots \
           --diff $(git diff -- '*.php' --name-only --diff-filter=ACMRTUXB "${TRAVIS_COMMIT_RANGE}")
         else
