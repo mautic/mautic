@@ -44,26 +44,33 @@ jobs:
       with:
         php-version: ${{ matrix.php-versions }}
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
-        #coverage: xdebug #optional
+        coverage: pcov
     
     - name: Set SYMFONY_ENV to test
       run: echo "SYMFONY_ENV=test" >> $GITHUB_ENV
-        
-    - name: Validate composer.json and composer.lock
-      run: composer validate
 
     - name: Install dependencies
       # Force Composer to v1.10
       run: |
         composer self-update --1
         composer global require hirak/prestissimo
+        composer validate
         composer install --prefer-dist --no-progress --no-suggest
     
     - name: Run tests - database = ${{ matrix.db-types }}
       run: |
         export DB_PORT_STRING="${{ matrix.db-types }}_port"
         export DB_PORT=${!DB_PORT_STRING}
-        composer test
+
+        if [[ "${{ matrix.php-versions }}" == "7.4" ]] && [[ "${{ matrix.db-types }}" == "mysql" ]]; then
+          # Clobber is needed because PCOV normally only works with PHPUnit 8+. Needed only to run test coverage.
+          composer require --dev pcov/clobber
+          bin/pcov clobber
+          composer test -- --coverage-clover=coverage.xml
+          bash <(curl -s https://codecov.io/bash)
+        else
+          composer test
+        fi
       env:
         mysql_port: ${{ job.services.mysql.ports[3306] }}
         mariadb_port: ${{ job.services.mariadb.ports[3306] }}
