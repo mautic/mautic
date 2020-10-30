@@ -71,7 +71,11 @@ jobs:
         composer global require hirak/prestissimo
         composer install --prefer-dist --no-progress --no-suggest
     
-    - name: Run tests
-      run: composer test
+    - name: Run tests - database = ${{ matrix.db-types }}
+      run: |
+        export DB_PORT_STRING="${{ matrix.db-types }}_port"
+        export DB_PORT=$!{$DB_PORT_STRING}
+        composer test
       env:
-        DB_PORT: ${{ job.services.${{ matrix.db-types }}.ports[3306] }}
+        mysql_port: ${{ job.services.mysql.ports[3306] }}
+        mariadb_port: ${{ job.services.mariadb.ports[3306] }}
