@@ -1,4 +1,4 @@
-name: Mautic PHPUnit tests
+name: Mautic tests and validations
 
 on:
   push:
@@ -7,17 +7,15 @@ on:
     branches: [ staging ]
 
 jobs:
-  test:
-
+  phpunit:
     runs-on: ubuntu-latest
 
     strategy:
-        fail-fast: false
         matrix:
           php-versions: ['7.2', '7.3', '7.4']
           db-types: ['mysql', 'mariadb']
   
-    name: PHP ${{ matrix.php-versions }} ${{ matrix.db-types }} test
+    name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
 
     services:
       mysql:
@@ -69,3 +67,43 @@ jobs:
       env:
         mysql_port: ${{ job.services.mysql.ports[3306] }}
         mariadb_port: ${{ job.services.mariadb.ports[3306] }}
+
+  misc:
+    runs-on: ubuntu-latest
+
+    strategy:
+        matrix:
+          commands: ['PHPSTAN', 'Rector', 'CS Fixer']
+
+    name: ${{ matrix.commands }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup PHP, with composer and extensions
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 7.4
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+
+    - name: Install dependencies
+      # Force Composer to v1.10
+      run: |
+        composer self-update --1
+        composer global require hirak/prestissimo
+        composer validate
+        composer install --prefer-dist --no-progress --no-suggest
+    
+    - name: Run ${{ matrix.commands }}
+      run: |
+        if [[ ${{ matrix.commands }} == 'PHPSTAN' ]]; then
+          composer phpstan
+        elif [[ ${{ matrix.commands }} == 'Rector' ]]; then
+          composer rector -- --dry-run --no-progress-bar
+        elif [[ ${{ matrix.commands }} == 'CS Fixer' ]]; then
+          bin/php-cs-fixer fix --config=.php_cs -v --dry-run --using-cache=no --show-progress=dots \
+          --diff $(git diff -- '*.php' --name-only --diff-filter=ACMRTUXB "${TRAVIS_COMMIT_RANGE}")
+        else
+          echo "Invalid command"
+          exit 1
+        fi
