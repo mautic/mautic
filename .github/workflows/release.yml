@@ -1,0 +1,78 @@
+name: release
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  release:
+    name: Create draft release ${{ github.ref }}
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Setup PHP, with composer and extensions
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 7.3
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+
+    - name: Install dependencies
+      # Force Composer to v1.10
+      run: |
+        composer self-update --1
+        composer global require hirak/prestissimo
+        composer validate
+        composer install --prefer-dist --no-progress --no-suggest
+
+    - name: Build release files
+      run: |
+        php build/package_release.php -b=${{ github.ref }}
+
+    - name: "Prerelease or not?"
+      run: |
+        STABILITY=$(jq -r '.stability' app/release_metadata.json)
+        if [[ "${STABILITY}" == 'stable' ]]; then
+          PRERELEASE=false
+        else
+          PRERELEASE=true
+        fi
+
+        echo "IS_PRERELEASE=${PRERELEASE}" >> $GITHUB_ENV
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Mautic Community ${{ github.ref }}
+        draft: true
+        prerelease: ${{ env.IS_PRERELEASE }}
+        body: |
+          TODO add release notes here!
+
+          $(cat build/packages/build-sha1-all)
+
+    - name: Upload full package ${{ github.ref }}.zip
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./build/packages/${{ github.ref }}.zip
+        asset_name: ${{ github.ref }}.zip
+        asset_content_type: application/zip
+
+    - name: Upload update package ${{ github.ref }}-update.zip
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./build/packages/${{ github.ref }}-update.zip
+        asset_name: ${{ github.ref }}-update.zip
+        asset_content_type: application/zip
