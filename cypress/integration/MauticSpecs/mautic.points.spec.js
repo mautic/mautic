@@ -19,8 +19,7 @@ context("Points", () => {
     points.actionDropDown.click();
     points.opensAnEmailOption.click();
     points.saveAndCloseButton.click();
-    leftNavigation.PointsSection.click();
-    cy.wait(1000);
+    points.waitforActionToBeCreated;
   })
 
   it("Edit a newly added action", () => {
@@ -32,7 +31,7 @@ context("Points", () => {
     points.searchAndGetFirstResult.click();
     points.pointsToBeChanged.clear().type("10");
     points.saveAndCloseButton.click();
-    leftNavigation.PointsSection.click();
+    points.waitforActionToBeCreated;
   })
 
   it("Delete a newly added action", () => {
@@ -69,7 +68,7 @@ context("Points", () => {
     points.addButton.click();
     cy.wait(1000);
     points.saveAndCloseTriggerButton.click();
-    leftNavigation.PointsSection.click();
+    points.waitforTriggerToBeCreated;
   })
 
   it("Edit newly added Trigger", () => {
@@ -85,7 +84,7 @@ context("Points", () => {
     points.triggerPoints.clear();
     points.triggerPoints.type("50");
     points.saveAndCloseTriggerButton.click();
-    leftNavigation.PointsSection.click();
+    points.waitforTriggerToBeCreated;
   })
 
   it("Delete newly added Trigger", () => {

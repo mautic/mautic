@@ -3,6 +3,19 @@ class LandingPages {
     waitforPageLoad (){
         cy.get('h3.pull-left').should('contain', 'Landing Pages');
     }
+
+    waitforPageLoadForLandingPage(){
+        cy.get('h3.pull-left');
+    }
+
+    waitforEditLandingPage(){
+        cy.get('h3.pull-left').should('contain', 'Edit Page');
+    }
+
+    waitforNewPageLandingCreationLogo (){
+        cy.get('h3.pull-left').should('contain', 'New Page');
+    }
+
     get addNewButton() {
         return cy.get('#toolbar > div.std-toolbar.btn-group > a');
     }
@@ -11,12 +24,20 @@ class LandingPages {
         return  cy.get('#page_title');
     }
 
+    get selectSkylineTheme() {
+        return  cy.get('a[data-theme="skyline"]');
+    }
+
     get applyButton(){
         return cy.get('#page_buttons_apply_toolbar');
     }
 
     get saveAndCloseButton() {
         return cy.get("#page_buttons_save_toolbar");
+    }
+
+    get searchAndSelectFIrstItem() {
+        return cy.get("#pageTable>tbody>tr>td>a");
     }
 
     get builderButton() {
@@ -42,8 +63,14 @@ class LandingPages {
     get formInTheList() {
         return cy.get("#slot > div:nth-child(2) > div > div > div.fr-toolbar.fr-desktop.fr-top.fr-basic > div:nth-child(22) > div > div > ul > li:nth-child(5) > a");
     }
+    
+    get editLandingPage() {
+        return cy.get('a[href*="pages/edit"]');
+    }
 
-  
+    waitforLandingPageCreation(){
+        cy.get('span[class="tt-u label label-success"]').should('be.visible');
+    }
 
 }
 const landingPages = new LandingPages();

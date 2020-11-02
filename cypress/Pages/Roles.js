@@ -1,9 +1,9 @@
 "use strict";
 class Roles {
 
-        waitForPageLoad() {
+    waitForPageLoad() {
             cy.get('h3.pull-left').should('contain', 'Roles'); 
-        }
+    }
     get addNewRoleButton() {
         return cy.get('a[href="/s/roles/new"]');
     }
@@ -82,6 +82,10 @@ class Roles {
 
     get saveAndCloseTab() {
         return  cy.get('#role_buttons_save_toolbar');
+    }
+
+    waitforRoleCreation(){
+        cy.get('#roleTable>tbody>tr>td>a[href*="roles"]').should('be.visible');
     }
 }
 const roles = new Roles();

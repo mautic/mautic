@@ -22,6 +22,7 @@ context("Roles", () => {
     roles.contacts_Access_ViewOwn.click();
     roles.contacts_Access_ViewOthers.click();
     roles.saveAndCloseTab.click();
+    roles.waitforRoleCreation();
   });
 
   it("Search and Delete newly added role", () => {

@@ -14,34 +14,7 @@ context("Contacts", () => {
     company.addNewButton.click({ force: true });
     company.companyName.type("CompanyAddedByCypress");
     company.saveButton.click();
-  });
-
-  it("Add new Contact", () => {
-    leftNavigation.contactsSection.click();
-    contact.waitforPageLoad();
-    contact.addNewButton.click({ force: true });
-    contact.title.type("Mr");
-    contact.firstName.type("Cypress");
-    contact.lastName.type("Tester");
-    contact.leadEmail.type("Cypress@test.com");
-    contact.SaveButton.click();
-    contact.closeButton.click({ force: true });
-  });
-
-  it("Edit newly added contact", () => {
-    leftNavigation.contactsSection.click();
-    contact.waitforPageLoad();
-    search.searchBox.clear();
-    search.searchBox.type("Cypress");
-    cy.wait(2000);
-    contact.searchAndClickForFirstElement.contains("Cypress").click();
-    cy.wait(2000);
-    contact.editContact.click();
-    contact.leadCity.type("Pune");
-    contact.lastName.clear();
-    contact.lastName.type("Contact");
-    contact.SaveButton.click();
-    contact.closeButton.click({ force: true });
+    company.waitforCompanyCreation();
   });
 
   it("Edit newly added Company", () => {
@@ -49,12 +22,14 @@ context("Contacts", () => {
     company.waitforPageLoad();
     search.searchBox.clear();
     search.searchBox.type("CompanyAddedByCypress");
+    company.waitTillSearchResultGetsDisplayed();
     cy.wait(2000);
     company.searchAndClickForFirstElement.contains("CompanyAddedByCypress").click();
-    cy.wait(2000);
+    company.waitforCompanyEditPageOpen();
     company.companyCity.type("Pune");
     company.companyZipCode.type("412308");
     company.saveButton.click();
+    company.waitforCompanyCreation();
   });
 
   it("Search and Delete Company", () => {
@@ -62,18 +37,51 @@ context("Contacts", () => {
     company.waitforPageLoad();
     search.searchBox.clear();
     search.searchBox.type("CompanyAddedByCypress");
+    company.waitTillSearchResultGetsDisplayed();
     search.selectCheckBoxForFirstItem.click({ force: true });
     search.OptionsDropdownForFirstItem.click();
     search.deleteButtonForFirstItem.click();
     search.confirmDeleteButton.click();
   });
 
+  it("Add new Contact", () => {
+    leftNavigation.contactsSection.click();
+    contact.waitforPageLoad();
+    contact.addNewButton.click({ force: true });
+    contact.title.type("Mr");
+    contact.firstName.type("ContactAddedCypress");
+    contact.lastName.type("Tester");
+    contact.leadEmail.type("Cypress@test.com");
+    contact.SaveButton.click();
+    contact.closeButton.click({ force: true });
+    contact.waitForContactCreation();
+  });
+
+  it("Edit newly added contact", () => {
+    leftNavigation.contactsSection.click();
+    contact.waitforPageLoad();
+    search.searchBox.clear();
+    search.searchBox.type("ContactAddedCypress");
+    contact.waitTillSearchResultGetsDisplayed();
+    cy.wait(1000);
+    contact.searchAndClickForFirstElement.contains("ContactAddedCypress").click();
+    contact.waitForContactOpen();
+    contact.editContact.click();
+    contact.waitForContactEditPageOpen();
+    contact.leadCity.type("Pune");
+    contact.lastName.clear();
+    contact.lastName.type("Contact");
+    contact.SaveButton.click();
+    contact.closeButton.click({ force: true });
+    contact.waitForContactCreation();
+  });
+
   it("Search and Delete a Contact", () => {
     leftNavigation.contactsSection.click();
     contact.waitforPageLoad();
     search.searchBox.clear();
-    search.searchBox.type("Cypress");
-    cy.wait(2000);
+    search.searchBox.type("ContactAddedCypress");
+    contact.waitTillSearchResultGetsDisplayed();
     search.selectCheckBoxForFirstItem.click({ force: true });
     search.OptionsDropdownForFirstItem.click();
     search.deleteButtonForFirstItem.click();

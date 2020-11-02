@@ -3,6 +3,11 @@ class Company {
     waitforPageLoad (){
         cy.get('h3.pull-left').should('contain', 'Companies');
     }
+
+    waitforCompanyCreation(){
+        cy.get('#companyTable>tbody>tr>td>div>a').should('be.visible');
+    }
+
     get addNewButton() {
         return cy.get("#toolbar > div.std-toolbar.btn-group > a > span > span")
         .first();
@@ -17,6 +22,10 @@ class Company {
 
     get companyCity() {
         return  cy.get('#company_companycity');
+    }
+
+    waitforCompanyEditPageOpen(){
+        cy.get('#company_companycity').should('be.visible');
     }
 
     get companyAddressOne() {
@@ -49,6 +58,10 @@ class Company {
 
     get searchAndClickForFirstElement() {
         return   cy.get('#companyTable>tbody>tr>td>div>a');
+    }
+
+    waitTillSearchResultGetsDisplayed(){
+        cy.get('#companyTable>tbody>tr>td>a').should('not.be.empty');
     }
   
 }

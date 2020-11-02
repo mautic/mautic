@@ -23,6 +23,7 @@ context("Emails", () => {
     emails.firstSegmentEmailSelector.click();
     emails.saveEmailButton.click();
     emails.closeButton.click();
+    emails.waitforEmailCreation();
     search.searchBox.clear();
     search.searchBox.type("testSegmentEmailCypress");
     cy.wait(2000);

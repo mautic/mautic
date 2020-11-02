@@ -40,7 +40,11 @@ class Forms {
     }
 
     get contactFieldDropdown() {
-        return cy.get("#formfield_mappedField_chosen>a>span");
+        return cy.get('div[class="choice-wrapper"]>div>a[class="chosen-single chosen-default"]>span').eq(1);
+    }
+
+    get selectFromDropdown() {
+        return cy.get('div[class="choice-wrapper"]>div>a[class="chosen-single chosen-default"]>span');
     }
 
     get contactFieldSearchBox() {
@@ -57,6 +61,18 @@ class Forms {
     
     get saveFormButton() {
         return cy.get("#mauticform_buttons_save_toolbar");
+    }
+
+    get searchAndSelectFirstItem() {
+        return cy.get('#formTable>tbody>tr>td>div>a');
+    }
+
+    get editForm() {
+        return cy.get('a[href*="forms/edit"]');
+    }
+
+    waitforFormCreation(){
+        cy.get('span[class="tt-u label label-success"]').should('be.visible');
     }
 
 }
