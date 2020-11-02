@@ -30,6 +30,7 @@ class LeadPermissions extends AbstractPermissions
             ],
             'fields' => [
                 'full' => 1024,
+                'view' => 1,
             ],
         ];
         $this->addExtendedPermissions('leads', false);
@@ -71,6 +72,7 @@ class LeadPermissions extends AbstractPermissions
             [
                 'choices' => [
                     'mautic.core.permissions.manage' => 'full',
+                    'mautic.core.permissions.view'   => 'view',
                 ],
                 'label'             => 'mautic.lead.permissions.fields',
                 'data'              => (!empty($data['fields']) ? $data['fields'] : []),

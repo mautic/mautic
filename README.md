@@ -11,6 +11,7 @@ Mautic Introduction
 |2.15  | 27 Sep 2019 | 8 Oct 2019 | 8 Oct 2019 | 8 Oct 2019
 |2.16  | 30 Jan 2020 | 13 Feb 2020 | 15 June 2020 | 15 December 2020
 |3.0   | 27 Jan 2020 | 15 June 2020 | 15 June 2021 | 15 December 2021
+|3.1   | 17 Aug 2020 | 24 Aug 2020 | 23 Nov 2020 | 23 May 2021
 
 * = Security Support for 2.16 will only be provided for Mautic itself, not for core dependencies that are EOL like Symfony 2.8.
 
@@ -59,7 +60,7 @@ That's fantastic!
 
 If you want to contribute to Mautic's **code**, please read our [CONTRIBUTING.md](https://github.com/mautic/mautic/blob/staging/.github/CONTRIBUTING.md) or [Contributing Code](https://contribute.mautic.org/contributing-to-mautic/developer) docs. Then, check out the issues with the [L1 label](https://github.com/mautic/mautic/issues?q=is%3Aissue+is%3Aopen+label%3AL1) to get started quickly :rocket:
 
-If you want to contribute in **other areas** of Mautic, please read our general [Contributing](https://contribute.mautic.org/about/how-can-i-contribute) guide.
+If you want to contribute in **other areas** of Mautic, please read our general [Contributing](https://contribute.mautic.org/contributing-to-mautic) guide.
 
 ## FAQ and Contact Information
 Marketing automation has historically been a difficult tool to implement in a business. The Mautic community is a rich environment for you to learn from others and share your knowledge as well. Open source means more than open code. Open source is providing equality for all and a chance to improve. If you have questions then the Mautic community can help provide the answers.

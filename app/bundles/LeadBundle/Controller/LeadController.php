@@ -1317,12 +1317,11 @@ class LeadController extends FormController
         $leadFields['id'] = $lead->getId();
         $leadEmail        = $leadFields['email'];
         $leadName         = $leadFields['firstname'].' '.$leadFields['lastname'];
+        $mailerIsOwner    = $this->get('mautic.helper.core_parameters')->getParameter('mailer_is_owner');
 
         // Set onwer ID to be the current user ID so it will use his signature
         $leadFields['owner_id'] = $this->get('mautic.helper.user')->getUser()->getId();
 
-        // Check if lead has a bounce status
-        $dnc    = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
         $inList = ('GET' == $this->request->getMethod())
             ? $this->request->get('list', 0)
             : $this->request->request->get(
@@ -1331,6 +1330,22 @@ class LeadController extends FormController
                 true
             );
         $email  = ['list' => $inList];
+
+        // Try set owner If should be mailer
+        if ($lead->getOwner()) {
+            $leadFields['owner_id'] = $lead->getOwner()->getId();
+            if ($mailerIsOwner) {
+                $email['fromname'] = sprintf(
+                    '%s %s',
+                    $lead->getOwner()->getFirstName(),
+                    $lead->getOwner()->getLastName()
+                );
+                $email['from']     = $lead->getOwner()->getEmail();
+            }
+        }
+
+        // Check if lead has a bounce status
+        $dnc    = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'email', 'objectId' => $objectId]);
         $form   = $this->get('form.factory')->create(EmailType::class, $email, ['action' => $action]);
 
@@ -1625,7 +1640,7 @@ class LeadController extends FormController
                 $persistEntities = [];
                 foreach ($entities as $lead) {
                     if ($this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-                        if ($doNotContact->addDncForContact($lead->getId(), 'email', $data['reason'], DoNotContact::MANUAL)) {
+                        if ($doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, $data['reason'])) {
                             $persistEntities[] = $lead;
                         }
                     }
