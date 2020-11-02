@@ -11,7 +11,7 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Tests\Validator;
+namespace Mautic\CoreBundle\Tests\Unit\Form\DataTransformer;
 
 use Mautic\CoreBundle\Form\DataTransformer\BarStringTransformer;
 use PHPUnit\Framework\Assert;
