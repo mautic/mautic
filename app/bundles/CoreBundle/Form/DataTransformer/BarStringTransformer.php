@@ -23,12 +23,8 @@ class BarStringTransformer implements DataTransformerInterface
 {
     public function transform($array): string
     {
-        if (null === $array) {
+        if (!is_array($array)) {
             return '';
-        }
-
-        if (is_string($array)) {
-            return $array;
         }
 
         return implode('|', $array);
@@ -36,7 +32,7 @@ class BarStringTransformer implements DataTransformerInterface
 
     public function reverseTransform($string): array
     {
-        if (!$string) {
+        if (!is_string($string)) {
             return [];
         }
 
