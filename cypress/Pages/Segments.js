@@ -30,11 +30,11 @@ class Segments {
     }
 
     get filterSearchBox(){
-        return cy.get('#available_segment_filters_chosen > div > div > input');
+        return cy.get('.chosen-search-input');
     }
 
     get filterField(){
-        return     cy.get('#available_segment_filters_chosen > div > ul > li.active-result.group-option.segment-filter.user');
+        return     cy.get('.active-result')
     }
 
     get editSegment(){
@@ -42,7 +42,7 @@ class Segments {
     }
 
     get filterValue(){
-        return   cy.get('#leadlist_filters_1_properties_filter');
+        return   cy.get('#leadlist_filters_1_filter')
     }
 
     get saveAndCloseButton(){
