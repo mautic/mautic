@@ -9,11 +9,12 @@ const search = require("../../Pages/Search");
 context("Add new a stage", () => {
    it("Add a Stage", () => {
     leftNavigation.StagesSection.click();
-    cy.wait(2000);
+    stages.checkNoResultFoundMessage.should('contain','No Results Found');
     stages.addNewButton.click();
     stages.stageName.type("TestStage");
     stages.stageWeight.type("40");
     stages.saveAndCloseButton.click();
+    stages.waitforStageCreation();
   })
 
   it("Edit newly added Stage", () => {
@@ -26,7 +27,7 @@ context("Add new a stage", () => {
     stages.stageWeight.clear();
     stages.stageWeight.type("50");
     stages.saveAndCloseButton.click();
-    cy.wait(1000);
+    stages.waitforStageCreation();
   })
 
   it("search and delete newly added stage", () => {
@@ -38,6 +39,7 @@ context("Add new a stage", () => {
     search.selectAndClickFirstItemsOption.click();
     search.deleteButtonForFirstItem.click();
     search.confirmDeleteButton.click();
+    stages.checkNoResultFoundMessage.should('contain','No Results Found');
   })
 
   });

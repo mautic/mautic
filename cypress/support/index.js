@@ -23,38 +23,39 @@ const segment = require("../Pages/Segments");
 import "./commands";
 
 Cypress.Cookies.defaults({
-  preserve: [Cypress.env("instanceId"), "sid", "success"],
+  preserve: [Cypress.env("instanceId"),'_ga','_gid','_gat','mautic_referer_id','mtc_id','mtc_sid','mautic_device_id','device_id','sid','id','success','__Secure-3PAPISID','SAPISID','APISID','__Secure-3PSID','SID','SSID','HSID','NID','1P_JAR','ANID','SIDCC','OTZ'],
 });
 
 before("Perform login", () => {
   cy.visit("/s/login");
   cy.login(Cypress.env("userName"), Cypress.env("password"));
 
-  // adding sample contacts to be used across test
+  //adding sample contacts to be used across test
   leftNavigation.contactsSection.click();
   contact.waitforPageLoad();
   contact.addNewButton.click({ force: true });
   contact.title.type("Mr");
-  contact.firstName.type("Test");
-  contact.lastName.type("User1");
-  contact.leadEmail.type("Testuser1@mailtest.mautic.com");
+  contact.firstName.type("TestContact");
+  contact.lastName.type("Data");
+  contact.leadEmail.type("TestContact@mailtest.mautic.com");
   contact.SaveButton.click();
   contact.closeButton.click({ force: true });
+  contact.waitForContactCreation();
 
   //adding sample email to be used across test
-
   leftNavigation.ChannelsSection.click();
   leftNavigation.EmailsSubSection.click();
   cy.wait(3000);
   emails.waitforPageLoad();
   emails.addNewButton.click({ force: true });
-  cy.wait(5000);
+  emails.waitforEmailSelectorPageGetsLoaded();
   emails.templateEmailSelector.click();
   cy.wait(2000);
   emails.emailSubject.type("Test Email");
   emails.emailInternalName.type("Test Email");
   emails.saveEmailButton.click();
-  emails.closeButton.click({ force: true });
+  emails.closeButton.click();
+  emails.waitforEmailCreation();
 
   //adding sample segment to be used across test
   leftNavigation.SegmentsSection.click();
@@ -62,29 +63,32 @@ before("Perform login", () => {
   segments.waitForPageLoad();
   segments.addNewButton.click({ force: true });
   cy.wait(1000);
-  segments.segmentName.type("TestUsers");
+  segments.segmentName.type("TestSegment");
   segments.filterTab.click();
   cy.wait(1000);
   segments.filterDropDown.click();
   cy.wait(1000);
   segments.filterSearchBox.type("First");
   segments.filterField.click();
-  segments.filterValue.type("Test");
+  segments.filterValue.type("TestContact");
   segments.saveAndCloseButton.click();
+  segments.waitforSegmentCreation();
 });
 
 after("Delete Test Data", () => {
   //deleting created contact
   cy.wait(2000);
   leftNavigation.contactsSection.click();
+  leftNavigation.contactsSection.click();
   contact.waitforPageLoad();
   search.searchBox.clear();
-  search.searchBox.type("User1");
+  search.searchBox.type("TestContact");
   cy.wait(2000);
   search.selectCheckBoxForFirstItem.click({ force: true });
   search.OptionsDropdownForFirstItem.click();
   search.deleteButtonForFirstItem.click();
   search.confirmDeleteButton.click();
+  cy.wait(2000);
 
   //deleting created Email
   leftNavigation.ChannelsSection.click();
@@ -105,7 +109,7 @@ after("Delete Test Data", () => {
   cy.wait(1000);
   segments.waitForPageLoad();
   segments.SearchBox.click().clear();
-  segments.SearchBox.type("TestUsers");
+  segments.SearchBox.type("TestSegment");
   cy.wait(2000);
   segments.firstCheckbox.click();
   segments.firstDropDown.click();

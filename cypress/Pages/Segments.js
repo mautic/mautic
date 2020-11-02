@@ -1,8 +1,18 @@
 "use strict";
 class Segments {
-      waitForPageLoad(){
+
+    waitForPageLoad(){
         cy.get('h3.pull-left').should('contain', 'Contact Segments');
-      }
+    }
+
+    waitTillSearchedElementGetsVisible(){
+        return cy.get('#leadListTable>tbody>tr>td>div>a').should('be.visible');
+    }
+
+    waitTillClickedSegmentGetsOpen(){
+        return cy.get('a[href*="/s/segments/edit"]').should('be.visible');
+    }
+
     get addNewButton() {
         return cy.get('.std-toolbar > .btn');
     }
@@ -20,11 +30,11 @@ class Segments {
     }
 
     get filterSearchBox(){
-        return cy.get('.chosen-search-input');
+        return cy.get('#available_segment_filters_chosen > div > div > input');
     }
 
     get filterField(){
-        return     cy.get('.active-result');
+        return     cy.get('#available_segment_filters_chosen > div > ul > li.active-result.group-option.segment-filter.user');
     }
 
     get editSegment(){
@@ -32,7 +42,7 @@ class Segments {
     }
 
     get filterValue(){
-        return   cy.get('#leadlist_filters_1_filter');
+        return   cy.get('#leadlist_filters_1_properties_filter');
     }
 
     get saveAndCloseButton(){
@@ -71,6 +81,13 @@ class Segments {
         return cy.get('#leadlist_filters_1_properties_filter');
     }
 
+    waitforSegmentCreation(){
+        cy.get('#leadListTable>tbody>tr>td>div>a').should('be.visible');
+    }
+
+    waitforSegmentUpdate(){
+        cy.get('span[class="tt-u label label-success"]').should('be.visible');
+    }
 }
 const segment = new Segments();
 module.exports = segment;

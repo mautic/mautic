@@ -5,9 +5,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const settings = require("../../Pages/Settings");
 const customFields = require("../../Pages/CustomFields");
 
-
-
-
 context("Custom Fields", () => {
    
   it("add new Booleean custom field for Company", () => {

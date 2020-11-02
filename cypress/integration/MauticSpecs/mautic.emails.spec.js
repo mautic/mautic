@@ -11,17 +11,16 @@ context("Emails", () => {
   it("Add new Email", () => {
     leftNavigation.ChannelsSection.click();
     leftNavigation.EmailsSubSection.click();
-    cy.wait(3000);
     emails.waitforPageLoad();
     emails.addNewButton.click({ force: true });
-    cy.wait(5000);
+    emails.waitforEmailSelectorPageGetsLoaded();
     emails.templateEmailSelector.click();
     cy.wait(2000);
     emails.emailSubject.type('TestEmailCypress');
     emails.emailInternalName.type('TestEmailCypress')
     emails.saveEmailButton.click();
     emails.closeButton.click({force: true});
-    cy.wait(1000);
+    emails.waitforEmailCreation();
   });
 
   it("Edit newly added email", () => {
@@ -30,15 +29,17 @@ context("Emails", () => {
     emails.waitforPageLoad();
     search.searchBox.clear();
     search.searchBox.type("TestEmailCypress");
-    cy.wait(2000);
+    emails.waitTillSearchedElementGetsVisible();
+    cy.wait(1000);
     emails.searchAndSelectEmail.contains("TestEmailCypress").click();
-    cy.wait(1000);
+    emails.waitTillEditMailPageGetsVisible();
     emails.emailEditButton.click();
-    cy.wait(1000);
+    emails.waitforSelectedEmailGetsOpen();
     emails.emailSubject.clear();
     emails.emailSubject.type('TestEmail');
     emails.saveEmailButton.click();
     emails.closeButton.click({force: true});
+    emails.waitforEmailCreation();
   });
 
   it("Search and delete newly added email", () => {
@@ -47,12 +48,13 @@ context("Emails", () => {
     emails.waitforPageLoad();
     search.searchBox.clear();
     search.searchBox.type("TestEmailCypress");
-    cy.wait(2000);
+    emails.waitTillSearchedElementGetsVisible();
+    cy.wait(1000);
     search.selectCheckBoxForFirstItem.click();
     search.OptionsDropdownForFirstItem.click();
     search.deleteButtonForFirstItem.click();
     search.confirmDeleteButton.click();
-    cy.wait(1000);
+    emails.checkNoResultFoundMessage.should('contain','No Results Found');
   });
 
   });

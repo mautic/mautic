@@ -22,9 +22,9 @@ context("Campaign", () => {
     campaigns.addStepButtonBottom.click({ force: true });
     campaigns.actionSelector.click();
     campaigns.listOfActions.select("Send email", { force: true });
-    campaigns.sendEmailActionName.type("Test");
+    campaigns.sendEmailActionName.type("Test Campaign Email");
     campaigns.emailTOBeSentSelector.click();
-    campaigns.emailSearchBox.type("Test");
+    campaigns.emailSearchBox.type("Test Email");
     campaigns.firstEmailinTheSearchList.click();
     campaigns.addEmailButton.click();
     campaigns.closeBuilderButton.click();
@@ -32,7 +32,7 @@ context("Campaign", () => {
     campaigns.saveAndCloseButton.click();
     campaigns.closeSummaryPageButton.click();
     search.searchBox.clear();
-    search.searchBox.type("Test");
+    search.searchBox.type("TestCampaign");
     search.selectCheckBoxForFirstItem.should('exist');
   });
 
