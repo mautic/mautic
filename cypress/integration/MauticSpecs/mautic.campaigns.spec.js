@@ -7,7 +7,7 @@ const campaigns = require("../../Pages/Campaigns");
 const search = require("../../Pages/Search");
 
 context("Campaign", () => {
- 
+
   it("Add new Campaign", () => {
     leftNavigation.CampaignsSection.click();
     campaigns.waitforPageLoad();
@@ -22,9 +22,12 @@ context("Campaign", () => {
     campaigns.addStepButtonBottom.click({ force: true });
     campaigns.actionSelector.click();
     campaigns.listOfActions.select("Send email", { force: true });
+    cy.wait(2000);
     campaigns.sendEmailActionName.type("Test Campaign Email");
     campaigns.emailTOBeSentSelector.click();
-    campaigns.emailSearchBox.type("Test Email");
+    cy.wait(2000);
+    campaigns.emailSearchBox.type("Test");
+    cy.wait(2000);
     campaigns.firstEmailinTheSearchList.click();
     campaigns.addEmailButton.click();
     campaigns.closeBuilderButton.click();
