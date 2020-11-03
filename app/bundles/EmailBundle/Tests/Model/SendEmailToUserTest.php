@@ -17,9 +17,11 @@ use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Validator\CustomFieldValidator;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
 {
@@ -29,6 +31,16 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
     private $emailModel;
 
     /**
+     * @var MockObject|EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
+     * @var MockObject|CustomFieldValidator
+     */
+    private $customFieldValidator;
+
+    /**
      * @var SendEmailToUser
      */
     private $sendEmailToUser;
@@ -36,8 +48,14 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->emailModel      = $this->createMock(EmailModel::class);
-        $this->sendEmailToUser = new SendEmailToUser($this->emailModel);
+        $this->emailModel           = $this->createMock(EmailModel::class);
+        $this->dispatcher           = $this->createMock(EventDispatcherInterface::class);
+        $this->customFieldValidator = $this->createMock(CustomFieldValidator::class);
+        $this->sendEmailToUser      = new SendEmailToUser(
+            $this->emailModel,
+            $this->dispatcher,
+            $this->customFieldValidator
+        );
     }
 
     public function testEmailNotFound()
