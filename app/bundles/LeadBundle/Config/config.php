@@ -786,9 +786,9 @@ return [
                 'tag'       => 'validator.constraint_validator',
                 'alias'     => 'uniqueleadlist',
             ],
-            'mautic.lead.validator.custom_field_token' => [
+            'mautic.lead.validator.custom_field' => [
                 'class'     => \Mautic\LeadBundle\Validator\CustomFieldValidator::class,
-                'arguments' => ['mautic.lead.model.field'],
+                'arguments' => ['mautic.lead.model.field', 'translator'],
             ],
             'mautic.lead.event.dispatcher' => [
                 'class'     => \Mautic\LeadBundle\Helper\LeadChangeEventDispatcher::class,

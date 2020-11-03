@@ -48,7 +48,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
             }
         };
 
-        $ranslator = new class() extends Translator {
+        $translator = new class() extends Translator {
             public function __construct()
             {
             }
@@ -86,8 +86,8 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         };
 
         $emaiOrEmailTokenListValidator = new EmailOrEmailTokenListValidator(
-            new EmailValidator($ranslator, $dispatcher),
-            new CustomFieldValidator($fieldModel)
+            new EmailValidator($translator, $dispatcher),
+            new CustomFieldValidator($fieldModel, $translator)
         );
 
         $emaiOrEmailTokenListValidator->initialize($context);

@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Validator;
 
 use Mautic\CoreBundle\Exception\InvalidValueException;
-use Mautic\CoreBundle\Exception\RecordNotFoundException;
+use Mautic\CoreBundle\Exception\RecordException;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\EmailValidator;
@@ -89,7 +89,7 @@ final class EmailOrEmailTokenListValidator extends ConstraintValidator
 
                     // Validate that the contact field exists and is type of email.
                     $this->customFieldValidator->validateFieldType($contactFieldToken->getFieldAlias(), 'email');
-                } catch (RecordNotFoundException | InvalidValueException $tokenException) {
+                } catch (RecordException | InvalidValueException $tokenException) {
                     $this->context->addViolation(
                         'mautic.email.email_or_token.not_valid',
                         ['%value%' => $emailOrToken, '%details%' => $tokenException->getMessage()]

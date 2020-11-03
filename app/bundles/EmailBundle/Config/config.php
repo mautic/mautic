@@ -758,6 +758,7 @@ return [
                 'arguments' => [
                     'mautic.email.model.email',
                     'event_dispatcher',
+                    'mautic.lead.validator.custom_field',
                 ],
             ],
             'mautic.email.model.send_email_to_contacts' => [
@@ -804,7 +805,7 @@ return [
                 'class'     => \Mautic\EmailBundle\Validator\EmailOrEmailTokenListValidator::class,
                 'arguments' => [
                     'mautic.validator.email',
-                    'mautic.lead.validator.custom_field_token',
+                    'mautic.lead.validator.custom_field',
                 ],
                 'tag' => 'validator.constraint_validator',
             ],

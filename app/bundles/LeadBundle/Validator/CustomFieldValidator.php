@@ -15,8 +15,10 @@ namespace Mautic\LeadBundle\Validator;
 
 use Mautic\CoreBundle\Exception\InvalidValueException;
 use Mautic\CoreBundle\Exception\RecordNotFoundException;
+use Mautic\CoreBundle\Exception\RecordNotPublishedException;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomFieldValidator
 {
@@ -25,26 +27,58 @@ class CustomFieldValidator
      */
     private $fieldModel;
 
-    public function __construct(FieldModel $fieldModel)
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    public function __construct(FieldModel $fieldModel, TranslatorInterface $translator)
     {
         $this->fieldModel = $fieldModel;
+        $this->translator = $translator;
     }
 
     /**
      * @throws RecordNotFoundException
+     * @throws RecordNotPublishedException
      * @throws InvalidValueException
      */
     public function validateFieldType(string $alias, string $fieldType): void
+    {
+        $field = $this->getPublishedFieldByAlias($alias);
+
+        if ($field->getType() !== $fieldType) {
+            throw new InvalidValueException($this->translator->trans('mautic.lead.contact.wrong.field.type', ['%alias%' => $alias, '%fieldType%' => $field->getType(), '%expectedType%' => $fieldType], 'validators'));
+        }
+    }
+
+    /**
+     * @throws RecordNotFoundException
+     * @throws RecordNotPublishedException
+     */
+    private function getPublishedFieldByAlias(string $alias): LeadField
+    {
+        $field = $this->getFieldByAlias($alias);
+
+        if (!$field->getIsPublished()) {
+            throw new RecordNotPublishedException($this->translator->trans('mautic.lead.contact.field.not.published', ['%alias%' => $alias], 'validators'));
+        }
+
+        return $field;
+    }
+
+    /**
+     * @throws RecordNotFoundException
+     */
+    private function getFieldByAlias(string $alias): LeadField
     {
         /** @var LeadField|null */
         $field = $this->fieldModel->getEntityByAlias($alias);
 
         if (!$field) {
-            throw new RecordNotFoundException("Contact field with alias '{$alias}' was not found.");
+            throw new RecordNotFoundException($this->translator->trans('mautic.lead.contact.field.not.found', ['%alias%' => $alias], 'validators'));
         }
 
-        if ($field->getType() !== $fieldType) {
-            throw new InvalidValueException("Contact field '{$field->getAlias()}' is type of '{$field->getType()}' but must be type of '{$fieldType}'");
-        }
+        return $field;
     }
 }

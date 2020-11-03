@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\DataObject;
 
-use Mautic\CoreBundle\Exception\InvalidValueException;
 use Mautic\CoreBundle\Form\DataTransformer\BarStringTransformer;
+use Mautic\LeadBundle\Exception\InvalidContactFieldTokenException;
 
 /**
  * A value object representation of a contact field token.
@@ -39,7 +39,7 @@ class ContactFieldToken
     private $defaultValue;
 
     /**
-     * @throws InvalidValueException
+     * @throws InvalidContactFieldTokenException
      */
     public function __construct(string $fullToken)
     {
@@ -67,7 +67,7 @@ class ContactFieldToken
         preg_match('/'.self::REGEX.'/', $fullToken, $matches);
 
         if (empty($matches[1])) {
-            throw new InvalidValueException("'{$fullToken}' is not a valid contact field token. A valid token example: '{contactfield=firstname|John}'");
+            throw new InvalidContactFieldTokenException("'{$fullToken}' is not a valid contact field token. A valid token example: '{contactfield=firstname|John}'");
         }
 
         $barStringTransformer = new BarStringTransformer();
