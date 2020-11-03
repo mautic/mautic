@@ -184,7 +184,7 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
                 ['hello@there.com'],
                 ['bob@bobek.cz'],
                 ['hidden@translation.in'],
-                ['{invalid-token}'],
+                ['{invalid-token}']
             )
             ->willReturnOnConsecutiveCalls(
                 null,
