@@ -757,6 +757,7 @@ return [
                 'class'     => \Mautic\EmailBundle\Model\SendEmailToUser::class,
                 'arguments' => [
                     'mautic.email.model.email',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.email.model.send_email_to_contacts' => [
