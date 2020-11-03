@@ -121,7 +121,9 @@ class FieldChangeRepository extends CommonRepository
             )
             ->setParameter('integration', $integration)
             ->setParameter('objectType', $objectType)
-            ->orderBy('f.modified_at'); // Newer updated fields must override older updated fields
+            // 1. We must sort by f.object_id. Otherwise values stored in PartialObjectReportBuilder::lastProcessedTrackedId will be incorrect.
+            // 2. Newer updated fields must override older updated fields
+            ->orderBy('f.object_id, f.modified_at', 'ASC');
 
         return $qb->executeQuery()->fetchAllAssociative();
     }
