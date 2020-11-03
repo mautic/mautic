@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -13,6 +11,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Exception;
 
-class InvalidValueException extends \Exception
+class RecordNotPublishedException extends RecordException
 {
 }
