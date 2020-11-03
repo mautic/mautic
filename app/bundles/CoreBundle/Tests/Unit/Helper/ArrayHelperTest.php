@@ -12,6 +12,7 @@
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;
+use PHPUnit\Framework\Assert;
 
 class ArrayHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -46,5 +47,24 @@ class ArrayHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['two' => 'three'], ArrayHelper::select(['two'], $origin));
         $this->assertSame(['two' => 'three', 'four' => 'five'], ArrayHelper::select(['two', 'four'], $origin));
         $this->assertSame(['one', 'two' => 'three'], ArrayHelper::select(['two', 0], $origin));
+    }
+
+    /**
+     * @dataProvider removeEmptyValuesProvider
+     */
+    public function testRemoveEmptyValues($value, $expected): void
+    {
+        Assert::assertSame($expected, ArrayHelper::removeEmptyValues($value));
+    }
+
+    public function removeEmptyValuesProvider(): \Generator
+    {
+        $object = new \StdClass();
+        yield [[null], []];
+        yield [[], []];
+        yield [[123], [123]];
+        yield [[$object], [$object]];
+        yield [[''], []];
+        yield [['value A', ''], ['value A']];
     }
 }
