@@ -212,6 +212,7 @@ return [
                     'mautic.integrations.sync.data_exchange.mautic.full_object_report_builder',
                     'mautic.integrations.sync.data_exchange.mautic.partial_object_report_builder',
                     'mautic.integrations.sync.data_exchange.mautic.order_executioner',
+                    'mautic.integrations.helper.sync_date',
                 ],
             ],
             'mautic.integrations.sync.integration_process.object_change_generator' => [
