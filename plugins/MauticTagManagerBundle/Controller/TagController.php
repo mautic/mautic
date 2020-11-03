@@ -160,7 +160,11 @@ class TagController extends FormController
         }
 
         //retrieve the entity
+<<<<<<< HEAD
         $tag   = new Tag();
+=======
+        $tag = new Tag();
+>>>>>>> added TagManagerPlugin
         $model = $this->getModel('tagmanager.tag');
         //set the page we came from
         $page = $this->get('session')->get('mautic.tagmanager.page', 1);
@@ -220,7 +224,11 @@ class TagController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
+<<<<<<< HEAD
                 'form'   => $form->createView(),
+=======
+                'form' => $form->createView(),
+>>>>>>> added TagManagerPlugin
                 'entity' => $tag,
             ],
             'contentTemplate' => 'MauticTagManagerBundle:Tag:form.html.php',
@@ -249,7 +257,11 @@ class TagController extends FormController
         $postActionVars = $this->getPostActionVars();
 
         try {
+<<<<<<< HEAD
             $tag   = $this->getTag($objectId);
+=======
+            $tag = $this->getTag($objectId);
+>>>>>>> added TagManagerPlugin
             $clone = new Tag();
             $clone->setTag($tag->getTag());
 
@@ -545,9 +557,15 @@ class TagController extends FormController
 
         if ('POST' == $this->request->getMethod()) {
             /** @var TagModel $model */
+<<<<<<< HEAD
             $model         = $this->getModel('lead.tag');
             $overrideModel = $this->getModel('tagmanager.tag');
             $tag           = $model->getEntity($objectId);
+=======
+            $model = $this->getModel('lead.tag');
+            $overrideModel = $this->getModel('tagmanager.tag');
+            $tag  = $model->getEntity($objectId);
+>>>>>>> added TagManagerPlugin
 
             if (null === $tag) {
                 $flashes[] = [
@@ -616,7 +634,11 @@ class TagController extends FormController
             /** @var ListModel $model */
             $model           = $this->getModel('lead.tag');
             $ids             = json_decode($this->request->query->get('ids', '{}'));
+<<<<<<< HEAD
             $deleteIds       = [];
+=======
+            $deleteIds   = [];
+>>>>>>> added TagManagerPlugin
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
