@@ -56,10 +56,9 @@ class EmailRepositoryTest extends TestCase
     /**
      * @dataProvider dataGetEmailPendingQueryForCount
      */
-    public function testGetEmailPendingQueryForCount(bool $countWithMaxMin, string $expectedQuery): void
+    public function testGetEmailPendingQueryForCount(?array $variantIds, bool $countWithMaxMin, string $expectedQuery): void
     {
         $emailId         = 5;
-        $variantIds      = null;
         $listIds         = [22, 33];
         $countOnly       = true;
         $limit           = null;
@@ -83,8 +82,9 @@ class EmailRepositoryTest extends TestCase
 
     public function dataGetEmailPendingQueryForCount(): iterable
     {
-        yield [false, "SELECT count(*) as count FROM leads l WHERE (l.id IN (SELECT ll.lead_id FROM lead_lists_leads ll WHERE (ll.leadlist_id IN (22, 33)) AND (ll.manually_removed = :false))) AND (l.id NOT IN (SELECT dnc.lead_id FROM lead_donotcontact dnc WHERE dnc.channel = 'email')) AND (l.id NOT IN (SELECT stat.lead_id FROM email_stats stat WHERE stat.email_id = 5)) AND (l.id NOT IN (SELECT mq.lead_id FROM message_queue mq WHERE (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND ((l.email IS NOT NULL) AND (l.email <> ''))"];
-        yield [true, "SELECT count(*) as count, MIN(l.id) as min_id, MAX(l.id) as max_id FROM leads l WHERE (l.id IN (SELECT ll.lead_id FROM lead_lists_leads ll WHERE (ll.leadlist_id IN (22, 33)) AND (ll.manually_removed = :false))) AND (l.id NOT IN (SELECT dnc.lead_id FROM lead_donotcontact dnc WHERE dnc.channel = 'email')) AND (l.id NOT IN (SELECT stat.lead_id FROM email_stats stat WHERE stat.email_id = 5)) AND (l.id NOT IN (SELECT mq.lead_id FROM message_queue mq WHERE (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND ((l.email IS NOT NULL) AND (l.email <> ''))"];
+        yield [null, false, "SELECT count(*) as count FROM leads l WHERE (l.id IN (SELECT ll.lead_id FROM lead_lists_leads ll WHERE (ll.leadlist_id IN (22, 33)) AND (ll.manually_removed = :false))) AND (l.id NOT IN (SELECT dnc.lead_id FROM lead_donotcontact dnc WHERE dnc.channel = 'email')) AND (l.id NOT IN (SELECT stat.lead_id FROM email_stats stat WHERE stat.email_id = 5)) AND (l.id NOT IN (SELECT mq.lead_id FROM message_queue mq WHERE (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND ((l.email IS NOT NULL) AND (l.email <> ''))"];
+        yield [[6], false, "SELECT count(*) as count FROM leads l WHERE (l.id IN (SELECT ll.lead_id FROM lead_lists_leads ll WHERE (ll.leadlist_id IN (22, 33)) AND (ll.manually_removed = :false))) AND (l.id NOT IN (SELECT dnc.lead_id FROM lead_donotcontact dnc WHERE dnc.channel = 'email')) AND (l.id NOT IN (SELECT stat.lead_id FROM email_stats stat WHERE stat.email_id IN (6, 5))) AND (l.id NOT IN (SELECT mq.lead_id FROM message_queue mq WHERE (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id IN (6, 5)))) AND ((l.email IS NOT NULL) AND (l.email <> ''))"];
+        yield [null, true, "SELECT count(*) as count, MIN(l.id) as min_id, MAX(l.id) as max_id FROM leads l WHERE (l.id IN (SELECT ll.lead_id FROM lead_lists_leads ll WHERE (ll.leadlist_id IN (22, 33)) AND (ll.manually_removed = :false))) AND (l.id NOT IN (SELECT dnc.lead_id FROM lead_donotcontact dnc WHERE dnc.channel = 'email')) AND (l.id NOT IN (SELECT stat.lead_id FROM email_stats stat WHERE stat.email_id = 5)) AND (l.id NOT IN (SELECT mq.lead_id FROM message_queue mq WHERE (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND ((l.email IS NOT NULL) AND (l.email <> ''))"];
     }
 
     public function testGetEmailPendingQueryForMaxMinIdCountWithMaxMinIdsDefined(): void
