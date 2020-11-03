@@ -14,9 +14,6 @@ namespace Mautic\CoreBundle\Event;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class CommonEvent.
- */
 class TokenReplacementEvent extends CommonEvent
 {
     /**
@@ -52,11 +49,9 @@ class TokenReplacementEvent extends CommonEvent
     protected $passthrough;
 
     /**
-     * TokenReplacementEvent constructor.
-     *
-     * @param       $content
-     * @param null  $lead
-     * @param mixed $passthrough
+     * @param CommonEntity|string $content
+     * @param Lead|null           $lead
+     * @param mixed               $passthrough
      */
     public function __construct($content, $lead = null, array $clickthrough = [], $passthrough = null)
     {

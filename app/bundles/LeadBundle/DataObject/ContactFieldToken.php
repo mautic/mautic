@@ -38,6 +38,9 @@ class ContactFieldToken
      */
     private $defaultValue;
 
+    /**
+     * @throws InvalidValueException
+     */
     public function __construct(string $fullToken)
     {
         $this->fullToken = $fullToken;
