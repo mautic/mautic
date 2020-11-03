@@ -15,6 +15,7 @@ use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Exception\InvalidValueException;
 use Mautic\CoreBundle\Exception\RecordException;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\OptionsAccessor\EmailToUserAccessor;
@@ -65,13 +66,9 @@ class SendEmailToUser
 
         $leadCredentials = $lead->getProfileFields();
 
-        $to  = $emailToUserAccessor->getToFormatted();
-        $cc  = $emailToUserAccessor->getCcFormatted();
-        $bcc = $emailToUserAccessor->getBccFormatted();
-
-        $to  = $this->replaceTokens($to, $lead);
-        $cc  = $this->replaceTokens($cc, $lead);
-        $bcc = $this->replaceTokens($bcc, $lead);
+        $to  = ArrayHelper::removeEmptyValues($this->replaceTokens($emailToUserAccessor->getToFormatted(), $lead));
+        $cc  = ArrayHelper::removeEmptyValues($this->replaceTokens($emailToUserAccessor->getCcFormatted(), $lead));
+        $bcc = ArrayHelper::removeEmptyValues($this->replaceTokens($emailToUserAccessor->getBccFormatted(), $lead));
 
         $users  = $emailToUserAccessor->getUserIdsToSend($lead->getOwner());
         $idHash = UserHash::getFakeUserHash();
