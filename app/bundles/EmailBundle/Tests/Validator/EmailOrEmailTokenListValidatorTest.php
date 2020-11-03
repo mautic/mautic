@@ -196,7 +196,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
                 Assert::assertSame(
                     [
                         '%value%'   => '{contactfield=somefield|jane@doe.com}',
-                        '%details%' => 'Contact field with alias \'somefield\' was not found.',
+                        '%details%' => 'mautic.lead.contact.field.not.found',
                     ],
                     $parameters
                 );
@@ -220,7 +220,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
                 Assert::assertSame(
                     [
                         '%value%'   => '{contactfield=somefield}',
-                        '%details%' => 'Contact field \'somefield\' is type of \'unicorn\' but must be type of \'email\'',
+                        '%details%' => 'mautic.lead.contact.wrong.field.type',
                     ],
                     $parameters
                 );

@@ -759,6 +759,7 @@ return [
                     'mautic.email.model.email',
                     'event_dispatcher',
                     'mautic.lead.validator.custom_field',
+                    'mautic.validator.email',
                 ],
             ],
             'mautic.email.model.send_email_to_contacts' => [

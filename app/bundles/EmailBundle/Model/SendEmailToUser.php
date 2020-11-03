@@ -18,6 +18,8 @@ use Mautic\CoreBundle\Exception\RecordException;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
+use Mautic\EmailBundle\Exception\InvalidEmailException;
+use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\EmailBundle\OptionsAccessor\EmailToUserAccessor;
 use Mautic\LeadBundle\DataObject\ContactFieldToken;
 use Mautic\LeadBundle\Entity\Lead;
@@ -43,11 +45,21 @@ class SendEmailToUser
      */
     private $customFieldValidator;
 
-    public function __construct(EmailModel $emailModel, EventDispatcherInterface $dispatcher, CustomFieldValidator $customFieldValidator)
-    {
+    /**
+     * @var EmailValidator
+     */
+    private $emailValidator;
+
+    public function __construct(
+        EmailModel $emailModel,
+        EventDispatcherInterface $dispatcher,
+        CustomFieldValidator $customFieldValidator,
+        EmailValidator $emailValidator
+    ) {
         $this->emailModel           = $emailModel;
         $this->dispatcher           = $dispatcher;
         $this->customFieldValidator = $customFieldValidator;
+        $this->emailValidator       = $emailValidator;
     }
 
     /**
@@ -91,8 +103,13 @@ class SendEmailToUser
             try {
                 $contactFieldToken = new ContactFieldToken($emailAddressOrToken);
             } catch (InvalidContactFieldTokenException $e) {
-                // Not a token, do nothing to the value. It should be a valid email address already due to validation rules on forms.
-                return $emailAddressOrToken;
+                try {
+                    $this->emailValidator->validate($emailAddressOrToken);
+
+                    return $emailAddressOrToken;
+                } catch (InvalidEmailException $e) {
+                    return '';
+                }
             }
 
             // The values are validated on form save.

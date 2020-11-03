@@ -11,9 +11,14 @@
 
 namespace Mautic\EmailBundle\Tests\Model;
 
+use Mautic\CoreBundle\Event\TokenReplacementEvent;
+use Mautic\CoreBundle\Exception\RecordNotPublishedException;
+use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
+use Mautic\EmailBundle\Exception\InvalidEmailException;
+use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
@@ -41,6 +46,11 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
     private $customFieldValidator;
 
     /**
+     * @var MockObject|EmailValidator
+     */
+    private $emailValidator;
+
+    /**
      * @var SendEmailToUser
      */
     private $sendEmailToUser;
@@ -51,10 +61,12 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
         $this->emailModel           = $this->createMock(EmailModel::class);
         $this->dispatcher           = $this->createMock(EventDispatcherInterface::class);
         $this->customFieldValidator = $this->createMock(CustomFieldValidator::class);
+        $this->emailValidator       = $this->createMock(EmailValidator::class);
         $this->sendEmailToUser      = new SendEmailToUser(
             $this->emailModel,
             $this->dispatcher,
-            $this->customFieldValidator
+            $this->customFieldValidator,
+            $this->emailValidator
         );
     }
 
@@ -129,11 +141,57 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
             }
         };
 
-        // Token for Email
+        // Global token for Email
         $this->emailModel->expects($this->once())
             ->method('dispatchEmailSendEvent')
             ->willReturn($emailSendEvent);
 
+        // Different handling of tokens in the To, BC, BCC fields.
+        $this->customFieldValidator->expects($this->exactly(3))
+            ->method('validateFieldType')
+            ->withConsecutive(
+                ['unpublished-field', 'email'],
+                ['unpublished-field', 'email'],
+                ['active-field', 'email']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new RecordNotPublishedException()),
+                $this->throwException(new RecordNotPublishedException()),
+                null
+            );
+
+        // The event is dispatched only for valid tokens.
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                EmailEvents::ON_EMAIL_ADDRESS_TOKEN_REPLACEMENT,
+                $this->callback(
+                    function (TokenReplacementEvent $event) use ($lead) {
+                        Assert::assertSame('{contactfield=active-field}', $event->getContent());
+                        Assert::assertSame($lead, $event->getLead());
+
+                        // Emulate a subscriber.
+                        $event->setContent('replaced.token@email.address');
+
+                        return true;
+                    }
+                )
+            );
+
+        $this->emailValidator->expects($this->exactly(4))
+            ->method('validate')
+            ->withConsecutive(
+                ['hello@there.com'],
+                ['bob@bobek.cz'],
+                ['hidden@translation.in'],
+                ['{invalid-token}'],
+            )
+            ->willReturnOnConsecutiveCalls(
+                null,
+                null,
+                null,
+                $this->throwException(new InvalidEmailException('{invalid-token}')),
+            );
         //Send email method
 
         $this->emailModel
@@ -148,9 +206,9 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
                 $this->assertInstanceOf(Email::class, $email);
                 $this->assertEquals($expectedUsers, $users);
                 $this->assertFalse($saveStat);
-                $this->assertEquals(['hello@there.com', 'bob@bobek.cz'], $to);
+                $this->assertEquals(['hello@there.com', 'bob@bobek.cz', 'default@email.com'], $to);
                 $this->assertEquals([], $cc);
-                $this->assertEquals(['hidden@translation.in'], $bcc);
+                $this->assertEquals([0 => 'hidden@translation.in', 2 => 'replaced.token@email.address'], $bcc);
             }));
 
         $config = [
@@ -159,8 +217,8 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
             ],
             'user_id'  => [6, 7],
             'to_owner' => true,
-            'to'       => 'hello@there.com, bob@bobek.cz',
-            'bcc'      => 'hidden@translation.in',
+            'to'       => 'hello@there.com, bob@bobek.cz, {contactfield=unpublished-field|default@email.com}, {contactfield=unpublished-field}',
+            'bcc'      => 'hidden@translation.in,{invalid-token}, {contactfield=active-field}',
         ];
 
         $this->sendEmailToUser->sendEmailToUsers($config, $lead);
