@@ -60,7 +60,6 @@ trait CustomFieldsApiControllerTrait
     /**
      * Flatten fields into an 'all' key for dev convenience.
      *
-     * @param        $entity
      * @param string $action
      */
     protected function preSerializeEntity(&$entity, $action = 'view')
@@ -178,8 +177,12 @@ trait CustomFieldsApiControllerTrait
         }
 
         $overwriteWithBlank = !$isPostOrPatch;
-        if (isset($parameters['overwriteWithBlank']) && !empty($parameters['overwriteWithBlank'])) {
-            $overwriteWithBlank = true;
+        if (isset($parameters['overwriteWithBlank'])) {
+            if (true === $parameters['overwriteWithBlank']) {
+                $overwriteWithBlank = true;
+            } elseif (false === $parameters['overwriteWithBlank']) {
+                $overwriteWithBlank = false;
+            }
             unset($parameters['overwriteWithBlank']);
         }
 
