@@ -12,26 +12,19 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20201102120710 extends AbstractMauticMigration
 {
     private $table  = 'email_list_xref';
-    private $column = 'email_id';
+    private $index  = 'IDX_11DC9DF2A832C1C9';
 
     public function up(Schema $schema): void
     {
-        /** @var QueryBuilder $query */
-        $query     = $this->container->get('doctrine')->getConnection()->createQueryBuilder();
-        $indexName = $query->select('INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema="'.$schema->getName().'" AND table_name="'.$this->prefix.$this->table.'" AND column_name="'.$this->column.'" AND INDEX_NAME != "PRIMARY"')->execute()->fetchColumn();
-
-        if (!empty($indexName)) {
-            $this->addSql('ALTER TABLE '.$this->prefix.$this->table.' DROP INDEX '.$indexName);
+        if (!$schema->getTable($this->prefix.$this->table)->hasIndex($this->index)) {
+            throw new SkipMigration('Schema includes this migration');
         }
-    }
-
-    public function down(Schema $schema): void
-    {
-        $this->addSql('ALTER TABLE '.$this->prefix.$this->table.' ADD INDEX IDX_'.strtoupper($this->column).' ('.$this->column.')');
+        $this->addSql('ALTER TABLE '.$this->prefix.$this->table.' DROP INDEX '.$this->index);
     }
 }
