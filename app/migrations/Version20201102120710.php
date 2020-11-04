@@ -25,7 +25,13 @@ final class Version20201102120710 extends AbstractMauticMigration
         $this->table = $this->getTableName();
         $this->index = $this->generatePropertyName($this->table, 'idx', ['email_id']);
 
-        if (!$schema->getTable($this->table)->hasIndex($this->index)) {
+        $sql  = 'SHOW INDEX FROM '.$this->table.' WHERE Key_name = "'.$this->index.'"';
+        $stmt = $this->connection->prepare($sql);
+        $stmt->execute();
+        $indexExists = (bool) $stmt->fetch();
+        $stmt->closeCursor();
+
+        if (!$indexExists) {
             throw new SkipMigration('Schema includes this migration');
         }
     }
