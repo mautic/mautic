@@ -14,13 +14,18 @@ namespace Mautic\WebhookBundle\Tests\Helper;
 use Doctrine\Common\Collections\ArrayCollection;
 use Joomla\Http\Http;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
 
 class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 {
     private $contact;
     private $connector;
+    private $companyModel;
+    private $companyRepository;
 
     /**
      * @var ArrayCollection
@@ -36,10 +41,22 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->contact        = $this->createMock(Lead::class);
-        $this->connector      = $this->createMock(Http::class);
-        $this->ipCollection   = new ArrayCollection();
-        $this->campaignHelper = new CampaignHelper($this->connector);
+        $this->contact           = $this->createMock(Lead::class);
+        $this->connector         = $this->createMock(Http::class);
+        $this->companyModel      = $this->createMock(CompanyModel::class);
+        $this->ipCollection      = new ArrayCollection();
+        $this->companyRepository = $this->getMockBuilder(CompanyRepository::class)
+        ->disableOriginalConstructor()
+        ->setMethods(['getCompaniesByLeadId'])
+        ->getMock();
+
+        $this->companyRepository->method('getCompaniesByLeadId')
+        ->willReturn([new Company()]);
+
+        $this->companyModel->method('getRepository')
+        ->willReturn($this->companyRepository);
+
+        $this->campaignHelper = new CampaignHelper($this->connector, $this->companyModel);
 
         $this->ipCollection->add((new IpAddress())->setIpAddress('127.0.0.1'));
         $this->ipCollection->add((new IpAddress())->setIpAddress('127.0.0.2'));
