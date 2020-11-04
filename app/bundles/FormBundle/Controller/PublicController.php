@@ -35,7 +35,7 @@ class PublicController extends CommonFormController
      */
     public function submitAction()
     {
-        if ($this->request->getMethod() !== 'POST') {
+        if ('POST' !== $this->request->getMethod()) {
             return $this->accessDenied();
         }
         $isAjax        = $this->request->query->get('ajax', false);
@@ -53,7 +53,7 @@ class PublicController extends CommonFormController
         if (!empty($return)) {
             //remove mauticError and mauticMessage from the referer so it doesn't get sent back
             $return = InputHelper::url($return, null, null, null, ['mauticError', 'mauticMessage'], true);
-            $query  = (strpos($return, '?') === false) ? '?' : '&';
+            $query  = (false === strpos($return, '?')) ? '?' : '&';
         }
 
         $translator = $this->get('translator');
@@ -72,7 +72,7 @@ class PublicController extends CommonFormController
             $form      = $formModel->getEntity($post['formId']);
 
             //check to see that the form was found
-            if ($form === null) {
+            if (null === $form) {
                 $error = $translator->trans('mautic.form.submit.error.unavailable', [], 'flashes');
             } else {
                 //get what to do immediately after successful post
@@ -82,7 +82,7 @@ class PublicController extends CommonFormController
                 //check to ensure the form is published
                 $status             = $form->getPublishStatus();
                 $dateTemplateHelper = $this->get('mautic.helper.template.date');
-                if ($status == 'pending') {
+                if ('pending' == $status) {
                     $error = $translator->trans(
                         'mautic.form.submit.error.pending',
                         [
@@ -90,7 +90,7 @@ class PublicController extends CommonFormController
                         ],
                         'flashes'
                     );
-                } elseif ($status == 'expired') {
+                } elseif ('expired' == $status) {
                     $error = $translator->trans(
                         'mautic.form.submit.error.expired',
                         [
@@ -98,7 +98,7 @@ class PublicController extends CommonFormController
                         ],
                         'flashes'
                     );
-                } elseif ($status != 'published') {
+                } elseif ('published' != $status) {
                     $error = $translator->trans('mautic.form.submit.error.unavailable', [], 'flashes');
                 } else {
                     $result = $this->getModel('form.submission')->saveSubmission($post, $server, $form, $this->request, true);
@@ -112,20 +112,8 @@ class PublicController extends CommonFormController
                         }
                     } elseif (!empty($result['callback'])) {
                         /** @var SubmissionEvent $submissionEvent */
-                        $submissionEvent = $result['callback'];
-
-                        // Return the first Response object if one is defined
-                        $firstResponseObject = false;
-                        if ($callbackResponses = $submissionEvent->getPostSubmitCallbackResponse()) {
-                            // Some submit actions already injected it's responses
-                            foreach ($callbackResponses as $key => $response) {
-                                if ($response instanceof Response) {
-                                    $firstResponseObject = $key;
-                                    break;
-                                }
-                            }
-                        }
-
+                        $submissionEvent   = $result['callback'];
+                        $callbackResponses = $submissionEvent->getPostSubmitCallbackResponse();
                         // These submit actions have requested a callback after all is said and done
                         $callbacksRequested = $submissionEvent->getPostSubmitCallback();
                         foreach ($callbacksRequested as $key => $callbackRequested) {
@@ -134,46 +122,18 @@ class PublicController extends CommonFormController
 
                             if (isset($callbackRequested['eventName'])) {
                                 $submissionEvent->setPostSubmitCallback($key, $callbackRequested);
+                                $submissionEvent->setContext($key);
 
                                 $this->get('event_dispatcher')->dispatch($callbackRequested['eventName'], $submissionEvent);
-                            } elseif (isset($callbackRequested['callback'])) {
-                                // @deprecated - to be removed in 3.0; use eventName instead - be sure to remove callback key support from SubmissionEvent::setPostSubmitCallback
-                                $callback = $callbackRequested['callback'];
-                                if (is_callable($callback)) {
-                                    if (is_array($callback)) {
-                                        $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                                    } elseif (strpos($callback, '::') !== false) {
-                                        $parts      = explode('::', $callback);
-                                        $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-                                    } else {
-                                        $reflection = new \ReflectionMethod(null, $callback);
-                                    }
+                            }
 
-                                    //add the factory to the arguments
-                                    $callbackRequested['factory'] = $this->factory;
-
-                                    $pass = [];
-                                    foreach ($reflection->getParameters() as $param) {
-                                        if (isset($callbackRequested[$param->getName()])) {
-                                            $pass[] = $callbackRequested[$param->getName()];
-                                        } else {
-                                            $pass[] = null;
-                                        }
-                                    }
-
-                                    $callbackResponses[$key] = $reflection->invokeArgs($this, $pass);
+                            if ($submissionEvent->isPropagationStopped() && $submissionEvent->hasPostSubmitResponse()) {
+                                if ($messengerMode) {
+                                    $callbackResponses[$key] = $submissionEvent->getPostSubmitResponse();
+                                } else {
+                                    return $submissionEvent->getPostSubmitResponse();
                                 }
                             }
-
-                            if (!$firstResponseObject && $callbackResponses[$key] instanceof Response) {
-                                $firstResponseObject = $key;
-                            }
-                        }
-
-                        if ($firstResponseObject && !$messengerMode && !$isAjax) {
-                            // Return the response given by the sbumit action
-
-                            return $callbackResponses[$firstResponseObject];
                         }
                     } elseif (isset($result['submission'])) {
                         /** @var SubmissionEvent $submissionEvent */
@@ -204,14 +164,14 @@ class PublicController extends CommonFormController
                     $data['results'] = $submissionEvent->getResults();
                 }
 
-                if ($postAction == 'redirect') {
+                if ('redirect' == $postAction) {
                     $data['redirect'] = $postActionProperty;
                 } elseif (!empty($postActionProperty)) {
                     $data['successMessage'] = [$postActionProperty];
                 }
 
                 if (!empty($callbackResponses)) {
-                    foreach ($callbackResponses as $key => $response) {
+                    foreach ($callbackResponses as $response) {
                         // Convert the responses to something useful for a JS response
                         if ($response instanceof RedirectResponse && !isset($data['redirect'])) {
                             $data['redirect'] = $response->getTargetUrl();
@@ -243,7 +203,6 @@ class PublicController extends CommonFormController
 
             if ($isAjax) {
                 // Post via ajax so return a json response
-
                 return new JsonResponse($data);
             } else {
                 $response = json_encode($data);
@@ -253,16 +212,16 @@ class PublicController extends CommonFormController
         } else {
             if (!empty($error)) {
                 if ($return) {
-                    $hash = ($form !== null) ? '#'.strtolower($form->getAlias()) : '';
+                    $hash = (null !== $form) ? '#'.strtolower($form->getAlias()) : '';
 
                     return $this->redirect($return.$query.'mauticError='.rawurlencode($error).$hash);
                 } else {
                     $msg     = $error;
                     $msgType = 'error';
                 }
-            } elseif ($postAction == 'redirect') {
+            } elseif ('redirect' == $postAction) {
                 return $this->redirect($postActionProperty);
-            } elseif ($postAction == 'return') {
+            } elseif ('return' == $postAction) {
                 if (!empty($return)) {
                     if (!empty($postActionProperty)) {
                         $return .= $query.'mauticMessage='.rawurlencode($postActionProperty);
@@ -308,12 +267,12 @@ class PublicController extends CommonFormController
             $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
         }
 
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$this->coreParametersHelper->getParameter('theme').':message.html.php');
+        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$this->coreParametersHelper->get('theme').':message.html.php');
 
         return $this->render($logicalName, [
             'message'  => $msg,
             'type'     => $msgType,
-            'template' => $this->coreParametersHelper->getParameter('theme'),
+            'template' => $this->coreParametersHelper->get('theme'),
         ]);
     }
 
@@ -337,7 +296,7 @@ class PublicController extends CommonFormController
         $customStylesheets = (!empty($css)) ? explode(',', $css) : [];
         $template          = null;
 
-        if ($form === null || !$form->isPublished()) {
+        if (null === $form || !$form->isPublished()) {
             return $this->notFound();
         } else {
             $html = $model->getContent($form);
@@ -413,9 +372,9 @@ class PublicController extends CommonFormController
         $form  = $model->getEntity($formId);
         $js    = '';
 
-        if ($form !== null) {
+        if (null !== $form) {
             $status = $form->getPublishStatus();
-            if ($status == 'published') {
+            if ('published' == $status) {
                 $js = $model->getAutomaticJavascript($form);
             }
         }
@@ -438,9 +397,9 @@ class PublicController extends CommonFormController
         $model = $this->getModel('form');
         $form  = $model->getEntity($formId);
 
-        if ($form !== null) {
+        if (null !== $form) {
             $status = $form->getPublishStatus();
-            if ($status === 'published') {
+            if ('published' === $status) {
                 if ($this->request->get('video')) {
                     return $this->render(
                         'MauticFormBundle:Public:videoembed.html.php',

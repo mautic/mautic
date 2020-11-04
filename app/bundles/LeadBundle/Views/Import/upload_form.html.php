@@ -14,7 +14,8 @@ $view['slots']->set(
     $view->render(
         'MauticCoreBundle:Helper:page_actions.html.php',
         [
-            'routeBase'       => 'contact_import',
+            'routeBase'       => 'import',
+            'routeVars'       => ['close' => ['object' => $view['request']->getParameter('object')]],
             'langVar'         => 'lead.import',
             'templateButtons' => [
                 'close' => true,

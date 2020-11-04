@@ -412,7 +412,7 @@ Mautic.initDynamicContentItem = function (tabId, jQueryVariant, tokenName) {
     var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
 
     var $el = mQuery('#dynamic-content-container');
-    if ($el.size() == 0){
+    if ($el.length === 0){
         mQuery = parent.mQuery;
         $el = mQuery('#dynamic-content-container');
     }
@@ -431,7 +431,7 @@ Mautic.initDynamicContentItem = function (tabId, jQueryVariant, tokenName) {
         $el.find('.dynamic-content-token-name').val(tokenName);
     }
 
-    if ($el.find('.dynamic-content-token-name').val() == '') {
+    if ($el.find('.dynamic-content-token-name').val() === '') {
         var dynamicContent = $el.attr('id').match(/\d+$/);
         if (dynamicContent) {
             var dynamicContentIndex  = dynamicContent[0];

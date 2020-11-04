@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($email->getEmailType() == 'list') {
+if ('list' == $email->getEmailType()) {
     $label = 'mautic.email.lead.list.comparison';
     $type  = 'bar';
 } else {

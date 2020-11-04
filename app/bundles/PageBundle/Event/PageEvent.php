@@ -20,7 +20,6 @@ use Mautic\PageBundle\Entity\Page;
 class PageEvent extends CommonEvent
 {
     /**
-     * @param Page $page
      * @param bool $isNew
      */
     public function __construct(Page $page, $isNew = false)
@@ -41,8 +40,6 @@ class PageEvent extends CommonEvent
 
     /**
      * Sets the Page entity.
-     *
-     * @param Page $page
      */
     public function setPage(Page $page)
     {

@@ -23,8 +23,6 @@ interface MauticController
     /**
      * Initialize the controller.
      *
-     * @param FilterControllerEvent $event
-     *
      * @return mixed
      */
     public function initialize(FilterControllerEvent $event);

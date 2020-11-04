@@ -11,7 +11,6 @@
 
 namespace Mautic\StageBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Symfony\Component\HttpFoundation\Response;
@@ -68,7 +67,7 @@ class StageApiController extends CommonApiController
 
         $this->getModel('lead')->addToStages($contact, $stage)->saveEntity($contact);
 
-        return $this->handleView($this->view(['success' => 1], Codes::HTTP_OK));
+        return $this->handleView($this->view(['success' => 1], Response::HTTP_OK));
     }
 
     /**
@@ -101,6 +100,6 @@ class StageApiController extends CommonApiController
 
         $this->getModel('lead')->removeFromStages($contact, $stage)->saveEntity($contact);
 
-        return $this->handleView($this->view(['success' => 1], Codes::HTTP_OK));
+        return $this->handleView($this->view(['success' => 1], Response::HTTP_OK));
     }
 }

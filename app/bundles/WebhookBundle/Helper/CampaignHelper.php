@@ -48,23 +48,17 @@ class CampaignHelper
 
     /**
      * Prepares the neccessary data transformations and then makes the HTTP request.
-     *
-     * @param array $config
-     * @param Lead  $contact
      */
     public function fireWebhook(array $config, Lead $contact)
     {
-        // dump($config);die;
         $payload = $this->getPayload($config, $contact);
         $headers = $this->getHeaders($config, $contact);
-        $this->makeRequest($config['url'], $config['method'], $config['timeout'], $headers, $payload);
+        $url     = rawurldecode(TokenHelper::findLeadTokens($config['url'], $this->getContactValues($contact), true));
+        $this->makeRequest($url, $config['method'], $config['timeout'], $headers, $payload);
     }
 
     /**
      * Gets the payload fields from the config and if there are tokens it translates them to contact values.
-     *
-     * @param array $config
-     * @param Lead  $contact
      *
      * @return array
      */
@@ -78,9 +72,6 @@ class CampaignHelper
 
     /**
      * Gets the payload fields from the config and if there are tokens it translates them to contact values.
-     *
-     * @param array $config
-     * @param Lead  $contact
      *
      * @return array
      */
@@ -96,8 +87,6 @@ class CampaignHelper
      * @param string $url
      * @param string $method
      * @param int    $timeout
-     * @param array  $headers
-     * @param array  $payload
      *
      * @throws \InvalidArgumentException
      * @throws \OutOfRangeException
@@ -112,6 +101,10 @@ class CampaignHelper
             case 'post':
             case 'put':
             case 'patch':
+                $headers = array_change_key_case($headers);
+                if (array_key_exists('content-type', $headers) && 'application/json' == strtolower($headers['content-type'])) {
+                    $payload                 = json_encode($payload);
+                }
                 $response = $this->connector->$method($url, $payload, $headers, $timeout);
                 break;
             case 'delete':
@@ -129,9 +122,6 @@ class CampaignHelper
     /**
      * Translates tokens to values.
      *
-     * @param array $rawTokens
-     * @param Lead  $contact
-     *
      * @return array
      */
     private function getTokenValues(array $rawTokens, Lead $contact)
@@ -140,7 +130,7 @@ class CampaignHelper
         $contactValues = $this->getContactValues($contact);
 
         foreach ($rawTokens as $key => $value) {
-            $values[$key] = urldecode(TokenHelper::findLeadTokens($value, $contactValues, true));
+            $values[$key] = rawurldecode(TokenHelper::findLeadTokens($value, $contactValues, true));
         }
 
         return $values;
@@ -148,8 +138,6 @@ class CampaignHelper
 
     /**
      * Gets array of contact values.
-     *
-     * @param Lead $contact
      *
      * @return array
      */
@@ -165,8 +153,6 @@ class CampaignHelper
     }
 
     /**
-     * @param Collection $ipAddresses
-     *
      * @return string
      */
     private function ipAddressesToCsv(Collection $ipAddresses)

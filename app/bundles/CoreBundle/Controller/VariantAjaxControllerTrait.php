@@ -17,23 +17,23 @@ use Symfony\Component\HttpFoundation\Request;
 trait VariantAjaxControllerTrait
 {
     /**
-     * @param Request $request
-     * @param         $modelName
-     * @param         $abSettingsFormName
-     * @param         $parentFormName
-     * @param         $abFormTemplate
-     * @param array   $formThemes
+     * @param string $modelName
+     * @param string $abSettingsFormName
+     * @param string $abSettingsFormBlockPrefix
+     * @param string $parentFormName
+     * @param string $abFormTemplate
+     * @param array  $formThemes
      *
      * @return mixed
      */
-    private function getAbTestForm(Request $request, $modelName, $abSettingsFormName, $parentFormName, $abFormTemplate, $formThemes = [])
+    private function getAbTestForm(Request $request, $modelName, $abSettingsFormName, $abSettingsFormBlockPrefix, $parentFormName, $abFormTemplate, $formThemes = [])
     {
         $dataArray = [
             'success' => 0,
             'html'    => '',
         ];
         $type = InputHelper::clean($request->request->get('abKey'));
-        $id   = InputHelper::int($request->request->get('id'));
+        $id   = (int) $request->request->get('id');
 
         if (!empty($type)) {
             //get the HTML for the form
@@ -63,9 +63,9 @@ trait VariantAjaxControllerTrait
 
                 $html = str_replace(
                     [
-                        "{$abSettingsFormName}[",
-                        "{$abSettingsFormName}_",
-                        $abSettingsFormName,
+                        "{$abSettingsFormBlockPrefix}[",
+                        "{$abSettingsFormBlockPrefix}_",
+                        $abSettingsFormBlockPrefix,
                     ],
                     [
                         "{$parentFormName}[variantSettings][",

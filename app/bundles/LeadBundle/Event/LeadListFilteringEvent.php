@@ -58,12 +58,11 @@ class LeadListFilteringEvent extends CommonEvent
     protected $func;
 
     /**
-     * @param array         $details
-     * @param int           $leadId
-     * @param string        $alias
-     * @param string        $func
-     * @param QueryBuilder  $queryBuilder
-     * @param EntityManager $entityManager
+     * @param array        $details
+     * @param int          $leadId
+     * @param string       $alias
+     * @param string       $func
+     * @param QueryBuilder $queryBuilder
      */
     public function __construct($details, $leadId, $alias, $func, $queryBuilder, EntityManager $entityManager)
     {

@@ -47,7 +47,7 @@ class DoNotContactFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $queryBuilder->addJoinCondition($tableAlias, $expression);
 
-        if ($filter->getOperator() === 'eq') {
+        if ('eq' === $filter->getOperator()) {
             $queryType = $filter->getParameterValue() ? 'isNotNull' : 'isNull';
         } else {
             $queryType = $filter->getParameterValue() ? 'isNull' : 'isNotNull';

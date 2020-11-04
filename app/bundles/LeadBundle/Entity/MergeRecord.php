@@ -41,9 +41,6 @@ class MergeRecord
      */
     private $mergedId;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -81,8 +78,6 @@ class MergeRecord
     }
 
     /**
-     * @param Lead $contact
-     *
      * @return MergeRecord
      */
     public function setContact(Lead $contact)

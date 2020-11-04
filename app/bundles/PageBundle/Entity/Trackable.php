@@ -45,9 +45,6 @@ class Trackable
      */
     private $uniqueHits = 0;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -104,8 +101,6 @@ class Trackable
     }
 
     /**
-     * @param Redirect $redirect
-     *
      * @return Trackable
      */
     public function setRedirect(Redirect $redirect)
