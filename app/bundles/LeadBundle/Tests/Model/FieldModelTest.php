@@ -241,6 +241,9 @@ class FieldModelTest extends MauticMysqlTestCase
         $columns = $this->getUniqueIdentifierIndexColumns('leads');
         Assert::assertCount(3, $columns);
         Assert::assertCount(0, $stack->getIndexQueries());
+
+        // Cleanup
+        $fieldModel->deleteEntities([$ui1Field->getId(), $ui2Field->getId(), $ui3Field->getId()]);
     }
 
     /**
