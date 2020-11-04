@@ -21,18 +21,26 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
  */
 final class Version20201102133546 extends AbstractMauticMigration
 {
-    /**
-     * @throws SchemaException
-     */
-    public function up(Schema $schema): void
-    {
-        $tableName = $this->prefix.'email_assets_xref';
-        $indexName = 'IDX_39CFAB07A832C1C9';
+    private $tableName;
+    private $indexName;
 
-        if (!$schema->getTable($tableName)->hasIndex($indexName)) {
+    public function preUp(Schema $schema): void
+    {
+        $this->tableName = $this->getTableName();
+        $this->indexName = $this->generatePropertyName($this->tableName, 'idx', ['email_id']);
+
+        if (!$schema->getTable($this->tableName)->hasIndex($this->indexName)) {
             throw new SkipMigration('Schema includes this migration');
         }
+    }
 
-        $this->addSql('ALTER TABLE '.$tableName.' DROP INDEX '.$indexName.';');
+    public function up(Schema $schema): void
+    {
+        $this->addSql('ALTER TABLE '.$this->tableName.' DROP INDEX '.$this->indexName.';');
+    }
+
+    private function getTableName(): string
+    {
+        return $this->prefix.'email_assets_xref';
     }
 }
