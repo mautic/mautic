@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Field;
 
 use Doctrine\DBAL\Exception\DriverException;
+use Doctrine\DBAL\Schema\SchemaException as DoctrineSchemaException;
 use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
+use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
 use Psr\Log\LoggerInterface;
 
@@ -22,8 +24,8 @@ class CustomFieldIndex
      * Update the unique_identifier_search index and add an index for this field.
      *
      * @throws DriverException
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     * @throws \Mautic\CoreBundle\Exception\SchemaException
+     * @throws DoctrineSchemaException
+     * @throws SchemaException
      */
     public function addIndexOnColumn(LeadField $leadField): void
     {
@@ -52,8 +54,8 @@ class CustomFieldIndex
      * Updates the index for this field.
      *
      * @throws DriverException
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     * @throws \Mautic\CoreBundle\Exception\SchemaException
+     * @throws DoctrineSchemaException
+     * @throws SchemaException
      */
     public function dropIndexOnColumn(LeadField $leadField): void
     {
@@ -77,7 +79,7 @@ class CustomFieldIndex
     }
 
     /**
-     * @throws \Mautic\CoreBundle\Exception\SchemaException
+     * @throws SchemaException
      */
     public function isUpdatePending(LeadField $leadField): bool
     {
@@ -95,7 +97,7 @@ class CustomFieldIndex
     }
 
     /**
-     * @throws \Mautic\CoreBundle\Exception\SchemaException
+     * @throws SchemaException
      */
     public function hasIndex(LeadField $leadField): bool
     {
@@ -104,36 +106,19 @@ class CustomFieldIndex
 
     public function hasMatchingUniqueIdentifierIndex(LeadField $leadField): bool
     {
-        $hasIndex           = $this->indexSchemaHelper->hasUniqueIdentifierIndex($leadField);
-        $isUniqueIdentifier = $leadField->getIsUniqueIdentifier();
-
-        if ($isUniqueIdentifier && !$hasIndex) {
-            return false;
-        }
-
-        if (!$isUniqueIdentifier && $hasIndex) {
-            return false;
-        }
-
         $uniqueIdentifierColumns = $this->getUniqueIdentifierIndexColumns($leadField->getObject());
-        if ($uniqueIdentifierColumns && !$hasIndex) {
-            return false;
-        }
 
-        if (!$uniqueIdentifierColumns && $hasIndex) {
-            return false;
+        try {
+            return $this->indexSchemaHelper->hasMatchingUniqueIdentifierIndex($leadField, $uniqueIdentifierColumns);
+        } catch (DoctrineSchemaException $exception) {
+            // Return true only if there are no unique identifier fields but otherwise assume the index is missing
+            return 0 === count($uniqueIdentifierColumns);
         }
-
-        if (!$uniqueIdentifierColumns && !$hasIndex) {
-            return true;
-        }
-
-        return $this->indexSchemaHelper->hasMatchingUniqueIdentifierIndex($leadField, $uniqueIdentifierColumns);
     }
 
     /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     * @throws \Mautic\CoreBundle\Exception\SchemaException
+     * @throws DoctrineSchemaException
+     * @throws SchemaException
      */
     public function updateUniqueIdentifierIndex(LeadField $leadField): void
     {
@@ -156,8 +141,8 @@ class CustomFieldIndex
     }
 
     /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     * @throws \Mautic\CoreBundle\Exception\SchemaException
+     * @throws DoctrineSchemaException
+     * @throws SchemaException
      */
     private function dropIndexForUniqueIdentifiers(LeadField $leadField): void
     {
@@ -183,7 +168,7 @@ class CustomFieldIndex
         $filters = ['object' => $object];
 
         // Get list of current uniques
-        $uniqueIdentifierFields = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier($filters);
+        $uniqueIdentifierFields = $this->fieldsWithUniqueIdentifier->getLiveFields($filters);
 
         // Always use email
         $indexColumns = array_keys($uniqueIdentifierFields);
