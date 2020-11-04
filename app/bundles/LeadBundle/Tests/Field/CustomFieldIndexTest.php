@@ -51,18 +51,11 @@ final class CustomFieldIndexTest extends \PHPUnit\Framework\TestCase
      */
     public function testHasMatchingUniqueIdentifierIndex(string $object, string $field, string $fieldKey): void
     {
-        $this->indexSchemaHelperMock->expects($this->once())
-            ->method('hasUniqueIdentifierIndex')
-            ->with($this->leadFieldMock)
-            ->willReturn(true);
-        $this->leadFieldMock->expects($this->once())
-            ->method('getIsUniqueIdentifier')
-            ->willReturn(true);
         $this->leadFieldMock->expects($this->once())
             ->method('getObject')
             ->willReturn($object);
         $this->fieldsWithUniqueIdentifierMock->expects($this->once())
-            ->method('getFieldsWithUniqueIdentifier')
+            ->method('getLiveFields')
             ->with(['object' => $object])
             ->willReturn([$fieldKey => $field]);
         $this->indexSchemaHelperMock->expects($this->once())
