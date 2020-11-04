@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
+use Doctrine\DBAL\FetchMode;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
@@ -28,7 +29,16 @@ final class Version20201102133546 extends AbstractMauticMigration
         $this->tableName = $this->getTableName();
         $this->indexName = $this->generatePropertyName($this->tableName, 'idx', ['email_id']);
 
-        if (!$schema->getTable($this->tableName)->hasIndex($this->indexName)) {
+        $sql = <<<SQL
+            SHOW INDEX FROM $this->tableName WHERE Key_name = '$this->indexName';
+SQL;
+
+        $stmt = $this->connection->prepare($sql);
+        $stmt->execute();
+        $found = (bool) $stmt->fetch(FetchMode::ASSOCIATIVE);
+        $stmt->closeCursor();
+
+        if (!$found) {
             throw new SkipMigration('Schema includes this migration');
         }
     }
