@@ -36,6 +36,7 @@
                     <?php endforeach; ?>
                 </select>
             </div>
+            <?php if ($permissions['lead:exports:create']) : ?>
             <div class="col-sm-2">
                 <a class="btn btn-default btn-block" href="<?php echo $view['router']->url('mautic_contact_auditlog_export_action', ['leadId' => $lead->getId()]); ?>" data-toggle="download">
                     <span>
@@ -43,6 +44,7 @@
                     </span>
                 </a>
             </div>
+            <?php endif; ?>
         </div>
     <?php endif; ?>
 

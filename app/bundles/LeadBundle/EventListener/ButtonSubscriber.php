@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -20,20 +21,17 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class ButtonSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TranslatorInterface
-     */
     private $translator;
 
-    /**
-     * @var RouterInterface
-     */
     private $router;
 
-    public function __construct(TranslatorInterface $translator, RouterInterface $router)
+    private $security;
+
+    public function __construct(TranslatorInterface $translator, RouterInterface $router, CorePermissions $security)
     {
-        $this->translator = $translator;
-        $this->router     = $router;
+        $this->translator   = $translator;
+        $this->router       = $router;
+        $this->security     = $security;
     }
 
     public static function getSubscribedEvents()
@@ -45,41 +43,50 @@ class ButtonSubscriber implements EventSubscriberInterface
 
     public function injectViewButtons(CustomButtonEvent $event)
     {
-        if (0 === strpos($event->getRoute(), 'mautic_contact_index')) {
-            $exportRoute = $this->router->generate(
-                'mautic_contact_action',
-                ['objectAction' => 'batchExport']
-            );
+        $permissions = $this->security->isGranted(
+            [
+                'lead:exports:create',
+            ],
+            'RETURN_ARRAY'
+        );
 
-            $event->addButton(
-                [
-                    'attr' => [
-                        'data-toggle'           => 'confirmation',
-                        'href'                  => $exportRoute,
-                        'data-precheck'         => 'batchActionPrecheck',
-                        'data-message'          => $this->translator->trans('mautic.core.export.items', ['%items%' => 'contacts']),
-                        'data-confirm-text'     => $this->translator->trans('mautic.core.export'),
-                        'data-confirm-callback' => 'executeBatchAction',
-                        'data-cancel-text'      => $this->translator->trans('mautic.core.form.cancel'),
-                        'data-cancel-callback'  => 'dismissConfirmation',
-                    ],
-                    'btnText'   => $this->translator->trans('mautic.core.export'),
-                    'iconClass' => 'fa fa-download',
-                ],
-                ButtonHelper::LOCATION_BULK_ACTIONS
-            );
+        if ($permissions['lead:exports:create']) {
+            if (0 === strpos($event->getRoute(), 'mautic_contact_index')) {
+                $exportRoute = $this->router->generate(
+                    'mautic_contact_action',
+                    ['objectAction' => 'batchExport']
+                );
 
-            $event->addButton(
-                [
-                    'attr' => [
-                        'href'        => $exportRoute,
-                        'data-toggle' => null,
+                $event->addButton(
+                    [
+                        'attr' => [
+                            'data-toggle'           => 'confirmation',
+                            'href'                  => $exportRoute,
+                            'data-precheck'         => 'batchActionPrecheck',
+                            'data-message'          => $this->translator->trans('mautic.core.export.items', ['%items%' => 'contacts']),
+                            'data-confirm-text'     => $this->translator->trans('mautic.core.export'),
+                            'data-confirm-callback' => 'executeBatchAction',
+                            'data-cancel-text'      => $this->translator->trans('mautic.core.form.cancel'),
+                            'data-cancel-callback'  => 'dismissConfirmation',
+                        ],
+                        'btnText'   => $this->translator->trans('mautic.core.export'),
+                        'iconClass' => 'fa fa-download',
                     ],
-                    'btnText'   => $this->translator->trans('mautic.core.export'),
-                    'iconClass' => 'fa fa-download',
-                ],
-                ButtonHelper::LOCATION_PAGE_ACTIONS
-            );
+                    ButtonHelper::LOCATION_BULK_ACTIONS
+                );
+
+                $event->addButton(
+                    [
+                        'attr' => [
+                            'href'        => $exportRoute,
+                            'data-toggle' => null,
+                        ],
+                        'btnText'   => $this->translator->trans('mautic.core.export'),
+                        'iconClass' => 'fa fa-download',
+                    ],
+                    ButtonHelper::LOCATION_PAGE_ACTIONS
+                );
+            }
         }
     }
 }

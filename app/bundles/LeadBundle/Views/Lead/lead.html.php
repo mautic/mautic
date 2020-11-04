@@ -133,7 +133,7 @@ if ($view['security']->hasEntityAccess(
     $permissions['lead:leads:viewown'],
     $permissions['lead:leads:viewother'],
     $lead->getPermissionUser()
-)
+) && $permissions['lead:exports:create']
 ) {
     $buttons[] = [
         'attr' => [
@@ -356,9 +356,10 @@ $view['slots']->set(
                 <?php echo $view->render(
                     'MauticLeadBundle:Timeline:list.html.php',
                     [
-                        'events' => $events,
-                        'lead'   => $lead,
-                        'tmpl'   => 'index',
+                        'events'      => $events,
+                        'lead'        => $lead,
+                        'tmpl'        => 'index',
+                        'permissions' => $permissions,
                     ]
                 ); ?>
             </div>
@@ -402,9 +403,10 @@ $view['slots']->set(
                 <?php echo $view->render(
                     'MauticLeadBundle:Auditlog:list.html.php',
                     [
-                        'events' => $auditlog,
-                        'lead'   => $lead,
-                        'tmpl'   => 'index',
+                        'events'      => $auditlog,
+                        'lead'        => $lead,
+                        'tmpl'        => 'index',
+                        'permissions' => $permissions,
                     ]
                 ); ?>
             </div>
