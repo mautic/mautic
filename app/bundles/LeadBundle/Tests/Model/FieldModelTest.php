@@ -184,9 +184,6 @@ class FieldModelTest extends MauticMysqlTestCase
         $columns = $this->getUniqueIdentifierIndexColumns('leads');
         Assert::assertCount(1, $columns);
         Assert::assertEquals('email', $columns[0]['COLUMN_NAME']);
-        $alteredIndexes = $stack->getIndexQueries();
-        Assert::assertCount(1, $alteredIndexes);
-        Assert::assertEquals(sprintf('CREATE INDEX %1$sunique_identifier_search ON %1$sleads (email)', MAUTIC_TABLE_PREFIX), $alteredIndexes[0]);
         $stack->resetQueries();
 
         // Test updating the index
