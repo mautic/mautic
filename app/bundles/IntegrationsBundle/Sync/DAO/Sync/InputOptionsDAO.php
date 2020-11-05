@@ -33,6 +33,11 @@ class InputOptionsDAO
     private $disablePull;
 
     /**
+     * @var bool
+     */
+    private $disableActivityPush;
+
+    /**
      * @var ObjectIdsDAO|null
      */
     private $mauticObjectIds;
