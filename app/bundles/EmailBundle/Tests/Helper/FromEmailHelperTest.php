@@ -15,8 +15,9 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Helper\Exception\OwnerNotFoundException;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use PHPUnit\Framework\TestCase;
 
-class FromEmailHelperTest extends \PHPUnit_Framework_TestCase
+class FromEmailHelperTest extends TestCase
 {
     /**
      * @var CoreParametersHelper|\PHPUnit_Framework_MockObject_MockObject
