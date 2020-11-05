@@ -135,7 +135,6 @@ class FrequencyRuleRepository extends CommonRepository
 
     /**
      * @param string $channel
-     * @param array  $leadIds
      * @param string $statTable
      * @param string $statContactColumn
      * @param string $statSentColumn
@@ -179,7 +178,6 @@ class FrequencyRuleRepository extends CommonRepository
     }
 
     /**
-     * @param array  $leadIds
      * @param string $defaultFrequencyNumber
      * @param string $defaultFrequencyTime
      * @param string $statTable
