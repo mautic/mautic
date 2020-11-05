@@ -19,7 +19,6 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 final class Version20201102133546 extends AbstractMauticMigration
 {
     private $tableName;
-    private $indexName;
 
     public function preUp(Schema $schema): void
     {
