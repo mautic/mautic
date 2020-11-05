@@ -18,17 +18,9 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20201102133546 extends AbstractMauticMigration
 {
-    private $tableName;
-
     public function preUp(Schema $schema): void
     {
-        $this->tableName = $this->getTableName();
-        $this->indexName = $this->generatePropertyName($this->tableName, 'idx', ['email_id']);
-
-        $sql = <<<SQL
-            SHOW INDEX FROM $this->tableName WHERE Key_name = '$this->indexName';
-SQL;
-
+        $sql  = "SHOW INDEX FROM {$this->getTableName()} WHERE Key_name = {$this->getIndexName()};";
         $stmt = $this->connection->prepare($sql);
         $stmt->execute();
         $found = (bool) $stmt->fetch(FetchMode::ASSOCIATIVE);
@@ -41,11 +33,16 @@ SQL;
 
     public function up(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE '.$this->tableName.' DROP INDEX '.$this->indexName.';');
+        $this->addSql("ALTER TABLE {$this->getTableName()} DROP INDEX {$this->getIndexName()};");
     }
 
     private function getTableName(): string
     {
         return $this->prefix.'email_assets_xref';
+    }
+
+    private function getIndexName(): string
+    {
+        return $this->generatePropertyName($this->getTableName(), 'idx', ['email_id']);
     }
 }
