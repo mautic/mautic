@@ -29,9 +29,6 @@ class SyncCommand extends ContainerAwareCommand
         $this->syncService = $syncService;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this->setName(self::NAME)
@@ -100,9 +97,6 @@ class SyncCommand extends ContainerAwareCommand
         parent::configure();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
