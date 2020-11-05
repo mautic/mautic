@@ -500,9 +500,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
-     * Extract and build a campaign ID from the metadata sample
-     *
-     * @param array $metadataSet
+     * Extract and build a campaign ID from the metadata sample.
      *
      * @return string
      */
@@ -512,13 +510,9 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
         if (!empty($metadataSet['utmTags']['utmCampaign'])) {
             $id = $metadataSet['utmTags']['utmCampaign'];
-        }
-
-        elseif (!empty($metadataSet['emailId']) && !empty($metadataSet['emailName'])) {
+        } elseif (!empty($metadataSet['emailId']) && !empty($metadataSet['emailName'])) {
             $id = $metadataSet['emailId'].':'.$metadataSet['emailName'];
-        }
-
-        elseif (!empty($metadataSet['emailId'])) {
+        } elseif (!empty($metadataSet['emailId'])) {
             $id = $metadataSet['emailId'];
         }
 
