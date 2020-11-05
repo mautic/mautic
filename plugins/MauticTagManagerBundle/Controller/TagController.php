@@ -14,8 +14,8 @@ namespace MauticPlugin\MauticTagManagerBundle\Controller;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\LeadBundle\Model\TagModel;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Model\TagModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -159,7 +159,7 @@ class TagController extends FormController
         }
 
         //retrieve the entity
-        $tag = new Tag();
+        $tag   = new Tag();
         $model = $this->getModel('tagmanager.tag');
         //set the page we came from
         $page = $this->get('session')->get('mautic.tagmanager.page', 1);
@@ -206,7 +206,7 @@ class TagController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'form' => $form->createView(),
+                'form'   => $form->createView(),
                 'entity' => $tag,
             ],
             'contentTemplate' => 'MauticTagManagerBundle:Tag:form.html.php',
@@ -235,7 +235,7 @@ class TagController extends FormController
         $postActionVars = $this->getPostActionVars();
 
         try {
-            $tag = $this->getTag($objectId);
+            $tag   = $this->getTag($objectId);
             $clone = new Tag();
             $clone->setTag($tag->getTag());
 
@@ -518,9 +518,9 @@ class TagController extends FormController
 
         if ('POST' == $this->request->getMethod()) {
             /** @var TagModel $model */
-            $model = $this->getModel('lead.tag');
+            $model         = $this->getModel('lead.tag');
             $overrideModel = $this->getModel('tagmanager.tag');
-            $tag  = $model->getEntity($objectId);
+            $tag           = $model->getEntity($objectId);
 
             if (null === $tag) {
                 $flashes[] = [
@@ -589,7 +589,7 @@ class TagController extends FormController
             /** @var ListModel $model */
             $model           = $this->getModel('lead.tag');
             $ids             = json_decode($this->request->query->get('ids', '{}'));
-            $deleteIds   = [];
+            $deleteIds       = [];
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {

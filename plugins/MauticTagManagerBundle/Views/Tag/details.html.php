@@ -23,10 +23,10 @@ $view['slots']->set(
             'customButtons'   => (isset($customButtons)) ? $customButtons : [],
             'nameGetter'      => 'getTag',
             'templateButtons' => [
-                'edit' => $view['security']->isGranted('tagManager:tagManager:edit'),
+                'edit'   => $view['security']->isGranted('tagManager:tagManager:edit'),
                 'delete' => $view['security']->isGranted('tagManager:tagManager:delete'),
-                'close' => $view['security']->isGranted('tagManager:tagManager:edit'),
-                'clone' => $view['security']->isGranted('tagManager:tagManager:create'),
+                'close'  => $view['security']->isGranted('tagManager:tagManager:edit'),
+                'clone'  => $view['security']->isGranted('tagManager:tagManager:create'),
             ],
             'routeBase' => 'tagmanager',
         ]

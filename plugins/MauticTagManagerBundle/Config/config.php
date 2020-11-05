@@ -13,7 +13,7 @@ return [
     'description' => 'Provides an interface for tags management.',
     'version'     => '1.0',
     'author'      => 'Leuchtfeuer',
-    'routes' => [
+    'routes'      => [
         'main' => [
             'mautic_tagmanager_index' => [
                 'path'       => '/tags/{page}',
