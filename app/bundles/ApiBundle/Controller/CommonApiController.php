@@ -812,6 +812,10 @@ class CommonApiController extends FOSRestController implements MauticController
 
         // Return the response with matching keys from the request
         if ($returnWithOriginalKeys) {
+            if ($entities instanceof Paginator) {
+                $entities = $entities->getIterator()->getArrayCopy();
+            }
+
             return $idHelper->orderByOriginalKey($entities);
         }
 
