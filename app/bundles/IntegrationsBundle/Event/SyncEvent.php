@@ -4,26 +4,25 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Event;
 
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Symfony\Component\EventDispatcher\Event;
 
 class SyncEvent extends Event
 {
-    /** @var string */
+    /**
+     * @var string
+     */
     private $integrationName;
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $fromDateTime;
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $toDateTime;
 
-    public function __construct(string $integrationName, ?\DateTimeInterface $fromDateTime = null, ?\DateTimeInterface $toDateTime = null)
+    /**
+     * @var InputOptionsDAO
+     */
+    private $inputOptionsDAO;
+
+    public function __construct(string $integrationName, InputOptionsDAO $inputOptionsDAO)
     {
         $this->integrationName = $integrationName;
-        $this->fromDateTime    = $fromDateTime;
-        $this->toDateTime      = $toDateTime;
+        $this->inputOptionsDAO = $inputOptionsDAO;
     }
 
     public function getIntegrationName(): string
@@ -38,11 +37,16 @@ class SyncEvent extends Event
 
     public function getFromDateTime(): ?\DateTimeInterface
     {
-        return $this->fromDateTime;
+        return $this->inputOptionsDAO->getStartDateTime();
     }
 
     public function getToDateTime(): ?\DateTimeInterface
     {
-        return $this->toDateTime;
+        return $this->inputOptionsDAO->getEndDateTime();
+    }
+
+    public function getInputOptions(): InputOptionsDAO
+    {
+        return $this->inputOptionsDAO;
     }
 }

@@ -89,6 +89,12 @@ class SyncCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
                 'Provide option pass to InputOptions Example: --option="type:1" --option="channel_id:1"'
+            )
+            ->addOption(
+                '--disable-activity-push',
+                null,
+                InputOption::VALUE_NONE,
+                'Notate if the sync should disable the activities sync if the integration supports it'
             );
 
         parent::configure();
