@@ -27,8 +27,6 @@ class AddressDTO
 
     /**
      * AddressDTO constructor.
-     *
-     * @param array $address
      */
     public function __construct(array $address)
     {
@@ -56,8 +54,6 @@ class AddressDTO
     }
 
     /**
-     * @param array $contact
-     *
      * @return string
      *
      * @throws TokenNotFoundOrEmptyException
@@ -78,8 +74,6 @@ class AddressDTO
     }
 
     /**
-     * @param array $contact
-     *
      * @return string
      *
      * @throws TokenNotFoundOrEmptyException

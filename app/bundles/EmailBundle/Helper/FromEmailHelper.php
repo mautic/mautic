@@ -47,9 +47,6 @@ class FromEmailHelper
 
     /**
      * FromEmailHelper constructor.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param LeadRepository       $leadRepository
      */
     public function __construct(CoreParametersHelper $coreParametersHelper, LeadRepository $leadRepository)
     {
@@ -57,18 +54,12 @@ class FromEmailHelper
         $this->leadRepository       = $leadRepository;
     }
 
-    /**
-     * @param array $from
-     */
     public function setDefaultFromArray(array $from)
     {
         $this->defaultFrom = new AddressDTO($from);
     }
 
     /**
-     * @param array      $from
-     * @param array|null $contact
-     *
      * @return array
      */
     public function getFromAddressArrayConsideringOwner(array $from, array $contact = null)
@@ -95,9 +86,6 @@ class FromEmailHelper
     }
 
     /**
-     * @param array      $from
-     * @param array|null $contact
-     *
      * @return array
      */
     public function getFromAddressArray(array $from, array $contact = null)
@@ -160,7 +148,6 @@ class FromEmailHelper
 
     /**
      * @param string $signature
-     * @param array  $owner
      *
      * @return string
      */
@@ -202,9 +189,8 @@ class FromEmailHelper
     }
 
     /**
-     * @param AddressDTO $address
-     * @param array      $contact
-     * @param bool       $asOwner
+     * @param array $contact
+     * @param bool  $asOwner
      *
      * @return array
      */
@@ -241,8 +227,6 @@ class FromEmailHelper
     }
 
     /**
-     * @param array $contact
-     *
      * @return array
      *
      * @throws OwnerNotFoundException
