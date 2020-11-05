@@ -18,7 +18,6 @@ use FOS\RestBundle\View\View;
 use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\ApiEntityEvent;
-use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Helper\BatchIdToEntityHelper;
 use Mautic\ApiBundle\Serializer\Exclusion\ParentChildrenExclusionStrategy;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
@@ -798,7 +797,7 @@ class CommonApiController extends FOSRestController implements MauticController
             ]
         );
 
-            [$entities, $total] = $prepareForSerialization
+        [$entities, $total] = $prepareForSerialization
                 ?
                 $this->prepareEntitiesForView($entities)
                 :
