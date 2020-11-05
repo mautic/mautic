@@ -74,6 +74,6 @@ class TagRepository extends BaseTagRepository
                 $return[$l] = 0;
             }
         }
-        return ($returnArray) ? $return : $return[tagIds[0]];
+        return ($returnArray) ? $return : $return[$tagIds[0]];
     }
 }
