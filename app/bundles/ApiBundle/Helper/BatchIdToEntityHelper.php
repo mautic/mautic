@@ -41,7 +41,6 @@ class BatchIdToEntityHelper
     /**
      * BatchIdToEntityHelper constructor.
      *
-     * @param array  $parameters
      * @param string $idKey
      */
     public function __construct(array $parameters, $idKey = 'id')
@@ -90,8 +89,6 @@ class BatchIdToEntityHelper
      * will return with associative keys (json object). If the request was a sequential numeric array starting with 0, the response will
      * be a simple array (json array).
      *
-     * @param array $entities
-     *
      * @return array
      */
     public function orderByOriginalKey(array $entities)
@@ -120,9 +117,6 @@ class BatchIdToEntityHelper
         return $orderedEntities;
     }
 
-    /**
-     * @param array $parameters
-     */
     private function extractIds(array $parameters)
     {
         $this->ids = [];
@@ -151,7 +145,7 @@ class BatchIdToEntityHelper
         }
 
         // ['ids' => '1,2,3']
-        if (strpos($ids, ',') !== false) {
+        if (false !== strpos($ids, ',')) {
             $this->ids           = str_getcsv($ids);
             $this->originalKeys  = array_keys($this->ids);
             $this->isAssociative = false;
@@ -164,9 +158,6 @@ class BatchIdToEntityHelper
         $this->errors[] = 'mautic.api.call.id_missing';
     }
 
-    /**
-     * @param array $parameters
-     */
     private function extractIdsFromParams(array $parameters)
     {
         $this->isAssociative = $this->isAssociativeArray($parameters);
@@ -195,8 +186,6 @@ class BatchIdToEntityHelper
     }
 
     /**
-     * @param array $array
-     *
      * @return bool
      */
     private function isAssociativeArray(array $array)
