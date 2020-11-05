@@ -15,9 +15,6 @@ use Mautic\CoreBundle\Exception\SchemaException;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- * Class RemoveDuplicateIndexData.
- */
 class RemoveDuplicateIndexData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface, FixtureGroupInterface
 {
     private $tables = [

@@ -16,9 +16,6 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
-/**
- * Class Version20201102133546.
- */
 final class Version20201102133546 extends AbstractMauticMigration
 {
     private $tableName;
