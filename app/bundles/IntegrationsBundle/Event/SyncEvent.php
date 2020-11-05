@@ -10,24 +10,18 @@ use Symfony\Component\EventDispatcher\Event;
 class SyncEvent extends Event
 {
     /**
-     * @var string
-     */
-    private $integrationName;
-
-    /**
      * @var InputOptionsDAO
      */
     private $inputOptionsDAO;
 
-    public function __construct(string $integrationName, InputOptionsDAO $inputOptionsDAO)
+    public function __construct(InputOptionsDAO $inputOptionsDAO)
     {
-        $this->integrationName = $integrationName;
         $this->inputOptionsDAO = $inputOptionsDAO;
     }
 
     public function getIntegrationName(): string
     {
-        return $this->integrationName;
+        return $this->inputOptionsDAO->getIntegration();
     }
 
     public function isIntegration(string $integrationName): bool
