@@ -13,8 +13,9 @@ namespace Mautic\ApiBundle\Tests\Helper;
 
 use Mautic\ApiBundle\Helper\BatchIdToEntityHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\TestCase;
 
-class BatchIdToEntityHelperTest extends \PHPUnit_Framework_TestCase
+class BatchIdToEntityHelperTest extends TestCase
 {
     public function testIdsAreExtractedFromIdKeyArray()
     {
