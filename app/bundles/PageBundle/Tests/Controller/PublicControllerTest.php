@@ -22,21 +22,22 @@ use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\PageBundle\Controller\PublicController;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
+use Mautic\PageBundle\Controller\PublicController;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Event\TrackingEvent;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\RedirectModel;
+use Mautic\PageBundle\PageEvents;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Logger;
-use Mautic\PageBundle\PageEvents;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Router;
 
@@ -413,25 +414,12 @@ class PublicControllerTest extends TestCase
             ->method('isAnonymous')
             ->willReturn(true);
 
-        $leadModel = $this->createMock(LeadModel::class);
-        $leadModel->expects($this->once())
-            ->method('getCurrentLead')
-            ->willReturn($contact);
-
         $pageModel    = $this->createMock(PageModel::class);
         $modelFactory = $this->createMock(ModelFactory::class);
-        $modelFactory->expects($this->exactly(2))
+        $modelFactory->expects($this->once())
             ->method('getModel')
-            ->willReturnCallback(
-                function (string $modelName) use ($leadModel, $pageModel) {
-                    switch ($modelName) {
-                        case 'lead':
-                            return $leadModel;
-                        case 'page':
-                            return $pageModel;
-                    }
-                }
-            );
+            ->with('page')
+            ->willReturn($pageModel);
 
         $deviceTrackingService = $this->createMock(DeviceTrackingServiceInterface::class);
 
@@ -439,6 +427,10 @@ class PublicControllerTest extends TestCase
         $trackingHelper->expects($this->once())
             ->method('getSession')
             ->willReturn($mtcSessionEventArray);
+
+        $contactTracker = $this->createMock(ContactTracker::class);
+        $contactTracker->method('getContact')
+            ->willReturn($contact);
 
         $container = $this->createMock(Container::class);
         $container->method('get')
@@ -448,15 +440,15 @@ class PublicControllerTest extends TestCase
                         ['mautic.security', Container::EXCEPTION_ON_INVALID_REFERENCE, $security],
                         ['mautic.model.factory', Container::EXCEPTION_ON_INVALID_REFERENCE, $modelFactory],
                         ['mautic.page.model.page', Container::EXCEPTION_ON_INVALID_REFERENCE, $pageModel],
-                        ['mautic.lead.model.lead', Container::EXCEPTION_ON_INVALID_REFERENCE, $leadModel],
                         ['mautic.lead.service.device_tracking_service', Container::EXCEPTION_ON_INVALID_REFERENCE, $deviceTrackingService],
                         ['mautic.page.helper.tracking', Container::EXCEPTION_ON_INVALID_REFERENCE, $trackingHelper],
                         ['event_dispatcher', Container::EXCEPTION_ON_INVALID_REFERENCE, $eventDispatcher],
+                        [ContactTracker::class, Container::EXCEPTION_ON_INVALID_REFERENCE, $contactTracker],
                     ]
                 )
             );
 
-        $publicController = new PublicController($deviceTrackingService);
+        $publicController = new PublicController();
         $publicController->setContainer($container);
         $publicController->setRequest($request);
 
