@@ -82,11 +82,6 @@ class LeadSubscriber implements EventSubscriberInterface
     private $router;
 
     /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
      * @var LeadListRepository
      */
     private $segmentRepository;
@@ -108,8 +103,7 @@ class LeadSubscriber implements EventSubscriberInterface
         LeadModel $leadModel,
         TranslatorInterface $translator,
         EntityManager $entityManager,
-        RouterInterface $router,
-        CorePermissions $security
+        RouterInterface $router
     ) {
         $this->membershipManager         = $membershipManager;
         $this->eventCollector            = $eventCollector;
@@ -118,7 +112,6 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->translator                = $translator;
         $this->entityManager             = $entityManager;
         $this->router                    = $router;
-        $this->security                  = $security;
         $this->segmentRepository         = $entityManager->getRepository(LeadList::class);
         $this->contactEventLogRepository = $entityManager->getRepository(LeadEventLog::class);
         $this->contactRepository         = $entityManager->getRepository(CampaignLead::class);
