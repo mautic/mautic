@@ -13,8 +13,9 @@ namespace Mautic\EmailBundle\Tests\Helper\DTO;
 
 use Mautic\EmailBundle\Helper\DTO\AddressDTO;
 use Mautic\EmailBundle\Helper\Exception\TokenNotFoundOrEmptyException;
+use PHPUnit\Framework\TestCase;
 
-class AddressDTOTest extends \PHPUnit_Framework_TestCase
+class AddressDTOTest extends TestCase
 {
     public function testNameTokenReturnsTrue()
     {
