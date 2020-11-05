@@ -51,10 +51,7 @@ jobs:
       run: echo "SYMFONY_ENV=test" >> $GITHUB_ENV
 
     - name: Install dependencies
-      # Force Composer to v1.10
       run: |
-        composer self-update --1
-        composer global require hirak/prestissimo
         composer validate
         composer install --prefer-dist --no-progress --no-suggest
     
@@ -95,10 +92,7 @@ jobs:
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
 
     - name: Install dependencies
-      # Force Composer to v1.10
       run: |
-        composer self-update --1
-        composer global require hirak/prestissimo
         composer validate
         composer install --prefer-dist --no-progress --no-suggest
     

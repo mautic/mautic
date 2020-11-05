@@ -24,10 +24,7 @@ jobs:
       run: echo "MAUTIC_VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
 
     - name: Install dependencies
-      # Force Composer to v1.10
       run: |
-        composer self-update --1
-        composer global require hirak/prestissimo
         composer validate
         composer install --prefer-dist --no-progress --no-suggest
 
