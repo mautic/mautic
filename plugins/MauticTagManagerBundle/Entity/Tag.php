@@ -21,6 +21,7 @@ class Tag extends BaseTag
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('lead_tags')
+            ->setEmbeddable()
             ->setCustomRepositoryClass(TagRepository::class);
     }
 }
