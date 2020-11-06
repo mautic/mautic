@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f83c30599d78dd304fcfdd29102b9993",
+    "content-hash": "45e35e843ead38bd8d7c2358e3eadeb6",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -1910,6 +1910,7 @@
                 "reflection",
                 "static"
             ],
+            "abandoned": "roave/better-reflection",
             "time": "2020-03-27T11:06:43+00:00"
         },
         {
@@ -2316,6 +2317,85 @@
                 "rest"
             ],
             "time": "2019-10-21T08:22:30+00:00"
+        },
+        {
+            "name": "gaufrette/aws-s3-adapter",
+            "version": "v0.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Gaufrette/aws-s3-adapter.git",
+                "reference": "a37143f592d5cb0ba124451439af6e6da6784d89"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Gaufrette/aws-s3-adapter/zipball/a37143f592d5cb0ba124451439af6e6da6784d89",
+                "reference": "a37143f592d5cb0ba124451439af6e6da6784d89",
+                "shasum": ""
+            },
+            "require": {
+                "aws/aws-sdk-php": "~2||~3",
+                "ext-fileinfo": "*",
+                "knplabs/gaufrette": "~0.4@dev"
+            },
+            "type": "metapackage",
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "KnpLabs",
+                    "email": "hello@knplabs.com"
+                }
+            ],
+            "description": "Aws adapter for Gaufrette",
+            "time": "2017-06-08T11:37:42+00:00"
+        },
+        {
+            "name": "gaufrette/extras",
+            "version": "v0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Gaufrette/extras.git",
+                "reference": "a2af9a8c53591a4c43a38249e17bcdefdcea8a23"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Gaufrette/extras/zipball/a2af9a8c53591a4c43a38249e17bcdefdcea8a23",
+                "reference": "a2af9a8c53591a4c43a38249e17bcdefdcea8a23",
+                "shasum": ""
+            },
+            "require": {
+                "knplabs/gaufrette": "~0.4"
+            },
+            "require-dev": {
+                "aws/aws-sdk-php": "~2.4|~3",
+                "phpspec/phpspec": "^3.4",
+                "phpunit/phpunit": "~5.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Gaufrette\\Extras\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "KnpLabs Team",
+                    "homepage": "http://knplabs.com"
+                },
+                {
+                    "name": "Albin Kerouanton",
+                    "email": "albin.kerouanton@knplabs.com"
+                },
+                {
+                    "name": "The contributors",
+                    "homepage": "http://github.com/Gaufrette/extras/contributors"
+                }
+            ],
+            "description": "Provides extra features (prefixed fs, resolvable fs) to Gaufrette",
+            "time": "2017-06-17T15:28:53+00:00"
         },
         {
             "name": "geoip2/geoip2",
@@ -6840,6 +6920,7 @@
                 "parser",
                 "useragent"
             ],
+            "abandoned": "matomo/device-detector",
             "time": "2020-03-31T08:53:12+00:00"
         },
         {

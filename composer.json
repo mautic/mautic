@@ -109,7 +109,9 @@
         "tightenco/collect": "^6.13",
         "kamermans/guzzle-oauth2-subscriber": "^1.0",
         "barryvdh/elfinder-flysystem-driver": "^0.2.1",
-        "bandwidth-throttle/token-bucket": "^2.0"
+        "bandwidth-throttle/token-bucket": "^2.0",
+        "gaufrette/extras": "^0.1.0",
+        "gaufrette/aws-s3-adapter": "^0.4.0"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~3.4.0",
