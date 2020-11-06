@@ -43,7 +43,6 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\StatsCollectionHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
-use Mautic\EmailBundle\Stats\Helper\FilterTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
@@ -76,7 +75,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     use VariantModelTrait;
     use TranslationModelTrait;
     use BuilderModelTrait;
-    use FilterTrait;
 
     /**
      * @var bool

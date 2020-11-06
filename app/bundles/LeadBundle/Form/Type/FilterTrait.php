@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Helper\ArrayHelper;
+use Exception;
 use Mautic\LeadBundle\Entity\RegexTrait;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -31,6 +32,9 @@ trait FilterTrait
         $this->connection = $connection;
     }
 
+    /**
+     * @param string $eventName
+     */
     public function buildFiltersForm($eventName, FormEvent $event, TranslatorInterface $translator, $currentListId = null): void
     {
         $data    = $event->getData();
@@ -85,7 +89,7 @@ trait FilterTrait
                 }
 
                 $customOptions['choices']                   = $options['lists'];
-                $customOptions['multiple']                  = true;
+                $customOptions['multiple']                  = in_array($data['operator'], ['in', '!in']);
                 $customOptions['choice_translation_domain'] = false;
                 $type                                       = ChoiceType::class;
                 break;
@@ -355,6 +359,12 @@ trait FilterTrait
                     array_splice($customOptions['constraints'], $i, 1);
                 }
             }
+
+            if (in_array($data['operator'], ['empty', '!empty'])) {
+                // @see Symfony\Component\Form\Extension\Core\Type\ChoiceType::configureOptions
+                $data['filter'] = null;
+            }
+
             $form->add(
                 'filter',
                 $type,
@@ -394,7 +404,7 @@ trait FilterTrait
             ]
         );
 
-        if (FormEvents::PRE_SUBMIT == $eventName) {
+        if (FormEvents::PRE_SUBMIT === $eventName) {
             $event->setData($data);
         }
     }

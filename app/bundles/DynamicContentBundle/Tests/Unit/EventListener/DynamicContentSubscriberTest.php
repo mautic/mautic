@@ -96,7 +96,7 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->formTokenHelper           = $this->createMock(FormTokenHelper::class);
         $this->focusTokenHelper          = $this->createMock(FocusTokenHelper::class);
         $this->auditLogModel             = $this->createMock(AuditLogModel::class);
-        $this->leadModel                 = $this->createMock(LeadModel::class);
+        $this->contactTracker            = $this->createMock(ContactTracker::class);
         $this->dynamicContentHelper      = $this->createMock(DynamicContentHelper::class);
         $this->dynamicContentModel       = $this->createMock(DynamicContentModel::class);
         $this->security                  = $this->createMock(CorePermissions::class);

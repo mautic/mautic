@@ -201,7 +201,7 @@ Mautic.addDwcFilter = function (elId, elObj) {
 
     //activate fields
     if (isSpecial) {
-        if (fieldType == 'select' || fieldType == 'multiselect' || fieldType == 'boolean') {
+        if (fieldType == 'select' || fieldType == 'multiselect' || fieldType == 'boolean' || fieldType == 'leadlist') {
             // Generate the options
             var fieldOptions = filterOption.data("field-list");
             mQuery.each(fieldOptions, function(index, val) {
