@@ -105,6 +105,7 @@ Mautic.launchBuilder = function (formName, actionName) {
     var builderContent = mQuery('.builder-content');
     var btnCloseBuilder = mQuery('.btn-close-builder');
     var applyBtn = mQuery('.btn-apply-builder');
+
     var panelHeight = (builderContent.css('right') == '0px') ? builderPanel.height() : 0;
     var panelWidth = (builderContent.css('right') == '0px') ? 0 : builderPanel.width();
     var spinnerLeft = (mQuery(window).width() - panelWidth - 60) / 2;

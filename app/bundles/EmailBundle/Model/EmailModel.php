@@ -311,7 +311,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         foreach ($entities as $entity) {
             $queued  = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'queued'));
             $pending = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'pending'));
-
             if (false !== $queued) {
                 $entity->setQueuedCount($queued);
             }

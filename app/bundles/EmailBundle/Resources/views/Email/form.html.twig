@@ -21,6 +21,7 @@
 } %}
 {% set isCodeMode = (email.getTemplate() is same as 'mautic_code_mode') %}
 {% set previewUrl = previewUrl|default('') %}
+{% set draftPreviewUrl = draftPreviewUrl|default('') %}
 {% set mauticTemplateVars = mauticTemplateVars|default({'mauticTemplate': '@MauticEmail/Email/form.html.twig', 'email': email}) %}
 
 {% block headerTitle %}
@@ -232,14 +233,15 @@
         {% endfor %}
     </div>
     {{- include('@MauticCore/Helper/builder.html.twig', {
-        'type'          : 'email',
-        'isCodeMode'    : isCodeMode,
-        'sectionForm'   : sectionForm,
-        'builderAssets' : builderAssets,
-        'slots'         : slots,
-        'sections'      : sections,
-        'objectId'      : email.sessionId,
-        'previewUrl'    : previewUrl,
+        'type'            : 'email',
+        'isCodeMode'      : isCodeMode,
+        'sectionForm'     : sectionForm,
+        'builderAssets'   : builderAssets,
+        'slots'           : slots,
+        'sections'        : sections,
+        'objectId'        : email.sessionId,
+        'previewUrl'      : previewUrl,
+        'draftPreviewUrl' : draftPreviewUrl,
     }, with_context=false) -}}
 
     {% set type = email.emailType %}

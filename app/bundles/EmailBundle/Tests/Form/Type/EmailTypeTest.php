@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\EmailType;
+use Mautic\EmailBundle\Helper\EmailConfigInterface;
 use Mautic\StageBundle\Model\StageModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -45,6 +46,11 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
     private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     /**
+     * @var EmailConfigInterface|MockObject
+     */
+    private $emailConfig;
+
+    /**
      * @var ThemeHelperInterface|MockObject
      */
     private \PHPUnit\Framework\MockObject\MockObject $themeHelper;
@@ -59,12 +65,14 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
         $this->formBuilder          = $this->createMock(FormBuilderInterface::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->themeHelper          = $this->createMock(ThemeHelperInterface::class);
+        $this->emailConfig          = $this->createMock(EmailConfigInterface::class);
         $this->form                 = new EmailType(
             $this->translator,
             $this->entityManager,
             $this->stageModel,
             $this->coreParametersHelper,
-            $this->themeHelper
+            $this->themeHelper,
+            $this->emailConfig
         );
 
         $this->formBuilder->method('create')->willReturnSelf();

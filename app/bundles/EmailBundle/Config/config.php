@@ -1,5 +1,9 @@
 <?php
 
+use Doctrine\ORM\EntityRepository;
+use Mautic\EmailBundle\Helper\EmailConfig;
+use Mautic\EmailBundle\Model\EmailDraftModel;
+
 return [
     'routes' => [
         'main' => [

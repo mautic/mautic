@@ -17,9 +17,12 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
+use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
 use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
+use Mautic\EmailBundle\Helper\EmailConfig;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Model\ListModel;
@@ -43,11 +46,10 @@ class EmailController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, $page = 1)
     {
-        $model = $this->getModel('email');
-
-        // set some permissions
+        $isDraftEnabled = $emailConfig->isDraftEnabled();
+        //set some permissions
         $permissions = $this->security->isGranted(
             [
                 'email:emails:viewown',
@@ -130,9 +132,9 @@ class EmailController extends FormController
 
             if ($updatedFilters) {
                 foreach ($updatedFilters as $updatedFilter) {
-                    [$clmn, $fltr] = explode(':', $updatedFilter);
+                    [$column, $filter] = explode(':', $updatedFilter);
 
-                    $newFilters[$clmn][] = $fltr;
+                    $newFilters[$column][] = $filter;
                 }
 
                 $currentFilters = $newFilters;
@@ -231,15 +233,16 @@ class EmailController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'searchValue' => $search,
-                    'filters'     => $listFilters,
-                    'items'       => $emails,
-                    'totalItems'  => $count,
-                    'page'        => $page,
-                    'limit'       => $limit,
-                    'tmpl'        => $request->get('tmpl', 'index'),
-                    'permissions' => $permissions,
-                    'model'       => $model,
+                    'searchValue'    => $search,
+                    'filters'        => $listFilters,
+                    'items'          => $emails,
+                    'totalItems'     => $count,
+                    'page'           => $page,
+                    'limit'          => $limit,
+                    'tmpl'           => $request->get('tmpl', 'index'),
+                    'permissions'    => $permissions,
+                    'model'          => $model,
+                    'isDraftEnabled' => $isDraftEnabled,
                 ],
                 'contentTemplate' => '@MauticEmail/Email/list.html.twig',
                 'passthroughVars' => [
@@ -256,10 +259,8 @@ class EmailController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, EmailModel $model, EmailConfig $emailConfig, $objectId)
     {
-        /** @var EmailModel $model */
-        $model    = $this->getModel('email');
         $security = $this->security;
 
         /** @var Email $email */
@@ -303,7 +304,7 @@ class EmailController extends FormController
             return $this->accessDenied();
         }
 
-        // get A/B test information
+        //get A/B test information
         [$parent, $children]     = $email->getVariants();
         $properties              = [];
         $variantError            = false;
@@ -360,7 +361,7 @@ class EmailController extends FormController
             }
         }
 
-        // get related translations
+        //get related translations
         [$translationParent, $translationChildren] = $email->getTranslations();
 
         // Audit Log
@@ -369,7 +370,18 @@ class EmailController extends FormController
         $logs = $auditLog->getLogForObject('email', $email->getId(), $email->getDateAdded());
 
         // Get click through stats
-        $trackableLinks = $model->getEmailClickStats($email->getId());
+        $trackableLinks  = $model->getEmailClickStats($email->getId());
+        $draftPreviewUrl = null;
+        if ($emailConfig->isDraftEnabled() && $email->hasDraft()) {
+            $draftPreviewUrl = $this->generateUrl(
+                'mautic_email_preview',
+                [
+                    'objectId'   => $email->getId(),
+                    'objectType' => 'draft',
+                ],
+                true
+            );
+        }
 
         $variants = [
             'parent'             => $parent,
@@ -413,9 +425,10 @@ class EmailController extends FormController
                         ],
                         'RETURN_ARRAY'
                     ),
-                    'abTestResults' => $abTestResults,
-                    'security'      => $security,
-                    'previewUrl'    => $this->generateUrl(
+                    'abTestResults'   => $abTestResults,
+                    'security'        => $security,
+                    'draftPreviewUrl' => $draftPreviewUrl,
+                    'previewUrl'      => $this->generateUrl(
                         'mautic_email_preview',
                         ['objectId' => $email->getId()],
                         UrlGeneratorInterface::ABSOLUTE_URL
@@ -627,6 +640,7 @@ class EmailController extends FormController
         Translator $translator,
         RouterInterface $routerHelper,
         CoreParametersHelper $coreParametersHelper,
+        EmailConfig $emailConfig,
         $objectId,
         $ignorePost = false,
         $forceTypeSelection = false
@@ -698,12 +712,26 @@ class EmailController extends FormController
         if (!$ignorePost && 'POST' === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
-                if ($valid = $this->isFormValid($form)) {
+                $existingEmail = clone $entity;
+                $this->restoreNullifiedFieldsDuringClone($existingEmail, $entity);
+                if ($valid = $this->isFormValid($form) && $this->isFormValidForWebinar($emailform, $form, $entity)) {
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);
 
                     // form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+
+                    if (true === $emailConfig->isDraftEnabled() && !empty($entity->getId())) {
+                        $this->dispatcher->dispatch(EmailEvents::ON_EMAIL_EDIT_SUBMIT, new EmailEditSubmitEvent(
+                            $existingEmail,
+                            $entity,
+                            $form->get('buttons')->get('save')->isClicked(),
+                            $form->get('buttons')->get('apply')->isClicked(),
+                            ($form->get('buttons')->has('save_draft') && $form->get('buttons')->get('save_draft')->isClicked()),
+                            ($form->get('buttons')->has('apply_draft') && $form->get('buttons')->get('apply_draft')->isClicked()),
+                            ($form->get('buttons')->has('discard_draft') && $form->get('buttons')->get('discard_draft')->isClicked())
+                        ));
+                    }
 
                     $this->addFlashMessage(
                         'mautic.core.notice.updated',
@@ -747,7 +775,12 @@ class EmailController extends FormController
                 );
             }
 
-            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
+            if ($cancelled ||
+                ($valid && ($this->getFormButton($form, ['buttons', 'save'])->isClicked() ||
+                    ($form->get('buttons')->has('save_draft') && $form->get('buttons')->get('save_draft')->isClicked()) ||
+                    ($form->get('buttons')->has('apply_draft') && $form->get('buttons')->get('apply_draft')->isClicked()) ||
+                    ($form->get('buttons')->has('discard_draft') && $form->get('buttons')->get('discard_draft')->isClicked())))
+                ) {
                 $viewParameters = [
                     'objectAction' => 'view',
                     'objectId'     => $entity->getId(),
@@ -808,6 +841,16 @@ class EmailController extends FormController
             ],
             'RETURN_ARRAY'
         );
+        $draftPreviewUrl = '';
+        if (true === $emailConfig->isDraftEnabled() && $entity->hasDraft()) {
+            $draftPreviewUrl = $this->generateUrl(
+                'mautic_email_preview',
+                ['objectId'       => $entity->getId(),
+                    'objectType'  => 'draft',
+                ],
+                true
+            );
+        }
 
         return $this->delegateView(
             [
@@ -823,6 +866,7 @@ class EmailController extends FormController
                     'builderAssets'      => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder($assetsHelper, $translator, $request, $routerHelper, $coreParametersHelper))), // strip new lines
                     'sectionForm'        => $sectionForm->createView(),
                     'permissions'        => $permissions,
+                    'draftPreviewUrl'    => $draftPreviewUrl,
                     'previewUrl'         => $this->generateUrl(
                         'mautic_email_preview',
                         ['objectId' => $entity->getId()],
@@ -1114,7 +1158,6 @@ class EmailController extends FormController
         // merge any existing changes
         $newContent = $request->getSession()->get('mautic.emailbuilder.'.$objectId.'.content', []);
         $content    = $entity->getContent();
-
         if (is_array($newContent)) {
             $content = array_merge($content, $newContent);
             // Update the content for processSlots
@@ -1636,5 +1679,25 @@ class EmailController extends FormController
     protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
+    }
+
+    private function restoreNullifiedFieldsDuringClone(Email $clonedEmail, Email $cloningEmail): void
+    {
+        $clonedEmail->setTranslationParent($cloningEmail->getTranslationParent());
+        foreach ($cloningEmail->getTranslationChildren() as $translationChild) {
+            $clonedEmail->addTranslationChild($translationChild);
+        }
+        $clonedEmail->setVariantParent($cloningEmail->getVariantParent());
+        foreach ($cloningEmail->getVariantChildren() as $variantChild) {
+            $clonedEmail->addVariantChild($variantChild);
+        }
+        $clonedEmail->setSentCount($cloningEmail->getSentCount());
+        $clonedEmail->setReadCount($cloningEmail->getReadCount());
+        $clonedEmail->setRevision($cloningEmail->getRevision());
+        $clonedEmail->setVariantSentCount($cloningEmail->getVariantSentCount());
+        $clonedEmail->setVariantReadCount($cloningEmail->getVariantReadCount());
+        $clonedEmail->setVariantStartDate($cloningEmail->getVariantStartDate());
+        $clonedEmail->setEmailType($cloningEmail->getEmailType());
+        $clonedEmail->setDraft($cloningEmail->getDraft());
     }
 }
