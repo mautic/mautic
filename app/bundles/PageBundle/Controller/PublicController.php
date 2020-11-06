@@ -365,9 +365,15 @@ class PublicController extends CommonFormController
      */
     public function trackingImageAction()
     {
+         /** @var LeadModel $leadModel */
+        $leadModel = $this->getModel('lead');
+
+        $lead = $leadModel->getCurrentLead();
+        
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model = $this->getModel('page');
-        $model->hitPage(null, $this->request);
+        //$model->hitPage(null, $this->request);
+        $model->hitPage(null, $this->request, '200', $lead);
 
         return TrackingPixelHelper::getResponse($this->request);
     }
@@ -387,10 +393,6 @@ class PublicController extends CommonFormController
             );
         }
 
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model = $this->getModel('page');
-        $model->hitPage(null, $this->request);
-
         /** @var ContactTracker $contactTracker */
         $contactTracker = $this->get(ContactTracker::class);
 
@@ -402,6 +404,10 @@ class PublicController extends CommonFormController
         /** @var TrackingHelper $trackingHelper */
         $trackingHelper = $this->get('mautic.page.helper.tracking');
         $sessionValue   = $trackingHelper->getSession(true);
+        
+        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        $model = $this->getModel('page');
+        $model->hitPage(null, $this->request, '200', $lead);
 
         return new JsonResponse(
             [
