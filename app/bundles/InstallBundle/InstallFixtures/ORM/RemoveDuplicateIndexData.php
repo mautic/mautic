@@ -40,20 +40,16 @@ class RemoveDuplicateIndexData extends AbstractFixture implements OrderedFixture
      */
     public function load(ObjectManager $manager): void
     {
+        $prefix = $this->container->getParameter('mautic.db_table_prefix');
         /** @var IndexSchemaHelper $indexHelper */
         $indexHelper = $this->container->get('mautic.schema.helper.index');
 
-        foreach ($this->tables as $tableName => $columns) {
-            $indexHelper->setName($tableName);
+        foreach ($this->tables as $table => $columns) {
+            $indexHelper->setName($table);
+            $table = $prefix.$table;
 
             foreach ($columns as $columnName) {
-                $indexSql = <<<SQL
-SHOW INDEX FROM $tableName WHERE Column_name = '$columnName' and Key_name <> 'PRIMARY';
-SQL;
-                $stmt = $manager->getConnection()->prepare($indexSql);
-                $stmt->execute();
-                $result    = $stmt->fetch(FetchMode::ASSOCIATIVE);
-                $indexName = $result['Key_name'] ?? null;
+                $indexName = $this->getIndexName($table, $manager);
 
                 if ($indexName) {
                     $indexHelper->dropIndex($columnName, $indexName)->executeChanges();
@@ -65,5 +61,15 @@ SQL;
     public function getOrder(): int
     {
         return 6;
+    }
+
+    private function getIndexName(string $table, ObjectManager $manager): ?string
+    {
+        $sql  = "SHOW INDEX FROM {$table} WHERE Key_name <> 'PRIMARY';";
+        $stmt = $manager->getConnection()->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetch(FetchMode::ASSOCIATIVE);
+
+        return $result['Key_name'] ?? null;
     }
 }
