@@ -88,6 +88,11 @@ class Sms extends FormEntity
      */
     private $smsType = 'template';
 
+    /**
+     * @var int
+     */
+    private $pendingCount = 0;
+
     public function __clone()
     {
         $this->id        = null;
@@ -175,24 +180,21 @@ class Sms extends FormEntity
                     $violations = $validator->validate(
                         $sms->getLists(),
                         [
-                            new LeadListAccess(
-                                [
-                                    'message' => 'mautic.lead.lists.required',
-                                ]
-                            ),
                             new NotBlank(
                                 [
                                     'message' => 'mautic.lead.lists.required',
                                 ]
                             ),
+                            new LeadListAccess(),
                         ]
                     );
 
                     if (count($violations) > 0) {
-                        $string = (string) $violations;
-                        $context->buildViolation($string)
-                            ->atPath('lists')
-                            ->addViolation();
+                        foreach ($violations as $violation) {
+                            $context->buildViolation($violation->getMessage())
+                                ->atPath('lists')
+                                ->addViolation();
+                        }
                     }
                 }
             },
@@ -466,5 +468,25 @@ class Sms extends FormEntity
     {
         $this->isChanged('smsType', $smsType);
         $this->smsType = $smsType;
+    }
+
+    /**
+     * @param int $pendingCount
+     *
+     * @return Sms
+     */
+    public function setPendingCount($pendingCount)
+    {
+        $this->pendingCount = $pendingCount;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPendingCount()
+    {
+        return $this->pendingCount;
     }
 }
