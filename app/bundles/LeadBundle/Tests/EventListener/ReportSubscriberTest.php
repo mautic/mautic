@@ -790,7 +790,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         ->method('getCompaniesByGroup')
         ->withConsecutive(
             [$this->queryBuilderMock, 'companycountry'],
-            [$this->queryBuilderMock, 'companyindustry'],
+            [$this->queryBuilderMock, 'companyindustry']
         )
         ->willReturnOnConsecutiveCalls([['companycountry' => 'test', 'companies' => '10']], [['companyindustry' => 'test', 'companies' => '10']]);
 
