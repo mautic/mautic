@@ -27,8 +27,15 @@ Cypress.Cookies.defaults({
 });
 
 before("Perform login", () => {
-  cy.visit("/s/login");
-  cy.login(Cypress.env("userName"), Cypress.env("password"));
+  cy.visit("/");
+  cy.location().then((loc) => {
+    console.log(loc)
+    if(loc.pathname.includes('login')){
+      cy.log("Logging in");
+      cy.login(Cypress.env("userName"), Cypress.env("password"));
+      cy.log('Login successful')
+    }
+  })
 
   //adding sample contacts to be used across test
   leftNavigation.contactsSection.click();
@@ -81,7 +88,7 @@ after("Delete Test Data", () => {
   leftNavigation.contactsSection.click();
   leftNavigation.contactsSection.click();
   contact.waitforPageLoad();
-  search.searchBox.clear();
+ // search.searchBox.clear();
   search.searchBox.type("TestContact");
   cy.wait(2000);
   search.selectCheckBoxForFirstItem.click({ force: true });
