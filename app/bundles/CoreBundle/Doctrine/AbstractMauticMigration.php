@@ -11,6 +11,16 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 abstract class AbstractMauticMigration extends AbstractMigration implements ContainerAwareInterface
 {
     /**
+     * @var string
+     */
+    public const COLUMN_TYPE_SIGNED = 'SIGNED';
+
+    /**
+     * @var string
+     */
+    public const COLUMN_TYPE_UNSIGNED = 'UNSIGNED';
+
+    /**
      * @var ContainerInterface
      */
     protected $container;
@@ -63,11 +73,9 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(?ContainerInterface $container = null)
     {
         $this->container     = $container;
         $this->prefix        = $container->getParameter('mautic.db_table_prefix');
@@ -188,5 +196,31 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     protected function suppressNoSQLStatementError()
     {
         $this->addSql('SELECT "This migration did not generate select statements." AS purpose');
+    }
+
+    /**
+     * This method will remove the burden of getting prefixed table name in individual migration file.
+     * Individual migration files just need to keep a protected static variable '$tableName'.
+     */
+    protected function getPrefixedTableName(?string $tableName = null): string
+    {
+        if (is_null($tableName)) {
+            $tableName = static::$tableName;
+        }
+
+        return $this->prefix.$tableName;
+    }
+
+    protected function getColumnTypeSignedOrUnsigned(Schema $schema, string $tableName, string $columnName): string
+    {
+        $pagesTable  = $schema->getTable($this->getPrefixedTableName($tableName));
+        $idColumn    = $pagesTable->getColumn($columnName);
+        $idDataType  = self::COLUMN_TYPE_SIGNED;
+
+        if (true === $idColumn->getUnsigned()) {
+            $idDataType = self::COLUMN_TYPE_UNSIGNED;
+        }
+
+        return $idDataType;
     }
 }

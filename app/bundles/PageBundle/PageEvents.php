@@ -146,4 +146,12 @@ final class PageEvents
      * Mautic\PageBundle\Event\TrackingEvent
      */
     public const ON_CONTACT_TRACKED = 'mautic.page.on_contact_tracked';
+
+    /**
+     * The mautic.page.on_edit_submit event is fired after a page edit is successfully submitted.
+     *
+     * The event listener receives a
+     * Mautic\PageBundle\Event\PageEditSubmitEvent
+     */
+    public const ON_PAGE_EDIT_SUBMIT = 'mautic.page.on_edit_submit';
 }

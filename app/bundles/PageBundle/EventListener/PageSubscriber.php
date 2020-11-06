@@ -7,9 +7,13 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PageBundle\Entity\HitRepository;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Event as Events;
+use Mautic\PageBundle\Event\PageEditSubmitEvent;
+use Mautic\PageBundle\Event\PageEvent;
+use Mautic\PageBundle\Model\PageDraftModel;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Event\QueueConsumerEvent;
@@ -17,6 +21,7 @@ use Mautic\QueueBundle\Queue\QueueConsumerResults;
 use Mautic\QueueBundle\QueueEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class PageSubscriber implements EventSubscriberInterface
 {
@@ -65,6 +70,11 @@ class PageSubscriber implements EventSubscriberInterface
      */
     private $contactRepository;
 
+    /**
+     * @var PageDraftModel
+     */
+    private $pageDraftModel;
+
     public function __construct(
         AssetsHelper $assetsHelper,
         IpLookupHelper $ipLookupHelper,
@@ -74,7 +84,8 @@ class PageSubscriber implements EventSubscriberInterface
         HitRepository $hitRepository,
         PageRepository $pageRepository,
         RedirectRepository $redirectRepository,
-        LeadRepository $contactRepository
+        LeadRepository $contactRepository,
+        PageDraftModel $pageDraftModel
     ) {
         $this->assetsHelper       = $assetsHelper;
         $this->ipLookupHelper     = $ipLookupHelper;
@@ -85,25 +96,24 @@ class PageSubscriber implements EventSubscriberInterface
         $this->pageRepository     = $pageRepository;
         $this->redirectRepository = $redirectRepository;
         $this->contactRepository  = $contactRepository;
+        $this->pageDraftModel     = $pageDraftModel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
-            PageEvents::PAGE_POST_SAVE   => ['onPagePostSave', 0],
-            PageEvents::PAGE_POST_DELETE => ['onPageDelete', 0],
-            PageEvents::PAGE_ON_DISPLAY  => ['onPageDisplay', -255], // We want this to run last
-            QueueEvents::PAGE_HIT        => ['onPageHit', 0],
+            PageEvents::PAGE_POST_SAVE      => ['onPagePostSave', 0],
+            PageEvents::PAGE_POST_DELETE    => ['onPageDelete', 0],
+            PageEvents::PAGE_ON_DISPLAY     => ['onPageDisplay', -255], // We want this to run last
+            QueueEvents::PAGE_HIT           => ['onPageHit', 0],
+            PageEvents::ON_PAGE_EDIT_SUBMIT => ['managePageDraft'],
         ];
     }
 
     /**
      * Add an entry to the audit log.
      */
-    public function onPagePostSave(Events\PageEvent $event)
+    public function onPagePostSave(PageEvent $event)
     {
         $page = $event->getPage();
         if ($details = $event->getChanges()) {
@@ -122,7 +132,7 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onPageDelete(Events\PageEvent $event)
+    public function onPageDelete(PageEvent $event)
     {
         $page = $event->getPage();
         $log  = [
@@ -240,6 +250,76 @@ class PageSubscriber implements EventSubscriberInterface
                     $payload
                 );
             }
+        }
+    }
+
+    public function managePageDraft(PageEditSubmitEvent $event): void
+    {
+        $livePage   = $event->getPreviousPage();
+        $editedPage = $event->getCurrentPage();
+
+        if (
+            ($event->isSaveAndClose() || $event->isApply())
+            && $editedPage->hasDraft()
+        ) {
+            $pageDraft = $editedPage->getDraft();
+            $pageDraft->setHtml($editedPage->getCustomHtml());
+            $pageDraft->setTemplate($editedPage->getTemplate());
+            $editedPage->setCustomHtml($livePage->getCustomHtml());
+            $editedPage->setTemplate($livePage->getTemplate());
+            $this->pageDraftModel->saveDraft($pageDraft);
+            $this->pageModel->saveEntity($editedPage);
+        }
+
+        if ($event->isSaveAsDraft()) {
+            $pageDraft = $this
+                ->pageDraftModel
+                ->createDraft($editedPage, $editedPage->getCustomHtml(), $editedPage->getTemplate());
+
+            $editedPage->setCustomHtml($livePage->getCustomHtml());
+            $editedPage->setTemplate($livePage->getTemplate());
+            $editedPage->setDraft($pageDraft);
+            $this->pageModel->saveEntity($editedPage);
+        }
+
+        if ($event->isDiscardDraft()) {
+            $this->revertPageModifications($livePage, $editedPage);
+            $this->pageDraftModel->deleteDraft($editedPage);
+            $editedPage->setDraft(null);
+            $this->pageModel->saveEntity($editedPage);
+        }
+
+        if ($event->isApplyDraft()) {
+            $this->pageDraftModel->deleteDraft($editedPage);
+            $editedPage->setDraft(null);
+        }
+    }
+
+    public function deletePageDraft(PageEvent $event): void
+    {
+        try {
+            $this->pageDraftModel->deleteDraft($event->getPage());
+        } catch (NotFoundHttpException $exception) {
+            // No associated draft found for deletion. We have nothing to do here. Return.
+            return;
+        }
+    }
+
+    private function revertPageModifications(Page $livePage, Page $editedPage): void
+    {
+        $livePageReflection   = new \ReflectionObject($livePage);
+        $editedPageReflection = new \ReflectionObject($editedPage);
+        foreach ($livePageReflection->getProperties() as $property) {
+            if ('id' == $property->getName()) {
+                continue;
+            }
+
+            $property->setAccessible(true);
+            $name                = $property->getName();
+            $value               = $property->getValue($livePage);
+            $editedPageProperty  = $editedPageReflection->getProperty($name);
+            $editedPageProperty->setAccessible(true);
+            $editedPageProperty->setValue($editedPage, $value);
         }
     }
 }

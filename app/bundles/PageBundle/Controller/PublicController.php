@@ -46,7 +46,7 @@ class PublicController extends CommonFormController
         Tracking404Model $tracking404Model,
         $slug)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model    = $this->getModel('page');
         $security = $this->security;
         /** @var Page $entity */
@@ -303,10 +303,12 @@ class PublicController extends CommonFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function previewAction($id)
+    public function previewAction($id, $objectType = null)
     {
-        $model  = $this->getModel('page');
-        $entity = $model->getEntity($id);
+        $pageConfig   = $this->get('mautic.helper.page_config');
+        $model        = $this->getModel('page');
+        $entity       = $model->getEntity($id);
+        $draftEnabled = $pageConfig->isDraftEnabled();
 
         if (null === $entity) {
             return $this->notFound();
@@ -316,6 +318,9 @@ class PublicController extends CommonFormController
 
         $BCcontent = $entity->getContent();
         $content   = $entity->getCustomHtml();
+        if ('draft' === $objectType && $draftEnabled && $entity->hasDraft()) {
+            $content = $entity->getDraftContent();
+        }
         if (empty($content) && !empty($BCcontent)) {
             $template = $entity->getTemplate();
             // all the checks pass so display the content
@@ -363,7 +368,7 @@ class PublicController extends CommonFormController
      */
     public function trackingImageAction(Request $request)
     {
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model = $this->getModel('page');
         $model->hitPage(null, $request);
 
@@ -390,7 +395,7 @@ class PublicController extends CommonFormController
             return $notSuccessResponse;
         }
 
-        /** @var \Mautic\PageBundle\Model\PageModel $model */
+        /** @var PageModel $model */
         $model = $this->getModel('page');
 
         try {
@@ -522,7 +527,7 @@ class PublicController extends CommonFormController
      */
     private function processSlots($slots, $entity)
     {
-        /** @var \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper */
+        /** @var AssetsHelper $assetsHelper */
         $assetsHelper = $this->factory->getHelper('template.assets');
         /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
         $slotsHelper = $this->factory->getHelper('template.slots');

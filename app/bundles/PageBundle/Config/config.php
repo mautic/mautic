@@ -1,5 +1,10 @@
 <?php
 
+use Doctrine\ORM\EntityRepository;
+use Mautic\PageBundle\Entity\PageDraft;
+use Mautic\PageBundle\Helper\PageConfig;
+use Mautic\PageBundle\Model\PageDraftModel;
+
 return [
     'routes' => [
         'main' => [
@@ -45,8 +50,9 @@ return [
                 'controller' => 'Mautic\PageBundle\Controller\PublicController::redirectAction',
             ],
             'mautic_page_preview' => [
-                'path'       => '/page/preview/{id}',
+                'path'       => '/page/preview/{id}/{objectType}',
                 'controller' => 'Mautic\PageBundle\Controller\PublicController::previewAction',
+                'defaults'   => ['objectType' => null],
             ],
             'mautic_gated_video_hit' => [
                 'path'       => '/video/hit',
@@ -90,43 +96,295 @@ return [
     ],
 
     'services' => [
+        'events' => [
+            'mautic.page.subscriber' => [
+                'class'     => Mautic\PageBundle\EventListener\PageSubscriber::class,
+                'arguments' => [
+                    'templating.helper.assets',
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog',
+                    'mautic.page.model.page',
+                    'monolog.logger.mautic',
+                    'mautic.page.repository.hit',
+                    'mautic.page.repository.page',
+                    'mautic.page.repository.redirect',
+                    'mautic.lead.repository.lead',
+                    'mautic.page.model.page_draft',
+                ],
+            ],
+            'mautic.pagebuilder.subscriber' => [
+                'class'     => Mautic\PageBundle\EventListener\BuilderSubscriber::class,
+                'arguments' => [
+                    'mautic.security',
+                    'mautic.page.helper.token',
+                    'mautic.helper.integration',
+                    'mautic.page.model.page',
+                    'mautic.helper.token_builder.factory',
+                    'translator',
+                    'doctrine.dbal.default_connection',
+                    'mautic.helper.templating',
+                ],
+            ],
+            'mautic.pagetoken.subscriber' => [
+                'class' => Mautic\PageBundle\EventListener\TokenSubscriber::class,
+            ],
+            'mautic.page.pointbundle.subscriber' => [
+                'class'     => Mautic\PageBundle\EventListener\PointSubscriber::class,
+                'arguments' => [
+                    'mautic.point.model.point',
+                ],
+            ],
+            'mautic.page.reportbundle.subscriber' => [
+                'class'     => Mautic\PageBundle\EventListener\ReportSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.company_report_data',
+                    'mautic.page.repository.hit',
+                    'translator',
+                ],
+            ],
+            'mautic.page.campaignbundle.subscriber' => [
+                'class'     => Mautic\PageBundle\EventListener\CampaignSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.page.helper.tracking',
+                    'mautic.campaign.executioner.realtime',
+                ],
+            ],
+            'mautic.page.leadbundle.subscriber' => [
+                'class'     => Mautic\PageBundle\EventListener\LeadSubscriber::class,
+                'arguments' => [
+                    'mautic.page.model.page',
+                    'mautic.page.model.video',
+                    'translator',
+                    'router',
+                ],
+                'methodCalls' => [
+                    'setModelFactory' => ['mautic.model.factory'],
+                ],
+            ],
+            'mautic.page.calendarbundle.subscriber' => [
+                'class'     => Mautic\PageBundle\EventListener\CalendarSubscriber::class,
+                'arguments' => [
+                    'mautic.page.model.page',
+                    'doctrine.dbal.default_connection',
+                    'mautic.security',
+                    'translator',
+                    'router',
+                ],
+            ],
+            'mautic.page.configbundle.subscriber' => [
+                'class' => Mautic\PageBundle\EventListener\ConfigSubscriber::class,
+            ],
+            'mautic.page.search.subscriber' => [
+                'class'     => Mautic\PageBundle\EventListener\SearchSubscriber::class,
+                'arguments' => [
+                    'mautic.helper.user',
+                    'mautic.page.model.page',
+                    'mautic.security',
+                    'mautic.helper.templating',
+                ],
+            ],
+            'mautic.page.webhook.subscriber' => [
+                'class'     => Mautic\PageBundle\EventListener\WebhookSubscriber::class,
+                'arguments' => [
+                    'mautic.webhook.model.webhook',
+                ],
+            ],
+            'mautic.page.dashboard.subscriber' => [
+                'class'     => Mautic\PageBundle\EventListener\DashboardSubscriber::class,
+                'arguments' => [
+                    'mautic.page.model.page',
+                    'router',
+                ],
+            ],
+            'mautic.page.js.subscriber' => [
+                'class'     => Mautic\PageBundle\EventListener\BuildJsSubscriber::class,
+                'arguments' => [
+                    'templating.helper.assets',
+                    'mautic.page.helper.tracking',
+                    'router',
+                ],
+            ],
+            'mautic.page.maintenance.subscriber' => [
+                'class'     => Mautic\PageBundle\EventListener\MaintenanceSubscriber::class,
+                'arguments' => [
+                    'doctrine.dbal.default_connection',
+                    'translator',
+                ],
+            ],
+            'mautic.page.stats.subscriber' => [
+                'class'     => Mautic\PageBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'mautic.security',
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
+            'mautic.page.subscriber.determine_winner' => [
+                'class'     => Mautic\PageBundle\EventListener\DetermineWinnerSubscriber::class,
+                'arguments' => [
+                    'mautic.page.repository.hit',
+                    'translator',
+                ],
+            ],
+        ],
+        'forms' => [
+            'mautic.form.type.page' => [
+                'class'     => Mautic\PageBundle\Form\Type\PageType::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.page.model.page',
+                    'mautic.security',
+                    'mautic.helper.user',
+                    'mautic.helper.page_config',
+                ],
+            ],
+            'mautic.form.type.pagevariant' => [
+                'class'     => Mautic\PageBundle\Form\Type\VariantType::class,
+                'arguments' => ['mautic.page.model.page'],
+            ],
+            'mautic.form.type.pointaction_pointhit' => [
+                'class' => Mautic\PageBundle\Form\Type\PointActionPageHitType::class,
+            ],
+            'mautic.form.type.pointaction_urlhit' => [
+                'class' => Mautic\PageBundle\Form\Type\PointActionUrlHitType::class,
+            ],
+            'mautic.form.type.pagehit.campaign_trigger' => [
+                'class' => Mautic\PageBundle\Form\Type\CampaignEventPageHitType::class,
+            ],
+            'mautic.form.type.pagelist' => [
+                'class'     => Mautic\PageBundle\Form\Type\PageListType::class,
+                'arguments' => [
+                    'mautic.page.model.page',
+                    'mautic.security',
+                ],
+            ],
+            'mautic.form.type.preferencecenterlist' => [
+                'class'     => Mautic\PageBundle\Form\Type\PreferenceCenterListType::class,
+                'arguments' => [
+                    'mautic.page.model.page',
+                    'mautic.security',
+                ],
+            ],
+            'mautic.form.type.page_abtest_settings' => [
+                'class' => Mautic\PageBundle\Form\Type\AbTestPropertiesType::class,
+            ],
+            'mautic.form.type.page_publish_dates' => [
+                'class' => Mautic\PageBundle\Form\Type\PagePublishDatesType::class,
+            ],
+            'mautic.form.type.pageconfig' => [
+                'class' => Mautic\PageBundle\Form\Type\ConfigType::class,
+            ],
+            'mautic.form.type.trackingconfig' => [
+                'class' => Mautic\PageBundle\Form\Type\ConfigTrackingPageType::class,
+            ],
+            'mautic.form.type.redirect_list' => [
+                'class'     => Mautic\PageBundle\Form\Type\RedirectListType::class,
+                'arguments' => ['mautic.helper.core_parameters'],
+            ],
+            'mautic.form.type.page_dashboard_hits_in_time_widget' => [
+                'class' => Mautic\PageBundle\Form\Type\DashboardHitsInTimeWidgetType::class,
+            ],
+            'mautic.page.tracking.pixel.send' => [
+                'class'     => Mautic\PageBundle\Form\Type\TrackingPixelSendType::class,
+                'arguments' => [
+                    'mautic.page.helper.tracking',
+                ],
+            ],
+        ],
+        'models' => [
+            'mautic.page.model.page' => [
+                'class'     => Mautic\PageBundle\Model\PageModel::class,
+                'arguments' => [
+                    'mautic.helper.cookie',
+                    'mautic.helper.ip_lookup',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.field',
+                    'mautic.page.model.redirect',
+                    'mautic.page.model.trackable',
+                    'mautic.queue.service',
+                    'mautic.lead.model.company',
+                    'mautic.tracker.device',
+                    'mautic.core.variant.converter',
+                ],
+                'methodCalls' => [
+                    'setCatInUrl' => [
+                        '%mautic.cat_in_page_url%',
+                    ],
+                ],
+            ],
+            'mautic.page.model.redirect' => [
+                'class'     => 'Mautic\PageBundle\Model\RedirectModel',
+                'arguments' => [
+                    'mautic.helper.url',
+                ],
+            ],
+            'mautic.page.model.trackable' => [
+                'class'     => Mautic\PageBundle\Model\TrackableModel::class,
+                'arguments' => [
+                    'mautic.page.model.redirect',
+                    'mautic.lead.repository.field',
+                ],
+            ],
+            'mautic.page.model.video' => [
+                'class'     => 'Mautic\PageBundle\Model\VideoModel',
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.helper.ip_lookup',
+                ],
+            ],
+            'mautic.page.model.page_draft' => [
+                'class'     => PageDraftModel::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.page.repository.page_draft',
+                    'mautic.page.repository.page',
+                ],
+            ],
+        ],
         'repositories' => [
             'mautic.page.repository.hit' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
+                'class'     => EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
-                    \Mautic\PageBundle\Entity\Hit::class,
+                    Mautic\PageBundle\Entity\Hit::class,
                 ],
             ],
             'mautic.page.repository.page' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
+                'class'     => EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
-                    \Mautic\PageBundle\Entity\Page::class,
+                    Mautic\PageBundle\Entity\Page::class,
                 ],
             ],
             'mautic.page.repository.redirect' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
+                'class'     => EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
-                    \Mautic\PageBundle\Entity\Redirect::class,
+                    Mautic\PageBundle\Entity\Redirect::class,
+                ],
+            ],
+            'mautic.page.repository.page_draft' => [
+                'class'     => EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    PageDraft::class,
                 ],
             ],
         ],
         'fixtures' => [
             'mautic.page.fixture.page_category' => [
-                'class'     => \Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'class'     => Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData::class,
+                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['mautic.category.model.category'],
             ],
             'mautic.page.fixture.page' => [
-                'class'     => \Mautic\PageBundle\DataFixtures\ORM\LoadPageData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'class'     => Mautic\PageBundle\DataFixtures\ORM\LoadPageData::class,
+                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['mautic.page.model.page'],
             ],
             'mautic.page.fixture.page_hit' => [
-                'class'     => \Mautic\PageBundle\DataFixtures\ORM\LoadPageHitData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'class'     => Mautic\PageBundle\DataFixtures\ORM\LoadPageHitData::class,
+                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['mautic.page.model.page'],
             ],
         ],
@@ -142,6 +400,12 @@ return [
                     'mautic.helper.core_parameters',
                     'request_stack',
                     'mautic.tracker.contact',
+                ],
+            ],
+            'mautic.helper.page_config' => [
+                'class'     => PageConfig::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
                 ],
             ],
         ],

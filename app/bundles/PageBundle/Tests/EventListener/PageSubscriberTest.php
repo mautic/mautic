@@ -15,6 +15,7 @@ use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\EventListener\PageSubscriber;
+use Mautic\PageBundle\Model\PageDraftModel;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\QueueBundle\Event\QueueConsumerEvent;
 use Mautic\QueueBundle\Queue\QueueConsumerResults;
@@ -90,6 +91,7 @@ class PageSubscriberTest extends TestCase
         $contactRepository  = $this->createMock(LeadRepository::class);
         $hitMock            = $this->createMock(Hit::class);
         $leadMock           = $this->createMock(Lead::class);
+        $pageDraftModel     = $this->createMock(PageDraftModel::class);
 
         $hitRepository->expects($this->any())
             ->method('find')
@@ -108,7 +110,8 @@ class PageSubscriberTest extends TestCase
             $hitRepository,
             $pageRepository,
             $redirectRepository,
-            $contactRepository
+            $contactRepository,
+            $pageDraftModel
         );
     }
 

@@ -111,7 +111,7 @@ Mautic.launchBuilder = function (formName, actionName) {
     var spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2;
     var form = mQuery('form[name='+formName+']');
 
-    applyBtn.off('click').on('click', function(e) {
+	applyBtn.off('click').on('click', function(e) {
         Mautic.activateButtonLoadingIndicator(applyBtn);
         try {
             Mautic.sendBuilderContentToTextarea(function () {
@@ -122,7 +122,7 @@ Mautic.launchBuilder = function (formName, actionName) {
                 // Clear the customize forms
                 mQuery('#slot-form-container, #section-form-container').html('');
                 Mautic.inBuilderSubmissionOn(form);
-                var bgApplyBtn = mQuery('.btn-apply');
+				var bgApplyBtn = mQuery('.btn-apply');
                 if (0 === bgApplyBtn.length && ("1" === Mautic.getUrlParameter('contentOnly') || Mautic.isInBuilder)) {
                     var frm = mQuery('.btn-save').closest('form');
                     Mautic.inBuilderSubmissionOn(frm);

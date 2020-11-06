@@ -16,11 +16,13 @@ use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Helper\PageConfigInterface;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
@@ -33,12 +35,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class PageType extends AbstractType
 {
     /**
-     * @var \Doctrine\ORM\EntityManager
+     * @var EntityManager
      */
     private $em;
 
     /**
-     * @var \Mautic\PageBundle\Model\PageModel
+     * @var PageModel
      */
     private $model;
 
@@ -46,6 +48,11 @@ class PageType extends AbstractType
      * @var User
      */
     private $user;
+
+    /**
+     * @var PageConfigInterface
+     */
+    private $pageConfig;
 
     /**
      * @var bool
@@ -62,18 +69,17 @@ class PageType extends AbstractType
         PageModel $pageModel,
         CorePermissions $corePermissions,
         UserHelper $userHelper,
-        ThemeHelperInterface $themeHelper
+        ThemeHelperInterface $themeHelper,
+        PageConfigInterface $pageConfig
     ) {
         $this->em           = $entityManager;
         $this->model        = $pageModel;
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
         $this->user         = $userHelper->getUser();
         $this->themeHelper  = $themeHelper;
+        $this->pageConfig   = $pageConfig;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html', 'redirectUrl' => 'url', 'headScript' => 'html', 'footerScript' => 'html']));
@@ -89,6 +95,10 @@ class PageType extends AbstractType
             ]
         );
 
+        $html = $options['data']->getCustomHtml();
+        if ($this->pageConfig->isDraftEnabled() && !empty($options['data']->getId()) && $options['data']->hasDraft() && !empty($options['data']->getDraft()->getHtml())) {
+            $html = $options['data']->getDraft()->getHtml();
+        }
         $builder->add(
             'customHtml',
             TextareaType::class,
@@ -102,13 +112,14 @@ class PageType extends AbstractType
                     'data-token-activator' => '{',
                     'rows'                 => '25',
                 ],
+                'data'     => $html,
             ]
         );
 
         $template = $options['data']->getTemplate() ?? 'blank';
-        // If theme does not exist, set empty
-        $template = $this->themeHelper->getCurrentTheme($template, 'page');
-
+        if ($this->pageConfig->isDraftEnabled() && !empty($options['data']->getId()) && $options['data']->hasDraft() && !empty($options['data']->getDraft()->getTemplate())) {
+            $template = $options['data']->getDraft()->getTemplate();
+        }
         $builder->add(
             'template',
             ThemeListType::class,
@@ -159,7 +170,7 @@ class PageType extends AbstractType
             $redirectUrlDataOptions .= "|{$page['alias']}";
         }
 
-        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\PageBundle\Entity\Page::class);
+        $transformer = new IdToEntityModelTransformer($this->em, Page::class);
         $builder->add(
             $builder->create(
                 'variantParent',
@@ -334,28 +345,73 @@ class PageType extends AbstractType
             ]
         );
 
-        $builder->add('buttons', FormButtonsType::class, [
-            'pre_extra_buttons' => [
-                [
-                    'name'  => 'builder',
-                    'label' => 'mautic.core.builder',
-                    'attr'  => [
-                        'class'   => 'btn btn-default btn-dnd btn-nospin btn-builder text-primary',
-                        'icon'    => 'fa fa-cube',
-                        'onclick' => "Mautic.launchBuilder('page');",
-                    ],
+        $extraButtons['pre_extra_buttons'] = [
+            [
+                'name'  => 'builder',
+                'label' => 'mautic.core.builder',
+                'attr'  => [
+                    'class'   => 'btn btn-default btn-dnd btn-nospin btn-builder text-primary',
+                    'icon'    => 'fa fa-cube',
+                    'onclick' => "Mautic.launchBuilder('page');",
                 ],
             ],
-        ]);
+        ];
+
+        $draftActionButtons = $this->getDraftActionButtons($options['data']);
+        if (!empty($draftActionButtons)) {
+            $extraButtons['post_extra_buttons'] = $draftActionButtons;
+        }
+        $builder->add('buttons',
+            FormButtonsType::class,
+            $extraButtons
+        );
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    private function getDraftActionButtons(Page $page): array
+    {
+        $draftActionButtons = [];
+        if (!$this->pageConfig->isDraftEnabled() || empty($page->getId())) {
+            return $draftActionButtons;
+        }
+
+        if ($page->hasDraft()) {
+            $draftActionButtons[] = [
+                'name'  => 'apply_draft',
+                'label' => 'mautic.core.applydraft',
+                'type'  => SubmitType::class,
+                'attr'  => [
+                    'class'   => 'btn btn-default text-primary btn-apply-draft',
+                    'icon'    => 'fa fa-files-o text-success',
+                ],
+            ];
+            $draftActionButtons[] = [
+                'name'  => 'discard_draft',
+                'label' => 'mautic.core.discarddraft',
+                'type'  => SubmitType::class,
+                'attr'  => [
+                    'class'   => 'btn btn-default text-primary btn-discard-draft',
+                    'icon'    => 'fa fa-trash text-danger',
+                ],
+            ];
+        } else {
+            $draftActionButtons[] = [
+                'name'  => 'save_draft',
+                'label' => 'mautic.core.saveasdraft',
+                'type'  => SubmitType::class,
+                'attr'  => [
+                    'class'   => 'btn btn-default text-primary btn-save-draft',
+                    'icon'    => 'fa fa-file text-success',
+                ],
+            ];
+        }
+
+        return $draftActionButtons;
+    }
+
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

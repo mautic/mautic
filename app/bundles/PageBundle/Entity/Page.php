@@ -108,7 +108,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     private $redirectUrl;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
+     * @var Category|null
      **/
     private $category;
 
@@ -127,11 +127,17 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      */
     private $sessionId;
 
+    /**
+     * @var PageDraft|null
+     */
+    private $draft;
+
     public function __clone()
     {
         $this->id = null;
         $this->clearTranslations();
         $this->clearVariants();
+        $this->setDraft(null);
 
         parent::__clone();
     }
@@ -221,6 +227,12 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $builder->createField('noIndex', 'boolean')
             ->columnName('no_index')
             ->nullable()
+            ->build();
+
+        $builder->createOneToOne('draft', PageDraft::class)
+            ->mappedBy('page')
+            ->fetchExtraLazy()
+            ->cascadeAll()
             ->build();
 
         self::addTranslationMetadata($builder, self::class);
@@ -631,11 +643,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Set category.
      *
-     * @param \Mautic\CategoryBundle\Entity\Category $category
-     *
      * @return Page
      */
-    public function setCategory(Category $category = null)
+    public function setCategory(?Category $category = null)
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -646,7 +656,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Get category.
      *
-     * @return \Mautic\CategoryBundle\Entity\Category
+     * @return Category
      */
     public function getCategory()
     {
@@ -792,27 +802,38 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getVariantHits') : $this->variantHits;
     }
 
-    /**
-     * @param mixed $variantHits
-     */
     public function setVariantHits($variantHits)
     {
         $this->variantHits = $variantHits;
     }
 
-    /**
-     * @return mixed
-     */
     public function getCustomHtml()
     {
         return $this->customHtml;
     }
 
-    /**
-     * @param mixed $customHtml
-     */
     public function setCustomHtml($customHtml)
     {
         $this->customHtml = $customHtml;
+    }
+
+    public function hasDraft(): bool
+    {
+        return !is_null($this->getDraft());
+    }
+
+    public function getDraftContent(): ?string
+    {
+        return $this->hasDraft() ? $this->getDraft()->getHtml() : null;
+    }
+
+    public function getDraft(): ?PageDraft
+    {
+        return $this->draft;
+    }
+
+    public function setDraft(?PageDraft $draft): void
+    {
+        $this->draft = $draft;
     }
 }
