@@ -563,7 +563,7 @@ th{background:rgba(78, 94, 158, 0.1 );border-right:1px solid rgba(78, 94, 158, 0
 td{overflow-wrap:break-word;word-wrap:break-word;-ms-word-break:break-all;word-break:break-all;-ms-hyphens:auto;-moz-hyphens:auto;-webkit-hyphens:auto;hyphens:auto}#contact-timeline .dl-horizontal
 dt{width:auto;text-align:left;margin-right:10px}#contact-timeline .dl-horizontal
 dd{margin-left:0px}#contact-timeline tr.timeline-row-highlighted{background-color:#fafafa}#contact-timeline tr.timeline-details
-img{max-height:200px}.frequency{width:45px!important}.fa-user:before,.fa-building:before{margin-right:6px}.inline-spacer{text-transform:capitalize}.contact{display:inline !important}.frequency-table, .frequency-table
+img{max-height:200px}.frequency{width:45px!important}.contact{display:inline !important}.frequency-table, .frequency-table
 td{border-bottom:none!important;border-top:none!important}.frequency-values{padding-left:10px;padding-top:27px;padding-bottom:15px}.frequency-select{width:145px !important;float:right;padding-right:5px}.frequency-label{padding:8px}.frequency-date{width:100px;float:left}.panel-companies
 .primary{color:#fdb933}.building::before{content:"\f1ad";font-family:"FontAwesome";padding-right:3px}.user::before{content:"\f007";font-family:"FontAwesome";padding-right:3px}.col-page-id{width:75px}.page-builder .builder-panel .panel-body{padding:5px
 0}.symbol-hashtag:before{content:'#'}.shuffle-item.integration{width:100px}.integration-disabled
@@ -589,5 +589,4 @@ auto}.css-device__image{display:block;margin:0;padding:0;width:100%;height:auto}
 #websiteCanvas{margin:0;padding:0;border:none;overflow:hidden;pointer-events:none;position:absolute;z-index:2;left:-50%;width:320px;height:568px}#websiteScreenshot.mobile
 #websiteCanvas{z-index:0;border:1px
 solid #000}#websiteScreenshot.mobile  #websiteCanvas
-iframe{height:100%;width:320px;border:0}.citrix-start-button{font-size:16px;color:#fff;text-decoration:none;border-radius:3px;padding:12px
-18px;background-color:#4e5e9e;display:inline-block}
+iframe{height:100%;width:320px;border:0}.citrix-start-button{font-size:16px;color:#fff;text-decoration:none;border-radius:3px;padding:12px 18px;background-color:#4e5e9e;display:inline-block}
