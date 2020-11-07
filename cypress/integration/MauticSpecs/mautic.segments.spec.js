@@ -41,7 +41,9 @@ context("Segments", () => {
     cy.wait(1000);
     segments.filterSearchBox.type("Last name");
     segments.filterField.click();
+    cy.wait(1000);
     segments.leadListFilter.select("or");
+    cy.wait(1000);
     segments.secondFilterTextBox.type("Test");
     segments.saveAndCloseButton.click();
     segments.waitforSegmentUpdate();
