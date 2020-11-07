@@ -41,6 +41,7 @@ context("Contacts", () => {
     company.waitTillSearchResultGetsDisplayed();
     search.selectCheckBoxForFirstItem.click({ force: true });
     search.OptionsDropdownForFirstItem.click();
+    cy.wait(1000);
     search.deleteButtonForFirstItem.click();
     search.confirmDeleteButton.click();
   });
