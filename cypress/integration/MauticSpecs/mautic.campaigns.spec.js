@@ -25,7 +25,7 @@ context("Campaign", () => {
     cy.wait(2000);
     campaigns.sendEmailActionName.type("Test Campaign Email");
     campaigns.emailTOBeSentSelector.click();
-    cy.wait(2000);
+    cy.wait(3000);
     campaigns.emailSearchBox.type("Test");
     cy.wait(2000);
     campaigns.firstEmailinTheSearchList.click();
