@@ -54,7 +54,7 @@ context("Create Form", () => {
     cy.wait(1000);
     search.searchForm.clear();
     search.searchForm.type(testFormName);
-    cy.wait(1000);
+    cy.wait(2000);
     form.searchAndSelectFirstItem.contains(testFormName).click();
     cy.wait(2000);
     form.editForm.click();
