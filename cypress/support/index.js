@@ -88,7 +88,7 @@ after("Delete Test Data", () => {
   leftNavigation.contactsSection.click();
   leftNavigation.contactsSection.click();
   contact.waitforPageLoad();
- // search.searchBox.clear();
+  search.searchClear.click();
   search.searchBox.type("TestContact");
   cy.wait(2000);
   search.selectCheckBoxForFirstItem.click({ force: true });
@@ -121,6 +121,7 @@ after("Delete Test Data", () => {
   segments.firstCheckbox.click();
   segments.firstDropDown.click();
   segments.deleteOption.click();
+  cy.wait(1000);
   segment.deleteConfirmation.click();
 });
 beforeEach("Visit HomePage", () => {
