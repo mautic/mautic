@@ -74,7 +74,11 @@ class Emails{
     }
 
     waitforEmailCreation(){
-        cy.get('span[class="tt-u label label-success"]').should('be.visible');
+        cy.get('.alert > span').should('contain', 'has been created');
+    }
+
+    waitforEmailUpdate(){
+        cy.get('.alert > span').should('contain', 'has been updated');
     }
 
     waitforEmailSelectorPageGetsLoaded(){
