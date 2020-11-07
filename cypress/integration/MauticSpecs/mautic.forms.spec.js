@@ -26,9 +26,11 @@ context("Create Form", () => {
     form.fieldTypeSearch.type('Text');
     form.firstResultOfFieldTypeSearch.click();
     form.fieldLabel.type("Title");
+    cy.wait(2000);
     form.contactFieldTab.click();
     form.contactFieldDropdown.click();
     form.contactFieldSearchBox.click().type("Title");
+    cy.wait(1000);
     form.contactFieldSearchFirstResult.click();
     form.addFieldButton.click();
    
