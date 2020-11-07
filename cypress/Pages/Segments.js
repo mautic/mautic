@@ -78,7 +78,7 @@ class Segments {
     }
 
     get secondFilterTextBox(){
-        return cy.get('#leadlist_filters_1_properties_filter');
+        return cy.get('#leadlist_filters_1_filter');
     }
 
     waitforSegmentCreation(){
