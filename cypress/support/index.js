@@ -47,7 +47,7 @@ before("Perform login", () => {
   contact.leadEmail.type("TestContact@mailtest.mautic.com");
   contact.SaveButton.click();
   contact.closeButton.click({ force: true });
-  contact.waitForContactCreation();
+  cy.wait(1000);
 
   //adding sample email to be used across test
   leftNavigation.ChannelsSection.click();
