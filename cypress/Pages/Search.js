@@ -8,6 +8,10 @@ class Search {
         return cy.get('input[id="form-search"]');
     }
 
+    get searchClear() {
+        return cy.get('#btn-filter');
+    }
+
     get selectCheckBoxForFirstItem() {
         return cy.get('.list-checkbox').eq(0);
     }
