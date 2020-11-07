@@ -19,6 +19,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Form\Type\BatchType;
 use Mautic\LeadBundle\Form\Type\DncType;
@@ -174,9 +175,8 @@ class LeadController extends FormController
         // Get the max ID of the latest lead added
         $maxLeadId = $model->getRepository()->getMaxLeadId();
 
-        // We need the EmailRepository to check if a lead is flagged as do not contact
-        /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
-        $emailRepo = $this->getModel('email')->getRepository();
+        /** @var DoNotContactRepository $dncRepository */
+        $dncRepository = $this->getModel('lead.dnc')->getDncRepo();
 
         return $this->delegateView(
             [
@@ -193,7 +193,7 @@ class LeadController extends FormController
                     'currentList'      => $list,
                     'security'         => $this->get('mautic.security'),
                     'inSingleList'     => $inSingleList,
-                    'noContactList'    => $emailRepo->getDoNotEmailList(array_keys($leads)),
+                    'noContactList'    => $dncRepository->getChannelList(null, array_keys($leads)),
                     'maxLeadId'        => $maxLeadId,
                     'anonymousShowing' => $anonymousShowing,
                 ],
@@ -361,28 +361,32 @@ class LeadController extends FormController
 
         // We need the DoNotContact repository to check if a lead is flagged as do not contact
         $dnc             = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
+
+        $dncSms             = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'sms');
+
         $integrationRepo = $this->get('doctrine.orm.entity_manager')->getRepository('MauticPluginBundle:IntegrationEntity');
 
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'lead'              => $lead,
-                    'avatarPanelState'  => $this->request->cookies->get('mautic_lead_avatar_panel', 'expanded'),
-                    'fields'            => $fields,
-                    'companies'         => $companies,
-                    'socialProfiles'    => $socialProfiles,
-                    'socialProfileUrls' => $socialProfileUrls,
-                    'places'            => $this->getPlaces($lead),
-                    'permissions'       => $permissions,
-                    'events'            => $this->getEngagements($lead),
-                    'upcomingEvents'    => $this->getScheduledCampaignEvents($lead),
-                    'engagementData'    => $this->getEngagementData($lead),
-                    'noteCount'         => $this->getModel('lead.note')->getNoteCount($lead, true),
-                    'integrations'      => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
-                    'devices'           => $this->get('mautic.lead.repository.lead_device')->getLeadDevices($lead),
-                    'auditlog'          => $this->getAuditlogs($lead),
-                    'doNotContact'      => end($dnc),
-                    'leadNotes'         => $this->forward(
+                    'lead'                 => $lead,
+                    'avatarPanelState'     => $this->request->cookies->get('mautic_lead_avatar_panel', 'expanded'),
+                    'fields'               => $fields,
+                    'companies'            => $companies,
+                    'socialProfiles'       => $socialProfiles,
+                    'socialProfileUrls'    => $socialProfileUrls,
+                    'places'               => $this->getPlaces($lead),
+                    'permissions'          => $permissions,
+                    'events'               => $this->getEngagements($lead),
+                    'upcomingEvents'       => $this->getScheduledCampaignEvents($lead),
+                    'engagementData'       => $this->getEngagementData($lead),
+                    'noteCount'            => $this->getModel('lead.note')->getNoteCount($lead, true),
+                    'integrations'         => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
+                    'devices'              => $this->get('mautic.lead.repository.lead_device')->getLeadDevices($lead),
+                    'auditlog'             => $this->getAuditlogs($lead),
+                    'doNotContact'         => end($dnc),
+                    'doNotContactSms'      => end($dncSms),
+                    'leadNotes'            => $this->forward(
                         'MauticLeadBundle:Note:index',
                         [
                             'leadId'     => $lead->getId(),
@@ -1331,12 +1335,11 @@ class LeadController extends FormController
         $leadFields['id'] = $lead->getId();
         $leadEmail        = $leadFields['email'];
         $leadName         = $leadFields['firstname'].' '.$leadFields['lastname'];
+        $mailerIsOwner    = $this->get('mautic.helper.core_parameters')->getParameter('mailer_is_owner');
 
         // Set onwer ID to be the current user ID so it will use his signature
         $leadFields['owner_id'] = $this->get('mautic.helper.user')->getUser()->getId();
 
-        // Check if lead has a bounce status
-        $dnc    = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
         $inList = ('GET' == $this->request->getMethod())
             ? $this->request->get('list', 0)
             : $this->request->request->get(
@@ -1345,6 +1348,22 @@ class LeadController extends FormController
                 true
             );
         $email  = ['list' => $inList];
+
+        // Try set owner If should be mailer
+        if ($lead->getOwner()) {
+            $leadFields['owner_id'] = $lead->getOwner()->getId();
+            if ($mailerIsOwner) {
+                $email['fromname'] = sprintf(
+                    '%s %s',
+                    $lead->getOwner()->getFirstName(),
+                    $lead->getOwner()->getLastName()
+                );
+                $email['from']     = $lead->getOwner()->getEmail();
+            }
+        }
+
+        // Check if lead has a bounce status
+        $dnc    = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'email', 'objectId' => $objectId]);
         $form   = $this->get('form.factory')->create(EmailType::class, $email, ['action' => $action]);
 
@@ -1639,7 +1658,7 @@ class LeadController extends FormController
                 $persistEntities = [];
                 foreach ($entities as $lead) {
                     if ($this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-                        if ($doNotContact->addDncForContact($lead->getId(), 'email', $data['reason'], DoNotContact::MANUAL)) {
+                        if ($doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, $data['reason'])) {
                             $persistEntities[] = $lead;
                         }
                     }

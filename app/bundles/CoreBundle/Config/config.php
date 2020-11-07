@@ -149,6 +149,17 @@ return [
         ],
     ],
     'services' => [
+        'main' => [
+            'mautic.core.service.flashbag' => [
+                'class'     => \Mautic\CoreBundle\Service\FlashBag::class,
+                'arguments' => [
+                    '@session',
+                    'translator',
+                    'request_stack',
+                    'mautic.core.model.notification',
+                ],
+            ],
+        ],
         'events' => [
             'mautic.core.subscriber' => [
                 'class'     => Mautic\CoreBundle\EventListener\CoreSubscriber::class,
@@ -165,12 +176,21 @@ return [
                     'request_stack',
                     'mautic.form.repository.form',
                     'mautic.factory',
+                    'mautic.core.service.flashbag',
                 ],
             ],
             'mautic.core.environment.subscriber' => [
                 'class'     => \Mautic\CoreBundle\EventListener\EnvironmentSubscriber::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
+                ],
+            ],
+            'mautic.core.migration.command.subscriber' => [
+                'class'     => \Mautic\CoreBundle\EventListener\MigrationCommandSubscriber::class,
+                'arguments' => [
+                    'mautic.database.version.provider',
+                    'mautic.generated.columns.provider',
+                    'database_connection',
                 ],
             ],
             'mautic.core.configbundle.subscriber' => [
@@ -661,6 +681,13 @@ return [
                     '%mautic.plugin.bundles%',
                 ],
             ],
+            'mautic.page.helper.factory' => [
+                'class'     => \Mautic\CoreBundle\Factory\PageHelperFactory::class,
+                'arguments' => [
+                    'session',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
             'mautic.translation.loader' => [
                 'class'     => \Mautic\CoreBundle\Loader\TranslationLoader::class,
                 'arguments' => [
@@ -674,6 +701,26 @@ return [
                 'class'     => 'Mautic\CoreBundle\EventListener\DoctrineEventsSubscriber',
                 'tag'       => 'doctrine.event_subscriber',
                 'arguments' => '%mautic.db_table_prefix%',
+            ],
+            'mautic.database.version.provider' => [
+                'class'     => \Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class,
+                'arguments' => ['database_connection', 'mautic.helper.core_parameters'],
+            ],
+            'mautic.generated.columns.provider' => [
+                'class'     => \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class,
+                'arguments' => ['mautic.database.version.provider', 'event_dispatcher'],
+            ],
+            'mautic.generated.columns.doctrine.listener' => [
+                'class'        => \Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener::class,
+                'tag'          => 'doctrine.event_listener',
+                'tagArguments' => [
+                    'event' => 'postGenerateSchema',
+                    'lazy'  => true,
+                ],
+                'arguments' => [
+                    'mautic.generated.columns.provider',
+                    'monolog.logger.mautic',
+                ],
             ],
             'mautic.exception.listener' => [
                 'class'     => 'Mautic\CoreBundle\EventListener\ExceptionListener',
