@@ -7,7 +7,7 @@ const emails = require("../../Pages/Emails");
 const search=require("../../Pages/Search");
 const email = require("../../Pages/Emails");
 
-context("Emails", () => {
+context("Segment Emails", () => {
 
   it("Add new segment Email", () => {
     leftNavigation.ChannelsSection.click();
@@ -25,13 +25,10 @@ context("Emails", () => {
     emails.closeButton.click();
     emails.waitforEmailCreation();
     search.searchBox.clear();
-    search.searchBox.type("testSegmentEmailCypress");
+    search.searchBox.type("testSegmentEmailCypress{enter}");
     cy.wait(2000);
     emails.searchAndSelectEmail.contains('testSegmentEmailCypress').click();
     cy.wait(2000);
-    emails.scheduleSegmentEmail.click();
-    emails.scheduleButton.click();
-    cy.wait(5000);
   });
 
   it("Search and Delete newly added segment Email", () => {

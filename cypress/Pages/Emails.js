@@ -45,18 +45,6 @@ class Emails{
         return cy.get('table[class="table table-hover table-striped table-bordered email-list"]>tbody>tr>td>div>a');
     }
 
-    get scheduleSegmentEmail(){
-        return cy.get('[data-header="Schedule testSegmentEmailCypress"] > :nth-child(1)');
-    }
-
-    get scheduleSegmentCalender(){
-        return cy.get('.div[class="input-group"]>input').eq(3);
-    }
-
-    get scheduleButton(){
-        return cy.get('.modal-form-buttons > .btn-save');
-    }
-
     get emailEditButton(){
         return cy.get('a[href*="emails/edit"]');
     }
