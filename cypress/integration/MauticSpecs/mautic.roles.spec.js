@@ -13,10 +13,8 @@ context("Roles", () => {
     roles.waitForPageLoad();
     roles.addNewRoleButton.click();
     roles.roleNameTextBox.click();
-    roles.roleNameTextBox.type("testConatctsReadRule");
+    roles.roleNameTextBox.type("testContactsReadRule");
     roles.permissionTab.click();
-    roles.apiPermissionTab.click();
-    roles.apiAccessGrantedCheckBox.click();
     cy.wait(1000);
     roles.contactPermissionTab.click();
     roles.contacts_Access_ViewOwn.click();
@@ -31,7 +29,7 @@ context("Roles", () => {
     cy.wait(1000);
     roles.waitForPageLoad();
     search.searchBox.clear();
-    search.searchBox.type("testConatctsReadRule");
+    search.searchBox.type("testContactsReadRule");
     cy.wait(2000);
     search.selectCheckBoxForFirstItem.click();
     search.OptionsDropdownForFirstItem.click();
