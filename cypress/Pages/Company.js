@@ -56,8 +56,12 @@ class Company {
         return   cy.get("#company_buttons_save_toolbar");
     }
 
-    get searchAndClickForFirstElement() {
-        return   cy.get('#companyTable>tbody>tr>td>div>a');
+    get clickCompanyEdit() {
+        return   cy.get('tbody > tr > :nth-child(1) > .input-group > .input-group-btn > .btn');
+    }
+
+    get editCompany() {
+        return   cy.get('#companyTable > tbody > tr:nth-child(1) > td:nth-child(1) > div > div > ul > li:nth-child(1) > a')
     }
 
     waitTillSearchResultGetsDisplayed(){

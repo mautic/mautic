@@ -24,8 +24,10 @@ context("Contacts", () => {
     search.searchBox.type("CompanyAddedByCypress");
     company.waitTillSearchResultGetsDisplayed();
     cy.wait(2000);
-    company.searchAndClickForFirstElement.contains("CompanyAddedByCypress").click();
-    company.waitforCompanyEditPageOpen();
+    company.clickCompanyEdit.click();
+    company.editCompany.click();
+
+      company.waitforCompanyEditPageOpen();
     company.companyCity.type("Pune");
     company.companyZipCode.type("412308");
     company.saveButton.click();
