@@ -29,6 +29,7 @@ context("Create Form", () => {
     cy.wait(2000);
     form.contactFieldTab.click();
     form.contactFieldDropdown.click();
+    cy.wait(1000);
     form.contactFieldSearchBox.click().type("Title");
     cy.wait(1000);
     form.contactFieldSearchFirstResult.click();
@@ -63,6 +64,7 @@ context("Create Form", () => {
     form.fieldTypeSearch.type('Text');
     form.firstResultOfFieldTypeSearch.click();
     form.fieldLabel.type("Living city");
+    cy.wait(2000);
     form.contactFieldTab.click();
     form.contactFieldTab.click();
     form.contactFieldDropdown.click();
