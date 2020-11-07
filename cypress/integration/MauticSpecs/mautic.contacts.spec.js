@@ -40,6 +40,7 @@ context("Contacts", () => {
     search.searchBox.type("CompanyAddedByCypress");
     company.waitTillSearchResultGetsDisplayed();
     search.selectCheckBoxForFirstItem.click({ force: true });
+    cy.wait(1000);
     search.OptionsDropdownForFirstItem.click();
     cy.wait(1000);
     search.deleteButtonForFirstItem.click();
