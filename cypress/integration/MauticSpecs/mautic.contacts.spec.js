@@ -74,7 +74,7 @@ context("Contacts", () => {
     contact.lastName.type("Contact");
     contact.SaveButton.click();
     contact.closeButton.click({ force: true });
-    contact.waitForContactCreation();
+    cy.wait(1000);
   });
 
   it("Search and Delete a Contact", () => {
@@ -84,7 +84,7 @@ context("Contacts", () => {
     search.searchBox.type("ContactAddedCypress");
     contact.waitTillSearchResultGetsDisplayed();
     search.selectCheckBoxForFirstItem.click({ force: true });
-    search.OptionsDropdownForFirstItem.click();
+    contact.OptionsDropdownForFirstItem.click();
     search.deleteButtonForFirstItem.click();
     search.confirmDeleteButton.click();
   });

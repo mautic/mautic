@@ -11,6 +11,10 @@ class Contacts {
         return cy.get('#leadTable>tbody>tr>td>a>div');
     }
 
+    get OptionsDropdownForFirstItem() {
+        return cy.get('#leadTable > tbody > tr > td:nth-child(1) > div > div > button');
+    }
+
     get quickAddButton() {
         return cy.get('.quickadd');
     }
