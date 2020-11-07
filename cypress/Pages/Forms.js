@@ -40,7 +40,7 @@ class Forms {
     }
 
     get contactFieldDropdown() {
-        return cy.get('div[class="choice-wrapper"]>div>a[class="chosen-single chosen-default"]>span').eq(1);
+        return cy.get('#formfield_leadField_chosen > .chosen-single > div > b');
     }
 
     get selectFromDropdown() {
@@ -52,7 +52,7 @@ class Forms {
     }
 
     get contactFieldSearchFirstResult(){
-        return cy.get('div[class="chosen-container chosen-container-single chosen-with-drop chosen-container-active"]>div>ul>li');
+        return cy.get('.active-result').eq(0);
     }
 
     get addFieldButton(){
