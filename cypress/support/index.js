@@ -88,7 +88,7 @@ after("Delete Test Data", () => {
   leftNavigation.contactsSection.click();
   leftNavigation.contactsSection.click();
   contact.waitforPageLoad();
-  search.searchClear.click();
+  search.searchBox.clear();
   search.searchBox.type("TestContact");
   cy.wait(2000);
   search.selectCheckBoxForFirstItem.click({ force: true });
