@@ -60,10 +60,6 @@ class Contacts {
         return  cy.get('.std-toolbar > .dropdown-menu > :nth-child(2) > a > :nth-child(1) > span');
     }
 
-    waitForContactCreation(){
-        return  cy.get('div[class="mt-sm points-panel text-center"]>h1').should('be.visible');
-    }
-
     waitTillSearchResultGetsDisplayed(){
         cy.get('#leadTable>tbody>tr>td>a').should('not.be.empty');
     }

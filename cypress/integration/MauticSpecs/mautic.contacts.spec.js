@@ -26,8 +26,7 @@ context("Contacts", () => {
     cy.wait(2000);
     company.clickCompanyEdit.click();
     company.editCompany.click();
-
-      company.waitforCompanyEditPageOpen();
+    company.waitforCompanyEditPageOpen();
     company.companyCity.type("Pune");
     company.companyZipCode.type("412308");
     company.saveButton.click();
@@ -56,7 +55,7 @@ context("Contacts", () => {
     contact.leadEmail.type("Cypress@test.com");
     contact.SaveButton.click();
     contact.closeButton.click({ force: true });
-    contact.waitForContactCreation();
+    cy.wait(1000);
   });
 
   it("Edit newly added contact", () => {
