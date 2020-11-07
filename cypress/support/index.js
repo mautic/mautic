@@ -116,8 +116,8 @@ after("Delete Test Data", () => {
   cy.wait(1000);
   segments.waitForPageLoad();
   segments.SearchBox.click().clear();
-  segments.SearchBox.type("TestSegment");
-  cy.wait(2000);
+  segments.SearchBox.type("TestSegment{enter}");
+  cy.wait(3000);
   segments.firstCheckbox.click();
   segments.firstDropDown.click();
   segments.deleteOption.click();
