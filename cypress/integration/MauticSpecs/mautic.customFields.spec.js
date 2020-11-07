@@ -7,12 +7,12 @@ const customFields = require("../../Pages/CustomFields");
 
 context("Custom Fields", () => {
    
-  it("add new Booleean custom field for Company", () => {
+  it("add new Boolean custom field for Company", () => {
     settings.settingsMenuButton.click();
     settings.customFieldSection.click();
     customFields.waitforPageLoad();
     customFields.addNewButton.click();
-    customFields.fieldLabel.type("Booleean custom field for Company");
+    customFields.fieldLabel.type("Boolean custom field for Company");
     customFields.ObjectSelectionDropDown.click();
     customFields.ObjectSelector.select("Company",{force: true});
     customFields.DataTypeSelectionDropDown.click();
@@ -25,7 +25,7 @@ context("Custom Fields", () => {
     settings.customFieldSection.click();
     customFields.waitforPageLoad();
     customFields.addNewButton.click();
-    customFields.fieldLabel.type("Booleean custom field for Contact");
+    customFields.fieldLabel.type("Boolean custom field for Contact");
     customFields.ObjectSelectionDropDown.click();
     customFields.ObjectSelector.select("Contact",{force: true});
     customFields.DataTypeSelectionDropDown.click();
