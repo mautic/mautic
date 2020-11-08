@@ -80,7 +80,7 @@ class Mapper
     public function setContact(array $contact)
     {
         foreach ($contact as $field => &$value) {
-            if (is_string($value) && strpos($value, '|') !== false) {
+            if (is_string($value) && false !== strpos($value, '|')) {
                 $value = explode('|', $value);
             }
         }
@@ -100,8 +100,6 @@ class Mapper
     }
 
     /**
-     * @param array $config
-     *
      * @return $this
      */
     public function setConfig(array $config)
@@ -125,12 +123,12 @@ class Mapper
         $hasOverwriteWithBlank = IntegrationConfigHelper::hasOverwriteWithBlank($this->config);
         foreach ($this->mappedFields as $zohoField => $mauticField) {
             $field = $this->getField($zohoField);
-            if ($field && ($hasOverwriteWithBlank || (!$hasOverwriteWithBlank && isset($this->contact[$mauticField]) && $this->contact[$mauticField] != ''))) {
+            if ($field && ($hasOverwriteWithBlank || (!$hasOverwriteWithBlank && isset($this->contact[$mauticField]) && '' != $this->contact[$mauticField]))) {
                 $mapped   = 1;
                 $apiField = $field['api_name'];
                 $apiValue = $this->contact[$mauticField];
                 // skip If required field is empty
-                if (!empty($field['required']) && $apiValue == '') {
+                if (!empty($field['required']) && '' == $apiValue) {
                     return 0;
                 }
                 $objectMappedValues[$apiField] = $apiValue;

@@ -14,13 +14,11 @@ namespace  MauticPlugin\MauticCrmBundle\Helper;
 class IntegrationConfigHelper
 {
     /**
-     * @param array $config
-     *
      * @return bool
      */
     public static function hasOverwriteWithBlank(array $config)
     {
-        if (isset($config['overwriteWithBlank']) && isset($config['overwriteWithBlank'][0]) && $config['overwriteWithBlank'][0] == 'overwriteWithBlank') {
+        if (isset($config['overwriteWithBlank']) && isset($config['overwriteWithBlank'][0]) && 'overwriteWithBlank' == $config['overwriteWithBlank'][0]) {
             return true;
         }
 
