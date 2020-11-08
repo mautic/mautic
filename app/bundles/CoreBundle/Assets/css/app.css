@@ -1448,6 +1448,9 @@ a.media {
 .media.new {
   background-color: #f6f7f8;
 }
+.notification .media-body {
+  display: table-cell;
+}
 .media-body {
   display: block;
 }
@@ -4741,4 +4744,12 @@ ul.media-list.media-list-feed div.media-body {
 ul.media-list.media-list-feed div.media-object {
   padding: 0px;
   margin: 10px;
+}
+.ico-email:before {
+  font-family: "FontAwesome";
+  content: "\f1fa";
+}
+.ico-sms:before {
+  font-family: "FontAwesome";
+  content: "\f27b";
 }

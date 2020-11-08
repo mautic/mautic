@@ -41,7 +41,6 @@ class CampaignHelper
      */
     public function fireWebhook(array $config, Lead $contact)
     {
-        // dump($config);die;
         $payload = $this->getPayload($config, $contact);
         $headers = $this->getHeaders($config, $contact);
         $url     = rawurldecode(TokenHelper::findLeadTokens($config['url'], $this->getContactValues($contact), true));
@@ -92,6 +91,10 @@ class CampaignHelper
             case 'post':
             case 'put':
             case 'patch':
+                $headers = array_change_key_case($headers);
+                if (array_key_exists('content-type', $headers) && 'application/json' == strtolower($headers['content-type'])) {
+                    $payload                 = json_encode($payload);
+                }
                 $response = $this->connector->$method($url, $payload, $headers, $timeout);
                 break;
             case 'delete':

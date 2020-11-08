@@ -119,7 +119,6 @@ trait EntityFieldsBuildFormTrait
                 case DateType::class:
                 case DateTimeType::class:
                 case TimeType::class:
-                    $attr['data-toggle'] = $type;
                     $opts                = [
                         'required'    => $required,
                         'label'       => $field['label'],
@@ -144,16 +143,19 @@ trait EntityFieldsBuildFormTrait
                         }
                     }
                     if (DateTimeType::class === $type) {
-                        $opts['model_timezone'] = 'UTC';
-                        $opts['view_timezone']  = date_default_timezone_get();
-                        $opts['format']         = 'yyyy-MM-dd HH:mm:ss';
-                        $opts['with_seconds']   = true;
+                        $opts['attr']['data-toggle'] = 'datetime';
+                        $opts['model_timezone']      = 'UTC';
+                        $opts['view_timezone']       = date_default_timezone_get();
+                        $opts['format']              = 'yyyy-MM-dd HH:mm:ss';
+                        $opts['with_seconds']        = true;
 
                         $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d H:i:s') : null;
                     } elseif (DateType::class === $type) {
-                        $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d') : null;
+                        $opts['attr']['data-toggle'] = 'date';
+                        $opts['data']                = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d') : null;
                     } else {
-                        $opts['model_timezone'] = 'UTC';
+                        $opts['attr']['data-toggle'] = 'time';
+                        $opts['model_timezone']      = 'UTC';
                         // $opts['with_seconds']   = true; // @todo figure out why this cause the contact form to fail.
                         $opts['view_timezone'] = date_default_timezone_get();
                         $opts['data']          = (!empty($value)) ? $dtHelper->toLocalString('H:i:s') : null;
