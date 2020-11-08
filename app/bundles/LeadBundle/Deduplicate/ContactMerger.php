@@ -182,7 +182,14 @@ class ContactMerger
             }
 
             try {
-                $defaultValue = ArrayHelper::getValue('default_value', $winner->getField($field));
+                $fromValue    = empty($oldestFields[$field]) ? 'empty' : $oldestFields[$field];
+                $fieldDetails = $winner->getField($field);
+
+                if (false === $fieldDetails) {
+                    throw new ValueNotMergeableException($fromValue, false);
+                }
+
+                $defaultValue = ArrayHelper::getValue('default_value', $fieldDetails);
                 $newValue     = MergeValueHelper::getMergeValue(
                     $newestFields[$field],
                     $oldestFields[$field],
@@ -192,7 +199,6 @@ class ContactMerger
                 );
                 $winner->addUpdatedField($field, $newValue);
 
-                $fromValue = empty($oldestFields[$field]) ? 'empty' : $oldestFields[$field];
                 $this->logger->debug("CONTACT: Updated {$field} from {$fromValue} to {$newValue} for {$winner->getId()}");
             } catch (ValueNotMergeableException $exception) {
                 $this->logger->info("CONTACT: {$field} is not mergeable for {$winner->getId()} - {$exception->getMessage()}");

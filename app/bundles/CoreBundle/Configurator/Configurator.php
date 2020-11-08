@@ -110,7 +110,7 @@ class Configurator
      */
     public function getSteps()
     {
-        if ($this->sortedSteps === []) {
+        if ([] === $this->sortedSteps) {
             $this->sortedSteps = $this->getSortedSteps();
         }
 

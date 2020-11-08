@@ -13,6 +13,7 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -41,15 +42,25 @@ class ReportSubscriber implements EventSubscriberInterface
     private $companyReportData;
 
     /**
+     * @var GeneratedColumnsProviderInterface
+     */
+    private $generatedColumnsProvider;
+
+    /**
      * @var StatRepository
      */
     private $statRepository;
 
-    public function __construct(Connection $db, CompanyReportData $companyReportData, StatRepository $statRepository)
-    {
-        $this->db                = $db;
-        $this->companyReportData = $companyReportData;
-        $this->statRepository    = $statRepository;
+    public function __construct(
+        Connection $db,
+        CompanyReportData $companyReportData,
+        StatRepository $statRepository,
+        GeneratedColumnsProviderInterface $generatedColumnsProvider
+    ) {
+        $this->db                       = $db;
+        $this->companyReportData        = $companyReportData;
+        $this->statRepository           = $statRepository;
+        $this->generatedColumnsProvider = $generatedColumnsProvider;
     }
 
     /**
@@ -426,6 +437,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
             switch ($g) {
                 case 'mautic.email.graph.line.stats':
+                    $chartQuery->setGeneratedColumnProvider($this->generatedColumnsProvider);
                     $chart     = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     $sendQuery = clone $queryBuilder;
                     $readQuery = clone $origQuery;
@@ -475,16 +487,22 @@ class ReportSubscriber implements EventSubscriberInterface
                     $queryBuilder->resetQueryPart('groupBy');
                     $counts = $queryBuilder->execute()->fetch();
                     $chart  = new PieChart();
-                    $chart->setDataset($options['translator']->trans('mautic.email.stat.read'), $counts['read_count']);
+                    $chart->setDataset(
+                        $options['translator']->trans('mautic.email.stat.read'),
+                        $counts['read_count'] ?? 0
+                    );
                     $chart->setDataset(
                         $options['translator']->trans('mautic.email.graph.pie.ignored.read.failed.ignored'),
-                        ($counts['sent_count'] - $counts['read_count'])
+                        (($counts['sent_count'] ?? 0) - ($counts['read_count'] ?? 0))
                     );
                     $chart->setDataset(
                         $options['translator']->trans('mautic.email.unsubscribed'),
-                        $counts['unsubscribed']
+                        $counts['unsubscribed'] ?? 0
                     );
-                    $chart->setDataset($options['translator']->trans('mautic.email.bounced'), $counts['bounced']);
+                    $chart->setDataset(
+                        $options['translator']->trans('mautic.email.bounced'),
+                        $counts['bounced'] ?? 0
+                    );
 
                     $event->setGraph(
                         $g,

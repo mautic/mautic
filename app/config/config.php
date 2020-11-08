@@ -97,8 +97,9 @@ $dbalSettings = [
         'row_format' => 'DYNAMIC',
     ],
     'types'    => [
-        'array'    => 'Mautic\CoreBundle\Doctrine\Type\ArrayType',
-        'datetime' => 'Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType',
+        'array'     => \Mautic\CoreBundle\Doctrine\Type\ArrayType::class,
+        'datetime'  => \Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType::class,
+        'generated' => \Mautic\CoreBundle\Doctrine\Type\GeneratedType::class,
     ],
     // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
     'mapping_types' => [
@@ -317,6 +318,8 @@ $container->loadFromExtension('fm_elfinder', [
                         'upload_deny'   => ['all'],
                         'accepted_name' => '/^[\w\x{0300}-\x{036F}][\w\x{0300}-\x{036F}\s\.\%\-]*$/u', // Supports diacritic symbols
                         'url'           => '%env(resolve:MAUTIC_EL_FINDER_URL)%', // We need to specify URL in case mod_rewrite is disabled
+                        'tmb_path'      => '%env(resolve:MAUTIC_EL_FINDER_PATH)%/.tmb/',
+                        'tmb_url'       => '%env(resolve:MAUTIC_EL_FINDER_URL)%/.tmb/',
                     ],
                 ],
             ],

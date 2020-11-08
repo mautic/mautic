@@ -36,7 +36,7 @@ class ConfigTrackingPageType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.form.anonymize_ip',
-                'data'  => (bool) $options['data']['anonymize_ip'],
+                'data'  => isset($options['data']['anonymize_ip']) ? (bool) $options['data']['anonymize_ip'] : false,
                 'attr'  => [
                     'tooltip' => 'mautic.page.config.form.anonymize_ip.tooltip',
                 ],
@@ -73,7 +73,7 @@ class ConfigTrackingPageType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.form.tracking.trackingpage.enabled',
-                'data'  => (bool) $options['data']['facebook_pixel_trackingpage_enabled'],
+                'data'  => isset($options['data']['facebook_pixel_trackingpage_enabled']) ? (bool) $options['data']['facebook_pixel_trackingpage_enabled'] : false,
             ]
         );
 
@@ -82,7 +82,7 @@ class ConfigTrackingPageType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.form.tracking.landingpage.enabled',
-                'data'  => (bool) $options['data']['facebook_pixel_landingpage_enabled'],
+                'data'  => isset($options['data']['facebook_pixel_landingpage_enabled']) ? (bool) $options['data']['facebook_pixel_landingpage_enabled'] : false,
             ]
         );
 
@@ -103,7 +103,7 @@ class ConfigTrackingPageType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.form.tracking.trackingpage.enabled',
-                'data'  => (bool) $options['data']['google_analytics_trackingpage_enabled'],
+                'data'  => isset($options['data']['google_analytics_trackingpage_enabled']) ? (bool) $options['data']['google_analytics_trackingpage_enabled'] : false,
             ]
         );
 
@@ -112,7 +112,7 @@ class ConfigTrackingPageType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.form.tracking.landingpage.enabled',
-                'data'  => (bool) $options['data']['google_analytics_landingpage_enabled'],
+                'data'  => isset($options['data']['google_analytics_landingpage_enabled']) ? (bool) $options['data']['google_analytics_landingpage_enabled'] : false,
             ]
         );
 
@@ -121,7 +121,7 @@ class ConfigTrackingPageType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.form.tracking.anonymize.ip.enabled',
-                'data'  => (bool) (isset($options['data']['google_analytics_anonymize_ip']) ? $options['data']['google_analytics_anonymize_ip'] : false),
+                'data'  => isset($options['data']['google_analytics_anonymize_ip']) ? (bool) $options['data']['google_analytics_anonymize_ip'] : false,
                 'attr'  => [
                     'tooltip' => 'mautic.page.config.form.tracking.anonymize.ip.enabled.tooltip',
                 ],
