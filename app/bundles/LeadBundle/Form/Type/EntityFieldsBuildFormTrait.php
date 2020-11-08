@@ -274,7 +274,6 @@ trait EntityFieldsBuildFormTrait
                         case MultiselectType::class:
                             $constraints[] = new Length(['max' => 65535]);
                             break;
-                            break;
                     }
 
                     $builder->add(
