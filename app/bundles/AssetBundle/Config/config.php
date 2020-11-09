@@ -15,6 +15,10 @@ return [
                 'path'       => '/assets/{objectAction}/{objectId}',
                 'controller' => 'MauticAssetBundle:Asset:execute',
             ],
+            'mautic_asset_contacts' => [
+                'path'       => '/assets/view/{objectId}/contact/{page}',
+                'controller' => 'MauticAssetBundle:Asset:contacts',
+            ],
         ],
         'api' => [
             'mautic_api_assetsstandard' => [

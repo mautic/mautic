@@ -74,6 +74,7 @@ $view['slots']->set(
 );
 
 $showActions = count($activeFormActions);
+$firstTab    = $showActions ? 'actions' : 'fields';
 ?>
 <!-- start: box layout -->
 <div class="box-layout">
@@ -171,11 +172,18 @@ $showActions = count($activeFormActions);
                         </a>
                     </li>
                 <?php endif; ?>
-                <li class="<?php if (!$showActions) {
+                <li class="<?php if ('fields' === $firstTab) {
                                     echo 'active';
                                 } ?>">
                     <a href="#fields-container" role="tab" data-toggle="tab">
                         <?php echo $view['translator']->trans('mautic.form.tab.fields'); ?>
+                    </a>
+                </li>
+                <li class="<?php if ('leads' === $firstTab) {
+                                    echo 'active';
+                                }?>">
+                    <a href="#leads-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.form.tab.leads'); ?>
                     </a>
                 </li>
             </ul>
@@ -230,7 +238,7 @@ $showActions = count($activeFormActions);
             <?php endif; ?>
 
             <!-- #fields-container -->
-            <div class="tab-pane fade<?php if (!$showActions) {
+            <div class="tab-pane fade<?php if ('fields' === $firstTab) {
                                             echo ' active in';
                                         } ?> bdr-w-0" id="fields-container">
                 <h5 class="fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.form.field'); ?></h5>
@@ -263,6 +271,13 @@ $showActions = count($activeFormActions);
                 </ul>
             </div>
             <!--/ #fields-container -->
+            <!-- #leads-container -->
+            <div id="leads-container" class="<?php if ('leads' === $firstTab): echo 'active '; endif; ?>tab-pane fade page-list in bdr-w-0">
+                <?php echo $formLeads; ?>
+                <div class="clearfix"></div>
+            </div>
+            <!--/ #leads-container -->
+
         </div>
         <!--/ end: tab-content -->
     </div>

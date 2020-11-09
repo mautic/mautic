@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -27,6 +28,7 @@ class PageController extends FormController
 {
     use BuilderControllerTrait;
     use FormErrorMessagesTrait;
+    use EntityContactsTrait;
 
     /**
      * @param int $page
@@ -331,6 +333,14 @@ class PageController extends FormController
                 'previewUrl'    => $this->generateUrl('mautic_page_preview', ['id' => $objectId], UrlGeneratorInterface::ABSOLUTE_URL),
                 'logs'          => $logs,
                 'dateRangeForm' => $dateRangeForm->createView(),
+                'pageLeads'     => $this->forward(
+                    'MauticPageBundle:Page:contacts',
+                    [
+                        'objectId'   => $activePage->getId(),
+                        'page'       => $this->get('session')->get('mautic.page.contact.page', 1),
+                        'ignoreAjax' => true,
+                    ]
+                )->getContent(),
             ],
             'contentTemplate' => 'MauticPageBundle:Page:details.html.php',
             'passthroughVars' => [
@@ -338,6 +348,25 @@ class PageController extends FormController
                 'mauticContent' => 'page',
             ],
         ]);
+    }
+
+    /**
+     * @param int $objectId
+     * @param int $page
+     *
+     * @return mixed
+     */
+    public function contactsAction($objectId, $page = 1)
+    {
+        return $this->generateContactsGrid(
+            $objectId,
+            $page,
+            'page:pages:view',
+            'page',
+            'page_hits',
+            null,
+            'page_id'
+        );
     }
 
     /**
