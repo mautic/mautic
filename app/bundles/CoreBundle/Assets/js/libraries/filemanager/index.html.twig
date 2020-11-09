@@ -17,7 +17,11 @@
             lang : '{{locale}}',
             onlyMimes: {{ onlyMimes|raw }},
             getFileCallback : function(file, elFinderInstance) {
-                window.opener.document.fileManagerInsertImageCallback('textarea.editor', elFinderInstance.convAbsUrl(file.url));
+                let fileUrl = file.url;
+                if (file.baseUrl == '' && typeof window.opener.mauticImagesPath !== 'undefined') {
+                    fileUrl = window.opener.mauticImagesPath+'/'+file.name;
+                }
+                window.opener.document.fileManagerInsertImageCallback('textarea.editor', elFinderInstance.convAbsUrl(fileUrl));
                 window.close();
             }
     });
