@@ -778,8 +778,10 @@ class PageModel extends FormModel
 
     /**
      * @param Redirect|Page|null $page
+     *
+     * @return array
      */
-    public function getHitQuery(Request $request, $page = null): array
+    public function getHitQuery(Request $request, $page = null)
     {
         $get  = $request->query->all();
         $post = $request->request->all();
@@ -1175,12 +1177,8 @@ class PageModel extends FormModel
      *
      * @return array
      */
-    private function cleanQuery($query)
+    private function cleanQuery(array $query): array
     {
-        if (!\is_array($query)) {
-            return [];
-        }
-
         foreach ($query as $key => $value) {
             if (filter_var($value, FILTER_VALIDATE_URL)) {
                 $query[$key] = InputHelper::url($value);
