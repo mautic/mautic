@@ -1162,8 +1162,12 @@ class PageModel extends FormModel
      *
      * @return array
      */
-    private function cleanQuery(array $query): array
+    private function cleanQuery($query)
     {
+        if (!\is_array($query)) {
+            return [];
+        }
+
         foreach ($query as $key => $value) {
             if (filter_var($value, FILTER_VALIDATE_URL)) {
                 $query[$key] = InputHelper::url($value);
