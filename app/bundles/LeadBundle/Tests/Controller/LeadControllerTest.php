@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
-use Illuminate\Support\Collection;
 use Mautic\CampaignBundle\DataFixtures\ORM\CampaignData;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
