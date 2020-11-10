@@ -39,6 +39,7 @@
                 <directory>./../plugins/*Bundle/Translations</directory>
                 <directory>./../plugins/*Bundle/Views</directory>
                 <directory>middlewares/Tests</directory>
+                <directory>bundles/CoreBundle/Test</directory>
             </exclude>
         </whitelist>
     </filter>
