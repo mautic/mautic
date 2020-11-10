@@ -47,5 +47,6 @@
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled" />
         <env name="MAXMIND_LICENSE_KEY" value=""/>
         <server name="KERNEL_DIR" value="app" />
+        <server name="APP_DEBUG" value="0" />
     </php>
 </phpunit>
