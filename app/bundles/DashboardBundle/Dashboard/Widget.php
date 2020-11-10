@@ -20,8 +20,8 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class Widget
 {
-    const FORMAT_HUMAN   = 'M j, Y';
-    const FORMAT_MYSQL   = 'Y-m-d';
+    public const FORMAT_HUMAN = 'M j, Y';
+    public const FORMAT_MYSQL = 'Y-m-d';
 
     /**
      * @var DashboardModel
@@ -38,11 +38,6 @@ class Widget
      */
     private $session;
 
-    /**
-     * @param DashboardModel $dashboardModel
-     * @param UserHelper     $userHelper
-     * @param Session        $session
-     */
     public function __construct(DashboardModel $dashboardModel, UserHelper $userHelper, Session $session)
     {
         $this->dashboardModel = $dashboardModel;
@@ -53,11 +48,9 @@ class Widget
     /**
      * Get ready widget to populate in template.
      *
-     * @param int $widgetId
-     *
      * @return bool|\Mautic\DashboardBundle\Entity\Widget
      */
-    public function get($widgetId)
+    public function get(int $widgetId)
     {
         /** @var \Mautic\DashboardBundle\Entity\Widget $widget */
         $widget = $this->dashboardModel->getEntity($widgetId);
@@ -80,8 +73,6 @@ class Widget
 
     /**
      * Set filter from POST to session.
-     *
-     * @param Request $request
      *
      * @throws \Exception
      */

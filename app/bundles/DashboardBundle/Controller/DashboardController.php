@@ -17,26 +17,26 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\DashboardBundle\Dashboard\Widget as WidgetService;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Form\Type\UploadType;
+use Mautic\DashboardBundle\Model\DashboardModel;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-/**
- * Class DashboardController.
- */
 class DashboardController extends AbstractFormController
 {
     /**
      * Generates the default view.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function indexAction()
     {
-        /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
+        /** @var DashboardModel $model */
         $model   = $this->getModel('dashboard');
         $widgets = $model->getWidgets();
 
@@ -49,7 +49,7 @@ class DashboardController extends AbstractFormController
         $dateRangeFilter = $this->request->get('daterange', []);
 
         // Set new date range to the session
-        if ($this->request->isMethod('POST')) {
+        if ($this->request->isMethod(Request::METHOD_POST)) {
             $session = $this->get('session');
             if (!empty($dateRangeFilter['date_from'])) {
                 $from = new \DateTime($dateRangeFilter['date_from']);
@@ -91,7 +91,7 @@ class DashboardController extends AbstractFormController
     }
 
     /**
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function widgetAction($widgetId)
     {
@@ -125,9 +125,9 @@ class DashboardController extends AbstractFormController
     }
 
     /**
-     * Generate's new dashboard widget and processes post data.
+     * Generate new dashboard widget and processes post data.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function newAction()
     {
@@ -143,7 +143,7 @@ class DashboardController extends AbstractFormController
         $valid      = false;
 
         ///Check for a submitted form and process it
-        if ('POST' == $this->request->getMethod()) {
+        if ($this->request->isMethod(Request::METHOD_POST)) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $closeModal = true;
@@ -192,7 +192,7 @@ class DashboardController extends AbstractFormController
      *
      * @param $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function editAction($objectId)
     {
@@ -205,7 +205,7 @@ class DashboardController extends AbstractFormController
         $closeModal = false;
         $valid      = false;
         ///Check for a submitted form and process it
-        if ('POST' == $this->request->getMethod()) {
+        if ($this->request->isMethod(Request::METHOD_POST)) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $closeModal = true;
@@ -254,7 +254,7 @@ class DashboardController extends AbstractFormController
      *
      * @param int $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function deleteAction($objectId)
     {
@@ -268,7 +268,7 @@ class DashboardController extends AbstractFormController
         $flashes = [];
         $success = 0;
 
-        /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
+        /** @var DashboardModel $model */
         $model  = $this->getModel('dashboard');
         $entity = $model->getEntity($objectId);
 
@@ -303,12 +303,12 @@ class DashboardController extends AbstractFormController
     /**
      * Saves the widgets of current user into a json and stores it for later as a file.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     public function saveAction()
     {
         // Accept only AJAX POST requests because those are check for CSRF tokens
-        if ('POST' !== $this->request->getMethod() || !$this->request->isXmlHttpRequest()) {
+        if ($this->request->isMethod(Request::METHOD_POST) || !$this->request->isXmlHttpRequest()) {
             return $this->accessDenied();
         }
 
@@ -347,7 +347,7 @@ class DashboardController extends AbstractFormController
     /**
      * Exports the widgets of current user into a json file and downloads it.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     public function exportAction()
     {
@@ -367,7 +367,7 @@ class DashboardController extends AbstractFormController
     /**
      * Exports the widgets of current user into a json file.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function deleteDashboardFileAction()
     {
@@ -392,7 +392,7 @@ class DashboardController extends AbstractFormController
      *
      * @param null $file
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function applyDashboardFileAction($file = null)
     {
@@ -419,7 +419,7 @@ class DashboardController extends AbstractFormController
         }
 
         if ($widgets) {
-            /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
+            /** @var DashboardModel $model */
             $model = $this->getModel('dashboard');
 
             $model->clearDashboardCache();
@@ -443,13 +443,13 @@ class DashboardController extends AbstractFormController
     }
 
     /**
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function importAction()
     {
         $preview = $this->request->get('preview');
 
-        /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
+        /** @var DashboardModel $model */
         $model = $this->getModel('dashboard');
 
         $directories = [
@@ -460,7 +460,7 @@ class DashboardController extends AbstractFormController
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'import']);
         $form   = $this->get('form.factory')->create(UploadType::class, [], ['action' => $action]);
 
-        if ('POST' == $this->request->getMethod()) {
+        if ($this->request->isMethod(Request::METHOD_POST)) {
             if (isset($form) && !$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     $fileData = $form['file']->getData();
