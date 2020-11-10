@@ -456,7 +456,7 @@ class Report extends FormEntity implements SchedulerInterface
      */
     public function getGroupBy()
     {
-        return $this->groupBy;
+        return (array) $this->groupBy;
     }
 
     public function setGroupBy(array $groupBy)
@@ -471,7 +471,7 @@ class Report extends FormEntity implements SchedulerInterface
      */
     public function getAggregators()
     {
-        return $this->aggregators;
+        return (array) $this->aggregators;
     }
 
     /**
