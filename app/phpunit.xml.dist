@@ -31,6 +31,7 @@
             <directory>middlewares</directory>
             <exclude>
                 <directory>bundles/*Bundle/Config</directory>
+                <directory>bundles/*Bundle/DataFixtures</directory>
                 <directory>bundles/*Bundle/Tests</directory>
                 <directory>bundles/*Bundle/Translations</directory>
                 <directory>bundles/*Bundle/Views</directory>
