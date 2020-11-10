@@ -2,10 +2,14 @@
 
 namespace Mautic\CoreBundle\Test;
 
+use Doctrine\Common\DataFixtures\Executor\AbstractExecutor;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Liip\TestFixturesBundle\Test\FixturesTrait;
+use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
+use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -21,11 +25,20 @@ use Symfony\Component\Routing\RouterInterface;
 
 abstract class AbstractMauticTestCase extends WebTestCase
 {
-    use FixturesTrait;
+    use FixturesTrait {
+        loadFixtures as private traitLoadFixtures;
+        loadFixtureFiles as private traitLoadFixtureFiles;
+    }
+
     /**
      * @var EntityManager
      */
     protected $em;
+
+    /**
+     * @var Connection
+     */
+    protected $connection;
 
     /**
      * @var ContainerInterface
@@ -40,6 +53,11 @@ abstract class AbstractMauticTestCase extends WebTestCase
     /**
      * @var array
      */
+    protected $clientOptions = [];
+
+    /**
+     * @var array
+     */
     protected $clientServer = [
         'PHP_AUTH_USER' => 'admin',
         'PHP_AUTH_PW'   => 'mautic',
@@ -47,22 +65,28 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
     protected function setUp()
     {
-        $defaultConfig = json_encode(
+        $this->setUpSymfony(
             [
-                'api_enabled'           => true,
-                'api_enable_basic_auth' => true,
+                'api_enabled'                       => true,
+                'api_enable_basic_auth'             => true,
+                'create_custom_field_in_background' => false,
             ]
         );
-        putenv('MAUTIC_CONFIG_PARAMETERS='.$defaultConfig);
+    }
 
-        \Mautic\CoreBundle\ErrorHandler\ErrorHandler::register('prod');
+    protected function setUpSymfony(array $defaultConfigOptions = []): void
+    {
+        putenv('MAUTIC_CONFIG_PARAMETERS='.json_encode($defaultConfigOptions));
 
-        $this->client = static::createClient([], $this->clientServer);
+        ErrorHandler::register('prod');
+
+        $this->client = static::createClient($this->clientOptions, $this->clientServer);
         $this->client->disableReboot();
         $this->client->followRedirects(true);
 
-        $this->container = $this->client->getContainer();
-        $this->em        = $this->container->get('doctrine')->getManager();
+        $this->container  = $this->client->getContainer();
+        $this->em         = $this->container->get('doctrine')->getManager();
+        $this->connection = $this->em->getConnection();
 
         /** @var RouterInterface $router */
         $router = $this->container->get('router');
@@ -81,6 +105,30 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->em->close();
 
         parent::tearDown();
+    }
+
+    /**
+     * Overrides \Liip\TestFixturesBundle\Test\FixturesTrait::getContainer() method to prevent from having multiple instances of container.
+     */
+    protected function getContainer(): ContainerInterface
+    {
+        return $this->container;
+    }
+
+    /**
+     * Make `$append = true` default so we can avoid unnecessary purges.
+     */
+    protected function loadFixtures(array $classNames = [], bool $append = true, ?string $omName = null, string $registryName = 'doctrine', ?int $purgeMode = null): ?AbstractExecutor
+    {
+        return $this->traitLoadFixtures($classNames, $append, $omName, $registryName, $purgeMode);
+    }
+
+    /**
+     * Make `$append = true` default so we can avoid unnecessary purges.
+     */
+    protected function loadFixtureFiles(array $paths = [], bool $append = true, ?string $omName = null, string $registryName = 'doctrine', ?int $purgeMode = null): array
+    {
+        return $this->traitLoadFixtureFiles($paths, $append, $omName, $registryName, $purgeMode);
     }
 
     /**
@@ -105,7 +153,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $finder->name('*TestKernel.php')->depth(0)->in($dir);
         $results = iterator_to_array($finder);
         if (!count($results)) {
-            throw new \RuntimeException('Either set KERNEL_DIR in your phpunit.xml according to https://symfony.com/doc/current/book/testing.html#your-first-functional-test or override the WebTestCase::createKernel() method.');
+            throw new RuntimeException('Either set KERNEL_DIR in your phpunit.xml according to https://symfony.com/doc/current/book/testing.html#your-first-functional-test or override the WebTestCase::createKernel() method.');
         }
 
         $file  = current($results);

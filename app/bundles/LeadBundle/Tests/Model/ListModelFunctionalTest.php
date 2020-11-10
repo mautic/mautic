@@ -2,25 +2,45 @@
 
 namespace Mautic\LeadBundle\Tests\Model;
 
-use Mautic\CoreBundle\Test\MauticWebTestCase;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Assert;
 
-class ListModelFunctionalTest extends MauticWebTestCase
+class ListModelFunctionalTest extends MauticMysqlTestCase
 {
     public function testPublicSegmentsInContactPreferences()
     {
-        /** @var LeadListRepository $repo */
-        $repo = $this->em->getRepository(LeadList::class);
+        $user           = $this->em->getRepository(User::class)->findBy([], [], 1)[0];
+        $firstLeadList  = $this->createLeadList($user, 'First', true);
+        $secondLeadList = $this->createLeadList($user, 'Second', false);
+        $thirdLeadList  = $this->createLeadList($user, 'Third', true);
+        $this->em->flush();
 
+        /** @var LeadListRepository $repo */
+        $repo  = $this->em->getRepository(LeadList::class);
         $lists = $repo->getGlobalLists();
 
-        $segmentTest2Ref = $this->fixtures->getReference('segment-test-2');
-
-        $this->assertArrayNotHasKey(
-            $segmentTest2Ref->getId(),
+        Assert::assertCount(2, $lists);
+        Assert::assertArrayHasKey($firstLeadList->getId(), $lists);
+        Assert::assertArrayHasKey($thirdLeadList->getId(), $lists);
+        Assert::assertArrayNotHasKey(
+            $secondLeadList->getId(),
             $lists,
-            'Non-public lists should not be returned by the `getGlobalLists()` method.'
+            'Non-global lists should not be returned by the `getGlobalLists()` method.'
         );
+    }
+
+    private function createLeadList(User $user, string $name, bool $isGlobal): LeadList
+    {
+        $leadList = new LeadList();
+        $leadList->setName($name);
+        $leadList->setAlias(mb_strtolower($name));
+        $leadList->setCreatedBy($user);
+        $leadList->setIsGlobal($isGlobal);
+        $this->em->persist($leadList);
+
+        return $leadList;
     }
 }
