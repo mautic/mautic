@@ -96,6 +96,7 @@ trait EntityContactsTrait
                 'orderByDir'     => $orderByDir,
                 'select'         => ListController::SEGMENT_CONTACT_FIELDS,
                 'route'          => $route,
+                'distinct'       => true,
             ],
             $entityJoinTable,
             $entityId,

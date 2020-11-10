@@ -36,8 +36,9 @@ trait CustomFieldRepositoryTrait
         /** @var QueryBuilder $dq */
         $dq = isset($args['qb']) ? $args['qb'] : $this->getEntitiesDbalQueryBuilder();
 
-        // Generate where clause first to know if we need to use distinct on primary ID or not
-        $this->useDistinctCount = false;
+        // Generate where clause to know if we need to use distinct on
+        // primary ID or not when the 'distinct' arg is not set
+        $this->useDistinctCount = $args['distinct'] ?? false;
         $this->buildWhereClause($dq, $args);
 
         if (!empty($args['withTotalCount']) || !isset($args['count'])) {
