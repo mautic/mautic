@@ -1036,7 +1036,6 @@ return [
                 'arguments' => [
                     'mautic.helper.paths',
                     'mautic.helper.update',
-                    'debril.reader',
                     'mautic.helper.core_parameters',
                 ],
                 'methodCalls' => [
