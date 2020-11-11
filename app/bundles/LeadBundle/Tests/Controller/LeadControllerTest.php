@@ -3,7 +3,7 @@
 namespace Mautic\LeadBundle\Tests\Controller;
 
 use Doctrine\DBAL\Connection;
-use Mautic\CampaignBundle\Tests\DataFixtures\Orm\CampaignData;
+use Mautic\CampaignBundle\DataFixtures\ORM\CampaignData;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
