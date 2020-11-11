@@ -130,9 +130,8 @@ class MauticCoreExtension extends Extension
                             $definitionArguments
                         ));
 
-                        if (isset($details['public'])) {
-                            $definition->setPublic($details['public']);
-                        }
+                        $public = $details['public'] ?? true;
+                        $definition->setPublic($public);
 
                         // Generate tag and tag arguments
                         if (isset($details['tags'])) {
