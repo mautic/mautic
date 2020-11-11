@@ -15,8 +15,8 @@ class NotificationRepositoryTest extends MauticMysqlTestCase
 {
     public function testIsDuplicate(): void
     {
-        $this->createNotification(2, 'dup1', new DateTime('-1 day'));
-        $this->createNotification(1, 'dup2', new DateTime('-1 day'));
+        $this->createNotification(2, 'dup1', new DateTime('-1 day +5 seconds'));
+        $this->createNotification(1, 'dup2', new DateTime('-1 day +5 seconds'));
         $this->em->flush();
 
         $this->assertDuplicate(true, 2, 'dup1', new DateTime('-1 day'));
@@ -37,10 +37,12 @@ class NotificationRepositoryTest extends MauticMysqlTestCase
 
     private function createNotification(int $userId, string $deduplicate, DateTime $datetime): Notification
     {
+        /** @var User $user */
+        $user         = $this->em->getReference(User::class, $userId);
         $notification = new Notification();
         $notification->setType('notice');
         $notification->setMessage('Some message');
-        $notification->setUser($this->em->getReference(User::class, $userId));
+        $notification->setUser($user);
         $notification->setDateAdded($datetime);
         $notification->setDeduplicate(md5($deduplicate));
         $this->em->persist($notification);
