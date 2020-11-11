@@ -31,22 +31,18 @@ final class Version20201105120328 extends AbstractMauticMigration
 
     public function up(Schema $schema): void
     {
-        $tables = [
-            'push_notifications' => [
-                ['name' => 'name',        'type' => 'VARCHAR(255)'],
-                ['name' => 'description', 'type' => 'LONGTEXT'],
-                ['name' => 'heading',     'type' => 'LONGTEXT'],
-                ['name' => 'message',     'type' => 'LONGTEXT'],
-                ['name' => 'button',      'type' => 'LONGTEXT'],
-            ],
+        $pushNotifications = [
+            ['name' => 'name',        'type' => 'VARCHAR(191)'],
+            ['name' => 'description', 'type' => 'LONGTEXT'],
+            ['name' => 'heading',     'type' => 'LONGTEXT'],
+            ['name' => 'message',     'type' => 'LONGTEXT'],
+            ['name' => 'button',      'type' => 'LONGTEXT'],
         ];
 
-        foreach ($tables as $table => $columns) {
-            foreach ($columns as $column) {
-                $this->addSql("ALTER TABLE {$this->prefix}{$table} 
-                    CHANGE {$column['name']} {$column['name']} {$column['type']} 
-                    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-            }
+        foreach ($pushNotifications as $column) {
+            $this->addSql("ALTER TABLE {$this->prefix}push_notifications 
+                CHANGE {$column['name']} {$column['name']} {$column['type']} 
+                CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
         }
     }
 }
