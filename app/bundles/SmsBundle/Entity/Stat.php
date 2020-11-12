@@ -136,10 +136,6 @@ class Stat
             ->columnName('is_read')
             ->build();
 
-        $builder->createField('isFailed', 'boolean')
-            ->columnName('is_failed')
-            ->build();
-
         $builder->createField('trackingHash', 'string')
             ->columnName('tracking_hash')
             ->nullable()
