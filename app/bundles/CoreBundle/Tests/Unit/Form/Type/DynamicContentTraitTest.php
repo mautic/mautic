@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Form\Type;
 
-use Mautic\AllydeBundle\Tests\TestingTrait;
 use Mautic\CoreBundle\Entity\DynamicContentEntityTrait;
 use Mautic\CoreBundle\Form\Type\DynamicContentTrait;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -24,8 +23,6 @@ use Symfony\Component\Form\Test\FormInterface;
 
 final class DynamicContentTraitTest extends \PHPUnit\Framework\TestCase
 {
-    use TestingTrait;
-
     /**
      * @var MockObject|FormBuilderInterface
      */
@@ -129,5 +126,14 @@ final class DynamicContentTraitTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->invokeMethod($this->trait, 'addDynamicContentField', [$this->formBuilder]);
+    }
+
+    private function invokeMethod($object, string $methodName, array $args = [])
+    {
+        $reflection = new \ReflectionClass(get_class($object));
+        $method     = $reflection->getMethod($methodName);
+        $method->setAccessible(true);
+
+        return $method->invokeArgs($object, $args);
     }
 }
