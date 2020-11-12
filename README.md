@@ -11,6 +11,7 @@ Mautic Introduction
 |2.15  | 27 Sep 2019 | 8 Oct 2019 | 8 Oct 2019 | 8 Oct 2019
 |2.16  | 30 Jan 2020 | 13 Feb 2020 | 15 June 2020 | 15 December 2020
 |3.0   | 27 Jan 2020 | 15 June 2020 | 15 June 2021 | 15 December 2021
+|3.1   | 17 Aug 2020 | 24 Aug 2020 | 23 Nov 2020 | 23 May 2021
 
 * = Security Support for 2.16 will only be provided for Mautic itself, not for core dependencies that are EOL like Symfony 2.8.
 

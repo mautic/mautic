@@ -123,21 +123,17 @@ if (count($items)):
                     </td>
                     <td>
                         <div>
-                            <?php if ('template' == $type): ?>
-                                <?php echo $view->render(
-                                    'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                                    ['item' => $item, 'model' => 'sms']
-                                ); ?>
-                            <?php else: ?>
-                                <i class="fa fa-fw fa-lg fa-toggle-on text-muted disabled"></i>
-                            <?php endif; ?>
+                            <?php echo $view->render(
+                                'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                                ['item' => $item, 'model' => 'sms']
+                            ); ?>
                             <a href="<?php echo $view['router']->path(
                                 'mautic_sms_action',
                                 ['objectAction' => 'view', 'objectId' => $item->getId()]
                             ); ?>">
                                 <?php echo $item->getName(); ?>
                                 <?php if ('list' == $type): ?>
-                                    <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.sms.icon_tooltip.list_sms'); ?>"><i class="fa fa-fw fa-list"></i></span>
+                                    <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.sms.icon_tooltip.list_sms'); ?>"><i class="fa fa-fw fa-pie-chart"></i></span>
                                 <?php endif; ?>
                             </a>
                         </div>
