@@ -65,9 +65,15 @@ class PasswordSubscriber implements EventSubscriberInterface
         $dictionary = $user ? $this->buildDictionary($user) : [];
 
         $score = $this->passwordStrengthEstimator->passwordStrength($credentials, $dictionary)['score'];
-        if (static::MINIMUM_PASSWORD_STRENGTH_ALLOWED > $score) {
-            throw new WeakPasswordException();
+
+        if (static::MINIMUM_PASSWORD_STRENGTH_ALLOWED <= $score) {
+            // The password is fine, bail.
+            return;
         }
+
+        $authenticationEvent->setIsFailedAuthentication(true);
+        $authenticationEvent->setFailedAuthenticationMessage('Weak password');
+        $authenticationEvent->stopPropagation();
     }
 
     private function buildDictionary(User $user): array
