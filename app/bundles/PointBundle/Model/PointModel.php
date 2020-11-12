@@ -196,14 +196,17 @@ class PointModel extends CommonFormModel
      * Triggers a specific point change.
      *
      * @param       $type
-     * @param mixed $eventDetails passthrough from function triggering action to the callback function
-     * @param mixed $typeId       Something unique to the triggering event to prevent  unnecessary duplicate calls
+     * @param mixed $eventDetails     passthrough from function triggering action to the callback function
+     * @param mixed $typeId           Something unique to the triggering event to prevent  unnecessary duplicate calls
      * @param Lead  $lead
+     * @param bool  $allowUserRequest
+     *
+     * @throws \ReflectionException
      */
-    public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null)
+    public function triggerAction($type, $eventDetails = null, $typeId = null, Lead $lead = null, $allowUserRequest = false)
     {
-        //only trigger actions for anonymous users
-        if (!$this->security->isAnonymous()) {
+        //only trigger actions for not logged Mautic users
+        if (!$this->security->isAnonymous() && !$allowUserRequest) {
             return;
         }
 

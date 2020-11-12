@@ -181,4 +181,12 @@ STRING
             )
         );
     }
+
+    public function testUrlValid()
+    {
+        $this->assertTrue(UrlHelper::isValidUrl('https://domain.tld/e'));
+        $this->assertTrue(UrlHelper::isValidUrl('https://domain.tld/é'));
+        $this->assertFalse(UrlHelper::isValidUrl('notvalidurl'));
+        $this->assertFalse(UrlHelper::isValidUrl('notvalidurlé'));
+    }
 }

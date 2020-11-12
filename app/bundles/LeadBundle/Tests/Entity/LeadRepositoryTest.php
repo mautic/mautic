@@ -11,6 +11,10 @@
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
 use Mautic\LeadBundle\Entity\CustomFieldRepositoryTrait;
 use Mautic\LeadBundle\Entity\Lead;
@@ -110,5 +114,42 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
         ];
 
         $this->assertSame($expected, array_keys($contacts), 'When getting leads with indexing by column, it should match the expected result.');
+    }
+
+    public function testGetContactIdsByEmails(): void
+    {
+        $emails = [
+            'somebody1@anywhere.com',
+            'somebody2@anywhere.com',
+        ];
+
+        $entityManager = $this->createMock(EntityManager::class);
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $repo          = new LeadRepository($entityManager, $classMetadata);
+
+        $query = $this->createMock(AbstractQuery::class);
+        $query->expects(self::once())
+            ->method('setParameter')
+            ->with(':emails', $emails, Connection::PARAM_STR_ARRAY)
+            ->willReturn($query);
+        $query->expects(self::once())
+            ->method('getArrayResult')
+            ->willReturn([
+                0 => [
+                    'id' => '1',
+                ],
+                1 => [
+                    'id' => '2',
+                ],
+            ]);
+
+        $entityManager->expects(self::once())
+            ->method('createQuery')
+            ->willReturn($query);
+
+        self::assertEquals(
+            [1, 2],
+            $repo->getContactIdsByEmails($emails)
+        );
     }
 }
