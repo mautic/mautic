@@ -33,7 +33,7 @@ class LeadPermissions extends AbstractPermissions
                 'view' => 1,
             ],
         ];
-        $this->addExtendedPermissions('leads', false);
+        $this->addExtendedPermissions(['leads', 'lists'], false);
         $this->addStandardPermissions('imports');
     }
 
