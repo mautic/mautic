@@ -23,7 +23,7 @@ use ZxcvbnPhp\Zxcvbn as PasswordStrengthEstimator;
 
 class PasswordSubscriber implements EventSubscriberInterface
 {
-    private const MINIMUIM_ALLOWED_PASSWORD = 3;
+    private const MINIMUM_PASSWORD_STRENGTH_ALLOWED = 3;
 
     /**
      * @var PasswordStrengthEstimator
@@ -50,7 +50,7 @@ class PasswordSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            UserEvents::USER_FORM_AUTHENTICATION => ['onUserFormAuthentication', 0],
+            UserEvents::USER_FORM_AUTHENTICATION => ['onUserFormAuthentication', 999],
         ];
     }
 
@@ -64,8 +64,10 @@ class PasswordSubscriber implements EventSubscriberInterface
         $user       = $this->initializeUser($authenticationEvent);
         $dictionary = $user ? $this->buildDictionary($user) : [];
 
-        $score = $this->passwordStrengthEstimator->passwordStrength($authenticationEvent->getToken(), $dictionary);
-        $a     = 5;
+        $score = $this->passwordStrengthEstimator->passwordStrength($credentials, $dictionary)['score'];
+        if (static::MINIMUM_PASSWORD_STRENGTH_ALLOWED > $score) {
+            throw new WeakPasswordException();
+        }
     }
 
     private function buildDictionary(User $user): array
