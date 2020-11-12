@@ -10,7 +10,7 @@
  */
 
 ?>
-<td class="<?php echo $class ?>">
+<td class="<?php echo $class; ?>">
     <?php
     $flag = (!empty($fields['core']['country'])) ? $view['assets']->getCountryFlag($fields['core']['country']['value']) : '';
     if (!empty($flag)):

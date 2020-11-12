@@ -10,12 +10,12 @@
  */
 
 ?>
-<td class="<?php echo $class ?> text-center">
+<td class="<?php echo $class; ?> text-center">
     <?php
     $color = $item->getColor();
     $style = !empty($color) ? ' style="background-color: '.$color.';"' : '';
     ?>
     <?php if ($item->getStage()):?>
         <span class="label label-default"<?php echo $style; ?>><?php echo $view->escape($item->getStage()->getName()); ?></span>
-    <?php endif?>
+    <?php endif; ?>
 </td>

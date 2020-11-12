@@ -10,7 +10,7 @@
  */
 
 ?>
-<td class="<?php echo $class ?> text-center">
+<td class="<?php echo $class; ?> text-center">
     <?php
     $color = $item->getColor();
     $style = !empty($color) ? ' style="background-color: '.$color.';"' : '';

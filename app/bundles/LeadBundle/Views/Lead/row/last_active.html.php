@@ -10,7 +10,7 @@
  */
 
 ?>
-<td class="<?php echo $class ?>">
+<td class="<?php echo $class; ?>">
     <abbr title="<?php echo $view['date']->toFull($item->getLastActive()); ?>">
         <?php echo $view['date']->toText($item->getLastActive()); ?>
     </abbr>
