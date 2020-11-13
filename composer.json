@@ -15,7 +15,7 @@
         ]
     },
     "require": {
-        "php": ">=7.2.21 <7.5",
+        "php": ">=7.3.0 <7.5",
         "ext-zlib": "^7.2",
         "ext-zip": "^1.15",
         "ext-imap": "*",
@@ -108,7 +108,8 @@
         "barryvdh/elfinder-flysystem-driver": "^0.2.1",
         "bandwidth-throttle/token-bucket": "^2.0",
         "gaufrette/extras": "^0.1.0",
-        "gaufrette/aws-s3-adapter": "^0.4.0"
+        "gaufrette/aws-s3-adapter": "^0.4.0",
+        "theofidry/psysh-bundle": "~4.3.0"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~4.4.0",
@@ -128,8 +129,7 @@
         "friendsofphp/php-cs-fixer": "~2.16.1",
         "liip/test-fixtures-bundle": "^1.6",
         "phpstan/phpstan": "^0.12.3",
-        "rector/rector-prefixed": "0.6.13",
-        "theofidry/psysh-bundle": "^v3.5.1"
+        "rector/rector-prefixed": "0.6.13"
     },
     "repositories": [
         {
