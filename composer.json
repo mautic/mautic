@@ -88,7 +88,6 @@
 
         "stack/run": "^1.0",
         "stack/builder": "^1.0",
-        "piwik/device-detector": "~3.12.2",
         "php-http/guzzle6-adapter": "^1.1",
         "sparkpost/sparkpost": "~2.2.0",
         "sonata-project/exporter": "^1.7",
@@ -109,7 +108,8 @@
         "bandwidth-throttle/token-bucket": "^2.0",
         "gaufrette/extras": "^0.1.0",
         "gaufrette/aws-s3-adapter": "^0.4.0",
-        "theofidry/psysh-bundle": "~4.3.0"
+        "theofidry/psysh-bundle": "~4.3.0",
+        "matomo/device-detector": "^4.0"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~4.4.0",
