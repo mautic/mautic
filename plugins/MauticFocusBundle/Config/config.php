@@ -102,6 +102,9 @@ return [
                     'router',
                 ],
             ],
+            'mautic.focus.configbundle.subscriber' => [
+                'class' => \MauticPlugin\MauticFocusBundle\EventListener\ConfigSubscriber::class,
+            ],
         ],
         'forms' => [
             'mautic.focus.form.type.focus' => [
@@ -115,6 +118,9 @@ return [
             'mautic.focus.form.type.focus_list' => [
                 'class'     => \MauticPlugin\MauticFocusBundle\Form\Type\FocusListType::class,
                 'arguments' => 'mautic.focus.model.focus',
+            ],
+            'mautic.focus.form.type.focusconfig' => [
+                'class' => \MauticPlugin\MauticFocusBundle\Form\Type\FocusConfigTrackingPageType::class,
             ],
         ],
         'models' => [

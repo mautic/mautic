@@ -260,10 +260,11 @@ class FocusModel extends FormModel
         $content = $this->templating->getTemplating()->render(
             'MauticFocusBundle:Builder:content.html.php',
             [
-                'focus'    => $focus,
-                'preview'  => $isPreview,
-                'htmlMode' => $htmlMode,
-                'clickUrl' => $url,
+                'focus'            => $focus,
+                'preview'          => $isPreview,
+                'htmlMode'         => $htmlMode,
+                'clickUrl'         => $url,
+                'tracking_enabled' => $this->coreParametersHelper->get('focus_pixel_enabled'),
             ]
         );
 
