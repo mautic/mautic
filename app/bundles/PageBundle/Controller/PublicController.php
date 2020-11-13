@@ -444,6 +444,12 @@ class PublicController extends CommonFormController
         // Ensure the URL does not have encoded ampersands
         $url = str_replace('&amp;', '&', $redirect->getUrl());
 
+        $fragment = false;
+        if (false !== strpos($url, '#')) {
+            $fragment = '#'.parse_url($url, PHP_URL_FRAGMENT);
+            $url      = str_replace($fragment, '', $url);
+        }
+
         // Get query string
         $query = $this->request->query->all();
 
@@ -454,6 +460,10 @@ class PublicController extends CommonFormController
         // Tak on anything left to the URL
         if (count($query)) {
             $url = UrlHelper::appendQueryToUrl($url, http_build_query($query));
+        }
+
+        if ($fragment) {
+            $url .= $fragment;
         }
 
         // If the IP address is not trackable, it means it came form a configured "do not track" IP or a "do not track" user agent
