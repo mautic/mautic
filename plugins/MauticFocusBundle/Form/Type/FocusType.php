@@ -94,7 +94,7 @@ class FocusType extends AbstractType
                 'attr'       => [
                     'class'    => 'form-control',
                     'onchange' => 'Mautic.focusUpdatePreview()',
-                    'tooltip'  => 'mautic.focums.html_mode.tooltip',
+                    'tooltip'  => 'mautic.focus.html_mode.tooltip',
                 ],
                 'choices' => [
                     'mautic.focus.form.basic'  => 'basic',
