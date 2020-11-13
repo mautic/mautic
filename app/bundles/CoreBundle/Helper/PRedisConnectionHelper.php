@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
+use Mautic\CoreBundle\Predis\Replication\MasterOnlyStrategy;
+use Predis\Client;
+use Predis\Connection\Aggregate\SentinelReplication;
+
 /**
  * Helper functions for simpler operations with arrays.
  */
@@ -65,5 +69,25 @@ class PRedisConnectionHelper
         }
 
         return $redisOptions;
+    }
+
+    public static function createClient(array $endpoints, array $options): Client
+    {
+        $replication = $options['replication'] ?? null;
+
+        if ('sentinel' === $replication) {
+            $options['aggregate'] = function () {
+                return function ($sentinels, $options) {
+                    return new SentinelReplication(
+                        $options->service,
+                        $sentinels,
+                        $options->connections,
+                        new MasterOnlyStrategy()
+                    );
+                };
+            };
+        }
+
+        return new Client($endpoints, $options);
     }
 }
