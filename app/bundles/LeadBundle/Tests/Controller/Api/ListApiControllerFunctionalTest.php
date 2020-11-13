@@ -264,6 +264,8 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
                     'type'       => 'text',
                     'operator'   => '=',
                     'properties' => ['filter' => 'Prague'],
+                    'filter'     => 'Prague',
+                    'display'    => null,
                 ],
                 [
                     'object'     => 'lead',
@@ -272,6 +274,8 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
                     'type'       => 'text',
                     'operator'   => '=',
                     'properties' => ['filter' => 'Prague'],
+                    'filter'     => 'Prague',
+                    'display'    => null,
                 ],
             ],
             $response2['lists'][0]['filters']
