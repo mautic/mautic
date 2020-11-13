@@ -179,7 +179,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     private $doNotContact;
 
     /**
-     * @var CorePermissions|MockObject
+     * @var MockObject|CorePermissions
      */
     private $corePermissions;
 
@@ -241,6 +241,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $this->emailModel->setTranslator($this->translator);
         $this->emailModel->setEntityManager($this->entityManager);
+        $this->emailModel->setSecurity($this->corePermissions);
     }
 
     /**
