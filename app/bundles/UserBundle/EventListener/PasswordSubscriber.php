@@ -13,17 +13,30 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\EventListener;
 
-use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Event\AuthenticationEvent;
+use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Routing\Router;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use ZxcvbnPhp\Zxcvbn as PasswordStrengthEstimator;
 
 class PasswordSubscriber implements EventSubscriberInterface
 {
     private const MINIMUM_PASSWORD_STRENGTH_ALLOWED = 3;
+
+    private const DICTIONARY = [
+        'mautic',
+        'acquia',
+        'user',
+        'lead',
+        'bundle',
+        'campaign',
+        'company',
+    ];
 
     /**
      * @var PasswordStrengthEstimator
@@ -36,21 +49,22 @@ class PasswordSubscriber implements EventSubscriberInterface
     private $userRepository;
 
     /**
-     * @var CompanyRepository
+     * @var Router
      */
-    private $companyRepository;
+    private $router;
 
-    public function __construct(PasswordStrengthEstimator $passwordStrengthEstimator, UserRepository $userRepository, CompanyRepository $companyRepository)
+    public function __construct(PasswordStrengthEstimator $passwordStrengthEstimator, UserRepository $userRepository, Router $router)
     {
         $this->passwordStrengthEstimator = $passwordStrengthEstimator;
         $this->userRepository            = $userRepository;
-        $this->companyRepository         = $companyRepository;
+        $this->router                    = $router;
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
             UserEvents::USER_FORM_AUTHENTICATION => ['onUserFormAuthentication', 999],
+            UserEvents::USER_PRE_AUTHENTICATION  => ['onUserFormAuthentication', 999],
         ];
     }
 
@@ -71,23 +85,23 @@ class PasswordSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $authenticationEvent->setIsFailedAuthentication(true);
-        $authenticationEvent->setFailedAuthenticationMessage('Weak password');
-        $authenticationEvent->stopPropagation();
+        $authenticationException = new AuthenticationException('Weak password');
+        $authenticationException->setToken($authenticationEvent->getToken());
+        throw $authenticationException;
     }
 
     private function buildDictionary(User $user): array
     {
-        $dictionary = [
+        $dictionary = array_merge([
             $user->getEmail(),
             $user->getUsername(),
             $user->getFirstName(),
             $user->getLastName(),
             $user->getPosition(),
             $user->getSignature(),
-        ];
+        ], static::DICTIONARY);
 
-        return array_unique(array_filter($dictionary));
+        return array_unique(array_map('mb_strtolower', array_filter($dictionary)));
     }
 
     private function initializeUser(AuthenticationEvent $authenticationEvent): ?User
