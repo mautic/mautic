@@ -23,15 +23,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 final class FilterTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject|TranslatorInterface
-     */
-    private $translator;
-
     /**
      * @var MockObject|FormAdjustmentsProviderInterface
      */
@@ -51,11 +45,9 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->translator              = $this->createMock(TranslatorInterface::class);
         $this->formAdjustmentsProvider = $this->createMock(FormAdjustmentsProviderInterface::class);
         $this->listModel               = $this->createMock(ListModel::class);
         $this->form                    = new FilterType(
-            $this->translator,
             $this->formAdjustmentsProvider,
             $this->listModel
         );
