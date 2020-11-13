@@ -1,6 +1,6 @@
 {
     "name": "mautic/core",
-    "license": "GPL-3.0",
+    "license": "GPL-3.0-or-later",
     "type": "mautic-core",
     "description": "Mautic Open Source Distribution",
     "autoload": {
