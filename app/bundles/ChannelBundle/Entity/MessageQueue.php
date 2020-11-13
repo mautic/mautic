@@ -128,7 +128,8 @@ class MessageQueue
             ->addIndex(['scheduled_date'], 'message_scheduled_date')
             ->addIndex(['priority'], 'message_priority')
             ->addIndex(['success'], 'message_success')
-            ->addIndex(['channel', 'channel_id'], 'message_channel_search');
+            ->addIndex(['channel', 'channel_id'], 'message_channel_search')
+            ->addIndex(['channel', 'lead_id', 'status'], 'message_status_channel_lead_search');
 
         $builder->addBigIntIdField();
 
