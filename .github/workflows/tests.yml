@@ -8,6 +8,21 @@ on:
   pull_request:
 
 jobs:
+  validation:
+    runs-on: ubuntu-latest
+    name: Validation
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup PHP, with Composer
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 7.4
+
+    - name: Validate Composer
+      uses: shivammathur/setup-php@v2
+      run: composer validate
+
   phpunit:
     runs-on: ubuntu-latest
 
