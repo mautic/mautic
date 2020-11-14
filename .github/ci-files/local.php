@@ -13,5 +13,5 @@ $parameters = [
     'db_user'               => 'root',
     'db_password'           => '',
     'admin_email'           => 'github-actions@mautic.org',
-    'admin_password'        => 'GitHubActionsIsAwesome',
+    'admin_password'        => 'mautic',
 ];

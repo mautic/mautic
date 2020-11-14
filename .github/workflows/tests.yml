@@ -123,15 +123,6 @@ jobs:
     name: Cypress
     runs-on: ubuntu-latest
 
-    container: 
-      image: php:7.4-apache
-      ports: 
-        - 80:80
-      options: --network-alias=mautic
-
-    env:
-      MAUTIC_BASE_URL: http://mautic
-
     services:
       mysql:
         image: mysql:5.7
@@ -145,18 +136,26 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Copy files to web root, install deps
+    - name: Setup PHP, with composer and extensions
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 7.4
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+    
+    - name: Install Apache
       run: |
+        sudo apt install apache2 libapache2-mod-php
+
+    - name: Copy files to web root
+      run: |
+        sudo chmod -R 755 /var/www/html
+        sudo chown -R www-data:www-data /var/www/html
         cp -R ./* /var/www/html
 
     - name: Install dependencies
       working-directory: /var/www/html
       # Force Composer to v1.10
       run: |
-        curl -sS https://getcomposer.org/installer -o composer-setup.php
-        HASH=`curl -sS https://composer.github.io/installer.sig`
-        php -r "if (hash_file('SHA384', 'composer-setup.php') === '$HASH') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
-        php composer-setup.php --install-dir=/usr/local/bin --filename=composer
         composer self-update --1
         composer global require hirak/prestissimo
         composer validate
@@ -168,7 +167,9 @@ jobs:
         DB_PORT: ${{ job.services.mysql.ports[3306] }}
       run: |
         cp ./.github/ci-files/local.php ./app/config/local.php
-        php bin/console mautic:install http://mautic
+        php bin/console mautic:install http://localhost
 
     - name: Cypress run
       uses: cypress-io/github-action@v2
+      with:
+          env: host=localhost,port=80
