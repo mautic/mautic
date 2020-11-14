@@ -12,6 +12,7 @@
 namespace Mautic\ApiBundle\Controller\oAuth1;
 
 use Bazinga\OAuthServerBundle\Model\RequestTokenInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +20,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class AuthorizeController extends Controller
+class AuthorizeController extends AbstractController
 {
     /**
      * @return Response

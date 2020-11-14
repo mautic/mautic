@@ -12,6 +12,7 @@
 namespace Mautic\CoreBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -74,6 +75,9 @@ class MauticCoreExtension extends Extension
                         case 'commands':
                             $defaultTag = 'console.command';
                             break;
+                        case 'controllers':
+                            $defaultTag = 'controller.service_arguments';
+                            break;
                         default:
                             $defaultTag = false;
                             break;
@@ -105,19 +109,21 @@ class MauticCoreExtension extends Extension
                         }
 
                         // Set service alias
+                        $alias = new Alias($name);
+                        $alias->setPublic(true);
                         if (isset($details['serviceAlias'])) {
                             // Fix escaped sprintf placeholders
                             $details['serviceAlias'] = str_replace('%%', '%', $details['serviceAlias']);
-                            $container->setAlias(sprintf($details['serviceAlias'], $name), $name);
+                            $container->setAlias(sprintf($details['serviceAlias'], $name), $alias);
                         } elseif (isset($details['serviceAliases'])) {
-                            foreach ($details['serviceAliases'] as $alias) {
-                                $alias = str_replace('%%', '%', $alias);
-                                $container->setAlias(sprintf($alias, $name), $name);
+                            foreach ($details['serviceAliases'] as $aliasName) {
+                                $aliasName = str_replace('%%', '%', $aliasName);
+                                $container->setAlias(sprintf($aliasName, $name), $alias);
                             }
                         }
-                        // Alias with class name
+                        // Symfony 4 is requiring the classname for some auto-wired services (controllers)
                         if ($name !== $details['class']) {
-                            $container->setAlias($details['class'], $name);
+                            $container->setAlias($details['class'], $alias);
                         }
 
                         // Generate definition arguments
@@ -138,9 +144,6 @@ class MauticCoreExtension extends Extension
                             $definitionArguments
                         ));
 
-                        $public = $details['public'] ?? true;
-                        $definition->setPublic($public);
-
                         // Generate tag and tag arguments
                         if (isset($details['tags'])) {
                             $tagArguments = (!empty($details['tagArguments'])) ? $details['tagArguments'] : [];
@@ -156,7 +159,7 @@ class MauticCoreExtension extends Extension
                                 $definition->addTag($tag, $tagArguments[$k]);
 
                                 if ('mautic.email_transport' === $tag) {
-                                    $container->setAlias(sprintf('swiftmailer.mailer.transport.%s', $name), $name);
+                                    $container->setAlias(sprintf('swiftmailer.mailer.transport.%s', $name), $alias);
                                 }
                             }
                         } else {
@@ -171,7 +174,7 @@ class MauticCoreExtension extends Extension
                                 $definition->addTag($tag, $tagArguments);
 
                                 if ('mautic.email_transport' === $tag) {
-                                    $container->setAlias(sprintf('swiftmailer.mailer.transport.%s', $name), $name);
+                                    $container->setAlias(sprintf('swiftmailer.mailer.transport.%s', $name), $alias);
                                 }
                             }
 
@@ -180,10 +183,9 @@ class MauticCoreExtension extends Extension
                             }
                         }
 
-                        // Set public service
-                        if (!empty($details['public'])) {
-                            $definition->setPublic($details['public']);
-                        }
+                        // Default to a public service
+                        $public = $details['public'] ?? true;
+                        $definition->setPublic($public);
 
                         // Set lazy service
                         if (!empty($details['lazy'])) {
