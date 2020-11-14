@@ -170,5 +170,5 @@ jobs:
     - name: Cypress run
       uses: cypress-io/github-action@v2
       with:
-          env: host=localhost,port=80
+          config: baseUrl=http://localhost
           working-directory: /var/www/html
