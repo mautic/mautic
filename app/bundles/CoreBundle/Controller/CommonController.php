@@ -12,8 +12,6 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Exporter\Handler;
-use Exporter\Source\ArraySourceIterator;
-use Exporter\Source\IteratorSourceIterator;
 use Exporter\Writer\CsvWriter;
 use Exporter\Writer\XlsWriter;
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -24,6 +22,8 @@ use Mautic\CoreBundle\Helper\TrailingSlashHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\UserBundle\Entity\User;
+use Sonata\Exporter\Source\ArraySourceIterator;
+use Sonata\Exporter\Source\IteratorSourceIterator;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
