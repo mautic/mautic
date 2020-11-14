@@ -11,14 +11,15 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\Command;
 
-use Mautic\CoreBundle\Tests\Unit\Command\src\FakeCommand;
-use Mautic\CoreBundle\Tests\Unit\Command\src\FakeCompleteCommand;
+use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Tests\Unit\Command\src\FakeModeratedCommand;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 class ModeratedCommandTest extends TestCase
 {
@@ -46,7 +47,7 @@ class ModeratedCommandTest extends TestCase
 
     public function testUnableToWriteLockFileThrowsAnException()
     {
-        $command   = new FakeCommand();
+        $command   = new FakeModeratedCommand();
         $command->setContainer($this->container);
 
         $this->expectException(\RuntimeException::class);
@@ -71,10 +72,64 @@ class ModeratedCommandTest extends TestCase
         $command->run($this->input, $this->output);
     }
 
-    public function testLockFileCreated()
+    public function testLockByPassDoesNotAttemptToCreateALock()
     {
-        $command   = new FakeCommand();
+        $command   = new FakeModeratedCommand();
         $command->setContainer($this->container);
+
+        $this->container->expects($this->never())
+            ->method('getParameter');
+
+        $this->input->method('getOption')
+            ->willReturnCallback(
+                function (string $name) {
+                    switch ($name) {
+                        case 'lock_mode':
+                            return ModeratedCommand::MODE_FLOCK;
+                        case 'bypass-locking':
+                            return true;
+                        default:
+                            return null;
+                    }
+                }
+            );
+
+        $command->run($this->input, $this->output);
+    }
+
+    public function testDeprecatedForceOptionIsRecognized()
+    {
+        $command   = new FakeModeratedCommand();
+        $command->setContainer($this->container);
+
+        $this->container->expects($this->never())
+            ->method('getParameter');
+
+        $this->input->method('getOption')
+            ->willReturnCallback(
+                function (string $name) {
+                    switch ($name) {
+                        case 'lock_mode':
+                            return ModeratedCommand::MODE_FLOCK;
+                        case 'bypass-locking':
+                            return false;
+                        case 'force':
+                            return true;
+                        default:
+                            return null;
+                    }
+                }
+            );
+
+        $command->run($this->input, $this->output);
+    }
+
+    public function testPidLock(): void
+    {
+        $command = new FakeModeratedCommand();
+        if (!$command->isPidSupported()) {
+            $this->markTestSkipped('getmypid and/or posix_getpgid are not available');
+        }
 
         $cacheDir = __DIR__.'/resource/cache/tmp';
         $this->container->expects($this->once())
@@ -87,8 +142,8 @@ class ModeratedCommandTest extends TestCase
                 function (string $name) {
                     switch ($name) {
                         case 'lock_mode':
-                            return 'file_lock';
-                        case 'force':
+                            return ModeratedCommand::MODE_PID;
+                        case 'bypass-locking':
                             return false;
                         default:
                             return null;
@@ -96,13 +151,11 @@ class ModeratedCommandTest extends TestCase
                 }
             );
 
-        $returnCode = $command->run($this->input, $this->output);
-
-        // Assert that 1 is returned because the checkRunStatus status gave the go to process
-        $this->assertSame(1, $returnCode);
+        $command->setContainer($this->container);
+        $command->run($this->input, $this->output);
 
         // Assert that the file lock was created
-        $runDir = $cacheDir.'/../run';
+        $runDir   = $cacheDir.'/../run';
         $this->assertFileExists($runDir);
 
         $finder = new Finder();
@@ -112,48 +165,10 @@ class ModeratedCommandTest extends TestCase
 
         $this->assertEquals(1, $finder->count());
 
-        // Cleanup
-        foreach ($finder as $file) {
-            unlink($file->getPathname());
-        }
+        // Complete the command
+        $command->forceCompleteRun();
 
-        rmdir($runDir);
-    }
-
-    public function testLockFileIsCleanedUp()
-    {
-        $command   = new FakeCompleteCommand();
-        $command->setContainer($this->container);
-
-        $cacheDir = __DIR__.'/resource/cache/tmp';
-        $this->container->expects($this->once())
-            ->method('getParameter')
-            ->with('kernel.cache_dir')
-            ->willReturn($cacheDir);
-
-        $this->input->method('getOption')
-            ->willReturnCallback(
-                function (string $name) {
-                    switch ($name) {
-                        case 'lock_mode':
-                            return 'file_lock';
-                        case 'force':
-                            return false;
-                        default:
-                            return null;
-                    }
-                }
-            );
-
-        $returnCode = $command->run($this->input, $this->output);
-
-        // Assert that 1 is returned because the checkRunStatus status gave the go to process
-        $this->assertSame(1, $returnCode);
-
-        // Assert that the file lock was removed after the command completed execution
-        $runDir = $cacheDir.'/../run';
-        $this->assertFileExists($runDir);
-
+        // Clean up the files
         $finder = new Finder();
         $finder->in($runDir)
             ->name('sf*')
@@ -165,31 +180,72 @@ class ModeratedCommandTest extends TestCase
         rmdir($runDir);
     }
 
-    public function testLockByPassDoesNotAttemptToCreateALock()
+    public function testFileLock()
     {
-        $command   = new FakeCommand();
+        $command = new FakeModeratedCommand();
         $command->setContainer($this->container);
 
-        $this->container->expects($this->never())
-            ->method('getParameter');
+        $cacheDir = __DIR__.'/resource/cache/tmp';
+        $this->container->expects($this->once())
+            ->method('getParameter')
+            ->with('kernel.cache_dir')
+            ->willReturn($cacheDir);
 
         $this->input->method('getOption')
             ->willReturnCallback(
                 function (string $name) {
                     switch ($name) {
                         case 'lock_mode':
-                            return 'file_lock';
+                            return ModeratedCommand::MODE_FLOCK;
                         case 'bypass-locking':
-                            return true;
+                            return false;
                         default:
                             return null;
                     }
                 }
             );
 
-        $resultCode = $command->run($this->input, $this->output);
+        $command->run($this->input, $this->output);
 
-        // Assert that 1 is returned because the checkRunStatus status gave the go to process
-        $this->assertSame(1, $resultCode);
+        $runDir = $cacheDir.'/../run';
+        $this->assertFileExists($runDir);
+
+        $finder = new Finder();
+        $finder->in($runDir)
+            ->name('sf*')
+            ->files();
+
+        $this->assertEquals(1, $finder->count());
+
+        // Check the file is locked
+        $file = $this->getFirstFile($finder);
+        $fileHandler = fopen($file->getPathname(), 'r');
+        if (flock($fileHandler, LOCK_EX | LOCK_NB)) {
+            $this->fail('file is not locked');
+        }
+        fclose($fileHandler);
+
+        // Finish the command
+        $command->forceCompleteRun();
+
+        // Check the file is unlocked
+        $fileHandler = fopen($file->getPathname(), 'r');
+        if (!flock($fileHandler, LOCK_EX | LOCK_NB)) {
+            $this->fail('file is still locked');
+        }
+        flock($fileHandler, LOCK_UN | LOCK_NB);
+        fclose($fileHandler);
+
+        // Cleanup
+        unlink($file->getPathname());
+        rmdir($runDir);
+    }
+
+    private function getFirstFile(Finder $finder): SplFileInfo
+    {
+        $iterator = $finder->getIterator();
+        $iterator->rewind();
+
+        return $iterator->current();
     }
 }

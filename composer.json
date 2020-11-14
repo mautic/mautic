@@ -109,7 +109,8 @@
         "gaufrette/extras": "^0.1.0",
         "gaufrette/aws-s3-adapter": "^0.4.0",
         "theofidry/psysh-bundle": "~4.3.0",
-        "matomo/device-detector": "^4.0"
+        "matomo/device-detector": "^4.0",
+        "symfony/lock": "^5.1"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~4.4.0",

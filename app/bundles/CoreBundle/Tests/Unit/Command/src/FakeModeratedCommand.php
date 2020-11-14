@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Command\ModeratedCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class FakeCommand extends ModeratedCommand
+class FakeModeratedCommand extends ModeratedCommand
 {
     protected function configure()
     {
@@ -29,6 +29,13 @@ class FakeCommand extends ModeratedCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        return (int) $this->checkRunStatus($input, $output);
+        $this->checkRunStatus($input, $output);
+
+        return 0;
+    }
+
+    public function forceCompleteRun(): void
+    {
+        $this->completeRun();
     }
 }
