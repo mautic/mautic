@@ -11,9 +11,11 @@
 
 namespace Mautic\CoreBundle\DependencyInjection;
 
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -31,6 +33,11 @@ class MauticCoreExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
+        // Auto-wire commands to keep support for the M3 way although best practice is to register each command
+        // as a service and tag with console.command or include in a Mautic config.php services[command] array.
+        $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../../config'));
+        $loader->load('services.php');
+
         $bundles = array_merge($container->getParameter('mautic.bundles'), $container->getParameter('mautic.plugin.bundles'));
 
         // Store menu renderer options to create unique renderering classes per menu
@@ -64,6 +71,7 @@ class MauticCoreExtension extends Extension
                             $defaultTag = 'mautic.integration';
                             break;
                         case 'command':
+                        case 'commands':
                             $defaultTag = 'console.command';
                             break;
                         default:
