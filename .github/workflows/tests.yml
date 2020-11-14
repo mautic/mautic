@@ -172,3 +172,4 @@ jobs:
       uses: cypress-io/github-action@v2
       with:
           env: host=localhost,port=80
+          working-directory: /var/www/html
