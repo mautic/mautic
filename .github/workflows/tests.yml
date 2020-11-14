@@ -162,8 +162,8 @@ jobs:
 
     - name: Copy files to web root
       run: |
-        sudo adduser $USER www-data
-        sudo chown -R www-data:www-data /var/www
+        sudo chmod -R 777 /var/www/html
+        sudo chown -R www-data:www-data /var/www/html
         mv * /var/www/html
         cd /var/www/html
 
