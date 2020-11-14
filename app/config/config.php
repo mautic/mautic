@@ -298,7 +298,7 @@ $container->loadFromExtension('fm_elfinder', [
             'editor'          => 'custom',
             'editor_template' => '@bundles/CoreBundle/Assets/js/libraries/filemanager/index.html.twig',
             'fullscreen'      => true,
-            'include_assets'  => true,
+            //'include_assets'  => true,
             'relative_path'   => false,
             'connector'       => [
                 'debug' => '%kernel.debug%',
