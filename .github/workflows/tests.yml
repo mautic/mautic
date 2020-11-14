@@ -173,3 +173,18 @@ jobs:
       with:
           config: baseUrl=http://localhost
           working-directory: /var/www/html
+
+    - name: Upload Cypress screenshots
+      uses: actions/upload-artifact@v1
+      if: failure()
+      with:
+        name: cypress-screenshots
+        path: /var/www/html/cypress/screenshots
+
+      # Test run video was always captured, so this action uses "always()" condition
+    - name: Upload Cypress test run video
+      uses: actions/upload-artifact@v1
+      if: always()
+      with:
+        name: cypress-videos
+        path: /var/www/html/cypress/videos
