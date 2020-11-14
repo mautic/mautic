@@ -202,28 +202,6 @@ class MauticCoreExtension extends Extension
                             $definition->setConfigurator($details['configurator']);
                         }
 
-                        // Set scope - Deprecated as of Symfony 2.8 and removed in 3.0
-                        if (!empty($details['scope'])) {
-                            $definition->setScope($details['scope']);
-                        } elseif ('templating' == $type) {
-                            $definition->setScope('request');
-                        }
-
-                        // Set factory service - Deprecated as of Symfony 2.6 and removed in Symfony 3.0
-                        if (!empty($details['factoryService'])) {
-                            $definition->setFactoryService($details['factoryService']);
-                        }
-
-                        // Set factory class - Deprecated as of Symfony 2.6 and removed in Symfony 3.0
-                        if (!empty($details['factoryClass'])) {
-                            $definition->setFactoryClass($details['factoryClass']);
-                        }
-
-                        // Set factory method - Deprecated as of Symfony 2.6 and removed in Symfony 3.0
-                        if (!empty($details['factoryMethod'])) {
-                            $definition->setFactoryMethod($details['factoryMethod']);
-                        }
-
                         // Set factory - Preferred API since Symfony 2.6
                         if (!empty($details['factory'])) {
                             $factory = $details['factory'];
