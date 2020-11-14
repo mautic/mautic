@@ -149,7 +149,7 @@ jobs:
     - name: Copy files to web root
       run: |
         sudo chmod -R 755 /var/www/html
-        sudo chown -R www-data:www-data /var/www/html
+        sudo chown -R www-data:${USER} /var/www/html
         cp -R ./* /var/www/html
 
     - name: Install dependencies
