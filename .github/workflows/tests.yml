@@ -115,3 +115,53 @@ jobs:
           echo "Invalid command"
           exit 1
         fi
+
+  cypress:
+    name: Cypress
+    runs-on: ubuntu-latest
+
+    container: 
+      image: php:7.4-apache
+      ports: 
+        - 80:80
+      options: --network-alias=mautic
+
+    env:
+      MAUTIC_BASE_URL: http://mautic
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: mautictest
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Copy files to web root, install deps
+      run: |
+        cp -R ./* /var/www/html
+
+    - name: Install dependencies
+      working-directory: /var/www/html
+      # Force Composer to v1.10
+      run: |
+        composer self-update --1
+        composer global require hirak/prestissimo
+        composer validate
+        composer install --prefer-dist --no-progress --no-suggest
+
+    - name: Install Mautic
+      working-directory: /var/www/html
+      env:
+        DB_PORT: ${{ job.services.mysql.ports[3306] }}
+      run: |
+        cp ./.github/ci-files/local.php ./app/config/local.php
+        php bin/console mautic:install http://mautic
+
+    - name: Cypress run
+      uses: cypress-io/github-action@v2
