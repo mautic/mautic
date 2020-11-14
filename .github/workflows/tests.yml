@@ -146,14 +146,7 @@ jobs:
       run: |
         sudo apt install apache2 libapache2-mod-php
 
-    - name: Copy files to web root
-      run: |
-        sudo chmod -R 777 /var/www/html
-        sudo chown -R www-data:${USER} /var/www/html
-        cp -R ./* /var/www/html
-
     - name: Install dependencies
-      working-directory: /var/www/html
       # Force Composer to v1.10
       run: |
         composer self-update --1
@@ -162,12 +155,18 @@ jobs:
         composer install --prefer-dist --no-progress --no-suggest
 
     - name: Install Mautic
-      working-directory: /var/www/html
       env:
         DB_PORT: ${{ job.services.mysql.ports[3306] }}
       run: |
         cp ./.github/ci-files/local.php ./app/config/local.php
         php bin/console mautic:install http://localhost
+
+    - name: Copy files to web root
+      run: |
+        sudo adduser $USER www-data
+        sudo chown -R www-data:www-data /var/www
+        mv * /var/www/html
+        cd /var/www/html
 
     - name: Cypress run
       uses: cypress-io/github-action@v2
