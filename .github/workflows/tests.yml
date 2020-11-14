@@ -9,6 +9,7 @@ on:
 
 jobs:
   phpunit:
+    needs: cypress
     runs-on: ubuntu-latest
 
     strategy:
@@ -77,6 +78,7 @@ jobs:
         mariadb_port: ${{ job.services.mariadb.ports[3306] }}
 
   misc:
+    needs: cypress
     runs-on: ubuntu-latest
 
     strategy:
