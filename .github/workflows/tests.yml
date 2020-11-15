@@ -171,8 +171,9 @@ jobs:
       run: |
         sudo chmod -R 777 /var/www/html
         sudo chown -R www-data:www-data /var/www/html
+        shopt -s dotglob
         rm -rf /var/www/html/*
-        mv $GITHUB_WORKSPACE/{.,}* /var/www/html
+        mv $GITHUB_WORKSPACE/* /var/www/html
 
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
@@ -180,11 +181,9 @@ jobs:
     - name: Cypress run
       uses: cypress-io/github-action@v2
       with:
-          config: baseUrl=http://localhost
-          env: CI=true
-          working-directory: /var/www/html
-          browser: chrome
-          headless: true
+        config: baseUrl=http://localhost
+        env: CI=true
+        working-directory: /var/www/html
 
       # If one or more Cypress tests fail, upload screenshots as artifacts
     - name: Upload Cypress screenshots
