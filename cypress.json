@@ -1,6 +1,6 @@
 {
   "projectId": "",
-  "baseUrl" : "http://your-mautic-instance",
+  "baseUrl" : "https://mautic3.ddev.site",
   "defaultCommandTimeout": 10000,
   "execTimeout":	10000,
   "taskTimeout":	10000	,
