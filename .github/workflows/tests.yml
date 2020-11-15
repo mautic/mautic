@@ -144,6 +144,10 @@ jobs:
     - name: Install Apache
       run: |
         sudo apt-get install apache2 libapache2-mod-php
+        sudo a2enmod rewrite
+        sudo cp ./github/workflows/mautic-apache.conf /etc/apache2/conf-available/mautic.conf
+        sudo a2enconf mautic
+        sudo service apache2 restart
 
     - name: Install dependencies
       # Force Composer to v1.10
@@ -158,7 +162,7 @@ jobs:
         DB_PORT: ${{ job.services.mysql.ports[3306] }}
       run: |
         cp ./.github/ci-files/local.php ./app/config/local.php
-        php bin/console mautic:install http://localhost
+        php bin/console mautic:install http://localhost/mautic
 
     - name: Move files to web root
       run: |
@@ -166,6 +170,7 @@ jobs:
         sudo chown -R www-data:www-data /var/www/html
         mv $GITHUB_WORKSPACE /var/www/html
         mkdir $GITHUB_WORKSPACE
+        sudo chmod -R 777 /var/www/html/mautic
     
     - name: Setup tmate session for debugging
       uses: mxschmitt/action-tmate@v3
