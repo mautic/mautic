@@ -146,7 +146,7 @@ jobs:
       run: |
         sudo apt-get install apache2 libapache2-mod-php
         sudo a2enmod rewrite
-        sudo cp ./github/workflows/mautic-apache.conf /etc/apache2/conf-available/mautic.conf
+        sudo cp ./.github/workflows/mautic-apache.conf /etc/apache2/conf-available/mautic.conf
         sudo a2enconf mautic
         sudo service apache2 restart
 
