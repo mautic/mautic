@@ -12534,7 +12534,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mautic/BazingaOAuthServerBundle.git",
-                "reference": "8766e99a8dc21f7a5e3a6f33e3503c992c3d6b91"
+                "reference": "a8cc47023dd5400c05b2d66703a2bc6b13ddc13b"
             },
             "require": {
                 "php": ">=7.1",
@@ -12566,7 +12566,7 @@
                 "oauth",
                 "server"
             ],
-            "time": "2020-11-11T03:55:12+00:00"
+            "time": "2020-11-14T06:58:02+00:00"
         }
     ],
     "packages-dev": [
