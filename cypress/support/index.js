@@ -22,9 +22,17 @@ const segments = require("../Pages/Segments");
 const segment = require("../Pages/Segments");
 import "./commands";
 
-Cypress.Cookies.defaults({
-  preserve: [Cypress.env("instanceId"),'_ga','_gid','_gat','mautic_referer_id','mtc_id','mtc_sid','mautic_device_id','device_id','sid','id','success','__Secure-3PAPISID','SAPISID','APISID','__Secure-3PSID','SID','SSID','HSID','NID','1P_JAR','ANID','SIDCC','OTZ'],
-});
+// You can set this e.g. with CYPRESS_CI=true
+if (Cypress.env('CI') && Cypress.env('CI') == true) {
+  console.log('In a CI environment. We\'ll preserve all cookies.');
+  Cypress.Cookies.defaults({
+    preserve: cookie => true
+  });
+} else {
+  Cypress.Cookies.defaults({
+    preserve: [Cypress.env("instanceId"),'_ga','_gid','_gat','mautic_referer_id','mtc_id','mtc_sid','mautic_device_id','device_id','sid','id','success','__Secure-3PAPISID','SAPISID','APISID','__Secure-3PSID','SID','SSID','HSID','NID','1P_JAR','ANID','SIDCC','OTZ'],
+  });
+}
 
 before("Perform login", () => {
   cy.visit("/");
