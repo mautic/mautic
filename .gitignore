@@ -62,6 +62,9 @@
 /upgrade
 /upgrade_errors.txt
 
+/cypress/screenshots
+/cypress/videos
+
 /media/dashboards/*
 !/media/dashboards/*.json
 /media/files/*

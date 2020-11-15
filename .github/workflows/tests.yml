@@ -143,7 +143,7 @@ jobs:
     
     - name: Install Apache
       run: |
-        sudo apt install apache2 libapache2-mod-php
+        sudo apt-get install apache2 libapache2-mod-php
 
     - name: Install dependencies
       # Force Composer to v1.10
@@ -165,7 +165,6 @@ jobs:
         sudo chmod -R 777 /var/www/html
         sudo chown -R www-data:www-data /var/www/html
         mv $GITHUB_WORKSPACE /var/www/html
-        cd /var/www/html/mautic
 
     - name: Setup tmate for debugging
       uses: mxschmitt/action-tmate@v3
@@ -173,7 +172,8 @@ jobs:
     - name: Cypress run
       uses: cypress-io/github-action@v2
       with:
-          config: baseUrl=http://localhost
+          config: baseUrl=http://localhost/mautic
+          env: CI=true
           working-directory: /var/www/html/mautic
 
       # If one or more Cypress tests fail, upload screenshots as artifacts
