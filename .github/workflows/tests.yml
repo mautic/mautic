@@ -168,6 +168,9 @@ jobs:
         mv $GITHUB_WORKSPACE /var/www/html
         cd /var/www/html/mautic
 
+    - name: Setup tmate for debugging
+      uses: mxschmitt/action-tmate@v3
+
     - name: Cypress run
       uses: cypress-io/github-action@v2
       with:
