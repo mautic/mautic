@@ -162,9 +162,9 @@ jobs:
 
     - name: Move files to web root
       run: |
-        rm -rf /var/www/html/{*,.*}
         sudo chmod -R 777 /var/www/html
         sudo chown -R www-data:www-data /var/www/html
+        rm -rf /var/www/html/{*,.*}
         mv {.,}* /var/www/html
         cd /var/www/html
 
