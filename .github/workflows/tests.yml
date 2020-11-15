@@ -185,13 +185,10 @@ jobs:
         rm -rf /var/www/html/*
         mv $GITHUB_WORKSPACE/* /var/www/html
 
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
-
     - name: Cypress run
       uses: cypress-io/github-action@v2
       with:
-        config: baseUrl=http://localhost
+        config: baseUrl=http://localhost,projectId=ozaou3
         env: CI=true
         working-directory: /var/www/html
         record: true
