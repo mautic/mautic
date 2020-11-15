@@ -161,11 +161,12 @@ jobs:
         cp ./.github/ci-files/local.php ./app/config/local.php
         php bin/console mautic:install http://localhost
 
-    - name: Copy files to web root
+    - name: Move files to web root
       run: |
+        rm -rf /var/www/html/{*,.*}
         sudo chmod -R 777 /var/www/html
         sudo chown -R www-data:www-data /var/www/html
-        mv * /var/www/html
+        mv {.,}* /var/www/html
         cd /var/www/html
 
     - name: Cypress run
@@ -174,16 +175,17 @@ jobs:
           config: baseUrl=http://localhost
           working-directory: /var/www/html
 
+      # If one or more Cypress tests fail, upload screenshots as artifacts
     - name: Upload Cypress screenshots
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       if: failure()
       with:
         name: cypress-screenshots
         path: /var/www/html/cypress/screenshots
 
-      # Test run video was always captured, so this action uses "always()" condition
+      # Test run video is always captured, so this action uses the "always()" condition
     - name: Upload Cypress test run video
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       if: always()
       with:
         name: cypress-videos
