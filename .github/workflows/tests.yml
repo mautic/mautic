@@ -188,7 +188,7 @@ jobs:
     - name: Cypress run
       uses: cypress-io/github-action@v2
       with:
-        config: baseUrl=http://localhost,projectId=ozaou3
+        config: baseUrl=http://localhost
         env: CI=true
         working-directory: /var/www/html
         record: true
