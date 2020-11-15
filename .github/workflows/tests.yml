@@ -119,8 +119,8 @@ jobs:
         fi
 
   cypress:
-    name: Cypress - container no. ${{ matrix.containers }}
-    runs-on: ubuntu-latest
+    name: Cypress
+    runs-on: ubuntu-20.04
 
     services:
       mysql:
@@ -174,9 +174,7 @@ jobs:
         shopt -s dotglob
         rm -rf /var/www/html/*
         mv $GITHUB_WORKSPACE/* /var/www/html
-
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
+        sudo chmod -R 777 /var/www/html
 
     - name: Cypress run
       uses: cypress-io/github-action@v2
