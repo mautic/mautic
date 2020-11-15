@@ -119,7 +119,7 @@ jobs:
         fi
 
   cypress:
-    name: Cypress
+    name: Cypress - container no. ${{ matrix.containers }}
     runs-on: ubuntu-latest
 
     services:
@@ -131,6 +131,16 @@ jobs:
         ports:
           - 3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    strategy:
+      # when one test fails, DO NOT cancel the other
+      # containers, because this will kill Cypress processes
+      # leaving the Dashboard hanging ...
+      # https://github.com/cypress-io/github-action/issues/48
+      fail-fast: false
+      matrix:
+        # run 3 copies of the current job in parallel
+        containers: [1, 2, 3]
 
     steps:
     - uses: actions/checkout@v2
@@ -184,6 +194,15 @@ jobs:
         config: baseUrl=http://localhost
         env: CI=true
         working-directory: /var/www/html
+        record: true
+        parallel: true
+        group: 'Mautic Cypress'
+      env:
+        # pass the Dashboard record key as an environment variable
+        CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+        # Recommended: pass the GitHub token lets this action correctly
+        # determine the unique run id necessary to re-run the checks
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # If one or more Cypress tests fail, upload screenshots as artifacts
     - name: Upload Cypress screenshots
