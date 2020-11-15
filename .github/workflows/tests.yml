@@ -164,6 +164,7 @@ jobs:
       run: |
         cp ./.github/ci-files/local.php ./app/config/local.php
         php bin/console mautic:install http://localhost/mautic
+        php bin/console cache:warmup
 
     - name: Move files to web root
       run: |
@@ -172,9 +173,6 @@ jobs:
         mv $GITHUB_WORKSPACE /var/www/html
         mkdir $GITHUB_WORKSPACE
         sudo chmod -R 777 /var/www/html/mautic
-    
-    - name: Setup tmate session for debugging
-      uses: mxschmitt/action-tmate@v3
 
     - name: Cypress run
       uses: cypress-io/github-action@v2
@@ -182,6 +180,8 @@ jobs:
           config: baseUrl=http://localhost/mautic
           env: CI=true
           working-directory: /var/www/html/mautic
+          browser: chrome
+          headless: true
 
       # If one or more Cypress tests fail, upload screenshots as artifacts
     - name: Upload Cypress screenshots
