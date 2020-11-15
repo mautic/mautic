@@ -15,27 +15,44 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Event\StatsEvent;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-/**
- * Class CommonStatsSubscriber.
- */
-abstract class CommonStatsSubscriber extends CommonSubscriber
+abstract class CommonStatsSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var array of CommonRepository
+     * @var CommonRepository[]
      */
     protected $repositories = [];
 
     /**
      * @var null
      */
-    protected $selects = null;
+    protected $selects;
 
     /**
      * @var array
      */
     protected $permissions = [];
+
+    /**
+     * @var CorePermissions
+     */
+    protected $security;
+
+    /**
+     * @var EntityManager
+     */
+    protected $entityManager;
+
+    public function __construct(
+        CorePermissions $security,
+        EntityManager $entityManager
+    ) {
+        $this->security      = $security;
+        $this->entityManager = $entityManager;
+    }
 
     /**
      * @return array
@@ -47,13 +64,10 @@ abstract class CommonStatsSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param StatsEvent $event
-     */
     public function onStatsFetch(StatsEvent $event)
     {
         /** @var CommonRepository $repository */
-        foreach ($this->repositories as $repoName => $repository) {
+        foreach ($this->repositories as $repository) {
             $table = $repository->getTableName();
 
             if (!$event->isLookingForTable($table, $repository)) {
@@ -62,7 +76,6 @@ abstract class CommonStatsSubscriber extends CommonSubscriber
 
             $permissions  = (isset($this->permissions[$table])) ? $this->permissions[$table] : [];
             $allowedJoins = [];
-            $canLoad      = false;
 
             foreach ($permissions as $tableAlias => $permBase) {
                 // It's an admin, don't check any further
@@ -111,29 +124,18 @@ abstract class CommonStatsSubscriber extends CommonSubscriber
     /**
      * Restrict stats based on contact permissions.
      *
-     * @param EntityManager $em
-     * @param               $repoNames
-     *
      * @return $this
      */
-    protected function addContactRestrictedRepositories(EntityManager $em, $repoNames)
+    protected function addContactRestrictedRepositories(array $repoNames)
     {
-        return $this->addRestrictedRepostories($em, $repoNames, ['lead' => 'lead:leads']);
+        return $this->addRestrictedRepostories($repoNames, ['lead' => 'lead:leads']);
     }
 
-    /**
-     * @param EntityManager $em
-     * @param               $repoNames
-     * @param array         $permissions
-     */
-    protected function addRestrictedRepostories(EntityManager $em, $repoNames, array $permissions)
+    protected function addRestrictedRepostories(array $repoNames, array $permissions)
     {
-        if (!is_array($repoNames)) {
-            $repoNames = [$repoNames];
-        }
-
         foreach ($repoNames as $repoName) {
-            $this->repositories[]      = $repo      = $em->getRepository($repoName);
+            $repo                      = $this->entityManager->getRepository($repoName);
+            $this->repositories[]      = $repo;
             $table                     = $repo->getTableName();
             $this->permissions[$table] = $permissions;
         }

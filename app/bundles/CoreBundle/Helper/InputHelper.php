@@ -13,9 +13,6 @@ namespace Mautic\CoreBundle\Helper;
 
 use Joomla\Filter\InputFilter;
 
-/**
- * Class InputHelper.
- */
 class InputHelper
 {
     /**
@@ -33,7 +30,7 @@ class InputHelper
     private static $htmlFilter;
 
     /**
-     * @var
+     * @var InputFilter
      */
     private static $strictHtmlFilter;
 
@@ -142,7 +139,7 @@ class InputHelper
 
                 if (is_array($v)) {
                     $v = self::_($v, $useMask, $urldecode);
-                } elseif ($useMask == 'filter') {
+                } elseif ('filter' == $useMask) {
                     $v = self::getFilter()->clean($v, $useMask);
                 } else {
                     $v = self::$useMask($v, $urldecode);
@@ -440,7 +437,16 @@ class InputHelper
             // Special handling for HTML comments
             $value = str_replace(['<!-->', '<!--', '-->'], ['<mcomment></mcomment>', '<mcomment>', '</mcomment>'], $value, $commentCount);
 
+            // detect if there is any unicode character in the passed string
+            $hasUnicode = strlen($value) != strlen(utf8_decode($value));
+
+            // Encode the incoming value before cleaning, it convert unicode to encoded strings
+            $value = $hasUnicode ? rawurlencode($value) : $value;
+
             $value = self::getFilter(true)->clean($value, 'html');
+
+            // After cleaning encode the value
+            $value = $hasUnicode ? rawurldecode($value) : $value;
 
             // Was a doctype found?
             if ($doctypeFound) {
@@ -516,6 +522,6 @@ class InputHelper
             return $trans->transliterate($value);
         }
 
-        return \URLify::transliterate($value);
+        return \URLify::transliterate((string) $value);
     }
 }

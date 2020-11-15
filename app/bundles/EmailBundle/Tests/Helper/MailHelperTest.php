@@ -16,6 +16,8 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
+use Mautic\EmailBundle\Swiftmailer\Spool\DelegatingSpool;
+use Mautic\EmailBundle\Swiftmailer\Transport\SpoolTransport;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
 use Mautic\EmailBundle\Tests\Helper\Transport\BcInterfaceTokenTransport;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
@@ -23,8 +25,31 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
 
-class MailHelperTest extends \PHPUnit_Framework_TestCase
+class MailHelperTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MauticFactory|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $mockFactory;
+
+    /**
+     * @var SpoolTransport
+     */
+    private $spoolTransport;
+
+    /**
+     * @var \Swift_Events_EventDispatcher
+     */
+    private $swiftEventsDispatcher;
+
+    /**
+     * @var DelegatingSpool
+     */
+    private $delegatingSpool;
+
+    /**
+     * @var array
+     */
     protected $contacts = [
         [
             'id'        => 1,
@@ -56,9 +81,15 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         ],
     ];
 
-    public function setUp()
+    protected function setUp()
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+
+        $this->mockFactory           = $this->createMock(MauticFactory::class);
+        $this->swiftEventsDispatcher = $this->createMock(\Swift_Events_EventDispatcher::class);
+        $this->delegatingSpool       = $this->createMock(DelegatingSpool::class);
+
+        $this->spoolTransport = new SpoolTransport($this->swiftEventsDispatcher, $this->delegatingSpool);
     }
 
     /**
@@ -149,7 +180,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $from = $mailer->message->getFrom();
 
         $this->assertTrue(array_key_exists('override@nowhere.com', $from));
-        $this->assertTrue(count($from) === 1);
+        $this->assertTrue(1 === count($from));
 
         $mailer->reset();
         foreach ($this->contacts as $contact) {
@@ -161,7 +192,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $from = $mailer->message->getFrom();
 
         $this->assertTrue(array_key_exists('nobody@nowhere.com', $from));
-        $this->assertTrue(count($from) === 1);
+        $this->assertTrue(1 === count($from));
     }
 
     public function testBatchMode()
@@ -383,7 +414,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
 
         foreach ($addresses as $address) {
             // will throw Swift_RfcComplianceException if it will find the address invalid
-            $helper::validateEmail($address);
+            $this->assertNull($helper::validateEmail($address));
         }
     }
 
@@ -519,7 +550,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         /** @var \Swift_Mime_Headers_ParameterizedHeader[] $headers */
         $headers = $mailer->message->getHeaders()->getAll();
         foreach ($headers as $header) {
-            if (strpos($header->getFieldName(), 'X-Mautic-Test') !== false) {
+            if (false !== strpos($header->getFieldName(), 'X-Mautic-Test')) {
                 $customHeadersFounds[] = $header->getFieldName();
 
                 $this->assertEquals('test', $header->getValue());
@@ -551,9 +582,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         /** @var \Swift_Mime_Headers_ParameterizedHeader[] $headers */
         $headers = $mailer->message->getHeaders()->getAll();
         foreach ($headers as $header) {
-            if (strpos($header->getFieldName(), 'X-Mautic-Test') !== false) {
-                $this->fail('System headers were not supposed to be set');
-            }
+            $this->assertFalse(strpos($header->getFieldName(), 'X-Mautic-Test'), 'System headers were not supposed to be set');
         }
     }
 
@@ -582,7 +611,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         /** @var \Swift_Mime_Headers_ParameterizedHeader[] $headers */
         $headers = $mailer->message->getHeaders()->getAll();
         foreach ($headers as $header) {
-            if (strpos($header->getFieldName(), 'X-Mautic-Test') !== false) {
+            if (false !== strpos($header->getFieldName(), 'X-Mautic-Test')) {
                 $customHeadersFounds[] = $header->getFieldName();
 
                 $this->assertEquals('test2', $header->getValue());
@@ -703,5 +732,27 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
             ],
             $mailer->message->getTo()
         );
+    }
+
+    public function testThatTokenizationIsEnabledIfTransportSupportsTokenization()
+    {
+        $swiftMailer = new \Swift_Mailer($this->spoolTransport);
+        $this->delegatingSpool->expects($this->once())
+            ->method('isTokenizationEnabled')
+            ->willReturn(true);
+
+        $mailer = new MailHelper($this->mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $this->assertTrue($mailer->inTokenizationMode());
+    }
+
+    public function testThatTokenizationIsDisabledIfTransportDoesnotSupportTokenization()
+    {
+        $swiftMailer = new \Swift_Mailer($this->spoolTransport);
+        $this->delegatingSpool->expects($this->once())
+            ->method('isTokenizationEnabled')
+            ->willReturn(false);
+
+        $mailer = new MailHelper($this->mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $this->assertFalse($mailer->inTokenizationMode());
     }
 }

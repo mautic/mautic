@@ -22,8 +22,6 @@ class ReportRepository extends CommonRepository
     /**
      * Get a list of entities.
      *
-     * @param array $args
-     *
      * @return Paginator
      */
     public function getEntities(array $args = [])
@@ -126,9 +124,6 @@ class ReportRepository extends CommonRepository
         return 'r';
     }
 
-    /**
-     * @param $viewOther
-     */
     public function findReportsWithGraphs($ownedBy = null)
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();

@@ -188,7 +188,7 @@ $view['slots']->set(
                     <?php $step = 0; ?>
                     <?php foreach ($groups as $g): ?>
                         <?php if (!empty($fields[$g])): ?>
-                            <li class="<?php echo ($step === 0) ? 'active' : ''; ?>">
+                            <li class="<?php echo (0 === $step) ? 'active' : ''; ?>">
                                 <a href="#<?php echo $g; ?>" class="group" data-toggle="tab">
                                     <?php echo $view['translator']->trans('mautic.lead.field.group.'.$g); ?>
                                 </a>
@@ -209,7 +209,7 @@ $view['slots']->set(
                 <div class="tab-content pa-md bg-white">
                     <?php $i = 0; ?>
                     <?php foreach ($groups as $group): ?>
-                        <div class="tab-pane fade <?php echo $i == 0 ? 'in active' : ''; ?> bdr-w-0" id="<?php echo $group; ?>">
+                        <div class="tab-pane fade <?php echo 0 == $i ? 'in active' : ''; ?> bdr-w-0" id="<?php echo $group; ?>">
                             <div class="pr-md pl-md pb-md">
                                 <div class="panel shd-none mb-0">
                                     <table class="table table-bordered table-striped mb-0">
@@ -219,7 +219,7 @@ $view['slots']->set(
                                                 <td width="20%"><span class="fw-b"><?php echo $view->escape($field['label']); ?></span>
                                                 </td>
                                                 <td>
-                                                    <?php if ($group == 'core' && $field['alias'] == 'country' && !empty($flag)): ?>
+                                                    <?php if ('core' == $group && 'country' == $field['alias'] && !empty($flag)): ?>
                                                     <img class="mr-sm" src="<?php echo $flag; ?>" alt="" style="max-height: 24px;"/>
                                                     <span class="mt-1"><?php echo $view->escape($field['value']); ?>
                                                     <?php else: ?>
@@ -230,7 +230,7 @@ $view['slots']->set(
                                                                 <?php echo $field['value']; ?>
                                                             </a>
                                                         <?php else: ?>
-                                                            <?php echo $view->escape($field['value']); ?>
+                                                            <?php echo $view->escape($field['normalizedValue']); ?>
                                                         <?php endif; ?>
                                                     <?php endif; ?>
                                                 </td>
@@ -434,13 +434,13 @@ $view['slots']->set(
                 <div class="lead-avatar-panel">
                     <div class="avatar-collapser hr-expand nm">
                         <a href="javascript:void(0)"
-                            class="arrow text-muted text-center<?php echo ($avatarPanelState == 'expanded') ? '' : ' collapsed'; ?>"
+                            class="arrow text-muted text-center<?php echo ('expanded' == $avatarPanelState) ? '' : ' collapsed'; ?>"
                             data-toggle="collapse"
                             data-target="#lead-avatar-block">
                             <span class="caret"></span>
                         </a>
                     </div>
-                    <div class="collapse<?php echo ($avatarPanelState == 'expanded') ? ' in' : ''; ?>" id="lead-avatar-block">
+                    <div class="collapse<?php echo ('expanded' == $avatarPanelState) ? ' in' : ''; ?>" id="lead-avatar-block">
                         <img class="img-responsive" src="<?php echo $img; ?>" alt="<?php echo $view->escape($leadName); ?> "/>
                     </div>
                 </div>
@@ -464,35 +464,23 @@ $view['slots']->set(
                     <hr>
                 <?php endif; ?>
             </div>
-            <?php if ($doNotContact) : ?>
-                <div id="bounceLabel<?php echo $doNotContact->getId(); ?>">
-                    <div class="panel-heading text-center">
-                        <h4 class="fw-sb">
-                            <?php if (\Mautic\LeadBundle\Entity\DoNotContact::UNSUBSCRIBED == $doNotContact->getReason()): ?>
-                                <span class="label label-danger" data-toggle="tooltip" title="<?php echo $view['lead_dnc_reason']->toText($doNotContact->getReason()); ?>">
-                                <?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?>
-                            </span>
-
-                            <?php elseif (\Mautic\LeadBundle\Entity\DoNotContact::MANUAL == $doNotContact->getReason()): ?>
-                                <span class="label label-danger" data-toggle="tooltip" title="<?php echo $view['lead_dnc_reason']->toText($doNotContact->getReason()); ?>">
-                                <?php echo $view['translator']->trans('mautic.lead.do.not.contact'); ?>
-                                    <span data-toggle="tooltip" data-placement="bottom" title="<?php echo $view['translator']->trans('mautic.lead.remove_dnc_status'); ?>">
-                                    <i class="fa fa-times has-click-event" onclick="Mautic.removeBounceStatus(this, <?php echo $doNotContact->getId(); ?>);"></i>
-                                </span>
-                            </span>
-
-                            <?php elseif (\Mautic\LeadBundle\Entity\DoNotContact::BOUNCED == $doNotContact->getReason()): ?>
-                                <span class="label label-warning" data-toggle="tooltip" title="<?php echo $view->escape($doNotContact->getComments()); ?>">
-                                <?php echo $view['translator']->trans('mautic.lead.do.not.contact_bounced'); ?>
-                                    <span data-toggle="tooltip" data-placement="bottom" title="<?php echo $view['translator']->trans('mautic.lead.remove_dnc_status'); ?>">
-                                    <i class="fa fa-times has-click-event" onclick="Mautic.removeBounceStatus(this, <?php echo $doNotContact->getId(); ?>);"></i>
-                                </span>
-                            </span>
-                            <?php endif; ?>
-                        </h4>
-                    </div>
-                    <hr/>
-                </div>
+            <?php if ($doNotContact) :
+                ?>
+                <?php echo $view->render(
+                    'MauticLeadBundle:Lead:dnc_large.html.php',
+                    [
+                        'doNotContact' => $doNotContact,
+                    ]
+                ); ?>
+            <?php endif; ?>
+            <?php if ($doNotContactSms) :
+                ?>
+                <?php echo $view->render(
+                'MauticLeadBundle:Lead:dnc_large.html.php',
+                [
+                    'doNotContact' => $doNotContactSms,
+                ]
+            ); ?>
             <?php endif; ?>
             <div class="panel-heading">
                 <div class="panel-title">
@@ -514,7 +502,7 @@ $view['slots']->set(
                     <?php endif; ?>
                     <?php echo (!empty($fields['core']['address2']['value'])) ? $view->escape($fields['core']['address2']['value']).'<br>' : ''; ?>
                     <?php echo $view->escape($lead->getLocation()); ?>
-                    <?php echo isset($fields['core']['zipcode']) ? $view->escape($fields['core']['zipcode']['value']) : '' ?>
+                    <?php echo isset($fields['core']['zipcode']) ? $view->escape($fields['core']['zipcode']['value']) : ''; ?>
                     <br>
                 </address>
 
@@ -591,11 +579,11 @@ $view['slots']->set(
             <h5 class="pull-left mt-xs mr-xs">
                 <span class="label label-success">
                     <i id="company-<?php echo $company['id']; ?>" 
-                        class="fa fa-check <?php echo ($company['is_primary'] == 1) ? 'primary' : ''; ?>" 
-                        onclick="Mautic.setAsPrimaryCompany(<?php echo $company['id']?>, <?php echo $lead->getId()?>);" 
+                        class="fa fa-check <?php echo (1 == $company['is_primary']) ? 'primary' : ''; ?>" 
+                        onclick="Mautic.setAsPrimaryCompany(<?php echo $company['id']; ?>, <?php echo $lead->getId(); ?>);" 
                         title="<?php echo $view['translator']->trans('mautic.lead.company.set.primary'); ?>">
                     </i>
-                    <a href="<?php echo $view['router']->path('mautic_company_action', ['objectAction' => 'edit', 'objectId' => $company['id']]); ?>" style="color: white;">
+                    <a href="<?php echo $view['router']->path('mautic_company_action', ['objectAction' => 'view', 'objectId' => $company['id']]); ?>" style="color: white;">
                         <?php echo $view->escape($company['companyname']); ?>
                     </a>
                 </span>

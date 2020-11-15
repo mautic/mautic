@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ReportBundle\Tests\Model;
+namespace Mautic\ReportBundle\Tests\Scheduler\Model;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\ReportBundle\Entity\Report;
@@ -19,7 +19,7 @@ use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Mautic\ReportBundle\Scheduler\Exception\NoScheduleException;
 use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
 
-class SchedulerPlannerTest extends \PHPUnit_Framework_TestCase
+class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
 {
     public function testComputeSchedule()
     {

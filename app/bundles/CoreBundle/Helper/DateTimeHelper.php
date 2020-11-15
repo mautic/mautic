@@ -62,8 +62,9 @@ class DateTimeHelper
      */
     public function setDateTime($datetime = '', $fromFormat = 'Y-m-d H:i:s', $timezone = 'local')
     {
-        if ($timezone == 'local') {
-            $timezone = date_default_timezone_get();
+        $localTimezone = date_default_timezone_get();
+        if ('local' == $timezone) {
+            $timezone = $localTimezone;
         } elseif (empty($timezone)) {
             $timezone = 'UTC';
         }
@@ -72,7 +73,7 @@ class DateTimeHelper
         $this->timezone = $timezone;
 
         $this->utc   = new \DateTimeZone('UTC');
-        $this->local = new \DateTimeZone($timezone);
+        $this->local = new \DateTimeZone($localTimezone);
 
         if ($datetime instanceof \DateTimeInterface) {
             $this->datetime = $datetime;
@@ -81,7 +82,7 @@ class DateTimeHelper
         } elseif (empty($datetime)) {
             $this->datetime = new \DateTime('now', new \DateTimeZone($this->timezone));
             $this->string   = $this->datetime->format($fromFormat);
-        } elseif ($fromFormat == null) {
+        } elseif (null == $fromFormat) {
             $this->string   = $datetime;
             $this->datetime = new \DateTime($datetime, new \DateTimeZone($this->timezone));
         } else {
@@ -93,7 +94,7 @@ class DateTimeHelper
                 new \DateTimeZone($this->timezone)
             );
 
-            if ($this->datetime === false) {
+            if (false === $this->datetime) {
                 //the format does not match the string so let's attempt to fix that
                 $this->string   = date($this->format, strtotime($datetime));
                 $this->datetime = \DateTime::createFromFormat(
@@ -112,7 +113,7 @@ class DateTimeHelper
     public function toUtcString($format = null)
     {
         if ($this->datetime) {
-            $utc = ($this->timezone == 'UTC') ? $this->datetime : $this->datetime->setTimezone($this->utc);
+            $utc = ('UTC' == $this->timezone) ? $this->datetime : $this->datetime->setTimezone($this->utc);
             if (empty($format)) {
                 $format = $this->format;
             }
@@ -219,7 +220,7 @@ class DateTimeHelper
      */
     public function getDiff($compare = 'now', $format = null, $resetTime = false)
     {
-        if ($compare == 'now') {
+        if ('now' == $compare) {
             $compare = new \DateTime();
         }
 
@@ -232,7 +233,7 @@ class DateTimeHelper
 
         $interval = $compare->diff($with);
 
-        return ($format == null) ? $interval : $interval->format($format);
+        return (null == $format) ? $interval : $interval->format($format);
     }
 
     /**
@@ -342,7 +343,7 @@ class DateTimeHelper
      */
     public function getTextDate($interval = null)
     {
-        if ($interval == null) {
+        if (null == $interval) {
             $interval = $this->getDiff('now', null, true);
         }
 

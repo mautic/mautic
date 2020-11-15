@@ -66,14 +66,6 @@ mQuery( document ).ready(function() {
         });
     }
 
-    if (typeof IdleTimer != 'undefined') {
-        IdleTimer.init({
-            idleTimeout: 60000, //1 min
-            awayTimeout: 900000, //15 min
-            statusChangeUrl: mauticAjaxUrl + '?action=updateUserStatus'
-        });
-    }
-
     // Prevent backspace from activating browser back
     mQuery(document).on('keydown', function (e) {
         if (e.which === 8 && !mQuery(e.target).is("input:not([readonly]):not([type=radio]):not([type=checkbox]), textarea, [contentEditable], [contentEditable=true]")) {
@@ -605,7 +597,7 @@ var Mautic = {
 
             if (jsonString) {
                 try {
-                    var response = mQuery.parseJSON(jsonString);
+                    var response = JSON.parse(jsonString);
                     if (inDevMode) {
                         console.log(response);
                     }
@@ -776,7 +768,7 @@ var Mautic = {
      * Marks notifications as read and clears unread indicators
      */
     showNotifications: function () {
-        mQuery("#notificationsDropdown").unbind('hide.bs.dropdown');
+        mQuery("#notificationsDropdown").off('hide.bs.dropdown');
         mQuery('#notificationsDropdown').on('hidden.bs.dropdown', function () {
             if (!mQuery('#newNotificationIndicator').hasClass('hide')) {
                 mQuery('#notifications .is-unread').remove();

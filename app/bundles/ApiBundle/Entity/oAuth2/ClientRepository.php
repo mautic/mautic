@@ -21,8 +21,6 @@ use Mautic\UserBundle\Entity\User;
 class ClientRepository extends CommonRepository
 {
     /**
-     * @param User $user
-     *
      * @return array
      */
     public function getUserClients(User $user)

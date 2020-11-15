@@ -12,10 +12,11 @@
 namespace Mautic\ApiBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class ClientController.
- */
 class ClientController extends FormController
 {
     /**
@@ -23,7 +24,7 @@ class ClientController extends FormController
      *
      * @param int $page
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function indexAction($page = 1)
     {
@@ -31,20 +32,17 @@ class ClientController extends FormController
             return $this->accessDenied();
         }
 
-        //set limits
-        $limit = $this->get('session')->get('mautic.client.limit', $this->get('mautic.helper.core_parameters')->getParameter('default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
-
-        $orderBy    = $this->get('session')->get('mautic.client.orderby', 'c.name');
-        $orderByDir = $this->get('session')->get('mautic.client.orderbydir', 'ASC');
-        $filter     = $this->request->get('search', $this->get('session')->get('mautic.client.filter', ''));
-        $apiMode    = $this->factory->getRequest()->get('api_mode', $this->get('session')->get('mautic.client.filter.api_mode', 'oauth1a'));
+        /** @var PageHelperFactoryInterface $pageHelperFacotry */
+        $pageHelperFacotry = $this->get('mautic.page.helper.factory');
+        $pageHelper        = $pageHelperFacotry->make('mautic.client', $page);
+        $limit             = $pageHelper->getLimit();
+        $start             = $pageHelper->getStart();
+        $orderBy           = $this->get('session')->get('mautic.client.orderby', 'c.name');
+        $orderByDir        = $this->get('session')->get('mautic.client.orderbydir', 'ASC');
+        $filter            = $this->request->get('search', $this->get('session')->get('mautic.client.filter', ''));
+        $apiMode           = $this->factory->getRequest()->get('api_mode', $this->get('session')->get('mautic.client.filter.api_mode', 'oauth1a'));
         $this->get('session')->set('mautic.client.filter.api_mode', $apiMode);
         $this->get('session')->set('mautic.client.filter', $filter);
-        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         $clients = $this->getModel('api.client')->getEntities(
             [
@@ -58,10 +56,9 @@ class ClientController extends FormController
 
         $count = count($clients);
         if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
-            $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
-            $this->get('session')->set('mautic.client.page', $lastPage);
+            $lastPage  = $pageHelper->countPage($count);
             $returnUrl = $this->generateUrl('mautic_client_index', ['page' => $lastPage]);
+            $pageHelper->rememberPage($lastPage);
 
             return $this->postActionRedirect(
                 [
@@ -76,15 +73,7 @@ class ClientController extends FormController
             );
         }
 
-        //set what page currently on so that we can return here after form submission/cancellation
-        $this->get('session')->set('mautic.client.page', $page);
-
-        //set some permissions
-        $permissions = [
-            'create' => $this->get('mautic.security')->isGranted('api:clients:create'),
-            'edit'   => $this->get('mautic.security')->isGranted('api:clients:editother'),
-            'delete' => $this->get('mautic.security')->isGranted('api:clients:deleteother'),
-        ];
+        $pageHelper->rememberPage($page);
 
         // filters
         $filters = [];
@@ -98,19 +87,21 @@ class ClientController extends FormController
             'options' => $apiOptions,
         ];
 
-        $parameters = [
-            'items'       => $clients,
-            'page'        => $page,
-            'limit'       => $limit,
-            'permissions' => $permissions,
-            'tmpl'        => $tmpl,
-            'searchValue' => $filter,
-            'filters'     => $filters,
-        ];
-
         return $this->delegateView(
             [
-                'viewParameters'  => $parameters,
+                'viewParameters'  => [
+                    'items'       => $clients,
+                    'page'        => $page,
+                    'limit'       => $limit,
+                    'permissions' => [
+                        'create' => $this->get('mautic.security')->isGranted('api:clients:create'),
+                        'edit'   => $this->get('mautic.security')->isGranted('api:clients:editother'),
+                        'delete' => $this->get('mautic.security')->isGranted('api:clients:deleteother'),
+                    ],
+                    'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+                    'searchValue' => $filter,
+                    'filters'     => $filters,
+                ],
                 'contentTemplate' => 'MauticApiBundle:Client:list.html.php',
                 'passthroughVars' => [
                     'route'         => $this->generateUrl('mautic_client_index', ['page' => $page]),
@@ -121,11 +112,11 @@ class ClientController extends FormController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function authorizedClientsAction()
     {
-        $me      = $this->get('security.context')->getToken()->getUser();
+        $me      = $this->get('security.token_storage')->getToken()->getUser();
         $clients = $this->getModel('api.client')->getUserClients($me);
 
         return $this->render('MauticApiBundle:Client:authorized.html.php', ['clients' => $clients]);
@@ -134,20 +125,20 @@ class ClientController extends FormController
     /**
      * @param int $clientId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function revokeAction($clientId)
     {
         $success = 0;
         $flashes = [];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             /** @var \Mautic\ApiBundle\Model\ClientModel $model */
             $model = $this->getModel('api.client');
 
             $client = $model->getEntity($clientId);
 
-            if ($client === null) {
+            if (null === $client) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.api.client.error.notfound',
@@ -183,7 +174,7 @@ class ClientController extends FormController
     /**
      * @param mixed $objectId
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return array|JsonResponse|RedirectResponse|Response
      */
     public function newAction($objectId = 0)
     {
@@ -191,7 +182,7 @@ class ClientController extends FormController
             return $this->accessDenied();
         }
 
-        $apiMode = ($objectId === 0) ? $this->get('session')->get('mautic.client.filter.api_mode', 'oauth1a') : $objectId;
+        $apiMode = (0 === $objectId) ? $this->get('session')->get('mautic.client.filter.api_mode', 'oauth1a') : $objectId;
         $this->get('session')->set('mautic.client.filter.api_mode', $apiMode);
 
         /** @var \Mautic\ApiBundle\Model\ClientModel $model */
@@ -216,7 +207,7 @@ class ClientController extends FormController
         $form->remove('consumerSecret');
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -278,7 +269,7 @@ class ClientController extends FormController
      * @param int  $objectId
      * @param bool $ignorePost
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function editAction($objectId, $ignorePost = false)
     {
@@ -301,7 +292,7 @@ class ClientController extends FormController
         ];
 
         //client not found
-        if ($client === null) {
+        if (null === $client) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -328,7 +319,7 @@ class ClientController extends FormController
         $form->remove('api_mode');
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && 'POST' == $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
@@ -384,7 +375,7 @@ class ClientController extends FormController
      *
      * @param int $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function deleteAction($objectId)
     {
@@ -406,11 +397,11 @@ class ClientController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             /** @var \Mautic\ApiBundle\Model\ClientModel $model */
             $model  = $this->getModel('api.client');
             $entity = $model->getEntity($objectId);
-            if ($entity === null) {
+            if (null === $entity) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.api.client.error.notfound',

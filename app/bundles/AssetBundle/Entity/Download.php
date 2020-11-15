@@ -75,9 +75,6 @@ class Download
      */
     private $email;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -88,10 +85,7 @@ class Download
             ->addIndex(['source', 'source_id'], 'download_source_search')
             ->addIndex(['date_download'], 'asset_date_download');
 
-        $builder->createField('id', 'integer')
-            ->isPrimaryKey()
-            ->generatedValue()
-            ->build();
+        $builder->addBigIntIdField();
 
         $builder->createField('dateDownload', 'datetime')
             ->columnName('date_download')
@@ -237,8 +231,6 @@ class Download
 
     /**
      * Set ipAddress.
-     *
-     * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
      *
      * @return Download
      */

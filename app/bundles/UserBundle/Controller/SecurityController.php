@@ -52,7 +52,7 @@ class SecurityController extends CommonController
         // the cache is cleared by upgrade.php
         if ($this->request->cookies->has('mautic_update')) {
             $step = $this->request->cookies->get('mautic_update');
-            if ($step == 'clearCache') {
+            if ('clearCache' == $step) {
                 // Run migrations
                 $this->request->query->set('finalize', 1);
 
@@ -61,7 +61,7 @@ class SecurityController extends CommonController
                         'request' => $this->request,
                     ]
                 );
-            } elseif ($step == 'schemaMigration') {
+            } elseif ('schemaMigration' == $step) {
                 // Done so finalize
                 return $this->forward('MauticCoreBundle:Ajax:updateFinalization',
                     [

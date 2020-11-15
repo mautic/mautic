@@ -17,8 +17,6 @@ class ConfigAccessor
 
     /**
      * ConfigAccessor constructor.
-     *
-     * @param array $config
      */
     public function __construct(array $config)
     {
