@@ -16,9 +16,6 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class Field.
- */
 class Field
 {
     /**
@@ -87,6 +84,11 @@ class Field
     private $properties = [];
 
     /**
+     * @var array
+     */
+    private $validation = [];
+
+    /**
      * @var Form
      */
     private $form;
@@ -126,9 +128,6 @@ class Field
      */
     private $changes;
 
-    /**
-     * @var
-     */
     private $sessionId;
 
     /**
@@ -150,9 +149,6 @@ class Field
         $this->form = null;
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -211,6 +207,10 @@ class Field
             ->nullable()
             ->build();
 
+        $builder->createField('validation', 'json_array')
+            ->nullable()
+            ->build();
+
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('fields')
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
@@ -254,6 +254,7 @@ class Field
                     'helpMessage',
                     'order',
                     'properties',
+                    'validation',
                     'labelAttributes',
                     'inputAttributes',
                     'containerAttributes',
@@ -480,6 +481,31 @@ class Field
     }
 
     /**
+     * Set validation.
+     *
+     * @param array $validation
+     *
+     * @return Field
+     */
+    public function setValidation($validation)
+    {
+        $this->isChanged('validation', $validation);
+        $this->validation = $validation;
+
+        return $this;
+    }
+
+    /**
+     * Get validation.
+     *
+     * @return array
+     */
+    public function getValidation()
+    {
+        return $this->validation;
+    }
+
+    /**
      * Set validationMessage.
      *
      * @param string $validationMessage
@@ -506,8 +532,6 @@ class Field
 
     /**
      * Set form.
-     *
-     * @param Form $form
      *
      * @return Field
      */
@@ -832,16 +856,16 @@ class Field
     public function showForContact($submissions = null, Lead $lead = null, Form $form = null)
     {
         // Always show in the kiosk mode
-        if ($form !== null && $form->getInKioskMode() === true) {
+        if (null !== $form && true === $form->getInKioskMode()) {
             return true;
         }
 
-        // Hide the field if there is the submission count limit and hide it untill the limit is overcame
+        // Hide the field if there is the submission count limit and hide it until the limit is overcame
         if ($this->showAfterXSubmissions > 0 && $this->showAfterXSubmissions > count($submissions)) {
             return false;
         }
 
-        if ($this->showWhenValueExists === false) {
+        if (false === $this->showWhenValueExists) {
             // Hide the field if there is the value condition and if we already know the value for this field
             if ($submissions) {
                 foreach ($submissions as $submission) {
@@ -852,7 +876,7 @@ class Field
             }
 
             // Hide the field if the value is already known from the lead profile
-            if ($lead !== null && $this->leadField && !empty($lead->getFieldValue($this->leadField)) && !$this->isAutoFill) {
+            if (null !== $lead && $this->leadField && !empty($lead->getFieldValue($this->leadField)) && !$this->isAutoFill) {
                 return false;
             }
         }
@@ -865,7 +889,7 @@ class Field
      */
     public function isCaptchaType()
     {
-        return $this->type === 'captcha';
+        return 'captcha' === $this->type;
     }
 
     /**
@@ -873,6 +897,6 @@ class Field
      */
     public function isFileType()
     {
-        return $this->type === 'file';
+        return 'file' === $this->type;
     }
 }

@@ -110,7 +110,7 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                                             <h4 class="modal-title" id="<?php echo $k; ?>"><?php echo $view->escape($item['name']); ?></h4>
                                         </div>
                                         <div class="modal-body">
-                                            <div style="background-image: url(<?php echo $thumbnailUrl ?>);background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 600px"></div>
+                                            <div style="background-image: url(<?php echo $thumbnailUrl; ?>);background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 600px"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -125,7 +125,7 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                     <td>
                         <div>
                             <?php if (isset($item['config']['authorUrl'])) : ?>
-                                <a href="<?php echo $item['config']['authorUrl']; ?>" target="_blank">
+                                <a href="<?php echo \Mautic\CoreBundle\Helper\InputHelper::url($item['config']['authorUrl']); ?>" target="_blank">
                                     <?php echo $view->escape($item['config']['author']); ?>
                                 </a>
                             <?php elseif (isset($item['config']['author'])) : ?>

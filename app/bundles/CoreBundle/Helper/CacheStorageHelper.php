@@ -15,9 +15,6 @@ use Doctrine\DBAL\Connection;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
 
-/**
- * Class CacheStorageHelper.
- */
 class CacheStorageHelper
 {
     const ADAPTOR_DATABASE = 'db';
@@ -60,22 +57,10 @@ class CacheStorageHelper
     protected $defaultExpiration;
 
     /**
-     * Semi BC support for pre 2.6.0.
-     *
-     * @deprecated 2.6.0 to be removed in 3.0
-     *
-     * @var array
-     */
-    protected $expirations = [];
-
-    /**
-     * CacheStorageHelper constructor.
-     *
-     * @param                 $adaptor
-     * @param null            $namespace
-     * @param Connection|null $connection
-     * @param null            $cacheDir
-     * @param int             $defaultExpiration
+     * @param      $adaptor
+     * @param null $namespace
+     * @param null $cacheDir
+     * @param int  $defaultExpiration
      */
     public function __construct($adaptor, $namespace = null, Connection $connection = null, $cacheDir = null, $defaultExpiration = 0)
     {
@@ -85,20 +70,15 @@ class CacheStorageHelper
         $this->connection        = $connection;
         $this->defaultExpiration = $defaultExpiration;
 
-        // @deprecated BC support for pre 2.6.0 to be removed in 3.0
-        if (!in_array($adaptor, [self::ADAPTOR_DATABASE, self::ADAPTOR_FILESYSTEM])) {
-            if (file_exists($adaptor)) {
-                $this->cacheDir = $adaptor.'/data';
-            } else {
-                throw new \InvalidArgumentException(
-                    'cache directory either not set or does not exist; use the container\'s mautic.helper.cache_storage service.'
-                );
-            }
-
-            $this->adaptor = self::ADAPTOR_FILESYSTEM;
-        }
-
         $this->setCacheAdaptor();
+    }
+
+    /**
+     * @return string|false
+     */
+    public function getAdaptorClassName()
+    {
+        return get_class($this->cacheAdaptor);
     }
 
     /**
@@ -113,9 +93,6 @@ class CacheStorageHelper
 
         if (null !== $expiration) {
             $cacheItem->expiresAfter((int) $expiration);
-        } elseif (isset($this->expirations[$name])) {
-            // @deprecated BC support to be removed in 3.0
-            $cacheItem->expiresAfter($this->expirations[$name]);
         } elseif ($data === $cacheItem->get()) {
             // Exact same data so don't update the cache unless expiration is set
 
@@ -138,7 +115,6 @@ class CacheStorageHelper
         if (0 === $maxAge) {
             return false;
         } elseif (null !== $maxAge) {
-            $this->expirations[$name] = (int) $maxAge;
         }
 
         $cacheItem = $this->cacheAdaptor->getItem($name);
@@ -198,10 +174,6 @@ class CacheStorageHelper
         return $this->cache[$namespace];
     }
 
-    /**
-     * @param $namespace
-     * @param $defaultExpiration
-     */
     protected function setCacheAdaptor()
     {
         switch ($this->adaptor) {

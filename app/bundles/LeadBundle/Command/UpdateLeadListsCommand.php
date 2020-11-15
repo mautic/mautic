@@ -56,17 +56,21 @@ class UpdateLeadListsCommand extends ModeratedCommand
 
         if ($id) {
             $list = $listModel->getEntity($id);
-            if ($list !== null) {
-                $output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $id]).'</info>');
-                try {
-                    $processed = $listModel->rebuildListLeads($list, $batch, $max, $output);
-                } catch (QueryException $e) {
-                    $this->getContainer()->get('monolog.logger.mautic')->error('Query Builder Exception: '.$e->getMessage());
-                }
 
-                $output->writeln(
-                    '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'
-                );
+            if (null !== $list) {
+                if ($list->isPublished()) {
+                    $output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $id]).'</info>');
+                    $processed = 0;
+                    try {
+                        $processed = $listModel->rebuildListLeads($list, $batch, $max, $output);
+                    } catch (QueryException $e) {
+                        $this->getContainer()->get('monolog.logger.mautic')->error('Query Builder Exception: '.$e->getMessage());
+                    }
+
+                    $output->writeln(
+                        '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'
+                    );
+                }
             } else {
                 $output->writeln('<error>'.$translator->trans('mautic.lead.list.rebuild.not_found', ['%id%' => $id]).'</error>');
             }
@@ -77,16 +81,18 @@ class UpdateLeadListsCommand extends ModeratedCommand
                 ]
             );
 
-            while (($l = $lists->next()) !== false) {
+            while (false !== ($l = $lists->next())) {
                 // Get first item; using reset as the key will be the ID and not 0
                 $l = reset($l);
 
-                $output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $l->getId()]).'</info>');
+                if ($l->isPublished()) {
+                    $output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $l->getId()]).'</info>');
 
-                $processed = $listModel->rebuildListLeads($l, $batch, $max, $output);
-                $output->writeln(
-                    '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'."\n"
-                );
+                    $processed = $listModel->rebuildListLeads($l, $batch, $max, $output);
+                    $output->writeln(
+                        '<comment>'.$translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'."\n"
+                    );
+                }
 
                 unset($l);
             }

@@ -54,9 +54,6 @@ class Focus extends FormEntity
      */
     private $name;
 
-    /**
-     * @var
-     */
     private $category;
 
     /**
@@ -84,9 +81,6 @@ class Focus extends FormEntity
      */
     private $publishDown;
 
-    /**
-     * @var array()
-     */
     private $properties = [];
 
     /**
@@ -104,9 +98,6 @@ class Focus extends FormEntity
      */
     private $cache;
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint(
@@ -133,9 +124,13 @@ class Focus extends FormEntity
         );
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
+    public function __clone()
+    {
+        $this->id = null;
+
+        parent::__clone();
+    }
+
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -261,8 +256,6 @@ class Focus extends FormEntity
     }
 
     /**
-     * @param mixed $setHtml
-     *
      * @return Focus
      */
     public function setEditor($editor)
@@ -283,8 +276,6 @@ class Focus extends FormEntity
     }
 
     /**
-     * @param mixed $setHtml
-     *
      * @return Focus
      */
     public function setHtml($html)
@@ -305,8 +296,6 @@ class Focus extends FormEntity
     }
 
     /**
-     * @param mixed $html
-     *
      * @return Focus
      */
     public function setHtmlMode($htmlMode)

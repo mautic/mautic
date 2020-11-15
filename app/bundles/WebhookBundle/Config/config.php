@@ -52,19 +52,25 @@ return [
         'forms' => [
             'mautic.form.type.webhook' => [
                 'class'     => \Mautic\WebhookBundle\Form\Type\WebhookType::class,
-                'arguments' => 'translator',
-                'alias'     => 'webhook',
             ],
             'mautic.form.type.webhookconfig' => [
                 'class' => \Mautic\WebhookBundle\Form\Type\ConfigType::class,
-                'alias' => 'webhookconfig',
             ],
             'mautic.campaign.type.action.sendwebhook' => [
                 'class'     => \Mautic\WebhookBundle\Form\Type\CampaignEventSendWebhookType::class,
                 'arguments' => [
                     'arguments' => 'translator',
                 ],
-                'alias' => 'campaignevent_sendwebhook',
+            ],
+            'mautic.webhook.notificator.webhookkillnotificator' => [
+                'class'     => \Mautic\WebhookBundle\Notificator\WebhookKillNotificator::class,
+                'arguments' => [
+                    'translator',
+                    'router',
+                    'mautic.core.model.notification',
+                    'doctrine.orm.entity_manager',
+                    'mautic.helper.mailer',
+                ],
             ],
         ],
         'events' => [
@@ -76,18 +82,20 @@ return [
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
+                    'mautic.webhook.notificator.webhookkillnotificator',
                 ],
             ],
             'mautic.webhook.stats.subscriber' => [
                 'class'     => \Mautic\WebhookBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],
             'mautic.webhook.campaign.subscriber' => [
                 'class'     => \Mautic\WebhookBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
-                    'mautic.http.connector',
+                    'mautic.webhook.campaign.helper',
                 ],
             ],
         ],
@@ -97,14 +105,29 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'jms_serializer',
-                    'mautic.core.model.notification',
+                    'mautic.webhook.http.client',
+                    'event_dispatcher',
+                ],
+            ],
+        ],
+        'others' => [
+            'mautic.webhook.campaign.helper' => [
+                'class'     => \Mautic\WebhookBundle\Helper\CampaignHelper::class,
+                'arguments' => [
+                    'mautic.http.connector',
+                ],
+            ],
+            'mautic.webhook.http.client' => [
+                'class'     => \Mautic\WebhookBundle\Http\Client::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.guzzle.client',
                 ],
             ],
         ],
     ],
 
     'parameters' => [
-        'webhook_start'         => 0, // deprecated, should be 0 by default
         'webhook_limit'         => 10, // How many entities can be sent in one webhook
         'webhook_log_max'       => 1000, // How many recent logs to keep
         'webhook_disable_limit' => 100, // How many times the webhook response can fail until the webhook will be unpublished

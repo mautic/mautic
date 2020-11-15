@@ -23,15 +23,15 @@ $indexCount = 1;
     <?php if (count($form->vars['errors'])): ?>
         <div class="alert alert-danger">
             <?php foreach ($form->vars['errors'] as $error): ?>
-                <p><?php echo $error->getMessage() ?></p>
+                <p><?php echo $error->getMessage(); ?></p>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
     <div class="<?php echo $object; ?>-field form-group col-xs-12">
         <div class="row">
-            <?php $class = ($numberOfFields == 5) ? 5 : 6; ?>
+            <?php $class = (5 == $numberOfFields) ? 5 : 6; ?>
             <div class="mb-xs col-sm-<?php echo $class; ?> text-center"><h4><?php echo $view['translator']->trans('mautic.plugins.integration.fields'); ?></h4></div>
-            <?php if ($numberOfFields == 5): ?>
+            <?php if (5 == $numberOfFields): ?>
                 <div class="col-sm-2"></div>
             <?php endif; ?>
             <div class="mb-xs col-sm-<?php echo $class; ?> text-center"><h4><?php echo $view['translator']->trans('mautic.plugins.mautic.fields'); ?></h4></div>
@@ -40,8 +40,8 @@ $indexCount = 1;
             $selected = false;
             ?>
             <?php $isRequired = !empty($child->vars['attr']['data-required']); ?>
-            <?php if ($rowCount % $numberOfFields == 0):  ?>
-            <div id="<?php echo $object; ?>-<?php echo $rowCount; ?>" class="field-container row<?php if ($numberOfFields !== 5): echo ' pb-md'; endif; ?>">
+            <?php if (0 == $rowCount % $numberOfFields):  ?>
+            <div id="<?php echo $object; ?>-<?php echo $rowCount; ?>" class="field-container row<?php if (5 !== $numberOfFields): echo ' pb-md'; endif; ?>">
             <?php endif; ?>
             <?php ++$rowCount; ?>
             <?php
@@ -50,11 +50,11 @@ $indexCount = 1;
             else:
                 $class = '';
                 switch (true):
-                    case $rowCount % $numberOfFields == 1:
-                    case $rowCount % $numberOfFields == 3:
+                    case 1 == $rowCount % $numberOfFields:
+                    case 3 == $rowCount % $numberOfFields:
                         $class = (5 === $numberOfFields) ? 'col-sm-5' : 'col-sm-6';
                         break;
-                    case $rowCount % $numberOfFields == 2:
+                    case 2 == $rowCount % $numberOfFields:
                         $class = (5 === $numberOfFields) ? 'col-sm-2' : 'col-sm-6';
                         break;
                 endswitch;
@@ -81,8 +81,8 @@ $indexCount = 1;
                 <div class="row">
                     <div class="form-group col-xs-12 ">
                         <div class="choice-wrapper">
-                            <div class="btn-group btn-block" data-toggle="buttons">
-                                <?php $checked = $child->vars['value'] === '0'; ?>
+                            <div class="btn-group btn-block" data-toggle="buttons" <?php if ($child->vars['attr']['forceDirection']) : echo 'data-force-direction="1"'; endif; ?>>
+                                <?php $checked = '0' === $child->vars['value']; ?>
                                 <label class="btn-arrow<?php echo $indexCount; ?> btn btn-default<?php if ($checked): echo ' active'; endif; ?> <?php if ($child->vars['attr']['disabled']) : echo 'disabled'; endif; ?>">
                                     <input type="radio"
                                            id="<?php echo $child->vars['id']; ?>_0"
@@ -95,7 +95,7 @@ $indexCount = 1;
                                            <?php if ($child->vars['attr']['disabled']) : echo 'disabled'; endif; ?>>
                                     <btn class="btn-nospin fa fa-arrow-circle-left"></btn>
                                 </label>
-                                <?php $checked = $child->vars['value'] === '1'; ?>
+                                <?php $checked = '1' === $child->vars['value']; ?>
                                 <label class="btn-arrow<?php echo $indexCount; ?> btn btn-default<?php if ($checked): echo ' active'; endif; ?> <?php if ($child->vars['attr']['disabled']) :echo 'disabled'; endif; ?>">
                                     <input type="radio" id="<?php echo $child->vars['id']; ?>_1"
                                            name="<?php echo $child->vars['full_name']; ?>"
@@ -103,7 +103,7 @@ $indexCount = 1;
                                            autocomplete="false"
                                            value="1"
                                            onchange="Mautic.matchedFields(<?php echo $indexCount; ?>, '<?php echo $object; ?>', '<?php echo $integration; ?>')"
-                                           <?php if ($child->vars['value'] === '1'): ?>checked="checked"<?php endif; ?>
+                                           <?php if ('1' === $child->vars['value']): ?>checked="checked"<?php endif; ?>
                                            <?php if ($child->vars['attr']['disabled']) : echo 'disabled'; endif; ?>>
                                     <btn class="btn-nospin fa fa-arrow-circle-right"></btn>
                                 </label>
@@ -130,15 +130,15 @@ $indexCount = 1;
                     foreach ($mauticChoices as $keyLabel => $options): ?>
                     <?php if (is_array($options)) : ?>
                     <optgroup label="<?php echo $keyLabel; ?>">
-                        <?php foreach ($options as $keyValue => $o): ?>
-                        <option value="<?php echo $view->escape($keyValue); ?>" <?php if ($keyValue === $child->vars['data']): echo 'selected'; $selected = true; elseif (empty($selected) && $keyValue == '-1'): echo 'selected'; endif; ?>>
+                        <?php foreach ($options as $o => $keyValue): ?>
+                        <option value="<?php echo $view->escape($keyValue); ?>" <?php if ($keyValue === $child->vars['data']): echo 'selected'; $selected = true; elseif (empty($selected) && '-1' == $keyValue): echo 'selected'; endif; ?>>
                             <?php echo $o; ?>
                         </option>
                         <?php endforeach; ?>
 
                     </optgroup>
                     <?php else : ?>
-                    <option value="<?php echo $view->escape($keyLabel); ?>" <?php if ($keyLabel === $child->vars['data']): echo 'selected'; $selected = true; elseif (empty($selected) && $keyLabel == '-1'): echo 'selected'; endif; ?>>
+                    <option value="<?php echo $view->escape($keyLabel); ?>" <?php if ($keyLabel === $child->vars['data']): echo 'selected'; $selected = true; elseif (empty($selected) && '-1' == $keyLabel): echo 'selected'; endif; ?>>
                         <?php echo $options; ?>
                     </option>
                     <?php endif; ?>
@@ -151,7 +151,7 @@ $indexCount = 1;
 
             <?php endif; ?>
 
-            <?php if ($rowCount % $numberOfFields == 0): ?>
+            <?php if (0 == $rowCount % $numberOfFields): ?>
                 </div>
                 <?php
                 ++$indexCount;

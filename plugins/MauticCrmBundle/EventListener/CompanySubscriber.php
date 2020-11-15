@@ -11,33 +11,25 @@
 
 namespace MauticPlugin\MauticCrmBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\CompanyExport;
 use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class LeadSubscriber.
- */
-class CompanySubscriber extends CommonSubscriber
+class CompanySubscriber implements EventSubscriberInterface
 {
     /**
      * @var IntegrationHelper
      */
-    protected $integrationHelper;
+    private $integrationHelper;
 
     /**
      * @var CompanyExport
      */
-    protected $companyExport;
+    private $companyExport;
 
-    /**
-     * CampaignSubscriber constructor.
-     *
-     * @param IntegrationHelper $integrationHelper
-     */
     public function __construct(IntegrationHelper $integrationHelper, CompanyExport $companyExport)
     {
         $this->integrationHelper = $integrationHelper;
@@ -68,8 +60,7 @@ class CompanySubscriber extends CommonSubscriber
 
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
-
-        if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished()) {
+        if (false === $integrationObject || !$integrationObject->shouldImportDataToPipedrive()) {
             return;
         }
 
@@ -90,8 +81,7 @@ class CompanySubscriber extends CommonSubscriber
 
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
-
-        if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished()) {
+        if (false === $integrationObject || !$integrationObject->shouldImportDataToPipedrive()) {
             return;
         }
 

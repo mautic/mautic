@@ -70,7 +70,7 @@ class DefaultController extends FormController
         ];
 
         //not found
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -99,7 +99,7 @@ class DefaultController extends FormController
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['formName' => $event->getFormName()]);
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {

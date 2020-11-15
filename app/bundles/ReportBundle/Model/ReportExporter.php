@@ -61,8 +61,6 @@ class ReportExporter
     }
 
     /**
-     * @param ExportOption $exportOption
-     *
      * @throws FileIOException
      */
     public function processExport(ExportOption $exportOption)
@@ -74,35 +72,57 @@ class ReportExporter
     }
 
     /**
-     * @param Scheduler $scheduler
-     *
      * @throws FileIOException
      */
     private function processReport(Scheduler $scheduler)
     {
         $report = $scheduler->getReport();
-        $this->reportExportOptions->beginExport();
-        while (true) {
-            $data = $this->reportDataAdapter->getReportData($report, $this->reportExportOptions);
 
-            $this->reportFileWriter->writeReportData($scheduler, $data, $this->reportExportOptions);
+        if (!is_null($scheduler->getScheduleDate())) {
+            /** @var /DateTime $dateTo */
+            $dateTo = clone $scheduler->getScheduleDate();
+            $dateTo->setTime(0, 0, 0);
 
-            $totalResults = $data->getTotalResults();
-            unset($data);
-
-            if ($this->reportExportOptions->getNumberOfProcessedResults() >= $totalResults) {
-                break;
+            $dateFrom = clone $dateTo;
+            switch ($report->getScheduleUnit()) {
+                case 'DAILY':
+                    $dateFrom->sub(new \DateInterval('P1D'));
+                    break;
+                case 'WEEKLY':
+                    $dateFrom->sub(new \DateInterval('P7D'));
+                    break;
+                case 'MONTHLY':
+                    $dateFrom->sub(new \DateInterval('P1M'));
+                    break;
             }
 
-            $this->reportExportOptions->nextBatch();
+            $this->reportExportOptions->setDateFrom($dateFrom);
+            $this->reportExportOptions->setDateTo($dateTo->sub(new \DateInterval('PT1S')));
         }
 
-        $file = $this->reportFileWriter->getFilePath($scheduler);
+        // just published reports, but schedule continue
+        if ($report->isPublished()) {
+            $this->reportExportOptions->beginExport();
+            while (true) {
+                $data = $this->reportDataAdapter->getReportData($report, $this->reportExportOptions);
 
-        $event = new ReportScheduleSendEvent($scheduler, $file);
-        $this->eventDispatcher->dispatch(ReportEvents::REPORT_SCHEDULE_SEND, $event);
+                $this->reportFileWriter->writeReportData($scheduler, $data, $this->reportExportOptions);
 
-        $this->reportFileWriter->clear($scheduler);
+                $totalResults = $data->getTotalResults();
+                unset($data);
+
+                if ($this->reportExportOptions->getNumberOfProcessedResults() >= $totalResults) {
+                    break;
+                }
+
+                $this->reportExportOptions->nextBatch();
+            }
+
+            $file = $this->reportFileWriter->getFilePath($scheduler);
+
+            $event = new ReportScheduleSendEvent($scheduler, $file);
+            $this->eventDispatcher->dispatch(ReportEvents::REPORT_SCHEDULE_SEND, $event);
+        }
 
         $this->schedulerModel->reportWasScheduled($report);
     }

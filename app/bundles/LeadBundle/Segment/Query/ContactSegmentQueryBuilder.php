@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\Segment\Query;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
@@ -41,10 +43,6 @@ class ContactSegmentQueryBuilder
 
     /**
      * ContactSegmentQueryBuilder constructor.
-     *
-     * @param EntityManager            $entityManager
-     * @param RandomParameterName      $randomParameterName
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(EntityManager $entityManager, RandomParameterName $randomParameterName, EventDispatcherInterface $dispatcher)
     {
@@ -63,8 +61,15 @@ class ContactSegmentQueryBuilder
      */
     public function assembleContactsSegmentQueryBuilder($segmentId, $segmentFilters)
     {
+        /** @var Connection $connection */
+        $connection = $this->entityManager->getConnection();
+        if ($connection instanceof MasterSlaveConnection) {
+            // Prefer a slave connection if available.
+            $connection->connect('slave');
+        }
+
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
+        $queryBuilder = new QueryBuilder($connection);
 
         $queryBuilder->select('l.id')->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
@@ -92,16 +97,21 @@ class ContactSegmentQueryBuilder
     }
 
     /**
-     * @param QueryBuilder $qb
-     *
      * @return QueryBuilder
      *
      * @throws \Doctrine\DBAL\DBALException
      */
     public function wrapInCount(QueryBuilder $qb)
     {
+        /** @var Connection $connection */
+        $connection = $this->entityManager->getConnection();
+        if ($connection instanceof MasterSlaveConnection) {
+            // Prefer a slave connection if available.
+            $connection->connect('slave');
+        }
+
         // Add count functions to the query
-        $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
+        $queryBuilder = new QueryBuilder($connection);
 
         //  If there is any right join in the query we need to select its it
         $primary = $qb->guessPrimaryLeadContactIdColumn();
@@ -128,9 +138,8 @@ class ContactSegmentQueryBuilder
     /**
      * Restrict the query to NEW members of segment.
      *
-     * @param QueryBuilder $queryBuilder
-     * @param              $segmentId
-     * @param              $batchRestrictions
+     * @param $segmentId
+     * @param $batchRestrictions
      *
      * @return QueryBuilder
      *
@@ -145,16 +154,7 @@ class ContactSegmentQueryBuilder
         $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias, $tableAlias.'.lead_id = l.id');
         $queryBuilder->addSelect($tableAlias.'.lead_id AS '.$tableAlias.'_lead_id');
 
-        // @todo evaluate if this was supposed to be here; it's causing contacts already in the segment to be added because the join is based on
-        // when the contact is created
-        if (false && isset($batchRestrictions['dateTime'])) {
-            $expression = $queryBuilder->expr()->andX(
-                $queryBuilder->expr()->eq($tableAlias.'.leadlist_id', $segmentId),
-                $queryBuilder->expr()->lte('l.date_added', "'".$batchRestrictions['dateTime']."'")
-            );
-        } else {
-            $expression = $queryBuilder->expr()->eq($tableAlias.'.leadlist_id', $segmentId);
-        }
+        $expression = $queryBuilder->expr()->eq($tableAlias.'.leadlist_id', $segmentId);
 
         $queryBuilder->addJoinCondition($tableAlias, $expression);
 
@@ -170,8 +170,7 @@ class ContactSegmentQueryBuilder
     }
 
     /**
-     * @param QueryBuilder $queryBuilder
-     * @param              $leadListId
+     * @param $leadListId
      *
      * @return QueryBuilder
      *
@@ -186,7 +185,6 @@ class ContactSegmentQueryBuilder
         $existsQueryBuilder
             ->select($tableAlias.'.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias)
-            ->where($tableAlias.'.lead_id = l.id')
             ->andWhere($queryBuilder->expr()->eq($tableAlias.'.leadlist_id', intval($leadListId)))
             ->andWhere(
                 $queryBuilder->expr()->orX(
@@ -196,15 +194,14 @@ class ContactSegmentQueryBuilder
             );
 
         $queryBuilder->orWhere(
-            $queryBuilder->expr()->exists($existsQueryBuilder->getSQL())
+            $queryBuilder->expr()->in('l.id', $existsQueryBuilder->getSQL())
         );
 
         return $queryBuilder;
     }
 
     /**
-     * @param QueryBuilder $queryBuilder
-     * @param              $leadListId
+     * @param $leadListId
      *
      * @return QueryBuilder
      *
@@ -225,10 +222,6 @@ class ContactSegmentQueryBuilder
         return $queryBuilder;
     }
 
-    /**
-     * @param LeadList     $segment
-     * @param QueryBuilder $queryBuilder
-     */
     public function queryBuilderGenerated(LeadList $segment, QueryBuilder $queryBuilder)
     {
         if (!$this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_QUERYBUILDER_GENERATED)) {
@@ -250,9 +243,6 @@ class ContactSegmentQueryBuilder
     }
 
     /**
-     * @param ContactSegmentFilter $filter
-     * @param QueryBuilder         $queryBuilder
-     *
      * @throws PluginHandledFilterException
      */
     private function dispatchPluginFilteringEvent(ContactSegmentFilter $filter, QueryBuilder $queryBuilder)

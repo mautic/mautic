@@ -103,7 +103,7 @@ class NotificationRepository extends CommonRepository
         /** @var Notification $result */
         $result = $qb->getQuery()->getOneOrNullResult();
 
-        return $result === null ? null : $result->getDateAdded();
+        return null === $result ? null : $result->getDateAdded();
     }
 
     /**
@@ -145,7 +145,7 @@ class NotificationRepository extends CommonRepository
         }
 
         $qb->where($expr)
-            ->orderBy('n.id');
+            ->orderBy('n.dateAdded', 'DESC');
 
         if ($limit) {
             $qb->setMaxResults($limit);

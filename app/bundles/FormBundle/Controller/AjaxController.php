@@ -21,8 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 class AjaxController extends CommonAjaxController
 {
     /**
-     * @param Request $request
-     * @param string  $name
+     * @param string $name
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -35,7 +34,7 @@ class AjaxController extends CommonAjaxController
         $sessionId   = InputHelper::clean($request->request->get('formId'));
         $sessionName = 'mautic.form.'.$sessionId.'.'.$name.'.modified';
         $session     = $this->get('session');
-        $orderName   = ($name == 'fields') ? 'mauticform' : 'mauticform_action';
+        $orderName   = ('fields' == $name) ? 'mauticform' : 'mauticform_action';
         $order       = InputHelper::clean($request->request->get($orderName));
         $components  = $session->get($sessionName);
 
@@ -49,8 +48,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function reorderActionsAction(Request $request)
@@ -59,13 +56,11 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function updateFormFieldsAction(Request $request)
     {
-        $formId     = InputHelper::int($request->request->get('formId'));
+        $formId     = (int) $request->request->get('formId');
         $dataArray  = ['success' => 0];
         $model      = $this->getModel('form');
         $entity     = $model->getEntity($formId);
@@ -73,7 +68,7 @@ class AjaxController extends CommonAjaxController
         $fields     = [];
 
         foreach ($formFields as $field) {
-            if ($field->getType() != 'button') {
+            if ('button' != $field->getType()) {
                 $properties = $field->getProperties();
                 $options    = [];
 

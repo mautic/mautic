@@ -21,6 +21,12 @@ if (typeof MauticPrefCenterLoaded === 'undefined') {
                 setLabelText(slot, 'label.label' + i, text);
             }
         }
+        // button value replace
+        text = slot.dataset['paramLinkText'];
+        if (typeof text !== "undefined") {
+            var labels = slot.querySelectorAll('.button');
+            labels[0].innerHTML = text;
+        }
     }
 
     function setLabelText(slot, querySelector, text) {
@@ -33,7 +39,7 @@ if (typeof MauticPrefCenterLoaded === 'undefined') {
 
     // Handler when the DOM is fully loaded
     var callback = function(){
-        var slots = document.querySelectorAll('div[data-slot="segmentlist"], div[data-slot="categorylist"], div[data-slot="preferredchannel"], div[data-slot="channelfrequency"]');
+        var slots = document.querySelectorAll('div[data-slot="segmentlist"], div[data-slot="categorylist"], div[data-slot="preferredchannel"], div[data-slot="channelfrequency"],div[data-slot="saveprefsbutton"]');
         for (var i = 0; i < slots.length; i++) {
             replaceSlotParams(slots[i]);
         }

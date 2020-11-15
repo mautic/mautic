@@ -14,8 +14,11 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\LeadBundle\Entity\Import;
+use Mautic\LeadBundle\Form\Type\LeadImportFieldType;
+use Mautic\LeadBundle\Form\Type\LeadImportType;
 use Mautic\LeadBundle\Helper\Progress;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -193,7 +196,7 @@ class ImportController extends FormController
                     $this->resetImport($fullPath);
                 }
 
-                $form = $this->get('form.factory')->create('lead_import', [], ['action' => $action]);
+                $form = $this->get('form.factory')->create(LeadImportType::class, [], ['action' => $action]);
                 break;
             case self::STEP_MATCH_FIELDS:
 
@@ -203,18 +206,24 @@ class ImportController extends FormController
                 $importFields  = $session->get('mautic.'.$object.'.import.importfields', []);
                 $companyFields = $fieldModel->getFieldList(false, false, ['isPublished' => true, 'object' => 'company']);
 
-                $form = $this->get('form.factory')->create(
-                    'lead_field_import',
-                    [],
-                    [
-                        'object'           => $object,
-                        'action'           => $action,
-                        'lead_fields'      => $leadFields,
-                        'company_fields'   => $companyFields,
-                        'import_fields'    => $importFields,
-                        'line_count_limit' => $this->getLineCountLimit(),
-                    ]
-                );
+                try {
+                    $form = $this->get('form.factory')->create(
+                        LeadImportFieldType::class,
+                        [],
+                        [
+                            'object'           => $object,
+                            'action'           => $action,
+                            'lead_fields'      => $leadFields,
+                            'company_fields'   => $companyFields,
+                            'import_fields'    => $importFields,
+                            'line_count_limit' => $this->getLineCountLimit(),
+                        ]
+                    );
+                } catch (LogicException $e) {
+                    $this->resetImport($fullPath);
+
+                    return $this->newAction(0, true);
+                }
 
                 break;
             case self::STEP_PROGRESS_BAR:
@@ -261,7 +270,7 @@ class ImportController extends FormController
         }
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && 'POST' == $this->request->getMethod()) {
             if (isset($form) && !$this->isFormCancelled($form)) {
                 $valid = $this->isFormValid($form);
                 switch ($step) {
@@ -277,7 +286,7 @@ class ImportController extends FormController
                                 $errorParameters = [];
                                 try {
                                     // Create the import dir recursively
-                                    $fs->mkdir($importDir, 0755);
+                                    $fs->mkdir($importDir);
 
                                     $fileData->move($importDir, $fileName);
 
@@ -290,14 +299,14 @@ class ImportController extends FormController
                                     foreach ($config as $key => &$c) {
                                         $c = htmlspecialchars_decode($c);
 
-                                        if ($key == 'batchlimit') {
+                                        if ('batchlimit' == $key) {
                                             $c = (int) $c;
                                         }
                                     }
 
                                     $session->set('mautic.'.$object.'.import.config', $config);
 
-                                    if ($file !== false) {
+                                    if (false !== $file) {
                                         // Get the headers for matching
                                         $headers = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
 
@@ -318,7 +327,7 @@ class ImportController extends FormController
                                         }
                                     }
                                 } catch (FileException $e) {
-                                    if (strpos($e->getMessage(), 'upload_max_filesize') !== false) {
+                                    if (false !== strpos($e->getMessage(), 'upload_max_filesize')) {
                                         $errorMessage    = 'mautic.lead.import.filetoolarge';
                                         $errorParameters = [
                                             '%upload_max_filesize%' => ini_get('upload_max_filesize'),
@@ -438,7 +447,7 @@ class ImportController extends FormController
             }
         }
 
-        if ($step === self::STEP_UPLOAD_CSV || $step === self::STEP_MATCH_FIELDS) {
+        if (self::STEP_UPLOAD_CSV === $step || self::STEP_MATCH_FIELDS === $step) {
             $contentTemplate = 'MauticLeadBundle:Import:new.html.php';
             $viewParameters  = ['form' => $form->createView()];
         } else {
@@ -456,7 +465,7 @@ class ImportController extends FormController
 
             return new JsonResponse(['success' => 1, 'ignore_wdt' => 1]);
         } else {
-            $activeLink = $object === 'lead' ? '#mautic_contact_index' : '#mautic_company_index';
+            $activeLink = 'lead' === $object ? '#mautic_contact_index' : '#mautic_company_index';
 
             return $this->delegateView(
                 [
@@ -468,7 +477,7 @@ class ImportController extends FormController
                         'route'         => $this->generateUrl(
                             'mautic_import_action',
                             [
-                                'object'       => $object === 'lead' ? 'contacts' : 'companies',
+                                'object'       => 'lead' === $object ? 'contacts' : 'companies',
                                 'objectAction' => 'new',
                             ]
                         ),
@@ -497,8 +506,6 @@ class ImportController extends FormController
     /**
      * Decide whether the import will be processed in client's browser.
      *
-     * @param Form $form
-     *
      * @return bool
      */
     protected function importInBrowser(Form $form)
@@ -516,13 +523,11 @@ class ImportController extends FormController
 
     protected function getLineCountLimit()
     {
-        return $this->get('mautic.helper.core_parameters')->getParameter('background_import_if_more_rows_than', 0);
+        return $this->get('mautic.helper.core_parameters')->get('background_import_if_more_rows_than', 0);
     }
 
     /**
      * Decide whether the import will be queued to be processed by the CLI command in the background.
-     *
-     * @param Form $form
      *
      * @return bool
      */
@@ -610,8 +615,7 @@ class ImportController extends FormController
     }
 
     /**
-     * @param array $args
-     * @param       $action
+     * @param $action
      *
      * @return array
      */

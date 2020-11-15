@@ -11,28 +11,21 @@
 
 namespace Mautic\FormBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event\SubmissionEvent;
+use Mautic\FormBundle\Form\Type\PointActionFormSubmitType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\PointEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class PointSubscriber.
- */
-class PointSubscriber extends CommonSubscriber
+class PointSubscriber implements EventSubscriberInterface
 {
     /**
      * @var PointModel
      */
-    protected $pointModel;
+    private $pointModel;
 
-    /**
-     * PointSubscriber constructor.
-     *
-     * @param PointModel $pointModel
-     */
     public function __construct(PointModel $pointModel)
     {
         $this->pointModel = $pointModel;
@@ -49,9 +42,6 @@ class PointSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param PointBuilderEvent $event
-     */
     public function onPointBuild(PointBuilderEvent $event)
     {
         $action = [
@@ -59,7 +49,7 @@ class PointSubscriber extends CommonSubscriber
             'label'       => 'mautic.form.point.action.submit',
             'description' => 'mautic.form.point.action.submit_descr',
             'callback'    => ['\\Mautic\\FormBundle\\Helper\\PointActionHelper', 'validateFormSubmit'],
-            'formType'    => 'pointaction_formsubmit',
+            'formType'    => PointActionFormSubmitType::class,
         ];
 
         $event->addAction('form.submit', $action);
@@ -67,8 +57,6 @@ class PointSubscriber extends CommonSubscriber
 
     /**
      * Trigger point actions for form submit.
-     *
-     * @param SubmissionEvent $event
      */
     public function onFormSubmit(SubmissionEvent $event)
     {

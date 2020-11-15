@@ -14,13 +14,11 @@ namespace Mautic\PluginBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\PluginBundle\Form\Type\IntegrationsListType;
 use Mautic\PluginBundle\PluginEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     use PushToIntegrationTrait;
 
@@ -35,15 +33,12 @@ class CampaignSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $action = [
             'label'       => 'mautic.plugin.actions.push_lead',
             'description' => 'mautic.plugin.actions.tooltip',
-            'formType'    => 'integration_list',
+            'formType'    => IntegrationsListType::class,
             'formTheme'   => 'MauticPluginBundle:FormTheme\Integration',
             'eventName'   => PluginEvents::ON_CAMPAIGN_TRIGGER_ACTION,
         ];
@@ -51,15 +46,14 @@ class CampaignSubscriber extends CommonSubscriber
         $event->addAction('plugin.leadpush', $action);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
-        $config  = $event->getConfig();
-        $lead    = $event->getLead();
-        $errors  = [];
-        $success = $this->pushToIntegration($config, $lead, $errors);
+        $config                  = $event->getConfig();
+        $config['campaignEvent'] = $event->getEvent();
+        $config['leadEventLog']  = $event->getLogEntry();
+        $lead                    = $event->getLead();
+        $errors                  = [];
+        $success                 = $this->pushToIntegration($config, $lead, $errors);
 
         if (count($errors)) {
             $log = $event->getLogEntry();

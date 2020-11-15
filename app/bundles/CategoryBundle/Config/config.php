@@ -12,6 +12,14 @@
 return [
     'routes' => [
         'main' => [
+            'mautic_category_batch_contact_set' => [
+                'path'       => '/categories/batch/contact/set',
+                'controller' => 'MauticCategoryBundle:BatchContact:exec',
+            ],
+            'mautic_category_batch_contact_view' => [
+                'path'       => '/categories/batch/contact/view',
+                'controller' => 'MauticCategoryBundle:BatchContact:index',
+            ],
             'mautic_category_index' => [
                 'path'       => '/categories/{bundle}/{page}',
                 'controller' => 'MauticCategoryBundle:Category:index',
@@ -51,11 +59,18 @@ return [
     'services' => [
         'events' => [
             'mautic.category.subscriber' => [
-                'class'     => 'Mautic\CategoryBundle\EventListener\CategorySubscriber',
+                'class'     => \Mautic\CategoryBundle\EventListener\CategorySubscriber::class,
                 'arguments' => [
                     'mautic.helper.bundle',
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
+                ],
+            ],
+            'mautic.category.button.subscriber' => [
+                'class'     => \Mautic\CategoryBundle\EventListener\ButtonSubscriber::class,
+                'arguments' => [
+                    'router',
+                    'translator',
                 ],
             ],
         ],
@@ -68,13 +83,10 @@ return [
                     'mautic.category.model.category',
                     'router',
                 ],
-                'alias' => 'category',
             ],
             'mautic.form.type.category_form' => [
-                'class'     => 'Mautic\CategoryBundle\Form\Type\CategoryType',
-                'alias'     => 'category_form',
+                'class'     => \Mautic\CategoryBundle\Form\Type\CategoryType::class,
                 'arguments' => [
-                    'translator',
                     'session',
                 ],
             ],
@@ -83,7 +95,6 @@ return [
                 'arguments' => [
                     'event_dispatcher',
                 ],
-                'alias' => 'category_bundles_form',
             ],
         ],
         'models' => [
@@ -91,6 +102,12 @@ return [
                 'class'     => 'Mautic\CategoryBundle\Model\CategoryModel',
                 'arguments' => [
                     'request_stack',
+                ],
+            ],
+            'mautic.category.model.contact.action' => [
+                'class'     => \Mautic\CategoryBundle\Model\ContactActionModel::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
                 ],
             ],
         ],

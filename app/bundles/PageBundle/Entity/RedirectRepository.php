@@ -20,8 +20,6 @@ use Mautic\EmailBundle\Entity\Email;
 class RedirectRepository extends CommonRepository
 {
     /**
-     * @param array $urls
-     *
      * @return array
      */
     public function findByUrls(array $urls)
@@ -39,7 +37,6 @@ class RedirectRepository extends CommonRepository
     }
 
     /**
-     * @param array $ids
      * @param Email $email
      *
      * @return array
@@ -52,7 +49,7 @@ class RedirectRepository extends CommonRepository
             $q->expr()->in('r.id', ':ids')
         );
 
-        if ($email === null) {
+        if (null === $email) {
             $expr->add(
                 $q->expr()->isNull('r.email')
             );
@@ -92,13 +89,11 @@ class RedirectRepository extends CommonRepository
     }
 
     /**
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param int|null  $createdByUserId
-     * @param int|null  $companyId
-     * @param int|null  $campaignId
-     * @param int|null  $segmentId
+     * @param int      $limit
+     * @param int|null $createdByUserId
+     * @param int|null $companyId
+     * @param int|null $campaignId
+     * @param int|null $segmentId
      *
      * @return array
      */
@@ -111,54 +106,78 @@ class RedirectRepository extends CommonRepository
         $campaignId = null,
         $segmentId = null
     ) {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->addSelect('pr.url')
-            ->addSelect('pr.hits')
-            ->addSelect('pr.unique_hits')
-            ->from(MAUTIC_TABLE_PREFIX.'page_redirects', 'pr')
-            ->leftJoin('pr', MAUTIC_TABLE_PREFIX.'page_hits', 'ph', 'pr.redirect_id = ph.redirect_id')
-            ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'emails', 'e', 'ph.email_id = e.id')
+            ->addSelect('count(ph.id) as hits')
+            ->addSelect('count(distinct ph.tracking_id) as unique_hits')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
+            ->join('ph', MAUTIC_TABLE_PREFIX.'page_redirects', 'pr', 'pr.id = ph.redirect_id')
+            ->join('ph', MAUTIC_TABLE_PREFIX.'email_stats', 'es', 'ph.source = "email" and ph.source_id = es.email_id and ph.lead_id = es.lead_id')
+            ->join('es', MAUTIC_TABLE_PREFIX.'emails', 'e', 'es.email_id = e.id')
             ->addSelect('e.id AS email_id')
             ->addSelect('e.name AS email_name');
 
-        if ($createdByUserId !== null) {
+        if (null !== $createdByUserId) {
             $q->andWhere('e.created_by = :userId')
                 ->setParameter('userId', $createdByUserId);
         }
 
-        $q->andWhere('pr.date_added BETWEEN :dateFrom AND :dateTo')
+        $q->andWhere('ph.date_hit BETWEEN :dateFrom AND :dateTo')
             ->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'))
             ->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
 
-        if ($companyId !== null) {
-            $q->leftJoin('ph', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'ph.lead_id = cl.lead_id')
-                ->andWhere('cl.company_id = :companyId')
-                ->setParameter('companyId', $companyId);
-        }
-
-        $q->leftJoin('ph', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 'ph.source_id = ce.id AND ph.source = "campaign.event"')
+        $q->leftJoin('es', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 'es.source = "campaign.event" and es.source_id = ce.id')
             ->leftJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'campaign', 'ce.campaign_id = campaign.id')
             ->addSelect('campaign.id AS campaign_id')
             ->addSelect('campaign.name AS campaign_name');
 
-        if ($campaignId !== null) {
+        if (null !== $campaignId) {
             $q->andWhere('ce.campaign_id = :campaignId')
                 ->setParameter('campaignId', $campaignId);
         }
 
-        $q->leftJoin('ph', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'ph.lead_id = lll.lead_id')
-            ->leftJoin('lll', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'lll.leadlist_id = ll.id')
-            ->addSelect('ll.id AS segment_id')
-            ->addSelect('ll.name AS segment_name');
+        if (!empty($companyId)) {
+            $sb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        if ($segmentId !== null) {
-            $q->andWhere('lll.leadlist_id = :segmentId')
+            $sb->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
+                ->where(
+                    $sb->expr()->andX(
+                        $sb->expr()->eq('cl.company_id', ':companyId'),
+                        $sb->expr()->eq('cl.lead_id', 'ph.lead_id')
+                    )
+                );
+
+            $q->andWhere(
+                sprintf('EXISTS (%s)', $sb->getSQL())
+            )
+                ->setParameter('companyId', $companyId);
+        }
+
+        if (null !== $segmentId) {
+            $sb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+            $sb->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
+                ->where(
+                    $sb->expr()->andX(
+                        $sb->expr()->eq('lll.leadlist_id', ':segmentId'),
+                        $sb->expr()->eq('lll.lead_id', 'ph.lead_id'),
+                        $sb->expr()->eq('lll.manually_removed', 0)
+                    )
+                );
+
+            $q->andWhere(
+                sprintf('EXISTS (%s)', $sb->getSQL())
+            )
                 ->setParameter('segmentId', $segmentId);
         }
 
+        $q->groupBy('pr.id, pr.url, e.id, e.name, campaign.id, campaign.name');
+
         $q->setMaxResults($limit);
-        $q->groupBy('pr.id');
-        $q->orderBy('pr.hits', 'DESC');
+
+        $q->orderBy('hits', 'DESC');
 
         return $q->execute()->fetchAll();
     }

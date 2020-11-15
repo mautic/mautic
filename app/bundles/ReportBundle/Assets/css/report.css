@@ -42,11 +42,11 @@
 	margin:0;
 }
 
-#report_filters > .in-group > .panel-heading {
+#report_filters > .in-group:first-child > .panel-heading {
 	display:none;
 }
 
-#report_filters > .in-group ~ .in-group {
+#report_filters > .in-group:not(:first-child) {
 	margin-top:0;
 	border-top:0;
 	border-top-left-radius: 0;
@@ -54,12 +54,12 @@
 	margin-left:20px;
 }
 
-#report_filters > .in-group ~ .in-group > .panel-heading {
+#report_filters > .in-group:not(:first-child) > .panel-heading {
 	display:block;
 	padding-left:10px;
 }
 
-#report_filters > .in-group ~ .in-group > .panel-body > .row > div {
+#report_filters > .in-group:not(:first-child) > .panel-body > .row > div {
 	padding-left:10px;
 	padding-right:10px;
 }

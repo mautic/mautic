@@ -16,9 +16,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class Event.
- */
 class Event
 {
     /**
@@ -46,9 +43,6 @@ class Event
         $this->queues = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -102,7 +96,7 @@ class Event
     }
 
     /**
-     * @return mixed
+     * @return Webhook
      */
     public function getWebhook()
     {
@@ -110,9 +104,9 @@ class Event
     }
 
     /**
-     * @param mixed $webhook
+     * @return $this
      */
-    public function setWebhook($webhook)
+    public function setWebhook(Webhook $webhook)
     {
         $this->webhook = $webhook;
 
@@ -135,5 +129,25 @@ class Event
         $this->eventType = $eventType;
 
         return $this;
+    }
+
+    /**
+     * @param ArrayCollection $queues
+     *
+     * @return self
+     */
+    public function setQueues($queues)
+    {
+        $this->queues = $queues;
+
+        return $this;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getQueues()
+    {
+        return $this->queues;
     }
 }

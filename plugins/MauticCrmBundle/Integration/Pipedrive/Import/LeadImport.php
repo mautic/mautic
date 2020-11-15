@@ -23,9 +23,6 @@ class LeadImport extends AbstractImport
 
     /**
      * LeadImport constructor.
-     *
-     * @param EntityManager $em
-     * @param LeadModel     $leadModel
      */
     public function __construct(EntityManager $em, LeadModel $leadModel, CompanyModel $companyModel)
     {
@@ -36,8 +33,6 @@ class LeadImport extends AbstractImport
     }
 
     /**
-     * @param array $data
-     *
      * @return bool
      *
      * @throws \Doctrine\ORM\ORMException
@@ -51,12 +46,12 @@ class LeadImport extends AbstractImport
         if ($integrationEntity) {
             throw new \Exception('Lead already have integration', Response::HTTP_CONFLICT);
         }
-
-        $data         = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields('person'));
+        $data         = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields(self::PERSON_ENTITY_TYPE));
         $dataToUpdate = $this->getIntegration()->populateMauticLeadData($data);
 
-        $lead = new Lead();
-
+        if (!$lead =  $this->leadModel->checkForDuplicateContact($dataToUpdate)) {
+            $lead = new Lead();
+        }
         // prevent listeners from exporting
         $lead->setEventData('pipedrive.webhook', 1);
 
@@ -65,9 +60,13 @@ class LeadImport extends AbstractImport
         if (isset($data['owner_id'])) {
             $this->addOwnerToLead($data['owner_id'], $lead);
         }
+
         $this->leadModel->saveEntity($lead);
 
-        $integrationEntity = $this->createIntegrationLeadEntity(new \DateTime(), $data['id'], $lead->getId());
+        $integrationEntity = $this->getLeadIntegrationEntity(['integrationEntityId' => $data['id']]);
+        if (!$integrationEntity) {
+            $integrationEntity = $this->createIntegrationLeadEntity(new \DateTime(), $data['id'], $lead->getId());
+        }
 
         $this->em->persist($integrationEntity);
         $this->em->flush();
@@ -81,8 +80,6 @@ class LeadImport extends AbstractImport
     }
 
     /**
-     * @param array $data
-     *
      * @return bool
      *
      * @throws \Doctrine\ORM\ORMException
@@ -98,15 +95,23 @@ class LeadImport extends AbstractImport
         }
 
         /** @var Lead $lead * */
-        $lead         = $this->em->getRepository(Lead::class)->findOneById($integrationEntity->getInternalEntityId());
+        $lead = $this->leadModel->getEntity($integrationEntity->getInternalEntityId());
 
         // prevent listeners from exporting
         $lead->setEventData('pipedrive.webhook', 1);
-        $data         = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields('person'));
 
+        $data         = $this->convertPipedriveData($data, $this->getIntegration()->getApiHelper()->getFields(self::PERSON_ENTITY_TYPE));
         $dataToUpdate = $this->getIntegration()->populateMauticLeadData($data);
 
-        $this->leadModel->setFieldValues($lead, $dataToUpdate);
+        $lastSyncDate      = $integrationEntity->getLastSyncDate();
+        $leadDateModified  = $lead->getDateModified();
+
+        if ($lastSyncDate->format('Y-m-d H:i:s') >= $data['update_time']) {
+            return false;
+        } //Do not push lead if contact was modified in Mautic, and we don't wanna mofify it
+
+        $lead->setDateModified(new \DateTime());
+        $this->leadModel->setFieldValues($lead, $dataToUpdate, true);
 
         if (!isset($data['owner_id']) && $lead->getOwner()) {
             $lead->setOwner(null);
@@ -123,7 +128,7 @@ class LeadImport extends AbstractImport
             return;
         }
 
-        if (!isset($data['org_id']) && $lead->getCompany()) {
+        if (empty($data['org_id']) && $lead->getCompany()) {
             $this->removeLeadFromCompany($lead->getCompany(), $lead);
         } elseif (isset($data['org_id'])) {
             $this->addLeadToCompany($data['org_id'], $lead);
@@ -133,8 +138,6 @@ class LeadImport extends AbstractImport
     }
 
     /**
-     * @param array $data
-     *
      * @throws \Exception
      */
     public function delete(array $data = [])
@@ -163,8 +166,7 @@ class LeadImport extends AbstractImport
     }
 
     /**
-     * @param      $integrationOwnerId
-     * @param Lead $lead
+     * @param $integrationOwnerId
      */
     private function addOwnerToLead($integrationOwnerId, Lead $lead)
     {
@@ -173,8 +175,7 @@ class LeadImport extends AbstractImport
     }
 
     /**
-     * @param      $companyName
-     * @param Lead $lead
+     * @param $companyName
      *
      * @throws \Doctrine\ORM\ORMException
      */
@@ -190,8 +191,7 @@ class LeadImport extends AbstractImport
     }
 
     /**
-     * @param      $integrationCompanyId
-     * @param Lead $lead
+     * @param $integrationCompanyId
      *
      * @throws \Doctrine\ORM\ORMException
      */

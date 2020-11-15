@@ -35,4 +35,13 @@ final class ConfigEvents
      * @var string
      */
     const CONFIG_PRE_SAVE = 'mautic.config_pre_save';
+
+    /**
+     * The mautic.config_post_save event is thrown right after config data are saved.
+     *
+     * The event listener receives a Mautic\ConfigBundle\Event\ConfigEvent instance.
+     *
+     * @var string
+     */
+    const CONFIG_POST_SAVE = 'mautic.config_post_save';
 }

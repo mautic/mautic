@@ -6,7 +6,8 @@ use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
 /**
- * Class PageControllerTest.
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
  */
 class PageControllerTest extends MauticMysqlTestCase
 {
@@ -14,15 +15,16 @@ class PageControllerTest extends MauticMysqlTestCase
      * @var Connection
      */
     private $db;
+
     /**
-     * @var
+     * @var string
      */
     private $prefix;
 
     /**
      * @throws \Exception
      */
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
         $this->db     = $this->container->get('doctrine.dbal.default_connection');
@@ -56,10 +58,11 @@ class PageControllerTest extends MauticMysqlTestCase
         $leadIdsBeforeTest = array_column($leadsBeforeTest, 'id');
         $this->client->request('GET', '/page-page-landingPageTracking');
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
-        $newLeads = $this->db->fetchAll('
-          SELECT `id`
-          FROM `'.$this->prefix.'leads`
-          WHERE `id` NOT IN (:leadIds);', ['leadIds' => $leadIdsBeforeTest]);
+        $sql = 'SELECT `id` FROM `'.$this->prefix.'leads`';
+        if (!empty($leadIdsBeforeTest)) {
+            $sql .= ' WHERE `id` NOT IN ('.implode(',', $leadIdsBeforeTest).');';
+        }
+        $newLeads = $this->db->fetchAll($sql);
         $this->assertCount(1, $newLeads);
         $leadId        = reset($newLeads)['id'];
         $leadEventLogs = $this->db->fetchAll('
@@ -93,10 +96,11 @@ class PageControllerTest extends MauticMysqlTestCase
         $leadIdsBeforeTest = array_column($leadsBeforeTest, 'id');
         $this->client->request('GET', '/page-page-landingPageTrackingSecondVisit');
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
-        $newLeadsAfterFirstVisit = $this->db->fetchAll('
-          SELECT `id`
-          FROM `'.$this->prefix.'leads`
-          WHERE `id` NOT IN (:leadIds);', ['leadIds' => $leadIdsBeforeTest]);
+        $sql = 'SELECT `id` FROM `'.$this->prefix.'leads`';
+        if (!empty($leadIdsBeforeTest)) {
+            $sql .= ' WHERE `id` NOT IN ('.implode(',', $leadIdsBeforeTest).');';
+        }
+        $newLeadsAfterFirstVisit = $this->db->fetchAll($sql);
         $this->assertCount(1, $newLeadsAfterFirstVisit);
         $leadId                   = reset($newLeadsAfterFirstVisit)['id'];
         $eventLogsAfterFirstVisit = $this->db->fetchAll('

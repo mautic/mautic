@@ -14,7 +14,7 @@ namespace Mautic\CampaignBundle\Tests\EventCollector\Builder;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\EventCollector\Builder\ConnectionBuilder;
 
-class ConnectionBuilderTest extends \PHPUnit_Framework_TestCase
+class ConnectionBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testArrayIsBuiltAsItsUsedInJsPlumb()
     {

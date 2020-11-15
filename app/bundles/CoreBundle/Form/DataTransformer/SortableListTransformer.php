@@ -14,16 +14,8 @@ namespace Mautic\CoreBundle\Form\DataTransformer;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Symfony\Component\Form\DataTransformerInterface;
 
-/**
- * Class SortableListTransformer.
- */
 class SortableListTransformer implements DataTransformerInterface
 {
-    /**
-     * @var bool
-     */
-    private $removeEmpty = true;
-
     /**
      * @var bool
      */
@@ -35,22 +27,16 @@ class SortableListTransformer implements DataTransformerInterface
     private $useKeyValuePairs = false;
 
     /**
-     * SortableListTransformer constructor.
-     *
-     * @param bool $removeEmpty
      * @param bool $withLabels
      * @param bool $atRootLevel
      */
-    public function __construct($removeEmpty = true, $withLabels = true, $useKeyValuePairs = false)
+    public function __construct($withLabels = true, $useKeyValuePairs = false)
     {
-        $this->removeEmpty      = $removeEmpty;
         $this->withLabels       = $withLabels;
         $this->useKeyValuePairs = $useKeyValuePairs;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array
      */
     public function transform($array)
@@ -63,8 +49,6 @@ class SortableListTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array
      */
     public function reverseTransform($array)
@@ -78,16 +62,14 @@ class SortableListTransformer implements DataTransformerInterface
 
     /**
      * @param $array
-     *
-     * @return mixed
      */
     private function formatList($array)
     {
-        if ($array === null || !isset($array['list'])) {
+        if (null === $array || !isset($array['list'])) {
             return ['list' => []];
         }
 
-        $array['list'] = AbstractFormFieldHelper::parseList($array['list'], $this->removeEmpty);
+        $array['list'] = AbstractFormFieldHelper::parseList($array['list']);
 
         if (!$this->withLabels) {
             $array['list'] = array_keys($array['list']);
@@ -106,7 +88,7 @@ class SortableListTransformer implements DataTransformerInterface
      */
     private function transformKeyValuePair($array)
     {
-        if ($array === null) {
+        if (null === $array) {
             return ['list' => []];
         }
 
@@ -129,7 +111,7 @@ class SortableListTransformer implements DataTransformerInterface
      */
     private function reverseTransformKeyValuePair($array)
     {
-        if ($array === null || !isset($array['list'])) {
+        if (null === $array || !isset($array['list'])) {
             return [];
         }
 

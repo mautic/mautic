@@ -12,8 +12,16 @@
 namespace Mautic\CampaignBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\CoreBundle\Form\Type\ButtonGroupType;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\PropertiesTrait;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -24,17 +32,13 @@ class EventType extends AbstractType
 {
     use PropertiesTrait;
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $masks = [];
 
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.name',
                 'label_attr' => ['class' => 'control-label'],
@@ -45,7 +49,7 @@ class EventType extends AbstractType
 
         $builder->add(
             'anchor',
-            'hidden',
+            HiddenType::class,
             [
                 'label' => false,
             ]
@@ -76,29 +80,29 @@ class EventType extends AbstractType
             $triggerMode = (empty($options['data']['triggerMode'])) ? $default : $options['data']['triggerMode'];
             $builder->add(
                 'triggerMode',
-                'button_group',
+                ButtonGroupType::class,
                 [
-                    'choices'     => $choices,
-                    'expanded'    => true,
-                    'multiple'    => false,
-                    'label_attr'  => ['class' => 'control-label'],
-                    'label'       => $label,
-                    'empty_value' => false,
-                    'required'    => false,
-                    'attr'        => [
+                    'choices'           => array_flip($choices),
+                    'expanded'          => true,
+                    'multiple'          => false,
+                    'label_attr'        => ['class' => 'control-label'],
+                    'label'             => $label,
+                    'placeholder'       => false,
+                    'required'          => false,
+                    'attr'              => [
                         'onchange' => 'Mautic.campaignToggleTimeframes();',
                         'tooltip'  => 'mautic.campaign.form.type.help',
                     ],
-                    'data' => $triggerMode,
+                    'data'        => $triggerMode,
                 ]
             );
 
             $builder->add(
                 'triggerDate',
-                'datetime',
+                DateTimeType::class,
                 [
-                    'label' => false,
-                    'attr'  => [
+                    'label'  => false,
+                    'attr'   => [
                         'class'       => 'form-control',
                         'preaddon'    => 'fa fa-calendar',
                         'data-toggle' => 'datetime',
@@ -108,42 +112,116 @@ class EventType extends AbstractType
                 ]
             );
 
-            $data = (empty($options['data']['triggerInterval'])) ? 1 : $options['data']['triggerInterval'];
+            $data = (!isset($options['data']['triggerInterval']) || '' === $options['data']['triggerInterval']
+                || null === $options['data']['triggerInterval']) ? 1 : (int) $options['data']['triggerInterval'];
             $builder->add(
                 'triggerInterval',
-                'number',
+                NumberType::class,
                 [
                     'label' => false,
                     'attr'  => [
                         'class'    => 'form-control',
                         'preaddon' => 'symbol-hashtag',
                     ],
-                    'data' => $data,
+                    'data'  => $data,
                 ]
             );
 
             $data = (!empty($options['data']['triggerIntervalUnit'])) ? $options['data']['triggerIntervalUnit'] : 'd';
-
             $builder->add(
                 'triggerIntervalUnit',
-                'choice',
+                ChoiceType::class,
                 [
-                    'choices' => [
-                        'i' => 'mautic.campaign.event.intervalunit.choice.i',
-                        'h' => 'mautic.campaign.event.intervalunit.choice.h',
-                        'd' => 'mautic.campaign.event.intervalunit.choice.d',
-                        'm' => 'mautic.campaign.event.intervalunit.choice.m',
-                        'y' => 'mautic.campaign.event.intervalunit.choice.y',
+                    'choices'     => [
+                        'mautic.campaign.event.intervalunit.choice.i' => 'i',
+                        'mautic.campaign.event.intervalunit.choice.h' => 'h',
+                        'mautic.campaign.event.intervalunit.choice.d' => 'd',
+                        'mautic.campaign.event.intervalunit.choice.m' => 'm',
+                        'mautic.campaign.event.intervalunit.choice.y' => 'y',
                     ],
-                    'multiple'   => false,
-                    'label_attr' => ['class' => 'control-label'],
-                    'label'      => false,
-                    'attr'       => [
+                    'multiple'          => false,
+                    'label_attr'        => ['class' => 'control-label'],
+                    'label'             => false,
+                    'attr'              => [
                         'class' => 'form-control',
                     ],
-                    'empty_value' => false,
+                    'placeholder' => false,
                     'required'    => false,
                     'data'        => $data,
+                ]
+            );
+
+            // I could not get Doctrine TimeType does not play well with Symfony TimeType so hacking this workaround
+            $data = $this->getTimeValue($options['data'], 'triggerHour');
+            $builder->add(
+                'triggerHour',
+                TextType::class,
+                [
+                    'label' => false,
+                    'attr'  => [
+                        'class'        => 'form-control',
+                        'data-toggle'  => 'time',
+                        'data-format'  => 'H:i',
+                        'autocomplete' => 'off',
+                    ],
+                    'data'  => ($data) ? $data->format('H:i') : $data,
+                ]
+            );
+
+            $data = $this->getTimeValue($options['data'], 'triggerRestrictedStartHour');
+            $builder->add(
+                'triggerRestrictedStartHour',
+                TextType::class,
+                [
+                    'label' => false,
+                    'attr'  => [
+                        'class'        => 'form-control',
+                        'data-toggle'  => 'time',
+                        'data-format'  => 'H:i',
+                        'autocomplete' => 'off',
+                    ],
+                    'data'  => ($data) ? $data->format('H:i') : $data,
+                ]
+            );
+
+            $data = $this->getTimeValue($options['data'], 'triggerRestrictedStopHour');
+            $builder->add(
+                'triggerRestrictedStopHour',
+                TextType::class,
+                [
+                    'label' => false,
+                    'attr'  => [
+                        'class'        => 'form-control',
+                        'data-toggle'  => 'time',
+                        'data-format'  => 'H:i',
+                        'autocomplete' => 'off',
+                    ],
+                    'data'  => ($data) ? $data->format('H:i') : $data,
+                ]
+            );
+
+            $builder->add(
+                'triggerRestrictedDaysOfWeek',
+                ChoiceType::class,
+                [
+                    'label'    => true,
+                    'attr'     => [
+                        'data-toggle' => 'time',
+                        'data-format' => 'H:i',
+                    ],
+                    'choices'  => [
+                        'mautic.report.schedule.day.monday'     => 1,
+                        'mautic.report.schedule.day.tuesday'    => 2,
+                        'mautic.report.schedule.day.wednesday'  => 3,
+                        'mautic.report.schedule.day.thursday'   => 4,
+                        'mautic.report.schedule.day.friday'     => 5,
+                        'mautic.report.schedule.day.saturday'   => 6,
+                        'mautic.report.schedule.day.sunday'     => 0,
+                        'mautic.report.schedule.day.week_days'  => -1,
+                    ],
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'required'          => false,
                 ]
             );
         }
@@ -152,11 +230,11 @@ class EventType extends AbstractType
             $this->addPropertiesType($builder, $options, $masks);
         }
 
-        $builder->add('type', 'hidden');
-        $builder->add('eventType', 'hidden');
+        $builder->add('type', HiddenType::class);
+        $builder->add('eventType', HiddenType::class);
         $builder->add(
             'anchorEventType',
-            'hidden',
+            HiddenType::class,
             [
                 'mapped' => false,
                 'data'   => (isset($options['data']['anchorEventType'])) ? $options['data']['anchorEventType'] : '',
@@ -165,7 +243,7 @@ class EventType extends AbstractType
 
         $builder->add(
             'canvasSettings',
-            'campaignevent_canvassettings',
+            EventCanvasSettingsType::class,
             [
                 'label' => false,
             ]
@@ -182,7 +260,7 @@ class EventType extends AbstractType
 
         $builder->add(
             'buttons',
-            'form_buttons',
+            FormButtonsType::class,
             [
                 'save_text'       => $btnValue,
                 'save_icon'       => $btnIcon,
@@ -194,7 +272,7 @@ class EventType extends AbstractType
 
         $builder->add(
             'campaignId',
-            'hidden',
+            HiddenType::class,
             [
                 'mapped' => false,
             ]
@@ -207,18 +285,30 @@ class EventType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['settings']);
     }
 
     /**
-     * @return string
+     * @param $name
+     *
+     * @return \DateTime|mixed|null
      */
-    public function getName()
+    private function getTimeValue(array $data, $name)
+    {
+        if (empty($data[$name])) {
+            return null;
+        }
+
+        if ($data[$name] instanceof \DateTime) {
+            return $data[$name];
+        }
+
+        return new \DateTime($data[$name]);
+    }
+
+    public function getBlockPrefix()
     {
         return 'campaignevent';
     }

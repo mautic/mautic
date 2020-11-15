@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticCategoryBundle:Category:index.html.php');
 }
 ?>
@@ -156,7 +156,7 @@ if ($tmpl == 'index') {
                     'baseUrl'    => $view['router']->path(
                         'mautic_category_index',
                         [
-                            'bundle' => ($bundle == 'category') ? 'all' : $bundle,
+                            'bundle' => ('category' == $bundle) ? 'all' : $bundle,
                         ]
                     ),
                     'sessionVar' => 'category',

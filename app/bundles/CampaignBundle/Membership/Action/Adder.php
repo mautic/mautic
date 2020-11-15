@@ -34,9 +34,6 @@ class Adder
 
     /**
      * Adder constructor.
-     *
-     * @param LeadRepository         $leadRepository
-     * @param LeadEventLogRepository $leadEventLogRepository
      */
     public function __construct(LeadRepository $leadRepository, LeadEventLogRepository $leadEventLogRepository)
     {
@@ -45,13 +42,9 @@ class Adder
     }
 
     /**
-     * @param Lead     $contact
-     * @param Campaign $campaign
-     * @param          $isManualAction
+     * @param $isManualAction
      *
      * @return CampaignMember
-     *
-     * @throws ContactCannotBeAddedToCampaignException
      */
     public function createNewMembership(Lead $contact, Campaign $campaign, $isManualAction)
     {
@@ -60,11 +53,6 @@ class Adder
         // Start the new rotation at 2
         $rotation = 1;
         if ($this->leadEventLogRepository->hasBeenInCampaignRotation($contact->getId(), $campaign->getId(), 1)) {
-            if (!$campaign->allowRestart()) {
-                // This contact has already been in the campaign at some point
-                throw new ContactCannotBeAddedToCampaignException();
-            }
-
             $rotation = 2;
         }
 
@@ -80,20 +68,19 @@ class Adder
     }
 
     /**
-     * @param CampaignMember $campaignMember
-     * @param bool           $isManualAction
+     * @param bool $isManualAction
      *
      * @throws ContactCannotBeAddedToCampaignException
      */
     public function updateExistingMembership(CampaignMember $campaignMember, $isManualAction)
     {
-        if (!$campaignMember->getCampaign()->allowRestart()) {
+        $wasRemoved = $campaignMember->wasManuallyRemoved();
+        if (!($wasRemoved && $isManualAction) && !$campaignMember->getCampaign()->allowRestart()) {
             // A contact cannot restart this campaign
 
             throw new ContactCannotBeAddedToCampaignException();
         }
 
-        $wasRemoved = $campaignMember->wasManuallyRemoved();
         if ($wasRemoved && !$isManualAction && null === $campaignMember->getDateLastExited()) {
             // Prevent contacts from being added back if they were manually removed but automatically added back
 

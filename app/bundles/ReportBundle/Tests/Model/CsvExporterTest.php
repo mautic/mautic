@@ -11,7 +11,7 @@
 
 namespace Mautic\ReportBundle\Tests\Model;
 
-use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
@@ -19,31 +19,25 @@ use Mautic\ReportBundle\Model\CsvExporter;
 use Mautic\ReportBundle\Tests\Fixtures;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class CsvExporterTest extends \PHPUnit_Framework_TestCase
+class CsvExporterTest extends \PHPUnit\Framework\TestCase
 {
     public function testExport()
     {
-        $appVersion = $this->getMockBuilder(AppVersion::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $dateHelperMock = $this->getMockBuilder(DateHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dateHelperMock = $this->createMock(DateHelper::class);
 
         $dateHelperMock->expects($this->any())
             ->method('toFull')
             ->willReturn('2017-10-01');
 
-        $translator = $this->getMockBuilder(TranslatorInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $translator = $this->createMock(TranslatorInterface::class);
 
-        $formatterHelperMock = new FormatterHelper($appVersion, $dateHelperMock, $translator);
+        $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
+
+        $formatterHelperMock = new FormatterHelper($dateHelperMock, $translator);
 
         $reportDataResult = new ReportDataResult(Fixtures::getValidReportResult());
 
-        $csvExporter = new CsvExporter($formatterHelperMock);
+        $csvExporter = new CsvExporter($formatterHelperMock, $coreParametersHelperMock);
 
         $tmpFile = tempnam(sys_get_temp_dir(), 'mautic_csv_export_test_');
         $file    = fopen($tmpFile, 'w');

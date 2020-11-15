@@ -11,7 +11,7 @@
 
 namespace Mautic\FormBundle\Entity;
 
-use Doctrine\ORM\Query;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -179,13 +179,13 @@ class SubmissionRepository extends CommonRepository
      *
      * @param int $id
      *
-     * @return null|Submission
+     * @return Submission|null
      */
     public function getEntity($id = 0)
     {
         $entity = parent::getEntity($id);
 
-        if ($entity != null) {
+        if (null != $entity) {
             $form = $entity->getForm();
 
             //use DBAL to get entity fields
@@ -209,7 +209,7 @@ class SubmissionRepository extends CommonRepository
      */
     public function getFilterExpr(&$q, $filter, $parameterName = null)
     {
-        if ($filter['column'] == 's.date_submitted') {
+        if ('s.date_submitted' == $filter['column']) {
             $date       = (new DateTimeHelper($filter['value'], 'Y-m-d'))->toUtcString();
             $date1      = $this->generateRandomParameterName();
             $date2      = $this->generateRandomParameterName();
@@ -237,8 +237,6 @@ class SubmissionRepository extends CommonRepository
 
     /**
      * Fetch the base submission data from the database.
-     *
-     * @param array $options
      *
      * @return array
      *
@@ -290,9 +288,7 @@ class SubmissionRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
+        return $query->execute()->fetchAll();
     }
 
     /**
@@ -317,9 +313,7 @@ class SubmissionRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
+        return $query->execute()->fetchAll();
     }
 
     public function getSubmissionCountsByPage($pageId, \DateTime $fromDate = null)
@@ -337,15 +331,13 @@ class SubmissionRepository extends CommonRepository
                 ->setParameter('page', (int) $pageId);
         }
 
-        if ($fromDate != null) {
+        if (null != $fromDate) {
             $dh = new DateTimeHelper($fromDate);
             $q->andWhere($q->expr()->gte('s.date_submitted', ':date'))
                 ->setParameter('date', $dh->toUtcString());
         }
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -374,15 +366,13 @@ class SubmissionRepository extends CommonRepository
                 ->setParameter('id', (int) $emailId);
         }
 
-        if ($fromDate != null) {
+        if (null != $fromDate) {
             $dh = new DateTimeHelper($fromDate);
             $q->andWhere($q->expr()->gte('s.date_submitted', ':date'))
                 ->setParameter('date', $dh->toUtcString());
         }
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -433,17 +423,34 @@ class SubmissionRepository extends CommonRepository
     /**
      * Compare a form result value with defined value for defined lead.
      *
-     * @param int    $lead         ID
-     * @param int    $form         ID
-     * @param string $formAlias
-     * @param int    $field        alias
-     * @param string $value        to compare with
-     * @param string $operatorExpr for WHERE clause
+     * @param int         $lead         ID
+     * @param int         $form         ID
+     * @param string      $formAlias
+     * @param int         $field        alias
+     * @param string      $value        to compare with
+     * @param string      $operatorExpr for WHERE clause
+     * @param string|null $type
      *
      * @return bool
      */
-    public function compareValue($lead, $form, $formAlias, $field, $value, $operatorExpr)
+    public function compareValue($lead, $form, $formAlias, $field, $value, $operatorExpr, $type = null)
     {
+        // Modify operator
+        switch ($operatorExpr) {
+            case 'startsWith':
+                $operatorExpr    = 'like';
+                $value           = $value.'%';
+                break;
+            case 'endsWith':
+                $operatorExpr   = 'like';
+                $value          = '%'.$value;
+                break;
+            case 'contains':
+                $operatorExpr   = 'like';
+                $value          = '%'.$value.'%';
+                break;
+        }
+
         //use DBAL to get entity fields
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.id')
@@ -452,17 +459,40 @@ class SubmissionRepository extends CommonRepository
             ->where(
                 $q->expr()->andX(
                     $q->expr()->eq('s.lead_id', ':lead'),
-                    $q->expr()->eq('s.form_id', ':form'),
-                    $q->expr()->$operatorExpr('r.'.$field, ':value')
+                    $q->expr()->eq('s.form_id', ':form')
                 )
             )
             ->setParameter('lead', (int) $lead)
-            ->setParameter('form', (int) $form)
+            ->setParameter('form', (int) $form);
+
+        switch ($type) {
+            case 'boolean':
+            case 'number':
+            $q->andWhere($q->expr()->$operatorExpr('r.'.$field, $value));
+                break;
+            default:
+        $q->andWhere($q->expr()->$operatorExpr('r.'.$field, ':value'))
             ->setParameter('value', $value);
+                break;
+        }
 
         $result = $q->execute()->fetch();
 
         return !empty($result['id']);
+    }
+
+    /**
+     * @param Form $form
+     */
+    public function getSubmissionCounts($form)
+    {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->select('COUNT(fs.id) AS `total`, COUNT(DISTINCT (fs.lead_id)) AS `unique`')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs');
+        $query->where($query->expr()->eq('fs.form_id', ':id'))
+                ->setParameter('id', $form->getId());
+
+        return $query->execute()->fetch();
     }
 
     /**

@@ -333,7 +333,7 @@ class PlainTextHelper
     protected function buildlinkList($link, $display, $linkOverride = null)
     {
         $linkMethod = ($linkOverride) ? $linkOverride : $this->options['do_links'];
-        if ($linkMethod == 'none') {
+        if ('none' == $linkMethod) {
             return $display;
         }
 
@@ -346,20 +346,20 @@ class PlainTextHelper
             $url = $link;
         } else {
             $url = $this->options['base_url'];
-            if (substr($link, 0, 1) != '/') {
+            if ('/' != substr($link, 0, 1)) {
                 $url .= '/';
             }
             $url .= $link;
         }
 
-        if ($linkMethod == 'table') {
-            if (($index = array_search($url, $this->linkList)) === false) {
+        if ('table' == $linkMethod) {
+            if (false === ($index = array_search($url, $this->linkList))) {
                 $index            = count($this->linkList);
                 $this->linkList[] = $url;
             }
 
             return $display.' ['.($index + 1).']';
-        } elseif ($linkMethod == 'nextline') {
+        } elseif ('nextline' == $linkMethod) {
             return $display."\n[".$url.']';
         } else { // link_method defaults to inline
             return $display.' ['.$url.']';
@@ -411,7 +411,7 @@ class PlainTextHelper
             $level  = 0;
             $diff   = 0;
             foreach ($matches[0] as $m) {
-                if ($m[0][0] == '<' && $m[0][1] == '/') {
+                if ('<' == $m[0][0] && '/' == $m[0][1]) {
                     --$level;
                     if ($level < 0) {
                         $level = 0; // malformed HTML: go to next blockquote
@@ -444,7 +444,7 @@ class PlainTextHelper
                         unset($body);
                     }
                 } else {
-                    if ($level == 0) {
+                    if (0 == $level) {
                         $start  = $m[1];
                         $taglen = strlen($m[0]);
                     }
@@ -512,7 +512,7 @@ class PlainTextHelper
 
         // convert toupper only the text between HTML tags
         foreach ($chunks as $i => $chunk) {
-            if ($chunk[0] != '<') {
+            if ('<' != $chunk[0]) {
                 $chunks[$i] = $this->strtoupper($chunk);
             }
         }
@@ -537,9 +537,7 @@ class PlainTextHelper
             $str = strtoupper($str);
         }
 
-        $str = htmlspecialchars($str, ENT_COMPAT, self::ENCODING);
-
-        return $str;
+        return htmlspecialchars($str, ENT_COMPAT, self::ENCODING);
     }
 
     /**

@@ -15,11 +15,7 @@ use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Metadata\MetadataProcessor;
-use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class SwiftMessageService.
- */
 final class SwiftMessageService implements SwiftMessageServiceInterface
 {
     private $reservedKeys = [
@@ -34,27 +30,9 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
     ];
 
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * MomentumSwiftMessageService constructor.
-     *
-     * @param TranslatorInterface $translator
-     */
-    public function __construct(
-        TranslatorInterface $translator
-    ) {
-        $this->translator = $translator;
-    }
-
-    /**
-     * @param \Swift_Mime_Message $message
-     *
      * @return TransmissionDTO
      */
-    public function transformToTransmission(\Swift_Mime_Message $message)
+    public function transformToTransmission(\Swift_Mime_SimpleMessage $message)
     {
         $messageFrom      = $message->getFrom();
         $messageFromEmail = current(array_keys($messageFrom));
@@ -62,10 +40,11 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
         if (!empty($messageFrom[$messageFromEmail])) {
             $from->setName($messageFrom[$messageFromEmail]);
         }
-        $content = new TransmissionDTO\ContentDTO($message->getSubject(), $from);
 
+        // Process metadata before consuming subject, body, etc
         $metadataProcessor = new MetadataProcessor($message);
 
+        $content = new TransmissionDTO\ContentDTO($message->getSubject(), $from);
         if ($body = $message->getBody()) {
             $content->setHtml($body);
         }
@@ -73,7 +52,7 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
         $headers = $message->getHeaders()->getAll();
         /** @var \Swift_Mime_Header $header */
         foreach ($headers as $header) {
-            if ($header->getFieldType() == \Swift_Mime_Header::TYPE_TEXT && !in_array($header->getFieldName(), $this->reservedKeys)) {
+            if (\Swift_Mime_Header::TYPE_TEXT == $header->getFieldType() && !in_array($header->getFieldName(), $this->reservedKeys)) {
                 $content->addHeader($header->getFieldName(), $header->getFieldBodyModel());
             }
         }
@@ -112,8 +91,9 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
                 }
             }
         }
+
         $cssHeader = $message->getHeaders()->get('X-MC-InlineCSS');
-        if ($cssHeader !== null) {
+        if (null !== $cssHeader) {
             $content->setInlineCss($cssHeader);
         }
 
@@ -129,7 +109,7 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
         ];
 
         foreach ($recipientsGrouped as $group => $recipients) {
-            $isBcc = ($group === 'bcc');
+            $isBcc = ('bcc' === $group);
             foreach ($recipients as $email => $name) {
                 $addressDTO   = new TransmissionDTO\RecipientDTO\AddressDTO($email, $name, $isBcc);
                 $recipientDTO = new TransmissionDTO\RecipientDTO(

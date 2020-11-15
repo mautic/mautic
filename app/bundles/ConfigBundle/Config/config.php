@@ -49,20 +49,21 @@ return [
     'services' => [
         'events' => [
             'mautic.config.subscriber' => [
-                'class'     => 'Mautic\ConfigBundle\EventListener\ConfigSubscriber',
+                'class'     => \Mautic\ConfigBundle\EventListener\ConfigSubscriber::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
+                    'service_container',
+                    'mautic.config.config_change_logger',
                 ],
             ],
         ],
 
         'forms' => [
             'mautic.form.type.config' => [
-                'class'     => 'Mautic\ConfigBundle\Form\Type\ConfigType',
+                'class'     => \Mautic\ConfigBundle\Form\Type\ConfigType::class,
                 'arguments' => [
                     'mautic.config.form.restriction_helper',
                 ],
-                'alias' => 'config',
             ],
         ],
         'models' => [
@@ -73,10 +74,6 @@ return [
                     'mautic.helper.core_parameters',
                     'translator',
                 ],
-            ],
-            // @deprecated 2.12.0; to be removed in 3.0
-            'mautic.config.model.config' => [
-                'class' => \Mautic\ConfigBundle\Model\ConfigModel::class,
             ],
         ],
         'others' => [
@@ -92,6 +89,13 @@ return [
                     'translator',
                     '%mautic.security.restrictedConfigFields%',
                     '%mautic.security.restrictedConfigFields.displayMode%',
+                ],
+            ],
+            'mautic.config.config_change_logger' => [
+                'class'     => \Mautic\ConfigBundle\Service\ConfigChangeLogger::class,
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog',
                 ],
             ],
         ],

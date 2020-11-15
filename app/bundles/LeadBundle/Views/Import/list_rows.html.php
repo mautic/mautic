@@ -44,6 +44,7 @@
         <td class="visible-md visible-lg"><?php echo $item->getInsertedCount(); ?></td>
         <td class="visible-md visible-lg"><?php echo $item->getUpdatedCount(); ?></td>
         <td class="visible-md visible-lg"><?php echo $item->getIgnoredCount(); ?></td>
+        <td class="visible-md visible-lg"><?php echo $item->getCreatedByUser(); ?></td>
         <td class="visible-md visible-lg">
             <abbr title="<?php echo $view['date']->toFull($item->getDateAdded()); ?>">
                 <?php echo $view['date']->toText($item->getDateAdded()); ?>

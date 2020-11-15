@@ -95,6 +95,15 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
                 $queryBuilder->addLogic($queryBuilder->expr()->notExists($subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
+            case 'regexp':
+            case 'notRegexp':
+                $not        = ('notRegexp' === $filterOperator) ? ' NOT' : '';
+                $expression = $tableAlias.'.'.$filter->getField().$not.' REGEXP '.$filterParametersHolder;
+
+                $subQueryBuilder->andWhere($expression);
+
+                $queryBuilder->addLogic($queryBuilder->expr()->exists($subQueryBuilder->getSQL()), $filter->getGlue());
+                break;
             default:
                 $expression = $subQueryBuilder->expr()->$filterOperator(
                     $tableAlias.'.'.$filter->getField(),

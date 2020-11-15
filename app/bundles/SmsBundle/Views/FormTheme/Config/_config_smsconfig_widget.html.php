@@ -17,7 +17,11 @@
     <div class="panel-body">
         <div class="row">
             <div class="col-md-6">
+            <?php if (count($form['sms_transport']->vars['choices'])):?>
                 <?php echo $view['form']->row($form['sms_transport']); ?>
+            <?php else: ?>
+                <?php echo $view['translator']->trans('mautic.sms.config.smsconfig'); ?>
+            <?php endif; ?>
             </div>
         </div>
     </div>

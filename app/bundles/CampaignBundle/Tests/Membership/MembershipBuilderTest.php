@@ -18,33 +18,27 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class MembershipBuilderTest extends \PHPUnit_Framework_TestCase
+class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MembershipManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var MembershipManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $manager;
 
     /**
-     * @var LeadRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $campaignMemberRepository;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\LeadRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var \Mautic\LeadBundle\Entity\LeadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $leadRepository;
 
     /**
-     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $eventDispatcher;
-
-    /**
-     * @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $translator;
 
@@ -53,7 +47,6 @@ class MembershipBuilderTest extends \PHPUnit_Framework_TestCase
         $this->manager                  = $this->createMock(MembershipManager::class);
         $this->campaignMemberRepository = $this->createMock(LeadRepository::class);
         $this->leadRepository           = $this->createMock(\Mautic\LeadBundle\Entity\LeadRepository::class);
-        $this->eventDispatcher          = $this->createMock(EventDispatcherInterface::class);
         $this->translator               = $this->createMock(TranslatorInterface::class);
     }
 
@@ -69,6 +62,14 @@ class MembershipBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->campaignMemberRepository->expects($this->never())
             ->method('getCountsForOrphanedContactsBySegments');
+
+        $this->campaignMemberRepository->expects($this->once())
+            ->method('getCampaignContactsBySegments')
+            ->willReturn([]);
+
+        $this->campaignMemberRepository->expects($this->once())
+            ->method('getOrphanedContacts')
+            ->willReturn([]);
 
         $builder->build($campaign, $contactLimiter, 1000);
     }
@@ -103,14 +104,14 @@ class MembershipBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->campaignMemberRepository->expects($this->exactly(4))
             ->method('getCampaignContactsBySegments')
-            ->willReturnOnConsecutiveCalls([20], [21], [22]);
+            ->willReturnOnConsecutiveCalls([20], [21], [22], []);
 
         $this->manager->expects($this->exactly(3))
             ->method('addContacts');
 
         $this->campaignMemberRepository->expects($this->exactly(4))
             ->method('getOrphanedContacts')
-            ->willReturnOnConsecutiveCalls([23], [24], [25]);
+            ->willReturnOnConsecutiveCalls([23], [24], [25], []);
 
         $this->manager->expects($this->exactly(3))
             ->method('removeContacts');
@@ -131,7 +132,6 @@ class MembershipBuilderTest extends \PHPUnit_Framework_TestCase
             $this->manager,
             $this->campaignMemberRepository,
             $this->leadRepository,
-            $this->eventDispatcher,
             $this->translator
         );
     }

@@ -231,6 +231,9 @@ Mautic.processUpdate = function (container, step, state) {
                 },
                 error: function (request, textStatus, errorThrown) {
                     Mautic.processAjaxError(request, textStatus, errorThrown);
+
+                    // Try again, as exceptions can occur due to excessive caching.
+                    Mautic.processUpdate(container, step, response.updateState);
                 }
             });
             break;
@@ -264,7 +267,7 @@ Mautic.processUpdate = function (container, step, state) {
                 },
                 error: function (request, textStatus, errorThrown) {
                     // Redirect to the update/schema page in a last ditch attempt instead of just failing
-                    window.location = mauticBaseUrl + '/s/update/schema?update=1';
+                    window.location = mauticBaseUrl + 's/update/schema?update=1';
                 }
             });
             break;

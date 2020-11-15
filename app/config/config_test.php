@@ -64,7 +64,7 @@ $container->loadFromExtension('doctrine', [
                 'dbname'   => getenv('DB_NAME') ?: '%mautic.db_name%',
                 'user'     => getenv('DB_USER') ?: '%mautic.db_user%',
                 'password' => getenv('DB_PASSWD') ?: '%mautic.db_password%',
-                'charset'  => 'UTF8',
+                'charset'  => 'utf8mb4',
                 // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
                 'mapping_types' => [
                     'enum'  => 'string',
@@ -111,8 +111,10 @@ $container->loadFromExtension('monolog', [
     ],
 ]);
 
-$container->loadFromExtension('liip_functional_test', [
-    'cache_sqlite_db' => true,
+$container->loadFromExtension('liip_test_fixtures', [
+    'cache_db' => [
+        'sqlite' => 'liip_functional_test.services_database_backup.sqlite',
+    ],
 ]);
 
 // Enable api by default
@@ -130,3 +132,4 @@ if (file_exists(__DIR__.'/config_override.php')) {
 $container->setParameter('mautic.secret_key', '68c7e75470c02cba06dd543431411e0de94e04fdf2b3a2eac05957060edb66d0');
 $container->setParameter('mautic.security.disableUpdates', true);
 $container->setParameter('mautic.rss_notification_url', null);
+$container->setParameter('mautic.batch_sleep_time', 0);

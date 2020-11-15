@@ -34,6 +34,8 @@ class Event implements ChannelInterface
     const TRIGGER_MODE_INTERVAL  = 'interval';
     const TRIGGER_MODE_IMMEDIATE = 'immediate';
 
+    const CHANNEL_EMAIL = 'email';
+
     /**
      * @var int
      */
@@ -70,7 +72,7 @@ class Event implements ChannelInterface
     private $properties = [];
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $triggerDate;
 
@@ -83,6 +85,26 @@ class Event implements ChannelInterface
      * @var string
      */
     private $triggerIntervalUnit;
+
+    /**
+     * @var \DateTime|null
+     */
+    private $triggerHour;
+
+    /**
+     * @var \DateTime|null
+     */
+    private $triggerRestrictedStartHour;
+
+    /**
+     * @var \DateTime|null
+     */
+    private $triggerRestrictedStopHour;
+
+    /**
+     * @var array|null
+     */
+    private $triggerRestrictedDaysOfWeek = [];
 
     /**
      * @var string
@@ -102,7 +124,7 @@ class Event implements ChannelInterface
     /**
      * @var Event
      **/
-    private $parent = null;
+    private $parent;
 
     /**
      * @var string
@@ -127,19 +149,19 @@ class Event implements ChannelInterface
     private $contactLog = [];
 
     /**
-     * @var
+     * @var string|null
      */
     private $channel;
 
     /**
-     * @var
+     * @var int|null
      */
     private $channelId;
 
     /**
-     * @var
+     * @var array
      */
-    private $changes;
+    private $changes = [];
 
     public function __construct()
     {
@@ -158,9 +180,6 @@ class Event implements ChannelInterface
         $this->channelId = null;
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -201,6 +220,26 @@ class Event implements ChannelInterface
         $builder->createField('triggerIntervalUnit', 'string')
             ->columnName('trigger_interval_unit')
             ->length(1)
+            ->nullable()
+            ->build();
+
+        $builder->createField('triggerHour', 'time')
+            ->columnName('trigger_hour')
+            ->nullable()
+            ->build();
+
+        $builder->createField('triggerRestrictedStartHour', 'time')
+            ->columnName('trigger_restricted_start_hour')
+            ->nullable()
+            ->build();
+
+        $builder->createField('triggerRestrictedStopHour', 'time')
+            ->columnName('trigger_restricted_stop_hour')
+            ->nullable()
+            ->build();
+
+        $builder->createField('triggerRestrictedDaysOfWeek', 'array')
+            ->columnName('trigger_restricted_dow')
             ->nullable()
             ->build();
 
@@ -280,6 +319,10 @@ class Event implements ChannelInterface
                     'triggerDate',
                     'triggerInterval',
                     'triggerIntervalUnit',
+                    'triggerHour',
+                    'triggerRestrictedStartHour',
+                    'triggerRestrictedStopHour',
+                    'triggerRestrictedDaysOfWeek',
                     'triggerMode',
                     'decisionPath',
                     'channel',
@@ -312,6 +355,10 @@ class Event implements ChannelInterface
                      'triggerDate',
                      'triggerInterval',
                      'triggerIntervalUnit',
+                     'triggerHour',
+                    'triggerRestrictedStartHour',
+                    'triggerRestrictedStopHour',
+                    'triggerRestrictedDaysOfWeek',
                      'triggerMode',
                      'children',
                      'parent',
@@ -332,6 +379,10 @@ class Event implements ChannelInterface
                     'triggerDate',
                     'triggerInterval',
                     'triggerIntervalUnit',
+                    'triggerHour',
+                    'triggerRestrictedStartHour',
+                    'triggerRestrictedStopHour',
+                    'triggerRestrictedDaysOfWeek',
                     'triggerMode',
                     'decisionPath',
                     'order',
@@ -356,7 +407,7 @@ class Event implements ChannelInterface
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
-        if ($prop == 'category' || $prop == 'parent') {
+        if ('category' == $prop || 'parent' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -368,7 +419,7 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getChanges()
     {
@@ -444,8 +495,6 @@ class Event implements ChannelInterface
 
     /**
      * Set campaign.
-     *
-     * @param \Mautic\CampaignBundle\Entity\Campaign $campaign
      *
      * @return Event
      */
@@ -552,8 +601,6 @@ class Event implements ChannelInterface
     /**
      * Add log.
      *
-     * @param LeadEventLog $log
-     *
      * @return Event
      */
     public function addLog(LeadEventLog $log)
@@ -565,8 +612,6 @@ class Event implements ChannelInterface
 
     /**
      * Remove log.
-     *
-     * @param LeadEventLog $log
      */
     public function removeLog(LeadEventLog $log)
     {
@@ -581,6 +626,29 @@ class Event implements ChannelInterface
     public function getLog()
     {
         return $this->log;
+    }
+
+    /**
+     * Get log for a contact and a rotation.
+     *
+     * @param $rotation
+     *
+     * @return LeadEventLog|null
+     */
+    public function getLogByContactAndRotation(Contact $contact, $rotation)
+    {
+        $criteria = Criteria::create()
+            ->where(Criteria::expr()->eq('lead', $contact))
+            ->andWhere(Criteria::expr()->eq('rotation', $rotation))
+            ->setMaxResults(1);
+
+        $log = $this->getLog()->matching($criteria);
+
+        if (count($log)) {
+            return $log->first();
+        }
+
+        return null;
     }
 
     /**
@@ -728,6 +796,33 @@ class Event implements ChannelInterface
     }
 
     /**
+     * @return \DateTime
+     */
+    public function getTriggerHour()
+    {
+        return $this->triggerHour;
+    }
+
+    /**
+     * @param string $triggerHour
+     *
+     * @return Event
+     */
+    public function setTriggerHour($triggerHour)
+    {
+        if (empty($triggerHour)) {
+            $triggerHour = null;
+        } elseif (!$triggerHour instanceof \DateTime) {
+            $triggerHour = new \DateTime($triggerHour);
+        }
+
+        $this->isChanged('triggerHour', $triggerHour ? $triggerHour->format('H:i') : $triggerHour);
+        $this->triggerHour = $triggerHour;
+
+        return $this;
+    }
+
+    /**
      * @return mixed
      */
     public function getTriggerIntervalUnit()
@@ -759,6 +854,7 @@ class Event implements ChannelInterface
      */
     public function setEventType($eventType)
     {
+        $this->isChanged('eventType', $eventType);
         $this->eventType = $eventType;
 
         return $this;
@@ -777,6 +873,7 @@ class Event implements ChannelInterface
      */
     public function setTriggerMode($triggerMode)
     {
+        $this->isChanged('triggerMode', $triggerMode);
         $this->triggerMode = $triggerMode;
     }
 
@@ -793,6 +890,7 @@ class Event implements ChannelInterface
      */
     public function setDecisionPath($decisionPath)
     {
+        $this->isChanged('decisionPath', $decisionPath);
         $this->decisionPath = $decisionPath;
     }
 
@@ -809,6 +907,7 @@ class Event implements ChannelInterface
      */
     public function setTempId($tempId)
     {
+        $this->isChanged('tempId', $tempId);
         $this->tempId = $tempId;
     }
 
@@ -825,6 +924,7 @@ class Event implements ChannelInterface
      */
     public function setChannel($channel)
     {
+        $this->isChanged('channel', $channel);
         $this->channel = $channel;
     }
 
@@ -841,13 +941,12 @@ class Event implements ChannelInterface
      */
     public function setChannelId($channelId)
     {
+        $this->isChanged('channelId', $channelId);
         $this->channelId = (int) $channelId;
     }
 
     /**
      * Used by the API.
-     *
-     * @param Contact|null $contact
      *
      * @return LeadEventLog[]|\Doctrine\Common\Collections\Collection|static
      */
@@ -887,6 +986,93 @@ class Event implements ChannelInterface
     public function addContactLog($contactLog)
     {
         $this->contactLog[] = $contactLog;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of triggerRestrictedStartHour.
+     *
+     * @return \DateTime|null
+     */
+    public function getTriggerRestrictedStartHour()
+    {
+        return $this->triggerRestrictedStartHour;
+    }
+
+    /**
+     * Set the value of triggerRestrictedStartHour.
+     *
+     * @param \DateTime|null $triggerRestrictedStartHour
+     *
+     * @return self
+     */
+    public function setTriggerRestrictedStartHour($triggerRestrictedStartHour)
+    {
+        if (empty($triggerRestrictedStartHour)) {
+            $triggerRestrictedStartHour = null;
+        } elseif (!$triggerRestrictedStartHour instanceof \DateTime) {
+            $triggerRestrictedStartHour = new \DateTime($triggerRestrictedStartHour);
+        }
+
+        $this->isChanged('triggerRestrictedStartHour', $triggerRestrictedStartHour ? $triggerRestrictedStartHour->format('H:i') : $triggerRestrictedStartHour);
+
+        $this->triggerRestrictedStartHour = $triggerRestrictedStartHour;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of triggerRestrictedStopHour.
+     *
+     * @return \DateTime|null
+     */
+    public function getTriggerRestrictedStopHour()
+    {
+        return $this->triggerRestrictedStopHour;
+    }
+
+    /**
+     * Set the value of triggerRestrictedStopHour.
+     *
+     * @param \DateTime|null $triggerRestrictedStopHour
+     *
+     * @return self
+     */
+    public function setTriggerRestrictedStopHour($triggerRestrictedStopHour)
+    {
+        if (empty($triggerRestrictedStopHour)) {
+            $triggerRestrictedStopHour = null;
+        } elseif (!$triggerRestrictedStopHour instanceof \DateTime) {
+            $triggerRestrictedStopHour = new \DateTime($triggerRestrictedStopHour);
+        }
+
+        $this->isChanged('triggerRestrictedStopHour', $triggerRestrictedStopHour ? $triggerRestrictedStopHour->format('H:i') : $triggerRestrictedStopHour);
+
+        $this->triggerRestrictedStopHour = $triggerRestrictedStopHour;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of triggerRestrictedDaysOfWeek.
+     *
+     * @return array
+     */
+    public function getTriggerRestrictedDaysOfWeek()
+    {
+        return (array) $this->triggerRestrictedDaysOfWeek;
+    }
+
+    /**
+     * Set the value of triggerRestrictedDaysOfWeek.
+     *
+     * @return self
+     */
+    public function setTriggerRestrictedDaysOfWeek(array $triggerRestrictedDaysOfWeek = null)
+    {
+        $this->triggerRestrictedDaysOfWeek = $triggerRestrictedDaysOfWeek;
+        $this->isChanged('triggerRestrictedDaysOfWeek', $triggerRestrictedDaysOfWeek);
 
         return $this;
     }

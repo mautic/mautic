@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index'):
+if ('index' == $tmpl):
     $view->extend('MauticLeadBundle:Import:index.html.php');
 endif;
 ?>
@@ -69,6 +69,13 @@ endif;
                     'orderBy'    => $tablePrefix.'.ignoredCount',
                     'text'       => 'mautic.lead.import.ignored.count',
                     'class'      => 'col-ignored-count',
+                ]);
+
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
+                    'sessionVar' => $sessionVar,
+                    'orderBy'    => $tablePrefix.'.createdByUser',
+                    'text'       => 'mautic.core.create.by.past.tense',
+                    'class'      => 'col-created visible-md visible-lg',
                 ]);
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [

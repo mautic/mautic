@@ -15,7 +15,7 @@ $header = ($entity->getId())
     ?
     $view['translator']->trans(
         'mautic.company.menu.edit',
-        ['%name%' => $entity->getName()]
+        ['%name%' => $view->escape($entity->getName())]
     )
     :
     $view['translator']->trans('mautic.company.menu.new');
@@ -41,7 +41,7 @@ echo $view['form']->start($form);
                     <?php $step = 1; ?>
                     <?php foreach ($groups as $g): ?>
                         <?php if (!empty($fields[$g])): ?>
-                            <li class="list-group-item<?php if ($step === 1) {
+                            <li class="list-group-item<?php if (1 === $step) {
     echo ' active';
 } ?>">
                                 <a href="#company-<?php echo $g; ?>" class="steps" data-toggle="tab">

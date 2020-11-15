@@ -12,26 +12,23 @@
 namespace Mautic\PluginBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class IntegrationCampaignsType.
  */
 class IntegrationCampaignsType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
                 'campaign_member_status',
-                'choice',
+            ChoiceType::class,
                 [
-                    'choices' => $options['campaignContactStatus'],
-                    'attr'    => [
+                    'choices'           => array_flip($options['campaignContactStatus']),
+                    'attr'              => [
                         'class' => 'form-control', ],
                     'label'    => 'mautic.plugin.integration.campaigns.member.status',
                     'required' => false,
@@ -42,7 +39,7 @@ class IntegrationCampaignsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             ['campaignContactStatus' => []]);
@@ -51,7 +48,7 @@ class IntegrationCampaignsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'integration_campaign_status';
     }

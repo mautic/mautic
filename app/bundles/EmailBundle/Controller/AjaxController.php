@@ -18,20 +18,16 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\PageBundle\Form\Type\AbTestPropertiesType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class AjaxController.
- */
 class AjaxController extends CommonAjaxController
 {
     use VariantAjaxControllerTrait;
     use AjaxLookupControllerTrait;
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function getAbTestFormAction(Request $request)
@@ -39,6 +35,7 @@ class AjaxController extends CommonAjaxController
         return $this->getAbTestForm(
             $request,
             'email',
+            AbTestPropertiesType::class,
             'email_abtest_settings',
             'emailform',
             'MauticEmailBundle:AbTest:form.html.php',
@@ -47,8 +44,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function sendBatchAction(Request $request)
@@ -76,7 +71,7 @@ class AjaxController extends CommonAjaxController
                 $stats['sent'] += $batchSentCount;
                 $stats['failed'] += $batchFailedCount;
 
-                foreach ($batchFailedRecipients as $list => $emails) {
+                foreach ($batchFailedRecipients as $emails) {
                     $stats['failedRecipients'] = $stats['failedRecipients'] + $emails;
                 }
 
@@ -109,8 +104,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function generatePlaintTextAction(Request $request)
@@ -132,8 +125,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function getAttachmentsSizeAction(Request $request)
@@ -152,8 +143,6 @@ class AjaxController extends CommonAjaxController
     /**
      * Tests monitored email connection settings.
      *
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     protected function testMonitoredEmailServerConnectionAction(Request $request)
@@ -164,7 +153,7 @@ class AjaxController extends CommonAjaxController
             $settings = $request->request->all();
 
             if (empty($settings['password'])) {
-                $existingMonitoredSettings = $this->coreParametersHelper->getParameter('monitored_email');
+                $existingMonitoredSettings = $this->coreParametersHelper->get('monitored_email');
                 if (is_array($existingMonitoredSettings) && (!empty($existingMonitoredSettings[$settings['mailbox']]['password']))) {
                     $settings['password'] = $existingMonitoredSettings[$settings['mailbox']]['password'];
                 }
@@ -185,7 +174,7 @@ class AjaxController extends CommonAjaxController
                 $dataArray['success'] = 1;
                 $dataArray['message'] = $this->translator->trans('mautic.core.success');
             } catch (\Exception $e) {
-                $dataArray['message'] = $e->getMessage();
+                $dataArray['message'] = $this->translator->trans($e->getMessage());
             }
         }
 
@@ -194,8 +183,6 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Tests mail transport settings.
-     *
-     * @param Request $request
      *
      * @return JsonResponse
      */
@@ -221,7 +208,12 @@ class AjaxController extends CommonAjaxController
                         $mailer = $this->container->get($transport);
 
                         if ('mautic.transport.amazon' == $transport) {
-                            $mailer->setHost($settings['amazon_region']);
+                            $amazonHost = $mailer->buildHost($settings['amazon_region'], $settings['amazon_other_region']);
+                            $mailer->setHost($amazonHost, $settings['port']);
+                        }
+
+                        if ('mautic.transport.amazon_api' == $transport) {
+                            $mailer->setRegion($settings['amazon_region'], $settings['amazon_other_region']);
                         }
                     }
             }
@@ -234,7 +226,7 @@ class AjaxController extends CommonAjaxController
                 try {
                     if (method_exists($mailer, 'setApiKey')) {
                         if (empty($settings['api_key'])) {
-                            $settings['api_key'] = $this->get('mautic.helper.core_parameters')->getParameter('mailer_api_key');
+                            $settings['api_key'] = $this->get('mautic.helper.core_parameters')->get('mailer_api_key');
                         }
                         $mailer->setApiKey($settings['api_key']);
                     }
@@ -245,7 +237,7 @@ class AjaxController extends CommonAjaxController
                 try {
                     if (is_callable([$mailer, 'setUsername']) && is_callable([$mailer, 'setPassword'])) {
                         if (empty($settings['password'])) {
-                            $settings['password'] = $this->get('mautic.helper.core_parameters')->getParameter('mailer_password');
+                            $settings['password'] = $this->get('mautic.helper.core_parameters')->get('mailer_password');
                         }
                         $mailer->setUsername($settings['user']);
                         $mailer->setPassword($settings['password']);
@@ -270,9 +262,6 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @param Request $request
-     */
     protected function sendTestEmailAction(Request $request)
     {
         /** @var MailHelper $mailer */
@@ -302,22 +291,27 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse(['success' => $success, 'message' => $message]);
     }
 
-    /**
-     * @param Request $request
-     */
     protected function getEmailCountStatsAction(Request $request)
     {
         /** @var EmailModel $model */
         $model = $this->getModel('email');
 
+        $id  = $request->get('id');
+        $ids = $request->get('ids');
+
+        // Support for legacy calls
+        if (!$ids && $id) {
+            $ids = [$id];
+        }
+
         $data = [];
-        if ($id = $request->get('id')) {
+        foreach ($ids as $id) {
             if ($email = $model->getEntity($id)) {
                 $pending = $model->getPendingLeads($email, null, true);
                 $queued  = $model->getQueuedCounts($email);
 
-                $data = [
-                    'success'     => 1,
+                $data[] = [
+                    'id'          => $id,
                     'pending'     => 'list' === $email->getEmailType() && $pending ? $this->translator->trans(
                         'mautic.email.stat.leadcount',
                         ['%count%' => $pending]
@@ -328,6 +322,16 @@ class AjaxController extends CommonAjaxController
                     'readPercent' => $this->translator->trans('mautic.email.stat.readpercent', ['%count%' => $email->getReadPercentage(true)]),
                 ];
             }
+        }
+
+        // Support for legacy calls
+        if ($request->get('id') && !empty($data[0])) {
+            $data = $data[0];
+        } else {
+            $data = [
+                'success' => 1,
+                'stats'   => $data,
+            ];
         }
 
         return new JsonResponse($data);

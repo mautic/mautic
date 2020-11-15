@@ -11,6 +11,8 @@
 
 namespace Mautic\ReportBundle\Model;
 
+use Doctrine\DBAL\Connections\MasterSlaveConnection;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -30,6 +32,7 @@ use Mautic\ReportBundle\Event\ReportQueryEvent;
 use Mautic\ReportBundle\Generator\ReportGenerator;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\ReportEvents;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -43,6 +46,11 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class ReportModel extends FormModel
 {
     const CHANNEL_FEATURE = 'reporting';
+
+    /**
+     * @var array
+     */
+    private $reportBuilderData;
 
     /**
      * @var mixed
@@ -84,17 +92,6 @@ class ReportModel extends FormModel
      */
     private $excelExporter;
 
-    /**
-     * ReportModel constructor.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param TemplatingHelper     $templatingHelper
-     * @param ChannelListHelper    $channelListHelper
-     * @param FieldModel           $fieldModel
-     * @param ReportHelper         $reportHelper
-     * @param CsvExporter          $csvExporter
-     * @param ExcelExporter        $excelExporter
-     */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         TemplatingHelper $templatingHelper,
@@ -104,7 +101,7 @@ class ReportModel extends FormModel
         CsvExporter $csvExporter,
         ExcelExporter $excelExporter
     ) {
-        $this->defaultPageLimit  = $coreParametersHelper->getParameter('default_pagelimit');
+        $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
         $this->templatingHelper  = $templatingHelper;
         $this->channelListHelper = $channelListHelper;
         $this->fieldModel        = $fieldModel;
@@ -113,9 +110,6 @@ class ReportModel extends FormModel
         $this->excelExporter     = $excelExporter;
     }
 
-    /**
-     * @param Session $session
-     */
     public function setSession(Session $session)
     {
         $this->session = $session;
@@ -155,8 +149,10 @@ class ReportModel extends FormModel
         }
 
         $options = array_merge($options, [
-            'read_only'  => false,
             'table_list' => $this->getTableData(),
+            'attr'       => [
+                'readonly' => false,
+            ],
         ]);
 
         // Fire the REPORT_ON_BUILD event off to get the table/column data
@@ -231,13 +227,11 @@ class ReportModel extends FormModel
      */
     public function buildAvailableReports($context)
     {
-        static $data = [];
-
-        if (empty($data[$context])) {
+        if (empty($this->reportBuilderData[$context])) {
             // Check to see if all has been obtained
-            if (isset($data['all'])) {
-                $data[$context]['tables'] = &$data['all']['tables'][$context];
-                $data[$context]['graphs'] = &$data['all']['graphs'][$context];
+            if (isset($this->reportBuilderData['all'])) {
+                $this->reportBuilderData[$context]['tables'] = $this->reportBuilderData['all']['tables'][$context] ?? [];
+                $this->reportBuilderData[$context]['graphs'] = $this->reportBuilderData['all']['graphs'][$context] ?? [];
             } else {
                 //build them
                 $eventContext = ('all' == $context) ? '' : $context;
@@ -249,25 +243,25 @@ class ReportModel extends FormModel
                 $graphs = $event->getGraphs();
 
                 if ('all' == $context) {
-                    $data[$context]['tables'] = $tables;
-                    $data[$context]['graphs'] = $graphs;
+                    $this->reportBuilderData[$context]['tables'] = $tables;
+                    $this->reportBuilderData[$context]['graphs'] = $graphs;
                 } else {
                     if (isset($tables[$context])) {
-                        $data[$context]['tables'] = $tables[$context];
+                        $this->reportBuilderData[$context]['tables'] = $tables[$context];
                     } else {
-                        $data[$context]['tables'] = $tables;
+                        $this->reportBuilderData[$context]['tables'] = $tables;
                     }
 
                     if (isset($graphs[$context])) {
-                        $data[$context]['graphs'] = $graphs[$context];
+                        $this->reportBuilderData[$context]['graphs'] = $graphs[$context];
                     } else {
-                        $data[$context]['graphs'] = $graphs;
+                        $this->reportBuilderData[$context]['graphs'] = $graphs;
                     }
                 }
             }
         }
 
-        return $data[$context];
+        return $this->reportBuilderData[$context];
     }
 
     /**
@@ -281,7 +275,41 @@ class ReportModel extends FormModel
     {
         $data = $this->buildAvailableReports($context);
 
-        return (!isset($data['tables'])) ? [] : $data['tables'];
+        $data = (!isset($data['tables'])) ? [] : $data['tables'];
+
+        if (array_key_exists('columns', $data)) {
+            $data['columns'] = $this->preventSameAliases($data['columns']);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Prevent same aliases using numeric suffixes for each alias.
+     *
+     * @return array
+     */
+    private function preventSameAliases(array $columns)
+    {
+        $existingAliases = [];
+
+        foreach ($columns as $key => $column) {
+            $alias = $column['alias'];
+
+            // Count suffixes
+            if (!array_key_exists($alias, $existingAliases)) {
+                $existingAliases[$alias] = 0;
+            } else {
+                ++$existingAliases[$alias];
+            }
+
+            // Add numeric suffix
+            if ($existingAliases[$alias] > 0) {
+                $columns[$key]['alias'] = $alias.$existingAliases[$alias];
+            }
+        }
+
+        return $columns;
     }
 
     /**
@@ -392,8 +420,6 @@ class ReportModel extends FormModel
      * Export report.
      *
      * @param string $format
-     * @param Report $report
-     * @param array  $reportData
      * @param null   $handle
      * @param int    $page
      *
@@ -434,21 +460,22 @@ class ReportModel extends FormModel
                 $content = $this->templatingHelper->getTemplating()->renderResponse(
                     'MauticReportBundle:Report:export.html.php',
                     [
-                        'data'      => $reportData['data'],
-                        'columns'   => $reportData['columns'],
-                        'pageTitle' => $name,
-                        'graphs'    => $reportData['graphs'],
-                        'report'    => $report,
-                        'dateFrom'  => $reportData['dateFrom'],
-                        'dateTo'    => $reportData['dateTo'],
+                        'reportData' => $reportData,
+                        'data'       => $reportData['data'],
+                        'columns'    => $reportData['columns'],
+                        'pageTitle'  => $name,
+                        'graphs'     => $reportData['graphs'],
+                        'report'     => $report,
+                        'dateFrom'   => $reportData['dateFrom'],
+                        'dateTo'     => $reportData['dateTo'],
                     ]
                 )->getContent();
 
                 return new Response($content);
 
             case 'xlsx':
-                if (!class_exists('PHPExcel')) {
-                    throw new \Exception('PHPExcel is required to export to Excel spreadsheets');
+                if (!class_exists(Spreadsheet::class)) {
+                    throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
                 }
 
                 $response = new StreamedResponse(
@@ -470,9 +497,7 @@ class ReportModel extends FormModel
     /**
      * Get report data for view rendering.
      *
-     * @param Report               $entity
      * @param FormFactoryInterface $formFactory
-     * @param array                $options
      *
      * @return array
      */
@@ -488,11 +513,6 @@ class ReportModel extends FormModel
             // Fix date ranges if applicable
             if (!isset($options['dateTo'])) {
                 $options['dateTo'] = new \DateTime();
-            }
-
-            // Fix the time frames
-            if ($options['dateFrom'] == $options['dateTo']) {
-                $options['dateTo']->modify('+1 day');
             }
 
             // Adjust dateTo to be end of day or to current hour if today
@@ -511,21 +531,23 @@ class ReportModel extends FormModel
         $paginate        = !empty($options['paginate']);
         $reportPage      = isset($options['reportPage']) ? $options['reportPage'] : 1;
         $data            = $graphs            = [];
-        $reportGenerator = new ReportGenerator($this->dispatcher, $this->em->getConnection(), $entity, $this->channelListHelper, $formFactory);
+        $reportGenerator = new ReportGenerator($this->dispatcher, $this->getConnection(), $entity, $this->channelListHelper, $formFactory);
 
         $selectedColumns = $entity->getColumns();
         $totalResults    = $limit    = 0;
 
         // Prepare the query builder
-        $tableDetails = $this->getTableData($entity->getSource());
-
+        $tableDetails      = $this->getTableData($entity->getSource());
+        $dataColumns       = $dataAggregatorColumns = [];
         $aggregatorColumns = ($aggregators = $entity->getAggregators()) ? $aggregators : [];
 
         foreach ($aggregatorColumns as $aggregatorColumn) {
             $selectedColumns[] = $aggregatorColumn['column'];
+            // add aggregator columns to dataColumns also
+            $dataColumns[$aggregatorColumn['function'].' '.$aggregatorColumn['column']]           = $aggregatorColumn['column'];
+            $dataAggregatorColumns[$aggregatorColumn['function'].' '.$aggregatorColumn['column']] = $aggregatorColumn['column'];
         }
         // Build a reference for column to data column (without table prefix)
-        $dataColumns = [];
         foreach ($tableDetails['columns'] as $dbColumn => &$columnData) {
             $dataColumns[$columnData['alias']] = $dbColumn;
         }
@@ -542,7 +564,7 @@ class ReportModel extends FormModel
             'dynamicFilters' => (isset($options['dynamicFilters'])) ? $options['dynamicFilters'] : [],
         ];
 
-        /** @var \Doctrine\DBAL\Query\QueryBuilder $query */
+        /** @var QueryBuilder $query */
         $query                 = $reportGenerator->getQuery($dataOptions);
         $options['translator'] = $this->translator;
 
@@ -592,6 +614,13 @@ class ReportModel extends FormModel
             }
         }
 
+        $query->add('orderBy', $order);
+
+        // Allow plugin to manipulate the query
+        $event = new ReportQueryEvent($entity, $query, $totalResults, $dataOptions);
+        $this->dispatcher->dispatch(ReportEvents::REPORT_QUERY_PRE_EXECUTE, $event);
+        $query = $event->getQuery();
+
         if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
             if ($paginate) {
                 // Build the options array to pass into the query
@@ -605,19 +634,17 @@ class ReportModel extends FormModel
                     $start = 0;
                 }
 
-                $totalResults = $query->execute()->rowCount();
+                if (empty($options['totalResults'])) {
+                    $options['totalResults'] = $totalResults = $this->getTotalCount($query, $debugData);
+                } else {
+                    $totalResults = $options['totalResults'];
+                }
+
                 if ($limit > 0) {
                     $query->setFirstResult($start)
                         ->setMaxResults($limit);
                 }
             }
-
-            $query->add('orderBy', $order);
-
-            // Allow plugin to manipulate the query
-            $event = new ReportQueryEvent($entity, $query, $totalResults, $dataOptions);
-            $this->dispatcher->dispatch(ReportEvents::REPORT_QUERY_PRE_EXECUTE, $event);
-            $query = $event->getQuery();
 
             $queryTime = microtime(true);
             $data      = $query->execute()->fetchAll();
@@ -646,6 +673,9 @@ class ReportModel extends FormModel
             $params             = $query->getParameters();
 
             foreach ($params as $name => $param) {
+                if (is_array($param)) {
+                    $param = implode("','", $param);
+                }
                 $debugData['query'] = str_replace(":$name", "'$param'", $debugData['query']);
             }
 
@@ -659,16 +689,18 @@ class ReportModel extends FormModel
         }
 
         return [
-            'totalResults'    => $totalResults,
-            'data'            => $data,
-            'dataColumns'     => $dataColumns,
-            'graphs'          => $graphs,
-            'contentTemplate' => $contentTemplate,
-            'columns'         => $tableDetails['columns'],
-            'limit'           => ($paginate) ? $limit : 0,
-            'dateFrom'        => $dataOptions['dateFrom'],
-            'dateTo'          => $dataOptions['dateTo'],
-            'debug'           => $debugData,
+            'totalResults'      => $totalResults,
+            'data'              => $data,
+            'dataColumns'       => $dataColumns,
+            'graphs'            => $graphs,
+            'contentTemplate'   => $contentTemplate,
+            'columns'           => $tableDetails['columns'],
+            'limit'             => ($paginate) ? $limit : 0,
+            'page'              => ($paginate) ? $reportPage : 1,
+            'dateFrom'          => $dataOptions['dateFrom'],
+            'dateTo'            => $dataOptions['dateTo'],
+            'debug'             => $debugData,
+            'aggregatorColumns' => $dataAggregatorColumns,
         ];
     }
 
@@ -684,8 +716,6 @@ class ReportModel extends FormModel
 
     /**
      * Determine what operators should be used for the filter type.
-     *
-     * @param array $data
      *
      * @return mixed|string
      */
@@ -704,10 +734,71 @@ class ReportModel extends FormModel
             $options = MauticReportBuilder::OPERATORS[$operator];
         }
 
-        foreach ($options as $value => &$label) {
+        foreach ($options as &$label) {
             $label = $this->translator->trans($label);
         }
 
         return $options;
+    }
+
+    /**
+     * @return int
+     */
+    private function getTotalCount(QueryBuilder $qb, array &$debugData)
+    {
+        $countQb = clone $qb;
+        $countQb->resetQueryParts();
+
+        $countQb->select('count(*)')
+            ->from('('.$qb->getSQL().')', 'c');
+
+        if (MAUTIC_ENV == 'dev') {
+            $debugData['count_query'] = $countQb->getSQL();
+        }
+
+        return (int) $countQb->execute()->fetchColumn();
+    }
+
+    /**
+     * @param int $segmentId
+     *
+     * @return array
+     */
+    public function getReportsIdsWithDependenciesOnSegment($segmentId)
+    {
+        $search = 'lll.leadlist_id';
+        $filter = [
+            'force'  => [
+                ['column' => 'r.filters', 'expr' => 'LIKE', 'value'=>'%'.$search.'"%'],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+        $dependents = [];
+        foreach ($entities as $entity) {
+            $retrFilters = $entity->getFilters();
+            foreach ($retrFilters as $eachFilter) {
+                if ($eachFilter['column'] == $search && $eachFilter['value'] == $segmentId) {
+                    $dependents[] = $entity->getId();
+                }
+            }
+        }
+
+        return $dependents;
+    }
+
+    /**
+     * @return \Doctrine\DBAL\Connection
+     */
+    private function getConnection()
+    {
+        if ($this->em->getConnection() instanceof MasterSlaveConnection) {
+            $this->em->getConnection()->connect('slave');
+        }
+
+        return $this->em->getConnection();
     }
 }
