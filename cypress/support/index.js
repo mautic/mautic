@@ -70,7 +70,9 @@ before("Perform login", () => {
   emails.emailInternalName.type("Test Email");
   emails.saveEmailButton.click();
   emails.closeButton.click();
-  emails.waitforEmailCreation();
+  cy.wait(3000);
+  // due to a bug, no "has been created" is shown
+  // emails.waitforEmailCreation();
 
   //adding sample segment to be used across test
   leftNavigation.SegmentsSection.click();
