@@ -141,6 +141,9 @@ jobs:
         php-version: 7.4
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
     
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+
     - name: Install Apache
       run: |
         sudo apt-get update -qq
