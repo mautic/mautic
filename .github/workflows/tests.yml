@@ -165,9 +165,7 @@ jobs:
         sudo chmod -R 777 /var/www/html
         sudo chown -R www-data:www-data /var/www/html
         mv $GITHUB_WORKSPACE /var/www/html
-
-    - name: Setup tmate for debugging
-      uses: mxschmitt/action-tmate@v3
+        mkdir $GITHUB_WORKSPACE
 
     - name: Cypress run
       uses: cypress-io/github-action@v2
