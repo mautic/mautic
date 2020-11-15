@@ -143,6 +143,7 @@ jobs:
     
     - name: Install Apache
       run: |
+        sudo apt-get update -qq
         sudo apt-get install apache2 libapache2-mod-php
         sudo a2enmod rewrite
         sudo cp ./.github/workflows/mautic-apache.conf /etc/apache2/conf-available/mautic.conf
