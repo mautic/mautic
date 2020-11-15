@@ -164,15 +164,14 @@ jobs:
       run: |
         sudo chmod -R 777 /var/www/html
         sudo chown -R www-data:www-data /var/www/html
-        rm -rf /var/www/html/*
-        mv {.,}* /var/www/html
-        cd /var/www/html
+        mv $GITHUB_WORKSPACE /var/www/html
+        cd /var/www/html/mautic
 
     - name: Cypress run
       uses: cypress-io/github-action@v2
       with:
           config: baseUrl=http://localhost
-          working-directory: /var/www/html
+          working-directory: /var/www/html/mautic
 
       # If one or more Cypress tests fail, upload screenshots as artifacts
     - name: Upload Cypress screenshots
