@@ -166,6 +166,9 @@ jobs:
         sudo chown -R www-data:www-data /var/www/html
         mv $GITHUB_WORKSPACE /var/www/html
         mkdir $GITHUB_WORKSPACE
+    
+    - name: Setup tmate session for debugging
+      uses: mxschmitt/action-tmate@v3
 
     - name: Cypress run
       uses: cypress-io/github-action@v2
@@ -180,7 +183,7 @@ jobs:
       if: failure()
       with:
         name: cypress-screenshots
-        path: /var/www/html/cypress/screenshots
+        path: /var/www/html/mautic/cypress/screenshots
 
       # Test run video is always captured, so this action uses the "always()" condition
     - name: Upload Cypress test run video
@@ -188,4 +191,4 @@ jobs:
       if: always()
       with:
         name: cypress-videos
-        path: /var/www/html/cypress/videos
+        path: /var/www/html/mautic/cypress/videos
