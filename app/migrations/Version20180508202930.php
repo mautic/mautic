@@ -14,19 +14,16 @@ class Version20180508202930 extends AbstractMauticMigration
      * @throws SkipMigrationException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public function preUp(Schema $schema)
+    public function preUp(Schema $schema): void
     {
         if ($schema->getTable($this->prefix.'emails')->hasColumn('use_owner_as_mailer')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
 
-    /**
-     * @param Schema $schema
-     */
-    public function up(Schema $schema)
+    public function up(Schema $schema): void
     {
-        $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'mysql', 'Migration can only be executed safely on \'mysql\'.');
+        $this->abortIf('mysql' != $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
 
         $this->addSql("ALTER TABLE {$this->prefix}emails ADD use_owner_as_mailer TINYINT(4) AFTER email_type;");
 
@@ -35,12 +32,9 @@ class Version20180508202930 extends AbstractMauticMigration
         $this->addSql("UPDATE {$this->prefix}emails SET use_owner_as_mailer = {$ownerAsMailerConfigSetting};");
     }
 
-    /**
-     * @param Schema $schema
-     */
-    public function down(Schema $schema)
+    public function down(Schema $schema): void
     {
-        $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'mysql', 'Migration can only be executed safely on \'mysql\'.');
+        $this->abortIf('mysql' != $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
 
         $this->addSql("ALTER TABLE {$this->prefix}emails DROP use_owner_as_mailer;");
     }
