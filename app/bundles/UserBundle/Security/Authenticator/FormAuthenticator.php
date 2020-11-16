@@ -155,7 +155,15 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
         $newUser->setUsername($user->getUserName());
         $newUser->setPassword($user->getPassword());
 
-        return $this->hasher->isPasswordValid($newUser, $credentials['password']);
+        $authenticated = $this->hasher->isPasswordValid($newUser, $credentials['password']);
+
+        // @todo: This needs refactoring for Symfony 5
+        if ($authenticated && $this->dispatcher->hasListeners(UserEvents::USER_FORM_POST_LOCAL_PASSWORD_AUTHENTICATION)) {
+            $authenticationEvent    = new AuthenticationEvent($user, $token, $userProvider, $this->requestStack->getCurrentRequest());
+            $this->dispatcher->dispatch(UserEvents::USER_FORM_POST_LOCAL_PASSWORD_AUTHENTICATION, $authenticationEvent);
+        }
+
+        return $authenticated;
     }
 
     public function getPassword($credentials): ?string

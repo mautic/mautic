@@ -16,12 +16,10 @@ namespace Mautic\UserBundle\EventListener;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Event\AuthenticationEvent;
-use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
+use Mautic\UserBundle\Exception\WeakPasswordException;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use ZxcvbnPhp\Zxcvbn as PasswordStrengthEstimator;
 
 class PasswordSubscriber implements EventSubscriberInterface
@@ -63,8 +61,7 @@ class PasswordSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            UserEvents::USER_FORM_AUTHENTICATION => ['onUserFormAuthentication', 999],
-            UserEvents::USER_PRE_AUTHENTICATION  => ['onUserFormAuthentication', 999],
+            UserEvents::USER_FORM_POST_LOCAL_PASSWORD_AUTHENTICATION => ['onUserFormAuthentication'],
         ];
     }
 
@@ -85,9 +82,7 @@ class PasswordSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $authenticationException = new AuthenticationException('Weak password');
-        $authenticationException->setToken($authenticationEvent->getToken());
-        throw $authenticationException;
+        throw new WeakPasswordException();
     }
 
     private function buildDictionary(User $user): array
