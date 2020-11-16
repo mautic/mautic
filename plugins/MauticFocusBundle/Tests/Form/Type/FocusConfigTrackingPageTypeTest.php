@@ -17,7 +17,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class FocusConfigTrackingPageTypeTest extends TestCase
 {
-
     /**
      * @var FocusConfigTrackingPageType
      */
