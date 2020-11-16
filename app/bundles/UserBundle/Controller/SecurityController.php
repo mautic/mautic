@@ -5,6 +5,8 @@ namespace Mautic\UserBundle\Controller;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\UserBundle\Exception\WeakPasswordException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -73,7 +75,11 @@ class SecurityController extends CommonController implements EventSubscriberInte
         $error = $authenticationUtils->getLastAuthenticationError();
 
         if (null !== $error) {
-            if ($error instanceof Exception\BadCredentialsException) {
+            if ($error instanceof WeakPasswordException) {
+                $this->addFlash('mautic.user.auth.error.weakpassword', [], FlashBag::LEVEL_ERROR);
+
+                return $this->forward('MauticUserBundle:Public:passwordReset');
+            } elseif ($error instanceof Exception\BadCredentialsException) {
                 $msg = 'mautic.user.auth.error.invalidlogin';
             } elseif ($error instanceof Exception\DisabledException) {
                 $msg = 'mautic.user.auth.error.disabledaccount';
@@ -81,7 +87,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
                 $msg = $error->getMessage();
             }
 
-            $this->addFlashMessage($msg, [], 'error', null, false);
+            $this->addFlashMessage($msg, [], FlashBag::LEVEL_ERROR, null, false);
         }
         $request->query->set('tmpl', 'login');
 
