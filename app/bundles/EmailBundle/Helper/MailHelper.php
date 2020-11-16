@@ -664,7 +664,6 @@ class MailHelper
         $this->internalSend     = false;
         $this->fatal            = false;
         $this->idHashState      = true;
-        $this->useGlobalFrom    = false;
         $this->checkIfTransportNeedsRestart(true);
 
         $this->logger->clear();
