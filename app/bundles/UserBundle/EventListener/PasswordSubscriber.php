@@ -28,7 +28,6 @@ class PasswordSubscriber implements EventSubscriberInterface
 
     private const DICTIONARY = [
         'mautic',
-        'acquia',
         'user',
         'lead',
         'bundle',
@@ -61,7 +60,7 @@ class PasswordSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            UserEvents::USER_FORM_POST_LOCAL_PASSWORD_AUTHENTICATION => ['onUserFormAuthentication'],
+            UserEvents::USER_FORM_POST_LOCAL_PASSWORD_AUTHENTICATION => ['onUserFormAuthentication', 0],
         ];
     }
 
