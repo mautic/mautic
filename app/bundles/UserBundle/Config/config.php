@@ -280,6 +280,15 @@ return [
                 ],
             ],
         ],
+        'validator' => [
+            'mautic.user.validator.not_weak_validator' => [
+                'class'     => \Mautic\UserBundle\Form\Validator\Constraints\NotWeakValidator::class,
+                'arguments' => [
+                    'mautic.security.password.strength.estimator',
+                ],
+                'tag' => 'validator.constraint_validator',
+            ],
+        ],
         'fixtures' => [
             'mautic.user.fixture.role' => [
                 'class'     => \Mautic\UserBundle\DataFixtures\ORM\LoadRoleData::class,
