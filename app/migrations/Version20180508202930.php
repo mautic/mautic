@@ -27,7 +27,7 @@ class Version20180508202930 extends AbstractMauticMigration
 
         $this->addSql("ALTER TABLE {$this->prefix}emails ADD use_owner_as_mailer TINYINT(4) AFTER email_type;");
 
-        $ownerAsMailerConfigSetting = $this->container->getParameter('mautic.mailer_is_owner');
+        $ownerAsMailerConfigSetting = $this->container->getParameter('mautic.mailer_is_owner') ? 1 : 0;
 
         $this->addSql("UPDATE {$this->prefix}emails SET use_owner_as_mailer = {$ownerAsMailerConfigSetting};");
     }

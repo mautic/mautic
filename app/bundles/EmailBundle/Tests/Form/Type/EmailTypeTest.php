@@ -78,7 +78,7 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
             'data' => new Email(),
         ];
 
-        $this->formBuilder->expects($this->at(46))
+        $this->formBuilder->expects($this->at(47))
             ->method('add')
             ->with(
                 'buttons',
