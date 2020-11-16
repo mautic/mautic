@@ -23,6 +23,11 @@ class FocusConfigTrackingPageTypeTest extends TestCase
      */
     private $form;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject
+     */
+    private $formBuilder;
+
     public function setUp()
     {
         $this->form                 = new FocusConfigTrackingPageType();
