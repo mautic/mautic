@@ -30,6 +30,11 @@ class Tracking404Model
     private $pageModel;
 
     /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    /**
      * Tracking404Model constructor.
      */
     public function __construct(
