@@ -31,8 +31,9 @@ class ConfigSubscriberTest extends TestCase
 
     protected function setUp()
     {
-        $this->configEvent = $this->createMock(ConfigEvent::class);
-        $this->subscriber           = new ConfigSubscriber();    }
+        $this->configEvent          = $this->createMock(ConfigEvent::class);
+        $this->subscriber           = new ConfigSubscriber();
+    }
 
     public function testGetSubscribedEvents()
     {
@@ -43,6 +44,4 @@ class ConfigSubscriberTest extends TestCase
             $this->subscriber->getSubscribedEvents()
         );
     }
-
-
 }
