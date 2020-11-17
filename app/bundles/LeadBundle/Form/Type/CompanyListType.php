@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\EntityLookupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CompanyListType extends AbstractType
@@ -31,6 +32,16 @@ class CompanyListType extends AbstractType
                 'model'               => 'lead.company',
                 'ajax_lookup_action'  => 'lead:getLookupChoiceList',
                 'repo_lookup_method'  => 'getAjaxSimpleList',
+                'lookup_arguments'    => function (Options $options) {
+                    return [
+                        'expr'       => null,
+                        'parameters' => [],
+                        'label'      => null,
+                        'value'      => 'id',
+                        'limit'      => 100,
+                        'include'    => '$data',
+                    ];
+                },
                 'multiple'            => true,
                 'main_entity'         => null,
             ]
