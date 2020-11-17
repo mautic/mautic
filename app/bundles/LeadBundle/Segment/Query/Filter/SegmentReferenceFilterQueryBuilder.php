@@ -81,14 +81,17 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
 
             $filters = $this->leadSegmentFilterFactory->getSegmentFilters($contactSegment);
 
-            $segmentQueryBuilder = $this->leadSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($contactSegment->getId(), $filters);
+            $segmentQueryBuilder       = $this->leadSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($contactSegment->getId(), $filters);
+            $subSegmentLeadsTableAlias = $this->generateRandomParameterName();
+            $segmentQueryBuilder->resetQueryParts(['select', 'from'])->select('null');
+            $segmentQueryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', $subSegmentLeadsTableAlias);
 
             //  If the segment contains no filters; it means its for manually subscribed only
             if (count($filters)) {
-                $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallyUnsubscribedQuery($segmentQueryBuilder, $contactSegment->getId());
+                $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallyUnsubscribedQuery($segmentQueryBuilder, $contactSegment->getId(), $subSegmentLeadsTableAlias);
             }
 
-            $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallySubscribedQuery($segmentQueryBuilder, $contactSegment->getId());
+            $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallySubscribedQuery($segmentQueryBuilder, $contactSegment->getId(), $subSegmentLeadsTableAlias);
 
             $parameters = $segmentQueryBuilder->getParameters();
             foreach ($parameters as $key => $value) {
@@ -96,14 +99,15 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
             }
 
             $this->leadSegmentQueryBuilder->queryBuilderGenerated($contactSegment, $segmentQueryBuilder);
+            $segmentQueryWherePart = $segmentQueryBuilder->getQueryPart('where');
+            $segmentQueryBuilder->where("l.id = $subSegmentLeadsTableAlias.id");
+            $segmentQueryBuilder->andWhere($segmentQueryWherePart);
 
             $segmentAlias = $this->generateRandomParameterName();
             if ($exclusion) {
-                $queryBuilder->leftJoin('l', '('.$segmentQueryBuilder->getSQL().') ', $segmentAlias, $segmentAlias.'.id = l.id');
-                $expression = $queryBuilder->expr()->isNull($segmentAlias.'.id');
+                $expression = $queryBuilder->expr()->notExists($segmentQueryBuilder->getSQL());
             } else {
-                $queryBuilder->leftJoin('l', '('.$segmentQueryBuilder->getSQL().') ', $segmentAlias, $segmentAlias.'.id = l.id');
-                $expression = $queryBuilder->expr()->isNotNull($segmentAlias.'.id');
+                $expression = $queryBuilder->expr()->exists($segmentQueryBuilder->getSQL());
             }
             $queryBuilder->addSelect($segmentAlias.'.id as '.$segmentAlias.'_id');
 

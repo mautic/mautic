@@ -163,19 +163,19 @@ class ContactSegmentQueryBuilder
 
     /**
      * @param $leadListId
-     *
-     * @return QueryBuilder
-     *
-     * @throws QueryException
+     * @param string $defaultAlias
      */
-    public function addManuallySubscribedQuery(QueryBuilder $queryBuilder, $leadListId)
-    {
+    public function addManuallySubscribedQuery(
+        QueryBuilder $queryBuilder,
+        $leadListId,
+        $defaultAlias = 'l'
+    ): QueryBuilder {
         $tableAlias = $this->generateRandomParameterName();
 
         $existsQueryBuilder = $queryBuilder->getConnection()->createQueryBuilder();
 
         $existsQueryBuilder
-            ->select($tableAlias.'.lead_id')
+            ->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias)
             ->andWhere($queryBuilder->expr()->eq($tableAlias.'.leadlist_id', intval($leadListId)))
             ->andWhere(
@@ -185,8 +185,12 @@ class ContactSegmentQueryBuilder
                 )
             );
 
+        $existingQueryWherePart = $existsQueryBuilder->getQueryPart('where');
+        $existsQueryBuilder->where("$defaultAlias.id = $tableAlias.lead_id");
+        $existsQueryBuilder->andWhere($existingQueryWherePart);
+
         $queryBuilder->orWhere(
-            $queryBuilder->expr()->in('l.id', $existsQueryBuilder->getSQL())
+            $queryBuilder->expr()->exists($existsQueryBuilder->getSQL())
         );
 
         return $queryBuilder;
@@ -194,19 +198,21 @@ class ContactSegmentQueryBuilder
 
     /**
      * @param $leadListId
-     *
-     * @return QueryBuilder
+     * @param string $defaultAlias
      *
      * @throws QueryException
      */
-    public function addManuallyUnsubscribedQuery(QueryBuilder $queryBuilder, $leadListId)
-    {
+    public function addManuallyUnsubscribedQuery(
+        QueryBuilder $queryBuilder,
+        $leadListId,
+        $defaultAlias = 'l'
+    ): QueryBuilder {
         $tableAlias = $this->generateRandomParameterName();
         $queryBuilder->leftJoin(
-            'l',
+            $defaultAlias,
             MAUTIC_TABLE_PREFIX.'lead_lists_leads',
             $tableAlias,
-            'l.id = '.$tableAlias.'.lead_id and '.$tableAlias.'.leadlist_id = '.intval($leadListId)
+            $defaultAlias.'.id = '.$tableAlias.'.lead_id and '.$tableAlias.'.leadlist_id = '.intval($leadListId)
         );
         $queryBuilder->addJoinCondition($tableAlias, $queryBuilder->expr()->eq($tableAlias.'.manually_removed', 1));
         $queryBuilder->andWhere($queryBuilder->expr()->isNull($tableAlias.'.lead_id'));
