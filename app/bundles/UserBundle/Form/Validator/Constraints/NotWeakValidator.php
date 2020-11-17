@@ -11,35 +11,22 @@
 
 namespace Mautic\UserBundle\Form\Validator\Constraints;
 
+use Mautic\UserBundle\Model\PasswordStrengthEstimatorModel;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use ZxcvbnPhp\Zxcvbn as PasswordStrengthEstimator;
 
 class NotWeakValidator extends ConstraintValidator
 {
-    private const MINIMUM_SCORE = 3;
-
     /**
      * @var PasswordStrengthEstimator
      */
-    private $passwordStrengthEstimator;
+    private $passwordStrengthEstimatorModel;
 
-    /**
-     * @var
-     */
-    private $minimumScore;
-
-    public function __construct(PasswordStrengthEstimator $passwordStrengthEstimator)
+    public function __construct(PasswordStrengthEstimatorModel $passwordStrengthEstimatorModel)
     {
-        $this->passwordStrengthEstimator = $passwordStrengthEstimator;
-        $this->minimumScore              = self::MINIMUM_SCORE;
-    }
-
-    public function setMinimumScore(int $minimumScore): void
-    {
-        $this->minimumScore = max(0, $minimumScore);
+        $this->passwordStrengthEstimatorModel = $passwordStrengthEstimatorModel;
     }
 
     public function validate($value, Constraint $constraint): void
@@ -48,9 +35,13 @@ class NotWeakValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, NotWeak::class);
         }
 
+        if ($this->passwordStrengthEstimatorModel->validate($value, $constraint->score)) {
+            return;
+        }
+
         $this->context->buildViolation($constraint->message)
             ->setParameter('{{ value }}', $this->formatValue($value))
-            ->setCode(NotBlank::IS_BLANK_ERROR)
+            ->setCode(NotWeak::TOO_WEAK)
             ->addViolation();
     }
 }

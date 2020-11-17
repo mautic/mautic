@@ -284,7 +284,7 @@ return [
             'mautic.user.validator.not_weak_validator' => [
                 'class'     => \Mautic\UserBundle\Form\Validator\Constraints\NotWeakValidator::class,
                 'arguments' => [
-                    'mautic.security.password.strength.estimator',
+                    'mautic.user.model.password_strength_estimator',
                 ],
                 'tag' => 'validator.constraint_validator',
             ],

@@ -21,10 +21,7 @@ class NotWeak extends Constraint
         self::TOO_WEAK => 'PASSWORD_TOO_WEAK_ERROR',
     ];
 
-    public $errorMessage = 'This password is too weak. Consider generating a stronger password.';
+    public $message = 'This password is too weak. Consider using a stronger password.';
 
-    public function __construct($options = null)
-    {
-        parent::__construct($options);
-    }
+    public $score;
 }
