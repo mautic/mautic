@@ -260,7 +260,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         $metadata->addPropertyConstraint('plainPassword', new NotWeak(
             [
                 'score'      => static::MINIMUM_PASSWORD_STRENGTH,
-                'message'    => 'mautic.user.user.password.minlength',
+                'message'    => 'mautic.user.user.password.weak',
                 'groups'     => ['CheckPassword'],
             ]
         ));
