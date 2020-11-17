@@ -40,7 +40,6 @@ class NotWeakValidator extends ConstraintValidator
         }
 
         $this->context->buildViolation($constraint->message)
-            ->setParameter('{{ value }}', $this->formatValue($value))
             ->setCode(NotWeak::TOO_WEAK)
             ->addViolation();
     }
