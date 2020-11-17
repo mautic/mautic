@@ -17,28 +17,17 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Event\AuthenticationEvent;
 use Mautic\UserBundle\Exception\WeakPasswordException;
+use Mautic\UserBundle\Model\PasswordStrengthEstimatorModel;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Router;
-use ZxcvbnPhp\Zxcvbn as PasswordStrengthEstimator;
 
 class PasswordSubscriber implements EventSubscriberInterface
 {
-    private const MINIMUM_PASSWORD_STRENGTH_ALLOWED = 3;
-
-    private const DICTIONARY = [
-        'mautic',
-        'user',
-        'lead',
-        'bundle',
-        'campaign',
-        'company',
-    ];
-
     /**
-     * @var PasswordStrengthEstimator
+     * @var PasswordStrengthEstimatorModel
      */
-    private $passwordStrengthEstimator;
+    private $passwordStrengthEstimatorModel;
 
     /**
      * @var UserRepository
@@ -50,11 +39,11 @@ class PasswordSubscriber implements EventSubscriberInterface
      */
     private $router;
 
-    public function __construct(PasswordStrengthEstimator $passwordStrengthEstimator, UserRepository $userRepository, Router $router)
+    public function __construct(PasswordStrengthEstimatorModel $passwordStrengthEstimatorModel, UserRepository $userRepository, Router $router)
     {
-        $this->passwordStrengthEstimator = $passwordStrengthEstimator;
-        $this->userRepository            = $userRepository;
-        $this->router                    = $router;
+        $this->passwordStrengthEstimatorModel = $passwordStrengthEstimatorModel;
+        $this->userRepository                 = $userRepository;
+        $this->router                         = $router;
     }
 
     public static function getSubscribedEvents(): array
@@ -66,36 +55,16 @@ class PasswordSubscriber implements EventSubscriberInterface
 
     public function onUserFormAuthentication(AuthenticationEvent $authenticationEvent): void
     {
-        $credentials = $authenticationEvent->getToken()->getCredentials();
-        if (!is_string($credentials)) {
+        $userPassword = $authenticationEvent->getToken()->getCredentials();
+        if (!is_string($userPassword)) {
             return;
         }
 
-        $user       = $this->initializeUser($authenticationEvent);
-        $dictionary = $user ? $this->buildDictionary($user) : [];
+        $user = $this->initializeUser($authenticationEvent);
 
-        $score = $this->passwordStrengthEstimator->passwordStrength($credentials, $dictionary)['score'];
-
-        if (static::MINIMUM_PASSWORD_STRENGTH_ALLOWED <= $score) {
-            // The password is fine, bail.
-            return;
+        if (!$this->passwordStrengthEstimatorModel->validateUser($userPassword, $user)) {
+            throw new WeakPasswordException();
         }
-
-        throw new WeakPasswordException();
-    }
-
-    private function buildDictionary(User $user): array
-    {
-        $dictionary = array_merge([
-            $user->getEmail(),
-            $user->getUsername(),
-            $user->getFirstName(),
-            $user->getLastName(),
-            $user->getPosition(),
-            $user->getSignature(),
-        ], static::DICTIONARY);
-
-        return array_unique(array_map('mb_strtolower', array_filter($dictionary)));
     }
 
     private function initializeUser(AuthenticationEvent $authenticationEvent): ?User
