@@ -35,6 +35,11 @@ class ContactSegmentFilter
      */
     private $schemaCache;
 
+    /**
+     * @var string
+     */
+    private $baseAlias;
+
     public function __construct(
         ContactSegmentFilterCrate $contactSegmentFilterCrate,
         FilterDecoratorInterface $filterDecorator,
@@ -234,5 +239,15 @@ class ContactSegmentFilter
     {
         return method_exists($this->filterDecorator, 'getRelationJoinTableField') ?
             $this->filterDecorator->getRelationJoinTableField() : null;
+    }
+
+    public function getBaseAlias(): string
+    {
+        return $this->baseAlias ?? 'l';
+    }
+
+    public function setBaseAlias(string $baseAlias): void
+    {
+        $this->baseAlias = $baseAlias;
     }
 }
