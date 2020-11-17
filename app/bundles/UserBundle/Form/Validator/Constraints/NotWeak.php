@@ -11,6 +11,7 @@
 
 namespace Mautic\UserBundle\Form\Validator\Constraints;
 
+use Mautic\UserBundle\Model\PasswordStrengthEstimatorModel;
 use Symfony\Component\Validator\Constraint;
 
 class NotWeak extends Constraint
@@ -23,5 +24,5 @@ class NotWeak extends Constraint
 
     public $message = 'This password is too weak. Consider using a stronger password.';
 
-    public $score;
+    public $score = PasswordStrengthEstimatorModel::MINIMUM_PASSWORD_STRENGTH_ALLOWED;
 }
