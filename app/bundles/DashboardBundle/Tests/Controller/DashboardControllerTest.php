@@ -61,17 +61,18 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     public function testSaveWithGetWillCallAccessDenied()
     {
         $this->requestMock->expects($this->once())
-            ->method('getMethod')
-            ->willReturn('GET');
+            ->method('isMethod')
+            ->willReturn(Request::METHOD_POST)
+            ->willReturn(true);
+
+        $this->requestMock->expects(self::once())
+            ->method('isXmlHttpRequest')
+            ->willReturn(false);
 
         $this->containerMock->expects($this->at(0))
             ->method('get')
             ->with('mautic.security')
             ->willReturn($this->securityMock);
-
-        $this->translatorMock->expects($this->at(0))
-            ->method('trans')
-            ->with('mautic.core.url.error.401');
 
         $this->expectException(AccessDeniedHttpException::class);
         $this->controller->saveAction();
@@ -80,8 +81,9 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     public function testSaveWithPostNotAjaxWillCallAccessDenied()
     {
         $this->requestMock->expects($this->once())
-            ->method('getMethod')
-            ->willReturn('POST');
+            ->method('isMethod')
+            ->willReturn('POST')
+            ->willReturn(true);
 
         $this->requestMock->method('isXmlHttpRequest')
             ->willReturn(false);
@@ -102,8 +104,9 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     public function testSaveWithPostAjaxWillSave()
     {
         $this->requestMock->expects($this->once())
-            ->method('getMethod')
-            ->willReturn('POST');
+            ->method('isMethod')
+            ->willReturn('POST')
+            ->willReturn(true);
 
         $this->requestMock->method('isXmlHttpRequest')
             ->willReturn(true);
@@ -153,8 +156,9 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     public function testSaveWithPostAjaxWillNotBeAbleToSave()
     {
         $this->requestMock->expects($this->once())
-            ->method('getMethod')
-            ->willReturn('POST');
+            ->method('isMethod')
+            ->willReturn('POST')
+            ->willReturn(true);
 
         $this->requestMock->method('isXmlHttpRequest')
             ->willReturn(true);

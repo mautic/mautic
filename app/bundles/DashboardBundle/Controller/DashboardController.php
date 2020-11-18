@@ -308,7 +308,7 @@ class DashboardController extends AbstractFormController
     public function saveAction()
     {
         // Accept only AJAX POST requests because those are check for CSRF tokens
-        if ($this->request->isMethod(Request::METHOD_POST) || !$this->request->isXmlHttpRequest()) {
+        if (!$this->request->isMethod(Request::METHOD_POST) || !$this->request->isXmlHttpRequest()) {
             return $this->accessDenied();
         }
 
