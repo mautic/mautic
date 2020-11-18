@@ -8,7 +8,7 @@ use Predis\Replication\ReplicationStrategy;
 
 class MasterOnlyStrategy extends ReplicationStrategy
 {
-    protected function getReadOnlyOperations()
+    protected function getReadOnlyOperations(): array
     {
         return [];
     }
