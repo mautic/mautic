@@ -63,7 +63,7 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
      */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
-        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
+        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $segmentIds      = $filter->getParameterValue();
 
         if (!is_array($segmentIds)) {
@@ -84,7 +84,7 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
             $filters = $this->leadSegmentFilterFactory->getSegmentFilters($contactSegment);
 
             $segmentQueryBuilder       = $this->leadSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($contactSegment->getId(), $filters, true);
-            $subSegmentLeadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
+            $subSegmentLeadsTableAlias = $segmentQueryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
             $segmentQueryBuilder->resetQueryParts(['select'])->select('null');
 
             //  If the segment contains no filters; it means its for manually subscribed only

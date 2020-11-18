@@ -55,7 +55,7 @@ class ContactSegmentService
         }
 
         $qb = $this->getNewSegmentContactsQuery($segment);
-        $leadsTableAlias = $qb->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
+        $leadsTableAlias = $qb->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
 
         $this->addMinMaxLimiters($qb, $batchLimiters);
         $this->addLeadLimiter($qb, $batchLimiters, $leadsTableAlias.'.id');
@@ -119,7 +119,7 @@ class ContactSegmentService
     public function getNewLeadListLeads(LeadList $segment, array $batchLimiters, $limit = 1000): array
     {
         $queryBuilder    = $this->getNewSegmentContactsQuery($segment);
-        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
+        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
 
         // Prepend the DISTINCT to the beginning of the select array
         $select = $queryBuilder->getQueryPart('select');
@@ -264,7 +264,7 @@ class ContactSegmentService
 
     private function addMinMaxLimiters(QueryBuilder $queryBuilder, array $batchLimiters)
     {
-        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
+        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
 
         if (!empty($batchLimiters['minId']) && !empty($batchLimiters['maxId'])) {
             $queryBuilder->andWhere(
@@ -281,9 +281,9 @@ class ContactSegmentService
         }
     }
 
-    private function excludeVisitors(QueryBuilder $queryBuilder)
+    private function excludeVisitors(QueryBuilder $queryBuilder): void
     {
-        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
+        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $queryBuilder->andWhere($queryBuilder->expr()->isNotNull($leadsTableAlias.'.date_identified'));
     }
 
