@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
+use Exception;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -25,9 +26,15 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
         return 'mautic.lead.query.builder.complex_relation.value';
     }
 
-    /** {@inheritdoc} */
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
+    /**
+     * @param  QueryBuilder  $queryBuilder
+     * @param  ContactSegmentFilter  $filter
+     * @return QueryBuilder
+     * @throws Exception
+     */
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
+        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
         $filterOperator = $filter->getOperator();
 
         $filterParameters = $filter->getParameterValue();
@@ -49,7 +56,7 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
             $tableAlias = $this->generateRandomParameterName();
 
             $relTable = $this->generateRandomParameterName();
-            $queryBuilder->leftJoin('l', $filter->getRelationJoinTable(), $relTable, $relTable.'.lead_id = l.id');
+            $queryBuilder->leftJoin($leadsTableAlias, $filter->getRelationJoinTable(), $relTable, $relTable.'.lead_id = '.$leadsTableAlias.'.id');
             $queryBuilder->leftJoin($relTable, $filter->getTable(), $tableAlias, $tableAlias.'.id = '.$relTable.'.'
                 .$filter->getRelationJoinTableField());
         }
@@ -117,7 +124,7 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $expression = $queryBuilder->expr()->andX($expressions);
                 break;
             default:
-                throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');
+                throw new Exception('Dunno how to handle operator "'.$filterOperator.'"');
         }
 
         $queryBuilder->addLogic($expression, $filter->getGlue());

@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Mautic\LeadBundle\Segment\Query\QueryException;
 
 class DoNotContactFilterQueryBuilder extends BaseFilterQueryBuilder
 {
@@ -14,6 +15,7 @@ class DoNotContactFilterQueryBuilder extends BaseFilterQueryBuilder
 
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
+        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
         $doNotContactParts = $filter->getDoNotContactParts();
         $expr              = $queryBuilder->expr();
         $queryAlias        = $this->generateRandomParameterName();
@@ -30,9 +32,9 @@ class DoNotContactFilterQueryBuilder extends BaseFilterQueryBuilder
             ->andWhere($expr->eq($queryAlias.'.channel', $channelParameter));
 
         if ('eq' === $filter->getOperator() xor !$filter->getParameterValue()) {
-            $expression = $expr->in('l.id', $filterQueryBuilder->getSQL());
+            $expression = $expr->in($leadsTableAlias.'.id', $filterQueryBuilder->getSQL());
         } else {
-            $expression = $expr->notIn('l.id', $filterQueryBuilder->getSQL());
+            $expression = $expr->notIn($leadsTableAlias.'.id', $filterQueryBuilder->getSQL());
         }
 
         $queryBuilder->addLogic($expression, $filter->getGlue());

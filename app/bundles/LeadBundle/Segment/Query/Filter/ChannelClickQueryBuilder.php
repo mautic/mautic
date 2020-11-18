@@ -17,6 +17,7 @@ class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
 
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
+        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
         $filterOperator = $filter->getOperator();
         $filterChannel  = $this->getChannel($filter->getField());
 
@@ -49,7 +50,11 @@ class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', $tableAlias)
             ->where($expr);
 
-        $queryBuilder->addLogic($queryBuilder->expr()->$inExpr('l.id', $subQb->getSQL()), $filter->getGlue());
+        if ('empty' === $filterOperator && !$this->isDateBased($filter->getField())) {
+            $queryBuilder->addLogic($queryBuilder->expr()->notIn($leadsTableAlias.'.id', $subQb->getSQL()), $filter->getGlue());
+        } else {
+            $queryBuilder->addLogic($queryBuilder->expr()->in($leadsTableAlias.'.id', $subQb->getSQL()), $filter->getGlue());
+        }
 
         $queryBuilder->setParametersPairs($parameter, $filterParameter);
 

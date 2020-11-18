@@ -23,13 +23,22 @@ final class SegmentOperatorQueryBuilderEvent extends Event
     private bool $operatorHandled = false;
 
     /**
-     * @param string|string[] $parameterHolder
+     * @var string
+     */
+    private $leadsTableAlias;
+
+    /**
+     * SegmentOperatorQueryBuilderEvent constructor.
+     * @param  QueryBuilder  $queryBuilder
+     * @param  ContactSegmentFilter  $filter
+     * @param $parameterHolder
      */
     public function __construct(QueryBuilder $queryBuilder, ContactSegmentFilter $filter, $parameterHolder)
     {
         $this->queryBuilder    = $queryBuilder;
         $this->filter          = $filter;
         $this->parameterHolder = $parameterHolder;
+        $this->leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
     }
 
     public function getQueryBuilder(): QueryBuilder
@@ -78,5 +87,13 @@ final class SegmentOperatorQueryBuilderEvent extends Event
     public function wasOperatorHandled(): bool
     {
         return $this->operatorHandled;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLeadsTableAlias(): string
+    {
+        return $this->leadsTableAlias;
     }
 }

@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Segment\Query;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\ORM\EntityManager;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
 use Mautic\LeadBundle\Event\LeadListQueryBuilderGeneratedEvent;
@@ -50,7 +51,7 @@ class ContactSegmentQueryBuilder
      *
      * @throws SegmentQueryException
      */
-    public function assembleContactsSegmentQueryBuilder($segmentId, $segmentFilters)
+    public function assembleContactsSegmentQueryBuilder($segmentId, $segmentFilters, bool $changeAlias = false): QueryBuilder
     {
         /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
@@ -62,7 +63,9 @@ class ContactSegmentQueryBuilder
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = new QueryBuilder($connection);
 
-        $queryBuilder->select('l.id')->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+        $leadsTableAlias = $changeAlias ? $this->generateRandomParameterName() : Lead::DEFAULT_ALIAS;
+
+        $queryBuilder->select($leadsTableAlias.'.id')->from(MAUTIC_TABLE_PREFIX.'leads', $leadsTableAlias);
 
         /*
          * Validate the plan, check for circular dependencies.
@@ -146,6 +149,7 @@ class ContactSegmentQueryBuilder
      */
     public function addNewContactsRestrictions(QueryBuilder $queryBuilder, $segmentId)
     {
+        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
         $expr               = $queryBuilder->expr();
         $tableAlias         = $this->generateRandomParameterName();
         $segmentIdParameter = ":{$tableAlias}segmentId";
@@ -156,20 +160,17 @@ class ContactSegmentQueryBuilder
             ->andWhere($expr->eq($tableAlias.'.leadlist_id', $segmentIdParameter));
 
         $queryBuilder->setParameter($segmentIdParameter, $segmentId);
-        $queryBuilder->andWhere($expr->notIn('l.id', $segmentQueryBuilder->getSQL()));
+        $queryBuilder->andWhere($expr->notIn($leadsTableAlias.'.id', $segmentQueryBuilder->getSQL()));
 
         return $queryBuilder;
     }
 
     /**
      * @param $leadListId
-     * @param string $defaultAlias
      */
-    public function addManuallySubscribedQuery(
-        QueryBuilder $queryBuilder,
-        $leadListId,
-        $defaultAlias = 'l'
-    ): QueryBuilder {
+    public function addManuallySubscribedQuery(QueryBuilder $queryBuilder, $leadListId): QueryBuilder
+    {
+        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
         $tableAlias = $this->generateRandomParameterName();
 
         $existsQueryBuilder = $queryBuilder->getConnection()->createQueryBuilder();
@@ -186,7 +187,7 @@ class ContactSegmentQueryBuilder
             );
 
         $existingQueryWherePart = $existsQueryBuilder->getQueryPart('where');
-        $existsQueryBuilder->where("$defaultAlias.id = $tableAlias.lead_id");
+        $existsQueryBuilder->where("$leadsTableAlias.id = $tableAlias.lead_id");
         $existsQueryBuilder->andWhere($existingQueryWherePart);
 
         $queryBuilder->orWhere(
@@ -198,21 +199,18 @@ class ContactSegmentQueryBuilder
 
     /**
      * @param $leadListId
-     * @param string $defaultAlias
      *
      * @throws QueryException
      */
-    public function addManuallyUnsubscribedQuery(
-        QueryBuilder $queryBuilder,
-        $leadListId,
-        $defaultAlias = 'l'
-    ): QueryBuilder {
+    public function addManuallyUnsubscribedQuery(QueryBuilder $queryBuilder, $leadListId): QueryBuilder
+    {
+        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
         $tableAlias = $this->generateRandomParameterName();
         $queryBuilder->leftJoin(
-            $defaultAlias,
+            $leadsTableAlias,
             MAUTIC_TABLE_PREFIX.'lead_lists_leads',
             $tableAlias,
-            $defaultAlias.'.id = '.$tableAlias.'.lead_id and '.$tableAlias.'.leadlist_id = '.intval($leadListId)
+            $leadsTableAlias.'.id = '.$tableAlias.'.lead_id and '.$tableAlias.'.leadlist_id = '.intval($leadListId)
         );
         $queryBuilder->addJoinCondition($tableAlias, $queryBuilder->expr()->eq($tableAlias.'.manually_removed', 1));
         $queryBuilder->andWhere($queryBuilder->expr()->isNull($tableAlias.'.lead_id'));

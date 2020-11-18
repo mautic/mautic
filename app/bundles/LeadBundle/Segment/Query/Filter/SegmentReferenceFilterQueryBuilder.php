@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
@@ -11,6 +12,7 @@ use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Mautic\LeadBundle\Segment\Query\QueryException;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -54,14 +56,17 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
     }
 
     /**
+     * @param  QueryBuilder  $queryBuilder
+     * @param  ContactSegmentFilter  $filter
      * @return QueryBuilder
-     *
-     * @throws \Doctrine\DBAL\Query\QueryException
-     * @throws \Exception
+     * @throws SegmentNotFoundException
      * @throws SegmentQueryException
+     * @throws DBALException
+     * @throws QueryException
      */
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
+        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
         $segmentIds = $filter->getParameterValue();
 
         if (!is_array($segmentIds)) {
@@ -81,17 +86,16 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
 
             $filters = $this->leadSegmentFilterFactory->getSegmentFilters($contactSegment);
 
-            $segmentQueryBuilder       = $this->leadSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($contactSegment->getId(), $filters);
-            $subSegmentLeadsTableAlias = $this->generateRandomParameterName();
-            $segmentQueryBuilder->resetQueryParts(['select', 'from'])->select('null');
-            $segmentQueryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', $subSegmentLeadsTableAlias);
+            $segmentQueryBuilder       = $this->leadSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($contactSegment->getId(), $filters, true);
+            $subSegmentLeadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
+            $segmentQueryBuilder->resetQueryParts(['select'])->select('null');
 
             //  If the segment contains no filters; it means its for manually subscribed only
             if (count($filters)) {
-                $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallyUnsubscribedQuery($segmentQueryBuilder, $contactSegment->getId(), $subSegmentLeadsTableAlias);
+                $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallyUnsubscribedQuery($segmentQueryBuilder, $contactSegment->getId());
             }
 
-            $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallySubscribedQuery($segmentQueryBuilder, $contactSegment->getId(), $subSegmentLeadsTableAlias);
+            $segmentQueryBuilder = $this->leadSegmentQueryBuilder->addManuallySubscribedQuery($segmentQueryBuilder, $contactSegment->getId());
 
             $parameters = $segmentQueryBuilder->getParameters();
             foreach ($parameters as $key => $value) {
@@ -99,8 +103,9 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
             }
 
             $this->leadSegmentQueryBuilder->queryBuilderGenerated($contactSegment, $segmentQueryBuilder);
+
             $segmentQueryWherePart = $segmentQueryBuilder->getQueryPart('where');
-            $segmentQueryBuilder->where("l.id = $subSegmentLeadsTableAlias.id");
+            $segmentQueryBuilder->where("$leadsTableAlias.id = $subSegmentLeadsTableAlias.id");
             $segmentQueryBuilder->andWhere($segmentQueryWherePart);
 
             $segmentAlias = $this->generateRandomParameterName();
