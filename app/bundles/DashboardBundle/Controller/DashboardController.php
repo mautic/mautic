@@ -95,15 +95,13 @@ class DashboardController extends AbstractFormController
      */
     public function widgetAction($widgetId)
     {
-        $request = $this->get('request_stack')->getCurrentRequest();
-
-        if (!$request->isXmlHttpRequest()) {
+        if (!$this->request->isXmlHttpRequest()) {
             throw new NotFoundHttpException('Not found.');
         }
 
         /** @var WidgetService $widgetService */
         $widgetService = $this->get('mautic.dashboard.widget');
-        $widgetService->setFilter($request);
+        $widgetService->setFilter($this->request);
         $widget        = $widgetService->get((int) $widgetId);
 
         if (!$widget) {
