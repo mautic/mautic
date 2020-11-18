@@ -86,12 +86,12 @@ class Widget
 
         if (!empty($dateRangeFilter['date_from'])) {
             $from = new \DateTime($dateRangeFilter['date_from']);
-            $this->session->set('mautic.dashboard.date.from', $from->format(self::FORMAT_MYSQL));
+            $this->session->set('mautic.daterange.form.from', $from->format(self::FORMAT_MYSQL));
         }
 
         if (!empty($dateRangeFilter['date_to'])) {
             $to = new \DateTime($dateRangeFilter['date_to']);
-            $this->session->set('mautic.dashboard.date.to', $to->format(self::FORMAT_MYSQL));
+            $this->session->set('mautic.daterange.form.to', $to->format(self::FORMAT_MYSQL));
         }
 
         $this->dashboardModel->clearDashboardCache();
