@@ -16,14 +16,9 @@ class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
         return 'mautic.lead.query.builder.special.sessions';
     }
 
-    /**
-     * @param  QueryBuilder  $queryBuilder
-     * @param  ContactSegmentFilter  $filter
-     * @return QueryBuilder
-     */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
-        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
+        $leadsTableAlias      = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
         $pageHitsAlias        = $this->generateRandomParameterName();
         $exclusionAlias       = $this->generateRandomParameterName();
         $expressionValueAlias = $this->generateRandomParameterName();

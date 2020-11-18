@@ -56,9 +56,6 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
     }
 
     /**
-     * @param  QueryBuilder  $queryBuilder
-     * @param  ContactSegmentFilter  $filter
-     * @return QueryBuilder
      * @throws SegmentNotFoundException
      * @throws SegmentQueryException
      * @throws DBALException
@@ -67,7 +64,7 @@ class SegmentReferenceFilterQueryBuilder extends BaseFilterQueryBuilder
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
-        $segmentIds = $filter->getParameterValue();
+        $segmentIds      = $filter->getParameterValue();
 
         if (!is_array($segmentIds)) {
             $segmentIds = [intval($segmentIds)];

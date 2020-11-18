@@ -113,11 +113,12 @@ class ContactSegmentService
     /**
      * @param int $limit
      *
-     * @throws \Exception
+     * @throws DBALException
+     * @throws Exception\SegmentQueryException
      */
     public function getNewLeadListLeads(LeadList $segment, array $batchLimiters, $limit = 1000): array
     {
-        $queryBuilder = $this->getNewSegmentContactsQuery($segment);
+        $queryBuilder    = $this->getNewSegmentContactsQuery($segment);
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
 
         // Prepend the DISTINCT to the beginning of the select array

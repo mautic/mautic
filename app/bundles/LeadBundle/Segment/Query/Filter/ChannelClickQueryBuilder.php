@@ -15,11 +15,11 @@ class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
         return 'mautic.lead.query.builder.channel_click.value';
     }
 
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
-        $filterOperator = $filter->getOperator();
-        $filterChannel  = $this->getChannel($filter->getField());
+        $filterOperator  = $filter->getOperator();
+        $filterChannel   = $this->getChannel($filter->getField());
 
         $filterParameter = $filter->getParameterValue();
         $parameter       = $this->generateRandomParameterName();

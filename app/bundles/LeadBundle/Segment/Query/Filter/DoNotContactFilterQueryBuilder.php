@@ -13,9 +13,12 @@ class DoNotContactFilterQueryBuilder extends BaseFilterQueryBuilder
         return 'mautic.lead.query.builder.special.dnc';
     }
 
+    /**
+     * @throws QueryException
+     */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
-        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
+        $leadsTableAlias   = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
         $doNotContactParts = $filter->getDoNotContactParts();
         $expr              = $queryBuilder->expr();
         $queryAlias        = $this->generateRandomParameterName();

@@ -28,10 +28,7 @@ final class SegmentOperatorQueryBuilderEvent extends Event
     private $leadsTableAlias;
 
     /**
-     * SegmentOperatorQueryBuilderEvent constructor.
-     * @param  QueryBuilder  $queryBuilder
-     * @param  ContactSegmentFilter  $filter
-     * @param $parameterHolder
+     * @param string|string[] $parameterHolder
      */
     public function __construct(QueryBuilder $queryBuilder, ContactSegmentFilter $filter, $parameterHolder)
     {
@@ -89,9 +86,6 @@ final class SegmentOperatorQueryBuilderEvent extends Event
         return $this->operatorHandled;
     }
 
-    /**
-     * @return string
-     */
     public function getLeadsTableAlias(): string
     {
         return $this->leadsTableAlias;

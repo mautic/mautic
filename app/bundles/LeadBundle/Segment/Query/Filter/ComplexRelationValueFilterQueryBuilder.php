@@ -27,15 +27,12 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
     }
 
     /**
-     * @param  QueryBuilder  $queryBuilder
-     * @param  ContactSegmentFilter  $filter
-     * @return QueryBuilder
      * @throws Exception
      */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
-        $filterOperator = $filter->getOperator();
+        $filterOperator  = $filter->getOperator();
 
         $filterParameters = $filter->getParameterValue();
 

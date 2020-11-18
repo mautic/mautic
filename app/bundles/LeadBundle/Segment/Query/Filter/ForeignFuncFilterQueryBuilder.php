@@ -21,18 +21,15 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
     }
 
     /**
-     * @param  QueryBuilder  $queryBuilder
-     * @param  ContactSegmentFilter  $filter
-     * @return QueryBuilder
      * @throws FieldNotFoundException
      * @throws QueryException
      */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
-        $filterOperator = $filter->getOperator();
-        $filterGlue     = $filter->getGlue();
-        $filterAggr     = $filter->getAggregateFunction();
+        $filterOperator  = $filter->getOperator();
+        $filterGlue      = $filter->getGlue();
+        $filterAggr      = $filter->getAggregateFunction();
 
         $filterParameters = $filter->getParameterValue();
 
