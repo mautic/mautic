@@ -18,13 +18,6 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class User extends FormEntity implements UserInterface, EquatableInterface, PasswordAuthenticatedUserInterface
 {
     /**
-     * Minimum required password strength.
-     *
-     * @int
-     */
-    public const MINIMUM_PASSWORD_STRENGTH = 3;
-
-    /**
      * @var int
      */
     protected $id;
