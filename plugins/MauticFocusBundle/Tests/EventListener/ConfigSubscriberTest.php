@@ -29,7 +29,7 @@ class ConfigSubscriberTest extends TestCase
      */
     private $subscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configEvent          = $this->createMock(ConfigEvent::class);
         $this->subscriber           = new ConfigSubscriber();
