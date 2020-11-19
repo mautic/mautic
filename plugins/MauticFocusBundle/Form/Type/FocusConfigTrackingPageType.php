@@ -16,9 +16,6 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\PageBundle\Form\Type\ConfigTrackingPageType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class ConfigType.
- */
 class FocusConfigTrackingPageType extends ConfigTrackingPageType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
