@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 /*
  * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
