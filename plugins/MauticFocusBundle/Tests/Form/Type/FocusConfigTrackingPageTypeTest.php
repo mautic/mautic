@@ -36,7 +36,7 @@ class FocusConfigTrackingPageTypeTest extends TestCase
         $this->formBuilder          = $this->createMock(FormBuilderInterface::class);
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $options = [
             'data' => true,
