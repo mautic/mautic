@@ -56,7 +56,7 @@ class FocusConfigTrackingPageTypeTest extends TestCase
         $this->form->buildForm($this->formBuilder, $options);
     }
 
-    public function testGetBlockPrefix()
+    public function testGetBlockPrefix(): void
     {
         $this->assertSame('focusconfig', $this->form->getBlockPrefix());
     }
