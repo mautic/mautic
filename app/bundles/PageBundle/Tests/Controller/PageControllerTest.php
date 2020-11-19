@@ -139,7 +139,7 @@ class PageControllerTest extends MauticMysqlTestCase
         // $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), 'page not found');
         if (Response::HTTP_OK === $clientResponse->getStatusCode()) {
             $leadModel     = $this->container->get('mautic.model.factory')->getModel('lead');
-            $allUtmTags    = $leadModel->getUtmTagRepository()->getEntities();
+            $allUtmTags    = $this->em->getRepository(UtmTag::class)->getEntities();
             $this->assertNotCount(0, $allUtmTags);
 
             foreach ($allUtmTags as $utmTag) {
