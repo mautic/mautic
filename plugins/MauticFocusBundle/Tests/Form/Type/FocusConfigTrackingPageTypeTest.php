@@ -27,7 +27,7 @@ class FocusConfigTrackingPageTypeTest extends TestCase
      */
     private $formBuilder;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->form                 = new FocusConfigTrackingPageType();
         $this->formBuilder          = $this->createMock(FormBuilderInterface::class);
