@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types = 1);
+
 /*
  * @copyright   2020 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -33,7 +36,7 @@ class FocusConfigTrackingPageTypeTest extends TestCase
         $this->formBuilder          = $this->createMock(FormBuilderInterface::class);
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $options = [
             'data' => true,
@@ -49,14 +52,14 @@ class FocusConfigTrackingPageTypeTest extends TestCase
                     'attr'  => [
                         'tooltip' => 'mautic.page.config.form.focus.pixel.enabled.tooltip',
                     ],
-                    'data'  => isset($options['data']['focus_pixel_enabled']) ? (bool) $options['data']['focus_pixel_enabled'] : false,
+                'data'  => (bool) $options['data']['focus_pixel_enabled']) ?? true,
                 ]
             );
 
         $this->form->buildForm($this->formBuilder, $options);
     }
 
-    public function testGetBlockPrefix()
+    public function testGetBlockPrefix(): void
     {
         $this->assertSame('focusconfig', $this->form->getBlockPrefix());
     }
