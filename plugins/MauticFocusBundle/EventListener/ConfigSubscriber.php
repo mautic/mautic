@@ -19,7 +19,7 @@ use Mautic\PageBundle\Form\Type\ConfigType;
 use MauticPlugin\MauticFocusBundle\Form\Type\FocusConfigTrackingPageType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ConfigSubscriber implements EventSubscriberInterface
+final class ConfigSubscriber implements EventSubscriberInterface
 {
     /**
      * @return array
