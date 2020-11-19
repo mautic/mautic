@@ -14,6 +14,7 @@ namespace Mautic\UserBundle\Tests\EventListener;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Event\AuthenticationEvent;
 use Mautic\UserBundle\EventListener\PasswordSubscriber;
+use Mautic\UserBundle\Exception\WeakPasswordException;
 use Mautic\UserBundle\Model\PasswordStrengthEstimatorModel;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
 use PHPUnit\Framework\TestCase;
@@ -60,10 +61,21 @@ class PasswordSubscriberTest extends TestCase
         $this->passwordSubscriber             = new PasswordSubscriber($this->passwordStrengthEstimatorModel, $this->userRepository, $this->router);
         $this->authenticationEvent            = $this->createMock(AuthenticationEvent::class);
         $this->pluginToken                    = $this->createMock(PluginToken::class);
+
+        $this->authenticationEvent->expects($this->any())
+            ->method('getToken')
+            ->willReturn($this->pluginToken);
     }
 
     public function testThatItThrowsExceptionIfPasswordIsWeak(): void
     {
+        $this->expectException(WeakPasswordException::class);
+
+        $simplePassword = '11111111';
+        $this->pluginToken->expects($this->once())
+            ->method('getCredentials')
+            ->willReturn($simplePassword);
+
         $this->passwordSubscriber->onUserFormAuthentication($this->authenticationEvent);
     }
 }

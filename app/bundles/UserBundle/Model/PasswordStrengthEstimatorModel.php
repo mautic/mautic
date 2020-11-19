@@ -47,8 +47,12 @@ class PasswordStrengthEstimatorModel
         return $this->validate($userPassword, $score, $this->buildUserPasswordDictionary($user));
     }
 
-    private function buildUserPasswordDictionary(User $user): array
+    private function buildUserPasswordDictionary(User $user = null): array
     {
+        if (!$user) {
+            return $this->sanitazeDictionary(static::DICTIONARY);
+        }
+
         $dictionary = array_merge([
             $user->getEmail(),
             $user->getUsername(),
@@ -58,6 +62,11 @@ class PasswordStrengthEstimatorModel
             $user->getSignature(),
         ], static::DICTIONARY);
 
-        return array_unique(array_map('mb_strtolower', array_filter($dictionary)));
+        return $this->sanitazeDictionary($dictionary);
+    }
+
+    private function sanitazeDictionary(array $dictionary): array
+    {
+        return array_unique(array_filter($dictionary));
     }
 }
