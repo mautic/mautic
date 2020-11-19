@@ -49,8 +49,9 @@ class TrackingPixelHelper
 
         //check to ses if request is a POST
         if ('GET' == $request->getMethod()) {
-            if('HTTP/1.1' == $request->getProtocolVersion())
-            $response->headers->set('Connection', 'close');
+            if ('HTTP/1.1' == $request->getProtocolVersion()) {
+                $response->headers->set('Connection', 'close');
+            }
 
             //return 1x1 pixel transparent gif
             $response->headers->set('Content-Type', 'image/gif');
