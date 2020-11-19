@@ -17,6 +17,8 @@ use Mautic\UserBundle\EventListener\PasswordSubscriber;
 use Mautic\UserBundle\Exception\WeakPasswordException;
 use Mautic\UserBundle\Model\PasswordStrengthEstimatorModel;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
+use Mautic\UserBundle\UserEvents;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Router;
 use ZxcvbnPhp\Zxcvbn;
@@ -67,15 +69,29 @@ class PasswordSubscriberTest extends TestCase
             ->willReturn($this->pluginToken);
     }
 
+    public function testThatItIsSubcribedToEvents(): void
+    {
+        Assert::assertArrayHasKey(UserEvents::USER_FORM_POST_LOCAL_PASSWORD_AUTHENTICATION, PasswordSubscriber::getSubscribedEvents());
+    }
+
     public function testThatItThrowsExceptionIfPasswordIsWeak(): void
     {
         $this->expectException(WeakPasswordException::class);
 
-        $simplePassword = '11111111';
         $this->pluginToken->expects($this->once())
             ->method('getCredentials')
-            ->willReturn($simplePassword);
+            ->willReturn('11111111');
 
         $this->passwordSubscriber->onUserFormAuthentication($this->authenticationEvent);
+    }
+
+    public function testThatItDoesntThrowExceptionIfPasswordIsStrong(): void
+    {
+        $this->pluginToken->expects($this->once())
+            ->method('getCredentials')
+            ->willReturn(uniqid());
+
+        $this->passwordSubscriber->onUserFormAuthentication($this->authenticationEvent);
+        $this->addToAssertionCount(1); // Verify that no exception is thrown
     }
 }
