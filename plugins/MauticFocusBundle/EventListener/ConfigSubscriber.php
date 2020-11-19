@@ -31,7 +31,7 @@ final class ConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onConfigGenerateTracking(ConfigBuilderEvent $event)
+    public function onConfigGenerateTracking(ConfigBuilderEvent $event): void
     {
         $event->addForm([
             'bundle'     => 'FocusBundle',
