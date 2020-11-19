@@ -28,7 +28,7 @@ class FocusConfigTrackingPageType extends ConfigTrackingPageType
                 'attr'  => [
                     'tooltip' => 'mautic.page.config.form.focus.pixel.enabled.tooltip',
                 ],
-                'data'  => (bool) $options['data']['focus_pixel_enabled']) ?? true,
+                'data'  => ((bool) $options['data']['focus_pixel_enabled']) ?? true,
             ]
         );
     }
