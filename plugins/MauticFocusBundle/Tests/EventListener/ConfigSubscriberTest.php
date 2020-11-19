@@ -35,7 +35,7 @@ class ConfigSubscriberTest extends TestCase
         $this->subscriber           = new ConfigSubscriber();
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
             [
