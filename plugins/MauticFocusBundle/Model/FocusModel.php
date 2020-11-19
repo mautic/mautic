@@ -264,7 +264,7 @@ class FocusModel extends FormModel
                 'preview'          => $isPreview,
                 'htmlMode'         => $htmlMode,
                 'clickUrl'         => $url,
-                'tracking_enabled' => $this->coreParametersHelper->get('focus_pixel_enabled'),
+                'tracking_enabled' => $this->coreParametersHelper->get('focus_pixel_enabled', true),
             ]
         );
 
