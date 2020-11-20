@@ -11,13 +11,11 @@
 
 namespace Mautic\CampaignBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class ConfigType.
- */
 class ConfigType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -52,26 +50,28 @@ class ConfigType extends AbstractType
                 'required' => false,
             ]
         );
+
         $builder->add(
             'campaign_by_range',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.campaignconfig.campaign_by_range',
                 'attr'  => [
                     'tooltip' => 'mautic.campaignconfig.campaign_by_range.tooltip',
                 ],
-                'data'  => isset($options['data']['campaign_by_range']) ? (bool) $options['data']['campaign_by_range'] : false,
+                'data'  => ((bool) $options['data']['campaign_by_range']) ?? false,
             ]
         );
+
         $builder->add(
             'campaign_use_summary',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.campaignconfig.use_summary',
                 'attr'  => [
                     'tooltip' => 'mautic.campaignconfig.use_summary.tooltip',
                 ],
-                'data'  => isset($options['data']['campaign_use_summary']) ? (bool) $options['data']['campaign_use_summary'] : false,
+                'data'  => ((bool) $options['data']['campaign_use_summary']) ?? false,
             ]
         );
     }

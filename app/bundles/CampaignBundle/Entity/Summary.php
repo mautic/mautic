@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -11,51 +13,52 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class Summary.
- */
 class Summary
 {
+    public const TABLE_NAME = 'campaign_summary';
+
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      **/
     private $dateTriggered;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $scheduledCount = 0;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $triggeredCount = 0;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $nonActionPathTakenCount = 0;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $failedCount = 0;
 
     /**
-     * @var Event
+     * @var Event|null
      */
     private $event;
 
     /**
-     * @var Campaign
+     * @var Campaign|null
      */
     private $campaign;
 
@@ -63,188 +66,104 @@ class Summary
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('campaign_summary')
-            ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\SummaryRepository')
+        $builder->setTable(self::TABLE_NAME)
+            ->setCustomRepositoryClass(SummaryRepository::class)
             ->addUniqueConstraint(['campaign_id', 'event_id', 'date_triggered'], 'campaign_event_date_triggered');
 
         $builder->addId();
 
         $builder->createManyToOne('campaign', 'Campaign')
-            ->addJoinColumn('campaign_id', 'id')
+            ->addJoinColumn('campaign_id', Types::INTEGER)
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createManyToOne('event', 'Event')
-            ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
+        $builder->createManyToOne('event', Event::class)
+            ->addJoinColumn('event_id', Types::INTEGER, false, false, 'CASCADE')
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createField('dateTriggered', 'datetime')
-            ->columnName('date_triggered')
-            ->nullable()
-            ->build();
-
-        $builder->createField('scheduledCount', 'integer')
-            ->columnName('scheduled_count')
-            ->build();
-
-        $builder->createField('triggeredCount', 'integer')
-            ->columnName('triggered_count')
-            ->build();
-
-        $builder->createField('nonActionPathTakenCount', 'integer')
-            ->columnName('non_action_path_taken_count')
-            ->build();
-
-        $builder->createField('failedCount', 'integer')
-            ->columnName('failed_count')
-            ->build();
+        $builder->addNullableField('dateTriggered', Types::DATETIME_IMMUTABLE, 'date_triggered');
+        $builder->addNamedField('scheduledCount', Types::INTEGER, 'scheduled_count');
+        $builder->addNamedField('triggeredCount', Types::INTEGER, 'triggered_count');
+        $builder->addNamedField('nonActionPathTakenCount', Types::INTEGER, 'non_action_path_taken_count');
+        $builder->addNamedField('failedCount', Types::INTEGER, 'failed_count');
     }
 
-    /**
-     * @return int
-     */
-    public function getScheduledCount()
+    public function getScheduledCount(): ?int
     {
         return $this->scheduledCount;
     }
 
-    /**
-     * @param int $scheduledCount
-     *
-     * @return $this
-     */
-    public function setScheduledCount($scheduledCount)
+    public function setScheduledCount(int $scheduledCount): void
     {
         $this->scheduledCount = $scheduledCount;
-
-        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getTriggeredCount()
+    public function getTriggeredCount(): ?int
     {
         return $this->triggeredCount;
     }
 
-    /**
-     * @param int $triggeredCount
-     *
-     * @return $this
-     */
-    public function setTriggeredCount($triggeredCount)
+    public function setTriggeredCount(int $triggeredCount): void
     {
         $this->triggeredCount = $triggeredCount;
-
-        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getNonActionPathTakenCount()
+    public function getNonActionPathTakenCount(): ?int
     {
         return $this->nonActionPathTakenCount;
     }
 
-    /**
-     * @param int $nonActionPathTakenCount
-     *
-     * @return $this
-     */
-    public function setNonActionPathTakenCount($nonActionPathTakenCount)
+    public function setNonActionPathTakenCount(int $nonActionPathTakenCount): void
     {
         $this->nonActionPathTakenCount = $nonActionPathTakenCount;
-
-        return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getFailedCount()
+    public function getFailedCount(): ?int
     {
         return $this->failedCount;
     }
 
-    /**
-     * @param int $failedCount
-     *
-     * @return $this
-     */
-    public function setFailedCount($failedCount)
+    public function setFailedCount(int $failedCount): void
     {
         $this->failedCount = $failedCount;
-
-        return $this;
     }
 
-    /**
-     * @return Campaign
-     */
-    public function getCampaign()
+    public function getCampaign(): ?Campaign
     {
         return $this->campaign;
     }
 
-    /**
-     * @return $this
-     */
-    public function setCampaign(Campaign $campaign)
+    public function setCampaign(Campaign $campaign): void
     {
         $this->campaign = $campaign;
-
-        return $this;
     }
 
-    /**
-     * @return Event
-     */
-    public function getEvent()
+    public function getEvent(): ?Event
     {
         return $this->event;
     }
 
-    /***
-     * @param $event
-     *
-     * @return $this
-     */
-    public function setEvent(Event $event)
+    public function setEvent(Event $event): void
     {
         $this->event = $event;
 
         if (!$this->campaign) {
             $this->setCampaign($event->getCampaign());
         }
-
-        return $this;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getDateTriggered()
+    public function getDateTriggered(): ?\DateTime
     {
         return $this->dateTriggered;
     }
 
-    /**
-     * @return $this
-     */
-    public function setDateTriggered(\DateTime $dateTriggered = null)
+    public function setDateTriggered(\DateTime $dateTriggered = null): void
     {
         $this->dateTriggered = $dateTriggered;
-
-        return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

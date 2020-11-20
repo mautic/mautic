@@ -88,9 +88,6 @@ class EventExecutioner
      */
     private $leadRepository;
 
-    /**
-     * EventExecutioner constructor.
-     */
     public function __construct(
         EventCollector $eventCollector,
         EventLogger $eventLogger,
@@ -523,9 +520,8 @@ class EventExecutioner
      * @throws \Doctrine\DBAL\DBALException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function persistSummaries()
+    public function persistSummaries(): void
     {
-        $summaryModel = $this->eventLogger->getsummaryModel();
-        $summaryModel->persistSummaries();
+        $this->eventLogger->getSummaryModel()->persistSummaries();
     }
 }

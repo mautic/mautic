@@ -206,7 +206,7 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param      $campaignId
+     * @param int  $campaignId
      * @param bool $excludeScheduled
      * @param bool $excludeNegative
      * @param bool $all
@@ -215,7 +215,7 @@ class LeadEventLogRepository extends CommonRepository
      *
      * @throws \Doctrine\DBAL\Cache\CacheException
      */
-    public function getCampaignLogCounts($campaignId, $excludeScheduled = false, $excludeNegative = true, $all = false, \DateTime $dateFrom = null, \DateTime $dateTo = null)
+    public function getCampaignLogCounts($campaignId, $excludeScheduled = false, $excludeNegative = true, $all = false, \DateTimeInterface $dateFrom = null, \DateTimeInterface $dateTo = null)
     {
         $join = $all ? 'leftJoin' : 'innerJoin';
 
@@ -537,12 +537,7 @@ class LeadEventLogRepository extends CommonRepository
         return $dates;
     }
 
-    /**
-     * Get the oldest triggered date.
-     *
-     * @return \DateTime|null
-     */
-    public function getOldestTriggeredDate()
+    public function getOldestTriggeredDate(): ?\DateTime
     {
         $qb = $this->getSlaveConnection()->createQueryBuilder();
         $qb->select('log.date_triggered')
