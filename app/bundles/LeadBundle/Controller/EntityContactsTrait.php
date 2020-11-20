@@ -90,7 +90,7 @@ trait EntityContactsTrait
             $this->get('mautic.helper.core_parameters')->getParameter('default_pagelimit')
         );
 
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -99,7 +99,7 @@ trait EntityContactsTrait
         $repo     = $this->getModel('lead')->getRepository();
         $contacts = $repo->getEntityContacts(
             [
-                'withTotalCount' => ($count === null),
+                'withTotalCount' => (null === $count),
                 'start'          => $start,
                 'limit'          => $limit,
                 'filter'         => $filter,

@@ -455,11 +455,9 @@ class CampaignRepository extends CommonRepository
     /**
      * Get a count of leads that belong to the campaign.
      *
-     * @param int            $campaignId
-     * @param int            $leadId        Optional lead ID to check if lead is part of campaign
-     * @param array          $pendingEvents List of specific events to rule out
-     * @param \DateTime|null $dateFrom
-     * @param \DateTime|null $dateTo
+     * @param int   $campaignId
+     * @param int   $leadId        Optional lead ID to check if lead is part of campaign
+     * @param array $pendingEvents List of specific events to rule out
      *
      * @return int
      *

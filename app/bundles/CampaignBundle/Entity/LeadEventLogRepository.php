@@ -210,12 +210,10 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param                $campaignId
-     * @param bool           $excludeScheduled
-     * @param bool           $excludeNegative
-     * @param bool           $all
-     * @param \DateTime|null $dateFrom
-     * @param \DateTime|null $dateTo
+     * @param      $campaignId
+     * @param bool $excludeScheduled
+     * @param bool $excludeNegative
+     * @param bool $all
      *
      * @return array
      *
