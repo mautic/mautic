@@ -13,7 +13,6 @@ namespace Mautic\CampaignBundle\Command;
 
 use Mautic\CampaignBundle\Model\SummaryModel;
 use Mautic\CoreBundle\Command\ModeratedCommand;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -35,7 +34,6 @@ class SummarizeCommand extends ModeratedCommand
 
     public function __construct(
         TranslatorInterface $translator,
-        FormatterHelper $formatterHelper,
         SummaryModel $summaryModel
     ) {
         parent::__construct();
