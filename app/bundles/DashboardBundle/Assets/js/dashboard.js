@@ -1,5 +1,5 @@
 //DashboardBundle
-Mautic.widgetUrl = '/s/dashboard/widget/';
+Mautic.widgetUrl = origin + '/s/dashboard/widget/';
 
 /**
  * @type jQuery DOM element to be replaced with spinner
