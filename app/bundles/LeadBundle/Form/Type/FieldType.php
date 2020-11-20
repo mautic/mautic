@@ -544,7 +544,8 @@ class FieldType extends AbstractType
                 'label'             => 'mautic.lead.field.object',
                 'placeholder'       => false,
                 'attr'              => [
-                    'class' => 'form-control',
+                    'class'    => 'form-control',
+                    'onchange' => 'Mautic.displayUniqueIdentifier(this)',
                 ],
                 'required' => false,
                 'disabled' => ($disabled || !$new),

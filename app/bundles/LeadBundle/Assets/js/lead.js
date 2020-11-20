@@ -1428,6 +1428,15 @@ Mautic.toggleTimelineMoreVisiblity = function (el) {
     }
 };
 
+Mautic.displayUniqueIdentifier = function (el) {
+    if (mQuery(el).val() === "company") {
+        mQuery('#leadfield_isUniqueIdentifer_0').click();
+        mQuery('.unique-identifier-warning').prev().hide();
+    } else {
+        mQuery('.unique-identifier-warning').prev().show();
+    }
+};
+
 Mautic.displayUniqueIdentifierWarning = function (el) {
     if (mQuery(el).val() === "0") {
         mQuery('.unique-identifier-warning').fadeOut('fast');

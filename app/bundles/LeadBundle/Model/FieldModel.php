@@ -214,7 +214,7 @@ class FieldModel extends FormModel
         ],
         'companyemail' => [
             'type'     => 'email',
-            'unique'   => true,
+            'unique'   => false,
             'fixed'    => true,
             'listable' => true,
             'object'   => 'company',

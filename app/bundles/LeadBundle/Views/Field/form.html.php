@@ -140,7 +140,7 @@ $defaultTimezoneTemplate = $view['form']->widget($form['default_template_timezon
                     <?php echo $view['form']->row($form['isPubliclyUpdatable']); ?>
                 </div>
             </div>
-            <div class="row">
+            <div class="row" style="<?php if ('company' == $form['object']->vars['data']): echo 'display:none;'; endif; ?>">
                 <div class="col-md-6">
                     <?php echo $view['form']->row($form['isUniqueIdentifer']); ?>
                 </div>
