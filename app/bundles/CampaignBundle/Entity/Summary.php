@@ -72,13 +72,13 @@ class Summary
 
         $builder->addId();
 
-        $builder->createManyToOne('campaign', 'Campaign')
-            ->addJoinColumn('campaign_id', Types::INTEGER)
+        $builder->createManyToOne('campaign', Campaign::class)
+            ->addJoinColumn('campaign_id', 'id')
             ->fetchExtraLazy()
             ->build();
 
         $builder->createManyToOne('event', Event::class)
-            ->addJoinColumn('event_id', Types::INTEGER, false, false, 'CASCADE')
+            ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
             ->fetchExtraLazy()
             ->build();
 
