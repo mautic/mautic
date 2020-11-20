@@ -95,7 +95,6 @@ class ButtonSubscriber implements EventSubscriberInterface
                     ],
                     'btnText'   => $this->translator->trans('mautic.core.export.xlsx'),
                     'iconClass' => 'fa fa-file-excel-o',
-                    'primary'   => true,
                 ],
                 ButtonHelper::LOCATION_PAGE_ACTIONS
             );
@@ -108,7 +107,6 @@ class ButtonSubscriber implements EventSubscriberInterface
                     ],
                     'btnText'   => $this->translator->trans('mautic.core.export.csv'),
                     'iconClass' => 'fa fa-file-text-o',
-                    'primary'   => true,
                 ],
                 ButtonHelper::LOCATION_PAGE_ACTIONS
             );
