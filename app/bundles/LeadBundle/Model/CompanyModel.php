@@ -707,6 +707,12 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $companyFields  = [];
         $internalFields = $this->fetchCompanyFields();
 
+        if (!isset($mappedFields['companyname']) && isset($mappedFields['company'])) {
+            $mappedFields['companyname'] = $mappedFields['company'];
+
+            unset($mappedFields['company']);
+        }
+
         foreach ($mappedFields as $mauticField => $importField) {
             foreach ($internalFields as $entityField) {
                 if ($entityField['alias'] === $mauticField) {
