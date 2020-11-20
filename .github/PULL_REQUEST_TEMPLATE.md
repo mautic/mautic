@@ -1,6 +1,6 @@
 | Q                                      | A
 | -------------------------------------- | ---
-| Branch?                                | 3.x for features or enhancements / 3.2 for bug fixes <!-- see below -->
+| Branch?                                | "features" for features or enhancements / 3.2 for bug fixes <!-- see below -->
 | Bug fix?                               | yes/no
 | New feature?                           | yes/no
 | Deprecations?                          | yes/no
@@ -15,7 +15,7 @@ Additionally (see https://contribute.mautic.org/contributing-to-mautic/developer
  - Always add tests and ensure they pass.
  - Bug fixes must be submitted against the lowest maintained branch where they apply
    (lowest branches are regularly merged to upper ones so they get the fixes too.)
- - Features and deprecations must be submitted against the 3.x branch.
+ - Features and deprecations must be submitted against the "features" branch.
 -->
 
 <!--
