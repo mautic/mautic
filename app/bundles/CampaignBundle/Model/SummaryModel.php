@@ -95,10 +95,9 @@ class SummaryModel extends AbstractCommonModel
     /**
      * Summarize all of history.
      *
-     * @param OutputInterface $output
-     * @param int             $hoursPerBatch
-     * @param null            $maxHours
-     * @param bool            $rebuild
+     * @param int  $hoursPerBatch
+     * @param null $maxHours
+     * @param bool $rebuild
      *
      * @throws \Doctrine\DBAL\DBALException
      */

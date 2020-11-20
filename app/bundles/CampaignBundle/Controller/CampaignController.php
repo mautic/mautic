@@ -14,8 +14,8 @@ namespace Mautic\CampaignBundle\Controller;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
-use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Entity\SummaryRepository;
+use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
@@ -120,11 +120,9 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param                $objectId
-     * @param int            $page
-     * @param null           $count
-     * @param \DateTime|null $dateFrom
-     * @param \DateTime|null $dateTo
+     * @param      $objectId
+     * @param int  $page
+     * @param null $count
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */

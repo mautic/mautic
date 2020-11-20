@@ -73,9 +73,7 @@ class SummaryRepository extends CommonRepository
     }
 
     /**
-     * @param                $campaignId
-     * @param \DateTime|null $dateFrom
-     * @param \DateTime|null $dateTo
+     * @param $campaignId
      *
      * @return array
      */
@@ -134,9 +132,6 @@ class SummaryRepository extends CommonRepository
 
     /**
      * Regenerate summary entries for a given time frame.
-     *
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
      *
      * @throws \Doctrine\DBAL\DBALException
      */

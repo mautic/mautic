@@ -59,9 +59,6 @@ class Summary
      */
     private $campaign;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -193,8 +190,6 @@ class Summary
     }
 
     /**
-     * @param Campaign $campaign
-     *
      * @return $this
      */
     public function setCampaign(Campaign $campaign)
@@ -237,8 +232,6 @@ class Summary
     }
 
     /**
-     * @param \DateTime|null $dateTriggered
-     *
      * @return $this
      */
     public function setDateTriggered(\DateTime $dateTriggered = null)

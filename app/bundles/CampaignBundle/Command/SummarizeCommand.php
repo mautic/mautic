@@ -19,9 +19,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class SummaryFillCommand.
- */
 class SummarizeCommand extends ModeratedCommand
 {
     use WriteCountTrait;
@@ -41,13 +38,6 @@ class SummarizeCommand extends ModeratedCommand
      */
     private $formatterHelper;
 
-    /**
-     * SummarizeCommand constructor.
-     *
-     * @param TranslatorInterface $translator
-     * @param FormatterHelper     $formatterHelper
-     * @param SummaryModel        $summaryModel
-     */
     public function __construct(
         TranslatorInterface $translator,
         FormatterHelper $formatterHelper,
@@ -60,9 +50,6 @@ class SummarizeCommand extends ModeratedCommand
         $this->summaryModel    = $summaryModel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -92,9 +79,6 @@ class SummarizeCommand extends ModeratedCommand
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
      * @return int|null
      *
      * @throws \Exception
