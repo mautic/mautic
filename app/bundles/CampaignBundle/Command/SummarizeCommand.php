@@ -33,11 +33,6 @@ class SummarizeCommand extends ModeratedCommand
      */
     private $translator;
 
-    /**
-     * @var FormatterHelper
-     */
-    private $formatterHelper;
-
     public function __construct(
         TranslatorInterface $translator,
         FormatterHelper $formatterHelper,
@@ -45,9 +40,8 @@ class SummarizeCommand extends ModeratedCommand
     ) {
         parent::__construct();
 
-        $this->translator      = $translator;
-        $this->formatterHelper = $formatterHelper;
-        $this->summaryModel    = $summaryModel;
+        $this->translator   = $translator;
+        $this->summaryModel = $summaryModel;
     }
 
     protected function configure()
