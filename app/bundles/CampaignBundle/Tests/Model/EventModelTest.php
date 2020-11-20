@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Model;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Model\EventModel;
 use PHPUnit\Framework\TestCase;
@@ -42,7 +41,6 @@ class EventModelTest extends TestCase
             ->getMock();
 
         $this->leadEventLogRepository = $this->createMock(LeadEventLogRepository::class);
-        $this->entityManager          = $this->createMock(EntityManager::class);
     }
 
     public function testThatClonedEventsDoNotAttemptNullingParentInDeleteEvents(): void
