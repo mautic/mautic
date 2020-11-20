@@ -80,6 +80,8 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $stageChange = true;
             } elseif (!$leadStage) {
                 $stageChange = true;
+            } else {
+                return $event->setFailed();
             }
         }
 
