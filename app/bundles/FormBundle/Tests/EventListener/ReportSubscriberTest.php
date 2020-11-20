@@ -20,9 +20,9 @@ use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use PHPUnit\Framework\TestCase;
 
-class ReportSubscriberTest extends WebTestCase
+class ReportSubscriberTest extends TestCase
 {
     private $submissionRepository;
     private $companyReportData;
