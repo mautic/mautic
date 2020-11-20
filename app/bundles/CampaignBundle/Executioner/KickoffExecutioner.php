@@ -85,9 +85,6 @@ class KickoffExecutioner implements ExecutionerInterface
      */
     private $counter;
 
-    /**
-     * KickoffExecutioner constructor.
-     */
     public function __construct(
         LoggerInterface $logger,
         KickoffContactFinder $kickoffContactFinder,

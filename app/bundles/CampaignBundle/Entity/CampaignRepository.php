@@ -23,9 +23,6 @@ class CampaignRepository extends CommonRepository
     use ContactLimiterTrait;
     use SlaveConnectionTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntities(array $args = [])
     {
         $q = $this->getEntityManager()
@@ -48,8 +45,6 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param object $entity
      * @param bool   $flush
      */
@@ -463,7 +458,7 @@ class CampaignRepository extends CommonRepository
      *
      * @throws \Doctrine\DBAL\Cache\CacheException
      */
-    public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = [], \DateTime $dateFrom = null, \DateTime $dateTo = null)
+    public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = [], \DateTimeInterface $dateFrom = null, \DateTimeInterface $dateTo = null)
     {
         $q = $this->getSlaveConnection()->createQueryBuilder();
 

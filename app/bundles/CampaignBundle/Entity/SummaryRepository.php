@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -14,9 +16,6 @@ namespace Mautic\CampaignBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
-/**
- * SummaryRepository.
- */
 class SummaryRepository extends CommonRepository
 {
     use TimelineTrait;
@@ -72,16 +71,11 @@ class SummaryRepository extends CommonRepository
             ->execute();
     }
 
-    /**
-     * @param $campaignId
-     *
-     * @return array
-     */
     public function getCampaignLogCounts(
-        $campaignId,
-        \DateTime $dateFrom = null,
-        \DateTime $dateTo = null
-    ) {
+        int $campaignId,
+        \DateTimeInterface $dateFrom = null,
+        \DateTimeInterface $dateTo = null
+    ): array {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select(
                 'cs.event_id, SUM(cs.scheduled_count) as scheduled_count, SUM(cs.triggered_count) as triggered_count, SUM(cs.non_action_path_taken_count) as non_action_path_taken_count, SUM(cs.failed_count) as failed_count'
@@ -112,12 +106,8 @@ class SummaryRepository extends CommonRepository
 
     /**
      * Get the oldest triggered time for back-filling historical data.
-     *
-     * @return \DateTime|null
-     *
-     * @throws \Exception
      */
-    public function getOldestTriggeredDate()
+    public function getOldestTriggeredDate(): ?\DateTime
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->select('cs.date_triggered')
@@ -135,7 +125,7 @@ class SummaryRepository extends CommonRepository
      *
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function summarize(\DateTime $dateFrom, \DateTime $dateTo)
+    public function summarize(\DateTime $dateFrom, \DateTime $dateTo): void
     {
         $sql = 'INSERT INTO '.MAUTIC_TABLE_PREFIX.'campaign_summary '.
             '(campaign_id, event_id, date_triggered, scheduled_count, non_action_path_taken_count, failed_count, triggered_count) '.

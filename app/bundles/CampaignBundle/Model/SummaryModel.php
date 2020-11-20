@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -12,28 +14,29 @@
 namespace Mautic\CampaignBundle\Model;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\Summary;
+use Mautic\CampaignBundle\Entity\SummaryRepository;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * Class SummaryModel.
- */
 class SummaryModel extends AbstractCommonModel
 {
-    /** @var ProgressBarHelper */
+    /**
+     * @var ProgressBarHelper
+     */
     private $progressBar;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     private $summaries = [];
 
     /**
      * Collapse Event Log entities into insert/update queries for the campaign summary.
-     *
-     * @param $logs
      */
-    public function updateSummary($logs)
+    public function updateSummary(iterable $logs): void
     {
         $now       = new \DateTime();
         foreach ($logs as $log) {
@@ -72,22 +75,12 @@ class SummaryModel extends AbstractCommonModel
         }
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return \Mautic\CampaignBundle\Entity\SummaryRepository
-     */
-    public function getRepository()
+    public function getRepository(): SummaryRepository
     {
-        return $this->em->getRepository('MauticCampaignBundle:Summary');
+        return $this->em->getRepository(Summary::class);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getPermissionBase()
+    public function getPermissionBase(): string
     {
         return 'campaign:campaigns';
     }
@@ -95,24 +88,18 @@ class SummaryModel extends AbstractCommonModel
     /**
      * Summarize all of history.
      *
-     * @param int  $hoursPerBatch
-     * @param null $maxHours
-     * @param bool $rebuild
-     *
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function summarize(OutputInterface $output, $hoursPerBatch = 1, $maxHours = null, $rebuild = false)
+    public function summarize(OutputInterface $output, int $hoursPerBatch = 1, int $maxHours = null, bool $rebuild = false): void
     {
         $start = null;
         if (!$rebuild) {
-            /** @var \DateTime $oldestSumamryDate */
             $start = $this->getRepository()->getOldestTriggeredDate();
         }
         // Start with the last complete hour.
         $start = $start ? $start : new \DateTime('-1 hour');
         $start->setTimestamp($start->getTimestamp() - ($start->getTimestamp() % 3600));
 
-        /** @var LeadEventLog $oldestTriggeredEventLog */
         $end = $this->getCampaignLeadEventLogRepository()->getOldestTriggeredDate();
         $end->setTimestamp($end->getTimestamp() - ($end->getTimestamp() % 3600));
         if ($end && $end <= $start) {
@@ -138,19 +125,16 @@ class SummaryModel extends AbstractCommonModel
         }
     }
 
-    /**
-     * @return \Mautic\CampaignBundle\Entity\LeadEventLogRepository
-     */
-    public function getCampaignLeadEventLogRepository()
+    public function getCampaignLeadEventLogRepository(): LeadEventLogRepository
     {
-        return $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
+        return $this->em->getRepository(LeadEventLog::class);
     }
 
     /**
      * @throws \Doctrine\DBAL\DBALException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function persistSummaries()
+    public function persistSummaries(): void
     {
         if ($this->summaries) {
             $this->getRepository()->saveEntities($this->summaries);
