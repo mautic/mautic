@@ -78,7 +78,6 @@
         "joomla/http": "~1.3.3",
         "joomla/filter": "~1.3.5",
         "oneup/uploader-bundle": "^2.1.5",
-        "phpoffice/phpspreadsheet": "^1.10",
         "mrclay/minify": "2.2.0",
         "jbroadway/urlify": "^1.0",
         "geoip2/geoip2": "~2.0",
@@ -93,7 +92,6 @@
         "piwik/device-detector": "~3.12.2",
         "php-http/guzzle6-adapter": "^1.1",
         "sparkpost/sparkpost": "~2.2.0",
-        "sonata-project/exporter": "^1.7",
         "lightsaml/sp-bundle": "~1.2.1",
         "egeloen/ordered-form-bundle": "^3.0",
         "php-amqplib/rabbitmq-bundle": "^1.10",
@@ -111,7 +109,8 @@
         "barryvdh/elfinder-flysystem-driver": "^0.2.1",
         "bandwidth-throttle/token-bucket": "^2.0",
         "gaufrette/extras": "^0.1.0",
-        "gaufrette/aws-s3-adapter": "^0.4.0"
+        "gaufrette/aws-s3-adapter": "^0.4.0",
+        "phpoffice/phpspreadsheet": "^1.15"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~3.4.0",

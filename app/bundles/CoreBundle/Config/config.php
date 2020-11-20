@@ -840,6 +840,12 @@ return [
                     'monolog.logger.mautic',
                 ],
             ],
+            'mautic.helper.export' => [
+                'class'     => \Mautic\CoreBundle\Helper\ExportHelper::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
             // Menu
             'mautic.helper.menu' => [
                 'class'     => 'Mautic\CoreBundle\Menu\MenuHelper',
