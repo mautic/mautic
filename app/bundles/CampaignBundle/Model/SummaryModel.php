@@ -38,7 +38,7 @@ class SummaryModel extends AbstractCommonModel
      */
     public function updateSummary(iterable $logs): void
     {
-        $now       = new \DateTime();
+        $now = new \DateTime();
         foreach ($logs as $log) {
             /** @var LeadEventLog $log */
             $timestamp = $log->getDateTriggered()->getTimestamp();

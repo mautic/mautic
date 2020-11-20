@@ -606,7 +606,6 @@ return [
                 'class'     => \Mautic\CampaignBundle\Command\SummarizeCommand::class,
                 'arguments' => [
                     'translator',
-                    'mautic.helper.template.formatter',
                     'mautic.campaign.model.summary',
                 ],
                 'tag' => 'console.command',
