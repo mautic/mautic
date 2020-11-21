@@ -1553,6 +1553,7 @@ return [
         'cached_data_timeout'       => 10,
         'batch_sleep_time'          => 1,
         'batch_campaign_sleep_time' => false,
+        'transliterate_page_title'  => false,
         'cors_restrict_domains'     => true,
         'cors_valid_domains'        => [],
         'max_entity_lock_time'      => 0,
