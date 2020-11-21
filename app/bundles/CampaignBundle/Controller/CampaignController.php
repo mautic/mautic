@@ -126,7 +126,7 @@ class CampaignController extends AbstractStandardFormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function contactsAction($objectId, $page = 1, $count = null, \DateTime $dateFrom = null, \DateTime $dateTo = null)
+    public function contactsAction($objectId, $page = 1, $count = null, \DateTimeInterface $dateFrom = null, \DateTimeInterface $dateTo = null)
     {
         return $this->generateContactsGrid(
             $objectId,
@@ -691,19 +691,19 @@ class CampaignController extends AbstractStandardFormController
                 if ($this->coreParametersHelper->getParameter('campaign_by_range')) {
                     $dateFrom        = new \DateTimeImmutable($dateRangeForm->get('date_from')->getData());
                     $dateTo          = new \DateTimeImmutable($dateRangeForm->get('date_to')->getData());
-                    $dateTo->modify('+1 day');
+                    $dateToPlusOne   = $dateTo->modify('+1 day');
                 }
                 if ($this->coreParametersHelper->getParameter('campaign_use_summary')) {
                     /** @var SummaryRepository $summaryRepo */
                     $summaryRepo       = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:Summary');
-                    $campaignLogCounts = $summaryRepo->getCampaignLogCounts($entity->getId(), $dateFrom, $dateTo);
+                    $campaignLogCounts = $summaryRepo->getCampaignLogCounts($entity->getId(), $dateFrom, $dateToPlusOne);
                 } else {
                     /** @var LeadEventLogRepository $eventLogRepo */
                     $eventLogRepo             = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
-                    $campaignLogCounts        = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true, $dateFrom, $dateTo);
-                    $pendingCampaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false); // @todo implement pending counts for summary as well.
+                    $campaignLogCounts        = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true, $dateFrom, $dateToPlusOne);
+                    $pendingCampaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false);
                 }
-                $leadCount    = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId(), null, [], $dateFrom, $dateTo);
+                $leadCount    = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId(), null, [], $dateFrom, $dateToPlusOne);
                 $sortedEvents = [
                     'decision'  => [],
                     'action'    => [],
@@ -721,7 +721,7 @@ class CampaignController extends AbstractStandardFormController
                         $event['logCount']           = array_sum($campaignLogCounts[$event['id']]);
                         $event['logCountForPending'] = isset($pendingCampaignLogCounts[$event['id']]) ? array_sum($pendingCampaignLogCounts[$event['id']]) : 0;
 
-                        $pending  = $event['leadCount'] - $event['logCountForPending'];
+                        $pending  = isset($pendingCampaignLogCounts) ? $event['leadCount'] - $event['logCountForPending'] : 0;
                         $totalYes = $campaignLogCounts[$event['id']][1];
                         $totalNo  = $campaignLogCounts[$event['id']][0];
                         $total    = $totalYes + $totalNo + $pending;
