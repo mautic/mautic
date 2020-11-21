@@ -591,7 +591,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @return array
      */
-    public function getEntityContacts($args, $joinTable, $entityId, $filters = [], $entityColumnName = 'id', array $additionalJoins = null, $contactColumnName = 'lead_id', \DateTime $dateFrom = null, \DateTime $dateTo = null)
+    public function getEntityContacts($args, $joinTable, $entityId, $filters = [], $entityColumnName = 'id', array $additionalJoins = null, $contactColumnName = 'lead_id', \DateTimeInterface $dateFrom = null, \DateTimeInterface $dateTo = null)
     {
         $qb = $this->getEntitiesDbalQueryBuilder();
 

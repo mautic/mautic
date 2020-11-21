@@ -12,7 +12,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\DBAL\Cache\QueryCacheProfile;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Expr;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -470,7 +470,7 @@ class CampaignRepository extends CommonRepository
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )
             )
-            ->setParameter('false', false, Type::BOOLEAN);
+            ->setParameter('false', false, Types::BOOLEAN);
 
         if ($leadId) {
             $q->andWhere(

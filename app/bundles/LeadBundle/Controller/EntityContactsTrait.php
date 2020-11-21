@@ -53,8 +53,8 @@ trait EntityContactsTrait
         $orderBy = null,
         $orderByDir = null,
         $count = null,
-        \DateTime $dateFrom = null,
-        \DateTime $dateTo = null
+        \DateTimeInterface $dateFrom = null,
+        \DateTimeInterface $dateTo = null
     ) {
         if ($permission && !$this->get('mautic.security')->isGranted($permission)) {
             return $this->accessDenied();
