@@ -999,15 +999,11 @@ class PageModel extends FormModel
     /**
      * Get all params (e.g. UTM tags) from a url.
      */
-    protected function getQueryFromUrl(string $pageUrl): array
+    private function getQueryFromUrl(string $pageUrl): array
     {
         $query             = [];
         $urlQuery          = parse_url($pageUrl, PHP_URL_QUERY);
         parse_str($urlQuery, $urlQueryArray);
-
-        if (empty($urlQueryArray)) {
-            return $query;
-        }
 
         foreach ($urlQueryArray as $key => $value) {
             $key           = strtolower($key);
@@ -1019,10 +1015,8 @@ class PageModel extends FormModel
 
     /**
      * Set UTM Tags based on the query of a page hit.
-     *
-     * @return void
      */
-    protected function setUtmTags(Hit $hit, Lead $lead)
+    private function setUtmTags(Hit $hit, Lead $lead): void
     {
         // Add UTM tags entry if a UTM tag exist
         $queryHasUtmTags = false;
