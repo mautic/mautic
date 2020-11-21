@@ -427,15 +427,13 @@ class LeadController extends FormController
         }
 
         //set the page we came from
-        $page = $this->get('session')->get('mautic.lead.page', 1);
-
+        $page   = $this->get('session')->get('mautic.lead.page', 1);
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'new']);
         $fields = $this->getModel('lead.field')->getPublishedFieldArrays('lead');
-
-        $form = $model->createForm($lead, $this->get('form.factory'), $action, ['fields' => $fields]);
+        $form   = $model->createForm($lead, $this->get('form.factory'), $action, ['fields' => $fields]);
 
         ///Check for a submitted form and process it
-        if ('POST' == $this->request->getMethod()) {
+        if ('POST' === $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -464,18 +462,25 @@ class LeadController extends FormController
                         null,
                         $this->get('mautic.helper.user')->getUser()->getName()
                     ));
-                    $model->saveEntity($lead);
+
+                    /** @var LeadRepository $contactRepository */
+                    $contactRepository = $this->getDoctrine()->getManager()->getRepository(Lead::class);
+
+                    // Save here as we need the entity with an ID for the company code bellow.
+                    $contactRepository->saveEntity($lead);
 
                     if (!empty($companies)) {
                         $model->modifyCompanies($lead, $companies);
                     }
 
+                    // Save here through the model to trigger all subscribers.
+                    $model->saveEntity($lead);
+
                     // Upload avatar if applicable
                     $image = $form['preferred_profile_image']->getData();
-                    if ('custom' == $image) {
+                    if ('custom' === $image) {
                         // Check for a file
-                        /** @var UploadedFile $file */
-                        if ($file = $form['custom_avatar']->getData()) {
+                        if ($form['custom_avatar']->getData()) {
                             $this->uploadAvatar($lead);
                         }
                     }
