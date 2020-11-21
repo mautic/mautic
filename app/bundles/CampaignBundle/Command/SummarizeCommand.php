@@ -24,6 +24,8 @@ class SummarizeCommand extends ModeratedCommand
 {
     use WriteCountTrait;
 
+    public const NAME = 'mautic:campaigns:summarize';
+
     /**
      * @var SummaryModel
      */
@@ -46,13 +48,12 @@ class SummarizeCommand extends ModeratedCommand
 
     protected function configure()
     {
-        $this
-            ->setName('mautic:campaigns:summarize')
+        $this->setName(self::NAME)
             ->addOption(
                 '--batch-limit',
                 '-l',
                 InputOption::VALUE_OPTIONAL,
-                'Number of hours to process per batch.',
+                'Number of hours to process per batch. 1 hour is default value.',
                 1
             )
             ->addOption(
@@ -72,23 +73,18 @@ class SummarizeCommand extends ModeratedCommand
         parent::configure();
     }
 
-    /**
-     * @return int|null
-     *
-     * @throws \Exception
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->checkRunStatus($input, $output)) {
             return 0;
         }
 
-        $batchLimit = $input->getOption('batch-limit');
-        $maxHours   = $input->getOption('max-hours');
-        $rebuild    = $input->getOption('rebuild');
+        $batchLimit = (int) $input->getOption('batch-limit');
+        $maxHours   = (int) $input->getOption('max-hours');
+        $rebuild    = (bool) $input->getOption('rebuild');
 
         $output->writeln(
-            '<info>'.$this->translator->trans('mautic.campaign.summarizing', ['%batch%' => $batchLimit]).'</info>'
+            "<info>{$this->translator->trans('mautic.campaign.summarizing', ['%batch%' => $batchLimit])}</info>"
         );
 
         $this->summaryModel->summarize($output, $batchLimit, $maxHours, $rebuild);
