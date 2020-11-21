@@ -13,7 +13,9 @@ namespace Mautic\CampaignBundle\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Entity\Summary;
 use Mautic\CampaignBundle\Entity\SummaryRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
@@ -688,18 +690,18 @@ class CampaignController extends AbstractStandardFormController
                 $dateFrom        = null;
                 $dateTo          = null;
                 $this->setCoreParametersHelper($this->get('mautic.config'));
-                if ($this->coreParametersHelper->getParameter('campaign_by_range')) {
+                if ($this->coreParametersHelper->get('campaign_by_range')) {
                     $dateFrom        = new \DateTimeImmutable($dateRangeForm->get('date_from')->getData());
                     $dateTo          = new \DateTimeImmutable($dateRangeForm->get('date_to')->getData());
                     $dateToPlusOne   = $dateTo->modify('+1 day');
                 }
-                if ($this->coreParametersHelper->getParameter('campaign_use_summary')) {
+                if ($this->coreParametersHelper->get('campaign_use_summary')) {
                     /** @var SummaryRepository $summaryRepo */
-                    $summaryRepo       = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:Summary');
+                    $summaryRepo       = $this->getDoctrine()->getManager()->getRepository(Summary::class);
                     $campaignLogCounts = $summaryRepo->getCampaignLogCounts($entity->getId(), $dateFrom, $dateToPlusOne);
                 } else {
                     /** @var LeadEventLogRepository $eventLogRepo */
-                    $eventLogRepo             = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
+                    $eventLogRepo             = $this->getDoctrine()->getManager()->getRepository(LeadEventLog::class);
                     $campaignLogCounts        = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true, $dateFrom, $dateToPlusOne);
                     $pendingCampaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false);
                 }

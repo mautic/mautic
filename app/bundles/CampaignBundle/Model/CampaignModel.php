@@ -741,7 +741,7 @@ class CampaignModel extends CommonFormModel
                 foreach ($events as $type => $eventIds) {
                     $filter['event_id'] = $eventIds;
 
-                    if ($this->coreParametersHelper->getParameter('mautic.campaign_use_summary')) {
+                    if ($this->coreParametersHelper->get('campaign_use_summary')) {
                         $q       = $query->prepareTimeDataQuery('campaign_summary', 'date_triggered', $filter, 'triggered_count + non_action_path_taken_count', 'sum');
                         $rawData = $q->execute()->fetchAll();
                     } else {
