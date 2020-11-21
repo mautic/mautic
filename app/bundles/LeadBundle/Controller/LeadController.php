@@ -182,6 +182,7 @@ class LeadController extends FormController
             [
                 'viewParameters' => [
                     'searchValue'      => $search,
+                    'columns'          => $this->get('mautic.lead.columns.dictionary')->getColumns(),
                     'items'            => $leads,
                     'page'             => $page,
                     'totalItems'       => $count,
