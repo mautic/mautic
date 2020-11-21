@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 /*
  * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -57,12 +59,11 @@ class ExportHelperTest extends \PHPUnit\Framework\TestCase
         $content = ob_get_contents();
         ob_end_clean();
 
-        $csvData = $this->parseCsvString($this->removeBomUtf8($content));
+        $lines = explode(PHP_EOL, $this->removeBomUtf8($content));
 
-        $this->assertSame('1', $csvData[0]['id']);
-        $this->assertSame('Mautibot', $csvData[0]['firstname']);
-        $this->assertSame('2', $csvData[1]['id']);
-        $this->assertSame('Demo', $csvData[1]['firstname']);
+        $this->assertSame('"id","firstname","lastname","email"', $lines[0]);
+        $this->assertSame('"1","Mautibot","Mautic","mautibot@mautic.org"', $lines[1]);
+        $this->assertSame('"2","Demo","Mautic","demo@mautic.org"', $lines[2]);
     }
 
     /**
@@ -100,29 +101,10 @@ class ExportHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function parseCsvString(string $content): array
-    {
-        $lines   = explode(PHP_EOL, $content);
-        $csvData = [];
-
-        // Turn the header row (0) into array keys.
-        $headerRow = str_getcsv($lines[0]);
-
-        foreach ($lines as $key => $line) {
-            if (0 === $key || !$line) {
-                continue;
-            }
-
-            $csvData[] = array_combine($headerRow, str_getcsv($line));
-        }
-
-        return $csvData;
-    }
-
     /**
      * Needed to remove the BOM that we add in our CSV exports (for UTF-8 parsing in Excel).
      */
-    private function removeBomUtf8($s)
+    private function removeBomUtf8(string $s): string
     {
         if (substr($s, 0, 3) == chr(hexdec('EF')).chr(hexdec('BB')).chr(hexdec('BF'))) {
             return substr($s, 3);
