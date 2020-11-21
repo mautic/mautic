@@ -2,38 +2,33 @@
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
-use Doctrine\DBAL\Connection;
-use Mautic\CampaignBundle\Tests\DataFixtures\Orm\CampaignData;
+use Mautic\CampaignBundle\DataFixtures\ORM\CampaignData;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
-use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
-use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
-use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class LeadControllerTest extends MauticMysqlTestCase
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->connection = $this->container->get('doctrine.dbal.default_connection');
-
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
+    }
+
+    protected function beforeBeginTransaction(): void
+    {
+        $this->resetAutoincrement([
+            'leads',
+            'companies',
+            'campaigns',
+        ]);
     }
 
     public function testContactsAreAddedToThenRemovedFromCampaignsInBatch()
     {
-        $this->loadFixtures(
-            [LeadFieldData::class, RoleData::class, LoadRoleData::class, LoadUserData::class, CampaignData::class, LoadLeadData::class]
-        );
+        $this->loadFixtures([CampaignData::class, LoadLeadData::class]);
 
         $payload = [
             'lead_batch' => [

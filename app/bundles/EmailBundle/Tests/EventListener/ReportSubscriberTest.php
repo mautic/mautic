@@ -14,6 +14,8 @@ namespace Mautic\EmailBundle\Tests\EventListener;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\EventListener\ReportSubscriber;
@@ -27,6 +29,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     private $connectionMock;
     private $companyReportDataMock;
     private $statRepository;
+    private $generatedColumnsProvider;
 
     /**
      * @var ReportSubscriber
@@ -37,13 +40,15 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->connectionMock        = $this->createMock(Connection::class);
-        $this->companyReportDataMock = $this->createMock(CompanyReportData::class);
-        $this->statRepository        = $this->createMock(StatRepository::class);
-        $this->subscriber            = new ReportSubscriber(
+        $this->connectionMock           = $this->createMock(Connection::class);
+        $this->companyReportDataMock    = $this->createMock(CompanyReportData::class);
+        $this->statRepository           = $this->createMock(StatRepository::class);
+        $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
+        $this->subscriber               = new ReportSubscriber(
             $this->connectionMock,
             $this->companyReportDataMock,
-            $this->statRepository
+            $this->statRepository,
+            $this->generatedColumnsProvider
         );
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -11,22 +13,48 @@
 
 namespace Mautic\CampaignBundle\Tests\Functional\Campaign;
 
-use Mautic\CampaignBundle\Tests\DataFixtures\Orm\CampaignData;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Assert;
 
 class DetailsTest extends MauticMysqlTestCase
 {
-    protected function setUp()
+    public function testDetailsPageLoadCorrectly(): void
     {
-        parent::setUp();
-        $this->loadFixtures([CampaignData::class], true);
-    }
+        $campaign = new Campaign();
+        $campaign->setName('Campaign A');
+        $campaign->setCanvasSettings([
+                'nodes' => [
+                    0 => [
+                        'id'        => '148',
+                        'positionX' => '760',
+                        'positionY' => '155',
+                    ],
+                    1 => [
+                        'id'        => 'lists',
+                        'positionX' => '860',
+                        'positionY' => '50',
+                    ],
+                ],
+                'connections' => [
+                    0 => [
+                        'sourceId' => 'lists',
+                        'targetId' => '148',
+                        'anchors'  => [
+                            'source' => 'leadsource',
+                            'target' => 'top',
+                        ],
+                    ],
+                ],
+            ]
+        );
+        $this->em->persist($campaign);
+        $this->em->flush();
 
-    public function testDetailsPageLoadCorrectly()
-    {
-        $this->client->request('GET', 's/campaigns/view/1');
+        $this->client->request('GET', sprintf('/s/campaigns/view/%s', $campaign->getId()));
 
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
-        $this->assertContains('Campaign A', $this->client->getResponse()->getContent());
+        $response = $this->client->getResponse();
+        Assert::assertSame(200, $response->getStatusCode());
+        Assert::assertContains($campaign->getName(), $response->getContent());
     }
 }
