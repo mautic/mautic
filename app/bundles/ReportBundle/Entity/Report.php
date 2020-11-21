@@ -469,7 +469,7 @@ class Report extends FormEntity implements SchedulerInterface
     /**
      * @return mixed
      */
-    public function getAggregators()
+    public function getAggregators(): array
     {
         return (array) $this->aggregators;
     }
