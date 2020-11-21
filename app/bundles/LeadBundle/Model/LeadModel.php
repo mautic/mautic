@@ -357,6 +357,14 @@ class LeadModel extends FormModel
     }
 
     /**
+     * @return LeadListRepository
+     */
+    public function getLeadListRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:LeadList');
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return string

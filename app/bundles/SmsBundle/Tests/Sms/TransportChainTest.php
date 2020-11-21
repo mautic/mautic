@@ -10,18 +10,25 @@
 
 namespace Mautic\SmsBundle\Tests\Sms;
 
-use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Exception;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\SmsBundle\Integration\Twilio\TwilioTransport;
 use Mautic\SmsBundle\Sms\TransportChain;
+use Mautic\SmsBundle\Sms\TransportInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use ReflectionClass;
 
-class TransportChainTest extends AbstractMauticTestCase
+class TransportChainTest extends MauticMysqlTestCase
 {
     /**
-     * @var TransportChain
+     * @var TransportChain|MockObject
      */
     private $transportChain;
 
+    /**
+     * @var TransportInterface|MockObject
+     */
     private $twilioTransport;
 
     /**
@@ -37,7 +44,7 @@ class TransportChainTest extends AbstractMauticTestCase
      */
     public function invokeMethod(&$object, $methodName, array $parameters = [])
     {
-        $reflection = new \ReflectionClass(get_class($object));
+        $reflection = new ReflectionClass(get_class($object));
         $method     = $reflection->getMethod($methodName);
         $method->setAccessible(true);
 
@@ -80,7 +87,7 @@ class TransportChainTest extends AbstractMauticTestCase
 
         try {
             $this->transportChain->sendSms($lead, 'Yeah');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $message = $e->getMessage();
             $this->assertEquals('Primary SMS transport is not enabled', $message);
         }

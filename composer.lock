@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a4f40507d5062af239218e828e955885",
+    "content-hash": "45e35e843ead38bd8d7c2358e3eadeb6",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -1910,6 +1910,7 @@
                 "reflection",
                 "static"
             ],
+            "abandoned": "roave/better-reflection",
             "time": "2020-03-27T11:06:43+00:00"
         },
         {
@@ -2316,6 +2317,85 @@
                 "rest"
             ],
             "time": "2019-10-21T08:22:30+00:00"
+        },
+        {
+            "name": "gaufrette/aws-s3-adapter",
+            "version": "v0.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Gaufrette/aws-s3-adapter.git",
+                "reference": "a37143f592d5cb0ba124451439af6e6da6784d89"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Gaufrette/aws-s3-adapter/zipball/a37143f592d5cb0ba124451439af6e6da6784d89",
+                "reference": "a37143f592d5cb0ba124451439af6e6da6784d89",
+                "shasum": ""
+            },
+            "require": {
+                "aws/aws-sdk-php": "~2||~3",
+                "ext-fileinfo": "*",
+                "knplabs/gaufrette": "~0.4@dev"
+            },
+            "type": "metapackage",
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "KnpLabs",
+                    "email": "hello@knplabs.com"
+                }
+            ],
+            "description": "Aws adapter for Gaufrette",
+            "time": "2017-06-08T11:37:42+00:00"
+        },
+        {
+            "name": "gaufrette/extras",
+            "version": "v0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Gaufrette/extras.git",
+                "reference": "a2af9a8c53591a4c43a38249e17bcdefdcea8a23"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Gaufrette/extras/zipball/a2af9a8c53591a4c43a38249e17bcdefdcea8a23",
+                "reference": "a2af9a8c53591a4c43a38249e17bcdefdcea8a23",
+                "shasum": ""
+            },
+            "require": {
+                "knplabs/gaufrette": "~0.4"
+            },
+            "require-dev": {
+                "aws/aws-sdk-php": "~2.4|~3",
+                "phpspec/phpspec": "^3.4",
+                "phpunit/phpunit": "~5.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Gaufrette\\Extras\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "KnpLabs Team",
+                    "homepage": "http://knplabs.com"
+                },
+                {
+                    "name": "Albin Kerouanton",
+                    "email": "albin.kerouanton@knplabs.com"
+                },
+                {
+                    "name": "The contributors",
+                    "homepage": "http://github.com/Gaufrette/extras/contributors"
+                }
+            ],
+            "description": "Provides extra features (prefixed fs, resolvable fs) to Gaufrette",
+            "time": "2017-06-17T15:28:53+00:00"
         },
         {
             "name": "geoip2/geoip2",
@@ -6840,6 +6920,7 @@
                 "parser",
                 "useragent"
             ],
+            "abandoned": "matomo/device-detector",
             "time": "2020-03-31T08:53:12+00:00"
         },
         {
@@ -7552,6 +7633,7 @@
                 "configuration",
                 "distribution"
             ],
+            "abandoned": true,
             "time": "2019-06-18T15:43:58+00:00"
         },
         {
@@ -11494,12 +11576,12 @@
             "version": "v6.18.6",
             "source": {
                 "type": "git",
-                "url": "https://github.com/tightenco/collect.git",
+                "url": "https://github.com/tighten/collect.git",
                 "reference": "1a1378fda47c964b53523d3e1f30a08d8f97adc8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tightenco/collect/zipball/1a1378fda47c964b53523d3e1f30a08d8f97adc8",
+                "url": "https://api.github.com/repos/tighten/collect/zipball/1a1378fda47c964b53523d3e1f30a08d8f97adc8",
                 "reference": "1a1378fda47c964b53523d3e1f30a08d8f97adc8",
                 "shasum": ""
             },
@@ -13464,6 +13546,7 @@
             "keywords": [
                 "tokenizer"
             ],
+            "abandoned": true,
             "time": "2019-09-17T06:23:10+00:00"
         },
         {
@@ -14795,6 +14878,54 @@
             "time": "2019-12-10T14:07:41+00:00"
         },
         {
+            "name": "webimpress/safe-writer",
+            "version": "2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webimpress/safe-writer.git",
+                "reference": "d03bea3b98abe1d4c8b24cbebf524361ffaafee4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webimpress/safe-writer/zipball/d03bea3b98abe1d4c8b24cbebf524361ffaafee4",
+                "reference": "d03bea3b98abe1d4c8b24cbebf524361ffaafee4",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^8.4.3",
+                "webimpress/coding-standard": "dev-develop"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0.x-dev",
+                    "dev-develop": "2.1.x-dev",
+                    "dev-release-1.0": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Webimpress\\SafeWriter\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "description": "Tool to write files safely, to avoid race conditions",
+            "keywords": [
+                "concurrent write",
+                "file writer",
+                "race condition",
+                "safe writer",
+                "webimpress"
+            ],
+            "time": "2019-11-27T19:40:53+00:00"
+        },
+        {
             "name": "webmozart/assert",
             "version": "1.7.0",
             "source": {
@@ -14851,10 +14982,9 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.2.21 <7.4",
+        "php": ">=7.2.21 <7.5",
         "ext-zlib": "^7.2",
-        "ext-zip": "^1.15",
-        "ext-imap": "*"
+        "ext-zip": "^1.15"
     },
     "platform-dev": [],
     "plugin-api-version": "1.1.0"
