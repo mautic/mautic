@@ -30,6 +30,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
+use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
@@ -41,25 +42,141 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    private $leadModel;
-    private $stageModel;
-    private $campaignModel;
-    private $eventCollector;
-    private $companyModel;
+    /**
+     * @var MockObject|LeadModel
+     */
+    private $leadModelMock;
+
+    /**
+     * @var MockObject|StageModel
+     */
+    private $stageModelMock;
+
+    /**
+     * @var MockObject|CampaignModel
+     */
+    private $campaignModelMock;
+
+    /**
+     * @var MockObject|EventCollector
+     */
+    private $eventCollectorMock;
+
+    /**
+     * @var MockObject|CompanyModel
+     */
+    private $companyModelMock;
+
+    /**
+     * @var MockObject|CompanyReportData
+     */
     private $companyReportDataMock;
+
+    /**
+     * @var MockObject|FieldsBuilder
+     */
     private $fieldsBuilderMock;
+
+    /**
+     * @var MockObject|Translator
+     */
     private $translatorMock;
+
+    /**
+     * @var MockObject|ReportGeneratorEvent
+     */
     private $reportGeneratorEventMock;
+
+    /**
+     * @var MockObject|ChannelListHelper
+     */
     private $channelListHelperMock;
+
+    /**
+     * @var MockObject|ReportHelper
+     */
     private $reportHelperMock;
+
+    /**
+     * @var MockObject|CampaignRepository
+     */
     private $campaignRepositoryMock;
+
+    /**
+     * @var MockObject|ReportBuilderEvent
+     */
     private $reportBuilderEventMock;
+
+    /**
+     * @var MockObject|QueryBuilder
+     */
     private $queryBuilderMock;
-    private $expressionBuilder;
+
+    /**
+     * @var MockObject|ExpressionBuilder
+     */
+    private $expressionBuilderMock;
+
+    /**
+     * @var MockObject|ReportGraphEvent
+     */
     private $reportGraphEventMock;
-    private $companyRepository;
-    private $pointsChangeLogRepository;
-    private $reportDataEvent;
+
+    /**
+     * @var MockObject|CompanyRepository
+     */
+    private $companyRepositoryMock;
+
+    /**
+     * @var MockObject|PointsChangeLogRepository
+     */
+    private $pointsChangeLogRepositoryMock;
+
+    /**
+     * @var MockObject|ReportMock
+     */
+    private $reportMock;
+
+    /**
+     * @var MockObject|ReportDataEventMock
+     */
+    private $reportDataEventMock;
+
+    /**
+     * @var ReportSubscriber
+     */
+    private $reportSubscriber;
+
+    /**
+     * @var array
+     */
+    private $leadColumns = [
+        'xx.yy' => [
+            'label' => null,
+            'type'  => 'bool',
+            'alias' => 'first',
+        ],
+    ];
+
+    /**
+     * @var array
+     */
+    private $leadFilters = [
+        'filter' => [
+            'label' => 'second',
+            'type'  => 'text',
+        ],
+    ];
+
+    /**
+     * @var array
+     */
+    private $companyColumns = [
+        'comp.name' => [
+            'label' => 'company_name',
+            'type'  => 'text',
+        ],
+    ];
 
     protected function setUp()
     {
@@ -67,35 +184,52 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             define('MAUTIC_TABLE_PREFIX', '');
         }
 
-        $this->leadModel                    = $this->createMock(LeadModel::class);
-        $this->stageModel                   = $this->createMock(StageModel::class);
-        $this->campaignModel                = $this->createMock(CampaignModel::class);
-        $this->eventCollector               = $this->createMock(EventCollector::class);
-        $this->companyModel                 = $this->createMock(CompanyModel::class);
-        $this->companyReportDataMock        = $this->createMock(CompanyReportData::class);
-        $this->fieldsBuilderMock            = $this->createMock(FieldsBuilder::class);
-        $this->translatorMock               = $this->createMock(Translator::class);
-        $this->reportGeneratorEventMock     = $this->createMock(ReportGeneratorEvent::class);
-        $this->reportDataEvent              = $this->createMock(ReportDataEvent::class);
-        $this->channelListHelperMock        = $this->createMock(ChannelListHelper::class);
-        $this->reportHelperMock             = $this->createMock(ReportHelper::class);
-        $this->campaignRepositoryMock       = $this->createMock(CampaignRepository::class);
-        $this->reportBuilderEventMock       = $this->createMock(ReportBuilderEvent::class);
-        $this->queryBuilderMock             = $this->createMock(QueryBuilder::class);
-        $this->expressionBuilder            = $this->createMock(ExpressionBuilder::class);
-        $this->reportGraphEventMock         = $this->createMock(ReportGraphEvent::class);
-        $this->companyRepository            = $this->createMock(CompanyRepository::class);
-        $this->pointsChangeLogRepository    = $this->createMock(PointsChangeLogRepository::class);
-        $this->expressionBuilder->expects($this->any())
+        $this->leadModelMock                    = $this->createMock(LeadModel::class);
+        $this->stageModelMock                   = $this->createMock(StageModel::class);
+        $this->campaignModelMock                = $this->createMock(CampaignModel::class);
+        $this->eventCollectorMock               = $this->createMock(EventCollector::class);
+        $this->companyModelMock                 = $this->createMock(CompanyModel::class);
+        $this->companyReportDataMock            = $this->createMock(CompanyReportData::class);
+        $this->fieldsBuilderMock                = $this->createMock(FieldsBuilder::class);
+        $this->translatorMock                   = $this->createMock(Translator::class);
+        $this->reportGeneratorEventMock         = $this->createMock(ReportGeneratorEvent::class);
+        $this->reportDataEventMock              = $this->createMock(ReportDataEvent::class);
+        $this->channelListHelperMock            = $this->createMock(ChannelListHelper::class);
+        $this->reportHelperMock                 = $this->createMock(ReportHelper::class);
+        $this->campaignRepositoryMock           = $this->createMock(CampaignRepository::class);
+        $this->reportBuilderEventMock           = $this->createMock(ReportBuilderEvent::class);
+        $this->queryBuilderMock                 = $this->createMock(QueryBuilder::class);
+        $this->expressionBuilderMock            = $this->createMock(ExpressionBuilder::class);
+        $this->reportGraphEventMock             = $this->createMock(ReportGraphEvent::class);
+        $this->companyRepositoryMock            = $this->createMock(CompanyRepository::class);
+        $this->pointsChangeLogRepositoryMock    = $this->createMock(PointsChangeLogRepository::class);
+        $this->reportMock                       = $this->createMock(Report::class);
+        $this->reportSubscriber                 = new ReportSubscriber(
+            $this->leadModelMock,
+            $this->stageModelMock,
+            $this->campaignModelMock,
+            $this->eventCollectorMock,
+            $this->companyModelMock,
+            $this->companyReportDataMock,
+            $this->fieldsBuilderMock,
+            $this->translatorMock
+        );
+
+        $this->expressionBuilderMock->expects($this->any())
             ->method('andX')
-            ->willReturn($this->expressionBuilder);
+            ->willReturn($this->expressionBuilderMock);
+
         $this->queryBuilderMock->expects($this->any())
                 ->method('expr')
-                ->willReturn($this->expressionBuilder);
+                ->willReturn($this->expressionBuilderMock);
 
         $this->queryBuilderMock->expects($this->any())
             ->method('resetQueryParts')
             ->willReturn($this->queryBuilderMock);
+
+        $this->queryBuilderMock->expects($this->any())
+            ->method('getQueryPart')
+            ->willReturn([['alias' => 'lp']]);
 
         $this->queryBuilderMock->expects($this->any())
             ->method('from')
@@ -136,45 +270,58 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('orderBy')
             ->willReturn($this->queryBuilderMock);
 
+        $this->campaignModelMock->method('getRepository')->willReturn($this->campaignRepositoryMock);
+
+        $this->eventCollectorMock->expects($this->any())
+            ->method('getEventsArray')
+            ->willReturn(
+                [
+                    'action' => [
+                        'email.send' => [
+                            'label'           => 'Send email',
+                            'description'     => 'Send the selected email to the contact.',
+                            'batchEventName'  => 'mautic.email.on_campaign_batch_action',
+                            'formType'        => "Mautic\EmailBundle\Form\Type\EmailSendType",
+                            'formTypeOptions' => [
+                              'update_select'    => 'campaignevent_properties_email',
+                              'with_email_types' => true,
+                            ],
+                            'formTheme'      => "MauticEmailBundle:FormTheme\EmailSendList",
+                            'channel'        => 'email',
+                            'channelIdField' => 'email',
+                          ],
+                        ],
+                        'decision' => [
+                            'email.click' => [
+                              'label'                  => 'Clicks email',
+                              'description'            => 'Trigger actions when an email is clicked. Connect a &quot;Send Email&quot; action to the top of this decision.',
+                              'eventName'              => 'mautic.email.on_campaign_trigger_decision',
+                              'formType'               => "Mautic\EmailBundle\Form\Type\EmailClickDecisionType",
+                              'connectionRestrictions' => [
+                                'source' => [
+                                  'action' => [
+                                    'email.send',
+                                  ],
+                                ],
+                              ],
+                            ],
+                        ],
+                ]);
+
+        $this->translatorMock->expects($this->any())
+            ->method('hasId')
+            ->willReturn(false);
+
+        $this->stageModelMock->expects($this->any())
+            ->method('getUserStages')
+            ->willReturn([
+                'stage' => [
+                    'id'   => '1',
+                    'name' => 'Stage One',
+                ],
+            ]);
+
         parent::setUp();
-    }
-
-    /**
-     * @return ReportUtmTagSubscriber
-     */
-    private function getReportSubscriber()
-    {
-        $reportSubscriber = new ReportSubscriber(
-            $this->leadModel,
-            $this->stageModel,
-            $this->campaignModel,
-            $this->eventCollector,
-            $this->companyModel,
-            $this->companyReportDataMock,
-            $this->fieldsBuilderMock,
-            $this->translatorMock
-        );
-
-        return $reportSubscriber;
-    }
-
-    /**
-     * @return ReportGeneratorEvent|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getReportGeneratorEventMock()
-    {
-        $this->reportGeneratorEventMock->expects($this->at(0))
-            ->method('checkContext')
-            ->with(['leads',
-            'lead.pointlog',
-            'contact.attribution.multi',
-            'contact.attribution.first',
-            'contact.attribution.last',
-            'contact.frequencyrules',
-            ])
-            ->willReturn(true);
-
-        return $this->reportGeneratorEventMock;
     }
 
     public function eventDataProvider()
@@ -186,6 +333,16 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ['contact.attribution.first'],
             ['contact.attribution.multi'],
             ['contact.attribution.last'],
+            ['companies'],
+        ];
+    }
+
+    public function reportGraphEventDataProvider()
+    {
+        return [
+            ['leads'],
+            ['lead.pointlog'],
+            ['contact.attribution.multi'],
             ['companies'],
         ];
     }
@@ -206,7 +363,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportBuilderEventMock->expects($this->never())
             ->method('addTable');
 
-        $this->getReportSubscriber()->onReportBuilder($this->reportBuilderEventMock);
+        $this->reportSubscriber->onReportBuilder($this->reportBuilderEventMock);
     }
 
     public function testNotRelevantContextGenerate()
@@ -228,93 +385,38 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportGeneratorEventMock->expects($this->never())
             ->method('getQueryBuilder');
 
-        $this->getReportSubscriber()->onReportGenerate($this->reportGeneratorEventMock);
+        $this->reportSubscriber->onReportGenerate($this->reportGeneratorEventMock);
     }
 
     /**
      * @dataProvider eventDataProvider
      */
-    public function testReportBuilder($event)
+    public function testOnReportBuilder($event)
     {
-        $leadColumns = [
-            'xx.yy' => [
-                'label' => null,
-                'type'  => 'bool',
-                'alias' => 'first',
-            ],
-        ];
-
-        $leadFilters = [
-            'filter' => [
-                'label' => 'second',
-                'type'  => 'text',
-            ],
-        ];
-
-        $companyColumns = [
-            'comp.name' => [
-                'label' => 'company_name',
-                'type'  => 'text',
-            ],
-        ];
-
-        $this->campaignModel->method('getRepository')->willReturn($this->campaignRepositoryMock);
-
         if ('companies' != $event) {
             $this->fieldsBuilderMock->expects($this->once())
             ->method('getLeadFieldsColumns')
             ->with('l.')
-            ->willReturn($leadColumns);
+            ->willReturn($this->leadColumns);
 
             $this->fieldsBuilderMock->expects($this->once())
                 ->method('getLeadFilter')
                 ->with('l.', 's.')
-                ->willReturn($leadFilters);
+                ->willReturn($this->leadFilters);
 
             $this->companyReportDataMock->expects($this->once())
             ->method('getCompanyData')
-            ->willReturn($companyColumns);
-        }
-
-        if ('companies' == $event) {
+            ->willReturn($this->companyColumns);
+        } else {
             $this->fieldsBuilderMock->expects($this->once())
             ->method('getCompanyFieldsColumns')
             ->with('comp.')
-            ->willReturn($companyColumns);
+            ->willReturn($this->companyColumns);
         }
-
-        $this->eventCollector->expects($this->any())
-            ->method('getEventsArray')
-            ->willReturn([
-                'decision' => ['email.click' => []],
-            ]);
-
-        $this->translatorMock->expects($this->any())
-            ->method('hasId')
-            ->willReturn(false);
-
-        $this->stageModel->expects($this->any())
-            ->method('getUserStages')
-            ->willReturn([
-                'stage' => [
-                    'id'   => '1',
-                    'name' => 'Stage One',
-                ],
-            ]);
 
         $reportBuilderEvent = new ReportBuilderEvent($this->translatorMock, $this->channelListHelperMock, $event, [], $this->reportHelperMock);
 
-        $reportSubscriber = new ReportSubscriber(
-            $this->leadModel,
-            $this->stageModel,
-            $this->campaignModel,
-            $this->eventCollector,
-            $this->companyModel,
-            $this->companyReportDataMock,
-            $this->fieldsBuilderMock,
-            $this->translatorMock
-        );
-        $reportSubscriber->onReportBuilder($reportBuilderEvent);
+        $this->reportSubscriber->onReportBuilder($reportBuilderEvent);
 
         $expected = [
             'leads' => [
@@ -729,28 +831,26 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testReportGenerate($event)
     {
-        $reportGeneratorEventMock = $this->getReportGeneratorEventMock();
-        $reporSubscriber          = $this->getReportSubscriber();
+        $this->reportGeneratorEventMock->expects($this->at(0))
+        ->method('checkContext')
+        ->with(['leads',
+        'lead.pointlog',
+        'contact.attribution.multi',
+        'contact.attribution.first',
+        'contact.attribution.last',
+        'contact.frequencyrules',
+        ])
+        ->willReturn(true);
 
-        $reportGeneratorEventMock->expects($this->once())
+        $this->reportGeneratorEventMock->expects($this->once())
             ->method('getContext')
             ->willReturn($event);
 
-        $reportGeneratorEventMock->expects($this->once())
+        $this->reportGeneratorEventMock->expects($this->once())
             ->method('getQueryBuilder')
             ->willReturn($this->queryBuilderMock);
 
-        $reporSubscriber->onReportGenerate($reportGeneratorEventMock);
-    }
-
-    public function reportGraphEventDataProvider()
-    {
-        return [
-            ['leads'],
-            ['lead.pointlog'],
-            ['contact.attribution.multi'],
-            ['companies'],
-        ];
+        $this->reportSubscriber->onReportGenerate($this->reportGeneratorEventMock);
     }
 
     /**
@@ -765,62 +865,27 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportGraphEventMock->expects($this->once())
             ->method('getRequestedGraphs')
             ->willReturn([
-                'mautic.lead.graph.pie.attribution_stages',
-                'mautic.lead.graph.pie.attribution_campaigns',
-                'mautic.lead.graph.pie.attribution_actions',
-                'mautic.lead.graph.pie.attribution_channels',
                 'mautic.lead.graph.line.leads',
+                'mautic.lead.table.top.actions',
+                'mautic.lead.table.top.cities',
+                'mautic.lead.table.top.countries',
+                'mautic.lead.table.top.events',
                 'mautic.lead.graph.line.points',
                 'mautic.lead.table.most.points',
-                'mautic.lead.table.top.countries',
-                'mautic.lead.table.top.cities',
-                'mautic.lead.table.top.events',
-                'mautic.lead.table.top.actions',
-                'mautic.lead.table.pie.company.country',
-                'mautic.lead.graph.line.companies',
-                'mautic.lead.graph.pie.companies.industry',
-                'mautic.lead.company.table.top.cities',
             ]);
 
-        $this->leadModel->expects($this->once())
+        $this->leadModelMock->expects($this->once())
             ->method('getPointLogRepository')
-            ->willReturn($this->pointsChangeLogRepository);
+            ->willReturn($this->pointsChangeLogRepositoryMock);
 
-        $this->companyRepository->expects($this->exactly(2))
-        ->method('getCompaniesByGroup')
-        ->withConsecutive(
-            [$this->queryBuilderMock, 'companycountry'],
-            [$this->queryBuilderMock, 'companyindustry']
-        )
-        ->willReturnOnConsecutiveCalls([['companycountry' => 'test', 'companies' => '10']], [['companyindustry' => 'test', 'companies' => '10']]);
-
-        $this->companyModel->expects($this->once())
+        $this->companyModelMock->expects($this->once())
             ->method('getRepository')
-            ->willReturn($this->companyRepository);
+            ->willReturn($this->companyRepositoryMock);
 
         $mockStmt = $this->getMockBuilder(PDOStatement::class)
             ->disableOriginalConstructor()
             ->setMethods(['fetchAll'])
             ->getMock();
-
-        $mockStmt->expects($this->any())
-            ->method('fetchAll')
-            ->willReturn(
-                [
-                    [
-                        'total_attribution'        => '10',
-                        'slice'                    => '10',
-                    ],
-                    [
-                        'total_attribution'        => '20',
-                        'slice'                    => '20',
-                    ],
-                ]
-            );
-
-        $this->queryBuilderMock->expects($this->any())
-            ->method('execute')
-            ->willReturn($mockStmt);
 
         $this->reportGraphEventMock->expects($this->once())
             ->method('getQueryBuilder')
@@ -860,25 +925,77 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getOptions')
             ->willReturn($graphOptions);
 
-        $this->getReportSubscriber()->onReportGraphGenerate($this->reportGraphEventMock);
+        $this->reportGraphEventMock->expects($this->any())
+            ->method('getOptions')
+            ->willReturn($graphOptions);
+
+        $this->reportSubscriber->onReportGraphGenerate($this->reportGraphEventMock);
     }
 
     /**
      * @dataProvider ReportGraphEventDataProvider
      */
-    public function testonReportDisplay($event)
+    public function testOnReportDisplay($event)
     {
-        $this->reportDataEvent->expects($this->once())
+        $this->reportBuilderEventMock->expects($this->any())
+        ->method('checkContext')
+        ->willReturn($event);
+
+        $this->fieldsBuilderMock->expects($this->any())
+    ->method('getLeadFieldsColumns')
+    ->with('l.')
+    ->willReturn($this->leadColumns);
+
+        $this->fieldsBuilderMock->expects($this->any())
+        ->method('getLeadFilter')
+        ->with('l.', 's.')
+        ->willReturn($this->leadFilters);
+
+        $this->companyReportDataMock->expects($this->any())
+    ->method('getCompanyData')
+    ->willReturn($this->companyColumns);
+
+        $this->reportBuilderEventMock->expects($this->any())
+        ->method('getCategoryColumns')
+        ->willReturn([
+            'c.id' => [
+                'label' => 'mautic.report.field.category_id',
+                'type'  => 'int',
+                'alias' => 'category_id',
+            ],
+            'c.title' => [
+                'label' => 'mautic.report.field.category_name',
+                'type'  => 'string',
+                'alias' => 'category_title',
+            ],
+        ]);
+        $this->reportBuilderEventMock->expects($this->any())
+        ->method('getIpColumn')
+        ->willReturn(
+            [
+                'i.ip_address' => [
+                    'label' => 'mautic.core.ipaddress',
+                    'type'  => 'string',
+                ],
+            ]
+        );
+        $this->reportBuilderEventMock->expects($this->any())
+        ->method('addGraph')
+        ->willReturn($this->reportBuilderEventMock);
+
+        $this->reportSubscriber->onReportBuilder($this->reportBuilderEventMock);
+
+        $this->reportDataEventMock->expects($this->once())
             ->method('checkContext')
             ->willReturn($event);
-        $this->reportDataEvent->expects($this->once())
+        $this->reportDataEventMock->expects($this->once())
             ->method('getData')
             ->willReturn([[
-                'channel'        => 'test',
-                'channel_action' => 'test',
+                'channel'        => 'email',
+                'channel_action' => 'click',
                 'activity_count' => 10,
             ]]);
-
-        $this->getReportSubscriber()->onReportDisplay($this->reportDataEvent);
+        $this->reportSubscriber->onReportBuilder($this->reportBuilderEventMock);
+        $this->reportSubscriber->onReportDisplay($this->reportDataEventMock);
     }
 }
