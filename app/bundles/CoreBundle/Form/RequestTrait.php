@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Form\Type\RegionType;
 use Mautic\CoreBundle\Form\Type\SelectType;
 use Mautic\CoreBundle\Form\Type\TimezoneType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -29,8 +30,19 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
 
 trait RequestTrait
 {
-    protected function prepareParametersFromRequest(Form $form, array &$params, $entity = null, $masks = [])
+    protected function prepareParametersFromRequest(Form $form, array &$params, $entity = null, $masks = [], $fields = [])
     {
+        // ungroup fields if need it
+        foreach ($fields as $key=>$field) {
+            if (is_array($field)) {
+                foreach ($field as $k=>$f) {
+                    $fields[$k]=$f;
+                }
+                unset($fields[$key]);
+                continue;
+            }
+        }
+
         // Special handling of some fields
         foreach ($form as $name => $child) {
             if (!isset($params[$name])) {
@@ -57,6 +69,17 @@ trait RequestTrait
 
                     if ('' === $params[$name]) {
                         break;
+                    }
+
+                    // find property by value
+                    if (!empty($fields)) {
+                        $properties = ArrayHelper::getValue('properties', $fields[$name]);
+                        if (is_array($properties)) {
+                            $valuesAsKeys = array_flip(array_values($properties));
+                            if (isset($valuesAsKeys[$params[$name]])) {
+                                $params[$name] = $valuesAsKeys[$params[$name]];
+                            }
+                        }
                     }
 
                     $data = filter_var($params[$name], FILTER_VALIDATE_BOOLEAN);

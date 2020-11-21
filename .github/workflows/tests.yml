@@ -1,0 +1,117 @@
+name: Mautic tests and validations
+
+on:
+  push:
+    branches:
+      - staging
+      - '[0-9]+\.[0-9]+'
+  pull_request:
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+
+    strategy:
+        matrix:
+          php-versions: ['7.2', '7.3', '7.4']
+          db-types: ['mysql', 'mariadb']
+  
+    name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: mautictest
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+      mariadb:
+        image: mariadb:10.3
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: mautictest
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Setup PHP, with composer and extensions
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-versions }}
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+        coverage: pcov
+    
+    - name: Set SYMFONY_ENV to test
+      run: echo "SYMFONY_ENV=test" >> $GITHUB_ENV
+
+    - name: Install dependencies
+      # Force Composer to v1.10
+      run: |
+        composer self-update --1
+        composer global require hirak/prestissimo
+        composer validate
+        composer install --prefer-dist --no-progress --no-suggest
+    
+    - name: Run tests - database = ${{ matrix.db-types }}
+      run: |
+        export DB_PORT_STRING="${{ matrix.db-types }}_port"
+        export DB_PORT=${!DB_PORT_STRING}
+
+        if [[ "${{ matrix.php-versions }}" == "7.4" ]] && [[ "${{ matrix.db-types }}" == "mysql" ]]; then
+          # Clobber is needed because PCOV normally only works with PHPUnit 8+. Needed only to run test coverage.
+          composer require --dev pcov/clobber
+          bin/pcov clobber
+          composer test -- --coverage-clover=coverage.xml
+          bash <(curl -s https://codecov.io/bash)
+        else
+          composer test
+        fi
+      env:
+        mysql_port: ${{ job.services.mysql.ports[3306] }}
+        mariadb_port: ${{ job.services.mariadb.ports[3306] }}
+
+  misc:
+    runs-on: ubuntu-latest
+
+    strategy:
+        matrix:
+          commands: ['PHPSTAN', 'Rector', 'CS Fixer']
+
+    name: ${{ matrix.commands }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup PHP, with composer and extensions
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 7.4
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+
+    - name: Install dependencies
+      # Force Composer to v1.10
+      run: |
+        composer self-update --1
+        composer global require hirak/prestissimo
+        composer validate
+        composer install --prefer-dist --no-progress --no-suggest
+    
+    - name: Run ${{ matrix.commands }}
+      run: |
+        if [[ "${{ matrix.commands }}" == "PHPSTAN" ]]; then
+          composer phpstan
+        elif [[ "${{ matrix.commands }}" == "Rector" ]]; then
+          composer rector -- --dry-run --no-progress-bar
+        elif [[ "${{ matrix.commands }}" == "CS Fixer" ]]; then
+          bin/php-cs-fixer fix --config=.php_cs -v --dry-run --using-cache=no --show-progress=dots \
+          --diff $(git diff -- '*.php' --name-only --diff-filter=ACMRTUXB "HEAD~..HEAD")
+        else
+          echo "Invalid command"
+          exit 1
+        fi
