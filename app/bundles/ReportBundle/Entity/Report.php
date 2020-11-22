@@ -454,7 +454,7 @@ class Report extends FormEntity implements SchedulerInterface
     /**
      * @return mixed
      */
-    public function getGroupBy(): array
+    public function getGroupBy()
     {
         return (array) $this->groupBy;
     }
