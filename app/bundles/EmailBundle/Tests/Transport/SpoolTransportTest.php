@@ -44,14 +44,14 @@ class SpoolTransportTest extends TestCase
         $this->spool           = $this->createMock(DelegatingSpool::class);
         $this->message         = $this->createMock(\Swift_Mime_SimpleMessage::class);
         $this->sendEvent       = $this->createMock(\Swift_Events_SendEvent::class);
-
-        $this->eventDispatcher->expects($this->once())
-            ->method('createSendEvent')
-            ->willReturn($this->sendEvent);
     }
 
     public function testSpooledEventIsDispatched()
     {
+        $this->eventDispatcher->expects($this->once())
+            ->method('createSendEvent')
+            ->willReturn($this->sendEvent);
+
         $this->spool->expects($this->once())
             ->method('delegateMessage')
             ->willReturn(1);
@@ -74,6 +74,10 @@ class SpoolTransportTest extends TestCase
 
     public function testSuccessEventIsDispatched()
     {
+        $this->eventDispatcher->expects($this->once())
+            ->method('createSendEvent')
+            ->willReturn($this->sendEvent);
+
         $this->spool->expects($this->once())
             ->method('delegateMessage')
             ->willReturn(1);
@@ -96,6 +100,10 @@ class SpoolTransportTest extends TestCase
 
     public function testFailedEventIsDispatched()
     {
+        $this->eventDispatcher->expects($this->once())
+            ->method('createSendEvent')
+            ->willReturn($this->sendEvent);
+
         $this->spool->expects($this->once())
             ->method('delegateMessage')
             ->willReturn(0);
@@ -114,5 +122,25 @@ class SpoolTransportTest extends TestCase
         $sent   = $transport->send($this->message, $failed);
 
         $this->assertEquals(0, $sent);
+    }
+
+    public function testThatSupportsTokenizationMethodReturnsTrueIfTokenizationIsEnabled()
+    {
+        $this->spool->expects($this->once())
+            ->method('isTokenizationEnabled')
+            ->willReturn(true);
+
+        $transport = new SpoolTransport($this->eventDispatcher, $this->spool);
+        $this->assertTrue($transport->supportsTokenization());
+    }
+
+    public function testThatSupportsTokenizationMethodReturnsFalseIfTokenizationIsDisabled()
+    {
+        $this->spool->expects($this->once())
+            ->method('isTokenizationEnabled')
+            ->willReturn(false);
+
+        $transport = new SpoolTransport($this->eventDispatcher, $this->spool);
+        $this->assertFalse($transport->supportsTokenization());
     }
 }

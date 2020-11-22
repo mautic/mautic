@@ -187,6 +187,96 @@ class SparkpostTransportTest extends \PHPUnit\Framework\TestCase
         $this->sparkpostTransport->send($this->message);
     }
 
+    public function testCampaignIdFromUtmTagInPayload()
+    {
+        $metadata = [
+            'name'        => 'Joe Smith',
+            'leadId'      => '1',
+            'emailId'     => 20,
+            'emailName'   => 'Campaign Test Email',
+            'hashId'      => '5c92a91788e39848445285',
+            'hashIdState' => true,
+            'source'      => [
+                    'email',
+                    20,
+                ],
+            'tokens'      => [
+                    '{dynamiccontent="Dynamic Content 1"}' => 'Default Dynamic Content',
+                    '{unsubscribe_text}'                   => '<a href="http://website/email/unsubscribe/5c92a91788e39848445285">Unsubscribe</a> to no longer receive emails from us.',
+                    '{unsubscribe_url}'                    => 'http://website/email/unsubscribe/5c92a91788e39848445285',
+                    '{webview_text}'                       => '<a href="http://website/email/view/5c92a91788e39848445285">Having trouble reading this email? Click here.</a>',
+                    '{webview_url}'                        => 'http://website/email/view/5c92a91788e39848445285',
+                    '{signature}'                          => 'Best regards, Company',
+                    '{subject}'                            => 'Campaign Test',
+                    '{tracking_pixel}'                     => 'http://website/email/5c92a91788e39848445285.gif',
+                ],
+            'utmTags'     => [
+                    'utmSource'   => null,
+                    'utmMedium'   => null,
+                    'utmCampaign' => 'Campaign Test',
+                    'utmContent'  => null,
+                ],
+        ];
+
+        $message = new MauticMessage();
+        $message->addMetadata('test@test.com', $metadata);
+        $message->addTo('test@test.com');
+        $message->setFrom('someone@somewhere.com');
+        $message->setSubject('Test Email');
+        $message->setBody('Hello');
+
+        $sparkpost = new SparkpostTransport('abc123', $this->translator, $this->transportCallback, $this->sparkpostFactory, $this->logger);
+
+        $message = $sparkpost->getSparkPostMessage($message);
+
+        $this->assertEquals($message['campaign_id'], 'Campaign Test');
+    }
+
+    public function testCampaignIdFromEmailNameInPayload()
+    {
+        $metadata = [
+            'name'        => 'Joe Smith',
+            'leadId'      => '1',
+            'emailId'     => 20,
+            'emailName'   => 'Campaign Test Email',
+            'hashId'      => '5c92a91788e39848445285',
+            'hashIdState' => true,
+            'source'      => [
+                    'email',
+                    20,
+                ],
+            'tokens'      => [
+                    '{dynamiccontent="Dynamic Content 1"}' => 'Default Dynamic Content',
+                    '{unsubscribe_text}'                   => '<a href="http://website/email/unsubscribe/5c92a91788e39848445285">Unsubscribe</a> to no longer receive emails from us.',
+                    '{unsubscribe_url}'                    => 'http://website/email/unsubscribe/5c92a91788e39848445285',
+                    '{webview_text}'                       => '<a href="http://website/email/view/5c92a91788e39848445285">Having trouble reading this email? Click here.</a>',
+                    '{webview_url}'                        => 'http://website/email/view/5c92a91788e39848445285',
+                    '{signature}'                          => 'Best regards, Company',
+                    '{subject}'                            => 'Campaign Test',
+                    '{tracking_pixel}'                     => 'http://website/email/5c92a91788e39848445285.gif',
+                ],
+            'utmTags'     => [
+                    'utmSource'   => null,
+                    'utmMedium'   => null,
+                    'utmCampaign' => null,
+                    'utmContent'  => null,
+                ],
+        ];
+
+        $message = new MauticMessage();
+        $message->addMetadata('test@test.com', $metadata);
+        $message->addTo('test@test.com');
+        $message->setFrom('someone@somewhere.com');
+        $message->setSubject('Test Email');
+        $message->setBody('Hello');
+
+        $sparkpost = new SparkpostTransport('abc123', $this->translator, $this->transportCallback, $this->sparkpostFactory, $this->logger);
+
+        $message = $sparkpost->getSparkPostMessage($message);
+
+        $this->assertEquals($message['campaign_id'], '20:Campaign Test Email');
+    }
+
     private function getRequestWithPayload()
     {
         $json = <<<JSON

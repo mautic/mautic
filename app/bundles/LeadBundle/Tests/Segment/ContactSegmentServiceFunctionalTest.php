@@ -1,22 +1,64 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Segment;
 
-use Mautic\CoreBundle\Test\MauticWebTestCase;
+use Doctrine\Common\DataFixtures\ReferenceRepository;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData;
+use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
+use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadFieldData;
+use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
+use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadPageHitData;
+use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadSegmentsData;
+use Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData;
+use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
+use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 
 /**
- * Class ContactSegmentServiceFunctionalTest
  * These tests cover same tests like \Mautic\LeadBundle\Tests\Model\ListModelFunctionalTest.
  */
-class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
+class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 {
-    public function testSegmentCountIsCorrect()
+    /**
+     * @var ReferenceRepository
+     */
+    private $fixtures;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->fixtures = $this->loadFixtures([
+            LoadCompanyData::class,
+            LoadLeadListData::class,
+            LoadLeadData::class,
+            LoadLeadFieldData::class,
+            LoadPageHitData::class,
+            LoadSegmentsData::class,
+            LoadPageCategoryData::class,
+            LoadRoleData::class,
+            LoadUserData::class,
+        ], false)->getReferenceRepository();
+    }
+
+    protected function beforeBeginTransaction(): void
+    {
+        $this->resetAutoincrement([
+            'leads',
+            'lead_lists',
+        ]);
+    }
+
+    public function testSegmentCountIsCorrect(): void
     {
         /** @var ContactSegmentService $contactSegmentService */
         $contactSegmentService = $this->container->get('mautic.lead.model.lead_segment_service');
 
-        $segmentTest1Ref = $this->fixtures->getReference('segment-test-1');
+        $segmentTest1Ref = $this->getReference('segment-test-1');
         $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($segmentTest1Ref);
         $this->assertEquals(
             1,
@@ -24,7 +66,7 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             'There should be 1 contacts in the segment-test-1 segment.'
         );
 
-        $segmentTest2Ref = $this->fixtures->getReference('segment-test-2');
+        $segmentTest2Ref = $this->getReference('segment-test-2');
         $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($segmentTest2Ref);
         $this->assertEquals(
             4,
@@ -32,7 +74,7 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             'There should be 4 contacts in the segment-test-2 segment.'
         );
 
-        $segmentTest3Ref = $this->fixtures->getReference('segment-test-3');
+        $segmentTest3Ref = $this->getReference('segment-test-3');
         $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($segmentTest3Ref);
         $this->assertEquals(
             24,
@@ -40,7 +82,7 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             'There should be 24 contacts in the segment-test-3 segment'
         );
 
-        $segmentTest4Ref = $this->fixtures->getReference('segment-test-4');
+        $segmentTest4Ref = $this->getReference('segment-test-4');
         $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($segmentTest4Ref);
         $this->assertEquals(
             1,
@@ -48,7 +90,7 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             'There should be 1 contacts in the segment-test-4 segment.'
         );
 
-        $segmentTest5Ref = $this->fixtures->getReference('segment-test-5');
+        $segmentTest5Ref = $this->getReference('segment-test-5');
         $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($segmentTest5Ref);
         $this->assertEquals(
             53,
@@ -56,7 +98,7 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             'There should be 53 contacts in the segment-test-5 segment.'
         );
 
-        $likePercentEndRef = $this->fixtures->getReference('like-percent-end');
+        $likePercentEndRef = $this->getReference('like-percent-end');
         $segmentContacts   = $contactSegmentService->getTotalLeadListLeadsCount($likePercentEndRef);
         $this->assertEquals(
             32,
@@ -64,7 +106,7 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             'There should be 32 contacts in the like-percent-end segment.'
         );
 
-        $segmentTestWithoutFiltersRef = $this->fixtures->getReference('segment-test-without-filters');
+        $segmentTestWithoutFiltersRef = $this->getReference('segment-test-without-filters');
         $segmentContacts              = $contactSegmentService->getTotalLeadListLeadsCount($segmentTestWithoutFiltersRef);
         $this->assertEquals(
             0,
@@ -72,7 +114,7 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             'There should be 0 contacts in the segment-test-without-filters segment.'
         );
 
-        $segmentTestIncludeMembershipWithFiltersRef = $this->fixtures->getReference('segment-test-include-segment-with-filters');
+        $segmentTestIncludeMembershipWithFiltersRef = $this->getReference('segment-test-include-segment-with-filters');
         $segmentContacts                            = $contactSegmentService->getTotalLeadListLeadsCount($segmentTestIncludeMembershipWithFiltersRef);
         $this->assertEquals(
             26,
@@ -80,7 +122,7 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             'There should be 26 contacts in the segment-test-include-segment-with-filters segment. 24 from segment-test-3 that was not added yet plus 4 from segment-test-2 minus 2 for being in both = 26.'
         );
 
-        $segmentTestExcludeMembershipWithFiltersRef = $this->fixtures->getReference('segment-test-exclude-segment-with-filters');
+        $segmentTestExcludeMembershipWithFiltersRef = $this->getReference('segment-test-exclude-segment-with-filters');
         $segmentContacts                            = $contactSegmentService->getTotalLeadListLeadsCount($segmentTestExcludeMembershipWithFiltersRef);
         $this->assertEquals(
             7,
@@ -88,7 +130,7 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             'There should be 7 contacts in the segment-test-exclude-segment-with-filters segment. 8 that are in the US minus 1 that is in segment-test-3.'
         );
 
-        $segmentTestIncludeMembershipWithoutFiltersRef = $this->fixtures->getReference('segment-test-include-segment-without-filters');
+        $segmentTestIncludeMembershipWithoutFiltersRef = $this->getReference('segment-test-include-segment-without-filters');
         $segmentContacts                               = $contactSegmentService->getTotalLeadListLeadsCount($segmentTestIncludeMembershipWithoutFiltersRef);
         $this->assertEquals(
             0,
@@ -96,7 +138,7 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             'There should be 0 contacts as there is no one in segment-test-without-filters'
         );
 
-        $segmentTestExcludeMembershipWithoutFiltersRef = $this->fixtures->getReference('segment-test-exclude-segment-without-filters');
+        $segmentTestExcludeMembershipWithoutFiltersRef = $this->getReference('segment-test-exclude-segment-without-filters');
         $segmentContacts                               = $contactSegmentService->getTotalLeadListLeadsCount($segmentTestExcludeMembershipWithoutFiltersRef);
         $this->assertEquals(
             11,
@@ -104,7 +146,7 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             'There should be 11 contacts in the United Kingdom and 0 from segment-test-without-filters.'
         );
 
-        $segmentTestIncludeMembershipMixedFiltersRef = $this->fixtures->getReference('segment-test-include-segment-mixed-filters');
+        $segmentTestIncludeMembershipMixedFiltersRef = $this->getReference('segment-test-include-segment-mixed-filters');
         $segmentContacts                             = $contactSegmentService->getTotalLeadListLeadsCount($segmentTestIncludeMembershipMixedFiltersRef);
         $this->assertEquals(
             24,
@@ -112,7 +154,7 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             'There should be 24 contacts. 0 from segment-test-without-filters and 24 from segment-test-3.'
         );
 
-        $segmentTestExcludeMembershipMixedFiltersRef = $this->fixtures->getReference('segment-test-exclude-segment-mixed-filters');
+        $segmentTestExcludeMembershipMixedFiltersRef = $this->getReference('segment-test-exclude-segment-mixed-filters');
         $segmentContacts                             = $contactSegmentService->getTotalLeadListLeadsCount($segmentTestExcludeMembershipMixedFiltersRef);
         $this->assertEquals(
             30,
@@ -120,7 +162,7 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             'There should be 30 contacts. 0 from segment-test-without-filters and 30 from segment-test-3.'
         );
 
-        $segmentTestMixedIncludeExcludeRef = $this->fixtures->getReference('segment-test-mixed-include-exclude-filters');
+        $segmentTestMixedIncludeExcludeRef = $this->getReference('segment-test-mixed-include-exclude-filters');
         $segmentContacts                   = $contactSegmentService->getTotalLeadListLeadsCount($segmentTestMixedIncludeExcludeRef);
         $this->assertEquals(
             8,
@@ -128,7 +170,7 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             'There should be 8 contacts. 32 from like-percent-end minus 24 from segment-test-3.'
         );
 
-        $segmentTestManualMembership = $this->fixtures->getReference('segment-test-manual-membership');
+        $segmentTestManualMembership = $this->getReference('segment-test-manual-membership');
         $segmentContacts             = $contactSegmentService->getTotalLeadListLeadsCount($segmentTestManualMembership);
         $this->assertEquals(
             12,
@@ -136,7 +178,7 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             'There should be 12 contacts. 11 in the United Kingdom plus 3 manually added minus 2 manually removed.'
         );
 
-        $segmentTestIncludeMembershipManualMembersRef = $this->fixtures->getReference('segment-test-include-segment-manual-members');
+        $segmentTestIncludeMembershipManualMembersRef = $this->getReference('segment-test-include-segment-manual-members');
         $segmentContacts                              = $contactSegmentService->getTotalLeadListLeadsCount($segmentTestIncludeMembershipManualMembersRef);
         $this->assertEquals(
             12,
@@ -144,7 +186,7 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             'There should be 12 contacts in the included segment-test-include-segment-manual-members segment'
         );
 
-        $segmentTestExcludeMembershipManualMembersRef = $this->fixtures->getReference('segment-test-exclude-segment-manual-members');
+        $segmentTestExcludeMembershipManualMembersRef = $this->getReference('segment-test-exclude-segment-manual-members');
         $segmentContacts                              = $contactSegmentService->getTotalLeadListLeadsCount($segmentTestExcludeMembershipManualMembersRef);
         $this->assertEquals(
             25,
@@ -152,7 +194,7 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             'There should be 25 contacts in the segment-test-exclude-segment-manual-members segment'
         );
 
-        $segmentTestExcludeMembershipWithoutOtherFiltersRef = $this->fixtures->getReference('segment-test-exclude-segment-without-other-filters');
+        $segmentTestExcludeMembershipWithoutOtherFiltersRef = $this->getReference('segment-test-exclude-segment-without-other-filters');
         $segmentContacts                                    = $contactSegmentService->getTotalLeadListLeadsCount($segmentTestExcludeMembershipWithoutOtherFiltersRef);
         $this->assertEquals(
             42,
@@ -160,7 +202,7 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             'There should be 42 contacts in the included segment-test-exclude-segment-without-other-filters segment'
         );
 
-        $segmentTestIncludeWithUnrelatedManualRemovalRef = $this->fixtures->getReference('segment-test-include-segment-with-unrelated-segment-manual-removal');
+        $segmentTestIncludeWithUnrelatedManualRemovalRef = $this->getReference('segment-test-include-segment-with-unrelated-segment-manual-removal');
         $segmentContacts                                 = $contactSegmentService->getTotalLeadListLeadsCount($segmentTestIncludeWithUnrelatedManualRemovalRef);
         $this->assertEquals(
             11,
@@ -168,7 +210,7 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             'There should be 11 contacts in the segment-test-include-segment-with-unrelated-segment-manual-removal segment where a contact has been manually removed form another list'
         );
 
-        $segmentMembershipRegex = $this->fixtures->getReference('segment-membership-regexp');
+        $segmentMembershipRegex = $this->getReference('segment-membership-regexp');
         $segmentContacts        = $contactSegmentService->getTotalLeadListLeadsCount($segmentMembershipRegex);
         $this->assertEquals(
             11,
@@ -176,7 +218,7 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             'There should be 11 contacts that match the regex with dayrep.com in it'
         );
 
-        $segmentCompanyFields = $this->fixtures->getReference('segment-company-only-fields');
+        $segmentCompanyFields = $this->getReference('segment-company-only-fields');
         $segmentContacts      = $contactSegmentService->getTotalLeadListLeadsCount($segmentCompanyFields);
         $this->assertEquals(
             6,
@@ -184,7 +226,7 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             'There should only be 6 in this segment (6 contacts belong to HostGator based in Houston)'
         );
 
-        $segmentMembershipCompanyOnlyFields = $this->fixtures->getReference('segment-including-segment-with-company-only-fields');
+        $segmentMembershipCompanyOnlyFields = $this->getReference('segment-including-segment-with-company-only-fields');
         $segmentContacts                    = $contactSegmentService->getTotalLeadListLeadsCount($segmentMembershipCompanyOnlyFields);
         $this->assertEquals(
             14,
@@ -192,7 +234,7 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             'There should be 14 in this segment.'
         );
 
-        $segmentMembershipCompanyOnlyFields = $this->fixtures->getReference('name-is-not-equal-not-null-test');
+        $segmentMembershipCompanyOnlyFields = $this->getReference('name-is-not-equal-not-null-test');
         $segmentContacts                    = $contactSegmentService->getTotalLeadListLeadsCount($segmentMembershipCompanyOnlyFields);
         $this->assertEquals(
             54,
@@ -201,11 +243,11 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
         );
     }
 
-    public function testSegmentRebuildCommand()
+    public function testSegmentRebuildCommand(): void
     {
         /** @var ContactSegmentService $contactSegmentService */
         $contactSegmentService = $this->container->get('mautic.lead.model.lead_segment_service');
-        $segmentTest3Ref       = $this->fixtures->getReference('segment-test-3');
+        $segmentTest3Ref       = $this->getReference('segment-test-3');
 
         $this->runCommand('mautic:segments:update', [
             '-i'    => $segmentTest3Ref->getId(),
@@ -235,5 +277,13 @@ class ContactSegmentServiceFunctionalTest extends MauticWebTestCase
             $segmentContacts[$segmentTest3Ref->getId()]['count'],
             'There should be no contacts in the segment-test-3 segment after removing contact titles and rebuilding from the command line.'
         );
+    }
+
+    private function getReference(string $name): LeadList
+    {
+        /** @var LeadList $reference */
+        $reference = $this->fixtures->getReference($name);
+
+        return $reference;
     }
 }

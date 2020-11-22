@@ -114,9 +114,8 @@ class AjaxController extends CommonAjaxController
                     if ('_' == substr($idPrefix, -1)) {
                         $idPrefix = substr($idPrefix, 0, -1);
                     }
-
-                    $html                 = preg_replace('/'.$formType.'\[(.*?)\]/', $prefix.'[$1]', $html);
-                    $html                 = str_replace($formType, $idPrefix, $html);
+                    $html                 = preg_replace('/'.$form->getName().'\[(.*?)\]/', $prefix.'[$1]', $html);
+                    $html                 = str_replace($form->getName(), $idPrefix, $html);
                     $dataArray['success'] = 1;
                     $dataArray['html']    = $html;
                 }

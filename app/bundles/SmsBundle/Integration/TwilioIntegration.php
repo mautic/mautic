@@ -61,17 +61,6 @@ class TwilioIntegration extends AbstractIntegration
     }
 
     /**
-     * @return array
-     */
-    public function getFormSettings()
-    {
-        return [
-            'requires_callback'      => false,
-            'requires_authorization' => false,
-        ];
-    }
-
-    /**
      * {@inheritdoc}
      *
      * @return string

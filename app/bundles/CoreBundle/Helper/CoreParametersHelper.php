@@ -88,7 +88,7 @@ class CoreParametersHelper
 
     private function resolveParameters(): void
     {
-        $all = $this->parameters->keys();
+        $all = $this->parameters->all();
 
         foreach ($all as $key => $value) {
             $this->resolvedParameters[$key] = $this->get($key, $value);
