@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Helper\Chart;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\ColorHelper;
 
@@ -78,6 +79,13 @@ abstract class AbstractChart
      * @var array
      */
     public $colors = ['#4E5D9D', '#00B49C', '#FD9572', '#FDB933', '#757575', '#9C4E5C', '#694535', '#596935'];
+
+    /**
+     * Doctrine's Connetion object.
+     *
+     * @var Connection
+     */
+    protected $connection;
 
     /**
      * Create a DateInterval time unit.
