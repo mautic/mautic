@@ -452,7 +452,7 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getGroupBy()
     {
@@ -467,7 +467,7 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getAggregators()
     {
