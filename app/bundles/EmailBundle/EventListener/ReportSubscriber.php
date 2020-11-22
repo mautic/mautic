@@ -13,6 +13,7 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -41,15 +42,25 @@ class ReportSubscriber implements EventSubscriberInterface
     private $companyReportData;
 
     /**
+     * @var GeneratedColumnsProviderInterface
+     */
+    private $generatedColumnsProvider;
+
+    /**
      * @var StatRepository
      */
     private $statRepository;
 
-    public function __construct(Connection $db, CompanyReportData $companyReportData, StatRepository $statRepository)
-    {
-        $this->db                = $db;
-        $this->companyReportData = $companyReportData;
-        $this->statRepository    = $statRepository;
+    public function __construct(
+        Connection $db,
+        CompanyReportData $companyReportData,
+        StatRepository $statRepository,
+        GeneratedColumnsProviderInterface $generatedColumnsProvider
+    ) {
+        $this->db                       = $db;
+        $this->companyReportData        = $companyReportData;
+        $this->statRepository           = $statRepository;
+        $this->generatedColumnsProvider = $generatedColumnsProvider;
     }
 
     /**
@@ -131,26 +142,26 @@ class ReportSubscriber implements EventSubscriberInterface
                 'alias'   => 'unsubscribed',
                 'label'   => 'mautic.email.report.unsubscribed',
                 'type'    => 'string',
-                'formula' => 'IFNULL((SELECT ROUND(SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::UNSUBSCRIBED.', 1, 0)), 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
+                'formula' => 'IFNULL((SELECT SUM(IF('.$doNotContact.'id IS NOT NULL AND '.$doNotContact.'channel_id='.$prefix.'id AND '.$doNotContact.'reason='.DoNotContact::UNSUBSCRIBED.', 1, 0)) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
             ],
             'unsubscribed_ratio' => [
                 'alias'   => 'unsubscribed_ratio',
                 'label'   => 'mautic.email.report.unsubscribed_ratio',
                 'type'    => 'string',
-                'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::UNSUBSCRIBED.', 1, 0))/'.$prefix.'sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
+                'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.$doNotContact.'id IS NOT NULL AND '.$doNotContact.'channel_id='.$prefix.'id AND '.$doNotContact.'reason='.DoNotContact::UNSUBSCRIBED.', 1, 0))/'.$prefix.'sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
                 'suffix'  => '%',
             ],
             'bounced' => [
                 'alias'   => 'bounced',
                 'label'   => 'mautic.email.report.bounced',
                 'type'    => 'string',
-                'formula' => 'IFNULL((SELECT ROUND(SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::BOUNCED.' , 1, 0)), 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
+                'formula' => 'IFNULL((SELECT SUM(IF('.$doNotContact.'id IS NOT NULL AND '.$doNotContact.'channel_id='.$prefix.'id AND '.$doNotContact.'reason='.DoNotContact::BOUNCED.' , 1, 0)) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
             ],
             'bounced_ratio' => [
                 'alias'   => 'bounced_ratio',
                 'label'   => 'mautic.email.report.bounced_ratio',
                 'type'    => 'string',
-                'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.$doNotContact.'id IS NOT NULL AND dnc.reason='.DoNotContact::BOUNCED.', 1, 0))/'.$prefix.'sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
+                'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.$doNotContact.'id IS NOT NULL AND '.$doNotContact.'channel_id='.$prefix.'id AND '.$doNotContact.'reason='.DoNotContact::BOUNCED.', 1, 0))/'.$prefix.'sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
                 'suffix'  => '%',
             ],
             $prefix.'revision' => [
@@ -426,6 +437,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
             switch ($g) {
                 case 'mautic.email.graph.line.stats':
+                    $chartQuery->setGeneratedColumnProvider($this->generatedColumnsProvider);
                     $chart     = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     $sendQuery = clone $queryBuilder;
                     $readQuery = clone $origQuery;
@@ -475,16 +487,22 @@ class ReportSubscriber implements EventSubscriberInterface
                     $queryBuilder->resetQueryPart('groupBy');
                     $counts = $queryBuilder->execute()->fetch();
                     $chart  = new PieChart();
-                    $chart->setDataset($options['translator']->trans('mautic.email.stat.read'), $counts['read_count']);
+                    $chart->setDataset(
+                        $options['translator']->trans('mautic.email.stat.read'),
+                        $counts['read_count'] ?? 0
+                    );
                     $chart->setDataset(
                         $options['translator']->trans('mautic.email.graph.pie.ignored.read.failed.ignored'),
-                        ($counts['sent_count'] - $counts['read_count'])
+                        (($counts['sent_count'] ?? 0) - ($counts['read_count'] ?? 0))
                     );
                     $chart->setDataset(
                         $options['translator']->trans('mautic.email.unsubscribed'),
-                        $counts['unsubscribed']
+                        $counts['unsubscribed'] ?? 0
                     );
-                    $chart->setDataset($options['translator']->trans('mautic.email.bounced'), $counts['bounced']);
+                    $chart->setDataset(
+                        $options['translator']->trans('mautic.email.bounced'),
+                        $counts['bounced'] ?? 0
+                    );
 
                     $event->setGraph(
                         $g,

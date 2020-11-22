@@ -1,18 +1,52 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date;
 
+use DateTime;
+use DateTimeZone;
+use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\CoreBundle\Test\MauticWebTestCase;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
+use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
+use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadSegmentsData;
+use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
+use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 
-/**
- * Class RelativeDateFunctionalTest.
- */
-class RelativeDateFunctionalTest extends MauticWebTestCase
+class RelativeDateFunctionalTest extends MauticMysqlTestCase
 {
+    /**
+     * @var ReferenceRepository
+     */
+    private $fixtures;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->fixtures = $this->loadFixtures([
+            LoadLeadListData::class,
+            LoadLeadData::class,
+            LoadSegmentsData::class,
+            LoadRoleData::class,
+            LoadUserData::class,
+        ], false)->getReferenceRepository();
+    }
+
+    protected function beforeBeginTransaction(): void
+    {
+        $this->resetAutoincrement([
+            'leads',
+            'lead_lists',
+        ]);
+    }
+
     public function testSegmentCountIsCorrectForToday()
     {
         $name = 'Today';
@@ -117,21 +151,17 @@ class RelativeDateFunctionalTest extends MauticWebTestCase
         $this->checkSegmentResult($name, $lead);
     }
 
-    /**
-     * @param string $name
-     */
-    private function checkSegmentResult($name, Lead $lead)
+    private function checkSegmentResult(string $name, Lead $lead): void
     {
         /** @var ContactSegmentService $contactSegmentService */
         $contactSegmentService = $this->container->get('mautic.lead.model.lead_segment_service');
 
         $alias = strtolower(InputHelper::alphanum($name, false, '-'));
 
-        $segmentName     = 'segment-with-relative-date-'.$alias;
+        $segmentName = 'segment-with-relative-date-'.$alias;
+        /** @var LeadList $segmentRef */
         $segmentRef      = $this->fixtures->getReference($segmentName);
         $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($segmentRef);
-
-        $this->removeAllDateRelatedLeads(); //call before assert to be sure cleaning will process
 
         $this->assertEquals(
             1,
@@ -145,21 +175,12 @@ class RelativeDateFunctionalTest extends MauticWebTestCase
         );
     }
 
-    /**
-     * @param string $name
-     * @param string $initialTime
-     * @param string $dateModifier
-     *
-     * @return Lead
-     */
-    private function createLead($name, $initialTime, $dateModifier)
+    private function createLead(string $name, string $initialTime, string $dateModifier): Lead
     {
-        $this->removeAllDateRelatedLeads();
-
         /** @var LeadRepository $leadRepository */
         $leadRepository = $this->container->get('doctrine.orm.default_entity_manager')->getRepository(Lead::class);
 
-        $date = new \DateTime($initialTime, new \DateTimeZone('UTC'));
+        $date = new DateTime($initialTime, new DateTimeZone('UTC'));
         $date->modify($dateModifier);
 
         $lead = new Lead();
@@ -170,11 +191,5 @@ class RelativeDateFunctionalTest extends MauticWebTestCase
         $leadRepository->saveEntity($lead);
 
         return $lead;
-    }
-
-    private function removeAllDateRelatedLeads()
-    {
-        // Remove all date related leads to not affect other test
-        $this->em->getConnection()->query(sprintf("DELETE FROM %sleads WHERE lastname = 'Date';", MAUTIC_TABLE_PREFIX));
     }
 }

@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\CookieHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -54,28 +55,69 @@ class PageModel extends FormModel
     use VariantModelTrait;
     use BuilderModelTrait;
 
+    /**
+     * @var bool
+     */
     protected $catInUrl;
 
+    /**
+     * @var CookieHelper
+     */
     protected $cookieHelper;
 
+    /**
+     * @var IpLookupHelper
+     */
     protected $ipLookupHelper;
 
+    /**
+     * @var LeadModel
+     */
     protected $leadModel;
 
+    /**
+     * @var FieldModel
+     */
     protected $leadFieldModel;
 
+    /**
+     * @var RedirectModel
+     */
     protected $pageRedirectModel;
 
+    /**
+     * @var TrackableModel
+     */
     protected $pageTrackableModel;
 
+    /**
+     * @var DateTimeHelper
+     */
     protected $dateTimeHelper;
 
+    /**
+     * @var QueueService
+     */
     protected $queueService;
 
+    /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
+     * @var DeviceTracker
+     */
     private $deviceTracker;
 
+    /**
+     * @var CompanyModel
+     */
     private $companyModel;
 
+    /**
+     * @var ContactTracker
+     */
     private $contactTracker;
 
     /**
@@ -91,19 +133,21 @@ class PageModel extends FormModel
         QueueService $queueService,
         CompanyModel $companyModel,
         DeviceTracker $deviceTracker,
-        ContactTracker $contactTracker
+        ContactTracker $contactTracker,
+        CoreParametersHelper $coreParametersHelper
     ) {
-        $this->cookieHelper       = $cookieHelper;
-        $this->ipLookupHelper     = $ipLookupHelper;
-        $this->leadModel          = $leadModel;
-        $this->leadFieldModel     = $leadFieldModel;
-        $this->pageRedirectModel  = $pageRedirectModel;
-        $this->pageTrackableModel = $pageTrackableModel;
-        $this->dateTimeHelper     = new DateTimeHelper();
-        $this->queueService       = $queueService;
-        $this->companyModel       = $companyModel;
-        $this->deviceTracker      = $deviceTracker;
-        $this->contactTracker     = $contactTracker;
+        $this->cookieHelper         = $cookieHelper;
+        $this->ipLookupHelper       = $ipLookupHelper;
+        $this->leadModel            = $leadModel;
+        $this->leadFieldModel       = $leadFieldModel;
+        $this->pageRedirectModel    = $pageRedirectModel;
+        $this->pageTrackableModel   = $pageTrackableModel;
+        $this->dateTimeHelper       = new DateTimeHelper();
+        $this->queueService         = $queueService;
+        $this->companyModel         = $companyModel;
+        $this->deviceTracker        = $deviceTracker;
+        $this->contactTracker       = $contactTracker;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -560,9 +604,14 @@ class PageModel extends FormModel
             $hit->setPageLanguage($query['page_language']);
         }
         if (isset($query['page_title'])) {
-            $safeTitle = InputHelper::transliterate($query['page_title']);
-            $hit->setUrlTitle($safeTitle);
-            $query['page_title'] = $safeTitle;
+            // Transliterate page titles.
+            if ($this->coreParametersHelper->get('transliterate_page_title')) {
+                $safeTitle = InputHelper::transliterate($query['page_title']);
+                $hit->setUrlTitle($safeTitle);
+                $query['page_title'] = $safeTitle;
+            } else {
+                $hit->setUrlTitle($query['page_title']);
+            }
         }
 
         $hit->setQuery($query);

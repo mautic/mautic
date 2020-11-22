@@ -473,6 +473,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 $dataObject['Email__Lead'] = InputHelper::email($dataObject['Email__Lead']);
                             }
 
+                            // normalize multiselect field
+                            foreach ($dataObject as &$dataO) {
+                                if (is_string($dataO)) {
+                                    $dataO = str_replace(';', '|', $dataO);
+                                }
+                            }
                             $entity                = $this->getMauticLead($dataObject, true, null, null, $object);
                             $mauticObjectReference = 'lead';
                             $detachClass           = Lead::class;
@@ -2575,6 +2581,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function amendLeadDataBeforePush(&$mappedData)
     {
+        // normalize for multiselect field
+        foreach ($mappedData as &$data) {
+            $data = str_replace('|', ';', $data);
+        }
+
         $mappedData = StateValidationHelper::validate($mappedData);
     }
 
@@ -2703,7 +2714,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $lead = $this->leadModel->getEntity($leadId);
 
         if (true == $newDncValue) {
-            $this->doNotContact->addDncForContact($lead->getId(), 'email', 'Set by Salesforce', DoNotContact::MANUAL, true, false, true);
+            $this->doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, 'Set by Salesforce', true, false, true);
         } elseif (false == $newDncValue) {
             $this->doNotContact->removeDncForContact($lead->getId(), 'email', true);
         }

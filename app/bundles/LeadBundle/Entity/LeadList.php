@@ -38,6 +38,11 @@ class LeadList extends FormEntity
     /**
      * @var string
      */
+    private $publicName;
+
+    /**
+     * @var string
+     */
     private $description;
 
     /**
@@ -84,6 +89,10 @@ class LeadList extends FormEntity
 
         $builder->addField('alias', 'string');
 
+        $builder->createField('publicName', 'string')
+            ->columnName('public_name')
+            ->build();
+
         $builder->addField('filters', 'array');
 
         $builder->createField('isGlobal', 'boolean')
@@ -125,6 +134,7 @@ class LeadList extends FormEntity
                 [
                     'id',
                     'name',
+                    'publicName',
                     'alias',
                     'description',
                 ]
@@ -200,6 +210,31 @@ class LeadList extends FormEntity
     }
 
     /**
+     * Get publicName.
+     *
+     * @return string
+     */
+    public function getPublicName()
+    {
+        return $this->publicName;
+    }
+
+    /**
+     * Set publicName.
+     *
+     * @param string $publicName
+     *
+     * @return LeadList
+     */
+    public function setPublicName($publicName)
+    {
+        $this->isChanged('publicName', $publicName);
+        $this->publicName = $publicName;
+
+        return $this;
+    }
+
+    /**
      * Set filters.
      *
      * @return LeadList
@@ -219,6 +254,10 @@ class LeadList extends FormEntity
      */
     public function getFilters()
     {
+        if (is_array($this->filters)) {
+            return $this->addLegacyParams($this->filters);
+        }
+
         return $this->filters;
     }
 
@@ -320,5 +359,24 @@ class LeadList extends FormEntity
     {
         $this->isChanged('isPreferenceCenter', $isPreferenceCenter);
         $this->isPreferenceCenter = $isPreferenceCenter;
+    }
+
+    /**
+     * @deprecated remove after several of years.
+     *
+     * This is needed go keep BC after we moved 'filter' and 'display' params
+     * to the 'properties' array.
+     */
+    private function addLegacyParams(array $filters): array
+    {
+        return array_map(
+            function (array $filter) {
+                $filter['filter'] = $filter['properties']['filter'] ?? $filter['filter'] ?? null;
+                $filter['display'] = $filter['properties']['display'] ?? $filter['display'] ?? null;
+
+                return $filter;
+            },
+            $filters
+        );
     }
 }
