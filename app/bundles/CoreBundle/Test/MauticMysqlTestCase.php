@@ -43,7 +43,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         }
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if ($this->useCleanupRollback) {
             if ($this->connection->isTransactionActive()) {
