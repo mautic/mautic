@@ -164,6 +164,7 @@ jobs:
     # expects Mautic to run in the root folder http://localhost
     - name: Move files to web root
       run: |
+        cp $GITHUB_WORKSPACE/.github/ci-files/local.php $GITHUB_WORKSPACE/app/config/local.php
         shopt -s dotglob
         sudo chmod -R 777 /var/www/html
         sudo chown -R www-data:www-data /var/www/html
@@ -174,7 +175,6 @@ jobs:
       env:
         DB_PORT: ${{ job.services.mysql.ports[3306] }}
       run: |
-        cp $GITHUB_WORKSPACE/.github/ci-files/local.php ./app/config/local.php
         php bin/console mautic:install http://localhost
         php bin/console cache:warmup --no-interaction --env=prod
         sudo chmod -R 777 /var/www/html
