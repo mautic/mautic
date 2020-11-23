@@ -39,7 +39,7 @@ class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
         file_put_contents($this->goodFilePath, $this->goodData);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
