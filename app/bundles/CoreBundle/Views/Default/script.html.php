@@ -24,5 +24,6 @@ $mauticContent = $view['slots']->get(
     var mauticContent     = '<?php echo $mauticContent; ?>';
     var mauticEnv         = '<?php echo $app->getEnvironment(); ?>';
     var mauticLang        = <?php echo $view['translator']->getJsLang(); ?>;
+    var mauticLocale      = '<?php echo $app->getRequest()->getLocale(); ?>';
 </script>
 <?php $view['assets']->outputSystemScripts(true); ?>
