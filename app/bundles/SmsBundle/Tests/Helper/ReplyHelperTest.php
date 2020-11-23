@@ -15,7 +15,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\SmsBundle\Callback\CallbackInterface;
-use Mautic\SmsBundle\Callback\CallbackResponseInterface;
 use Mautic\SmsBundle\Callback\ResponseInterface;
 use Mautic\SmsBundle\Exception\NumberNotFoundException;
 use Mautic\SmsBundle\Helper\ReplyHelper;
@@ -66,26 +65,26 @@ class ReplyHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testHandlerResponseIsReturnedIfResponseInterface()
     {
-        $handler = $this->createMock(CallbackResponseInterface::class);
-
-        $handlerResponse = new Response('hi');
-        $handler->expects($this->once())
-            ->method('getResponse')
-            ->willReturn($handlerResponse);
-
-        $handler->expects($this->once())
-            ->method('getContacts')
-            ->willReturn(new ArrayCollection([new Lead()]));
-
-        $this->contactTracker->expects($this->once())
-            ->method('setSystemContact');
-
-        $this->eventDispatcher->expects($this->once())
-            ->method('dispatch');
+        $handler = new class implements CallbackInterface, ResponseInterface {
+            public function getResponse() {
+                return new Response('hi');
+            }
+            public function getContacts(Request $request) {
+                return new ArrayCollection([new Lead()]);
+            }
+        
+            public function getMessage(Request $request) {
+                return '';
+            }
+        
+            public function getTransportName() {
+                return '';
+            }
+        };
 
         $response = $this->getHelper()->handleRequest($handler, new Request());
 
-        $this->assertEquals($handlerResponse, $response);
+        $this->assertEquals(new Response('hi'), $response);
     }
 
     public function testContactsNotFoundDoesNotDispatchEvent()
