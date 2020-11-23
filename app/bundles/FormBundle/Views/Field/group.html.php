@@ -51,9 +51,8 @@ $checked          = ($field['defaultValue'] === $listValue) ? 'checked="checked"
 $checkboxBrackets = ('checkbox' == $type) ? '[]' : '';
 
 $option = <<<HTML
-
-                    <label id="mauticform_{$containerType}_label_{$id}" for="mauticform_{$containerType}_{$type}_{$id}" {$optionLabelAttr}>$listLabel</label>
                     <input {$inputAttr}{$checked} name="mauticform[{$field['alias']}]{$checkboxBrackets}" id="mauticform_{$containerType}_{$type}_{$id}" type="{$type}" value="{$view->escape($listValue)}" />
+                    <label id="mauticform_{$containerType}_label_{$id}" for="mauticform_{$containerType}_{$type}_{$id}" {$optionLabelAttr}>$listLabel</label>
 HTML;
 
 if ($wrapDiv):

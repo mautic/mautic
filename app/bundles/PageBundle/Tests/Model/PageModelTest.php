@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class PageModelTest extends PageTestAbstract
 {
-    public function testUtf8CharsInTitle()
+    public function testUtf8CharsInTitleWithTransletirationEnabled()
     {
         $providedTitle = '你好，世界';
         $expectedTitle = 'ni hao, shi jie';
@@ -30,6 +30,25 @@ class PageModelTest extends PageTestAbstract
         $request       = new Request();
         $contact       = new Lead();
         $pageModel     = $this->getPageModel();
+
+        $hit->setIpAddress(new IpAddress());
+        $hit->setQuery(['page_title' => $providedTitle]);
+
+        $pageModel->processPageHit($hit, $page, $request, $contact, false);
+
+        $this->assertSame($expectedTitle, $hit->getUrlTitle());
+        $this->assertSame(['page_title' => $expectedTitle], $hit->getQuery());
+    }
+
+    public function testUtf8CharsInTitleWithTransletirationDisabled()
+    {
+        $providedTitle = '你好，世界';
+        $expectedTitle = '你好，世界';
+        $hit           = new Hit();
+        $page          = new Page();
+        $request       = new Request();
+        $contact       = new Lead();
+        $pageModel     = $this->getPageModel(false);
 
         $hit->setIpAddress(new IpAddress());
         $hit->setQuery(['page_title' => $providedTitle]);
