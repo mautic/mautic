@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -37,7 +39,7 @@ class PasswordStrengthEstimatorModel
         $this->passwordStrengthEstimator = $passwordStrengthEstimator;
     }
 
-    public function validate(string $password, int $score = self::MINIMUM_PASSWORD_STRENGTH_ALLOWED, $dictionary = []): bool
+    public function validate(string $password, int $score = self::MINIMUM_PASSWORD_STRENGTH_ALLOWED, array $dictionary = []): bool
     {
         return $score <= $this->passwordStrengthEstimator->passwordStrength($password, $dictionary)['score'];
     }
