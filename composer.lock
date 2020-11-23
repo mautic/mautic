@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9f914d373927dc2ad11fcc90881261f9",
+    "content-hash": "adc6f38148444b3e2058cd8e46a1e16d",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -1778,6 +1778,10 @@
                 "database",
                 "orm"
             ],
+            "support": {
+                "issues": "https://github.com/doctrine/orm/issues",
+                "source": "https://github.com/doctrine/orm/tree/v2.7.0"
+            },
             "time": "2019-11-19T08:38:05+00:00"
         },
         {
@@ -14945,7 +14949,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.3.0 <7.5",
+        "php": ">=7.4.0 <8.1",
         "ext-zlib": "^7.2",
         "ext-zip": "^1.15",
         "ext-imap": "*"
