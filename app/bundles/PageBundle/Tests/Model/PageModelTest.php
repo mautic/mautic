@@ -65,7 +65,7 @@ class PageModelTest extends PageTestAbstract
         $page->setAlias('this-is-a-test');
         $pageModel = $this->getPageModel();
         $url       = $pageModel->generateUrl($page);
-        $this->assertContains('/this-is-a-test', $url);
+        $this->assertStringContainsString('/this-is-a-test', $url);
     }
 
     public function testCleanQuery_WhenCalled_ReturnsSafeAndValidData()

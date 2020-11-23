@@ -75,7 +75,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $response = json_decode($clientResponse->getContent(), true);
         $this->assertTrue(isset($response['closeModal']), 'The response does not contain the `closeModal` param.');
         $this->assertTrue($response['closeModal']);
-        $this->assertContains('3 contacts affected', $response['flashes']);
+        $this->assertStringContainsString('3 contacts affected', $response['flashes']);
 
         $payload = [
             'lead_batch' => [
@@ -116,7 +116,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $response = json_decode($clientResponse->getContent(), true);
         $this->assertTrue(isset($response['closeModal']), 'The response does not contain the `closeModal` param.');
         $this->assertTrue($response['closeModal']);
-        $this->assertContains('3 contacts affected', $response['flashes']);
+        $this->assertStringContainsString('3 contacts affected', $response['flashes']);
     }
 
     public function testCompanyChangesAreTrackedWhenContactAddedViaUI(): void
