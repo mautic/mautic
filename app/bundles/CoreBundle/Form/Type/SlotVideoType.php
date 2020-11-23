@@ -11,7 +11,6 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -49,10 +48,10 @@ class SlotVideoType extends SlotType
                 'class'           => 'form-control',
                 'data-slot-param' => 'video-color',
             ],
-            'choice_list' => new ChoiceList(
-                ['slot-video-light', 'slot-video-dark'],
-                ['mautic.core.video.color.light', 'mautic.core.video.color.dark']
-            ),
+            'choice_list' => [
+                'mautic.core.video.color.light' => 'slot-video-light',
+                'mautic.core.video.color.dark'  => 'slot-video-dark',
+            ],
         ]);
 
         parent::buildForm($builder, $options);
