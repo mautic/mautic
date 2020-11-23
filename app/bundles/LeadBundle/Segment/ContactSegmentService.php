@@ -131,7 +131,7 @@ class ContactSegmentService
         $queryBuilder->setMaxResults($limit);
 
         $this->addMinMaxLimiters($queryBuilder, $batchLimiters);
-        $this->addLeadLimiter($queryBuilder, $batchLimiters);
+        $this->addLeadLimiter($queryBuilder, $batchLimiters, $leadsTableAlias.'.id');
 
         if (!empty($batchLimiters['dateTime'])) {
             // Only leads in the list at the time of count
@@ -239,8 +239,10 @@ class ContactSegmentService
     {
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
 
-        $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segment->getId(), $segmentFilters);
-        $this->addLeadLimiter($queryBuilder, $batchLimiters);
+        $queryBuilder    = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segment->getId(), $segmentFilters);
+        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
+
+        $this->addLeadLimiter($queryBuilder, $batchLimiters, $leadsTableAlias.'.id');
 
         $this->contactSegmentQueryBuilder->queryBuilderGenerated($segment, $queryBuilder);
 
