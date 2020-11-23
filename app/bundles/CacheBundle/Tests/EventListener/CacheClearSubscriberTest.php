@@ -27,7 +27,7 @@ class CacheClearSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $random;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->random  = sha1((string) time());
