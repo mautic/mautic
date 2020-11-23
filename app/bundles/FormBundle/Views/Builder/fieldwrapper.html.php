@@ -40,7 +40,7 @@ if (!isset($inBuilder)) {
     ?>
     </div>
     <?php if ((isset($field['showWhenValueExists']) && false === $field['showWhenValueExists']) || !empty($field['showAfterXSubmissions'])
-        || (isset($field['alwaysDisplay']) && $field['alwaysDisplay'] === true)
+        || (isset($field['alwaysDisplay']) && true === $field['alwaysDisplay'])
         || !empty($field['leadField'])
     ): ?>
         <div class="panel-footer">

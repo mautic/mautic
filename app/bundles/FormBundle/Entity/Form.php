@@ -284,7 +284,7 @@ class Form extends FormEntity
             $groups[] = 'urlRequired';
         }
 
-        if ($data->getProgressiveProfilingLimit() != '') {
+        if ('' != $data->getProgressiveProfilingLimit()) {
             $groups[] = 'progressiveProfilingLimit';
         }
 
@@ -870,7 +870,7 @@ class Form extends FormEntity
 
         // Progressive profiling must be turned off in the kiosk mode
         if (false === $this->getInKioskMode()) {
-            if ($this->getProgressiveProfilingLimit() != '') {
+            if ('' != $this->getProgressiveProfilingLimit()) {
                 $this->usesProgressiveProfiling = true;
 
                 return $this->usesProgressiveProfiling;
@@ -909,7 +909,7 @@ class Form extends FormEntity
      */
     public function getProgressiveProfilingLimit()
     {
-        if ($this->progressiveProfilingLimit === 0) {
+        if (0 === $this->progressiveProfilingLimit) {
             $this->progressiveProfilingLimit = '';
         }
 

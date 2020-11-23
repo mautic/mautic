@@ -33,8 +33,6 @@ class DisplayCounter
 
     /**
      * DisplayCounter constructor.
-     *
-     * @param Form $form
      */
     public function __construct(Form $form)
     {

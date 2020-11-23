@@ -33,9 +33,6 @@ class DisplayManager
 
     /**
      * DisplayManager constructor.
-     *
-     * @param Form  $form
-     * @param array $viewOnlyFields
      */
     public function __construct(Form $form, array $viewOnlyFields = [])
     {
@@ -45,8 +42,6 @@ class DisplayManager
     }
 
     /**
-     * @param Field $field
-     *
      * @return bool
      */
     public function showForField(Field $field)
@@ -74,8 +69,6 @@ class DisplayManager
     }
 
     /**
-     * @param Field $field
-     *
      * @return bool
      */
     private function shouldDisplayNotAlwaysDisplayField(Field $field)
@@ -102,7 +95,7 @@ class DisplayManager
      */
     public function useProgressiveProfilingLimit()
     {
-        return $this->form->getProgressiveProfilingLimit() != '';
+        return '' != $this->form->getProgressiveProfilingLimit();
     }
 
     /**
@@ -113,9 +106,6 @@ class DisplayManager
         return $this->displayCounter;
     }
 
-    /**
-     * @param Field $field
-     */
     public function increaseDisplayedFields(Field $field)
     {
         if (!in_array($field->getType(), $this->viewOnlyFields)) {
