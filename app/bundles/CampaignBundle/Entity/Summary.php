@@ -28,7 +28,7 @@ class Summary
     private $id;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      **/
     private $dateTriggered;
 
@@ -153,12 +153,12 @@ class Summary
         }
     }
 
-    public function getDateTriggered(): ?\DateTime
+    public function getDateTriggered(): ?\DateTimeInterface
     {
         return $this->dateTriggered;
     }
 
-    public function setDateTriggered(\DateTime $dateTriggered = null): void
+    public function setDateTriggered(\DateTimeInterface $dateTriggered = null): void
     {
         $this->dateTriggered = $dateTriggered;
     }

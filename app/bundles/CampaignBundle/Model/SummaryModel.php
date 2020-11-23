@@ -101,7 +101,15 @@ class SummaryModel extends AbstractCommonModel
         $start->setTimestamp($start->getTimestamp() - ($start->getTimestamp() % 3600));
 
         $end = $this->getCampaignLeadEventLogRepository()->getOldestTriggeredDate();
-        $end->setTimestamp($end->getTimestamp() - ($end->getTimestamp() % 3600));
+
+        if (!$end) {
+            $output->writeln('There are no records in the campaign lead event log table. Nothng to summarize.');
+
+            return;
+        }
+
+        $end = $end->setTimestamp($end->getTimestamp() - ($end->getTimestamp() % 3600));
+
         if ($end && $end <= $start) {
             $hours = ($end->diff($start)->days * 24) + $end->diff($start)->h;
             if ($maxHours && $hours > $maxHours) {
@@ -115,11 +123,11 @@ class SummaryModel extends AbstractCommonModel
             $dateFrom = clone $start;
             $dateTo   = clone $start;
             do {
-                $dateFrom->sub($interval);
+                $dateFrom = $dateFrom->sub($interval);
                 $output->write("\t".$dateFrom->format('Y-m-d H:i:s'));
                 $this->getRepository()->summarize($dateFrom, $dateTo);
                 $this->progressBar->advance($hoursPerBatch);
-                $dateTo->sub($interval);
+                $dateTo = $dateTo->sub($interval);
             } while ($end < $dateFrom);
             $this->progressBar->finish();
         }
