@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -32,7 +34,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $subscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -40,7 +42,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber   = new WebhookSubscriber($this->webhookModel);
     }
 
-    public function testOnWebhookBuild()
+    public function testOnWebhookBuild(): void
     {
         $event = $this->createMock(WebhookBuilderEvent::class);
 
@@ -66,7 +68,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onWebhookBuild($event);
     }
 
-    public function testOnEmailSendWhenInternalSend()
+    public function testOnEmailSendWhenInternalSend(): void
     {
         $event = $this->createMock(EmailSendEvent::class);
 
@@ -80,7 +82,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onEmailSend($event);
     }
 
-    public function testOnEmailSend()
+    public function testOnEmailSend(): void
     {
         $event   = $this->createMock(EmailSendEvent::class);
         $contact = $this->createMock(Lead::class);

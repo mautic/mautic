@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -17,9 +19,13 @@ use Mautic\SmsBundle\EventListener\WebhookSubscriber;
 use Mautic\SmsBundle\SmsEvents;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
+use PHPUnit\Framework\MockObject\MockObject;
 
-class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
+final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|WebhookModel
+     */
     private $webhookModel;
 
     /**
@@ -27,7 +33,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $subscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -35,7 +41,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber   = new WebhookSubscriber($this->webhookModel);
     }
 
-    public function testOnWebhookBuild()
+    public function testOnWebhookBuild(): void
     {
         $event = $this->createMock(WebhookBuilderEvent::class);
 
@@ -52,7 +58,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onWebhookBuild($event);
     }
 
-    public function testOnSend()
+    public function testOnSend(): void
     {
         $event   = $this->createMock(SmsSendEvent::class);
         $contact = $this->createMock(Lead::class);

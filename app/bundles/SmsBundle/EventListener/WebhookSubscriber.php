@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -18,7 +20,7 @@ use Mautic\WebhookBundle\Model\WebhookModel;
 use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class WebhookSubscriber implements EventSubscriberInterface
+final class WebhookSubscriber implements EventSubscriberInterface
 {
     /**
      * @var WebhookModel
@@ -30,10 +32,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         $this->webhookModel = $webhookModel;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             SmsEvents::SMS_ON_SEND          => 'onSend',
@@ -44,7 +43,7 @@ class WebhookSubscriber implements EventSubscriberInterface
     /**
      * Add event triggers and actions.
      */
-    public function onWebhookBuild(WebhookBuilderEvent $event)
+    public function onWebhookBuild(WebhookBuilderEvent $event): void
     {
         $event->addEvent(
             SmsEvents::SMS_ON_SEND,
@@ -55,7 +54,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onSend(SmsSendEvent $event)
+    public function onSend(SmsSendEvent $event): void
     {
         $this->webhookModel->queueWebhooksByType(
             SmsEvents::SMS_ON_SEND,
