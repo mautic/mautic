@@ -65,19 +65,24 @@ class ReplyHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testHandlerResponseIsReturnedIfResponseInterface()
     {
-        $handler = new class implements CallbackInterface, ResponseInterface {
-            public function getResponse() {
+        $handler = new class() implements CallbackInterface, ResponseInterface {
+            public function getResponse()
+            {
                 return new Response('hi');
             }
-            public function getContacts(Request $request) {
+
+            public function getContacts(Request $request)
+            {
                 return new ArrayCollection([new Lead()]);
             }
-        
-            public function getMessage(Request $request) {
+
+            public function getMessage(Request $request)
+            {
                 return '';
             }
-        
-            public function getTransportName() {
+
+            public function getTransportName()
+            {
                 return '';
             }
         };
