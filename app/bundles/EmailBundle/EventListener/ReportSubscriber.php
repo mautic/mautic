@@ -397,8 +397,6 @@ class ReportSubscriber implements EventSubscriberInterface
                 }
 
                 $event->addCampaignByChannelJoin($qb, 'e', 'email');
-                $qb->leftJoin('clel', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 'clel.event_id = ce.id');
-                $qb->andWhere('ce.type = \'email.send\'');
 
                 if ($this->companyReportData->eventHasCompanyColumns($event)) {
                     $event->addCompanyLeftJoin($qb);

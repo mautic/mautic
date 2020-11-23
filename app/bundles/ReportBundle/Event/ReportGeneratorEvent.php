@@ -269,6 +269,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
                         || $options['order'][0] === $cmpId)))) {
             $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'clel', sprintf('clel.channel="%s" AND %s.id = clel.channel_id AND clel.lead_id = %s.id', $channel, $prefix, $leadPrefix))
                     ->leftJoin('clel', MAUTIC_TABLE_PREFIX.'campaigns', 'cmp', 'cmp.id = clel.campaign_id');
+            $queryBuilder->leftJoin('clel', MAUTIC_TABLE_PREFIX.'campaign_events', 'ce', 'clel.event_id = ce.id');
+            $queryBuilder->andWhere('ce.type = \'email.send\'');
         }
 
         return $this;
