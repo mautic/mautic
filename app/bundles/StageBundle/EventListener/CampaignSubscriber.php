@@ -82,7 +82,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->addAction('stage.change', $action);
     }
 
-    public function onCampaignTriggerActionChangeStage(PendingEvent $event, $eventName)
+    public function onCampaignTriggerStageChange(PendingEvent $event)
     {
         $logs               = $event->getPending();
         $config             = $event->getEvent()->getProperties();
