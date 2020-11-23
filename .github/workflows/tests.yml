@@ -158,26 +158,28 @@ jobs:
         composer self-update --1
         composer global require hirak/prestissimo
         composer validate
-        composer install --prefer-dist --no-progress --no-suggest
-
-    - name: Install Mautic
-      env:
-        DB_PORT: ${{ job.services.mysql.ports[3306] }}
-      run: |
-        cp ./.github/ci-files/local.php ./app/config/local.php
-        php bin/console mautic:install http://localhost
-        php bin/console cache:warmup
+        composer install --prefer-dist --no-progress
 
     # We need to move files into /var/www/html because the test suite
     # expects Mautic to run in the root folder http://localhost
     - name: Move files to web root
       run: |
+        shopt -s dotglob
         sudo chmod -R 777 /var/www/html
         sudo chown -R www-data:www-data /var/www/html
-        shopt -s dotglob
         rm -rf /var/www/html/*
         mv $GITHUB_WORKSPACE/* /var/www/html
+
+    - name: Install Mautic
+      env:
+        DB_PORT: ${{ job.services.mysql.ports[3306] }}
+      run: |
+        cp $GITHUB_WORKSPACE/.github/ci-files/local.php ./app/config/local.php
+        php bin/console mautic:install http://localhost
+        php bin/console cache:warmup --no-interaction --env=prod
         sudo chmod -R 777 /var/www/html
+        sudo chown -R www-data:www-data /var/www/html
+      working-directory: /var/www/html
 
     - name: Cypress run
       uses: cypress-io/github-action@v2
