@@ -28,7 +28,7 @@ context("Create dynamic content", () => {
     search.searchBox.clear();
     search.searchBox.type(dynamicContentText);
     dynamicContent.waitTillSearchedElementGetsVisible();
-    cy.wait(1000);
+    cy.wait(2000);
     dynamicContent.clickOnFirstSearchedElement.contains(dynamicContentText).click();
     dynamicContent.waitTillDynamicContentCreationFlag();
     dynamicContent.editSelectedContent.click();

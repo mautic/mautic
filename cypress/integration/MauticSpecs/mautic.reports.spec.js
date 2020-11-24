@@ -59,5 +59,6 @@ context("Create a report", () => {
     search.deleteButtonForFirstItem.click();
     search.confirmDeleteButton.click();
     reports.checkNoResultFoundMessage.should('contain','No Results Found');
+    cy.wait(3000);
   })
 });

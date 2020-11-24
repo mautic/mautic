@@ -8,6 +8,7 @@ const search=require("../../Pages/Search");
 
 context("Roles", () => {
   it("Add new role for reading contact", () => {
+    cy.wait(3000);
     settings.settingsMenuButton.click();
     settings.rolesSection.click();
     roles.waitForPageLoad();
@@ -25,7 +26,7 @@ context("Roles", () => {
 
   it("Search and Delete newly added role", () => {
     settings.settingsMenuButton.click();
-    settings.rolesSection.click();
+    settings.rolesSection.click({force: true});
     cy.wait(1000);
     roles.waitForPageLoad();
     search.searchBox.clear();

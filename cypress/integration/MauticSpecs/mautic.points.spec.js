@@ -28,6 +28,7 @@ context("Points", () => {
     search.searchBox.clear();
     search.searchBox.type("Action");
     cy.wait(1000);
+    points.searchAndGetFirstResult.should("be.visible");
     points.searchAndGetFirstResult.click();
     points.pointsToBeChanged.clear().type("10");
     points.saveAndCloseButton.click();

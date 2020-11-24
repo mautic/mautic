@@ -98,7 +98,7 @@ after("Delete Test Data", () => {
   leftNavigation.contactsSection.click();
   leftNavigation.contactsSection.click();
   contact.waitforPageLoad();
-  search.searchBox.clear();
+  search.searchBox.clear({ force: true });
   search.searchBox.type("TestContact");
   cy.wait(2000);
   search.selectCheckBoxForFirstItem.click({ force: true });
@@ -111,7 +111,7 @@ after("Delete Test Data", () => {
   leftNavigation.ChannelsSection.click();
   leftNavigation.EmailsSubSection.click();
   emails.waitforPageLoad();
-  search.searchBox.clear();
+  search.searchBox.clear({ force: true });
   search.searchBox.type("Test");
   cy.wait(2000);
   search.selectCheckBoxForFirstItem.click({ force: true });
@@ -125,7 +125,7 @@ after("Delete Test Data", () => {
   leftNavigation.SegmentsSection.click();
   cy.wait(1000);
   segments.waitForPageLoad();
-  segments.SearchBox.click().clear();
+  segments.SearchBox.clear({ force: true });
   segments.SearchBox.type("TestSegment{enter}");
   cy.wait(3000);
   segments.firstCheckbox.click();
