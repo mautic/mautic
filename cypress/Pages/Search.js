@@ -17,7 +17,7 @@ class Search {
     }
 
     get deleteButtonForFirstItem() {
-        return cy.get('a[href*="delete"]');
+        return cy.get('a[href*="delete"]').eq(0);
     }
 
     get confirmDeleteButton(){
