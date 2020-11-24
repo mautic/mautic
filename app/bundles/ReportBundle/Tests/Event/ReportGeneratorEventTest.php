@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -23,7 +25,7 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
     private $channelListHelper;
     private $reportGeneratorEvent;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -40,7 +42,7 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddCategoryLeftJoinWhenColumnIsNotUsed()
+    public function testAddCategoryLeftJoinWhenColumnIsNotUsed(): void
     {
         $this->report->expects($this->once())
             ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
@@ -52,7 +54,7 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
         $this->reportGeneratorEvent->addCategoryLeftJoin($this->queryBuilder, 'e');
     }
 
-    public function testAddCategoryLeftJoinWhenColumnIsUsed()
+    public function testAddCategoryLeftJoinWhenColumnIsUsed(): void
     {
         $this->report->expects($this->once())
             ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
@@ -72,7 +74,7 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
         $this->reportGeneratorEvent->addCategoryLeftJoin($this->queryBuilder, 'e');
     }
 
-    public function testAddLeadLeftJoinWhenColumnIsNotUsed()
+    public function testAddLeadLeftJoinWhenColumnIsNotUsed(): void
     {
         $this->report->expects($this->exactly(5))
             ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
@@ -84,7 +86,7 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
         $this->reportGeneratorEvent->addLeadLeftJoin($this->queryBuilder, 'e');
     }
 
-    public function testAddLeadLeftJoinWhenColumnIsUsed()
+    public function testAddLeadLeftJoinWhenColumnIsUsed(): void
     {
         $this->report->expects($this->once())
             ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
@@ -104,7 +106,7 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
         $this->reportGeneratorEvent->addLeadLeftJoin($this->queryBuilder, 'e');
     }
 
-    public function testAddLeadLeftJoinWhenCampaignIdColumnIsUsed()
+    public function testAddLeadLeftJoinWhenCampaignIdColumnIsUsed(): void
     {
         $this->report->expects($this->exactly(5))
             ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
@@ -124,7 +126,7 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
         $this->reportGeneratorEvent->addLeadLeftJoin($this->queryBuilder, 'e');
     }
 
-    public function testAddIpAddressLeftJoinWhenColumnIsNotUsed()
+    public function testAddIpAddressLeftJoinWhenColumnIsNotUsed(): void
     {
         $this->report->expects($this->once())
             ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
@@ -136,7 +138,7 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
         $this->reportGeneratorEvent->addIpAddressLeftJoin($this->queryBuilder, 'e');
     }
 
-    public function testAddIpAddressLeftJoinWhenColumnIsUsed()
+    public function testAddIpAddressLeftJoinWhenColumnIsUsed(): void
     {
         $this->report->expects($this->once())
             ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
@@ -156,7 +158,7 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
         $this->reportGeneratorEvent->addIpAddressLeftJoin($this->queryBuilder, 'e');
     }
 
-    public function testHasColumnWithPrefix()
+    public function testHasColumnWithPrefix(): void
     {
         $this->report->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
             ->willReturn(['e.id', 'c.first_name', 'comp.name']);
@@ -169,7 +171,7 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->reportGeneratorEvent->hasColumnWithPrefix('c.'));
     }
 
-    public function testUsesColumnWithPrefix()
+    public function testUsesColumnWithPrefix(): void
     {
         $this->report->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
             ->willReturn(['e.id', 'c.first_name', 'comp.name']);
@@ -199,7 +201,7 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->reportGeneratorEvent->usesColumnWithPrefix('c.'));
     }
 
-    public function testUsesColumn()
+    public function testUsesColumn(): void
     {
         $this->report->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
             ->willReturn(['e.id', 'c.first_name', 'comp.name']);

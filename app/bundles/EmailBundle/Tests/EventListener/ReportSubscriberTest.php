@@ -14,8 +14,8 @@ namespace Mautic\EmailBundle\Tests\EventListener;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\EventListener\ReportSubscriber;
@@ -63,7 +63,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->queryBuilder      = new QueryBuilder($this->connectionMock);
     }
 
-    public function testOnReportGenerateForEmailStatsWhenDncIsUsed()
+    public function testOnReportGenerateForEmailStatsWhenDncIsUsed(): void
     {
         $this->report->expects($this->once())
             ->method('getSource')
@@ -92,7 +92,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnReportGenerateForEmailStatsWhenVariantIsUsed()
+    public function testOnReportGenerateForEmailStatsWhenVariantIsUsed(): void
     {
         $this->report->expects($this->once())
             ->method('getSource')
@@ -117,7 +117,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnReportGenerateForEmailStatsWhenClickIsUsed()
+    public function testOnReportGenerateForEmailStatsWhenClickIsUsed(): void
     {
         $this->report->expects($this->once())
             ->method('getSource')
@@ -150,7 +150,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnReportGenerateForEmailStatsWhenCampaignIsUsed()
+    public function testOnReportGenerateForEmailStatsWhenCampaignIsUsed(): void
     {
         $this->report->expects($this->once())
             ->method('getSource')
@@ -183,7 +183,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnReportGraphGenerateForEmailContextWithEmailGraph()
+    public function testOnReportGraphGenerateForEmailContextWithEmailGraph(): void
     {
         $eventMock        = $this->createMock(ReportGraphEvent::class);
         $queryBuilderMock = $this->createMock(QueryBuilder::class);

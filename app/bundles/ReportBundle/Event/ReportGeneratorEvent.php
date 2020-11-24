@@ -368,12 +368,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         return $this;
     }
 
-    /**
-     * @param string $prefix
-     *
-     * @return bool
-     */
-    public function hasColumnWithPrefix($prefix)
+    public function hasColumnWithPrefix(string $prefix): bool
     {
         $columns = $this->getReport()->getSelectAndAggregatorAndOrderAndGroupByColumns();
         $pattern = "/^{$prefix}\./";
@@ -383,24 +378,16 @@ class ReportGeneratorEvent extends AbstractReportEvent
 
     /**
      * Returns true if the report uses the column anywhere in the query.
-     *
-     * @param $column
-     *
-     * @return bool
      */
-    public function usesColumn($column)
+    public function usesColumn(string $column): bool
     {
         return $this->hasColumn($column) || $this->hasFilter($column);
     }
 
     /**
      * Returns true if the report uses the prefix anywhere in the query.
-     *
-     * @param $prefix
-     *
-     * @return bool
      */
-    public function usesColumnWithPrefix($prefix)
+    public function usesColumnWithPrefix(string $prefix): bool
     {
         if ($this->hasColumnWithPrefix($prefix)) {
             return true;
@@ -513,7 +500,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         return substr(str_shuffle($alpha_numeric), 0, 8);
     }
 
-    private function buildSortedFilters()
+    private function buildSortedFilters(): void
     {
         if (null !== $this->sortedFilters) {
             return;
