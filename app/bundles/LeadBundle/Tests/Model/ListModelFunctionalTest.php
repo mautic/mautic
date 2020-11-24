@@ -7,8 +7,8 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\UserBundle\Entity\User;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 
 class ListModelFunctionalTest extends MauticMysqlTestCase
