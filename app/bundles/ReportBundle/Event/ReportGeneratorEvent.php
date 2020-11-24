@@ -378,8 +378,10 @@ class ReportGeneratorEvent extends AbstractReportEvent
 
     /**
      * Returns true if the report uses the column anywhere in the query.
+     *
+     * @param string|array $column
      */
-    public function usesColumn(string $column): bool
+    public function usesColumn($column): bool
     {
         return $this->hasColumn($column) || $this->hasFilter($column);
     }
