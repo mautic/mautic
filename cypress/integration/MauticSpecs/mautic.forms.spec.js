@@ -10,6 +10,7 @@ var testFormName= "testForm";
 context("Create Form", () => {
 
   it("Create a new form", () => {
+    cy.wait(3000);
     leftNavigation.componentsSection.click();
     leftNavigation.formsSubSection.click();
     cy.wait(2000);
@@ -28,7 +29,7 @@ context("Create Form", () => {
     cy.wait(2000);
     form.fieldLabel.type("Title");
     cy.wait(2000);
-    form.contactFieldTab.click();
+    form.contactFieldTab.click({force: true});
     form.contactFieldDropdown.click();
     cy.wait(1000);
     form.contactFieldSearchBox.click().type("Title");

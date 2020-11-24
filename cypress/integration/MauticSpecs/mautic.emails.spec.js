@@ -30,7 +30,7 @@ context("Emails", () => {
     search.searchBox.clear();
     search.searchBox.type("TestEmailCypress");
     emails.waitTillSearchedElementGetsVisible();
-    cy.wait(1000);
+    cy.wait(2000);
     emails.searchAndSelectEmail.contains("TestEmailCypress").click();
     emails.waitTillEditMailPageGetsVisible();
     emails.emailEditButton.click();

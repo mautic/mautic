@@ -39,6 +39,7 @@ context("Segment Emails", () => {
     search.searchBox.clear();
     search.searchBox.type("testSegmentEmailCypress");
     cy.wait(2000);
+    search.selectCheckBoxForFirstItem.should('be.visible');
     search.selectCheckBoxForFirstItem.click();
     search.OptionsDropdownForFirstItem.click();
     search.deleteButtonForFirstItem.click();
