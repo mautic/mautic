@@ -18,6 +18,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
+use Mautic\LeadBundle\Controller\ListController;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\PointBundle\Model\TriggerModel;
@@ -55,6 +56,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     private $triggerModel;
 
     /**
+     * @var ListLeadRepository
+     */
+    private $listLeadRepository;
+
+    /**
      * Used by search functions to search social profiles.
      */
     public function setAvailableSocialFields(array $fields)
@@ -81,6 +87,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
+    }
+
+    public function setListLeadRepository(ListLeadRepository $listLeadRepository): void
+    {
+        $this->listLeadRepository = $listLeadRepository;
     }
 
     /**
@@ -647,7 +658,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             }
         }
 
-        $args['qb'] = $qb;
+        $args['qb']    = $qb;
+        $args['count'] = (ListController::ROUTE_SEGMENT_CONTACTS == $args['route']) ? $this->listLeadRepository->getContactsCountBySegment($entityId, $filters) : null;
 
         return $this->getEntities($args);
     }

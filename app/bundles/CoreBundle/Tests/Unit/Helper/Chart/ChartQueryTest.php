@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\LeadBundle\Entity\LeadEventLog;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class ChartQueryTest extends \PHPUnit\Framework\TestCase
@@ -322,5 +323,40 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
             $expectedResult,
             $this->chartQuery->completeTimeData($data, false, false)
         );
+    }
+
+    public function testPrepareTimeDataQueryWithLeadEventLog(): void
+    {
+        $table   = 'lead_event_log';
+        $column  = 'date_added';
+        $filters = [
+            'object'    => 'segment',
+            'bundle'    => 'lead',
+            'action'    => 'added',
+            'object_id' => '1',
+        ];
+
+        $this->queryBuilder->expects($this->once())
+            ->method('select')
+            ->with("DATE_FORMAT(t.date_added, '%Y-%m-%d') AS date, COUNT(*) AS count");
+
+        $this->queryBuilder->expects($this->once())
+            ->method('from')
+            ->with('lead_event_log', sprintf('t USE INDEX (%s)', LeadEventLog::INDEX_SEARCH));
+
+        $this->queryBuilder->expects($this->once())
+            ->method('groupBy')
+            ->with("DATE_FORMAT(t.date_added, '%Y-%m-%d')");
+
+        $this->queryBuilder->expects($this->once())
+            ->method('orderBy')
+            ->with("DATE_FORMAT(t.date_added, '%Y-%m-%d')");
+
+        $this->queryBuilder->expects($this->once())
+            ->method('setMaxResults')
+            ->with(32);
+
+        $query = $this->chartQuery->prepareTimeDataQuery($table, $column, $filters);
+        $this->assertInstanceOf(QueryBuilder::class, $query);
     }
 }

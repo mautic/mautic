@@ -24,6 +24,16 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class LeadEventLog
 {
     /**
+     * @var string
+     */
+    const INDEX_SEARCH = 'IDX_SEARCH';
+
+    /**
+     * @var string
+     */
+    const TABLE_NAME = 'lead_event_log';
+
+    /**
      * @var int
      */
     protected $id;

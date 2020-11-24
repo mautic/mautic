@@ -158,7 +158,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
     private function getFirstDateAddedSegmentEventLog()
     {
         $subQuery = $this->connection->createQueryBuilder();
-        $subQuery->select('MIN(el.date_added) - INTERVAL 10 SECOND')
+        $subQuery->select('el.date_added - INTERVAL 10 SECOND')
             ->from(MAUTIC_TABLE_PREFIX.'lead_event_log', 'el')
             ->where(
                 $subQuery->expr()->andX(
@@ -166,7 +166,10 @@ class SegmentContactsLineChartQuery extends ChartQuery
                     $subQuery->expr()->eq('el.bundle', $subQuery->expr()->literal('lead')),
                     $subQuery->expr()->eq('el.object_id', $this->segmentId)
                 )
-            );
+            )
+            ->orderBy('el.date_added')
+            ->setFirstResult(0)
+            ->setMaxResults(1);
 
         return $subQuery->execute()->fetchColumn();
     }

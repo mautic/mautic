@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\LeadBundle\Controller\ListController;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
 trait CustomFieldRepositoryTrait
@@ -60,9 +61,13 @@ trait CustomFieldRepositoryTrait
             $dq->resetQueryPart('groupBy');
         }
 
-        //get a total count
-        $result = $dq->execute()->fetchAll();
-        $total  = ($result) ? (int) $result[0]['count'] : 0;
+        if (!isset($args['count'])) {
+            //get a total count
+            $result = $dq->execute()->fetchAll();
+            $total  = ($result) ? $result[0]['count'] : 0;
+        } else {
+            $total = $args['count'];
+        }
 
         if (!$total) {
             $results = [];
@@ -79,6 +84,9 @@ trait CustomFieldRepositoryTrait
             $this->buildSelectClause($dq, $args);
 
             $results = $dq->execute()->fetchAll();
+            if (isset($args['route']) && ListController::ROUTE_SEGMENT_CONTACTS == $args['route']) {
+                unset($args['select']); //Our purpose of getting list of ids has already accomplished. We no longer need this.
+            }
 
             //loop over results to put fields in something that can be assigned to the entities
             $fieldValues = [];
