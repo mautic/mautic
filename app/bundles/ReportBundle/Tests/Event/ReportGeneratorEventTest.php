@@ -17,12 +17,28 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|Report
+     */
     private $report;
+
+    /**
+     * @var MockObject|QueryBuilder
+     */
     private $queryBuilder;
+
+    /**
+     * @var MockObject|ChannelListHelper
+     */
     private $channelListHelper;
+
+    /**
+     * @var ReportGeneratorEvent
+     */
     private $reportGeneratorEvent;
 
     protected function setUp(): void

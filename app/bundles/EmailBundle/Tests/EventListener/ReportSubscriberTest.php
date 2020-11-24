@@ -24,16 +24,41 @@ use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|Connection
+     */
     private $connectionMock;
+
+    /**
+     * @var MockObject|CompanyReportData
+     */
     private $companyReportDataMock;
+
+    /**
+     * @var MockObject|StatRepository
+     */
     private $statRepository;
+
+    /**
+     * @var MockObject|GeneratedColumnsProviderInterface
+     */
     private $generatedColumnsProvider;
+
+    /**
+     * @var MockObject|Report
+     */
     private $report;
+
     private $channelListHelper;
+
+    /**
+     * @var MockObject|ChannelListHelper
+     */
     private $queryBuilder;
 
     /**
