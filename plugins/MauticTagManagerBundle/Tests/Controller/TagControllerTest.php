@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticTagManagerBundle\Tests\Controller;
 
+use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\LeadBundle\Entity\Tag;
@@ -19,10 +20,6 @@ class TagControllerTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->loadFixtures(
-            [RoleData::class, LoadRoleData::class, LoadUserData::class]
-        );
 
         $tags = [
             'tag1',
@@ -70,10 +67,11 @@ class TagControllerTest extends MauticMysqlTestCase
 
     public function testTagDeletion(): void
     {
-        $this->client->request('POST', '/s/tags/delete/1');
+        $tagId = $this->tagModel->getRepository()->getRows(1)['results'][0]['id'];
+        $this->client->request('POST', '/s/tags/delete/'.$tagId);
         $clientResponse         = $this->client->getResponse();
 
         $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
-        $this->assertSame($this->tagModel->getRepository()->find(1), null, 'Assert that tag is deleted');
+        $this->assertSame($this->tagModel->getRepository()->find($tagId), null, 'Assert that tag is deleted');
     }
 }
