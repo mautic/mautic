@@ -229,7 +229,7 @@ class ChartQuery extends AbstractChart
             $alias = sprintf(
                 '%s USE INDEX (%s)',
                 self::QB_ALIAS,
-                LeadEventLog::INDEX_SEARCH
+                MAUTIC_TABLE_PREFIX.LeadEventLog::INDEX_SEARCH
             );
         }
         $query->from($this->prepareTable($table), $alias);
