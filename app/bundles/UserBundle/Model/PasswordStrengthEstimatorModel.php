@@ -39,7 +39,7 @@ class PasswordStrengthEstimatorModel
         $this->passwordStrengthEstimator = $passwordStrengthEstimator;
     }
 
-    public function validate(string $password, int $score = self::MINIMUM_PASSWORD_STRENGTH_ALLOWED, array $dictionary = []): bool
+    public function validate(string $password, int $score = self::MINIMUM_PASSWORD_STRENGTH_ALLOWED, array $dictionary = self::DICTIONARY): bool
     {
         return $score <= $this->passwordStrengthEstimator->passwordStrength($password, $dictionary)['score'];
     }

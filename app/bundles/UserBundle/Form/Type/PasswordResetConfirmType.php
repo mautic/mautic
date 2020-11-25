@@ -3,6 +3,7 @@
 namespace Mautic\UserBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\UserBundle\Form\Validator\Constraints\NotWeak;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
@@ -60,6 +61,9 @@ class PasswordResetConfirmType extends AbstractType
                         new Assert\Length([
                             'min'        => 6,
                             'minMessage' => 'mautic.user.user.password.minlength',
+                        ]),
+                        new NotWeak([
+                            'message' => 'mautic.user.user.password.weak',
                         ]),
                     ],
                 ],
