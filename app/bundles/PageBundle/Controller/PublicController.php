@@ -456,7 +456,7 @@ class PublicController extends CommonFormController
         if (count($query)) {
             $url = UrlHelper::appendQueryToUrl($url, http_build_query($query));
         }
-        
+
         // If the IP address is not trackable, it means it came form a configured "do not track" IP or a "do not track" user agent
         // This prevents simulated clicks from 3rd party services such as URL shorteners from simulating clicks
         $ipAddress = $this->container->get('mautic.helper.ip_lookup')->getIpAddress();
@@ -498,7 +498,7 @@ class PublicController extends CommonFormController
 
         $url = UrlHelper::sanitizeAbsoluteUrl($url);
 
-        if (false === filter_var($url, FILTER_VALIDATE_URL)) {
+        if (!UrlHelper::isValidUrl($url)) {
             throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404', ['%url%' => $url]));
         }
 
@@ -544,7 +544,7 @@ class PublicController extends CommonFormController
      */
     private function urlIsToken($url)
     {
-        return substr($url, 0, 1) === '{';
+        return '{' === substr($url, 0, 1);
     }
 
     /**

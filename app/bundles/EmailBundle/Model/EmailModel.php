@@ -14,6 +14,7 @@ namespace Mautic\EmailBundle\Model;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
@@ -56,10 +57,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class EmailModel
- * {@inheritdoc}
- */
 class EmailModel extends FormModel implements AjaxLookupModelInterface
 {
     use VariantModelTrait;
@@ -152,8 +149,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     private $doNotContact;
 
     /**
-     * EmailModel constructor.
+     * @var GeneratedColumnsProviderInterface
      */
+    private $generatedColumnsProvider;
+
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         ThemeHelper $themeHelper,
@@ -169,23 +168,25 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         RedirectRepository $redirectRepository,
         CacheStorageHelper $cacheStorageHelper,
         ContactTracker $contactTracker,
-        DNC $doNotContact
+        DNC $doNotContact,
+        GeneratedColumnsProviderInterface $generatedColumnsProvider
     ) {
-        $this->ipLookupHelper        = $ipLookupHelper;
-        $this->themeHelper           = $themeHelper;
-        $this->mailboxHelper         = $mailboxHelper;
-        $this->mailHelper            = $mailHelper;
-        $this->leadModel             = $leadModel;
-        $this->companyModel          = $companyModel;
-        $this->pageTrackableModel    = $pageTrackableModel;
-        $this->userModel             = $userModel;
-        $this->messageQueueModel     = $messageQueueModel;
-        $this->sendModel             = $sendModel;
-        $this->deviceTracker         = $deviceTracker;
-        $this->redirectRepository    = $redirectRepository;
-        $this->cacheStorageHelper    = $cacheStorageHelper;
-        $this->contactTracker        = $contactTracker;
-        $this->doNotContact          = $doNotContact;
+        $this->ipLookupHelper           = $ipLookupHelper;
+        $this->themeHelper              = $themeHelper;
+        $this->mailboxHelper            = $mailboxHelper;
+        $this->mailHelper               = $mailHelper;
+        $this->leadModel                = $leadModel;
+        $this->companyModel             = $companyModel;
+        $this->pageTrackableModel       = $pageTrackableModel;
+        $this->userModel                = $userModel;
+        $this->messageQueueModel        = $messageQueueModel;
+        $this->sendModel                = $sendModel;
+        $this->deviceTracker            = $deviceTracker;
+        $this->redirectRepository       = $redirectRepository;
+        $this->cacheStorageHelper       = $cacheStorageHelper;
+        $this->contactTracker           = $contactTracker;
+        $this->doNotContact             = $doNotContact;
+        $this->generatedColumnsProvider = $generatedColumnsProvider;
     }
 
     /**
@@ -748,7 +749,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $sentCounts         = $statRepo->getSentCount($emailIds, $lists->getKeys(), $query);
             $readCounts         = $statRepo->getReadCount($emailIds, $lists->getKeys(), $query);
             $failedCounts       = $statRepo->getFailedCount($emailIds, $lists->getKeys(), $query);
-            $clickCounts        = $trackableRepo->getCount('email', $emailIds, $lists->getKeys(), $query);
+            $clickCounts        = $trackableRepo->getCount('email', $emailIds, $lists->getKeys(), $query, false, 'DISTINCT ph.lead_id');
             $unsubscribedCounts = $dncRepo->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, $lists->getKeys(), $query);
             $bouncedCounts      = $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, $lists->getKeys(), $query);
 
@@ -780,7 +781,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 $statRepo->getSentCount($emailIds, $lists->getKeys(), $query, true),
                 $statRepo->getReadCount($emailIds, $lists->getKeys(), $query, true),
                 $statRepo->getFailedCount($emailIds, $lists->getKeys(), $query, true),
-                $trackableRepo->getCount('email', $emailIds, $lists->getKeys(), $query, true),
+                $trackableRepo->getCount('email', $emailIds, $lists->getKeys(), $query, true, 'DISTINCT ph.lead_id'),
                 $dncRepo->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, $lists->getKeys(), $query, true),
                 $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, $lists->getKeys(), $query, true),
             ];
@@ -1473,6 +1474,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->sendModel->finalFlush();
 
         // Get the errors to return
+
+        // Don't use array_merge or it will reset contact ID based keys
         $errorMessages  = $errors + $this->sendModel->getErrors();
         $failedContacts = $this->sendModel->getFailedContacts();
 
@@ -1762,8 +1765,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $dnc[] = $this->doNotContact->addDncForContact(
                 $this->em->getReference('MauticLeadBundle:Lead', $lead),
                 'email',
-                $comments,
                 $reason,
+                $comments,
                 $flush
             );
         }
@@ -1818,6 +1821,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $segmentId  = ArrayHelper::pickValue('segmentId', $filter);
         $chart      = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query      = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $unit);
+
+        $query->setGeneratedColumnProvider($this->generatedColumnsProvider);
 
         if ('sent_and_opened_and_failed' == $flag || 'all' == $flag || 'sent_and_opened' == $flag || !$flag || in_array('sent', $datasets)) {
             $q = $query->prepareTimeDataQuery('email_stats', 'date_sent', $filter);

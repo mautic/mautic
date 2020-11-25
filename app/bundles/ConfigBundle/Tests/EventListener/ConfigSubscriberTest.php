@@ -35,7 +35,7 @@ class ConfigSubscriberTest extends TestCase
      */
     private $subscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->container            = $this->createMock(Container::class);

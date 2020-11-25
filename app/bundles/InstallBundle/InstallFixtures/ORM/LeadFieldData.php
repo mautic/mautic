@@ -26,9 +26,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface, FixtureGroupInterface
 {
     /**
+     * @var bool
+     */
+    private $addIndexes;
+
+    /**
      * @var ContainerInterface
      */
     private $container;
+
+    public function __construct(bool $addIndexes = true)
+    {
+        $this->addIndexes = $addIndexes;
+    }
 
     /**
      * {@inheritdoc}
@@ -98,7 +108,10 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
                     // Schema already has this custom field; likely defined as a property in the entity class itself
                 }
 
-                $indexesToAdd[$object][$alias] = $field;
+                if ($this->addIndexes) {
+                    $indexesToAdd[$object][$alias] = $field;
+                }
+
                 if (!$this->hasReference('leadfield-'.$alias)) {
                     $this->addReference('leadfield-'.$alias, $entity);
                 }

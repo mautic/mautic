@@ -22,7 +22,7 @@ class EntityMetadataTest extends TestCase
      */
     private $metadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $metadataArray = [
             'isPlugin'          => true,
