@@ -460,6 +460,8 @@ class TrackableModelTest extends TestCase
             'email',
             1
         );
+
+        reset($trackables);
         $token = key($trackables);
         $this->assertNotEmpty($trackables, $content);
     }
