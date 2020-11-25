@@ -62,7 +62,7 @@ class PasswordSubscriber implements EventSubscriberInterface
 
         $user = $this->initializeUser($authenticationEvent);
 
-        if (!$this->passwordStrengthEstimatorModel->validateUser($userPassword, $user)) {
+        if (!$this->passwordStrengthEstimatorModel->validate($userPassword)) {
             throw new WeakPasswordException();
         }
     }
