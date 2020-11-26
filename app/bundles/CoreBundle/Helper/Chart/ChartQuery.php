@@ -14,19 +14,12 @@ namespace Mautic\CoreBundle\Helper\Chart;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
-use Mautic\LeadBundle\Entity\LeadEventLog;
-use Mautic\LeadBundle\Entity\ListLead;
 
 /**
  * Methods to get the chart data as native queries to get better performance and work with date/time native SQL queries.
  */
 class ChartQuery extends AbstractChart
 {
-    /**
-     * @var string
-     */
-    const QB_ALIAS = 't';
-
     /**
      * Doctrine's Connetion object.
      *
@@ -110,9 +103,6 @@ class ChartQuery extends AbstractChart
 
                 // Special case: Lead list filter
                 if ('leadlist_id' === $column) {
-                    if (false !== array_search(MAUTIC_TABLE_PREFIX.ListLead::TABLE_NAME, array_column($query->getQueryPart('from'), 'table'))) {
-                        continue; // Restrain from unwanted self join, go to next filter.
-                    }
                     $query->join('t', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.lead_id = '.$value['list_column_name']);
                     $query->andWhere('lll.leadlist_id = :'.$valId);
                     $query->setParameter($valId, $value['value']);
@@ -224,15 +214,7 @@ class ChartQuery extends AbstractChart
     {
         // Convert time unitst to the right form for current database platform
         $query = $this->connection->createQueryBuilder();
-        $alias = self::QB_ALIAS;
-        if (LeadEventLog::TABLE_NAME == $table) {
-            $alias = sprintf(
-                '%s USE INDEX (%s)',
-                self::QB_ALIAS,
-                MAUTIC_TABLE_PREFIX.LeadEventLog::INDEX_SEARCH
-            );
-        }
-        $query->from($this->prepareTable($table), $alias);
+        $query->from($this->prepareTable($table), 't');
 
         $this->modifyTimeDataQuery($query, $column, 't', $countColumn, $isEnumerable, $useSqlOrder);
         $this->applyFilters($query, $filters);
@@ -365,7 +347,7 @@ class ChartQuery extends AbstractChart
                          * format, so we transform it into d-M-Y.
                          */
                         if ('W' === $this->unit && isset($item['date'])) {
-                            [$year, $week]     = explode(' ', $item['date']);
+                            list($year, $week) = explode(' ', $item['date']);
                             $newDate           = new \DateTime();
                             $newDate->setISODate($year, $week);
                             $item['date'] = $newDate->format('d-M-Y');
