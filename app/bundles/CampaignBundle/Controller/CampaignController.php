@@ -11,6 +11,7 @@
 
 namespace Mautic\CampaignBundle\Controller;
 
+use Doctrine\DBAL\Cache\CacheException;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -667,9 +668,9 @@ class CampaignController extends AbstractStandardFormController
     /**
      * @param $action
      *
-     * @return array
+     * @throws CacheException
      */
-    protected function getViewArguments(array $args, $action)
+    protected function getViewArguments(array $args, $action): array
     {
         /** @var EventCollector $eventCollector */
         $eventCollector = $this->get('mautic.campaign.event_collector');
@@ -692,20 +693,19 @@ class CampaignController extends AbstractStandardFormController
                 $this->setCoreParametersHelper($this->get('mautic.config'));
                 if ($this->coreParametersHelper->get('campaign_by_range')) {
                     $dateFrom        = new \DateTimeImmutable($dateRangeForm->get('date_from')->getData());
-                    $dateTo          = new \DateTimeImmutable($dateRangeForm->get('date_to')->getData());
-                    $dateToPlusOne   = $dateTo->modify('+1 day');
+                    $dateTo          = (new \DateTimeImmutable($dateRangeForm->get('date_to')->getData()))->modify('last second +1 day');
                 }
                 if ($this->coreParametersHelper->get('campaign_use_summary')) {
                     /** @var SummaryRepository $summaryRepo */
                     $summaryRepo       = $this->getDoctrine()->getManager()->getRepository(Summary::class);
-                    $campaignLogCounts = $summaryRepo->getCampaignLogCounts($entity->getId(), $dateFrom, $dateToPlusOne);
+                    $campaignLogCounts = $summaryRepo->getCampaignLogCounts($entity->getId(), $dateFrom, $dateTo);
                 } else {
                     /** @var LeadEventLogRepository $eventLogRepo */
                     $eventLogRepo             = $this->getDoctrine()->getManager()->getRepository(LeadEventLog::class);
-                    $campaignLogCounts        = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true, $dateFrom, $dateToPlusOne);
+                    $campaignLogCounts        = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true, $dateFrom, $dateTo);
                     $pendingCampaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false);
                 }
-                $leadCount    = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId(), null, [], $dateFrom, $dateToPlusOne);
+                $leadCount    = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId(), null, [], $dateFrom, $dateTo);
                 $sortedEvents = [
                     'decision'  => [],
                     'action'    => [],
@@ -743,7 +743,7 @@ class CampaignController extends AbstractStandardFormController
                         $event['percent']            = $parentEvent['percent'];
                         $event['yesPercent']         = $parentEvent['yesPercent'];
                         $event['noPercent']          = $parentEvent['noPercent'];
-                        if ('yes' == $event['decisionPath']) {
+                        if ('yes' === $event['decisionPath']) {
                             $event['noPercent'] = 0;
                         } else {
                             $event['yesPercent'] = 0;
