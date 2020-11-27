@@ -48,7 +48,7 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
      */
     private $chartQuery;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

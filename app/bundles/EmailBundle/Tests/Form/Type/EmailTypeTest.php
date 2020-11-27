@@ -53,7 +53,7 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
      */
     private $coreParametersHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
