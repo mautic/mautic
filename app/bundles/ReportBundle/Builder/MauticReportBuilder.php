@@ -449,6 +449,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                                 $columnValue = (int) $filter['value'];
                                 break;
 
+                            case 'text':
                             case 'string':
                             case 'email':
                             case 'url':
