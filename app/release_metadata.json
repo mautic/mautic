@@ -1,7 +1,7 @@
 {
   "version": "3.2.2",
   "stability": "stable",
-  "minimum_php_version": "7.2.21",
+  "minimum_php_version": "7.3.0",
   "maximum_php_version": "7.4.99",
   "minimum_mautic_version": "3.1.0",
   "announcement_url": ""
