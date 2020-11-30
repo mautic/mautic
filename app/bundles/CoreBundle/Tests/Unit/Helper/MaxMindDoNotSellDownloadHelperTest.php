@@ -31,7 +31,7 @@ final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCa
      */
     private $coreParametersHelperMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->loggerMock               = $this->createMock(LoggerInterface::class);
         $this->httpClientMock           = $this->createMock(HttpClientInterface::class);
@@ -42,7 +42,7 @@ final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCa
             ->willReturn(self::TEMP_TEST_FILE);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $filename = self::TEMP_TEST_FILE;
 
