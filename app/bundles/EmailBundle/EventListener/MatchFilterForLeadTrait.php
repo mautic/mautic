@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 
 /**
@@ -21,6 +22,10 @@ trait MatchFilterForLeadTrait
         foreach ($filter as $data) {
             $isCompanyField = (str_starts_with((string) $data['field'], 'company') && 'company' !== $data['field']);
             $primaryCompany = ($isCompanyField && !empty($lead['companies'])) ? $lead['companies'][0] : null;
+
+            if ('leadlist' === $data['type']) {
+                return $this->isContactSegmentRelationshipValid((int) $lead['id'], $data['operator'], $data['filter']);
+            }
 
             if ($isCompanyField) {
                 if (empty($primaryCompany)) {
@@ -190,5 +195,38 @@ trait MatchFilterForLeadTrait
         }
 
         return $retFlag;
+    }
+
+    /**
+     * Duplicate method. Needs refactoring.
+     *
+     * @see \Mautic\LeadBundle\EventListener\DynamicContentSubscriber::isContactSegmentRelationshipValid
+     *
+     * @param string $operator empty, !empty, in, !in
+     */
+    private function isContactSegmentRelationshipValid(int $contactId, string $operator, array $segmentIds = null): bool
+    {
+        switch ($operator) {
+            case OperatorOptions::EMPTY:
+                // Contact is not in any segment
+                $return = $this->segmentRepository->isNotContactInAnySegment($contactId);
+                break;
+            case OperatorOptions::NOT_EMPTY:
+                // Contact is in any segment
+                $return = $this->segmentRepository->isContactInAnySegment($contactId);
+                break;
+            case OperatorOptions::IN:
+                // Contact is in all segments provided in $segmentsIds
+                $return = $this->segmentRepository->isContactInSegments($contactId, $segmentIds);
+                break;
+            case OperatorOptions::NOT_IN:
+                // Contact is not in all segments provided in $segmentsIds
+                $return = $this->segmentRepository->isNotContactInSegments($contactId, $segmentIds);
+                break;
+            default:
+                throw new \InvalidArgumentException(sprintf("Unexpected operator '%s'", $operator));
+        }
+
+        return $return;
     }
 }
