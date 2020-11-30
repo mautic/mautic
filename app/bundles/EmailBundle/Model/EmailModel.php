@@ -749,7 +749,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $sentCounts         = $statRepo->getSentCount($emailIds, $lists->getKeys(), $query);
             $readCounts         = $statRepo->getReadCount($emailIds, $lists->getKeys(), $query);
             $failedCounts       = $statRepo->getFailedCount($emailIds, $lists->getKeys(), $query);
-            $clickCounts        = $trackableRepo->getCount('email', $emailIds, $lists->getKeys(), $query, false, 'DISTINCT .ph.lead_id');
+            $clickCounts        = $trackableRepo->getCount('email', $emailIds, $lists->getKeys(), $query, false, 'DISTINCT ph.lead_id');
             $unsubscribedCounts = $dncRepo->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, $lists->getKeys(), $query);
             $bouncedCounts      = $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, $lists->getKeys(), $query);
 
@@ -781,7 +781,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 $statRepo->getSentCount($emailIds, $lists->getKeys(), $query, true),
                 $statRepo->getReadCount($emailIds, $lists->getKeys(), $query, true),
                 $statRepo->getFailedCount($emailIds, $lists->getKeys(), $query, true),
-                $trackableRepo->getCount('email', $emailIds, $lists->getKeys(), $query, true, 'DISTINCT .ph.lead_id'),
+                $trackableRepo->getCount('email', $emailIds, $lists->getKeys(), $query, true, 'DISTINCT ph.lead_id'),
                 $dncRepo->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, $lists->getKeys(), $query, true),
                 $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, $lists->getKeys(), $query, true),
             ];
@@ -1474,6 +1474,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->sendModel->finalFlush();
 
         // Get the errors to return
+
+        // Don't use array_merge or it will reset contact ID based keys
         $errorMessages  = $errors + $this->sendModel->getErrors();
         $failedContacts = $this->sendModel->getFailedContacts();
 
@@ -1763,8 +1765,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $dnc[] = $this->doNotContact->addDncForContact(
                 $this->em->getReference('MauticLeadBundle:Lead', $lead),
                 'email',
-                $comments,
                 $reason,
+                $comments,
                 $flush
             );
         }

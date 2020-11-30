@@ -81,7 +81,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private $pageModel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = new EventDispatcher();
 
