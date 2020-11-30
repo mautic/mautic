@@ -38,6 +38,7 @@ class LoadLeadListData extends AbstractFixture implements OrderedFixtureInterfac
 
         $list = new LeadList();
         $list->setName('United States');
+        $list->setPublicName('United States');
         $list->setAlias('us');
         $list->setCreatedBy($adminUser);
         $list->setIsGlobal(true);

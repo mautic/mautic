@@ -28,7 +28,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     /**
      * @throws Exception
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -43,7 +43,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         }
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if ($this->useCleanupRollback) {
             if ($this->connection->isTransactionActive()) {

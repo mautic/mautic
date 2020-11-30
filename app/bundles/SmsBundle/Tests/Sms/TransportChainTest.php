@@ -51,7 +51,7 @@ class TransportChainTest extends MauticMysqlTestCase
         return $method->invokeArgs($object, $parameters);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -43,7 +43,7 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
      */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
