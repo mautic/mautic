@@ -22,7 +22,7 @@ class FieldAliasHelperTest extends \PHPUnit\Framework\TestCase
     private $fieldRepository;
     private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
