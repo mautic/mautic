@@ -185,6 +185,7 @@ return [
                 'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType::class,
                 'arguments' => [
                     'translator',
+                    'mautic.lead.model.list',
                 ],
                 'methodCalls' => [
                     'setConnection' => [

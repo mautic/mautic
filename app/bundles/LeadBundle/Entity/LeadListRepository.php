@@ -252,7 +252,7 @@ class LeadListRepository extends CommonRepository
     /**
      * Get a count of leads that belong to the list.
      *
-     * @param int|int[] $listIds
+     * @param $listIds
      *
      * @return array|int
      *

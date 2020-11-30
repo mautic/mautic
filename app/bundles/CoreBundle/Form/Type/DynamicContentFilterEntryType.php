@@ -134,7 +134,6 @@ class DynamicContentFilterEntryType extends AbstractType
                 $key,
                 [
                     'company',
-                    'leadlist',
                     'campaign',
                     'device_type',
                     'device_brand',
