@@ -65,7 +65,7 @@ class WebhookModelTest extends \PHPUnit\Framework\TestCase
 
     private $httpClientMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->parametersHelperMock  = $this->createMock(CoreParametersHelper::class);
         $this->serializerMock        = $this->createMock(SerializerInterface::class);

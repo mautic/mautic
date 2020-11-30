@@ -21,7 +21,7 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
      */
     private $lead;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
