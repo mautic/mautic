@@ -127,7 +127,7 @@ final class InstallNewFilesStep implements StepInterface
         // Fetch the update package
         $package = $this->updateHelper->fetchPackage($update['package']);
 
-        if ($package['error']) {
+        if (isset($package['error'])) {
             throw new UpdateFailedException($this->translator->trans($package['message']));
         }
 

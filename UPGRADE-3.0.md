@@ -1,7 +1,7 @@
 # User facing changes
 
 *   {leadfield=...} tokens were removed. Use {contactfield=...} tokens instead.
-*   Supported PHP versions are 7.2 and 7.3
+*   Supported PHP versions are 7.2, 7.3 and 7.4
 *   Console was moved to another directory. Update all your cron job and replace app/console with bin/console
 *   There is a new file manager. You can see it when you go to a WYSIWYG editor and try to add an image for example.
 *   The Rackspace and OpenStack plugins for remote assets were removed due to outdated library from Rackspace.
@@ -13,7 +13,7 @@
 
 # Backwards compatibility breaking changes
 
-*   Minimal PHP version was increased from v5.6.19 to v7.2.0.
+*   Minimal PHP version was increased from v5.6.19 to v7.2.21.
 *   Minimal MySQL version was increased from v5.5.3 to v5.7.14
 *   Symfony deprecations were removed or refactored [https://github.com/symfony/symfony/blob/3.0/UPGRADE-3.0.md](https://github.com/symfony/symfony/blob/3.0/UPGRADE-3.0.md)
 *   Migrating the database should be done by upgrading to the latest 2.x series then to M3 as all 2.x migrations have been removed from the 3.x code

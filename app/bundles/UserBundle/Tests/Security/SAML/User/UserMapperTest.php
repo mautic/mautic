@@ -31,7 +31,7 @@ class UserMapperTest extends TestCase
      */
     private $response;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->mapper = new UserMapper(
             [

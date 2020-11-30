@@ -324,4 +324,21 @@ class UrlHelper
 
         return $string;
     }
+
+    /**
+     *  This method return true with special characters in URL, for example https://domain.tld/é.pdf
+     * filter_var($url, FILTER_VALIDATE_URL) allow only alphanumerics [0-9a-zA-Z], the special characters "$-_.+!*'()," [not including the quotes - ed].
+     *
+     * @param string $url
+     *
+     * @return bool
+     */
+    public static function isValidUrl($url)
+    {
+        $path         = parse_url($url, PHP_URL_PATH);
+        $encodedPath  = array_map('urlencode', explode('/', $path));
+        $url          = str_replace($path, implode('/', $encodedPath), $url);
+
+        return (bool) filter_var($url, FILTER_VALIDATE_URL);
+    }
 }
