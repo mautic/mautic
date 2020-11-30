@@ -28,7 +28,7 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $subscriber;
 
-    protected function setup()
+    protected function setUp(): void
     {
         parent::setUp();
 

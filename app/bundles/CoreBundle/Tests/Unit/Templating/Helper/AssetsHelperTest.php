@@ -41,19 +41,19 @@ class AssetsHelperTest extends \PHPUnit\Framework\TestCase
         $assetHelper->addStylesheet('/app.css');
         $head = $assetHelper->getHeadDeclarations();
 
-        $this->assertContains('app.css', $head);
+        $this->assertStringContainsString('app.css', $head);
 
         $assetHelper->setContext(AssetsHelper::CONTEXT_BUILDER)
             ->addStylesheet('/builder.css')
             ->setContext();
 
         $head = $assetHelper->getHeadDeclarations();
-        $this->assertNotContains('builder.css', $head);
+        $this->assertStringNotContainsString('builder.css', $head);
 
         $head = $assetHelper->setContext(AssetsHelper::CONTEXT_BUILDER)
             ->getHeadDeclarations();
-        $this->assertContains('builder.css', $head);
-        $this->assertNotContains('app.css', $head);
+        $this->assertStringContainsString('builder.css', $head);
+        $this->assertStringNotContainsString('app.css', $head);
     }
 
     public function testGetUrlWithAbsolutePath()

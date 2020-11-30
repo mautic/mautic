@@ -1,7 +1,7 @@
 # User facing changes
 
 *   {leadfield=...} tokens were removed. Use {contactfield=...} tokens instead.
-*   Supported PHP versions are 7.2 and 7.3
+*   Supported PHP versions are 7.2, 7.3 and 7.4
 *   Console was moved to another directory. Update all your cron job and replace app/console with bin/console
 *   There is a new file manager. You can see it when you go to a WYSIWYG editor and try to add an image for example.
 *   The Rackspace and OpenStack plugins for remote assets were removed due to outdated library from Rackspace.
@@ -13,7 +13,7 @@
 
 # Backwards compatibility breaking changes
 
-*   Minimal PHP version was increased from v5.6.19 to v7.2.0.
+*   Minimal PHP version was increased from v5.6.19 to v7.2.21.
 *   Minimal MySQL version was increased from v5.5.3 to v5.7.14
 *   Symfony deprecations were removed or refactored [https://github.com/symfony/symfony/blob/3.0/UPGRADE-3.0.md](https://github.com/symfony/symfony/blob/3.0/UPGRADE-3.0.md)
 *   Migrating the database should be done by upgrading to the latest 2.x series then to M3 as all 2.x migrations have been removed from the 3.x code
@@ -31,12 +31,59 @@
 
 ### Configuration
 
-If you have `api_rate_limiter_cache` present in you `app/config/local.php`, you need to change the value to:
+In Mautic 3, several configuration parameters have changed (`app/config/local.php`). The [upgrade script](https://github.com/mautic/mautic/issues/8819) will update those automatically for you, but here's an overview of parameters that will be updated by the script:
 
+| Key | Old value | New value | Comment
+|---|---|---|---|
+| mailer_transport | 'mail' | 'sendmail' | 'mail' option was removed in SwiftMailer 6, other options should keep working as-is
+| system_update_url | 'https://updates.mautic.org/ index.php?option=com_mauticdownload& task=checkUpdates' | 'https://api.github.com/ repos/mautic/mautic/releases' | New update mechanism
+| dev_hosts | null | array() | If this was set to null, it should now be an empty array
+| theme | 'Mauve' | 'blank' | Mauve theme was removed in 3.x (already deprecated for a while)
+| track_by_fingerprint | 0 | N/A | Functionality removed in 3.x
+| webhook_start | '0' | N/A | Removed in 3.x
+| cache_path | 'YOUR_MAUTIC_FOLDER/ app/cache' | 'YOUR_MAUTIC_FOLDER/ app/../var/cache' | We'll only change the default value (new location is var/cache) but leave any custom configs intact
+| log_path | 'YOUR_MAUTIC_FOLDER/ app/logs' | 'YOUR_MAUTIC_FOLDER/ app/../var/logs' | We'll only change the default value (new location is var/logs) but leave any custom configs intact
+| tmp_path | 'YOUR_MAUTIC_FOLDER/ app/cache' | 'YOUR_MAUTIC_FOLDER/ app/../var/tmp' | We'll only change the default value (new location is var/tmp, it has its own dedicated folder now) but leave any custom configs intact
+| mailer_spool_path | '%kernel.root_dir%/spool' | '%kernel.root_dir%/../var/spool' | We'll only change the default value (new location is var/spool) but leave any custom configs intact
+| api_rate_limiter_cache | 'type' => 'file_system' | 'adapter' => 'cache.adapter.filesystem' | See below |
+
+**Note on the `api_rate_limiter_cache` parameter**: this is an advanced feature that we only expect a very small subset of users to be using currently. 
+
+If you had a custom API rate limiter other than the filesystem (default), you'll need to specify a [Symfony cache adapter](https://symfony.com/doc/3.4/cache.html#configuring-cache-with-frameworkbundle) as of Mautic 3. **The upgrade script will change it to 'cache.adapter.filesystem' to prevent issues in the upgrade process, so you should change it yourself post-upgrade**.  For example, if you had Memcached set up with the following configuration:
+
+```PHP
+'api_rate_limiter_cache' => array(
+  'memcached' => array(
+    'servers' => array(
+      '0' => array(
+        'host' => 'memcached.local',
+          'port' => '12345'
+      )
+    )
+  )
+),
 ```
-'api_rate_limiter_cache'            => [
-     'adapter' => 'cache.adapter.filesystem',
-],
+... it should now be:
+
+```PHP
+'api_rate_limiter_cache' => array(
+  'adapter' => 'cache.adapter.memcached',
+  'provider' => 'memcached://memcached.local:12345'
+),
+```
+
+In case you've been using `$_SERVER['MAUTIC_DEV_HOSTS']` to add more allowed IP addresses for the development enviroment, there had to be 2 changes because it was conflicting with handling configuration with environment variables.
+1. Change `MAUTIC_DEV_HOSTS` to `MAUTIC_CUSTOM_DEV_HOSTS`.
+2. It's not a string anymore, but a JSON encoded array.
+
+Before:
+```
+$_SERVER['MAUTIC_DEV_HOSTS'] = '1.2.3.4';
+```
+
+After:
+```
+$_SERVER['MAUTIC_CUSTOM_DEV_HOSTS'] = '["1.2.3.4"]';
 ```
 
 #### Removing the Container as a Configuration Dependency
