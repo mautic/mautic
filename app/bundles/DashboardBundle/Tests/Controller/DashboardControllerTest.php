@@ -37,7 +37,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     private $containerMock;
     private $controller;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
