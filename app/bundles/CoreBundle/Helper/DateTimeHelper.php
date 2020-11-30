@@ -62,8 +62,9 @@ class DateTimeHelper
      */
     public function setDateTime($datetime = '', $fromFormat = 'Y-m-d H:i:s', $timezone = 'local')
     {
+        $localTimezone = date_default_timezone_get();
         if ('local' == $timezone) {
-            $timezone = date_default_timezone_get();
+            $timezone = $localTimezone;
         } elseif (empty($timezone)) {
             $timezone = 'UTC';
         }
@@ -72,7 +73,7 @@ class DateTimeHelper
         $this->timezone = $timezone;
 
         $this->utc   = new \DateTimeZone('UTC');
-        $this->local = new \DateTimeZone($timezone);
+        $this->local = new \DateTimeZone($localTimezone);
 
         if ($datetime instanceof \DateTimeInterface) {
             $this->datetime = $datetime;

@@ -1137,4 +1137,20 @@ class FormModel extends CommonFormModel
 
         return $list;
     }
+
+    /**
+     * @param string $fieldAlias
+     *
+     * @return Field|null
+     */
+    public function findFormFieldByAlias(Form $form, $fieldAlias)
+    {
+        foreach ($form->getFields() as $field) {
+            if ($field->getAlias() === $fieldAlias) {
+                return $field;
+            }
+        }
+
+        return null;
+    }
 }

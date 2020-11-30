@@ -25,7 +25,7 @@ class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
      */
     private $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()
@@ -81,6 +81,10 @@ class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
             'companies_lead.is_primary' => [
                 'label' => 'mautic.lead.report.company.is_primary',
                 'type'  => 'bool',
+            ],
+            'companies_lead.date_added' => [
+                'label' => 'mautic.lead.report.company.date_added',
+                'type'  => 'datetime',
             ],
             'comp.boolField' => [
                 'label' => 'mautic.report.field.company.label',
