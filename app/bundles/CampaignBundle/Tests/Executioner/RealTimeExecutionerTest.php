@@ -68,7 +68,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
      */
     private $leadRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->leadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()

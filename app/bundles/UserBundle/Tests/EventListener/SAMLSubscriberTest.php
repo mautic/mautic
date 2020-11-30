@@ -38,7 +38,7 @@ class SAMLSubscriberTest extends TestCase
      */
     private $router;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->event = $this->createMock(GetResponseEvent::class);
         $this->event->expects($this->once())

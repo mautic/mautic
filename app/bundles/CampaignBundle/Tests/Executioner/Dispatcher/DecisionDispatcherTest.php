@@ -35,7 +35,7 @@ class DecisionDispatcherTest extends \PHPUnit\Framework\TestCase
      */
     private $legacyDispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)
             ->disableOriginalConstructor()

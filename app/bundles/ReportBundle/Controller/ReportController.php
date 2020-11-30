@@ -12,6 +12,7 @@
 namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -22,9 +23,6 @@ use Symfony\Component\HttpFoundation;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-/**
- * Class ReportController.
- */
 class ReportController extends FormController
 {
     /**
@@ -59,17 +57,15 @@ class ReportController extends FormController
 
         $this->setListFilters();
 
-        //set limits
-        $limit = $this->container->get('session')->get('mautic.report.limit', $this->coreParametersHelper->get('default_pagelimit'));
-        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
+        /** @var PageHelperFactoryInterface $pageHelperFacotry */
+        $pageHelperFacotry = $this->get('mautic.page.helper.factory');
+        $pageHelper        = $pageHelperFacotry->make('mautic.report', $page);
 
+        $limit  = $pageHelper->getLimit();
+        $start  = $pageHelper->getStart();
         $search = $this->request->get('search', $this->container->get('session')->get('mautic.report.filter', ''));
-        $this->container->get('session')->set('mautic.report.filter', $search);
-
         $filter = ['string' => $search, 'force' => []];
+        $this->container->get('session')->set('mautic.report.filter', $search);
 
         if (!$permissions['report:reports:viewother']) {
             $filter['force'][] = ['column' => 'r.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
@@ -77,8 +73,7 @@ class ReportController extends FormController
 
         $orderBy    = $this->container->get('session')->get('mautic.report.orderby', 'r.name');
         $orderByDir = $this->container->get('session')->get('mautic.report.orderbydir', 'DESC');
-
-        $reports = $model->getEntities(
+        $reports    = $model->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -90,10 +85,9 @@ class ReportController extends FormController
 
         $count = count($reports);
         if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
-            $lastPage = (1 === $count) ? 1 : (ceil($count / $limit)) ?: 1;
-            $this->container->get('session')->set('mautic.report.page', $lastPage);
+            $lastPage  = $pageHelper->countPage($count);
             $returnUrl = $this->generateUrl('mautic_report_index', ['page' => $lastPage]);
+            $pageHelper->rememberPage($lastPage);
 
             return $this->postActionRedirect(
                 [
@@ -108,10 +102,7 @@ class ReportController extends FormController
             );
         }
 
-        //set what page currently on so that we can return here after form submission/cancellation
-        $this->container->get('session')->set('mautic.report.page', $page);
-
-        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $pageHelper->rememberPage($page);
 
         return $this->delegateView(
             [
@@ -123,7 +114,7 @@ class ReportController extends FormController
                     'limit'       => $limit,
                     'permissions' => $permissions,
                     'model'       => $model,
-                    'tmpl'        => $tmpl,
+                    'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'security'    => $this->container->get('mautic.security'),
                 ],
                 'contentTemplate' => 'MauticReportBundle:Report:list.html.php',
