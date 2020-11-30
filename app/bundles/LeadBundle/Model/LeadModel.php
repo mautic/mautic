@@ -2455,4 +2455,9 @@ class LeadModel extends FormModel
     {
         return $this->legacyLeadModel->mergeLeads($lead, $lead2, $autoMode);
     }
+
+    public function getAvailableLeadFields(): array
+    {
+        return $this->availableLeadFields;
+    }
 }

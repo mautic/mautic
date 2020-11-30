@@ -108,7 +108,7 @@ class CoreSubscriberTest extends TestCase
      */
     private $subscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->bundleHelper         = $this->createMock(BundleHelper::class);
         $this->menuHelper           = $this->createMock(MenuHelper::class);
