@@ -24,7 +24,7 @@ class StopSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $doNotContactModel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doNotContactModel = $this->createMock(DoNotContactModel::class);
     }

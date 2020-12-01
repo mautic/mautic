@@ -52,7 +52,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
      */
     private $notificationHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)
             ->disableOriginalConstructor()

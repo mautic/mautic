@@ -25,7 +25,7 @@ class VersionProviderTest extends \PHPUnit\Framework\TestCase
     private $statement;
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -74,7 +74,7 @@ class VersionProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->coreParametersHelper->expects($this->once())
             ->method('getParameter')
-            ->willReturn('5.5');
+            ->willReturn('5.7');
 
         $this->connection->expects($this->once())
             ->method('executeQuery')
