@@ -80,7 +80,7 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
      */
     private $leadFieldModelMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->leadRepositoryMock = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
