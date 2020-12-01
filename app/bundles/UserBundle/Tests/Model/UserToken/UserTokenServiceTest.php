@@ -32,7 +32,7 @@ class UserTokenServiceTest extends \PHPUnit\Framework\TestCase
      */
     private $userTokenRepositoryMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->randomHelperMock        = $this->getMockBuilder(RandomHelperInterface::class)->getMock();
         $this->userTokenRepositoryMock = $this->getMockBuilder(UserTokenRepositoryInterface::class)->getMock();
