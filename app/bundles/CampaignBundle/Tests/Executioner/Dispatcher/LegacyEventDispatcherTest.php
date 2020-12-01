@@ -57,7 +57,7 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
      */
     private $contactTracker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)
             ->disableOriginalConstructor()

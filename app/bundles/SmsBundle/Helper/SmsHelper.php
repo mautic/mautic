@@ -105,7 +105,7 @@ class SmsHelper
             }
         }
 
-        return $this->doNotContact->addDncForContact($lead->getId(), 'sms', null, DoNotContactEntity::UNSUBSCRIBED);
+        return $this->doNotContact->addDncForContact($lead->getId(), 'sms', DoNotContactEntity::UNSUBSCRIBED);
     }
 
     /**
