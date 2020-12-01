@@ -214,7 +214,6 @@ class FieldModel extends FormModel
         ],
         'companyemail' => [
             'type'     => 'email',
-            'unique'   => true,
             'fixed'    => true,
             'listable' => true,
             'object'   => 'company',
@@ -228,12 +227,14 @@ class FieldModel extends FormModel
         'companycity' => [
             'fixed'    => true,
             'listable' => true,
+            'unique'   => true,
             'object'   => 'company',
         ],
         'companystate' => [
             'type'     => 'region',
             'fixed'    => true,
             'listable' => true,
+            'unique'   => true,
             'object'   => 'company',
         ],
         'companyzipcode' => [
@@ -245,12 +246,14 @@ class FieldModel extends FormModel
             'type'     => 'country',
             'fixed'    => true,
             'listable' => true,
+            'unique'   => true,
             'object'   => 'company',
         ],
         'companyname' => [
             'fixed'    => true,
             'required' => true,
             'listable' => true,
+            'unique'   => true,
             'object'   => 'company',
         ],
         'companywebsite' => [
