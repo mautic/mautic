@@ -20,7 +20,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
     const WEBHOOK_USER     = 'user';
     const WEBHOOK_PASSWORD = 'pa$$word';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -32,7 +32,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         $_SERVER['REQUEST_URI']     = '/index.php';
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($GLOBALS['requests'], $_SERVER['SERVER_PROTOCOL'], $_SERVER['SERVER_PORT'], $_SERVER['SERVER_NAME']);
 

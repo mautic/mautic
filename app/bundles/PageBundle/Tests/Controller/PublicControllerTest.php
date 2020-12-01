@@ -74,7 +74,7 @@ class PublicControllerTest extends TestCase
     /** @var PrimaryCompanyHelper */
     private $primaryCompanyHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->controller           = new PublicController();
         $this->request              = new Request();
