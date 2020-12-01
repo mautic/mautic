@@ -16,9 +16,9 @@ use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use PHPUnit\Framework\TestCase;
 
-class TrackableModelTest extends WebTestCase
+class TrackableModelTest extends TestCase
 {
     /**
      * @testdox Test that content is detected as HTML
@@ -464,7 +464,7 @@ class TrackableModelTest extends WebTestCase
         reset($trackables);
         $token = key($trackables);
         $this->assertNotEmpty($trackables, $content);
-        $this->assertContains($token, $content);
+        $this->assertStringContainsString($token, $content);
     }
 
     /**
