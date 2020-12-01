@@ -29,7 +29,7 @@ class RedirectListTypeTest extends TestCase
      */
     private $form;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->form                 = new RedirectListType($this->coreParametersHelper);

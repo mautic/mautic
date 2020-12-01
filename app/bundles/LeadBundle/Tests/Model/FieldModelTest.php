@@ -20,6 +20,8 @@ use Mautic\LeadBundle\Model\ListModel;
 
 class FieldModelTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     public function testSingleContactFieldIsCreatedAndDeleted()
     {
         $fieldModel = $this->container->get('mautic.lead.model.field');
@@ -119,9 +121,8 @@ class FieldModelTest extends MauticMysqlTestCase
      */
     private function getColumns($table, $column)
     {
-        $connection = $this->container->get('doctrine.dbal.default_connection');
-        $stmt       = $connection->executeQuery(
-            "SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$connection->getDatabase()}' AND TABLE_NAME = '".MAUTIC_TABLE_PREFIX
+        $stmt       = $this->connection->executeQuery(
+            "SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$this->connection->getDatabase()}' AND TABLE_NAME = '".MAUTIC_TABLE_PREFIX
             ."$table' AND COLUMN_NAME = '$column'"
         );
         $stmt->execute();

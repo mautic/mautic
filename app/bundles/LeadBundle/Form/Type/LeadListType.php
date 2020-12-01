@@ -39,7 +39,11 @@ class LeadListType extends AbstractType
 
                     $choices = [];
                     foreach ($lists as $l) {
-                        $choices[$l['name']] = $l['id'];
+                        if (empty($options['preference_center_only'])) {
+                            $choices[$l['name']] = $l['id'];
+                        } else {
+                            $choices[empty($l['publicName']) ? $l['name'] : $l['publicName']] = $l['id'];
+                        }
                     }
 
                     return $choices;
