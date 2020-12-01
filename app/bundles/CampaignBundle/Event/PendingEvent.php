@@ -160,6 +160,29 @@ class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
+     * @param string $error
+     */
+    public function passAllWithError($error)
+    {
+        /** @var LeadEventLog $log */
+        foreach ($this->logs as $log) {
+            $this->passWithError($log, $error);
+        }
+    }
+
+    /**
+     * Pass all remainging logs that have not failed failed nor suceeded yet.
+     */
+    public function passRemainingWithError(string $error)
+    {
+        foreach ($this->logs as $log) {
+            if (!$this->failures->contains($log) && !$this->successful->contains($log)) {
+                $this->passWithError($log, $error);
+            }
+        }
+    }
+
+    /**
      * Pass all pending.
      */
     public function passAll()
