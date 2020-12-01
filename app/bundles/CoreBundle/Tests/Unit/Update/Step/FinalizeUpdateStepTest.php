@@ -45,7 +45,7 @@ class FinalizeUpdateStepTest extends AbstractStepTest
      */
     private $step;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
