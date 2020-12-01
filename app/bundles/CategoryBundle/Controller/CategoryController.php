@@ -191,7 +191,7 @@ class CategoryController extends AbstractFormController
         $success    = $closeModal    = 0;
         $cancelled  = $valid  = false;
         $method     = $this->request->getMethod();
-        $inForm     = ('POST' == $method) ? $this->request->request->get('category_form[inForm]', 0, true) : $this->request->get('inForm', 0);
+        $inForm     = ('POST' == $method) ? $this->request->request->get('category_form')['inForm'] : $this->request->get('inForm', 0);
         $showSelect = $this->request->get('show_bundle_select', false);
 
         //not found
@@ -286,7 +286,8 @@ class CategoryController extends AbstractFormController
         $success   = $closeModal   = 0;
         $cancelled = $valid = false;
         $method    = $this->request->getMethod();
-        $inForm    = ('POST' == $method) ? $this->request->request->get('category_form[inForm]', 0, true) : $this->request->get('inForm', 0);
+        $inForm    = ('POST' == $method) ? $this->request->request->get('category_form')['inForm'] : $this->request->get('inForm', 0);
+
         //not found
         if (null === $entity) {
             $closeModal = true;

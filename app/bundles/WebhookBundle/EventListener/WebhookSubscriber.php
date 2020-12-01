@@ -14,7 +14,8 @@ namespace Mautic\WebhookBundle\EventListener;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\WebhookBundle\Event\WebhookEvent;
-use Mautic\WebhookBundle\WebhookEvents as WebhookEvents;
+use Mautic\WebhookBundle\Notificator\WebhookKillNotificator;
+use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class WebhookSubscriber implements EventSubscriberInterface
@@ -29,10 +30,19 @@ class WebhookSubscriber implements EventSubscriberInterface
      */
     private $auditLogModel;
 
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
-    {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
+    /**
+     * @var WebhookKillNotificator
+     */
+    private $webhookKillNotificator;
+
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        AuditLogModel $auditLogModel,
+        WebhookKillNotificator $webhookKillNotificator
+    ) {
+        $this->ipLookupHelper         = $ipLookupHelper;
+        $this->auditLogModel          = $auditLogModel;
+        $this->webhookKillNotificator = $webhookKillNotificator;
     }
 
     /**
@@ -43,6 +53,7 @@ class WebhookSubscriber implements EventSubscriberInterface
         return [
             WebhookEvents::WEBHOOK_POST_SAVE   => ['onWebhookSave', 0],
             WebhookEvents::WEBHOOK_POST_DELETE => ['onWebhookDelete', 0],
+            WebhookEvents::WEBHOOK_KILL        => ['onWebhookKill', 0],
         ];
     }
 
@@ -81,5 +92,13 @@ class WebhookSubscriber implements EventSubscriberInterface
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
+    }
+
+    /**
+     * Send notification about killed webhook.
+     */
+    public function onWebhookKill(WebhookEvent $event)
+    {
+        $this->webhookKillNotificator->send($event->getWebhook(), $event->getReason());
     }
 }
