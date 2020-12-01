@@ -12,7 +12,7 @@ use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 
 abstract class MauticSqliteTestCase extends AbstractMauticTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -271,7 +271,9 @@ Mautic.keepPreviewAlive = function(iframeId, slot) {
     window.setInterval(function() {
         if (codeChanged) {
             var value = (Mautic.builderCodeMirror)?Mautic.builderCodeMirror.getValue():'';
-            Mautic.setCodeModeSlotContent(slot, value);
+            if (!Mautic.codeMode) {
+                Mautic.setCodeModeSlotContent(slot, value);
+            }
             Mautic.livePreviewInterval = Mautic.updateIframeContent(iframeId, value, slot);
             codeChanged = false;
         }
@@ -1239,7 +1241,19 @@ window.document.fileManagerInsertImageCallback = function(selector, url) {
     if (Mautic.isCodeMode()) {
         Mautic.insertTextAtCMCursor(url);
     } else {
-        mQuery(selector).froalaEditor('image.insert', url);
+        if (typeof FroalaEditorForFileManager !== 'underfined') {
+            if (typeof FroalaEditorForFileManagerCurrentImage !== 'undefined') {
+                FroalaEditorForFileManager.image.insert(url, false, {}, FroalaEditorForFileManagerCurrentImage);
+            } else {
+                FroalaEditorForFileManager.image.insert(url);
+            }
+        } else {
+            if (typeof FroalaEditorForFileManagerCurrentImage !== 'undefined') {
+                mQuery(selector).froalaEditor('image.insert', url, false, {}, FroalaEditorForFileManagerCurrentImage);
+            } else {
+                mQuery(selector).froalaEditor('image.insert', url);
+            }
+        }
     }
 };
 
