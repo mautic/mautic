@@ -1324,5 +1324,6 @@ return [
             '5' => 'last_active',
             '6' => 'id',
         ],
+        'company_unique_identifiers_operator' => \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_AND,
     ],
 ];
