@@ -544,6 +544,15 @@ return [
                     'mautic.helper.user',
                 ],
             ],
+            'mautic.helper.maxmind_do_not_sell_download' => [
+                'class'     => \Mautic\CoreBundle\Helper\MaxMindDoNotSellDownloadHelper::class,
+                'arguments' => [
+                    '%mautic.ip_lookup_auth%',
+                    'monolog.logger.mautic',
+                    'mautic.native.connector',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
         ],
         'menus' => [
             'mautic.menu.main' => [
@@ -585,6 +594,14 @@ return [
                     'transifex.factory',
                     'translator',
                 ],
+            ],
+            'mautic.core.command.do_not_sell' => [
+                'class'     => \Mautic\CoreBundle\Command\UpdateDoNotSellListCommand::class,
+                'arguments' => [
+                    'mautic.helper.maxmind_do_not_sell_download',
+                    'translator',
+                ],
+                'tag' => 'console.command',
             ],
             'mautic.core.command.apply_update' => [
                 'tag'       => 'console.command',
@@ -906,6 +923,11 @@ return [
                 'factory' => ['Joomla\Http\HttpFactory', 'getHttp'],
             ],
 
+            'mautic.native.connector' => [
+                'class'     => \Symfony\Contracts\HttpClient\HttpClientInterface::class,
+                'factory'   => [Symfony\Component\HttpClient\HttpClient::class, 'create'],
+            ],
+
             'twig.controller.exception.class' => 'Mautic\CoreBundle\Controller\ExceptionController',
 
             // Form extensions
@@ -1134,7 +1156,7 @@ return [
         'db_user'                         => '',
         'db_password'                     => '',
         'db_table_prefix'                 => '',
-        'db_server_version'               => '5.5',
+        'db_server_version'               => '5.7',
         'locale'                          => 'en_US',
         'secret_key'                      => '',
         'dev_hosts'                       => [],

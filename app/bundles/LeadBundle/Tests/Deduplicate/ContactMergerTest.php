@@ -51,7 +51,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
      */
     private $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->leadModel       = $this->createMock(LeadModel::class);
         $this->leadRepo        = $this->createMock(LeadRepository::class);
