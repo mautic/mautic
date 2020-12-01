@@ -36,18 +36,12 @@ class LeadChangeEventDispatcher
 
     /**
      * LeadChangeEventDispatcher constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * @param Events\LeadEvent $event
-     * @param array            $changes
-     */
     public function dispatchEvents(Events\LeadEvent $event, array $changes)
     {
         $this->lead    = $event->getLead();
@@ -59,9 +53,6 @@ class LeadChangeEventDispatcher
         $this->dispatchDncChangeEvent();
     }
 
-    /**
-     * @param Events\LeadEvent $event
-     */
     private function dispatchDateIdentifiedEvent(Events\LeadEvent $event)
     {
         if (!isset($this->changes['dateIdentified'])) {
@@ -71,9 +62,6 @@ class LeadChangeEventDispatcher
         $this->dispatcher->dispatch(LeadEvents::LEAD_IDENTIFIED, $event);
     }
 
-    /**
-     * @param Events\LeadEvent $event
-     */
     private function dispatchPointChangeEvent(Events\LeadEvent $event)
     {
         if (!isset($this->changes['points'])) {

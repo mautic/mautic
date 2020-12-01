@@ -23,13 +23,11 @@ use Symfony\Component\HttpFoundation\Request;
 class DefaultController extends CommonController
 {
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function indexAction(Request $request)
     {
-        $root = $this->coreParametersHelper->getParameter('webroot');
+        $root = $this->coreParametersHelper->get('webroot');
 
         if (empty($root)) {
             return $this->redirect($this->generateUrl('mautic_dashboard_index'));

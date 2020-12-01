@@ -8,6 +8,9 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'formresult');
 $view['slots']->set('headerTitle', $view['translator']->trans('mautic.form.result.header.index', [
@@ -39,7 +42,7 @@ $buttons[] = [
     'primary'   => true,
 ];
 
-if (class_exists('PHPExcel')) {
+if (class_exists(Spreadsheet::class)) {
     $buttons[] = [
         'attr' => [
             'data-toggle' => '',

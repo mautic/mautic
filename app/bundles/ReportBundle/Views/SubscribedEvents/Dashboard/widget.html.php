@@ -11,7 +11,7 @@
 if (isset($chartData['data']) and isset($chartType)) :
     $chartData = $chartData['data'];
 
-if ($chartType === 'table') {
+if ('table' === $chartType) {
     echo $view->render(
         'MauticCoreBundle:Helper:table.html.php',
         [

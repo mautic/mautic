@@ -11,25 +11,24 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\LeadBundle\Entity\LeadRepository;
 
-/**
- * Class EntityContactsTrait.
- */
 trait EntityContactsTrait
 {
     /**
-     * @param        $entityId
-     * @param        $page
-     * @param        $permission
-     * @param        $sessionVar
-     * @param        $entityJoinTable    Table to join to obtain list of related contacts or a DBAL QueryBuilder object defining custom joins
-     * @param null   $dncChannel         Channel for this entity to get do not contact records for
-     * @param null   $entityIdColumnName If the entity ID in $joinTable is not "id", set the column name here
-     * @param array  $contactFilter      Array of additional filters for the getEntityContactsWithFields() function
-     * @param array  $additionalJoins    [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
-     * @param string $contactColumnName  Column of the contact in the join table
-     * @param string $paginationTarget   DOM seletor for injecting new content when pagination is used
+     * @param string|int  $entityId
+     * @param int         $page
+     * @param string      $permission
+     * @param string      $sessionVar
+     * @param string      $entityJoinTable    Table to join to obtain list of related contacts or a DBAL QueryBuilder object defining custom joins
+     * @param string|null $dncChannel         Channel for this entity to get do not contact records for
+     * @param string|null $entityIdColumnName If the entity ID in $joinTable is not "id", set the column name here
+     * @param array|null  $contactFilter      Array of additional filters for the getEntityContactsWithFields() function
+     * @param array|null  $additionalJoins    [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
+     * @param string|null $contactColumnName  Column of the contact in the join table
+     * @param array|null  $routeParameters
+     * @param string|null $paginationTarget   DOM seletor for injecting new content when pagination is used
      *
      * @return mixed
      */
@@ -58,27 +57,22 @@ trait EntityContactsTrait
         }
 
         // Apply filters
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $this->setListFilters($sessionVar.'.contact');
         }
 
         $search = $this->request->get('search', $this->get('session')->get('mautic.'.$sessionVar.'.contact.filter', ''));
         $this->get('session')->set('mautic.'.$sessionVar.'.contact.filter', $search);
 
+        /** @var PageHelperFactoryInterface $pageHelperFacotry */
+        $pageHelperFacotry = $this->get('mautic.page.helper.factory');
+        $pageHelper        = $pageHelperFacotry->make("mautic.{$sessionVar}", $page);
+
         $filter     = ['string' => $search, 'force' => []];
         $orderBy    = $this->get('session')->get('mautic.'.$sessionVar.'.contact.orderby', 'l.id');
         $orderByDir = $this->get('session')->get('mautic.'.$sessionVar.'.contact.orderbydir', 'DESC');
-
-        //set limits
-        $limit = $this->get('session')->get(
-            'mautic.'.$sessionVar.'.contact.limit',
-            $this->get('mautic.helper.core_parameters')->getParameter('default_pagelimit')
-        );
-
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
+        $limit      = $pageHelper->getLimit();
+        $start      = $pageHelper->getStart();
 
         /** @var LeadRepository $repo */
         $repo     = $this->getModel('lead')->getRepository();
@@ -102,8 +96,8 @@ trait EntityContactsTrait
         $count = $contacts['count'];
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
-            $this->get('session')->set('mautic.'.$sessionVar.'.contact.page', $lastPage);
+            $lastPage = $pageHelper->countPage($count);
+            $pageHelper->rememberPage($lastPage);
             $returnUrl = $this->generateUrl($route, array_merge(['objectId' => $entityId, 'page' => $lastPage], $routeParameters));
 
             return $this->postActionRedirect(
@@ -118,6 +112,8 @@ trait EntityContactsTrait
                 ]
             );
         }
+
+        $pageHelper->rememberPage($page);
 
         // Get DNC for the contact
         $dnc = [];

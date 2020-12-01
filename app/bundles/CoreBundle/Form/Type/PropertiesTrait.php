@@ -18,8 +18,6 @@ trait PropertiesTrait
 {
     /**
      * @param FormBuilderInterface|Form $builder
-     * @param array                     $options
-     * @param array                     $masks
      */
     protected function addPropertiesType($builder, array $options, array &$masks)
     {

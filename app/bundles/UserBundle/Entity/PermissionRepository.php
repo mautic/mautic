@@ -21,8 +21,6 @@ class PermissionRepository extends CommonRepository
 {
     /**
      * Delete all permissions for a specific role.
-     *
-     * @param Role $role
      */
     public function purgeRolePermissions(Role $role)
     {
@@ -38,7 +36,6 @@ class PermissionRepository extends CommonRepository
     /**
      * Retrieves array of permissions for a set role.  If $forForm, then the array will contain.
      *
-     * @param Role $role
      * @param bool $forForm
      *
      * @return array

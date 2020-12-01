@@ -32,7 +32,7 @@ class DoNotContactParts
     {
         $parts         = explode('_', $field);
         $this->type    = $parts[1];
-        $this->channel = count($parts) === 3 ? $parts[2] : 'email';
+        $this->channel = 3 === count($parts) ? $parts[2] : 'email';
     }
 
     /**
@@ -48,6 +48,15 @@ class DoNotContactParts
      */
     public function getParameterType()
     {
-        return $this->type === 'bounced' ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED;
+        switch ($this->type) {
+            case 'bounced':
+            case DoNotContact::BOUNCED:
+                return DoNotContact::BOUNCED;
+            case 'manual':
+            case DoNotContact::MANUAL:
+                return DoNotContact::MANUAL;
+            default:
+                return DoNotContact::UNSUBSCRIBED;
+        }
     }
 }

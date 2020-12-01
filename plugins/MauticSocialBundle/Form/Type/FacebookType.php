@@ -11,7 +11,9 @@
 
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -19,46 +21,42 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class FacebookType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('layout', 'choice', [
+        $builder->add('layout', ChoiceType::class, [
             'choices' => [
-                'standard'     => 'mautic.integration.Facebook.share.layout.standard',
-                'button_count' => 'mautic.integration.Facebook.share.layout.buttoncount',
-                'button'       => 'mautic.integration.Facebook.share.layout.button',
-                'box_count'    => 'mautic.integration.Facebook.share.layout.boxcount',
-                'icon'         => 'mautic.integration.Facebook.share.layout.icon',
+                'mautic.integration.Facebook.share.layout.standard'    => 'standard',
+                'mautic.integration.Facebook.share.layout.buttoncount' => 'button_count',
+                'mautic.integration.Facebook.share.layout.button'      => 'button',
+                'mautic.integration.Facebook.share.layout.boxcount'    => 'box_count',
+                'mautic.integration.Facebook.share.layout.icon'        => 'icon',
             ],
-            'label'       => 'mautic.integration.Facebook.share.layout',
-            'required'    => false,
-            'empty_value' => false,
-            'label_attr'  => ['class' => 'control-label'],
-            'attr'        => ['class' => 'form-control'],
+            'label'             => 'mautic.integration.Facebook.share.layout',
+            'required'          => false,
+            'placeholder'       => false,
+            'label_attr'        => ['class' => 'control-label'],
+            'attr'              => ['class' => 'form-control'],
         ]);
 
-        $builder->add('action', 'choice', [
+        $builder->add('action', ChoiceType::class, [
             'choices' => [
-                'like'      => 'mautic.integration.Facebook.share.action.like',
-                'recommend' => 'mautic.integration.Facebook.share.action.recommend',
-                'share'     => 'mautic.integration.Facebook.share.action.share',
+                'mautic.integration.Facebook.share.action.like'      => 'like',
+                'mautic.integration.Facebook.share.action.recommend' => 'recommend',
+                'mautic.integration.Facebook.share.action.share'     => 'share',
             ],
-            'label'       => 'mautic.integration.Facebook.share.action',
-            'required'    => false,
-            'empty_value' => false,
-            'label_attr'  => ['class' => 'control-label'],
-            'attr'        => ['class' => 'form-control'],
+            'label'             => 'mautic.integration.Facebook.share.action',
+            'required'          => false,
+            'placeholder'       => false,
+            'label_attr'        => ['class' => 'control-label'],
+            'attr'              => ['class' => 'form-control'],
         ]);
 
-        $builder->add('showFaces', 'yesno_button_group', [
+        $builder->add('showFaces', YesNoButtonGroupType::class, [
             'label' => 'mautic.integration.Facebook.share.showfaces',
             'data'  => (!isset($options['data']['showFaces'])) ? 1 : $options['data']['showFaces'],
         ]);
 
-        $builder->add('showShare', 'yesno_button_group', [
+        $builder->add('showShare', YesNoButtonGroupType::class, [
             'label' => 'mautic.integration.Facebook.share.showshare',
             'data'  => (!isset($options['data']['showShare'])) ? 1 : $options['data']['showShare'],
         ]);
@@ -67,7 +65,7 @@ class FacebookType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'socialmedia_facebook';
     }

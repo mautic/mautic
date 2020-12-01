@@ -14,26 +14,25 @@ namespace Mautic\PageBundle\EventListener;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class MaintenanceSubscriber.
- */
-class MaintenanceSubscriber extends CommonSubscriber
+class MaintenanceSubscriber implements EventSubscriberInterface
 {
     /**
      * @var Connection
      */
-    protected $db;
+    private $db;
 
     /**
-     * MaintenanceSubscriber constructor.
-     *
-     * @param Connection $db
+     * @var TranslatorInterface
      */
-    public function __construct(Connection $db)
+    private $translator;
+
+    public function __construct(Connection $db, TranslatorInterface $translator)
     {
-        $this->db = $db;
+        $this->db         = $db;
+        $this->translator = $translator;
     }
 
     /**
@@ -46,9 +45,6 @@ class MaintenanceSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param MaintenanceEvent $event
-     */
     public function onDataCleanup(MaintenanceEvent $event)
     {
         $this->cleanData($event, 'page_hits');
@@ -66,7 +62,7 @@ class MaintenanceSubscriber extends CommonSubscriber
               ->join('h', MAUTIC_TABLE_PREFIX.'leads', 'l', 'h.lead_id = l.id')
               ->where($qb->expr()->lte('l.last_active', ':date'));
 
-            if ($event->isGdpr() === false) {
+            if (false === $event->isGdpr()) {
                 $qb->andWhere($qb->expr()->isNull('l.date_identified'));
             } else {
                 $qb->orWhere(
@@ -83,7 +79,7 @@ class MaintenanceSubscriber extends CommonSubscriber
             $subQb->select('id')->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
               ->where($qb->expr()->lte('l.last_active', ':date'));
 
-            if ($event->isGdpr() === false) {
+            if (false === $event->isGdpr()) {
                 $subQb->andWhere($qb->expr()->isNull('l.date_identified'));
             } else {
                 $subQb->orWhere(
@@ -91,7 +87,7 @@ class MaintenanceSubscriber extends CommonSubscriber
                     $subQb->expr()->lte('l.date_added', ':date2'),
                     $subQb->expr()->isNull('l.last_active')
                   ));
-                $qb->setParameter('date2', $event->getDate()->format('Y-m-d H:i:s'));
+                $subQb->setParameter('date2', $event->getDate()->format('Y-m-d H:i:s'));
             }
             $rows = 0;
             $loop = 0;
@@ -101,7 +97,7 @@ class MaintenanceSubscriber extends CommonSubscriber
 
                 $leadsIds = array_column($subQb->execute()->fetchAll(), 'id');
 
-                if (sizeof($leadsIds) === 0) {
+                if (0 === sizeof($leadsIds)) {
                     break;
                 }
 

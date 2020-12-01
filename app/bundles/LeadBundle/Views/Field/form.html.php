@@ -84,7 +84,7 @@ $defaultTimezoneTemplate = $view['form']->widget($form['default_template_timezon
                         case 'number':
                             echo $view->render('MauticLeadBundle:Field:properties_number.html.php', [
                                 'roundMode' => isset($properties['roundmode']) ? $properties['roundmode'] : '',
-                                'precision' => isset($properties['precision']) ? $properties['precision'] : '',
+                                'scale'     => isset($properties['scale']) ? $properties['scale'] : '',
                             ]);
                             break;
                         case 'select':

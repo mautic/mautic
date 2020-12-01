@@ -12,7 +12,8 @@
 namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class TelType.
@@ -22,7 +23,7 @@ class TelType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'compound' => false,
@@ -34,13 +35,13 @@ class TelType extends AbstractType
      */
     public function getParent()
     {
-        return 'text';
+        return TextType::class;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'tel';
     }

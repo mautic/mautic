@@ -35,9 +35,9 @@ class SchedulerEnum
     public static function getUnitEnumForSelect()
     {
         return [
-            self::UNIT_DAILY   => 'mautic.report.schedule.unit.day',
-            self::UNIT_WEEKLY  => 'mautic.report.schedule.unit.week',
-            self::UNIT_MONTHLY => 'mautic.report.schedule.unit.month',
+            'mautic.report.schedule.unit.day'   => self::UNIT_DAILY,
+            'mautic.report.schedule.unit.week'  => self::UNIT_WEEKLY,
+            'mautic.report.schedule.unit.month' => self::UNIT_MONTHLY,
         ];
     }
 
@@ -47,14 +47,14 @@ class SchedulerEnum
     public static function getDayEnumForSelect()
     {
         return [
-            self::DAY_MO        => 'mautic.report.schedule.day.monday',
-            self::DAY_TU        => 'mautic.report.schedule.day.tuesday',
-            self::DAY_WE        => 'mautic.report.schedule.day.wednesday',
-            self::DAY_TH        => 'mautic.report.schedule.day.thursday',
-            self::DAY_FR        => 'mautic.report.schedule.day.friday',
-            self::DAY_SA        => 'mautic.report.schedule.day.saturday',
-            self::DAY_SU        => 'mautic.report.schedule.day.sunday',
-            self::DAY_WEEK_DAYS => 'mautic.report.schedule.day.week_days',
+            'mautic.report.schedule.day.monday'    => self::DAY_MO,
+            'mautic.report.schedule.day.tuesday'   => self::DAY_TU,
+            'mautic.report.schedule.day.wednesday' => self::DAY_WE,
+            'mautic.report.schedule.day.thursday'  => self::DAY_TH,
+            'mautic.report.schedule.day.friday'    => self::DAY_FR,
+            'mautic.report.schedule.day.saturday'  => self::DAY_SA,
+            'mautic.report.schedule.day.sunday'    => self::DAY_SU,
+            'mautic.report.schedule.day.week_days' => self::DAY_WEEK_DAYS,
         ];
     }
 
@@ -64,8 +64,8 @@ class SchedulerEnum
     public static function getMonthFrequencyForSelect()
     {
         return [
-            self::MONTH_FREQUENCY_FIRST => 'mautic.report.schedule.month_frequency.first',
-            self::MONTH_FREQUENCY_LAST  => 'mautic.report.schedule.month_frequency.last',
+            'mautic.report.schedule.month_frequency.first' => self::MONTH_FREQUENCY_FIRST,
+            'mautic.report.schedule.month_frequency.last'  => self::MONTH_FREQUENCY_LAST,
         ];
     }
 

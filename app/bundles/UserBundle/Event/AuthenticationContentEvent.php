@@ -36,8 +36,6 @@ class AuthenticationContentEvent extends Event
 
     /**
      * AuthenticationContentEvent constructor.
-     *
-     * @param Request $request
      */
     public function __construct(Request $request)
     {

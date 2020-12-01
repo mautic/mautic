@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
 /**
  * Class ChannelSubscriptionChangeTest.
  */
-class ChannelSubscriptionChangeTest extends \PHPUnit_Framework_TestCase
+class ChannelSubscriptionChangeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Tests that getters returns same values as the contstruct

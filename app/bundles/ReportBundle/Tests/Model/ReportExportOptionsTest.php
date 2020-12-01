@@ -14,7 +14,7 @@ namespace Mautic\ReportBundle\Tests\Model;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\ReportBundle\Model\ReportExportOptions;
 
-class ReportExportOptionsTest extends \PHPUnit_Framework_TestCase
+class ReportExportOptionsTest extends \PHPUnit\Framework\TestCase
 {
     public function testBatch()
     {
@@ -23,7 +23,7 @@ class ReportExportOptionsTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('report_export_batch_size')
             ->willReturn(3);
 

@@ -11,12 +11,12 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
+
 class ClickthroughHelper
 {
     /**
      * Encode an array to append to a URL.
-     *
-     * @param array $array
      *
      * @return string
      */
@@ -31,17 +31,21 @@ class ClickthroughHelper
      * @param      $string
      * @param bool $urlDecode
      *
-     * @return mixed
+     * @return array
      */
     public static function decodeArrayFromUrl($string, $urlDecode = true)
     {
         $raw     = $urlDecode ? urldecode($string) : $string;
         $decoded = base64_decode($raw);
 
-        if (strpos(strtolower($decoded), 'a') !== 0) {
-            throw new \InvalidArgumentException(sprintf('The string %s is not a serialized array.', $decoded));
+        if (empty($decoded)) {
+            return [];
         }
 
-        return unserialize($decoded);
+        if (0 !== stripos($decoded, 'a')) {
+            throw new InvalidDecodedStringException($decoded);
+        }
+
+        return Serializer::decode($decoded);
     }
 }

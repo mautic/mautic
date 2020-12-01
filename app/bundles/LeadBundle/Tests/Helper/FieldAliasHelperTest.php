@@ -16,13 +16,13 @@ use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 
-class FieldAliasHelperTest extends \PHPUnit_Framework_TestCase
+class FieldAliasHelperTest extends \PHPUnit\Framework\TestCase
 {
     private $fieldModel;
     private $fieldRepository;
     private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
