@@ -761,7 +761,8 @@ class SubmissionModel extends CommonFormModel
     protected function executeFormActions(SubmissionEvent $event): void
     {
         $actions          = $event->getSubmission()->getForm()->getActions();
-        $availableActions = $this->formModel->getCustomComponents()['actions'];
+        $customComponents = $this->formModel->getCustomComponents();
+        $availableActions = $customComponents['actions'] ?? [];
 
         $actions->filter(function (Action $action) use ($availableActions) {
             return array_key_exists($action->getType(), $availableActions);

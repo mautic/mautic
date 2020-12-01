@@ -29,7 +29,7 @@ class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.api.config.form.api.enabled',
-                'data'  => (bool) $options['data']['api_enabled'],
+                'data'  => isset($options['data']['api_enabled']) ? (bool) $options['data']['api_enabled'] : false,
                 'attr'  => [
                     'tooltip' => 'mautic.api.config.form.api.enabled.tooltip',
                 ],
@@ -41,7 +41,7 @@ class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.api.config.form.api.basic_auth_enabled',
-                'data'  => (bool) $options['data']['api_enable_basic_auth'],
+                'data'  => isset($options['data']['api_enable_basic_auth']) ? (bool) $options['data']['api_enable_basic_auth'] : false,
                 'attr'  => [
                     'tooltip' => 'mautic.api.config.form.api.basic_auth.tooltip',
                 ],

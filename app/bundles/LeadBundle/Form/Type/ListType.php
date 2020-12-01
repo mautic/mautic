@@ -113,7 +113,7 @@ class ListType extends AbstractType
             $this->stageChoices[$stage['label']] = $stage['value'];
         }
 
-        $categories = $categoryModel->getLookupResults('global');
+        $categories = $categoryModel->getLookupResults('global', null, 0);
 
         foreach ($categories as $category) {
             $this->categoriesChoices[$category['title']] = $category['id'];
@@ -135,6 +135,20 @@ class ListType extends AbstractType
                 'label'      => 'mautic.core.name',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
+            ]
+        );
+
+        $builder->add(
+            'publicName',
+            TextType::class,
+            [
+                'label'      => 'mautic.lead.list.form.publicname',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.lead.list.form.publicname.tooltip',
+                ],
+                'required' => false,
             ]
         );
 
