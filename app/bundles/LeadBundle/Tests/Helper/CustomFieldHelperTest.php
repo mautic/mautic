@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Tests\Helper;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
 class CustomFieldHelperTest extends \PHPUnit\Framework\TestCase
@@ -46,5 +47,57 @@ class CustomFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('1', CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_SELECT, 1));
         $this->assertEquals('1', CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_SELECT, '1'));
         $this->assertEquals('one', CustomFieldHelper::fixValueType(CustomFieldHelper::TYPE_SELECT, 'one'));
+    }
+
+    public function testFieldsValuesTransformerWithoutRelativesDates()
+    {
+        $values = [
+            'customdate'     => '2020-11-01',
+            'customdatetime' => '2020-11-02 23:59:00',
+            'customtime'     => '23:59:00',
+        ];
+
+        $fields = [
+            'customdate'=> [
+                'type' => 'date',
+            ],
+            'customdatetime'=> [
+                'type' => 'datetime',
+            ],
+            'customtime'=> [
+                'type' => 'time',
+            ],
+        ];
+
+        $this->assertSame($values, CustomFieldHelper::fieldsValuesTransformer($fields, $values));
+    }
+
+    public function testFieldsValuesTransformerWithRelativesDates()
+    {
+        $values = [
+            'customdate'     => '-1 day',
+            'customdatetime' => '-1 day',
+            'customtime'     => '-20 minutes',
+        ];
+
+        $fields = [
+            'customdate'=> [
+                'type' => 'date',
+            ],
+            'customdatetime'=> [
+                'type' => 'datetime',
+            ],
+            'customtime'=> [
+                'type' => 'time',
+            ],
+        ];
+
+        $expected = [
+            'customdate'     => (new DateTimeHelper('-1 day'))->getString('Y-m-d'),
+            'customdatetime' => (new DateTimeHelper('-1 day'))->getString('Y-m-d H:i:s'),
+            'customtime'     => (new DateTimeHelper('-20 minutes'))->getString('H:i:s'),
+        ];
+
+        $this->assertSame($expected, CustomFieldHelper::fieldsValuesTransformer($fields, $values));
     }
 }

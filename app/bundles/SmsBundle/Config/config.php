@@ -12,6 +12,20 @@
 return [
     'services' => [
         'events' => [
+            'mautic.sms.lead.subscriber' => [
+                'class'     => \Mautic\SmsBundle\EventListener\LeadSubscriber::class,
+                'arguments' => [
+                    'translator',
+                    'router',
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
+            'mautic.sms.broadcast.subscriber' => [
+                'class'     => \Mautic\SmsBundle\EventListener\BroadcastSubscriber::class,
+                'arguments' => [
+                    'mautic.sms.broadcast.executioner',
+                ],
+            ],
             'mautic.sms.campaignbundle.subscriber.send' => [
                 'class'     => \Mautic\SmsBundle\EventListener\CampaignSendSubscriber::class,
                 'arguments' => [
@@ -82,6 +96,9 @@ return [
         'forms' => [
             'mautic.form.type.sms' => [
                 'class'     => \Mautic\SmsBundle\Form\Type\SmsType::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
             ],
             'mautic.form.type.smsconfig' => [
                 'class' => \Mautic\SmsBundle\Form\Type\ConfigType::class,
@@ -182,6 +199,21 @@ return [
                     'monolog.logger.mautic',
                 ],
             ],
+            'mautic.sms.broadcast.executioner' => [
+                'class'        => \Mautic\SmsBundle\Broadcast\BroadcastExecutioner::class,
+                'arguments'    => [
+                    'mautic.sms.model.sms',
+                    'mautic.sms.broadcast.query',
+                    'translator',
+                ],
+            ],
+            'mautic.sms.broadcast.query' => [
+                'class'        => \Mautic\SmsBundle\Broadcast\BroadcastQuery::class,
+                'arguments'    => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.sms.model.sms',
+                ],
+            ],
         ],
         'models' => [
             'mautic.sms.model.sms' => [
@@ -191,6 +223,7 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.channel.model.queue',
                     'mautic.sms.transport_chain',
+                    'mautic.helper.cache_storage',
                 ],
             ],
         ],
