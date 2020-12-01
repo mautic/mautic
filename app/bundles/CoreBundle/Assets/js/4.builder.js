@@ -271,7 +271,9 @@ Mautic.keepPreviewAlive = function(iframeId, slot) {
     window.setInterval(function() {
         if (codeChanged) {
             var value = (Mautic.builderCodeMirror)?Mautic.builderCodeMirror.getValue():'';
-            Mautic.setCodeModeSlotContent(slot, value);
+            if (!Mautic.codeMode) {
+                Mautic.setCodeModeSlotContent(slot, value);
+            }
             Mautic.livePreviewInterval = Mautic.updateIframeContent(iframeId, value, slot);
             codeChanged = false;
         }
@@ -471,6 +473,7 @@ Mautic.updateIframeContent = function(iframeId, content, slot) {
         }
     } else if (slot) {
         slot.html(content);
+        Mautic.setEmptySlotPlaceholder(slot.parent());
     }
 };
 
@@ -630,8 +633,7 @@ Mautic.sanitizeHtmlBeforeSave = function(htmlContent) {
 };
 
 /**
- * Clones full HTML document by creating a virtual iframe, putting the HTML into it and
- * reading it back. This is async process.
+ * Clones full HTML document by creating a virtual iframe, putting the HTML into it and reading it back. This is async process.
  *
  * @param  object   content
  * @param  Function callback(clonedContent)
@@ -1239,7 +1241,19 @@ window.document.fileManagerInsertImageCallback = function(selector, url) {
     if (Mautic.isCodeMode()) {
         Mautic.insertTextAtCMCursor(url);
     } else {
-        mQuery(selector).froalaEditor('image.insert', url);
+        if (typeof FroalaEditorForFileManager !== 'underfined') {
+            if (typeof FroalaEditorForFileManagerCurrentImage !== 'undefined') {
+                FroalaEditorForFileManager.image.insert(url, false, {}, FroalaEditorForFileManagerCurrentImage);
+            } else {
+                FroalaEditorForFileManager.image.insert(url);
+            }
+        } else {
+            if (typeof FroalaEditorForFileManagerCurrentImage !== 'undefined') {
+                mQuery(selector).froalaEditor('image.insert', url, false, {}, FroalaEditorForFileManagerCurrentImage);
+            } else {
+                mQuery(selector).froalaEditor('image.insert', url);
+            }
+        }
     }
 };
 
@@ -1327,6 +1341,7 @@ Mautic.initSlotListeners = function() {
             }
 
             slot.append(slotToolbar);
+            Mautic.setEmptySlotPlaceholder(slot);
         }, function() {
             if (Mautic.sortActive) {
                 // don't activate while sorting
@@ -1517,6 +1532,7 @@ Mautic.initSlotListeners = function() {
                     // replace DEC with content from the first editor
                     if (!(focusType == 'dynamicContent' && mQuery(this).attr('id').match(/filters/))) {
                         clickedSlot.html(slotHtml.html());
+                        Mautic.setEmptySlotPlaceholder(clickedSlot);
                     }
                 });
 
@@ -2072,6 +2088,18 @@ Mautic.getDynamicContentMaxId = function() {
     if (isNaN(maxId) || Number.NEGATIVE_INFINITY === maxId) maxId = 0;
 
     return maxId;
+};
+
+Mautic.setEmptySlotPlaceholder = function (slot) {
+    var clonedSlot = slot.clone();
+    clonedSlot.find('div[data-slot-focus="true"]').remove()
+    clonedSlot.find('div[data-slot-toolbar="true"]').remove()
+
+    if ((clonedSlot.text()).trim() == '' && !clonedSlot.find('img').length) {
+        slot.addClass('empty');
+    } else {
+        slot.removeClass('empty');
+    }
 };
 
 // Init inside the builder's iframe

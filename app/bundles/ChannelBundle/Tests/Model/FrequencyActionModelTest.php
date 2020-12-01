@@ -50,7 +50,7 @@ class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
      */
     private $actionModel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contactMock5      = $this->createMock(Lead::class);
         $this->contactModelMock  = $this->createMock(LeadModel::class);

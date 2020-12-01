@@ -16,6 +16,7 @@ use Joomla\Http\Http;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
+use Mautic\LeadBundle\Model\CompanyModel;
 
 class CampaignHelper
 {
@@ -25,15 +26,21 @@ class CampaignHelper
     protected $connector;
 
     /**
+     * @var CompanyModel
+     */
+    protected $companyModel;
+
+    /**
      * Cached contact values in format [contact_id => [key1 => val1, key2 => val1]].
      *
      * @var array
      */
     private $contactsValues = [];
 
-    public function __construct(Http $connector)
+    public function __construct(Http $connector, $companyModel)
     {
-        $this->connector = $connector;
+        $this->connector    = $connector;
+        $this->companyModel = $companyModel;
     }
 
     /**
@@ -41,7 +48,6 @@ class CampaignHelper
      */
     public function fireWebhook(array $config, Lead $contact)
     {
-        // dump($config);die;
         $payload = $this->getPayload($config, $contact);
         $headers = $this->getHeaders($config, $contact);
         $url     = rawurldecode(TokenHelper::findLeadTokens($config['url'], $this->getContactValues($contact), true));
@@ -92,6 +98,10 @@ class CampaignHelper
             case 'post':
             case 'put':
             case 'patch':
+                $headers = array_change_key_case($headers);
+                if (array_key_exists('content-type', $headers) && 'application/json' == strtolower($headers['content-type'])) {
+                    $payload                 = json_encode($payload);
+                }
                 $response = $this->connector->$method($url, $payload, $headers, $timeout);
                 break;
             case 'delete':
@@ -133,6 +143,7 @@ class CampaignHelper
         if (empty($this->contactsValues[$contact->getId()])) {
             $this->contactsValues[$contact->getId()]              = $contact->getProfileFields();
             $this->contactsValues[$contact->getId()]['ipAddress'] = $this->ipAddressesToCsv($contact->getIpAddresses());
+            $this->contactsValues[$contact->getId()]['companies'] = $this->companyModel->getRepository()->getCompaniesByLeadId($contact->getId());
         }
 
         return $this->contactsValues[$contact->getId()];
