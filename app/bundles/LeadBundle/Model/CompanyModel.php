@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\EmailBundle\Helper\EmailValidator;
+use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
@@ -65,13 +66,19 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     private $fields = [];
 
     /**
+     * @var CompanyDeduper
+     */
+    private $companyDeduper;
+
+    /**
      * CompanyModel constructor.
      */
-    public function __construct(FieldModel $leadFieldModel, Session $session, EmailValidator $validator)
+    public function __construct(FieldModel $leadFieldModel, Session $session, EmailValidator $validator, CompanyDeduper $companyDeduper)
     {
         $this->leadFieldModel = $leadFieldModel;
         $this->session        = $session;
         $this->emailValidator = $validator;
+        $this->companyDeduper = $companyDeduper;
     }
 
     /**
@@ -707,6 +714,12 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $companyFields  = [];
         $internalFields = $this->fetchCompanyFields();
 
+        if (!isset($mappedFields['companyname']) && isset($mappedFields['company'])) {
+            $mappedFields['companyname'] = $mappedFields['company'];
+
+            unset($mappedFields['company']);
+        }
+
         foreach ($mappedFields as $mauticField => $importField) {
             foreach ($internalFields as $entityField) {
                 if ($entityField['alias'] === $mauticField) {
@@ -723,43 +736,26 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param array        $fields
-     * @param array        $data
-     * @param null         $owner
-     * @param null         $list
-     * @param null         $tags
-     * @param bool         $persist
-     * @param LeadEventLog $eventLog
+     * @param array $fields
+     * @param array $data
+     * @param null  $owner
+     * @param null  $list
+     * @param null  $tags
+     * @param bool  $persist
      *
      * @return bool|null
      *
      * @throws \Exception
      */
-    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null)
+    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true)
     {
-        $fields = array_flip($fields);
+        $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($data);
 
-        // Let's check for an existing company by name
-        $hasName  = (!empty($fields['companyname']) && !empty($data[$fields['companyname']]));
-        $hasEmail = (!empty($fields['companyemail']) && !empty($data[$fields['companyemail']]));
-
-        if ($hasEmail) {
-            $this->emailValidator->validate($data[$fields['companyemail']], false);
-        }
-
-        if ($hasName) {
-            $companyName    = isset($fields['companyname']) ? $data[$fields['companyname']] : null;
-            $companyCity    = isset($fields['companycity']) ? $data[$fields['companycity']] : null;
-            $companyCountry = isset($fields['companycountry']) ? $data[$fields['companycountry']] : null;
-            $companyState   = isset($fields['companystate']) ? $data[$fields['companystate']] : null;
-
-            $found   = $companyName ? $this->getRepository()->identifyCompany($companyName, $companyCity, $companyCountry, $companyState) : false;
-            $company = ($found) ? $this->em->getReference('MauticLeadBundle:Company', $found['id']) : new Company();
-            $merged  = $found;
+        if (!empty($duplicateCompanies)) {
+            $company = $duplicateCompanies[0];
         } else {
-            return null;
+            $company = new Company();
         }
-
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
             $dateAdded = new DateTimeHelper($data[$fields['dateAdded']]);
             $company->setDateAdded($dateAdded->getUtcDateTime());
@@ -844,6 +840,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $this->saveEntity($company);
         }
 
-        return $merged;
+        return $company;
     }
 }

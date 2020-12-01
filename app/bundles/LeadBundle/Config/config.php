@@ -802,6 +802,13 @@ return [
                     'mautic.lead.repository.lead',
                 ],
             ],
+            'mautic.company.deduper' => [
+                'class'     => \Mautic\LeadBundle\Deduplicate\CompanyDeduper::class,
+                'arguments' => [
+                    'mautic.lead.model.field',
+                    'mautic.lead.repository.company',
+                ],
+            ],
             'mautic.lead.helper.primary_company' => [
                 'class'     => \Mautic\LeadBundle\Helper\PrimaryCompanyHelper::class,
                 'arguments' => [
@@ -1166,6 +1173,7 @@ return [
                     'mautic.lead.model.field',
                     'session',
                     'mautic.validator.email',
+                    'mautic.company.deduper',
                 ],
             ],
             'mautic.lead.model.import' => [
