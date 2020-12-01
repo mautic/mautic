@@ -15,12 +15,14 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\LockHandler;
 
 abstract class ModeratedCommand extends ContainerAwareCommand
 {
-    const MODE_LOCK = 'lock';
-    const MODE_PID  = 'pid';
+    const MODE_LOCK   = 'lock';
+    const MODE_PID    = 'pid';
+    const MODE_FLOCK  = 'flock';
 
     protected $checkFile;
     protected $moderationKey;
@@ -31,6 +33,8 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     protected $lockHandler;
     protected $lockFile;
     private $bypassLocking;
+
+    private $flockHandle;
 
     /* @var OutputInterface $output */
     protected $output;
@@ -47,22 +51,19 @@ abstract class ModeratedCommand extends ContainerAwareCommand
                 '--timeout',
                 '-t',
                 InputOption::VALUE_REQUIRED,
-                'If getmypid() is disabled on this system, lock files will be used. This option will assume the process is dead afer the specified number of seconds and will execute anyway. This is disabled by default.',
+                'If getmypid() is disabled on this system, lock files will be used. This option will assume the process is dead after the specified number of seconds and will execute anyway. This is disabled by default.',
                 false
             )
             ->addOption(
                 '--lock_mode',
                 '-x',
                 InputOption::VALUE_REQUIRED,
-                'Force use of PID or FILE LOCK for semaphore. Allowed value are "pid" or "file_lock". By default, lock will try with pid, if not available will use file system',
+                'Allowed value are "pid" , "file_lock" or "flock". By default, lock will try with pid, if not available will use file system',
                 'pid'
             );
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
      * @return bool
      */
     protected function checkRunStatus(InputInterface $input, OutputInterface $output, $moderationKey = '')
@@ -72,7 +73,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
         $this->bypassLocking  = $input->getOption('bypass-locking');
         $lockMode             = $input->getOption('lock_mode');
 
-        if (!in_array($lockMode, ['pid', 'file_lock'])) {
+        if (!in_array($lockMode, ['pid', 'file_lock', 'flock'])) {
             $output->writeln('<error>Unknown locking method specified.</error>');
 
             return false;
@@ -89,7 +90,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
         // Setup the run directory for lock/pid files
         $this->runDirectory = $this->getContainer()->getParameter('kernel.cache_dir').'/../run';
         if (!file_exists($this->runDirectory)) {
-            if (!mkdir($this->runDirectory, 0755)) {
+            if (!mkdir($this->runDirectory)) {
                 $output->writeln('<error>'.$this->runDirectory.' could not be created.</error>');
 
                 return false;
@@ -125,6 +126,9 @@ abstract class ModeratedCommand extends ContainerAwareCommand
         if (self::MODE_LOCK == $this->moderationMode) {
             $this->lockHandler->release();
         }
+        if (self::MODE_FLOCK == $this->moderationMode) {
+            fclose($this->flockHandle);
+        }
 
         // Attempt to keep things tidy
         @unlink($this->lockFile);
@@ -141,7 +145,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     private function checkStatus($force = false, $lockMode = null)
     {
         // getmypid may be disabled and posix_getpgid is not available on Windows machines
-        if ((is_null($lockMode) || $lockMode === 'pid') && function_exists('getmypid') && function_exists('posix_getpgid')) {
+        if ((is_null($lockMode) || 'pid' === $lockMode) && function_exists('getmypid') && function_exists('posix_getpgid')) {
             $disabled = explode(',', ini_get('disable_functions'));
             if (!in_array('getmypid', $disabled) && !in_array('posix_getpgid', $disabled)) {
                 $this->moderationMode = self::MODE_PID;
@@ -176,6 +180,36 @@ abstract class ModeratedCommand extends ContainerAwareCommand
 
                 return true;
             }
+        } elseif (self::MODE_FLOCK === $lockMode && !$force) {
+            $this->moderationMode = self::MODE_FLOCK;
+            $error                = null;
+            // Silence error reporting
+            set_error_handler(function ($errno, $msg) use (&$error) {
+                $error = $msg;
+            });
+
+            if (!$this->flockHandle = fopen($this->lockFile, 'r+') ?: fopen($this->lockFile, 'r')) {
+                if ($this->flockHandle = fopen($this->lockFile, 'x')) {
+                    chmod($this->lockFile, 0666);
+                } elseif (!$this->flockHandle = fopen($this->lockFile, 'r+') ?: fopen($this->lockFile, 'r')) {
+                    usleep(100);
+                    $this->flockHandle = fopen($this->lockFile, 'r+') ?: fopen($this->lockFile, 'r');
+                }
+            }
+
+            restore_error_handler();
+
+            if (!$this->flockHandle) {
+                throw new IOException($error, 0, null, $this->lockFile);
+            }
+            if (!flock($this->flockHandle, LOCK_EX | LOCK_NB)) {
+                fclose($this->flockHandle);
+                $this->flockHandle = null;
+
+                return false;
+            }
+
+            return true;
         }
 
         // in anycase, fallback on file system

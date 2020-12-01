@@ -28,8 +28,6 @@ class GroupExecutionDateDAO
 
     /**
      * GroupExecutionDateDAO constructor.
-     *
-     * @param \DateTime $executionDate
      */
     public function __construct(\DateTime $executionDate)
     {
@@ -37,9 +35,6 @@ class GroupExecutionDateDAO
         $this->contacts      = new ArrayCollection();
     }
 
-    /**
-     * @param Lead $contact
-     */
     public function addContact(Lead $contact)
     {
         $this->contacts->set($contact->getId(), $contact);

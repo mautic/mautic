@@ -13,6 +13,7 @@ namespace Mautic\PageBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CookieHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -21,6 +22,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\PageRepository;
@@ -38,7 +40,7 @@ class PageTestAbstract extends WebTestCase
     protected $mockTrackingId;
     protected $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         self::bootKernel();
         $this->mockTrackingId = hash('sha1', uniqid(mt_rand(), true));
@@ -48,7 +50,7 @@ class PageTestAbstract extends WebTestCase
     /**
      * @return PageModel
      */
-    protected function getPageModel()
+    protected function getPageModel($transliterationEnabled = true)
     {
         $cookieHelper = $this
             ->getMockBuilder(CookieHelper::class)
@@ -94,12 +96,6 @@ class PageTestAbstract extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $leadModel->expects($this
-            ->any())
-            ->method('getCurrentLead')
-            ->willReturn($this
-                ->returnValue(['id' => self::$mockId, 'name' => self::$mockName]));
-
         $entityManager = $this
             ->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
@@ -110,6 +106,11 @@ class PageTestAbstract extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $coreParametersHelper = $this
+            ->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $hitRepository = $this->createMock(HitRepository::class);
         $userHelper    = $this->createMock(UserHelper::class);
 
@@ -117,6 +118,15 @@ class PageTestAbstract extends WebTestCase
             ->getMockBuilder(QueueService::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $contactTracker = $this->createMock(ContactTracker::class);
+
+        $contactTracker->expects($this
+            ->any())
+            ->method('getContact')
+            ->willReturn($this
+                ->returnValue(['id' => self::$mockId, 'name' => self::$mockName])
+            );
 
         $queueService->expects($this
             ->any())
@@ -137,6 +147,11 @@ class PageTestAbstract extends WebTestCase
                 )
             );
 
+        $coreParametersHelper->expects($this->any())
+                ->method('get')
+                ->with('transliterate_page_title')
+                ->willReturn($transliterationEnabled);
+
         $deviceTrackerMock = $this->createMock(DeviceTracker::class);
 
         $pageModel = new PageModel(
@@ -148,7 +163,9 @@ class PageTestAbstract extends WebTestCase
             $trackableModel,
             $queueService,
             $companyModel,
-            $deviceTrackerMock
+            $deviceTrackerMock,
+            $contactTracker,
+            $coreParametersHelper
         );
 
         $pageModel->setDispatcher($dispatcher);
@@ -158,11 +175,6 @@ class PageTestAbstract extends WebTestCase
         $pageModel->setUserHelper($userHelper);
 
         return $pageModel;
-    }
-
-    public function getCurrentLead($tracking)
-    {
-        return $tracking ? [new Lead(), $this->mockTrackingId, true] : new Lead();
     }
 
     /**

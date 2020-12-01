@@ -11,16 +11,41 @@
 
 namespace Mautic\DynamicContentBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\DynamicContentBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class LeadSubscriber.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    /**
+     * @var StatRepository
+     */
+    private $statRepository;
+
+    public function __construct(
+        TranslatorInterface $translator,
+        RouterInterface $router,
+        StatRepository $statRepository
+    ) {
+        $this->translator     = $translator;
+        $this->router         = $router;
+        $this->statRepository = $statRepository;
+    }
+
     /**
      * @return array
      */
@@ -34,8 +59,6 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
@@ -49,9 +72,7 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        /** @var \Mautic\DynamicContentBundle\Entity\StatRepository $statRepository */
-        $statRepository = $this->em->getRepository('MauticDynamicContentBundle:Stat');
-        $stats          = $statRepository->getLeadStats($event->getLeadId(), $event->getQueryOptions());
+        $stats = $this->statRepository->getLeadStats($event->getLeadId(), $event->getQueryOptions());
 
         // Add total number to counter
         $event->addToCounter($eventTypeKey, $stats);
@@ -89,12 +110,9 @@ class LeadSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param LeadMergeEvent $event
-     */
     public function onLeadMerge(LeadMergeEvent $event)
     {
-        $this->em->getRepository('MauticDynamicContentBundle:Stat')->updateLead(
+        $this->statRepository->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );

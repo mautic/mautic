@@ -11,15 +11,13 @@
 
 namespace Mautic\StageBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\StageBundle\Entity\Stage;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class StageController.
- */
-class StageController extends FormController
+class StageController extends AbstractFormController
 {
     /**
      * @param int $page
@@ -46,24 +44,17 @@ class StageController extends FormController
 
         $this->setListFilters();
 
-        //set limits
-        $limit = $this->get('session')->get(
-            'mautic.stage.limit',
-            $this->coreParametersHelper->getParameter('default_pagelimit')
-        );
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
+        /** @var PageHelperFactoryInterface $pageHelperFacotry */
+        $pageHelperFacotry = $this->get('mautic.page.helper.factory');
+        $pageHelper        = $pageHelperFacotry->make('mautic.stage', $page);
 
-        $search = $this->request->get('search', $this->get('session')->get('mautic.stage.filter', ''));
-        $this->get('session')->set('mautic.stage.filter', $search);
-
+        $limit      = $pageHelper->getLimit();
+        $start      = $pageHelper->getStart();
+        $search     = $this->request->get('search', $this->get('session')->get('mautic.stage.filter', ''));
         $filter     = ['string' => $search, 'force' => []];
         $orderBy    = $this->get('session')->get('mautic.stage.orderby', 's.name');
         $orderByDir = $this->get('session')->get('mautic.stage.orderbydir', 'ASC');
-
-        $stages = $this->getModel('stage')->getEntities(
+        $stages     = $this->getModel('stage')->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -73,11 +64,13 @@ class StageController extends FormController
             ]
         );
 
+        $this->get('session')->set('mautic.stage.filter', $search);
+
         $count = count($stages);
         if ($count && $count < ($start + 1)) {
-            $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
-            $this->get('session')->set('mautic.stage.page', $lastPage);
+            $lastPage  = $pageHelper->countPage($count);
             $returnUrl = $this->generateUrl('mautic_stage_index', ['page' => $lastPage]);
+            $pageHelper->rememberPage($lastPage);
 
             return $this->postActionRedirect(
                 [
@@ -92,10 +85,7 @@ class StageController extends FormController
             );
         }
 
-        //set what page currently on so that we can return here after form submission/cancellation
-        $this->get('session')->set('mautic.stage.page', $page);
-
-        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $pageHelper->rememberPage($page);
 
         //get the list of actions
         $actions = $this->getModel('stage')->getStageActions();
@@ -109,7 +99,7 @@ class StageController extends FormController
                     'page'        => $page,
                     'limit'       => $limit,
                     'permissions' => $permissions,
-                    'tmpl'        => $tmpl,
+                    'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 ],
                 'contentTemplate' => 'MauticStageBundle:Stage:list.html.php',
                 'passthroughVars' => [
@@ -142,14 +132,13 @@ class StageController extends FormController
         }
 
         //set the page we came from
-        $page = $this->get('session')->get('mautic.stage.page', 1);
-
-        $actionType = ($this->request->getMethod() == 'POST') ? $this->request->request->get('stage[type]', '', true)
-            : '';
-
-        $action  = $this->generateUrl('mautic_stage_action', ['objectAction' => 'new']);
-        $actions = $model->getStageActions();
-        $form    = $model->createForm(
+        $page       = $this->get('session')->get('mautic.stage.page', 1);
+        $method     = $this->request->getMethod();
+        $stage      = $this->request->request->get('stage', []);
+        $actionType = 'POST' === $method ? ($stage['type'] ?? '') : '';
+        $action     = $this->generateUrl('mautic_stage_action', ['objectAction' => 'new']);
+        $actions    = $model->getStageActions();
+        $form       = $model->createForm(
             $entity,
             $this->get('form.factory'),
             $action,
@@ -161,8 +150,9 @@ class StageController extends FormController
         $viewParameters = ['page' => $page];
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' === $method) {
             $valid = false;
+
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
@@ -272,7 +262,7 @@ class StageController extends FormController
         ];
 
         //form not found
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -309,7 +299,7 @@ class StageController extends FormController
         );
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && 'POST' == $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -402,7 +392,7 @@ class StageController extends FormController
         $model  = $this->getModel('stage');
         $entity = $model->getEntity($objectId);
 
-        if ($entity != null) {
+        if (null != $entity) {
             if (!$this->get('mautic.security')->isGranted('stage:stages:create')) {
                 return $this->accessDenied();
             }
@@ -437,11 +427,11 @@ class StageController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $model  = $this->getModel('stage');
             $entity = $model->getEntity($objectId);
 
-            if ($entity === null) {
+            if (null === $entity) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.stage.error.notfound',
@@ -497,7 +487,7 @@ class StageController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $model     = $this->getModel('stage');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];
@@ -506,7 +496,7 @@ class StageController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if ($entity === null) {
+                if (null === $entity) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.stage.error.notfound',

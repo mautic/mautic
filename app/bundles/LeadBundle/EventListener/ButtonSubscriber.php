@@ -13,11 +13,29 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class ButtonSubscriber extends CommonSubscriber
+class ButtonSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    public function __construct(TranslatorInterface $translator, RouterInterface $router)
+    {
+        $this->translator = $translator;
+        $this->router     = $router;
+    }
+
     public static function getSubscribedEvents()
     {
         return [
@@ -25,9 +43,6 @@ class ButtonSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param CustomButtonEvent $event
-     */
     public function injectViewButtons(CustomButtonEvent $event)
     {
         if (0 === strpos($event->getRoute(), 'mautic_contact_index')) {
@@ -40,16 +55,16 @@ class ButtonSubscriber extends CommonSubscriber
                 [
                     'attr' => [
                         'data-toggle'           => 'confirmation',
-                        'href'                  => $exportRoute,
+                        'href'                  => $exportRoute.'?filetype=xlsx',
                         'data-precheck'         => 'batchActionPrecheck',
                         'data-message'          => $this->translator->trans('mautic.core.export.items', ['%items%' => 'contacts']),
-                        'data-confirm-text'     => $this->translator->trans('mautic.core.export'),
+                        'data-confirm-text'     => $this->translator->trans('mautic.core.export.xlsx'),
                         'data-confirm-callback' => 'executeBatchAction',
                         'data-cancel-text'      => $this->translator->trans('mautic.core.form.cancel'),
                         'data-cancel-callback'  => 'dismissConfirmation',
                     ],
-                    'btnText'   => $this->translator->trans('mautic.core.export'),
-                    'iconClass' => 'fa fa-download',
+                    'btnText'   => $this->translator->trans('mautic.core.export.xlsx'),
+                    'iconClass' => 'fa fa-file-excel-o',
                 ],
                 ButtonHelper::LOCATION_BULK_ACTIONS
             );
@@ -57,11 +72,41 @@ class ButtonSubscriber extends CommonSubscriber
             $event->addButton(
                 [
                     'attr' => [
-                        'href'        => $exportRoute,
+                        'data-toggle'           => 'confirmation',
+                        'href'                  => $exportRoute.'?filetype=csv',
+                        'data-precheck'         => 'batchActionPrecheck',
+                        'data-message'          => $this->translator->trans('mautic.core.export.items', ['%items%' => 'contacts']),
+                        'data-confirm-text'     => $this->translator->trans('mautic.core.export.csv'),
+                        'data-confirm-callback' => 'executeBatchAction',
+                        'data-cancel-text'      => $this->translator->trans('mautic.core.form.cancel'),
+                        'data-cancel-callback'  => 'dismissConfirmation',
+                    ],
+                    'btnText'   => $this->translator->trans('mautic.core.export.csv'),
+                    'iconClass' => 'fa fa-file-text-o',
+                ],
+                ButtonHelper::LOCATION_BULK_ACTIONS
+            );
+
+            $event->addButton(
+                [
+                    'attr' => [
+                        'href'        => $exportRoute.'?filetype=xlsx',
                         'data-toggle' => null,
                     ],
-                    'btnText'   => $this->translator->trans('mautic.core.export'),
-                    'iconClass' => 'fa fa-download',
+                    'btnText'   => $this->translator->trans('mautic.core.export.xlsx'),
+                    'iconClass' => 'fa fa-file-excel-o',
+                ],
+                ButtonHelper::LOCATION_PAGE_ACTIONS
+            );
+
+            $event->addButton(
+                [
+                    'attr' => [
+                        'href'        => $exportRoute.'?filetype=csv',
+                        'data-toggle' => null,
+                    ],
+                    'btnText'   => $this->translator->trans('mautic.core.export.csv'),
+                    'iconClass' => 'fa fa-file-text-o',
                 ],
                 ButtonHelper::LOCATION_PAGE_ACTIONS
             );

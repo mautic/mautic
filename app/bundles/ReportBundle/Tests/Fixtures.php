@@ -188,4 +188,60 @@ class Fixtures
     {
         return 'email';
     }
+
+    public static function getReportBuilderEventData()
+    {
+        return [
+            'all' => [
+                'tables' => [
+                    'assets' => [
+                        'display_name' => 'mautic.asset.assets',
+                        'columns'      => [
+                            'a.alias' => [
+                                'label' => 'Alias',
+                                'type'  => 'string',
+                                'alias' => 'alias',
+                            ],
+                            'a.description' => [
+                                'label' => 'Description',
+                                'type'  => 'string',
+                                'alias' => 'a_description',
+                            ],
+                        ],
+                        'group' => 'assets',
+                    ],
+                ],
+                'graphs' => [
+                    'all'                 => [],
+                    'mautic.asset.assets' => [
+                        'tables' => [],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    public static function getGoodColumnList()
+    {
+        $list          = new \stdClass();
+        $list->choices = [
+            'a.alias'       => 'Alias',
+            'a.description' => 'Description',
+        ];
+        $list->choiceHtml  = '<option value="a.alias">Alias</option>\n<option value="a.description">Description</option>\n';
+        $list->definitions = [
+            'a.alias' => [
+                'label' => 'Alias',
+                'type'  => 'string',
+                'alias' => 'alias',
+            ],
+            'a.description' => [
+                'label' => 'Description',
+                'type'  => 'string',
+                'alias' => 'a_description',
+            ],
+        ];
+
+        return $list;
+    }
 }

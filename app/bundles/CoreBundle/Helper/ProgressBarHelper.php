@@ -21,8 +21,7 @@ class ProgressBarHelper
      * Avoid printing progress bar to stderr
      * https://github.com/symfony/symfony/issues/18744.
      *
-     * @param OutputInterface $output
-     * @param int             $maxCount
+     * @param int $maxCount
      *
      * @return ProgressBar
      */

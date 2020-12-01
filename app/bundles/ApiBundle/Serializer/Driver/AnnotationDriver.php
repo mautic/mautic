@@ -12,17 +12,14 @@
 namespace Mautic\ApiBundle\Serializer\Driver;
 
 use JMS\Serializer\Metadata\ClassMetadata;
+use JMS\Serializer\Metadata\Driver\AnnotationDriver as BaseAnnotationDriver;
+use Metadata\ClassMetadata as BaseClassMetadata;
 
-/**
- * Class AnnotationDriver.
- */
-class AnnotationDriver extends \JMS\Serializer\Metadata\Driver\AnnotationDriver
+class AnnotationDriver extends BaseAnnotationDriver
 {
-    public function loadMetadataForClass(\ReflectionClass $class)
+    public function loadMetadataForClass(\ReflectionClass $class): ?BaseClassMetadata
     {
         // Overriding annotation driver to not generate annotation cache files
-        $classMetadata = new ClassMetadata($name = $class->name);
-
-        return $classMetadata;
+        return new ClassMetadata($class->getName());
     }
 }

@@ -21,9 +21,6 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 interface DeviceCreatorServiceInterface
 {
     /**
-     * @param DeviceDetector $deviceDetector
-     * @param Lead           $assignedLead
-     *
      * @return LeadDevice|null Null is returned if device can't be detected
      */
     public function getCurrentFromDetector(DeviceDetector $deviceDetector, Lead $assignedLead);

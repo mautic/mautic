@@ -28,14 +28,17 @@ abstract class AbstractLookup
     public $extra        = '';
 
     /**
+     * @var Http|null
+     */
+    protected $connector;
+
+    /**
      * @var string IP Address
      */
     protected $ip;
 
     /**
      * Authorization for lookup service.
-     *
-     * @var
      */
     protected $auth;
 
@@ -69,11 +72,9 @@ abstract class AbstractLookup
     /**
      * AbstractLookup constructor.
      *
-     * @param null                 $auth
-     * @param null                 $ipLookupConfig
-     * @param null                 $cacheDir
-     * @param LoggerInterface|null $logger
-     * @param Http|null            $httpConnector
+     * @param null $auth
+     * @param null $ipLookupConfig
+     * @param null $cacheDir
      */
     public function __construct($auth = null, $ipLookupConfig = null, $cacheDir = null, LoggerInterface $logger = null, Http $httpConnector = null)
     {
@@ -106,14 +107,17 @@ abstract class AbstractLookup
      */
     public function getDetails()
     {
-        $reflect = new \ReflectionClass($this);
-        $props   = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC);
-
-        $details = [];
-        foreach ($props as $prop) {
-            $details[$prop->getName()] = $prop->getValue($this);
-        }
-
-        return $details;
+        return [
+            'city'         => $this->city,
+            'region'       => $this->region,
+            'zipcode'      => $this->zipcode,
+            'country'      => $this->country,
+            'latitude'     => $this->latitude,
+            'longitude'    => $this->longitude,
+            'isp'          => $this->isp,
+            'organization' => $this->organization,
+            'timezone'     => $this->timezone,
+            'extra'        => $this->extra,
+        ];
     }
 }

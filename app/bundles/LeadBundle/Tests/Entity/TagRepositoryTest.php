@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 
-class TagRepositoryTest extends \PHPUnit_Framework_TestCase
+class TagRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetTagByNameOrCreateNewOneWithSomeExistingTag()
     {

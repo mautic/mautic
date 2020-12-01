@@ -29,17 +29,17 @@ class FieldController extends FormController
     public function indexAction($page = 1)
     {
         //set some permissions
-        $permissions = $this->get('mautic.security')->isGranted(['lead:fields:full'], 'RETURN_ARRAY');
+        $permissions = $this->get('mautic.security')->isGranted(['lead:fields:view', 'lead:fields:full'], 'RETURN_ARRAY');
 
         $session = $this->get('session');
 
-        if (!$permissions['lead:fields:full']) {
+        if (!$permissions['lead:fields:view'] && !$permissions['lead:fields:full']) {
             return $this->accessDenied();
         }
 
         $this->setListFilters();
 
-        $limit  = $session->get('mautic.leadfield.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
+        $limit  = $session->get('mautic.leadfield.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $search = $this->request->get('search', $session->get('mautic.leadfield.filter', ''));
         $session->set('mautic.leadfilter.filter', $search);
 
@@ -47,7 +47,7 @@ class FieldController extends FormController
         $orderBy    = $this->get('session')->get('mautic.leadfilter.orderby', 'f.order');
         $orderByDir = $this->get('session')->get('mautic.leadfilter.orderbydir', 'ASC');
 
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -68,7 +68,7 @@ class FieldController extends FormController
 
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            if ($count === 1) {
+            if (1 === $count) {
                 $lastPage = 1;
             } else {
                 $lastPage = (ceil($count / $limit)) ?: 1;
@@ -133,14 +133,14 @@ class FieldController extends FormController
         $form = $model->createForm($field, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $request = $this->request->request->all();
                     if (isset($request['leadfield']['properties'])) {
                         $result = $model->setFieldProperties($field, $request['leadfield']['properties']);
-                        if ($result !== true) {
+                        if (true !== $result) {
                             //set the error
                             $form->get('properties')->addError(
                                 new FormError(
@@ -251,7 +251,7 @@ class FieldController extends FormController
             ],
         ];
         //list not found
-        if ($field === null) {
+        if (null === $field) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -272,14 +272,14 @@ class FieldController extends FormController
         $form   = $model->createForm($field, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && 'POST' == $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $request = $this->request->request->all();
                     if (isset($request['leadfield']['properties'])) {
                         $result = $model->setFieldProperties($field, $request['leadfield']['properties']);
-                        if ($result !== true) {
+                        if (true !== $result) {
                             //set the error
                             $form->get('properties')->addError(new FormError(
                                 $this->get('translator')->trans($result, [], 'validators')
@@ -356,7 +356,7 @@ class FieldController extends FormController
         $model  = $this->getModel('lead.field');
         $entity = $model->getEntity($objectId);
 
-        if ($entity != null) {
+        if (null != $entity) {
             if (!$this->get('mautic.security')->isGranted('lead:fields:full')) {
                 return $this->accessDenied();
             }
@@ -375,7 +375,7 @@ class FieldController extends FormController
     /**
      * Delete a field.
      *
-     * @param   $objectId
+     * @param $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -397,12 +397,12 @@ class FieldController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             /** @var FieldModel $model */
             $model = $this->getModel('lead.field');
             $field = $model->getEntity($objectId);
 
-            if ($field === null) {
+            if (null === $field) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.lead.field.error.notfound',
@@ -415,13 +415,19 @@ class FieldController extends FormController
                 return $this->accessDenied();
             }
 
-            if ($model->isUsedField($field)) {
+            $segments = [];
+            foreach ($model->getFieldSegments($field) as $segment) {
+                $segments[] = sprintf('"%s" (%d)', $segment->getName(), $segment->getId());
+            }
+
+            if (count($segments)) {
                 $flashMessage = [
                     'type'    => 'error',
                     'msg'     => 'mautic.core.notice.used.field',
                     'msgVars' => [
-                        '%name%' => $field->getLabel(),
-                        '%id%'   => $objectId,
+                        '%name%'     => $field->getLabel(),
+                        '%id%'       => $objectId,
+                        '%segments%' => implode(', ', $segments),
                     ],
                 ];
             } else {
@@ -469,7 +475,7 @@ class FieldController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             /** @var FieldModel $model */
             $model     = $this->getModel('lead.field');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
@@ -479,7 +485,7 @@ class FieldController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if ($entity === null) {
+                if (null === $entity) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.lead.field.error.notfound',
@@ -497,16 +503,34 @@ class FieldController extends FormController
             // Delete everything we are able to
             if (!empty($deleteIds)) {
                 $filteredDeleteIds = $model->filterUsedFieldIds($deleteIds);
+                $usedFieldIds      = array_diff($deleteIds, $filteredDeleteIds);
+                $segments          = [];
+                $usedFieldsNames   = [];
+
+                if ($usedFieldIds) {
+                    // Iterating through all used fileds to get segments they are used in
+                    foreach ($usedFieldIds as $usedFieldId) {
+                        $fieldEntity = $model->getEntity($usedFieldId);
+                        foreach ($model->getFieldSegments($fieldEntity) as $segment) {
+                            $segments[$segment->getId()] = sprintf('"%s" (%d)', $segment->getName(), $segment->getId());
+                            $usedFieldsNames[]           = sprintf('"%s"', $fieldEntity->getName());
+                        }
+                    }
+                }
 
                 if ($filteredDeleteIds !== $deleteIds) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.core.notice.used.fields',
+                        'msgVars' => [
+                            '%segments%' => implode(', ', $segments),
+                            '%fields%'   => implode(', ', array_unique($usedFieldsNames)),
+                        ],
                     ];
                 }
 
                 if (count($filteredDeleteIds)) {
-                    $entities = $model->deleteEntities($deleteIds);
+                    $entities = $model->deleteEntities($filteredDeleteIds);
 
                     $flashes[] = [
                         'type'    => 'notice',

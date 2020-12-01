@@ -13,7 +13,7 @@ namespace Mautic\CampaignBundle\Tests\Executioner\Result;
 
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 
-class CounterTest extends \PHPUnit_Framework_TestCase
+class CounterTest extends \PHPUnit\Framework\TestCase
 {
     public function testCounterIncrements()
     {

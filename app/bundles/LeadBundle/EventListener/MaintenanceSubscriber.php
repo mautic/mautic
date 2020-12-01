@@ -14,26 +14,25 @@ namespace Mautic\LeadBundle\EventListener;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class MaintenanceSubscriber.
- */
-class MaintenanceSubscriber extends CommonSubscriber
+class MaintenanceSubscriber implements EventSubscriberInterface
 {
     /**
      * @var Connection
      */
-    protected $db;
+    private $db;
 
     /**
-     * MaintenanceSubscriber constructor.
-     *
-     * @param Connection $db
+     * @var TranslatorInterface
      */
-    public function __construct(Connection $db)
+    private $translator;
+
+    public function __construct(Connection $db, TranslatorInterface $translator)
     {
-        $this->db = $db;
+        $this->db         = $db;
+        $this->translator = $translator;
     }
 
     /**
@@ -46,9 +45,6 @@ class MaintenanceSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param MaintenanceEvent $event
-     */
     public function onDataCleanup(MaintenanceEvent $event)
     {
         $qb = $this->db->createQueryBuilder()
@@ -59,7 +55,7 @@ class MaintenanceSubscriber extends CommonSubscriber
               ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
               ->where($qb->expr()->lte('l.last_active', ':date'));
 
-            if ($event->isGdpr() === false) {
+            if (false === $event->isGdpr()) {
                 $qb->andWhere($qb->expr()->isNull('l.date_identified'));
             } else {
                 $qb->orWhere(
@@ -71,21 +67,38 @@ class MaintenanceSubscriber extends CommonSubscriber
             }
             $rows = $qb->execute()->fetchColumn();
         } else {
-            $qb->delete(MAUTIC_TABLE_PREFIX.'leads')
-              ->where($qb->expr()->lte('last_active', ':date'));
+            $qb->select('l.id')->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+              ->where($qb->expr()->lte('l.last_active', ':date'));
 
-            if ($event->isGdpr() === false) {
-                $qb->andWhere($qb->expr()->isNull('date_identified'));
+            if (false === $event->isGdpr()) {
+                $qb->andWhere($qb->expr()->isNull('l.date_identified'));
             } else {
                 $qb->orWhere(
                   $qb->expr()->andX(
-                    $qb->expr()->lte('date_added', ':date2'),
-                    $qb->expr()->isNull('last_active')
+                    $qb->expr()->lte('l.date_added', ':date2'),
+                    $qb->expr()->isNull('l.last_active')
                   ));
                 $qb->setParameter('date2', $event->getDate()->format('Y-m-d H:i:s'));
             }
 
-            $rows = $qb->execute();
+            $rows = 0;
+            $qb->setMaxResults(10000)->setFirstResult(0);
+
+            $qb2 = $this->db->createQueryBuilder();
+            while (true) {
+                $leadsIds = array_column($qb->execute()->fetchAll(), 'id');
+                if (0 === sizeof($leadsIds)) {
+                    break;
+                }
+                foreach ($leadsIds as $leadId) {
+                    $rows += $qb2->delete(MAUTIC_TABLE_PREFIX.'leads')
+                      ->where(
+                        $qb2->expr()->eq(
+                          'id', $leadId
+                        )
+                      )->execute();
+                }
+            }
         }
 
         $event->setStat($this->translator->trans('mautic.maintenance.visitors'), $rows, $qb->getSQL(), $qb->getParameters());

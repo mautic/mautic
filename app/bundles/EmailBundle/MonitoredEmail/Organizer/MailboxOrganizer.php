@@ -34,9 +34,6 @@ class MailboxOrganizer
 
     /**
      * MailboxOrganizer constructor.
-     *
-     * @param ParseEmailEvent $event
-     * @param array           $mailboxes
      */
     public function __construct(ParseEmailEvent $event, array $mailboxes)
     {
@@ -85,8 +82,6 @@ class MailboxOrganizer
     }
 
     /**
-     * @param ConfigAccessor $config
-     *
      * @return MailboxContainer
      */
     protected function getContainer(ConfigAccessor $config)

@@ -20,8 +20,7 @@ use Mautic\NotificationBundle\Entity\Notification;
 class NotificationEvent extends CommonEvent
 {
     /**
-     * @param Notification $notification
-     * @param bool         $isNew
+     * @param bool $isNew
      */
     public function __construct(Notification $notification, $isNew = false)
     {
@@ -41,8 +40,6 @@ class NotificationEvent extends CommonEvent
 
     /**
      * Sets the Notification entity.
-     *
-     * @param Notification $notification
      */
     public function setNotification(Notification $notification)
     {

@@ -14,8 +14,8 @@
 <ul class="list-group campaign-event-list">
     <?php foreach ($events as $event) : ?>
         <?php $typeClass    = ('action' === $event['eventType'] && 'no' === $event['decisionPath']) ? 'danger' : 'success'; ?>
-        <?php $percentLabel = ($typeClass === 'danger') ? 'mautic.report.campaign.no.percent' : 'mautic.report.campaign.yes.percent'; ?>
-        <?php $percentProp  = ($typeClass === 'danger') ? 'noPercent' : 'yesPercent'; ?>
+        <?php $percentLabel = ('danger' === $typeClass) ? 'mautic.report.campaign.no.percent' : 'mautic.report.campaign.yes.percent'; ?>
+        <?php $percentProp  = ('danger' === $typeClass) ? 'noPercent' : 'yesPercent'; ?>
         <li class="list-group-item bg-auto bg-light-xs">
             <div class="progress-bar progress-bar-<?php echo $typeClass; ?>" style="width:<?php echo $event['yesPercent']; ?>%; left: 0;"></div>
             <div class="progress-bar progress-bar-danger" style="width:<?php echo $event['noPercent']; ?>%; left: <?php echo $event['yesPercent']; ?>%"></div>
@@ -29,7 +29,7 @@
                         <?php echo $event['noPercent'].'%'; ?>
                     </span>
                     <?php endif; ?>
-                <span class="mt-xs label label-warning" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.report.campaign.completed.actions'); ?>"><?= $event['logCount']; ?></span> <span class="mt-xs label label-default"  data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.report.campaign.pending.actions'); ?>"><?= $event['leadCount'] - $event['logCount']; ?></span>
+                <span class="mt-xs label label-warning" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.report.campaign.completed.actions'); ?>"><?= $event['logCount']; ?></span> <span class="mt-xs label label-default"  data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.report.campaign.pending.actions'); ?>"><?= $event['leadCount'] - $event['logCountForPending']; ?></span>
                 </div>
                     <div class="col-md-5 va-m">
                     <h5 class="fw-sb text-primary mb-xs">
