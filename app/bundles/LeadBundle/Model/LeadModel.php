@@ -357,6 +357,14 @@ class LeadModel extends FormModel
     }
 
     /**
+     * @return LeadListRepository
+     */
+    public function getLeadListRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:LeadList');
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return string
@@ -2446,5 +2454,10 @@ class LeadModel extends FormModel
     public function mergeLeads(Lead $lead, Lead $lead2, $autoMode = true)
     {
         return $this->legacyLeadModel->mergeLeads($lead, $lead2, $autoMode);
+    }
+
+    public function getAvailableLeadFields(): array
+    {
+        return $this->availableLeadFields;
     }
 }
