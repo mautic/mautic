@@ -15,15 +15,13 @@ use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
+use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-/**
- * Class PageController.
- */
 class PageController extends FormController
 {
     use BuilderControllerTrait;
@@ -59,17 +57,16 @@ class PageController extends FormController
 
         $this->setListFilters();
 
-        //set limits
-        $limit = $this->get('session')->get('mautic.page.limit', $this->coreParametersHelper->get('default_pagelimit'));
-        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
+        /** @var PageHelperFactoryInterface $pageHelperFacotry */
+        $pageHelperFacotry = $this->get('mautic.page.helper.factory');
+        $pageHelper        = $pageHelperFacotry->make('mautic.page', $page);
 
+        $limit  = $pageHelper->getLimit();
+        $start  = $pageHelper->getStart();
         $search = $this->request->get('search', $this->get('session')->get('mautic.page.filter', ''));
-        $this->get('session')->set('mautic.page.filter', $search);
-
         $filter = ['string' => $search, 'force' => []];
+
+        $this->get('session')->set('mautic.page.filter', $search);
 
         if (!$permissions['page:pages:viewother']) {
             $filter['force'][] = ['column' => 'p.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
@@ -117,8 +114,7 @@ class PageController extends FormController
 
         $orderBy    = $this->get('session')->get('mautic.page.orderby', 'p.title');
         $orderByDir = $this->get('session')->get('mautic.page.orderbydir', 'DESC');
-
-        $pages = $model->getEntities(
+        $pages      = $model->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -129,10 +125,9 @@ class PageController extends FormController
 
         $count = count($pages);
         if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
-            $lastPage = (1 === $count) ? 1 : (ceil($count / $limit)) ?: 1;
-            $this->get('session')->set('mautic.page.page', $lastPage);
+            $lastPage  = $pageHelper->countPage($count);
             $returnUrl = $this->generateUrl('mautic_page_index', ['page' => $lastPage]);
+            $pageHelper->rememberPage($lastPage);
 
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
@@ -145,24 +140,18 @@ class PageController extends FormController
             ]);
         }
 
-        //set what page currently on so that we can return here after form submission/cancellation
-        $this->get('session')->set('mautic.page.page', $page);
-
-        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
-
-        //retrieve a list of categories
-        $categories = $this->getModel('page.page')->getLookupResults('category', '', 0);
+        $pageHelper->rememberPage($page);
 
         return $this->delegateView([
             'viewParameters' => [
                 'searchValue' => $search,
                 'items'       => $pages,
-                'categories'  => $categories,
+                'categories'  => $this->getModel('page.page')->getLookupResults('category', '', 0),
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,
                 'model'       => $model,
-                'tmpl'        => $tmpl,
+                'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'security'    => $this->get('mautic.security'),
             ],
             'contentTemplate' => 'MauticPageBundle:Page:list.html.php',

@@ -31,6 +31,7 @@
             <directory>middlewares</directory>
             <exclude>
                 <directory>bundles/*Bundle/Config</directory>
+                <directory>bundles/*Bundle/DataFixtures</directory>
                 <directory>bundles/*Bundle/Tests</directory>
                 <directory>bundles/*Bundle/Translations</directory>
                 <directory>bundles/*Bundle/Views</directory>
@@ -39,6 +40,7 @@
                 <directory>./../plugins/*Bundle/Translations</directory>
                 <directory>./../plugins/*Bundle/Views</directory>
                 <directory>middlewares/Tests</directory>
+                <directory>bundles/CoreBundle/Test</directory>
             </exclude>
         </whitelist>
     </filter>
@@ -46,5 +48,7 @@
     <php>
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled" />
         <env name="MAXMIND_LICENSE_KEY" value=""/>
+        <server name="KERNEL_DIR" value="app" />
+        <server name="APP_DEBUG" value="0" />
     </php>
 </phpunit>

@@ -15,10 +15,9 @@
         ]
     },
     "require": {
-        "php": ">=7.2.21 <7.4",
+        "php": ">=7.2.21 <7.5",
         "ext-zlib": "^7.2",
         "ext-zip": "^1.15",
-        "ext-imap": "*",
         "symfony/console": "~3.4.0",
         "symfony/debug": "~3.4.0",
         "symfony/form": "~3.4.0",
@@ -79,7 +78,6 @@
         "joomla/http": "~1.3.3",
         "joomla/filter": "~1.3.5",
         "oneup/uploader-bundle": "^2.1.5",
-        "phpoffice/phpspreadsheet": "^1.10",
         "mrclay/minify": "2.2.0",
         "jbroadway/urlify": "^1.0",
         "geoip2/geoip2": "~2.0",
@@ -94,7 +92,6 @@
         "piwik/device-detector": "~3.12.2",
         "php-http/guzzle6-adapter": "^1.1",
         "sparkpost/sparkpost": "~2.2.0",
-        "sonata-project/exporter": "^1.7",
         "lightsaml/sp-bundle": "~1.2.1",
         "egeloen/ordered-form-bundle": "^3.0",
         "php-amqplib/rabbitmq-bundle": "^1.10",
@@ -110,18 +107,16 @@
         "tightenco/collect": "^6.13",
         "kamermans/guzzle-oauth2-subscriber": "^1.0",
         "barryvdh/elfinder-flysystem-driver": "^0.2.1",
-        "bandwidth-throttle/token-bucket": "^2.0"
+        "bandwidth-throttle/token-bucket": "^2.0",
+        "gaufrette/extras": "^0.1.0",
+        "gaufrette/aws-s3-adapter": "^0.4.0",
+        "phpoffice/phpspreadsheet": "^1.15"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~3.4.0",
         "symfony/var-dumper": "~3.4.0",
         "symfony/browser-kit": "~3.4.0",
         "symfony/dom-crawler": "~3.4.0",
-
-        "symfony/phpunit-bridge": "~4.3.0",
-        "phpunit/phpunit": "~7.5.0",
-        "phpunit/phpunit-selenium": "~7.0.0",
-        "codeception/codeception": "^4.0",
 
         "liip/functional-test-bundle": "~3.3.0",
         "mautic/transifex": "^4.0",
@@ -131,7 +126,11 @@
         "liip/test-fixtures-bundle": "^1.6",
         "phpstan/phpstan": "^0.12.3",
         "rector/rector-prefixed": "0.6.13",
-        "theofidry/psysh-bundle": "^v3.5.1"
+        "theofidry/psysh-bundle": "^v3.5.1",
+        "symfony/phpunit-bridge": "~5.1.0",
+        "phpunit/phpunit": "~8.5.0",
+        "phpunit/phpunit-selenium": "~8.0.0",
+        "codeception/codeception": "^4.0"
     },
     "repositories": [
         {
@@ -147,8 +146,8 @@
         "auto-scripts": [
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
-            "php -r \"if(file_exists('./.git')&&file_exists('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''))){copy('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''),'./.git/hooks/pre-commit');}\"",
-            "php -r \"if(file_exists('./.git/hooks/pre-commit')&&(PHP_OS!='WINNT')){chmod('./.git/hooks/pre-commit',0755);}\""
+            "php -r \"if(file_exists('./.git')&&file_exists('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''))){copy('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''),'./.git/hooks/pre-commit');} if(file_exists('./.git')&&file_exists('./build/hooks/post-checkout')){copy('./build/hooks/post-checkout','./.git/hooks/post-checkout');}\"",
+            "php -r \"if(file_exists('./.git/hooks/pre-commit')&&(PHP_OS!='WINNT')){chmod('./.git/hooks/pre-commit',0755);} if(file_exists('./.git/hooks/post-checkout')&&(PHP_OS!='WINNT')){chmod('./.git/hooks/post-checkout',0755);}\""
         ],
         "post-install-cmd": [
             "@auto-scripts"
