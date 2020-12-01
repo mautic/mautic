@@ -60,24 +60,8 @@ class PasswordSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $user = $this->initializeUser($authenticationEvent);
-
         if (!$this->passwordStrengthEstimatorModel->validate($userPassword)) {
             throw new WeakPasswordException();
         }
-    }
-
-    private function initializeUser(AuthenticationEvent $authenticationEvent): ?User
-    {
-        $token = $authenticationEvent->getToken();
-        if ($token->getUser() instanceof User) {
-            return $token->getUser();
-        }
-
-        if ($token->getUsername()) {
-            return $this->userRepository->findOneByUsername($token->getUsername()) ?? null;
-        }
-
-        return null;
     }
 }
