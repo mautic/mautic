@@ -11,10 +11,11 @@
 
 namespace Mautic\StageBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class StageActionType.
@@ -23,48 +24,40 @@ class StageActionListType extends AbstractType
 {
     private $model;
 
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
+    public function __construct(StageModel $model)
     {
-        $this->model = $factory->getModel('stage');
+        $this->model = $model;
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        /** @var \Mautic\StageBundle\Model\StageModel $model */
-        $model = $this->model;
         $resolver->setDefaults([
-            'choices' => function (Options $options) use ($model) {
-                $stages = $model->getUserStages();
+            'choices' => function (Options $options) {
+                $stages = $this->model->getUserStages();
 
                 $choices = [];
                 foreach ($stages as $s) {
-                    $choices[$s['id']] = $s['name'];
+                    $choices[$s['name']] = $s['id'];
                 }
 
                 return $choices;
             },
-            'required' => false,
-        ]);
+            'required'          => false,
+            ]);
     }
 
     /**
-     * @return null|string|\Symfony\Component\Form\FormTypeInterface
+     * @return string|\Symfony\Component\Form\FormTypeInterface|null
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'stageaction_list';
     }

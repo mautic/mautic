@@ -40,8 +40,6 @@ abstract class AbstractEventAccessor
 
     /**
      * AbstractEventAccessor constructor.
-     *
-     * @param array $config
      */
     public function __construct(array $config)
     {

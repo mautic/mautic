@@ -17,22 +17,17 @@ use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiResponse;
 use Monolog\Logger;
 use SendGrid\Response;
 
-class SendGridApiResponseTest extends \PHPUnit_Framework_TestCase
+class SendGridApiResponseTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider successfulResponseProvider
      */
     public function testSuccessfulResponse($code)
     {
-        $logger = $this->getMockBuilder(Logger::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $sendGridApiMessage = new SendGridApiResponse($this->createMock(Logger::class));
+        $response           = new Response($code);
 
-        $sendGridApiMessage = new SendGridApiResponse($logger);
-
-        $response = new Response($code);
-
-        $sendGridApiMessage->checkResponse($response);
+        $this->assertNull($sendGridApiMessage->checkResponse($response));
     }
 
     public function successfulResponseProvider()
@@ -47,13 +42,9 @@ class SendGridApiResponseTest extends \PHPUnit_Framework_TestCase
 
     public function testBadLogin()
     {
-        $logger = $this->getMockBuilder(Logger::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $logger             = $this->createMock(Logger::class);
         $sendGridApiMessage = new SendGridApiResponse($logger);
-
-        $response = new Response(401);
+        $response           = new Response(401);
 
         $logger->expects($this->once())
             ->method('addError')
@@ -66,15 +57,10 @@ class SendGridApiResponseTest extends \PHPUnit_Framework_TestCase
 
     public function testBadRequest()
     {
-        $logger = $this->getMockBuilder(Logger::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $logger             = $this->createMock(Logger::class);
         $sendGridApiMessage = new SendGridApiResponse($logger);
-
-        $body = '{"errors":[{"message":"The attachment content must be base64 encoded.","field":"attachments.0.content","help":"http://sendgrid.com/docs/API_Reference/Web_API_v3/Mail/errors.html#message.attachments.content"}]}';
-
-        $response = new Response(410, $body);
+        $body               = '{"errors":[{"message":"The attachment content must be base64 encoded.","field":"attachments.0.content","help":"http://sendgrid.com/docs/API_Reference/Web_API_v3/Mail/errors.html#message.attachments.content"}]}';
+        $response           = new Response(410, $body);
 
         $logger->expects($this->once())
             ->method('addError')

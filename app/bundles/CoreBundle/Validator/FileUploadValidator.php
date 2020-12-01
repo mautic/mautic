@@ -31,7 +31,6 @@ class FileUploadValidator
      * @param int    $fileSize          In bytes
      * @param string $fileExtension
      * @param int    $maxUploadSize     In bytes
-     * @param array  $allowedExtensions
      * @param string $extensionErrorMsg
      * @param string $sizeErrorMsg
      *
@@ -61,7 +60,6 @@ class FileUploadValidator
 
     /**
      * @param string $extension
-     * @param array  $allowedExtensions
      * @param string $extensionErrorMsg
      *
      * @throws FileInvalidException

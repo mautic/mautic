@@ -32,18 +32,12 @@ class MessageType extends AbstractFormStandardType
 
     /**
      * MessageType constructor.
-     *
-     * @param MessageModel $messageModel
      */
     public function __construct(MessageModel $messageModel)
     {
         $this->model = $messageModel;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Add standard fields
@@ -93,7 +87,8 @@ class MessageType extends AbstractFormStandardType
     {
         $resolver->setDefaults(
             [
-                'data_class' => Message::class,
+                'data_class'      => Message::class,
+                'category_bundle' => 'messages',
             ]
         );
     }

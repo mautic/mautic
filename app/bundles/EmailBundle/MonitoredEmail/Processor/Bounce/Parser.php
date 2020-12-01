@@ -23,8 +23,6 @@ class Parser
 
     /**
      * Parser constructor.
-     *
-     * @param Message $message
      */
     public function __construct(Message $message)
     {
@@ -32,7 +30,7 @@ class Parser
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getFailedRecipients()
     {
@@ -50,7 +48,7 @@ class Parser
         foreach ($this->message->to as $to => $name) {
             // Some ISPs strip the + email so will still process the content for a bounce
             // even if a +bounce address was not found
-            if (strpos($to, '+bounce') !== false) {
+            if (false !== strpos($to, '+bounce')) {
                 $bouncerAddress = $to;
 
                 break;

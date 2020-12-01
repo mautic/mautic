@@ -12,22 +12,18 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Entity\AuditLog;
+use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
-/**
- * Class StatsSubscriber.
- */
 class StatsSubscriber extends CommonStatsSubscriber
 {
-    /**
-     * StatsSubscriber constructor.
-     *
-     * @param EntityManager $em
-     */
-    public function __construct(EntityManager $em)
+    public function __construct(CorePermissions $security, EntityManager $entityManager)
     {
-        $this->repositories['MauticCoreBundle:AuditLog'] = $em->getRepository('MauticCoreBundle:AuditLog');
+        parent::__construct($security, $entityManager);
+        $this->repositories['MauticCoreBundle:AuditLog'] = $entityManager->getRepository(AuditLog::class);
         $this->permissions['MauticCoreBundle:AuditLog']  = ['admin'];
 
-        $this->repositories['MauticCoreBundle:IpAddress'] = $em->getRepository('MauticCoreBundle:IpAddress');
+        $this->repositories['MauticCoreBundle:IpAddress'] = $entityManager->getRepository(IpAddress::class);
     }
 }

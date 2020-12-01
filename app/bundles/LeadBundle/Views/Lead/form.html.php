@@ -43,7 +43,7 @@ $img = $view['lead_avatar']->getAvatar($lead);
     echo ' has-error';
 } ?>"
                     id="customAvatarContainer"
-                    style="<?php if ($form['preferred_profile_image']->vars['data'] != 'custom') {
+                    style="<?php if ('custom' != $form['preferred_profile_image']->vars['data']) {
     echo 'display: none;';
 } ?>">
                     <?php echo $view['form']->widget($form['custom_avatar']); ?>
@@ -57,7 +57,7 @@ $img = $view['lead_avatar']->getAvatar($lead);
                 <?php $step = 1; ?>
                 <?php foreach ($groups as $g): ?>
                     <?php if (!empty($fields[$g])): ?>
-                        <li class="list-group-item <?php if ($step === 1) {
+                        <li class="list-group-item <?php if (1 === $step) {
     echo 'active';
 } ?>">
                             <a href="#<?php echo $g; ?>" class="steps" data-toggle="tab">
@@ -81,13 +81,13 @@ $img = $view['lead_avatar']->getAvatar($lead);
                 if (isset($fields[$group])):
                     $groupFields = $fields[$group];
                     if (!empty($groupFields)): ?>
-                        <div class="tab-pane fade<?php if ($key === 0): echo ' in active'; endif; ?> bdr-rds-0 bdr-w-0"
+                        <div class="tab-pane fade<?php if (0 === $key): echo ' in active'; endif; ?> bdr-rds-0 bdr-w-0"
                              id="<?php echo $group; ?>">
                             <div class="pa-md bg-auto bg-light-xs bdr-b">
                                 <h4 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.field.group.'.$group); ?></h4>
                             </div>
                             <div class="pa-md">
-                                <?php if ($group == 'core'): ?>
+                                <?php if ('core' == $group): ?>
                                 <?php if (isset($form['title']) || isset($form['firstname']) || isset($form['lastname'])): ?>
                                     <div class="form-group mb-0">
                                         <label
@@ -219,7 +219,7 @@ $img = $view['lead_avatar']->getAvatar($lead);
                                         <?php endforeach; ?>
                                     </div>
                                 </div>
-                                <?php if ($group == 'core'): ?>
+                                <?php if ('core' == $group): ?>
                                     <hr class="mnr-md mnl-md">
                                     <div class="row">
                                         <div class="col-sm-8">

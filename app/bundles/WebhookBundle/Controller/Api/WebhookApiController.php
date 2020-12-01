@@ -59,7 +59,7 @@ class WebhookApiController extends CommonApiController
         }
 
         // Remove events missing in the PUT request
-        if ($this->request->getMethod() === 'PUT') {
+        if ('PUT' === $this->request->getMethod()) {
             foreach ($entity->getEvents() as $event) {
                 if (!in_array($event->getEventType(), $eventsToKeep)) {
                     $entity->removeEvent($event);
