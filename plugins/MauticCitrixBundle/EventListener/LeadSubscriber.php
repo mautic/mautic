@@ -173,7 +173,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'label'      => $this->translator->trans('plugin.citrix.event.'.$product.'.registration'),
                         'properties' => [
                             'type' => 'select',
-                            'list' => array_flip($eventNamesWithAny),
+                            'list' => $eventNamesWithAny,
                         ],
                         'operators' => [
                             $this->translator->trans('mautic.core.operator.in')    => 'in',
@@ -190,7 +190,7 @@ class LeadSubscriber implements EventSubscriberInterface
                     'label'      => $this->translator->trans('plugin.citrix.event.'.$product.'.attendance'),
                     'properties' => [
                         'type' => 'select',
-                        'list' => array_flip($eventNamesWithAny),
+                        'list' => $eventNamesWithAny,
                     ],
                     'operators' => [
                         $this->translator->trans('mautic.core.operator.in')    => 'in',
@@ -206,7 +206,7 @@ class LeadSubscriber implements EventSubscriberInterface
                     'label'      => $this->translator->trans('plugin.citrix.event.'.$product.'.no.attendance'),
                     'properties' => [
                         'type' => 'select',
-                        'list' => array_flip($eventNamesWithoutAny),
+                        'list' => $eventNamesWithoutAny,
                     ],
                     'operators' => [
                         $this->translator->trans('mautic.core.operator.in') => 'in',

@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\DBAL\DBALException;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -126,6 +127,8 @@ class ListModel extends FormModel
      * @param bool $unlock
      *
      * @return mixed|void
+     *
+     * @throws DBALException
      */
     public function saveEntity($entity, $unlock = true)
     {
@@ -157,6 +160,11 @@ class ListModel extends FormModel
             $alias = $testAlias;
         }
         $entity->setAlias($alias);
+
+        $publicName = $entity->getPublicName();
+        if (empty($publicName)) {
+            $entity->setPublicName($entity->getName());
+        }
 
         $event = $this->dispatchEvent('pre_save', $entity, $isNew);
         $repo->saveEntity($entity);

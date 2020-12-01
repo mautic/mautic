@@ -76,7 +76,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     private $generatedColumnsProvider;
     private $doNotContact;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -34,7 +34,7 @@ class RemoveDeletedFilesStepTest extends AbstractStepTest
      */
     private $pathsHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

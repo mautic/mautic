@@ -204,8 +204,16 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     private $queuedCount = 0;
 
+    /**
+     * In some use cases, we need to get the original email ID after it's been cloned.
+     *
+     * @var int
+     */
+    private $clonedId;
+
     public function __clone()
     {
+        $this->clonedId         = $this->id;
         $this->id               = null;
         $this->sentCount        = 0;
         $this->readCount        = 0;
@@ -1182,5 +1190,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function getPendingCount()
     {
         return $this->pendingCount;
+    }
+
+    public function getClonedId(): ?int
+    {
+        return $this->clonedId;
     }
 }

@@ -35,8 +35,9 @@ class InputHelperTest extends \PHPUnit\Framework\TestCase
         $xhtml1Doctype = '<!DOCTYPE html PUBLIC
   "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
-        $cdata  = '<![CDATA[content]]>';
-        $script = '<script>for (let i = 0; i < 10; i += 1) {console.log(i);}</script>';
+        $cdata   = '<![CDATA[content]]>';
+        $script  = '<script>for (let i = 0; i < 10; i += 1) {console.log(i);}</script>';
+        $unicode = '<a href="https://m3.mautibox.com/3.x/media/images/testá.png">test with unicode</a>';
 
         $samples = [
             $outlookXML                => $outlookXML,
@@ -45,6 +46,7 @@ class InputHelperTest extends \PHPUnit\Framework\TestCase
             $xhtml1Doctype             => $xhtml1Doctype,
             $cdata                     => $cdata,
             $script                    => $script,
+            $unicode                   => $unicode,
             '<applet>content</applet>' => 'content',
         ];
 
@@ -148,5 +150,17 @@ class InputHelperTest extends \PHPUnit\Framework\TestCase
             '29nidji__dsfjhro85t784.txt',
             InputHelper::filename('29NIDJi  dsfjh(#*RO85T784šěíáčýžěé+ěšéřář', 'txt')
         );
+    }
+
+    public function testTransliterate()
+    {
+        $tests = [
+            'custom test' => 'custom test',
+            'čusťom test' => 'custom test',
+            null          => '',
+        ];
+        foreach ($tests as $input=>$expected) {
+            $this->assertEquals(InputHelper::transliterate($input), $expected);
+        }
     }
 }
