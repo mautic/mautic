@@ -95,7 +95,7 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
      */
     private $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->eventCollector        = $this->createMock(EventCollector::class);
         $this->eventLogger           = $this->createMock(EventLogger::class);

@@ -10,12 +10,13 @@
 
 namespace Mautic\SmsBundle\Tests\DependencyInjection\Compiler;
 
-use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\SmsBundle\DependencyInjection\Compiler\SmsTransportPass;
 use Mautic\SmsBundle\Sms\TransportChain;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class SmsTransportPassTest extends AbstractMauticTestCase
+class SmsTransportPassTest extends TestCase
 {
     public function testProcess()
     {
@@ -46,7 +47,7 @@ class SmsTransportPassTest extends AbstractMauticTestCase
         $container
             ->register('mautic.sms.transport_chain')
             ->setClass(get_class($transport))
-            ->setArguments(['foo', $this->container->get('mautic.helper.integration'), $this->container->get('monolog.logger.mautic')])
+            ->setArguments(['foo', $this->createMock(IntegrationHelper::class)])
             ->setShared(false)
             ->setSynthetic(true)
             ->setAbstract(true);

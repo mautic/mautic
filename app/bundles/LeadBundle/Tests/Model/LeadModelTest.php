@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\EmailBundle\Helper\EmailValidator;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
@@ -63,7 +64,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     private $entityManagerMock;
     private $leadModel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -227,15 +228,11 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $this->setProperty($mockLeadModel, LeadModel::class, 'leadFieldModel', $this->fieldModelMock);
 
-        $this->assertAttributeEquals(
-            [],
-            'availableLeadFields',
-            $mockLeadModel,
-            'The availableLeadFields property should start empty'
-        );
+        // The availableLeadFields property should start empty.
+        $this->assertEquals([], $mockLeadModel->getAvailableLeadFields());
 
         $contact = $mockLeadModel->checkForDuplicateContact(['email' => 'john@doe.com', 'firstname' => 'John']);
-        $this->assertAttributeEquals(['email' => 'Email', 'firstname' => 'First Name'], 'availableLeadFields', $mockLeadModel);
+        $this->assertEquals(['email' => 'Email', 'firstname' => 'First Name'], $mockLeadModel->getAvailableLeadFields());
         $this->assertEquals('john@doe.com', $contact->getEmail());
         $this->assertEquals('John', $contact->getFirstname());
     }
@@ -274,15 +271,11 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $this->setProperty($mockLeadModel, LeadModel::class, 'leadFieldModel', $this->fieldModelMock);
 
-        $this->assertAttributeEquals(
-            [],
-            'availableLeadFields',
-            $mockLeadModel,
-            'The availableLeadFields property should start empty'
-        );
+        // The availableLeadFields property should start empty.
+        $this->assertEquals([], $mockLeadModel->getAvailableLeadFields());
 
         list($contact, $fields) = $mockLeadModel->checkForDuplicateContact(['email' => 'john@doe.com', 'firstname' => 'John'], null, true, true);
-        $this->assertAttributeEquals(['email' => 'Email'], 'availableLeadFields', $mockLeadModel);
+        $this->assertEquals(['email' => 'Email'], $mockLeadModel->getAvailableLeadFields());
         $this->assertEquals('john@doe.com', $contact->getEmail());
         $this->assertNull($contact->getFirstname());
         $this->assertEquals(['email' => 'john@doe.com'], $fields);
@@ -448,6 +441,49 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->leadModel->setFieldValues($lead, $data, false, false);
     }
 
+    public function testManipulatorIsLoggedOnlyOnce()
+    {
+        $this->mockGetLeadRepository();
+
+        $contact     = $this->createMock(Lead::class);
+        $manipulator = new LeadManipulator('lead', 'import', 333);
+
+        $contact->expects($this->exactly(2))
+            ->method('getIpAddresses')
+            ->willReturn([]);
+
+        $contact->expects($this->exactly(2))
+            ->method('isNewlyCreated')
+            ->willReturn(true);
+
+        $contact->expects($this->exactly(2))
+            ->method('getManipulator')
+            ->willReturn($manipulator);
+
+        $contact->expects($this->once())
+            ->method('addEventLog')
+            ->with($this->callback(function (LeadEventLog $leadEventLog) use ($contact) {
+                $this->assertSame($contact, $leadEventLog->getLead());
+                $this->assertSame('identified_contact', $leadEventLog->getAction());
+                $this->assertSame('lead', $leadEventLog->getBundle());
+                $this->assertSame('import', $leadEventLog->getObject());
+                $this->assertSame(333, $leadEventLog->getObjectId());
+
+                return true;
+            }));
+
+        $this->fieldModelMock->expects($this->exactly(2))
+            ->method('getFieldListWithProperties')
+            ->willReturn([]);
+
+        $this->fieldModelMock->expects($this->once())
+            ->method('getFieldList')
+            ->willReturn([]);
+
+        $this->leadModel->saveEntity($contact);
+        $this->leadModel->saveEntity($contact);
+    }
+
     /**
      * Set protected property to an object.
      *
@@ -470,7 +506,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticLeadBundle:Lead', $this->leadRepositoryMock],
+                        [Lead::class, $this->leadRepositoryMock],
                     ]
                 )
             );
