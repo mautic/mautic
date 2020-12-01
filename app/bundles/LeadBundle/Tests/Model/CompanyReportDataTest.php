@@ -25,7 +25,7 @@ class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
      */
     private $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()

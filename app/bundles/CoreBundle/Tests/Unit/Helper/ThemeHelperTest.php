@@ -44,7 +44,7 @@ class ThemeHelperTest extends \PHPUnit\Framework\TestCase
      */
     private $coreParameterHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->pathsHelper         = $this->createMock(PathsHelper::class);
         $this->templatingHelper    = $this->createMock(TemplatingHelper::class);
@@ -68,7 +68,7 @@ class ThemeHelperTest extends \PHPUnit\Framework\TestCase
             ->with('mautic.core.theme.missing.files', $this->anything(), 'validators')
             ->willReturnCallback(
                 function ($key, array $parameters) {
-                    $this->assertContains('config.json', $parameters['%files%']);
+                    $this->assertStringContainsString('config.json', $parameters['%files%']);
                 }
             );
 
@@ -88,7 +88,7 @@ class ThemeHelperTest extends \PHPUnit\Framework\TestCase
             ->with('mautic.core.theme.missing.files', $this->anything(), 'validators')
             ->willReturnCallback(
                 function ($key, array $parameters) {
-                    $this->assertContains('message.html.twig', $parameters['%files%']);
+                    $this->assertStringContainsString('message.html.twig', $parameters['%files%']);
                 }
             );
 
@@ -108,7 +108,7 @@ class ThemeHelperTest extends \PHPUnit\Framework\TestCase
             ->with('mautic.core.theme.missing.files', $this->anything(), 'validators')
             ->willReturnCallback(
                 function ($key, array $parameters) {
-                    $this->assertContains('page.html.twig', $parameters['%files%']);
+                    $this->assertStringContainsString('page.html.twig', $parameters['%files%']);
                 }
             );
 
@@ -239,7 +239,7 @@ class ThemeHelperTest extends \PHPUnit\Framework\TestCase
         $template = $themeHelper->checkForTwigTemplate(':goldstar:page.html.twig');
         $this->assertNotEquals(':nature:page.html.twig', $template);
         $this->assertNotEquals(':goldstar:page.html.twig', $template);
-        $this->assertContains(':page.html.twig', $template);
+        $this->assertStringContainsString(':page.html.twig', $template);
     }
 
     /**

@@ -12,6 +12,7 @@
 namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionResultLoader;
@@ -20,9 +21,6 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-/**
- * Class ResultController.
- */
 class ResultController extends CommonFormController
 {
     public function __construct()
@@ -88,13 +86,13 @@ class ResultController extends CommonFormController
             $this->setListFilters($this->request->query->get('name'));
         }
 
-        //set limits
-        $limit = $session->get('mautic.formresult.'.$objectId.'.limit', $this->coreParametersHelper->get('default_pagelimit'));
+        /** @var PageHelperFactoryInterface $pageHelperFacotry */
+        $pageHelperFacotry = $this->get('mautic.page.helper.factory');
+        $pageHelper        = $pageHelperFacotry->make("mautic.formresult.{$objectId}", $page);
 
-        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
+        //set limits
+        $limit = $pageHelper->getLimit();
+        $start = $pageHelper->getStart();
 
         // Set order direction to desc if not set
         if (!$session->get('mautic.formresult.'.$objectId.'.orderbydir', null)) {
@@ -104,8 +102,7 @@ class ResultController extends CommonFormController
         $orderBy    = $session->get('mautic.formresult.'.$objectId.'.orderby', 's.date_submitted');
         $orderByDir = $session->get('mautic.formresult.'.$objectId.'.orderbydir', 'DESC');
         $filters    = $session->get('mautic.formresult.'.$objectId.'.filters', []);
-
-        $model = $this->getModel('form.submission');
+        $model      = $this->getModel('form.submission');
 
         if ($this->request->query->has('result')) {
             // Force ID
@@ -134,8 +131,8 @@ class ResultController extends CommonFormController
 
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            $lastPage = (1 === $count) ? 1 : (ceil($count / $limit)) ?: 1;
-            $session->set('mautic.formresult.page', $lastPage);
+            $lastPage = $pageHelper->countPage($count);
+            $pageHelper->rememberPage($lastPage);
             $returnUrl = $this->generateUrl('mautic_form_results', ['objectId' => $objectId, 'page' => $lastPage]);
 
             return $this->postActionRedirect(
@@ -152,9 +149,7 @@ class ResultController extends CommonFormController
         }
 
         //set what page currently on so that we can return here if need be
-        $session->set('mautic.formresult.page', $page);
-
-        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $pageHelper->rememberPage($page);
 
         return $this->delegateView(
             [
@@ -166,7 +161,7 @@ class ResultController extends CommonFormController
                     'page'           => $page,
                     'totalCount'     => $count,
                     'limit'          => $limit,
-                    'tmpl'           => $tmpl,
+                    'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'canDelete'      => $this->get('mautic.security')->hasEntityAccess(
                         'form:forms:editown',
                         'form:forms:editother',
@@ -314,7 +309,7 @@ class ResultController extends CommonFormController
         $formId   = $this->request->get('formId', 0);
         $objectId = $this->request->get('objectId', 0);
         $session  = $this->get('session');
-        $page     = $session->get('mautic.formresult.page', 1);
+        $page     = $session->get("mautic.formresult.{$formId}.page", 1);
         $flashes  = [];
 
         if ('POST' == $this->request->getMethod()) {
