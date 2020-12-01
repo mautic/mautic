@@ -50,7 +50,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
      */
     private $mergeRecordRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cookieHelperMock         = $this->createMock(CookieHelper::class);
         $this->leadDeviceRepositoryMock = $this->createMock(LeadDeviceRepository::class);
