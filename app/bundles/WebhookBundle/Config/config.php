@@ -62,6 +62,16 @@ return [
                     'arguments' => 'translator',
                 ],
             ],
+            'mautic.webhook.notificator.webhookkillnotificator' => [
+                'class'     => \Mautic\WebhookBundle\Notificator\WebhookKillNotificator::class,
+                'arguments' => [
+                    'translator',
+                    'router',
+                    'mautic.core.model.notification',
+                    'doctrine.orm.entity_manager',
+                    'mautic.helper.mailer',
+                ],
+            ],
         ],
         'events' => [
             'mautic.webhook.config.subscriber' => [
@@ -72,6 +82,7 @@ return [
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
+                    'mautic.webhook.notificator.webhookkillnotificator',
                 ],
             ],
             'mautic.webhook.stats.subscriber' => [
@@ -94,7 +105,8 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'jms_serializer',
-                    'mautic.core.model.notification',
+                    'mautic.webhook.http.client',
+                    'event_dispatcher',
                 ],
             ],
         ],
@@ -103,6 +115,14 @@ return [
                 'class'     => \Mautic\WebhookBundle\Helper\CampaignHelper::class,
                 'arguments' => [
                     'mautic.http.connector',
+                    'mautic.lead.model.company',
+                ],
+            ],
+            'mautic.webhook.http.client' => [
+                'class'     => \Mautic\WebhookBundle\Http\Client::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.guzzle.client',
                 ],
             ],
         ],

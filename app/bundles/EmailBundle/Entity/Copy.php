@@ -15,9 +15,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 
-/**
- * Class Copy.
- */
 class Copy
 {
     /**
@@ -38,7 +35,7 @@ class Copy
     private $body;
 
     /**
-     * @var
+     * @var string|null
      */
     private $subject;
 

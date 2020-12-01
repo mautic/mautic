@@ -35,7 +35,7 @@ class IdStoreTest extends TestCase
      */
     private $store;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->manager      = $this->createMock(ObjectManager::class);
         $this->timeProvider = $this->createMock(TimeProviderInterface::class);

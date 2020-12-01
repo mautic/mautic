@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\Form\Type\FormFieldEmailType;
+use Mautic\FormBundle\Form\Type\FormFieldTelType;
 use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -60,12 +61,12 @@ class FormValidationSubscriber implements EventSubscriberInterface
             'phone.validation',
             [
                 'eventName' => FormEvents::ON_FORM_VALIDATE,
-                'fieldType' => TelType::class,
-                'formType'  => \Mautic\FormBundle\Form\Type\FormFieldTelType::class,
+                'fieldType' => 'tel',
+                'formType'  => FormFieldTelType::class,
             ]
         );
 
-        if (!empty($this->coreParametersHelper->getParameter('do_not_submit_emails'))) {
+        if (!empty($this->coreParametersHelper->get('do_not_submit_emails'))) {
             $event->addValidator(
                 'email.validation',
                 [
@@ -99,7 +100,7 @@ class FormValidationSubscriber implements EventSubscriberInterface
             $donotSubmitFilter = function ($doNotSubmitArray) use ($value) {
                 return fnmatch($doNotSubmitArray, $value, FNM_CASEFOLD);
             };
-            $notNotSubmitEmails = $this->coreParametersHelper->getParameter('do_not_submit_emails');
+            $notNotSubmitEmails = $this->coreParametersHelper->get('do_not_submit_emails');
             if (array_filter($notNotSubmitEmails, $donotSubmitFilter)) {
                 $event->failedValidation(ArrayHelper::getValue('donotsubmit_validationmsg', $field->getValidation()));
             }

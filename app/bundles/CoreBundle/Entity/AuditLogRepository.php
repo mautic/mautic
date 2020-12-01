@@ -226,13 +226,15 @@ class AuditLogRepository extends CommonRepository
             ->groupBy('l.ip_address');
 
         if ($lead instanceof Lead) {
+            $dateTimeFormat = 'Y-m-d H:i:s';
+
             // Just a check to ensure reused IDs (happens with innodb) doesn't infect data
-            $dt = new DateTimeHelper($lead->getDateAdded(), 'Y-m-d H:i:s', 'local');
+            $dateTimeHelper = new DateTimeHelper($lead->getDateAdded(), $dateTimeFormat, 'local');
 
             $sqb->andWhere(
                 $sqb->expr()->andX(
                     $sqb->expr()->eq('l.object_id', $lead->getId()),
-                    $sqb->expr()->gte('l.date_added', $sqb->expr()->literal($dt->getString('Y-m-d H:i:s')))
+                    $sqb->expr()->gte('l.date_added', $sqb->expr()->literal($dateTimeHelper->toUtcString($dateTimeFormat)))
                 )
             );
         }

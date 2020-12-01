@@ -40,9 +40,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
      */
     protected $campaignModel;
 
-    /**
-     * @var
-     */
     protected static $channels;
 
     /**

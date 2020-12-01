@@ -301,6 +301,8 @@ class AjaxController extends CommonController
             }
         }
 
+        $dataArray['flashes'] = $this->getFlashContent();
+
         return $this->sendJsonResponse($dataArray);
     }
 
@@ -641,28 +643,6 @@ class AjaxController extends CommonController
         $dataArray['redirect'] = $this->container->get('router')->generate('mautic_core_update');
 
         return $this->sendJsonResponse($dataArray);
-    }
-
-    /**
-     * @return JsonResponse
-     */
-    protected function updateUserStatusAction(Request $request)
-    {
-        $status = InputHelper::clean($request->request->get('status'));
-
-        /** @var \Mautic\UserBundle\Model\UserModel $model */
-        $model = $this->getModel('user');
-
-        $currentStatus = $this->user->getOnlineStatus();
-        if (!in_array($currentStatus, ['manualaway', 'dnd'])) {
-            if ('back' == $status) {
-                $status = 'online';
-            }
-
-            $model->setOnlineStatus($status);
-        }
-
-        return $this->sendJsonResponse(['success' => 1]);
     }
 
     /**

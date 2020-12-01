@@ -100,7 +100,9 @@ class EventLogger
     {
         $log = new LeadEventLog();
 
-        $log->setIpAddress($this->ipLookupHelper->getIpAddress());
+        if (!defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED')) {
+            $log->setIpAddress($this->ipLookupHelper->getIpAddress());
+        }
 
         $log->setEvent($event);
         $log->setCampaign($event->getCampaign());

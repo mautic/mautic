@@ -14,24 +14,13 @@ namespace Mautic\PageBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PageBundle\Entity\VideoHit;
 
-/**
- * Class PageHitEvent.
- */
 class VideoHitEvent extends CommonEvent
 {
-    /**
-     * @var
-     */
     protected $request;
 
-    /**
-     * @var
-     */
     protected $code;
 
     /**
-     * PageHitEvent constructor.
-     *
      * @param $request
      * @param $code
      */

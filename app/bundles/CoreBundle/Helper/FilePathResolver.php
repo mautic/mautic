@@ -18,14 +18,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FilePathResolver
 {
-    /**
-     * @var Filesystem
-     */
     private $filesystem;
 
-    /**
-     * @var InputHelper
-     */
     private $inputHelper;
 
     public function __construct(Filesystem $filesystem, InputHelper $inputHelper)
@@ -61,7 +55,7 @@ class FilePathResolver
             $filePath = $this->getFilePath($uploadDir, $name, $ext);
             ++$i;
 
-            if ($i > 100) {
+            if ($i > 1000) {
                 throw new FilePathException('Could not generate path');
             }
         }

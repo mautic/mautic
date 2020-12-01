@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
@@ -67,6 +68,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
         NotificationModel $notificationModel,
         FieldModel $fieldModel,
         IntegrationEntityModel $integrationEntityModel,
+        DoNotContact $doNotContact,
         Transport $transport,
         LeadExport $leadExport
     ) {
@@ -85,7 +87,8 @@ class PipedriveIntegration extends CrmAbstractIntegration
             $pathsHelper,
             $notificationModel,
             $fieldModel,
-            $integrationEntityModel
+            $integrationEntityModel,
+            $doNotContact
         );
 
         $this->transport  = $transport;

@@ -66,14 +66,6 @@ mQuery( document ).ready(function() {
         });
     }
 
-    if (typeof IdleTimer != 'undefined') {
-        IdleTimer.init({
-            idleTimeout: 60000, //1 min
-            awayTimeout: 900000, //15 min
-            statusChangeUrl: mauticAjaxUrl + '?action=updateUserStatus'
-        });
-    }
-
     // Prevent backspace from activating browser back
     mQuery(document).on('keydown', function (e) {
         if (e.which === 8 && !mQuery(e.target).is("input:not([readonly]):not([type=radio]):not([type=checkbox]), textarea, [contentEditable], [contentEditable=true]")) {

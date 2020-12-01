@@ -90,7 +90,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
         // Setup the run directory for lock/pid files
         $this->runDirectory = $this->getContainer()->getParameter('kernel.cache_dir').'/../run';
         if (!file_exists($this->runDirectory)) {
-            if (!mkdir($this->runDirectory, 0755)) {
+            if (!mkdir($this->runDirectory)) {
                 $output->writeln('<error>'.$this->runDirectory.' could not be created.</error>');
 
                 return false;

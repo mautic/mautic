@@ -47,64 +47,28 @@ class Company extends FormEntity implements CustomFieldEntityInterface
      */
     private $socialCache = [];
 
-    /**
-     * @var
-     */
     private $email;
 
-    /**
-     * @var
-     */
     private $address1;
 
-    /**
-     * @var
-     */
     private $address2;
 
-    /**
-     * @var
-     */
     private $phone;
 
-    /**
-     * @var
-     */
     private $city;
 
-    /**
-     * @var
-     */
     private $state;
 
-    /**
-     * @var
-     */
     private $zipcode;
 
-    /**
-     * @var
-     */
     private $country;
 
-    /**
-     * @var
-     */
     private $name;
 
-    /**
-     * @var
-     */
     private $website;
 
-    /**
-     * @var
-     */
     private $industry;
 
-    /**
-     * @var
-     */
     private $description;
 
     public function __clone()
@@ -288,6 +252,16 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     public function getOwner()
     {
         return $this->owner;
+    }
+
+    /**
+     * Returns the user to be used for permissions.
+     *
+     * @return User|int
+     */
+    public function getPermissionUser()
+    {
+        return (null === $this->getOwner()) ? $this->getCreatedBy() : $this->getOwner();
     }
 
     /**

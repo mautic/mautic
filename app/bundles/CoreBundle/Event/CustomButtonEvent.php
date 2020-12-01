@@ -18,8 +18,6 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
 {
     /**
      * Button location requested.
-     *
-     * @var
      */
     protected $location;
 

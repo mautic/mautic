@@ -137,13 +137,4 @@ final class UserEvents
      * @var string
      */
     const USER_AUTHENTICATION_CONTENT = 'mautic.user_authentication_content';
-
-    /**
-     * The mautic.user_status_change event is dispatched when a user's online status is changed.
-     *
-     * The event listener receives a Mautic\UserBundle\Event\StatusChangeEvent instance.
-     *
-     * @var string
-     */
-    const STATUS_CHANGE = 'mautic.user_status_change';
 }
