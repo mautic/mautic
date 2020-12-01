@@ -11,17 +11,13 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Exporter\Handler;
-use Exporter\Source\ArraySourceIterator;
-use Exporter\Source\IteratorSourceIterator;
-use Exporter\Writer\CsvWriter;
-use Exporter\Writer\XlsWriter;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DataExporterHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TrailingSlashHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Debug\Exception\FlattenException;
@@ -33,6 +29,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -74,6 +71,11 @@ class CommonController extends Controller implements MauticController
      */
     protected $translator;
 
+    /**
+     * @var FlashBag
+     */
+    private $flashBag;
+
     public function setRequest(Request $request)
     {
         $this->request = $request;
@@ -102,6 +104,11 @@ class CommonController extends Controller implements MauticController
     public function setTranslator(TranslatorInterface $translator)
     {
         $this->translator = $translator;
+    }
+
+    public function setFlashBag(FlashBag $flashBag)
+    {
+        $this->flashBag = $flashBag;
     }
 
     public function initialize(FilterControllerEvent $event)
@@ -610,6 +617,8 @@ class CommonController extends Controller implements MauticController
      * @param bool|true $isRead
      * @param null      $header
      * @param null      $iconClass
+     *
+     * @deprecated Will be removed in Mautic 3.0 as unused.
      */
     public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null)
     {
@@ -619,52 +628,17 @@ class CommonController extends Controller implements MauticController
     }
 
     /**
-     * @param        $message
-     * @param array  $messageVars
-     * @param string $type
-     * @param string $domain
-     * @param bool   $addNotification
+     * @param string      $message
+     * @param array|null  $messageVars
+     * @param string|null $level
+     * @param string|null $domain
+     * @param bool|null   $addNotification
+     *
+     * @deprecated Will be removed in Mautic 3.0. Use CommonController::flashBag->addFlash() instead.
      */
-    public function addFlash($message, $messageVars = [], $type = 'notice', $domain = 'flashes', $addNotification = false)
+    public function addFlash($message, $messageVars = [], $level = FlashBag::LEVEL_NOTICE, $domain = 'flashes', $addNotification = false)
     {
-        if (null == $domain) {
-            $domain = 'flashes';
-        }
-
-        if (false === $domain) {
-            //message is already translated
-            $translatedMessage = $message;
-        } else {
-            if (isset($messageVars['pluralCount'])) {
-                $translatedMessage = $this->get('translator')->transChoice($message, $messageVars['pluralCount'], $messageVars, $domain);
-            } else {
-                $translatedMessage = $this->get('translator')->trans($message, $messageVars, $domain);
-            }
-        }
-
-        $this->get('session')->getFlashBag()->add($type, $translatedMessage);
-
-        if (!defined('MAUTIC_INSTALLER') && $addNotification) {
-            switch ($type) {
-                case 'warning':
-                    $iconClass = 'text-warning fa-exclamation-triangle';
-                    break;
-                case 'error':
-                    $iconClass = 'text-danger fa-exclamation-circle';
-                    break;
-                case 'notice':
-                    $iconClass = 'fa-info-circle';
-                    // no break
-                default:
-                    break;
-            }
-
-            //If the user has not interacted with the browser for the last 30 seconds, consider the message unread
-            $lastActive = $this->request->get('mauticUserLastActive', 0);
-            $isRead     = $lastActive > 30 ? 0 : 1;
-
-            $this->addNotification($translatedMessage, null, $isRead, null, $iconClass);
-        }
+        $this->flashBag->add($message, $messageVars, $level, $domain, $addNotification);
     }
 
     /**
@@ -675,6 +649,8 @@ class CommonController extends Controller implements MauticController
      * @param null   $icon
      * @param bool   $addNotification
      * @param string $type
+     *
+     * @deprecated Will be removed in Mautic 3.0 as unused
      */
     public function addBrowserNotification($message, $messageVars = [], $domain = 'flashes', $title = null, $icon = null, $addNotification = true, $type = 'notice')
     {
@@ -744,34 +720,26 @@ class CommonController extends Controller implements MauticController
     }
 
     /**
-     * @param array $toExport
-     * @param       $type
-     * @param       $filename
+     * @param array|\Iterator $toExport
+     * @param                 $type
+     * @param                 $filename
      *
      * @return StreamedResponse
      */
     public function exportResultsAs($toExport, $type, $filename)
     {
-        if (!in_array($type, ['csv', 'xlsx'])) {
-            throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
+        /** @var \Mautic\CoreBundle\Helper\ExportHelper */
+        $exportHelper = $this->get('mautic.helper.export');
+
+        if (!in_array($type, $exportHelper->getSupportedExportTypes())) {
+            throw new BadRequestHttpException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
         }
 
-        if ($toExport instanceof \Iterator) {
-            $sourceIterator = new IteratorSourceIterator($toExport);
-        } else {
-            $sourceIterator = new ArraySourceIterator($toExport);
-        }
+        $dateFormat = $this->coreParametersHelper->get('date_format_dateonly');
+        $dateFormat = str_replace('--', '-', preg_replace('/[^a-zA-Z]/', '-', $dateFormat));
+        $filename   = strtolower($filename.'_'.((new \DateTime())->format($dateFormat)).'.'.$type);
 
-        $dateFormat  = $this->coreParametersHelper->get('date_format_dateonly');
-        $dateFormat  = str_replace('--', '-', preg_replace('/[^a-zA-Z]/', '-', $dateFormat));
-        $writer      = 'xlsx' === $type ? new XlsWriter('php://output') : new CsvWriter('php://output');
-        $contentType = 'xlsx' === $type ? 'application/vnd.ms-excel' : 'text/csv';
-        $filename    = strtolower($filename.'_'.((new \DateTime())->format($dateFormat)).'.'.$type);
-        $handler     = Handler::create($sourceIterator, $writer);
-
-        return new StreamedResponse(function () use ($handler) {
-            $handler->export();
-        }, 200, ['Content-Type' => $contentType, 'Content-Disposition' => sprintf('attachment; filename=%s', $filename)]);
+        return $exportHelper->exportDataAs($toExport, $type, $filename);
     }
 
     /**
