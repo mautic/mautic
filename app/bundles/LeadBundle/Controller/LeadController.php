@@ -19,6 +19,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Form\Type\BatchType;
 use Mautic\LeadBundle\Form\Type\DncType;
@@ -174,14 +175,14 @@ class LeadController extends FormController
         // Get the max ID of the latest lead added
         $maxLeadId = $model->getRepository()->getMaxLeadId();
 
-        // We need the EmailRepository to check if a lead is flagged as do not contact
-        /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
-        $emailRepo = $this->getModel('email')->getRepository();
+        /** @var DoNotContactRepository $dncRepository */
+        $dncRepository = $this->getModel('lead.dnc')->getDncRepo();
 
         return $this->delegateView(
             [
                 'viewParameters' => [
                     'searchValue'      => $search,
+                    'columns'          => $this->get('mautic.lead.columns.dictionary')->getColumns(),
                     'items'            => $leads,
                     'page'             => $page,
                     'totalItems'       => $count,
@@ -193,7 +194,7 @@ class LeadController extends FormController
                     'currentList'      => $list,
                     'security'         => $this->get('mautic.security'),
                     'inSingleList'     => $inSingleList,
-                    'noContactList'    => $emailRepo->getDoNotEmailList(array_keys($leads)),
+                    'noContactList'    => $dncRepository->getChannelList(null, array_keys($leads)),
                     'maxLeadId'        => $maxLeadId,
                     'anonymousShowing' => $anonymousShowing,
                 ],
@@ -360,7 +361,10 @@ class LeadController extends FormController
         }
 
         // We need the DoNotContact repository to check if a lead is flagged as do not contact
-        $dnc             = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
+        $dnc = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
+
+        $dncSms = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'sms');
+
         $integrationRepo = $this->get('doctrine.orm.entity_manager')->getRepository('MauticPluginBundle:IntegrationEntity');
 
         return $this->delegateView(
@@ -382,6 +386,7 @@ class LeadController extends FormController
                     'devices'           => $this->get('mautic.lead.repository.lead_device')->getLeadDevices($lead),
                     'auditlog'          => $this->getAuditlogs($lead),
                     'doNotContact'      => end($dnc),
+                    'doNotContactSms'   => end($dncSms),
                     'leadNotes'         => $this->forward(
                         'MauticLeadBundle:Note:index',
                         [
@@ -422,15 +427,13 @@ class LeadController extends FormController
         }
 
         //set the page we came from
-        $page = $this->get('session')->get('mautic.lead.page', 1);
-
+        $page   = $this->get('session')->get('mautic.lead.page', 1);
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'new']);
         $fields = $this->getModel('lead.field')->getPublishedFieldArrays('lead');
-
-        $form = $model->createForm($lead, $this->get('form.factory'), $action, ['fields' => $fields]);
+        $form   = $model->createForm($lead, $this->get('form.factory'), $action, ['fields' => $fields]);
 
         ///Check for a submitted form and process it
-        if ('POST' == $this->request->getMethod()) {
+        if ('POST' === $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -459,18 +462,25 @@ class LeadController extends FormController
                         null,
                         $this->get('mautic.helper.user')->getUser()->getName()
                     ));
-                    $model->saveEntity($lead);
+
+                    /** @var LeadRepository $contactRepository */
+                    $contactRepository = $this->getDoctrine()->getManager()->getRepository(Lead::class);
+
+                    // Save here as we need the entity with an ID for the company code bellow.
+                    $contactRepository->saveEntity($lead);
 
                     if (!empty($companies)) {
                         $model->modifyCompanies($lead, $companies);
                     }
 
+                    // Save here through the model to trigger all subscribers.
+                    $model->saveEntity($lead);
+
                     // Upload avatar if applicable
                     $image = $form['preferred_profile_image']->getData();
-                    if ('custom' == $image) {
+                    if ('custom' === $image) {
                         // Check for a file
-                        /** @var UploadedFile $file */
-                        if ($file = $form['custom_avatar']->getData()) {
+                        if ($form['custom_avatar']->getData()) {
                             $this->uploadAvatar($lead);
                         }
                     }
@@ -977,7 +987,7 @@ class LeadController extends FormController
         if (true === $form) {
             return $this->postActionRedirect(
                 [
-                    'returnUrl'       => $this->generateUrl('mautic_contact_action', [
+                    'returnUrl' => $this->generateUrl('mautic_contact_action', [
                         'objectId'     => $lead->getId(),
                         'objectAction' => 'view',
                     ]),
@@ -1329,7 +1339,7 @@ class LeadController extends FormController
                 0,
                 true
             );
-        $email  = ['list' => $inList];
+        $email = ['list' => $inList];
 
         // Try set owner If should be mailer
         if ($lead->getOwner()) {
@@ -1340,7 +1350,7 @@ class LeadController extends FormController
                     $lead->getOwner()->getFirstName(),
                     $lead->getOwner()->getLastName()
                 );
-                $email['from']     = $lead->getOwner()->getEmail();
+                $email['from'] = $lead->getOwner()->getEmail();
             }
         }
 
@@ -1615,8 +1625,8 @@ class LeadController extends FormController
             /** @var \Mautic\LeadBundle\Model\DoNotContact $doNotContact */
             $doNotContact = $this->get('mautic.lead.model.dnc');
 
-            $data  = $this->request->request->get('lead_batch_dnc', [], true);
-            $ids   = json_decode($data['ids'], true);
+            $data = $this->request->request->get('lead_batch_dnc', [], true);
+            $ids  = json_decode($data['ids'], true);
 
             $entities = [];
             if (is_array($ids)) {
@@ -1936,7 +1946,7 @@ class LeadController extends FormController
         $anonymous  = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
         $mine       = $translator->trans('mautic.core.searchcommand.ismine');
         $indexMode  = $session->get('mautic.lead.indexmode', 'list');
-        $dataType   = $this->request->get('filetype', 'csv');
+        $dataType   = $this->request->get('filetype');
 
         if (!empty($ids)) {
             $filter['force'] = [
@@ -1996,9 +2006,9 @@ class LeadController extends FormController
         }
 
         /** @var LeadModel $leadModel */
-        $leadModel  = $this->getModel('lead.lead');
-        $lead       = $leadModel->getEntity($contactId);
-        $dataType   = $this->request->get('filetype', 'csv');
+        $leadModel = $this->getModel('lead.lead');
+        $lead      = $leadModel->getEntity($contactId);
+        $dataType  = $this->request->get('filetype', 'csv');
 
         if (empty($lead)) {
             return $this->notFound();
@@ -2006,7 +2016,7 @@ class LeadController extends FormController
 
         $contactFields = $lead->getProfileFields();
         $export        = [];
-        foreach ($contactFields as $alias=>$contactField) {
+        foreach ($contactFields as $alias => $contactField) {
             $export[] = [
                 'alias' => $alias,
                 'value' => $contactField,
