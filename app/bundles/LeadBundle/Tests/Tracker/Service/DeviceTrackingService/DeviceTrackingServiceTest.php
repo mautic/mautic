@@ -57,7 +57,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
      */
     private $security;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cookieHelperMock            = $this->createMock(CookieHelper::class);
         $this->entityManagerMock           = $this->createMock(EntityManagerInterface::class);

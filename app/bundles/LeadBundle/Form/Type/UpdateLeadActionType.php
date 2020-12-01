@@ -46,6 +46,7 @@ class UpdateLeadActionType extends AbstractType
 
         $options['fields']                      = $leadFields;
         $options['ignore_required_constraints'] = true;
+        $options['ignore_date_type']            = true;
 
         $this->getFormFields($builder, $options);
     }
