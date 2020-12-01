@@ -39,8 +39,6 @@ abstract class AbstractLookup
 
     /**
      * Authorization for lookup service.
-     *
-     * @var
      */
     protected $auth;
 

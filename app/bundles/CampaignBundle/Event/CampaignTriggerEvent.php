@@ -14,9 +14,6 @@ namespace Mautic\CampaignBundle\Event;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Symfony\Component\EventDispatcher\Event;
 
-/**
- * Class CampaignTriggerEvent.
- */
 class CampaignTriggerEvent extends Event
 {
     /**
@@ -25,7 +22,7 @@ class CampaignTriggerEvent extends Event
     protected $campaign;
 
     /**
-     * @var
+     * @var bool
      */
     protected $triggerCampaign = true;
 

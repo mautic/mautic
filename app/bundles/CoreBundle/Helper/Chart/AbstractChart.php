@@ -13,9 +13,6 @@ namespace Mautic\CoreBundle\Helper\Chart;
 
 use Mautic\CoreBundle\Helper\ColorHelper;
 
-/**
- * Class AbstractChart.
- */
 abstract class AbstractChart
 {
     /**
@@ -49,7 +46,7 @@ abstract class AbstractChart
     /**
      * Timezone data is requested to be in.
      *
-     * @var
+     * @var \DateTimeZone
      */
     protected $timezone;
 
@@ -93,8 +90,8 @@ abstract class AbstractChart
         if (!$unit) {
             $unit = $this->unit;
         }
-        $isTime  = in_array($unit, ['H', 'i', 's']) ? 'T' : '';
-        $toUpper = ['d', 'i'];
+
+        $isTime = in_array($unit, ['H', 'i', 's']) ? 'T' : '';
 
         if ('i' == $unit) {
             $unit = 'M';

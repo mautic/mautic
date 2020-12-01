@@ -20,7 +20,7 @@ class DynamicsApiTest extends AbstractIntegrationTestCase
     /** @var DynamicsIntegration */
     private $integration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -39,7 +39,8 @@ class DynamicsApiTest extends AbstractIntegrationTestCase
             $this->pathsHelper,
             $this->notificationModel,
             $this->fieldModel,
-            $this->integrationEntityModel
+            $this->integrationEntityModel,
+            $this->doNotContact
         );
 
         $this->api         = new DynamicsApi($this->integration);

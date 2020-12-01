@@ -17,13 +17,13 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserToken;
 use Mautic\UserBundle\Enum\UserTokenAuthorizator;
-use Mautic\UserBundle\Event\StatusChangeEvent;
 use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\Form\Type\UserType;
 use Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
 class UserModel extends FormModel
@@ -45,20 +45,6 @@ class UserModel extends FormModel
         $this->mailHelper       = $mailHelper;
         $this->userTokenService = $userTokenService;
     }
-
-    /**
-     * Define statuses that are supported.
-     *
-     * @var array
-     */
-    private $supportedOnlineStatuses = [
-        'online',
-        'idle',
-        'away',
-        'manualaway',
-        'dnd',
-        'offline',
-    ];
 
     /**
      * {@inheritdoc}
@@ -307,7 +293,7 @@ class UserModel extends FormModel
             $this->logger->addError($exception->getMessage());
             throw new \RuntimeException();
         }
-        $resetLink  = $this->router->generate('mautic_user_passwordresetconfirm', ['token' => $resetToken->getSecret()], true);
+        $resetLink  = $this->router->generate('mautic_user_passwordresetconfirm', ['token' => $resetToken->getSecret()], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $mailer->setTo([$user->getEmail() => $user->getName()]);
         $mailer->setSubject($this->translator->trans('mautic.user.user.passwordreset.subject'));
@@ -360,26 +346,6 @@ class UserModel extends FormModel
         $preferences = $user->getPreferences();
 
         return (isset($preferences[$key])) ? $preferences[$key] : $default;
-    }
-
-    /**
-     * @param $status
-     */
-    public function setOnlineStatus($status)
-    {
-        $status = strtolower($status);
-
-        if (in_array($status, $this->supportedOnlineStatuses)) {
-            if ($this->userHelper->getUser()->getId()) {
-                $this->userHelper->getUser()->setOnlineStatus($status);
-                $this->getRepository()->saveEntity($this->userHelper->getUser());
-
-                if ($this->dispatcher->hasListeners(UserEvents::STATUS_CHANGE)) {
-                    $event = new StatusChangeEvent($this->userHelper->getUser());
-                    $this->dispatcher->dispatch(UserEvents::STATUS_CHANGE, $event);
-                }
-            }
-        }
     }
 
     /**

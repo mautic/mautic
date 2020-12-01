@@ -15,6 +15,10 @@ use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Finder\Finder;
 
+/**
+ * This is an temporary necessity until https://github.com/mautic/mautic/pull/7312 is merged and permission classes are
+ * converted to services.
+ */
 class PermissionClassMetadata
 {
     /**
@@ -43,15 +47,21 @@ class PermissionClassMetadata
             $className       = basename($file->getFilename(), '.php');
             $permissionClass = sprintf('\\%s\\Security\\Permissions\\%s', $this->metadata->getNamespace(), $className);
 
-            // Skip CorePermissions and AbstractPermissions
-            if ('CoreBundle' === $this->metadata->getBaseName() && in_array($className, ['CorePermissions', 'AbstractPermissions'])) {
+            // Required because https://github.com/mautic/mautic/pull/7312 introduces permission DI and thus classes cannot be instantiated here
+            $reflectionClass = new \ReflectionClass($permissionClass);
+            if ($reflectionClass->isAbstract()) {
+                // Skip abstract classes
                 continue;
             }
 
             /** @var AbstractPermissions $permissionInstance */
-            $permissionInstance = new $permissionClass([]);
-            $permissionName     = $permissionInstance->getName();
+            $permissionInstance = $reflectionClass->newInstanceWithoutConstructor();
+            if (!$permissionInstance instanceof AbstractPermissions) {
+                // Not a permission class
+                continue;
+            }
 
+            $permissionName = $permissionInstance->getName();
             $this->metadata->addPermissionClass($permissionName, $permissionClass);
         }
     }

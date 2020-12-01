@@ -18,7 +18,7 @@ chdir($baseDir.'/packaging');
 
 system('rm -f app/phpunit.*');
 system('rm -f app/tests.bootstrap*');
-system('rm -rf app/bundles/*/Tests');
+system('find app/bundles/*/Tests/* ! -path "*/Tests/DataFixtures*" -prune -exec rm -rf {} \\;');
 system('rm -rf app/bundles/CoreBundle/Test');
 system('rm -rf app/cache/*');
 system('rm -rf app/logs/*');
@@ -165,5 +165,5 @@ system('find . -name .DS_Store -exec rm -rf {} \\;');
 // Delete test directories
 system('find . -type d -name Test ! -path "./vendor/twig/twig/lib/Twig/Node/Expression/Test" ! -path "./vendor/twig/twig/lib/Twig/Test" ! -path "./vendor/twig/twig/src/Node/Expression/Test" ! -path "./vendor/twig/twig/src/Test" -prune -exec rm -rf {} \\;');
 system('find . -type d -name test ! -path "./vendor/twig/twig/lib/Twig/Node/Expression/Test" ! -path "./vendor/twig/twig/lib/Twig/Test" ! -path "./vendor/twig/twig/src/Node/Expression/Test" ! -path "./vendor/twig/twig/src/Test" -prune -exec rm -rf {} \\;');
-system('find . -type d -name Tests -prune -exec rm -rf {} \\;');
+system('find . -path "*/Tests/*" ! -path "./app/bundles/*/Tests*" ! -path "./plugins/*/Tests/DataFixtures*" -prune -exec rm -rf {} \\;');
 system('find . -type d -name tests -prune -exec rm -rf {} \\;');

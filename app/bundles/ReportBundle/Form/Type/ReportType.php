@@ -231,7 +231,7 @@ class ReportType extends AbstractType
                         'entry_type'    => AggregatorType::class,
                         'label'         => false,
                         'entry_options' => [
-                            'columnList' => $groupByColumns->choices,
+                            'columnList' => $columns->choices,
                             'required'   => false,
                         ],
                         'allow_add'    => true,

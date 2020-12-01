@@ -16,10 +16,10 @@ return [
                 'class'     => \Mautic\NotificationBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.helper.integration',
-                    'mautic.lead.model.lead',
                     'mautic.notification.model.notification',
                     'mautic.notification.api',
                     'event_dispatcher',
+                    'mautic.lead.model.dnc',
                 ],
             ],
             'mautic.notification.campaignbundle.condition_subscriber' => [
@@ -164,6 +164,7 @@ return [
                     'mautic.core.model.notification',
                     'mautic.lead.model.field',
                     'mautic.plugin.model.integration_entity',
+                    'mautic.lead.model.dnc',
                 ],
             ],
         ],

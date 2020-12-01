@@ -15,14 +15,15 @@ use Doctrine\ORM\EntityManager;
 use JMS\Serializer\SerializerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Entity\WebhookRepository;
+use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class WebhookModelTest extends \PHPUnit\Framework\TestCase
@@ -36,11 +37,6 @@ class WebhookModelTest extends \PHPUnit\Framework\TestCase
      * @var MockObject|SerializerInterface
      */
     private $serializerMock;
-
-    /**
-     * @var MockObject|NotificationModel
-     */
-    private $notificationModelMock;
 
     /**
      * @var MockObject|EntityManager
@@ -60,22 +56,25 @@ class WebhookModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private $eventDispatcherMock;
 
     /**
      * @var WebhookModel
      */
     private $model;
 
-    protected function setUp()
+    private $httpClientMock;
+
+    protected function setUp(): void
     {
         $this->parametersHelperMock  = $this->createMock(CoreParametersHelper::class);
         $this->serializerMock        = $this->createMock(SerializerInterface::class);
-        $this->notificationModelMock = $this->createMock(NotificationModel::class);
         $this->entityManagerMock     = $this->createMock(EntityManager::class);
         $this->userHelper            = $this->createMock(UserHelper::class);
-        $this->dispatcher            = $this->createMock(EventDispatcherInterface::class);
         $this->webhookRepository     = $this->createMock(WebhookRepository::class);
+        $this->httpClientMock        = $this->createMock(Client::class);
+        $this->entityManagerMock     = $this->createMock(EntityManager::class);
+        $this->eventDispatcherMock   = $this->createMock(EventDispatcher::class);
         $this->model                 = $this->initModel();
     }
 
@@ -205,12 +204,13 @@ class WebhookModelTest extends \PHPUnit\Framework\TestCase
         $model = new WebhookModel(
             $this->parametersHelperMock,
             $this->serializerMock,
-            $this->notificationModelMock
+            $this->httpClientMock,
+            $this->eventDispatcherMock
         );
 
         $model->setEntityManager($this->entityManagerMock);
         $model->setUserHelper($this->userHelper);
-        $model->setDispatcher($this->dispatcher);
+        $model->setDispatcher($this->eventDispatcherMock);
 
         return $model;
     }

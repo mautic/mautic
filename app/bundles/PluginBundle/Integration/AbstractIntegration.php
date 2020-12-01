@@ -22,6 +22,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\Integration;
@@ -50,8 +51,6 @@ use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class AbstractIntegration.
- *
  * @method pushLead(Lead $lead, array $config = [])
  * @method pushLeadToCampaign(Lead $lead, mixed $integrationCampaign, mixed $integrationMemberStatus)
  * @method getLeads(array $params, string $query, &$executed, array $result = [], $object = 'Lead')
@@ -158,12 +157,12 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     protected $adminUsers;
 
     /**
-     * @var
+     * @var array
      */
     protected $notifications = [];
 
     /**
-     * @var
+     * @var string|null
      */
     protected $lastIntegrationError;
 
@@ -193,6 +192,11 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     protected $integrationEntityModel;
 
     /**
+     * @var DoNotContactModel
+     */
+    protected $doNotContact;
+
+    /**
      * @var array
      */
     protected $commandParameters = [];
@@ -212,7 +216,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         PathsHelper $pathsHelper,
         NotificationModel $notificationModel,
         FieldModel $fieldModel,
-        IntegrationEntityModel $integrationEntityModel
+        IntegrationEntityModel $integrationEntityModel,
+        DoNotContactModel $doNotContact
     ) {
         $this->dispatcher             = $eventDispatcher;
         $this->cache                  = $cacheStorageHelper->getCache($this->getName());
@@ -229,6 +234,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $this->notificationModel      = $notificationModel;
         $this->fieldModel             = $fieldModel;
         $this->integrationEntityModel = $integrationEntityModel;
+        $this->doNotContact           = $doNotContact;
     }
 
     public function setCommandParameters(array $params)
@@ -785,7 +791,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $method   = strtoupper($method);
         $authType = (empty($settings['auth_type'])) ? $this->getAuthenticationType() : $settings['auth_type'];
 
-        list($parameters, $headers) = $this->prepareRequest($url, $parameters, $method, $settings, $authType);
+        [$parameters, $headers] = $this->prepareRequest($url, $parameters, $method, $settings, $authType);
 
         if (empty($settings['ignore_event_dispatch'])) {
             $event = $this->dispatcher->dispatch(
@@ -893,7 +899,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             foreach ($parseHeaders as $key => $value) {
                 // Ignore string keys which assume it is already parsed and avoids splitting up a value that includes colons (such as a date/time)
                 if (!is_string($key) && false !== strpos($value, ':')) {
-                    list($key, $value) = explode(':', $value);
+                    [$key, $value]     = explode(':', $value);
                     $key               = trim($key);
                     $value             = trim($value);
                 }
@@ -1208,7 +1214,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                     $refreshTokenKeys = $this->getRefreshTokenKeys();
 
                     if (!empty($refreshTokenKeys)) {
-                        list($refreshTokenKey, $expiryKey) = $refreshTokenKeys;
+                        [$refreshTokenKey, $expiryKey] = $refreshTokenKeys;
 
                         $settings['refresh_token'] = $refreshTokenKey;
                     }
@@ -1340,7 +1346,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 if (!isset($this->keys[$authTokenKey])) {
                     $valid = false;
                 } elseif (!empty($refreshTokenKeys)) {
-                    list($refreshTokenKey, $expiryKey) = $refreshTokenKeys;
+                    [$refreshTokenKey, $expiryKey] = $refreshTokenKeys;
                     if (!empty($this->keys[$refreshTokenKey]) && !empty($expiryKey) && isset($this->keys[$expiryKey])
                         && time() > $this->keys[$expiryKey]
                     ) {
@@ -1682,7 +1688,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         foreach ($availableFields as $key => $field) {
             $integrationKey = $matchIntegrationKey = $this->convertLeadFieldKey($key, $field);
             if (is_array($integrationKey)) {
-                list($integrationKey, $matchIntegrationKey) = $integrationKey;
+                [$integrationKey, $matchIntegrationKey] = $integrationKey;
             } elseif (!isset($config['leadFields'][$integrationKey])) {
                 continue;
             }
@@ -2153,7 +2159,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getLastIntegrationError()
     {
@@ -2225,16 +2231,18 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         switch ($type) {
             case 'oauth1a':
             case 'oauth2':
-                $callback = $authorization = true;
+                $callback              = true;
+                $requiresAuthorization = true;
                 break;
             default:
-                $callback = $authorization = false;
+                $callback              = false;
+                $requiresAuthorization = false;
                 break;
         }
 
         return [
             'requires_callback'      => $callback,
-            'requires_authorization' => $authorization,
+            'requires_authorization' => $requiresAuthorization,
             'default_features'       => [],
             'enable_data_priority'   => $enableDataPriority,
         ];
@@ -2556,7 +2564,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         $isDoNotContact = 0;
         if ($lead = $this->leadModel->getEntity($leadId)) {
-            $isContactableReason = $this->leadModel->isContactable($lead, $channel);
+            $isContactableReason = $this->doNotContact->isContactable($lead, $channel);
             if (DoNotContact::IS_CONTACTABLE !== $isContactableReason) {
                 $isDoNotContact = 1;
             }

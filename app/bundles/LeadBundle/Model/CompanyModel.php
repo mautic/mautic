@@ -282,7 +282,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $company->setFields($fieldValues);
     }
 
-    /** Add lead to company
+    /**
+     * Add lead to company.
+     *
      * @param array|Company $companies
      * @param array|Lead    $lead
      *
@@ -292,7 +294,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     public function addLeadToCompany($companies, $lead)
     {
-        // Primary company name to be peristed to the lead's contact company field
+        // Primary company name to be persisted to the lead's contact company field
         $companyName        = '';
         $companyLeadAdd     = [];
         $searchForCompanies = [];

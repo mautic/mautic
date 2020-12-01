@@ -97,6 +97,7 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
                 $this->notificationModel,
                 $this->fieldModel,
                 $integrationEntityModel,
+                $this->doNotContact,
             ])
             ->setMethodsExcept(['getCampaignMembers', 'getRecordList', 'setIntegrationEntityModel'])
             ->getMock();

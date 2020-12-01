@@ -85,8 +85,8 @@ $graphContent = $view->render(
                                     $columnName = isset($columns[$aggregator['column']]['alias']) ? $columns[$aggregator['column']]['label'] : '';
                                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                                         'sessionVar' => 'report.'.$report->getId(),
-                                        'orderBy'    => $aggregator['function'],
                                         'text'       => $aggregator['function'].' '.$columnName,
+                                        'orderBy'    => '`'.$aggregator['function'].' '.$aggregator['column'].'`',
                                         'dataToggle' => '',
                                         'target'     => '.report-content',
                                     ]);
@@ -129,7 +129,21 @@ $graphContent = $view->render(
                                                     $cellType = 'date';
                                                 }
                                                 ?>
-                                                <?php echo $view['formatter']->_($cellVal, $cellType); ?>
+                                                <?php
+                                                if ($cellVal) {
+                                                    switch ($cellType) {
+                                                        case 'datetime':
+                                                            echo $view['date']->toFullConcat($cellVal, 'UTC');
+                                                            break;
+                                                        case 'date':
+                                                            echo $view['date']->toShort($cellVal, 'UTC');
+                                                            break;
+                                                        default:
+                                                            echo $view['formatter']->_($cellVal, $cellType);
+                                                            break;
+                                                    }
+                                                }
+                                                ?>
                                                 <?php if ($closeLink): ?></a><?php endif; ?>
                                         </td>
                                     <?php endif; ?>

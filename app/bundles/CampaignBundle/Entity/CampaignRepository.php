@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\Query\Expr;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -423,15 +424,14 @@ class CampaignRepository extends CommonRepository
             ->where(
                 $sq->expr()->andX(
                     $sq->expr()->eq('e.lead_id', 'cl.lead_id'),
-                    $sq->expr()->eq('e.campaign_id', ':campaignId'),
+                    $sq->expr()->eq('e.campaign_id', (int) $campaignId),
                     $sq->expr()->eq('e.rotation', 'cl.rotation')
                 )
             );
 
         $q->andWhere(
             sprintf('NOT EXISTS (%s)', $sq->getSQL())
-        )
-            ->setParameter('campaignId', (int) $campaignId);
+        );
 
         if ($limiter->hasCampaignLimit() && $limiter->getCampaignLimitRemaining() < $limiter->getBatchLimit()) {
             $q->setMaxResults($limiter->getCampaignLimitRemaining());
@@ -553,5 +553,74 @@ class CampaignRepository extends CommonRepository
             ->setMaxResults(1)
             ->execute()
             ->fetch();
+    }
+
+    /**
+     * @param int   $segmentId
+     * @param array $campaignIds
+     *
+     * @return array
+     */
+    public function getCampaignsSegmentShare($segmentId, $campaignIds = [])
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('c.id, c.name, ROUND(IFNULL(COUNT(DISTINCT t.lead_id)/COUNT(DISTINCT cl.lead_id)*100, 0),1) segmentCampaignShare');
+        $q->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c')
+            ->leftJoin('c', MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl', 'cl.campaign_id = c.id AND cl.manually_removed = 0')
+            ->leftJoin('cl',
+                '(SELECT lll.lead_id AS ll, lll.lead_id FROM lead_lists_leads lll WHERE lll.leadlist_id = '.$segmentId
+                .' AND lll.manually_removed = 0)',
+                't',
+                't.lead_id = cl.lead_id'
+            );
+        $q->groupBy('c.id');
+
+        if (!empty($campaignIds)) {
+            $q->where($q->expr()->in('c.id', $campaignIds));
+        }
+
+        return $q->execute()->fetchAll();
+    }
+
+    /**
+     * Searches for emails assigned to campaign and returns associative array of email ids in format:.
+     *
+     *  array (size=1)
+     *      0 =>
+     *          array (size=2)
+     *              'channelId' => int 18
+     *
+     * or empty array if nothing found.
+     *
+     * @param int $id
+     *
+     * @return array
+     */
+    public function fetchEmailIdsById($id)
+    {
+        $emails = $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select('e.channelId')
+            ->from('MauticCampaignBundle:Campaign', $this->getTableAlias(), $this->getTableAlias().'.id')
+            ->leftJoin(
+                $this->getTableAlias().'.events',
+                'e',
+                Expr\Join::WITH,
+                "e.channel = '".Event::CHANNEL_EMAIL."'"
+            )
+            ->where($this->getTableAlias().'.id = :id')
+            ->setParameter('id', $id)
+            ->andWhere('e.channelId IS NOT NULL')
+            ->getQuery()
+            ->setHydrationMode(\Doctrine\ORM\Query::HYDRATE_ARRAY)
+            ->getResult();
+
+        $return = [];
+        foreach ($emails as $email) {
+            // Every channelId represents e-mail ID
+            $return[] = $email['channelId']; // mautic_campaign_events.channel_id
+        }
+
+        return $return;
     }
 }

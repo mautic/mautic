@@ -21,9 +21,9 @@ use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Menu\MenuHelper;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\FormBundle\Entity\FormRepository;
-use Mautic\InstallBundle\Controller\InstallController;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\LoginEvent;
 use Mautic\UserBundle\Model\UserModel;
@@ -102,6 +102,11 @@ class CoreSubscriber implements EventSubscriberInterface
      */
     private $factory;
 
+    /**
+     * @var FlashBag
+     */
+    private $flashBag;
+
     public function __construct(
         BundleHelper $bundleHelper,
         MenuHelper $menuHelper,
@@ -114,7 +119,8 @@ class CoreSubscriber implements EventSubscriberInterface
         TranslatorInterface $translator,
         RequestStack $requestStack,
         FormRepository $formRepository,
-        MauticFactory $factory
+        MauticFactory $factory,
+        FlashBag $flashBag
     ) {
         $this->bundleHelper         = $bundleHelper;
         $this->menuHelper           = $menuHelper;
@@ -128,6 +134,7 @@ class CoreSubscriber implements EventSubscriberInterface
         $this->requestStack         = $requestStack;
         $this->formRepository       = $formRepository;
         $this->factory              = $factory;
+        $this->flashBag             = $flashBag;
     }
 
     /**
@@ -181,8 +188,6 @@ class CoreSubscriber implements EventSubscriberInterface
             //mark the user as last logged in
             $user = $this->userHelper->getUser();
             if ($user instanceof User) {
-                $this->userModel->setOnlineStatus('online');
-
                 $this->userModel->getRepository()->setLastLogin($user);
 
                 // Set the timezone and locale in session while we have it since Symfony dispatches the onKernelRequest prior to the
@@ -244,38 +249,11 @@ class CoreSubscriber implements EventSubscriberInterface
             // and the translator
             $controller[0]->setTranslator($this->translator);
 
+            // and the flash bag
+            $controller[0]->setFlashBag($this->flashBag);
+
             //run any initialize functions
             $controller[0]->initialize($event);
-
-            //update the user's activity marker
-            if (!($controller[0] instanceof InstallController) && !defined('MAUTIC_ACTIVITY_CHECKED') && !defined('MAUTIC_INSTALLER')) {
-                //prevent multiple updates
-                $user = $this->userHelper->getUser();
-                //slight delay to prevent too many updates
-                //note that doctrine will return in current timezone so we do not have to worry about that
-                $delay = new \DateTime();
-                $delay->setTimestamp(strtotime('2 minutes ago'));
-
-                if ($user instanceof User && $user->getLastActive() < $delay && $user->getId()) {
-                    $this->userModel->getRepository()->setLastActive($user);
-                }
-
-                $session = $request->getSession();
-
-                if ($session) {
-                    $delay = new \DateTime();
-                    $delay->setTimestamp(strtotime('15 minutes ago'));
-
-                    $lastOnlineStatusCleanup = $session->get('mautic.online.status.cleanup', $delay);
-
-                    if ($lastOnlineStatusCleanup <= $delay) {
-                        $this->userModel->getRepository()->updateOnlineStatuses();
-                        $session->set('mautic.online.status.cleanup', new \DateTime());
-                    }
-
-                    define('MAUTIC_ACTIVITY_CHECKED', 1);
-                }
-            }
         }
     }
 

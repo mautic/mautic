@@ -42,7 +42,7 @@ class ArrayTypeTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractPlatform */
     private $platform;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -100,6 +100,57 @@ class ArrayTypeTest extends \PHPUnit\Framework\TestCase
         $result = $this->arrayType->convertToDatabaseValue([$object], $this->platform);
         $this->assertEquals(
             'a:1:{i:0;O:8:"stdClass":1:{s:4:"test";s:5:"value";}}',
+            $result
+        );
+    }
+
+    public function testGiven_objectWithPrivateProperty_when_convertsToPHPValue_then_getsArrayWithoutObject()
+    {
+        $array = [
+            0,
+            new ExampleClassWithPrivateProperty(),
+        ];
+
+        $array = serialize($array);
+
+        $result = $this->arrayType->convertToPHPValue($array, $this->platform);
+        $this->assertEquals(
+            [0],
+            $result
+        );
+    }
+
+    public function testGiven_objectWithProtectedProperty_when_convertsToPHPValue_then_getsArrayWithoutObject()
+    {
+        $array = [
+            0,
+            new ExampleClassWithProtectedProperty(),
+        ];
+
+        $array = serialize($array);
+
+        $result = $this->arrayType->convertToPHPValue($array, $this->platform);
+        $this->assertEquals(
+            [0],
+            $result
+        );
+    }
+
+    public function testGiven_objectWithPublicProperty_when_convertsToPHPValue_then_getsArrayWithObject()
+    {
+        $array = [
+            0,
+            new ExampleClassWithPublicProperty(),
+        ];
+
+        $array = serialize($array);
+
+        $result = $this->arrayType->convertToPHPValue($array, $this->platform);
+        $this->assertEquals(
+            [
+                0,
+                new ExampleClassWithPublicProperty(),
+            ],
             $result
         );
     }

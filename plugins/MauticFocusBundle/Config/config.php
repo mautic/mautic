@@ -125,8 +125,8 @@ return [
                     'mautic.page.model.trackable',
                     'mautic.helper.templating',
                     'event_dispatcher',
-                    'mautic.lead.model.lead',
                     'mautic.lead.model.field',
+                    'mautic.tracker.contact',
                 ],
             ],
         ],
@@ -137,6 +137,12 @@ return [
                     'mautic.focus.model.focus',
                     'router',
                     'mautic.security',
+                ],
+            ],
+            'mautic.focus.helper.iframe_availability_checker' => [
+                'class'     => \MauticPlugin\MauticFocusBundle\Helper\IframeAvailabilityChecker::class,
+                'arguments' => [
+                    'translator',
                 ],
             ],
         ],

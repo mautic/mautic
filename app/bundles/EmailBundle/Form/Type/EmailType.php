@@ -40,7 +40,6 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -59,11 +58,6 @@ class EmailType extends AbstractType
     private $em;
 
     /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
      * @var StageModel
      */
     private $stageModel;
@@ -71,13 +65,11 @@ class EmailType extends AbstractType
     public function __construct(
         TranslatorInterface $translator,
         EntityManager $entityManager,
-        RequestStack $requestStack,
         StageModel $stageModel
     ) {
-        $this->translator   = $translator;
-        $this->em           = $entityManager;
-        $this->requestStack = $requestStack;
-        $this->stageModel   = $stageModel;
+        $this->translator = $translator;
+        $this->em         = $entityManager;
+        $this->stageModel = $stageModel;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -383,7 +375,6 @@ class EmailType extends AbstractType
             ]
         );
 
-        $request                 = $this->requestStack->getCurrentRequest();
         $variantSettingsModifier = function (FormEvent $event, $isVariant) {
             if ($isVariant) {
                 $event->getForm()->add(
@@ -427,7 +418,6 @@ class EmailType extends AbstractType
             }
         );
 
-        //add category
         $builder->add(
             'category',
             CategoryListType::class,
@@ -436,7 +426,6 @@ class EmailType extends AbstractType
             ]
         );
 
-        //add lead lists
         $transformer = new IdToEntityModelTransformer($this->em, 'MauticLeadBundle:LeadList', 'id', true);
         $builder->add(
             $builder->create(
@@ -466,11 +455,10 @@ class EmailType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'required' => false,
+                'required' => true,
             ]
         );
 
-        //add lead lists
         $transformer = new IdToEntityModelTransformer(
             $this->em,
             'MauticAssetBundle:Asset',
@@ -487,6 +475,7 @@ class EmailType extends AbstractType
                     'attr'       => [
                         'class'    => 'form-control',
                         'onchange' => 'Mautic.getTotalAttachmentSize();',
+                        'tooltip'  => 'mautic.email.attachments.help',
                     ],
                     'multiple' => true,
                     'expanded' => false,
@@ -497,24 +486,21 @@ class EmailType extends AbstractType
 
         $builder->add('sessionId', HiddenType::class);
         $builder->add('emailType', HiddenType::class);
-
-        $customButtons = [
-            [
-                'name'  => 'builder',
-                'label' => 'mautic.core.builder',
-                'attr'  => [
-                    'class'   => 'btn btn-default btn-dnd btn-nospin text-primary btn-builder',
-                    'icon'    => 'fa fa-cube',
-                    'onclick' => "Mautic.launchBuilder('email', 'email');",
-                ],
-            ],
-        ];
-
         $builder->add(
             'buttons',
             FormButtonsType::class,
             [
-                'pre_extra_buttons' => $customButtons,
+                'pre_extra_buttons' => [
+                    [
+                        'name'  => 'builder',
+                        'label' => 'mautic.core.builder',
+                        'attr'  => [
+                            'class'   => 'btn btn-default btn-dnd btn-nospin text-primary btn-builder',
+                            'icon'    => 'fa fa-cube',
+                            'onclick' => "Mautic.launchBuilder('{$this->getBlockPrefix()}', 'email');",
+                        ],
+                    ],
+                ],
             ]
         );
 
@@ -547,9 +533,6 @@ class EmailType extends AbstractType
         $resolver->setDefined(['update_select']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $stages       = $this->stageModel->getRepository()->getSimpleList();
@@ -566,9 +549,6 @@ class EmailType extends AbstractType
         $view->vars['stages']    = $stageChoices;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'emailform';
