@@ -73,7 +73,7 @@ $template  = '<div class="col-md-6">{content}</div>';
 </div>
 <?php endif; ?>
 
-<?php if (count(array_intersect($fieldKeys, ['trusted_hosts', 'trusted_proxies', 'ip_lookup_service', 'do_not_track_ips', 'do_not_track_bots']))): ?>
+<?php if (count(array_intersect($fieldKeys, ['trusted_hosts', 'trusted_proxies', 'ip_lookup_service', 'do_not_track_ips', 'do_not_track_bots', 'transliterate_page_title']))): ?>
 <div class="panel panel-primary">
     <div class="panel-heading">
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.misc'); ?></h3>
@@ -125,6 +125,13 @@ $template  = '<div class="col-md-6">{content}</div>';
         <hr class="text-muted" />
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'max_entity_lock_time', $template); ?>
+        </div>
+        <?php endif; ?>
+
+        <?php if (isset($fields['transliterate_page_title'])): ?>
+        <hr class="text-muted" />
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'transliterate_page_title', $template); ?>
         </div>
         <?php endif; ?>
     </div>
