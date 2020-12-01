@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -175,6 +176,30 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         return $contacts;
+    }
+
+    /**
+     * @param string[] $emails
+     *
+     * @return int[]|array
+     */
+    public function getContactIdsByEmails(array $emails): array
+    {
+        $result = $this->getEntityManager()
+            ->createQuery("
+                SELECT c.id 
+                FROM Mautic\LeadBundle\Entity\Lead c
+                WHERE c.email IN (:emails)
+            ")
+            ->setParameter(':emails', $emails, Connection::PARAM_STR_ARRAY)
+            ->getArrayResult();
+
+        return array_map(
+            function ($row) {
+                return (int) $row['id'];
+            },
+            $result
+        );
     }
 
     /**
@@ -1002,7 +1027,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('u.id, u.first_name, u.last_name, u.email, u.signature')
+            ->select('u.id, u.first_name, u.last_name, u.email, u.position, u.signature')
             ->from(MAUTIC_TABLE_PREFIX.'users', 'u')
             ->where('u.id = :ownerId')
             ->setParameter('ownerId', (int) $ownerId);

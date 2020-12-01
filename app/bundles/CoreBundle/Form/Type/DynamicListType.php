@@ -38,8 +38,10 @@ class DynamicListType extends AbstractType
             function (FormEvent $event) {
                 //reorder list in case keys were dynamically removed
                 $data = $event->getData();
-                $data = array_values($data);
-                $event->setData($data);
+                if (is_array($data)) {
+                    $data = array_values($data);
+                    $event->setData($data);
+                }
             }
         );
     }
