@@ -56,8 +56,9 @@ class DynamicContentFilterType extends AbstractType
                             'class' => 'form-control',
                         ],
                     ],
-                    'allow_add'    => true,
-                    'allow_delete' => true,
+                    'option_required' => false,
+                    'allow_add'       => true,
+                    'allow_delete'    => true,
                 ]
             )
         );
