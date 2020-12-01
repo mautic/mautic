@@ -34,9 +34,6 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
 
     /**
      * MandrillTransport constructor.
-     *
-     * @param TranslatorInterface $translator
-     * @param TransportCallback   $transportCallback
      */
     public function __construct(TranslatorInterface $translator, TransportCallback $transportCallback)
     {
@@ -104,7 +101,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
                 $rcpt['type'] = $type;
                 $recipients[] = $rcpt;
 
-                if ($type == 'to' && isset($metadata[$rcpt['email']])) {
+                if ('to' == $type && isset($metadata[$rcpt['email']])) {
                     if (!empty($metadata[$rcpt['email']]['tokens'])) {
                         $mergeVars = [
                             'rcpt' => $rcpt['email'],
@@ -115,7 +112,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
                         $trackingPixelToken = [];
 
                         foreach ($metadata[$rcpt['email']]['tokens'] as $token => $value) {
-                            if ($token == '{tracking_pixel}') {
+                            if ('{tracking_pixel}' == $token) {
                                 $trackingPixelToken = [
                                     [
                                         'name'    => $mandrillMergeVars[$token],
@@ -189,7 +186,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
 
                             // If CC and BCC, remove the ct from URLs to prevent false lead tracking
                             foreach ($ccMergeVars['vars'] as &$var) {
-                                if (strpos($var['content'], 'http') !== false && $ctPos = strpos($var['content'], 'ct=') !== false) {
+                                if (false !== strpos($var['content'], 'http') && $ctPos = false !== strpos($var['content'], 'ct=')) {
                                     // URL so make sure a ct query is not part of it
                                     $var['content'] = substr($var['content'], 0, $ctPos);
                                 }
@@ -320,7 +317,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
         $parsedResponse = '';
         $response       = json_decode($response, true);
 
-        if ($response === false) {
+        if (false === $response) {
             $parsedResponse = $response;
         }
 
@@ -343,7 +340,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
         $metadata   = $this->getMetadata();
 
         if (is_array($response)) {
-            if (isset($response['status']) && $response['status'] == 'error') {
+            if (isset($response['status']) && 'error' == $response['status']) {
                 $parsedResponse = $response['message'];
                 $error          = true;
             } else {
@@ -369,11 +366,11 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
             }
         }
 
-        if ($evt = $this->getDispatcher()->createResponseEvent($this, $parsedResponse, ($info['http_code'] == 200))) {
+        if ($evt = $this->getDispatcher()->createResponseEvent($this, $parsedResponse, (200 == $info['http_code']))) {
             $this->getDispatcher()->dispatchEvent($evt, 'responseReceived');
         }
 
-        if ($response === false) {
+        if (false === $response) {
             $this->throwException('Unexpected response');
         } elseif (!empty($error)) {
             $this->throwException('Mandrill error');
@@ -402,9 +399,8 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
     }
 
     /**
-     * @param \Swift_Message $message
-     * @param int            $toBeAdded
-     * @param string         $type
+     * @param int    $toBeAdded
+     * @param string $type
      *
      * @return int
      */
@@ -416,8 +412,6 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
 
     /**
      * Handle response.
-     *
-     * @param Request $request
      */
     public function processCallbackRequest(Request $request)
     {
@@ -447,5 +441,13 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
                 }
             }
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function ping()
+    {
+        return true;
     }
 }

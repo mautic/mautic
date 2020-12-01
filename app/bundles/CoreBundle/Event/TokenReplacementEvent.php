@@ -56,7 +56,6 @@ class TokenReplacementEvent extends CommonEvent
      *
      * @param       $content
      * @param null  $lead
-     * @param array $clickthrough
      * @param mixed $passthrough
      */
     public function __construct($content, $lead = null, array $clickthrough = [], $passthrough = null)

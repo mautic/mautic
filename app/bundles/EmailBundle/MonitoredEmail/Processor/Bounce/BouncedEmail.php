@@ -11,28 +11,25 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
 
-/**
- * Class BouncedEmail.
- */
 class BouncedEmail
 {
     /**
-     * @var
+     * @var string|null
      */
     private $email;
 
     /**
-     * @var
+     * @var string|null
      */
     private $ruleCategory;
 
     /**
-     * @var
+     * @var string|null
      */
     private $ruleNumber;
 
     /**
-     * @var
+     * @var string|null
      */
     private $bounceType;
 
@@ -42,7 +39,7 @@ class BouncedEmail
     private $final = 0;
 
     /**
-     * @var
+     * @var string|null
      */
     private $bounceAddress;
 

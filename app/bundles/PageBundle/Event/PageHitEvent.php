@@ -15,19 +15,10 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 
-/**
- * Class PageHitEvent.
- */
 class PageHitEvent extends CommonEvent
 {
-    /**
-     * @var
-     */
     protected $request;
 
-    /**
-     * @var
-     */
     protected $code;
 
     /**
@@ -48,7 +39,6 @@ class PageHitEvent extends CommonEvent
     /**
      * PageHitEvent constructor.
      *
-     * @param Hit   $hit
      * @param       $request
      * @param       $code
      * @param array $clickthrough

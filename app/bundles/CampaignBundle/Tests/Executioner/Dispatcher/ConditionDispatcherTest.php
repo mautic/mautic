@@ -16,16 +16,17 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\ConditionEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ConditionDispatcher;
+use PHPUnit\Framework\MockObject\MockBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ConditionDispatcherTest extends \PHPUnit_Framework_TestCase
+class ConditionDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockBuilder|EventDispatcherInterface
+     * @var MockBuilder|EventDispatcherInterface
      */
     private $dispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)
             ->disableOriginalConstructor()

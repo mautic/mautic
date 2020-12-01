@@ -21,8 +21,12 @@ use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Helper\FormUploader;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FormUploaderTest extends \PHPUnit_Framework_TestCase
+class FormUploaderTest extends \PHPUnit\Framework\TestCase
 {
+    private $formId1   = 1;
+    private $formId2   = 2;
+    private $uploadDir = 'path/to/file';
+
     /**
      * @testdox Uploader uploads files correctly
      *
@@ -30,8 +34,6 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testSuccessfulUploadFiles()
     {
-        $uploadDir = 'path/to/file';
-
         $fileUploaderMock = $this->getMockBuilder(FileUploader::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -40,9 +42,9 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $coreParametersHelperMock->expects($this->exactly(2))
-            ->method('getParameter')
+            ->method('get')
             ->with('form_upload_dir')
-            ->willReturn($uploadDir);
+            ->willReturn($this->uploadDir);
 
         $formUploader = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
 
@@ -61,7 +63,7 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
         $form1Mock->expects($this->once())
             ->method('getId')
             ->with()
-            ->willReturn('formId1');
+            ->willReturn($this->formId1);
 
         $field1Mock = $this->getMockBuilder(Field::class)
             ->disableOriginalConstructor()
@@ -89,7 +91,7 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
         $form2Mock->expects($this->once())
             ->method('getId')
             ->with()
-            ->willReturn('formId2');
+            ->willReturn($this->formId2);
 
         $field2Mock = $this->getMockBuilder(Field::class)
             ->disableOriginalConstructor()
@@ -117,8 +119,8 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
         $submission = new Submission();
         $submission->setResults(['key' => 'value']);
 
-        $path1 = $uploadDir.'/formId1/fieldId1';
-        $path2 = $uploadDir.'/formId2/fieldId2';
+        $path1 = $this->uploadDir.'/1/fieldId1';
+        $path2 = $this->uploadDir.'/2/fieldId2';
 
         $fileUploaderMock->expects($this->at(0))
             ->method('upload')
@@ -148,8 +150,6 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testUploadFilesWithError()
     {
-        $uploadDir = 'path/to/file';
-
         $fileUploaderMock = $this->getMockBuilder(FileUploader::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -158,9 +158,9 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $coreParametersHelperMock->expects($this->exactly(2))
-            ->method('getParameter')
+            ->method('get')
             ->with('form_upload_dir')
-            ->willReturn($uploadDir);
+            ->willReturn($this->uploadDir);
 
         $formUploader = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
 
@@ -179,7 +179,7 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
         $form1Mock->expects($this->once())
             ->method('getId')
             ->with()
-            ->willReturn('formId1');
+            ->willReturn($this->formId1);
 
         $field1Mock = $this->getMockBuilder(Field::class)
             ->disableOriginalConstructor()
@@ -207,7 +207,7 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
         $form2Mock->expects($this->once())
             ->method('getId')
             ->with()
-            ->willReturn('formId2');
+            ->willReturn($this->formId2);
 
         $field2Mock = $this->getMockBuilder(Field::class)
             ->disableOriginalConstructor()
@@ -235,8 +235,8 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
         $submission = new Submission();
         $submission->setResults(['key' => 'value']);
 
-        $path1 = $uploadDir.'/formId1/fieldId1';
-        $path2 = $uploadDir.'/formId2/fieldId2';
+        $path1 = $this->uploadDir.'/1/fieldId1';
+        $path2 = $this->uploadDir.'/2/fieldId2';
 
         $fileUploaderMock->expects($this->at(0))
             ->method('upload')
@@ -250,7 +250,7 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
 
         $fileUploaderMock->expects($this->once())
             ->method('delete')
-            ->with('path/to/file/formId1/fieldId1/upload1');
+            ->with('path/to/file/1/fieldId1/upload1');
 
         $this->expectException(FileUploadException::class);
         $this->expectExceptionMessage('file2');
@@ -302,8 +302,6 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetCompleteFilePath()
     {
-        $uploadDir = 'path/to/file';
-
         $fileUploaderMock = $this->getMockBuilder(FileUploader::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -312,9 +310,9 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $coreParametersHelperMock->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('form_upload_dir')
-            ->willReturn($uploadDir);
+            ->willReturn($this->uploadDir);
 
         $formMock = $this->getMockBuilder(Form::class)
             ->disableOriginalConstructor()
@@ -323,7 +321,7 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
         $formMock->expects($this->once())
             ->method('getId')
             ->with()
-            ->willReturn('formId1');
+            ->willReturn($this->formId1);
 
         $fieldMock = $this->getMockBuilder(Field::class)
             ->disableOriginalConstructor()
@@ -343,7 +341,7 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
 
         $actual = $formUploader->getCompleteFilePath($fieldMock, 'fileName');
 
-        $this->assertSame('path/to/file/formId1/fieldId1/fileName', $actual);
+        $this->assertSame('path/to/file/1/fieldId1/fileName', $actual);
     }
 
     /**
@@ -353,23 +351,21 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testDeleteAllFilesOfFormField()
     {
-        $uploadDir = 'path/to/file';
-
         $fileUploaderMock = $this->getMockBuilder(FileUploader::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $fileUploaderMock->expects($this->once())
             ->method('delete')
-            ->with('path/to/file/formId1/fieldId1');
+            ->with('path/to/file/1/fieldId1');
 
         $coreParametersHelperMock = $this->getMockBuilder(CoreParametersHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
         $coreParametersHelperMock->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('form_upload_dir')
-            ->willReturn($uploadDir);
+            ->willReturn($this->uploadDir);
 
         $formUploader = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
 
@@ -380,7 +376,7 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
         $formMock->expects($this->once())
             ->method('getId')
             ->with()
-            ->willReturn('formId1');
+            ->willReturn($this->formId1);
 
         $fieldMock = $this->getMockBuilder(Field::class)
             ->disableOriginalConstructor()
@@ -402,5 +398,45 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
 
         $formUploader->deleteAllFilesOfFormField($fieldMock);
+    }
+
+    public function testDeleteFilesOfForm()
+    {
+        $fileUploaderMock = $this->getMockBuilder(FileUploader::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $fileUploaderMock
+            ->method('delete')
+            ->with('path/to/file/1');
+
+        $coreParametersHelperMock = $this->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $coreParametersHelperMock->expects($this->exactly(2))
+            ->method('get')
+            ->with('form_upload_dir')
+            ->willReturn($this->uploadDir);
+
+        $formMock = $this->getMockBuilder(Form::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $formMock->expects($this->at(0))
+            ->method('getId')
+            ->with()
+            ->willReturn($this->formId1);
+
+        $formMock->expects($this->at(1))
+            ->method('getId')
+            ->with()
+            ->willReturn(null);
+
+        $formUploader = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
+        $formUploader->deleteFilesOfForm($formMock);
+
+        $formMock->deletedId = $this->formId1;
+
+        $formUploader->deleteFilesOfForm($formMock);
     }
 }

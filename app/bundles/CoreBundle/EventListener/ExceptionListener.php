@@ -38,9 +38,7 @@ class ExceptionListener extends KernelExceptionListener
     /**
      * ExceptionListener constructor.
      *
-     * @param Router               $router
-     * @param LoggerInterface      $controller
-     * @param LoggerInterface|null $logger
+     * @param LoggerInterface $controller
      */
     public function __construct(Router $router, $controller, LoggerInterface $logger = null)
     {
@@ -49,9 +47,6 @@ class ExceptionListener extends KernelExceptionListener
         $this->router = $router;
     }
 
-    /**
-     * @param GetResponseForExceptionEvent $event
-     */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();

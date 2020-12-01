@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Month\DateMonthThis;
 use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateAnniversary;
 use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateDefault;
 use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval;
+use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast;
 use Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekNext;
 use Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekThis;
@@ -31,7 +32,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearThis;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\RelativeDate;
 
-class DateOptionFactoryTest extends \PHPUnit_Framework_TestCase
+class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
@@ -44,7 +45,7 @@ class DateOptionFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(DateAnniversary::class, $filterDecorator);
 
-        $filterName = 'birthday';
+        $filterName = 'anniversary';
 
         $filterDecorator = $this->getFilterDecorator($filterName);
 
@@ -262,8 +263,9 @@ class DateOptionFactoryTest extends \PHPUnit_Framework_TestCase
      */
     private function getFilterDecorator($filterName)
     {
-        $dateDecorator = $this->createMock(DateDecorator::class);
-        $relativeDate  = $this->createMock(RelativeDate::class);
+        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $relativeDate     = $this->createMock(RelativeDate::class);
+        $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
         $relativeDate->method('getRelativeDateStrings')
             ->willReturn(
@@ -285,7 +287,7 @@ class DateOptionFactoryTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $dateOptionFactory = new DateOptionFactory($dateDecorator, $relativeDate);
+        $dateOptionFactory = new DateOptionFactory($dateDecorator, $relativeDate, $timezoneResolver);
 
         $filter                    = [
             'glue'     => 'and',

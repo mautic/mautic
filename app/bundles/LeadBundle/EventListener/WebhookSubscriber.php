@@ -11,21 +11,28 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
+use Mautic\LeadBundle\Event\CompanyEvent;
+use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
-use Mautic\WebhookBundle\EventListener\WebhookModelTrait;
+use Mautic\WebhookBundle\Model\WebhookModel;
 use Mautic\WebhookBundle\WebhookEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class WebhookSubscriber.
- */
-class WebhookSubscriber extends CommonSubscriber
+class WebhookSubscriber implements EventSubscriberInterface
 {
-    use WebhookModelTrait;
+    /**
+     * @var WebhookModel
+     */
+    private $webhookModel;
+
+    public function __construct(WebhookModel $webhookModel)
+    {
+        $this->webhookModel = $webhookModel;
+    }
 
     /**
      * @return array
@@ -33,18 +40,19 @@ class WebhookSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            WebhookEvents::WEBHOOK_ON_BUILD          => ['onWebhookBuild', 0],
-            LeadEvents::LEAD_POST_SAVE               => ['onLeadNewUpdate', 0],
-            LeadEvents::LEAD_POINTS_CHANGE           => ['onLeadPointChange', 0],
-            LeadEvents::LEAD_POST_DELETE             => ['onLeadDelete', 0],
-            LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED => ['onChannelSubscriptionChange', 0],
+            WebhookEvents::WEBHOOK_ON_BUILD           => ['onWebhookBuild', 0],
+            LeadEvents::LEAD_POST_SAVE                => ['onLeadNewUpdate', 0],
+            LeadEvents::LEAD_POINTS_CHANGE            => ['onLeadPointChange', 0],
+            LeadEvents::LEAD_POST_DELETE              => ['onLeadDelete', 0],
+            LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED  => ['onChannelSubscriptionChange', 0],
+            LeadEvents::LEAD_COMPANY_CHANGE           => ['onLeadCompanyChange', 0],
+            LeadEvents::COMPANY_POST_SAVE             => ['onCompanySave', 0],
+            LeadEvents::COMPANY_POST_DELETE           => ['onCompanyDelete', 0],
         ];
     }
 
     /**
      * Add event triggers and actions.
-     *
-     * @param WebhookBuilderEvent $event
      */
     public function onWebhookBuild(WebhookBuilderEvent $event)
     {
@@ -92,11 +100,35 @@ class WebhookSubscriber extends CommonSubscriber
                 'description' => 'mautic.lead.webhook.event.lead.dnc_desc',
             ]
         );
+
+        // add checkbox to the webhook form for new/updated companies
+        $event->addEvent(
+            LeadEvents::LEAD_COMPANY_CHANGE,
+            [
+                'label'       => 'mautic.lead.webhook.event.lead.company.change',
+                'description' => 'mautic.lead.webhook.event.lead.company.change.desc',
+            ]
+        );
+
+        // add checkbox to the webhook form for new/updated companies
+        $event->addEvent(
+            LeadEvents::COMPANY_POST_SAVE,
+            [
+                'label'       => 'mautic.lead.webhook.event.company.new_or_update',
+                'description' => 'mautic.lead.webhook.event.company.new_or_update_desc',
+            ]
+        );
+
+        // add checkbox to the webhook form for deleted companies
+        $event->addEvent(
+            LeadEvents::COMPANY_POST_DELETE,
+            [
+                'label'       => 'mautic.lead.webhook.event.company.deleted',
+                'description' => 'mautic.lead.webhook.event.company.deleted_desc',
+            ]
+        );
     }
 
-    /**
-     * @param LeadEvent $event
-     */
     public function onLeadNewUpdate(LeadEvent $event)
     {
         $lead = $event->getLead();
@@ -110,7 +142,6 @@ class WebhookSubscriber extends CommonSubscriber
         // Consider this a new contact if it was just identified, otherwise consider it updated
             !empty($changes['dateIdentified']) ? LeadEvents::LEAD_POST_SAVE.'_new' : LeadEvents::LEAD_POST_SAVE.'_update',
             [
-                'lead'    => $event->getLead(),
                 'contact' => $event->getLead(),
             ],
             [
@@ -118,20 +149,17 @@ class WebhookSubscriber extends CommonSubscriber
                 'userList',
                 'publishDetails',
                 'ipAddress',
+                'doNotContactList',
                 'tagList',
             ]
         );
     }
 
-    /**
-     * @param PointsChangeEvent $event
-     */
     public function onLeadPointChange(PointsChangeEvent $event)
     {
         $this->webhookModel->queueWebhooksByType(
             LeadEvents::LEAD_POINTS_CHANGE,
             [
-                'lead'    => $event->getLead(),
                 'contact' => $event->getLead(),
                 'points'  => [
                     'old_points' => $event->getOldPoints(),
@@ -143,14 +171,12 @@ class WebhookSubscriber extends CommonSubscriber
                 'userList',
                 'publishDetails',
                 'ipAddress',
+                'doNotContactList',
                 'tagList',
             ]
         );
     }
 
-    /**
-     * @param LeadEvent $event
-     */
     public function onLeadDelete(LeadEvent $event)
     {
         $lead = $event->getLead();
@@ -158,21 +184,18 @@ class WebhookSubscriber extends CommonSubscriber
             LeadEvents::LEAD_POST_DELETE,
             [
                 'id'      => $lead->deletedId,
-                'lead'    => $lead,
                 'contact' => $lead,
             ],
             [
                 'leadDetails',
                 'userList',
                 'publishDetails',
+                'doNotContactList',
                 'ipAddress',
             ]
         );
     }
 
-    /**
-     * @param ChannelSubscriptionChange $event
-     */
     public function onChannelSubscriptionChange(ChannelSubscriptionChange $event)
     {
         $this->webhookModel->queueWebhooksByType(
@@ -188,7 +211,50 @@ class WebhookSubscriber extends CommonSubscriber
                 'userList',
                 'publishDetails',
                 'ipAddress',
+                'doNotContactList',
                 'tagList',
+            ]
+        );
+    }
+
+    public function onLeadCompanyChange(LeadChangeCompanyEvent $event)
+    {
+        $leads = $event->getLeads();
+        if (empty($leads)) {
+            $leads = [$event->getLead()];
+        }
+        foreach ($leads as $lead) {
+            $this->webhookModel->queueWebhooksByType(
+                LeadEvents::LEAD_COMPANY_CHANGE,
+                [
+                    'added'    => $event->wasAdded(),
+                    'contact'  => $lead,
+                    'company'  => $event->getCompany(),
+                ],
+                [
+                ]
+            );
+        }
+    }
+
+    public function onCompanySave(CompanyEvent $event)
+    {
+        $this->webhookModel->queueWebhooksByType(
+            LeadEvents::COMPANY_POST_SAVE,
+            [
+                'company'    => $event->getCompany(),
+            ]
+        );
+    }
+
+    public function onCompanyDelete(CompanyEvent $event)
+    {
+        $company = $event->getCompany();
+        $this->webhookModel->queueWebhooksByType(
+            LeadEvents::COMPANY_POST_DELETE,
+            [
+                'id'      => $company->deletedId,
+                'company' => $event->getCompany(),
             ]
         );
     }

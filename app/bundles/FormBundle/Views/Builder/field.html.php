@@ -134,7 +134,7 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                             <?php
                             foreach ($fieldGroups as $object => $group):
                             $header = $object;
-                            $icon   = ($object == 'company') ? 'building' : 'user';
+                            $icon   = ('company' == $object) ? 'building' : 'user';
                             ?>
                             <optgroup label="<?php echo $view['translator']->trans('mautic.lead.'.$header); ?>">
                                 <?php
@@ -148,7 +148,7 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                                         $label = $field->label;
                                         $value = $field->value;
                                         ?>
-                                        <option value="<?php echo $view->escape($value) ?>" class="segment-filter <?php echo $icon; ?>" <?php if ($data === $value) {
+                                        <option value="<?php echo $view->escape($value); ?>" class="segment-filter <?php echo $icon; ?>" <?php if ($data === $value) {
                                             echo 'Selected';
                                         } ?> <?php echo $attrString; ?> ><?php echo $label; ?></option>
                                     <?php endforeach; ?>
@@ -172,15 +172,15 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                     <?php
                     $i = 0;
                     foreach ($validation as $name => $property):
-                        if ($form['validation'][$name]->isRendered() || $name == 'labelAttributes') {
+                        if ($form['validation'][$name]->isRendered() || 'labelAttributes' == $name) {
                             continue;
                         }
 
-                        if ($form['validation'][$name]->vars['block_prefixes'][1] == 'hidden') :
+                        if ('hidden' == $form['validation'][$name]->vars['block_prefixes'][1]) :
                             echo $view['form']->row($form['validation'][$name]);
                         else:
                             $col = 8;
-                            if ($form['validation'][$name]->vars['block_prefixes'][1] == 'choice'):
+                            if ('choice' == $form['validation'][$name]->vars['block_prefixes'][1]):
                                 $col = 4;
                                 endif;
                             ?>
@@ -230,14 +230,14 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                     <?php
                     $i = 0;
                     foreach ($properties as $name => $property):
-                    if ($form['properties'][$name]->isRendered() || $name == 'labelAttributes') {
+                    if ($form['properties'][$name]->isRendered() || 'labelAttributes' == $name) {
                         continue;
                     }
 
-                    if ($form['properties'][$name]->vars['block_prefixes'][1] == 'hidden') :
+                    if ('hidden' == $form['properties'][$name]->vars['block_prefixes'][1]) :
                         echo $view['form']->row($form['properties'][$name]);
                     else:
-                    $col = ($name == 'text') ? 12 : 6;
+                    $col = ('text' == $name) ? 12 : 6;
                     ?>
                     <div class="col-md-<?php echo $col; ?>">
                         <?php echo $view['form']->row($form['properties'][$name]); ?>

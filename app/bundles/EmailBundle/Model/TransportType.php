@@ -17,14 +17,15 @@ class TransportType
      */
     private $transportTypes = [
         'mautic.transport.amazon'       => 'mautic.email.config.mailer_transport.amazon',
+        'mautic.transport.amazon_api'   => 'mautic.email.config.mailer_transport.amazon_api',
         'mautic.transport.elasticemail' => 'mautic.email.config.mailer_transport.elasticemail',
         'gmail'                         => 'mautic.email.config.mailer_transport.gmail',
         'mautic.transport.mandrill'     => 'mautic.email.config.mailer_transport.mandrill',
         'mautic.transport.mailjet'      => 'mautic.email.config.mailer_transport.mailjet',
         'smtp'                          => 'mautic.email.config.mailer_transport.smtp',
-        'mail'                          => 'mautic.email.config.mailer_transport.mail',
         'mautic.transport.postmark'     => 'mautic.email.config.mailer_transport.postmark',
         'mautic.transport.sendgrid'     => 'mautic.email.config.mailer_transport.sendgrid',
+        'mautic.transport.pepipost'     => 'mautic.email.config.mailer_transport.pepipost',
         'mautic.transport.sendgrid_api' => 'mautic.email.config.mailer_transport.sendgrid_api',
         'sendmail'                      => 'mautic.email.config.mailer_transport.sendmail',
         'mautic.transport.sparkpost'    => 'mautic.email.config.mailer_transport.sparkpost',
@@ -42,6 +43,7 @@ class TransportType
      */
     private $showPort = [
         'smtp',
+        'mautic.transport.amazon',
     ];
 
     /**
@@ -50,8 +52,10 @@ class TransportType
     private $showUser = [
         'mautic.transport.mailjet',
         'mautic.transport.sendgrid',
+        'mautic.transport.pepipost',
         'mautic.transport.elasticemail',
         'mautic.transport.amazon',
+        'mautic.transport.amazon_api',
         'mautic.transport.postmark',
         'gmail',
         // smtp is left out on purpose as the auth_mode will manage displaying this field
@@ -63,8 +67,10 @@ class TransportType
     private $showPassword = [
         'mautic.transport.mailjet',
         'mautic.transport.sendgrid',
+        'mautic.transport.pepipost',
         'mautic.transport.elasticemail',
         'mautic.transport.amazon',
+        'mautic.transport.amazon_api',
         'mautic.transport.postmark',
         'gmail',
         // smtp is left out on purpose as the auth_mode will manage displaying this field
@@ -77,6 +83,14 @@ class TransportType
         'mautic.transport.sparkpost',
         'mautic.transport.mandrill',
         'mautic.transport.sendgrid_api',
+    ];
+
+    /**
+     * @var array
+     */
+    private $showAmazonRegion = [
+        'mautic.transport.amazon',
+        'mautic.transport.amazon_api',
     ];
 
     /**
@@ -148,6 +162,19 @@ class TransportType
     /**
      * @return string
      */
+    public function getServiceDoNotNeedAmazonRegion()
+    {
+        $tempTransports     = $this->transportTypes;
+
+        $transports               = array_keys($tempTransports);
+        $doNotRequireAmazonRegion = array_diff($transports, $this->showAmazonRegion);
+
+        return $this->getString($doNotRequireAmazonRegion);
+    }
+
+    /**
+     * @return string
+     */
     public function getServiceDoNotNeedUser()
     {
         // The auth_mode data-show-on will handle smtp
@@ -201,7 +228,7 @@ class TransportType
      */
     public function getAmazonService()
     {
-        return '"mautic.transport.amazon"';
+        return $this->getString($this->showAmazonRegion);
     }
 
     /**
@@ -213,28 +240,6 @@ class TransportType
     }
 
     /**
-     * @deprecated 2.14.0 to be removed in 3.0
-     *
-     * @return string
-     */
-    public function getServiceRequiresLogin()
-    {
-        return $this->getServiceRequiresUser();
-    }
-
-    /**
-     * @deprecated 2.14.0 to be removed in 3.0
-     *
-     * @return string
-     */
-    public function getServiceDoNotNeedLogin()
-    {
-        return $this->getServiceDoNotNeedUser();
-    }
-
-    /**
-     * @param array $services
-     *
      * @return string
      */
     private function getString(array $services)

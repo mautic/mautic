@@ -93,14 +93,8 @@ class Hit
      */
     private $code;
 
-    /**
-     * @var
-     */
     private $referer;
 
-    /**
-     * @var
-     */
     private $url;
 
     /**
@@ -152,9 +146,6 @@ class Hit
      */
     private $device;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -170,7 +161,7 @@ class Hit
         // created in fixtures instead
         //->addIndex(['url'], 'page_hit_url');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createField('dateHit', 'datetime')
             ->columnName('date_hit')
@@ -658,8 +649,6 @@ class Hit
     /**
      * Set ipAddress.
      *
-     * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
-     *
      * @return Hit
      */
     public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
@@ -760,8 +749,6 @@ class Hit
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return Hit
      */
     public function setLead(Lead $lead)
@@ -820,8 +807,6 @@ class Hit
     }
 
     /**
-     * @param Redirect $redirect
-     *
      * @return Hit
      */
     public function setRedirect(Redirect $redirect)
@@ -876,8 +861,6 @@ class Hit
     }
 
     /**
-     * @param LeadDevice $device
-     *
      * @return Hit
      */
     public function setDeviceStat(LeadDevice $device)

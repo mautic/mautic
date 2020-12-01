@@ -74,8 +74,15 @@ class Stat
     private $tokens = [];
 
     /**
-     * @param ORM\ClassMetadata $metadata
+     * @var array
      */
+    private $details = [];
+
+    /**
+     * @var bool
+     */
+    private $isFailed = false;
+
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -84,9 +91,10 @@ class Stat
             ->setCustomRepositoryClass('Mautic\SmsBundle\Entity\StatRepository')
             ->addIndex(['sms_id', 'lead_id'], 'stat_sms_search')
             ->addIndex(['tracking_hash'], 'stat_sms_hash_search')
-            ->addIndex(['source', 'source_id'], 'stat_sms_source_search');
+            ->addIndex(['source', 'source_id'], 'stat_sms_source_search')
+            ->addIndex(['is_failed'], 'stat_sms_failed_search');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createManyToOne('sms', 'Sms')
             ->inversedBy('stats')
@@ -103,6 +111,11 @@ class Stat
 
         $builder->createField('dateSent', 'datetime')
             ->columnName('date_sent')
+            ->build();
+
+        $builder->createField('isFailed', 'boolean')
+            ->columnName('is_failed')
+            ->nullable()
             ->build();
 
         $builder->createField('trackingHash', 'string')
@@ -122,6 +135,8 @@ class Stat
         $builder->createField('tokens', 'array')
             ->nullable()
             ->build();
+
+        $builder->addField('details', 'json_array');
     }
 
     /**
@@ -137,11 +152,13 @@ class Stat
                     'id',
                     'ipAddress',
                     'dateSent',
+                    'isFailed',
                     'source',
                     'sourceId',
                     'trackingHash',
                     'lead',
                     'sms',
+                    'details',
                 ]
             )
             ->build();
@@ -164,8 +181,6 @@ class Stat
     }
 
     /**
-     * @param Sms $sms
-     *
      * @return Stat
      */
     public function setSms(Sms $sms)
@@ -184,8 +199,6 @@ class Stat
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return Stat
      */
     public function setLead(Lead $lead)
@@ -204,8 +217,6 @@ class Stat
     }
 
     /**
-     * @param LeadList $list
-     *
      * @return Stat
      */
     public function setList(LeadList $list)
@@ -224,8 +235,6 @@ class Stat
     }
 
     /**
-     * @param IpAddress $ipAddress
-     *
      * @return Stat
      */
     public function setIpAddress(IpAddress $ipAddress)
@@ -324,13 +333,64 @@ class Stat
     }
 
     /**
-     * @param array $tokens
-     *
      * @return Stat
      */
     public function setTokens(array $tokens)
     {
         $this->tokens = $tokens;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $isFailed
+     *
+     * @return Stat
+     */
+    public function setIsFailed($isFailed)
+    {
+        $this->isFailed = $isFailed;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFailed()
+    {
+        return $this->isFailed;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDetails()
+    {
+        return $this->details;
+    }
+
+    /**
+     * @param array $details
+     *
+     * @return Stat
+     */
+    public function setDetails($details)
+    {
+        $this->details = $details;
+
+        return $this;
+    }
+
+    /**
+     * @param string $type
+     * @param string $detail
+     *
+     * @return Stat
+     */
+    public function addDetail($type, $detail)
+    {
+        $this->details[$type][] = $detail;
 
         return $this;
     }

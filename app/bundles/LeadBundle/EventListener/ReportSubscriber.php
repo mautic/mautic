@@ -11,8 +11,8 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -26,11 +26,10 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Mautic\StageBundle\Model\StageModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class ReportSubscriber.
- */
-class ReportSubscriber extends CommonSubscriber
+class ReportSubscriber implements EventSubscriberInterface
 {
     const CONTEXT_LEADS                     = 'leads';
     const CONTEXT_LEAD_POINT_LOG            = 'lead.pointlog';
@@ -56,22 +55,27 @@ class ReportSubscriber extends CommonSubscriber
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
      * @var StageModel
      */
-    protected $stageModel;
+    private $stageModel;
 
     /**
      * @var CampaignModel
      */
-    protected $campaignModel;
+    private $campaignModel;
+
+    /**
+     * @var EventCollector
+     */
+    private $eventCollector;
 
     /**
      * @var CompanyModel
      */
-    protected $companyModel;
+    private $companyModel;
 
     /**
      * @var FieldsBuilder
@@ -81,12 +85,12 @@ class ReportSubscriber extends CommonSubscriber
     /**
      * @var array
      */
-    protected $channels;
+    private $channels;
 
     /**
      * @var array
      */
-    protected $channelActions;
+    private $channelActions;
 
     /**
      * @var CompanyReportData
@@ -94,27 +98,28 @@ class ReportSubscriber extends CommonSubscriber
     private $companyReportData;
 
     /**
-     * @param LeadModel         $leadModel
-     * @param StageModel        $stageModel
-     * @param CampaignModel     $campaignModel
-     * @param CompanyModel      $companyModel
-     * @param CompanyReportData $companyReportData
-     * @param FieldsBuilder     $fieldsBuilder
+     * @var TranslatorInterface
      */
+    private $translator;
+
     public function __construct(
         LeadModel $leadModel,
         StageModel $stageModel,
         CampaignModel $campaignModel,
+        EventCollector $eventCollector,
         CompanyModel $companyModel,
         CompanyReportData $companyReportData,
-        FieldsBuilder $fieldsBuilder
+        FieldsBuilder $fieldsBuilder,
+        TranslatorInterface $translator
     ) {
         $this->leadModel         = $leadModel;
         $this->stageModel        = $stageModel;
         $this->campaignModel     = $campaignModel;
+        $this->eventCollector    = $eventCollector;
         $this->companyModel      = $companyModel;
         $this->companyReportData = $companyReportData;
         $this->fieldsBuilder     = $fieldsBuilder;
+        $this->translator        = $translator;
     }
 
     /**
@@ -132,8 +137,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Add available tables and columns to the report builder lookup.
-     *
-     * @param ReportBuilderEvent $event
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
@@ -216,8 +219,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGeneratorEvent $event
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
@@ -381,8 +382,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGraphEvent $event
      */
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
@@ -409,7 +408,7 @@ class ReportSubscriber extends CommonSubscriber
 
             $chartQuery->applyDateFilters($queryBuilder, 'date_added', 'l');
 
-            if ($queryBuilder->getQueryPart('from')[0]['alias'] === 'lp') {
+            if ('lp' === $queryBuilder->getQueryPart('from')[0]['alias']) {
                 $queryBuilder->resetQueryPart('join');
                 $queryBuilder->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id');
             }
@@ -581,7 +580,7 @@ class ReportSubscriber extends CommonSubscriber
                     $chart        = new PieChart();
                     $companyCount = 0;
                     foreach ($counts as $count) {
-                        if ($count['companycountry'] != '') {
+                        if ('' != $count['companycountry']) {
                             $chart->setDataset($count['companycountry'], $count['companies']);
                         }
                         $companyCount += $count['companies'];
@@ -610,7 +609,7 @@ class ReportSubscriber extends CommonSubscriber
                     $chart        = new PieChart();
                     $companyCount = 0;
                     foreach ($counts as $count) {
-                        if ($count['companyindustry'] != '') {
+                        if ('' != $count['companyindustry']) {
                             $chart->setDataset($count['companyindustry'], $count['companies']);
                         }
                         $companyCount += $count['companies'];
@@ -650,11 +649,6 @@ class ReportSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param ReportBuilderEvent $event
-     * @param array              $columns
-     * @param array              $filters
-     */
     private function injectPointsReportData(ReportBuilderEvent $event, array $columns, array $filters)
     {
         $pointColumns = [
@@ -701,11 +695,6 @@ class ReportSubscriber extends CommonSubscriber
             ->addGraph($context, 'table', 'mautic.lead.table.top.actions');
     }
 
-    /**
-     * @param ReportBuilderEvent $event
-     * @param array              $columns
-     * @param array              $filters
-     */
     private function injectFrequencyReportData(ReportBuilderEvent $event, array $columns, array $filters)
     {
         $frequencyColumns = [
@@ -748,10 +737,7 @@ class ReportSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param ReportBuilderEvent $event
-     * @param array              $columns
-     * @param array              $filters
-     * @param string             $type
+     * @param string $type
      */
     private function injectAttributionReportData(ReportBuilderEvent $event, array $columns, array $filters, $type)
     {
@@ -804,7 +790,7 @@ class ReportSubscriber extends CommonSubscriber
         $filters = array_merge($filters, $event->getCategoryColumns('cat.'), $attributionColumns);
 
         // Setup available channels
-        $availableChannels = $this->campaignModel->getEvents();
+        $availableChannels = $this->eventCollector->getEventsArray();
         $channels          = [];
         $channelActions    = [];
         foreach ($availableChannels['decision'] as $channel => $decision) {
@@ -877,9 +863,6 @@ class ReportSubscriber extends CommonSubscriber
         $event->addTable($context, $data, self::GROUP_CONTACTS);
     }
 
-    /**
-     * @param ReportDataEvent $event
-     */
     public function onReportDisplay(ReportDataEvent $event)
     {
         $data = $event->getData();
@@ -891,7 +874,7 @@ class ReportSubscriber extends CommonSubscriber
             self::CONTEXT_CONTACT_MESSAGE_FREQUENCY,
         ])) {
             if (isset($data[0]['channel']) || isset($data[0]['channel_action']) || (isset($data[0]['activity_count']) && isset($data[0]['attribution']))) {
-                foreach ($data as $key => &$row) {
+                foreach ($data as &$row) {
                     if (isset($row['channel'])) {
                         $row['channel'] = $this->channels[$row['channel']];
                     }

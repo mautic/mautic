@@ -11,8 +11,10 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use Joomla\Http\HttpFactory;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Joomla\Http\Http;
+use Mautic\CoreBundle\Helper\Language\Installer;
+use Monolog\Logger;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Helper class for managing Mautic's installed languages.
@@ -25,25 +27,68 @@ class LanguageHelper
     private $cacheFile;
 
     /**
-     * @var \Joomla\Http\Http
+     * @var Http
      */
     private $connector;
 
     /**
-     * @var MauticFactory
+     * @var PathsHelper
      */
-    private $factory;
+    private $pathsHelper;
 
     /**
-     * @param MauticFactory $factory
+     * @var Logger
      */
-    public function __construct(MauticFactory $factory)
+    private $logger;
+
+    /**
+     * @var Installer
+     */
+    private $installer;
+
+    /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    /**
+     * @var array
+     */
+    private $supportedLanguages = [];
+
+    /**
+     * @var string
+     */
+    private $installedTranslationsDirectory;
+
+    /**
+     * @var string
+     */
+    private $defaultTranslationsDirectory;
+
+    public function __construct(PathsHelper $pathsHelper, Logger $logger, CoreParametersHelper $coreParametersHelper, Http $connector)
     {
-        $this->factory = $factory;
+        $this->pathsHelper                    = $pathsHelper;
+        $this->logger                         = $logger;
+        $this->coreParametersHelper           = $coreParametersHelper;
+        $this->connector                      = $connector;
+        $this->defaultTranslationsDirectory   = __DIR__.'/../Translations';
+        $this->installedTranslationsDirectory = $this->pathsHelper->getSystemPath('translations_root').'/translations';
+        $this->installer                      = new Installer($this->installedTranslationsDirectory);
 
         // Moved to outside environment folder so that it doesn't get wiped on each config update
-        $this->cacheFile = $this->factory->getSystemPath('cache').'/../languageList.txt';
-        $this->connector = HttpFactory::getHttp();
+        $this->cacheFile = $pathsHelper->getSystemPath('cache').'/../languageList.txt';
+    }
+
+    public function getSupportedLanguages(): array
+    {
+        if (!empty($this->supportedLanguages)) {
+            return $this->supportedLanguages;
+        }
+
+        $this->loadSupportedLanguages();
+
+        return $this->supportedLanguages;
     }
 
     /**
@@ -57,8 +102,7 @@ class LanguageHelper
      */
     public function extractLanguagePackage($languageCode)
     {
-        $packagePath = $this->factory->getSystemPath('cache').'/'.$languageCode.'.zip';
-        $translator  = $this->factory->getTranslator();
+        $packagePath = $this->pathsHelper->getSystemPath('cache').'/'.$languageCode.'.zip';
 
         // Make sure the package actually exists
         if (!file_exists($packagePath)) {
@@ -74,7 +118,7 @@ class LanguageHelper
         $zipper  = new \ZipArchive();
         $archive = $zipper->open($packagePath);
 
-        if ($archive !== true) {
+        if (true !== $archive) {
             // Get the exact error
             switch ($archive) {
                 case \ZipArchive::ER_EXISTS:
@@ -106,7 +150,18 @@ class LanguageHelper
         }
 
         // Extract the archive file now
-        $zipper->extractTo($this->factory->getSystemPath('translations_root').'/translations');
+        $tempDir = $this->pathsHelper->getSystemPath('tmp');
+
+        if (!$zipper->extractTo($tempDir)) {
+            return [
+                'error'   => true,
+                'message' => 'mautic.core.update.archive_failed_to_extract',
+            ];
+        }
+
+        $this->installer->install($tempDir, $languageCode)
+            ->cleanup();
+
         $zipper->close();
 
         // We can remove the package now
@@ -127,16 +182,16 @@ class LanguageHelper
      */
     public function fetchLanguages($overrideCache = false, $returnError = true)
     {
-        $overrideFile = $this->factory->getParameter('language_list_file');
+        $overrideFile = $this->coreParametersHelper->get('language_list_file');
         if (!empty($overrideFile) && is_readable($overrideFile)) {
             $overrideData = json_decode(file_get_contents($overrideFile), true);
             if (isset($overrideData['languages'])) {
                 return $overrideData['languages'];
             } elseif (isset($overrideData['name'])) {
                 return $overrideData;
-            } else {
-                return [];
             }
+
+            return [];
         }
 
         // Check if we have a cache file and try to return cached data if so
@@ -151,37 +206,45 @@ class LanguageHelper
 
         // Get the language data
         try {
-            $data      = $this->connector->post('https://updates.mautic.org/index.php?option=com_mauticdownload&task=fetchLanguages', [], [], 10);
-            $languages = json_decode($data->body, true);
-            $languages = $languages['languages'];
+            $data      = $this->connector->get($this->coreParametersHelper->get('translations_list_url'), [], 10);
+            $manifest  = json_decode($data->body, true);
+            $languages = [];
+
+            // translate the manifest (plain array) to a format
+            // expected everywhere else inside mautic (locale keyed sorted array)
+            foreach ($manifest['languages'] as $lang) {
+                $languages[$lang['locale']] = $lang;
+            }
+            ksort($languages);
         } catch (\Exception $exception) {
             // Log the error
-            $logger = $this->factory->getLogger();
-            $logger->addError('An error occurred while attempting to fetch the language list: '.$exception->getMessage());
+            $this->logger->addError('An error occurred while attempting to fetch the language list: '.$exception->getMessage());
 
-            return (!$returnError) ? [] : [
-                'error'   => true,
-                'message' => 'mautic.core.language.helper.error.fetching.languages',
-            ];
+            return (!$returnError)
+                ? []
+                : [
+                    'error'   => true,
+                    'message' => 'mautic.core.language.helper.error.fetching.languages',
+                ];
         }
 
-        if ($data->code != 200) {
+        if (200 != $data->code) {
             // Log the error
-            $logger = $this->factory->getLogger();
-            $logger->addError(sprintf(
-                'An unexpected %1$s code was returned while attempting to fetch the language.  The message received was: %2$s',
-                $data->code,
-                is_string($data->body) ? $data->body : implode('; ', $data->body)
-            ));
+            $this->logger->addError(
+                sprintf(
+                    'An unexpected %1$s code was returned while attempting to fetch the language.  The message received was: %2$s',
+                    $data->code,
+                    is_string($data->body) ? $data->body : implode('; ', $data->body)
+                )
+            );
 
-            return (!$returnError) ? [] : [
-                'error'   => true,
-                'message' => 'mautic.core.language.helper.error.fetching.languages',
-            ];
+            return (!$returnError)
+                ? []
+                : [
+                    'error'   => true,
+                    'message' => 'mautic.core.language.helper.error.fetching.languages',
+                ];
         }
-
-        // Alphabetize the languages
-        ksort($languages);
 
         // Store to cache
         $cacheData = [
@@ -221,14 +284,13 @@ class LanguageHelper
             ];
         }
 
-        $langUrl = 'https://updates.mautic.org/index.php?option=com_mauticdownload&task=downloadLanguagePackage&langCode='.$languageCode;
+        $langUrl = $this->coreParametersHelper->get('translations_fetch_url').$languageCode.'.zip';
 
         // GET the update data
         try {
             $data = $this->connector->get($langUrl);
         } catch (\Exception $exception) {
-            $logger = $this->factory->getLogger();
-            $logger->addError('An error occurred while attempting to fetch the package: '.$exception->getMessage());
+            $this->logger->addError('An error occurred while attempting to fetch the package: '.$exception->getMessage());
 
             return [
                 'error'   => true,
@@ -247,7 +309,7 @@ class LanguageHelper
                     '%url%' => $langUrl,
                 ],
             ];
-        } elseif ($data->code != 200) {
+        } elseif (200 != $data->code) {
             return [
                 'error'   => true,
                 'message' => 'mautic.core.language.helper.error.on.language.server.side',
@@ -258,7 +320,7 @@ class LanguageHelper
         }
 
         // Set the filesystem target
-        $target = $this->factory->getSystemPath('cache').'/'.$languageCode.'.zip';
+        $target = $this->pathsHelper->getSystemPath('cache').'/'.$languageCode.'.zip';
 
         // Write the response to the filesystem
         file_put_contents($target, $data->body);
@@ -267,5 +329,30 @@ class LanguageHelper
         return [
             'error' => false,
         ];
+    }
+
+    private function loadSupportedLanguages()
+    {
+        // Find available translations
+        $finder = new Finder();
+        $finder
+            ->directories()
+            ->in($this->defaultTranslationsDirectory)
+            ->in($this->installedTranslationsDirectory)
+            ->ignoreDotFiles(true)
+            ->depth('== 0');
+
+        foreach ($finder as $dir) {
+            $locale = $dir->getFilename();
+
+            // Check config exists
+            $configFile = $dir->getRealpath().'/config.json';
+            if (!file_exists($configFile)) {
+                return;
+            }
+
+            $config                            = json_decode(file_get_contents($configFile), true);
+            $this->supportedLanguages[$locale] = (!empty($config['name'])) ? $config['name'] : $locale;
+        }
     }
 }
