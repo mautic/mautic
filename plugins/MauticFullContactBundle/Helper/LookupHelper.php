@@ -48,18 +48,15 @@ class LookupHelper
     protected $router;
 
     /**
-     * @var
+     * @var LeadModel
      */
     protected $leadModel;
 
     /**
-     * @var
+     * @var CompanyModel
      */
     protected $companyModel;
 
-    /**
-     * LookupHelper constructor.
-     */
     public function __construct(
         IntegrationHelper $integrationHelper,
         UserHelper $userHelper,

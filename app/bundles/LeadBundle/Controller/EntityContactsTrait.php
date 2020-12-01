@@ -11,11 +11,9 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\LeadBundle\Entity\LeadRepository;
 
-/**
- * Class EntityContactsTrait.
- */
 trait EntityContactsTrait
 {
     /**
@@ -66,20 +64,15 @@ trait EntityContactsTrait
         $search = $this->request->get('search', $this->get('session')->get('mautic.'.$sessionVar.'.contact.filter', ''));
         $this->get('session')->set('mautic.'.$sessionVar.'.contact.filter', $search);
 
+        /** @var PageHelperFactoryInterface $pageHelperFacotry */
+        $pageHelperFacotry = $this->get('mautic.page.helper.factory');
+        $pageHelper        = $pageHelperFacotry->make("mautic.{$sessionVar}", $page);
+
         $filter     = ['string' => $search, 'force' => []];
         $orderBy    = $this->get('session')->get('mautic.'.$sessionVar.'.contact.orderby', 'l.id');
         $orderByDir = $this->get('session')->get('mautic.'.$sessionVar.'.contact.orderbydir', 'DESC');
-
-        //set limits
-        $limit = $this->get('session')->get(
-            'mautic.'.$sessionVar.'.contact.limit',
-            $this->get('mautic.helper.core_parameters')->get('default_pagelimit')
-        );
-
-        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
+        $limit      = $pageHelper->getLimit();
+        $start      = $pageHelper->getStart();
 
         /** @var LeadRepository $repo */
         $repo     = $this->getModel('lead')->getRepository();
@@ -103,8 +96,8 @@ trait EntityContactsTrait
         $count = $contacts['count'];
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            $lastPage = (1 === $count) ? 1 : (ceil($count / $limit)) ?: 1;
-            $this->get('session')->set('mautic.'.$sessionVar.'.contact.page', $lastPage);
+            $lastPage = $pageHelper->countPage($count);
+            $pageHelper->rememberPage($lastPage);
             $returnUrl = $this->generateUrl($route, array_merge(['objectId' => $entityId, 'page' => $lastPage], $routeParameters));
 
             return $this->postActionRedirect(
@@ -119,6 +112,8 @@ trait EntityContactsTrait
                 ]
             );
         }
+
+        $pageHelper->rememberPage($page);
 
         // Get DNC for the contact
         $dnc = [];

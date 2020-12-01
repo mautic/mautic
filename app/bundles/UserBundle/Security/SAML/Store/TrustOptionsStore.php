@@ -66,6 +66,10 @@ class TrustOptionsStore implements TrustOptionsStoreInterface
     {
         $this->trustOptions = $trustOptions = new TrustOptions();
 
+        if (!$this->coreParametersHelper->get('saml_idp_own_certificate')) {
+            return $trustOptions;
+        }
+
         $trustOptions->setSignAuthnRequest(true);
         $trustOptions->setEncryptAssertions(true);
         $trustOptions->setEncryptAuthnRequest(true);

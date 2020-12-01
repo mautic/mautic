@@ -12,6 +12,7 @@
 namespace Mautic\ReportBundle\Model;
 
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\ReportBundle\Crate\ReportDataResult;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -54,8 +55,9 @@ class ExcelExporter
 
             $header = [];
 
+            $reportDataResult = new ReportDataResult($reportData);
             //build the data rows
-            foreach ($reportData['data'] as $count => $data) {
+            foreach ($reportDataResult->getData() as $count=>$data) {
                 $row = [];
                 foreach ($data as $k => $v) {
                     if (0 === $count) {
@@ -72,7 +74,7 @@ class ExcelExporter
 
                 if (0 === $count) {
                     //write the column names row
-                    $objPHPExcel->getActiveSheet()->fromArray($header);
+                    $objPHPExcel->getActiveSheet()->fromArray($reportDataResult->getHeaders());
                 }
                 //write the row
                 $rowCount = $count + 2;

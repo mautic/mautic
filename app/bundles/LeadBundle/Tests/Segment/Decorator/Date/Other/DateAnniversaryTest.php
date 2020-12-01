@@ -75,4 +75,34 @@ class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($expectedResult, $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateAnniversary::getParameterValue
+     */
+    public function testGetParameterValueWithRelativeDate()
+    {
+        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $timezoneResolver = $this->createMock(TimezoneResolver::class);
+
+        $date = new DateTimeHelper('2018-03-02', null, 'local');
+
+        $timezoneResolver->method('getDefaultDate')
+            ->with()
+            ->willReturn($date);
+
+        $filter        = [
+            'operator' => '=',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
+
+        $filter        = [
+            'filter'   => 'birthday +2days',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+
+        $filterDecorator = new DateAnniversary($dateDecorator, $dateOptionParameters);
+
+        $this->assertEquals('%-03-04', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
 }

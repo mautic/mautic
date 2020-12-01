@@ -19,8 +19,10 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Exception\PartialEmailSendFailure;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
+use Mautic\EmailBundle\Swiftmailer\Transport\SpoolTransport;
 use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -40,14 +42,8 @@ class MailHelper
      */
     protected $factory;
 
-    /**
-     * @var
-     */
     protected $mailer;
 
-    /**
-     * @var
-     */
     protected $transport;
 
     /**
@@ -75,9 +71,6 @@ class MailHelper
      */
     protected $from;
 
-    /**
-     * @var
-     */
     protected $systemFrom;
 
     /**
@@ -249,9 +242,10 @@ class MailHelper
     private $copies = [];
 
     /**
-     * @param      $mailer
-     * @param null $from
+     * @var array
      */
+    private $embedImagesReplaces = [];
+
     public function __construct(MauticFactory $factory, \Swift_Mailer $mailer, $from = null)
     {
         $this->factory   = $factory;
@@ -274,7 +268,10 @@ class MailHelper
         $this->returnPath = $factory->getParameter('mailer_return_path');
 
         // Check if batching is supported by the transport
-        if ('memory' == $this->factory->getParameter('mailer_spool_type') && $this->transport instanceof TokenTransportInterface) {
+        if (
+            ('memory' == $this->factory->getParameter('mailer_spool_type') && $this->transport instanceof TokenTransportInterface)
+            || ($this->transport instanceof SpoolTransport && $this->transport->supportsTokenization())
+        ) {
             $this->tokenizationEnabled = true;
         }
 
@@ -431,16 +428,20 @@ class MailHelper
 
                 $failures = null;
 
-                if ($this->factory->getParameter('mailer_convert_embed_images')) {
-                    $convertedContent = $this->convertEmbedImages($this->message->getBody());
-                    $this->message->setBody($convertedContent);
-                }
-
                 $this->mailer->send($this->message, $failures);
 
                 if (!empty($failures)) {
                     $this->errors['failures'] = $failures;
                     $this->logError('Sending failed for one or more recipients');
+                }
+
+                // Clear the log so that previous output is not associated with new errors
+                $this->logger->clear();
+            } catch (PartialEmailSendFailure $exception) {
+                // Don't fail the entire message
+                if (!empty($failures)) {
+                    $this->errors['failures'] = $failures;
+                    $this->logError($exception->getMessage());
                 }
 
                 // Clear the log so that previous output is not associated with new errors
@@ -750,7 +751,7 @@ class MailHelper
         /** @var \Swift_Mime_SimpleMimeEntity $child */
         foreach ($children as $child) {
             $childType  = $child->getContentType();
-            list($type) = sscanf($childType, '%[^/]/%s');
+            [$type]     = sscanf($childType, '%[^/]/%s');
 
             if ('text' == $type) {
                 $childBody = $child->getBody();
@@ -954,6 +955,10 @@ class MailHelper
      */
     public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false)
     {
+        if ($this->factory->getParameter('mailer_convert_embed_images')) {
+            $content = $this->convertEmbedImages($content);
+        }
+
         if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
             // Append tracking pixel
             $trackingImg = '<img height="1" width="1" src="{tracking_pixel}" alt="" />';
@@ -982,14 +987,14 @@ class MailHelper
     private function convertEmbedImages($content)
     {
         $matches = [];
+        $content = strtr($content, $this->embedImagesReplaces);
         if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
-            $replaces = [];
             foreach ($matches[1] as $match) {
-                if (false === strpos($match, 'cid:')) {
-                    $replaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
+                if (false === strpos($match, 'cid:') && false === strpos($match, '{tracking_pixel}')) {
+                    $this->embedImagesReplaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
                 }
             }
-            $content = strtr($content, $replaces);
+            $content = strtr($content, $this->embedImagesReplaces);
         }
 
         return $content;
@@ -1875,7 +1880,8 @@ class MailHelper
             $copy        = $emailModel->getCopyRepository()->findByHash($hash);
             $copyCreated = false;
             if (null === $copy) {
-                if (!$emailModel->getCopyRepository()->saveCopy($hash, $this->subject, $this->body['content'])) {
+                $contentToPersist = strtr($this->body['content'], array_flip($this->embedImagesReplaces));
+                if (!$emailModel->getCopyRepository()->saveCopy($hash, $this->subject, $contentToPersist)) {
                     // Try one more time to find the ID in case there was overlap when creating
                     $copy = $emailModel->getCopyRepository()->findByHash($hash);
                 } else {
@@ -1936,7 +1942,7 @@ class MailHelper
 
         if ($settings = $this->isMontoringEnabled('EmailBundle', 'bounces')) {
             // Append the bounce notation
-            list($email, $domain) = explode('@', $settings['address']);
+            [$email, $domain] = explode('@', $settings['address']);
             $email .= '+bounce';
             if ($idHash || $this->idHash) {
                 $email .= '_'.($idHash ?: $this->idHash);
@@ -1960,7 +1966,7 @@ class MailHelper
 
         if ($settings = $this->isMontoringEnabled('EmailBundle', 'unsubscribes')) {
             // Append the bounce notation
-            list($email, $domain) = explode('@', $settings['address']);
+            [$email, $domain] = explode('@', $settings['address']);
             $email .= '+unsubscribe';
             if ($idHash || $this->idHash) {
                 $email .= '_'.($idHash ?: $this->idHash);

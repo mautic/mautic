@@ -16,7 +16,7 @@ class DynamicsIntegrationTest extends AbstractIntegrationTestCase
     /** @var DynamicsIntegration */
     private $integration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -35,7 +35,8 @@ class DynamicsIntegrationTest extends AbstractIntegrationTestCase
             $this->pathsHelper,
             $this->notificationModel,
             $this->fieldModel,
-            $this->integrationEntityModel
+            $this->integrationEntityModel,
+            $this->doNotContact
         );
     }
 

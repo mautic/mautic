@@ -63,35 +63,6 @@ class UserRepository extends CommonRepository
     }
 
     /**
-     * @param $userId
-     * @param $status
-     */
-    public function setOnlineStatus($userId, $status)
-    {
-        $conn = $this->_em->getConnection();
-        $conn->update(MAUTIC_TABLE_PREFIX.'users', ['online_status' => $status], ['id' => (int) $userId]);
-    }
-
-    /**
-     * Last active updates every 2 minutes. If it didn't get updated, it means the user closed their browser and are thus
-     * now offline.
-     */
-    public function updateOnlineStatuses()
-    {
-        $dt           = new DateTimeHelper();
-        $offlineDelay = $dt->getUtcDateTime();
-        $offlineDelay->setTimestamp(strtotime('15 minutes ago'));
-
-        $q = $this->_em->createQueryBuilder()
-            ->update('MauticUserBundle:User', 'u')
-            ->set('u.onlineStatus', ':status')
-            ->where('u.lastActive <= :delay')
-            ->setParameter('delay', $offlineDelay)
-            ->setParameter('status', 'offline');
-        $q->getQuery()->execute();
-    }
-
-    /**
      * Checks to ensure that a username and/or email is unique.
      *
      * @param $params

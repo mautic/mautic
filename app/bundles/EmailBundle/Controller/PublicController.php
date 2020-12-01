@@ -172,7 +172,7 @@ class PublicController extends CommonFormController
 
             if ($lead = $stat->getLead()) {
                 // Set the lead as current lead
-                $leadModel->setCurrentLead($lead);
+                $this->get('mautic.tracker.contact')->setTrackedContact($lead);
 
                 // Set lead lang
                 if ($lead->getPreferredLocale()) {
@@ -335,7 +335,7 @@ class PublicController extends CommonFormController
                 // Set the lead as current lead
                 /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
                 $leadModel = $this->getModel('lead');
-                $leadModel->setCurrentLead($lead);
+                $this->get('mautic.tracker.contact')->setTrackedContact($lead);
 
                 // Set lead lang
                 if ($lead->getPreferredLocale()) {

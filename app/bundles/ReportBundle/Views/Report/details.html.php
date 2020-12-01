@@ -172,7 +172,7 @@ if ('index' == $tmpl) {
 <div class="report-content">
     <?php $view['slots']->output('_content'); ?>
 </div>
-<?php if (!empty($debug)): ?>
+<?php if (!empty($debug) && isset($debug['count_query'])): ?>
 <div class="well">
     <h4>Debug: <?php echo $debug['query_time']; ?></h4>
     <div><?php echo $debug['count_query']; ?></div>

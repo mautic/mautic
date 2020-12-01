@@ -77,13 +77,8 @@ class PointEventHelperTest extends \PHPUnit\Framework\TestCase
     {
         $mock = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
-            ->setMethods(['flattenFields'])
             ->getMock()
         ;
-
-        $mock->expects($this->any())
-            ->method('flattenFields')
-            ->willReturn([]);
 
         return $mock;
     }

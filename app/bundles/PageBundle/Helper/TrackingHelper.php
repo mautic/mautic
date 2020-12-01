@@ -14,7 +14,7 @@ namespace Mautic\PageBundle\Helper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 
@@ -23,11 +23,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
  */
 class TrackingHelper
 {
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
     /**
      * @var Session
      */
@@ -44,14 +39,23 @@ class TrackingHelper
     protected $request;
 
     /**
+     * @var ContactTracker
+     */
+    protected $contactTracker;
+
+    /**
      * BuildJsSubscriber constructor.
      */
-    public function __construct(LeadModel $leadModel, Session $session, CoreParametersHelper $coreParametersHelper, RequestStack $request)
-    {
-        $this->leadModel            = $leadModel;
+    public function __construct(
+        Session $session,
+        CoreParametersHelper $coreParametersHelper,
+        RequestStack $request,
+        ContactTracker $contactTracker
+    ) {
         $this->session              = $session;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->request              = $request;
+        $this->contactTracker       = $contactTracker;
     }
 
     public function getEnabledServices()
@@ -72,7 +76,7 @@ class TrackingHelper
 
     public function getSessionName()
     {
-        $lead = $this->leadModel->getCurrentLead();
+        $lead = $this->contactTracker->getContact();
         if ($lead instanceof Lead) {
             return 'mtc-tracking-pixel-events-'.$lead->getId();
         }
@@ -129,7 +133,7 @@ class TrackingHelper
      */
     public function getLead()
     {
-        return $this->leadModel->getCurrentLead();
+        return $this->contactTracker->getContact();
     }
 
     public function getAnonymizeIp()

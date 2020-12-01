@@ -13,19 +13,13 @@ namespace Mautic\AssetBundle\Helper;
 
 use Mautic\AssetBundle\Model\AssetModel;
 
-/**
- * Class TokenHelper.
- */
 class TokenHelper
 {
     /**
-     * @var
+     * @var AssetModel
      */
     protected $model;
 
-    /**
-     * TokenHelper constructor.
-     */
     public function __construct(AssetModel $model)
     {
         $this->model = $model;
