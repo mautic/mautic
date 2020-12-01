@@ -31,15 +31,13 @@ class Tag
 
     /**
      * @param string $tag
+     * @param bool   $clean
      */
-    public function __construct($tag = null)
+    public function __construct($tag = null, $clean = true)
     {
-        $this->tag = $this->validateTag($tag);
+        $this->tag = $clean ? $this->validateTag($tag) : $tag;
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadMetadata(ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -51,9 +49,6 @@ class Tag
         $builder->addField('tag', Type::STRING);
     }
 
-    /**
-     * @param ApiMetadataDriver $metadata
-     */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
         $metadata->setGroupPrefix('tag')

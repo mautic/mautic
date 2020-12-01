@@ -13,37 +13,28 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class LeadCategoryType.
- */
 class LeadCategoryType extends AbstractType
 {
     private $categoryModel;
 
-    /**
-     * @param CategoryModel $categoryModel
-     */
     public function __construct(CategoryModel $categoryModel)
     {
         $this->categoryModel = $categoryModel;
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $model = $this->categoryModel;
         $resolver->setDefaults([
-            'choices' => function (Options $options) use ($model) {
-                $categories = $model->getLookupResults('global');
+            'choices'           => function (Options $options) {
+                $categories = $this->categoryModel->getLookupResults('global');
+                $choices    = [];
 
-                $choices = [];
                 foreach ($categories as $cat) {
-                    $choices[$cat['id']] = $cat['title'];
+                    $choices[$cat['title']] = $cat['id'];
                 }
 
                 return $choices;
@@ -54,17 +45,17 @@ class LeadCategoryType extends AbstractType
     }
 
     /**
-     * @return null|string|\Symfony\Component\Form\FormTypeInterface
+     * @return string|\Symfony\Component\Form\FormTypeInterface|null
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'leadcategory_choices';
     }

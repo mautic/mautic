@@ -25,7 +25,7 @@ trait VariantEntityTrait
     /**
      * @var Page
      **/
-    private $variantParent = null;
+    private $variantParent;
 
     /**
      * @var array
@@ -68,8 +68,6 @@ trait VariantEntityTrait
     /**
      * Add variant.
      *
-     * @param VariantEntityInterface $child
-     *
      * @return $this
      */
     public function addVariantChild(VariantEntityInterface $child)
@@ -83,8 +81,6 @@ trait VariantEntityTrait
 
     /**
      * Remove variant.
-     *
-     * @param VariantEntityInterface $child
      */
     public function removeVariantChild(VariantEntityInterface $child)
     {
@@ -134,7 +130,7 @@ trait VariantEntityTrait
      */
     public function removeVariantParent()
     {
-        $this->setVariantParent(null);
+        $this->setVariantParent();
     }
 
     /**
@@ -200,7 +196,7 @@ trait VariantEntityTrait
         $children = $this->getVariantChildren();
 
         if ($isChild) {
-            return ($parent === null) ? false : true;
+            return (null === $parent) ? false : true;
         } else {
             return (!empty($parent) || count($children)) ? true : false;
         }

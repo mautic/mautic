@@ -18,7 +18,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\EmailBundle\Entity\EmailRepository;
 
-class EmailRepositoryTest extends \PHPUnit_Framework_TestCase
+class EmailRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     private $mockConnection;
     private $em;
@@ -29,7 +29,7 @@ class EmailRepositoryTest extends \PHPUnit_Framework_TestCase
      */
     private $repo;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -11,40 +11,41 @@
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Api\Zoho;
 
+use MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException;
 use MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper;
 
-class MapperTest extends \PHPUnit_Framework_TestCase
+class MapperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array
      */
     protected $availableFields = [
         'Leads' => [
-                'Company' => [
-                        'type'     => 'string',
-                        'label'    => 'Company',
-                        'dv'       => 'Company',
-                        'required' => true,
-                    ],
-                'FirstName' => [
-                        'type'     => 'string',
-                        'label'    => 'First Name',
-                        'dv'       => 'First Name',
-                        'required' => false,
-                    ],
-                'LastName' => [
-                        'type'     => 'string',
-                        'label'    => 'Last Name',
-                        'dv'       => 'Last Name',
-                        'required' => true,
-                    ],
-                'Email' => [
-                        'type'     => 'string',
-                        'label'    => 'Email',
-                        'dv'       => 'Email',
-                        'required' => false,
-                    ],
+            'Company'   => [
+                'type'     => 'string',
+                'label'    => 'Company',
+                'api_name' => 'Company',
+                'required' => true,
             ],
+            'FirstName' => [
+                'type'     => 'string',
+                'label'    => 'First Name',
+                'api_name' => 'First Name',
+                'required' => false,
+            ],
+            'LastName'  => [
+                'type'     => 'string',
+                'label'    => 'Last Name',
+                'api_name' => 'Last Name',
+                'required' => true,
+            ],
+            'Email'     => [
+                'type'     => 'string',
+                'label'    => 'Email',
+                'api_name' => 'Email',
+                'required' => false,
+            ],
+        ],
     ];
 
     /**
@@ -92,12 +93,12 @@ class MapperTest extends \PHPUnit_Framework_TestCase
     ];
 
     /**
-     * @testdox Test that xml is generated according to the mapping
+     * @testdox Test that array is generated according to the mapping
      *
      * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::map()
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getXml()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getArray()
      */
-    public function testXmlIsGeneratedBasedOnMapping()
+    public function testArrayIsGeneratedBasedOnMapping()
     {
         $mapper = new Mapper($this->availableFields);
         $mapper->setObject('Leads');
@@ -108,35 +109,34 @@ class MapperTest extends \PHPUnit_Framework_TestCase
                 ->map($contact['internal_entity_id']);
         }
 
-        $xml = <<<'XML'
-<Leads>
-<row no="1">
-<FL val="Email"><![CDATA[zoho1@email.com]]></FL>
-<FL val="First Name"><![CDATA[FirstName1]]></FL>
-<FL val="Last Name"><![CDATA[LastName1]]></FL>
-</row>
-<row no="2">
-<FL val="Email"><![CDATA[zoho2@email.com]]></FL>
-<FL val="First Name"><![CDATA[FirstName2]]></FL>
-<FL val="Last Name"><![CDATA[LastName2]]></FL>
-</row>
-<row no="3">
-<FL val="Email"><![CDATA[zoho3@email.com]]></FL>
-<FL val="First Name"><![CDATA[FirstName3]]></FL>
-<FL val="Last Name"><![CDATA[LastName3]]></FL>
-</row>
-</Leads>
-XML;
-        $this->assertEquals($xml, $mapper->getXml());
+        $expected = [
+            [
+                'Email'      => 'zoho1@email.com',
+                'First Name' => 'FirstName1',
+                'Last Name'  => 'LastName1',
+            ],
+            [
+                'Email'      => 'zoho2@email.com',
+                'First Name' => 'FirstName2',
+                'Last Name'  => 'LastName2',
+            ],
+            [
+                'Email'      => 'zoho3@email.com',
+                'First Name' => 'FirstName3',
+                'Last Name'  => 'LastName3',
+            ],
+        ];
+
+        $this->assertEquals($expected, $mapper->getArray());
     }
 
     /**
      * @testdox Test that contacts do not inherit previous contact information
      *
      * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::map()
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getXml()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getArray()
      */
-    public function testContactDoesNotInheritPrevioudContactData()
+    public function testContactDoesNotInheritPreviousContactData()
     {
         $mapper = new Mapper($this->availableFields);
         $mapper->setObject('Leads');
@@ -147,38 +147,39 @@ XML;
         foreach ($contacts as $contact) {
             $mapper->setMappedFields($this->mappedFields)
                 ->setContact($contact)
-                ->map($contact['internal_entity_id']);
+                ->map($contact['internal_entity_id'], $contact['integration_entity_id']);
         }
 
-        $xml = <<<'XML'
-<Leads>
-<row no="1">
-<FL val="Email"><![CDATA[zoho1@email.com]]></FL>
-<FL val="First Name"><![CDATA[FirstName1]]></FL>
-<FL val="Last Name"><![CDATA[LastName1]]></FL>
-</row>
-<row no="2">
-<FL val="Email"><![CDATA[zoho2@email.com]]></FL>
-<FL val="Last Name"><![CDATA[LastName2]]></FL>
-</row>
-<row no="3">
-<FL val="Email"><![CDATA[zoho3@email.com]]></FL>
-<FL val="First Name"><![CDATA[FirstName3]]></FL>
-<FL val="Last Name"><![CDATA[LastName3]]></FL>
-</row>
-</Leads>
-XML;
+        $expected = [
+            [
+                'id'         => 'abc',
+                'Email'      => 'zoho1@email.com',
+                'First Name' => 'FirstName1',
+                'Last Name'  => 'LastName1',
+            ],
+            [
+                'id'         => 'def',
+                'Email'      => 'zoho2@email.com',
+                'Last Name'  => 'LastName2',
+            ],
+            [
+                'id'         => 'ghi',
+                'Email'      => 'zoho3@email.com',
+                'First Name' => 'FirstName3',
+                'Last Name'  => 'LastName3',
+            ],
+        ];
 
-        $this->assertEquals($xml, $mapper->getXml());
+        $this->assertEquals($expected, $mapper->getArray());
     }
 
     /**
-     * @testdox Test that xml is generated according to the mapping
+     * @testdox Test that array is generated according to the mapping
      *
      * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::map()
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getXml()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getArray()
      */
-    public function testXmlIsGeneratedBasedOnMappingWithId()
+    public function testArrayIsGeneratedBasedOnMappingWithId()
     {
         $mapper = new Mapper($this->availableFields);
         $mapper->setObject('Leads');
@@ -189,28 +190,69 @@ XML;
                 ->map($contact['internal_entity_id'], $contact['integration_entity_id']);
         }
 
-        $xml = <<<'XML'
-<Leads>
-<row no="1">
-<FL val="Id"><![CDATA[abc]]></FL>
-<FL val="Email"><![CDATA[zoho1@email.com]]></FL>
-<FL val="First Name"><![CDATA[FirstName1]]></FL>
-<FL val="Last Name"><![CDATA[LastName1]]></FL>
-</row>
-<row no="2">
-<FL val="Id"><![CDATA[def]]></FL>
-<FL val="Email"><![CDATA[zoho2@email.com]]></FL>
-<FL val="First Name"><![CDATA[FirstName2]]></FL>
-<FL val="Last Name"><![CDATA[LastName2]]></FL>
-</row>
-<row no="3">
-<FL val="Id"><![CDATA[ghi]]></FL>
-<FL val="Email"><![CDATA[zoho3@email.com]]></FL>
-<FL val="First Name"><![CDATA[FirstName3]]></FL>
-<FL val="Last Name"><![CDATA[LastName3]]></FL>
-</row>
-</Leads>
-XML;
-        $this->assertEquals($xml, $mapper->getXml());
+        $expected = [
+            [
+                'id'         => 'abc',
+                'Email'      => 'zoho1@email.com',
+                'First Name' => 'FirstName1',
+                'Last Name'  => 'LastName1',
+            ],
+            [
+                'id'         => 'def',
+                'First Name' => 'FirstName2',
+                'Email'      => 'zoho2@email.com',
+                'Last Name'  => 'LastName2',
+            ],
+            [
+                'id'         => 'ghi',
+                'Email'      => 'zoho3@email.com',
+                'First Name' => 'FirstName3',
+                'Last Name'  => 'LastName3',
+            ],
+        ];
+
+        $this->assertEquals($expected, $mapper->getArray());
+    }
+
+    /**
+     * @testdox Test asking for a key returns the correct contact
+     *
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getContactIdByKey()
+     */
+    public function testThatContactIdMatchesGivenKey()
+    {
+        $mapper = new Mapper($this->availableFields);
+        $mapper->setObject('Leads');
+
+        foreach ($this->contacts as $contact) {
+            $mapper->setMappedFields($this->mappedFields)
+                ->setContact($contact)
+                ->map($contact['internal_entity_id'], $contact['integration_entity_id']);
+        }
+
+        $this->assertEquals(3, $mapper->getContactIdByKey(2));
+        $this->assertEquals(2, $mapper->getContactIdByKey(1));
+        $this->assertEquals(1, $mapper->getContactIdByKey(0));
+    }
+
+    /**
+     * @testdox Test asking for a key that doesn't exist throws exception
+     *
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getContactIdByKey()
+     */
+    public function testThatExceptionIsThrownIfKeyNotFound()
+    {
+        $this->expectException(MatchingKeyNotFoundException::class);
+
+        $mapper = new Mapper($this->availableFields);
+        $mapper->setObject('Leads');
+
+        foreach ($this->contacts as $contact) {
+            $mapper->setMappedFields($this->mappedFields)
+                ->setContact($contact)
+                ->map($contact['internal_entity_id'], $contact['integration_entity_id']);
+        }
+
+        $mapper->getContactIdByKey(4);
     }
 }

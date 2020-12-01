@@ -13,35 +13,44 @@ namespace Mautic\UserBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\UserBundle\Model\RoleModel;
 use Mautic\UserBundle\Model\UserModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class SearchSubscriber.
- */
-class SearchSubscriber extends CommonSubscriber
+class SearchSubscriber implements EventSubscriberInterface
 {
     /**
      * @var UserModel
      */
-    protected $userModel;
+    private $userModel;
 
     /**
      * @var RoleModel
      */
-    protected $userRoleModel;
+    private $userRoleModel;
 
     /**
-     * SearchSubscriber constructor.
-     *
-     * @param UserModel $userModel
-     * @param RoleModel $roleModel
+     * @var CorePermissions
      */
-    public function __construct(UserModel $userModel, RoleModel $roleModel)
-    {
+    private $security;
+
+    /**
+     * @var TemplatingHelper
+     */
+    private $templating;
+
+    public function __construct(
+        UserModel $userModel,
+        RoleModel $roleModel,
+        CorePermissions $security,
+        TemplatingHelper $templating
+    ) {
         $this->userModel     = $userModel;
         $this->userRoleModel = $roleModel;
+        $this->security      = $security;
+        $this->templating    = $templating;
     }
 
     /**
@@ -73,7 +82,7 @@ class SearchSubscriber extends CommonSubscriber
                 $userResults = [];
                 $canEdit     = $this->security->isGranted('user:users:edit');
                 foreach ($users as $user) {
-                    $userResults[] = $this->templating->renderResponse(
+                    $userResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticUserBundle:SubscribedEvents\Search:global_user.html.php',
                         [
                             'user'    => $user,
@@ -82,7 +91,7 @@ class SearchSubscriber extends CommonSubscriber
                     )->getContent();
                 }
                 if (count($users) > 5) {
-                    $userResults[] = $this->templating->renderResponse(
+                    $userResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticUserBundle:SubscribedEvents\Search:global_user.html.php',
                         [
                             'showMore'     => true,
@@ -107,7 +116,7 @@ class SearchSubscriber extends CommonSubscriber
                 $canEdit     = $this->security->isGranted('user:roles:edit');
 
                 foreach ($roles as $role) {
-                    $roleResults[] = $this->templating->renderResponse(
+                    $roleResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticUserBundle:SubscribedEvents\Search:global_role.html.php',
                         [
                             'role'    => $role,
@@ -116,7 +125,7 @@ class SearchSubscriber extends CommonSubscriber
                     )->getContent();
                 }
                 if (count($roles) > 5) {
-                    $roleResults[] = $this->templating->renderResponse(
+                    $roleResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticUserBundle:SubscribedEvents\Search:global_role.html.php',
                         [
                             'showMore'     => true,
@@ -131,9 +140,6 @@ class SearchSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param MauticEvents\CommandListEvent $event
-     */
     public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
         if ($this->security->isGranted('user:users:view')) {

@@ -20,7 +20,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Monolog\Logger;
 
-class ContactFinderTest extends \PHPUnit_Framework_TestCase
+class ContactFinderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Contact should be found via contact email address
@@ -87,7 +87,7 @@ class ContactFinderTest extends \PHPUnit_Framework_TestCase
         $statRepository->expects($this->once())
             ->method('findOneBy')
             ->willReturnCallback(
-                function ($hash) use ($lead, $stat) {
+                function ($hash) use ($stat) {
                     $stat->setTrackingHash($hash);
 
                     $email = new Email();

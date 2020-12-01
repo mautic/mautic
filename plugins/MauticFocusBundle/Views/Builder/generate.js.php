@@ -11,18 +11,18 @@
 $style          = $focus['style'];
 $props          = $focus['properties'];
 $useScrollEvent = in_array($props['when'], ['scroll_slight', 'scroll_middle', 'scroll_bottom']);
-$useUnloadEvent = ($props['when'] == 'leave');
+$useUnloadEvent = ('leave' == $props['when']);
 $useTimeout     = (int) $props['timeout'];
-if ($props['when'] == '5seconds') {
+if ('5seconds' == $props['when']) {
     $useTimeout = 5;
-} elseif ($props['when'] == 'minute') {
+} elseif ('minute' == $props['when']) {
     $useTimeout = 60;
 }
 if ($useTimeout) {
     $timeout = $useTimeout * 1000;
 }
 
-$debug          = ($app->getEnvironment() == 'dev') ? 'true' : 'false';
+$debug          = ('dev' == $app->getEnvironment()) ? 'true' : 'false';
 $animate        = (!isset($props['animate']) || !empty($props['animate']));
 $linkActivation = (!isset($props['link_activation']) || !empty($props['link_activation']));
 
@@ -79,7 +79,7 @@ switch ($style) {
         var Focus = {
             debug: <?php echo $debug; ?>,
             modalsDismissed: {},
-            ignoreConverted: <?php echo ($focus['type'] !== 'notification' && !empty($props['stop_after_conversion'])) ? 'true' : 'false'; ?>,
+            ignoreConverted: <?php echo ('notification' !== $focus['type'] && !empty($props['stop_after_conversion'])) ? 'true' : 'false'; ?>,
 
             // Initialize the focus
             initialize: function () {
@@ -95,12 +95,17 @@ switch ($style) {
 
             // Register click events for toggling bar, closing windows, etc
             registerClickEvents: function () {
-                <?php if ($style == 'bar'): ?>
+                <?php if ('bar' == $style): ?>
+                var isTop = Focus.hasClass(Focus.iframeFocus, 'mf-bar-top');
+                Focus.setDefaultBarPosition(isTop);
+
                 var collapser = document.getElementsByClassName('mf-bar-collapser-<?php echo $focus['id']; ?>');
 
-                collapser[0].addEventListener('click', function () {
-                    Focus.toggleBarCollapse(collapser[0], false);
-                });
+                if (collapser[0]) {
+                    collapser[0].addEventListener('click', function () {
+                        Focus.toggleBarCollapse(collapser[0], false);
+                    });
+                }
 
                 <?php else: ?>
                 var closer = Focus.iframeDoc.getElementsByClassName('mf-<?php echo $style; ?>-close');
@@ -131,14 +136,14 @@ switch ($style) {
                 });
                 <?php endif; ?>
 
-                <?php if ($focus['type'] == 'link'): ?>
+                <?php if ('link' == $focus['type']): ?>
                 var links = Focus.iframeDoc.getElementsByClassName('mf-link');
                 if (links.length) {
                     links[0].addEventListener('click', function (event) {
                         Focus.convertVisitor();
                     });
                 }
-                <?php elseif ($focus['type'] == 'form'): ?>
+                <?php elseif ('form' == $focus['type']): ?>
                 var buttons = Focus.iframeDoc.getElementsByClassName('mauticform-button');
                 if (buttons.length) {
                     buttons[0].addEventListener('click', function (event) {
@@ -147,7 +152,13 @@ switch ($style) {
                 }
                 <?php endif; ?>
             },
-
+            setDefaultBarPosition: function (isTop) {
+                if (isTop) {
+                    Focus.iframe.style.marginTop = 0;
+                }else {
+                    Focus.iframe.style.marginBottom = 0;
+                }
+            },
             toggleBarCollapse: function (collapser, useCookie) {
                 var svg = collapser.getElementsByTagName('svg');
                 var g = svg[0].getElementsByTagName('g');
@@ -178,12 +189,7 @@ switch ($style) {
                 var isTop = Focus.hasClass(Focus.iframeFocus, 'mf-bar-top');
                 if ((!isTop && newDirection == 90) || (isTop && newDirection == -90)) {
                     // Open it up
-                    if (isTop) {
-                        Focus.iframe.style.marginTop = 0;
-                    } else {
-                        Focus.iframe.style.marginBottom = 0;
-                    }
-
+                    Focus.setDefaultBarPosition(isTop);
                     Focus.removeClass(collapser, 'mf-bar-collapsed');
                     Focus.enableIframeResizer();
 
@@ -488,7 +494,7 @@ switch ($style) {
                 // Register events
                 Focus.registerClickEvents();
 
-                <?php if ($props['when'] == 'leave'): ?>
+                <?php if ('leave' == $props['when']): ?>
                 // Ensure user can leave
                 document.documentElement.removeEventListener('mouseleave', Focus.engageVisitor);
                 <?php endif; ?>
@@ -500,7 +506,7 @@ switch ($style) {
                 Focus.cookies.removeItem('mautic_focus_<?php echo $focus['id']; ?>');
                 Focus.cookies.setItem('mautic_focus_<?php echo $focus['id']; ?>', now, Infinity, '/');
 
-                <?php if ($style == 'bar'): ?>
+                <?php if ('bar' == $style): ?>
                 var collapser = document.getElementsByClassName('mf-bar-collapser-<?php echo $focus['id']; ?>');
 
                 if (animate) {
@@ -654,7 +660,7 @@ switch ($style) {
                     if (Focus.debug)
                         console.log('Visitor converted');
 
-                    Focus.cookies.setItem('mautic_focus_<?php echo $focus['id']; ?>', -1, Infinity);
+                    Focus.cookies.setItem('mautic_focus_<?php echo $focus['id']; ?>', -1, Infinity, '/');
                 } else if (Focus.debug) {
                     console.log('Visitor converted but ignoreConverted not enabled');
                 }

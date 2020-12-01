@@ -15,34 +15,25 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\AssetBundle\Entity\Asset;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Mautic\AssetBundle\Model\AssetModel;
 
-/**
- * Class LoadAssetData.
- */
-class LoadAssetData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LoadAssetData extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
-     * @var ContainerInterface
+     * @var AssetModel
      */
-    private $container;
+    private $assetModel;
 
     /**
      * {@inheritdoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function __construct(AssetModel $assetModel)
     {
-        $this->container = $container;
+        $this->assetModel = $assetModel;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
-        $repo = $this->container->get('mautic.asset.model.asset')->getRepository();
-
         $asset = new Asset();
         $asset
             ->setTitle('@TOCHANGE: Asset1 Title')
@@ -55,7 +46,7 @@ class LoadAssetData extends AbstractFixture implements OrderedFixtureInterface, 
             ->setLanguage('en');
 
         try {
-            $repo->saveEntity($asset);
+            $this->assetModel->getRepository()->saveEntity($asset);
         } catch (\Exception $e) {
             echo $e->getMessage();
         }

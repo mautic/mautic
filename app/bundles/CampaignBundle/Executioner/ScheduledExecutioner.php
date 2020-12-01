@@ -99,13 +99,6 @@ class ScheduledExecutioner implements ExecutionerInterface
 
     /**
      * ScheduledExecutioner constructor.
-     *
-     * @param LeadEventLogRepository $repository
-     * @param LoggerInterface        $logger
-     * @param TranslatorInterface    $translator
-     * @param EventExecutioner       $executioner
-     * @param EventScheduler         $scheduler
-     * @param ScheduledContactFinder $scheduledContactFinder
      */
     public function __construct(
         LeadEventLogRepository $repository,
@@ -124,10 +117,6 @@ class ScheduledExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @param Campaign             $campaign
-     * @param ContactLimiter       $limiter
-     * @param OutputInterface|null $output
-     *
      * @return Counter|mixed
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
@@ -160,9 +149,6 @@ class ScheduledExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @param array                $logIds
-     * @param OutputInterface|null $output
-     *
      * @return Counter
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
@@ -293,8 +279,7 @@ class ScheduledExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @param           $eventId
-     * @param \DateTime $now
+     * @param $eventId
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
@@ -329,9 +314,7 @@ class ScheduledExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @param ArrayCollection $logs
-     * @param \DateTime       $now
-     * @param bool            $scheduleTogether
+     * @param bool $scheduleTogether
      *
      * @throws Scheduler\Exception\NotSchedulableException
      */
@@ -346,8 +329,8 @@ class ScheduledExecutioner implements ExecutionerInterface
             $executionDate = $this->scheduler->validateExecutionDateTime($log, $now);
             $this->logger->debug(
                 'CAMPAIGN: Log ID #'.$log->getID().
-                ' to be executed on '.$executionDate->format('Y-m-d H:i:s').
-                ' compared to '.$now->format('Y-m-d H:i:s')
+                ' to be executed on '.$executionDate->format('Y-m-d H:i:s e').
+                ' compared to '.$now->format('Y-m-d H:i:s e')
             );
 
             if ($this->scheduler->shouldSchedule($executionDate, $now)) {
@@ -375,8 +358,6 @@ class ScheduledExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @param ArrayCollection $logs
-     *
      * @return ArrayCollection[]
      */
     private function organizeByEvent(ArrayCollection $logs)

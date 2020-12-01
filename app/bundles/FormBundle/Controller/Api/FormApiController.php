@@ -11,10 +11,11 @@
 
 namespace Mautic\FormBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -57,7 +58,7 @@ class FormApiController extends CommonApiController
 
         $entity = $this->model->getEntity($formId);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
@@ -87,7 +88,7 @@ class FormApiController extends CommonApiController
 
         $entity = $this->model->getEntity($formId);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
@@ -97,15 +98,7 @@ class FormApiController extends CommonApiController
             return $this->badRequest('The actions attribute must be array.');
         }
 
-        $currentActions = $entity->getActions();
-
-        foreach ($currentActions as $currentAction) {
-            if (in_array($currentAction->getId(), $actionsToDelete)) {
-                $entity->removeAction($currentAction);
-            }
-        }
-
-        $this->model->saveEntity($entity);
+        $this->model->deleteActions($entity, $actionsToDelete);
 
         $view = $this->view([$this->entityNameOne => $entity]);
 
@@ -170,14 +163,14 @@ class FormApiController extends CommonApiController
                         'flashes'
                     );
 
-                    return $this->returnError($msg, Codes::HTTP_NOT_FOUND);
+                    return $this->returnError($msg, Response::HTTP_NOT_FOUND);
                 }
 
                 $fieldEntityArray           = $fieldEntity->convertToArray();
                 $fieldEntityArray['formId'] = $formId;
 
                 if (!empty($fieldParams['alias'])) {
-                    $fieldParams['alias'] = InputHelper::filename($fieldParams['alias']);
+                    $fieldParams['alias'] = $fieldModel->cleanAlias($fieldParams['alias'], '', 25);
 
                     if (!in_array($fieldParams['alias'], $aliases)) {
                         $fieldEntityArray['alias'] = $fieldParams['alias'];
@@ -195,7 +188,7 @@ class FormApiController extends CommonApiController
                     $formErrors = $this->getFormErrorMessages($fieldForm);
                     $msg        = $this->getFormErrorMessage($formErrors);
 
-                    return $this->returnError($msg, Codes::HTTP_BAD_REQUEST);
+                    return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
                 }
             }
 
@@ -203,7 +196,7 @@ class FormApiController extends CommonApiController
         }
 
         // Remove fields which weren't in the PUT request
-        if (!$isNew && $method === 'PUT') {
+        if (!$isNew && 'PUT' === $method) {
             $fieldsToDelete = [];
 
             foreach ($currentFields as $currentField) {
@@ -219,6 +212,7 @@ class FormApiController extends CommonApiController
 
         // Add actions from the request
         if (!empty($parameters['actions']) && is_array($parameters['actions'])) {
+            $actions = [];
             foreach ($parameters['actions'] as &$actionParams) {
                 if (empty($actionParams['id'])) {
                     $actionParams['id'] = 'new'.hash('sha1', uniqid(mt_rand()));
@@ -230,29 +224,36 @@ class FormApiController extends CommonApiController
 
                 $actionEntity->setForm($entity);
 
-                $actionForm = $this->createActionEntityForm($actionEntity);
+                $actionForm = $this->createActionEntityForm($actionEntity, $actionParams);
                 $actionForm->submit($actionParams, 'PATCH' !== $method);
 
                 if (!$actionForm->isValid()) {
                     $formErrors = $this->getFormErrorMessages($actionForm);
                     $msg        = $this->getFormErrorMessage($formErrors);
 
-                    return $this->returnError($msg, Codes::HTTP_BAD_REQUEST);
+                    return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
                 }
+                $actions[] = $actionForm->getNormData();
             }
 
             // Save the form first and new actions so that new fields are available to actions.
             // Using the repository function to not trigger the listeners twice.
             $this->model->getRepository()->saveEntity($entity);
-            $this->model->setActions($entity, $parameters['actions']);
+            $this->model->setActions($entity, $actions);
         }
 
         // Remove actions which weren't in the PUT request
-        if (!$isNew && $method === 'PUT') {
+        if (!$isNew && 'PUT' === $method) {
+            $actionsToDelete = [];
+
             foreach ($currentActions as $currentAction) {
                 if (!in_array($currentAction->getId(), $requestActionIds)) {
-                    $entity->removeAction($currentAction);
+                    $actionsToDelete[] = $currentAction->getId();
                 }
+            }
+
+            if ($actionsToDelete) {
+                $this->model->deleteActions($entity, $actionsToDelete);
             }
         }
     }
@@ -264,8 +265,13 @@ class FormApiController extends CommonApiController
      *
      * @return FormInterface
      */
-    protected function createActionEntityForm($entity)
+    protected function createActionEntityForm(Action $entity, array $action)
     {
+        /** @var FormModel $formModel */
+        $formModel  = $this->getModel('form');
+        $components = $formModel->getCustomComponents();
+        $type       = $action['type'] ?? $entity->getType();
+
         return $this->getModel('form.action')->createForm(
             $entity,
             $this->get('form.factory'),
@@ -273,6 +279,7 @@ class FormApiController extends CommonApiController
             [
                 'csrf_protection'    => false,
                 'allow_extra_fields' => true,
+                'settings'           => $components['actions'][$type],
             ]
         );
     }

@@ -13,44 +13,28 @@ namespace Mautic\CategoryBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class CategoryType.
- */
 class CategoryType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
     /**
      * @var Session
      */
     private $session;
 
-    /**
-     * CategoryType constructor.
-     *
-     * @param TranslatorInterface $translator
-     * @param Session             $session
-     */
-    public function __construct(TranslatorInterface $translator, Session $session)
+    public function __construct(Session $session)
     {
-        $this->translator = $translator;
-        $this->session    = $session;
+        $this->session = $session;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
@@ -58,12 +42,12 @@ class CategoryType extends AbstractType
 
         if (!$options['data']->getId()) {
             // Do not allow custom bundle
-            if ($options['show_bundle_select'] == true) {
+            if (true == $options['show_bundle_select']) {
                 // Create new category from category bundle - let user select the bundle
                 $selected = $this->session->get('mautic.category.type', 'category');
                 $builder->add(
                     'bundle',
-                    'category_bundles_form',
+                    CategoryBundlesType::class,
                     [
                         'label'      => 'mautic.core.type',
                         'label_attr' => ['class' => 'control-label'],
@@ -76,7 +60,7 @@ class CategoryType extends AbstractType
                 // Create new category directly from another bundle - preset bundle
                 $builder->add(
                     'bundle',
-                    'hidden',
+                    HiddenType::class,
                     [
                         'data' => $options['bundle'],
                     ]
@@ -86,7 +70,7 @@ class CategoryType extends AbstractType
 
         $builder->add(
             'title',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.title',
                 'label_attr' => ['class' => 'control-label'],
@@ -96,7 +80,7 @@ class CategoryType extends AbstractType
 
         $builder->add(
             'description',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.description',
                 'label_attr' => ['class' => 'control-label'],
@@ -107,7 +91,7 @@ class CategoryType extends AbstractType
 
         $builder->add(
             'alias',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.alias',
                 'label_attr' => ['class' => 'control-label'],
@@ -121,7 +105,7 @@ class CategoryType extends AbstractType
 
         $builder->add(
             'color',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.color',
                 'label_attr' => ['class' => 'control-label'],
@@ -133,26 +117,23 @@ class CategoryType extends AbstractType
             ]
         );
 
-        $builder->add('isPublished', 'yesno_button_group');
+        $builder->add('isPublished', YesNoButtonGroupType::class);
 
         $builder->add(
             'inForm',
-            'hidden',
+            HiddenType::class,
             [
                 'mapped' => false,
             ]
         );
 
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('buttons', FormButtonsType::class);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -173,7 +154,7 @@ class CategoryType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'category_form';
     }

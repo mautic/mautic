@@ -23,16 +23,14 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 abstract class PluginBundleBase extends Bundle
 {
     /**
-     * @param Plugin        $plugin
-     * @param MauticFactory $factory
-     * @param null          $metadata
-     * @param null          $installedSchema
+     * @param null $metadata
+     * @param null $installedSchema
      *
      * @throws \Exception
      */
     public static function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null)
     {
-        if ($metadata !== null) {
+        if (null !== $metadata) {
             self::installPluginSchema($metadata, $factory, $installedSchema);
         }
     }
@@ -40,9 +38,7 @@ abstract class PluginBundleBase extends Bundle
     /**
      * Install plugin schema based on Doctrine metadata.
      *
-     * @param array         $metadata
-     * @param MauticFactory $factory
-     * @param null          $installedSchema
+     * @param null $installedSchema
      *
      * @throws \Exception
      */
@@ -74,10 +70,8 @@ abstract class PluginBundleBase extends Bundle
     /**
      * Called by PluginController::reloadAction when the addon version does not match what's installed.
      *
-     * @param Plugin        $plugin
-     * @param MauticFactory $factory
-     * @param null          $metadata
-     * @param Schema        $installedSchema
+     * @param null   $metadata
+     * @param Schema $installedSchema
      *
      * @throws \Exception
      */
@@ -93,10 +87,6 @@ abstract class PluginBundleBase extends Bundle
      * WARNING - this is not recommended as Doctrine does not guarantee results. There is a risk
      * that Doctrine will generate an incorrect query leading to lost data. If using this method,
      * be sure to thoroughly test the queries Doctrine generates
-     *
-     * @param array         $metadata
-     * @param Schema        $installedSchema
-     * @param MauticFactory $factory
      *
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \Exception
@@ -125,9 +115,7 @@ abstract class PluginBundleBase extends Bundle
     /**
      * Not used yet :-).
      *
-     * @param Plugin        $plugin
-     * @param MauticFactory $factory
-     * @param null          $metadata
+     * @param null $metadata
      */
     public static function onPluginUninstall(Plugin $plugin, MauticFactory $factory, $metadata = null)
     {
@@ -135,9 +123,6 @@ abstract class PluginBundleBase extends Bundle
 
     /**
      * Drops plugin's tables based on Doctrine metadata.
-     *
-     * @param array         $metadata
-     * @param MauticFactory $factory
      *
      * @throws \Doctrine\DBAL\ConnectionException
      * @throws \Exception

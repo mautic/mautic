@@ -15,7 +15,7 @@ use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Exception\ScheduleNotValidException;
 
-class ReportTest extends \PHPUnit_Framework_TestCase
+class ReportTest extends \PHPUnit\Framework\TestCase
 {
     public function testNotScheduled()
     {
@@ -84,6 +84,41 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 
         $report = $this->getInvalidReport();
         $report->ensureIsWeeklyScheduled();
+    }
+
+    public function testGetFilterValueIfFIltersAreEmpty()
+    {
+        $report = $this->getInvalidReport();
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->assertSame('1234', $report->getFilterValue('e.test'));
+    }
+
+    public function testGetFilterValueIfExists()
+    {
+        $report = $this->getInvalidReport();
+        $report->setFilters([
+            [
+                'column' => 'e.test',
+                'value'  => '1234',
+            ],
+        ]);
+
+        $this->assertSame('1234', $report->getFilterValue('e.test'));
+    }
+
+    public function testGetFilterValueIfDoesNotExist()
+    {
+        $report = $this->getInvalidReport();
+        $report->setFilters([
+            [
+                'column' => 'e.test',
+                'value'  => '1234',
+            ],
+        ]);
+
+        $this->expectException(\UnexpectedValueException::class);
+        $report->getFilterValue('I need coffee');
     }
 
     /**

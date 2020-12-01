@@ -90,6 +90,96 @@ Mautic.loadContent = function (route, link, method, target, showPageLoading, cal
 };
 
 /**
+ *  Load results with  ajax in batch mode
+ *
+ * @param elementName
+ * @param route
+ * @param callback
+ */
+Mautic.loadAjaxColumn = function(elementName, route, callback){
+    var className = '.'+elementName;
+    if (mQuery(className).length) {
+        var ids = [];
+        mQuery(className).each(function () {
+            if(!mQuery(this).text()) {
+                var id = mQuery(this).attr('data-value');
+                ids.push(id);
+            }
+        });
+
+        var batchIds;
+
+        // If not gonna load any data, then just callback
+        if(ids.length == 0) {
+            Mautic.getCallback(callback);
+        }
+
+        // Get all stats numbers in batches of 10
+        while (ids.length > 0) {
+            batchIds = ids.splice(0, 10);
+            Mautic.ajaxActionRequest(
+                route,
+                {ids: batchIds, entityId: Mautic.getEntityId()},
+                function (response) {
+                    if (response.success && response.stats) {
+                        for (var i = 0; i < response.stats.length; i++) {
+                            var stat = response.stats[i];
+                            if (mQuery('#' + elementName + '-' + stat.id).length) {
+                                mQuery('#' + elementName + '-' + stat.id).html(stat.data);
+                            }
+                        }
+                        if(batchIds.length < 10) {
+                            Mautic.getCallback(callback);
+                        }
+                    }
+                },
+                false,
+                true
+            );
+        }
+    }
+}
+
+/**
+ *  Sort table by column
+ *
+ * @param tableId
+ * @param sortElement
+ */
+Mautic.sortTableByColumn = function(tableId, sortElement, removeZero){
+    var tbody = mQuery(tableId).find('tbody');
+    tbody.find('tr').each(function () {
+        if(parseInt(mQuery(this).find(sortElement).text()) == 0) {
+            mQuery(this).remove();
+        }
+    })
+    tbody.find('tr').sort(function(a, b) {
+        var tda = parseFloat(mQuery(a).find(sortElement).text()); // target order attribute
+        var tdb = parseFloat(mQuery(b).find(sortElement).text()); // target order attribute
+        // if a < b return 1
+        return tda < tdb ? 1
+            // else if a > b return -1
+            : tda > tdb ? -1
+            // else they are equal - return 0
+            : 0;
+    }).appendTo(tbody);
+}
+
+/**
+ * @param callback
+ */
+Mautic.getCallback = function (callback) {
+    if (callback && typeof callback !== 'undefined') {
+        if (typeof callback == 'function') {
+            callback();
+        } else {
+            window["Mautic"][callback].apply('window', []);
+        }
+    }
+}
+
+
+/**
  * Generates the title of the current page
  *
  * @param route
@@ -570,36 +660,6 @@ Mautic.onPageLoad = function (container, response, inModal) {
         });
     }
 
-    //activate shuffles
-    if (mQuery(container + ' .shuffle-grid').length) {
-        var grid = mQuery(container + " .shuffle-grid");
-
-        //give a slight delay in order for images to load so that shuffle starts out with correct dimensions
-        setTimeout(function () {
-            grid.shuffle({
-                itemSelector: ".shuffle",
-                sizer: false
-            });
-
-            // Update shuffle on sidebar minimize/maximize
-            mQuery("html")
-                .on("fa.sidebar.minimize", function () {
-                    grid.shuffle("update");
-                })
-                .on("fa.sidebar.maximize", function () {
-                    grid.shuffle("update");
-                });
-
-            // Update shuffle if in a tab
-            if (grid.parents('.tab-pane').length) {
-                var tabId = grid.parents('.tab-pane').first().attr('id');
-                var tab   = mQuery('a[href="#' + tabId + '"]').on('shown.bs.tab', function() {
-                    grid.shuffle("update");
-                });
-            }
-        }, 1000);
-    }
-
     //prevent auto closing dropdowns for dropdown forms
     if (mQuery(container + ' .dropdown-menu-form').length) {
         mQuery(container + ' .dropdown-menu-form').on('click', function (e) {
@@ -715,9 +775,10 @@ Mautic.onPageLoad = function (container, response, inModal) {
  */
 Mautic.activateLookupTypeahead = function(containerEl) {
     containerEl.find("*[data-toggle='field-lookup']").each(function () {
-        var lookup = mQuery(this);
+        var lookup = mQuery(this),
+            callback = lookup.attr('data-callback') ? lookup.attr('data-callback') : 'activateFieldTypeahead';
 
-        Mautic.activateFieldTypeahead(
+        Mautic[callback](
             lookup.attr('id'),
             lookup.attr('data-target'),
             lookup.attr('data-options'),
@@ -983,7 +1044,9 @@ Mautic.activateChosenSelect = function(el, ignoreGlobal, jQueryVariant) {
  * @param el
  */
 Mautic.destroyChosen = function(el) {
-    var eventObject = mQuery._data(el.get(0), 'events');
+    if(el.get(0)) {
+        var eventObject = mQuery._data(el.get(0), 'events');
+    }
 
     // Check if object has chosen event
     if (eventObject !== undefined && eventObject['chosen:activate'] !== undefined) {
@@ -1017,11 +1080,17 @@ Mautic.activateFieldTypeahead = function (field, target, options, action) {
             minLength: 0
         });
     } else {
-        var fieldTypeahead = Mautic.activateTypeahead('#' + field, {
+        var typeAheadOptions = {
             prefetch: true,
             remote: true,
             action: action + "&field=" + target
-        });
+        };
+
+        if (('undefined' !== typeof options) && ('undefined' !== typeof options.limit)) {
+            typeAheadOptions.limit = options.limit;
+        }
+
+        var fieldTypeahead = Mautic.activateTypeahead('#' + field, typeAheadOptions);
     }
 
     var callback = function (event, datum) {
@@ -1229,6 +1298,7 @@ Mautic.activateDateTimeInputs = function(el, type) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false
         });
     } else if(type == 'date') {
@@ -1238,6 +1308,7 @@ Mautic.activateDateTimeInputs = function(el, type) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false,
             closeOnDateSelect: true
         });
@@ -1248,6 +1319,7 @@ Mautic.activateDateTimeInputs = function(el, type) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false
         });
     }

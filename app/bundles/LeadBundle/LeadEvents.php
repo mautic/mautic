@@ -468,6 +468,24 @@ final class LeadEvents
     const ON_CAMPAIGN_ACTION_DELETE_CONTACT = 'mautic.lead.on_campaign_action_delete_contact';
 
     /**
+     * The mautic.lead.on_campaign_action_add_donotcontact event is dispatched when the campaign action to add a donotcontact is executed.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\PendingEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_ACTION_ADD_DONOTCONTACT = 'mautic.lead.on_campaign_action_add_donotcontact';
+
+    /**
+     * The mautic.lead.on_campaign_action_remove_donotcontact event is dispatched when the campaign action to remove a donotcontact is executed.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\PendingEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_ACTION_REMOVE_DONOTCONTACT = 'mautic.lead.on_campaign_action_remove_donotcontact';
+
+    /**
      * The mautic.lead.on_campaign_trigger_condition event is fired when the campaign condition triggers.
      *
      * The event listener receives a
@@ -564,15 +582,6 @@ final class LeadEvents
     const LIST_PRE_PROCESS_LIST = 'mautic.list_pre_process_list';
 
     /**
-     * The mautic.remove_do_no_contact event is dispatched when a new submission is fired.
-     *
-     * The event listener receives a Mautic\FormBundle\Event\SubmissionEvent instance.
-     *
-     * @var string
-     */
-    const FORM_SUBMIT_REMOVE_DO_NO_CONTACT = 'mautic.form_submit_remove_do_no_contact';
-
-    /**
      * The mautic.clickthrough_contact_identification event is dispatched when a clickthrough array is parsed from a tracking
      * URL.
      *
@@ -581,15 +590,4 @@ final class LeadEvents
      * @var string
      */
     const ON_CLICKTHROUGH_IDENTIFICATION = 'mautic.clickthrough_contact_identification';
-
-    /**
-     * @deprecated - 2.4 to be removed in 3.0; use Mautic\ChannelBundle\ChannelEvents::ADD_CHANNEL
-     *
-     * The mautic.add_channel event registers communication channels.
-     *
-     * The event listener receives a Mautic\LeadBundle\Event\ChannelEvent instance
-     *
-     * @var string
-     */
-    const ADD_CHANNEL = 'mautic.bc_add_channel';
 }

@@ -13,9 +13,6 @@ namespace Mautic\PointBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
-/**
- * Class TriggerRepository.
- */
 class TriggerRepository extends CommonRepository
 {
     /**
@@ -49,9 +46,7 @@ class TriggerRepository extends CommonRepository
 
         $q->orderBy('t.points', 'ASC');
 
-        $results = $q->getQuery()->getArrayResult();
-
-        return $results;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**

@@ -11,19 +11,24 @@
 
 namespace Mautic\FormBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
-use Mautic\WebhookBundle\EventListener\WebhookModelTrait;
+use Mautic\WebhookBundle\Model\WebhookModel;
 use Mautic\WebhookBundle\WebhookEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class WebhookSubscriber.
- */
-class WebhookSubscriber extends CommonSubscriber
+class WebhookSubscriber implements EventSubscriberInterface
 {
-    use WebhookModelTrait;
+    /**
+     * @var WebhookModel
+     */
+    private $webhookModel;
+
+    public function __construct(WebhookModel $webhookModel)
+    {
+        $this->webhookModel = $webhookModel;
+    }
 
     /**
      * @return array
@@ -38,8 +43,6 @@ class WebhookSubscriber extends CommonSubscriber
 
     /**
      * Add event triggers and actions.
-     *
-     * @param WebhookBuilderEvent $event
      */
     public function onWebhookBuild(WebhookBuilderEvent $event)
     {
@@ -53,9 +56,6 @@ class WebhookSubscriber extends CommonSubscriber
         $event->addEvent(FormEvents::FORM_ON_SUBMIT, $formSubmit);
     }
 
-    /**
-     * @param SubmissionEvent $event
-     */
     public function onFormSubmit(SubmissionEvent $event)
     {
         $this->webhookModel->queueWebhooksByType(

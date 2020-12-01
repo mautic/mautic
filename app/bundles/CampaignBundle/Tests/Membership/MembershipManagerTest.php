@@ -22,34 +22,34 @@ use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\NullLogger;
 
-class MembershipManagerTest extends \PHPUnit_Framework_TestCase
+class MembershipManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var Adder|\PHPUnit_Framework_MockObject_MockObject
+     * @var Adder|\PHPUnit\Framework\MockObject\MockObject
      */
     private $adder;
 
     /**
-     * @var Remover|\PHPUnit_Framework_MockObject_MockObject
+     * @var Remover|\PHPUnit\Framework\MockObject\MockObject
      */
     private $remover;
 
     /**
-     * @var EventDispatcher|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject
      */
     private $eventDispatcher;
 
     /**
-     * @var LeadRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $leadRepository;
 
     /**
-     * @var NullLogger|\PHPUnit_Framework_MockObject_MockObject
+     * @var NullLogger|\PHPUnit\Framework\MockObject\MockObject
      */
     private $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->adder           = $this->createMock(Adder::class);
         $this->remover         = $this->createMock(Remover::class);

@@ -25,9 +25,8 @@ class CompanyEvent extends CommonEvent
     protected $score;
 
     /**
-     * @param Company $company
-     * @param bool    $isNew
-     * @param int     $score
+     * @param bool $isNew
+     * @param int  $score
      */
     public function __construct(Company $company, $isNew = false, $score = 0)
     {
@@ -48,8 +47,6 @@ class CompanyEvent extends CommonEvent
 
     /**
      * Sets the Company entity.
-     *
-     * @param Company $company
      */
     public function setCompany(Company $company)
     {

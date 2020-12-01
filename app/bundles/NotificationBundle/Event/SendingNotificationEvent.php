@@ -32,9 +32,6 @@ class SendingNotificationEvent extends CommonEvent
 
     /**
      * SendingNotificationEvent constructor.
-     *
-     * @param Notification $notification
-     * @param Lead         $lead
      */
     public function __construct(Notification $notification, Lead $lead)
     {
@@ -51,8 +48,6 @@ class SendingNotificationEvent extends CommonEvent
     }
 
     /**
-     * @param Notification $notification
-     *
      * @return $this
      */
     public function setNotifiction(Notification $notification)
@@ -71,8 +66,6 @@ class SendingNotificationEvent extends CommonEvent
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return $this
      */
     public function setLead(Lead $lead)

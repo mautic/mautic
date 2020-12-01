@@ -84,6 +84,10 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
 
+        $this->translations['dnc_manual_email'] = [
+            'type' => DoNotContactFilterQueryBuilder::getServiceId(),
+        ];
+
         $this->translations['dnc_unsubscribed_sms'] = [
             'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
@@ -229,6 +233,12 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'foreign_table' => 'campaign_leads',
             'field'         => 'campaign_id',
             'where'         => 'campaign_leads.manually_removed = 0',
+        ];
+
+        $this->translations['lead_asset_download'] = [
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'asset_downloads',
+            'field'         => 'asset_id',
         ];
 
         parent::__construct($this->translations);

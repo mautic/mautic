@@ -75,7 +75,6 @@ class ContactLimiter
      * @param int|null $contactId
      * @param int|null $minContactId
      * @param int|null $maxContactId
-     * @param array    $contactIdList
      * @param int|null $threadId
      * @param int|null $maxThreads
      * @param int|null $campaignLimit
@@ -219,7 +218,7 @@ class ContactLimiter
      */
     public function hasCampaignLimit()
     {
-        return $this->campaignLimit !== null;
+        return null !== $this->campaignLimit;
     }
 
     /**
@@ -247,7 +246,7 @@ class ContactLimiter
     {
         if (!$this->hasCampaignLimit()) {
             throw new \Exception('Campaign Limit was not set');
-        } elseif ($this->campaignLimit < ($this->campaignLimitUsed + $reduction)) {
+        } elseif ($this->campaignLimit <= ($this->campaignLimitUsed + $reduction)) {
             throw new \Exception('Campaign Limit exceeded');
         }
         $this->campaignLimitUsed += $reduction;

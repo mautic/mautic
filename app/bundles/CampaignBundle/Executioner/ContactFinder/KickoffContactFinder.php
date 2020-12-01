@@ -37,10 +37,6 @@ class KickoffContactFinder
 
     /**
      * KickoffContactFinder constructor.
-     *
-     * @param LeadRepository     $leadRepository
-     * @param CampaignRepository $campaignRepository
-     * @param LoggerInterface    $logger
      */
     public function __construct(LeadRepository $leadRepository, CampaignRepository $campaignRepository, LoggerInterface $logger)
     {
@@ -50,8 +46,7 @@ class KickoffContactFinder
     }
 
     /**
-     * @param int            $campaignId
-     * @param ContactLimiter $limiter
+     * @param int $campaignId
      *
      * @return ArrayCollection
      *
@@ -84,9 +79,7 @@ class KickoffContactFinder
     }
 
     /**
-     * @param int            $campaignId
-     * @param array          $eventIds
-     * @param ContactLimiter $limiter
+     * @param int $campaignId
      *
      * @return int
      */

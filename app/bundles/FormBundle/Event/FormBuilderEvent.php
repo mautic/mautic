@@ -12,6 +12,7 @@
 namespace Mautic\FormBundle\Event;
 
 use Mautic\CoreBundle\Event\ComponentValidationTrait;
+use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\Form;
 
@@ -62,33 +63,27 @@ class FormBuilderEvent extends Event
      *                       'formType'           => (required) name of the form type SERVICE for the action
      *                       'allowCampaignForm'  => (optional) true to allow this action for campaign forms; defaults to false
      *                       'description'        => (optional) short description of event
-     *                       'template'           => (optional) template to use for the action's HTML in the form builder;
-     *                       eg AcmeMyBundle:FormAction:theaction.html.php
+     *                       'template'           => (optional) template to use for the action's HTML in the form builder; eg AcmeMyBundle:FormAction:theaction.html.php
      *                       'formTypeOptions'    => (optional) array of options to pass to formType
      *                       'formTheme'          => (optional  theme for custom form views
-     *                       'validator'          => (deprecated) callback function to validate form results - use addValidator() instead
-     *                       'callback'           => (deprecated) callback function that will be passed the results upon a form submit; use eventName instead
      *                       ]
      *
-     * @throws \InvalidArgumentException
+     * @throws BadConfigurationException
      */
-    public function addSubmitAction($key, array $action)
+    public function addSubmitAction(string $key, array $action)
     {
         if (array_key_exists($key, $this->actions)) {
             throw new \InvalidArgumentException("The key, '$key' is already used by another action. Please use a different key.");
         }
 
-        //check for required keys and that given functions are callable
+        // check for required keys and that given functions are callable
         $this->verifyComponent(
-            ['group', 'label', 'formType', ['eventName', 'callback', 'validator']],
+            ['group', 'label', 'formType', 'eventName'],
             $action
         );
 
-        $action['label'] = $this->translator->trans($action['label']);
-
-        if (!isset($action['description'])) {
-            $action['description'] = '';
-        }
+        $action['label']       = $this->translator->trans($action['label']);
+        $action['description'] = $action['description'] ?? '';
 
         $this->actions[$key] = $action;
     }
@@ -142,7 +137,6 @@ class FormBuilderEvent extends Event
      *                      'formTheme'        => (optional) theme for custom form view
      *                      'valueFilter'      => (optional) the filter to use to clean the input as supported by InputHelper or a callback;
      *                      should accept arguments FormField $field and $filteredValue
-     *                      'valueConstraints' => (deprecated) callback to use to validate the value; use addValidator() instead
      *                      'builderOptions'   => (optional) array of options
      *                      [
      *                      'addHelpMessage'     => (bool) show help message inputs
@@ -155,6 +149,7 @@ class FormBuilderEvent extends Event
      *                      ]
      *
      * @throws \InvalidArgumentException
+     * @throws BadConfigurationException
      */
     public function addFormField($key, array $field)
     {
@@ -162,7 +157,7 @@ class FormBuilderEvent extends Event
             throw new \InvalidArgumentException("The key, '$key' is already used by another field. Please use a different key.");
         }
 
-        $callbacks = ['valueConstraints'];
+        $callbacks = [];
 
         // Only validate valueFilter if it's not a InputHelper method
         if (isset($field['valueFilter'])
@@ -212,9 +207,6 @@ class FormBuilderEvent extends Event
         $this->validators[$key] = $validator;
     }
 
-    /**
-     * @param Form $form
-     */
     public function addValidatorsToBuilder(Form $form)
     {
         if (!empty($this->validators)) {
