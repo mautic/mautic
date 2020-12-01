@@ -1148,6 +1148,10 @@ class FieldModel extends FormModel
                 $schemaType = 'text';
         }
 
+        if ('string' === $schemaType) {
+            $schemaLength = 191;
+        }
+
         return [
             'name'    => $alias,
             'type'    => $schemaType,
