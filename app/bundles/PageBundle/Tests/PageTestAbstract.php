@@ -40,7 +40,7 @@ class PageTestAbstract extends WebTestCase
     protected $mockTrackingId;
     protected $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         self::bootKernel();
         $this->mockTrackingId = hash('sha1', uniqid(mt_rand(), true));
