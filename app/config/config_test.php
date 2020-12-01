@@ -1,6 +1,8 @@
 <?php
 
+use Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass;
 use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\Mock\Client;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Dotenv\Dotenv;
 
 /*
@@ -115,6 +117,7 @@ $container->loadFromExtension('liip_test_fixtures', [
     'cache_db' => [
         'sqlite' => 'liip_functional_test.services_database_backup.sqlite',
     ],
+    'keep_database_and_schema' => true,
 ]);
 
 // Enable api by default
@@ -128,8 +131,22 @@ if (file_exists(__DIR__.'/config_override.php')) {
     $loader->import('config_override.php');
 }
 
-//Add required parameters
+// Add required parameters
 $container->setParameter('mautic.secret_key', '68c7e75470c02cba06dd543431411e0de94e04fdf2b3a2eac05957060edb66d0');
 $container->setParameter('mautic.security.disableUpdates', true);
 $container->setParameter('mautic.rss_notification_url', null);
 $container->setParameter('mautic.batch_sleep_time', 0);
+
+// Turn off creating of indexes in lead field fixtures
+$container->register('mautic.install.fixture.lead_field', \Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData::class)
+    ->addArgument(false)
+    ->addTag(FixturesCompilerPass::FIXTURE_TAG);
+$container->register('mautic.lead.fixture.contact_field', \Mautic\LeadBundle\DataFixtures\ORM\LoadLeadFieldData::class)
+    ->addArgument(false)
+    ->addTag(FixturesCompilerPass::FIXTURE_TAG);
+
+// Use static namespace for token manager
+$container->register('security.csrf.token_manager', \Symfony\Component\Security\Csrf\CsrfTokenManager::class)
+    ->addArgument(new Reference('security.csrf.token_generator'))
+    ->addArgument(new Reference('security.csrf.token_storage'))
+    ->addArgument('test');

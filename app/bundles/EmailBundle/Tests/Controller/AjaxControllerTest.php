@@ -28,7 +28,7 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
     private $emailMock;
     private $controller;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
