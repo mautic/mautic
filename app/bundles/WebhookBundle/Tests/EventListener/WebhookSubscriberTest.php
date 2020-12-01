@@ -25,7 +25,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
     private $auditLogModel;
     private $webhookKillNotificator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->ipLookupHelper         = $this->createMock(IpLookupHelper::class);
         $this->auditLogModel          = $this->createMock(AuditLogModel::class);

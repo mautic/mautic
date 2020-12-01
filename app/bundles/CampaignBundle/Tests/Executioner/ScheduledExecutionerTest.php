@@ -52,7 +52,7 @@ class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
      */
     private $contactFinder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->repository = $this->getMockBuilder(LeadEventLogRepository::class)
             ->disableOriginalConstructor()

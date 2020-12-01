@@ -23,9 +23,9 @@ class ColorHelperTest extends \PHPUnit\Framework\TestCase
     public function testTheHelperIsInstantiatedWithoutAttributeCorrectly()
     {
         $helper = new ColorHelper();
-        $this->assertAttributeSame(0, 'red', $helper);
-        $this->assertAttributeSame(0, 'green', $helper);
-        $this->assertAttributeSame(0, 'blue', $helper);
+        $this->assertEquals(0, $helper->getRed());
+        $this->assertEquals(0, $helper->getGreen());
+        $this->assertEquals(0, $helper->getBlue());
     }
 
     /**
@@ -46,9 +46,9 @@ class ColorHelperTest extends \PHPUnit\Framework\TestCase
 
         foreach ($colors as $hex => $rgb) {
             $helper = new ColorHelper($hex);
-            $this->assertAttributeSame($rgb[0], 'red', $helper);
-            $this->assertAttributeSame($rgb[1], 'green', $helper);
-            $this->assertAttributeSame($rgb[2], 'blue', $helper);
+            $this->assertEquals($rgb[0], $helper->getRed());
+            $this->assertEquals($rgb[1], $helper->getGreen());
+            $this->assertEquals($rgb[2], $helper->getBlue());
         }
     }
 
@@ -95,6 +95,34 @@ class ColorHelperTest extends \PHPUnit\Framework\TestCase
         foreach ($colors as $hex => $rgb) {
             $helper = new ColorHelper($hex);
             $this->assertEquals($rgb, $helper->toRgb());
+        }
+    }
+
+    public function testThatRgbColorsAreReturnedCorrectly()
+    {
+        $colors = [
+            '#ccc'    => [
+                'red'   => 204,
+                'green' => 204,
+                'blue'  => 204,
+            ],
+            '#369'    => [
+                'red'   => 51,
+                'green' => 102,
+                'blue'  => 153,
+            ],
+            '#f8Ac30' => [
+                'red'   => 248,
+                'green' => 172,
+                'blue'  => 48,
+            ],
+        ];
+
+        foreach ($colors as $hex => $colors) {
+            $helper = new ColorHelper($hex);
+            $this->assertEquals($colors['red'], $helper->getRed());
+            $this->assertEquals($colors['green'], $helper->getGreen());
+            $this->assertEquals($colors['blue'], $helper->getBlue());
         }
     }
 
