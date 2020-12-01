@@ -67,7 +67,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
      */
     private $scheduler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->logger              = new NullLogger();
         $this->coreParamtersHelper = $this->createMock(CoreParametersHelper::class);
