@@ -41,6 +41,7 @@ class InstallService
     const DOCTRINE_STEP = 1;
     const USER_STEP     = 2;
     const EMAIL_STEP    = 3;
+    const FINAL_STEP    = 4;
 
     private $configurator;
 

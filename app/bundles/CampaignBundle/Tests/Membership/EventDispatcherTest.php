@@ -26,7 +26,7 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
      */
     private $eventDispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
     }
