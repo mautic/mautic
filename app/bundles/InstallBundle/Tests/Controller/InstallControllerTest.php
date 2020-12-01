@@ -46,7 +46,7 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
     private $configurator;
     private $installer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
