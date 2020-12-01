@@ -24,7 +24,7 @@ class ConfigSubscriberTest extends TestCase
      */
     private $configEvent;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configEvent = $this->createMock(ConfigEvent::class);
     }

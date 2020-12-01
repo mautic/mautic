@@ -26,7 +26,7 @@ class ReleaseParserTest extends TestCase
      */
     private $releaseParser;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $client = new Client(
             [

@@ -33,7 +33,7 @@ class LeadSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private $leadId = 111;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

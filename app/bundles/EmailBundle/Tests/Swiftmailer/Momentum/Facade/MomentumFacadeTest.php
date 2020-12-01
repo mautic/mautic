@@ -44,7 +44,7 @@ class MomentumFacadeTest extends \PHPUnit\Framework\TestCase
      */
     private $loggerMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->adapterMock               = $this->createMock(AdapterInterface::class);
