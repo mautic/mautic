@@ -63,7 +63,7 @@ return [
     ],
 
     'categories' => [
-        'messages',
+        'messages' => null,
     ],
 
     'services' => [

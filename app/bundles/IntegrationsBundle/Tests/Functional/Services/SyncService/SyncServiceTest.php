@@ -40,9 +40,7 @@ class SyncServiceTest extends MauticMysqlTestCase
         // Sleep one second to ensure that the modified date/time stamps of the contacts just created are in the past
         sleep(1);
 
-        $prefix     = $this->container->getParameter('mautic.db_table_prefix');
-        $connection = $this->container->get('doctrine.dbal.default_connection');
-
+        $prefix             = $this->container->getParameter('mautic.db_table_prefix');
         $dataExchange       = new ExampleSyncDataExchange();
         $exampleIntegration = new ExampleIntegration($dataExchange);
 
@@ -90,7 +88,7 @@ class SyncServiceTest extends MauticMysqlTestCase
         /** @var Connection $connection */
 
         // All should be mapped to the OBJECT_LEAD object
-        $qb      = $connection->createQueryBuilder();
+        $qb      = $this->connection->createQueryBuilder();
         $results = $qb->select('count(*) as the_count, m.integration_object_name, m.integration')
             ->from($prefix.'sync_object_mapping', 'm')
             ->groupBy('m.integration, m.integration_object_name')
@@ -102,7 +100,7 @@ class SyncServiceTest extends MauticMysqlTestCase
         $this->assertEquals(ExampleSyncDataExchange::OBJECT_LEAD, $results[0]['integration_object_name']);
 
         // All should be mapped to the Mautic contact object
-        $qb      = $connection->createQueryBuilder();
+        $qb      = $this->connection->createQueryBuilder();
         $results = $qb->select('count(*) as the_count, m.internal_object_name, m.integration')
             ->from($prefix.'sync_object_mapping', 'm')
             ->groupBy('m.integration, m.internal_object_name')
@@ -114,7 +112,7 @@ class SyncServiceTest extends MauticMysqlTestCase
         $this->assertEquals(Contact::NAME, $results[0]['internal_object_name']);
 
         // There should be 50 entries
-        $qb      = $connection->createQueryBuilder();
+        $qb      = $this->connection->createQueryBuilder();
         $results = $qb->select('count(*) as the_count')
             ->from($prefix.'sync_object_mapping', 'm')
             ->execute()

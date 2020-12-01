@@ -31,7 +31,7 @@ class MomentumSubscriberTest extends \PHPUnit\Framework\TestCase
     private $loggerMock;
     private $momentumSubscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

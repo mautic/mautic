@@ -51,9 +51,9 @@ if ('index' == $tmpl) {
                             [
                                 'item'            => $item,
                                 'templateButtons' => [
-                                    'edit'   => true,
-                                    'clone'  => true,
-                                    'delete' => $item->isFixed() ? false : true,
+                                    'edit'   => $permissions['lead:fields:full'],
+                                    'clone'  => $permissions['lead:fields:full'],
+                                    'delete' => $item->isFixed() ? false : $permissions['lead:fields:full'],
                                 ],
                                 'routeBase' => 'contactfield',
                                 'langVar'   => 'lead.field',
