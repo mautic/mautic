@@ -14,13 +14,18 @@ namespace Mautic\WebhookBundle\Tests\Helper;
 use Doctrine\Common\Collections\ArrayCollection;
 use Joomla\Http\Http;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
 
 class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 {
     private $contact;
     private $connector;
+    private $companyModel;
+    private $companyRepository;
 
     /**
      * @var ArrayCollection
@@ -32,14 +37,26 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
      */
     private $campaignHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->contact        = $this->createMock(Lead::class);
-        $this->connector      = $this->createMock(Http::class);
-        $this->ipCollection   = new ArrayCollection();
-        $this->campaignHelper = new CampaignHelper($this->connector);
+        $this->contact           = $this->createMock(Lead::class);
+        $this->connector         = $this->createMock(Http::class);
+        $this->companyModel      = $this->createMock(CompanyModel::class);
+        $this->ipCollection      = new ArrayCollection();
+        $this->companyRepository = $this->getMockBuilder(CompanyRepository::class)
+        ->disableOriginalConstructor()
+        ->setMethods(['getCompaniesByLeadId'])
+        ->getMock();
+
+        $this->companyRepository->method('getCompaniesByLeadId')
+        ->willReturn([new Company()]);
+
+        $this->companyModel->method('getRepository')
+        ->willReturn($this->companyRepository);
+
+        $this->campaignHelper = new CampaignHelper($this->connector, $this->companyModel);
 
         $this->ipCollection->add((new IpAddress())->setIpAddress('127.0.0.1'));
         $this->ipCollection->add((new IpAddress())->setIpAddress('127.0.0.2'));
@@ -78,6 +95,20 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->campaignHelper->fireWebhook($config, $this->contact);
     }
 
+    public function testFireWebhookWithPostJson()
+    {
+        $config      = $this->provideSampleConfig('post');
+        $expectedUrl = 'https://mautic.org?test=tee&email=john%40doe.email&IP=127.0.0.1%2C127.0.0.2';
+
+        $config      = $this->provideSampleConfig('post', 'application/json');
+        $this->connector->expects($this->once())
+            ->method('post')
+            ->with('https://mautic.org', json_encode(['test'  => 'tee', 'email' => 'john@doe.email', 'IP' => '127.0.0.1,127.0.0.2']), ['test' => 'tee', 'company' => 'Mautic', 'content-type' => 'application/json'], 10)
+            ->willReturn((object) ['code' => 200]);
+
+        $this->campaignHelper->fireWebhook($config, $this->contact);
+    }
+
     public function testFireWebhookWhenReturningNotFound()
     {
         $this->connector->expects($this->once())
@@ -89,9 +120,9 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->campaignHelper->fireWebhook($this->provideSampleConfig(), $this->contact);
     }
 
-    private function provideSampleConfig($method = 'get')
+    private function provideSampleConfig($method = 'get', $type = 'application/x-www-form-urlencoded')
     {
-        return [
+        $sample = [
             'url'             => 'https://mautic.org',
             'method'          => $method,
             'timeout'         => 10,
@@ -124,5 +155,14 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
         ];
+        if ('application/json' == $type) {
+            array_push($sample['headers']['list'],
+            [
+                'label' => 'content-type',
+                'value' => 'application/json',
+            ]);
+        }
+
+        return $sample;
     }
 }

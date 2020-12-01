@@ -51,7 +51,7 @@ class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $subscirber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->security      = $this->createMock(CorePermissions::class);
