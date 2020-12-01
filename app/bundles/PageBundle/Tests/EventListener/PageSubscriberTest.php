@@ -28,11 +28,11 @@ use Mautic\QueueBundle\Event\QueueConsumerEvent;
 use Mautic\QueueBundle\Queue\QueueConsumerResults;
 use Mautic\QueueBundle\QueueEvents;
 use Monolog\Logger;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 
-class PageSubscriberTest extends WebTestCase
+class PageSubscriberTest extends TestCase
 {
     public function testGetTokens_WhenCalled_ReturnsValidTokens()
     {

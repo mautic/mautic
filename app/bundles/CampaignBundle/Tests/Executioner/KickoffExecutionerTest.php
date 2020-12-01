@@ -48,7 +48,7 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
      */
     private $scheduler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->kickoffContactFinder = $this->getMockBuilder(KickoffContactFinder::class)
             ->disableOriginalConstructor()
