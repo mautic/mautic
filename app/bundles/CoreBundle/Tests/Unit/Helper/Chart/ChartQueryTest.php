@@ -130,7 +130,7 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
         $this->chartQuery->prepareTimeDataQuery('email_stats', $this->dateColumn);
     }
 
-    public function testPhpOrderinginCompleteTimeData(): void
+    public function testPhpOrderingInCompleteTimeDataWeek(): void
     {
         $this->dateFrom     = new \DateTime('2020-10-31 12:00:00');
         $this->dateTo       = new \DateTime('2020-12-02 12:00:00');
@@ -157,6 +157,25 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
             5 => 0,
         ];
 
+        $result = $this->chartQuery->completeTimeData($rawData, false, false);
+
+        self::assertSame(
+            $expectedResult,
+            $result
+        );
+
+        $rawData = [
+            0 => [
+                'count' => '2',
+                'date'  => '2020 47',
+            ],
+            1 => [
+                'count' => '1',
+                'date'  => '2020 48',
+            ],
+        ];
+
+        $this->createChartQuery();
         $result = $this->chartQuery->completeTimeData($rawData, false, false);
 
         self::assertSame(
