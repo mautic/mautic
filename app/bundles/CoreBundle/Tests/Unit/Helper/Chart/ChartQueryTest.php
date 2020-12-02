@@ -132,22 +132,9 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
 
     public function testPhpOrderingInCompleteTimeDataWeek(): void
     {
-        $this->dateFrom     = new \DateTime('2020-10-31 12:00:00');
-        $this->dateTo       = new \DateTime('2020-12-02 12:00:00');
-        $this->unit         = 'W';
-        $this->createChartQuery();
-
-        $rawData = [
-            0 => [
-                'count' => '1',
-                'date'  => '2020 48',
-            ],
-            1 => [
-                'count' => '2',
-                'date'  => '2020 47',
-            ],
-        ];
-
+        $this->dateFrom = new \DateTime('2020-10-31 12:00:00');
+        $this->dateTo   = new \DateTime('2020-12-02 12:00:00');
+        $this->unit     = 'W';
         $expectedResult = [
             0 => 0,
             1 => 0,
@@ -157,12 +144,18 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
             5 => 0,
         ];
 
-        $result = $this->chartQuery->completeTimeData($rawData, false, false);
+        $rawData = [
+            0 => [
+                'count' => '1',
+                'date'  => '2020 48',
+            ],
+            1 => [
+                'count' => '2',
+                'date'  => '2020 47',
+            ],
+        ];
 
-        self::assertSame(
-            $expectedResult,
-            $result
-        );
+        $this->assertTimeDataWithoutSqlOrder($expectedResult, $rawData);
 
         $rawData = [
             0 => [
@@ -175,17 +168,78 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $this->createChartQuery();
-        $result = $this->chartQuery->completeTimeData($rawData, false, false);
+        $this->assertTimeDataWithoutSqlOrder($expectedResult, $rawData);
+    }
 
-        self::assertSame(
-            $expectedResult,
-            $result
-        );
+    public function testPhpOrderingInCompleteTimeDataDay(): void
+    {
+        $this->dateFrom = new \DateTime('2020-11-18 12:00:00');
+        $this->dateTo   = new \DateTime('2020-12-02 12:00:00');
+        $this->unit     = 'd';
+        $expectedResult = [
+            0  => 0,
+            1  => 0,
+            2  => 0,
+            3  => 0,
+            4  => 0,
+            5  => 0,
+            6  => 0,
+            7  => 0,
+            8  => 0,
+            9  => 0,
+            10 => 0,
+            11 => '1',
+            12 => '2',
+            13 => 0,
+            14 => '3',
+        ];
+
+        $rawData = [
+            0 => [
+                'count' => '1',
+                'date'  => '2020-11-29',
+            ],
+            1 => [
+                'count' => '2',
+                'date'  => '2020-11-30',
+            ],
+            2 => [
+                'count' => '3',
+                'date'  => '2020-12-02',
+            ],
+        ];
+
+        $this->assertTimeDataWithoutSqlOrder($expectedResult, $rawData);
+
+        $rawData = [
+            0 => [
+                'count' => '1',
+                'date'  => '2020-11-29',
+            ],
+            1 => [
+                'count' => '2',
+                'date'  => '2020-11-30',
+            ],
+            2 => [
+                'count' => '3',
+                'date'  => '2020-12-02',
+            ],
+        ];
+
+        $this->assertTimeDataWithoutSqlOrder($expectedResult, $rawData);
     }
 
     private function createChartQuery(): void
     {
         $this->chartQuery = new ChartQuery($this->connection, $this->dateFrom, $this->dateTo, $this->unit);
+    }
+
+    private function assertTimeDataWithoutSqlOrder($expectedResult, $data): void
+    {
+        $this->createChartQuery();
+        self::assertSame(
+            $expectedResult,
+            $this->chartQuery->completeTimeData($data, false, false)
+        );
     }
 }
