@@ -19,30 +19,33 @@ use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
 use Mautic\CampaignBundle\Model\SummaryModel;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class EventLoggerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
+     * @var LeadRepository|MockObject
      */
     private $ipLookupHelper;
 
     /**
-     * @var ContactTracker|\PHPUnit\Framework\MockObject\MockObject
+     * @var ContactTracker|MockObject
      */
     private $contactTracker;
 
     /**
-     * @var LeadEventLogRepository|\PHPUnit\Framework\MockObject\MockObject
+     * @var LeadEventLogRepository|MockObject
      */
     private $leadEventLogRepository;
 
     /**
-     * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
+     * @var LeadRepository|MockObject
      */
     private $leadRepository;
 
-    /** @var SummaryModel */
+    /**
+     * @var SummaryModel|MockObject
+     */
     private $summaryModel;
 
     protected function setUp(): void
@@ -51,10 +54,10 @@ class EventLoggerTest extends \PHPUnit\Framework\TestCase
         $this->contactTracker         = $this->createMock(ContactTracker::class);
         $this->leadEventLogRepository = $this->createMock(LeadEventLogRepository::class);
         $this->leadRepository         = $this->createMock(LeadRepository::class);
-        $this->summaryModel           = $this->createMock(summaryModel::class);
+        $this->summaryModel           = $this->createMock(SummaryModel::class);
     }
 
-    public function testAllLogsAreReturnedWithFinalPersist()
+    public function testAllLogsAreReturnedWithFinalPersist(): void
     {
         $logCollection = new ArrayCollection();
         while ($logCollection->count() < 60) {
@@ -79,7 +82,7 @@ class EventLoggerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($logCollection->getValues(), $persistedLogs->getValues());
     }
 
-    private function getLogger()
+    private function getLogger(): EventLogger
     {
         return new EventLogger(
             $this->ipLookupHelper,

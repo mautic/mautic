@@ -695,16 +695,19 @@ class CampaignController extends AbstractStandardFormController
                     $dateFrom        = new \DateTimeImmutable($dateRangeForm->get('date_from')->getData());
                     $dateTo          = (new \DateTimeImmutable($dateRangeForm->get('date_to')->getData()))->modify('last second +1 day');
                 }
+
+                /** @var LeadEventLogRepository $eventLogRepo */
+                $eventLogRepo             = $this->getDoctrine()->getManager()->getRepository(LeadEventLog::class);
+                $pendingCampaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false);
+
                 if ($this->coreParametersHelper->get('campaign_use_summary')) {
                     /** @var SummaryRepository $summaryRepo */
                     $summaryRepo       = $this->getDoctrine()->getManager()->getRepository(Summary::class);
                     $campaignLogCounts = $summaryRepo->getCampaignLogCounts($entity->getId(), $dateFrom, $dateTo);
                 } else {
-                    /** @var LeadEventLogRepository $eventLogRepo */
-                    $eventLogRepo             = $this->getDoctrine()->getManager()->getRepository(LeadEventLog::class);
-                    $campaignLogCounts        = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true, $dateFrom, $dateTo);
-                    $pendingCampaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false);
+                    $campaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true, $dateFrom, $dateTo);
                 }
+
                 $leadCount    = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId(), null, [], $dateFrom, $dateTo);
                 $sortedEvents = [
                     'decision'  => [],
