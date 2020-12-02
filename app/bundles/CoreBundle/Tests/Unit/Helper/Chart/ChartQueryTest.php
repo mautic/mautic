@@ -167,6 +167,6 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
 
     private function createChartQuery(): void
     {
-        $this->chartQuery   = new ChartQuery($this->connection, $this->dateFrom, $this->dateTo, $this->unit);
+        $this->chartQuery = new ChartQuery($this->connection, $this->dateFrom, $this->dateTo, $this->unit);
     }
 }

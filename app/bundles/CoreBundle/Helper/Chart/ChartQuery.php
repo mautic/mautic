@@ -70,6 +70,10 @@ class ChartQuery extends AbstractChart
     ];
 
     /**
+     * Possible values are 'd'/'H'/'i'/'i'/'W'/'m'/'Y'.
+     *
+     * @see \Mautic\CoreBundle\Helper\Chart\DateRangeUnitTrait::getTimeUnitFromDateRange()
+     *
      * @param string|null $unit
      */
     public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, $unit = null)
@@ -624,6 +628,8 @@ class ChartQuery extends AbstractChart
 //                'date'  => '2020 48',
 //            ],
 //        ];
+
+        array_multisort($data['date'], SORT_ASC, SORT_STRING);
 
         return $data;
     }
