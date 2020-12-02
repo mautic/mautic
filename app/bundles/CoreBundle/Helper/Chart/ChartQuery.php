@@ -616,21 +616,6 @@ class ChartQuery extends AbstractChart
      */
     private function reorderDataByDate(array $data): array
     {
-//        $key = (int) str_replace(' ', '',"2020 48");
-
-//        return [
-//            0 => [
-//                'count' => '2',
-//                'date'  => '2020 47',
-//            ],
-//            1 => [
-//                'count' => '1',
-//                'date'  => '2020 48',
-//            ],
-//        ];
-
-        array_multisort($data['date'], SORT_ASC, SORT_STRING);
-
         return $data;
     }
 }
