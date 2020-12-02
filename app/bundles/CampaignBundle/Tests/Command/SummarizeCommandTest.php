@@ -15,11 +15,15 @@ use Mautic\CampaignBundle\Command\SummarizeCommand;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
+use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\Summary;
 use Mautic\CampaignBundle\Entity\SummaryRepository;
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\Assert;
@@ -79,6 +83,31 @@ final class SummarizeCommandTest extends MauticMysqlTestCase
         Assert::assertSame(1, $summaries[2]->getTriggeredCount());
         Assert::assertSame($campaign->getId(), $summaries[2]->getCampaign()->getId());
         Assert::assertSame('Event B', $summaries[2]->getEvent()->getName());
+
+        /** @var CampaignModel $campaignModel */
+        $campaignModel = $this->container->get('mautic.model.factory')->getModel('campaign');
+
+        $datasetLabel = $this->container->get('translator')->trans('mautic.campaign.campaign.leads');
+
+        $stats = $campaignModel->getCampaignMetricsLineChartData(
+            null,
+            new \DateTime('2020-10-21'),
+            new \DateTime('2020-11-22'),
+            null,
+            ['campaign_id' => 1]
+        );
+        $datasets      = $stats['datasets'] ?? [];
+        $totalContacts = 0;
+
+        foreach ($datasets as $dataset) {
+            if ($dataset['label'] === $datasetLabel) {
+                $data          = $dataset['data'] ?? [];
+                $totalContacts = array_sum($data);
+                break;
+            }
+        }
+
+        Assert::assertSame(2, $totalContacts);
     }
 
     private function saveSomeCampaignLeadEventLogs(): Campaign
@@ -91,6 +120,9 @@ final class SummarizeCommandTest extends MauticMysqlTestCase
 
         /** @var LeadRepository $contactRepo */
         $contactRepo = $this->em->getRepository(Lead::class);
+
+        /** @var \Mautic\CampaignBundle\Entity\LeadRepository $campaignLeadRepo */
+        $campaignLeadRepo = $this->em->getRepository(CampaignLead::class);
 
         $contactA = new Lead();
         $contactB = new Lead();
@@ -142,6 +174,18 @@ final class SummarizeCommandTest extends MauticMysqlTestCase
         $leadEventLogD->setDateTriggered(new \DateTime('2020-11-21 17:04:00', new \DateTimeZone('UTC')));
 
         $leadEventLogRepo->saveEntities([$leadEventLogA, $leadEventLogB, $leadEventLogC, $leadEventLogD]);
+
+        $campaignMemberA = new CampaignMember();
+        $campaignMemberA->setLead($contactA);
+        $campaignMemberA->setCampaign($campaign);
+        $campaignMemberA->setDateAdded(new \DateTime('2020-11-21'));
+
+        $campaignMemberB = new CampaignMember();
+        $campaignMemberB->setLead($contactB);
+        $campaignMemberB->setCampaign($campaign);
+        $campaignMemberB->setDateAdded(new \DateTime('2020-11-21'));
+
+        $campaignLeadRepo->saveEntities([$campaignMemberA, $campaignMemberB]);
 
         return $campaign;
     }

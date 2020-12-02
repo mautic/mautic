@@ -690,10 +690,12 @@ class CampaignController extends AbstractStandardFormController
                 $events          = $this->getCampaignModel()->getEventRepository()->getCampaignEvents($entity->getId());
                 $dateFrom        = null;
                 $dateTo          = null;
+                $dateToPlusOne   = null;
                 $this->setCoreParametersHelper($this->get('mautic.config'));
                 if ($this->coreParametersHelper->get('campaign_by_range')) {
                     $dateFrom        = new \DateTimeImmutable($dateRangeForm->get('date_from')->getData());
-                    $dateTo          = (new \DateTimeImmutable($dateRangeForm->get('date_to')->getData()))->modify('last second +1 day');
+                    $dateTo          = new \DateTimeImmutable($dateRangeForm->get('date_to')->getData());
+                    $dateToPlusOne   = $dateTo->modify('+1 day');
                 }
 
                 /** @var LeadEventLogRepository $eventLogRepo */
@@ -703,12 +705,12 @@ class CampaignController extends AbstractStandardFormController
                 if ($this->coreParametersHelper->get('campaign_use_summary')) {
                     /** @var SummaryRepository $summaryRepo */
                     $summaryRepo       = $this->getDoctrine()->getManager()->getRepository(Summary::class);
-                    $campaignLogCounts = $summaryRepo->getCampaignLogCounts($entity->getId(), $dateFrom, $dateTo);
+                    $campaignLogCounts = $summaryRepo->getCampaignLogCounts($entity->getId(), $dateFrom, $dateToPlusOne);
                 } else {
-                    $campaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true, $dateFrom, $dateTo);
+                    $campaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true, $dateFrom, $dateToPlusOne);
                 }
 
-                $leadCount    = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId(), null, [], $dateFrom, $dateTo);
+                $leadCount    = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId(), null, [], $dateFrom, $dateToPlusOne);
                 $sortedEvents = [
                     'decision'  => [],
                     'action'    => [],
