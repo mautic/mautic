@@ -64,7 +64,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $subscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
