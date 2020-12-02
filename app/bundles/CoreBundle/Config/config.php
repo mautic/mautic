@@ -1156,7 +1156,7 @@ return [
         'db_user'                         => '',
         'db_password'                     => '',
         'db_table_prefix'                 => '',
-        'db_server_version'               => '5.5',
+        'db_server_version'               => '5.7',
         'locale'                          => 'en_US',
         'secret_key'                      => '',
         'dev_hosts'                       => [],
