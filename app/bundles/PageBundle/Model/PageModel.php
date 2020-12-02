@@ -850,7 +850,6 @@ class PageModel extends FormModel
     public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
     {
         $flag        = null;
-        $useSqlOrder = false;
 
         if (isset($filter['flag'])) {
             $flag = $filter['flag'];
@@ -878,14 +877,14 @@ class PageModel extends FormModel
                 $filter,
                 'distinct(t.lead_id)',
                 true,
-                $useSqlOrder
+                false
             );
 
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
             }
 
-            $data = $query->loadAndBuildTimeData($q, $useSqlOrder);
+            $data = $query->loadAndBuildTimeData($q);
             $chart->setDataset($this->translator->trans('mautic.page.show.unique.visits'), $data);
         }
 

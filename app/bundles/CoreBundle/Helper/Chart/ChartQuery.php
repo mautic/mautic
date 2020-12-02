@@ -293,15 +293,14 @@ class ChartQuery extends AbstractChart
      * Loads data from prepared query and builds the chart data.
      *
      * @param QueryBuilder $query
-     * @param bool         $isOrdered Does the $query contain ORDER BY clause?
      *
      * @return array
      */
-    public function loadAndBuildTimeData($query, bool $isOrdered = true)
+    public function loadAndBuildTimeData($query)
     {
         $rawData = $query->execute()->fetchAll();
 
-        return $this->completeTimeData($rawData, false, $isOrdered);
+        return $this->completeTimeData($rawData, false);
     }
 
     /**
@@ -309,12 +308,8 @@ class ChartQuery extends AbstractChart
      *
      * @return array
      */
-    public function completeTimeData($rawData, $countAverage = false, bool $isOrdered = true)
+    public function completeTimeData($rawData, $countAverage = false)
     {
-        if (!$isOrdered) {
-            $rawData = $this->reorderDataByDate($rawData);
-        }
-
         $data          = [];
         $averageCounts = [];
         $oneUnit       = $this->getUnitInterval();
@@ -605,17 +600,5 @@ class ChartQuery extends AbstractChart
         $dbUnit = $this->translateTimeUnit($this->unit);
 
         return 'DATE_FORMAT('.$tablePrefix.'.'.$column.', \''.$dbUnit.'\')';
-    }
-
-    /**
-     * This is used when SQL ORDER data is not used in query.
-     *
-     * @param $data
-     *
-     * @return \string[][]
-     */
-    private function reorderDataByDate(array $data): array
-    {
-        return $data;
     }
 }
