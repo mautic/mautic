@@ -130,6 +130,87 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
         $this->chartQuery->prepareTimeDataQuery('email_stats', $this->dateColumn);
     }
 
+    public function testPhpOrderingInCompleteTimeDataHour(): void
+    {
+        $this->dateFrom = new \DateTime('2020-12-01 00:00:00.000000');
+        $this->dateTo   = new \DateTime('2020-12-02 03:31:55.492167');
+        $this->unit     = 'H';
+        $expectedResult = [
+            0  => 0,
+            1  => 0,
+            2  => 0,
+            3  => 0,
+            4  => 0,
+            5  => 0,
+            6  => 0,
+            7  => 0,
+            8  => 0,
+            9  => 0,
+            10 => 0,
+            11 => 0,
+            12 => 0,
+            13 => 0,
+            14 => 0,
+            15 => 0,
+            16 => 0,
+            17 => 0,
+            18 => 0,
+            19 => 0,
+            20 => 0,
+            21 => 0,
+            22 => 0,
+            23 => 0,
+            24 => 0,
+            25 => 0,
+            26 => 0,
+            27 => 0,
+            28 => 0,
+            29 => 0,
+            30 => 0,
+            31 => 0,
+            32 => '1',
+            33 => '2',
+            34 => 0,
+            35 => '3',
+            36 => 0,
+            37 => 0,
+        ];
+
+        $rawData = [
+            0 => [
+                'count' => '1',
+                'date'  => '2020-12-02 08:00',
+            ],
+            1 => [
+                'count' => '2',
+                'date'  => '2020-12-02 09:00',
+            ],
+            2 => [
+                'count' => '3',
+                'date'  => '2020-12-02 11:00',
+            ],
+        ];
+
+        $this->assertTimeDataWithoutSqlOrder($expectedResult, $rawData);
+
+        $rawData = [
+            0 => [
+                'count' => '3',
+                'date'  => '2020-12-02 11:00',
+            ],
+            1 => [
+                'count' => '2',
+                'date'  => '2020-12-02 09:00',
+            ],
+            2 => [
+                'count' => '1',
+                'date'  => '2020-12-02 08:00',
+            ],
+        ];
+
+        $this->assertTimeDataWithoutSqlOrder($expectedResult, $rawData);
+    }
+
     public function testPhpOrderingInCompleteTimeDataDay(): void
     {
         $this->dateFrom = new \DateTime('2020-11-18 12:00:00');
@@ -205,7 +286,7 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
         $rawData = [
             0 => [
                 'count' => '1',
-                'date'  => '2020 48',
+                'date'  => '2020-12-02 09:00',
             ],
             1 => [
                 'count' => '2',
