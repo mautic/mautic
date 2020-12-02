@@ -130,47 +130,6 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
         $this->chartQuery->prepareTimeDataQuery('email_stats', $this->dateColumn);
     }
 
-    public function testPhpOrderingInCompleteTimeDataWeek(): void
-    {
-        $this->dateFrom = new \DateTime('2020-10-31 12:00:00');
-        $this->dateTo   = new \DateTime('2020-12-02 12:00:00');
-        $this->unit     = 'W';
-        $expectedResult = [
-            0 => 0,
-            1 => 0,
-            2 => 0,
-            3 => '2',
-            4 => '1',
-            5 => 0,
-        ];
-
-        $rawData = [
-            0 => [
-                'count' => '1',
-                'date'  => '2020 48',
-            ],
-            1 => [
-                'count' => '2',
-                'date'  => '2020 47',
-            ],
-        ];
-
-        $this->assertTimeDataWithoutSqlOrder($expectedResult, $rawData);
-
-        $rawData = [
-            0 => [
-                'count' => '2',
-                'date'  => '2020 47',
-            ],
-            1 => [
-                'count' => '1',
-                'date'  => '2020 48',
-            ],
-        ];
-
-        $this->assertTimeDataWithoutSqlOrder($expectedResult, $rawData);
-    }
-
     public function testPhpOrderingInCompleteTimeDataDay(): void
     {
         $this->dateFrom = new \DateTime('2020-11-18 12:00:00');
@@ -223,6 +182,47 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
             2 => [
                 'count' => '3',
                 'date'  => '2020-12-02',
+            ],
+        ];
+
+        $this->assertTimeDataWithoutSqlOrder($expectedResult, $rawData);
+    }
+
+    public function testPhpOrderingInCompleteTimeDataWeek(): void
+    {
+        $this->dateFrom = new \DateTime('2020-10-31 12:00:00');
+        $this->dateTo   = new \DateTime('2020-12-02 12:00:00');
+        $this->unit     = 'W';
+        $expectedResult = [
+            0 => 0,
+            1 => 0,
+            2 => 0,
+            3 => '2',
+            4 => '1',
+            5 => 0,
+        ];
+
+        $rawData = [
+            0 => [
+                'count' => '1',
+                'date'  => '2020 48',
+            ],
+            1 => [
+                'count' => '2',
+                'date'  => '2020 47',
+            ],
+        ];
+
+        $this->assertTimeDataWithoutSqlOrder($expectedResult, $rawData);
+
+        $rawData = [
+            0 => [
+                'count' => '2',
+                'date'  => '2020 47',
+            ],
+            1 => [
+                'count' => '1',
+                'date'  => '2020 48',
             ],
         ];
 
