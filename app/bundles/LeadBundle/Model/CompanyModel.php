@@ -736,18 +736,39 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param array $fields
-     * @param array $data
-     * @param null  $owner
-     * @param null  $list
-     * @param null  $tags
-     * @param bool  $persist
+     * @param array        $fields
+     * @param array        $data
+     * @param null         $owner
+     * @param null         $list
+     * @param null         $tags
+     * @param bool         $persist
+     * @param LeadEventLog $eventLog
      *
      * @return bool|null
      *
      * @throws \Exception
      */
-    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true)
+    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null)
+    {
+        $company = $this->importCompany($fields, $data, $owner, false);
+
+        $merged = !$company->isNew();
+
+        $this->saveEntity($company);
+
+        return $merged;
+    }
+
+    /**
+     * @param array $fields
+     * @param array $data
+     * @param null  $owner
+     *
+     * @return bool|null
+     *
+     * @throws \Exception
+     */
+    public function importCompany($fields, $data, $owner = null, $persist = true)
     {
         $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($data);
 

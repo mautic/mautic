@@ -1300,7 +1300,7 @@ class LeadModel extends FormModel
 
         if (!empty($companyData)) {
             $companyFields = array_flip($companyFields);
-            $company       = $this->companyModel->import($companyFields, $companyData, $owner, $list, $tags, $persist, $eventLog);
+            $company       = $this->companyModel->importCompany($companyFields, $companyData, $owner);
         }
 
         foreach ($fields as $leadField => $importField) {
