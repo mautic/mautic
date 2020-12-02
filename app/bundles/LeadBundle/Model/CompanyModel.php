@@ -863,4 +863,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         return $company;
     }
+
+    public function checkForDuplicateCompanies(array $queryFields)
+    {
+        return $this->companyDeduper->checkForDuplicateCompanies($queryFields);
+    }
 }

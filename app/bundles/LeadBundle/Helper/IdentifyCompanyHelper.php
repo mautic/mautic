@@ -20,53 +20,45 @@ use Mautic\LeadBundle\Model\CompanyModel;
 class IdentifyCompanyHelper
 {
     /**
-     * @param array $parameters
+     * @param array $data
      * @param mixed $lead
      *
      * @return array
      */
-    public static function identifyLeadsCompany($parameters, $lead, CompanyModel $companyModel)
+    public static function identifyLeadsCompany($data, $lead, CompanyModel $companyModel)
     {
-        list($company, $companyEntities) = self::findCompany($parameters, $companyModel);
-        if (!empty($company)) {
-            $leadAdded = false;
-            if (count($companyEntities)) {
-                foreach ($companyEntities as $entity) {
-                    $companyEntity   = $entity;
-                    $companyLeadRepo = $companyModel->getCompanyLeadRepository();
-                    if ($lead) {
-                        $companyLead = $companyLeadRepo->getCompaniesByLeadId($lead->getId(), $entity->getId());
-                        if (empty($companyLead)) {
-                            $leadAdded = true;
-                        }
-                    }
-                }
-            } else {
-                //create new company
-                $companyEntity = new Company();
-                $companyModel->setFieldValues($companyEntity, $company, true);
-                $companyModel->saveEntity($companyEntity);
-                $company['id'] = $companyEntity->getId();
-                if ($lead) {
-                    $leadAdded = true;
+        $addContactToCompany = true;
+
+        $parameters = self::normalizeParameters($data);
+
+        $companies = $companyModel->checkForDuplicateCompanies($parameters);
+        if (!empty($companies)) {
+            end($companies);
+            $companyEntity = key($companies);
+            $companyData   = $companyEntity->getProfileFields();
+
+            if ($lead) {
+                $companyLeadRepo = $companyModel->getCompanyLeadRepository();
+                $companyLead     = $companyLeadRepo->getCompaniesByLeadId($lead->getId(), $companyEntity->getId());
+                if (!empty($companyLead)) {
+                    $addContactToCompany = false;
                 }
             }
+        } else {
+            $companyData = $parameters;
 
-            return [$company, $leadAdded, $companyEntity];
+            //create new company
+            $companyEntity = new Company();
+            $companyModel->setFieldValues($companyEntity, $companyData, true);
+            $companyModel->saveEntity($companyEntity);
+            $companyData['id'] = $companyEntity->getId();
         }
 
-        return [null, false, null];
+        return [$companyData, $addContactToCompany, $companyEntity];
     }
 
-    /**
-     * @return array
-     */
-    public static function findCompany(array $parameters, CompanyModel $companyModel)
+    private static function normalizeParameters(array $parameters)
     {
-        $companyName   = null;
-        $companyDomain = null;
-        $companyEntity = null;
-
         if (isset($parameters['company'])) {
             $companyName = filter_var($parameters['company']);
         } elseif (isset($parameters['companyname'])) {
@@ -81,37 +73,29 @@ class IdentifyCompanyHelper
             $companyDomain = self::domainExists($parameters['companyemail']);
         }
 
-        if ($companyName) {
-            $filter['force'] = [
-                'column' => 'companyname',
-                'expr'   => 'eq',
-                'value'  => $companyName,
-            ];
-
-            self::setCompanyFilter('city', $parameters, $filter);
-            self::setCompanyFilter('state', $parameters, $filter);
-            self::setCompanyFilter('country', $parameters, $filter);
-
-            $companyEntities = $companyModel->getEntities(
-                [
-                    'limit'          => 1,
-                    'filter'         => ['force' => [$filter['force']]],
-                    'withTotalCount' => false,
-                ]
-            );
-
-            $company = array_merge([
-                'companyname'    => $companyName,
-                'companywebsite' => $companyDomain,
-            ], $parameters);
-
-            if (1 === count($companyEntities)) {
-                end($companyEntities);
-                $key           = key($companyEntities);
-                $company['id'] = $companyEntities[$key]->getId();
+        $fields= ['country', 'city', 'state'];
+        foreach ($fields as $field) {
+            if (isset($parameters[$field]) && !isset($parameters['company'.$field])) {
+                $parameters['company'.$field] = $parameters[$field];
+                unset($parameters[$field]);
             }
+        }
 
-            return [$company, $companyEntities];
+        return array_merge([
+            'companyname'    => $companyName,
+            'companywebsite' => $companyDomain,
+        ], $parameters);
+    }
+
+    /**
+     * @return array
+     */
+    public static function findCompany(array $data, CompanyModel $companyModel)
+    {
+        $parameters = self::normalizeParameters($data);
+
+        $duplicateCompanies = $companyModel->checkForDuplicateCompanies($parameters);
+        if (!empty($duplicateCompanies)) {
         }
 
         return [[], []];
@@ -130,7 +114,7 @@ class IdentifyCompanyHelper
             return false;
         }
 
-        list($user, $domain) = explode('@', $email);
+        [$user, $domain]     = explode('@', $email);
         $arr                 = dns_get_record($domain, DNS_MX);
 
         if (empty($arr)) {
