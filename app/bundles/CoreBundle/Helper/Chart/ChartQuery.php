@@ -206,13 +206,13 @@ class ChartQuery extends AbstractChart
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function prepareTimeDataQuery($table, $column, $filters = [], $countColumn = '*', $isEnumerable = true)
+    public function prepareTimeDataQuery($table, $column, $filters = [], $countColumn = '*', $isEnumerable = true, bool $useSqlOrder = true)
     {
         // Convert time unitst to the right form for current database platform
         $query = $this->connection->createQueryBuilder();
         $query->from($this->prepareTable($table), 't');
 
-        $this->modifyTimeDataQuery($query, $column, 't', $countColumn, $isEnumerable);
+        $this->modifyTimeDataQuery($query, $column, 't', $countColumn, $isEnumerable, $useSqlOrder);
         $this->applyFilters($query, $filters);
         $this->applyDateFilters($query, $column);
 
@@ -228,7 +228,7 @@ class ChartQuery extends AbstractChart
      * @param string       $countColumn
      * @param bool|string  $isEnumerable true = COUNT, string sum = SUM
      */
-    public function modifyTimeDataQuery($query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true)
+    public function modifyTimeDataQuery($query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true, bool $useSqlOrder = true)
     {
         // Convert time unitst to the right form for current database platform
         $limit         = $this->countAmountFromDateRange();
@@ -245,7 +245,10 @@ class ChartQuery extends AbstractChart
 
         $query->select($dateConstruct.' AS date, '.$count);
         $query->groupBy($dateConstruct);
-        $query->orderBy($dateConstruct, 'ASC');
+        if ($useSqlOrder) {
+            // Some queries needs to avoid this because of query performance
+            $query->orderBy($dateConstruct, 'ASC');
+        }
         $query->setMaxResults($limit);
     }
 
@@ -286,14 +289,15 @@ class ChartQuery extends AbstractChart
      * Loads data from prepared query and builds the chart data.
      *
      * @param QueryBuilder $query
+     * @param bool         $isOrdered Does the $query contain ORDER BY clause?
      *
      * @return array
      */
-    public function loadAndBuildTimeData($query)
+    public function loadAndBuildTimeData($query, bool $isOrdered = true)
     {
         $rawData = $query->execute()->fetchAll();
 
-        return $this->completeTimeData($rawData);
+        return $this->completeTimeData($rawData, false, $isOrdered);
     }
 
     /**
@@ -301,8 +305,12 @@ class ChartQuery extends AbstractChart
      *
      * @return array
      */
-    public function completeTimeData($rawData, $countAverage = false)
+    public function completeTimeData($rawData, $countAverage = false, bool $isOrdered = true)
     {
+        if (!$isOrdered) {
+            $rawData = $this->reorderDataByDate($rawData);
+        }
+
         $data          = [];
         $averageCounts = [];
         $oneUnit       = $this->getUnitInterval();
@@ -593,5 +601,30 @@ class ChartQuery extends AbstractChart
         $dbUnit = $this->translateTimeUnit($this->unit);
 
         return 'DATE_FORMAT('.$tablePrefix.'.'.$column.', \''.$dbUnit.'\')';
+    }
+
+    /**
+     * This is used when SQL ORDER data is not used in query.
+     *
+     * @param $data
+     *
+     * @return \string[][]
+     */
+    private function reorderDataByDate(array $data): array
+    {
+//        $key = (int) str_replace(' ', '',"2020 48");
+
+//        return [
+//            0 => [
+//                'count' => '2',
+//                'date'  => '2020 47',
+//            ],
+//            1 => [
+//                'count' => '1',
+//                'date'  => '2020 48',
+//            ],
+//        ];
+
+        return $data;
     }
 }

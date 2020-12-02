@@ -849,7 +849,8 @@ class PageModel extends FormModel
      */
     public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
     {
-        $flag = null;
+        $flag        = null;
+        $useSqlOrder = false;
 
         if (isset($filter['flag'])) {
             $flag = $filter['flag'];
@@ -871,13 +872,20 @@ class PageModel extends FormModel
         }
 
         if ('unique' == $flag || 'total_and_unique' == $flag) {
-            $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', $filter, 'distinct(t.lead_id)');
+            $q = $query->prepareTimeDataQuery(
+                'page_hits',
+                'date_hit',
+                $filter,
+                'distinct(t.lead_id)',
+                true,
+                $useSqlOrder
+            );
 
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
             }
 
-            $data = $query->loadAndBuildTimeData($q);
+            $data = $query->loadAndBuildTimeData($q, $useSqlOrder);
             $chart->setDataset($this->translator->trans('mautic.page.show.unique.visits'), $data);
         }
 

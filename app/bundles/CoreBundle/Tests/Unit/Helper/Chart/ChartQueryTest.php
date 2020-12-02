@@ -24,6 +24,16 @@ use PHPUnit\Framework\MockObject\MockObject;
 class ChartQueryTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @var \DateTime
+     */
+    private $dateFrom;
+
+    /**
+     * @var \DateTime
+     */
+    private $dateTo;
+
+    /**
      * @var MockObject|Connection
      */
     private $connection;
@@ -54,19 +64,20 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
 
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
-        $dateFrom           = new \DateTime('2018-01-01 12:00:00');
-        $dateTo             = new \DateTime('2018-02-01 12:00:00');
+        $this->dateFrom     = new \DateTime('2018-01-01 12:00:00');
+        $this->dateTo       = new \DateTime('2018-02-01 12:00:00');
         $this->unit         = 'd';
         $this->dateColumn   = 'date_sent';
         $this->connection   = $this->createMock(Connection::class);
         $this->queryBuilder = $this->createMock(QueryBuilder::class);
-        $this->chartQuery   = new ChartQuery($this->connection, $dateFrom, $dateTo, $this->unit);
 
         $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilder);
     }
 
     public function testClassicDateColumn()
     {
+        $this->createChartQuery();
+
         $this->queryBuilder->expects($this->once())
             ->method('select')
             ->with('DATE_FORMAT(t.date_sent, \'%Y-%m-%d\') AS date, COUNT(*) AS count');
@@ -88,6 +99,8 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
 
     public function testGeneratedDateColumn()
     {
+        $this->createChartQuery();
+
         $generatedColumn          = new GeneratedColumn('email_stats', 'generated_sent_date', 'DATE', 'CONCAT(YEAR(date_sent), "-", LPAD(MONTH(date_sent), 2, "0"), "-", LPAD(DAY(date_sent), 2, "0"))');
         $generatedColumns         = new GeneratedColumns();
         $generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
@@ -115,5 +128,45 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
             ->with('t.generated_sent_date');
 
         $this->chartQuery->prepareTimeDataQuery('email_stats', $this->dateColumn);
+    }
+
+    public function testPhpOrderinginCompleteTimeData(): void
+    {
+        $this->dateFrom     = new \DateTime('2020-10-31 12:00:00');
+        $this->dateTo       = new \DateTime('2020-12-02 12:00:00');
+        $this->unit         = 'W';
+        $this->createChartQuery();
+
+        $rawData = [
+            0 => [
+                'count' => '1',
+                'date'  => '2020 48',
+            ],
+            1 => [
+                'count' => '2',
+                'date'  => '2020 47',
+            ],
+        ];
+
+        $expectedResult = [
+            0 => 0,
+            1 => 0,
+            2 => 0,
+            3 => '2',
+            4 => '1',
+            5 => 0,
+        ];
+
+        $result = $this->chartQuery->completeTimeData($rawData, false, false);
+
+        self::assertSame(
+            $expectedResult,
+            $result
+        );
+    }
+
+    private function createChartQuery(): void
+    {
+        $this->chartQuery   = new ChartQuery($this->connection, $this->dateFrom, $this->dateTo, $this->unit);
     }
 }
