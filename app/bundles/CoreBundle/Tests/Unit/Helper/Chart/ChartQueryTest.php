@@ -286,7 +286,7 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
         $rawData = [
             0 => [
                 'count' => '1',
-                'date'  => '2020-12-02 09:00',
+                'date'  => '2020 48',
             ],
             1 => [
                 'count' => '2',
