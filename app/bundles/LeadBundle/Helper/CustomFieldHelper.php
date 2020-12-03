@@ -51,11 +51,8 @@ class CustomFieldHelper
 
     /**
      * Transform field value based on type.
-     *
-     * @param $field
-     * @param $value
      */
-    public static function fieldValueTransfomer($field, $value)
+    public static function fieldValueTransfomer(array $field, ?string $value)
     {
         $type = $field['type'];
         switch ($type) {
@@ -82,11 +79,8 @@ class CustomFieldHelper
 
     /**
      * Transform all fields values.
-     *
-     * @param $fields
-     * @param $values
      */
-    public static function fieldsValuesTransformer($fields, $values)
+    public static function fieldsValuesTransformer(array $fields, array $values)
     {
         foreach ($values as $alias => &$value) {
             if (!empty($fields[$alias])) {
