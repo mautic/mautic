@@ -33,12 +33,13 @@ class ContactSegmentQueryBuilderTest extends TestCase
     {
         $queryBuilder = new QueryBuilder($this->createConnection());
         $queryBuilder->select('1');
+        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
         $queryBuilder->where('NULL');
 
         $filterQueryBuilder = new ContactSegmentQueryBuilder($this->createMock(EntityManager::class), new RandomParameterName(), new EventDispatcher());
 
         Assert::assertSame($queryBuilder, $filterQueryBuilder->addNewContactsRestrictions($queryBuilder, 8));
-        Assert::assertSame('SELECT 1 WHERE (NULL) AND (l.id NOT IN (SELECT par0.lead_id FROM lead_lists_leads par0 WHERE par0.leadlist_id = 8))', $queryBuilder->getDebugOutput());
+        Assert::assertSame('SELECT 1 FROM leads l WHERE (NULL) AND (l.id NOT IN (SELECT par0.lead_id FROM lead_lists_leads par0 WHERE par0.leadlist_id = 8))', $queryBuilder->getDebugOutput());
     }
 
     private function createConnection(): Connection
