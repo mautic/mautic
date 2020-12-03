@@ -192,6 +192,15 @@ return [
                     'mautic.campaign.repository.lead',
                 ],
             ],
+            'mautic.campaign.event.subscriber' => [
+                'class'     => \Mautic\CampaignBundle\EventListener\CampaignEventSubscriber::class,
+                'arguments' => [
+                    'mautic.campaign.repository.event',
+                    'mautic.campaign.helper.notification',
+                    'mautic.campaign.model.campaign',
+                    'mautic.campaign.repository.lead_event_log',
+                ],
+            ],
         ],
         'forms'        => [
             'mautic.campaign.type.form'                 => [

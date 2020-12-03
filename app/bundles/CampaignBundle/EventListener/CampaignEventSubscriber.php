@@ -11,7 +11,6 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
-use Doctrine\ORM\NonUniqueResultException;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
@@ -91,29 +90,23 @@ class CampaignEventSubscriber implements EventSubscriberInterface
      * Process the FailedEvent event. Notifies users and checks
      * failed thresholds to notify CS and/or disable the campaign.
      *
-     * @throws NonUniqueResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function onEventFailed(FailedEvent $event): void
     {
-        $log                  = $event->getLog();
-        $failedEvent          = $log->getEvent();
-        $campaign             = $failedEvent->getCampaign();
-        $lead                 = $log->getLead();
-        $countFailedLeadEvent = $this->eventRepository->getFailedCountLeadEvent($lead->getId(), $failedEvent->getId());
-
-        // Do not increase if under LOOPS_TO_FAIL || Do not increase twice
-        if (($countFailedLeadEvent < self::LOOPS_TO_FAIL) || ($countFailedLeadEvent > self::LOOPS_TO_FAIL &&
-                $this->leadEventLogRepository->isLastFailed($lead->getId(), $failedEvent->getId())
-            )) {
+        $log           = $event->getLog();
+        $failedEvent   = $log->getEvent();
+        $campaign      = $failedEvent->getCampaign();
+        // Do not increase twice
+        if ($this->leadEventLogRepository->isLastFailed($log->getLead()->getId(), $failedEvent->getId())) {
             return;
         }
 
-        // Increase if LOOPS_TO_FAIL or last success
         $failedCount   = $this->eventRepository->incrementFailedCount($failedEvent);
         $contactCount  = $campaign->getLeads()->count();
         $failedPercent = $contactCount ? ($failedCount / $contactCount) : 1;
 
-        $this->notificationHelper->notifyOfFailure($lead, $failedEvent);
+        $this->notificationHelper->notifyOfFailure($log->getLead(), $failedEvent);
 
         if ($failedPercent >= self::DISABLE_CAMPAIGN_THRESHOLD) {
             $this->notificationHelper->notifyOfUnpublish($failedEvent);
@@ -126,24 +119,15 @@ class CampaignEventSubscriber implements EventSubscriberInterface
      * Check the fail log if the lead is recorded there. If yes it decrease the failed count. It prevents counting
      * the same failure twice.
      *
-     * @throws NonUniqueResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function onEventExecuted(ExecutedEvent $event): void
     {
-        $log                  = $event->getLog();
-        $executedEvent        = $log->getEvent();
-        $lead                 = $log->getLead();
-        $leadId               = $lead->getId() ?? $lead->deletedId;
-
-        $countFailedLeadEvent = $this->eventRepository->getFailedCountLeadEvent($leadId, $executedEvent->getId());
+        $log   = $event->getLog();
+        $event = $log->getEvent();
         // Decrease if success event and last failed
-        if (!$this->leadEventLogRepository->isLastFailed($leadId, $executedEvent->getId()) ||
-            $countFailedLeadEvent < self::LOOPS_TO_FAIL
-        ) {
-            // Do not decrease if under LOOPS_TO_FAIL or last success
-            return;
+        if ($this->leadEventLogRepository->isLastFailed($log->getLead()->getId(), $event->getId())) {
+            $this->eventRepository->decreaseFailedCount($event);
         }
-        // Decrease if last failed and over the LOOPS_TO_FAIL
-        $this->eventRepository->decreaseFailedCount($executedEvent);
     }
 }

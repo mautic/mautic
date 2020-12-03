@@ -339,4 +339,79 @@ class EventRepository extends CommonRepository
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }
+
+    /**
+     * Update the failed count using DBAL to avoid
+     * race conditions and deadlocks.
+     *
+     * @return int The current value of the failed_count
+     */
+    public function incrementFailedCount(Event $event)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->update(MAUTIC_TABLE_PREFIX.'campaign_events')
+            ->set('failed_count', 'failed_count + 1')
+            ->where($q->expr()->eq('id', ':id'))
+            ->setParameter('id', $event->getId());
+
+        $q->execute();
+
+        return $this->getFailedCount($event);
+    }
+
+    /**
+     * Update the failed count using DBAL to avoid
+     * race conditions and deadlocks.
+     *
+     * @return int The current value of the failed_count
+     */
+    public function decreaseFailedCount(Event $event)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->update(MAUTIC_TABLE_PREFIX.'campaign_events')
+            ->set('failed_count', 'failed_count - 1')
+            ->where($q->expr()->eq('id', ':id'))
+            ->setParameter('id', $event->getId());
+
+        $q->execute();
+
+        return $this->getFailedCount($event);
+    }
+
+    /**
+     * Get the up to date failed count
+     * for the given Event.
+     *
+     * @return int The current value of the failed_count
+     */
+    public function getFailedCount(Event $event)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('failed_count')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_events')
+            ->where($q->expr()->eq('id', ':id'))
+            ->setParameter(':id', $event->getId());
+
+        return (int) $q->execute()->fetchColumn();
+    }
+
+    /**
+     * Reset the failed_count's for all events
+     * within the given Campaign.
+     */
+    public function resetFailedCountsForEventsInCampaign(Campaign $campaign)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->update(MAUTIC_TABLE_PREFIX.'campaign_events')
+            ->set('failed_count', ':failedCount')
+            ->where($q->expr()->eq('campaign_id', ':campaignId'))
+            ->setParameter('failedCount', 0)
+            ->setParameter('campaignId', $campaign->getId());
+
+        $q->execute();
+    }
 }
