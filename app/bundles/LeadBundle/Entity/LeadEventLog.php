@@ -29,11 +29,6 @@ class LeadEventLog
     const INDEX_SEARCH = 'IDX_SEARCH';
 
     /**
-     * @var string
-     */
-    const TABLE_NAME = 'lead_event_log';
-
-    /**
      * @var int
      */
     protected $id;
