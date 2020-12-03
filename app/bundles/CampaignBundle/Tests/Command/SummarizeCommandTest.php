@@ -12,23 +12,13 @@
 namespace Mautic\CampaignBundle\Tests\Command;
 
 use Mautic\CampaignBundle\Command\SummarizeCommand;
-use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CampaignBundle\Entity\CampaignRepository;
-use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
-use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
-use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\Summary;
 use Mautic\CampaignBundle\Entity\SummaryRepository;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\CoreBundle\Translation\Translator;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTest;
 use PHPUnit\Framework\Assert;
 
-final class SummarizeCommandTest extends MauticMysqlTestCase
+final class SummarizeCommandTest extends AbstractCampaignTest
 {
     public function testBackwardSummarizationWhenThereAreNoCampaignEventLogs(): void
     {
@@ -94,7 +84,7 @@ final class SummarizeCommandTest extends MauticMysqlTestCase
             new \DateTime('2020-10-21'),
             new \DateTime('2020-11-22'),
             null,
-            ['campaign_id' => 1]
+            ['campaign_id' => $campaign->getId()]
         );
         $datasets      = $stats['datasets'] ?? [];
         $totalContacts = 0;
@@ -108,85 +98,5 @@ final class SummarizeCommandTest extends MauticMysqlTestCase
         }
 
         Assert::assertSame(2, $totalContacts);
-    }
-
-    private function saveSomeCampaignLeadEventLogs(): Campaign
-    {
-        /** @var LeadEventLogRepository $leadEventLogRepo */
-        $leadEventLogRepo = $this->em->getRepository(LeadEventLog::class);
-
-        /** @var CampaignRepository $campaignRepo */
-        $campaignRepo = $this->em->getRepository(Campaign::class);
-
-        /** @var LeadRepository $contactRepo */
-        $contactRepo = $this->em->getRepository(Lead::class);
-
-        /** @var \Mautic\CampaignBundle\Entity\LeadRepository $campaignLeadRepo */
-        $campaignLeadRepo = $this->em->getRepository(CampaignLead::class);
-
-        $contactA = new Lead();
-        $contactB = new Lead();
-
-        $contactRepo->saveEntities([$contactA, $contactB]);
-
-        $campaign = new Campaign();
-        $campaign->setName('Campaign ABC');
-
-        $eventA = new Event();
-        $eventA->setName('Event A');
-        $eventA->setType('type.a');
-        $eventA->setEventType('type.a');
-        $eventA->setCampaign($campaign);
-
-        $eventB = new Event();
-        $eventB->setName('Event B');
-        $eventB->setType('type.b');
-        $eventB->setEventType('type.b');
-        $eventB->setCampaign($campaign);
-
-        $campaign->addEvent(0, $eventA);
-        $campaign->addEvent(1, $eventB);
-
-        $campaignRepo->saveEntity($campaign);
-
-        $leadEventLogA = new LeadEventLog();
-        $leadEventLogA->setCampaign($campaign);
-        $leadEventLogA->setEvent($eventA);
-        $leadEventLogA->setLead($contactA);
-        $leadEventLogA->setDateTriggered(new \DateTime('2020-11-21 16:34:00', new \DateTimeZone('UTC')));
-
-        $leadEventLogB = new LeadEventLog();
-        $leadEventLogB->setCampaign($campaign);
-        $leadEventLogB->setEvent($eventA);
-        $leadEventLogB->setLead($contactB);
-        $leadEventLogB->setDateTriggered(new \DateTime('2020-11-21 16:54:00', new \DateTimeZone('UTC')));
-
-        $leadEventLogC = new LeadEventLog();
-        $leadEventLogC->setCampaign($campaign);
-        $leadEventLogC->setEvent($eventB);
-        $leadEventLogC->setLead($contactA);
-        $leadEventLogC->setDateTriggered(new \DateTime('2020-11-21 16:55:00', new \DateTimeZone('UTC')));
-
-        $leadEventLogD = new LeadEventLog();
-        $leadEventLogD->setCampaign($campaign);
-        $leadEventLogD->setEvent($eventB);
-        $leadEventLogD->setLead($contactB);
-        $leadEventLogD->setDateTriggered(new \DateTime('2020-11-21 17:04:00', new \DateTimeZone('UTC')));
-
-        $leadEventLogRepo->saveEntities([$leadEventLogA, $leadEventLogB, $leadEventLogC, $leadEventLogD]);
-
-        $campaignMemberA = new CampaignMember();
-        $campaignMemberA->setLead($contactA);
-        $campaignMemberA->setCampaign($campaign);
-        $campaignMemberA->setDateAdded(new \DateTime('2020-11-21'));
-
-        $campaignMemberB = new CampaignMember();
-        $campaignMemberB->setLead($contactB);
-        $campaignMemberB->setCampaign($campaign);
-        $campaignMemberB->setDateAdded(new \DateTime('2020-11-21'));
-
-        $campaignLeadRepo->saveEntities([$campaignMemberA, $campaignMemberB]);
-
-        return $campaign;
     }
 }
