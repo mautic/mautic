@@ -1,9 +1,6 @@
-<!--
-Any PR related to Mautic 2 issues is not relavant anymore, please consider upgrading your code to the Mautic 3 series (staging/3.0 branch).
--->
 | Q                                      | A
 | -------------------------------------- | ---
-| Branch?                                | staging for features or enhancements / 3.2 for bug fixes <!-- see below -->
+| Branch?                                | "features" for features or enhancements / 3.2 for bug fixes <!-- see below -->
 | Bug fix?                               | yes/no
 | New feature?                           | yes/no
 | Deprecations?                          | yes/no
@@ -18,7 +15,7 @@ Additionally (see https://contribute.mautic.org/contributing-to-mautic/developer
  - Always add tests and ensure they pass.
  - Bug fixes must be submitted against the lowest maintained branch where they apply
    (lowest branches are regularly merged to upper ones so they get the fixes too.)
- - Features and deprecations must be submitted against the staging branch.
+ - Features and deprecations must be submitted against the "features" branch.
 -->
 
 <!--
