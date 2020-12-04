@@ -73,30 +73,5 @@ final class SummarizeCommandTest extends AbstractCampaignTest
         Assert::assertSame(1, $summaries[2]->getTriggeredCount());
         Assert::assertSame($campaign->getId(), $summaries[2]->getCampaign()->getId());
         Assert::assertSame('Event B', $summaries[2]->getEvent()->getName());
-
-        /** @var CampaignModel $campaignModel */
-        $campaignModel = $this->container->get('mautic.model.factory')->getModel('campaign');
-
-        $datasetLabel = $this->container->get('translator')->trans('mautic.campaign.campaign.leads');
-
-        $stats = $campaignModel->getCampaignMetricsLineChartData(
-            null,
-            new \DateTime('2020-10-21'),
-            new \DateTime('2020-11-22'),
-            null,
-            ['campaign_id' => $campaign->getId()]
-        );
-        $datasets      = $stats['datasets'] ?? [];
-        $totalContacts = 0;
-
-        foreach ($datasets as $dataset) {
-            if ($dataset['label'] === $datasetLabel) {
-                $data          = $dataset['data'] ?? [];
-                $totalContacts = array_sum($data);
-                break;
-            }
-        }
-
-        Assert::assertSame(2, $totalContacts);
     }
 }

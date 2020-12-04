@@ -726,9 +726,9 @@ class CampaignController extends AbstractStandardFormController
 
                     if (isset($campaignLogCounts[$event['id']])) {
                         $event['logCount']           = array_sum($campaignLogCounts[$event['id']]);
-                        $event['logCountForPending'] = isset($pendingCampaignLogCounts[$event['id']]) ? array_sum($pendingCampaignLogCounts[$event['id']]) : 0;
+                        $event['logCountForPending'] = array_sum($pendingCampaignLogCounts[$event['id']]);
 
-                        $pending  = isset($pendingCampaignLogCounts) ? $event['leadCount'] - $event['logCountForPending'] : 0;
+                        $pending  = $event['leadCount'] - $event['logCountForPending'];
                         $totalYes = $campaignLogCounts[$event['id']][1];
                         $totalNo  = $campaignLogCounts[$event['id']][0];
                         $total    = $totalYes + $totalNo + $pending;
