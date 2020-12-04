@@ -1582,6 +1582,12 @@ function update_local_config()
     if (array_key_exists('mailer_spool_path', $parameters)) {
         $parameters['mailer_spool_path'] = str_replace('%kernel.root_dir%/spool', '%kernel.root_dir%/../var/spool', $parameters['mailer_spool_path']);
     }
+    
+    // MySQL minimum version was bumped to 5.7 in Mautic 3
+    // https://github.com/mautic/mautic/pull/9437
+    if (array_key_exists('db_server_version', $parameters)) {
+        $parameters['db_server_version'] = '5.7';
+    }
 
     // Write updated config to local.php
     $result = file_put_contents($filename, "<?php\n" . '$parameters = ' . var_export($parameters, true) . ';');
