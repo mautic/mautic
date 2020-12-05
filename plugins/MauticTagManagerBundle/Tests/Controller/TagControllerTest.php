@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\TagModel;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
+use Symfony\Component\HttpFoundation\Response;
 
 class TagControllerTest extends MauticMysqlTestCase
 {
@@ -73,5 +74,29 @@ class TagControllerTest extends MauticMysqlTestCase
 
         $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
         $this->assertSame($this->tagModel->getRepository()->find($tagId), null, 'Assert that tag is deleted');
+    }
+
+    /**
+     * Get tag's edit page.
+     */
+    public function testEditActionCompany(): void
+    {
+        $tag = $this->tagModel->getRepository()->getRows(1)['results'][0];
+
+        $this->client->request('GET', '/s/tags/edit/'.$tag['id']);
+        $clientResponse         = $this->client->getResponse();
+        $clientResponseContent  = $clientResponse->getContent();
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertStringContainsString('Edit tag: '.$tag['tag'], $clientResponseContent, 'The return must contain \'Edit tag\' text');
+    }
+
+    /**
+     * Get tag's create page.
+     */
+    public function testNewActionCompany(): void
+    {
+        $this->client->request('GET', '/s/tags/new/');
+        $clientResponse         = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 }
