@@ -38,6 +38,11 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
      */
     private $campaignHelper;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface
+     */
+    private $dispatcher;
+
     protected function setUp(): void
     {
         parent::setUp();
