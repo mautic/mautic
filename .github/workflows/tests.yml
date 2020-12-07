@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - staging
+      - features
       - '[0-9]+\.[0-9]+'
   pull_request:
 
