@@ -55,7 +55,7 @@ class ContactSegmentService
             ];
         }
 
-        $qb = $this->getNewSegmentContactsQuery($segment, $batchLimiters);
+        $qb = $this->getNewSegmentContactsQuery($segment);
 
         $this->addMinMaxLimiters($qb, $batchLimiters);
         $this->addLeadLimiter($qb, $batchLimiters);
@@ -119,7 +119,7 @@ class ContactSegmentService
      */
     public function getNewLeadListLeads(LeadList $segment, array $batchLimiters, $limit = 1000)
     {
-        $queryBuilder = $this->getNewSegmentContactsQuery($segment, $batchLimiters);
+        $queryBuilder = $this->getNewSegmentContactsQuery($segment);
 
         // Prepend the DISTINCT to the beginning of the select array
         $select = $queryBuilder->getQueryPart('select');
@@ -197,14 +197,14 @@ class ContactSegmentService
      * @throws Exception\SegmentQueryException
      * @throws \Exception
      */
-    private function getNewSegmentContactsQuery(LeadList $segment, $batchLimiters)
+    private function getNewSegmentContactsQuery(LeadList $segment)
     {
         $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder(
             $segment->getId(),
             $this->contactSegmentFilterFactory->getSegmentFilters($segment)
         );
 
-        $queryBuilder = $this->contactSegmentQueryBuilder->addNewContactsRestrictions($queryBuilder, $segment->getId(), $batchLimiters);
+        $queryBuilder = $this->contactSegmentQueryBuilder->addNewContactsRestrictions($queryBuilder, $segment->getId());
 
         $this->contactSegmentQueryBuilder->queryBuilderGenerated($segment, $queryBuilder);
 
