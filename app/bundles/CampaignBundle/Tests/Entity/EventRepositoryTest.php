@@ -35,6 +35,13 @@ final class EventRepositoryTest extends TestCase
             ->method('eq')
             ->with('id', ':id')
             ->willReturn('id = :id');
+        $queryBuilderMock->expects($this->at(4))
+            ->method('expr')
+            ->willReturn($expressionMock);
+        $expressionMock->expects($this->at(1))
+            ->method('gt')
+            ->with('failed_count', 0)
+            ->willReturn('failed_count > 0');
         $queryBuilderMock->expects($this->at(0))
             ->method('update')
             ->with('mautic_campaign_events')
@@ -47,11 +54,15 @@ final class EventRepositoryTest extends TestCase
             ->method('where')
             ->with('id = :id')
             ->willReturn($queryBuilderMock);
-        $queryBuilderMock->expects($this->at(4))
+        $queryBuilderMock->expects($this->at(5))
+            ->method('andWhere')
+            ->with('failed_count > 0')
+            ->willReturn($queryBuilderMock);
+        $queryBuilderMock->expects($this->at(6))
             ->method('setParameter')
             ->with('id', 42)
             ->willReturn($queryBuilderMock);
-        $queryBuilderMock->expects($this->at(5))
+        $queryBuilderMock->expects($this->at(7))
             ->method('execute');
 
         $class           = new ClassMetadata(Event::class);
