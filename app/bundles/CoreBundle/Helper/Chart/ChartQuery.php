@@ -300,7 +300,7 @@ class ChartQuery extends AbstractChart
     {
         $rawData = $query->execute()->fetchAll();
 
-        return $this->completeTimeData($rawData, false);
+        return $this->completeTimeData($rawData);
     }
 
     /**
