@@ -328,8 +328,7 @@ class PageType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.page.form.language.help',
                 ],
-                'required'   => false,
-                'empty_data' => 'en',
+                'required'   => true,
             ]
         );
 
