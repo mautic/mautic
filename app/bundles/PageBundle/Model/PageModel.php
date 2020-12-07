@@ -849,7 +849,7 @@ class PageModel extends FormModel
      */
     public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
     {
-        $flag        = null;
+        $flag = null;
 
         if (isset($filter['flag'])) {
             $flag = $filter['flag'];
