@@ -21,6 +21,7 @@ use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Menu\MenuHelper;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\UserBundle\Entity\User;
@@ -101,6 +102,11 @@ class CoreSubscriber implements EventSubscriberInterface
      */
     private $factory;
 
+    /**
+     * @var FlashBag
+     */
+    private $flashBag;
+
     public function __construct(
         BundleHelper $bundleHelper,
         MenuHelper $menuHelper,
@@ -113,7 +119,8 @@ class CoreSubscriber implements EventSubscriberInterface
         TranslatorInterface $translator,
         RequestStack $requestStack,
         FormRepository $formRepository,
-        MauticFactory $factory
+        MauticFactory $factory,
+        FlashBag $flashBag
     ) {
         $this->bundleHelper         = $bundleHelper;
         $this->menuHelper           = $menuHelper;
@@ -127,6 +134,7 @@ class CoreSubscriber implements EventSubscriberInterface
         $this->requestStack         = $requestStack;
         $this->formRepository       = $formRepository;
         $this->factory              = $factory;
+        $this->flashBag             = $flashBag;
     }
 
     /**
@@ -240,6 +248,9 @@ class CoreSubscriber implements EventSubscriberInterface
 
             // and the translator
             $controller[0]->setTranslator($this->translator);
+
+            // and the flash bag
+            $controller[0]->setFlashBag($this->flashBag);
 
             //run any initialize functions
             $controller[0]->initialize($event);

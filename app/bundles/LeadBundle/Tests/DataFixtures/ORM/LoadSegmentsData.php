@@ -854,6 +854,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
 
         $list = new LeadList();
         $list->setName($listConfig['name']);
+        $list->setPublicName($listConfig['name']);
         $list->setAlias($listConfig['alias']);
         $list->setCreatedBy($adminUser);
         $list->setIsGlobal($listConfig['public']);
