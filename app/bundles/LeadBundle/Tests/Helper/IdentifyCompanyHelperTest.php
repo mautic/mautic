@@ -59,7 +59,7 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $model->expects($this->once())
-            ->method('getEntities')
+            ->method('checkForDuplicateCompanies')
             ->willReturn([]);
 
         $helper     = new IdentifyCompanyHelper();
@@ -93,7 +93,7 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $model->expects($this->once())
-            ->method('getEntities')
+            ->method('checkForDuplicateCompanies')
             ->willReturn([]);
 
         $helper     = new IdentifyCompanyHelper();
@@ -128,7 +128,7 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $model->expects($this->once())
-            ->method('getEntities')
+            ->method('checkForDuplicateCompanies')
             ->willReturn([]);
 
         $helper     = new IdentifyCompanyHelper();

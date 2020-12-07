@@ -31,6 +31,10 @@ class IdentifyCompanyHelper
 
         $parameters = self::normalizeParameters($data);
 
+        if (empty($parameters['companyname'])) {
+            return [null, false, null];
+        }
+
         $companies = $companyModel->checkForDuplicateCompanies($parameters);
         if (!empty($companies)) {
             end($companies);
@@ -59,6 +63,9 @@ class IdentifyCompanyHelper
 
     private static function normalizeParameters(array $parameters)
     {
+        $companyName   = null;
+        $companyDomain = null;
+
         if (isset($parameters['company'])) {
             $companyName = filter_var($parameters['company']);
         } elseif (isset($parameters['companyname'])) {
@@ -78,6 +85,8 @@ class IdentifyCompanyHelper
             if (isset($parameters[$field]) && !isset($parameters['company'.$field])) {
                 $parameters['company'.$field] = $parameters[$field];
                 unset($parameters[$field]);
+            } else {
+                $parameters['company'.$field] = '';
             }
         }
 
@@ -94,8 +103,16 @@ class IdentifyCompanyHelper
     {
         $parameters = self::normalizeParameters($data);
 
-        $duplicateCompanies = $companyModel->checkForDuplicateCompanies($parameters);
-        if (!empty($duplicateCompanies)) {
+        if (!empty($parameters['companyname'])) {
+            $companyEntities = $companyModel->checkForDuplicateCompanies($parameters);
+            $companyData     = $parameters;
+            if (!empty($companyEntities)) {
+                end($companyEntities);
+                $key               = key($companyEntities);
+                $companyData['id'] = $companyEntities[$key]->getId();
+            }
+
+            return [$companyData, $companyEntities];
         }
 
         return [[], []];
