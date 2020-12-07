@@ -31,7 +31,7 @@ class IdentifyCompanyHelper
 
         $parameters = self::normalizeParameters($data);
 
-        if (empty($parameters['companyname'])) {
+        if (!self::hasCompanyParameters($parameters, $companyModel)) {
             return [null, false, null];
         }
 
@@ -61,41 +61,6 @@ class IdentifyCompanyHelper
         return [$companyData, $addContactToCompany, $companyEntity];
     }
 
-    private static function normalizeParameters(array $parameters)
-    {
-        $companyName   = null;
-        $companyDomain = null;
-
-        if (isset($parameters['company'])) {
-            $companyName = filter_var($parameters['company']);
-        } elseif (isset($parameters['companyname'])) {
-            $companyName = filter_var($parameters['companyname']);
-        }
-
-        if (isset($parameters['email']) || isset($parameters['companyemail'])) {
-            $companyDomain = isset($parameters['email']) ? self::domainExists($parameters['email']) : self::domainExists($parameters['companyemail']);
-        }
-
-        if (empty($parameters['companywebsite']) && !empty($parameters['companyemail'])) {
-            $companyDomain = self::domainExists($parameters['companyemail']);
-        }
-
-        $fields= ['country', 'city', 'state'];
-        foreach ($fields as $field) {
-            if (isset($parameters[$field]) && !isset($parameters['company'.$field])) {
-                $parameters['company'.$field] = $parameters[$field];
-                unset($parameters[$field]);
-            } else {
-                $parameters['company'.$field] = '';
-            }
-        }
-
-        return array_merge([
-            'companyname'    => $companyName,
-            'companywebsite' => $companyDomain,
-        ], $parameters);
-    }
-
     /**
      * @return array
      */
@@ -103,19 +68,54 @@ class IdentifyCompanyHelper
     {
         $parameters = self::normalizeParameters($data);
 
-        if (!empty($parameters['companyname'])) {
-            $companyEntities = $companyModel->checkForDuplicateCompanies($parameters);
-            $companyData     = $parameters;
-            if (!empty($companyEntities)) {
-                end($companyEntities);
-                $key               = key($companyEntities);
-                $companyData['id'] = $companyEntities[$key]->getId();
-            }
-
-            return [$companyData, $companyEntities];
+        if (!self::hasCompanyParameters($parameters, $companyModel)) {
+            return [[], []];
         }
 
-        return [[], []];
+        $companyEntities = $companyModel->checkForDuplicateCompanies($parameters);
+        $companyData     = $parameters;
+        if (!empty($companyEntities)) {
+            end($companyEntities);
+            $key               = key($companyEntities);
+            $companyData['id'] = $companyEntities[$key]->getId();
+        }
+
+        return [$companyData, $companyEntities];
+    }
+
+    private static function hasCompanyParameters(array $parameters, CompanyModel $companyModel)
+    {
+        $companyFields = $companyModel->fetchCompanyFields();
+        foreach ($parameters as $alias => $value) {
+            foreach ($companyFields as $companyField) {
+                if ($companyField['alias'] === $alias) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static function normalizeParameters(array $parameters)
+    {
+        $companyName   = null;
+        $companyDomain = null;
+
+        if (isset($parameters['company'])) {
+            $parameters['companyname'] = filter_var($parameters['company']);
+            unset($parameters['company']);
+        }
+
+        $fields= ['country', 'city', 'state'];
+        foreach ($fields as $field) {
+            if (isset($parameters[$field]) && !isset($parameters['company'.$field])) {
+                $parameters['company'.$field] = $parameters[$field];
+                unset($parameters[$field]);
+            }
+        }
+
+        return $parameters;
     }
 
     /**
@@ -143,25 +143,5 @@ class IdentifyCompanyHelper
         }
 
         return false;
-    }
-
-    /**
-     * @param string $field
-     */
-    private static function setCompanyFilter($field, array &$parameters, array &$filter)
-    {
-        if (isset($parameters[$field]) || isset($parameters['company'.$field])) {
-            if (!isset($parameters['company'.$field])) {
-                $parameters['company'.$field] = $parameters[$field];
-            }
-
-            $filter['force'][] = [
-                'column' => 'company'.$field,
-                'expr'   => 'eq',
-                'value'  => $parameters['company'.$field],
-            ];
-        } else {
-            $parameters['company'.$field] = '';
-        }
     }
 }
