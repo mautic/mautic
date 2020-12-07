@@ -20,7 +20,7 @@ final class Version20201207140911 extends AbstractMauticMigration
     public function preUp(Schema $schema): void
     {
         $table = $schema->getTable($this->prefix.'campaign_lead_event_log');
-        if ($table->hasIndex($this->prefix.'trigger_date_order')) {
+        if ($table->hasIndex('campaign_trigger_date_order')) {
             throw new SkipMigration('Schema includes this migration');
         }
 
