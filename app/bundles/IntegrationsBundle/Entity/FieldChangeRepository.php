@@ -157,34 +157,4 @@ class FieldChangeRepository extends CommonRepository
 
         return $qb->execute()->fetchAll();
     }
-
-    /**
-     * Use for finding out whether you can execute a paralel sync for specific contacts. For example for campaign sync action.
-     */
-    public function getInternalObjectIdsThatHaveSomeChanges(string $integration, string $objectType, array $objectIds): array
-    {
-        // Get a list of object IDs so that we can get complete snapshots of the objects
-        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $qb
-            ->select('f.object_id')
-            ->from(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report', 'f')
-            ->where(
-                $qb->expr()->andX(
-                    $qb->expr()->eq('f.integration', ':integration'),
-                    $qb->expr()->eq('f.object_type', ':objectType'),
-                    $qb->expr()->in('f.object_id', ':objectIds')
-                )
-            )
-            ->setParameter('integration', $integration)
-            ->setParameter('objectType', $objectType)
-            ->setParameter('objectIds', $objectIds, Connection::PARAM_INT_ARRAY)
-            ->groupBy('f.object_id');
-
-        return array_map(
-            function (array $fieldChange) {
-                return (int) $fieldChange['object_id'];
-            },
-            $qb->execute()->fetchAll()
-        );
-    }
 }
