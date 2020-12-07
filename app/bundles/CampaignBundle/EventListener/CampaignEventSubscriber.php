@@ -123,11 +123,11 @@ class CampaignEventSubscriber implements EventSubscriberInterface
      */
     public function onEventExecuted(ExecutedEvent $event): void
     {
-        $log   = $event->getLog();
-        $event = $log->getEvent();
+        $log           = $event->getLog();
+        $executedEvent = $log->getEvent();
         // Decrease if success event and last failed
-        if ($this->leadEventLogRepository->isLastFailed($log->getLead()->getId(), $event->getId())) {
-            $this->eventRepository->decreaseFailedCount($event);
+        if ($this->leadEventLogRepository->isLastFailed($log->getLead()->getId(), $executedEvent->getId())) {
+            $this->eventRepository->decreaseFailedCount($executedEvent);
         }
     }
 }
