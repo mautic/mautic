@@ -133,7 +133,7 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
     public function testPhpOrderingInCompleteTimeDataHour(): void
     {
         $this->dateFrom = new \DateTime('2020-12-01 00:00:00.000000');
-        $this->dateTo   = new \DateTime('2020-12-02 03:31:55.492167');
+        $this->dateTo   = new \DateTime('2020-12-02 13:31:55.492167');
         $this->unit     = 'H';
         $expectedResult = [
             0  => 0,
