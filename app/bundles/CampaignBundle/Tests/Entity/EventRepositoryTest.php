@@ -43,7 +43,7 @@ final class EventRepositoryTest extends TestCase
             ->willReturn('failed_count > 0');
         $queryBuilderMock->expects($this->at(0))
             ->method('update')
-            ->with(MAUTIC_TABLE_PREFIX . 'campaign_events')
+            ->with(MAUTIC_TABLE_PREFIX.'campaign_events')
             ->willReturn($queryBuilderMock);
         $queryBuilderMock->expects($this->at(1))
             ->method('set')
