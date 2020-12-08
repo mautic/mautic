@@ -45,6 +45,19 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $coreParametersHelper
+        ->method('get')
+        ->willReturnCallback(
+            function ($key) use ($limit) {
+                switch ($key) {
+                    case 'default_timezone':
+                        return date_default_timezone_get();
+                    case 'report_export_max_filesize_in_bytes':
+                        return $limit;
+                }
+            }
+        );
+
         $router = $this->getMockBuilder(Router::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -53,11 +66,6 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
             ->method('getFileSize')
             ->with('path-to-a-file')
             ->willReturn($fileSize);
-
-        $coreParametersHelper->expects($this->once())
-            ->method('get')
-            ->with('report_export_max_filesize_in_bytes')
-            ->willReturn($limit);
 
         $router->expects($this->never())
             ->method('generate');
@@ -113,10 +121,18 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
             ->with('path-to-a-file')
             ->willReturn($fileSize);
 
-        $coreParametersHelper->expects($this->once())
+        $coreParametersHelper
             ->method('get')
-            ->with('report_export_max_filesize_in_bytes')
-            ->willReturn($limit);
+            ->willReturnCallback(
+                function ($key) use ($limit) {
+                    switch ($key) {
+                        case 'default_timezone':
+                            return date_default_timezone_get();
+                        case 'report_export_max_filesize_in_bytes':
+                            return $limit;
+                    }
+                }
+            );
 
         $router->expects($this->once())
             ->method('generate')
@@ -166,10 +182,18 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
             ->with('path-to-a-file')
             ->willReturn($fileSize);
 
-        $coreParametersHelper->expects($this->once())
+        $coreParametersHelper
             ->method('get')
-            ->with('report_export_max_filesize_in_bytes')
-            ->willReturn($limit);
+            ->willReturnCallback(
+                function ($key) use ($limit) {
+                    switch ($key) {
+                        case 'default_timezone':
+                            return date_default_timezone_get();
+                        case 'report_export_max_filesize_in_bytes':
+                            return $limit;
+                    }
+                }
+            );
 
         $messageSchedule = new MessageSchedule($translatorMock, $fileProperties, $coreParametersHelper, $router);
 
@@ -207,10 +231,18 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
             ->with('path-to-a-file')
             ->willReturn($fileSize);
 
-        $coreParametersHelper->expects($this->once())
+        $coreParametersHelper
             ->method('get')
-            ->with('report_export_max_filesize_in_bytes')
-            ->willReturn($limit);
+            ->willReturnCallback(
+                function ($key) use ($limit) {
+                    switch ($key) {
+                        case 'default_timezone':
+                            return date_default_timezone_get();
+                        case 'report_export_max_filesize_in_bytes':
+                            return $limit;
+                    }
+                }
+            );
 
         $messageSchedule = new MessageSchedule($translatorMock, $fileProperties, $coreParametersHelper, $router);
 
