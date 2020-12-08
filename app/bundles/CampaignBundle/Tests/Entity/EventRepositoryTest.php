@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Entity;
 
-define('MAUTIC_TABLE_PREFIX', 'mautic_');
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
@@ -44,7 +43,7 @@ final class EventRepositoryTest extends TestCase
             ->willReturn('failed_count > 0');
         $queryBuilderMock->expects($this->at(0))
             ->method('update')
-            ->with('mautic_campaign_events')
+            ->with('campaign_events')
             ->willReturn($queryBuilderMock);
         $queryBuilderMock->expects($this->at(1))
             ->method('set')
