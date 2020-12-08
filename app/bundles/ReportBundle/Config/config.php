@@ -189,6 +189,7 @@ return [
                 'class'     => \Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder::class,
                 'arguments' => [
                     'mautic.report.model.scheduler_template_factory',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.report.model.scheduler_template_factory' => [

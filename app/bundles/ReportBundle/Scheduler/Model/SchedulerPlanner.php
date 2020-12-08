@@ -63,12 +63,15 @@ class SchedulerPlanner
 
     private function removeSchedulerOfReport(Report $report)
     {
-        $scheduler = $this->schedulerRepository->getSchedulerByReport($report);
-        if (!$scheduler) {
+        $schedulers = $this->schedulerRepository->findAll(['report' => $report]);
+        if (!$schedulers) {
             return;
         }
 
-        $this->entityManager->remove($scheduler);
+        foreach ($schedulers as $scheduler) {
+            $this->entityManager->remove($scheduler);
+        }
+
         $this->entityManager->flush();
     }
 }
