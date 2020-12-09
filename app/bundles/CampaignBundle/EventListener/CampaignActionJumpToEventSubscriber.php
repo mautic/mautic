@@ -12,7 +12,6 @@
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
-use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
@@ -48,9 +47,6 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
      */
     private $leadRepository;
 
-    /**
-     * CampaignActionJumpToEvent constructor.
-     */
     public function __construct(EventRepository $eventRepository, EventExecutioner $eventExecutioner, TranslatorInterface $translator, LeadRepository $leadRepository)
     {
         $this->eventRepository  = $eventRepository;
@@ -146,7 +142,7 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $jumpTarget = $this->getJumpTargetForEvent($event);
+            $jumpTarget = $this->getJumpTargetForEvent($event, 'e.tempId');
 
             if (null !== $jumpTarget) {
                 $event->setProperties(array_merge(
@@ -167,12 +163,8 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
 
     /**
      * Inspect a jump event and get its target.
-     *
-     * @param mixed $column
-     *
-     * @return Event|null
      */
-    private function getJumpTargetForEvent(Event $event, $column = 'e.tempId')
+    private function getJumpTargetForEvent(Event $event, string $column): ?Event
     {
         $properties  = $event->getProperties();
         $jumpToEvent = $this->eventRepository->getEntities([
