@@ -50,7 +50,7 @@ $isCodeMode = ($active == $codeMode);
         <div class="col-md-3 theme-list">
             <div class="panel panel-default <?php echo $isSelected ? 'theme-selected' : ''; ?>">
                 <div class="panel-body text-center">
-                    <h3><?php echo $themeInfo['name']; ?></h3>
+                    <h3 class="ellipsis" title="<?php echo $this->escape($themeInfo['name']); ?>"><?php echo $this->escape($themeInfo['name']); ?></h3>
                     <?php if ($hasThumbnail) : ?>
                         <a href="#" data-toggle="modal" data-target="#theme-<?php echo $themeKey; ?>">
                             <div style="background-image: url(<?php echo $thumbnailUrl; ?>);background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 250px"></div>
