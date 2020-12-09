@@ -37,14 +37,14 @@ class LeadListType extends AbstractType
                 $lists = (empty($options['global_only'])) ? $this->segmentModel->getUserLists() : $this->segmentModel->getGlobalLists();
                 $lists = (empty($options['preference_center_only'])) ? $lists : $this->segmentModel->getPreferenceCenterLists();
 
-                    $choices = [];
-                    foreach ($lists as $l) {
-                        if (empty($options['preference_center_only'])) {
-                            $choices[$l['name']] = $l['id'];
-                        } else {
-                            $choices[empty($l['publicName']) ? $l['name'] : $l['publicName']] = $l['id'];
-                        }
+                $choices = [];
+                foreach ($lists as $l) {
+                    if (empty($options['preference_center_only'])) {
+                        $choices[$l['name']] = $l['id'];
+                    } else {
+                        $choices[empty($l['publicName']) ? $l['name'] : $l['publicName']] = $l['id'];
                     }
+                }
 
                 return $choices;
             },
