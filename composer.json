@@ -7,7 +7,8 @@
         "psr-4": {
             "Mautic\\": "app/bundles/",
             "MauticPlugin\\": "plugins/",
-            "Mautic\\Middleware\\": "app/middlewares/"
+            "Mautic\\Middleware\\": "app/middlewares/",
+            "Mautic\\Migrations\\": "app/migrations/"
         },
         "files": [
             "app/AppKernel.php",
@@ -156,7 +157,7 @@
             "@auto-scripts"
         ],
         "test": "bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
-        "phpstan": "bin/phpstan analyse app/bundles plugins",
+        "phpstan": "bin/phpstan analyse app/bundles app/migrations plugins",
         "cs": "bin/php-cs-fixer fix -v --dry-run --diff",
         "fixcs": "bin/php-cs-fixer fix -v",
         "rector": "bin/rector process --config rector.yaml"
