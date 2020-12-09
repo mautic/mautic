@@ -14,13 +14,16 @@ namespace Mautic\DashboardBundle\Tests\Controller;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Templating\Engine\PhpEngine;
 use Mautic\DashboardBundle\Controller\DashboardController;
+use Mautic\DashboardBundle\Dashboard\Widget;
 use Mautic\DashboardBundle\Model\DashboardModel;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -61,17 +64,18 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     public function testSaveWithGetWillCallAccessDenied()
     {
         $this->requestMock->expects($this->once())
-            ->method('getMethod')
-            ->willReturn('GET');
+            ->method('isMethod')
+            ->willReturn(Request::METHOD_POST)
+            ->willReturn(true);
+
+        $this->requestMock->expects(self::once())
+            ->method('isXmlHttpRequest')
+            ->willReturn(false);
 
         $this->containerMock->expects($this->at(0))
             ->method('get')
             ->with('mautic.security')
             ->willReturn($this->securityMock);
-
-        $this->translatorMock->expects($this->at(0))
-            ->method('trans')
-            ->with('mautic.core.url.error.401');
 
         $this->expectException(AccessDeniedHttpException::class);
         $this->controller->saveAction();
@@ -80,8 +84,9 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     public function testSaveWithPostNotAjaxWillCallAccessDenied()
     {
         $this->requestMock->expects($this->once())
-            ->method('getMethod')
-            ->willReturn('POST');
+            ->method('isMethod')
+            ->willReturn('POST')
+            ->willReturn(true);
 
         $this->requestMock->method('isXmlHttpRequest')
             ->willReturn(false);
@@ -102,8 +107,9 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     public function testSaveWithPostAjaxWillSave()
     {
         $this->requestMock->expects($this->once())
-            ->method('getMethod')
-            ->willReturn('POST');
+            ->method('isMethod')
+            ->willReturn('POST')
+            ->willReturn(true);
 
         $this->requestMock->method('isXmlHttpRequest')
             ->willReturn(true);
@@ -153,8 +159,9 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     public function testSaveWithPostAjaxWillNotBeAbleToSave()
     {
         $this->requestMock->expects($this->once())
-            ->method('getMethod')
-            ->willReturn('POST');
+            ->method('isMethod')
+            ->willReturn('POST')
+            ->willReturn(true);
 
         $this->requestMock->method('isXmlHttpRequest')
             ->willReturn(true);
@@ -190,5 +197,82 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         // This exception is thrown if templating is not set. Let's take it as success to avoid further mocking.
         $this->expectException(\LogicException::class);
         $this->controller->saveAction();
+    }
+
+    public function testWidgetDirectRequest(): void
+    {
+        $this->requestMock->method('isXmlHttpRequest')
+            ->willReturn(false);
+
+        $this->expectException(NotFoundHttpException::class);
+        $this->controller->widgetAction(1);
+    }
+
+    public function testWidgetNotFound(): void
+    {
+        $widgetId = '1';
+
+        $this->requestMock->method('isXmlHttpRequest')
+            ->willReturn(true);
+
+        $widgetService = $this->createMock(Widget::class);
+        $widgetService->expects(self::once())
+            ->method('setFilter')
+            ->with($this->requestMock);
+        $widgetService->expects(self::once())
+            ->method('get')
+            ->with((int) $widgetId)
+            ->willReturn(null);
+
+        $this->containerMock->expects(self::once())
+            ->method('get')
+            ->with('mautic.dashboard.widget')
+            ->willReturn($widgetService);
+
+        $this->expectException(NotFoundHttpException::class);
+        $this->controller->widgetAction($widgetId);
+    }
+
+    public function testWidget(): void
+    {
+        $widgetId        = '1';
+        $widget          = new \Mautic\DashboardBundle\Entity\Widget();
+        $renderedContent = 'lfsadkdhfůasfjds';
+
+        $this->requestMock->method('isXmlHttpRequest')
+            ->willReturn(true);
+
+        $widgetService = $this->createMock(Widget::class);
+        $widgetService->expects(self::once())
+            ->method('setFilter')
+            ->with($this->requestMock);
+        $widgetService->expects(self::once())
+            ->method('get')
+            ->with((int) $widgetId)
+            ->willReturn($widget);
+
+        $this->containerMock->expects(self::at(0))
+            ->method('get')
+            ->with('mautic.dashboard.widget')
+            ->willReturn($widgetService);
+
+        $this->containerMock->expects(self::once())
+            ->method('has')
+            ->with('templating')
+            ->willReturn(true);
+
+        $engine = $this->createMock(PhpEngine::class);
+        $engine->expects(self::once())
+            ->method('render')
+            ->willReturn($renderedContent);
+
+        $this->containerMock->expects(self::at(2))
+            ->method('get')
+            ->with('templating')
+            ->willReturn($engine);
+
+        $response = $this->controller->widgetAction($widgetId);
+
+        self::assertSame('{"success":1,"widgetId":"1","widgetHtml":"lfsadkdhf\u016fasfjds","widgetWidth":null,"widgetHeight":null}', $response->getContent());
     }
 }
