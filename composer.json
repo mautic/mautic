@@ -62,7 +62,7 @@
         "sensio/distribution-bundle": "~5.0",
         "sensio/framework-extra-bundle": "~3.0",
 
-        "doctrine/doctrine-bundle": "~1.11.0",
+        "doctrine/doctrine-bundle": "~1.12.0",
         "doctrine/doctrine-fixtures-bundle": "~3.3.0",
         "doctrine/doctrine-migrations-bundle": "~2.1",
         "doctrine/annotations": "~1.8.0",
