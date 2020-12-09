@@ -295,6 +295,7 @@ return [
                     'mautic.lead.model.company',
                     'mautic.tracker.device',
                     'mautic.tracker.contact',
+                    'mautic.helper.core_parameters',
                 ],
                 'methodCalls' => [
                     'setCatInUrl' => [

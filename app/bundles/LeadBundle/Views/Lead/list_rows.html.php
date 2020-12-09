@@ -22,6 +22,23 @@
                     );
 
                     $custom = [];
+
+                    $custom[] = [
+                        'attr'      => [
+                            'href'        => $view['router']->path(
+                                'mautic_contact_action',
+                                [
+                                    'objectAction' => 'view',
+                                    'objectId'     => $item->getId(),
+                                ]
+                            ),
+                            'data-toggle' => 'ajax',
+                            'data-method' => 'POST',
+                        ],
+                        'btnText'   => 'mautic.core.details',
+                        'iconClass' => 'fa fa-info-circle',
+                    ];
+
                     if ($hasEditAccess && !empty($currentList)) {
                         //this lead was manually added to a list so give an option to remove them
                         $custom[] = [
@@ -64,62 +81,25 @@
                     ]);
                     ?>
                 </td>
-                <td>
-                    <a href="<?php echo $view['router']->path('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $item->getId()]); ?>" data-toggle="ajax">
-                        <?php if (in_array($item->getId(), array_keys($noContactList)))  : ?>
-                        <div class="pull-right">
-                            <?php echo $view->render('MauticLeadBundle:Lead:dnc_small.html.php', [
-                                'dncList'         => $noContactList[$item->getId()],
-                            ]); ?>
-                        </div>
-                        <?php endif; ?>
-                        <div><?php echo $view->escape($item->isAnonymous() ? $view['translator']->trans($item->getPrimaryIdentifier()) : $item->getPrimaryIdentifier()); ?></div>
-                        <div class="small"><?php echo $view->escape($item->getSecondaryIdentifier()); ?></div>
-                    </a>
-                </td>
-                <td class="visible-md visible-lg"><?php echo $view->escape($fields['core']['email']['value']); ?></td>
-                <td class="visible-md visible-lg">
-                    <?php
-                    $flag = (!empty($fields['core']['country'])) ? $view['assets']->getCountryFlag($fields['core']['country']['value']) : '';
-                    if (!empty($flag)):
-                    ?>
-                    <img src="<?php echo $flag; ?>" style="max-height: 24px;" class="mr-sm" />
-                    <?php
-                    endif;
-                    $location = [];
-                    if (!empty($fields['core']['city']['value'])):
-                        $location[] = $fields['core']['city']['value'];
-                    endif;
-                    if (!empty($fields['core']['state']['value'])):
-                        $location[] = $fields['core']['state']['value'];
-                    elseif (!empty($fields['core']['country']['value'])):
-                        $location[] = $fields['core']['country']['value'];
-                    endif;
-                    echo $view->escape(implode(', ', $location));
-                    ?>
-                    <div class="clearfix"></div>
-                </td>
-                <td class="text-center">
-                    <?php
-                    $color = $item->getColor();
-                    $style = !empty($color) ? ' style="background-color: '.$color.';"' : '';
-                    ?>
-                    <?php if ($item->getStage()):?>
-                    <span class="label label-default"<?php echo $style; ?>><?php echo $view->escape($item->getStage()->getName()); ?></span>
-                    <?php endif; ?>
-                </td>
-                <td class="visible-md visible-lg text-center">
-                    <?php
-                    $color = $item->getColor();
-                    $style = !empty($color) ? ' style="background-color: '.$color.';"' : '';
-                    ?>
-                    <span class="label label-default"<?php echo $style; ?>><?php echo $item->getPoints(); ?></span>
-                </td>
-                <td class="visible-md visible-lg">
-                    <abbr title="<?php echo $view['date']->toFull($item->getLastActive()); ?>">
-                        <?php echo $view['date']->toText($item->getLastActive()); ?>
-                    </abbr>
-                </td>
-                <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
+                <?php
+                $columsAliases = array_flip($columns);
+                foreach ($columns as $column=>$label) {
+                    $template = 'MauticLeadBundle:Lead\row:'.$column.'.html.php';
+                    if (!$view->exists($template)) {
+                        $template = 'MauticLeadBundle:Lead\row:default.html.php';
+                    }
+                    echo $view->render(
+                        $template,
+                        [
+                            'item'          => $item,
+                            'fields'        => $fields,
+                            'label'         => $label,
+                            'column'        => $column,
+                            'noContactList' => $noContactList,
+                            'class'         => array_search($column, $columsAliases) > 1 ? 'hidden-xs' : '',
+                        ]
+                    );
+                }
+                ?>
             </tr>
         <?php endforeach; ?>
