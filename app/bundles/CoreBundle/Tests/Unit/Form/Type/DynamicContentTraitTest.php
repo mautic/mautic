@@ -48,7 +48,7 @@ final class DynamicContentTraitTest extends \PHPUnit\Framework\TestCase
      */
     private $trait;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -64,7 +64,7 @@ final class DynamicContentTraitTest extends \PHPUnit\Framework\TestCase
      * without configuring it. New email won't save with no error. We must ensure
      * each dynamic content slot has its full structure.
      */
-    public function testAddDynamicContentFieldWithDecWithoutFiltersAndContent()
+    public function testAddDynamicContentFieldWithDecWithoutFiltersAndContent(): void
     {
         $this->formBuilder->expects($this->once())
             ->method('addEventListener')
@@ -128,7 +128,7 @@ final class DynamicContentTraitTest extends \PHPUnit\Framework\TestCase
         $this->invokeMethod($this->trait, 'addDynamicContentField', [$this->formBuilder]);
     }
 
-    private function invokeMethod($object, string $methodName, array $args = [])
+    private function invokeMethod($object, string $methodName, array $args = []): void
     {
         $reflection = new \ReflectionClass(get_class($object));
         $method     = $reflection->getMethod($methodName);

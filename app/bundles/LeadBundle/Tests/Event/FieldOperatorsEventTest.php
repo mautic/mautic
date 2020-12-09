@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Event\FieldOperatorsEvent;
 
 final class FieldOperatorsEventTest extends \PHPUnit\Framework\TestCase
 {
-    public function testConstructGettersSetters()
+    public function testConstructGettersSetters(): void
     {
         $type         = 'select';
         $field        = 'country';

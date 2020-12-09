@@ -31,7 +31,7 @@ final class DynamicListTypeTest extends \PHPUnit\Framework\TestCase
      */
     private $form;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -39,7 +39,7 @@ final class DynamicListTypeTest extends \PHPUnit\Framework\TestCase
         $this->form        = new DynamicListType();
     }
 
-    public function testBuildFormWhenDataIsNull()
+    public function testBuildFormWhenDataIsNull(): void
     {
         $this->formBuilder->expects($this->once())
             ->method('addEventListener')
@@ -64,7 +64,7 @@ final class DynamicListTypeTest extends \PHPUnit\Framework\TestCase
         $this->form->buildForm($this->formBuilder, []);
     }
 
-    public function testBuildFormWhenDataIsArray()
+    public function testBuildFormWhenDataIsArray(): void
     {
         $this->formBuilder->expects($this->once())
             ->method('addEventListener')
