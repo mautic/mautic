@@ -128,7 +128,7 @@ final class DynamicContentTraitTest extends \PHPUnit\Framework\TestCase
         $this->invokeMethod($this->trait, 'addDynamicContentField', [$this->formBuilder]);
     }
 
-    private function invokeMethod($object, string $methodName, array $args = [])
+    private function invokeMethod($object, string $methodName, array $args = []): void
     {
         $reflection = new \ReflectionClass(get_class($object));
         $method     = $reflection->getMethod($methodName);
