@@ -2,6 +2,7 @@
 
 namespace Mautic\ReportBundle\Tests\Scheduler\Date;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Mautic\ReportBundle\Scheduler\Entity\SchedulerEntity;
@@ -16,7 +17,13 @@ class DateBuilderTest extends \PHPUnit\Framework\TestCase
     public function testGetNextEvent()
     {
         $schedulerTemplateFactory = new SchedulerTemplateFactory();
-        $schedulerBuilder         = new SchedulerBuilder($schedulerTemplateFactory);
+        $coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelper->expects($this->once())
+            ->method('get')
+            ->with('default_timezone')
+            ->willReturn(date_default_timezone_get());
+
+        $schedulerBuilder         = new SchedulerBuilder($schedulerTemplateFactory, $coreParametersHelper);
 
         $dateBuilder = new DateBuilder($schedulerBuilder);
 

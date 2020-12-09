@@ -47,11 +47,11 @@ class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
         $oldScheduler = new Scheduler($report, new \DateTime());
 
         $schedulerRepository->expects($this->once())
-            ->method('getSchedulerByReport')
-            ->with($report)
+            ->method('findAll')
+            ->with(['report'=>$report])
             ->willReturn($oldScheduler);
 
-        $entityManager->expects($this->once())
+        $entityManager->expects($this->any())
             ->method('remove')
             ->with($oldScheduler);
 
@@ -104,11 +104,11 @@ class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
         $oldScheduler = new Scheduler($report, new \DateTime());
 
         $schedulerRepository->expects($this->once())
-            ->method('getSchedulerByReport')
-            ->with($report)
+            ->method('findAll')
+            ->with(['report' => $report])
             ->willReturn($oldScheduler);
 
-        $entityManager->expects($this->once())
+        $entityManager->expects($this->any())
             ->method('remove')
             ->with($oldScheduler);
 
@@ -148,8 +148,8 @@ class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
         $report = new Report();
 
         $schedulerRepository->expects($this->once())
-            ->method('getSchedulerByReport')
-            ->with($report)
+            ->method('findAll')
+            ->with(['report' => $report])
             ->willReturn(null);
 
         $dateBuilder->expects($this->once())
