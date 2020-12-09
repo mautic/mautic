@@ -11,11 +11,6 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Exporter\Handler;
-use Exporter\Source\ArraySourceIterator;
-use Exporter\Source\IteratorSourceIterator;
-use Exporter\Writer\CsvWriter;
-use Exporter\Writer\XlsWriter;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DataExporterHelper;
@@ -34,6 +29,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -724,34 +720,26 @@ class CommonController extends Controller implements MauticController
     }
 
     /**
-     * @param array $toExport
-     * @param       $type
-     * @param       $filename
+     * @param array|\Iterator $toExport
+     * @param                 $type
+     * @param                 $filename
      *
      * @return StreamedResponse
      */
     public function exportResultsAs($toExport, $type, $filename)
     {
-        if (!in_array($type, ['csv', 'xlsx'])) {
-            throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
+        /** @var \Mautic\CoreBundle\Helper\ExportHelper */
+        $exportHelper = $this->get('mautic.helper.export');
+
+        if (!in_array($type, $exportHelper->getSupportedExportTypes())) {
+            throw new BadRequestHttpException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
         }
 
-        if ($toExport instanceof \Iterator) {
-            $sourceIterator = new IteratorSourceIterator($toExport);
-        } else {
-            $sourceIterator = new ArraySourceIterator($toExport);
-        }
+        $dateFormat = $this->coreParametersHelper->get('date_format_dateonly');
+        $dateFormat = str_replace('--', '-', preg_replace('/[^a-zA-Z]/', '-', $dateFormat));
+        $filename   = strtolower($filename.'_'.((new \DateTime())->format($dateFormat)).'.'.$type);
 
-        $dateFormat  = $this->coreParametersHelper->get('date_format_dateonly');
-        $dateFormat  = str_replace('--', '-', preg_replace('/[^a-zA-Z]/', '-', $dateFormat));
-        $writer      = 'xlsx' === $type ? new XlsWriter('php://output') : new CsvWriter('php://output');
-        $contentType = 'xlsx' === $type ? 'application/vnd.ms-excel' : 'text/csv';
-        $filename    = strtolower($filename.'_'.((new \DateTime())->format($dateFormat)).'.'.$type);
-        $handler     = Handler::create($sourceIterator, $writer);
-
-        return new StreamedResponse(function () use ($handler) {
-            $handler->export();
-        }, 200, ['Content-Type' => $contentType, 'Content-Disposition' => sprintf('attachment; filename=%s', $filename)]);
+        return $exportHelper->exportDataAs($toExport, $type, $filename);
     }
 
     /**
