@@ -21,7 +21,7 @@ use PHPUnit\Framework\Assert;
 
 final class PendingEventTest extends \PHPUnit\Framework\TestCase
 {
-    public function testFailAndPassRemainingWithError()
+    public function testFailAndPassRemainingWithError(): void
     {
         $event    = new Event();
         $contact  = new Lead();
