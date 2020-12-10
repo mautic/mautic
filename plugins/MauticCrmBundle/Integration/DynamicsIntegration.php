@@ -910,7 +910,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
             $leadData        = [];
             $leadUpdatedData = [];
             $rowNum          = 0;
-            foreach ($leadsToCreateInD as $email => $lead) {
+            foreach ($leadsToCreateInD as $lead) {
                 if ($dObject !== $lead['integration_entity']) {
                     continue;
                 }
@@ -1025,7 +1025,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         foreach (['leads', 'contacts'] as $dObject) {
             $leadData = [];
             $rowNum   = 0;
-            foreach ($leadsToUpdateInD as $email => $lead) {
+            foreach ($leadsToUpdateInD as $lead) {
                 if ($dObject !== $lead['integration_entity']) {
                     continue;
                 }
