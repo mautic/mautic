@@ -96,7 +96,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
             ]
         );
         if ('features' === $formArea) {
-
             $builder->add(
                 'push_object',
                 ButtonGroupType::class,
@@ -304,11 +303,11 @@ class DynamicsIntegration extends CrmAbstractIntegration
         $contactFields = [];
         if (isset($settings['feature_settings']['objects'])) {
             $objects = $settings['feature_settings']['objects'];
-        } else if(isset($settings['objects'])) {
+        } elseif (isset($settings['objects']) || isset($settings['object'])) {
             $settings                                = $this->mergeConfigToFeatureSettings();
             $objects                                 = $settings['objects'];
             $settings['feature_settings']['objects'] = $objects;
-        }else{
+        } else {
             return [];
         }
 
@@ -378,7 +377,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                             } elseif ('DateTimeType' === $fieldType) {
                                 $type = 'datetime';
                             }
-                            if ($dynamicsObject !== 'company') {
+                            if ('company' !== $dynamicsObject) {
                                 $dynamicsFields[$dynamicsObject][$field['LogicalName']] = [
                                     'type'     => $type,
                                     'label'    => $field['DisplayName']['UserLocalizedLabel']['Label'],
@@ -934,7 +933,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 }
 
                 // find existing contact based on configuration
-                if ($config['push_type'] == 'both') {
+                if ('both' == $config['push_type']) {
                     $existingPerson = array_merge(
                         $this->getExistingRecord('emailaddress1', $lead['email'], 'leads'),
                         $this->getExistingRecord('emailaddress1', $lead['email'], 'contacts')
@@ -1135,12 +1134,12 @@ class DynamicsIntegration extends CrmAbstractIntegration
     public function getBlankFieldsToUpdate($fields, $sfRecord, $objectFields, $config)
     {
         //check if update blank fields is selected
-        if (isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && $config['updateBlanks'][0] == 'updateBlanks') {
+        if (isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && 'updateBlanks' == $config['updateBlanks'][0]) {
             foreach ($sfRecord as $fieldName => $sfField) {
                 if (array_key_exists($fieldName, $objectFields['required']['fields'])) {
                     continue; // this will be treated differently
                 }
-                if ($sfField === 'null' && array_key_exists($fieldName, $objectFields['create']) && !array_key_exists($fieldName, $fields)) {
+                if ('null' === $sfField && array_key_exists($fieldName, $objectFields['create']) && !array_key_exists($fieldName, $fields)) {
                     //map to mautic field
                     $fields[$fieldName] = $objectFields['create'][$fieldName];
                 }
