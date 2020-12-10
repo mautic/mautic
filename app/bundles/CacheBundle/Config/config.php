@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org

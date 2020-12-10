@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc. Jan Kozak <galvani78@gmail.com>
+ * @copyright   2018 Mautic. All rights reserved
+ * @author      Mautic
  *
- * @link        http://mautic.com
- * @created     12.9.18
+ * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -15,7 +17,7 @@ use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 
 class FilesystemTagAwareAdapter extends TagAwareAdapter
 {
-    public function __construct($prefix, $lifetime)
+    public function __construct(string $prefix, int $lifetime)
     {
         $prefix = 'app_cache_'.$prefix;
 

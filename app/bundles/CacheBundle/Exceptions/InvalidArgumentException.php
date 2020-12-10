@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc. Jan Kozak <galvani78@gmail.com>
+ * @copyright   2018 Mautic. All rights reserved
+ * @author      Mautic
  *
- * @link        http://mautic.com
- * @created     7.11.18
+ * @link        https://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 

@@ -1,5 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * @copyright   2020 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        https://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace Mautic\CoreBundle\Session\Storage\Handler;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -20,9 +31,6 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
      */
     private $redisConfiguration;
 
-    /**
-     * List of available options:.
-     */
     public function __construct(array $redisConfiguration, CoreParametersHelper $coreParametersHelper)
     {
         $this->redisConfiguration = $redisConfiguration;
@@ -32,17 +40,11 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
         $this->redis = new Client(PRedisConnectionHelper::getRedisEndpoints($redisConfiguration['url']), $redisOptions);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doRead($sessionId): string
     {
         return $this->redis->get($sessionId) ?: '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doWrite($sessionId, $data): bool
     {
         $expireTime = isset($this->redisConfiguration['session_expire_time']) ? (int) $this->redisConfiguration['session_expire_time'] : 1209600;
@@ -51,9 +53,6 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
         return $result && !$result instanceof ErrorInterface;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function doDestroy($sessionId): bool
     {
         $this->redis->del($sessionId);
@@ -61,26 +60,17 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function close(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function gc($maxlifetime): bool
     {
         return true;
     }
 
-    /**
-     * @return bool
-     */
-    public function updateTimestamp($sessionId, $data)
+    public function updateTimestamp($sessionId, $data): bool
     {
         $expireTime = isset($this->redisConfiguration['session_expire_time']) ? (int) $this->redisConfiguration['session_expire_time'] : 1209600;
 

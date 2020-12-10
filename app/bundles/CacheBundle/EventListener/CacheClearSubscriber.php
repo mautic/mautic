@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * @copyright   2016 Mautic Contributors. All rights reserved
+ * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
- * @link        http://mautic.org
+ * @link        https://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -16,9 +18,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 
-/**
- * Class CampaignSubscriber.
- */
 class CacheClearSubscriber implements CacheClearerInterface
 {
     /**
@@ -41,7 +40,7 @@ class CacheClearSubscriber implements CacheClearerInterface
      *
      * @throws \Exception
      */
-    public function clear($cacheDir)
+    public function clear($cacheDir): void
     {
         try {
             $reflect = new \ReflectionClass($this->cacheProvider->getCacheAdapter());

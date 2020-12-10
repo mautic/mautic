@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
- * @link        http://mautic.org
+ * @link        https://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -15,14 +17,14 @@ use Mautic\CoreBundle\Helper\PRedisConnectionHelper;
 
 class PRedisConnectionHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testEndpointsArrayInput()
+    public function testEndpointsArrayInput(): void
     {
         $a = ['tcp://1.1.1.1', 'unix://var/socket'];
         // assume arrays are already in correct format
         $this->assertEquals($a, PRedisConnectionHelper::getRedisEndpoints($a));
     }
 
-    public function testEndpointsStringInput()
+    public function testEndpointsStringInput(): void
     {
         // non domain string should be encapsulated into an array
         $this->assertEquals([['scheme'=>'tcp', 'host'=>'1.1.1.1']], PRedisConnectionHelper::getRedisEndpoints('tcp://1.1.1.1'));
@@ -39,7 +41,7 @@ class PRedisConnectionHelperTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testRedisOptions()
+    public function testRedisOptions(): void
     {
         $redisConfiguration = [
             'replication' => 'sentinel',

@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc. Jan Kozak <galvani78@gmail.com>
+ * @copyright   2018 Mautic. All rights reserved
+ * @author      Mautic
  *
- * @link        http://mautic.com
- * @created     10.10.18
+ * @link        https://mautic.org
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -51,7 +52,7 @@ class CacheProviderTest extends TestCase
         $this->cacheProvider        = new CacheProvider($this->coreParametersHelper, $this->container);
     }
 
-    public function testRequestedCacheAdaptorIsReturned()
+    public function testRequestedCacheAdaptorIsReturned(): void
     {
         $this->coreParametersHelper->expects($this->once())
             ->method('get')
@@ -71,7 +72,7 @@ class CacheProviderTest extends TestCase
         $this->assertEquals($this->cacheProvider->getCacheAdapter(), $this->adapter);
     }
 
-    public function testSimplePsrCacheIsReturned()
+    public function testSimplePsrCacheIsReturned(): void
     {
         $this->coreParametersHelper->expects($this->once())
             ->method('get')
@@ -92,7 +93,7 @@ class CacheProviderTest extends TestCase
         $this->assertInstanceOf(Psr6Cache::class, $simpleCache);
     }
 
-    public function testExceptionThrownIfAdaptorNotFoundInContainer()
+    public function testExceptionThrownIfAdaptorNotFoundInContainer(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -112,7 +113,7 @@ class CacheProviderTest extends TestCase
         $this->cacheProvider->getCacheAdapter();
     }
 
-    public function testExceptionThrownIfAdaptorEmpty()
+    public function testExceptionThrownIfAdaptorEmpty(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -130,7 +131,7 @@ class CacheProviderTest extends TestCase
         $this->cacheProvider->getCacheAdapter();
     }
 
-    public function testExceptionThrownIfAdaptorNotInstanceOfTagAwareAdapterInterface()
+    public function testExceptionThrownIfAdaptorNotInstanceOfTagAwareAdapterInterface(): void
     {
         $this->expectException(InvalidArgumentException::class);
 

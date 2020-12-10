@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
- * @link        http://mautic.org
+ * @link        https://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -21,12 +23,9 @@ class PRedisConnectionHelper
      * If possible also resolve the configured redis hostname to multiple IP addresses.
      *
      * @param mixed $configuredUrls a string or an array of redis endpoints to connect to
-     *
-     * @return array
      */
-    public static function getRedisEndpoints($configuredUrls)
+    public static function getRedisEndpoints($configuredUrls): iterable
     {
-        $redisEndpoints = [];
         if (is_iterable($configuredUrls)) {
             // assume arrays are already in the correct format
             return $configuredUrls;
@@ -56,10 +55,8 @@ class PRedisConnectionHelper
      * Transform the redis mautic config to an options array consumable by PRedis.
      *
      * @param array $redisConfiguration mautic's redis configuration
-     *
-     * @return array
      */
-    public static function makeRedisOptions(array $redisConfiguration, string $prefix = '')
+    public static function makeRedisOptions(array $redisConfiguration, string $prefix = ''): array
     {
         $redisOptions = [];
 
