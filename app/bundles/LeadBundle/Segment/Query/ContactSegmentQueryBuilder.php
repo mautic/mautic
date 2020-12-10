@@ -145,7 +145,7 @@ class ContactSegmentQueryBuilder
      */
     public function addNewContactsRestrictions(QueryBuilder $queryBuilder, $segmentId): QueryBuilder
     {
-        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'.leads');
+        $leadsTableAlias    = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $expr               = $queryBuilder->expr();
         $tableAlias         = $this->generateRandomParameterName();
         $segmentIdParameter = ":{$tableAlias}segmentId";

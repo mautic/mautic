@@ -54,7 +54,7 @@ class ContactSegmentService
             ];
         }
 
-        $qb = $this->getNewSegmentContactsQuery($segment);
+        $qb              = $this->getNewSegmentContactsQuery($segment);
         $leadsTableAlias = $qb->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
 
         $this->addMinMaxLimiters($qb, $batchLimiters);
