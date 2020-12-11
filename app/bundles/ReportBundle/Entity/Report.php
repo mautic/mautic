@@ -230,16 +230,9 @@ class Report extends FormEntity implements SchedulerInterface
         return $this->id;
     }
 
-    /**
-     * @param ?int
-     *
-     * @return Report
-     */
-    public function setId($id)
+    public function setId(?int $id): void
     {
         $this->id = $id;
-
-        return $this;
     }
 
     /**
@@ -636,10 +629,7 @@ class Report extends FormEntity implements SchedulerInterface
         $this->setScheduleMonthFrequency(null);
     }
 
-    /**
-     * @param string $email
-     */
-    public function setAsScheduledNow($email)
+    public function setAsScheduledNow(string $email): void
     {
         $this->setIsScheduled(true);
         $this->setToAddress($email);
@@ -682,10 +672,7 @@ class Report extends FormEntity implements SchedulerInterface
         $this->setScheduleMonthFrequency(null);
     }
 
-    /**
-     * @return bool
-     */
-    public function isScheduledNow()
+    public function isScheduledNow(): bool
     {
         return SchedulerEnum::UNIT_NOW === $this->getScheduleUnit();
     }

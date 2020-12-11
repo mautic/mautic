@@ -78,10 +78,7 @@ class MessageSchedule
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getMessageForAttachedFile(Report $report)
+    public function getMessageForAttachedFile(Report $report): string
     {
         $link = $this->router->generate('mautic_report_view', ['objectId' => $report->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
         $date = new \DateTime();
@@ -92,10 +89,7 @@ class MessageSchedule
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getMessageForLinkedFile(Report $report)
+    public function getMessageForLinkedFile(Report $report): string
     {
         $link = $this->router->generate('mautic_report_download', ['reportId' => $report->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 

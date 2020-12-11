@@ -18,12 +18,28 @@ use Mautic\ReportBundle\Entity\SchedulerRepository;
 use Mautic\ReportBundle\Model\ScheduleModel;
 use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ScheduleModelTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|SchedulerRepository
+     */
     private $schedulerRepository;
+
+    /**
+     * @var MockObject|EntityManager
+     */
     private $entityManager;
+
+    /**
+     * @var MockObject|SchedulerPlanner
+     */
     private $schedulerPlanner;
+
+    /**
+     * @var MockObject|ExportOption
+     */
     private $exportOption;
 
     /**
@@ -31,7 +47,7 @@ class ScheduleModelTest extends \PHPUnit\Framework\TestCase
      */
     private $scheduleModel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->schedulerRepository = $this->createMock(SchedulerRepository::class);
         $this->entityManager       = $this->createMock(EntityManager::class);

@@ -55,7 +55,7 @@ class ScheduleModel
         $this->schedulerPlanner->computeScheduler($report);
     }
 
-    public function turnOffScheduler(Report $report)
+    public function turnOffScheduler(Report $report): void
     {
         $report->setIsScheduled(false);
         $this->entityManager->persist($report);

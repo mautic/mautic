@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -20,11 +22,9 @@ use Recurr\Rule;
 class SchedulerNowBuilder implements BuilderInterface
 {
     /**
-     * @return Rule
-     *
      * @throws InvalidSchedulerException
      */
-    public function build(Rule $rule, SchedulerInterface $scheduler)
+    public function build(Rule $rule, SchedulerInterface $scheduler): Rule
     {
         try {
             $rule->setFreq('SECONDLY');

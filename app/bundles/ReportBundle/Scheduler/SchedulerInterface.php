@@ -15,7 +15,7 @@ interface SchedulerInterface
 {
     public function isScheduled();
 
-    public function isScheduledNow();
+    public function isScheduledNow(): bool;
 
     public function isScheduledDaily();
 

@@ -90,11 +90,7 @@ class FilePathResolver
         }
     }
 
-    /**
-     * @param string $originPath
-     * @param string $targetPath
-     */
-    public function move($originPath, $targetPath)
+    public function move(string $originPath, string $targetPath): void
     {
         $this->filesystem->rename($originPath, $targetPath);
     }
