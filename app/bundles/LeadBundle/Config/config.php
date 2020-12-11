@@ -1374,6 +1374,7 @@ return [
                 'arguments' => [
                     'mautic.lead.field.settings.background_service',
                     'translator',
+                    'mautic.lead.repository.field',
                 ],
                 'tag' => 'console.command',
             ],
@@ -1424,6 +1425,6 @@ return [
             '5' => 'last_active',
             '6' => 'id',
         ],
-        'create_custom_field_in_background'   => false,
+        \Mautic\LeadBundle\Field\Settings\BackgroundSettings::CREATE_CUSTOM_FIELD_IN_BACKGROUND => false,
     ],
 ];

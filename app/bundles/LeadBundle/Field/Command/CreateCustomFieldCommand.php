@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2017 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -14,6 +16,7 @@ namespace Mautic\LeadBundle\Field\Command;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Schema\SchemaException;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Field\BackgroundService;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\ColumnAlreadyCreatedException;
@@ -37,14 +40,23 @@ class CreateCustomFieldCommand extends ContainerAwareCommand
      */
     private $translator;
 
-    public function __construct(BackgroundService $backgroundService, TranslatorInterface $translator)
-    {
+    /**
+     * @var LeadFieldRepository
+     */
+    private $leadFieldRepository;
+
+    public function __construct(
+        BackgroundService $backgroundService,
+        TranslatorInterface $translator,
+        LeadFieldRepository $leadFieldRepository
+    ) {
         parent::__construct();
-        $this->backgroundService = $backgroundService;
-        $this->translator        = $translator;
+        $this->backgroundService   = $backgroundService;
+        $this->translator          = $translator;
+        $this->leadFieldRepository = $leadFieldRepository;
     }
 
-    public function configure()
+    public function configure(): void
     {
         parent::configure();
 
@@ -61,13 +73,23 @@ EOT
             );
     }
 
-    /**
-     * @return int
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $leadFieldId = (int) $input->getOption('id');
         $userId      = (int) $input->getOption('user');
+
+        if (!$leadFieldId) {
+            $leadField = $this->leadFieldRepository->getFieldThatIsMissingColumn();
+
+            if (!$leadField) {
+                $output->writeln('<info>'.$this->translator->trans('mautic.lead.field.all_fields_have_columns').'</info>');
+
+                return 0;
+            }
+
+            $leadFieldId = $leadField->getId();
+            $userId      = $leadField->getCreatedBy();
+        }
 
         try {
             $this->backgroundService->addColumn($leadFieldId, $userId);
@@ -106,7 +128,7 @@ EOT
         }
 
         $output->writeln('');
-        $output->writeln('<info>'.$this->translator->trans('mautic.lead.field.column_was_created').'</info>');
+        $output->writeln('<info>'.$this->translator->trans('mautic.lead.field.column_was_created', ['%id%' => $leadFieldId]).'</info>');
 
         return 0;
     }
