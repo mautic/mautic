@@ -67,7 +67,7 @@ class FileHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($fileSize);
 
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('report_export_max_filesize_in_bytes')
             ->willReturn($fileLimit);
 
@@ -86,7 +86,7 @@ class FileHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($fileSize);
 
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('report_export_max_filesize_in_bytes')
             ->willReturn($fileLimit);
 
@@ -115,7 +115,7 @@ class FileHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(33);
 
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('report_temp_dir')
             ->willReturn('/some/path');
 
@@ -134,7 +134,7 @@ class FileHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(33);
 
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('report_temp_dir')
             ->willReturn('/some/path');
 
