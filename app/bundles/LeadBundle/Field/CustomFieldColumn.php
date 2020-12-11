@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
- * @link        http://mautic.org
+ * @link        https://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -16,7 +18,6 @@ use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
-use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
@@ -86,7 +87,7 @@ class CustomFieldColumn
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function createLeadColumn(LeadField $leadField)
+    public function createLeadColumn(LeadField $leadField): void
     {
         $leadsSchema = $this->columnSchemaHelper->setName($leadField->getCustomFieldObject());
 
@@ -104,7 +105,13 @@ class CustomFieldColumn
 
         try {
             $this->fieldColumnDispatcher->dispatchPreAddColumnEvent($leadField);
-        } catch (NoListenerException $e) {
+        } catch (AbortColumnCreateException $e) {
+            // No subscriber is creating the field on background.
+            // Save the field metadata and throw the exception again to stop column creation.
+            // As the column should be created by a background job.
+            $this->leadFieldSaver->saveLeadFieldEntityWithoutColumnCreated($leadField);
+
+            throw $e;
         }
 
         $this->processCreateLeadColumn($leadField);
@@ -113,14 +120,12 @@ class CustomFieldColumn
     /**
      * Create the field as its own column in the leads table.
      *
-     * @param bool $saveLeadField
-     *
      * @throws CustomFieldLimitException
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function processCreateLeadColumn(LeadField $leadField, $saveLeadField = true)
+    public function processCreateLeadColumn(LeadField $leadField, bool $saveLeadField = true): void
     {
         $leadsSchema = $this->columnSchemaHelper->setName($leadField->getCustomFieldObject());
 

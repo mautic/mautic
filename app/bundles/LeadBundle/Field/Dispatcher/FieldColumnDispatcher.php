@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
- * @link        http://mautic.org
+ * @link        https://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -12,7 +14,6 @@
 namespace Mautic\LeadBundle\Field\Dispatcher;
 
 use Mautic\LeadBundle\Entity\LeadField;
-use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\Event\AddColumnEvent;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Settings\BackgroundSettings;
@@ -39,23 +40,15 @@ class FieldColumnDispatcher
 
     /**
      * @throws AbortColumnCreateException
-     * @throws NoListenerException
      */
-    public function dispatchPreAddColumnEvent(LeadField $leadField)
+    public function dispatchPreAddColumnEvent(LeadField $leadField): void
     {
-        $action = LeadEvents::LEAD_FIELD_PRE_ADD_COLUMN;
-
-        if (!$this->dispatcher->hasListeners($action)) {
-            throw new NoListenerException('There is no Listener for this event');
-        }
-
         $shouldProcessInBackground = $this->backgroundSettings->shouldProcessColumnChangeInBackground();
+        $event                     = new AddColumnEvent($leadField, $shouldProcessInBackground);
 
-        $event = new AddColumnEvent($leadField, $shouldProcessInBackground);
+        $this->dispatcher->dispatch(LeadEvents::LEAD_FIELD_PRE_ADD_COLUMN, $event);
 
-        $this->dispatcher->dispatch($action, $event);
-
-        if ($event->shouldProcessInBackground()) {
+        if ($shouldProcessInBackground) {
             throw new AbortColumnCreateException('Column change will be processed in background job');
         }
     }
