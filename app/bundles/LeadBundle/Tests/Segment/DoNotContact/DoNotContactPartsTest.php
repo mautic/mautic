@@ -16,14 +16,9 @@ use Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts;
 
 class DoNotContactPartsTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @covers \Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts::getChannel
-     * @covers \Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts::getParameterType
-     */
     public function testDncBouncedEmail()
     {
-        $field             = 'dnc_bounced';
-        $doNotContactParts = new DoNotContactParts($field);
+        $doNotContactParts = new DoNotContactParts('dnc_bounced');
 
         $this->assertSame('email', $doNotContactParts->getChannel());
         $this->assertSame(
@@ -32,8 +27,7 @@ class DoNotContactPartsTest extends \PHPUnit\Framework\TestCase
             'Type for dnc_bounced should be bounced'
         );
 
-        $field             = 'dnc_unsubscribed';
-        $doNotContactParts = new DoNotContactParts($field);
+        $doNotContactParts = new DoNotContactParts('dnc_unsubscribed');
 
         $this->assertSame('email', $doNotContactParts->getChannel());
         $this->assertSame(
@@ -42,8 +36,7 @@ class DoNotContactPartsTest extends \PHPUnit\Framework\TestCase
             'Type for dnc_unsubscribed should be unsubscribed'
         );
 
-        $field             = 'dnc_unsubscribed_manually';
-        $doNotContactParts = new DoNotContactParts($field);
+        $doNotContactParts = new DoNotContactParts('dnc_unsubscribed_manually');
 
         $this->assertSame('email', $doNotContactParts->getChannel());
         $this->assertSame(
@@ -53,14 +46,9 @@ class DoNotContactPartsTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @covers \Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts::getChannel
-     * @covers \Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts::getParameterType
-     */
     public function testDncBouncedSms()
     {
-        $field             = 'dnc_bounced_sms';
-        $doNotContactParts = new DoNotContactParts($field);
+        $doNotContactParts = new DoNotContactParts('dnc_bounced_sms');
 
         $this->assertSame('sms', $doNotContactParts->getChannel());
         $this->assertSame(
@@ -69,8 +57,7 @@ class DoNotContactPartsTest extends \PHPUnit\Framework\TestCase
             'Type for dnc_bounced_sms should be bounced'
         );
 
-        $field             = 'dnc_unsubscribed_sms';
-        $doNotContactParts = new DoNotContactParts($field);
+        $doNotContactParts = new DoNotContactParts('dnc_unsubscribed_sms');
 
         $this->assertSame('sms', $doNotContactParts->getChannel());
         $this->assertSame(
@@ -79,8 +66,7 @@ class DoNotContactPartsTest extends \PHPUnit\Framework\TestCase
             'Type for dnc_unsubscribed_sms should be unsubscribed'
         );
 
-        $field             = 'dnc_unsubscribed_sms_manually';
-        $doNotContactParts = new DoNotContactParts($field);
+        $doNotContactParts = new DoNotContactParts('dnc_unsubscribed_sms_manually');
 
         $this->assertSame('sms', $doNotContactParts->getChannel());
         $this->assertSame(
