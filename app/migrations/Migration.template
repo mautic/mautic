@@ -20,7 +20,7 @@ final class Version<version> extends AbstractMauticMigration
     /**
      * @throws SkipMigrationException
      */
-    public function preUp(Schema $schema)
+    public function preUp(Schema $schema): void
     {
         $shouldRunMigration = false; // Please modify to your needs
         
@@ -29,7 +29,7 @@ final class Version<version> extends AbstractMauticMigration
         }
     }
 
-    public function up(Schema $schema)
+    public function up(Schema $schema): void
     {
         // Please modify to your needs
     }

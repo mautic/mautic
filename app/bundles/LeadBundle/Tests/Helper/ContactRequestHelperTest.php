@@ -68,7 +68,7 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
      */
     private $trackedContact;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->leadModel            = $this->createMock(LeadModel::class);
         $this->contactTracker       = $this->createMock(ContactTracker::class);

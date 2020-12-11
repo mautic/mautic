@@ -131,7 +131,7 @@ class BaseDecorator implements FilterDecoratorInterface
                 $filter = (array) $filter;
 
                 foreach ($filter as $key => $value) {
-                    $filter[$key] = sprintf('(([|]|^)%s([|]|$))', $value);
+                    $filter[$key] = sprintf('(([|]|^)%s([|]|$))', preg_quote($value, '/'));
                 }
 
                 return $filter;
