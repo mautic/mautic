@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\DBALException;
 use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -30,6 +31,7 @@ use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
 use Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -70,13 +72,19 @@ class ListModel extends FormModel
      */
     private $requestStack;
 
-    public function __construct(CategoryModel $categoryModel, CoreParametersHelper $coreParametersHelper, ContactSegmentService $leadSegment, SegmentChartQueryFactory $segmentChartQueryFactory, RequestStack $requestStack)
+    /**
+     * @var CacheStorageHelper
+     */
+    private $cacheStorageHelper;
+
+    public function __construct(CategoryModel $categoryModel, CoreParametersHelper $coreParametersHelper, ContactSegmentService $leadSegment, SegmentChartQueryFactory $segmentChartQueryFactory, RequestStack $requestStack, CacheStorageHelper $cacheStorageHelper)
     {
         $this->categoryModel            = $categoryModel;
         $this->coreParametersHelper     = $coreParametersHelper;
         $this->leadSegmentService       = $leadSegment;
         $this->segmentChartQueryFactory = $segmentChartQueryFactory;
         $this->requestStack             = $requestStack;
+        $this->cacheStorageHelper       = $cacheStorageHelper;
     }
 
     /**
@@ -1301,5 +1309,27 @@ class ListModel extends FormModel
         }
 
         return (null == $sourceType) ? $choices : $choices[$sourceType];
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function getLeadCount(array $listIds): array
+    {
+        $leadCount = [];
+
+        foreach ($listIds as $listId) {
+            $leadCount[$listId] = (int) $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'segment', $listId, 'lead'));
+        }
+
+        return $leadCount;
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function setLeadCount(int $id, int $count): void
+    {
+        $this->cacheStorageHelper->set(sprintf('%s|%s|%s', 'segment', $id, 'lead'), $count);
     }
 }

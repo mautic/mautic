@@ -274,12 +274,20 @@ class LeadListRepository extends CommonRepository
             $listIds = [$listIds];
         }
 
+        $listIds    = [$listIds[0]];
+        $expression = null;
+
+        if (1 === count($listIds)) {
+            $q          = $this->forceUseIndex($q, MAUTIC_TABLE_PREFIX.'manually_removed');
+            $expression = $q->expr()->eq('l.leadlist_id', $listIds[0]);
+        } else {
+            $expression = $q->expr()->in('l.leadlist_id', $listIds);
+        }
+
         $q->where(
-            $q->expr()->in('l.leadlist_id', $listIds),
+            $expression,
             $q->expr()->eq('l.manually_removed', ':false')
-        )
-            ->setParameter('false', false, 'boolean')
-            ->groupBy('l.leadlist_id');
+        )->setParameter('false', false, 'boolean')->groupBy('l.leadlist_id');
 
         $result = $q->execute()->fetchAll();
 
@@ -296,6 +304,16 @@ class LeadListRepository extends CommonRepository
         }
 
         return ($returnArray) ? $return : $return[$listIds[0]];
+    }
+
+    private function forceUseIndex(QueryBuilder $qb, string $indexName): QueryBuilder
+    {
+        $fromPart             = $qb->getQueryPart('from');
+        $fromPart[0]['alias'] = sprintf('%s USE INDEX (%s)', $fromPart[0]['alias'], $indexName);
+        $qb->resetQueryPart('from');
+        $qb->from($fromPart[0]['table'], $fromPart[0]['alias']);
+
+        return $qb;
     }
 
     /**

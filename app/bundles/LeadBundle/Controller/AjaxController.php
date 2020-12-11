@@ -944,4 +944,22 @@ class AjaxController extends CommonAjaxController
 
         return new JsonResponse($data);
     }
+
+    protected function getLeadCountAction(Request $request): JsonResponse
+    {
+        $id        = $request->get('id');
+        $model     = $this->getModel('lead.list');
+        $leadCount = $model->getRepository()->getLeadCount($id);
+        $model->setLeadCount($id, $leadCount);
+
+        $data['success'] = 1;
+        $data['html']    = $this->translator->transChoice(
+            'mautic.lead.list.viewleads_count',
+            $leadCount,
+            ['%count%' => $leadCount]
+        );
+        $data['leadCount'] = $leadCount;
+
+        return new JsonResponse($data);
+    }
 }
