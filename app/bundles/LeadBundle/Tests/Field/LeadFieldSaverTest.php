@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -18,7 +20,7 @@ use Mautic\LeadBundle\Field\LeadFieldSaver;
 
 class LeadFieldSaverTest extends \PHPUnit\Framework\TestCase
 {
-    public function testSave()
+    public function testSave(): void
     {
         $leadFieldRepository = $this->createMock(LeadFieldRepository::class);
         $fieldSaveDispatcher = $this->createMock(FieldSaveDispatcher::class);
@@ -38,7 +40,7 @@ class LeadFieldSaverTest extends \PHPUnit\Framework\TestCase
         $leadFieldSaver->saveLeadFieldEntity($leadField, true);
     }
 
-    public function testSaveNoColumnCreated()
+    public function testSaveNoColumnCreated(): void
     {
         $leadFieldRepository = $this->createMock(LeadFieldRepository::class);
         $fieldSaveDispatcher = $this->createMock(FieldSaveDispatcher::class);

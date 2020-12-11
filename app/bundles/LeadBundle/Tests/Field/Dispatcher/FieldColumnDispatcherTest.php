@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -13,7 +15,6 @@ namespace Mautic\LeadBundle\Tests\Field\Dispatcher;
 
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher;
-use Mautic\LeadBundle\Field\Event\AddColumnBackgroundEvent;
 use Mautic\LeadBundle\Field\Event\AddColumnEvent;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Settings\BackgroundSettings;
@@ -21,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
 {
-    public function testNoBackground()
+    public function testNoBackground(): void
     {
         $dispatcher         = $this->createMock(EventDispatcherInterface::class);
         $backgroundSettings = $this->createMock(BackgroundSettings::class);
@@ -51,7 +52,7 @@ class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
         $fieldColumnDispatcher->dispatchPreAddColumnEvent($leadField);
     }
 
-    public function testStopPropagation()
+    public function testStopPropagation(): void
     {
         $leadField = new LeadField();
 

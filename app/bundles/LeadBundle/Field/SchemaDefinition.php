@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -17,14 +19,8 @@ class SchemaDefinition
      * Get the MySQL database type based on the field type
      * Use a static function so that it's accessible from DoctrineSubscriber
      * without causing a circular service injection error.
-     *
-     * @param string $alias
-     * @param string $type
-     * @param bool   $isUnique
-     *
-     * @return array
      */
-    public static function getSchemaDefinition($alias, $type, $isUnique = false)
+    public static function getSchemaDefinition(string $alias, string $type, bool $isUnique = false): array
     {
         // Unique is always a string in order to control index length
         if ($isUnique) {
@@ -74,14 +70,8 @@ class SchemaDefinition
 
     /**
      * Get the MySQL database type based on the field type.
-     *
-     * @param string $alias
-     * @param string $type
-     * @param bool   $isUnique
-     *
-     * @return array
      */
-    public function getSchemaDefinitionNonStatic($alias, $type, $isUnique = false)
+    public function getSchemaDefinitionNonStatic(string $alias, string $type, bool $isUnique = false): array
     {
         return self::getSchemaDefinition($alias, $type, $isUnique);
     }

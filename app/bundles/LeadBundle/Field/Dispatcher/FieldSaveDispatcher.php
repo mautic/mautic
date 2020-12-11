@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -37,38 +39,25 @@ class FieldSaveDispatcher
     }
 
     /**
-     * @param bool $isNew
-     *
-     * @return LeadFieldEvent
-     *
      * @throws NoListenerException
      */
-    public function dispatchPreSaveEvent(LeadField $entity, $isNew)
+    public function dispatchPreSaveEvent(LeadField $entity, bool $isNew): LeadFieldEvent
     {
         return $this->dispatchEvent(LeadEvents::FIELD_PRE_SAVE, $entity, $isNew);
     }
 
     /**
-     * @param bool $isNew
-     *
-     * @return LeadFieldEvent
-     *
      * @throws NoListenerException
      */
-    public function dispatchPostSaveEvent(LeadField $entity, $isNew)
+    public function dispatchPostSaveEvent(LeadField $entity, bool $isNew): LeadFieldEvent
     {
         return $this->dispatchEvent(LeadEvents::FIELD_POST_SAVE, $entity, $isNew);
     }
 
     /**
      * @deprecated Use method dispatchEvent directly
-     *
-     * @param string $action
-     * @param bool   $isNew
-     *
-     * @return LeadFieldEvent|null
      */
-    public function dispatchEventBc($action, LeadField $entity, $isNew = false, LeadFieldEvent $event = null)
+    public function dispatchEventBc(string $action, LeadField $entity, bool $isNew = false, LeadFieldEvent $event = null): ?LeadFieldEvent
     {
         switch ($action) {
             case 'pre_save':
@@ -96,13 +85,10 @@ class FieldSaveDispatcher
 
     /**
      * @param string $action - Use constant from LeadEvents class (e.g. LeadEvents::FIELD_PRE_SAVE)
-     * @param bool   $isNew
-     *
-     * @return LeadFieldEvent
      *
      * @throws NoListenerException
      */
-    private function dispatchEvent($action, LeadField $entity, $isNew, LeadFieldEvent $event = null)
+    private function dispatchEvent(string $action, LeadField $entity, bool $isNew, LeadFieldEvent $event = null): LeadFieldEvent
     {
         if (!$this->dispatcher->hasListeners($action)) {
             throw new NoListenerException('There is no Listener for this event');

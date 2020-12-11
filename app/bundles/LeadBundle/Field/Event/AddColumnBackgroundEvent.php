@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -14,7 +16,7 @@ namespace Mautic\LeadBundle\Field\Event;
 use Mautic\LeadBundle\Entity\LeadField;
 use Symfony\Component\EventDispatcher\Event;
 
-class AddColumnBackgroundEvent extends Event
+final class AddColumnBackgroundEvent extends Event
 {
     /**
      * @var LeadField
@@ -26,10 +28,7 @@ class AddColumnBackgroundEvent extends Event
         $this->leadField = $leadField;
     }
 
-    /**
-     * @return LeadField
-     */
-    public function getLeadField()
+    public function getLeadField(): LeadField
     {
         return $this->leadField;
     }

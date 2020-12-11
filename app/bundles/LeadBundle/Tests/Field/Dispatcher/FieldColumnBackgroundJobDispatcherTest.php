@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -20,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\TestCase
 {
-    public function testNoListener()
+    public function testNoListener(): void
     {
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher
@@ -41,7 +43,7 @@ class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\TestCase
         $fieldColumnBackgroundJobDispatcher->dispatchPreAddColumnEvent($leadField);
     }
 
-    public function testNormalProcess()
+    public function testNormalProcess(): void
     {
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher
@@ -64,7 +66,7 @@ class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\TestCase
         $fieldColumnBackgroundJobDispatcher->dispatchPreAddColumnEvent($leadField);
     }
 
-    public function testStopPropagation()
+    public function testStopPropagation(): void
     {
         $leadField = new LeadField();
 

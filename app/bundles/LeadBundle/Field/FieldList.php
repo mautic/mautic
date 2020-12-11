@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -32,14 +34,7 @@ class FieldList
         $this->translator          = $translator;
     }
 
-    /**
-     * @param bool|true $byGroup
-     * @param bool|true $alphabetical
-     * @param array     $filters
-     *
-     * @return array
-     */
-    public function getFieldList($byGroup = true, $alphabetical = true, $filters = ['isPublished' => true, 'object' => 'lead'])
+    public function getFieldList(bool $byGroup = true, bool $alphabetical = true, array $filters = ['isPublished' => true, 'object' => 'lead']): array
     {
         $forceFilters = [];
         foreach ($filters as $col => $val) {

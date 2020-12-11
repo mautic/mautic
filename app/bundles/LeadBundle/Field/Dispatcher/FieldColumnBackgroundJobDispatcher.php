@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -34,7 +36,7 @@ class FieldColumnBackgroundJobDispatcher
      * @throws AbortColumnCreateException
      * @throws NoListenerException
      */
-    public function dispatchPreAddColumnEvent(LeadField $leadField)
+    public function dispatchPreAddColumnEvent(LeadField $leadField): void
     {
         $action = LeadEvents::LEAD_FIELD_PRE_ADD_COLUMN_BACKGROUND_JOB;
 

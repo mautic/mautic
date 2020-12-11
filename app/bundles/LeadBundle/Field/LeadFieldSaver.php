@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -34,10 +36,7 @@ class LeadFieldSaver
         $this->fieldSaveDispatcher = $fieldSaveDispatcher;
     }
 
-    /**
-     * @param bool $isNew
-     */
-    public function saveLeadFieldEntity(LeadField $leadField, $isNew)
+    public function saveLeadFieldEntity(LeadField $leadField, bool $isNew): void
     {
         try {
             $this->fieldSaveDispatcher->dispatchPreSaveEvent($leadField, $isNew);
@@ -52,7 +51,7 @@ class LeadFieldSaver
         }
     }
 
-    public function saveLeadFieldEntityWithoutColumnCreated(LeadField $leadField)
+    public function saveLeadFieldEntityWithoutColumnCreated(LeadField $leadField): void
     {
         $leadField->setColumnIsNotCreated();
 

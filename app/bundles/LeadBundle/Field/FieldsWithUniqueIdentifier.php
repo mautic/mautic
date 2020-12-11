@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -31,11 +33,9 @@ class FieldsWithUniqueIdentifier
     /**
      * Retrieves a list of published fields that are unique identifers.
      *
-     * @param array $filters
-     *
      * @return mixed
      */
-    public function getFieldsWithUniqueIdentifier($filters = [])
+    public function getFieldsWithUniqueIdentifier(array $filters = [])
     {
         $filters['isPublished']       = isset($filters['isPublished']) ? $filters['isPublished'] : true;
         $filters['isUniqueIdentifer'] = isset($filters['isUniqueIdentifer']) ? $filters['isUniqueIdentifer'] : true;

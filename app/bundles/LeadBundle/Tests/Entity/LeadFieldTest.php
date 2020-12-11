@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
+ * @copyright   2018 Mautic Contributors. All rights reserved
+ * @author      Mautic.
  *
  * @link        https://mautic.org
  *
@@ -15,7 +17,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 
 class LeadFieldTest extends \PHPUnit\Framework\TestCase
 {
-    public function testNewEntity()
+    public function testNewEntity(): void
     {
         $leadField = new LeadField();
 
@@ -23,7 +25,7 @@ class LeadFieldTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($leadField->getColumnIsNotCreated());
     }
 
-    public function testColumnNotCreatedForPublishedEntity()
+    public function testColumnNotCreatedForPublishedEntity(): void
     {
         $leadField = new LeadField();
         $leadField->setIsPublished(true);
@@ -41,7 +43,7 @@ class LeadFieldTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($leadField->getColumnIsNotCreated());
     }
 
-    public function testColumnNotCreatedForUnpublishedEntity()
+    public function testColumnNotCreatedForUnpublishedEntity(): void
     {
         $leadField = new LeadField();
         $leadField->setIsPublished(false);
@@ -59,7 +61,7 @@ class LeadFieldTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($leadField->getColumnIsNotCreated());
     }
 
-    public function testEmailCannotBeUnpublished()
+    public function testEmailCannotBeUnpublished(): void
     {
         $leadField = new LeadField();
         $leadField->setIsPublished(true);
@@ -71,7 +73,7 @@ class LeadFieldTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($leadField->disablePublishChange());
     }
 
-    public function testCannotBeUnpublishedUntilColumnIsCreated()
+    public function testCannotBeUnpublishedUntilColumnIsCreated(): void
     {
         $leadField = new LeadField();
         $leadField->setIsPublished(false);

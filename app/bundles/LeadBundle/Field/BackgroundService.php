@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
- * @link        http://mautic.org
+ * @link        https://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -65,9 +67,6 @@ class BackgroundService
     }
 
     /**
-     * @param int $leadFieldId
-     * @param int $userId
-     *
      * @throws AbortColumnCreateException
      * @throws ColumnAlreadyCreatedException
      * @throws CustomFieldLimitException
@@ -77,7 +76,7 @@ class BackgroundService
      * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function addColumn($leadFieldId, $userId)
+    public function addColumn(int $leadFieldId, int $userId): void
     {
         $leadField = $this->fieldModel->getEntity($leadFieldId);
         if (null === $leadField) {
@@ -96,13 +95,7 @@ class BackgroundService
 
         try {
             $this->customFieldColumn->processCreateLeadColumn($leadField, false);
-        } catch (DriverException $e) {
-            $this->customFieldNotification->customFieldCannotBeCreated($leadField, $userId);
-            throw $e;
-        } catch (SchemaException $e) {
-            $this->customFieldNotification->customFieldCannotBeCreated($leadField, $userId);
-            throw $e;
-        } catch (\Mautic\CoreBundle\Exception\SchemaException $e) {
+        } catch (DriverException | SchemaException | \Mautic\CoreBundle\Exception\SchemaException $e) {
             $this->customFieldNotification->customFieldCannotBeCreated($leadField, $userId);
             throw $e;
         } catch (CustomFieldLimitException $e) {

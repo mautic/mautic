@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -20,7 +22,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomFieldNotificationTest extends \PHPUnit\Framework\TestCase
 {
-    public function testNoUserId()
+    public function testNoUserId(): void
     {
         $notificationModel   = $this->createMock(NotificationModel::class);
         $userModel           = $this->createMock(UserModel::class);
@@ -36,7 +38,7 @@ class CustomFieldNotificationTest extends \PHPUnit\Framework\TestCase
         $customFieldNotification->customFieldWasCreated($leadField, 0);
     }
 
-    public function testNoUser()
+    public function testNoUser(): void
     {
         $notificationModel   = $this->createMock(NotificationModel::class);
         $userModel           = $this->createMock(UserModel::class);
@@ -56,7 +58,7 @@ class CustomFieldNotificationTest extends \PHPUnit\Framework\TestCase
         $customFieldNotification->customFieldWasCreated($leadField, 1);
     }
 
-    public function testCustomFieldWasCreated()
+    public function testCustomFieldWasCreated(): void
     {
         $notificationModel   = $this->createMock(NotificationModel::class);
         $userModel           = $this->createMock(UserModel::class);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -45,10 +47,7 @@ class CustomFieldNotification
         $this->translator        = $translator;
     }
 
-    /**
-     * @param int $userId
-     */
-    public function customFieldWasCreated(LeadField $leadField, $userId)
+    public function customFieldWasCreated(LeadField $leadField, int $userId): void
     {
         try {
             $user = $this->getUser($userId);
@@ -65,10 +64,7 @@ class CustomFieldNotification
         $this->addToNotificationCenter($user, $message, $header);
     }
 
-    /**
-     * @param int $userId
-     */
-    public function customFieldLimitWasHit(LeadField $leadField, $userId)
+    public function customFieldLimitWasHit(LeadField $leadField, int $userId): void
     {
         try {
             $user = $this->getUser($userId);
@@ -85,10 +81,7 @@ class CustomFieldNotification
         $this->addToNotificationCenter($user, $message, $header);
     }
 
-    /**
-     * @param int $userId
-     */
-    public function customFieldCannotBeCreated(LeadField $leadField, $userId)
+    public function customFieldCannotBeCreated(LeadField $leadField, int $userId): void
     {
         try {
             $user = $this->getUser($userId);
@@ -105,11 +98,7 @@ class CustomFieldNotification
         $this->addToNotificationCenter($user, $message, $header);
     }
 
-    /**
-     * @param string $message
-     * @param string $header
-     */
-    private function addToNotificationCenter(User $user, $message, $header)
+    private function addToNotificationCenter(User $user, string $message, string $header): void
     {
         $this->notificationModel->addNotification(
             $message,
@@ -123,13 +112,9 @@ class CustomFieldNotification
     }
 
     /**
-     * @param int $userId
-     *
-     * @return User
-     *
      * @throws NoUserException
      */
-    private function getUser($userId)
+    private function getUser(int $userId): User
     {
         if (!$userId || !$user = $this->userModel->getEntity($userId)) {
             throw new NoUserException();

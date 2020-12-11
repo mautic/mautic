@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -25,7 +27,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
 {
-    public function testColumnExists()
+    public function testColumnExists(): void
     {
         $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
         $schemaDefinition      = $this->createMock(SchemaDefinition::class);
@@ -57,7 +59,7 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
         $customFieldColumn->processCreateLeadColumn($leadField);
     }
 
-    public function testAbortColumnCreation()
+    public function testAbortColumnCreation(): void
     {
         $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
         $schemaDefinition      = $this->createMock(SchemaDefinition::class);
@@ -92,7 +94,7 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
         $customFieldColumn->createLeadColumn($leadField);
     }
 
-    public function testCustomFieldLimit()
+    public function testCustomFieldLimit(): void
     {
         $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
         $schemaDefinition      = $this->createMock(SchemaDefinition::class);
@@ -138,7 +140,7 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
         $customFieldColumn->processCreateLeadColumn($leadField);
     }
 
-    public function testNoErrorWithAddColumnIndex()
+    public function testNoErrorWithAddColumnIndex(): void
     {
         $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
         $schemaDefinition      = $this->createMock(SchemaDefinition::class);
@@ -181,7 +183,7 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
         $customFieldColumn->processCreateLeadColumn($leadField);
     }
 
-    public function testNoErrorNoColumnIndex()
+    public function testNoErrorNoColumnIndex(): void
     {
         $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
         $schemaDefinition      = $this->createMock(SchemaDefinition::class);

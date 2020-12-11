@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -14,7 +16,7 @@ namespace Mautic\LeadBundle\Field\Event;
 use Mautic\LeadBundle\Entity\LeadField;
 use Symfony\Component\EventDispatcher\Event;
 
-class AddColumnEvent extends Event
+final class AddColumnEvent extends Event
 {
     /**
      * @var LeadField
@@ -26,27 +28,18 @@ class AddColumnEvent extends Event
      */
     private $shouldProcessInBackground;
 
-    /**
-     * @param bool $shouldProcessInBackground
-     */
-    public function __construct(LeadField $leadField, $shouldProcessInBackground)
+    public function __construct(LeadField $leadField, bool $shouldProcessInBackground)
     {
         $this->leadField                 = $leadField;
         $this->shouldProcessInBackground = $shouldProcessInBackground;
     }
 
-    /**
-     * @return LeadField
-     */
-    public function getLeadField()
+    public function getLeadField(): LeadField
     {
         return $this->leadField;
     }
 
-    /**
-     * @return bool
-     */
-    public function shouldProcessInBackground()
+    public function shouldProcessInBackground(): bool
     {
         return $this->shouldProcessInBackground;
     }

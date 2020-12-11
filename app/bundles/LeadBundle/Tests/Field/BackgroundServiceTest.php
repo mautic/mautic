@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -22,36 +24,37 @@ use Mautic\LeadBundle\Field\Exception\LeadFieldWasNotFoundException;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Field\Notification\CustomFieldNotification;
 use Mautic\LeadBundle\Model\FieldModel;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|BackgroundService
+     * @var MockObject|BackgroundService
      */
     private $backgroundService;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|FieldModel
+     * @var MockObject|FieldModel
      */
     private $fieldModel;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|CustomFieldColumn
+     * @var MockObject|CustomFieldColumn
      */
     private $customFieldColumn;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|LeadFieldSaver
+     * @var MockObject|LeadFieldSaver
      */
     private $leadFieldSaver;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|FieldColumnBackgroundJobDispatcher
+     * @var MockObject|FieldColumnBackgroundJobDispatcher
      */
     private $fieldColumnBackgroundJobDispatcher;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|CustomFieldNotification
+     * @var MockObject|CustomFieldNotification
      */
     private $customFieldNotification;
 
@@ -72,7 +75,7 @@ class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testNoLeadField()
+    public function testNoLeadField(): void
     {
         $this->fieldModel->expects($this->once())
             ->method('getEntity')
@@ -84,7 +87,7 @@ class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
         $this->backgroundService->addColumn(1, 3);
     }
 
-    public function testColumnAlreadyCreated()
+    public function testColumnAlreadyCreated(): void
     {
         $leadField = new LeadField();
         $leadField->setColumnWasCreated();
@@ -104,7 +107,7 @@ class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
         $this->backgroundService->addColumn(1, $userId);
     }
 
-    public function testAbortColumnCreate()
+    public function testAbortColumnCreate(): void
     {
         $leadField = new LeadField();
         $leadField->setColumnIsNotCreated();
@@ -126,7 +129,7 @@ class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
         $this->backgroundService->addColumn(1, $userId);
     }
 
-    public function testCustomFieldLimit()
+    public function testCustomFieldLimit(): void
     {
         $leadField = new LeadField();
         $leadField->setColumnIsNotCreated();
@@ -155,7 +158,7 @@ class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
         $this->backgroundService->addColumn(1, $userId);
     }
 
-    public function testCreateColumnWithNoError()
+    public function testCreateColumnWithNoError(): void
     {
         $leadField = new LeadField();
         $leadField->setColumnIsNotCreated();

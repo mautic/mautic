@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -42,10 +44,7 @@ class CustomFieldObject
         $this->leadField = $leadField;
     }
 
-    /**
-     * @return string
-     */
-    public function getObject()
+    public function getObject(): string
     {
         return $this->objects[$this->leadField->getObject()];
     }
