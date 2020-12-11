@@ -47,7 +47,7 @@ class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
         $oldScheduler = new Scheduler($report, new \DateTime());
 
         $schedulerRepository->expects($this->once())
-            ->method('findAll')
+            ->method('findBy')
             ->with(['report'=>$report])
             ->willReturn($oldScheduler);
 
@@ -104,7 +104,7 @@ class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
         $oldScheduler = new Scheduler($report, new \DateTime());
 
         $schedulerRepository->expects($this->once())
-            ->method('findAll')
+            ->method('findBy')
             ->with(['report' => $report])
             ->willReturn($oldScheduler);
 
@@ -148,7 +148,7 @@ class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
         $report = new Report();
 
         $schedulerRepository->expects($this->once())
-            ->method('findAll')
+            ->method('findBy')
             ->with(['report' => $report])
             ->willReturn(null);
 
