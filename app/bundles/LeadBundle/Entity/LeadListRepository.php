@@ -274,7 +274,6 @@ class LeadListRepository extends CommonRepository
             $listIds = [$listIds];
         }
 
-        $listIds    = [$listIds[0]];
         $expression = null;
 
         if (1 === count($listIds)) {
