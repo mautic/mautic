@@ -26,19 +26,13 @@ class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
     {
         $dispatcher         = $this->createMock(EventDispatcherInterface::class);
         $backgroundSettings = $this->createMock(BackgroundSettings::class);
+        $leadField          = new LeadField();
 
-        $dispatcher
-            ->expects($this->once())
-            ->method('hasListeners')
-            ->willReturn(true);
-
-        $backgroundSettings
-            ->expects($this->once())
+        $backgroundSettings->expects($this->once())
             ->method('shouldProcessColumnChangeInBackground')
             ->willReturn(false);
 
-        $dispatcher
-            ->expects($this->once())
+        $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
                 'mautic.lead_field_pre_add_column',
@@ -47,30 +41,20 @@ class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
 
         $fieldColumnDispatcher = new FieldColumnDispatcher($dispatcher, $backgroundSettings);
 
-        $leadField = new LeadField();
-
         $fieldColumnDispatcher->dispatchPreAddColumnEvent($leadField);
     }
 
     public function testStopPropagation(): void
     {
-        $leadField = new LeadField();
-
+        $leadField          = new LeadField();
         $dispatcher         = $this->createMock(EventDispatcherInterface::class);
         $backgroundSettings = $this->createMock(BackgroundSettings::class);
 
-        $dispatcher
-            ->expects($this->once())
-            ->method('hasListeners')
-            ->willReturn(true);
-
-        $backgroundSettings
-            ->expects($this->once())
+        $backgroundSettings->expects($this->once())
             ->method('shouldProcessColumnChangeInBackground')
             ->willReturn(true);
 
-        $dispatcher
-            ->expects($this->once())
+        $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
                 'mautic.lead_field_pre_add_column',

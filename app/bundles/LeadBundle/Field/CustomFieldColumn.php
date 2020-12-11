@@ -106,7 +106,6 @@ class CustomFieldColumn
         try {
             $this->fieldColumnDispatcher->dispatchPreAddColumnEvent($leadField);
         } catch (AbortColumnCreateException $e) {
-            // No subscriber is creating the field on background.
             // Save the field metadata and throw the exception again to stop column creation.
             // As the column should be created by a background job.
             $this->leadFieldSaver->saveLeadFieldEntityWithoutColumnCreated($leadField);
