@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
+ * @author      Mautic
  *
  * @link        https://mautic.org
  *
@@ -41,7 +43,7 @@ class FileHandlerTest extends \PHPUnit\Framework\TestCase
      */
     private $fileHandler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->filePathResolver     = $this->createMock(FilePathResolver::class);
         $this->fileProperties       = $this->createMock(FileProperties::class);
@@ -53,7 +55,7 @@ class FileHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFileCanBeAttachedIfTrue()
+    public function testFileCanBeAttachedIfTrue(): void
     {
         $filePath  = 'file/path.csv';
         $fileSize  = 1000;
@@ -72,7 +74,7 @@ class FileHandlerTest extends \PHPUnit\Framework\TestCase
         $this->fileHandler->fileCanBeAttached($filePath);
     }
 
-    public function testFileCanBeAttachedIfFalse()
+    public function testFileCanBeAttachedIfFalse(): void
     {
         $filePath  = 'file/path.csv';
         $fileSize  = 10000;
@@ -93,7 +95,7 @@ class FileHandlerTest extends \PHPUnit\Framework\TestCase
         $this->fileHandler->fileCanBeAttached($filePath);
     }
 
-    public function testZipIt()
+    public function testZipIt(): void
     {
         $tmpFilePath    = $this->createTmpFile();
         $tmpZipFilePath = $this->fileHandler->zipIt($tmpFilePath);
@@ -104,7 +106,7 @@ class FileHandlerTest extends \PHPUnit\Framework\TestCase
         unlink($tmpZipFilePath);
     }
 
-    public function testGetPathToCompressedCsvFileForReport()
+    public function testGetPathToCompressedCsvFileForReport(): void
     {
         $report = $this->createMock(Report::class);
 
@@ -122,7 +124,7 @@ class FileHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('/some/path/csv_reports/report_33.zip', $filePath);
     }
 
-    public function testMoveZipToPermanentLocation()
+    public function testMoveZipToPermanentLocation(): void
     {
         $report   = $this->createMock(Report::class);
         $filePath = 'file/path.csv';
@@ -151,7 +153,7 @@ class FileHandlerTest extends \PHPUnit\Framework\TestCase
         $this->fileHandler->moveZipToPermanentLocation($report, $filePath);
     }
 
-    private function createTmpFile($name = 'test.csv', $content = '')
+    private function createTmpFile(string $name = 'test.csv', string $content = ''): string
     {
         $filePath = sys_get_temp_dir().'/'.$name;
         file_put_contents($filePath, $content);

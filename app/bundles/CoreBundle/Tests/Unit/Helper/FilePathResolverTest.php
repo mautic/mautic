@@ -41,7 +41,7 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
      */
     private $filePathResolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->filesystemMock   = $this->createMock(Filesystem::class);
         $this->fileMock         = $this->createMock(UploadedFile::class);

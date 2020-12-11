@@ -15,15 +15,31 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileProperties;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Scheduler\Model\MessageSchedule;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class MessageScheduleTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|Router
+     */
     private $router;
+
+    /**
+     * @var MockObject|FileProperties
+     */
     private $fileProperties;
+
+    /**
+     * @var MockObject|CoreParametersHelper
+     */
     private $coreParametersHelper;
+
+    /**
+     * @var MockObject|TranslatorInterface
+     */
     private $translatorMock;
 
     /**
@@ -36,7 +52,7 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
      */
     private $messageSchedule;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->router               = $this->createMock(Router::class);
         $this->fileProperties       = $this->createMock(FileProperties::class);

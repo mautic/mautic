@@ -10,9 +10,13 @@ use Mautic\ReportBundle\Scheduler\Exception\InvalidSchedulerException;
 use Mautic\ReportBundle\Scheduler\Exception\NoScheduleException;
 use Mautic\ReportBundle\Scheduler\Exception\NotSupportedScheduleTypeException;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class DateBuilderTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|SchedulerBuilder
+     */
     private $schedulerBuilder;
 
     /**
@@ -20,7 +24,7 @@ class DateBuilderTest extends \PHPUnit\Framework\TestCase
      */
     private $dateBuilder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -28,7 +32,7 @@ class DateBuilderTest extends \PHPUnit\Framework\TestCase
         $this->dateBuilder      = new DateBuilder($this->schedulerBuilder);
     }
 
-    public function testGetNextEvent()
+    public function testGetNextEvent(): void
     {
         $schedulerTemplateFactory = new SchedulerTemplateFactory();
         $schedulerBuilder         = new SchedulerBuilder($schedulerTemplateFactory);
@@ -40,7 +44,7 @@ class DateBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedDate, $date);
     }
 
-    public function testInvalidScheduler()
+    public function testInvalidScheduler(): void
     {
         $schedulerEntity = new SchedulerEntity(true, SchedulerEnum::UNIT_DAILY, null, null);
 
@@ -54,7 +58,7 @@ class DateBuilderTest extends \PHPUnit\Framework\TestCase
         $this->dateBuilder->getNextEvent($schedulerEntity);
     }
 
-    public function testSchedulerNotSupported()
+    public function testSchedulerNotSupported(): void
     {
         $schedulerEntity = new SchedulerEntity(true, SchedulerEnum::UNIT_DAILY, null, null);
 
@@ -68,7 +72,7 @@ class DateBuilderTest extends \PHPUnit\Framework\TestCase
         $this->dateBuilder->getNextEvent($schedulerEntity);
     }
 
-    public function testNoResult()
+    public function testNoResult(): void
     {
         $schedulerEntity = new SchedulerEntity(true, SchedulerEnum::UNIT_DAILY, null, null);
 
@@ -82,7 +86,7 @@ class DateBuilderTest extends \PHPUnit\Framework\TestCase
         $this->dateBuilder->getNextEvent($schedulerEntity);
     }
 
-    public function testGetPreviewDaysForNow()
+    public function testGetPreviewDaysForNow(): void
     {
         $this->schedulerBuilder->expects($this->once())
             ->method('getNextEvents')
@@ -92,7 +96,7 @@ class DateBuilderTest extends \PHPUnit\Framework\TestCase
         $this->dateBuilder->getPreviewDays(true, SchedulerEnum::UNIT_NOW, '', '');
     }
 
-    public function testGetPreviewDaysForMonths()
+    public function testGetPreviewDaysForMonths(): void
     {
         $this->schedulerBuilder->expects($this->once())
             ->method('getNextEvents')

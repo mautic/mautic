@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Scheduler\Builder;
 
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerNowBuilder;
@@ -11,7 +13,7 @@ use Recurr\Rule;
 
 class SchedulerNowBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    public function testBuilEvent()
+    public function testBuilEvent(): void
     {
         $schedulerNowBuilder = new SchedulerNowBuilder();
         $schedulerEntity     = new SchedulerEntity(true, SchedulerEnum::UNIT_NOW, null, null);
@@ -26,7 +28,7 @@ class SchedulerNowBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(Rule::$freqs['SECONDLY'], $rule->getFreq());
     }
 
-    public function testBuilEventFails()
+    public function testBuilEventFails(): void
     {
         $schedulerNowBuilder = new SchedulerNowBuilder();
         $schedulerEntity     = new SchedulerEntity(true, SchedulerEnum::UNIT_NOW, null, null);

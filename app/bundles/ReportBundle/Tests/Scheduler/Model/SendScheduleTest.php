@@ -52,7 +52,7 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
      */
     private $fileHandler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
