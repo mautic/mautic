@@ -63,7 +63,7 @@ class SchedulerPlanner
 
     private function removeSchedulerOfReport(Report $report)
     {
-        $schedulers = $this->schedulerRepository->findAll(['report' => $report]);
+        $schedulers = $this->schedulerRepository->findBy(['report' => $report]);
         if (!$schedulers) {
             return;
         }
