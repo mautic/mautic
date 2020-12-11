@@ -244,6 +244,25 @@ Mautic.getLeadId = function() {
 }
 
 Mautic.leadlistOnLoad = function(container, response) {
+    if (mQuery('a.col-count').length) {
+        mQuery('a.col-count').each(function() {
+            const $elem = mQuery(this);
+            const id = $elem.attr('data-id');
+
+            Mautic.ajaxActionRequest(
+                'lead:getLeadCount',
+                {id: id},
+                function (response) {
+                    if (response.success) {
+                        const disabled = response.leadCount ? '' : 'disabled=disabled';
+                        $elem.html(response.html).attr(disabled);
+                    }
+                },
+                false,
+                true
+            );
+        });
+    }
 
     mQuery('#campaign-share-tab').hover(function () {
         if (Mautic.shareTableLoaded != true) {
