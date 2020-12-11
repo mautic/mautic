@@ -41,7 +41,7 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
      */
     private $avatarHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->assetsHelperMock        = $this->createMock(AssetsHelper::class);
         $this->pathsHelperMock         = $this->createMock(PathsHelper::class);

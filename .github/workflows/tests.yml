@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - staging
+      - features
       - '[0-9]+\.[0-9]+'
   pull_request:
 
@@ -64,9 +65,6 @@ jobs:
         export DB_PORT=${!DB_PORT_STRING}
 
         if [[ "${{ matrix.php-versions }}" == "7.4" ]] && [[ "${{ matrix.db-types }}" == "mysql" ]]; then
-          # Clobber is needed because PCOV normally only works with PHPUnit 8+. Needed only to run test coverage.
-          composer require --dev pcov/clobber
-          bin/pcov clobber
           composer test -- --coverage-clover=coverage.xml
           bash <(curl -s https://codecov.io/bash)
         else
