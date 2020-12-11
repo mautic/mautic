@@ -1550,7 +1550,7 @@ class CommonRepository extends EntityRepository
                                 $whereClause = $query->expr()->{$clause['expr']}($column, ':'.$param);
                                 $query->setParameter($param, $arg, Connection::PARAM_STR_ARRAY);
                             } else {
-                                $expression  = $clause['expr'] === 'in' ? 'eq' : 'neq';
+                                $expression  = 'in' === $clause['expr'] ? 'eq' : 'neq';
                                 $whereClause = $query->expr()->{$expression}($column, ':'.$param);
                                 $query->setParameter($param, $arg);
                             }
