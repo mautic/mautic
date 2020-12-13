@@ -13,9 +13,9 @@ Detail your bug report:
 | Mautic version | **MAUTIC 2 is not supported any more**
 | PHP version | 
 
-[//]: # (Feature request? ---> Go to forum please ---> https://forum.mautic.org/c/ideas)
-[//]: # (Enhancement? ---> Go to forum please ---> https://forum.mautic.org/c/ideas)
-[//]: # (Need support, have questions? ---> Go to forum please ---> https://forum.mautic.org/c/support)
+[//]: # (Feature request? ---> Go to the forum please ---> https://forum.mautic.org/c/ideas)
+[//]: # (Enhancement? ---> Go to the forum please ---> https://forum.mautic.org/c/ideas)
+[//]: # (Need support, have questions? ---> Go to the forum please ---> https://forum.mautic.org/c/support)
 
 ## Description:
 The more details the better...
@@ -27,4 +27,4 @@ The more details the better...
  
 ### Log errors: 
 
-_Please check for related errors in the latest log file in [mautic root]/app/log/ and/or the web server's logs and post them here. Be sure to remove sensitive information if applicable._ 
+_Please check for related errors in the latest log file in [mautic root]/var/log/ and/or the web server's logs and post them here. Be sure to remove sensitive information if applicable._ 
