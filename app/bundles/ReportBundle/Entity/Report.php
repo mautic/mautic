@@ -230,6 +230,11 @@ class Report extends FormEntity implements SchedulerInterface
         return $this->id;
     }
 
+    public function setId(?int $id): void
+    {
+        $this->id = $id;
+    }
+
     /**
      * Set name.
      *
@@ -636,6 +641,13 @@ class Report extends FormEntity implements SchedulerInterface
         $this->setScheduleMonthFrequency(null);
     }
 
+    public function setAsScheduledNow(string $email): void
+    {
+        $this->setIsScheduled(true);
+        $this->setToAddress($email);
+        $this->setScheduleUnit(SchedulerEnum::UNIT_NOW);
+    }
+
     public function ensureIsDailyScheduled()
     {
         $this->setIsScheduled(true);
@@ -670,6 +682,11 @@ class Report extends FormEntity implements SchedulerInterface
         $this->setIsScheduled(true);
         $this->setScheduleUnit(SchedulerEnum::UNIT_WEEKLY);
         $this->setScheduleMonthFrequency(null);
+    }
+
+    public function isScheduledNow(): bool
+    {
+        return SchedulerEnum::UNIT_NOW === $this->getScheduleUnit();
     }
 
     /**
