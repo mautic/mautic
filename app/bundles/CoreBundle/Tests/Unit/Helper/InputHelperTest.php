@@ -151,4 +151,16 @@ class InputHelperTest extends \PHPUnit\Framework\TestCase
             InputHelper::filename('29NIDJi  dsfjh(#*RO85T784šěíáčýžěé+ěšéřář', 'txt')
         );
     }
+
+    public function testTransliterate()
+    {
+        $tests = [
+            'custom test' => 'custom test',
+            'čusťom test' => 'custom test',
+            null          => '',
+        ];
+        foreach ($tests as $input=>$expected) {
+            $this->assertEquals(InputHelper::transliterate($input), $expected);
+        }
+    }
 }

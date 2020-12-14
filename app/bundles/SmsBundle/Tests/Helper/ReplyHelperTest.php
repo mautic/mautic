@@ -40,7 +40,7 @@ class ReplyHelperTest extends \PHPUnit\Framework\TestCase
      */
     private $contactTracker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->logger          = new NullLogger();
@@ -65,26 +65,31 @@ class ReplyHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testHandlerResponseIsReturnedIfResponseInterface()
     {
-        $handler = $this->createMock([CallbackInterface::class, ResponseInterface::class]);
+        $handler = new class() implements CallbackInterface, ResponseInterface {
+            public function getResponse()
+            {
+                return new Response('hi');
+            }
 
-        $handlerResponse = new Response('hi');
-        $handler->expects($this->once())
-            ->method('getResponse')
-            ->willReturn($handlerResponse);
+            public function getContacts(Request $request)
+            {
+                return new ArrayCollection([new Lead()]);
+            }
 
-        $handler->expects($this->once())
-            ->method('getContacts')
-            ->willReturn(new ArrayCollection([new Lead()]));
+            public function getMessage(Request $request)
+            {
+                return '';
+            }
 
-        $this->contactTracker->expects($this->once())
-            ->method('setSystemContact');
-
-        $this->eventDispatcher->expects($this->once())
-            ->method('dispatch');
+            public function getTransportName()
+            {
+                return '';
+            }
+        };
 
         $response = $this->getHelper()->handleRequest($handler, new Request());
 
-        $this->assertEquals($handlerResponse, $response);
+        $this->assertEquals(new Response('hi'), $response);
     }
 
     public function testContactsNotFoundDoesNotDispatchEvent()

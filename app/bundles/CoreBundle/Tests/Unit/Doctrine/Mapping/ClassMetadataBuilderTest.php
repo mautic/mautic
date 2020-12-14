@@ -28,7 +28,7 @@ class ClassMetadataBuilderTest extends \PHPUnit\Framework\TestCase
      */
     private $classMetadataBuilder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

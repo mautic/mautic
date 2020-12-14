@@ -34,7 +34,7 @@ class TransifexFactoryTest extends \PHPUnit\Framework\TestCase
      */
     private $transifexFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->client               = $this->createMock(ClientInterface::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);

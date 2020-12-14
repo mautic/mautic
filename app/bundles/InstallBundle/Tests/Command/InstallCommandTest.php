@@ -33,7 +33,7 @@ class InstallCommandTest extends \PHPUnit\Framework\TestCase
 
     private $command;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -97,6 +97,6 @@ class InstallCommandTest extends \PHPUnit\Framework\TestCase
         $output = new BufferedOutput();
         $this->command->run($input, $output);
 
-        $this->assertContains('Install complete'.PHP_EOL, $output->fetch());
+        $this->assertStringContainsString('Install complete'.PHP_EOL, $output->fetch());
     }
 }

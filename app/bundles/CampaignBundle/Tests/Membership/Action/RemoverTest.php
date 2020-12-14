@@ -31,7 +31,7 @@ class RemoverTest extends \PHPUnit\Framework\TestCase
      */
     private $leadEventLogRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->leadRepository         = $this->createMock(LeadRepository::class);
         $this->leadEventLogRepository = $this->createMock(LeadEventLogRepository::class);

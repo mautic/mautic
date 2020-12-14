@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\Helper;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+
 /**
  * Helper class custom field operations.
  */
@@ -45,5 +47,53 @@ class CustomFieldHelper
         }
 
         return $value;
+    }
+
+    /**
+     * Transform field value based on type.
+     *
+     * @param $field
+     * @param $value
+     */
+    public static function fieldValueTransfomer($field, $value)
+    {
+        $type = $field['type'];
+        switch ($type) {
+            case 'datetime':
+            case 'date':
+            case 'time':
+                $dtHelper = new DateTimeHelper($value, null, 'local');
+                switch ($type) {
+                    case 'datetime':
+                        $value = $dtHelper->toLocalString('Y-m-d H:i:s');
+                        break;
+                    case 'date':
+                        $value = $dtHelper->toLocalString('Y-m-d');
+                        break;
+                    case 'time':
+                        $value = $dtHelper->toLocalString('H:i:s');
+                        break;
+                }
+                break;
+        }
+
+        return $value;
+    }
+
+    /**
+     * Transform all fields values.
+     *
+     * @param $fields
+     * @param $values
+     */
+    public static function fieldsValuesTransformer($fields, $values)
+    {
+        foreach ($values as $alias => &$value) {
+            if (!empty($fields[$alias])) {
+                $value = self::fieldValueTransfomer($fields[$alias], $value);
+            }
+        }
+
+        return $values;
     }
 }
