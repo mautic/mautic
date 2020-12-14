@@ -540,8 +540,9 @@ class LeadListRepository extends CommonRepository
 
     public function leadListExists(int $id): bool
     {
-        $sql = <<<SQL
-            SELECT EXISTS(SELECT 1 FROM mautic_lead_lists WHERE id = $id)
+        $tableName = MAUTIC_TABLE_PREFIX.'lead_lists';
+        $sql       = <<<SQL
+            SELECT EXISTS(SELECT 1 FROM $tableName WHERE id = $id)
 SQL;
 
         $result = (int) $this->getEntityManager()->getConnection()
