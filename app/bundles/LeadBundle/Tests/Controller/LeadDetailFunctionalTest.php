@@ -21,7 +21,7 @@ use PHPUnit\Framework\Assert;
 
 class LeadDetailFunctionalTest extends MauticMysqlTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
