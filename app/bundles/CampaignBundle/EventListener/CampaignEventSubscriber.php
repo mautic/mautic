@@ -23,9 +23,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignEventSubscriber implements EventSubscriberInterface
 {
-    public const LOOPS_TO_FAIL = 100;
-
-    private const DISABLE_CAMPAIGN_THRESHOLD = 0.35;
+    /**
+     * @var float
+     */
+    private $disableCampaignThreshold = 0.35;
 
     /**
      * @var EventRepository
@@ -108,7 +109,7 @@ class CampaignEventSubscriber implements EventSubscriberInterface
 
         $this->notificationHelper->notifyOfFailure($log->getLead(), $failedEvent);
 
-        if ($failedPercent >= self::DISABLE_CAMPAIGN_THRESHOLD) {
+        if ($failedPercent >= $this->disableCampaignThreshold) {
             $this->notificationHelper->notifyOfUnpublish($failedEvent);
             $campaign->setIsPublished(false);
             $this->campaignModel->saveEntity($campaign);

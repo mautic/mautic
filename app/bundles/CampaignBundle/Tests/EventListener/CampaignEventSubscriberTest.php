@@ -58,7 +58,7 @@ class CampaignEventSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $leadEventLogRepositoryMock;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->eventRepo                  = $this->createMock(EventRepository::class);
         $this->notificationHelper         = $this->createMock(NotificationHelper::class);
