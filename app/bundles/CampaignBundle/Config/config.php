@@ -190,6 +190,7 @@ return [
                     'mautic.campaign.repository.event',
                     'mautic.campaign.event_executioner',
                     'translator',
+                    'mautic.campaign.repository.lead',
                 ],
             ],
         ],
