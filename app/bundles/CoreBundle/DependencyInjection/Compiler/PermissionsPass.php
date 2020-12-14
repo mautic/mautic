@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -16,10 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class PermissionsPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $corePermissions = $container->findDefinition('mautic.security');
 

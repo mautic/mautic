@@ -93,7 +93,7 @@ class CorePermissions
         $this->registerPermissionClasses();
     }
 
-    public function setPermissionObject(AbstractPermissions $permissionObject)
+    public function setPermissionObject(AbstractPermissions $permissionObject): void
     {
         $this->permissionObjectsByClass[get_class($permissionObject)] = $permissionObject;
         $this->permissionObjectsByName[$permissionObject->getName()]  = $permissionObject;
@@ -481,10 +481,7 @@ class CorePermissions
         return $this->coreParametersHelper->all();
     }
 
-    /**
-     * @return array
-     */
-    protected function getPermissionClasses()
+    protected function getPermissionClasses(): array
     {
         if (empty($this->permissionClasses)) {
             $this->registerPermissionClasses();
@@ -494,18 +491,14 @@ class CorePermissions
     }
 
     /**
-     * @deprecated To be removed in 3.0.
+     * @deprecated To be removed in 4.0.
      *
      * It is recommended to define permission objects via DI with tag 'mautic.permissions'.
      * This is fallback for keeping BC where the permission object is instantiated on the fly.
      *
-     * @param string $class
-     *
-     * @return AbstractPermissions
-     *
      * @throws \InvalidArgumentException
      */
-    private function instantiatePermissionObject($class)
+    private function instantiatePermissionObject(string $class): AbstractPermissions
     {
         if (empty($this->getPermissionClasses()[$class])) {
             throw new \InvalidArgumentException("Permission class not found for {$class} in permissions classes");
@@ -519,13 +512,9 @@ class CorePermissions
     /**
      * Search for the permission objects by name or by class name.
      *
-     * @param string $bundle
-     *
-     * @return AbstractPermissions
-     *
      * @throws \UnexpectedValueException
      */
-    private function findPermissionObject($bundle)
+    private function findPermissionObject(string $bundle): AbstractPermissions
     {
         if (isset($this->permissionObjectsByName[$bundle])) {
             return $this->permissionObjectsByName[$bundle];

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -43,7 +45,7 @@ class CorePermissionsTest extends \PHPUnit\Framework\TestCase
      */
     private $coreParametersHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->userHelper           = $this->createMock(UserHelper::class);
