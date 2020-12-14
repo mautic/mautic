@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
@@ -951,13 +950,12 @@ class AjaxController extends CommonAjaxController
         $id        = (int) InputHelper::clean($request->request->get('id'));
         $model     = $this->getModel('lead.list');
 
-        /** @var LeadList $leadList */
-        $leadList  = $model->getRepository()->find($id);
-        $leadCount = 0;
+        $leadListExists  = $model->getRepository()->leadListExists($id);
+        $leadCount       = 0;
 
-        if ($leadList) {
+        if ($leadListExists) {
             $leadCount = $model->getRepository()->getLeadCount($id);
-            $model->setLeadCount($id, $leadCount);
+            $model->setLeadCountCache($id, $leadCount);
         }
 
         $data['success'] = 1;

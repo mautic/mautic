@@ -537,4 +537,17 @@ class LeadListRepository extends CommonRepository
     {
         return 'l';
     }
+
+    public function leadListExists(int $id): bool
+    {
+        $sql = <<<SQL
+            SELECT EXISTS(SELECT 1 FROM mautic_lead_lists WHERE id = $id)
+SQL;
+
+        $result = (int) $this->getEntityManager()->getConnection()
+            ->executeQuery($sql)
+            ->fetchColumn();
+
+        return 1 === $result;
+    }
 }

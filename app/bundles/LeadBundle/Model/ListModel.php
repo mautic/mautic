@@ -1314,7 +1314,7 @@ class ListModel extends FormModel
     /**
      * @throws InvalidArgumentException
      */
-    public function getLeadCount(array $listIds): array
+    public function getCachedLeadsCount(array $listIds): array
     {
         $leadCount = [];
 
@@ -1328,7 +1328,7 @@ class ListModel extends FormModel
     /**
      * @throws InvalidArgumentException
      */
-    public function setLeadCount(int $id, int $count): void
+    public function setLeadCountCache(int $id, int $count): void
     {
         $this->cacheStorageHelper->set(sprintf('%s|%s|%s', 'segment', $id, 'lead'), $count);
     }
