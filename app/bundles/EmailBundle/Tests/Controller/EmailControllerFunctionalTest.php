@@ -24,6 +24,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 {
+    protected $clientOptions = ['debug' => true];
+
     /**
      * Ensure there is no query for DNC reasons if there are no contacts who received the email
      * because it loads the whole DNC table if no contact IDs are provided. It can lead to
@@ -33,6 +35,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     {
         $segment = new LeadList();
         $segment->setName('Segment A');
+        $segment->setPublicName('Segment A');
         $segment->setAlias('segment-a');
         $email = new Email();
         $email->setName('Email A');
@@ -70,6 +73,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     {
         $segment = new LeadList();
         $segment->setName('Segment A');
+        $segment->setPublicName('Segment A');
         $segment->setAlias('segment-a');
         $email = new Email();
         $email->setName('Email A');
