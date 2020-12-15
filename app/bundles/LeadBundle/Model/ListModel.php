@@ -581,6 +581,11 @@ class ListModel extends FormModel
             }
         }
 
+        if ($this->cacheStorageHelper->has(sprintf('%s.%s.%s', 'segment', $leadList->getId(), 'lead'))) {
+            $count = $this->cacheStorageHelper->get(sprintf('%s.%s.%s', 'segment', $leadList->getId(), 'lead'));
+            $this->cacheStorageHelper->set(sprintf('%s.%s.%s', 'segment', $leadList->getId(), 'lead'), $count, 0);
+        }
+
         return $leadsProcessed;
     }
 
@@ -1314,12 +1319,26 @@ class ListModel extends FormModel
     /**
      * @throws InvalidArgumentException
      */
-    public function getCachedLeadsCount(array $listIds): array
+    public function getLeadsCount(array $listIds, $setCache = false): array
     {
-        $leadCount = [];
+        $leadCount = $unCachedLeadCount = [];
 
         foreach ($listIds as $listId) {
-            $leadCount[$listId] = (int) $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'segment', $listId, 'lead'));
+            $leadCount[$listId] = 0;
+
+            if ($this->cacheStorageHelper->has(sprintf('%s.%s.%s', 'segment', $listId, 'lead'))) {
+                $leadCount[$listId] = (int) $this->cacheStorageHelper->get(sprintf('%s.%s.%s', 'segment', $listId, 'lead'));
+            } else {
+                $unCachedLeadCount[] = $listId;
+            }
+        }
+
+        if ($setCache) {
+            foreach ($unCachedLeadCount as $listId) {
+                $count              = $this->getRepository()->getLeadCount($listId);
+                $leadCount[$listId] = $count;
+                $this->setLeadCount($listId, $count);
+            }
         }
 
         return $leadCount;
@@ -1328,8 +1347,13 @@ class ListModel extends FormModel
     /**
      * @throws InvalidArgumentException
      */
-    public function setLeadCountCache(int $id, int $count): void
+    public function setLeadCount(int $id, int $count): void
     {
-        $this->cacheStorageHelper->set(sprintf('%s|%s|%s', 'segment', $id, 'lead'), $count);
+        $this->cacheStorageHelper->set(sprintf('%s.%s.%s', 'segment', $id, 'lead'), $count);
+    }
+
+    public function leadListExists(int $id): bool
+    {
+        return $this->getRepository()->leadListExists($id);
     }
 }

@@ -950,12 +950,12 @@ class AjaxController extends CommonAjaxController
         $id        = (int) InputHelper::clean($request->request->get('id'));
         $model     = $this->getModel('lead.list');
 
-        $leadListExists  = $model->getRepository()->leadListExists($id);
+        $leadListExists  = $model->leadListExists($id);
         $leadCount       = 0;
 
         if ($leadListExists) {
-            $leadCount = $model->getRepository()->getLeadCount($id);
-            $model->setLeadCountCache($id, $leadCount);
+            $leadCounts = $model->getLeadsCount([$id], true);
+            $leadCount  = $leadCounts[$id];
         }
 
         $data['success'] = 1;
