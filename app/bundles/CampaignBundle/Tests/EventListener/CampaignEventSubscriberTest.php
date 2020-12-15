@@ -119,7 +119,7 @@ class CampaignEventSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
 
         $mockLead     = $this->createMock(Lead::class);
-        $mockLead->expects($this->once())
+        $mockLead->expects($this->any())
             ->method('getId')
             ->willReturn(42);
         $mockCampaign = $this->createMock(Campaign::class);
@@ -131,7 +131,7 @@ class CampaignEventSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockEvent->expects($this->once())
             ->method('getCampaign')
             ->willReturn($mockCampaign);
-        $mockEvent->expects($this->once())
+        $mockEvent->expects($this->any())
             ->method('getId')
             ->willReturn(42);
 
@@ -172,7 +172,7 @@ class CampaignEventSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
 
         $mockLead     = $this->createMock(Lead::class);
-        $mockLead->expects($this->once())
+        $mockLead->expects($this->any())
             ->method('getId')
             ->willReturn(42);
         $mockCampaign = $this->createMock(Campaign::class);
@@ -184,7 +184,7 @@ class CampaignEventSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockEvent->expects($this->once())
             ->method('getCampaign')
             ->willReturn($mockCampaign);
-        $mockEvent->expects($this->once())
+        $mockEvent->expects($this->any())
             ->method('getId')
             ->willReturn(42);
 
@@ -237,7 +237,7 @@ class CampaignEventSubscriberTest extends \PHPUnit\Framework\TestCase
         $lead->setId(42);
 
         $eventMock = $this->createMock(Event::class);
-        $eventMock->expects($this->at(0))
+        $eventMock->expects($this->any())
             ->method('getId')
             ->willReturn(42);
 
@@ -255,6 +255,11 @@ class CampaignEventSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
 
         $executedEvent = new ExecutedEvent($this->createMock(AbstractEventAccessor::class), $mockEventLog);
+
+        $this->eventRepo->expects($this->once())
+            ->method('getFailedCountLeadEvent')
+            ->withAnyParameters()
+            ->willReturn(101);
 
         $this->eventRepo->expects($this->once())
             ->method('decreaseFailedCount')
