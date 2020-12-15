@@ -23,6 +23,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignEventSubscriber implements EventSubscriberInterface
 {
+    const LOOPS_TO_FAIL = 100;
+
     /**
      * @var float
      */
@@ -95,19 +97,26 @@ class CampaignEventSubscriber implements EventSubscriberInterface
      */
     public function onEventFailed(FailedEvent $event): void
     {
-        $log           = $event->getLog();
-        $failedEvent   = $log->getEvent();
-        $campaign      = $failedEvent->getCampaign();
-        // Do not increase twice
-        if ($this->leadEventLogRepository->isLastFailed($log->getLead()->getId(), $failedEvent->getId())) {
+        $log                  = $event->getLog();
+        $failedEvent          = $log->getEvent();
+        $campaign             = $failedEvent->getCampaign();
+        $lead                 = $log->getLead();
+        $countFailedLeadEvent = $this->eventRepository->getFailedCountLeadEvent($lead->getId(), $failedEvent->getId());
+        if ($countFailedLeadEvent < self::LOOPS_TO_FAIL) {
+            // Do not increase if under LOOPS_TO_FAIL
+            return;
+        } elseif ($countFailedLeadEvent > self::LOOPS_TO_FAIL &&
+            $this->leadEventLogRepository->isLastFailed($lead->getId(), $failedEvent->getId())
+        ) {
+            // Do not increase twice
             return;
         }
-
+        // Increase if LOOPS_TO_FAIL or last success
         $failedCount   = $this->eventRepository->incrementFailedCount($failedEvent, $log->getLead()->getId());
         $contactCount  = $campaign->getLeads()->count();
         $failedPercent = $contactCount ? ($failedCount / $contactCount) : 1;
 
-        $this->notificationHelper->notifyOfFailure($log->getLead(), $failedEvent);
+        $this->notificationHelper->notifyOfFailure($lead, $failedEvent);
 
         if ($failedPercent >= $this->disableCampaignThreshold) {
             $this->notificationHelper->notifyOfUnpublish($failedEvent);
@@ -124,11 +133,18 @@ class CampaignEventSubscriber implements EventSubscriberInterface
      */
     public function onEventExecuted(ExecutedEvent $event): void
     {
-        $log           = $event->getLog();
-        $executedEvent = $log->getEvent();
+        $log                  = $event->getLog();
+        $executedEvent        = $log->getEvent();
+        $lead                 = $log->getLead();
+        $countFailedLeadEvent = $this->eventRepository->getFailedCountLeadEvent($lead->getId(), $executedEvent->getId());
         // Decrease if success event and last failed
-        if ($this->leadEventLogRepository->isLastFailed($log->getLead()->getId(), $executedEvent->getId())) {
-            $this->eventRepository->decreaseFailedCount($executedEvent, $log->getLead()->getId());
+        if (!$this->leadEventLogRepository->isLastFailed($log->getLead()->getId(), $executedEvent->getId()) ||
+            $countFailedLeadEvent < self::LOOPS_TO_FAIL
+        ) {
+            // Do not decrease if under LOOPS_TO_FAIL or last succes
+            return;
         }
+        // Decrease if last failed and over the LOOPS_TO_FAIL
+        $this->eventRepository->decreaseFailedCount($executedEvent);
     }
 }

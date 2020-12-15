@@ -15,8 +15,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 
 class EventRepository extends CommonRepository
 {
-    const LOOPS_TO_FAIL = 100;
-
     /**
      * Get a list of entities.
      *
@@ -348,11 +346,8 @@ class EventRepository extends CommonRepository
      *
      * @return int The current value of the failed_count
      */
-    public function incrementFailedCount(Event $event, int $leadId = -1): int
+    public function incrementFailedCount(Event $event)
     {
-        if ($this->getFailedCountLeadEvent($leadId, $event->getId()) < self::LOOPS_TO_FAIL) {
-            return 0;
-        }
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'campaign_events')
@@ -369,11 +364,8 @@ class EventRepository extends CommonRepository
      * Update the failed count using DBAL to avoid
      * race conditions and deadlocks.
      */
-    public function decreaseFailedCount(Event $event, int $leadId = -1): void
+    public function decreaseFailedCount(Event $event): void
     {
-        if ($this->getFailedCountLeadEvent($leadId, $event->getId()) < self::LOOPS_TO_FAIL) {
-            return;
-        }
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'campaign_events')
