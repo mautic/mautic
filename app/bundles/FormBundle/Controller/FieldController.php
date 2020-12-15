@@ -239,7 +239,7 @@ class FieldController extends CommonFormController
                                 }
                             }
                             $formField['alias'] = $this->getModel('form.field')->generateAlias(
-                                $formField['alias'] ? $formField['alias'] : $formField['label'],
+                                $formField['alias'] ?? $formField['label'],
                                 $aliases
                             );
                         }
