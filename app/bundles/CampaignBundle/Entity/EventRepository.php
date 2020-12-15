@@ -434,6 +434,6 @@ class EventRepository extends CommonRepository
             ->andWhere('le.event_id = :eventId')
             ->setParameters(['leadId' => $leadId, 'eventId' => $eventId]);
 
-        return (int) $q->execute()->fetch();
+        return (int) $q->execute()->fetchColumn();
     }
 }
