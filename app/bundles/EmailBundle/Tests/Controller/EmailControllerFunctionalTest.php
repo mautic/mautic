@@ -110,6 +110,6 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
             }
         );
 
-        Assert::assertCount(1, $dncQueries);
+        Assert::assertCount(1, $dncQueries, 'DNC query not found. '.var_export($queries, true));
     }
 }
