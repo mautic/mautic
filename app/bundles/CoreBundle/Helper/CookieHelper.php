@@ -37,8 +37,8 @@ class CookieHelper
         $this->httponly = $cookieHttp;
 
         $this->request = $requestStack->getCurrentRequest();
-	if (('' === $this->secure || null === $this->secure) && $this->request) {
-            $this->secure = $requestStack->getCurrentRequest()->isSecure();		
+        if (('' === $this->secure || null === $this->secure) && $this->request) {
+            $this->secure = $requestStack->getCurrentRequest()->isSecure();
         }
     }
 
