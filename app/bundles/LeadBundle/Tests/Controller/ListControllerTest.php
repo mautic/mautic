@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
+use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
-use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
-use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadSegmentsData;
-use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
-use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\HttpFoundation\Request;
 
 class ListControllerTest extends MauticMysqlTestCase
@@ -86,20 +85,13 @@ class ListControllerTest extends MauticMysqlTestCase
         return $list;
     }
 
+    /**
+     * @throws ORMException
+     */
     public function testLeadListCountFromCache(): void
     {
-        $this->loadFixtures(
-            [
-                LoadLeadListData::class,
-                LoadLeadData::class,
-                LoadSegmentsData::class,
-                LoadRoleData::class,
-                LoadUserData::class,
-            ],
-            false
-        )->getReferenceRepository();
-
-        $id = 3;
+        $leadList = $this->saveLeadList();
+        $id       = $leadList->getId();
 
         // load the page for first time - cache not set
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
@@ -119,5 +111,33 @@ class ListControllerTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
         $content = $crawler->filter('a.col-count')->filter('a[data-id="'.$id.'"]')->html();
         self::assertSame('View 4 Contacts', trim($content));
+    }
+
+    /**
+     * @throws ORMException
+     */
+    private function saveLeadList(): LeadList
+    {
+        /** @var ListModel $listModel */
+        $listModel = self::$container->get('mautic.lead.model.list');
+
+        /** @var LeadRepository $leadRepo */
+        $leadRepo = $this->em->getRepository(Lead::class);
+
+        $leadList = new LeadList();
+        $leadList->setName('Lead List 1');
+
+        $listModel->saveEntity($leadList);
+
+        $leads = [new Lead(), new Lead(), new Lead(), new Lead()];
+
+        $leadRepo->saveEntities($leads);
+
+        $listModel->addLead($leads[0], $leadList);
+        $listModel->addLead($leads[1], $leadList);
+        $listModel->addLead($leads[2], $leadList);
+        $listModel->addLead($leads[3], $leadList);
+
+        return $leadList;
     }
 }
