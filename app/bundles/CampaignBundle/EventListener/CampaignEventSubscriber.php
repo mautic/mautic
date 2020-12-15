@@ -103,7 +103,7 @@ class CampaignEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $failedCount   = $this->eventRepository->incrementFailedCount($failedEvent);
+        $failedCount   = $this->eventRepository->incrementFailedCount($failedEvent, $log->getLead()->getId());
         $contactCount  = $campaign->getLeads()->count();
         $failedPercent = $contactCount ? ($failedCount / $contactCount) : 1;
 
@@ -128,7 +128,7 @@ class CampaignEventSubscriber implements EventSubscriberInterface
         $executedEvent = $log->getEvent();
         // Decrease if success event and last failed
         if ($this->leadEventLogRepository->isLastFailed($log->getLead()->getId(), $executedEvent->getId())) {
-            $this->eventRepository->decreaseFailedCount($executedEvent);
+            $this->eventRepository->decreaseFailedCount($executedEvent, $log->getLead()->getId());
         }
     }
 }

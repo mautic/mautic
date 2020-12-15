@@ -15,6 +15,8 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 
 class EventRepository extends CommonRepository
 {
+    const LOOPS_TO_FAIL = 100;
+
     /**
      * Get a list of entities.
      *
@@ -346,8 +348,11 @@ class EventRepository extends CommonRepository
      *
      * @return int The current value of the failed_count
      */
-    public function incrementFailedCount(Event $event)
+    public function incrementFailedCount(Event $event, int $leadId = -1): int
     {
+        if ($this->getFailedCountLeadEvent($leadId, $event->getId()) < self::LOOPS_TO_FAIL) {
+            return 0;
+        }
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'campaign_events')
@@ -364,8 +369,11 @@ class EventRepository extends CommonRepository
      * Update the failed count using DBAL to avoid
      * race conditions and deadlocks.
      */
-    public function decreaseFailedCount(Event $event): void
+    public function decreaseFailedCount(Event $event, int $leadId = -1): void
     {
+        if ($this->getFailedCountLeadEvent($leadId, $event->getId()) < self::LOOPS_TO_FAIL) {
+            return;
+        }
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $q->update(MAUTIC_TABLE_PREFIX.'campaign_events')
@@ -410,5 +418,22 @@ class EventRepository extends CommonRepository
             ->setParameter('campaignId', $campaign->getId());
 
         $q->execute();
+    }
+
+    /**
+     * Get the count of failed event for Lead/Event.
+     */
+    public function getFailedCountLeadEvent(int $leadId, int $eventId): int
+    {
+        /** @var LeadEventLog $log */
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('count(u.id)')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'le')
+            ->innerJoin('le', MAUTIC_TABLE_PREFIX.'mautic_campaign_lead_event_failed_log', 'fle', 'le.id = fle.log_id')
+            ->where('le.lead_id = :leadId')
+            ->andWhere('le.event_id = :eventId')
+            ->setParameters(['leadId' => $leadId, 'eventId' => $eventId]);
+
+        return (int) $q->execute()->fetch();
     }
 }
