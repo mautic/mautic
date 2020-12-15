@@ -105,8 +105,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $dncQueries = array_filter(
             $queries['default'],
-            function (array $query) use ($prefix) {
-                return "SELECT l.id, dnc.reason FROM {$prefix}lead_donotcontact dnc LEFT JOIN {$prefix}leads l ON l.id = dnc.lead_id WHERE (dnc.channel = :channel) AND (l.id IN (1))" === $query['sql'];
+            function (array $query) use ($prefix, $contact) {
+                return "SELECT l.id, dnc.reason FROM {$prefix}lead_donotcontact dnc LEFT JOIN {$prefix}leads l ON l.id = dnc.lead_id WHERE (dnc.channel = :channel) AND (l.id IN ({$contact->getId()}))" === $query['sql'];
             }
         );
 
