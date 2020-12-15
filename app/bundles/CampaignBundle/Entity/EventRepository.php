@@ -426,10 +426,10 @@ class EventRepository extends CommonRepository
     public function getFailedCountLeadEvent(int $leadId, int $eventId): int
     {
         /** @var LeadEventLog $log */
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->select('count(u.id)')
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('count(le.id)')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'le')
-            ->innerJoin('le', MAUTIC_TABLE_PREFIX.'mautic_campaign_lead_event_failed_log', 'fle', 'le.id = fle.log_id')
+            ->innerJoin('le', MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fle', 'le.id = fle.log_id')
             ->where('le.lead_id = :leadId')
             ->andWhere('le.event_id = :eventId')
             ->setParameters(['leadId' => $leadId, 'eventId' => $eventId]);
