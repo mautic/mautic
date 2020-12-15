@@ -51,7 +51,7 @@ class LanguageHelperTest extends TestCase
      */
     private $tmpPath;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->logger               = $this->createMock(Logger::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);

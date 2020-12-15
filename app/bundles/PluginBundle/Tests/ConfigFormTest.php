@@ -28,7 +28,7 @@ class ConfigFormTest extends KernelTestCase
 {
     protected $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         self::bootKernel();
         $this->container = self::$kernel->getContainer();
@@ -153,7 +153,7 @@ class ConfigFormTest extends KernelTestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
     }

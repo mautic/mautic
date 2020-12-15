@@ -13,10 +13,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Functional\Sync\Notification;
 
-use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
-use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\NotificationDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
@@ -26,23 +23,17 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Integration\ExampleIntegration;
 use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Sync\SyncDataExchange\ExampleSyncDataExchange;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
-use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
-use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
+use Mautic\LeadBundle\Entity\Lead;
 
 class NotifierTest extends MauticMysqlTestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        // Populate contacts
-        $this->installDatabaseFixtures([LeadFieldData::class, LoadLeadData::class, RoleData::class, LoadRoleData::class, LoadUserData::class]);
-    }
-
     public function testNotifications(): void
     {
-        /** @var Connection $connection */
-        $connection = $this->container->get('doctrine.dbal.default_connection');
+        $this->installDatabaseFixtures([LoadLeadData::class]);
+
+        $leadRepository = $this->em->getRepository(Lead::class);
+        /** @var Lead[] $leads */
+        $leads = $leadRepository->findBy([], [], 2);
 
         /** @var SyncIntegrationsHelper $syncIntegrationsHelper */
         $syncIntegrationsHelper = $this->container->get('mautic.integrations.helper.sync_integrations');
@@ -57,7 +48,7 @@ class NotifierTest extends MauticMysqlTestCase
                 'Foo',
                 1,
                 Contact::NAME,
-                1
+                (int) $leads[0]->getId()
             ),
             'This is the message'
         );
@@ -67,7 +58,7 @@ class NotifierTest extends MauticMysqlTestCase
                 'Bar',
                 2,
                 MauticSyncDataExchange::OBJECT_COMPANY,
-                2
+                (int) $leads[1]->getId()
             ),
             'This is the message'
         );
@@ -76,8 +67,8 @@ class NotifierTest extends MauticMysqlTestCase
         $notifier->finalizeNotifications();
 
         // Check audit log
-        $qb = $connection->createQueryBuilder();
-        $qb->select('*')
+        $qb = $this->connection->createQueryBuilder();
+        $qb->select('1')
             ->from(MAUTIC_TABLE_PREFIX.'audit_log')
             ->where(
                 $qb->expr()->eq('bundle', $qb->expr()->literal(ExampleIntegration::NAME))
@@ -86,8 +77,8 @@ class NotifierTest extends MauticMysqlTestCase
         $this->assertCount(2, $qb->execute()->fetchAll());
 
         // Contact event log
-        $qb = $connection->createQueryBuilder();
-        $qb->select('*')
+        $qb = $this->connection->createQueryBuilder();
+        $qb->select('1')
             ->from(MAUTIC_TABLE_PREFIX.'lead_event_log')
             ->where(
                 $qb->expr()->andX(
@@ -98,8 +89,8 @@ class NotifierTest extends MauticMysqlTestCase
         $this->assertCount(1, $qb->execute()->fetchAll());
 
         // User notifications
-        $qb = $connection->createQueryBuilder();
-        $qb->select('*')
+        $qb = $this->connection->createQueryBuilder();
+        $qb->select('1')
             ->from(MAUTIC_TABLE_PREFIX.'notifications')
             ->where(
                 $qb->expr()->eq('icon_class', $qb->expr()->literal('fa-refresh'))

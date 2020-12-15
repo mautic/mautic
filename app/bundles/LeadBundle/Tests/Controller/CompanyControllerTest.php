@@ -10,7 +10,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
 {
     private $id;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

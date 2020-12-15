@@ -1,0 +1,211 @@
+name: release
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  release:
+    name: Create draft release
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      # Our build script needs access to all previous tags, so we add fetch-depth: 0
+      with:
+        fetch-depth: 0
+    
+    - name: Setup PHP, with composer and extensions
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 7.4
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+
+    - name: Get tag name
+      run: echo "MAUTIC_VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+
+    - name: Install dependencies
+      # Force Composer to v1.10
+      run: |
+        composer self-update --1
+        composer global require hirak/prestissimo
+        composer validate
+        composer install --prefer-dist --no-progress --no-suggest
+
+    - name: Build release files
+      run: |
+        php build/package_release.php -b=${{ env.MAUTIC_VERSION }}
+        echo 'MAUTIC_SHA1_CONTENTS<<EOF' >> $GITHUB_ENV
+        cat build/packages/build-sha1-all >> $GITHUB_ENV
+        echo 'EOF' >> $GITHUB_ENV
+
+    - name: "Prerelease or not?"
+      run: |
+        STABILITY=$(jq -r '.stability' app/release_metadata.json)
+
+        if [[ "${STABILITY}" == 'stable' ]]; then
+          PRERELEASE=false
+        else
+          PRERELEASE=true
+        fi
+
+        echo "IS_PRERELEASE=${PRERELEASE}" >> $GITHUB_ENV
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.MAUTIC_VERSION }}
+        release_name: Mautic Community ${{ env.MAUTIC_VERSION }}
+        draft: true
+        prerelease: ${{ env.IS_PRERELEASE }}
+        body: |
+          TODO add release notes here!
+
+          ${{ env.MAUTIC_SHA1_CONTENTS }}
+
+    - name: Upload full package ${{ env.MAUTIC_VERSION }}.zip
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./build/packages/${{ env.MAUTIC_VERSION }}.zip
+        asset_name: ${{ env.MAUTIC_VERSION }}.zip
+        asset_content_type: application/zip
+
+    - name: Upload update package ${{ env.MAUTIC_VERSION }}-update.zip
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./build/packages/${{ env.MAUTIC_VERSION }}-update.zip
+        asset_name: ${{ env.MAUTIC_VERSION }}-update.zip
+        asset_content_type: application/zip
+
+    - name: Store full package artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.MAUTIC_VERSION }}.zip
+        path: ./build/packages/${{ env.MAUTIC_VERSION }}.zip
+
+    - name: Store update package artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.MAUTIC_VERSION }}-update.zip
+        path: ./build/packages/${{ env.MAUTIC_VERSION }}-update.zip
+
+  test-fresh-install:
+    name: Test a fresh installation
+    needs: release
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: mautictest
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    # We need this so we can get the local.php override file
+    - uses: actions/checkout@v2
+
+    - name: Get tag name
+      run: echo "MAUTIC_VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+
+    - name: Setup PHP, with composer and extensions
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 7.4
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+
+    - name: Download full installation package from previous step
+      uses: actions/download-artifact@v2
+      with:
+        name: ${{ env.MAUTIC_VERSION }}.zip
+
+    - name: Install Mautic
+      env:
+        DB_PORT: ${{ job.services.mysql.ports[3306] }}
+      run: |
+        unzip -q ${{ env.MAUTIC_VERSION }}.zip -d ./mautic-testing
+        mkdir -p ./mautic-testing/var/logs
+        cp ./.github/ci-files/local.php ./mautic-testing/app/config/local.php
+        cd ./mautic-testing
+        php bin/console mautic:install http://localhost
+
+    - name: Store log artifacts
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: install-logs
+        path: ./mautic-testing/var/logs/*
+
+  test-update-install:
+    name: Test updating from previous version
+    needs: release
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: mautictest
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      # We need this so we can get the local.php override file
+    - uses: actions/checkout@v2
+
+    - name: Get tag name and minimum Mautic version
+      run: |
+        echo "MAUTIC_VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+        echo "MAUTIC_MINIMUM_VERSION=$(jq -r '.minimum_mautic_version' app/release_metadata.json)" >> $GITHUB_ENV
+        echo "MAUTIC_PHP_MINIMUM_VERSION=$(jq -r '.minimum_php_version' app/release_metadata.json)" >> $GITHUB_ENV
+
+    - name: Setup PHP, with composer and extensions
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ env.MAUTIC_PHP_MINIMUM_VERSION }}
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+
+    - name: "Download and install minimum Mautic version: ${{ env.MAUTIC_MINIMUM_VERSION }}"
+      env:
+        DB_PORT: ${{ job.services.mysql.ports[3306] }}
+      run: |
+        curl -sSL https://github.com/mautic/mautic/releases/download/${{ env.MAUTIC_MINIMUM_VERSION }}/${{ env.MAUTIC_MINIMUM_VERSION }}.zip -o ${{ env.MAUTIC_MINIMUM_VERSION }}.zip
+        unzip -q ${{ env.MAUTIC_MINIMUM_VERSION }}.zip -d ./mautic-testing
+        mkdir -p ./mautic-testing/var/logs
+        cp ./.github/ci-files/local.php ./mautic-testing/app/config/local.php
+        cd ./mautic-testing
+        php bin/console mautic:install http://localhost
+    
+    - name: "Download update package artifact ${{ env.MAUTIC_VERSION }}-update.zip"
+      uses: actions/download-artifact@v2
+      with:
+        name: ${{ env.MAUTIC_VERSION }}-update.zip
+        path: ./mautic-testing
+
+    - name: "Attempt update from ${{ env.MAUTIC_MINIMUM_VERSION }} to ${{ env.MAUTIC_VERSION }}"
+      env:
+        DB_PORT: ${{ job.services.mysql.ports[3306] }}
+      working-directory: ./mautic-testing
+      run: |
+        php bin/console mautic:update:apply --force --update-package=${{ env.MAUTIC_VERSION }}-update.zip
+        php bin/console mautic:update:apply --finish
+
+    - name: Store log artifacts
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: update-logs
+        path: ./mautic-testing/var/logs/*
