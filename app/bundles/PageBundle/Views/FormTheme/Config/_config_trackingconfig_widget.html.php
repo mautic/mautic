@@ -56,6 +56,9 @@
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.config.tab.tracking.google.analytics'); ?></h3>
     </div>
     <div class="panel-body">
+        <?php if (($form['google_analytics_trackingpage_enabled']->vars['value'] && $form['google_tag_manager_trackingpage_enabled']->vars['value']) || ($form['google_analytics_landingpage_enabled']->vars['value'] && $form['google_tag_manager_landingpage_enabled']->vars['value'])) : ?>
+            <div class="alert alert-warning"><?php echo $view['translator']->trans('mautic.config.tab.googleanalytics.info'); ?></div>
+        <?php endif; ?>
         <?php echo $view['form']->row($form['google_analytics_id']); ?>
         <div class="row">
             <?php foreach ($form->children as $name => $f): ?>
