@@ -55,6 +55,6 @@ class DetailsTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         Assert::assertSame(200, $response->getStatusCode());
-        Assert::assertContains($campaign->getName(), $response->getContent());
+        Assert::assertStringContainsString($campaign->getName(), $response->getContent());
     }
 }
