@@ -112,7 +112,7 @@ class CampaignEventSubscriber implements EventSubscriberInterface
             return;
         }
         // Increase if LOOPS_TO_FAIL or last success
-        $failedCount   = $this->eventRepository->incrementFailedCount($failedEvent, $log->getLead()->getId());
+        $failedCount   = $this->eventRepository->incrementFailedCount($failedEvent);
         $contactCount  = $campaign->getLeads()->count();
         $failedPercent = $contactCount ? ($failedCount / $contactCount) : 1;
 
