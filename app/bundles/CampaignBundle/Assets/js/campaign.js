@@ -122,12 +122,12 @@ Mautic.campaignOnLoad = function (container, response) {
 
 Mautic.getCampaignContactsContent = function(page = 1)
 {
-    let campaignContactUrl = mQuery('#contactGrid').data('target-url') + '/' + page;
+    let campaignContactUrl = mQuery('#leads-container').data('target-url') + '/' + page;
 
     mQuery.get(campaignContactUrl, function(response) {
 
-        mQuery('#contactGrid').html(response.newContent);
-        mQuery('#leads-container .pagination-wrapper a').click(function(){
+        mQuery('#leads-container').html(response.newContent);
+        mQuery('#leads-container .pagination-wrapper').click(function(){
             page = mQuery(this).find('span').html();
             Mautic.getCampaignContactsContent(page);
             return false;
