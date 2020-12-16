@@ -232,19 +232,7 @@ switch (true) {
             <?php endif; ?>
             <!--/ #events-container -->
             <div class="tab-pane fade in bdr-w-0 page-list" id="leads-container">
-                <div id="contactGrid"></div>
-                <script>
-                    <?php
-                        $pageId           = 1;
-                        $campaignLeadsUrl = $view['router']->url('mautic_campaign_contacts', ['objectId' => $campaign->getId(), 'page' => $pageId]);
-                    ?>
-                    mQuery(document).ready(function(){
-                            mQuery.get('<?php echo $campaignLeadsUrl; ?>', function(response) {
-                                mQuery('#contactGrid').html(response.newContent);
-                            });
-                        }
-                    )
-                </script>
+                <div id="contactGrid" data-target-url="<?php echo $campaignLeadsUrl = $view['router']->url('mautic_campaign_contacts', ['objectId' => $campaign->getId(), 'page' => null]); ?>"></div>
                 <div class="clearfix"></div>
             </div>
             <?php echo $view['content']->getCustomContent('tabs.content', $mauticTemplateVars); ?>
