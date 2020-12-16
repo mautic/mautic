@@ -7,7 +7,10 @@
 Mautic.campaignOnLoad = function (container, response) {
 
     mQuery(document).ready(function() {
-        Mautic.getCampaignContactsContent();
+        let campaignContactUrl = mQuery('#leads-container').data('target-url') + '/1';
+        mQuery.get(campaignContactUrl, function(response) {
+            mQuery('#leads-container').html(response.newContent);
+        });
     });
 
     if (mQuery(container + ' #list-search').length) {
@@ -119,21 +122,6 @@ Mautic.campaignOnLoad = function (container, response) {
 
     }
 };
-
-Mautic.getCampaignContactsContent = function(page = 1)
-{
-    let campaignContactUrl = mQuery('#leads-container').data('target-url') + '/' + page;
-
-    mQuery.get(campaignContactUrl, function(response) {
-
-        mQuery('#leads-container').html(response.newContent);
-        mQuery('#leads-container .pagination-wrapper').click(function(){
-            page = mQuery(this).find('span').html();
-            Mautic.getCampaignContactsContent(page);
-            return false;
-        });
-    });
-}
 
 /**
  * Update chosen tooltips
