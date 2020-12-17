@@ -110,7 +110,8 @@
         "bandwidth-throttle/token-bucket": "^2.0",
         "gaufrette/extras": "^0.1.0",
         "gaufrette/aws-s3-adapter": "^0.4.0",
-        "phpoffice/phpspreadsheet": "^1.15"
+        "phpoffice/phpspreadsheet": "^1.15",
+        "predis/predis": "^1.1"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~3.4.0",
