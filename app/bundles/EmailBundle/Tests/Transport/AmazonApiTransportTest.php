@@ -58,7 +58,7 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
      */
     private $message;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

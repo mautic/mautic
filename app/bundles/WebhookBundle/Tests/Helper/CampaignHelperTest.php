@@ -37,7 +37,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
      */
     private $campaignHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

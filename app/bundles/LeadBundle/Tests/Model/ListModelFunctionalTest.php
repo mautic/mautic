@@ -36,6 +36,7 @@ class ListModelFunctionalTest extends MauticMysqlTestCase
     {
         $leadList = new LeadList();
         $leadList->setName($name);
+        $leadList->setPublicName('Public'.$name);
         $leadList->setAlias(mb_strtolower($name));
         $leadList->setCreatedBy($user);
         $leadList->setIsGlobal($isGlobal);
