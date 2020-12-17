@@ -56,6 +56,8 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
             'multiselect'  => '',
             'multiselect2' => 'input',
             'multiselect3' => ['first'],
+            'multiselect4' => 'first|second',
+            'multiselect5' => ['first', 'second'],
         ];
 
         $expectedValues =
@@ -63,6 +65,8 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
                 'multiselect'  => [],
                 'multiselect2' => ['input'],
                 'multiselect3' => ['first'],
+                'multiselect4' => ['first', 'second'],
+                'multiselect5' => ['first', 'second'],
             ];
 
         foreach ($params as $alias => $value) {
