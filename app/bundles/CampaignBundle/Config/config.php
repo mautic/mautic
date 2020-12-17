@@ -271,7 +271,7 @@ return [
                 ],
             ],
             'mautic.campaign.model.summary' => [
-                'class'     => 'Mautic\CampaignBundle\Model\SummaryModel',
+                'class'     => \Mautic\CampaignBundle\Model\SummaryModel::class,
             ],
         ],
         'repositories' => [
