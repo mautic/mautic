@@ -23,20 +23,23 @@ final class Version20201120122846 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema): void
     {
-        if ($schema->hasTable($this->getTableName())) {
+        if ($schema->hasTable($this->generateTableName(Summary::TABLE_NAME))) {
             throw new SkipMigration('Schema includes this migration');
         }
     }
 
     public function up(Schema $schema): void
     {
-        $campaignIDX = $this->generatePropertyName(Summary::TABLE_NAME, 'idx', ['campaign_id']);
-        $campaignFK  = $this->generatePropertyName(Summary::TABLE_NAME, 'fk', ['campaign_id']);
-        $eventIDX    = $this->generatePropertyName(Summary::TABLE_NAME, 'idx', ['evemt_id']);
-        $eventFK     = $this->generatePropertyName(Summary::TABLE_NAME, 'fk', ['event_id']);
+        $campaignIDX          = $this->generatePropertyName(Summary::TABLE_NAME, 'idx', ['campaign_id']);
+        $campaignFK           = $this->generatePropertyName(Summary::TABLE_NAME, 'fk', ['campaign_id']);
+        $eventIDX             = $this->generatePropertyName(Summary::TABLE_NAME, 'idx', ['evemt_id']);
+        $eventFK              = $this->generatePropertyName(Summary::TABLE_NAME, 'fk', ['event_id']);
+        $campaignSummaryTable = $this->generateTableName(Summary::TABLE_NAME);
+        $campaignsTable       = $this->generateTableName('campaigns');
+        $campaignEventsTable  = $this->generateTableName('campaign_events');
 
         $this->addSql("
-            CREATE TABLE {$this->getTableName()} (
+            CREATE TABLE {$campaignSummaryTable} (
                 id INT UNSIGNED AUTO_INCREMENT NOT NULL,
                 campaign_id INT UNSIGNED DEFAULT NULL,
                 event_id INT UNSIGNED NOT NULL,
@@ -52,12 +55,12 @@ final class Version20201120122846 extends AbstractMauticMigration
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB ROW_FORMAT = DYNAMIC;
         ");
 
-        $this->addSql("ALTER TABLE {$this->getTableName()} ADD CONSTRAINT {$campaignFK} FOREIGN KEY (campaign_id) REFERENCES campaigns (id)");
-        $this->addSql("ALTER TABLE {$this->getTableName()} ADD CONSTRAINT {$eventFK} FOREIGN KEY (event_id) REFERENCES campaign_events (id) ON DELETE CASCADE");
+        $this->addSql("ALTER TABLE {$campaignSummaryTable} ADD CONSTRAINT {$campaignFK} FOREIGN KEY (campaign_id) REFERENCES $campaignsTable (id)");
+        $this->addSql("ALTER TABLE {$campaignSummaryTable} ADD CONSTRAINT {$eventFK} FOREIGN KEY (event_id) REFERENCES $campaignEventsTable (id) ON DELETE CASCADE");
     }
 
-    private function getTableName(): string
+    private function generateTableName(string $tableName): string
     {
-        return $this->prefix.Summary::TABLE_NAME;
+        return "{$this->prefix}$tableName";
     }
 }

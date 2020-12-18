@@ -698,16 +698,15 @@ class CampaignController extends AbstractStandardFormController
                     $dateToPlusOne   = $dateTo->modify('+1 day');
                 }
 
-                /** @var LeadEventLogRepository $eventLogRepo */
-                $eventLogRepo             = $this->getDoctrine()->getManager()->getRepository(LeadEventLog::class);
-                $pendingCampaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false);
-
                 if ($this->coreParametersHelper->get('campaign_use_summary')) {
                     /** @var SummaryRepository $summaryRepo */
                     $summaryRepo       = $this->getDoctrine()->getManager()->getRepository(Summary::class);
                     $campaignLogCounts = $summaryRepo->getCampaignLogCounts($entity->getId(), $dateFrom, $dateToPlusOne);
                 } else {
-                    $campaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true, $dateFrom, $dateToPlusOne);
+                    /** @var LeadEventLogRepository $eventLogRepo */
+                    $eventLogRepo             = $this->getDoctrine()->getManager()->getRepository(LeadEventLog::class);
+                    $campaignLogCounts        = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true, $dateFrom, $dateToPlusOne);
+                    $pendingCampaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false);
                 }
 
                 $leadCount    = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId(), null, [], $dateFrom, $dateToPlusOne);
@@ -726,8 +725,9 @@ class CampaignController extends AbstractStandardFormController
 
                     if (isset($campaignLogCounts[$event['id']])) {
                         $event['logCount']           = array_sum($campaignLogCounts[$event['id']]);
-                        $event['logCountForPending'] = array_sum($pendingCampaignLogCounts[$event['id']]);
-
+                        $event['logCountForPending'] = isset($pendingCampaignLogCounts[$event['id']])
+                            ? array_sum($pendingCampaignLogCounts[$event['id']])
+                            : $event['logCount'];
                         $pending  = $event['leadCount'] - $event['logCountForPending'];
                         $totalYes = $campaignLogCounts[$event['id']][1];
                         $totalNo  = $campaignLogCounts[$event['id']][0];

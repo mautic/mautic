@@ -78,7 +78,13 @@ class SummaryRepository extends CommonRepository
     ): array {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select(
-                'cs.event_id, SUM(cs.scheduled_count) as scheduled_count, SUM(cs.triggered_count) as triggered_count, SUM(cs.non_action_path_taken_count) as non_action_path_taken_count, SUM(cs.failed_count) as failed_count'
+                [
+                    'cs.event_id',
+                    'SUM(cs.scheduled_count) as scheduled_count',
+                    'SUM(cs.triggered_count) as triggered_count',
+                    'SUM(cs.non_action_path_taken_count) as non_action_path_taken_count',
+                    'SUM(cs.failed_count) as failed_count',
+                ]
             )
             ->from(MAUTIC_TABLE_PREFIX.'campaign_summary', 'cs')
             ->where('cs.campaign_id = '.(int) $campaignId)
@@ -96,8 +102,8 @@ class SummaryRepository extends CommonRepository
         // Group by event id
         foreach ($results as $row) {
             $return[$row['event_id']] = [
-                0 => intval($row['non_action_path_taken_count']),
-                1 => intval($row['triggered_count']) + intval($row['scheduled_count']),
+                0 => (int) $row['non_action_path_taken_count'],
+                1 => (int) $row['triggered_count'] + (int) $row['scheduled_count'],
             ];
         }
 
