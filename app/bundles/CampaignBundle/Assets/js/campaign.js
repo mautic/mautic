@@ -9,7 +9,7 @@ Mautic.campaignOnLoad = function (container, response) {
     mQuery(document).ready(function() {
         let campaignContactUrl = mQuery('#leads-container').data('target-url') + '/1';
         mQuery.get(campaignContactUrl, function(response) {
-            mQuery('#leads-container').html(response.newContent);
+            // Mautic.processPageContent(response);
         });
     });
 
