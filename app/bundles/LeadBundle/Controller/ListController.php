@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -35,6 +36,8 @@ class ListController extends FormController
      * @param int $page
      *
      * @return JsonResponse|Response
+     *
+     * @throws InvalidArgumentException
      */
     public function indexAction($page = 1)
     {

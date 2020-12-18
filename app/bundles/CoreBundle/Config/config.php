@@ -828,6 +828,7 @@ return [
                     'doctrine.dbal.default_connection',
                     '%kernel.cache_dir%',
                 ],
+                'public' => true,
             ],
             'mautic.helper.update' => [
                 'class'     => \Mautic\CoreBundle\Helper\UpdateHelper::class,

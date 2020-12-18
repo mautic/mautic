@@ -4,7 +4,9 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\UserBundle\Entity\User;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class LeadListRepository extends CommonRepository
@@ -39,6 +41,16 @@ class LeadListRepository extends CommonRepository
      * @var \Doctrine\DBAL\Schema\Column[]
      */
     protected $companyTableSchema;
+
+    /**
+     * @var CacheStorageHelper
+     */
+    private $cacheStorageHelper;
+
+    public function setCacheStorageHelper(CacheStorageHelper $cacheStorageHelper): void
+    {
+        $this->cacheStorageHelper = $cacheStorageHelper;
+    }
 
     /**
      * {@inheritdoc}
@@ -260,23 +272,30 @@ class LeadListRepository extends CommonRepository
      * @param int|int[] $listIds
      *
      * @return array|int
+     *
+     * @throws InvalidArgumentException
      */
     public function getLeadCount($listIds)
     {
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-
-        $q->select('count(l.lead_id) as thecount, l.leadlist_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l');
-
-        $returnArray = (is_array($listIds));
-
-        if (!$returnArray) {
+        if (!(is_array($listIds))) {
             $listIds = [$listIds];
         }
 
-        $expression = null;
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('count(l.lead_id) as thecount, l.leadlist_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l');
 
-        if (1 === count($listIds)) {
+        $expression   = null;
+        $countListIds = count($listIds);
+        $cacheKey     = null;
+
+        if (1 === $countListIds) {
+            $cacheKey = $this->generateCacheKey((int) $listIds[0]);
+
+            if ($this->cacheStorageHelper->has($cacheKey)) {
+                return (int) $this->cacheStorageHelper->get($cacheKey);
+            }
+
             $q          = $this->forceUseIndex($q, MAUTIC_TABLE_PREFIX.'manually_removed');
             $expression = $q->expr()->eq('l.leadlist_id', $listIds[0]);
         } else {
@@ -286,7 +305,9 @@ class LeadListRepository extends CommonRepository
         $q->where(
             $expression,
             $q->expr()->eq('l.manually_removed', ':false')
-        )->setParameter('false', false, 'boolean')->groupBy('l.leadlist_id');
+        )
+            ->setParameter('false', false, 'boolean')
+            ->groupBy('l.leadlist_id');
 
         $result = $q->execute()->fetchAll();
 
@@ -302,7 +323,13 @@ class LeadListRepository extends CommonRepository
             }
         }
 
-        return ($returnArray) ? $return : $return[$listIds[0]];
+        if (1 === $countListIds) {
+            $this->cacheStorageHelper->set($cacheKey, $return[$listIds[0]]);
+
+            return $return[$listIds[0]];
+        }
+
+        return $return;
     }
 
     private function forceUseIndex(QueryBuilder $qb, string $indexName): QueryBuilder
@@ -541,12 +568,8 @@ class LeadListRepository extends CommonRepository
     public function leadListExists(int $id): bool
     {
         $tableName = MAUTIC_TABLE_PREFIX.'lead_lists';
-        $sql       = <<<SQL
-            SELECT EXISTS(SELECT 1 FROM $tableName WHERE id = $id)
-SQL;
-
-        $result = (int) $this->getEntityManager()->getConnection()
-            ->executeQuery($sql)
+        $result    = (int) $this->getEntityManager()->getConnection()
+            ->executeQuery("SELECT EXISTS(SELECT 1 FROM {$tableName} WHERE id = {$id})")
             ->fetchColumn();
 
         return 1 === $result;

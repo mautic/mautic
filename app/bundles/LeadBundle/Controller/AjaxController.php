@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Doctrine\DBAL\DBALException;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
@@ -21,6 +22,7 @@ use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -945,16 +947,23 @@ class AjaxController extends CommonAjaxController
         return new JsonResponse($data);
     }
 
+    /**
+     * @throws InvalidArgumentException
+     * @throws DBALException
+     */
     protected function getLeadCountAction(Request $request): JsonResponse
     {
-        $id        = (int) InputHelper::clean($request->request->get('id'));
-        $model     = $this->getModel('lead.list');
+        $id = (int) InputHelper::clean($request->request->get('id'));
 
-        $leadListExists  = $model->leadListExists($id);
-        $leadCount       = 0;
+        /** @var ListModel $model */
+        $model = $this->getModel('lead.list');
+
+        // If the input request is for e.g. id = abc
+        $leadListExists = $model->leadListExists($id);
+        $leadCount      = 0;
 
         if ($leadListExists) {
-            $leadCounts = $model->getLeadsCount([$id], true);
+            $leadCounts = $model->getLeadsCount([$id]);
             $leadCount  = $leadCounts[$id];
         }
 
