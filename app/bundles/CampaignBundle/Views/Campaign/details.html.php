@@ -232,6 +232,7 @@ switch (true) {
             <?php endif; ?>
             <!--/ #events-container -->
             <div class="tab-pane fade in bdr-w-0 page-list" id="leads-container" data-target-url="<?php echo $campaignLeadsUrl = $view['router']->url('mautic_campaign_contacts', ['objectId' => $campaign->getId(), 'page' => null]); ?>">
+                <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
                 <div class="clearfix"></div>
             </div>
             <?php echo $view['content']->getCustomContent('tabs.content', $mauticTemplateVars); ?>
