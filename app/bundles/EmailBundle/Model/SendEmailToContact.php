@@ -288,8 +288,8 @@ class SendEmailToContact
     }
 
     /**
-     * @param bool   $hasBadEmail
-     * @param string $errorMessages
+     * @param bool  $hasBadEmail
+     * @param array $errorMessages
      *
      * @throws FailedToSendToContactException
      */
@@ -298,6 +298,8 @@ class SendEmailToContact
         if (null === $errorMessages) {
             // Clear the errors so it doesn't stop the next send
             $errorMessages = implode('; ', (array) $this->mailer->getErrors());
+        } elseif (is_array($errorMessages)) {
+            $errorMessages = implode('; ', $errorMessages);
         }
 
         $this->errorMessages[$this->contact['id']]  = $errorMessages;
@@ -430,6 +432,6 @@ class SendEmailToContact
         $this->createContactStatEntry($this->contact['email']);
 
         // Now send but don't redispatch the event
-        return $this->mailer->queue(true, MailHelper::QUEUE_RETURN_ERRORS);
+        return $this->mailer->queue(false, MailHelper::QUEUE_RETURN_ERRORS);
     }
 }
