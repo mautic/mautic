@@ -13,6 +13,8 @@ namespace Mautic\CoreBundle\Tests\Form;
 
 use Mautic\CoreBundle\Form\RequestTrait;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -36,14 +38,12 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
         $factoryBuilder->addType(new ButtonType());
         $factory = $factoryBuilder->getFormFactory();
 
-        $dispatcher = $this->getMockBuilder(
-            'Symfony\Component\EventDispatcher\EventDispatcherInterface'
-        )->getMock();
+        $dispatcher        = $this->createMock(EventDispatcherInterface::class);
         $formConfigBuilder = new FormConfigBuilder('foo', null, $dispatcher);
         $formConfigBuilder->setFormFactory($factory);
         $formConfigBuilder->setCompound(true);
         $formConfigBuilder->setDataMapper(
-            $this->getMockBuilder('Symfony\Component\Form\DataMapperInterface')->getMock()
+            $this->createMock(DataMapperInterface::class)
         );
         $fooConfig = $formConfigBuilder->getFormConfig();
 
