@@ -612,6 +612,14 @@ return [
                     'mautic.update.step_provider',
                 ],
             ],
+            'mautic.core.command.maxmind.purge' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\MaxMindDoNotSellPurgeCommand::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.maxmind.doNotSellList',
+                ],
+            ],
         ],
         'other' => [
             'mautic.cache.warmer.middleware' => [
@@ -987,6 +995,12 @@ return [
                     'request_stack',
                 ],
                 'tag' => 'validator.constraint_validator',
+            ],
+            'mautic.maxmind.doNotSellList' => [
+                'class'     => Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
             ],
             // Logger
             'mautic.monolog.handler' => [
