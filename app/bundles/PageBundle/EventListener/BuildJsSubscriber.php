@@ -352,16 +352,9 @@ MauticJS.processGatedVideos = function (videoElements) {
     };
     
     MauticJS.iterateCollection(videoElements)(function(node, i){
-        var playerFeatures = [];
-        var source   = node.getElementsByTagName('source')[0];
-        
-        if (source.type === 'video/mp4') {
-            node.dataset.mp4 = true;
-            playerFeatures = ['playpause','progress','current','duration','volume','fullscreen'];
-        }
-
-        if (!node.id) {
-            node.id = 'mautic-player-' + i;
+        // If we don't have a formId, and it's not explicitly set as a Mautic controlled video, return.
+        if (!node.dataset.formId && !node.dataset.mauticVideo) {
+            return;
         }
 
         mediaPlayers[i] = [];
@@ -375,9 +368,15 @@ MauticJS.processGatedVideos = function (videoElements) {
             mediaPlayers[i].formHtml = '';
         }
 
-        // If we don't have a formId, and it's not explicitly set as a Mautic controlled video, return.
-        if (!node.dataset.formId && !node.dataset.mauticVideo) {
-            return;
+        var playerFeatures = [];
+        var source = node.getElementsByTagName('source')[0];
+        if (source && source.type && source.type === 'video/mp4') {
+            node.dataset.mp4 = true;
+            playerFeatures = ['playpause','progress','current','duration','volume','fullscreen'];
+        }
+
+        if (!node.id) {
+            node.id = 'mautic-player-' + i;
         }
         
         mediaPlayers[i].player = new MediaElementPlayer('#' + node.id, {features: playerFeatures, alwaysShowControls: true, enableKeyboard: false, success: function (mediaElement, domElement) {

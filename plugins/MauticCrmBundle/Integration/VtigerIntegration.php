@@ -297,17 +297,6 @@ class VtigerIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
-     */
-    public function getFormSettings()
-    {
-        return [
-            'requires_callback'      => false,
-            'requires_authorization' => true,
-        ];
-    }
-
-    /**
      * Get available company fields for choices in the config UI.
      *
      * @param array $settings
