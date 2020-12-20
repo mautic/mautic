@@ -226,4 +226,15 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->execute()
             ->fetchAll();
     }
+
+    /**
+     * @testdox Ensure correct Preferred Timezone placeholder on add/edit contact page
+     */
+    public function testEnsureCorrectPreferredTimeZonePlaceHolderOnContactPage(): void
+    {
+        $crawler             = $this->client->request('GET', '/s/contacts/new');
+        $elementPlaceholder  = $crawler->filter('#lead_timezone')->filter('select')->attr('data-placeholder');
+        $expectedPlaceholder = $this->container->get('translator')->trans('mautic.lead.field.timezone');
+        $this->assertEquals($expectedPlaceholder, $elementPlaceholder);
+    }
 }
