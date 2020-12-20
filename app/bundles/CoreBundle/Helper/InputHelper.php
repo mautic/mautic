@@ -449,7 +449,7 @@ class InputHelper
             $value = $hasUnicode ? rawurldecode($value) : $value;
 
             // Was a doctype found?
-            if ($doctypeFound) {
+            if (!$doctypeFound) {
                 $value = "$doctype[0]$value";
             }
 
