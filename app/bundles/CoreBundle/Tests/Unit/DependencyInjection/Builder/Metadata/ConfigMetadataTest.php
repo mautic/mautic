@@ -23,7 +23,7 @@ class ConfigMetadataTest extends TestCase
      */
     private $metadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->metadata = $this->getMockBuilder(BundleMetadata::class)
             ->setMethodsExcept(['setConfig', 'toArray'])

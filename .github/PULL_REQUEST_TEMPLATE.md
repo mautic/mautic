@@ -3,7 +3,7 @@ Any PR related to Mautic 2 issues is not relavant anymore, please consider upgra
 -->
 | Q                                      | A
 | -------------------------------------- | ---
-| Branch?                                | staging for features or enhancements / 3.0 for bug fixes <!-- see below -->
+| Branch?                                | staging for features or enhancements / 3.2 for bug fixes <!-- see below -->
 | Bug fix?                               | yes/no
 | New feature?                           | yes/no
 | Deprecations?                          | yes/no

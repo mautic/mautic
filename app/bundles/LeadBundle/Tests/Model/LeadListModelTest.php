@@ -10,7 +10,7 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
 {
     protected $fixture;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $mockListModel = $this->getMockBuilder(ListModel::class)
             ->disableOriginalConstructor()
