@@ -126,4 +126,19 @@ class ColorHelper
 
         return $hex;
     }
+
+    public function getRed(): int
+    {
+        return $this->red;
+    }
+
+    public function getGreen(): int
+    {
+        return $this->green;
+    }
+
+    public function getBlue(): int
+    {
+        return $this->blue;
+    }
 }

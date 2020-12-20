@@ -119,19 +119,21 @@ trait EntityFieldsBuildFormTrait
                 case DateType::class:
                 case DateTimeType::class:
                 case TimeType::class:
-                    $attr['data-toggle'] = $type;
                     $opts                = [
                         'required'    => $required,
                         'label'       => $field['label'],
                         'label_attr'  => ['class' => 'control-label'],
-                        'widget'      => 'single_text',
                         'attr'        => $attr,
                         'mapped'      => $mapped,
-                        'input'       => 'string',
-                        'html5'       => false,
                         'constraints' => $constraints,
                     ];
 
+                if (!empty($options['ignore_date_type'])) {
+                    $type = TextType::class;
+                } else {
+                    $opts['html5']  = false;
+                    $opts['input']  = 'string';
+                    $opts['widget'] = 'single_text';
                     if ($value) {
                         try {
                             $dtHelper = new DateTimeHelper($value, null, 'local');
@@ -140,21 +142,23 @@ trait EntityFieldsBuildFormTrait
                             $value = null;
                         }
                     }
-
                     if (DateTimeType::class === $type) {
-                        $opts['model_timezone'] = 'UTC';
-                        $opts['view_timezone']  = date_default_timezone_get();
-                        $opts['format']         = 'yyyy-MM-dd HH:mm:ss';
-                        $opts['with_seconds']   = true;
+                        $opts['attr']['data-toggle'] = 'datetime';
+                        $opts['model_timezone']      = 'UTC';
+                        $opts['view_timezone']       = date_default_timezone_get();
+                        $opts['format']              = 'yyyy-MM-dd HH:mm:ss';
+                        $opts['with_seconds']        = true;
 
                         $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d H:i:s') : null;
-                    } elseif (DateType::class == $type) {
-                        $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d') : null;
+                    } elseif (DateType::class === $type) {
+                        $opts['attr']['data-toggle'] = 'date';
+                        $opts['data']                = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d') : null;
                     } else {
-                        $opts['model_timezone'] = 'UTC';
+                        $opts['attr']['data-toggle'] = 'time';
+                        $opts['model_timezone']      = 'UTC';
                         // $opts['with_seconds']   = true; // @todo figure out why this cause the contact form to fail.
-                        $opts['view_timezone']  = date_default_timezone_get();
-                        $opts['data']           = (!empty($value)) ? $dtHelper->toLocalString('H:i:s') : null;
+                        $opts['view_timezone'] = date_default_timezone_get();
+                        $opts['data']          = (!empty($value)) ? $dtHelper->toLocalString('H:i:s') : null;
                     }
 
                     $builder->addEventListener(
@@ -184,6 +188,7 @@ trait EntityFieldsBuildFormTrait
                             $event->setData($data);
                         }
                     );
+                }
 
                     $builder->add($alias, $type, $opts);
                     break;
@@ -269,7 +274,6 @@ trait EntityFieldsBuildFormTrait
                         case MultiselectType::class:
                             $constraints[] = new Length(['max' => 65535]);
                             break;
-                        break;
                     }
 
                     $builder->add(

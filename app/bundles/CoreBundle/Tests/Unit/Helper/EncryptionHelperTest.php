@@ -31,7 +31,7 @@ class EncryptionHelperTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $key = 'totallySecretKeyHere';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
         $this->mainCipherMock           = $this->createMock(OpenSSLCipher::class);

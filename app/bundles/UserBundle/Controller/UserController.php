@@ -12,6 +12,7 @@
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\UserBundle\Form\Type\ContactType;
@@ -31,20 +32,18 @@ class UserController extends FormController
             return $this->accessDenied();
         }
 
+        /** @var PageHelperFactoryInterface $pageHelperFacotry */
+        $pageHelperFacotry = $this->get('mautic.page.helper.factory');
+        $pageHelper        = $pageHelperFacotry->make('mautic.user', $page);
+
         $this->setListFilters();
 
-        //set limits
-        $limit = $this->get('session')->get('mautic.user.limit', $this->coreParametersHelper->get('default_pagelimit'));
-        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
-
+        $limit      = $pageHelper->getLimit();
+        $start      = $pageHelper->getStart();
         $orderBy    = $this->get('session')->get('mautic.user.orderby', 'u.lastName, u.firstName, u.username');
         $orderByDir = $this->get('session')->get('mautic.user.orderbydir', 'ASC');
-
-        $search = $this->request->get('search', $this->get('session')->get('mautic.user.filter', ''));
-        $search = html_entity_decode($search);
+        $search     = $this->request->get('search', $this->get('session')->get('mautic.user.filter', ''));
+        $search     = html_entity_decode($search);
         $this->get('session')->set('mautic.user.filter', $search);
 
         //do some default filtering
@@ -63,8 +62,8 @@ class UserController extends FormController
         $count = count($users);
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            $lastPage = (1 === $count) ? 1 : (ceil($count / $limit)) ?: 1;
-            $this->get('session')->set('mautic.user.page', $lastPage);
+            $lastPage = $pageHelper->countPage($count);
+            $pageHelper->rememberPage($lastPage);
             $returnUrl = $this->generateUrl('mautic_user_index', ['page' => $lastPage]);
 
             return $this->postActionRedirect([
@@ -81,27 +80,21 @@ class UserController extends FormController
             ]);
         }
 
-        //set what page currently on so that we can return here after form submission/cancellation
-        $this->get('session')->set('mautic.user.page', $page);
-
-        //set some permissions
-        $permissions = [
-            'create' => $this->get('mautic.security')->isGranted('user:users:create'),
-            'edit'   => $this->get('mautic.security')->isGranted('user:users:editother'),
-            'delete' => $this->get('mautic.security')->isGranted('user:users:deleteother'),
-        ];
-
-        $parameters = [
-            'items'       => $users,
-            'searchValue' => $search,
-            'page'        => $page,
-            'limit'       => $limit,
-            'permissions' => $permissions,
-            'tmpl'        => $tmpl,
-        ];
+        $pageHelper->rememberPage($page);
 
         return $this->delegateView([
-            'viewParameters'  => $parameters,
+            'viewParameters'  => [
+                'items'       => $users,
+                'searchValue' => $search,
+                'page'        => $page,
+                'limit'       => $limit,
+                'tmpl'        => $tmpl,
+                'permissions' => [
+                    'create' => $this->get('mautic.security')->isGranted('user:users:create'),
+                    'edit'   => $this->get('mautic.security')->isGranted('user:users:editother'),
+                    'delete' => $this->get('mautic.security')->isGranted('user:users:deleteother'),
+                ],
+            ],
             'contentTemplate' => 'MauticUserBundle:User:list.html.php',
             'passthroughVars' => [
                 'route'         => $this->generateUrl('mautic_user_index', ['page' => $page]),
