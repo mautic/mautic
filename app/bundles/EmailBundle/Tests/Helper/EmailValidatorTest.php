@@ -27,7 +27,7 @@ class EmailValidatorTest extends \PHPUnit\Framework\TestCase
     private $event;
     private $emailValidator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
