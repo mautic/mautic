@@ -33,7 +33,7 @@ class DisplayManagerTest extends \PHPUnit\Framework\TestCase
      */
     private $displayCounter;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->viewOnlyFields = [];
         $this->form           = new Form();
