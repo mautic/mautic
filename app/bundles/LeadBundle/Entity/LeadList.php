@@ -38,6 +38,11 @@ class LeadList extends FormEntity
     /**
      * @var string
      */
+    private $publicName;
+
+    /**
+     * @var string
+     */
     private $description;
 
     /**
@@ -84,6 +89,10 @@ class LeadList extends FormEntity
 
         $builder->addField('alias', 'string');
 
+        $builder->createField('publicName', 'string')
+            ->columnName('public_name')
+            ->build();
+
         $builder->addField('filters', 'array');
 
         $builder->createField('isGlobal', 'boolean')
@@ -125,6 +134,7 @@ class LeadList extends FormEntity
                 [
                     'id',
                     'name',
+                    'publicName',
                     'alias',
                     'description',
                 ]
@@ -197,6 +207,31 @@ class LeadList extends FormEntity
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * Get publicName.
+     *
+     * @return string
+     */
+    public function getPublicName()
+    {
+        return $this->publicName;
+    }
+
+    /**
+     * Set publicName.
+     *
+     * @param string $publicName
+     *
+     * @return LeadList
+     */
+    public function setPublicName($publicName)
+    {
+        $this->isChanged('publicName', $publicName);
+        $this->publicName = $publicName;
+
+        return $this;
     }
 
     /**
