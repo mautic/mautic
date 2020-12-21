@@ -125,7 +125,7 @@
         "webfactory/exceptions-bundle": "~4.3",
         "friendsofphp/php-cs-fixer": "~2.16.1",
         "liip/test-fixtures-bundle": "^1.6",
-        "phpstan/phpstan": "^0.12.3",
+        "phpstan/phpstan": "^0.12.19",
         "rector/rector-prefixed": "0.6.13",
         "theofidry/psysh-bundle": "^v3.5.1",
         "symfony/phpunit-bridge": "~5.1.0",

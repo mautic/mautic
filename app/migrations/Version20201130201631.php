@@ -26,9 +26,10 @@ final class Version20201130201631 extends AbstractMauticMigration
 
         require $confFile;
 
-        // MySQL minimum version was bumped to 5.7 in Mautic 3
-        // https://github.com/mautic/mautic/pull/9437
+        /** @phpstan-ignore-next-line */
         if (isset($parameters) && array_key_exists('db_server_version', $parameters)) {
+            // MySQL minimum version was bumped to 5.7 in Mautic 3
+            // https://github.com/mautic/mautic/pull/9437
             $parameters['db_server_version'] = '5.7';
         } else {
             return;
