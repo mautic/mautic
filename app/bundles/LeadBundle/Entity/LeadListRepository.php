@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
+use Mautic\LeadBundle\Helper\ListCacheHelper;
 use Mautic\UserBundle\Entity\User;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -41,16 +42,6 @@ class LeadListRepository extends CommonRepository
      * @var \Doctrine\DBAL\Schema\Column[]
      */
     protected $companyTableSchema;
-
-    /**
-     * @var CacheStorageHelper
-     */
-    private $cacheStorageHelper;
-
-    public function setCacheStorageHelper(CacheStorageHelper $cacheStorageHelper): void
-    {
-        $this->cacheStorageHelper = $cacheStorageHelper;
-    }
 
     /**
      * {@inheritdoc}
@@ -275,7 +266,7 @@ class LeadListRepository extends CommonRepository
      *
      * @throws InvalidArgumentException
      */
-    public function getLeadCount($listIds)
+    public function getLeadCount($listIds, CacheStorageHelper $cacheStorageHelper = null)
     {
         if (!(is_array($listIds))) {
             $listIds = [$listIds];
@@ -290,10 +281,10 @@ class LeadListRepository extends CommonRepository
         $cacheKey     = null;
 
         if (1 === $countListIds) {
-            $cacheKey = $this->generateCacheKey((int) $listIds[0]);
+            $cacheKey = ListCacheHelper::generateCacheKey((int) $listIds[0]);
 
-            if ($this->cacheStorageHelper->has($cacheKey)) {
-                return (int) $this->cacheStorageHelper->get($cacheKey);
+            if ($cacheStorageHelper instanceof CacheStorageHelper && $cacheStorageHelper->has($cacheKey)) {
+                return (int) $cacheStorageHelper->get($cacheKey);
             }
 
             $q          = $this->forceUseIndex($q, MAUTIC_TABLE_PREFIX.'manually_removed');
@@ -324,7 +315,9 @@ class LeadListRepository extends CommonRepository
         }
 
         if (1 === $countListIds) {
-            $this->cacheStorageHelper->set($cacheKey, $return[$listIds[0]]);
+            if ($cacheStorageHelper instanceof CacheStorageHelper) {
+                $cacheStorageHelper->set($cacheKey, $return[$listIds[0]]);
+            }
 
             return $return[$listIds[0]];
         }

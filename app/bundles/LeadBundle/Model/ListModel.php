@@ -25,6 +25,7 @@ use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
 use Mautic\LeadBundle\Form\Type\ListType;
+use Mautic\LeadBundle\Helper\ListCacheHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
@@ -581,7 +582,7 @@ class ListModel extends FormModel
             }
         }
 
-        $cacheKey = $this->getRepository()->generateCacheKey($leadList->getId());
+        $cacheKey = ListCacheHelper::generateCacheKey($leadList->getId());
 
         if ($this->cacheStorageHelper->has($cacheKey)) {
             $this->cacheStorageHelper->delete($cacheKey);
@@ -1325,8 +1326,7 @@ class ListModel extends FormModel
         $leadCount = [];
 
         foreach ($listIds as $listId) {
-            $count              = $this->getRepository()->getLeadCount($listId);
-            $leadCount[$listId] = $count;
+            $leadCount[$listId] = $this->getRepository()->getLeadCount($listId, $this->cacheStorageHelper);
         }
 
         return $leadCount;

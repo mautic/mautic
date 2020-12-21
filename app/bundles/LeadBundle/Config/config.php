@@ -1012,9 +1012,6 @@ return [
                 'arguments' => [
                     \Mautic\LeadBundle\Entity\LeadList::class,
                 ],
-                'methodCalls' => [
-                    'setCacheStorageHelper' => ['mautic.helper.cache_storage'],
-                ],
             ],
             'mautic.lead.repository.points_change_log' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
