@@ -234,10 +234,9 @@ class ChartQuery extends AbstractChart
      */
     public function modifyTimeDataQuery($query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true, bool $useSqlOrder = true)
     {
-        // Convert time unitst to the right form for current database platform
+        // Convert time units to the right form for current database platform
         $limit         = $this->countAmountFromDateRange();
         $dateConstruct = $this->getDateConstruct($tablePrefix, $column);
-        $count         = (true === $isEnumerable) ? 'COUNT('.$countColumn.') AS count' : $countColumn.' AS count';
 
         if (true === $isEnumerable) {
             $count = 'COUNT('.$countColumn.') AS count';
@@ -316,6 +315,9 @@ class ChartQuery extends AbstractChart
         $limit         = $this->countAmountFromDateRange();
         $previousDate  = clone $this->dateFrom;
         $utcTz         = new \DateTimeZone('UTC');
+
+        // Do not let hours to mess with date comparisions.
+        $previousDate->setTime(0, 0, 0);
 
         if ('Y' === $this->unit) {
             $previousDate->modify('first day of January');
@@ -583,7 +585,11 @@ class ChartQuery extends AbstractChart
         return MAUTIC_TABLE_PREFIX.$table;
     }
 
-    private function getDateConstruct(string $tablePrefix, string $column): string
+    /**
+     * @param string $tablePrefix
+     * @param string $column
+     */
+    private function getDateConstruct($tablePrefix, $column)
     {
         if ($this->generatedColumnProvider) {
             $generatedColumns = $this->generatedColumnProvider->getGeneratedColumns();
