@@ -1,15 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Model;
 
+use Doctrine\DBAL\DBALException;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\ORMException;
 use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Helper\ListCacheHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory;
+use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\InvalidArgumentException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Translation\Translator;
 
 class ListModelTest extends TestCase
 {
@@ -18,8 +31,51 @@ class ListModelTest extends TestCase
      */
     protected $fixture;
 
+    /**
+     * @var ListModel
+     */
+    private $model;
+
+    /**
+     * @var LeadListRepository|MockObject
+     */
+    private $leadListRepositoryMock;
+
+    /**
+     * @var CacheStorageHelper|MockObject
+     */
+    private $cacheStorageHelperMock;
+
     protected function setUp(): void
     {
+        defined('MAUTIC_ENV') || define('MAUTIC_ENV', 'test');
+        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
+
+        $eventDispatcherInterfaceMock = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcherInterfaceMock->method('dispatch');
+        $loggerMock                   = $this->createMock(Logger::class);
+        $translatorMock               = $this->createMock(Translator::class);
+        $this->leadListRepositoryMock = $this->createMock(LeadListRepository::class);
+
+        $entityManagerMock = $this->createMock(EntityManager::class);
+        $entityManagerMock->method('getRepository')
+            ->willReturn($this->leadListRepositoryMock);
+
+        $coreParametersHelperMock     = $this->createMock(CoreParametersHelper::class);
+        $contactSegmentServiceMock    = $this->createMock(ContactSegmentService::class);
+        $segmentChartQueryFactoryMock = $this->createMock(SegmentChartQueryFactory::class);
+        $this->cacheStorageHelperMock = $this->createMock(CacheStorageHelper::class);
+
+        $this->model = new ListModel(
+            $coreParametersHelperMock,
+            $contactSegmentServiceMock,
+            $segmentChartQueryFactoryMock,
+            $this->cacheStorageHelperMock
+        );
+        $this->model->setDispatcher($eventDispatcherInterfaceMock);
+        $this->model->setLogger($loggerMock);
+        $this->model->setTranslator($translatorMock);
+        $this->model->setEntityManager($entityManagerMock);
     }
 
     /**
@@ -91,5 +147,54 @@ class ListModelTest extends TestCase
                 ],
             ],
         ];
+    }
+
+    /**
+     * @throws ORMException
+     */
+    public function testSegmentRebuildCountCacheGetsDeleted(): void
+    {
+        $leadList = new class() extends LeadList {
+            public function getId(): int
+            {
+                return 765;
+            }
+        };
+        $leadList->setFilters(['foo' => ['bar']]);
+
+        $cacheKey = ListCacheHelper::generateCacheKey($leadList->getId());
+        $this->cacheStorageHelperMock
+            ->expects(self::once())
+            ->method('has')
+            ->with($cacheKey)
+            ->willReturn(true);
+
+        self::assertSame(0, $this->model->rebuildListLeads($leadList));
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function testGetLeadsCount(): void
+    {
+        $this->leadListRepositoryMock->expects(self::once())
+            ->method('getLeadCount')
+            ->with(765, $this->cacheStorageHelperMock)
+            ->willReturn(422);
+
+        self::assertSame([765 => 422], $this->model->getLeadsCount([765]));
+    }
+
+    /**
+     * @throws DBALException
+     */
+    public function testLeadListExists(): void
+    {
+        $this->leadListRepositoryMock->expects(self::once())
+            ->method('leadListExists')
+            ->with(765)
+            ->willReturn(true);
+
+        self::assertTrue($this->model->leadListExists(765));
     }
 }
