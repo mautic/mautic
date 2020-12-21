@@ -880,9 +880,12 @@ class PageController extends FormController
             $clone->setVariantStartDate(null);
             $clone->setIsPublished(false);
             $clone->setVariantParent($entity);
+
+            return $this->newAction($clone);
         }
 
-        return $this->newAction($clone);
+        // Given entity ID is null or invalid. Show access denied page.
+        return $this->accessDenied();
     }
 
     /**
