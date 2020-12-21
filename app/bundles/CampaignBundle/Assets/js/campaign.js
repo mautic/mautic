@@ -9,7 +9,7 @@ Mautic.campaignOnLoad = function (container, response) {
     mQuery(document).ready(function() {
         let containerId = '#leads-container';
         // Lazy loading for contact tab in campaign view page
-        let campaignContactUrl = mQuery(containerId).data('target-url') + '/1';
+        let campaignContactUrl = mQuery(containerId).data('target-url');
         mQuery.get(campaignContactUrl, function(response) {
             response.target = containerId;
             Mautic.processPageContent(response);
