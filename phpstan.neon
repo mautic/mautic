@@ -16,6 +16,8 @@ parameters:
 		- app/bundles/CoreBundle/Loader/ParameterLoader.php
 		- app/bundles/CoreBundle/Helper/PathsHelper.php
 		- app/bundles/CoreBundle/Configurator/Configurator.php
+		- plugins/AFMailgunBundle/*
+		- plugins/HighFiveFoundationBundle/*
 	ignoreErrors:
 		- '#Cannot unset offset#'
 		- '#Undefined variable: \$container#'

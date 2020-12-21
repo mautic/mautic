@@ -882,6 +882,7 @@ class PageController extends FormController
             $clone->setVariantParent($entity);
         }
 
+        /** @phpstan-ignore-next-line */
         return $this->newAction($clone);
     }
 
