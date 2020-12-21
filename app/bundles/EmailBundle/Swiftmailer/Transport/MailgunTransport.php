@@ -77,9 +77,7 @@ class MailgunTransport implements \Swift_Transport, TokenTransportInterface, Cal
      */
     public function start()
     {
-        if ($this->mailgunFacade->checkConnection($this->domain)) {
-            $this->started = true;
-        }
+        $this->started = true;
     }
 
     /**

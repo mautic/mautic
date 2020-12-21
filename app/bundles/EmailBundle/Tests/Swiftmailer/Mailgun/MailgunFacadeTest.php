@@ -11,7 +11,6 @@
 
 namespace Mautic\EmailBundle\Tests\Swiftmailer\Mailgun;
 
-use Mailgun\Api\Domain;
 use Mailgun\Exception\HttpClientException;
 use Mautic\EmailBundle\Swiftmailer\Mailgun\MailgunFacade;
 use Mautic\EmailBundle\Swiftmailer\Mailgun\MailgunMessage;
@@ -43,7 +42,7 @@ class MailgunFacadeTest extends \PHPUnit\Framework\TestCase
 
     private $domain;
 
-    protected function setUp()
+    protected function setUp() : void
     {
         parent::setUp();
         $this->mailgunWrapper = $this->getMockBuilder(MailgunWrapper::class)
@@ -55,49 +54,19 @@ class MailgunFacadeTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $this->logger             = $this->createMock(Logger::class);
-        $this->response           = $this->createMock(ResponseInterface::class);
-        $this->domain             = $this->getMockBuilder(Domain::class)
-        ->disableOriginalConstructor()
-        ->setMethods(['getDomain', 'getState'])
-        ->getMock();
     }
 
-    public function testClientException()
+    public function testRequest()
     {
-        $this->response->method('getBody')->willReturn(new \Exception('Error'));
-        $this->response->method('getHeaderLine')->willReturn('application/json');
-
-        $this->mailgunWrapper->expects($this->once())
-            ->method('checkConnection')
-            ->will($this->throwException(new HttpClientException('error', 404, $this->response)));
-
         $mailgunFacade = new MailgunFacade($this->mailgunWrapper, $this->mailgunMessage, $this->logger);
-        $this->expectException(\Swift_TransportException::class);
-        $mailgunFacade->checkConnection('domain.com');
-    }
+        $mail = $this->getMockBuilder(Mail::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mailgunMessage->expects($this->once())
+        ->method('getMessage')
+        ->with($message)
+        ->willReturn($mail);
 
-    public function testCheckConnection()
-    {
-        $this->domain->expects($this->once())->method('getDomain')->willReturn($this->domain);
-        $this->domain->expects($this->once())->method('getState')->willReturn('active');
-
-        $this->mailgunWrapper->expects($this->once())
-            ->method('checkConnection')
-            ->willReturn($this->domain);
-
-        $mailgunFacade = new MailgunFacade($this->mailgunWrapper, $this->mailgunMessage, $this->logger);
-
-        $this->assertTrue($mailgunFacade->checkConnection('domain.com'));
-    }
-
-    public function testSend()
-    {
-        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
-        ->disableOriginalConstructor()
-        ->getMock();
-
-        $mailgunFacade = new MailgunFacade($this->mailgunWrapper, $this->mailgunMessage, $this->logger);
-
-        $this->assertTrue($mailgunFacade->send($message));
+        
     }
 }

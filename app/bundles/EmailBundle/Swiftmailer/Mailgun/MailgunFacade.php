@@ -48,22 +48,5 @@ class MailgunFacade implements SwiftmailerFacadeInterface
     public function send(\Swift_Mime_SimpleMessage $message)
     {
         $mail     = $this->mailgunMessage->getMessage($message);
-
-        //      $response = $this->mailgunWrapper->send($mail);
-    }
-
-    public function checkConnection(string $domain)
-    {
-        try {
-            $response = $this->mailgunWrapper->checkConnection($domain);
-
-            return 'active' == $response->getDomain()->getState();
-        } catch (HttpClientException $e) {
-            $this->logger->addError($e->getMessage());
-            throw new \Swift_TransportException($e->getMessage());
-        } catch (\Exception $e) {
-            $this->logger->addError($e->getMessage());
-            throw new \Swift_TransportException($e->getMessage());
-        }
     }
 }

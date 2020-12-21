@@ -11,7 +11,7 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Mailgun;
 
-use  Mailgun\Mailgun;
+use Mailgun\Mailgun;
 use Mailgun\Message\MessageBuilder;
 
 class MailgunWrapper

@@ -4,11 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-<<<<<<< HEAD
-    "content-hash": "6a4782e7a2a1dd8cf9289911c488eacb",
-=======
-    "content-hash": "8f2d02204465e639740f974d3ac2decb",
->>>>>>> inital Mailgun Transport Setup
+    "content-hash": "301e06dfc22430ba956b3a1fb8243d16",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -1191,6 +1187,7 @@
                 "cache",
                 "caching"
             ],
+            "abandoned": true,
             "time": "2019-11-29T11:22:01+00:00"
         },
         {
@@ -5190,7 +5187,6 @@
             "time": "2018-05-23T08:11:59+00:00"
         },
         {
-<<<<<<< HEAD
             "name": "maennchen/zipstream-php",
             "version": "2.1.0",
             "source": {
@@ -5220,18 +5216,55 @@
             "autoload": {
                 "psr-4": {
                     "ZipStream\\": "src/"
-=======
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Paul Duncan",
+                    "email": "pabs@pablotron.org"
+                },
+                {
+                    "name": "Jonatan Männchen",
+                    "email": "jonatan@maennchen.ch"
+                },
+                {
+                    "name": "Jesse Donat",
+                    "email": "donatj@gmail.com"
+                },
+                {
+                    "name": "András Kolesár",
+                    "email": "kolesar@kolesar.hu"
+                }
+            ],
+            "description": "ZipStream is a library for dynamically streaming dynamic zip files from PHP without writing to the disk at all on the server.",
+            "keywords": [
+                "stream",
+                "zip"
+            ],
+            "funding": [
+                {
+                    "url": "https://opencollective.com/zipstream",
+                    "type": "open_collective"
+                }
+            ],
+            "time": "2020-05-30T13:11:16+00:00"
+        },
+        {
             "name": "mailgun/mailgun-php",
-            "version": "3.1.0",
+            "version": "3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mailgun/mailgun-php.git",
-                "reference": "27d579fdf1295dd3fdf35f14cde797de21615fb7"
+                "reference": "a084abdb8601c0380b668651c169e0560fb435d0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mailgun/mailgun-php/zipball/27d579fdf1295dd3fdf35f14cde797de21615fb7",
-                "reference": "27d579fdf1295dd3fdf35f14cde797de21615fb7",
+                "url": "https://api.github.com/repos/mailgun/mailgun-php/zipball/a084abdb8601c0380b668651c169e0560fb435d0",
+                "reference": "a084abdb8601c0380b668651c169e0560fb435d0",
                 "shasum": ""
             },
             "require": {
@@ -5261,7 +5294,6 @@
             "autoload": {
                 "psr-4": {
                     "Mailgun\\": "src/"
->>>>>>> inital Mailgun Transport Setup
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -5270,43 +5302,12 @@
             ],
             "authors": [
                 {
-<<<<<<< HEAD
-                    "name": "Paul Duncan",
-                    "email": "pabs@pablotron.org"
-                },
-                {
-                    "name": "Jonatan Männchen",
-                    "email": "jonatan@maennchen.ch"
-                },
-                {
-                    "name": "Jesse Donat",
-                    "email": "donatj@gmail.com"
-                },
-                {
-                    "name": "András Kolesár",
-                    "email": "kolesar@kolesar.hu"
-                }
-            ],
-            "description": "ZipStream is a library for dynamically streaming dynamic zip files from PHP without writing to the disk at all on the server.",
-            "keywords": [
-                "stream",
-                "zip"
-            ],
-            "funding": [
-                {
-                    "url": "https://opencollective.com/zipstream",
-                    "type": "open_collective"
-                }
-            ],
-            "time": "2020-05-30T13:11:16+00:00"
-=======
                     "name": "Travis Swientek",
                     "email": "travis@mailgunhq.com"
                 }
             ],
             "description": "The Mailgun SDK provides methods for all API functions.",
-            "time": "2020-10-08T12:20:23+00:00"
->>>>>>> inital Mailgun Transport Setup
+            "time": "2020-11-25T07:33:50+00:00"
         },
         {
             "name": "malkusch/lock",
@@ -12220,16 +12221,16 @@
         },
         {
             "name": "webmozart/assert",
-            "version": "1.7.0",
+            "version": "1.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozart/assert.git",
-                "reference": "aed98a490f9a8f78468232db345ab9cf606cf598"
+                "reference": "ab2cb0b3b559010b75981b1bdce728da3ee90ad6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozart/assert/zipball/aed98a490f9a8f78468232db345ab9cf606cf598",
-                "reference": "aed98a490f9a8f78468232db345ab9cf606cf598",
+                "url": "https://api.github.com/repos/webmozart/assert/zipball/ab2cb0b3b559010b75981b1bdce728da3ee90ad6",
+                "reference": "ab2cb0b3b559010b75981b1bdce728da3ee90ad6",
                 "shasum": ""
             },
             "require": {
@@ -12237,7 +12238,7 @@
                 "symfony/polyfill-ctype": "^1.8"
             },
             "conflict": {
-                "vimeo/psalm": "<3.6.0"
+                "vimeo/psalm": "<3.9.1"
             },
             "require-dev": {
                 "phpunit/phpunit": "^4.8.36 || ^7.5.13"
@@ -12264,7 +12265,7 @@
                 "check",
                 "validate"
             ],
-            "time": "2020-02-14T12:15:55+00:00"
+            "time": "2020-04-18T12:12:48+00:00"
         },
         {
             "name": "willdurand/jsonp-callback-validator",
@@ -14165,11 +14166,7 @@
                 "testing",
                 "xunit"
             ],
-<<<<<<< HEAD
             "time": "2020-03-17T13:40:40+00:00"
-=======
-            "time": "2019-07-02T20:42:44+00:00"
->>>>>>> inital Mailgun Transport Setup
         },
         {
             "name": "psy/psysh",
@@ -15374,7 +15371,6 @@
             "description": "Building blocks for more user-friendly error pages, plus a simple controller to display error pages during development (helpful prior to Symfony 2.6.3)",
             "homepage": "https://www.webfactory.de/blog/symfony2-exception-handling-and-custom-error-pages-explained",
             "time": "2019-12-10T14:07:41+00:00"
-<<<<<<< HEAD
         },
         {
             "name": "webimpress/safe-writer",
@@ -15423,56 +15419,6 @@
                 "webimpress"
             ],
             "time": "2019-11-27T19:40:53+00:00"
-        },
-        {
-            "name": "webmozart/assert",
-            "version": "1.8.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/webmozart/assert.git",
-                "reference": "ab2cb0b3b559010b75981b1bdce728da3ee90ad6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/webmozart/assert/zipball/ab2cb0b3b559010b75981b1bdce728da3ee90ad6",
-                "reference": "ab2cb0b3b559010b75981b1bdce728da3ee90ad6",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^5.3.3 || ^7.0",
-                "symfony/polyfill-ctype": "^1.8"
-            },
-            "conflict": {
-                "vimeo/psalm": "<3.9.1"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4.8.36 || ^7.5.13"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Webmozart\\Assert\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Bernhard Schussek",
-                    "email": "bschussek@gmail.com"
-                }
-            ],
-            "description": "Assertions to validate method input/output with nice error messages.",
-            "keywords": [
-                "assert",
-                "check",
-                "validate"
-            ],
-            "time": "2020-04-18T12:12:48+00:00"
-=======
->>>>>>> inital Mailgun Transport Setup
         }
     ],
     "aliases": [],
