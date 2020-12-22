@@ -61,6 +61,7 @@ Mautic.initGrapesJS = function (object) {
         embedAsBase64: false,
         openAssetsOnDrop: 1,
         autoAdd: true,
+        headers: {'X-CSRF-Token': mauticAjaxCsrf}, // global variable
     };
 
     let presetMauticConf = {
@@ -74,6 +75,9 @@ Mautic.initGrapesJS = function (object) {
         'dynamicContentBtnLabel': Mautic.translate('grapesjsbuilder.dynamicContentBtnLabel'),
         'dynamicContentModalTitle': Mautic.translate('grapesjsbuilder.dynamicContentModalTitle'),
     };
+
+    // disable mautic global shortcuts
+    Mousetrap.reset();
 
     // Redefine Keyboard shortcuts due to unbind won't works with multiple keys.
     let keymapsConf = {
