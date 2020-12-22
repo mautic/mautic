@@ -160,7 +160,7 @@ trait MatchFilterForLeadTrait
                     $filterVal         = str_replace('%', '.*', $filterVal);
                     $groups[$groupNum] = 1 !== preg_match('/'.$filterVal.'/', $leadVal);
                     break;
-                case 'in':
+                case OperatorOptions::IN:
                     $leadValMatched = false;
 
                     if (in_array($leadVal, $filterVal)) {
@@ -169,7 +169,7 @@ trait MatchFilterForLeadTrait
 
                     $groups[$groupNum] = $leadValMatched;
                     break;
-                case '!in':
+                case OperatorOptions::NOT_IN:
                     $leadValNotMatched = true;
 
                     if (in_array($leadVal, $filterVal)) {
