@@ -37,14 +37,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class FieldType extends AbstractType
 {
-    /**
-     * @var TranslatorInterface
-     */
     private $translator;
 
-    /**
-     * @var LeadFieldRepository
-     */
     private $leadFieldRepository;
 
     public function __construct(TranslatorInterface $translator, LeadFieldRepository $leadFieldRepository)
@@ -335,7 +329,7 @@ class FieldType extends AbstractType
                                     function ($object, ExecutionContextInterface $context) {
                                         if (!empty($object)) {
                                             $validator = $context->getValidator();
-                                            $violations = $validator->validateValue($object, new Assert\Date());
+                                            $violations = $validator->validate($object, new Assert\Date());
 
                                             if (count($violations) > 0) {
                                                 $context->buildViolation('mautic.lead.date.invalid')->addViolation();
@@ -351,7 +345,7 @@ class FieldType extends AbstractType
                                     function ($object, ExecutionContextInterface $context) {
                                         if (!empty($object)) {
                                             $validator = $context->getValidator();
-                                            $violations = $validator->validateValue(
+                                            $violations = $validator->validate(
                                                 $object,
                                                 new Assert\Regex(['pattern' => '/(2[0-3]|[01][0-9]):([0-5][0-9])/'])
                                             );
