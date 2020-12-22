@@ -159,7 +159,9 @@ class CustomFieldHelperTest extends \PHPUnit\Framework\TestCase
             'string'      => [
                 'type' => 'text',
             ],
-            'boolean'     => 0,
+            'boolean'     => [
+                'type' => 'boolean',
+            ],
         ];
 
         $values = [
