@@ -143,4 +143,35 @@ class CustomFieldHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame($expected, CustomFieldHelper::fieldsValuesTransformer($fields, $values));
     }
+
+    public function testFieldsValuesTransformerForDifferingValueTypes()
+    {
+        $fields = [
+            'select'      => [
+                'type' => 'select',
+            ],
+            'multiselect' => [
+                'type' => 'multiselect',
+            ],
+            'number'      => [
+                'type' => 'number',
+            ],
+            'string'      => [
+                'type' => 'text',
+            ],
+            'boolean'     => 0,
+        ];
+
+        $values = [
+            'select'      => 'string',
+            'multiselect' => [
+                'array',
+            ],
+            'number'      => 100,
+            'string'      => 'string',
+            'boolean'     => 0,
+        ];
+
+        $this->assertSame($values, CustomFieldHelper::fieldsValuesTransformer($fields, $values));
+    }
 }

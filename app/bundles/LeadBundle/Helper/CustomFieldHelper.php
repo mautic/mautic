@@ -53,9 +53,11 @@ class CustomFieldHelper
     }
 
     /**
-     * Transform field value based on type.
+     * @param mixed $value This value can be at least array, string, null and maybe others
+     *
+     * @return mixed|string|null
      */
-    public static function fieldValueTransfomer(array $field, ?string $value)
+    public static function fieldValueTransfomer(array $field, $value)
     {
         if (null === $value) {
             // do not transform null values
