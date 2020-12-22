@@ -921,16 +921,16 @@ class Field
 
         foreach ($sendValues as $value) {
             // any value
-            if ($value && !empty($this->conditions['any'])) {
+            if ('' !== $value && !empty($this->conditions['any'])) {
                 return true;
             }
 
             if ('notIn' === $this->conditions['expr']) {
                 // value not matched
-                if ($value && !in_array($value, $this->conditions['values'], true)) {
+                if ('' !== $value && !in_array($value, $this->conditions['values'])) {
                     return true;
                 }
-            } elseif (in_array($value, $this->conditions['values'], true)) {
+            } elseif (in_array($value, $this->conditions['values'])) {
                 return true;
             }
         }
