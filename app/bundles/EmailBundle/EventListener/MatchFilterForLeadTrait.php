@@ -143,6 +143,7 @@ trait MatchFilterForLeadTrait
                     break;
                 case 'in':
                     $leadValMatched = false;
+
                     if (in_array($leadVal, $filterVal)) {
                         $leadValMatched = true;
                     }
