@@ -10,10 +10,13 @@ Mautic.campaignOnLoad = function (container, response) {
         let containerId = '#leads-container';
         // Lazy loading for contact tab in campaign view page
         let campaignContactUrl = mQuery(containerId).data('target-url');
-        mQuery.get(campaignContactUrl, function(response) {
-            response.target = containerId;
-            Mautic.processPageContent(response);
-        });
+        if (mQuery(containerId).length > 0) {
+            // Showing campaign detail page. Preventing run on campaign list page.
+            mQuery.get(campaignContactUrl, function(response) {
+                response.target = containerId;
+                Mautic.processPageContent(response);
+            });
+        }
     });
 
     if (mQuery(container + ' #list-search').length) {
