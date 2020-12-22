@@ -143,12 +143,8 @@ trait MatchFilterForLeadTrait
                     break;
                 case 'in':
                     $leadValMatched = false;
-                    foreach ($leadVal as $v) {
-                        if (in_array($v, $filterVal)) {
-                            $leadValMatched = true;
-                            // Break once we find a match
-                            break;
-                        }
+                    if (in_array($leadVal, $filterVal)) {
+                        $leadValMatched = true;
                     }
                     $groups[$groupNum] = $leadValMatched;
                     break;
