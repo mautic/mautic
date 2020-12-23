@@ -37,8 +37,14 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class FieldType extends AbstractType
 {
+    /**
+     * @var TranslatorInterface
+     */
     private $translator;
 
+    /**
+     * @var LeadFieldRepository
+     */
     private $leadFieldRepository;
 
     public function __construct(TranslatorInterface $translator, LeadFieldRepository $leadFieldRepository)
