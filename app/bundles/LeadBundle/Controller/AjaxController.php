@@ -963,7 +963,7 @@ class AjaxController extends CommonAjaxController
         $leadCount      = 0;
 
         if ($leadListExists) {
-            $leadCounts = $model->getLeadsCount([$id]);
+            $leadCounts = $model->getLeadsCount([$id], true);
             $leadCount  = $leadCounts[$id];
         }
 

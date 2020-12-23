@@ -1321,12 +1321,21 @@ class ListModel extends FormModel
     /**
      * @throws InvalidArgumentException
      */
-    public function getLeadsCount(array $listIds): array
+    public function getLeadsCount(array $listIds, bool $isAjax = false): array
     {
         $leadCount = [];
 
+        if ($isAjax) {
+            foreach ($listIds as $listId) {
+                $leadCount[$listId] = $this->getRepository()->getLeadCount($listId, $this->cacheStorageHelper);
+            }
+
+            return $leadCount;
+        }
+
         foreach ($listIds as $listId) {
-            $leadCount[$listId] = $this->getRepository()->getLeadCount($listId, $this->cacheStorageHelper);
+            $cacheKey           = ListCacheHelper::generateCacheKey($listId);
+            $leadCount[$listId] = (int) $this->cacheStorageHelper->get($cacheKey);
         }
 
         return $leadCount;

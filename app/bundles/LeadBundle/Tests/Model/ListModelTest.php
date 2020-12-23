@@ -177,12 +177,37 @@ class ListModelTest extends TestCase
      */
     public function testGetLeadsCount(): void
     {
+        $segmentId = 765;
+        $count     = 422;
+        $cacheKey  = ListCacheHelper::generateCacheKey($segmentId);
+
+        $this->cacheStorageHelperMock
+            ->method('has')
+            ->with($cacheKey)
+            ->willReturn(true);
+        $this->cacheStorageHelperMock
+            ->method('get')
+            ->with($cacheKey)
+            ->willReturn($count);
+        $this->leadListRepositoryMock
+            ->method('getLeadCount')
+            ->with($segmentId, $this->cacheStorageHelperMock)
+            ->willReturn($count);
+
+        self::assertSame([$segmentId => $count], $this->model->getLeadsCount([$segmentId]));
+    }
+
+    public function testAjaxGetLeadsCount(): void
+    {
+        $segmentId = 765;
+        $count     = 422;
+
         $this->leadListRepositoryMock->expects(self::once())
             ->method('getLeadCount')
-            ->with(765, $this->cacheStorageHelperMock)
-            ->willReturn(422);
+            ->with($segmentId, $this->cacheStorageHelperMock)
+            ->willReturn($count);
 
-        self::assertSame([765 => 422], $this->model->getLeadsCount([765]));
+        self::assertSame([$segmentId => $count], $this->model->getLeadsCount([$segmentId], true));
     }
 
     /**
@@ -190,11 +215,12 @@ class ListModelTest extends TestCase
      */
     public function testLeadListExists(): void
     {
+        $segmentId = 765;
         $this->leadListRepositoryMock->expects(self::once())
             ->method('leadListExists')
-            ->with(765)
+            ->with($segmentId)
             ->willReturn(true);
 
-        self::assertTrue($this->model->leadListExists(765));
+        self::assertTrue($this->model->leadListExists($segmentId));
     }
 }
