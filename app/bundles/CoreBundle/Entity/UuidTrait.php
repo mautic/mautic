@@ -31,7 +31,7 @@ trait UuidTrait
      */
     private $uuid;
 
-    protected static function addUuidMetadata(ClassMetadataBuilder $builder, $entityClass)
+    protected static function loadMetadata(ClassMetadataBuilder $builder)
     {
         $builder->createField('uuid', Types::GUID)
             ->nullable()

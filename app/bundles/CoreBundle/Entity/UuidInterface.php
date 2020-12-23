@@ -2,11 +2,11 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+
 interface UuidInterface
 {
-    public function getUuid();
+    public function getUuid(): string;
 
-    public function setUuid();
-
-    public function addUuidMetadata();
+    public function setUuid(string $uuid): void;
 }
