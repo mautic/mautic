@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
@@ -31,14 +33,14 @@ trait UuidTrait
      */
     private $uuid;
 
-    protected static function loadMetadata(ClassMetadataBuilder $builder)
+    public static function addUuidField(ClassMetadataBuilder $builder)
     {
         $builder->createField('uuid', Types::GUID)
             ->nullable()
             ->build();
     }
 
-    public function getUuid(): string
+    public function getUuid(): ?string
     {
         return $this->uuid;
     }
