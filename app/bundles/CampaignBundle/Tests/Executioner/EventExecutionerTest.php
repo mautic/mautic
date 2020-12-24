@@ -286,7 +286,7 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->eventRepository->method('getEntities')
             ->willReturn([]);
 
-        $subscriber = new CampaignActionJumpToEventSubscriber($this->eventRepository, $this->getEventExecutioner(), $this->translator);
+        $subscriber = new CampaignActionJumpToEventSubscriber($this->eventRepository, $this->getEventExecutioner(), $this->translator, $this->leadRepository);
         $subscriber->onJumpToEvent($pendingEvent);
 
         $this->assertEquals(count($pendingEvent->getSuccessful()), 1);

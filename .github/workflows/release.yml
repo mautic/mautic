@@ -23,6 +23,17 @@ jobs:
     - name: Get tag name
       run: echo "MAUTIC_VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
 
+    - name: Check if tag name matches version in release_metadata.json
+      run: |
+        METADATA_VERSION=$(jq -r '.version' app/release_metadata.json)
+
+        if [[ "${{ env.MAUTIC_VERSION }}" != "$METADATA_VERSION" ]]; then
+          echo "❌ ERROR: tag name (${{ env.MAUTIC_VERSION }}) doesn't match version in app/release_metadata.json ($METADATA_VERSION). Please ensure that both versions match!"
+          exit 1
+        else
+          echo "✔ Tag name (${{ env.MAUTIC_VERSION }}) and the version in app/release_metadata.json ($METADATA_VERSION) match. Great!"
+        fi
+
     - name: Install dependencies
       # Force Composer to v1.10
       run: |
