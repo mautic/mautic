@@ -3,8 +3,8 @@
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\DBALException;
+use Doctrine\ORM\ORMException;
 use Mautic\CategoryBundle\Model\CategoryModel;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -25,11 +25,12 @@ use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
 use Mautic\LeadBundle\Form\Type\ListType;
-use Mautic\LeadBundle\Helper\ListCacheHelper;
+use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
+use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
 use Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory;
 use Psr\Cache\InvalidArgumentException;
@@ -74,18 +75,23 @@ class ListModel extends FormModel
     private $requestStack;
 
     /**
-     * @var CacheStorageHelper
+     * @var SegmentCountCacheHelper
      */
-    private $cacheStorageHelper;
+    private $segmentCountCacheHelper;
 
-    public function __construct(CategoryModel $categoryModel, CoreParametersHelper $coreParametersHelper, ContactSegmentService $leadSegment, SegmentChartQueryFactory $segmentChartQueryFactory, RequestStack $requestStack, CacheStorageHelper $cacheStorageHelper)
-    {
-        $this->categoryModel            = $categoryModel;
+    public function __construct(
+        CategoryModel $categoryModel,
+        CoreParametersHelper $coreParametersHelper,
+        ContactSegmentService $leadSegment,
+        SegmentChartQueryFactory $segmentChartQueryFactory,
+        RequestStack $requestStack,
+        SegmentCountCacheHelper $segmentCountCacheHelper
+    ) {
         $this->coreParametersHelper     = $coreParametersHelper;
         $this->leadSegmentService       = $leadSegment;
         $this->segmentChartQueryFactory = $segmentChartQueryFactory;
         $this->requestStack             = $requestStack;
-        $this->cacheStorageHelper       = $cacheStorageHelper;
+        $this->segmentCountCacheHelper  = $segmentCountCacheHelper;
     }
 
     /**
@@ -386,17 +392,21 @@ class ListModel extends FormModel
      *
      * @return int
      *
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Exception
+     * @throws DBALException
+     * @throws InvalidArgumentException
+     * @throws ORMException
+     * @throws SegmentQueryException
      */
     public function rebuildListLeads(LeadList $leadList, $limit = 100, $maxLeads = false, OutputInterface $output = null)
     {
         defined('MAUTIC_REBUILDING_LEAD_LISTS') or define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
 
+        $segmentId = $leadList->getId();
+
         $dtHelper = new DateTimeHelper();
 
         $batchLimiters = ['dateTime' => $dtHelper->toUtcString()];
-        $list          = ['id' => $leadList->getId(), 'filters' => $leadList->getFilters()];
+        $list          = ['id' => $segmentId, 'filters' => $leadList->getFilters()];
 
         $this->dispatcher->dispatch(
             LeadEvents::LIST_PRE_PROCESS_LIST, new ListPreProcessListEvent($list, false)
@@ -414,10 +424,10 @@ class ListModel extends FormModel
         }
 
         // Ensure the same list is used each batch <- would love to know how
-        $batchLimiters['maxId'] = (int) $newLeadsCount[$leadList->getId()]['maxId'];
+        $batchLimiters['maxId'] = (int) $newLeadsCount[$segmentId]['maxId'];
 
         // Number of total leads to process
-        $leadCount = (int) $newLeadsCount[$leadList->getId()]['count'];
+        $leadCount = (int) $newLeadsCount[$segmentId]['count'];
 
         $this->logger->info('Segment QB - No new leads for segment found');
 
@@ -444,17 +454,17 @@ class ListModel extends FormModel
                 // Keep CPU down for large lists; sleep per $limit batch
                 $this->batchSleep();
 
-                $this->logger->debug(sprintf('Segment QB - Fetching new leads for segment [%d] %s', $leadList->getId(), $leadList->getName()));
+                $this->logger->debug(sprintf('Segment QB - Fetching new leads for segment [%d] %s', $segmentId, $leadList->getName()));
                 $newLeadList = $this->leadSegmentService->getNewLeadListLeads($leadList, $batchLimiters, $limit);
 
-                if (empty($newLeadList[$leadList->getId()])) {
+                if (empty($newLeadList[$segmentId])) {
                     // Somehow ran out of leads so break out
                     break;
                 }
 
-                $this->logger->debug(sprintf('Segment QB - Adding %d new leads to segment [%d] %s', count($newLeadList[$leadList->getId()]), $leadList->getId(), $leadList->getName()));
-                foreach ($newLeadList[$leadList->getId()] as $l) {
-                    $this->logger->debug(sprintf('Segment QB - Adding lead #%s to segment [%d] %s', $l['id'], $leadList->getId(), $leadList->getName()));
+                $this->logger->debug(sprintf('Segment QB - Adding %d new leads to segment [%d] %s', count($newLeadList[$segmentId]), $segmentId, $leadList->getName()));
+                foreach ($newLeadList[$segmentId] as $l) {
+                    $this->logger->debug(sprintf('Segment QB - Adding lead #%s to segment [%d] %s', $l['id'], $segmentId, $leadList->getName()));
 
                     $this->addLead($l, $leadList, false, true, -1, $dtHelper->getLocalDateTime());
 
@@ -468,7 +478,7 @@ class ListModel extends FormModel
                     }
                 }
 
-                $this->logger->info(sprintf('Segment QB - Added %d new leads to segment [%d] %s', count($newLeadList[$leadList->getId()]), $leadList->getId(), $leadList->getName()));
+                $this->logger->info(sprintf('Segment QB - Added %d new leads to segment [%d] %s', count($newLeadList[$segmentId]), $segmentId, $leadList->getName()));
 
                 $start += $limit;
 
@@ -476,7 +486,7 @@ class ListModel extends FormModel
                 if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
                     $this->dispatcher->dispatch(
                         LeadEvents::LEAD_LIST_BATCH_CHANGE,
-                        new ListChangeEvent($newLeadList[$leadList->getId()], $leadList, true)
+                        new ListChangeEvent($newLeadList[$segmentId], $leadList, true)
                     );
                 }
 
@@ -507,11 +517,11 @@ class ListModel extends FormModel
         $orphanLeadsCount = $this->leadSegmentService->getOrphanedLeadListLeadsCount($leadList);
 
         // Ensure the same list is used each batch
-        $batchLimiters['maxId'] = (int) $orphanLeadsCount[$leadList->getId()]['maxId'];
+        $batchLimiters['maxId'] = (int) $orphanLeadsCount[$segmentId]['maxId'];
 
         // Restart batching
         $start     = $lastRoundPercentage     = 0;
-        $leadCount = $orphanLeadsCount[$leadList->getId()]['count'];
+        $leadCount = $orphanLeadsCount[$segmentId]['count'];
 
         if ($output) {
             $output->writeln($this->translator->trans('mautic.lead.list.rebuild.to_be_removed', ['%leads%' => $leadCount, '%batch%' => $limit]));
@@ -532,13 +542,13 @@ class ListModel extends FormModel
 
                 $removeLeadList = $this->leadSegmentService->getOrphanedLeadListLeads($leadList, [], $limit);
 
-                if (empty($removeLeadList[$leadList->getId()])) {
+                if (empty($removeLeadList[$segmentId])) {
                     // Somehow ran out of leads so break out
                     break;
                 }
 
                 $processedLeads = [];
-                foreach ($removeLeadList[$leadList->getId()] as $l) {
+                foreach ($removeLeadList[$segmentId] as $l) {
                     $this->removeLead($l, $leadList, false, true, true);
                     $processedLeads[] = $l;
                     ++$leadsProcessed;
@@ -582,11 +592,7 @@ class ListModel extends FormModel
             }
         }
 
-        $cacheKey = ListCacheHelper::generateCacheKey($leadList->getId());
-
-        if ($this->cacheStorageHelper->has($cacheKey)) {
-            $this->cacheStorageHelper->delete($cacheKey);
-        }
+        $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, $leadCount);
 
         return $leadsProcessed;
     }
@@ -601,7 +607,8 @@ class ListModel extends FormModel
      * @param int            $searchListLead  0 = reference, 1 = yes, -1 = known to not exist
      * @param \DateTime      $dateManipulated
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @throws ORMException
+     * @throws InvalidArgumentException
      */
     public function addLead($lead, $lists, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1, $dateManipulated = null)
     {
@@ -705,6 +712,8 @@ class ListModel extends FormModel
                 $persistLists[]   = $listLead;
                 $dispatchEvents[] = $listId;
             }
+
+            $this->segmentCountCacheHelper->incrementSegmentContactCount($listId);
         }
 
         if (!empty($persistLists)) {
@@ -738,7 +747,8 @@ class ListModel extends FormModel
      * @param bool $batchProcess
      * @param bool $skipFindOne
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @throws ORMException
+     * @throws InvalidArgumentException
      */
     public function removeLead($lead, $lists, $manuallyRemoved = false, $batchProcess = false, $skipFindOne = false)
     {
@@ -823,6 +833,8 @@ class ListModel extends FormModel
                 $persistLists[]   = $listLead;
                 $dispatchEvents[] = $listId;
             }
+
+            $this->segmentCountCacheHelper->decrementSegmentContactCount($listId);
 
             unset($listLead);
         }
@@ -1321,21 +1333,12 @@ class ListModel extends FormModel
     /**
      * @throws InvalidArgumentException
      */
-    public function getLeadsCount(array $listIds, bool $isAjax = false): array
+    public function getSegmentContactCountFromCache(array $listIds): array
     {
         $leadCount = [];
 
-        if ($isAjax) {
-            foreach ($listIds as $listId) {
-                $leadCount[$listId] = $this->getRepository()->getLeadCount($listId, $this->cacheStorageHelper);
-            }
-
-            return $leadCount;
-        }
-
         foreach ($listIds as $listId) {
-            $cacheKey           = ListCacheHelper::generateCacheKey($listId);
-            $leadCount[$listId] = (int) $this->cacheStorageHelper->get($cacheKey);
+            $leadCount[$listId] = $this->segmentCountCacheHelper->getSegmentContactCount($listId);
         }
 
         return $leadCount;
@@ -1347,5 +1350,25 @@ class ListModel extends FormModel
     public function leadListExists(int $id): bool
     {
         return $this->getRepository()->leadListExists($id);
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function getSegmentContactCountFromDatabase(array $listIds): array
+    {
+        $leadCount = [];
+
+        foreach ($listIds as $listId) {
+            if ($this->segmentCountCacheHelper->hasSegmentContactCount($listId)) {
+                $leadCount[$listId] = $this->segmentCountCacheHelper->getSegmentContactCount($listId);
+            } else {
+                $count              = $this->getRepository()->getLeadCount($listId);
+                $leadCount[$listId] = $count;
+                $this->segmentCountCacheHelper->setSegmentContactCount($listId, $count);
+            }
+        }
+
+        return $leadCount;
     }
 }

@@ -118,7 +118,7 @@ class ListController extends FormController
         $session->set('mautic.segment.page', $page);
 
         $listIds    = array_keys($items->getIterator()->getArrayCopy());
-        $leadCounts = (!empty($listIds)) ? $model->getLeadsCount($listIds) : [];
+        $leadCounts = (!empty($listIds)) ? $model->getSegmentContactCountFromCache($listIds) : [];
 
         $parameters = [
             'items'                          => $items,

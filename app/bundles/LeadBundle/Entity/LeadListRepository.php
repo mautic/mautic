@@ -4,8 +4,6 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
-use Mautic\LeadBundle\Helper\ListCacheHelper;
 use Mautic\UserBundle\Entity\User;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -266,7 +264,7 @@ class LeadListRepository extends CommonRepository
      *
      * @throws InvalidArgumentException
      */
-    public function getLeadCount($listIds, CacheStorageHelper $cacheStorageHelper = null)
+    public function getLeadCount($listIds)
     {
         if (!(is_array($listIds))) {
             $listIds = [$listIds];
@@ -278,15 +276,8 @@ class LeadListRepository extends CommonRepository
 
         $expression   = null;
         $countListIds = count($listIds);
-        $cacheKey     = null;
 
         if (1 === $countListIds) {
-            $cacheKey = ListCacheHelper::generateCacheKey((int) $listIds[0]);
-
-            if ($cacheStorageHelper instanceof CacheStorageHelper && $cacheStorageHelper->has($cacheKey)) {
-                return (int) $cacheStorageHelper->get($cacheKey);
-            }
-
             $q          = $this->forceUseIndex($q, MAUTIC_TABLE_PREFIX.'manually_removed');
             $expression = $q->expr()->eq('l.leadlist_id', $listIds[0]);
         } else {
@@ -314,15 +305,7 @@ class LeadListRepository extends CommonRepository
             }
         }
 
-        if (1 === $countListIds) {
-            if ($cacheStorageHelper instanceof CacheStorageHelper) {
-                $cacheStorageHelper->set($cacheKey, $return[$listIds[0]]);
-            }
-
-            return $return[$listIds[0]];
-        }
-
-        return $return;
+        return (1 === $countListIds) ? $return[$listIds[0]] : $return;
     }
 
     private function forceUseIndex(QueryBuilder $qb, string $indexName): QueryBuilder
