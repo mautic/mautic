@@ -396,6 +396,7 @@ class ListModel extends FormModel
      * @throws InvalidArgumentException
      * @throws ORMException
      * @throws SegmentQueryException
+     * @throws \Exception
      */
     public function rebuildListLeads(LeadList $leadList, $limit = 100, $maxLeads = false, OutputInterface $output = null)
     {
@@ -592,7 +593,8 @@ class ListModel extends FormModel
             }
         }
 
-        $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, $leadCount);
+        $totalLeadCount = $this->getRepository()->getLeadCount($segmentId);
+        $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
 
         return $leadsProcessed;
     }

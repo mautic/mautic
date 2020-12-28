@@ -43,11 +43,6 @@ class ListModelTest extends TestCase
     private $leadListRepositoryMock;
 
     /**
-     * @var ContactSegmentService|MockObject
-     */
-    private $contactSegmentServiceMock;
-
-    /**
      * @var SegmentCountCacheHelper|MockObject
      */
     private $segmentCountCacheHelper;
@@ -67,13 +62,13 @@ class ListModelTest extends TestCase
             ->willReturn($this->leadListRepositoryMock);
 
         $coreParametersHelperMock        = $this->createMock(CoreParametersHelper::class);
-        $this->contactSegmentServiceMock = $this->createMock(ContactSegmentService::class);
+        $contactSegmentServiceMock       = $this->createMock(ContactSegmentService::class);
         $segmentChartQueryFactoryMock    = $this->createMock(SegmentChartQueryFactory::class);
         $this->segmentCountCacheHelper   = $this->createMock(SegmentCountCacheHelper::class);
 
         $this->model = new ListModel(
             $coreParametersHelperMock,
-            $this->contactSegmentServiceMock,
+            $contactSegmentServiceMock,
             $segmentChartQueryFactoryMock,
             $this->segmentCountCacheHelper
         );
@@ -166,14 +161,11 @@ class ListModelTest extends TestCase
         $segmentId = $leadList->getId();
         $leadCount = 433;
 
-        $orphanedLeadListLeadsCount[$segmentId]['maxId'] = 5000;
-        $orphanedLeadListLeadsCount[$segmentId]['count'] = $leadCount;
-
-        $this->contactSegmentServiceMock
+        $this->leadListRepositoryMock
             ->expects(self::once())
-            ->method('getOrphanedLeadListLeadsCount')
-            ->with($leadList)
-            ->willReturn($orphanedLeadListLeadsCount);
+            ->method('getLeadCount')
+            ->with($segmentId)
+            ->willReturn($leadCount);
 
         $this->segmentCountCacheHelper
             ->expects(self::once())
