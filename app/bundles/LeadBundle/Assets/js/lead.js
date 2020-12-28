@@ -244,8 +244,10 @@ Mautic.getLeadId = function() {
 }
 
 Mautic.leadlistOnLoad = function(container, response) {
-    if (mQuery('a.col-count').length) {
-        mQuery('a.col-count').each(function() {
+    const segmentCountElem = mQuery('a.col-count');
+
+    if (segmentCountElem.length) {
+        segmentCountElem.each(function() {
             const elem = mQuery(this);
             const id = elem.attr('data-id');
 
@@ -253,9 +255,7 @@ Mautic.leadlistOnLoad = function(container, response) {
                 'lead:getLeadCount',
                 {id: id},
                 function (response) {
-                    if (response.success) {
-                        elem.html(response.html);
-                    }
+                    elem.html(response.html);
                 },
                 false,
                 true
