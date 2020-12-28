@@ -8,13 +8,14 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use Mautic\CategoryBundle\Model\CategoryModel;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
-use Mautic\LeadBundle\Helper\ListCacheHelper;
+use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
+use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 use Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory;
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -42,13 +43,17 @@ class ListModelTest extends TestCase
     private $leadListRepositoryMock;
 
     /**
-     * @var CacheStorageHelper|MockObject
+     * @var ContactSegmentService|MockObject
      */
-    private $cacheStorageHelperMock;
+    private $contactSegmentServiceMock;
+
+    /**
+     * @var SegmentCountCacheHelper|MockObject
+     */
+    private $segmentCountCacheHelper;
 
     protected function setUp(): void
     {
-        defined('MAUTIC_ENV') || define('MAUTIC_ENV', 'test');
         defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
 
         $eventDispatcherInterfaceMock = $this->createMock(EventDispatcherInterface::class);
@@ -61,16 +66,16 @@ class ListModelTest extends TestCase
         $entityManagerMock->method('getRepository')
             ->willReturn($this->leadListRepositoryMock);
 
-        $coreParametersHelperMock     = $this->createMock(CoreParametersHelper::class);
-        $contactSegmentServiceMock    = $this->createMock(ContactSegmentService::class);
-        $segmentChartQueryFactoryMock = $this->createMock(SegmentChartQueryFactory::class);
-        $this->cacheStorageHelperMock = $this->createMock(CacheStorageHelper::class);
+        $coreParametersHelperMock        = $this->createMock(CoreParametersHelper::class);
+        $this->contactSegmentServiceMock = $this->createMock(ContactSegmentService::class);
+        $segmentChartQueryFactoryMock    = $this->createMock(SegmentChartQueryFactory::class);
+        $this->segmentCountCacheHelper   = $this->createMock(SegmentCountCacheHelper::class);
 
         $this->model = new ListModel(
             $coreParametersHelperMock,
-            $contactSegmentServiceMock,
+            $this->contactSegmentServiceMock,
             $segmentChartQueryFactoryMock,
-            $this->cacheStorageHelperMock
+            $this->segmentCountCacheHelper
         );
         $this->model->setDispatcher($eventDispatcherInterfaceMock);
         $this->model->setLogger($loggerMock);
@@ -150,64 +155,149 @@ class ListModelTest extends TestCase
     }
 
     /**
+     * @throws DBALException
+     * @throws InvalidArgumentException
      * @throws ORMException
+     * @throws SegmentQueryException
      */
-    public function testSegmentRebuildCountCacheGetsDeleted(): void
+    public function testSegmentRebuildCountCacheGetsUpdated(): void
     {
-        $leadList = new class() extends LeadList {
-            public function getId(): int
-            {
-                return 765;
-            }
-        };
-        $leadList->setFilters(['foo' => ['bar']]);
+        $leadList  = $this->mockLeadList(765);
+        $segmentId = $leadList->getId();
+        $leadCount = 433;
 
-        $cacheKey = ListCacheHelper::generateCacheKey($leadList->getId());
-        $this->cacheStorageHelperMock
+        $orphanedLeadListLeadsCount[$segmentId]['maxId'] = 5000;
+        $orphanedLeadListLeadsCount[$segmentId]['count'] = $leadCount;
+
+        $this->contactSegmentServiceMock
             ->expects(self::once())
-            ->method('has')
-            ->with($cacheKey)
-            ->willReturn(true);
+            ->method('getOrphanedLeadListLeadsCount')
+            ->with($leadList)
+            ->willReturn($orphanedLeadListLeadsCount);
+
+        $this->segmentCountCacheHelper
+            ->expects(self::once())
+            ->method('setSegmentContactCount')
+            ->with($segmentId, $leadCount);
 
         self::assertSame(0, $this->model->rebuildListLeads($leadList));
+
+        $this->segmentCountCacheHelper
+            ->expects(self::once())
+            ->method('getSegmentContactCount')
+            ->with($segmentId)
+            ->willReturn($leadCount);
+
+        $leadCounts = $this->model->getSegmentContactCountFromCache([$segmentId]);
+
+        self::assertSame([$segmentId => $leadCount], $leadCounts);
     }
 
     /**
      * @throws InvalidArgumentException
+     * @throws ORMException
      */
-    public function testGetLeadsCount(): void
+    public function testAddLeadWillIncrementCacheCounter(): void
     {
-        $segmentId = 765;
-        $count     = 422;
-        $cacheKey  = ListCacheHelper::generateCacheKey($segmentId);
+        $leadList         = $this->mockLeadList(765);
+        $segmentId        = $leadList->getId();
+        $lead             = $this->mockLead(100);
+        $currentLeadCount = 100;
 
-        $this->cacheStorageHelperMock
-            ->method('has')
-            ->with($cacheKey)
-            ->willReturn(true);
-        $this->cacheStorageHelperMock
-            ->method('get')
-            ->with($cacheKey)
-            ->willReturn($count);
-        $this->leadListRepositoryMock
-            ->method('getLeadCount')
-            ->with($segmentId, $this->cacheStorageHelperMock)
-            ->willReturn($count);
+        $this->model->addLead($lead, $leadList);
 
-        self::assertSame([$segmentId => $count], $this->model->getLeadsCount([$segmentId]));
+        $this->segmentCountCacheHelper
+            ->expects(self::once())
+            ->method('getSegmentContactCount')
+            ->with($segmentId)
+            ->willReturn($currentLeadCount + 1);
+
+        $leadCounts = $this->model->getSegmentContactCountFromCache([$segmentId]);
+
+        self::assertSame([$segmentId => $currentLeadCount + 1], $leadCounts);
     }
 
-    public function testAjaxGetLeadsCount(): void
+    public function testRemoveLeadWillDecrementCacheCounter(): void
     {
-        $segmentId = 765;
-        $count     = 422;
+        $leadList         = $this->mockLeadList(765);
+        $segmentId        = $leadList->getId();
+        $lead             = $this->mockLead(100);
+        $currentLeadCount = 100;
 
-        $this->leadListRepositoryMock->expects(self::once())
+        $this->model->removeLead($lead, $leadList);
+
+        $this->segmentCountCacheHelper
+            ->expects(self::once())
+            ->method('getSegmentContactCount')
+            ->with($segmentId)
+            ->willReturn($currentLeadCount - 1);
+
+        $leadCounts = $this->model->getSegmentContactCountFromCache([$segmentId]);
+
+        self::assertSame([$segmentId => $currentLeadCount - 1], $leadCounts);
+    }
+
+    public function testGetSegmentContactCountFromCache(): void
+    {
+        $leadList  = $this->mockLeadList(765);
+        $segmentId = $leadList->getId();
+        $leadCount = 100;
+
+        $this->segmentCountCacheHelper
+            ->expects(self::once())
+            ->method('getSegmentContactCount')
+            ->with($segmentId)
+            ->willReturn($leadCount);
+
+        $leadCounts = $this->model->getSegmentContactCountFromCache([$segmentId]);
+
+        self::assertSame([$segmentId => $leadCount], $leadCounts);
+    }
+
+    public function testGetSegmentContactCountFromDatabaseHavingCache(): void
+    {
+        $leadList  = $this->mockLeadList(765);
+        $segmentId = $leadList->getId();
+        $leadCount = 100;
+
+        $this->segmentCountCacheHelper
+            ->expects(self::once())
+            ->method('hasSegmentContactCount')
+            ->with($segmentId)
+            ->willReturn(true);
+
+        $this->segmentCountCacheHelper
+            ->expects(self::once())
+            ->method('getSegmentContactCount')
+            ->with($segmentId)
+            ->willReturn($leadCount);
+
+        $leadCounts = $this->model->getSegmentContactCountFromDatabase([$segmentId]);
+
+        self::assertSame([$segmentId => $leadCount], $leadCounts);
+    }
+
+    public function testGetSegmentContactCountFromDatabase(): void
+    {
+        $leadList  = $this->mockLeadList(765);
+        $segmentId = $leadList->getId();
+        $leadCount = 100;
+
+        $this->segmentCountCacheHelper
+            ->expects(self::once())
+            ->method('hasSegmentContactCount')
+            ->with($segmentId)
+            ->willReturn(false);
+
+        $this->leadListRepositoryMock
+            ->expects(self::once())
             ->method('getLeadCount')
-            ->with($segmentId, $this->cacheStorageHelperMock)
-            ->willReturn($count);
+            ->with($segmentId)
+            ->willReturn($leadCount);
 
-        self::assertSame([$segmentId => $count], $this->model->getLeadsCount([$segmentId], true));
+        $leadCounts = $this->model->getSegmentContactCountFromDatabase([$segmentId]);
+
+        self::assertSame([$segmentId => $leadCount], $leadCounts);
     }
 
     /**
@@ -215,12 +305,49 @@ class ListModelTest extends TestCase
      */
     public function testLeadListExists(): void
     {
-        $segmentId = 765;
+        $leadList  = $this->mockLeadList(765);
+        $segmentId = $leadList->getId();
         $this->leadListRepositoryMock->expects(self::once())
             ->method('leadListExists')
             ->with($segmentId)
             ->willReturn(true);
 
         self::assertTrue($this->model->leadListExists($segmentId));
+    }
+
+    private function mockLeadList(int $id): LeadList
+    {
+        return new class($id) extends LeadList {
+            private $id;
+
+            public function __construct(int $id)
+            {
+                $this->id = $id;
+                parent::__construct();
+            }
+
+            public function getId(): int
+            {
+                return $this->id;
+            }
+        };
+    }
+
+    private function mockLead(int $id): Lead
+    {
+        return new class($id) extends Lead {
+            private $id;
+
+            public function __construct(int $id)
+            {
+                $this->id = $id;
+                parent::__construct();
+            }
+
+            public function getId(): int
+            {
+                return $this->id;
+            }
+        };
     }
 }

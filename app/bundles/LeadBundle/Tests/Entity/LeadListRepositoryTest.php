@@ -10,9 +10,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\LeadBundle\Entity\LeadListRepository;
-use Mautic\LeadBundle\Helper\ListCacheHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\InvalidArgumentException;
@@ -130,7 +128,16 @@ class LeadListRepositoryTest extends TestCase
 
         $this->queryBuilderMock->expects(self::exactly(2))
             ->method('from')
-            ->withConsecutive([MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l'], [MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l USE INDEX '.MAUTIC_TABLE_PREFIX.'(manually_removed)'])
+            ->withConsecutive(
+                [
+                    MAUTIC_TABLE_PREFIX.'lead_lists_leads',
+                    'l',
+                ],
+                [
+                    MAUTIC_TABLE_PREFIX.'lead_lists_leads',
+                    'l USE INDEX '.MAUTIC_TABLE_PREFIX.'(manually_removed)',
+                ]
+            )
             ->willReturnOnConsecutiveCalls($this->queryBuilderMock, $this->queryBuilderMock);
 
         $this->expressionMock->expects(self::exactly(2))
@@ -139,46 +146,6 @@ class LeadListRepositoryTest extends TestCase
             ->willReturnSelf();
 
         self::assertSame($counts[0], $this->repository->getLeadCount($listIds));
-    }
-
-    /**
-     * @throws InvalidArgumentException
-     */
-    public function testGetSingleCachedLeadCount(): void
-    {
-        $listIds = [765];
-        $counts  = [100];
-
-        $this->connection
-            ->method('createQueryBuilder')
-            ->willReturn($this->queryBuilderMock);
-
-        $this->queryBuilderMock->expects(self::once())
-            ->method('select')
-            ->with('count(l.lead_id) as thecount, l.leadlist_id')
-            ->willReturnSelf();
-
-        $this->queryBuilderMock->expects(self::once())
-            ->method('from')
-            ->with(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l')
-            ->willReturnSelf();
-
-        $cacheKey           = ListCacheHelper::generateCacheKey($listIds[0]);
-        $cacheStorageHelper = $this->createMock(CacheStorageHelper::class);
-
-        $cacheStorageHelper->expects(self::once())
-            ->method('has')
-            ->with($cacheKey)
-            ->willReturn(true);
-
-        $cacheStorageHelper->expects(self::once())
-            ->method('get')
-            ->with($cacheKey)
-            ->willReturn($counts[0]);
-
-        $return = $this->repository->getLeadCount($listIds, $cacheStorageHelper);
-
-        self::assertSame($counts[0], $return);
     }
 
     private function mockGetLeadCount(array $queryResult): void
