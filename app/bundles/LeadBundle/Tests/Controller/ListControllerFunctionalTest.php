@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
+use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\Assert;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -24,6 +29,11 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
      */
     protected $listRepo;
 
+    /**
+     * @var LeadRepository
+     */
+    protected $leadRepo;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -31,6 +41,10 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         \assert($this->listModel instanceof ListModel);
         $this->listRepo = $this->listModel->getRepository();
         \assert($this->listRepo instanceof LeadListRepository);
+        /** @var LeadModel $leadModel */
+        $leadModel = self::$container->get('mautic.lead.model.lead');
+        /* @var LeadRepository $leadRepo */
+        $this->leadRepo = $leadModel->getRepository();
     }
 
     public function testUnpublishUsedSegment(): void
@@ -132,5 +146,127 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->listModel->saveEntity($segment);
 
         return $segment;
+    }
+
+    /**
+     * @throws ORMException
+     * @throws InvalidArgumentException
+     */
+    public function testSegmentCountOnPageLoad(): void
+    {
+        $segment = $this->saveSegment();
+        $id      = $segment->getId();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $content = $crawler->filter('a.col-count')->filter('a[data-id="'.$id.'"]')->html();
+
+        self::assertSame('No Contacts', trim($content));
+    }
+
+    /**
+     * @throws ORMException
+     * @throws InvalidArgumentException
+     */
+    public function testSegmentCountOnAjax(): void
+    {
+        $segment = $this->saveSegment2();
+        $id      = $segment->getId();
+
+        $parameter = ['id' => $id];
+        $response  = $this->callAjaxRequest($parameter);
+
+        self::assertSame('View 4 Contacts', $response['content']['html']);
+        self::assertSame(4, $response['content']['leadCount']);
+        self::assertSame(Response::HTTP_OK, $response['statusCode']);
+
+        // check count after ajax on page load
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $content = $crawler->filter('a.col-count')->filter('a[data-id="'.$id.'"]')->html();
+
+        self::assertSame('View 4 Contacts', trim($content));
+
+        // remove contact from segment
+        $segment = $this->removeContactFromSegment();
+        $id      = $segment->getId();
+
+        // check count from cache after contact removed
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $content = $crawler->filter('a.col-count')->filter('a[data-id="'.$id.'"]')->html();
+
+        self::assertSame('View 3 Contacts', trim($content));
+    }
+
+    public function testSegmentNotFoundOnAjax(): void
+    {
+        // emulate invalid request parameter
+        $parameter = ['id' => 'ABC'];
+        $response  = $this->callAjaxRequest($parameter);
+
+        self::assertSame('No Contacts', $response['content']['html']);
+        self::assertSame(0, $response['content']['leadCount']);
+        self::assertSame(Response::HTTP_NOT_FOUND, $response['statusCode']);
+    }
+
+    /**
+     * @throws ORMException
+     * @throws InvalidArgumentException
+     */
+    private function saveSegment2(): LeadList
+    {
+        $segment = new LeadList();
+        $segment->setName('Lead List 1');
+        $this->listModel->saveEntity($segment);
+
+        $contactA = new Lead();
+        $contactA->setFirstname('Contact A');
+
+        $contactB = new Lead();
+        $contactB->setFirstname('Contact B');
+
+        $contactC = new Lead();
+        $contactC->setFirstname('Contact C');
+
+        $contactD = new Lead();
+        $contactD->setFirstname('Contact D');
+
+        $contacts = [$contactA, $contactB, $contactC, $contactD];
+
+        $this->leadRepo->saveEntities($contacts);
+
+        // add in cache
+        $this->listModel->addLead($contactA, $segment);
+        $this->listModel->addLead($contactB, $segment);
+        $this->listModel->addLead($contactC, $segment);
+        $this->listModel->addLead($contactD, $segment);
+
+        return $segment;
+    }
+
+    /**
+     * @throws ORMException
+     * @throws InvalidArgumentException
+     */
+    private function removeContactFromSegment(): LeadList
+    {
+        $this->saveSegment2();
+
+        $segment  = $this->listRepo->findOneBy(['name' => 'Lead List 1']);
+        $contactA = $this->leadRepo->findOneBy(['firstname' => 'Contact A']);
+
+        // remove from cache
+        $this->listModel->removeLead($contactA, $segment);
+
+        return $segment;
+    }
+
+    private function callAjaxRequest(array $parameter): array
+    {
+        $this->client->request(Request::METHOD_POST, '/s/ajax?action=lead:getLeadCount', $parameter);
+        $clientResponse = $this->client->getResponse();
+
+        return [
+            'content'    => json_decode($clientResponse->getContent(), true),
+            'statusCode' => $this->client->getResponse()->getStatusCode(),
+        ];
     }
 }
