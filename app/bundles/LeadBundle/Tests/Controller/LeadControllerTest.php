@@ -87,6 +87,39 @@ class LeadControllerTest extends MauticMysqlTestCase
         );
     }
 
+    public function testRetrieveLeadListsBasedOnCategory()
+    {
+        $this->loadFixtures(
+            [
+                LoadCategoryData::class,
+                LoadCategorizedLeadListData::class,
+            ]
+        );
+
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(7, $leadListsTableRows->count());
+
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:1"]');
+        $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
+        $this->assertEquals(4, $leadListsTableRows->count());
+        $firstLeadListLinkTest = trim($leadListsTableRows->first()->filterXPath('//td[2]//div//a')->text());
+        $this->assertEquals('Lead List 1 - Segment Category 1 (lead-list-1)', $firstLeadListLinkTest);
+
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:2"]');
+        $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
+        $this->assertEquals(2, $leadListsTableRows->count());
+
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:2","category:1"]');
+        $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
+        $this->assertEquals(6, $leadListsTableRows->count());
+
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:4"]');
+        $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
+        $this->assertEquals(0, $leadListsTableRows->count());
+    }
+
     public function testContactsAreAddedToThenRemovedFromCampaignsInBatch()
     {
         $this->loadFixtures([CampaignData::class, LoadLeadData::class]);
