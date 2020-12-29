@@ -31,6 +31,8 @@ class LeadControllerTest extends MauticMysqlTestCase
             'leads',
             'companies',
             'campaigns',
+            'categories',
+            'lead_lists',
         ]);
     }
 
@@ -50,6 +52,39 @@ class LeadControllerTest extends MauticMysqlTestCase
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertEquals(1, $xpath->query("//option[@value='segment']")->count());
+    }
+
+    public function testAddCategorizedLeadList()
+    {
+        $this->loadFixtures([LoadCategoryData::class]);
+        $crawler        = $this->client->request(Request::METHOD_GET, '/s/segments/new');
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+
+        $form    = $crawler->filterXPath('//form[@name="leadlist"]')->form();
+        $form->setValues(
+            [
+                'leadlist[name]'               => 'Segment 1',
+                'leadlist[alias]'              => 'segment-1',
+                'leadlist[isGlobal]'           => '0',
+                'leadlist[isPreferenceCenter]' => '0',
+                'leadlist[isPublished]'        => '1',
+                'leadlist[publicName]'         => 'Segment 1',
+                'leadlist[category]'           => '1',
+            ]
+        );
+        $this->client->submit($form);
+
+        $this->assertEquals(
+            [
+                [
+                    'id'          => '1',
+                    'name'        => 'Segment 1',
+                    'category_id' => '1',
+                ],
+            ],
+            $this->getLeadLists()
+        );
     }
 
     public function testContactsAreAddedToThenRemovedFromCampaignsInBatch()
@@ -243,6 +278,15 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->select('cl.lead_id, cl.manually_added, cl.manually_removed, cl.date_last_exited')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where("cl.campaign_id = {$campaignId}")
+            ->execute()
+            ->fetchAll();
+    }
+
+    private function getLeadLists()
+    {
+        return $this->connection->createQueryBuilder()
+            ->select('ll.id', 'll.name', 'll.category_id')
+            ->from('lead_lists', 'll')
             ->execute()
             ->fetchAll();
     }
