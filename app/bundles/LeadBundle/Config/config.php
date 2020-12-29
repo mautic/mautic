@@ -317,6 +317,9 @@ return [
             ],
         ],
     ],
+    'categories' => [
+        'segment' => null,
+    ],
     'services' => [
         'events' => [
             'mautic.lead.subscriber' => [
