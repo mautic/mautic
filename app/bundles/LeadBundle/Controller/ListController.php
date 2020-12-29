@@ -90,16 +90,7 @@ class ListController extends FormController
             $filter['force'] = "($mine or $global)";
         }
 
-        $items = $model->getEntities(
-            [
-                'start'      => $start,
-                'limit'      => $limit,
-                'filter'     => $filter,
-                'orderBy'    => $orderBy,
-                'orderByDir' => $orderByDir,
-            ]);
-
-        $count = count($items);
+        list($count, $items) = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
 
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
@@ -143,15 +134,19 @@ class ListController extends FormController
             'searchValue' => $search,
         ];
 
-        return $this->delegateView([
-            'viewParameters'  => $parameters,
-            'contentTemplate' => 'MauticLeadBundle:List:list.html.php',
-            'passthroughVars' => [
-                'activeLink'    => '#mautic_segment_index',
-                'route'         => $this->generateUrl('mautic_segment_index', ['page' => $page]),
-                'mauticContent' => 'leadlist',
+        return $this->delegateView(
+            $this->getViewArguments([
+                'viewParameters'  => $parameters,
+                'contentTemplate' => 'MauticLeadBundle:List:list.html.php',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_segment_index',
+                    'route'         => $this->generateUrl('mautic_segment_index', ['page' => $page]),
+                    'mauticContent' => 'leadlist',
+                ],
             ],
-        ]);
+            'index'
+            )
+        );
     }
 
     /**
@@ -941,6 +936,22 @@ class ListController extends FormController
                 'joinCategories' => $joinCategories,
             ]
         );
+    }
+
+    /**
+     * @param $action
+     *
+     * @return array
+     */
+    public function getViewArguments(array $args, $action)
+    {
+        switch ($action) {
+            case 'index':
+                $args['viewParameters']['filters'] = $this->listFilters;
+                break;
+        }
+
+        return $args;
     }
 
     /**
