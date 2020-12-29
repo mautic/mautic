@@ -15,6 +15,7 @@ use DeviceDetector\Parser\Device\DeviceParserAbstract as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -175,6 +176,14 @@ class ListType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control editor'],
                 'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'category',
+            CategoryListType::class,
+            [
+                'bundle' => 'segment',
             ]
         );
 
