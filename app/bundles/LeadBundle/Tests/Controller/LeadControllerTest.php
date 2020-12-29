@@ -6,6 +6,8 @@ use Mautic\CampaignBundle\DataFixtures\ORM\CampaignData;
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData;
+use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -30,6 +32,24 @@ class LeadControllerTest extends MauticMysqlTestCase
             'companies',
             'campaigns',
         ]);
+    }
+
+    /**
+     * Assert there is an option to set the new Category type to 'segment'.
+     */
+    public function testSegmentTypeOptionAvailableOnNewCategoryForm()
+    {
+        $this->client->request(Request::METHOD_GET, '/s/categories/category/new?show_bundle_select=1');
+        $clientResponse = $this->client->getResponse();
+
+        $responseContent = json_decode($clientResponse->getContent(), true);
+        $contentDom      = new \DOMDocument();
+        $contentDom->loadHTML($responseContent['newContent']);
+
+        $xpath = new \DOMXPath($contentDom);
+
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertEquals(1, $xpath->query("//option[@value='segment']")->count());
     }
 
     public function testContactsAreAddedToThenRemovedFromCampaignsInBatch()
