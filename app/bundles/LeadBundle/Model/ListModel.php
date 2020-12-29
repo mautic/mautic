@@ -1809,4 +1809,33 @@ class ListModel extends FormModel
 
         return $namesNotToBeDeleted;
     }
+
+    /**
+     * Get a list of source choices.
+     *
+     * @param string $sourceType
+     *
+     * @return array
+     */
+    public function getSourceLists(string $sourceType = null)
+    {
+        $choices = [];
+        switch ($sourceType) {
+            case 'categories':
+            case null:
+                $choices['categories'] = [];
+                $categories            = $this->categoryModel->getLookupResults('segment');
+                if ($categories) {
+                    foreach ($categories as $category) {
+                        $choices['categories'][$category['id']] = $category['title'];
+                    }
+                }
+        }
+
+        foreach ($choices as &$typeChoices) {
+            asort($typeChoices);
+        }
+
+        return (null == $sourceType) ? $choices : $choices[$sourceType];
+    }
 }
