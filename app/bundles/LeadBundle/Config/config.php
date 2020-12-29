@@ -1302,6 +1302,11 @@ return [
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['mautic.lead.model.list'],
             ],
+            'mautic.lead.fixture.category' => [
+                'class'     => \Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['doctrine.orm.entity_manager'],
+            ],
             'mautic.lead.fixture.test.page_hit' => [
                 'class'     => \Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadPageHitData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
