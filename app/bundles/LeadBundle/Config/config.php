@@ -1050,6 +1050,7 @@ return [
             'mautic.lead.model.list' => [
                 'class'     => \Mautic\LeadBundle\Model\ListModel::class,
                 'arguments' => [
+                    'mautic.category.model.category',
                     'mautic.helper.core_parameters',
                     'mautic.lead.model.lead_segment_service',
                     'mautic.lead.segment.stat.chart.query.factory',
