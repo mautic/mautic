@@ -52,54 +52,24 @@ class ReportSubscriber implements EventSubscriberInterface
     ];
     private $companyContexts = [self::CONTEXT_COMPANIES];
 
-    /**
-     * @var LeadModel
-     */
     private $leadModel;
 
-    /**
-     * @var StageModel
-     */
     private $stageModel;
 
-    /**
-     * @var CampaignModel
-     */
     private $campaignModel;
 
-    /**
-     * @var EventCollector
-     */
     private $eventCollector;
 
-    /**
-     * @var CompanyModel
-     */
     private $companyModel;
 
-    /**
-     * @var FieldsBuilder
-     */
     private $fieldsBuilder;
 
-    /**
-     * @var array
-     */
     private $channels;
 
-    /**
-     * @var array
-     */
     private $channelActions;
 
-    /**
-     * @var CompanyReportData
-     */
     private $companyReportData;
 
-    /**
-     * @var TranslatorInterface
-     */
     private $translator;
 
     public function __construct(
@@ -481,7 +451,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
                 case 'mautic.lead.graph.line.leads':
                     $chart = new LineChart(null, $options['dateFrom'], $options['dateTo']);
-                    $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_added', 'l');
+                    $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_added', 's');
                     $leads = $chartQuery->loadAndBuildTimeData($queryBuilder);
                     $chart->setDataset($options['translator']->trans('mautic.lead.all.leads'), $leads);
                     $queryBuilder->andwhere($qb->expr()->isNotNull('l.date_identified'));
