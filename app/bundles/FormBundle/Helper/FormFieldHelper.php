@@ -221,7 +221,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 }
                 break;
             case 'textarea':
-                if (preg_match('/<textarea(.?)*id="mauticform_input_'.$formName.'_'.$alias.'"(.*)?>(.*)?<\/textarea>/i', $formHtml, $match)) {
+                if (preg_match('/<textarea(.*)?id="mauticform_input_'.$formName.'_'.$alias.'"(.*)?>(.*)?<\/textarea>/i', $formHtml, $match)) {
                     $replace  = '<textarea'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'>'.$this->sanitizeValue($value).'</textarea>';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
                 }
