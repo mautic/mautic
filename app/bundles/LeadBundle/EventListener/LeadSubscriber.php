@@ -98,9 +98,14 @@ class LeadSubscriber implements EventSubscriberInterface
         }
 
         // Unset dateLastActive and dateModified and ipAddress to prevent un-necessary audit log entries
-        unset($details['dateLastActive'], $details['dateModified'], $details['ipAddressList']);
+        unset($details['dateLastActive'], $details['dateModified'], $details['ipAddressList'], $details['manipulator']);
         if (empty($details)) {
             return;
+        }
+
+        if ($manipulator = $lead->getManipulator()) {
+            $details['manipulated_by']  = $manipulator->getManipulatedBy();
+            $details['manipulator_key'] = $manipulator->getManipulatorKey();
         }
 
         // Reset the loop prevention if processing a new contact to prevent a memory leak when manipulating large numbers of contacts
