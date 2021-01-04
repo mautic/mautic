@@ -545,6 +545,6 @@ class CategoryController extends AbstractFormController
             $inForm        = $category_form['inForm'] ?? 0;
         }
 
-        return $inForm;
+        return (int) $inForm;
     }
 }
