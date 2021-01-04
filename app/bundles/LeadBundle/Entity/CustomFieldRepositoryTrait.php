@@ -30,11 +30,8 @@ trait CustomFieldRepositoryTrait
     protected $uniqueIdentifiersOperator;
 
     /**
-     * @param      $object
-     * @param      $args
-     * @param null $resultsCallback
-     *
-     * @return array
+     * @param string $object
+     * @param array  $args
      */
     public function getEntitiesWithCustomFields($object, $args, $resultsCallback = null)
     {
@@ -51,9 +48,8 @@ trait CustomFieldRepositoryTrait
         $this->useDistinctCount = false;
         $this->buildWhereClause($dq, $args);
 
-        // Distinct is required here to get the correct count when group by is used due to applied filters
-        $total = 0;
-        if (!empty($args['withTotalCount'])) {
+        if (!empty($args['withTotalCount']) || !isset($args['count'])) {
+            // Distinct is required here to get the correct count when group by is used due to applied filters
             $countSelect = ($this->useDistinctCount) ? 'COUNT(DISTINCT('.$this->getTableAlias().'.id))' : 'COUNT('.$this->getTableAlias().'.id)';
             $dq->select($countSelect.' as count');
 
@@ -64,7 +60,9 @@ trait CustomFieldRepositoryTrait
 
             //get a total count
             $result = $dq->execute()->fetchAll();
-            $total  = ($result) ? (int) $result[0]['count'] : 0;
+            $total  = ($result) ? $result[0]['count'] : 0;
+        } else {
+            $total = $args['count'];
         }
 
         if (!$total && !empty($args['withTotalCount'])) {

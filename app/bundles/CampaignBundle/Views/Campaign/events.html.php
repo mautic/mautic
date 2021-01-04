@@ -33,7 +33,7 @@
                     <?php echo $event['logCount']; ?>
                 </span>
                 <span class="mt-xs label label-default"  data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.report.campaign.pending.actions'); ?>">
-                    <?php echo $event['leadCount'] - $event['logCountForPending']; ?>
+                    <?php echo $event['logCountForPending']; ?>
                 </span>
                 </div>
                     <div class="col-md-5 va-m">

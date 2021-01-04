@@ -17,23 +17,23 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 trait EntityContactsTrait
 {
     /**
-     * @param string|int     $entityId
-     * @param int            $page
-     * @param string         $permission
-     * @param string         $sessionVar
-     * @param string         $entityJoinTable    Table to join to obtain list of related contacts or a DBAL QueryBuilder object defining custom joins
-     * @param string|null    $dncChannel         Channel for this entity to get do not contact records for
-     * @param string|null    $entityIdColumnName If the entity ID in $joinTable is not "id", set the column name here
-     * @param array|null     $contactFilter      Array of additional filters for the getEntityContactsWithFields() function
-     * @param array|null     $additionalJoins    [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
-     * @param string|null    $contactColumnName  Column of the contact in the join table
-     * @param array|null     $routeParameters
-     * @param string|null    $paginationTarget   DOM seletor for injecting new content when pagination is used
-     * @param null           $orderBy            optional OrderBy column, to be used to increase performance with joins
-     * @param null           $orderByDir         optional $orderBy direction, to be used to increase performance with joins
-     * @param int            $count              optional $count if already known to avoid an extra query
-     * @param \DateTime|null $dateFrom           optionally limit to leads added between From and To dates
-     * @param \DateTime|null $dateTo             optionally limit to leads added between From and To dates
+     * @param string|int              $entityId
+     * @param int                     $page
+     * @param string                  $permission
+     * @param string                  $sessionVar
+     * @param string                  $entityJoinTable    Table to join to obtain list of related contacts or a DBAL QueryBuilder object defining custom joins
+     * @param string|null             $dncChannel         Channel for this entity to get do not contact records for
+     * @param string|null             $entityIdColumnName If the entity ID in $joinTable is not "id", set the column name here
+     * @param array|null              $contactFilter      Array of additional filters for the getEntityContactsWithFields() function
+     * @param array|null              $additionalJoins    [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
+     * @param string|null             $contactColumnName  Column of the contact in the join table
+     * @param array|null              $routeParameters
+     * @param string|null             $paginationTarget   DOM selector for injecting new content when pagination is used
+     * @param null                    $orderBy            optional OrderBy column, to be used to increase performance with joins
+     * @param null                    $orderByDir         optional $orderBy direction, to be used to increase performance with joins
+     * @param int                     $count              optional $count if already known to avoid an extra query
+     * @param \DateTimeInterface|null $dateFrom           optionally limit to leads added between From and To dates
+     * @param \DateTimeInterface|null $dateTo             optionally limit to leads added between From and To dates
      *
      * @return mixed
      */
@@ -79,11 +79,16 @@ trait EntityContactsTrait
         $pageHelper        = $pageHelperFacotry->make("mautic.{$sessionVar}", $page);
 
         $filter     = ['string' => $search, 'force' => []];
-        $limit      = $pageHelper->getLimit();
-        $start      = $pageHelper->getStart();
-        $orderBy    = $orderBy ? $orderBy : $this->get('session')->get('mautic.'.$sessionVar.'.contact.orderby', 'l.id');
-        $orderByDir = $orderByDir ? $orderByDir : $this->get('session')->get('mautic.'.$sessionVar.'.contact.orderbydir', 'DESC');
+        $orderBy    = $orderBy ?: $this->get('session')->get('mautic.'.$sessionVar.'.contact.orderby', 'l.id');
+        $orderByDir = $orderByDir ?: $this->get('session')->get('mautic.'.$sessionVar.'.contact.orderbydir', 'DESC');
 
+        //set limits
+        $limit = $this->get('session')->get(
+            'mautic.'.$sessionVar.'.contact.limit',
+            $this->get('mautic.helper.core_parameters')->get('default_pagelimit')
+        );
+
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -111,7 +116,7 @@ trait EntityContactsTrait
 
         // Normalize results regarding withTotalCount.
         if (isset($contacts['count'])) {
-            $count = $contacts['count'];
+            $count = (int) $contacts['count'];
         } else {
             $contacts = [
                 'results' => $contacts,

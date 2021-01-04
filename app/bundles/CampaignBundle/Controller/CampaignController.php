@@ -711,7 +711,7 @@ class CampaignController extends AbstractStandardFormController
                     /** @var LeadEventLogRepository $eventLogRepo */
                     $eventLogRepo             = $this->getDoctrine()->getManager()->getRepository(LeadEventLog::class);
                     $campaignLogCounts        = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true, $dateFrom, $dateToPlusOne);
-                    $pendingCampaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false);
+                    $pendingCampaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, false, $dateFrom, $dateToPlusOne);
                 }
 
                 $leadCount    = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId(), null, [], $dateFrom, $dateToPlusOne);
@@ -721,26 +721,27 @@ class CampaignController extends AbstractStandardFormController
                     'condition' => [],
                 ];
                 foreach ($events as &$event) {
-                    $event['logCount']           =
                     $event['logCountForPending'] =
                     $event['percent']            =
                     $event['yesPercent']         =
                     $event['noPercent']          = 0;
-                    $event['leadCount']          = $leadCount;
 
                     if (isset($campaignLogCounts[$event['id']])) {
-                        $event['logCount']           = array_sum($campaignLogCounts[$event['id']]);
-                        $event['logCountForPending'] = isset($pendingCampaignLogCounts[$event['id']])
+                        $completedCount     = array_sum($campaignLogCounts[$event['id']]);
+                        $logCountsProcessed = isset($pendingCampaignLogCounts[$event['id']])
                             ? array_sum($pendingCampaignLogCounts[$event['id']])
-                            : $event['logCount'];
-                        $pending  = $event['leadCount'] - $event['logCountForPending'];
-                        $totalYes = $campaignLogCounts[$event['id']][1];
-                        $totalNo  = $campaignLogCounts[$event['id']][0];
-                        $total    = $totalYes + $totalNo + $pending;
+                            : $completedCount;
+
+                        $event['logCountForPending'] = $completedCount - $logCountsProcessed;
+                        $event['logCountProcessed']  = $logCountsProcessed;
+
+                        [$totalNo, $totalYes] = $campaignLogCounts[$event['id']];
+                        $total                = $totalYes + $totalNo;
+
                         if ($leadCount) {
-                            $event['percent']    = min(100, max(0, round(($event['logCount'] / $total) * 100, 1)));
-                            $event['yesPercent'] = min(100, max(0, round(($campaignLogCounts[$event['id']][1] / $total) * 100, 1)));
-                            $event['noPercent']  = min(100, max(0, round(($campaignLogCounts[$event['id']][0] / $total) * 100, 1)));
+                            $event['percent']    = min(100, max(0, round(($completedCount / $total) * 100, 1)));
+                            $event['yesPercent'] = min(100, max(0, round(($totalYes / $total) * 100, 1)));
+                            $event['noPercent']  = min(100, max(0, round(($totalNo / $total) * 100, 1)));
                         }
                     }
                 }

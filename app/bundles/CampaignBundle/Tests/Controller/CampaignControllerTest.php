@@ -4,134 +4,548 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Controller;
 
-use Mautic\CampaignBundle\Command\SummarizeCommand;
+use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CampaignBundle\Controller\CampaignController;
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
+use Mautic\CampaignBundle\Entity\EventRepository;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Entity\Summary;
+use Mautic\CampaignBundle\Entity\SummaryRepository;
+use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTest;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use PHPUnit\Framework\Assert;
-use Symfony\Component\DomCrawler\Crawler;
+use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class CampaignControllerTest extends AbstractCampaignTest
+class CampaignControllerTest extends TestCase
 {
-    public function setUp(): void
+    public function testGetViewArguments(): void
     {
-        parent::setUp();
+        $campaign           = $this->mockCampaign();
+        $args               = $this->mockViewArguments($campaign);
+        $campaignController = $this->mockCampaignController();
 
-        $coreParam = new class($this->container) extends CoreParametersHelper {
-            public function get($name, $default = null)
+        $campaignId = $campaign->getId();
+
+        // TESTING ARGUMENTS
+        $events                   = $this->getMockEvents();
+        $campaignLogCounts        = $this->getMockCampaignLogCounts();
+        $pendingCampaignLogCounts = $this->mockCampaignProcessedLogCounts();
+
+        $requestMock            = $this->createMock(Request::class);
+        $campaignController->setRequest($requestMock);
+        $eventCollectorMock     = $this->createMock(EventCollector::class);
+        $containerMock          = $this->createMock(ContainerInterface::class);
+        $containerMock
+            ->expects(self::at(0))
+            ->method('get')
+            ->with('mautic.campaign.event_collector')
+            ->willReturn($eventCollectorMock);
+        $formFactoryMock = $this->createMock(FormFactory::class);
+        $formMock        = $this->createMock(FormInterface::class);
+        $formFactoryMock
+            ->expects(self::at(0))
+            ->method('create')
+            ->withAnyParameters()
+            ->willReturn($formMock);
+        $routerMock   = $this->createMock(Router::class);
+        $routerMock
+            ->expects(self::at(0))
+            ->method('generate')
+            ->withAnyParameters()
+            ->willReturn('address');
+        $containerMock
+            ->expects(self::at(1))
+            ->method('get')
+            ->with('router')
+            ->willReturn($routerMock);
+        $containerMock
+            ->expects(self::at(2))
+            ->method('get')
+            ->with('form.factory')
+            ->willReturn($formFactoryMock);
+        $modelFactoryMock  = $this->createMock(ModelFactory::class);
+        $campaignModelMock = $this->createMock(CampaignModel::class);
+        $modelFactoryMock
+            ->expects(self::at(0))
+            ->method('getModel')
+            ->with('campaign')
+            ->willReturn($campaignModelMock);
+        $containerMock
+            ->expects(self::at(3))
+            ->method('get')
+            ->with('mautic.model.factory')
+            ->willReturn($modelFactoryMock);
+        $eventRepositoryMock  = $this->createMock(EventRepository::class);
+        $campaignModelMock
+            ->expects(self::at(0))
+            ->method('getEventRepository')
+            ->willReturn($eventRepositoryMock);
+        $eventRepositoryMock
+            ->expects(self::at(0))
+            ->method('getCampaignEvents')
+            ->with($campaignId)
+            ->willReturn($events);
+        $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelperMock
+            ->method('get')
+            ->withConsecutive(['campaign_by_range'], ['campaign_use_summary'])
+            ->willReturnOnConsecutiveCalls(false, false);
+        $containerMock
+            ->expects(self::at(4))
+            ->method('get')
+            ->with('mautic.config')
+            ->willReturn($coreParametersHelperMock);
+        $containerMock
+            ->expects(self::at(5))
+            ->method('has')
+            ->with('doctrine')
+            ->willReturn(true);
+        $doctrineMock = $this->createMock(ManagerRegistry::class);
+        $containerMock
+            ->expects(self::at(6))
+            ->method('get')
+            ->with('doctrine')
+            ->willReturn($doctrineMock);
+        $entityManagerMock = $this->createMock(EntityManager::class);
+        $doctrineMock
+            ->expects(self::at(0))
+            ->method('getManager')
+            ->willReturn($entityManagerMock);
+        $leadEventLogRepositoryMock    = $this->createMock(LeadEventLogRepository::class);
+        $entityManagerMock
+            ->expects(self::at(0))
+            ->method('getRepository')
+            ->with(LeadEventLog::class)
+            ->willReturn($leadEventLogRepositoryMock);
+        $modelFactoryMock
+            ->expects(self::at(1))
+            ->method('getModel')
+            ->with('campaign')
+            ->willReturn($campaignModelMock);
+        $containerMock
+            ->expects(self::at(7))
+            ->method('get')
+            ->with('mautic.model.factory')
+            ->willReturn($modelFactoryMock);
+        $leadEventLogRepositoryMock
+            ->expects(self::at(0))
+            ->method('getCampaignLogCounts')
+            ->with($campaignId, false, false, true)
+            ->willReturn($campaignLogCounts);
+        $leadEventLogRepositoryMock
+            ->expects(self::at(1))
+            ->method('getCampaignLogCounts')
+            ->with($campaignId, false, false)
+            ->willReturn($pendingCampaignLogCounts);
+        $campaignRepositoryMock = $this->createMock(CampaignRepository::class);
+        $campaignModelMock
+            ->expects(self::at(1))
+            ->method('getRepository')
+            ->willReturn($campaignRepositoryMock);
+        $campaignRepositoryMock
+            ->expects(self::at(0))
+            ->method('getCampaignLeadCount')
+            ->with($campaignId)
+            ->willReturn(8);
+        $modelFactoryMock
+            ->expects(self::at(2))
+            ->method('getModel')
+            ->with('campaign')
+            ->willReturn($campaignModelMock);
+        $containerMock
+            ->expects(self::at(8))
+            ->method('get')
+            ->with('mautic.model.factory')
+            ->willReturn($modelFactoryMock);
+        $dateMock = $this->createMock(Form::class);
+        $formMock
+            ->expects(self::at(0))
+            ->method('get')
+            ->with('date_from')
+            ->willReturn($dateMock);
+        $formMock
+            ->expects(self::at(1))
+            ->method('get')
+            ->with('date_to')
+            ->willReturn($dateMock);
+        $dateMock
+            ->expects(self::at(0))
+            ->method('getData')
+            ->willReturn('Sep 14, 2020');
+        $dateMock
+            ->expects(self::at(1))
+            ->method('getData')
+            ->willReturn('Sep 16, 2020');
+        $modelFactoryMock
+            ->expects(self::at(3))
+            ->method('getModel')
+            ->with('campaign')
+            ->willReturn($campaignModelMock);
+        $containerMock
+            ->expects(self::at(9))
+            ->method('get')
+            ->with('mautic.model.factory')
+            ->willReturn($modelFactoryMock);
+        $sessionMock = $this->createMock(Session::class);
+        $containerMock
+            ->expects(self::at(12))
+            ->method('get')
+            ->with('session')
+            ->willReturn($sessionMock);
+        $sessionMock
+            ->expects(self::once())
+            ->method('set')
+            ->with('mautic.campaign.1.events.modified', []);
+        $modelFactoryMock
+            ->expects(self::at(4))
+            ->method('getModel')
+            ->with('campaign')
+            ->willReturn($campaignModelMock);
+        $containerMock
+            ->expects(self::at(13))
+            ->method('get')
+            ->with('mautic.model.factory')
+            ->willReturn($modelFactoryMock);
+        $campaignController->setContainer($containerMock);
+
+        $viewArguments = $campaignController->tryGetViewArguments($args, 'view');
+
+        // RESULT
+        $campaignEvents = $viewArguments['viewParameters']['campaignEvents'];
+        $resultCampaign = $viewArguments['viewParameters']['campaign'];
+        // Result for same campaign
+        self::assertSame($campaign, $resultCampaign);
+        // Condition YES percent 25%
+        self::assertSame(25.0, $campaignEvents[1]['yesPercent']);
+        // First action, pending 0
+        self::assertSame(0, $campaignEvents[2]['logCountForPending']);
+        // First action, count processed 2
+        self::assertSame(2, $campaignEvents[2]['logCountProcessed']);
+        // First action, YES percent 25%
+        self::assertSame(25.0, $campaignEvents[2]['yesPercent']);
+        // Second action, pending 1
+        self::assertSame(1, $campaignEvents[3]['logCountForPending']);
+        // Second action, count processed 1
+        self::assertSame(1, $campaignEvents[3]['logCountProcessed']);
+        // Second action, YES percent 100%
+        self::assertSame(100, $campaignEvents[3]['yesPercent']);
+    }
+
+    public function testGetViewArgumentsWithSummary(): void
+    {
+        $campaign           = $this->mockCampaign();
+        $args               = $this->mockViewArguments($campaign);
+        $campaignController = $this->mockCampaignController();
+
+        $campaignId = $campaign->getId();
+
+        // TESTING ARGUMENTS
+        $events            = $this->getMockEvents();
+        $campaignLogCounts = $this->getMockCampaignLogCounts();
+
+        $requestMock            = $this->createMock(Request::class);
+        $campaignController->setRequest($requestMock);
+        $eventCollectorMock     = $this->createMock(EventCollector::class);
+        $containerMock          = $this->createMock(ContainerInterface::class);
+        $containerMock
+            ->expects(self::at(0))
+            ->method('get')
+            ->with('mautic.campaign.event_collector')
+            ->willReturn($eventCollectorMock);
+        $formFactoryMock = $this->createMock(FormFactory::class);
+        $formMock        = $this->createMock(FormInterface::class);
+        $formFactoryMock
+            ->expects(self::at(0))
+            ->method('create')
+            ->withAnyParameters()
+            ->willReturn($formMock);
+        $routerMock   = $this->createMock(Router::class);
+        $routerMock
+            ->expects(self::at(0))
+            ->method('generate')
+            ->withAnyParameters()
+            ->willReturn('address');
+        $containerMock
+            ->expects(self::at(1))
+            ->method('get')
+            ->with('router')
+            ->willReturn($routerMock);
+        $containerMock
+            ->expects(self::at(2))
+            ->method('get')
+            ->with('form.factory')
+            ->willReturn($formFactoryMock);
+        $modelFactoryMock  = $this->createMock(ModelFactory::class);
+        $campaignModelMock = $this->createMock(CampaignModel::class);
+        $modelFactoryMock
+            ->expects(self::at(0))
+            ->method('getModel')
+            ->with('campaign')
+            ->willReturn($campaignModelMock);
+        $containerMock
+            ->expects(self::at(3))
+            ->method('get')
+            ->with('mautic.model.factory')
+            ->willReturn($modelFactoryMock);
+        $eventRepositoryMock  = $this->createMock(EventRepository::class);
+        $campaignModelMock
+            ->expects(self::at(0))
+            ->method('getEventRepository')
+            ->willReturn($eventRepositoryMock);
+        $eventRepositoryMock
+            ->expects(self::at(0))
+            ->method('getCampaignEvents')
+            ->with($campaignId)
+            ->willReturn($events);
+        $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelperMock
+            ->method('get')
+            ->withConsecutive(['campaign_by_range'], ['campaign_use_summary'])
+            ->willReturnOnConsecutiveCalls(false, true);
+        $containerMock
+            ->expects(self::at(4))
+            ->method('get')
+            ->with('mautic.config')
+            ->willReturn($coreParametersHelperMock);
+        $containerMock
+            ->expects(self::at(5))
+            ->method('has')
+            ->with('doctrine')
+            ->willReturn(true);
+        $doctrineMock = $this->createMock(ManagerRegistry::class);
+        $containerMock
+            ->expects(self::at(6))
+            ->method('get')
+            ->with('doctrine')
+            ->willReturn($doctrineMock);
+        $entityManagerMock = $this->createMock(EntityManager::class);
+        $doctrineMock
+            ->expects(self::at(0))
+            ->method('getManager')
+            ->willReturn($entityManagerMock);
+        $summaryRepositoryMock    = $this->createMock(SummaryRepository::class);
+        $entityManagerMock
+            ->expects(self::at(0))
+            ->method('getRepository')
+            ->with(Summary::class)
+            ->willReturn($summaryRepositoryMock);
+        $summaryRepositoryMock
+            ->expects(self::at(0))
+            ->method('getCampaignLogCounts')
+            ->with($campaignId)
+            ->willReturn($campaignLogCounts);
+        $modelFactoryMock
+            ->expects(self::at(1))
+            ->method('getModel')
+            ->with('campaign')
+            ->willReturn($campaignModelMock);
+        $containerMock
+            ->expects(self::at(7))
+            ->method('get')
+            ->with('mautic.model.factory')
+            ->willReturn($modelFactoryMock);
+        $campaignRepositoryMock = $this->createMock(CampaignRepository::class);
+        $campaignModelMock
+            ->expects(self::at(1))
+            ->method('getRepository')
+            ->willReturn($campaignRepositoryMock);
+        $campaignRepositoryMock
+            ->expects(self::at(0))
+            ->method('getCampaignLeadCount')
+            ->with($campaignId)
+            ->willReturn(8);
+        $modelFactoryMock
+            ->expects(self::at(2))
+            ->method('getModel')
+            ->with('campaign')
+            ->willReturn($campaignModelMock);
+        $containerMock
+            ->expects(self::at(8))
+            ->method('get')
+            ->with('mautic.model.factory')
+            ->willReturn($modelFactoryMock);
+        $dateMock = $this->createMock(Form::class);
+        $formMock
+            ->expects(self::at(0))
+            ->method('get')
+            ->with('date_from')
+            ->willReturn($dateMock);
+        $formMock
+            ->expects(self::at(1))
+            ->method('get')
+            ->with('date_to')
+            ->willReturn($dateMock);
+        $dateMock
+            ->expects(self::at(0))
+            ->method('getData')
+            ->willReturn('Sep 14, 2020');
+        $dateMock
+            ->expects(self::at(1))
+            ->method('getData')
+            ->willReturn('Sep 16, 2020');
+        $modelFactoryMock
+            ->expects(self::at(3))
+            ->method('getModel')
+            ->with('campaign')
+            ->willReturn($campaignModelMock);
+        $containerMock
+            ->expects(self::at(9))
+            ->method('get')
+            ->with('mautic.model.factory')
+            ->willReturn($modelFactoryMock);
+        $sessionMock = $this->createMock(Session::class);
+        $containerMock
+            ->expects(self::at(12))
+            ->method('get')
+            ->with('session')
+            ->willReturn($sessionMock);
+        $sessionMock
+            ->expects(self::once())
+            ->method('set')
+            ->with('mautic.campaign.1.events.modified', []);
+        $modelFactoryMock
+            ->expects(self::at(4))
+            ->method('getModel')
+            ->with('campaign')
+            ->willReturn($campaignModelMock);
+        $containerMock
+            ->expects(self::at(13))
+            ->method('get')
+            ->with('mautic.model.factory')
+            ->willReturn($modelFactoryMock);
+        $campaignController->setContainer($containerMock);
+
+        $viewArguments = $campaignController->tryGetViewArguments($args, 'view');
+
+        // RESULT
+        $campaignEvents = $viewArguments['viewParameters']['campaignEvents'];
+        $resultCampaign = $viewArguments['viewParameters']['campaign'];
+
+        // Result for same campaign
+        self::assertSame($campaign, $resultCampaign);
+        // Condition YES percent 25%
+        self::assertSame(25.0, $campaignEvents[1]['yesPercent']);
+        // First action, pending 0
+        self::assertSame(0, $campaignEvents[2]['logCountForPending']);
+        // First action, count processed 2
+        self::assertSame(2, $campaignEvents[2]['logCountProcessed']);
+        // First action, YES percent 25%
+        self::assertSame(25.0, $campaignEvents[2]['yesPercent']);
+        // Second action, pending 1
+        self::assertSame(0, $campaignEvents[3]['logCountForPending']);
+        // Second action, count processed 1
+        self::assertSame(2, $campaignEvents[3]['logCountProcessed']);
+        // Second action, YES percent 100%
+        self::assertSame(100, $campaignEvents[3]['yesPercent']);
+    }
+
+    private function mockCampaign(int $id = 10): Campaign
+    {
+        return new class($id) extends Campaign {
+            private $id;
+
+            public function __construct(int $id)
             {
-                if ('campaign_use_summary' === $name) {
-                    return true;
-                }
+                $this->id = $id;
+                parent::__construct();
+            }
 
-                return parent::get($name, $default);
+            public function getId(): int
+            {
+                return $this->id;
             }
         };
-        $this->container->set('mautic.helper.core_parameters', $coreParam);
     }
 
-    public function testContactCountWithSummaryThroughStats(): void
+    private function mockViewArguments(Campaign $campaign): array
     {
-        /** @var CampaignModel $campaignModel */
-        $campaignModel = $this->container->get('mautic.model.factory')->getModel('campaign');
+        $args['entity']         = $campaign;
+        $args['objectId']       = 1;
+        $args['viewParameters'] = [];
 
-        $campaign = $this->saveSomeCampaignLeadEventLogs();
-
-        $stats = $campaignModel->getCampaignMetricsLineChartData(
-            null,
-            new \DateTime('2020-10-21'),
-            new \DateTime('2020-11-22'),
-            null,
-            ['campaign_id' => $campaign->getId()]
-        );
-        $datasets      = $stats['datasets'] ?? [];
-        $totalContacts = $this->processTotalContactStats($datasets);
-
-        Assert::assertSame(2, $totalContacts);
+        return $args;
     }
 
-    public function testContactCountWithSummaryThroughCanvas(): void
+    private function mockCampaignController(): CampaignController
     {
-        $campaign      = $this->saveSomeCampaignLeadEventLogs();
-        $crawler       = $this->getCrawler($campaign->getId());
-        $canvasJson    = trim($crawler->filter('canvas')->html());
-        $canvasData    = json_decode($canvasJson, true);
-        $datasets      = $canvasData['datasets'] ?? [];
-        $totalContacts = $this->processTotalContactStats($datasets);
-
-        Assert::assertSame(2, $totalContacts);
-    }
-
-    public function testCampaignPendingCountWithSummary(): void
-    {
-        $campaign = $this->saveSomeCampaignLeadEventLogs();
-
-        $actionCounts = $this->getActionCounts($campaign->getId());
-
-        Assert::assertSame('0%', $actionCounts['successPercent']);
-        Assert::assertSame('0', $actionCounts['completed']);
-        Assert::assertSame('2', $actionCounts['pending']);
-    }
-
-    public function testCampaignCompleteCountWithSummary(): void
-    {
-        $campaign = $this->saveSomeCampaignLeadEventLogs();
-
-        $this->runCommand(
-            SummarizeCommand::NAME,
-            [
-                '--env'       => 'test',
-                '--max-hours' => 9999999,
-            ]
-        );
-
-        $actionCounts = $this->getActionCounts($campaign->getId());
-
-        Assert::assertSame('100%', $actionCounts['successPercent']);
-        Assert::assertSame('2', $actionCounts['completed']);
-        Assert::assertSame('0', $actionCounts['pending']);
-    }
-
-    private function processTotalContactStats(array $datasets): int
-    {
-        $datasetLabel  = $this->container->get('translator')->trans('mautic.campaign.campaign.leads');
-        $totalContacts = 0;
-
-        foreach ($datasets as $dataset) {
-            if ($dataset['label'] === $datasetLabel) {
-                $data          = $dataset['data'] ?? [];
-                $totalContacts = array_sum($data);
-                break;
+        // Anonymous class that extends CampaignController to be able to test protected function
+        return new class() extends CampaignController {
+            public function tryGetViewArguments(array $args, string $action): array
+            {
+                return $this->getViewArguments($args, $action);
             }
-        }
-
-        return $totalContacts;
+        };
     }
 
-    private function getCrawler(int $campaignId): Crawler
+    private function getMockEvents(): array
     {
-        $parameters = [
-            'daterange' => [
-                'date_from' => 'Nov 1, 2020',
-                'date_to'   => 'Nov 30, 2020',
+        return [
+            1 => [
+                'id'           => 1,
+                'name'         => 'Condition',
+                'eventType'    => 'condition',
+                'decisionPath' => null,
+                'parent_id'    => null,
+            ],
+            2 => [
+                'id'           => 2,
+                'name'         => 'Action 1',
+                'eventType'    => 'action',
+                'decisionPath' => 'yes',
+                'parent_id'    => 1,
+            ],
+            3 => [
+                'id'        => 3,
+                'name'      => 'Action 2',
+                'eventType' => 'action',
+                'parent_id' => 2,
             ],
         ];
-
-        return $this->client->request(Request::METHOD_POST, '/s/campaigns/view/'.$campaignId, $parameters);
     }
 
-    private function getActionCounts(int $campaignId): array
+    private function getMockCampaignLogCounts(): array
     {
-        $crawler        = $this->getCrawler($campaignId);
-        $successPercent = trim($crawler->filter('#actions-container')->filter('span')->eq(0)->html());
-        $completed      = trim($crawler->filter('#actions-container')->filter('span')->eq(1)->html());
-        $pending        = trim($crawler->filter('#actions-container')->filter('span')->eq(2)->html());
-
         return [
-            'successPercent' => $successPercent,
-            'completed'      => $completed,
-            'pending'        => $pending,
+            1 => [
+                0 => 6,
+                1 => 2,
+            ],
+            2 => [
+                0 => 0,
+                1 => 2,
+            ],
+            3 => [
+                0 => 0,
+                1 => 2,
+            ],
+        ];
+    }
+
+    private function mockCampaignProcessedLogCounts(): array
+    {
+        return [
+            1 => [
+                0 => 6,
+                1 => 2,
+            ],
+            2 => [
+                0 => 0,
+                1 => 2,
+            ],
+            3 => [
+                0 => 0,
+                1 => 1,
+            ],
         ];
     }
 }
