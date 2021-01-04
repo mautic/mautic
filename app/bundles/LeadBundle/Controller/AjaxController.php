@@ -964,7 +964,7 @@ class AjaxController extends CommonAjaxController
             return new JsonResponse($this->prepareJsonResponse(0), Response::HTTP_NOT_FOUND);
         }
 
-        $leadCounts = $model->getSegmentContactCountFromDatabase([$id]);
+        $leadCounts = $model->getSegmentContactCount([$id]);
         $leadCount  = $leadCounts[$id];
 
         return new JsonResponse($this->prepareJsonResponse($leadCount));

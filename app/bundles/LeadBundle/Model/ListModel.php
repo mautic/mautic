@@ -1337,13 +1337,13 @@ class ListModel extends FormModel
      */
     public function getSegmentContactCountFromCache(array $listIds): array
     {
-        $leadCount = [];
+        $leadCounts = [];
 
         foreach ($listIds as $listId) {
-            $leadCount[$listId] = $this->segmentCountCacheHelper->getSegmentContactCount($listId);
+            $leadCounts[$listId] = $this->segmentCountCacheHelper->getSegmentContactCount($listId);
         }
 
-        return $leadCount;
+        return $leadCounts;
     }
 
     /**
@@ -1357,20 +1357,20 @@ class ListModel extends FormModel
     /**
      * @throws InvalidArgumentException
      */
-    public function getSegmentContactCountFromDatabase(array $listIds): array
+    public function getSegmentContactCount(array $listIds): array
     {
-        $leadCount = [];
+        $leadCounts = [];
 
         foreach ($listIds as $listId) {
             if ($this->segmentCountCacheHelper->hasSegmentContactCount($listId)) {
-                $leadCount[$listId] = $this->segmentCountCacheHelper->getSegmentContactCount($listId);
+                $leadCounts[$listId] = $this->segmentCountCacheHelper->getSegmentContactCount($listId);
             } else {
-                $count              = $this->getRepository()->getLeadCount($listId);
-                $leadCount[$listId] = $count;
+                $count               = $this->getRepository()->getLeadCount($listId);
+                $leadCounts[$listId] = $count;
                 $this->segmentCountCacheHelper->setSegmentContactCount($listId, $count);
             }
         }
 
-        return $leadCount;
+        return $leadCounts;
     }
 }

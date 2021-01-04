@@ -160,7 +160,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
         $content = $crawler->filter('a.col-count')->filter('a[data-id="'.$id.'"]')->html();
 
-        self::assertSame('No Contacts', trim($content));
+        self::assertSame('View 4 Contacts', trim($content));
     }
 
     /**

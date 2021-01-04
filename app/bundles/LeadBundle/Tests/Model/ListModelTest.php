@@ -246,6 +246,9 @@ class ListModelTest extends TestCase
         self::assertSame([$segmentId => $leadCount], $leadCounts);
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function testGetSegmentContactCountFromDatabaseHavingCache(): void
     {
         $leadList  = $this->mockLeadList(765);
@@ -264,11 +267,14 @@ class ListModelTest extends TestCase
             ->with($segmentId)
             ->willReturn($leadCount);
 
-        $leadCounts = $this->model->getSegmentContactCountFromDatabase([$segmentId]);
+        $leadCounts = $this->model->getSegmentContactCount([$segmentId]);
 
         self::assertSame([$segmentId => $leadCount], $leadCounts);
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function testGetSegmentContactCountFromDatabase(): void
     {
         $leadList  = $this->mockLeadList(765);
@@ -287,7 +293,7 @@ class ListModelTest extends TestCase
             ->with($segmentId)
             ->willReturn($leadCount);
 
-        $leadCounts = $this->model->getSegmentContactCountFromDatabase([$segmentId]);
+        $leadCounts = $this->model->getSegmentContactCount([$segmentId]);
 
         self::assertSame([$segmentId => $leadCount], $leadCounts);
     }
