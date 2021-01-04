@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -48,7 +48,7 @@ class LoadCategorizedLeadListData extends AbstractFixture implements OrderedFixt
         $categoryRepo = $this->entityManager->getRepository(Category::class);
 
         $leadLists = CsvHelper::csv_to_array(__DIR__.'/fakecategorizedleadlistdata.csv');
-        foreach ($leadLists as $count => $leadList) {
+        foreach ($leadLists as $leadList) {
             $category       = $categoryRepo->find($leadList['category']);
             $leadListEntity = new LeadList();
             $leadListEntity->setName($leadList['name']);
