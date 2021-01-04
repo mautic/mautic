@@ -16,6 +16,7 @@ use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 class CategoryController extends AbstractFormController
 {
@@ -539,7 +540,7 @@ class CategoryController extends AbstractFormController
     private function getInFormValue(string $method): int
     {
         $inForm = $this->request->get('inForm', 0);
-        if ('POST' == $method) {
+        if (Request::METHOD_POST == $method) {
             $category_form = $this->request->request->get('category_form');
             $inForm        = $category_form['inForm'] ?? 0;
         }
