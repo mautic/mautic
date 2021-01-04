@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -39,7 +39,7 @@ class LoadCategoryData extends AbstractFixture implements OrderedFixtureInterfac
         /** @var CategoryRepository $categoryRepo */
         $categoryRepo = $this->entityManager->getRepository(Category::class);
         $categories   = CsvHelper::csv_to_array(__DIR__.'/fakecategorydata.csv');
-        foreach ($categories as $count => $category) {
+        foreach ($categories as $category) {
             $categoryEntity = new Category();
             $categoryEntity->setTitle($category['categoryname']);
             $categoryEntity->setBundle($category['categorybundle']);
