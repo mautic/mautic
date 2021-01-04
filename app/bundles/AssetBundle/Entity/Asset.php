@@ -181,7 +181,7 @@ class Asset extends FormEntity
             ->nullable()
             ->build();
 
-        $builder->createField('remotePath', 'string')
+        $builder->createField('remotePath', 'text')
             ->columnName('remote_path')
             ->nullable()
             ->build();
