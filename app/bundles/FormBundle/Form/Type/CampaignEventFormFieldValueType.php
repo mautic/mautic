@@ -168,7 +168,7 @@ class CampaignEventFormFieldValueType extends AbstractType
                     'value',
                     ChoiceType::class,
                     [
-                        'choices'    => $options[$data['field']],
+                        'choices'    => array_flip($options[$data['field']]),
                         'label'      => 'mautic.form.field.form.value',
                         'label_attr' => ['class' => 'control-label'],
                         'attr'       => [
