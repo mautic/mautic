@@ -18,7 +18,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class ConfigType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'campaign_time_wait_on_event_false',
@@ -59,7 +59,7 @@ class ConfigType extends AbstractType
                 'attr'  => [
                     'tooltip' => 'mautic.campaignconfig.campaign_by_range.tooltip',
                 ],
-                'data'  => ((bool) $options['data']['campaign_by_range']) ?? false,
+                'data'  => (bool) ($options['data']['campaign_by_range'] ?? false),
             ]
         );
 
@@ -71,12 +71,12 @@ class ConfigType extends AbstractType
                 'attr'  => [
                     'tooltip' => 'mautic.campaignconfig.use_summary.tooltip',
                 ],
-                'data'  => ((bool) $options['data']['campaign_use_summary']) ?? false,
+                'data'  => (bool) ($options['data']['campaign_use_summary'] ?? false),
             ]
         );
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'campaignconfig';
     }

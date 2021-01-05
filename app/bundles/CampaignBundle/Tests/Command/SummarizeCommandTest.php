@@ -14,12 +14,14 @@ namespace Mautic\CampaignBundle\Tests\Command;
 use Mautic\CampaignBundle\Command\SummarizeCommand;
 use Mautic\CampaignBundle\Entity\Summary;
 use Mautic\CampaignBundle\Entity\SummaryRepository;
-use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTest;
 use PHPUnit\Framework\Assert;
 
 final class SummarizeCommandTest extends AbstractCampaignTest
 {
+    /**
+     * @throws \Exception
+     */
     public function testBackwardSummarizationWhenThereAreNoCampaignEventLogs(): void
     {
         $output = $this->runCommand(
@@ -34,11 +36,14 @@ final class SummarizeCommandTest extends AbstractCampaignTest
         $summaryRepo = $this->em->getRepository(Summary::class);
         Assert::assertCount(0, $summaryRepo->findAll());
         Assert::assertStringContainsString(
-            'There are no records in the campaign lead event log table. Nothng to summarize.',
+            'There are no records in the campaign lead event log table. Nothing to summarize.',
             $output
         );
     }
 
+    /**
+     * @throws \Exception
+     */
     public function testBackwardSummarizationWhenThereAreLogs(): void
     {
         $campaign = $this->saveSomeCampaignLeadEventLogs();

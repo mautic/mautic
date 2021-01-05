@@ -24,7 +24,7 @@ class DbalPass implements CompilerPassInterface
      *
      * See config_prod.php
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $id = 'doctrine.dbal.default_connection.configuration';
 

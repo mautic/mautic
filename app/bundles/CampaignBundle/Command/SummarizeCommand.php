@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Command;
 
+use Doctrine\DBAL\DBALException;
 use Mautic\CampaignBundle\Model\SummaryModel;
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -46,7 +47,7 @@ class SummarizeCommand extends ModeratedCommand
         $this->summaryModel = $summaryModel;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName(self::NAME)
             ->addOption(
@@ -73,6 +74,9 @@ class SummarizeCommand extends ModeratedCommand
         parent::configure();
     }
 
+    /**
+     * @throws DBALException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->checkRunStatus($input, $output)) {
