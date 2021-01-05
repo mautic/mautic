@@ -151,6 +151,12 @@ class FieldHelperTest extends TestCase
             ['some fields', 'some unique fields'],
             $this->fieldHelper->getRequiredFields('lead')
         );
+
+        // Call it for the second time to ensure the result was cached,
+        $this->assertSame(
+            ['some fields', 'some unique fields'],
+            $this->fieldHelper->getRequiredFields('lead')
+        );
     }
 
     public function testGetRequiredFieldsForCompany(): void
@@ -162,6 +168,12 @@ class FieldHelperTest extends TestCase
         $this->fieldModel->expects($this->never())
             ->method('getUniqueIdentifierFields');
 
+        $this->assertSame(
+            ['some fields'],
+            $this->fieldHelper->getRequiredFields('company')
+        );
+
+        // Call it for the second time to ensure the result was cached,
         $this->assertSame(
             ['some fields'],
             $this->fieldHelper->getRequiredFields('company')
