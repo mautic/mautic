@@ -103,7 +103,7 @@ class SummaryModel extends AbstractCommonModel
         $end = $this->getCampaignLeadEventLogRepository()->getOldestTriggeredDate();
 
         if (!$end) {
-            $output->writeln('There are no records in the campaign lead event log table. Nothng to summarize.');
+            $output->writeln('There are no records in the campaign lead event log table. Nothing to summarize.');
 
             return;
         }
