@@ -413,7 +413,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
      */
     public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'contacts')
     {
-        if ('Contact' === $object) {
+        if ('Contacts' === $object) {
             $object = 'contacts';
         }
         $executed    = 0;
