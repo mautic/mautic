@@ -52,54 +52,24 @@ class ReportSubscriber implements EventSubscriberInterface
     ];
     private $companyContexts = [self::CONTEXT_COMPANIES];
 
-    /**
-     * @var LeadModel
-     */
     private $leadModel;
 
-    /**
-     * @var StageModel
-     */
     private $stageModel;
 
-    /**
-     * @var CampaignModel
-     */
     private $campaignModel;
 
-    /**
-     * @var EventCollector
-     */
     private $eventCollector;
 
-    /**
-     * @var CompanyModel
-     */
     private $companyModel;
 
-    /**
-     * @var FieldsBuilder
-     */
     private $fieldsBuilder;
 
-    /**
-     * @var array
-     */
     private $channels;
 
-    /**
-     * @var array
-     */
     private $channelActions;
 
-    /**
-     * @var CompanyReportData
-     */
     private $companyReportData;
 
-    /**
-     * @var TranslatorInterface
-     */
     private $translator;
 
     public function __construct(
@@ -398,6 +368,9 @@ class ReportSubscriber implements EventSubscriberInterface
         $qb           = $event->getQueryBuilder();
         $pointLogRepo = $this->leadModel->getPointLogRepository();
         $companyRepo  = $this->companyModel->getRepository();
+
+        $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'companies_lead', 'l.id = companies_lead.lead_id');
+        $qb->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', 'comp', 'companies_lead.company_id = comp.id');
 
         foreach ($graphs as $g) {
             $queryBuilder = clone $qb;
