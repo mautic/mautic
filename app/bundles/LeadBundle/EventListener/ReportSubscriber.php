@@ -52,24 +52,54 @@ class ReportSubscriber implements EventSubscriberInterface
     ];
     private $companyContexts = [self::CONTEXT_COMPANIES];
 
+    /**
+     * @var LeadModel
+     */
     private $leadModel;
 
+    /**
+     * @var StageModel
+     */
     private $stageModel;
 
+    /**
+     * @var CampaignModel
+     */
     private $campaignModel;
 
+    /**
+     * @var EventCollector
+     */
     private $eventCollector;
 
+    /**
+     * @var CompanyModel
+     */
     private $companyModel;
 
+    /**
+     * @var FieldsBuilder
+     */
     private $fieldsBuilder;
 
+    /**
+     * @var array
+     */
     private $channels;
 
+    /**
+     * @var array
+     */
     private $channelActions;
 
+    /**
+     * @var CompanyReportData
+     */
     private $companyReportData;
 
+    /**
+     * @var TranslatorInterface
+     */
     private $translator;
 
     public function __construct(
