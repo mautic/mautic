@@ -5,19 +5,7 @@
  * @param container
  */
 Mautic.campaignOnLoad = function (container, response) {
-
-    mQuery(document).ready(function() {
-        let containerId = '#leads-container';
-        // Lazy loading for contact tab in campaign view page
-        let campaignContactUrl = mQuery(containerId).data('target-url');
-        if (mQuery(containerId).length > 0) {
-            // Showing campaign detail page. Preventing run on campaign list page.
-            mQuery.get(campaignContactUrl, function(response) {
-                response.target = containerId;
-                Mautic.processPageContent(response);
-            });
-        }
-    });
+    Mautic.lazyLoadContactListOnCampaignDetail();
 
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'campaign');
@@ -127,6 +115,22 @@ Mautic.campaignOnLoad = function (container, response) {
         }
 
     }
+};
+
+Mautic.lazyLoadContactListOnCampaignDetail = function() {
+    let containerId = '#leads-container';
+    let container = mQuery(containerId);
+
+    // Load the contacts only if the container exists.
+    if (!container.length) {
+        return;
+    }
+
+    let campaignContactUrl = container.data('target-url');
+    mQuery.get(campaignContactUrl, function(response) {
+        response.target = containerId;
+        Mautic.processPageContent(response);
+    });
 };
 
 /**
