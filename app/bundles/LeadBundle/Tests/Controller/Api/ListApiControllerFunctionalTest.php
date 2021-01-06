@@ -12,9 +12,16 @@
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
 
 class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->loadFixtures([LoadCategoryData::class]);
+    }
+
     public function testSingleSegmentWorkflow()
     {
         $payload = [
