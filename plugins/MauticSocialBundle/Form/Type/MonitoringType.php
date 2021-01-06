@@ -23,7 +23,7 @@ class MonitoringType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber());
+        $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
 
         $builder->add('title', 'text', [
             'label'      => 'mautic.core.name',

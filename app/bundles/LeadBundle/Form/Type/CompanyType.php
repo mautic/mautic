@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
+use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -62,7 +63,8 @@ class CompanyType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $this->getFormFields($builder, $options, 'company');
+        $cleaningRules                 = $this->getFormFields($builder, $options, 'company');
+        $cleaningRules['companyemail'] = 'email';
 
         $transformer = new IdToEntityModelTransformer(
             $this->em,
@@ -142,6 +144,8 @@ class CompanyType extends AbstractType
                 ],
             ],
         ]);
+
+        $builder->addEventSubscriber(new CleanFormSubscriber($cleaningRules));
     }
 
     /**
