@@ -22,6 +22,11 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->loadFixtures([LoadCategoryData::class]);
     }
 
+    protected function beforeBeginTransaction(): void
+    {
+        $this->resetAutoincrement(['categories']);
+    }
+
     public function testSingleSegmentWorkflow()
     {
         $payload = [
