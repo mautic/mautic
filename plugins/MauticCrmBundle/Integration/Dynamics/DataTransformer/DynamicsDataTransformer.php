@@ -34,6 +34,16 @@ class DynamicsDataTransformer
      */
     private $dynamicsIntegration;
 
+    /**
+     * @var array
+     */
+    private $payloadData;
+
+    /**
+     * @var array
+     */
+    private $lookupReferencesToRemove;
+
     public function __construct(DynamicsIntegration $dynamicsIntegration)
     {
         $this->dynamicsIntegration = $dynamicsIntegration;
@@ -43,36 +53,29 @@ class DynamicsDataTransformer
     {
         $this->parseData($object, $data);
 
-        $data = [];
-        foreach ($this->dataObjects as $formattedValueDTO) {
-            if ($formattedValueDTO->isFieldToPayload()) {
-                $data[$formattedValueDTO->getKeyForPaload()] = $formattedValueDTO->getValueForPayload();
-            }
-        }
-
-        return $data;
+        return $this->payloadData;
     }
 
     public function getLookupReferencesToRemove(): array
     {
-        $data = [];
-        foreach ($this->dataObjects as $key => $formattedValueDTO) {
-            if ($formattedValueDTO->isLookupType() && !$formattedValueDTO->isFieldToPayload()) {
-                $data[] = $key;
-            }
-        }
-
-        return $data;
+        return $this->lookupReferencesToRemove;
     }
 
     private function parseData(string $object, array $data): void
     {
-        $this->dataObjects = [];
-
         $fields = $this->dynamicsIntegration->getAvailableLeadFields();
+
+        $this->payloadData              = [];
+        $this->lookupReferencesToRemove = [];
+
         if (is_array($fields)) {
-            foreach ($data as $key=> $value) {
-                $this->dataObjects[$key] = new FormattedValueDTO($key, $value, $fields[$object][$key] ?? []);
+            foreach ($data as $key => $value) {
+                $formattedValueDTO = new FormattedValueDTO($key, $value, $fields[$object][$key] ?? []);
+                if ($formattedValueDTO->isLookupType() && !$formattedValueDTO->getValue()) {
+                    $this->lookupReferencesToRemove[] = $key;
+                } else {
+                    $this->payloadData[$formattedValueDTO->getKeyForPayload()] = $formattedValueDTO->getValueForPayload();
+                }
             }
         }
     }

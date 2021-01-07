@@ -41,7 +41,7 @@ class FormattedValueDTO
         $this->target = $field['target'] ?? false;
     }
 
-    public function getKeyForPaload(): string
+    public function getKeyForPayload(): string
     {
         if ($this->isLookupType()) {
             return sprintf('%s@odata.bind', $this->key);
@@ -62,7 +62,7 @@ class FormattedValueDTO
         return $this->value;
     }
 
-    public function isFieldToPayload()
+    public function isFieldToPayload(): bool
     {
         return !$this->isLookupType() || ($this->isLookupType() && $this->value);
     }
@@ -74,5 +74,13 @@ class FormattedValueDTO
         }
 
         return false;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getValue()
+    {
+        return $this->value;
     }
 }
