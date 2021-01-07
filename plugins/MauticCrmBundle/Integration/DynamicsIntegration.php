@@ -296,12 +296,11 @@ class DynamicsIntegration extends CrmAbstractIntegration
                             $type      = 'string';
                             $fieldType = $field['AttributeTypeName']['Value'];
                             if (in_array($fieldType, [
-                                 'LookupType',
-                                 'OwnerType',
-                                 'PicklistType',
-                                 'StateType',
-                                 'StatusType',
-                                 'UniqueidentifierType',
+                                'OwnerType',
+                                'PicklistType',
+                                'StateType',
+                                'StatusType',
+                                'UniqueidentifierType',
                             ], true)) {
                                 continue;
                             } elseif (in_array($fieldType, [
@@ -310,17 +309,22 @@ class DynamicsIntegration extends CrmAbstractIntegration
                                  'MoneyType',
                             ], true)) {
                                 $type = 'int';
-                            } elseif ('Boolean' === $fieldType) {
+                            } elseif (in_array($fieldType, ['Boolean', 'BooleanType'])) {
                                 $type = 'boolean';
                             } elseif ('DateTimeType' === $fieldType) {
                                 $type = 'datetime';
                             }
+                            $target                                                 = $field['Targets'][0] ?? null;
                             $dynamicsFields[$dynamicsObject][$field['LogicalName']] = [
                                 'type'     => $type,
                                 'label'    => $field['DisplayName']['UserLocalizedLabel']['Label'],
                                 'dv'       => $field['LogicalName'],
                                 'required' => 'ApplicationRequired' === $field['RequiredLevel']['Value'],
+                                'target'   => $target,
                             ];
+                            if ($target) {
+                                $dynamicsFields[$dynamicsObject][$field['LogicalName']]['update_mautic']  = 0;
+                            }
                         }
                         $this->cache->set('leadFields'.$cacheSuffix, $dynamicsFields[$dynamicsObject]);
                     }

@@ -5,9 +5,24 @@ namespace MauticPlugin\MauticCrmBundle\Api;
 use Joomla\Http\Response;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
+use MauticPlugin\MauticCrmBundle\Integration\Dynamics\DataTransformer\DynamicsDataTransformer;
 
 class DynamicsApi extends CrmApi
 {
+    protected $integration;
+
+    /**
+     * @var DynamicsDataTransformer
+     */
+    private $dynamicsDataTransformer;
+
+    public function __construct(CrmAbstractIntegration $integration)
+    {
+        $this->integration             = $integration;
+        $this->dynamicsDataTransformer = new DynamicsDataTransformer($integration);
+    }
+
     /**
      * @return string
      */
@@ -82,7 +97,6 @@ class DynamicsApi extends CrmApi
         $operation  = sprintf('EntityDefinitions(LogicalName=\'%s\')/Attributes', $logicalName);
         $parameters = [
             '$filter' => 'Microsoft.Dynamics.CRM.NotIn(PropertyName=\'AttributeTypeName\',PropertyValues=["Virtual", "Uniqueidentifier", "Picklist", "Lookup", "Owner", "Customer"]) and IsValidForUpdate eq true and AttributeOf eq null and LogicalName ne \'parentcustomerid\'', // ignore system fields
-            '$select' => 'RequiredLevel,LogicalName,DisplayName,AttributeTypeName', // select only miningful columns
         ];
 
         return $this->request($operation, $parameters, 'GET', $object);
@@ -97,6 +111,8 @@ class DynamicsApi extends CrmApi
      */
     public function createLead($data, $lead, $object = 'contacts')
     {
+        $data = $this->dynamicsDataTransformer->getData($object, $data);
+
         return $this->request('', $data, 'POST', $object);
     }
 
@@ -108,8 +124,18 @@ class DynamicsApi extends CrmApi
      */
     public function updateLead($data, $objectId)
     {
-        //        $settings['headers']['If-Match'] = '*'; // prevent create new contact
-        return $this->request(sprintf('contacts(%s)', $objectId), $data, 'PATCH', 'contacts', []);
+        $data     = $this->dynamicsDataTransformer->getData($object, $data);
+        $response = $this->request(sprintf('%s(%s)', $object, $objectId), $data, 'PATCH', $object, []);
+        $this->deleteLookupReferences($this->dynamicsDataTransformer->getLookupReferencesToRemove(), $objectId, $object);
+
+        return $response;
+    }
+
+    public function deleteLookupReferences(array $references, $objectId, $object = 'contacts'): void
+    {
+        foreach ($references as $reference) {
+            $this->request(sprintf('%s(%s)/%s/$ref', $object, $objectId, $reference), [], 'DELETE', $object, []);
+        }
     }
 
     /**
@@ -170,6 +196,12 @@ class DynamicsApi extends CrmApi
         $contentId = 0;
         foreach ($data as $objectId => $lead) {
             ++$contentId;
+
+            $lead = $this->dynamicsDataTransformer->getData($object, $lead);
+            if ($isUpdate) {
+                $this->deleteLookupReferences($this->dynamicsDataTransformer->getLookupReferencesToRemove(), $objectId, $object);
+            }
+
             $odata .= '--changeset_'.$changeId.PHP_EOL;
             $odata .= 'Content-Type: application/http'.PHP_EOL;
             $odata .= 'Content-Transfer-Encoding:binary'.PHP_EOL;
@@ -235,10 +267,10 @@ class DynamicsApi extends CrmApi
         array_pop($a_blocks);
         // there is only one batchresponse
         $input                = array_pop($a_blocks);
-        list($header, $input) = explode("\r\n\r\n", $input, 2);
+        [$header, $input]     = explode("\r\n\r\n", $input, 2);
         foreach (explode("\r\n", $header) as $r) {
             if (0 === stripos($r, 'Content-Type:')) {
-                list($headername, $contentType) = explode(':', $r, 2);
+                [$headername, $contentType] = explode(':', $r, 2);
             }
         }
         // grab multipart boundary from content type header
