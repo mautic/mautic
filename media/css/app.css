@@ -540,7 +540,8 @@ li{margin:0
 10px;padding:5px
 0}.chart-wrapper .legend li
 span{display:inline-block;width:14px;height:8px;margin-right:5px;-moz-border-radius:4px;-webkit-border-radius:4px;border-radius:4px}@media (max-width: 700px){.dashboard-widgets
-.widget{width:100% !important}}.col-email-id{width:75px}.email-builder .builder-panel .panel-body{padding:5px
+.widget{width:100% !important}}#dashboard-widgets
+.spinner{text-align:center;line-height:250px;font-size:24px}.col-email-id{width:75px}.email-builder .builder-panel .panel-body{padding:5px
 0}.table-bordered{border-left:0}.table-bordered.email-list>thead>tr>th:first-child,.table-bordered.email-list>tbody>tr>td:first-child,.table-bordered.email-template>thead>tr>th:first-child,.table-bordered.email-template>tbody>tr>td:first-child{border-left:0px}.table-bordered.email-list>thead>tr>th:last-child,.table-bordered.email-list>tbody>tr>td:last-child,.table-bordered.email-template>thead>tr>th:last-child,.table-bordered.email-template>tbody>tr>td:last-child{border-right:0px}.email-filters{}.clickable-stat
 a{color:#fff}.clickable-stat a:hover{color:#fff}#emailGraphStats{height:437px}#emailGraphStats
 .spinner{padding-top:50px;text-align:center}.form-submitaction-group-header{font-size:1.1em;font-weight:bold}.form-field-wrapper{position:relative}.form-field-wrapper
