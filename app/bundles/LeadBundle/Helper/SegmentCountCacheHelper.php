@@ -63,6 +63,11 @@ class SegmentCountCacheHelper
     {
         if ($this->hasSegmentContactCount($segmentId)) {
             $count = $this->getSegmentContactCount($segmentId);
+
+            if ($count <= 0) {
+                $count = 1;
+            }
+
             $this->setSegmentContactCount($segmentId, --$count);
         }
     }
