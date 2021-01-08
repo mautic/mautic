@@ -11,7 +11,7 @@ Detail your bug report:
 | ---| ---
 | Confirm it is a Bug report |
 | Mautic version | **MAUTIC 2 is not supported any more**
-| PHP version | 
+| PHP version |
 
 [//]: # (Feature request? ---> Go to the forum please ---> https://forum.mautic.org/c/ideas)
 [//]: # (Enhancement? ---> Go to the forum please ---> https://forum.mautic.org/c/ideas)
@@ -22,9 +22,9 @@ The more details the better...
 
 
 ### Steps to reproduce:
-1. 
-2. 
- 
-### Log errors: 
+1.
+2.
+
+### Log errors:
 
 _Please check for related errors in the latest log file in [mautic root]/var/log/ and/or the web server's logs and post them here. Be sure to remove sensitive information if applicable._ 
