@@ -29,7 +29,7 @@ If you are fixing a bug and if there is no linked issue already, please provide 
 
 #### Steps to test this PR:
 1. Load up [this PR](https://mautibox.com)
-2. 
+2.
 
 <!--
 If you have any deprecations, list them here along with the new alternative.
