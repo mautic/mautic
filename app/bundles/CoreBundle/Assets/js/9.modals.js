@@ -64,7 +64,7 @@ Mautic.loadAjaxModal = function (target, route, method, header, footer, preventD
     }
 
     //move the modal to the body tag to get around positioned div issues
-    mQuery(target).on('show.bs.modal', function () {
+    mQuery(target).one('show.bs.modal', function () {
         if (header) {
             mQuery(target + " .modal-title").html(header);
         }
@@ -75,7 +75,7 @@ Mautic.loadAjaxModal = function (target, route, method, header, footer, preventD
     });
 
     //clean slate upon close
-    mQuery(target).on('hidden.bs.modal', function () {
+    mQuery(target).one('hidden.bs.modal', function () {
         if (typeof Mautic.modalContentXhr[target] != 'undefined') {
             Mautic.modalContentXhr[target].abort();
             delete Mautic.modalContentXhr[target];
