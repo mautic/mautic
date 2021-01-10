@@ -23,6 +23,17 @@ jobs:
     - name: Get tag name
       run: echo "MAUTIC_VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
 
+    - name: Check if tag name matches version in release_metadata.json
+      run: |
+        METADATA_VERSION=$(jq -r '.version' app/release_metadata.json)
+
+        if [[ "${{ env.MAUTIC_VERSION }}" != "$METADATA_VERSION" ]]; then
+          echo "❌ ERROR: tag name (${{ env.MAUTIC_VERSION }}) doesn't match version in app/release_metadata.json ($METADATA_VERSION). Please ensure that both versions match!"
+          exit 1
+        else
+          echo "✔ Tag name (${{ env.MAUTIC_VERSION }}) and the version in app/release_metadata.json ($METADATA_VERSION) match. Great!"
+        fi
+
     - name: Install dependencies
       # Force Composer to v1.10
       run: |
@@ -135,9 +146,17 @@ jobs:
         DB_PORT: ${{ job.services.mysql.ports[3306] }}
       run: |
         unzip -q ${{ env.MAUTIC_VERSION }}.zip -d ./mautic-testing
+        mkdir -p ./mautic-testing/var/logs
         cp ./.github/ci-files/local.php ./mautic-testing/app/config/local.php
         cd ./mautic-testing
         php bin/console mautic:install http://localhost
+
+    - name: Store log artifacts
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: install-logs
+        path: ./mautic-testing/var/logs/*
 
   test-update-install:
     name: Test updating from previous version
@@ -176,6 +195,7 @@ jobs:
       run: |
         curl -sSL https://github.com/mautic/mautic/releases/download/${{ env.MAUTIC_MINIMUM_VERSION }}/${{ env.MAUTIC_MINIMUM_VERSION }}.zip -o ${{ env.MAUTIC_MINIMUM_VERSION }}.zip
         unzip -q ${{ env.MAUTIC_MINIMUM_VERSION }}.zip -d ./mautic-testing
+        mkdir -p ./mautic-testing/var/logs
         cp ./.github/ci-files/local.php ./mautic-testing/app/config/local.php
         cd ./mautic-testing
         php bin/console mautic:install http://localhost
@@ -193,3 +213,10 @@ jobs:
       run: |
         php bin/console mautic:update:apply --force --update-package=${{ env.MAUTIC_VERSION }}-update.zip
         php bin/console mautic:update:apply --finish
+
+    - name: Store log artifacts
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: update-logs
+        path: ./mautic-testing/var/logs/*

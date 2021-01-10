@@ -63,7 +63,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         'PHP_AUTH_PW'   => 'mautic',
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->setUpSymfony(
             [
@@ -98,7 +98,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->mockServices();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         static::$class = null;
 
