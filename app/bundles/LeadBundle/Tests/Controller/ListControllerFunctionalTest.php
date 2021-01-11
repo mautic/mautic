@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
-use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -13,7 +12,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\Assert;
-use Psr\Cache\InvalidArgumentException;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -149,117 +148,133 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws ORMException
-     * @throws InvalidArgumentException
+     * @throws \Exception
      */
-    public function testSegmentCountOnPageLoad(): void
+    public function testSegmentCount(): void
     {
-        $segment = $this->saveSegment();
-        $id      = $segment->getId();
+        // Save segment.
+        $filters   = [
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'filter'   => null,
+                'display'  => null,
+                'operator' => '!empty',
+            ],
+        ];
+        $segment   = $this->saveSegment('Lead List 1', 'lead-list-1', $filters);
+        $segmentId = $segment->getId();
 
+        // Check segment count UI for no contacts.
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
-        $content = $crawler->filter('a.col-count')->filter('a[data-id="'.$id.'"]')->html();
+        $html    = $this->getSegmentCountHtml($crawler, $segmentId);
+        self::assertSame('No Contacts', $html);
 
-        self::assertSame('View 4 Contacts', trim($content));
-    }
+        // Add 4 contacts.
+        $contacts   = $this->saveContacts();
+        $contact1Id = $contacts[0]->getId();
 
-    /**
-     * @throws ORMException
-     * @throws InvalidArgumentException
-     */
-    public function testSegmentCountOnAjax(): void
-    {
-        $segment = $this->saveSegment2();
-        $id      = $segment->getId();
+        // Rebuild segment - set current count to the cache.
+        $cmdOutput = $this->runCommand('mautic:segments:update', ['-i' => $segmentId, '--env' => 'test']);
+        $outputArr = explode("\n", trim($cmdOutput));
+        $output    = end($outputArr);
+        self::assertSame('4 contact(s) affected', $output);
 
-        $parameter = ['id' => $id];
-        $response  = $this->callAjaxRequest($parameter);
+        // Check segment count UI for 4 contacts.
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $html    = $this->getSegmentCountHtml($crawler, $segmentId);
+        self::assertSame('View 4 Contacts', $html);
 
+        // Remove 1 contact from segment.
+        $this->client->request(Request::METHOD_POST, '/api/segments/'.$segmentId.'/contact/'.$contact1Id.'/remove');
+        self::assertSame('{"success":1}', $this->client->getResponse()->getContent());
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+
+        // Check segment count UI for 3 contacts.
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $html    = $this->getSegmentCountHtml($crawler, $segmentId);
+        self::assertSame('View 3 Contacts', $html);
+
+        // Add 1 contact back to segment.
+        $parameters = ['ids' => [$contact1Id]];
+        $this->client->request(Request::METHOD_POST, '/api/segments/'.$segmentId.'/contacts/add', $parameters);
+        self::assertSame('{"success":1,"details":{"1":{"success":true}}}', $this->client->getResponse()->getContent());
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+
+        // Check segment count UI for 4 contacts.
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $html    = $this->getSegmentCountHtml($crawler, $segmentId);
+        self::assertSame('View 4 Contacts', $html);
+
+        // Check segment count AJAX for 4 contacts.
+        $parameter = ['id' => $segmentId];
+        $response  = $this->callGetLeadCountAjaxRequest($parameter);
         self::assertSame('View 4 Contacts', $response['content']['html']);
         self::assertSame(4, $response['content']['leadCount']);
         self::assertSame(Response::HTTP_OK, $response['statusCode']);
 
-        // check count after ajax on page load
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
-        $content = $crawler->filter('a.col-count')->filter('a[data-id="'.$id.'"]')->html();
+        // Remove 1 contact from segment.
+        $this->client->request(Request::METHOD_POST, '/api/segments/'.$segmentId.'/contact/'.$contact1Id.'/remove');
+        self::assertSame('{"success":1}', $this->client->getResponse()->getContent());
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
 
-        self::assertSame('View 4 Contacts', trim($content));
+        // Check segment count AJAX for 3 contacts.
+        $parameter = ['id' => $segmentId];
+        $response  = $this->callGetLeadCountAjaxRequest($parameter);
+        self::assertSame('View 3 Contacts', $response['content']['html']);
+        self::assertSame(3, $response['content']['leadCount']);
+        self::assertSame(Response::HTTP_OK, $response['statusCode']);
 
-        // remove contact from segment
-        $segment = $this->removeContactFromSegment();
-        $id      = $segment->getId();
+        // Add 1 contact back to segment.
+        $parameters = ['ids' => [$contact1Id]];
+        $this->client->request(Request::METHOD_POST, '/api/segments/'.$segmentId.'/contacts/add', $parameters);
+        self::assertSame('{"success":1,"details":{"1":{"success":true}}}', $this->client->getResponse()->getContent());
+        self::assertSame(200, $this->client->getResponse()->getStatusCode());
 
-        // check count from cache after contact removed
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
-        $content = $crawler->filter('a.col-count')->filter('a[data-id="'.$id.'"]')->html();
-
-        self::assertSame('View 3 Contacts', trim($content));
+        // Check segment count AJAX for 4 contacts.
+        $parameter = ['id' => $segmentId];
+        $response  = $this->callGetLeadCountAjaxRequest($parameter);
+        self::assertSame('View 4 Contacts', $response['content']['html']);
+        self::assertSame(4, $response['content']['leadCount']);
+        self::assertSame(Response::HTTP_OK, $response['statusCode']);
     }
 
     public function testSegmentNotFoundOnAjax(): void
     {
-        // emulate invalid request parameter
+        // Emulate invalid request parameter.
         $parameter = ['id' => 'ABC'];
-        $response  = $this->callAjaxRequest($parameter);
+        $response  = $this->callGetLeadCountAjaxRequest($parameter);
 
         self::assertSame('No Contacts', $response['content']['html']);
         self::assertSame(0, $response['content']['leadCount']);
         self::assertSame(Response::HTTP_NOT_FOUND, $response['statusCode']);
     }
 
-    /**
-     * @throws ORMException
-     * @throws InvalidArgumentException
-     */
-    private function saveSegment2(): LeadList
+    private function saveContacts($count = 4): array
     {
-        $segment = new LeadList();
-        $segment->setName('Lead List 1');
-        $this->listModel->saveEntity($segment);
+        $contacts = [];
 
-        $contactA = new Lead();
-        $contactA->setFirstname('Contact A');
-
-        $contactB = new Lead();
-        $contactB->setFirstname('Contact B');
-
-        $contactC = new Lead();
-        $contactC->setFirstname('Contact C');
-
-        $contactD = new Lead();
-        $contactD->setFirstname('Contact D');
-
-        $contacts = [$contactA, $contactB, $contactC, $contactD];
+        for ($i = 1; $i <= $count; ++$i) {
+            $contact = new Lead();
+            $contact->setFirstname('Contact '.$i)->setEmail('contact'.$i.'@example.com');
+            $contacts[] = $contact;
+        }
 
         $this->leadRepo->saveEntities($contacts);
 
-        // add in cache
-        $this->listModel->addLead($contactA, $segment);
-        $this->listModel->addLead($contactB, $segment);
-        $this->listModel->addLead($contactC, $segment);
-        $this->listModel->addLead($contactD, $segment);
-
-        return $segment;
+        return $contacts;
     }
 
-    /**
-     * @throws ORMException
-     * @throws InvalidArgumentException
-     */
-    private function removeContactFromSegment(): LeadList
+    private function getSegmentCountHtml(Crawler $crawler, int $id): string
     {
-        $this->saveSegment2();
+        $content = $crawler->filter('a.col-count')->filter('a[data-id="'.$id.'"]')->html();
 
-        $segment  = $this->listRepo->findOneBy(['name' => 'Lead List 1']);
-        $contactA = $this->leadRepo->findOneBy(['firstname' => 'Contact A']);
-
-        // remove from cache
-        $this->listModel->removeLead($contactA, $segment);
-
-        return $segment;
+        return trim($content);
     }
 
-    private function callAjaxRequest(array $parameter): array
+    private function callGetLeadCountAjaxRequest(array $parameter): array
     {
         $this->client->request(Request::METHOD_POST, '/s/ajax?action=lead:getLeadCount', $parameter);
         $clientResponse = $this->client->getResponse();
