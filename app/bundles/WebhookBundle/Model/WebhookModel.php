@@ -656,10 +656,7 @@ class WebhookModel extends FormModel
         return 'webhook:webhooks';
     }
 
-    /**
-     * @return bool
-     */
-    private function isProcessingExpired()
+    private function isProcessingExpired(): bool
     {
         $currentTime = microtime(true);
         $runTime     = $currentTime - $this->startTime;
