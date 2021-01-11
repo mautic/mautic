@@ -177,10 +177,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         $contact1Id = $contacts[0]->getId();
 
         // Rebuild segment - set current count to the cache.
-        $cmdOutput = $this->runCommand('mautic:segments:update', ['-i' => $segmentId, '--env' => 'test']);
-        $outputArr = explode("\n", trim($cmdOutput));
-        $output    = end($outputArr);
-        self::assertSame('4 contact(s) affected', $output);
+        $this->runCommand('mautic:segments:update', ['-i' => $segmentId, '--env' => 'test']);
 
         // Check segment count UI for 4 contacts.
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
