@@ -197,7 +197,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         // Add 1 contact back to segment.
         $parameters = ['ids' => [$contact1Id]];
         $this->client->request(Request::METHOD_POST, '/api/segments/'.$segmentId.'/contacts/add', $parameters);
-        self::assertSame('{"success":1,"details":{"1":{"success":true}}}', $this->client->getResponse()->getContent());
+        self::assertSame('{"success":1,"details":{"'.$contact1Id.'":{"success":true}}}', $this->client->getResponse()->getContent());
         self::assertSame(200, $this->client->getResponse()->getStatusCode());
 
         // Check segment count UI for 4 contacts.
@@ -227,7 +227,7 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
         // Add 1 contact back to segment.
         $parameters = ['ids' => [$contact1Id]];
         $this->client->request(Request::METHOD_POST, '/api/segments/'.$segmentId.'/contacts/add', $parameters);
-        self::assertSame('{"success":1,"details":{"1":{"success":true}}}', $this->client->getResponse()->getContent());
+        self::assertSame('{"success":1,"details":{"'.$contact1Id.'":{"success":true}}}', $this->client->getResponse()->getContent());
         self::assertSame(200, $this->client->getResponse()->getStatusCode());
 
         // Check segment count AJAX for 4 contacts.
