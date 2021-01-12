@@ -174,7 +174,6 @@ trait MatchFilterForLeadTrait
 
                     if (in_array($leadVal, $filterVal)) {
                         $leadValNotMatched = false;
-                        break;
                     }
 
                     $groups[$groupNum] = $leadValNotMatched;
