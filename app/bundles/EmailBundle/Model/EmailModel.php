@@ -746,20 +746,20 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
             $key   = ($listCount > 1) ? 1 : 0;
 
-            $sentCounts         = $statRepo->getSentCount($emailIds, $lists->getKeys(), $query);
-            $readCounts         = $statRepo->getReadCount($emailIds, $lists->getKeys(), $query);
-            $failedCounts       = $statRepo->getFailedCount($emailIds, $lists->getKeys(), $query);
-            $clickCounts        = $trackableRepo->getCount('email', $emailIds, $lists->getKeys(), $query, false, 'DISTINCT ph.lead_id');
-            $unsubscribedCounts = $dncRepo->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, $lists->getKeys(), $query);
-            $bouncedCounts      = $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, $lists->getKeys(), $query);
+            $sentCounts         = $statRepo->getSentCount($emailIds, null, $query);
+            $readCounts         = $statRepo->getReadCount($emailIds, null, $query);
+            $failedCounts       = $statRepo->getFailedCount($emailIds, null, $query);
+            $clickCounts        = $trackableRepo->getCount('email', $emailIds, null, $query, false, 'DISTINCT ph.lead_id');
+            $unsubscribedCounts = $dncRepo->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, null, $query);
+            $bouncedCounts      = $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, null, $query);
 
             foreach ($lists as $l) {
-                $sentCount         = isset($sentCounts[$l->getId()]) ? $sentCounts[$l->getId()] : 0;
-                $readCount         = isset($readCounts[$l->getId()]) ? $readCounts[$l->getId()] : 0;
-                $failedCount       = isset($failedCounts[$l->getId()]) ? $failedCounts[$l->getId()] : 0;
-                $clickCount        = isset($clickCounts[$l->getId()]) ? $clickCounts[$l->getId()] : 0;
-                $unsubscribedCount = isset($unsubscribedCounts[$l->getId()]) ? $unsubscribedCounts[$l->getId()] : 0;
-                $bouncedCount      = isset($bouncedCounts[$l->getId()]) ? $bouncedCounts[$l->getId()] : 0;
+                $sentCount         = $sentCounts;
+                $readCount         = $readCounts;
+                $failedCount       = $failedCounts;
+                $clickCount        = $clickCounts;
+                $unsubscribedCount = $unsubscribedCounts;
+                $bouncedCount      = $bouncedCounts;
 
                 $chart->setDataset(
                     $l->getName(),
