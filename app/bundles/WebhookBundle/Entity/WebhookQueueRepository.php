@@ -49,18 +49,13 @@ class WebhookQueueRepository extends CommonRepository
             return 0;
         }
 
-        $qb    = $this->_em->getConnection()->createQueryBuilder();
-        $count = $qb->select('count(*) as webhook_count')
+        $qb = $this->_em->getConnection()->createQueryBuilder();
+
+        return (int) $qb->select('count(*) as webhook_count')
             ->from(MAUTIC_TABLE_PREFIX.'webhook_queue', $this->getTableAlias())
             ->where($this->getTableAlias().'.webhook_id = :id')
             ->setParameter('id', $id)
             ->execute()
-            ->fetch();
-
-        if (isset($count['webhook_count'])) {
-            return $count['webhook_count'];
-        }
-
-        return 0;
+            ->fetchColumn();
     }
 }
