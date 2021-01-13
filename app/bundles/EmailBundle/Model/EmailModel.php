@@ -741,8 +741,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         /** @var \Mautic\PageBundle\Entity\TrackableRepository $trackableRepo */
         $trackableRepo = $this->em->getRepository('MauticPageBundle:Trackable');
-        $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-        $key   = ($listCount > 1) ? 1 : 0;
+        $query         = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $key           = ($listCount > 1) ? 1 : 0;
 
         if ($listCount > 1) {
             $sentCounts         = $statRepo->getSentCount($emailIds, $lists->getKeys(), $query);
@@ -777,7 +777,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             }
         }
 
-        if($listCount) {
+        if ($listCount) {
             $combined = [
                 $statRepo->getSentCount($emailIds, null, $query),
                 $statRepo->getReadCount($emailIds, null, $query),
@@ -793,7 +793,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     $combined,
                     0
                 );
-            }else{
+            } else {
                 $chart->setDataset(
                     $lists->first()->getName(),
                     $combined,
