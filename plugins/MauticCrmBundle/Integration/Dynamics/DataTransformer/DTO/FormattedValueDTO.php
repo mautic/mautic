@@ -62,11 +62,6 @@ class FormattedValueDTO
         return $this->value;
     }
 
-    public function isFieldToPayload(): bool
-    {
-        return !$this->isLookupType() || ($this->isLookupType() && $this->value);
-    }
-
     public function isLookupType(): bool
     {
         if ($this->target) {
