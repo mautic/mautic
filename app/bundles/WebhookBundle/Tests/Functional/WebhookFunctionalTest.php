@@ -29,6 +29,16 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
         $this->truncateTables('leads', 'webhooks', 'webhook_queue', 'webhook_events');
     }
 
+    /**
+     * Clean up after the tests.
+     */
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->truncateTables('leads', 'webhooks', 'webhook_queue', 'webhook_events');
+    }
+
     public function testWebhookWorkflowWithCommandProcess()
     {
         $httpClient                    = new class() extends Client {
@@ -61,12 +71,11 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
         // At this point there should be 3 events waiting to be processed.
         Assert::assertSame(3, $webhookQueueRepository->getQueueCountByWebhookId($webhook->getId()));
 
-        $output = $this->runCommand(ProcessWebhookQueuesCommand::COMMAND_NAME, ['--webhook-id' => $webhook->getId()]);
+        $this->runCommand(ProcessWebhookQueuesCommand::COMMAND_NAME, ['--webhook-id' => $webhook->getId()]);
 
         // The queue should be processed now.
         Assert::assertSame(0, $webhookQueueRepository->getQueueCountByWebhookId($webhook->getId()));
         Assert::assertSame(1, $httpClient->sendRequestCounter);
-        Assert::assertStringContainsString('Webhook Processing Complete', $output);
     }
 
     private function createWebhook(): Webhook
