@@ -754,12 +754,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $bouncedCounts      = $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, null, $query);
 
             foreach ($lists as $l) {
-                $sentCount         = $sentCounts;
-                $readCount         = $readCounts;
-                $failedCount       = $failedCounts;
-                $clickCount        = $clickCounts;
-                $unsubscribedCount = $unsubscribedCounts;
-                $bouncedCount      = $bouncedCounts;
+                $sentCount         = isset($sentCounts[$l->getId()]) ? $sentCounts[$l->getId()] : 0;
+                $readCount         = isset($readCounts[$l->getId()]) ? $readCounts[$l->getId()] : 0;
+                $failedCount       = isset($failedCounts[$l->getId()]) ? $failedCounts[$l->getId()] : 0;
+                $clickCount        = isset($clickCounts[$l->getId()]) ? $clickCounts[$l->getId()] : 0;
+                $unsubscribedCount = isset($unsubscribedCounts[$l->getId()]) ? $unsubscribedCounts[$l->getId()] : 0;
+                $bouncedCount      = isset($bouncedCounts[$l->getId()]) ? $bouncedCounts[$l->getId()] : 0;
 
                 $chart->setDataset(
                     $l->getName(),
