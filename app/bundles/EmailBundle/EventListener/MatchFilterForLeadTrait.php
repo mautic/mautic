@@ -10,6 +10,8 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Mautic\LeadBundle\Segment\OperatorOptions;
+
 /**
  * Trait MatchFilterForLeadTrait.
  */
