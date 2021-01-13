@@ -671,7 +671,7 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param $action
+     * @param string $action
      *
      * @throws CacheException
      */
@@ -697,71 +697,21 @@ class CampaignController extends AbstractStandardFormController
                 $dateTo          = null;
                 $dateToPlusOne   = null;
                 $this->setCoreParametersHelper($this->get('mautic.config'));
+
                 if ($this->coreParametersHelper->get('campaign_by_range')) {
                     $dateFrom        = new \DateTimeImmutable($dateRangeForm->get('date_from')->getData());
                     $dateTo          = new \DateTimeImmutable($dateRangeForm->get('date_to')->getData());
                     $dateToPlusOne   = $dateTo->modify('+1 day');
                 }
 
-                if ($this->coreParametersHelper->get('campaign_use_summary')) {
-                    /** @var SummaryRepository $summaryRepo */
-                    $summaryRepo       = $this->getDoctrine()->getManager()->getRepository(Summary::class);
-                    $campaignLogCounts = $summaryRepo->getCampaignLogCounts($entity->getId(), $dateFrom, $dateToPlusOne);
-                } else {
-                    /** @var LeadEventLogRepository $eventLogRepo */
-                    $eventLogRepo             = $this->getDoctrine()->getManager()->getRepository(LeadEventLog::class);
-                    $campaignLogCounts        = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, true, $dateFrom, $dateToPlusOne);
-                    $pendingCampaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), false, false, false, $dateFrom, $dateToPlusOne);
-                }
+                $leadCount = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId());
+                $logCounts = $this->processCampaignLogCounts($entity->getId(), $dateFrom, $dateToPlusOne);
 
-                $leadCount    = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId(), null, [], $dateFrom, $dateToPlusOne);
-                $sortedEvents = [
-                    'decision'  => [],
-                    'action'    => [],
-                    'condition' => [],
-                ];
-                foreach ($events as &$event) {
-                    $event['logCountForPending'] =
-                    $event['percent']            =
-                    $event['yesPercent']         =
-                    $event['noPercent']          = 0;
+                $campaignLogCounts          = $logCounts['campaignLogCounts'] ?? [];
+                $campaignLogCountsProcessed = $logCounts['campaignLogCountsProcessed'] ?? [];
 
-                    if (isset($campaignLogCounts[$event['id']])) {
-                        $completedCount     = array_sum($campaignLogCounts[$event['id']]);
-                        $logCountsProcessed = isset($pendingCampaignLogCounts[$event['id']])
-                            ? array_sum($pendingCampaignLogCounts[$event['id']])
-                            : $completedCount;
-
-                        $event['logCountForPending'] = $completedCount - $logCountsProcessed;
-                        $event['logCountProcessed']  = $logCountsProcessed;
-
-                        [$totalNo, $totalYes] = $campaignLogCounts[$event['id']];
-                        $total                = $totalYes + $totalNo;
-
-                        if ($leadCount) {
-                            $event['percent']    = min(100, max(0, round(($completedCount / $total) * 100, 1)));
-                            $event['yesPercent'] = min(100, max(0, round(($totalYes / $total) * 100, 1)));
-                            $event['noPercent']  = min(100, max(0, round(($totalNo / $total) * 100, 1)));
-                        }
-                    }
-                }
-
-                // rewrite stats data from parent condition if exist
-                foreach ($events as &$event) {
-                    if (!empty($event['decisionPath']) && !empty($event['parent_id']) && isset($events[$event['parent_id']])) {
-                        $parentEvent                 = $events[$event['parent_id']];
-                        $event['logCountForPending'] = $parentEvent['logCountForPending'];
-                        $event['percent']            = $parentEvent['percent'];
-                        $event['yesPercent']         = $parentEvent['yesPercent'];
-                        $event['noPercent']          = $parentEvent['noPercent'];
-                        if ('yes' === $event['decisionPath']) {
-                            $event['noPercent'] = 0;
-                        } else {
-                            $event['yesPercent'] = 0;
-                        }
-                    }
-                    $sortedEvents[$event['eventType']][] = $event;
-                }
+                $events        = $this->processCampaignEvents($events, $leadCount, $campaignLogCounts, $campaignLogCountsProcessed);
+                $sortedEvents  = $this->processCampaignEventsFromParentCondition($events);
 
                 $stats = $this->getCampaignModel()->getCampaignMetricsLineChartData(
                     null,
@@ -771,9 +721,9 @@ class CampaignController extends AbstractStandardFormController
                     ['campaign_id' => $objectId]
                 );
 
-                $campaignSources = $this->getCampaignModel()->getSourceLists();
+                $sourcesList = $this->getCampaignModel()->getSourceLists();
 
-                $this->prepareCampaignSourcesForEdit($objectId, $campaignSources, true);
+                $this->prepareCampaignSourcesForEdit($objectId, $sourcesList, true);
                 $this->prepareCampaignEventsForEdit($entity, $objectId, true);
 
                 $args['viewParameters'] = array_merge(
@@ -918,5 +868,92 @@ class CampaignController extends AbstractStandardFormController
     protected function getSessionCanvasSettings($sessionId)
     {
         return $this->get('session')->get('mautic.campaign.'.$sessionId.'.events.canvassettings');
+    }
+
+    /**
+     * @throws CacheException
+     */
+    private function processCampaignLogCounts(int $id, ?\DateTimeImmutable $dateFrom, ?\DateTimeImmutable $dateToPlusOne): array
+    {
+        if ($this->coreParametersHelper->get('campaign_use_summary')) {
+            dump('campaign_use_summary');
+            /** @var SummaryRepository $summaryRepo */
+            $summaryRepo                = $this->getDoctrine()->getManager()->getRepository(Summary::class);
+            $campaignLogCounts          = $summaryRepo->getCampaignLogCounts($id, $dateFrom, $dateToPlusOne);
+            $campaignLogCountsProcessed = $summaryRepo->getCampaignLogCounts($id, $dateFrom, $dateToPlusOne);
+        } else {
+            dump('campaign_use_summary_not');
+            /** @var LeadEventLogRepository $eventLogRepo */
+            $eventLogRepo               = $this->getDoctrine()->getManager()->getRepository(LeadEventLog::class);
+            $campaignLogCounts          = $eventLogRepo->getCampaignLogCounts($id, false, false, true, $dateFrom, $dateToPlusOne);
+            $campaignLogCountsProcessed = $eventLogRepo->getCampaignLogCounts($id, false, false, false, $dateFrom, $dateToPlusOne);
+        }
+
+        return [
+            'campaignLogCounts'          => $campaignLogCounts,
+            'campaignLogCountsProcessed' => $campaignLogCountsProcessed,
+        ];
+    }
+
+    private function processCampaignEvents(array $events, int $leadCount, array $campaignLogCounts, array $campaignLogCountsProcessed): array
+    {
+        foreach ($events as &$event) {
+            $event['logCount']           =
+            $event['logCountForPending'] =
+            $event['logCountProcessed']  =
+            $event['percent']            =
+            $event['yesPercent']         =
+            $event['noPercent']          = 0;
+            $event['leadCount']          = $leadCount;
+
+            if (isset($campaignLogCounts[$event['id']])) {
+                $loggedCount                 = array_sum($campaignLogCounts[$event['id']]);
+                $logCountsProcessed          = isset($campaignLogCountsProcessed[$event['id']]) ? array_sum($campaignLogCountsProcessed[$event['id']]) : 0;
+                $pending                     = $loggedCount - $logCountsProcessed;
+                $event['logCount']           = $loggedCount;
+                $event['logCountForPending'] = $pending;
+                $event['logCountProcessed']  = $logCountsProcessed;
+                [$totalNo, $totalYes]        = $campaignLogCounts[$event['id']];
+                $total                       = $totalYes + $totalNo;
+
+                if ($leadCount) {
+                    $event['percent']    = min(100, max(0, round(($event['logCount'] / $total) * 100, 1)));
+                    $event['yesPercent'] = min(100, max(0, round(($totalYes / $total) * 100, 1)));
+                    $event['noPercent']  = min(100, max(0, round(($totalNo / $total) * 100, 1)));
+                }
+            }
+        }
+
+        return $events;
+    }
+
+    private function processCampaignEventsFromParentCondition(array $events): array
+    {
+        $sortedEvents = [
+            'decision'  => [],
+            'action'    => [],
+            'condition' => [],
+        ];
+
+        // rewrite stats data from parent condition if exist
+        foreach ($events as &$event) {
+            if (!empty($event['decisionPath']) &&
+                !empty($event['parent_id']) &&
+                isset($events[$event['parent_id']]) &&
+                'condition' !== $event['eventType']) {
+                $parentEvent                 = $events[$event['parent_id']];
+                $event['percent']            = $parentEvent['percent'];
+                $event['yesPercent']         = $parentEvent['yesPercent'];
+                $event['noPercent']          = $parentEvent['noPercent'];
+                if ('yes' === $event['decisionPath']) {
+                    $event['noPercent'] = 0;
+                } else {
+                    $event['yesPercent'] = 0;
+                }
+            }
+            $sortedEvents[$event['eventType']][] = $event;
+        }
+
+        return $sortedEvents;
     }
 }
