@@ -88,11 +88,6 @@ class MatchFilterForLeadTraitTestable
 {
     use MatchFilterForLeadTrait;
 
-    public function setRepository($segmentRepository): void
-    {
-        $this->segmentRepository = $segmentRepository;
-    }
-
     public function match(array $filter, array $lead): bool
     {
         return $this->matchFilterForLead($filter, $lead);
