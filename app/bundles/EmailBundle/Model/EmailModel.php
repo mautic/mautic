@@ -733,25 +733,24 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             ]
         );
 
-        if ($listCount) {
-            /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
-            $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
+        /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
+        $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
 
-            /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
-            $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
+        /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
+        $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
 
-            /** @var \Mautic\PageBundle\Entity\TrackableRepository $trackableRepo */
-            $trackableRepo = $this->em->getRepository('MauticPageBundle:Trackable');
+        /** @var \Mautic\PageBundle\Entity\TrackableRepository $trackableRepo */
+        $trackableRepo = $this->em->getRepository('MauticPageBundle:Trackable');
+        $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $key   = ($listCount > 1) ? 1 : 0;
 
-            $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-            $key   = ($listCount > 1) ? 1 : 0;
-
-            $sentCounts         = $statRepo->getSentCount($emailIds, null, $query);
-            $readCounts         = $statRepo->getReadCount($emailIds, null, $query);
-            $failedCounts       = $statRepo->getFailedCount($emailIds, null, $query);
-            $clickCounts        = $trackableRepo->getCount('email', $emailIds, null, $query, false, 'DISTINCT ph.lead_id');
-            $unsubscribedCounts = $dncRepo->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, null, $query);
-            $bouncedCounts      = $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, null, $query);
+        if ($listCount > 1) {
+            $sentCounts         = $statRepo->getSentCount($emailIds, $lists->getKeys(), $query);
+            $readCounts         = $statRepo->getReadCount($emailIds, $lists->getKeys(), $query);
+            $failedCounts       = $statRepo->getFailedCount($emailIds, $lists->getKeys(), $query);
+            $clickCounts        = $trackableRepo->getCount('email', $emailIds, $lists->getKeys(), $query, false, 'DISTINCT ph.lead_id');
+            $unsubscribedCounts = $dncRepo->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, $lists->getKeys(), $query);
+            $bouncedCounts      = $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, $lists->getKeys(), $query);
 
             foreach ($lists as $l) {
                 $sentCount         = isset($sentCounts[$l->getId()]) ? $sentCounts[$l->getId()] : 0;
@@ -776,19 +775,27 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
                 ++$key;
             }
+        }
 
+        if($listCount) {
             $combined = [
-                $statRepo->getSentCount($emailIds, $lists->getKeys(), $query, true),
-                $statRepo->getReadCount($emailIds, $lists->getKeys(), $query, true),
-                $statRepo->getFailedCount($emailIds, $lists->getKeys(), $query, true),
-                $trackableRepo->getCount('email', $emailIds, $lists->getKeys(), $query, true, 'DISTINCT ph.lead_id'),
-                $dncRepo->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, $lists->getKeys(), $query, true),
-                $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, $lists->getKeys(), $query, true),
+                $statRepo->getSentCount($emailIds, null, $query),
+                $statRepo->getReadCount($emailIds, null, $query),
+                $statRepo->getFailedCount($emailIds, null, $query),
+                $trackableRepo->getCount('email', $emailIds, null, $query, true, 'DISTINCT ph.lead_id'),
+                $dncRepo->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, null, $query),
+                $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, null, $query),
             ];
 
             if ($listCount > 1) {
                 $chart->setDataset(
                     $this->translator->trans('mautic.email.lists.combined'),
+                    $combined,
+                    0
+                );
+            }else{
+                $chart->setDataset(
+                    $lists->first()->getName(),
                     $combined,
                     0
                 );
