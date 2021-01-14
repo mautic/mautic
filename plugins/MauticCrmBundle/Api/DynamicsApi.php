@@ -122,7 +122,7 @@ class DynamicsApi extends CrmApi
      *
      * @return Response
      */
-    public function updateLead($data, $objectId)
+    public function updateLead($data, $objectId, $object = 'contacts')
     {
         $data     = $this->dynamicsDataTransformer->getData($object, $data);
         $response = $this->request(sprintf('%s(%s)', $object, $objectId), $data, 'PATCH', $object, []);

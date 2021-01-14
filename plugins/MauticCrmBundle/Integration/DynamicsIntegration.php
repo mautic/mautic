@@ -372,7 +372,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Dynamics', $object, 'lead', $lead->getId());
                 if (!empty($integrationId)) {
                     $integrationEntityId = $integrationId[0]['integration_entity_id'];
-                    $this->getApiHelper()->updateLead($mappedData, $integrationEntityId);
+                    $this->getApiHelper()->updateLead($mappedData, $integrationEntityId, $object);
 
                     return $integrationEntityId;
                 }
