@@ -25,42 +25,31 @@ use MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration;
 class DynamicsDataTransformer
 {
     /**
-     * @var FormattedValueDTO[]
-     */
-    private $dataObjects = [];
-
-    /**
      * @var DynamicsIntegration
      */
     private $dynamicsIntegration;
-
     /**
      * @var array
      */
     private $payloadData;
-
     /**
      * @var array
      */
     private $lookupReferencesToRemove;
-
     public function __construct(DynamicsIntegration $dynamicsIntegration)
     {
         $this->dynamicsIntegration = $dynamicsIntegration;
     }
-
     public function getData(string $object, array $data): array
     {
         $this->parseData($object, $data);
 
         return $this->payloadData;
     }
-
     public function getLookupReferencesToRemove(): array
     {
         return $this->lookupReferencesToRemove;
     }
-
     private function parseData(string $object, array $data): void
     {
         $fields = $this->dynamicsIntegration->getAvailableLeadFields();
