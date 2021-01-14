@@ -328,16 +328,33 @@ if (!$isEmbedded) {
                 <div class="panel-title"><?php echo $view['translator']->trans('mautic.email.preview.url'); ?></div>
             </div>
             <div class="panel-body pt-xs">
-                <div class="input-group">
-                    <div class="input-group-addon"><?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $email, 'model' => 'email', 'query' => 'customToggle=publicPreview']); ?></div>
-                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
-                           readonly
-                           value="<?php echo $view->escape($previewUrl); ?>"/>
-                    <span class="input-group-btn">
-                        <button class="btn btn-default btn-nospin" onclick="window.open('<?php echo $previewUrl; ?>', '_blank');">
-                            <i class="fa fa-external-link"></i>
-                        </button>
-                    </span>
+                <div class="row">
+                    <div class="form-group col-xs-12 ">
+                        <div class="control-label" for=""><?php echo $view['translator']->trans('mautic.email.preview.show.translation'); ?></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-xs-12 ">
+                        <div class="control-label" for=""><?php echo $view['translator']->trans('mautic.email.preview.show.ab.variant'); ?></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-xs-12 ">
+                        <div class="control-label" for=""><?php echo $view['translator']->trans('mautic.email.preview.show.contact'); ?></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-group">
+                        <div class="input-group-addon"><?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $email, 'model' => 'email', 'query' => 'customToggle=publicPreview']); ?></div>
+                            <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
+                               readonly
+                               value="<?php echo $view->escape($previewUrl); ?>"/>
+                            <span class="input-group-btn">
+                                <button class="btn btn-default btn-nospin" onclick="window.open('<?php echo $previewUrl; ?>', '_blank');">
+                                    <i class="fa fa-external-link"></i>
+                                </button>
+                            </span>
+                    </div>
                 </div>
             </div>
         </div>
