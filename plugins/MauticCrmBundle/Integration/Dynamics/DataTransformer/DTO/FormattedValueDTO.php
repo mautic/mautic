@@ -24,11 +24,6 @@ class FormattedValueDTO
     private $value;
 
     /**
-     * @var array
-     */
-    private $field;
-
-    /**
      * @var string|bool
      */
     private $target;
@@ -37,7 +32,6 @@ class FormattedValueDTO
     {
         $this->key    = $key;
         $this->value  = $value;
-        $this->field  = $field;
         $this->target = $field['target'] ?? false;
     }
 
