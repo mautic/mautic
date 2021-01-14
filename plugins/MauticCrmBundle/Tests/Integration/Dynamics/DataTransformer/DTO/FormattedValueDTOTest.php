@@ -29,7 +29,6 @@ class FormattedValueDTOTest extends TestCase
 
         $field['target'] = 'contact';
         self::assertEquals('key@odata.bind', $this->getFormattedValue($field)->getKeyForPayload());
-
     }
 
     public function testGetValueForPayload()

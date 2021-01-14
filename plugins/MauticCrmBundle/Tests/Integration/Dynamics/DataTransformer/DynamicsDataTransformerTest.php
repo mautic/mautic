@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 class DynamicsDataTransformerTest extends TestCase
 {
-
     /**
      * @var DynamicsDataTransformer
      */
@@ -29,10 +28,8 @@ class DynamicsDataTransformerTest extends TestCase
         self::assertSame(['lookupFieldToRemove'], $this->dynamicsDataTransformer->getLookupReferencesToRemove());
     }
 
-
     public function testPayloadData()
     {
-
         $payloadData = $this->getPayload();
         self::assertCount(2, $payloadData);
         self::assertArrayNotHasKey('lookupFieldToRemove', $payloadData);
