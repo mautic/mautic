@@ -156,8 +156,12 @@ class InputHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider urlProvider
+     *
+     * @param string $inputUrl
+     * @param string $outputUrl
+     * @param bool   $ignoreFragment
      */
-    public function testUrlSanitization(string $inputUrl, string $outputUrl, bool $ignoreFragment = false)
+    public function testUrlSanitization($inputUrl, $outputUrl, $ignoreFragment = false)
     {
         $cleanedUrl = InputHelper::url($inputUrl, false, null, null, [], $ignoreFragment);
 
