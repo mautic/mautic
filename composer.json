@@ -156,7 +156,7 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "test": "bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
+        "test": "bin/phpunit -d memory_limit=4G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
         "phpstan": "bin/phpstan analyse app/bundles app/migrations plugins",
         "cs": "bin/php-cs-fixer fix -v --dry-run --diff",
         "fixcs": "bin/php-cs-fixer fix -v",
