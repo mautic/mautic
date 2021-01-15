@@ -53,7 +53,7 @@ class CategoryType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber());
+        $builder->addEventSubscriber(new CleanFormSubscriber([]));
         $builder->addEventSubscriber(new FormExitSubscriber('category.category', $options));
 
         if (!$options['data']->getId()) {

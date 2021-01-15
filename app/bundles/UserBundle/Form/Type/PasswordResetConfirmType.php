@@ -26,7 +26,7 @@ class PasswordResetConfirmType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber());
+        $builder->addEventSubscriber(new CleanFormSubscriber([]));
 
         $builder->add('identifier', 'text', [
             'label'      => 'mautic.user.auth.form.loginusername',
