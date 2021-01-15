@@ -1,4 +1,4 @@
-[![codecov](https://codecov.io/gh/mautic/mautic/branch/feature/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
+[![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 
 Mautic Introduction
 ===========
