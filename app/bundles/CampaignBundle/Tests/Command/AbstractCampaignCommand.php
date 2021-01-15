@@ -41,7 +41,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
     /**
      * @throws \Exception
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         // Everything needs to happen anonymously
         $this->defaultClientServer = $this->clientServer;
@@ -73,7 +73,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         $this->em->getConnection()->exec($sql);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 

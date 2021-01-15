@@ -75,7 +75,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $response = json_decode($clientResponse->getContent(), true);
         $this->assertTrue(isset($response['closeModal']), 'The response does not contain the `closeModal` param.');
         $this->assertTrue($response['closeModal']);
-        $this->assertContains('3 contacts affected', $response['flashes']);
+        $this->assertStringContainsString('3 contacts affected', $response['flashes']);
 
         $payload = [
             'lead_batch' => [
@@ -116,7 +116,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $response = json_decode($clientResponse->getContent(), true);
         $this->assertTrue(isset($response['closeModal']), 'The response does not contain the `closeModal` param.');
         $this->assertTrue($response['closeModal']);
-        $this->assertContains('3 contacts affected', $response['flashes']);
+        $this->assertStringContainsString('3 contacts affected', $response['flashes']);
     }
 
     public function testCompanyChangesAreTrackedWhenContactAddedViaUI(): void
@@ -177,6 +177,46 @@ class LeadControllerTest extends MauticMysqlTestCase
         );
     }
 
+    /**
+     * Only tests if an actual CSV file is returned and if the content size isn't suspiciously small.
+     * We do more in-depth tests in \Mautic\CoreBundle\Tests\Unit\Helper\ExportHelperTest.
+     */
+    public function testCsvIsExportedCorrectly()
+    {
+        $this->loadFixtures([LoadLeadData::class]);
+
+        ob_start();
+        $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=csv');
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'text/csv; charset=UTF-8');
+        $this->assertEquals(true, (strlen($content) > 5000));
+    }
+
+    /**
+     * Only tests if an actual Excel file is returned and if the content size isn't suspiciously small.
+     * We do more in-depth tests in \Mautic\CoreBundle\Tests\Unit\Helper\ExportHelperTest.
+     */
+    public function testExcelIsExportedCorrectly()
+    {
+        $this->loadFixtures([LoadLeadData::class]);
+
+        ob_start();
+        $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=xlsx');
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $this->assertEquals(true, (strlen($content) > 10000));
+    }
+
     private function getMembersForCampaign(int $campaignId): array
     {
         return $this->connection->createQueryBuilder()
@@ -185,5 +225,16 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->where("cl.campaign_id = {$campaignId}")
             ->execute()
             ->fetchAll();
+    }
+
+    /**
+     * @testdox Ensure correct Preferred Timezone placeholder on add/edit contact page
+     */
+    public function testEnsureCorrectPreferredTimeZonePlaceHolderOnContactPage(): void
+    {
+        $crawler             = $this->client->request('GET', '/s/contacts/new');
+        $elementPlaceholder  = $crawler->filter('#lead_timezone')->filter('select')->attr('data-placeholder');
+        $expectedPlaceholder = $this->container->get('translator')->trans('mautic.lead.field.timezone');
+        $this->assertEquals($expectedPlaceholder, $elementPlaceholder);
     }
 }
