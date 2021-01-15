@@ -29,7 +29,7 @@ class ModelFactoryTest extends TestCase
      */
     private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
         $this->factory   = new ModelFactory($this->container);

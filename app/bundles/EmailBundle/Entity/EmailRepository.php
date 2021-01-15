@@ -615,4 +615,25 @@ class EmailRepository extends CommonRepository
 
         return $q;
     }
+
+    /**
+     * Is one of emails unpublished?
+     *
+     * @return bool
+     */
+    public function isOneUnpublished(array $ids)
+    {
+        $result = $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select($this->getTableAlias().'.id')
+            ->from('MauticEmailBundle:Email', $this->getTableAlias(), $this->getTableAlias().'.id')
+            ->where($this->getTableAlias().'.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->andWhere('e.isPublished = 0')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return (bool) $result;
+    }
 }

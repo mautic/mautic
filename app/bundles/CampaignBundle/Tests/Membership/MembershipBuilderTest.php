@@ -42,7 +42,7 @@ class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
      */
     private $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->manager                  = $this->createMock(MembershipManager::class);
         $this->campaignMemberRepository = $this->createMock(LeadRepository::class);

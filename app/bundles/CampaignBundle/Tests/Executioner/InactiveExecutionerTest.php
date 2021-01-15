@@ -52,7 +52,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
      */
     private $eventExecutioner;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->inactiveContactFinder = $this->getMockBuilder(InactiveContactFinder::class)
             ->disableOriginalConstructor()
