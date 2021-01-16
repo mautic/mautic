@@ -25,7 +25,7 @@ class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $statRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->statRepository = $this->createMock(StatRepository::class);
     }
