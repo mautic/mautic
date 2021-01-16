@@ -61,6 +61,14 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     'customButtons' => $buttons,
 ]));
 ?>
+<?php if (true === $phpVersion['isOutdated']): ?>
+<div class="row pt-md pl-md">
+    <div class="alert alert-warning col-md-12">
+        <h3><?php echo $view['translator']->trans('mautic.dashboard.phpversionwarning.title'); ?></h3>
+        <p><?php echo $view['translator']->trans('mautic.dashboard.phpversionwarning.body', ['%phpversion%' => $phpVersion['version']]); ?></p>
+    </div>
+</div>
+<?php endif; ?>
 <div class="row pt-md pl-md">
     <div class="col-sm-6">
         <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', ['dateRangeForm' => $dateRangeForm]); ?>
