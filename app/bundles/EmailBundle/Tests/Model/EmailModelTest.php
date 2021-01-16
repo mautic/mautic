@@ -615,7 +615,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
     private function getEmailListStats(ArrayCollection $lists)
     {
-        $trackableRepo  = $this->createMock(TrackableRepository::class);
+        $trackableRepo    = $this->createMock(TrackableRepository::class);
         $doNotContactRepo = $this->createMock(DoNotContactRepository::class);
 
         $this->entityManager->expects($this->any())
@@ -629,7 +629,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
                     ]
                 )
             );
-
 
         $this->emailEntity->method('getLists')->willReturn($lists);
 
