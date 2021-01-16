@@ -21,8 +21,6 @@ class PhpVersionHelper
     /**
      * For example, if the PHP version is 7.2.34-9+0\~20210112.53+debian10\~1.gbpfdd1e6,
      * this function will return 7.2.34. This is the semver MAJOR.MINOR.PATCH format.
-     *
-     * @return void
      */
     public static function getCurrentSemver(): string
     {
