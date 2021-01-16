@@ -10,7 +10,7 @@
  */
 $isPrototype = ('__name__' == $form->vars['name']);
 $filterType  = $form['field']->vars['value'];
-$inGroup     = 'and' === $form->vars['data']['glue'];
+$inGroup     = (isset($form->vars['data']['glue']) && 'and' === $form->vars['data']['glue']);
 $object      = (isset($form->vars['data']['object'])) ? $form->vars['data']['object'] : 'lead';
 $class       = (isset($form->vars['data']['object']) && 'company' == $form->vars['data']['object']) ? 'fa-building' : 'fa-user';
 if (!$isPrototype && !isset($fields[$object][$filterType]['label'])) {
