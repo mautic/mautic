@@ -62,8 +62,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
 ]));
 ?>
 <?php if (true === $phpVersion['isOutdated']): ?>
-<div class="row pt-md pl-md">
-    <div class="alert alert-warning col-md-12">
+<div class="pt-md pl-md col-md-12">
+    <div class="pt-md pl-md alert alert-warning">
         <h3><?php echo $view['translator']->trans('mautic.dashboard.phpversionwarning.title'); ?></h3>
         <p><?php echo $view['translator']->trans('mautic.dashboard.phpversionwarning.body', ['%phpversion%' => $phpVersion['version']]); ?></p>
     </div>
