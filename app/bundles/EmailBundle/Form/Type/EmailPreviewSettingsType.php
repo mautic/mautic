@@ -6,7 +6,6 @@ namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\LookupType;
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Entity\EmailRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -16,16 +15,6 @@ class EmailPreviewSettingsType extends AbstractType
 {
     private const CHOICE_TRANSLATION = 'translation';
     private const CHOICE_VARIANT     = 'variant';
-
-    /**
-     * @var EmailRepository
-     */
-    private $emailRepository;
-
-    public function __construct(EmailRepository $emailRepository)
-    {
-        $this->emailRepository = $emailRepository;
-    }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {

@@ -531,9 +531,7 @@ return [
             ],
             'mautic.form.type.email.preview.settings' => [
                 'class'     => \Mautic\EmailBundle\Form\Type\EmailPreviewSettingsType::class,
-                'arguments' => [
-                    'mautic.email.repository.email',
-                ],
+                'arguments' => [],
             ],
         ],
         'models' => [

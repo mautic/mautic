@@ -637,20 +637,6 @@ class EmailRepository extends CommonRepository
             ->andWhere('lc.manually_removed = 1');
     }
 
-    public function fetchPublishedEmailTranslationsById(int $emailId)
-    {
-        $qb = $this->getPublishedEmailsWithVariantQb();
-
-        return $qb->getQuery()->getResult();
-    }
-
-    public function fetchPublishedEmailVariantsById(int $mailId)
-    {
-        $qb = $this->getPublishedEmailsWithVariantQb();
-
-        return $qb->getQuery()->getResult();
-    }
-
     private function getPublishedEmailsWithVariantQb(): \Doctrine\ORM\QueryBuilder
     {
         $qb = $this->getEntityManager()
