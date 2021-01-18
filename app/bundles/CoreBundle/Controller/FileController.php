@@ -19,6 +19,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class FileController extends AjaxController
 {
+    const EDITOR_FROALA   = 'froala';
+    const EDITOR_CKEDITOR = 'ckeditor';
+
     protected $imageMimes = [
         'image/gif',
         'image/jpeg',
@@ -40,15 +43,16 @@ class FileController extends AjaxController
      */
     public function uploadAction()
     {
+        $editor   = $this->request->get('editor', 'froala');
         $mediaDir = $this->getMediaAbsolutePath();
         if (!isset($this->response['error'])) {
             foreach ($this->request->files as $file) {
                 if (in_array($file->getMimeType(), $this->imageMimes)) {
                     $fileName = md5(uniqid()).'.'.$file->guessExtension();
                     $file->move($mediaDir, $fileName);
-                    $this->response['link'] = $this->getMediaUrl().'/'.$fileName;
+                    $this->getSuccessResponse($fileName, $editor);
                 } else {
-                    $this->response['error'] = 'The uploaded image does not have an allowed mime type';
+                    $this->getFailureResponse($editor);
                 }
             }
         }
@@ -142,5 +146,26 @@ class FileController extends AjaxController
             .$this->request->getHttpHost()
             .$this->request->getBasePath().'/'
             .$this->coreParametersHelper->get('image_path');
+    }
+
+    private function getSuccessResponse(string $fileName, string $editor): void
+    {
+        $filePath = $this->getMediaUrl().'/'.$fileName;
+        if (self::EDITOR_CKEDITOR === $editor) {
+            $this->response['uploaded'] = true;
+            $this->response['url']      = $filePath;
+        } else {
+            $this->response['link'] = $filePath;
+        }
+    }
+
+    private function getFailureResponse(string $editor): void
+    {
+        if (self::EDITOR_CKEDITOR === $editor) {
+            $this->response['uploaded']         = false;
+            $this->response['error']['message'] = 'The uploaded image does not have an allowed mime type';
+        } else {
+            $this->response['error'] = 'The uploaded image does not have an allowed mime type';
+        }
     }
 }

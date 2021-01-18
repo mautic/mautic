@@ -1,3 +1,5 @@
+let ckEditors = new Map();
+
 /**
  * Takes a given route, retrieves the HTML, and then updates the content
  *
@@ -591,21 +593,18 @@ Mautic.onPageLoad = function (container, response, inModal) {
             var textarea = mQuery(this);
 
             // init AtWho in a froala editor
-            if (textarea.hasClass('editor-builder-tokens')) {
-                textarea.on('froalaEditor.initialized', function (e, editor) {
-                    Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'), editor);
-                });
+            // if (textarea.hasClass('editor-builder-tokens')) {
+            //     textarea.on('froalaEditor.initialized', function (e, editor) {
+            //         Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'), editor);
+            //     });
+            //
+            //     textarea.on('froalaEditor.focus', function (e, editor) {
+            //         Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'), editor);
+            //     });
+            // }
 
-                textarea.on('froalaEditor.focus', function (e, editor) {
-                    Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'), editor);
-                });
-            }
 
-            textarea.on('froalaEditor.blur', function (e, editor) {
-                editor.popups.hideAll();
-            });
-
-            var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
+            var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'token', 'link', 'imageUpload', 'insertTable'];
             var minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
 
             if (textarea.hasClass('editor-email')) {
@@ -617,45 +616,62 @@ Mautic.onPageLoad = function (container, response, inModal) {
             }
 
             if (textarea.hasClass('editor-dynamic-content')) {
-                minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
+                minButtons = ['undo', 'redo', '|',  'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'imageUpload', 'mediaEmbed', 'insertTable'];
             }
 
             if (textarea.hasClass('editor-basic')) {
-                minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertTable', 'html', 'fullscreen'];
+                minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'imageUpload', 'mediaEmbed', 'insertTable'];
+            }
+
+            if (ckEditors.has( textarea[0] ))
+            {
+                ckEditors.get( textarea[0] ).destroy();
+                ckEditors.delete( textarea[0] )
             }
 
             if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
-                var options = {
-                    // Set custom buttons with separator between them.
-                    toolbarButtons: maxButtons,
-                    toolbarButtonsMD: maxButtons,
-                    heightMin: 300,
-                    useClasses: false
-                };
-
-                if (textarea.hasClass('editor-basic-fullpage')) {
-                    options.fullPage = true;
-                    options.htmlAllowedTags = ['.*'];
-                    options.htmlAllowedAttrs = ['.*'];
-                    options.htmlRemoveTags = [];
-                    options.lineBreakerTags = [];
-                }
-
-                textarea.on('froalaEditor.focus', function (e, editor) {
-                    Mautic.showChangeThemeWarning = true;
-                });
-
-                textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, options));
+                ClassicEditor
+                    .create( textarea[0], {
+                        toolbar: maxButtons,
+                        autosave: {
+                            save( editor ) {
+                                editor.updateSourceElement();
+                            }
+                        },
+                        ckfinder: {
+                            uploadUrl: Mautic.imageUploadURL+'?editor=ckeditor',
+                        }
+                    } )
+                    .then( editor => {
+                        ckEditors.set( textarea[0], editor);
+                        editor.ui.view.editable.element.style.height = '300px';
+                        editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
+                            Mautic.showChangeThemeWarning = isFocused;
+                        } );
+                    } )
+                    .catch( err => {
+                        console.error( err.stack );
+                    } );
             } else {
-                textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
-                    // Set custom buttons with separator between them.
-                    toolbarButtons: minButtons,
-                    toolbarButtonsMD: minButtons,
-                    toolbarButtonsSM: minButtons,
-                    toolbarButtonsXS: minButtons,
-                    heightMin: 100,
-                    useClasses: false
-                }));
+                ClassicEditor
+                    .create( textarea[0], {
+                         toolbar: minButtons,
+                        autosave: {
+                            save( editor ) {
+                                editor.updateSourceElement();
+                            },
+                            ckfinder: {
+                                uploadUrl: Mautic.imageUploadURL+'?editor=ckeditor',
+                            }
+                        },
+                    } )
+                    .then( editor => {
+                        ckEditors.set( textarea[0], editor);
+                        editor.ui.view.editable.element.style.height = '100px';
+                    } )
+                    .catch( err => {
+                        console.error( err.stack );
+                    } );
             }
         });
     }
@@ -838,9 +854,10 @@ Mautic.onPageUnload = function (container, response) {
             MauticVars.modalsReset = {};
         }
 
-        mQuery(container + ' textarea.editor').each(function () {
-            mQuery('textarea.editor').froalaEditor('destroy');
-        });
+        if (document.querySelector('.ck-editor__editable')) {
+            document.querySelector('.ck-editor__editable').ckeditorInstance.destroy();
+            ckEditors.clear();
+        }
 
         //turn off shuffle events
         mQuery('html')

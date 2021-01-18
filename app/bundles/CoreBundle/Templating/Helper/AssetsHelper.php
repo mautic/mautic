@@ -446,7 +446,7 @@ class AssetsHelper
         $assets = $this->assetHelper->getAssets();
 
         if ($includeEditor) {
-            $assets['js'] = array_merge($assets['js'], $this->getFroalaScripts());
+            $assets['js'] = array_merge($assets['js'], $this->getFroalaScripts(), $this->getCKEditorScripts());
         }
 
         if (isset($assets['js'])) {
@@ -469,7 +469,7 @@ class AssetsHelper
         $assets = $this->assetHelper->getAssets();
 
         if ($includeEditor) {
-            $assets['js'] = array_merge($assets['js'], $this->getFroalaScripts());
+            $assets['js'] = array_merge($assets['js'], $this->getFroalaScripts(), $this->getCKEditorScripts());
         }
 
         if ($render) {
@@ -484,6 +484,21 @@ class AssetsHelper
         }
 
         return $assets['js'];
+    }
+
+    /**
+     * Load Froala JS source files.
+     *
+     * @return array
+     */
+    public function getCKEditorScripts()
+    {
+        $base    = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/';
+        $plugins = $base.'plugins/';
+
+        return [
+            $base.'ckeditor.js?v'.$this->version,
+        ];
     }
 
     /**

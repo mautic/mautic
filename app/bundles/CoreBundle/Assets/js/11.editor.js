@@ -1,6 +1,10 @@
 Mautic.builderTokens = {};
 Mautic.dynamicContentTokens = {};
 Mautic.builderTokensRequestInProgress = false;
+Mautic.imageManagerLoadURL = mauticBaseUrl + 's/file/list';
+Mautic.imageUploadURL = mauticBaseUrl + 's/file/upload';
+Mautic.imageManagerDeleteURL = mauticBaseUrl + 's/file/delete';
+
 
     /**
  * Activate Froala options
@@ -8,9 +12,9 @@ Mautic.builderTokensRequestInProgress = false;
 Mautic.activateGlobalFroalaOptions = function() {
     Mautic.basicFroalaOptions = {
         enter: mQuery.FroalaEditor.ENTER_BR,
-        imageUploadURL: mauticBaseUrl + 's/file/upload',
-        imageManagerLoadURL: mauticBaseUrl + 's/file/list',
-        imageManagerDeleteURL: mauticBaseUrl + 's/file/delete',
+        imageUploadURL: Mautic.imageUploadURL,
+        imageManagerLoadURL: Mautic.imageManagerLoadURL,
+        imageManagerDeleteURL: Mautic.imageManagerDeleteURL,
         imageDefaultWidth: 0,
         pastePlain: true,
         htmlAllowedTags: ['a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base', 'bdi', 'bdo', 'blockquote', 'br', 'button', 'canvas', 'caption', 'cite', 'code', 'col', 'colgroup', 'datalist', 'dd', 'del', 'details', 'dfn', 'dialog', 'div', 'dl', 'dt', 'em', 'embed', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'i', 'iframe', 'img', 'input', 'ins', 'kbd', 'keygen', 'label', 'legend', 'li', 'link', 'main', 'map', 'mark', 'menu', 'menuitem', 'meter', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'option', 'output', 'p', 'param', 'pre', 'progress', 'queue', 'rp', 'rt', 'ruby', 's', 'samp', 'script', 'style', 'section', 'select', 'small', 'source', 'span', 'strike', 'strong', 'sub', 'summary', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'time', 'title', 'tr', 'track', 'u', 'ul', 'var', 'video', 'wbr', 'center'],
@@ -146,3 +150,10 @@ Mautic.configureDynamicContentAtWhoTokens = function() {
         });
     }
 };
+
+Mautic.insertTextInEditor = function (obj, text) {
+    let ckEditor = ckEditors.get( obj[0] );
+    ckEditor.model.change( writer => {
+        writer.insertText( text, ckEditor.model.document.selection.getFirstPosition() );
+    } );
+}
