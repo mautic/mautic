@@ -31,7 +31,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
     /**
      * Sets up objects used in the tests.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $emMock = $this->getMockBuilder(EntityManager::class)
             ->setMethods(['none'])

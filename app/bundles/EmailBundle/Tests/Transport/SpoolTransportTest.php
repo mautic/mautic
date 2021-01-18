@@ -38,7 +38,7 @@ class SpoolTransportTest extends TestCase
      */
     private $sendEvent;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(\Swift_Events_EventDispatcher::class);
         $this->spool           = $this->createMock(DelegatingSpool::class);
