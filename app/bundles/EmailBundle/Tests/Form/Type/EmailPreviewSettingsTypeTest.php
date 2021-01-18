@@ -57,7 +57,12 @@ class EmailPreviewSettingsTypeTest extends TestCase
         $email->setId($emailId);
 
         $this->emailRepository->expects(self::once())
-            ->method('fetchPublishedEmailsWithVariantById')
+            ->method('fetchPublishedEmailTranslationsById')
+            ->with($emailId)
+            ->willReturn(null);
+
+        $this->emailRepository->expects(self::once())
+            ->method('fetchPublishedEmailVariantsById')
             ->with($emailId)
             ->willReturn(null);
 

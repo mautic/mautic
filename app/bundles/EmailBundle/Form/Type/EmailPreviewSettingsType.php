@@ -29,6 +29,8 @@ class EmailPreviewSettingsType extends AbstractType
         /** @var Email $email */
         $email = $options['email'];
 
+        $translations = $this->emailRepository->fetchPublishedEmailTranslationsById($email->getId());
+
         $builder->add(
             'translation',
             ChoiceType::class,
@@ -37,7 +39,7 @@ class EmailPreviewSettingsType extends AbstractType
             ]
         );
 
-        $variants = $this->emailRepository->fetchPublishedEmailsWithVariantById($email->getId());
+        $variants = $this->emailRepository->fetchPublishedEmailVariantsById($email->getId());
 
         $builder->add(
             'variant',
