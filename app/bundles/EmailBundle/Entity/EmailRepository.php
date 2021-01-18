@@ -637,7 +637,7 @@ class EmailRepository extends CommonRepository
             ->andWhere('lc.manually_removed = 1');
     }
 
-    private function getPublishedEmailsWithVariantQb(): \Doctrine\ORM\QueryBuilder
+    private function getPublishedEmailsWithVariantQb()
     {
         $qb = $this->getEntityManager()
                    ->createQueryBuilder();
