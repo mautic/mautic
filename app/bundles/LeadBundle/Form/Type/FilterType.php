@@ -108,6 +108,7 @@ class FilterType extends AbstractType
                 'stage',
                 'locales',
                 'globalcategory',
+                'forms',
             ]
         );
 

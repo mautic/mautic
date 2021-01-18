@@ -75,6 +75,18 @@ trait FilterTrait
                 $customOptions['choice_translation_domain'] = false;
                 $type                                       = ChoiceType::class;
                 break;
+            case 'forms':
+                if (!isset($data['filter'])) {
+                    $data['filter'] = [];
+                } elseif (!is_array($data['filter'])) {
+                    $data['filter'] = [$data['filter']];
+                }
+
+                $customOptions['choices']                   = $options['forms'];
+                $customOptions['multiple']                  = true;
+                $customOptions['choice_translation_domain'] = false;
+                $type                                       = ChoiceType::class;
+                break;
             case 'leadlist':
                 if (!isset($data['filter'])) {
                     $data['filter'] = [];
