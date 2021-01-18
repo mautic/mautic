@@ -424,7 +424,11 @@ class EmailController extends FormController
                         ]
                     )->getContent(),
                     'dateRangeForm'       => $dateRangeForm->createView(),
-                    'previewSettingsForm' => $this->createForm(EmailPreviewSettingsType::class)->createView(),
+                    'previewSettingsForm' => $this->createForm(
+                            EmailPreviewSettingsType::class,
+                            null,
+                            ['email' => $email]
+                        )->createView(),
                 ],
                 'contentTemplate' => 'MauticEmailBundle:Email:details.html.php',
                 'passthroughVars' => [

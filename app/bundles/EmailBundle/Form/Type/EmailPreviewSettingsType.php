@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\LookupType;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Component\Form\AbstractType;
@@ -31,6 +32,9 @@ class EmailPreviewSettingsType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        /** @var Email $email */
+        $email = $options['email'];
+
         $builder->add(
             'translation',
             ChoiceType::class,
@@ -38,6 +42,8 @@ class EmailPreviewSettingsType extends AbstractType
                 'choices' => [],
             ]
         );
+
+        $variants = $this->emailRepository->fetchPublishedEmailsWithVariantById($email->getId());
 
         $builder->add(
             'variant',
@@ -56,6 +62,9 @@ class EmailPreviewSettingsType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
+        $resolver->setDefaults(
+            ['email' => null]
+        );
     }
 
     /**

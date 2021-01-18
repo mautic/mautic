@@ -636,4 +636,11 @@ class EmailRepository extends CommonRepository
             ->where($qb->expr()->eq('e.id', $emailId))
             ->andWhere('lc.manually_removed = 1');
     }
+
+    public function fetchPublishedEmailsWithVariantById(int $mailId)
+    {
+        $qb = $this->getPublishedEmailsWithVariantQb();
+
+        return $qb->getQuery()->getResult();
+    }
 }
