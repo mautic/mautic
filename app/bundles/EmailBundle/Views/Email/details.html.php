@@ -328,18 +328,22 @@ if (!$isEmbedded) {
                 <div class="panel-title"><?php echo $view['translator']->trans('mautic.email.preview.url'); ?></div>
             </div>
             <div class="panel-body pt-xs">
+                <?php if (!empty($previewSettingsForm['translation'])) { ?>
                 <div class="row">
                     <div class="form-group col-xs-12 ">
                         <div class="control-label" for=""><?php echo $view['translator']->trans('mautic.email.preview.show.translation'); ?></div>
                         <?php echo $view['form']->widget($previewSettingsForm['translation']); ?>
                     </div>
                 </div>
+                <?php } ?>
+                <?php if (!empty($previewSettingsForm['variant'])) { ?>
                 <div class="row">
                     <div class="form-group col-xs-12 ">
                         <div class="control-label" for=""><?php echo $view['translator']->trans('mautic.email.preview.show.ab.variant'); ?></div>
                         <?php echo $view['form']->widget($previewSettingsForm['variant']); ?>
                     </div>
                 </div>
+                <?php } ?>
                 <div class="row">
                     <div class="form-group col-xs-12 ">
                         <div class="control-label" for=""><?php echo $view['translator']->trans('mautic.email.preview.show.contact'); ?></div>

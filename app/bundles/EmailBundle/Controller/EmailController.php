@@ -370,6 +370,20 @@ class EmailController extends FormController
         // Get click through stats
         $trackableLinks = $model->getEmailClickStats($email->getId());
 
+        $variants = [
+            'parent'             => $parent,
+            'children'           => $children,
+            'properties'         => isset($abTestSettings) ? $abTestSettings['variants'] : null,
+            'criteria'           => $criteria['criteria'],
+            'winnerCriteria'     => isset($abTestSettings) ? $abTestSettings['winnerCriteria'] : null,
+            'configurationError' => isset($abTestSettings) ? $abTestSettings['configurationError'] : null,
+        ];
+
+        $translations = [
+            'parent'   => $translationParent,
+            'children' => $translationChildren,
+        ];
+
         return $this->delegateView(
             [
                 'returnUrl' => $this->generateUrl(
@@ -384,17 +398,9 @@ class EmailController extends FormController
                     'trackables'   => $trackableLinks,
                     'logs'         => $logs,
                     'isEmbedded'   => $this->request->get('isEmbedded') ? $this->request->get('isEmbedded') : false,
-                    'variants'     => [
-                        'parent'     => $parent,
-                        'children'   => $children,
-                        'properties' => $properties,
-                        'criteria'   => $criteria['criteria'],
-                    ],
-                    'translations' => [
-                        'parent'   => $translationParent,
-                        'children' => $translationChildren,
-                    ],
-                    'permissions' => $security->isGranted(
+                    'variants'     => $variants,
+                    'translations' => $translations,
+                    'permissions'  => $security->isGranted(
                         [
                             'email:emails:viewown',
                             'email:emails:viewother',
@@ -427,7 +433,10 @@ class EmailController extends FormController
                     'previewSettingsForm' => $this->createForm(
                             EmailPreviewSettingsType::class,
                             null,
-                            ['email' => $email]
+                            [
+                                'variants'     => $variants,
+                                'translations' => $translations,
+                            ]
                         )->createView(),
                 ],
                 'contentTemplate' => 'MauticEmailBundle:Email:details.html.php',

@@ -14,6 +14,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailPreviewSettingsType extends AbstractType
 {
+    private const CHOICE_TRANSLATION = 'translation';
+    private const CHOICE_VARIANT     = 'variant';
+
     /**
      * @var EmailRepository
      */
@@ -26,28 +29,11 @@ class EmailPreviewSettingsType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        /** @var Email $email */
-        $email = $options['email'];
+        $translations = $options['translations'];
+        $variants     = $options['variants'];
 
-        $translations = $this->emailRepository->fetchPublishedEmailTranslationsById($email->getId());
-
-        $builder->add(
-            'translation',
-            ChoiceType::class,
-            [
-                'choices' => [],
-            ]
-        );
-
-        $variants = $this->emailRepository->fetchPublishedEmailVariantsById($email->getId());
-
-        $builder->add(
-            'variant',
-            ChoiceType::class,
-            [
-                'choices' => [],
-            ]
-        );
+        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TRANSLATION, $translations);
+        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_VARIANT, $variants);
 
         $builder->add(
             'contact',
@@ -59,7 +45,10 @@ class EmailPreviewSettingsType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
-            ['email' => null]
+            [
+                'variants'     => null,
+                'translations' => null,
+            ]
         );
     }
 
@@ -69,5 +58,43 @@ class EmailPreviewSettingsType extends AbstractType
     public function getBlockPrefix()
     {
         return 'email_preview_settings';
+    }
+
+    private function addTranslationOrVariantChoicesElement(FormBuilderInterface $builder, string $type, array $variants): void
+    {
+        if (!count($variants['children'])) {
+            return;
+        }
+
+        // Use order no in names to avoid missing choices with the same name
+        $orderNo = 1;
+
+        /** @var Email */
+        $child = $variants['parent'];
+
+        $variantChoices = [
+            // The first will be parent one
+            $this->addOrderNoToChoiceName($child->getName(), $orderNo) => $child->getId(),
+        ];
+
+        /** @var Email $child */
+        foreach ($variants['children'] as $child) {
+            // Add children
+            ++$orderNo;
+            $variantChoices[$this->addOrderNoToChoiceName($child->getName(), $orderNo)] = $child->getId();
+        }
+
+        $builder->add(
+            $type,
+            ChoiceType::class,
+            [
+                'choices' => $variantChoices,
+            ]
+        );
+    }
+
+    private function addOrderNoToChoiceName(string $name, int $orderNo): string
+    {
+        return "$name ($orderNo)";
     }
 }
