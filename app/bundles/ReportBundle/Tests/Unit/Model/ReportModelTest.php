@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Unit\Model;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ReportBundle\Model\ReportModel;
 use Symfony\Component\Form\FormFactory;
@@ -46,6 +47,7 @@ final class ReportModelTest extends MauticMysqlTestCase
             'source' => 'form.submissions',
             'is_scheduled' => 0,
         ];
+
         $this->connection->insert($this->prefix . 'reports', $reportData);
         $reportId = $this->connection->lastInsertId();
 
@@ -61,32 +63,41 @@ final class ReportModelTest extends MauticMysqlTestCase
 
         $ipData = [
             'ip_address' => '127.0.0.1',
-            'N;',
+            'ip_details' => 'N;',
         ];
 
-        $this->connection->insert($this->prefix . 'ip_address', $ipData);
-        $ipId = $this->connection->lastInsertId();
+        $this->connection->insert($this->prefix . 'ip_addresses', $ipData);
+        $ipAddressId = $this->connection->lastInsertId();
+
+        $utc = new \DateTimeZone('UTC');
+        $now = new \DateTime('now', $utc);
+        $aDayAgo = (clone $now)->modify('-1 day');
+        $twoDaysAgo = (clone $now)->modify('-2 days');
+        $format = 'Y-m-d H:i:s';
 
         $formSubmissionsData = [
             [
                 'form_id' => $formId,
-                'ip_id' => $ipId,
-                'date_submitted' => '2021-01-14 22:20:34'
+                'ip_id' => $ipAddressId,
+                'date_submitted' => $twoDaysAgo->format($format),
+                'referer' => 'https://mautic-cloud.local/index_dev.php/test',
             ],
             [
                 'form_id' => $formId,
-                'ip_id' => $ipId,
-                'date_submitted' => '2021-01-15 22:20:34'
+                'ip_id' => $ipAddressId,
+                'date_submitted' => $aDayAgo->format($format),
+                'referer' => 'https://mautic-cloud.local/index_dev.php/test',
             ],
             [
                 'form_id' => $formId,
-                'ip_id' => $ipId,
-                'date_submitted' => '2021-01-16 22:20:34'
+                'ip_id' => $ipAddressId,
+                'date_submitted' => $now->format($format),
+                'referer' => 'https://mautic-cloud.local/index_dev.php/test',
             ],
         ];
 
         foreach ($formSubmissionsData as $formSubmissionData) {
-            $this->connection->insert($this->prefix . 'form_submissions'. $formSubmissionData);
+            $this->connection->insert($this->prefix . 'form_submissions', $formSubmissionData);
         }
 
         $formFactory = $this->container->get('form.factory');
@@ -94,8 +105,13 @@ final class ReportModelTest extends MauticMysqlTestCase
         $reportModel = $this->container->get('mautic.model.factory')->getModel('report');
         $report = $reportModel->getEntity($reportId);
 
-        $options = [];
+        $aDayAgoBeginningOfTheDay = (clone $aDayAgo)->setTime(0, 0, 0);
 
-        $this->reportModel->getReportData($report, $formFactory, []);
+        $data = $this->reportModel->getReportData($report, $formFactory, [
+            'dateFrom' => $aDayAgoBeginningOfTheDay,
+            'dateTo' => clone $aDayAgoBeginningOfTheDay,
+        ]);
+
+        $a = 5;
     }
 }
