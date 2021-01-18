@@ -338,7 +338,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             $fromEmail = current(array_keys($from));
             $fromName  = $from[$fromEmail];
 
-            $sesArray['FromEmailAddress'] =  (!empty($fromName)) ? $fromName.' <'.$fromEmail.'>' : $fromEmail;
+            $sesArray['FromEmailAddress'] =  (!empty($fromName)) ? mb_encode_mimeheader($fromName).' <'.$fromEmail.'>' : $fromEmail;
             $to                           = $message->getTo();
             if (!empty($to)) {
                 $sesArray['Destination']['ToAddresses'] = array_keys($to);
