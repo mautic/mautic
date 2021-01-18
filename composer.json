@@ -125,7 +125,7 @@
         "webfactory/exceptions-bundle": "~4.3",
         "friendsofphp/php-cs-fixer": "~2.16.1",
         "liip/test-fixtures-bundle": "^1.6",
-        "phpstan/phpstan": "^0.12.19",
+        "phpstan/phpstan": "0.12.25",
         "rector/rector-prefixed": "0.6.13",
         "theofidry/psysh-bundle": "^v3.5.1",
         "symfony/phpunit-bridge": "~5.1.0",
@@ -156,7 +156,7 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "test": "bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
+        "test": "bin/phpunit -d memory_limit=4G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
         "phpstan": "bin/phpstan analyse app/bundles app/migrations plugins",
         "cs": "bin/php-cs-fixer fix -v --dry-run --diff",
         "fixcs": "bin/php-cs-fixer fix -v",

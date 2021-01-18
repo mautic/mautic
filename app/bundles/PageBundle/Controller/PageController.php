@@ -859,28 +859,30 @@ class PageController extends FormController
         $model  = $this->getModel('page.page');
         $entity = $model->getEntity($objectId);
 
-        if (null != $entity) {
-            $parent = $entity->getVariantParent();
+        if (!$entity) {
+            return $this->notFound();
+        }
 
-            if ($parent || !$this->get('mautic.security')->isGranted('page:pages:create') ||
+        $parent = $entity->getVariantParent();
+
+        if ($parent || !$this->get('mautic.security')->isGranted('page:pages:create') ||
                 !$this->get('mautic.security')->hasEntityAccess(
                     'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
                 )
             ) {
-                return $this->accessDenied();
-            }
-
-            $clone = clone $entity;
-
-            //reset
-            $clone->setHits(0);
-            $clone->setRevision(0);
-            $clone->setVariantHits(0);
-            $clone->setUniqueHits(0);
-            $clone->setVariantStartDate(null);
-            $clone->setIsPublished(false);
-            $clone->setVariantParent($entity);
+            return $this->accessDenied();
         }
+
+        $clone = clone $entity;
+
+        //reset
+        $clone->setHits(0);
+        $clone->setRevision(0);
+        $clone->setVariantHits(0);
+        $clone->setUniqueHits(0);
+        $clone->setVariantStartDate(null);
+        $clone->setIsPublished(false);
+        $clone->setVariantParent($entity);
 
         return $this->newAction($clone);
     }
