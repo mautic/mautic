@@ -533,7 +533,6 @@ return [
                 'class'     => \Mautic\EmailBundle\Form\Type\EmailPreviewSettingsType::class,
                 'arguments' => [
                     'mautic.email.repository.email',
-                    'mautic.lead.repository.lead',
                 ],
             ],
         ],

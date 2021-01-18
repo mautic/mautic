@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Form\Type\LookupType;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Form\Type\EmailPreviewSettingsType;
-use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -23,20 +22,14 @@ class EmailPreviewSettingsTypeTest extends TestCase
     private $emailRepository;
 
     /**
-     * @var LeadRepository|MockObject
-     */
-    private $contactRepository;
-
-    /**
      * @var EmailPreviewSettingsType|MockObject
      */
     private $form;
 
     protected function setUp()
     {
-        $this->emailRepository   = $this->createMock(EmailRepository::class);
-        $this->contactRepository = $this->createMock(LeadRepository::class);
-        $this->form              = new EmailPreviewSettingsType($this->emailRepository, $this->contactRepository);
+        $this->emailRepository = $this->createMock(EmailRepository::class);
+        $this->form            = new EmailPreviewSettingsType($this->emailRepository);
 
         parent::setUp();
     }
