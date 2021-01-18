@@ -15,6 +15,7 @@ namespace Mautic\ReportBundle\Tests\Unit\Model;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ReportBundle\Model\ReportModel;
+use Symfony\Component\Form\FormFactory;
 
 final class ReportModelTest extends MauticMysqlTestCase
 {
@@ -58,8 +59,43 @@ final class ReportModelTest extends MauticMysqlTestCase
         $this->connection->insert($this->prefix . 'forms', $formData);
         $formId = $this->connection->lastInsertId();
 
+        $ipData = [
+            'ip_address' => '127.0.0.1',
+            'N;',
+        ];
 
+        $this->connection->insert($this->prefix . 'ip_address', $ipData);
+        $ipId = $this->connection->lastInsertId();
 
-        $this->reportModel->getReportData();
+        $formSubmissionsData = [
+            [
+                'form_id' => $formId,
+                'ip_id' => $ipId,
+                'date_submitted' => '2021-01-14 22:20:34'
+            ],
+            [
+                'form_id' => $formId,
+                'ip_id' => $ipId,
+                'date_submitted' => '2021-01-15 22:20:34'
+            ],
+            [
+                'form_id' => $formId,
+                'ip_id' => $ipId,
+                'date_submitted' => '2021-01-16 22:20:34'
+            ],
+        ];
+
+        foreach ($formSubmissionsData as $formSubmissionData) {
+            $this->connection->insert($this->prefix . 'form_submissions'. $formSubmissionData);
+        }
+
+        $formFactory = $this->container->get('form.factory');
+        /** @var ReportModel $reportModel */
+        $reportModel = $this->container->get('mautic.model.factory')->getModel('report');
+        $report = $reportModel->getEntity($reportId);
+
+        $options = [];
+
+        $this->reportModel->getReportData($report, $formFactory, []);
     }
 }
