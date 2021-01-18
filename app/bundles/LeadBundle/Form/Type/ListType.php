@@ -25,6 +25,7 @@ use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
@@ -59,8 +60,9 @@ class ListType extends AbstractType
     private $assetChoices        = [];
     private $localeChoices       = [];
     private $categoriesChoices   = [];
+    private $formsChoices        = [];
 
-    public function __construct(TranslatorInterface $translator, ListModel $listModel, EmailModel $emailModel, CorePermissions $security, LeadModel $leadModel, StageModel $stageModel, CategoryModel $categoryModel, UserHelper $userHelper, CampaignModel $campaignModel, AssetModel $assetModel)
+    public function __construct(TranslatorInterface $translator, ListModel $listModel, EmailModel $emailModel, CorePermissions $security, LeadModel $leadModel, StageModel $stageModel, CategoryModel $categoryModel, UserHelper $userHelper, CampaignModel $campaignModel, AssetModel $assetModel, FormModel $formModel)
     {
         $this->translator = $translator;
 
@@ -103,6 +105,13 @@ class ListType extends AbstractType
             $this->assetChoices[$asset['language']][$asset['title']] = $asset['id'];
         }
         ksort($this->assetChoices);
+
+        $forms = $formModel->getRepository()->getFormList('', 0, 0, true);
+
+        foreach ($forms as $form) {
+            $this->formsChoices[$form['name']] = $form['id'];
+        }
+        ksort($this->formsChoices);
 
         $tags = $leadModel->getTagList();
         foreach ($tags as $tag) {
@@ -235,6 +244,7 @@ class ListType extends AbstractType
                         'stage'          => $this->stageChoices,
                         'locales'        => $this->localeChoices,
                         'globalcategory' => $this->categoriesChoices,
+                        'forms'          => $this->formsChoices,
                     ],
                     'error_bubbling' => false,
                     'mapped'         => true,
@@ -286,6 +296,7 @@ class ListType extends AbstractType
         $view->vars['stage']          = $this->stageChoices;
         $view->vars['locales']        = $this->localeChoices;
         $view->vars['globalcategory'] = $this->categoriesChoices;
+        $view->vars['forms']          = $this->formsChoices;
     }
 
     /**

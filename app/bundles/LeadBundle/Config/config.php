@@ -614,6 +614,7 @@ return [
                     'mautic.helper.user',
                     'mautic.campaign.model.campaign',
                     'mautic.asset.model.asset',
+                    'mautic.form.model.form',
                 ],
             ],
             'mautic.form.type.leadlist_choices' => [
