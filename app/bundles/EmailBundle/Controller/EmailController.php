@@ -21,6 +21,7 @@ use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\BatchSendType;
+use Mautic\EmailBundle\Form\Type\EmailPreviewSettingsType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Model\ListModel;
@@ -422,7 +423,8 @@ class EmailController extends FormController
                             'ignoreAjax' => true,
                         ]
                     )->getContent(),
-                    'dateRangeForm' => $dateRangeForm->createView(),
+                    'dateRangeForm'       => $dateRangeForm->createView(),
+                    'previewSettingsForm' => $this->createForm(EmailPreviewSettingsType::class)->createView(),
                 ],
                 'contentTemplate' => 'MauticEmailBundle:Email:details.html.php',
                 'passthroughVars' => [

@@ -529,6 +529,13 @@ return [
                 ],
                 'tag' => 'mautic.email_stat_helper',
             ],
+            'mautic.form.type.email.preview.settings' => [
+                'class'     => \Mautic\EmailBundle\Form\Type\EmailPreviewSettingsType::class,
+                'arguments' => [
+                    'mautic.email.repository.email',
+                    'mautic.lead.repository.lead',
+                ],
+            ],
         ],
         'models' => [
             'mautic.email.model.email' => [

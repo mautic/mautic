@@ -331,16 +331,19 @@ if (!$isEmbedded) {
                 <div class="row">
                     <div class="form-group col-xs-12 ">
                         <div class="control-label" for=""><?php echo $view['translator']->trans('mautic.email.preview.show.translation'); ?></div>
+                        <?php echo $view['form']->widget($previewSettingsForm['translation']); ?>
                     </div>
                 </div>
                 <div class="row">
                     <div class="form-group col-xs-12 ">
                         <div class="control-label" for=""><?php echo $view['translator']->trans('mautic.email.preview.show.ab.variant'); ?></div>
+                        <?php echo $view['form']->widget($previewSettingsForm['variant']); ?>
                     </div>
                 </div>
                 <div class="row">
                     <div class="form-group col-xs-12 ">
                         <div class="control-label" for=""><?php echo $view['translator']->trans('mautic.email.preview.show.contact'); ?></div>
+                        <?php echo $view['form']->widget($previewSettingsForm['contact']); ?>
                     </div>
                 </div>
                 <div class="row">
