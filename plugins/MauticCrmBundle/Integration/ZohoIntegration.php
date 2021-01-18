@@ -758,7 +758,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices'     => [
-                        'overwriteWithBlank' => 'mautic.zoho.form.blanks',
+                        'mautic.zoho.form.blanks' => 'overwriteWithBlank',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
