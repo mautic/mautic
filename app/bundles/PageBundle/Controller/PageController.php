@@ -21,6 +21,7 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PageController extends FormController
 {
@@ -211,7 +212,7 @@ class PageController extends FormController
         }
 
         //get A/B test information
-        list($parent, $children) = $activePage->getVariants();
+        [$parent, $children]     = $activePage->getVariants();
         $properties              = [];
         $variantError            = false;
         $weight                  = 0;
@@ -285,7 +286,7 @@ class PageController extends FormController
         );
 
         //get related translations
-        list($translationParent, $translationChildren) = $activePage->getTranslations();
+        [$translationParent, $translationChildren] = $activePage->getTranslations();
 
         return $this->delegateView([
             'returnUrl' => $this->generateUrl('mautic_page_action', [
@@ -327,7 +328,7 @@ class PageController extends FormController
                 'abTestResults' => $abTestResults,
                 'security'      => $security,
                 'pageUrl'       => $model->generateUrl($activePage, true),
-                'previewUrl'    => $this->generateUrl('mautic_page_preview', ['id' => $objectId], true),
+                'previewUrl'    => $this->generateUrl('mautic_page_preview', ['id' => $objectId], UrlGeneratorInterface::ABSOLUTE_URL),
                 'logs'          => $logs,
                 'dateRangeForm' => $dateRangeForm->createView(),
             ],
@@ -596,7 +597,7 @@ class PageController extends FormController
                 'sections'      => $this->buildSlotForms($sections),
                 'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
                 'sectionForm'   => $sectionForm->createView(),
-                'previewUrl'    => $this->generateUrl('mautic_page_preview', ['id' => $objectId], true),
+                'previewUrl'    => $this->generateUrl('mautic_page_preview', ['id' => $objectId], UrlGeneratorInterface::ABSOLUTE_URL),
                 'permissions'   => $security->isGranted(
                     [
                         'page:preference_center:editown',
