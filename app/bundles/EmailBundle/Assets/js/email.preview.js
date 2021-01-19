@@ -6,7 +6,7 @@ Mautic.emailPreview = {
 
     buildValueUrlPart  : function(name, value) {
 
-        if (value === undefined) {
+        if (value === undefined || value.length === 0) {
             return '';
         }
 
@@ -36,7 +36,10 @@ Mautic.emailPreview = {
 
     regenerateUrl : function() {
         let url = mauticBaseUrl + this.urlBase + '/' + this.getTranslationUrlPart() + this.getVariantUrlPart() + this.getContactUrlPart();
+        // Update url in preview input
         mQuery('#email_preview_url').val(url);
+        // Update URL in preview button
+        mQuery('#email_preview_url_button').attr('onClick', "window.open('" + url + "', '_blank');");
     }
 }
 

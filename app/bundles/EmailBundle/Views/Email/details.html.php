@@ -357,7 +357,7 @@ if (!$isEmbedded) {
                                readonly
                                value="<?php echo $view->escape($previewUrl); ?>"/>
                             <span class="input-group-btn">
-                                <button class="btn btn-default btn-nospin" onclick="window.open('<?php echo $previewUrl; ?>', '_blank');">
+                                <button id="email_preview_url_button" class="btn btn-default btn-nospin" onclick="window.open('<?php echo $previewUrl; ?>', '_blank');">
                                     <i class="fa fa-external-link"></i>
                                 </button>
                             </span>
