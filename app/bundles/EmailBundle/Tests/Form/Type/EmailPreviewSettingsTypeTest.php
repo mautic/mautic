@@ -32,7 +32,12 @@ class EmailPreviewSettingsTypeTest extends TestCase
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects(self::once())
             ->method('setDefaults')
-            ->with(['email' => null]);
+            ->with(
+                [
+                    'variants'     => null,
+                    'translations' => null,
+                ]
+            );
 
         $this->form->configureOptions($resolver);
     }
