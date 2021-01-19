@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Unit\Model;
 
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ReportBundle\Model\ReportModel;
+use PHPUnit\Framework\Assert;
 use Symfony\Component\Form\FormFactory;
 
 final class ReportModelTest extends MauticMysqlTestCase
@@ -39,6 +39,9 @@ final class ReportModelTest extends MauticMysqlTestCase
 
     public function testThatGetReportDataUsesCorrectDataRange(): void
     {
+        $columns = [
+            'fs.date_submitted',
+        ];
 
         $reportData = [
             'is_published' => 1,
@@ -46,6 +49,17 @@ final class ReportModelTest extends MauticMysqlTestCase
             'system' => 0,
             'source' => 'form.submissions',
             'is_scheduled' => 0,
+            'columns' => serialize($columns),
+            'filters' => serialize([]),
+            'table_order' => serialize([]),
+            'graphs' => serialize([]),
+            'group_by' => serialize([]),
+            'aggregators' => serialize([]),
+            'settings' => json_encode([
+                'showDynamicFilters' => 0,
+                'hideDateRangeFilter' => 0,
+                'showGraphsAboveTable' => 0
+            ]),
         ];
 
         $this->connection->insert($this->prefix . 'reports', $reportData);
@@ -70,6 +84,7 @@ final class ReportModelTest extends MauticMysqlTestCase
         $ipAddressId = $this->connection->lastInsertId();
 
         $utc = new \DateTimeZone('UTC');
+        // I know I can use \DateTimeImmutable, but getReportData expects \DateTime
         $now = new \DateTime('now', $utc);
         $aDayAgo = (clone $now)->modify('-1 day');
         $twoDaysAgo = (clone $now)->modify('-2 days');
@@ -100,18 +115,22 @@ final class ReportModelTest extends MauticMysqlTestCase
             $this->connection->insert($this->prefix . 'form_submissions', $formSubmissionData);
         }
 
+        /** @var FormFactory $formFactory */
         $formFactory = $this->container->get('form.factory');
+
         /** @var ReportModel $reportModel */
         $reportModel = $this->container->get('mautic.model.factory')->getModel('report');
+
         $report = $reportModel->getEntity($reportId);
 
         $aDayAgoBeginningOfTheDay = (clone $aDayAgo)->setTime(0, 0, 0);
 
-        $data = $this->reportModel->getReportData($report, $formFactory, [
+        $reportData = $this->reportModel->getReportData($report, $formFactory, [
             'dateFrom' => $aDayAgoBeginningOfTheDay,
             'dateTo' => clone $aDayAgoBeginningOfTheDay,
         ]);
 
-        $a = 5;
+        Assert::assertSame(1, $reportData['totalResults']);
+        Assert::assertCount(1, $reportData['data']);
     }
 }
