@@ -272,6 +272,9 @@ return [
             ],
             'mautic.campaign.model.summary' => [
                 'class'     => \Mautic\CampaignBundle\Model\SummaryModel::class,
+                'arguments' => [
+                    'mautic.campaign.repository.lead_event_log',
+                ],
             ],
         ],
         'repositories' => [

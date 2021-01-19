@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Model;
 
+use DateTimeInterface;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\Summary;
@@ -24,17 +25,29 @@ use Symfony\Component\Console\Output\OutputInterface;
 class SummaryModel extends AbstractCommonModel
 {
     /**
-     * @var ProgressBarHelper
-     */
-    private $progressBar;
-
-    /**
      * @var array
      */
     private $summaries = [];
 
     /**
+     * @var LeadEventLogRepository
+     */
+    private $leadEventLogRepository;
+
+    /**
+     * SummaryModel constructor.
+     */
+    public function __construct(LeadEventLogRepository $leadEventLogRepository)
+    {
+        $this->leadEventLogRepository = $leadEventLogRepository;
+    }
+
+    /**
      * Collapse Event Log entities into insert/update queries for the campaign summary.
+     *
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function updateSummary(iterable $logs): void
     {
@@ -43,7 +56,7 @@ class SummaryModel extends AbstractCommonModel
             /** @var LeadEventLog $log */
             $timestamp = $log->getDateTriggered()->getTimestamp();
             // Universally round down to the hour.
-            $timestamp = $timestamp - ($timestamp % 3600);
+            $timestamp -= ($timestamp % 3600);
             $campaign  = $log->getCampaign();
             $event     = $log->getEvent();
             $key       = $campaign->getId().'.'.$event->getId().'.'.$timestamp;
@@ -68,6 +81,8 @@ class SummaryModel extends AbstractCommonModel
             } elseif ($log->getSystemTriggered()) {
                 $summary->setTriggeredCount($summary->getTriggeredCount() + 1);
             }
+
+            $this->setSummaryLogCountsProcessed($summary);
         }
 
         if (count($this->summaries) >= 100) {
@@ -97,7 +112,7 @@ class SummaryModel extends AbstractCommonModel
             $start = $this->getRepository()->getOldestTriggeredDate();
         }
         // Start with the last complete hour.
-        $start = $start ? $start : new \DateTime('-1 hour');
+        $start = $start ?? new \DateTime('-1 hour');
         $start->setTimestamp($start->getTimestamp() - ($start->getTimestamp() % 3600));
 
         $end = $this->getCampaignLeadEventLogRepository()->getOldestTriggeredDate();
@@ -116,8 +131,8 @@ class SummaryModel extends AbstractCommonModel
                 $end = clone $start;
                 $end = $end->sub(new \DateInterval('PT'.intval($maxHours).'H'));
             }
-            $this->progressBar = ProgressBarHelper::init($output, $hours);
-            $this->progressBar->start();
+            $progressBar = ProgressBarHelper::init($output, $hours);
+            $progressBar->start();
 
             $interval = new \DateInterval('PT'.$hoursPerBatch.'H');
             $dateFrom = clone $start;
@@ -125,12 +140,15 @@ class SummaryModel extends AbstractCommonModel
             do {
                 $dateFrom = $dateFrom->sub($interval);
                 $output->write("\t".$dateFrom->format('Y-m-d H:i:s'));
-                $this->getRepository()->summarize($dateFrom, $dateTo);
-                $this->progressBar->advance($hoursPerBatch);
+                $summaryId = $this->getRepository()->summarize($dateFrom, $dateTo);
+                $this->processLogCountsProcessed($summaryId, $dateFrom, $dateTo);
+                $progressBar->advance($hoursPerBatch);
                 $dateTo = $dateTo->sub($interval);
             } while ($end < $dateFrom);
-            $this->progressBar->finish();
+            $progressBar->finish();
         }
+
+        $output->writeln("\n".'<info>Summary complete</info>');
     }
 
     public function getCampaignLeadEventLogRepository(): LeadEventLogRepository
@@ -139,6 +157,7 @@ class SummaryModel extends AbstractCommonModel
     }
 
     /**
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \Doctrine\DBAL\DBALException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
@@ -149,5 +168,71 @@ class SummaryModel extends AbstractCommonModel
             $this->summaries = [];
             $this->em->clear(Summary::class);
         }
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Cache\CacheException
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    private function processLogCountsProcessed(int $summaryId, \DateTime $dateFrom, \DateTime $dateTo): void
+    {
+        $summary = $this->getRepository()->find($summaryId);
+
+        if (!$summary instanceof Summary) {
+            return;
+        }
+
+        $campaignLogCountsProcessed = $this->getLogCountsProcessed($summary, $dateFrom, $dateTo);
+        $this->updateLogCountsProcessed($summary, $campaignLogCountsProcessed);
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Cache\CacheException
+     */
+    private function getLogCountsProcessed(
+        Summary $summary,
+        DateTimeInterface $dateFrom,
+        DateTimeInterface $dateTo
+    ): array {
+        $campaignId = $summary->getCampaign()->getId();
+        $eventId    = $summary->getEvent()->getId();
+
+        return $this->leadEventLogRepository->getCampaignLogCounts(
+            $campaignId,
+            false,
+            false,
+            false,
+            $dateFrom,
+            $dateTo,
+            $eventId
+        );
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    private function updateLogCountsProcessed(Summary $summary, array $campaignLogCountsProcessed): void
+    {
+        $summaryId = $summary->getId();
+        $eventId   = $summary->getEvent()->getId();
+
+        $logCountsProcessed = isset($campaignLogCountsProcessed[$eventId]) ? array_sum($campaignLogCountsProcessed[$eventId]) : 0;
+        $this->getRepository()->updateLogCountsProcessed($summaryId, $logCountsProcessed);
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Cache\CacheException
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    private function setSummaryLogCountsProcessed(Summary $summary): void
+    {
+        $dateTriggered              = $summary->getDateTriggered();
+        $dateTo                     = (clone $dateTriggered)->modify('+1 hour');
+        $campaignLogCountsProcessed = $this->getLogCountsProcessed($summary, $dateTriggered, $dateTo);
+
+        $eventId            = $summary->getEvent()->getId();
+        $logCountsProcessed = isset($campaignLogCountsProcessed[$eventId]) ? array_sum($campaignLogCountsProcessed[$eventId]) : 0;
+
+        $summary->setLogCountsProcessed($logCountsProcessed);
     }
 }
