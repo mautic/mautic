@@ -4,13 +4,13 @@ Mautic.emailPreview = {
 
     urlBase : 'email/preview',
 
-    buildValueUrlPart  : function(name, value) {
+    buildValueUrlPart  : function(parameterName, value) {
 
         if (value === undefined || value.length === 0) {
             return '';
         }
 
-        return name + '/' + value + '/';
+        return parameterName + '/' + value + '/';
     },
 
     getTranslationUrlPart : function() {
