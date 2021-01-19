@@ -21,10 +21,7 @@ class SummaryRepository extends CommonRepository
     use TimelineTrait;
     use ContactLimiterTrait;
 
-    /**
-     * @return string
-     */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return 's';
     }
@@ -37,7 +34,7 @@ class SummaryRepository extends CommonRepository
      * @throws \Doctrine\DBAL\DBALException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function saveEntities($entities)
+    public function saveEntities($entities): void
     {
         $values = [];
         foreach ($entities as $summary) {
@@ -52,18 +49,20 @@ class SummaryRepository extends CommonRepository
                     $summary->getTriggeredCount(),
                     $summary->getNonActionPathTakenCount(),
                     $summary->getFailedCount(),
+                    $summary->getLogCountsProcessed(),
                 ]
             );
         }
 
         $sql = 'INSERT INTO '.MAUTIC_TABLE_PREFIX.'campaign_summary '.
-            '(campaign_id, event_id, date_triggered, scheduled_count, triggered_count, non_action_path_taken_count, failed_count) '.
+            '(campaign_id, event_id, date_triggered, scheduled_count, triggered_count, non_action_path_taken_count, failed_count, log_counts_processed) '.
             'VALUES ('.implode('),(', $values).') '.
             'ON DUPLICATE KEY UPDATE '.
             'scheduled_count=scheduled_count+VALUES(scheduled_count), '.
             'triggered_count=triggered_count+VALUES(triggered_count), '.
             'non_action_path_taken_count=non_action_path_taken_count+VALUES(non_action_path_taken_count), '.
-            'failed_count=failed_count+VALUES(failed_count) ';
+            'failed_count=failed_count+VALUES(failed_count), '.
+            'log_counts_processed=log_counts_processed+VALUES(log_counts_processed) ';
 
         $this->getEntityManager()
             ->getConnection()
@@ -84,6 +83,7 @@ class SummaryRepository extends CommonRepository
                     'SUM(cs.triggered_count) as triggered_count',
                     'SUM(cs.non_action_path_taken_count) as non_action_path_taken_count',
                     'SUM(cs.failed_count) as failed_count',
+                    'SUM(cs.log_counts_processed) as log_counts_processed',
                 ]
             )
             ->from(MAUTIC_TABLE_PREFIX.'campaign_summary', 'cs')
@@ -104,6 +104,7 @@ class SummaryRepository extends CommonRepository
             $return[$row['event_id']] = [
                 0 => (int) $row['non_action_path_taken_count'],
                 1 => (int) $row['triggered_count'] + (int) $row['scheduled_count'],
+                2 => (int) $row['log_counts_processed'],
             ];
         }
 
@@ -131,10 +132,10 @@ class SummaryRepository extends CommonRepository
      *
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function summarize(\DateTime $dateFrom, \DateTime $dateTo): void
+    public function summarize(\DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): int
     {
         $sql = 'INSERT INTO '.MAUTIC_TABLE_PREFIX.'campaign_summary '.
-            '(campaign_id, event_id, date_triggered, scheduled_count, non_action_path_taken_count, failed_count, triggered_count) '.
+            '(campaign_id, event_id, date_triggered, scheduled_count, non_action_path_taken_count, failed_count, triggered_count, log_counts_processed) '.
             '    SELECT * FROM (SELECT '.
             '        t.campaign_id as campaign_id, '.
             '        t.event_id as event_id, '.
@@ -142,27 +143,43 @@ class SummaryRepository extends CommonRepository
             '        SUM(IF(t.is_scheduled = 1 AND t.trigger_date > NOW(), 1, 0)) as scheduled_count_i, '.
             '        SUM(IF(t.is_scheduled = 1 AND t.trigger_date > NOW(), 0, t.non_action_path_taken)) as non_action_path_taken_count_i, '.
             '        SUM(IF((t.is_scheduled = 1 AND t.trigger_date > NOW()) OR t.non_action_path_taken, 0, fe.log_id IS NOT NULL)) as failed_count_i, '.
-            '        SUM(IF((t.is_scheduled = 1 AND t.trigger_date > NOW()) OR t.non_action_path_taken OR fe.log_id IS NOT NULL, 0, 1)) as triggered_count_i '.
+            '        SUM(IF((t.is_scheduled = 1 AND t.trigger_date > NOW()) OR t.non_action_path_taken OR fe.log_id IS NOT NULL, 0, 1)) as triggered_count_i, '.
+            '        0'.
             '    FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log t '.
             '    LEFT JOIN '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log fe '.
             '        ON fe.log_id = t.id '.
             '    WHERE (t.date_triggered BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)) '.
             '    GROUP BY campaign_id, event_id, date_triggered) AS `s` '.
             'ON DUPLICATE KEY UPDATE '.
+            'id = LAST_INSERT_ID(id),'.
             'scheduled_count = scheduled_count + s.scheduled_count_i, '.
             'non_action_path_taken_count = non_action_path_taken_count + s.non_action_path_taken_count_i, '.
             'failed_count = failed_count + s.failed_count_i, '.
             'triggered_count = triggered_count + s.triggered_count_i; ';
 
-        $q = $this->getEntityManager()
-            ->getConnection()
-            ->prepare($sql);
+        $conn = $this->getEntityManager()->getConnection();
+        $stmt = $conn->prepare($sql);
 
         $dateFromTs = $dateFrom->getTimestamp();
-        $dateToTs   = $dateTo->getTimestamp();
-        $q->bindParam('dateFrom', $dateFromTs, \PDO::PARAM_INT);
-        $q->bindParam('dateTo', $dateToTs, \PDO::PARAM_INT);
+        $dateToTs   = $dateTo->getTimestamp() - 1;
+        $stmt->bindParam('dateFrom', $dateFromTs, \PDO::PARAM_INT);
+        $stmt->bindParam('dateTo', $dateToTs, \PDO::PARAM_INT);
 
-        $q->execute();
+        $stmt->execute();
+
+        return (int) $conn->lastInsertId();
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    public function updateLogCountsProcessed(int $summaryId, int $logCountsProcessed): void
+    {
+        $sql = 'UPDATE '.MAUTIC_TABLE_PREFIX.'campaign_summary SET log_counts_processed = '.$logCountsProcessed.
+            ' WHERE id = '.$summaryId;
+
+        $conn = $this->getEntityManager()->getConnection();
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
     }
 }
