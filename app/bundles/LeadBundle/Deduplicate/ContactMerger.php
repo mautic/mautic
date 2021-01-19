@@ -181,6 +181,11 @@ class ContactMerger
                 continue;
             }
 
+            if ($winner->getField($field) === false) {
+                // not merge disabled field
+                continue;
+            }
+
             try {
                 $fromValue    = empty($oldestFields[$field]) ? 'empty' : $oldestFields[$field];
                 $fieldDetails = $winner->getField($field);
