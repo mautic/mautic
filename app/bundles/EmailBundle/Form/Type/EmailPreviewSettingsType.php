@@ -15,6 +15,7 @@ class EmailPreviewSettingsType extends AbstractType
 {
     private const CHOICE_TYPE_TRANSLATION = 'translation';
     private const CHOICE_TYPE_VARIANT     = 'variant';
+    private const ON_CHANGE_CONTENT       = 'Mautic.emailPreview.regenerateUrl()';
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -27,7 +28,11 @@ class EmailPreviewSettingsType extends AbstractType
         $builder->add(
             'contact',
             LookupType::class,
-            []
+            [
+                'attr' => [
+                    'onChange' => self::ON_CHANGE_CONTENT,
+                ],
+            ]
         );
     }
 
@@ -81,6 +86,9 @@ class EmailPreviewSettingsType extends AbstractType
             ChoiceType::class,
             [
                 'choices' => $variantChoices,
+                'attr'    => [
+                    'onChange' => self::ON_CHANGE_CONTENT,
+                ],
             ]
         );
     }

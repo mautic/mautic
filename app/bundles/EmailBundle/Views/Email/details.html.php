@@ -353,7 +353,7 @@ if (!$isEmbedded) {
                 <div class="row">
                     <div class="input-group">
                         <div class="input-group-addon"><?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $email, 'model' => 'email', 'query' => 'customToggle=publicPreview']); ?></div>
-                            <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
+                            <input id="email_preview_url" onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
                                readonly
                                value="<?php echo $view->escape($previewUrl); ?>"/>
                             <span class="input-group-btn">
