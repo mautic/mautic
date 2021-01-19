@@ -62,7 +62,12 @@ class Summary
      */
     private $campaign;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    /**
+     * @var int|null
+     */
+    private $logCountsProcessed = 0;
+
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -87,6 +92,7 @@ class Summary
         $builder->addNamedField('triggeredCount', Types::INTEGER, 'triggered_count');
         $builder->addNamedField('nonActionPathTakenCount', Types::INTEGER, 'non_action_path_taken_count');
         $builder->addNamedField('failedCount', Types::INTEGER, 'failed_count');
+        $builder->addNamedField('logCountsProcessed', Types::INTEGER, 'log_counts_processed');
     }
 
     public function getScheduledCount(): ?int
@@ -166,5 +172,15 @@ class Summary
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getLogCountsProcessed(): ?int
+    {
+        return $this->logCountsProcessed;
+    }
+
+    public function setLogCountsProcessed(?int $logCountsProcessed): void
+    {
+        $this->logCountsProcessed = $logCountsProcessed;
     }
 }
