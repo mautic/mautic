@@ -699,9 +699,9 @@ class CampaignController extends AbstractStandardFormController
                 $this->setCoreParametersHelper($this->get('mautic.config'));
 
                 if ($this->coreParametersHelper->get('campaign_by_range')) {
-                    $dateFrom        = new \DateTimeImmutable($dateRangeForm->get('date_from')->getData());
-                    $dateTo          = new \DateTimeImmutable($dateRangeForm->get('date_to')->getData());
-                    $dateToPlusOne   = $dateTo->modify('+1 day');
+                    $dateFrom      = new \DateTimeImmutable($dateRangeForm->get('date_from')->getData());
+                    $dateTo        = new \DateTimeImmutable($dateRangeForm->get('date_to')->getData());
+                    $dateToPlusOne = $dateTo->modify('+1 day');
                 }
 
                 $leadCount = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId());
@@ -710,8 +710,8 @@ class CampaignController extends AbstractStandardFormController
                 $campaignLogCounts          = $logCounts['campaignLogCounts'] ?? [];
                 $campaignLogCountsProcessed = $logCounts['campaignLogCountsProcessed'] ?? [];
 
-                $events        = $this->processCampaignEvents($events, $leadCount, $campaignLogCounts, $campaignLogCountsProcessed);
-                $sortedEvents  = $this->processCampaignEventsFromParentCondition($events);
+                $events       = $this->processCampaignEvents($events, $leadCount, $campaignLogCounts, $campaignLogCountsProcessed);
+                $sortedEvents = $this->processCampaignEventsFromParentCondition($events);
 
                 $stats = $this->getCampaignModel()->getCampaignMetricsLineChartData(
                     null,
@@ -740,7 +740,6 @@ class CampaignController extends AbstractStandardFormController
                     ]
                 );
                 break;
-
             case 'new':
             case 'edit':
                 $args['viewParameters'] = array_merge(
@@ -876,13 +875,11 @@ class CampaignController extends AbstractStandardFormController
     private function processCampaignLogCounts(int $id, ?\DateTimeImmutable $dateFrom, ?\DateTimeImmutable $dateToPlusOne): array
     {
         if ($this->coreParametersHelper->get('campaign_use_summary')) {
-            dump('campaign_use_summary');
             /** @var SummaryRepository $summaryRepo */
             $summaryRepo                = $this->getDoctrine()->getManager()->getRepository(Summary::class);
             $campaignLogCounts          = $summaryRepo->getCampaignLogCounts($id, $dateFrom, $dateToPlusOne);
-            $campaignLogCountsProcessed = $summaryRepo->getCampaignLogCounts($id, $dateFrom, $dateToPlusOne);
+            $campaignLogCountsProcessed = $this->getCampaignLogCountsProcessed($campaignLogCounts);
         } else {
-            dump('campaign_use_summary_not');
             /** @var LeadEventLogRepository $eventLogRepo */
             $eventLogRepo               = $this->getDoctrine()->getManager()->getRepository(LeadEventLog::class);
             $campaignLogCounts          = $eventLogRepo->getCampaignLogCounts($id, false, false, true, $dateFrom, $dateToPlusOne);
@@ -898,26 +895,23 @@ class CampaignController extends AbstractStandardFormController
     private function processCampaignEvents(array $events, int $leadCount, array $campaignLogCounts, array $campaignLogCountsProcessed): array
     {
         foreach ($events as &$event) {
-            $event['logCount']           =
             $event['logCountForPending'] =
             $event['logCountProcessed']  =
             $event['percent']            =
             $event['yesPercent']         =
             $event['noPercent']          = 0;
-            $event['leadCount']          = $leadCount;
 
             if (isset($campaignLogCounts[$event['id']])) {
                 $loggedCount                 = array_sum($campaignLogCounts[$event['id']]);
                 $logCountsProcessed          = isset($campaignLogCountsProcessed[$event['id']]) ? array_sum($campaignLogCountsProcessed[$event['id']]) : 0;
                 $pending                     = $loggedCount - $logCountsProcessed;
-                $event['logCount']           = $loggedCount;
                 $event['logCountForPending'] = $pending;
                 $event['logCountProcessed']  = $logCountsProcessed;
                 [$totalNo, $totalYes]        = $campaignLogCounts[$event['id']];
                 $total                       = $totalYes + $totalNo;
 
                 if ($leadCount) {
-                    $event['percent']    = min(100, max(0, round(($event['logCount'] / $total) * 100, 1)));
+                    $event['percent']    = min(100, max(0, round(($loggedCount / $total) * 100, 1)));
                     $event['yesPercent'] = min(100, max(0, round(($totalYes / $total) * 100, 1)));
                     $event['noPercent']  = min(100, max(0, round(($totalNo / $total) * 100, 1)));
                 }
@@ -955,5 +949,18 @@ class CampaignController extends AbstractStandardFormController
         }
 
         return $sortedEvents;
+    }
+
+    private function getCampaignLogCountsProcessed(array &$campaignLogCounts): array
+    {
+        $campaignLogCountsProcessed = [];
+
+        foreach ($campaignLogCounts as $eventId => &$campaignLogCount) {
+            $count                                  = $campaignLogCount[2];
+            $campaignLogCountsProcessed[$eventId][] = $count;
+            unset($campaignLogCounts[$eventId][2]);
+        }
+
+        return $campaignLogCountsProcessed;
     }
 }
