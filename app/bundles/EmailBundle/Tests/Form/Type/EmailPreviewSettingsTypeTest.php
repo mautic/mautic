@@ -34,8 +34,9 @@ class EmailPreviewSettingsTypeTest extends TestCase
             ->method('setDefaults')
             ->with(
                 [
-                    'variants'     => null,
+                    'emailId'      => null,
                     'translations' => null,
+                    'variants'     => null,
                 ]
             );
 
@@ -49,7 +50,9 @@ class EmailPreviewSettingsTypeTest extends TestCase
 
     public function testBuildFormWithTranslationAndVariantFieldNotAvailable(): void
     {
+        $emailId = 1;
         $options = [
+            'emailId'      => $emailId,
             'translations' => [
                 'children' => [],
             ],
@@ -65,7 +68,11 @@ class EmailPreviewSettingsTypeTest extends TestCase
                 [
                     'contact',
                     LookupType::class,
-                    [],
+                    [
+                        'attr' => [
+                            'onChange' => "Mautic.emailPreview.regenerateUrl({$emailId})",
+                        ],
+                    ],
                 ]
             );
 
@@ -85,6 +92,7 @@ class EmailPreviewSettingsTypeTest extends TestCase
         ];
 
         $options = [
+            'emailId'      => $emailId,
             'translations' => [
                 'parent'   => $this->createEmailWithNameAndId($expectedTranslations[1], 1),
                 'children' => [
@@ -109,6 +117,9 @@ class EmailPreviewSettingsTypeTest extends TestCase
                     ChoiceType::class,
                     [
                         'choices' => array_flip($expectedTranslations),
+                        'attr'    => [
+                            'onChange' => "Mautic.emailPreview.regenerateUrl({$emailId})",
+                        ],
                     ],
                 ],
                 [
@@ -116,12 +127,19 @@ class EmailPreviewSettingsTypeTest extends TestCase
                     ChoiceType::class,
                     [
                         'choices' => array_flip($expectedVariants),
+                        'attr'    => [
+                            'onChange' => "Mautic.emailPreview.regenerateUrl({$emailId})",
+                        ],
                     ],
                 ],
                 [
                     'contact',
                     LookupType::class,
-                    [],
+                    [
+                        'attr' => [
+                            'onChange' => "Mautic.emailPreview.regenerateUrl({$emailId})",
+                        ],
+                    ],
                 ]
             );
 
