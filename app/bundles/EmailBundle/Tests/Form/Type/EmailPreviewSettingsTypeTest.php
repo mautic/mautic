@@ -59,7 +59,7 @@ class EmailPreviewSettingsTypeTest extends TestCase
         ];
 
         $builder = $this->createMock(FormBuilderInterface::class);
-        $builder->expects(self::exactly(1))
+        $builder->expects(self::once())
             ->method('add')
             ->withConsecutive(
                 [
@@ -72,11 +72,34 @@ class EmailPreviewSettingsTypeTest extends TestCase
         $this->form->buildForm($builder, $options);
     }
 
-    public function testBuildFormWithTranslationFieldAvailable(): void
+    public function testBuildFormWithTranslationAndVariantFieldAvailable(): void
     {
         $emailId = 1;
         $email   = new Email();
         $email->setId($emailId);
+
+        $expectedTranslations = $expectedVariants = [
+            1  => 'First (1)',
+            2  => 'Second (2)',
+            3  => 'Third (3)',
+        ];
+
+        $options = [
+            'translations' => [
+                'parent'   => $this->createEmailWithNameAndId($expectedTranslations[1], 1),
+                'children' => [
+                    $this->createEmailWithNameAndId($expectedTranslations[2], 2),
+                    $this->createEmailWithNameAndId($expectedTranslations[3], 3),
+                ],
+            ],
+            'variants'     => [
+                'parent'   => $this->createEmailWithNameAndId($expectedTranslations[1], 1),
+                'children' => [
+                    $this->createEmailWithNameAndId($expectedTranslations[2], 2),
+                    $this->createEmailWithNameAndId($expectedTranslations[3], 3),
+                ],
+            ],
+        ];
 
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects(self::exactly(3))
@@ -85,14 +108,14 @@ class EmailPreviewSettingsTypeTest extends TestCase
                     'translation',
                     ChoiceType::class,
                     [
-                        'choices' => [],
+                        'choices' => array_flip($expectedTranslations),
                     ],
                 ],
                 [
                     'variant',
                     ChoiceType::class,
                     [
-                        'choices' => [],
+                        'choices' => array_flip($expectedVariants),
                     ],
                 ],
                 [
@@ -102,6 +125,17 @@ class EmailPreviewSettingsTypeTest extends TestCase
                 ]
             );
 
-        $this->form->buildForm($builder, ['email' => $email]);
+        $this->form->buildForm($builder, $options);
+    }
+
+    private function createEmailWithNameAndId(string $name, int $id): Email
+    {
+        $name = substr($name, 0, strpos($name, ' '));
+
+        $email = new Email();
+        $email->setName($name);
+        $email->setId($id);
+
+        return $email;
     }
 }
