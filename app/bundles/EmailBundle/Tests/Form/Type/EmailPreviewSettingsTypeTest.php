@@ -47,10 +47,34 @@ class EmailPreviewSettingsTypeTest extends TestCase
         self::assertSame('email_preview_settings', $this->form->getBlockPrefix());
     }
 
-    public function testBuildForm(): void
+    public function testBuildFormWithTranslationAndVariantFieldNotAvailable(): void
+    {
+        $options = [
+            'translations' => [
+                'children' => [],
+            ],
+            'variants'     => [
+                'children' => [],
+            ],
+        ];
+
+        $builder = $this->createMock(FormBuilderInterface::class);
+        $builder->expects(self::exactly(3))
+            ->method('add')
+            ->withConsecutive(
+                [
+                    'contact',
+                    LookupType::class,
+                    [],
+                ]
+            );
+
+        $this->form->buildForm($builder, $options);
+    }
+
+    public function testBuildFormWithTranslationFieldAvailable(): void
     {
         $emailId = 1;
-
         $email   = new Email();
         $email->setId($emailId);
 

@@ -13,16 +13,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailPreviewSettingsType extends AbstractType
 {
-    private const CHOICE_TRANSLATION = 'translation';
-    private const CHOICE_VARIANT     = 'variant';
+    private const CHOICE_TYPE_TRANSLATION = 'translation';
+    private const CHOICE_TYPE_VARIANT     = 'variant';
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $translations = $options['translations'];
         $variants     = $options['variants'];
 
-        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TRANSLATION, $translations);
-        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_VARIANT, $variants);
+        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_TRANSLATION, $translations);
+        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_VARIANT, $variants);
 
         $builder->add(
             'contact',
@@ -49,8 +49,11 @@ class EmailPreviewSettingsType extends AbstractType
         return 'email_preview_settings';
     }
 
-    private function addTranslationOrVariantChoicesElement(FormBuilderInterface $builder, string $type, array $variants): void
-    {
+    private function addTranslationOrVariantChoicesElement(
+        FormBuilderInterface $builder,
+        string $type,
+        array $variants
+    ): void {
         if (!count($variants['children'])) {
             return;
         }
