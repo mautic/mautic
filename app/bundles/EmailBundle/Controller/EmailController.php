@@ -434,6 +434,7 @@ class EmailController extends FormController
                             EmailPreviewSettingsType::class,
                             null,
                             [
+                                'emailId'      => $email->getId(),
                                 'variants'     => $variants,
                                 'translations' => $translations,
                             ]

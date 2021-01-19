@@ -15,22 +15,28 @@ class EmailPreviewSettingsType extends AbstractType
 {
     private const CHOICE_TYPE_TRANSLATION = 'translation';
     private const CHOICE_TYPE_VARIANT     = 'variant';
-    private const ON_CHANGE_CONTENT       = 'Mautic.emailPreview.regenerateUrl()';
+
+    /**
+     * @var string
+     */
+    private $onChangeContent;
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $translations = $options['translations'];
-        $variants     = $options['variants'];
+        $emailId               = $options['emailId'];
+        $this->onChangeContent = "Mautic.emailPreview.regenerateUrl({$emailId})";
+        $translations          = $options['translations'];
+        $variants              = $options['variants'];
 
-        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_TRANSLATION, $translations);
-        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_VARIANT, $variants);
+        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_TRANSLATION, $translations, $emailId);
+        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_VARIANT, $variants, $emailId);
 
         $builder->add(
             'contact',
             LookupType::class,
             [
                 'attr' => [
-                    'onChange' => self::ON_CHANGE_CONTENT,
+                    'onChange' => $this->onChangeContent,
                 ],
             ]
         );
@@ -40,8 +46,9 @@ class EmailPreviewSettingsType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'variants'     => null,
+                'emailId'      => null,
                 'translations' => null,
+                'variants'     => null,
             ]
         );
     }
@@ -87,7 +94,7 @@ class EmailPreviewSettingsType extends AbstractType
             [
                 'choices' => $variantChoices,
                 'attr'    => [
-                    'onChange' => self::ON_CHANGE_CONTENT,
+                    'onChange' => $this->onChangeContent,
                 ],
             ]
         );

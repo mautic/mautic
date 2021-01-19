@@ -34,8 +34,8 @@ Mautic.emailPreview = {
         );
     },
 
-    regenerateUrl : function() {
-        let url = mauticBaseUrl + this.urlBase + '/' + this.getTranslationUrlPart() + this.getVariantUrlPart() + this.getContactUrlPart();
+    regenerateUrl : function(emailId) {
+        let url = mauticBaseUrl + this.urlBase + '/' + emailId + '/' + this.getTranslationUrlPart() + this.getVariantUrlPart() + this.getContactUrlPart();
         // Update url in preview input
         mQuery('#email_preview_url').val(url);
         // Update URL in preview button
