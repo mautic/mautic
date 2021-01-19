@@ -33,7 +33,7 @@ final class ReportModelTest extends MauticMysqlTestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->prefix = $this->container->getParameter('mautic.db_table_prefix');
+        $this->prefix      = $this->container->getParameter('mautic.db_table_prefix');
         $this->reportModel = $this->container->get('mautic.report.model.report');
     }
 
@@ -45,34 +45,34 @@ final class ReportModelTest extends MauticMysqlTestCase
 
         $reportData = [
             'is_published' => 1,
-            'name' => 'Test Report',
-            'system' => 0,
-            'source' => 'form.submissions',
+            'name'         => 'Test Report',
+            'system'       => 0,
+            'source'       => 'form.submissions',
             'is_scheduled' => 0,
-            'columns' => serialize($columns),
-            'filters' => serialize([]),
-            'table_order' => serialize([]),
-            'graphs' => serialize([]),
-            'group_by' => serialize([]),
-            'aggregators' => serialize([]),
-            'settings' => json_encode([
-                'showDynamicFilters' => 0,
-                'hideDateRangeFilter' => 0,
-                'showGraphsAboveTable' => 0
+            'columns'      => serialize($columns),
+            'filters'      => serialize([]),
+            'table_order'  => serialize([]),
+            'graphs'       => serialize([]),
+            'group_by'     => serialize([]),
+            'aggregators'  => serialize([]),
+            'settings'     => json_encode([
+                'showDynamicFilters'   => 0,
+                'hideDateRangeFilter'  => 0,
+                'showGraphsAboveTable' => 0,
             ]),
         ];
 
-        $this->connection->insert($this->prefix . 'reports', $reportData);
+        $this->connection->insert($this->prefix.'reports', $reportData);
         $reportId = $this->connection->lastInsertId();
 
         $formData = [
             'is_published' => 1,
-            'name' => 'Test Form',
-            'alias' => 'create_a_c',
-            'post_action' => 'return',
+            'name'         => 'Test Form',
+            'alias'        => 'create_a_c',
+            'post_action'  => 'return',
         ];
 
-        $this->connection->insert($this->prefix . 'forms', $formData);
+        $this->connection->insert($this->prefix.'forms', $formData);
         $formId = $this->connection->lastInsertId();
 
         $ipData = [
@@ -80,39 +80,39 @@ final class ReportModelTest extends MauticMysqlTestCase
             'ip_details' => 'N;',
         ];
 
-        $this->connection->insert($this->prefix . 'ip_addresses', $ipData);
+        $this->connection->insert($this->prefix.'ip_addresses', $ipData);
         $ipAddressId = $this->connection->lastInsertId();
 
         $utc = new \DateTimeZone('UTC');
         // I know I can use \DateTimeImmutable, but getReportData expects \DateTime
-        $now = new \DateTime('now', $utc);
-        $aDayAgo = (clone $now)->modify('-1 day');
+        $now        = new \DateTime('now', $utc);
+        $aDayAgo    = (clone $now)->modify('-1 day');
         $twoDaysAgo = (clone $now)->modify('-2 days');
-        $format = 'Y-m-d H:i:s';
+        $format     = 'Y-m-d H:i:s';
 
         $formSubmissionsData = [
             [
-                'form_id' => $formId,
-                'ip_id' => $ipAddressId,
+                'form_id'        => $formId,
+                'ip_id'          => $ipAddressId,
                 'date_submitted' => $twoDaysAgo->format($format),
-                'referer' => 'https://mautic-cloud.local/index_dev.php/test',
+                'referer'        => 'https://mautic-cloud.local/index_dev.php/test',
             ],
             [
-                'form_id' => $formId,
-                'ip_id' => $ipAddressId,
+                'form_id'        => $formId,
+                'ip_id'          => $ipAddressId,
                 'date_submitted' => $aDayAgo->format($format),
-                'referer' => 'https://mautic-cloud.local/index_dev.php/test',
+                'referer'        => 'https://mautic-cloud.local/index_dev.php/test',
             ],
             [
-                'form_id' => $formId,
-                'ip_id' => $ipAddressId,
+                'form_id'        => $formId,
+                'ip_id'          => $ipAddressId,
                 'date_submitted' => $now->format($format),
-                'referer' => 'https://mautic-cloud.local/index_dev.php/test',
+                'referer'        => 'https://mautic-cloud.local/index_dev.php/test',
             ],
         ];
 
         foreach ($formSubmissionsData as $formSubmissionData) {
-            $this->connection->insert($this->prefix . 'form_submissions', $formSubmissionData);
+            $this->connection->insert($this->prefix.'form_submissions', $formSubmissionData);
         }
 
         /** @var FormFactory $formFactory */
@@ -127,7 +127,7 @@ final class ReportModelTest extends MauticMysqlTestCase
 
         $reportData = $this->reportModel->getReportData($report, $formFactory, [
             'dateFrom' => $aDayAgoBeginningOfTheDay,
-            'dateTo' => clone $aDayAgoBeginningOfTheDay,
+            'dateTo'   => clone $aDayAgoBeginningOfTheDay,
         ]);
 
         Assert::assertSame(1, $reportData['totalResults']);
