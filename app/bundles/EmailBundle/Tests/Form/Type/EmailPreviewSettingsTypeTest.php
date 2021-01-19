@@ -59,7 +59,7 @@ class EmailPreviewSettingsTypeTest extends TestCase
         ];
 
         $builder = $this->createMock(FormBuilderInterface::class);
-        $builder->expects(self::exactly(3))
+        $builder->expects(self::exactly(1))
             ->method('add')
             ->withConsecutive(
                 [
