@@ -11,6 +11,7 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Types\Type;
@@ -211,12 +212,17 @@ class LeadEventLogRepository extends CommonRepository
      * @param bool $excludeNegative
      * @param bool $all
      *
-     * @return array
-     *
      * @throws \Doctrine\DBAL\Cache\CacheException
      */
-    public function getCampaignLogCounts($campaignId, $excludeScheduled = false, $excludeNegative = true, $all = false, \DateTimeInterface $dateFrom = null, \DateTimeInterface $dateTo = null)
-    {
+    public function getCampaignLogCounts(
+        $campaignId,
+        $excludeScheduled = false,
+        $excludeNegative = true,
+        $all = false,
+        DateTimeInterface $dateFrom = null,
+        DateTimeInterface $dateTo = null,
+        int $eventId = null
+    ): array {
         $join = $all ? 'leftJoin' : 'innerJoin';
 
         $q = $this->_em->getConnection()->createQueryBuilder();
@@ -231,6 +237,12 @@ class LeadEventLogRepository extends CommonRepository
         $expr = $q->expr()->andX(
             $q->expr()->eq('o.campaign_id', (int) $campaignId)
         );
+
+        if ($eventId) {
+            $expr->add(
+                $q->expr()->eq('o.event_id', $eventId)
+            );
+        }
 
         $groupBy = 'o.event_id';
         if ($excludeNegative) {
