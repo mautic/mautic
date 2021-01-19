@@ -181,7 +181,7 @@ class ContactMerger
                 continue;
             }
 
-            if ($winner->getField($field) === false) {
+            if (false === $winner->getField($field)) {
                 // not merge disabled field
                 continue;
             }
