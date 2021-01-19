@@ -93,10 +93,10 @@ class EmailPreviewSettingsTypeTest extends TestCase
                 ],
             ],
             'variants'     => [
-                'parent'   => $this->createEmailWithNameAndId($expectedTranslations[1], 1),
+                'parent'   => $this->createEmailWithNameAndId($expectedVariants[1], 1),
                 'children' => [
-                    $this->createEmailWithNameAndId($expectedTranslations[2], 2),
-                    $this->createEmailWithNameAndId($expectedTranslations[3], 3),
+                    $this->createEmailWithNameAndId($expectedVariants[2], 2),
+                    $this->createEmailWithNameAndId($expectedVariants[3], 3),
                 ],
             ],
         ];
