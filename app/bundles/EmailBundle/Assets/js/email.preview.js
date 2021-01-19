@@ -1,3 +1,5 @@
+// Email preview URL builder
+
 Mautic.emailPreview = {
 
     urlBase : 'email/preview',
