@@ -2,20 +2,10 @@
 
 namespace Mautic\PageBundle\Tests\Controller;
 
-use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
-/**
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
- */
 class PageControllerTest extends MauticMysqlTestCase
 {
-    /**
-     * @var Connection
-     */
-    private $db;
-
     /**
      * @var string
      */
@@ -24,25 +14,15 @@ class PageControllerTest extends MauticMysqlTestCase
     /**
      * @throws \Exception
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
-        $this->db     = $this->container->get('doctrine.dbal.default_connection');
         $this->prefix = $this->container->getParameter('mautic.db_table_prefix');
-        $this->db->beginTransaction();
-    }
-
-    /**
-     * @throws \Doctrine\DBAL\ConnectionException
-     */
-    public function tearDown()
-    {
-        $this->db->rollBack();
     }
 
     public function testLandingPageTracking()
     {
-        $this->db->insert($this->prefix.'pages', [
+        $this->connection->insert($this->prefix.'pages', [
             'is_published' => true,
             'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
             'title'        => 'Page:Page:LandingPageTracking',
@@ -54,7 +34,7 @@ class PageControllerTest extends MauticMysqlTestCase
             'revision'     => 0,
             'lang'         => 'en',
         ]);
-        $leadsBeforeTest   = $this->db->fetchAll('SELECT `id` FROM `'.$this->prefix.'leads`;');
+        $leadsBeforeTest   = $this->connection->fetchAll('SELECT `id` FROM `'.$this->prefix.'leads`;');
         $leadIdsBeforeTest = array_column($leadsBeforeTest, 'id');
         $this->client->request('GET', '/page-page-landingPageTracking');
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
@@ -62,10 +42,10 @@ class PageControllerTest extends MauticMysqlTestCase
         if (!empty($leadIdsBeforeTest)) {
             $sql .= ' WHERE `id` NOT IN ('.implode(',', $leadIdsBeforeTest).');';
         }
-        $newLeads = $this->db->fetchAll($sql);
+        $newLeads = $this->connection->fetchAll($sql);
         $this->assertCount(1, $newLeads);
         $leadId        = reset($newLeads)['id'];
-        $leadEventLogs = $this->db->fetchAll('
+        $leadEventLogs = $this->connection->fetchAll('
           SELECT `id`, `action`
           FROM `'.$this->prefix.'lead_event_log`
           WHERE `lead_id` = :leadId
@@ -80,7 +60,7 @@ class PageControllerTest extends MauticMysqlTestCase
      */
     public function LandingPageTrackingSecondVisit()
     {
-        $this->db->insert($this->prefix.'pages', [
+        $this->connection->insert($this->prefix.'pages', [
             'is_published' => true,
             'date_added'   => (new \DateTime())->format('Y-m-d H:i:s'),
             'title'        => 'Page:Page:LandingPageTrackingSecondVisit',
@@ -92,7 +72,7 @@ class PageControllerTest extends MauticMysqlTestCase
             'revision'     => 0,
             'lang'         => 'en',
         ]);
-        $leadsBeforeTest   = $this->db->fetchAll('SELECT `id` FROM `'.$this->prefix.'leads`;');
+        $leadsBeforeTest   = $this->connection->fetchAll('SELECT `id` FROM `'.$this->prefix.'leads`;');
         $leadIdsBeforeTest = array_column($leadsBeforeTest, 'id');
         $this->client->request('GET', '/page-page-landingPageTrackingSecondVisit');
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
@@ -100,10 +80,10 @@ class PageControllerTest extends MauticMysqlTestCase
         if (!empty($leadIdsBeforeTest)) {
             $sql .= ' WHERE `id` NOT IN ('.implode(',', $leadIdsBeforeTest).');';
         }
-        $newLeadsAfterFirstVisit = $this->db->fetchAll($sql);
+        $newLeadsAfterFirstVisit = $this->connection->fetchAll($sql);
         $this->assertCount(1, $newLeadsAfterFirstVisit);
         $leadId                   = reset($newLeadsAfterFirstVisit)['id'];
-        $eventLogsAfterFirstVisit = $this->db->fetchAll('
+        $eventLogsAfterFirstVisit = $this->connection->fetchAll('
           SELECT `id`, `action`
           FROM `'.$this->prefix.'lead_event_log`
           WHERE `lead_id` = :leadId
@@ -113,7 +93,7 @@ class PageControllerTest extends MauticMysqlTestCase
         $this->assertSame('created_contact', reset($eventLogsAfterFirstVisit)['action']);
         $this->client->request('GET', '/page-page-landingPageTrackingSecondVisit');
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
-        $eventLogsAfterSecondVisit = $this->db->fetchAll('
+        $eventLogsAfterSecondVisit = $this->connection->fetchAll('
           SELECT `id`, `action`
           FROM `'.$this->prefix.'lead_event_log`
           WHERE `lead_id` = :leadId

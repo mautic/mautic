@@ -544,6 +544,15 @@ return [
                     'mautic.helper.user',
                 ],
             ],
+            'mautic.helper.maxmind_do_not_sell_download' => [
+                'class'     => \Mautic\CoreBundle\Helper\MaxMindDoNotSellDownloadHelper::class,
+                'arguments' => [
+                    '%mautic.ip_lookup_auth%',
+                    'monolog.logger.mautic',
+                    'mautic.native.connector',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
         ],
         'menus' => [
             'mautic.menu.main' => [
@@ -586,6 +595,14 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.core.command.do_not_sell' => [
+                'class'     => \Mautic\CoreBundle\Command\UpdateDoNotSellListCommand::class,
+                'arguments' => [
+                    'mautic.helper.maxmind_do_not_sell_download',
+                    'translator',
+                ],
+                'tag' => 'console.command',
+            ],
             'mautic.core.command.apply_update' => [
                 'tag'       => 'console.command',
                 'class'     => \Mautic\CoreBundle\Command\ApplyUpdatesCommand::class,
@@ -593,6 +610,14 @@ return [
                     'translator',
                     'mautic.helper.core_parameters',
                     'mautic.update.step_provider',
+                ],
+            ],
+            'mautic.core.command.maxmind.purge' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\MaxMindDoNotSellPurgeCommand::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.maxmind.doNotSellList',
                 ],
             ],
         ],
@@ -840,6 +865,12 @@ return [
                     'monolog.logger.mautic',
                 ],
             ],
+            'mautic.helper.export' => [
+                'class'     => \Mautic\CoreBundle\Helper\ExportHelper::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
             // Menu
             'mautic.helper.menu' => [
                 'class'     => 'Mautic\CoreBundle\Menu\MenuHelper',
@@ -898,6 +929,11 @@ return [
             'mautic.http.connector' => [
                 'class'   => 'Joomla\Http\Http',
                 'factory' => ['Joomla\Http\HttpFactory', 'getHttp'],
+            ],
+
+            'mautic.native.connector' => [
+                'class'     => \Symfony\Contracts\HttpClient\HttpClientInterface::class,
+                'factory'   => [Symfony\Component\HttpClient\HttpClient::class, 'create'],
             ],
 
             'twig.controller.exception.class' => 'Mautic\CoreBundle\Controller\ExceptionController',
@@ -959,6 +995,12 @@ return [
                     'request_stack',
                 ],
                 'tag' => 'validator.constraint_validator',
+            ],
+            'mautic.maxmind.doNotSellList' => [
+                'class'     => Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
             ],
             // Logger
             'mautic.monolog.handler' => [
@@ -1128,7 +1170,7 @@ return [
         'db_user'                         => '',
         'db_password'                     => '',
         'db_table_prefix'                 => '',
-        'db_server_version'               => '5.5',
+        'db_server_version'               => '5.7',
         'locale'                          => 'en_US',
         'secret_key'                      => '',
         'dev_hosts'                       => [],
@@ -1553,6 +1595,7 @@ return [
         'cached_data_timeout'       => 10,
         'batch_sleep_time'          => 1,
         'batch_campaign_sleep_time' => false,
+        'transliterate_page_title'  => false,
         'cors_restrict_domains'     => true,
         'cors_valid_domains'        => [],
         'max_entity_lock_time'      => 0,

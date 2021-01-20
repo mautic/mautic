@@ -71,7 +71,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     <div id="dashboard-widgets" class="dashboard-widgets cards">
         <?php foreach ($widgets as $widget): ?>
             <div class="card-flex widget" data-widget-id="<?php echo $widget->getId(); ?>" style="width: <?php echo $widget->getWidth() ? $widget->getWidth().'' : '100'; ?>%; height: <?php echo $widget->getHeight() ? $widget->getHeight().'px' : '300px'; ?>">
-                <?php echo $view->render('MauticDashboardBundle:Widget:detail.html.php', ['widget' => $widget]); ?>
+                <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
             </div>
         <?php endforeach; ?>
     </div>
