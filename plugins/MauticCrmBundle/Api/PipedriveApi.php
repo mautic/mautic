@@ -68,6 +68,15 @@ class PipedriveApi extends CrmApi
         return $this->getResponseData($response);
     }
 
+    public function mergeCompany($id = null, $otherId = null)
+    {
+        $params   = $this->getRequestParameters(['merge_with_id' => $id]);
+        $url      = sprintf('%s/%s/%s', $this->integration->getApiUrl(), self::ORGANIZATIONS_API_ENDPOINT, $otherId);
+        $response = $this->transport->put($url, $params);
+
+        return $this->getResponseData($response);
+    }
+
     /**
      * @param $data
      */
@@ -97,6 +106,15 @@ class PipedriveApi extends CrmApi
         $params   = $this->getRequestParameters();
         $url      = sprintf('%s/%s/%s', $this->integration->getApiUrl(), self::PERSONS_API_ENDPOINT, $id);
         $response = $this->transport->delete($url, $params);
+
+        return $this->getResponseData($response);
+    }
+
+    public function mergeLead($id = null, $otherId = null)
+    {
+        $params   = $this->getRequestParameters(['merge_with_id' => $id]);
+        $url      = sprintf('%s/%s/%s', $this->integration->getApiUrl(), self::PERSONS_API_ENDPOINT, $otherId);
+        $response = $this->transport->put($url, $params);
 
         return $this->getResponseData($response);
     }

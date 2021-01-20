@@ -33,9 +33,10 @@ class LeadSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            LeadEvents::LEAD_POST_SAVE      => ['onLeadPostSave', 0],
-            LeadEvents::LEAD_PRE_DELETE     => ['onLeadPostDelete', 255],
-            LeadEvents::LEAD_COMPANY_CHANGE => ['onLeadCompanyChange', 0],
+            LeadEvents::LEAD_POST_SAVE       => ['onLeadPostSave', 0],
+            LeadEvents::LEAD_PRE_DELETE      => ['onLeadPostDelete', 255],
+            LeadEvents::LEAD_COMPANY_CHANGE  => ['onLeadCompanyChange', 0],
+            LeadEvents::LEAD_POST_MERGE      => ['onLeadPostMerge', 255],
         ];
     }
 
@@ -80,6 +81,26 @@ class LeadSubscriber implements EventSubscriberInterface
         }
         $this->leadExport->setIntegration($integrationObject);
         $this->leadExport->delete($lead);
+    }
+
+    public function OnLeadPostMerge(Events\LeadMergeEvent $event)
+    {
+        $lead = $event->getVictor();
+
+        if ($lead->getEventData('pipedrive.webhook')) {
+            return;
+        }
+
+        $otherLead = $event->getLoser();
+
+        /** @var PipedriveIntegration $integrationObject */
+        $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
+        if (false === $integrationObject || !$integrationObject->shouldImportDataToPipedrive()) {
+            return;
+        }
+
+        $this->leadExport->setIntegration($integrationObject);
+        $this->leadExport->merge($lead, $otherLead);
     }
 
     public function onLeadCompanyChange(Events\LeadChangeCompanyEvent $event)

@@ -256,6 +256,7 @@ return [
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
+                    'mautic.lead.merger',
                 ],
             ],
             'mautic_integration.pipedrive.export.company' => [

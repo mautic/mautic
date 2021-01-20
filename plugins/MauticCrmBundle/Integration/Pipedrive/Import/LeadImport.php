@@ -3,6 +3,8 @@
 namespace MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\LeadBundle\Deduplicate\ContactMerger;
+use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -22,9 +24,14 @@ class LeadImport extends AbstractImport
     private $companyModel;
 
     /**
+     * @var ContactMerger
+     */
+    private $contactMerger;
+
+    /**
      * LeadImport constructor.
      */
-    public function __construct(EntityManager $em, LeadModel $leadModel, CompanyModel $companyModel)
+    public function __construct(EntityManager $em, LeadModel $leadModel, CompanyModel $companyModel, ContactMerger $contactMerger)
     {
         parent::__construct($em);
 
@@ -163,6 +170,52 @@ class LeadImport extends AbstractImport
         if (!empty($lead->deletedId)) {
             $this->em->remove($integrationEntity);
         }
+    }
+
+    /**
+     * @return bool
+     *
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Exception
+     */
+    public function merge(array $data = [], array $otherData = [])
+    {
+        $otherIntegrationEntity = $this->getLeadIntegrationEntity(['integrationEntityId' => $otherData['id']]);
+
+        if (!$otherIntegrationEntity) {
+            // Only destination entity exists, so handle it as an update.
+            return $this->update($data);
+        }
+
+        $integrationEntity = $this->getLeadIntegrationEntity(['integrationEntityId' => $data['id']]);
+
+        if (!$integrationEntity) {
+            // Destination entity doesn't yet exist, so create it first.
+            $this->create($data);
+            $integrationEntity = $this->getLeadIntegrationEntity(['integrationEntityId' => $data['id']]);
+        }
+
+        /** @var Lead $lead */
+        $lead = $this->leadModel->getEntity($integrationEntity->getInternalEntityId());
+        /** @var Lead $otherLead */
+        $otherLead = $this->leadModel->getEntity($otherIntegrationEntity->getInternalEntityId());
+
+        // prevent listeners from exporting
+        $lead->setEventData('pipedrive.webhook', 1);
+
+        try {
+            $lead = $this->contactMerger->merge($lead, $otherLead);
+            $this->em->remove($otherIntegrationEntity);
+        } catch (SameContactException $exception) {
+            // Ignore
+        }
+
+        $integrationEntity->setLastSyncDate(new \DateTime());
+        $this->em->persist($integrationEntity);
+        $this->em->flush();
+
+        return true;
     }
 
     /**

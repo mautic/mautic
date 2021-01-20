@@ -22,10 +22,12 @@ class PipedriveController extends CommonController
     const LEAD_ADDED_EVENT  = 'added.person';
     const LEAD_UPDATE_EVENT = 'updated.person';
     const LEAD_DELETE_EVENT = 'deleted.person';
+    const LEAD_MERGED_EVENT = 'merged.person';
 
     const COMPANY_ADD_EVENT    = 'added.organization';
     const COMPANY_UPDATE_EVENT = 'updated.organization';
     const COMPANY_DELETE_EVENT = 'deleted.organization';
+    const COMPANY_MERGED_EVENT = 'merged.organization';
 
     const USER_ADD_EVENT    = 'added.user';
     const USER_UPDATE_EVENT = 'updated.user';
@@ -64,6 +66,10 @@ class PipedriveController extends CommonController
                     $leadImport = $this->getLeadImport($pipedriveIntegration);
                     $leadImport->delete($params['previous']);
                     break;
+                case self::LEAD_MERGED_EVENT:
+                    $leadImport = $this->getLeadImport($pipedriveIntegration);
+                    $leadImport->merge($params['current'], $params['previous']);
+                    break;
                 case self::COMPANY_UPDATE_EVENT:
                     $companyImport = $this->getCompanyImport($pipedriveIntegration);
                     $companyImport->update($data);
@@ -71,6 +77,10 @@ class PipedriveController extends CommonController
                 case self::COMPANY_DELETE_EVENT:
                     $companyImport = $this->getCompanyImport($pipedriveIntegration);
                     $companyImport->delete($params['previous']);
+                    break;
+                case self::COMPANY_MERGED_EVENT:
+                    $companyImport = $this->getCompanyImport($pipedriveIntegration);
+                    $companyImport->merge($params['current'], $params['previous']);
                     break;
                 case self::USER_UPDATE_EVENT:
                     $ownerImport = $this->getOwnerImport($pipedriveIntegration);

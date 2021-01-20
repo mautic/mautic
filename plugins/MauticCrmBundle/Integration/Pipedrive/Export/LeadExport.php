@@ -128,6 +128,44 @@ class LeadExport extends AbstractPipedrive
     }
 
     /**
+     * @return bool
+     */
+    public function merge(Lead $lead, Lead $otherLead)
+    {
+        $integrationEntity = $this->getLeadIntegrationEntity(['internalEntityId' => $lead->getId()]);
+
+        $created = false;
+
+        if (!$integrationEntity) {
+            $created           = $this->create($lead);
+            $integrationEntity = $this->getLeadIntegrationEntity(['internalEntityId' => $lead->getId()]);
+        }
+
+        if (!$integrationEntity) {
+            return false;
+        }
+
+        $otherIntegrationEntity = $this->getLeadIntegrationEntity(['internalEntityId' => $otherLead->getId()]);
+
+        if (!$otherIntegrationEntity) {
+            return $created ? true : $this->update($lead);
+        }
+
+        try {
+            $this->getIntegration()->getApiHelper()->mergeLead($integrationEntity->getIntegrationEntityId(), $otherIntegrationEntity->getIntegrationEntityId());
+
+            $this->em->remove($otherIntegrationEntity);
+            $this->em->flush();
+
+            return true;
+        } catch (\Exception $e) {
+            $this->getIntegration()->logIntegrationError($e);
+        }
+
+        return false;
+    }
+
+    /**
      * @return mixed
      */
     private function getMappedLeadData(Lead $lead)

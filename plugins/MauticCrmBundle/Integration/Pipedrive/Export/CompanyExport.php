@@ -121,6 +121,43 @@ class CompanyExport extends AbstractPipedrive
     }
 
     /**
+     * @return bool
+     */
+    public function merge(Company $company, Company $otherCompany, array $mappedData = [])
+    {
+        $integrationEntity = $this->getCompanyIntegrationEntity(['internalEntityId' => $company->getId()]);
+        $created           = false;
+
+        if (!$integrationEntity) {
+            $created           = $this->create($company, $mappedData);
+            $integrationEntity = $this->getCompanyIntegrationEntity(['internalEntityId' => $company->getId()]);
+        }
+
+        if (!$integrationEntity) {
+            return false;
+        }
+
+        $otherIntegrationEntity = $this->getCompanyIntegrationEntity(['internalEntityId' => $otherCompany->getId()]);
+
+        if (!$otherIntegrationEntity) {
+            return $created ? true : $this->update($integrationEntity, $mappedData);
+        }
+
+        try {
+            $this->getIntegration()->getApiHelper()->mergeCompany($integrationEntity->getIntegrationEntityId(), $otherIntegrationEntity->getIntegrationEntityId());
+
+            $this->em->remove($otherIntegrationEntity);
+            $this->em->flush();
+
+            return true;
+        } catch (\Exception $e) {
+            $this->getIntegration()->logIntegrationError($e);
+        }
+
+        return false;
+    }
+
+    /**
      * @return array
      */
     private function getMappedCompanyData(Company $company)
