@@ -41,7 +41,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
     /**
      * @throws \Exception
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         // Everything needs to happen anonymously
         $this->defaultClientServer = $this->clientServer;
@@ -49,7 +49,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
 
         parent::setUp();
 
-        $this->db     = $this->container->get('doctrine.dbal.default_connection');
+        $this->db     = $this->em->getConnection();
         $this->prefix = $this->container->getParameter('mautic.db_table_prefix');
 
         // Populate contacts
@@ -70,17 +70,26 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         $this->eventDate->modify('+15 seconds');
         $sql = str_replace('{CONDITION_TIMESTAMP}', $this->eventDate->format('Y-m-d H:i:s'), $sql);
 
-        // Update the schema
-        $tmpFile = $this->container->getParameter('kernel.cache_dir').'/campaign_schema.sql';
-        file_put_contents($tmpFile, $sql);
-        $this->applySqlFromFile($tmpFile);
+        $this->em->getConnection()->exec($sql);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 
         $this->clientServer = $this->defaultClientServer;
+    }
+
+    protected function beforeBeginTransaction(): void
+    {
+        $this->resetAutoincrement([
+            'leads',
+            'emails',
+            'lead_tags',
+            'campaigns',
+            'campaign_events',
+            'lead_lists',
+        ]);
     }
 
     /**

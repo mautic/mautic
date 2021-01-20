@@ -67,7 +67,7 @@ class UpdateHelperTest extends TestCase
      */
     private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->pathsHelper = $this->createMock(PathsHelper::class);
         $this->pathsHelper->method('getSystemPath')
@@ -88,7 +88,7 @@ class UpdateHelperTest extends TestCase
         $this->helper = new UpdateHelper($this->pathsHelper, $this->logger, $this->coreParametersHelper, $this->client, $this->releaseParser);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 

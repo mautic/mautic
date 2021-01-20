@@ -50,7 +50,7 @@ class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
      */
     private $actionModel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contactMock5     = $this->createMock(Lead::class);
         $this->contactMock6     = $this->createMock(Lead::class);
