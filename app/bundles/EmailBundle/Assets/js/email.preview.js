@@ -4,6 +4,12 @@ Mautic.emailPreview = {
 
     urlBase : 'email/preview',
 
+    init : function() {
+        // Activate contact chosen
+        // TODO
+        Mautic.activateChosenSelect(mQuery('#email_preview_settings_contact'));
+    },
+
     buildValueUrlPart  : function(parameterName, value) {
 
         if (value === undefined || value.length === 0) {
@@ -35,11 +41,15 @@ Mautic.emailPreview = {
     },
 
     regenerateUrl : function(emailId) {
-        let url = mauticBaseUrl + this.urlBase + '/' + emailId + '/' + this.getTranslationUrlPart() + this.getVariantUrlPart() + this.getContactUrlPart();
+        let previewUrl = mauticBaseUrl + this.urlBase + '/' + emailId + '/'
+            + this.getTranslationUrlPart() + this.getVariantUrlPart() + this.getContactUrlPart();
         // Update url in preview input
-        mQuery('#email_preview_url').val(url);
+        mQuery('#email_preview_url').val(previewUrl);
         // Update URL in preview button
-        mQuery('#email_preview_url_button').attr('onClick', "window.open('" + url + "', '_blank');");
+        mQuery('#email_preview_url_button').attr('onClick', "window.open('" + previewUrl + "', '_blank');");
     }
 }
 
+mQuery(document).ready(function() {
+    Mautic.emailPreview.init();
+});
