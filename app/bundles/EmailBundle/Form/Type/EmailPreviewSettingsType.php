@@ -36,7 +36,8 @@ class EmailPreviewSettingsType extends AbstractType
             LookupType::class,
             [
                 'attr' => [
-                    'onChange' => $this->onChangeContent,
+                    'onChange'         => $this->onChangeContent,
+                    'data-placeholder' => 'Choose contact ...',
                 ],
             ]
         );
