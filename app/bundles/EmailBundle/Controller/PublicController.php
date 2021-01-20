@@ -444,12 +444,17 @@ class PublicController extends CommonFormController
         int $variantId = null,
         int $contactId = null
     ) {
+        if ($translationId) {
+            // Use translation ID as object ID if specified
+            $objectId = $translationId;
+        }
+
         if ($variantId) {
             // Use A/B variant ID as object ID if specified
             $objectId = $variantId;
         }
 
-        if ($translationId || $contactId) {
+        if ($contactId) {
             // @TODO
             throw new RuntimeException('Not implemented');
         }
