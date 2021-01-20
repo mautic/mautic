@@ -435,8 +435,6 @@ class PublicController extends CommonFormController
     /**
      * Preview email.
      *
-     * @param null $objectType
-     *
      * @return Response
      */
     public function previewAction(
