@@ -112,7 +112,7 @@ class SummaryModel extends AbstractCommonModel
             $start = $this->getRepository()->getOldestTriggeredDate();
         }
         // Start with the last complete hour.
-        $start = $start ?? new \DateTime('-1 hour');
+        $start = $start ?? new \DateTime();
         $start->setTimestamp($start->getTimestamp() - ($start->getTimestamp() % 3600));
 
         $end = $this->getCampaignLeadEventLogRepository()->getOldestTriggeredDate();
@@ -126,6 +126,10 @@ class SummaryModel extends AbstractCommonModel
         $end = $end->setTimestamp($end->getTimestamp() - ($end->getTimestamp() % 3600));
 
         if ($end && $end <= $start) {
+            if ($rebuild) {
+                $this->prepareRebuildSummary();
+            }
+
             $hours = ($end->diff($start)->days * 24) + $end->diff($start)->h;
             if ($maxHours && $hours > $maxHours) {
                 $end = clone $start;
@@ -234,5 +238,13 @@ class SummaryModel extends AbstractCommonModel
         $logCountsProcessed = isset($campaignLogCountsProcessed[$eventId]) ? array_sum($campaignLogCountsProcessed[$eventId]) : 0;
 
         $summary->setLogCountsProcessed($logCountsProcessed);
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    private function prepareRebuildSummary(): void
+    {
+        $this->getRepository()->deleteAll();
     }
 }

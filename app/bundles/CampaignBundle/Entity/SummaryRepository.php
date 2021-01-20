@@ -182,4 +182,15 @@ class SummaryRepository extends CommonRepository
         $stmt = $conn->prepare($sql);
         $stmt->execute();
     }
+
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    public function deleteAll(): void
+    {
+        $sql  = 'DELETE FROM '.MAUTIC_TABLE_PREFIX.'campaign_summary';
+        $conn = $this->getEntityManager()->getConnection();
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+    }
 }
