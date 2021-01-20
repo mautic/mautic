@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Controller;
 
+use http\Exception\RuntimeException;
 use LogicException;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
@@ -448,6 +449,11 @@ class PublicController extends CommonFormController
         if ($variantId) {
             // Use A/B variant ID as object ID if specified
             $objectId = $variantId;
+        }
+
+        if ($translationId || $contactId) {
+            // @TODO
+            throw new RuntimeException('Not implemented');
         }
 
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
