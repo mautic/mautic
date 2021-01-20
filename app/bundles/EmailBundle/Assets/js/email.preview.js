@@ -14,7 +14,10 @@ Mautic.emailPreview = {
     addUrlParameter  : function(parameterName, value) {
 
         if (value === undefined || value.length === 0) {
-            return '';
+            if (this.urlParams.hasOwnProperty(parameterName)) {
+                delete this.urlParams[parameterName];
+            }
+            return;
         }
 
         this.urlParams[parameterName] = value;
@@ -36,7 +39,13 @@ Mautic.emailPreview = {
             mQuery('#email_preview_settings_contact').val()
         );
 
-        let previewUrl = mauticBaseUrl + this.urlBase + '/' + emailId + '?' + new URLSearchParams(this.urlParams)
+        let previewUrl = mauticBaseUrl + this.urlBase + '/' + emailId;
+        if (Object.keys(this.urlParams).length > 0) {
+            previewUrl = previewUrl + '?' + new URLSearchParams(this.urlParams);
+        }
+
+        console.log(this.urlParams.length);
+
         // Update url in preview input
         mQuery('#email_preview_url').val(previewUrl);
         // Update URL in preview button
