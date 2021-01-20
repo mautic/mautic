@@ -262,6 +262,10 @@ class ReportSubscriber implements EventSubscriberInterface
                     $event->addLeadIpAddressLeftJoin($qb);
                 }
 
+                if ($event->hasFilter('s.leadlist_id')) {
+                    $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = 0');
+                }
+
                 break;
             case self::CONTEXT_CONTACT_FREQUENCYRULES:
                 $event->applyDateFilters($qb, 'date_added', 'lf');
