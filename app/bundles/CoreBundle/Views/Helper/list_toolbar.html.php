@@ -20,12 +20,13 @@ include 'action_button_helper.php';
         <div class="col-xs-6 col-lg-8 va-m form-inline">
             <?php if (isset($searchValue)): ?>
             <?php echo $view->render('MauticCoreBundle:Helper:search.html.php', [
-                    'searchId'    => (empty($searchId)) ? null : $searchId,
-                    'searchValue' => $searchValue,
-                    'action'      => (isset($action)) ? $action : '',
-                    'searchHelp'  => (isset($searchHelp)) ? $searchHelp : '',
-                    'target'      => (empty($target)) ? null : $target,
-                    'tmpl'        => (empty($tmpl)) ? null : $tmpl,
+                    'searchId'        => (empty($searchId)) ? null : $searchId,
+                    'searchValue'     => $searchValue,
+                    'action'          => (isset($action)) ? $action : '',
+                    'searchHelp'      => (isset($searchHelp)) ? $searchHelp : '',
+                    'target'          => (empty($target)) ? null : $target,
+                    'tmpl'            => (empty($tmpl)) ? null : $tmpl,
+                    'overlayDisabled' => (isset($overlayDisabled)) ? $overlayDisabled : null,
                 ]); ?>
             <?php endif; ?>
 
