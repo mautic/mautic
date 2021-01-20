@@ -440,11 +440,16 @@ class PublicController extends CommonFormController
      */
     public function previewAction(
         int $objectId,
-        $objectType = null,
+        string $objectType = null,
         int $translationId = null,
         int $variantId = null,
         int $contactId = null
     ) {
+        if ($variantId) {
+            // Use A/B variant ID as object ID if specified
+            $objectId = $variantId;
+        }
+
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model       = $this->getModel('email');
         $emailEntity = $model->getEntity($objectId);
