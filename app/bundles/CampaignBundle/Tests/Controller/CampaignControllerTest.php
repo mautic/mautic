@@ -105,14 +105,24 @@ class CampaignControllerTest extends TestCase
             ->method('get')
             ->with('mautic.config')
             ->willReturn($coreParametersHelperMock);
+        $modelFactoryMock
+            ->expects(self::at(1))
+            ->method('getModel')
+            ->with('campaign')
+            ->willReturn($campaignModelMock);
         $containerMock
             ->expects(self::at(5))
+            ->method('get')
+            ->with('mautic.model.factory')
+            ->willReturn($modelFactoryMock);
+        $containerMock
+            ->expects(self::at(6))
             ->method('has')
             ->with('doctrine')
             ->willReturn(true);
         $doctrineMock = $this->createMock(ManagerRegistry::class);
         $containerMock
-            ->expects(self::at(6))
+            ->expects(self::at(7))
             ->method('get')
             ->with('doctrine')
             ->willReturn($doctrineMock);
@@ -127,16 +137,6 @@ class CampaignControllerTest extends TestCase
             ->method('getRepository')
             ->with(LeadEventLog::class)
             ->willReturn($leadEventLogRepositoryMock);
-        $modelFactoryMock
-            ->expects(self::at(1))
-            ->method('getModel')
-            ->with('campaign')
-            ->willReturn($campaignModelMock);
-        $containerMock
-            ->expects(self::at(7))
-            ->method('get')
-            ->with('mautic.model.factory')
-            ->willReturn($modelFactoryMock);
         $leadEventLogRepositoryMock
             ->expects(self::at(0))
             ->method('getCampaignLogCounts')
@@ -251,7 +251,7 @@ class CampaignControllerTest extends TestCase
 
         // TESTING ARGUMENTS
         $events            = $this->getMockEvents();
-        $campaignLogCounts = $this->getMockCampaignLogCounts();
+        $campaignLogCounts = $this->getMockSummaryCampaignLogCounts();
 
         $requestMock            = $this->createMock(Request::class);
         $campaignController->setRequest($requestMock);
@@ -317,14 +317,24 @@ class CampaignControllerTest extends TestCase
             ->method('get')
             ->with('mautic.config')
             ->willReturn($coreParametersHelperMock);
+        $modelFactoryMock
+            ->expects(self::at(1))
+            ->method('getModel')
+            ->with('campaign')
+            ->willReturn($campaignModelMock);
         $containerMock
             ->expects(self::at(5))
+            ->method('get')
+            ->with('mautic.model.factory')
+            ->willReturn($modelFactoryMock);
+        $containerMock
+            ->expects(self::at(6))
             ->method('has')
             ->with('doctrine')
             ->willReturn(true);
         $doctrineMock = $this->createMock(ManagerRegistry::class);
         $containerMock
-            ->expects(self::at(6))
+            ->expects(self::at(7))
             ->method('get')
             ->with('doctrine')
             ->willReturn($doctrineMock);
@@ -344,16 +354,6 @@ class CampaignControllerTest extends TestCase
             ->method('getCampaignLogCounts')
             ->with($campaignId)
             ->willReturn($campaignLogCounts);
-        $modelFactoryMock
-            ->expects(self::at(1))
-            ->method('getModel')
-            ->with('campaign')
-            ->willReturn($campaignModelMock);
-        $containerMock
-            ->expects(self::at(7))
-            ->method('get')
-            ->with('mautic.model.factory')
-            ->willReturn($modelFactoryMock);
         $campaignRepositoryMock = $this->createMock(CampaignRepository::class);
         $campaignModelMock
             ->expects(self::at(1))
@@ -545,6 +545,27 @@ class CampaignControllerTest extends TestCase
             3 => [
                 0 => 0,
                 1 => 1,
+            ],
+        ];
+    }
+
+    private function getMockSummaryCampaignLogCounts(): array
+    {
+        return [
+            1 => [
+                0 => 6,
+                1 => 2,
+                2 => 8,
+            ],
+            2 => [
+                0 => 0,
+                1 => 2,
+                2 => 2,
+            ],
+            3 => [
+                0 => 0,
+                1 => 2,
+                2 => 2,
             ],
         ];
     }

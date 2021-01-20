@@ -710,7 +710,7 @@ class CampaignController extends AbstractStandardFormController
                 $campaignLogCounts          = $logCounts['campaignLogCounts'] ?? [];
                 $campaignLogCountsProcessed = $logCounts['campaignLogCountsProcessed'] ?? [];
 
-                $events       = $this->processCampaignEvents($events, $leadCount, $campaignLogCounts, $campaignLogCountsProcessed);
+                $this->processCampaignEvents($events, $leadCount, $campaignLogCounts, $campaignLogCountsProcessed);
                 $sortedEvents = $this->processCampaignEventsFromParentCondition($events);
 
                 $stats = $this->getCampaignModel()->getCampaignMetricsLineChartData(
@@ -892,8 +892,12 @@ class CampaignController extends AbstractStandardFormController
         ];
     }
 
-    private function processCampaignEvents(array $events, int $leadCount, array $campaignLogCounts, array $campaignLogCountsProcessed): array
-    {
+    private function processCampaignEvents(
+        array &$events,
+        int $leadCount,
+        array $campaignLogCounts,
+        array $campaignLogCountsProcessed
+    ): void {
         foreach ($events as &$event) {
             $event['logCountForPending'] =
             $event['logCountProcessed']  =
@@ -917,11 +921,9 @@ class CampaignController extends AbstractStandardFormController
                 }
             }
         }
-
-        return $events;
     }
 
-    private function processCampaignEventsFromParentCondition(array $events): array
+    private function processCampaignEventsFromParentCondition(array &$events): array
     {
         $sortedEvents = [
             'decision'  => [],
@@ -955,7 +957,7 @@ class CampaignController extends AbstractStandardFormController
     {
         $campaignLogCountsProcessed = [];
 
-        foreach ($campaignLogCounts as $eventId => &$campaignLogCount) {
+        foreach ($campaignLogCounts as $eventId => $campaignLogCount) {
             $count                                  = $campaignLogCount[2];
             $campaignLogCountsProcessed[$eventId][] = $count;
             unset($campaignLogCounts[$eventId][2]);
