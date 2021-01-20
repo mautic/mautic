@@ -1899,6 +1899,10 @@ ul.dropdown-menu-form {
 label {
   font-weight: 600;
 }
+.label-tag {
+  white-space:normal;
+  text-align: left;
+}
 .control-label.text-left {
   text-align: left;
 }
