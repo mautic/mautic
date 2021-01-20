@@ -73,8 +73,14 @@ return [
                 'method'     => ['GET', 'POST'],
             ],
             'mautic_email_preview' => [
-                'path'       => '/email/preview/{objectId}',
+                'path'       => '/email/preview/{objectId}/{objectType}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::previewAction',
+                'defaults'   => [
+                    'objectType'    => null,
+                    'translationId' => null,
+                    'variantId'     => null,
+                    'contactId'     => null,
+                ],
             ],
         ],
     ],

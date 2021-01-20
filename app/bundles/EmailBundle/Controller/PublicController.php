@@ -434,12 +434,17 @@ class PublicController extends CommonFormController
     /**
      * Preview email.
      *
-     * @param $objectId
+     * @param null $objectType
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
-    public function previewAction($objectId)
-    {
+    public function previewAction(
+        int $objectId,
+        $objectType = null,
+        int $translationId = null,
+        int $variantId = null,
+        int $contactId = null
+    ) {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model       = $this->getModel('email');
         $emailEntity = $model->getEntity($objectId);
