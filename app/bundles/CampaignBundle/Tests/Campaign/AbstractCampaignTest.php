@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 
 abstract class AbstractCampaignTest extends MauticMysqlTestCase
 {
-    protected function saveSomeCampaignLeadEventLogs(): Campaign
+    protected function saveSomeCampaignLeadEventLogs(bool $emulatePendingCount = false): Campaign
     {
         /** @var LeadEventLogRepository $leadEventLogRepo */
         $leadEventLogRepo = $this->em->getRepository(LeadEventLog::class);
@@ -102,6 +102,27 @@ abstract class AbstractCampaignTest extends MauticMysqlTestCase
         $campaignLeadsB->setManuallyRemoved(false);
 
         $campaignLeadsRepo->saveEntities([$campaignLeadsA, $campaignLeadsB]);
+
+        if ($emulatePendingCount) {
+            $contactC = new Lead();
+            $contactRepo->saveEntity($contactC);
+
+            $leadEventLogD = new LeadEventLog();
+            $leadEventLogD->setCampaign($campaign);
+            $leadEventLogD->setEvent($eventA);
+            $leadEventLogD->setLead($contactC);
+            $leadEventLogD->setDateTriggered(new \DateTime('2020-11-21 16:34:00', new \DateTimeZone('UTC')));
+            $leadEventLogD->setRotation(0);
+            $leadEventLogRepo->saveEntity($leadEventLogD);
+
+            $campaignLeadsC = new CampaignLeads();
+            $campaignLeadsC->setLead($contactC);
+            $campaignLeadsC->setCampaign($campaign);
+            $campaignLeadsC->setDateAdded(new \DateTime('2020-11-21'));
+            $campaignLeadsC->setRotation(0);
+            $campaignLeadsC->setManuallyRemoved(true);
+            $campaignLeadsRepo->saveEntity($campaignLeadsC);
+        }
 
         return $campaign;
     }

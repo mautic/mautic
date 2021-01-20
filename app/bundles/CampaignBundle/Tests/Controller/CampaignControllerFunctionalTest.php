@@ -5,9 +5,18 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Command\SummarizeCommand;
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
+use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\Lead as CampaignLeads;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Entity\LeadRepository as CampaignLeadsRepository;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTest;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DomCrawler\Crawler;
@@ -155,6 +164,50 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
         Assert::assertSame('0', $actionCounts['pending']);
     }
 
+    public function testCampaignPendingCounts(): void
+    {
+        // emulate pending count
+        $campaign   = $this->saveSomeCampaignLeadEventLogs(true);
+        $campaignId = $campaign->getId();
+
+        $this->runCommand(
+            SummarizeCommand::NAME,
+            [
+                '--env'       => 'test',
+                '--max-hours' => 9999999,
+            ]
+        );
+
+        // Campaign Summary OFF, Campaign Range OFF
+        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => false, self::CAMPAIGN_RANGE_PARAM => false]);
+        $actionCounts = $this->getActionCounts($campaignId);
+
+        Assert::assertSame('100%', $actionCounts['successPercent']);
+        Assert::assertSame('2', $actionCounts['completed']);
+        Assert::assertSame('1', $actionCounts['pending']);
+
+        // Campaign Summary ON, Campaign Range OFF
+        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => true, self::CAMPAIGN_RANGE_PARAM => false]);
+        $actionCounts = $this->getActionCounts($campaignId);
+        Assert::assertSame('100%', $actionCounts['successPercent']);
+        Assert::assertSame('2', $actionCounts['completed']);
+        Assert::assertSame('1', $actionCounts['pending']);
+
+        // Campaign Summary OFF, Campaign Range ON
+        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => false, self::CAMPAIGN_RANGE_PARAM => true]);
+        $actionCounts = $this->getActionCounts($campaignId);
+        Assert::assertSame('100%', $actionCounts['successPercent']);
+        Assert::assertSame('2', $actionCounts['completed']);
+        Assert::assertSame('1', $actionCounts['pending']);
+
+        // Campaign Summary ON, Campaign Range ON
+        $this->setSummaryCoreParameter([self::CAMPAIGN_SUMMARY_PARAM => true, self::CAMPAIGN_RANGE_PARAM => true]);
+        $actionCounts = $this->getActionCounts($campaignId);
+        Assert::assertSame('100%', $actionCounts['successPercent']);
+        Assert::assertSame('2', $actionCounts['completed']);
+        Assert::assertSame('1', $actionCounts['pending']);
+    }
+
     private function getStatTotalContacts(int $campaignId): int
     {
         $stats = $this->campaignModel->getCampaignMetricsLineChartData(
@@ -239,5 +292,40 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
             'completed'      => $completed,
             'pending'        => $pending,
         ];
+    }
+
+    private function addCampaignLead(Campaign $campaign): void
+    {
+        /** @var LeadEventLogRepository $leadEventLogRepo */
+        $leadEventLogRepo = $this->em->getRepository(LeadEventLog::class);
+
+        /** @var CampaignRepository $campaignRepo */
+        $campaignRepo = $this->em->getRepository(Campaign::class);
+
+        /** @var CampaignLeadsRepository $campaignLeadsRepo */
+        $campaignLeadsRepo = $this->em->getRepository(CampaignLeads::class);
+
+        /** @var LeadRepository $contactRepo */
+        $contactRepo = $this->em->getRepository(Lead::class);
+
+        $eventX = new Event();
+        $eventX->setName('Event X');
+        $eventX->setType('type.x');
+        $eventX->setEventType('action');
+        $eventX->setCampaign($campaign);
+        $campaign->addEvent(3, $eventX);
+        $campaignRepo->saveEntity($campaign);
+
+        $contactX = new Lead();
+        $contactRepo->saveEntity($contactX);
+
+        $campaignLeadsX = new CampaignLeads();
+        $campaignLeadsX->setLead($contactX);
+        $campaignLeadsX->setCampaign($campaign);
+        $campaignLeadsX->setDateAdded(new \DateTime('2020-11-21'));
+        $campaignLeadsX->setRotation(0);
+        $campaignLeadsX->setManuallyRemoved(true);
+
+        $campaignLeadsRepo->saveEntity($campaignLeadsX);
     }
 }
