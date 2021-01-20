@@ -64,4 +64,10 @@ final class Version20201120122846 extends AbstractMauticMigration
     {
         return "{$this->prefix}$tableName";
     }
+
+    public function down(Schema $schema): void
+    {
+        $campaignSummaryTable = $this->generateTableName(Summary::TABLE_NAME);
+        $this->addSql("DROP TABLE {$campaignSummaryTable}");
+    }
 }
