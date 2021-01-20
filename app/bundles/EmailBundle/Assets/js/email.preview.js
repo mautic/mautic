@@ -3,6 +3,7 @@
 Mautic.emailPreview = {
 
     urlBase : 'email/preview',
+    urlParams : {},
 
     init : function() {
         // Activate contact chosen
@@ -10,39 +11,32 @@ Mautic.emailPreview = {
         Mautic.activateChosenSelect(mQuery('#email_preview_settings_contact'));
     },
 
-    buildValueUrlPart  : function(parameterName, value) {
+    addUrlParameter  : function(parameterName, value) {
 
         if (value === undefined || value.length === 0) {
             return '';
         }
 
-        return parameterName + '/' + value + '/';
-    },
-
-    getTranslationUrlPart : function() {
-        return this.buildValueUrlPart(
-            'translation',
-            mQuery('#email_preview_settings_translation').val()
-        );
-    },
-
-    getVariantUrlPart : function() {
-        return this.buildValueUrlPart(
-            'variant',
-            mQuery('#email_preview_settings_variant').val()
-        );
-    },
-
-    getContactUrlPart : function() {
-        return this.buildValueUrlPart(
-            'contact',
-            mQuery('#email_preview_settings_contact').val()
-        );
+        this.urlParams[parameterName] = value;
     },
 
     regenerateUrl : function(emailId) {
-        let previewUrl = mauticBaseUrl + this.urlBase + '/' + emailId + '/'
-            + this.getTranslationUrlPart() + this.getVariantUrlPart() + this.getContactUrlPart();
+        this.addUrlParameter(
+            'translationId',
+            mQuery('#email_preview_settings_translation').val()
+        );
+
+        this.addUrlParameter(
+            'variantId',
+            mQuery('#email_preview_settings_variant').val()
+        );
+
+        this.addUrlParameter(
+            'contactId',
+            mQuery('#email_preview_settings_contact').val()
+        );
+
+        let previewUrl = mauticBaseUrl + this.urlBase + '/' + emailId + '?' + new URLSearchParams(this.urlParams)
         // Update url in preview input
         mQuery('#email_preview_url').val(previewUrl);
         // Update URL in preview button
