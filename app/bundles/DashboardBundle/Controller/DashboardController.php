@@ -15,6 +15,8 @@ use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\DashboardBundle\Dashboard\Widget as WidgetService;
+use Mautic\CoreBundle\Helper\PhpVersionHelper;
+use Mautic\CoreBundle\Release\ThisRelease;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Form\Type\UploadType;
 use Mautic\DashboardBundle\Model\DashboardModel;
@@ -75,11 +77,18 @@ class DashboardController extends AbstractFormController
         $dateRangeFilter['date_to']   = $filter['dateTo']->format(WidgetService::FORMAT_HUMAN);
         $dateRangeForm                = $this->get('form.factory')->create(DateRangeType::class, $dateRangeFilter, ['action' => $action]);
 
+        $model->populateWidgetsContent($widgets, $filter);
+        $releaseMetadata = ThisRelease::getMetadata();
+
         return $this->delegateView([
             'viewParameters' => [
                 'security'      => $this->get('mautic.security'),
                 'widgets'       => $widgets,
                 'dateRangeForm' => $dateRangeForm->createView(),
+                'phpVersion'    => [
+                    'isOutdated' => version_compare(PHP_VERSION, $releaseMetadata->getShowPHPVersionWarningIfUnder(), 'lt'),
+                    'version'    => PhpVersionHelper::getCurrentSemver(),
+                ],
             ],
             'contentTemplate' => 'MauticDashboardBundle:Dashboard:index.html.php',
             'passthroughVars' => [
