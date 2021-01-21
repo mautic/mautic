@@ -38,8 +38,8 @@ class EmailPreviewSettingsType extends AbstractType
             [
                 'attr' => [
                     'onChange'         => $this->onChangeContent,
-                    'data-placeholder' => 'Choose ...',
                 ],
+                'placeholder' => 'Choose ...',
             ]
         );
     }

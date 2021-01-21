@@ -82,36 +82,56 @@ class EmailPreviewSettingsTypeTest extends TestCase
 
     public function testBuildFormWithTranslationAndVariantFieldAvailable(): void
     {
-        $emailId = 1;
-        $email   = new Email();
-        $email->setId($emailId);
+        $parentEmailId = 1;
+        $parentEmail   = new Email();
+        $parentEmail->setId($parentEmailId);
+        $parentEmail->setName('Parent');
+        $parentEmail->setLanguage('en');
+
+        $translationEmail1 = new Email();
+        $translationEmail1->setId(2);
+        $translationEmail1->setName('Translation 1');
+        $translationEmail1->setLanguage('cs_CZ');
+
+        $translationEmail2 = new Email();
+        $translationEmail2->setId(3);
+        $translationEmail2->setName('Translation 2');
+        $translationEmail2->setLanguage('dz_BT');
 
         $expectedTranslations = [
-            1  => 'First (en)',
-            2  => 'Second (cs)',
-            3  => 'Third (it)',
+            'Parent - English'                  => 1,
+            'Translation 1 - Czech (Czechia)'   => 2,
+            'Translation 2 - Dzongkha (Bhutan)' => 3,
         ];
 
+        $variantEmail1 = new Email();
+        $variantEmail1->setId(2);
+        $variantEmail1->setName('Variant 1');
+
+        $variantEmail2 = new Email();
+        $variantEmail2->setId(3);
+        $variantEmail2->setName('Variant 2');
+
         $expectedVariants = [
-            1  => 'First (1)',
-            2  => 'Second (2)',
-            3  => 'Third (3)',
+            'Parent - ID 1'    => 1,
+            'Variant 1 - ID 2' => 2,
+            'Variant 2 - ID 3' => 3,
         ];
 
         $options = [
-            'emailId'      => $emailId,
+            'emailId'      => $parentEmailId,
             'translations' => [
-                'parent'   => $this->createEmailWithNameAndId($expectedTranslations[1], 1),
+                'parent'   => $parentEmail,
                 'children' => [
-                    $this->createEmailWithNameAndId($expectedTranslations[2], 2),
-                    $this->createEmailWithNameAndId($expectedTranslations[3], 3),
+                    $translationEmail1,
+                    $translationEmail2,
                 ],
             ],
-            'variants'     => [
-                'parent'   => $this->createEmailWithNameAndId($expectedVariants[1], 1),
+            'variants' => [
+                'parent'   => $parentEmail,
                 'children' => [
-                    $this->createEmailWithNameAndId($expectedVariants[2], 2),
-                    $this->createEmailWithNameAndId($expectedVariants[3], 3),
+                    $variantEmail1,
+                    $variantEmail2,
                 ],
             ],
         ];
@@ -119,24 +139,27 @@ class EmailPreviewSettingsTypeTest extends TestCase
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects(self::exactly(3))
             ->method('add')
-            ->withConsecutive([
+            ->withConsecutive(
+                [
                     'translation',
                     ChoiceType::class,
                     [
-                        'choices' => array_flip($expectedTranslations),
+                        'choices' => $expectedTranslations,
                         'attr'    => [
-                            'onChange' => "Mautic.emailPreview.regenerateUrl({$emailId})",
+                            'onChange' => "Mautic.emailPreview.regenerateUrl({$parentEmailId})",
                         ],
+                        'placeholder' => 'Choose ...',
                     ],
                 ],
                 [
                     'variant',
                     ChoiceType::class,
                     [
-                        'choices' => array_flip($expectedVariants),
+                        'choices' => $expectedVariants,
                         'attr'    => [
-                            'onChange' => "Mautic.emailPreview.regenerateUrl({$emailId})",
+                            'onChange' => "Mautic.emailPreview.regenerateUrl({$parentEmailId})",
                         ],
+                        'placeholder' => 'Choose ...',
                     ],
                 ],
                 [
@@ -144,23 +167,13 @@ class EmailPreviewSettingsTypeTest extends TestCase
                     SelectType::class,
                     [
                         'attr' => [
-                            'onChange' => "Mautic.emailPreview.regenerateUrl({$emailId})",
+                            'onChange' => "Mautic.emailPreview.regenerateUrl({$parentEmailId})",
                         ],
+                        'placeholder' => 'Choose ...',
                     ],
                 ]
             );
 
         $this->form->buildForm($builder, $options);
-    }
-
-    private function createEmailWithNameAndId(string $name, int $id): Email
-    {
-        $name = substr($name, 0, strpos($name, ' '));
-
-        $email = new Email();
-        $email->setName($name);
-        $email->setId($id);
-
-        return $email;
     }
 }
