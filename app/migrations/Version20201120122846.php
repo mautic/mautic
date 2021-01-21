@@ -13,23 +13,23 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
-use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CampaignBundle\Entity\Summary;
-use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
-final class Version20201120122846 extends AbstractMauticMigration
+final class Version20201120122846 extends PreUpAssertionMigration
 {
     private const SIGNED   = 'SIGNED';
     private const UNSIGNED = 'UNSIGNED';
 
-    /**
-     * @throws SkipMigration
-     */
-    public function preUp(Schema $schema): void
+    protected function preUpAssertions(): void
     {
-        if ($schema->hasTable($this->generateTableName(Summary::TABLE_NAME))) {
-            throw new SkipMigration('Schema includes this migration');
-        }
+        $campaignSummaryTableName = $this->generateTableName(Summary::TABLE_NAME);
+        $this->skipAssertion(
+            function (Schema $schema) {
+                return $schema->hasTable($this->generateTableName(Summary::TABLE_NAME));
+            },
+            sprintf('Schema already includes %s table', $campaignSummaryTableName)
+        );
     }
 
     public function up(Schema $schema): void
