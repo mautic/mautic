@@ -19,6 +19,9 @@ use Mautic\CoreBundle\Helper\ParamsLoaderHelper;
  */
 class TokenHelper
 {
+    /**
+     * @var array
+     */
     private static $parameters;
 
     /**
