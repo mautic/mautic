@@ -17,10 +17,19 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class RedirectEvent extends CommonEvent
 {
+    /**
+     * @var string
+     */
     private $url;
 
+    /**
+     * @var Lead|null
+     */
     private $lead;
 
+    /**
+     * @var string
+     */
     private $clickthrough;
 
     /**
@@ -33,7 +42,7 @@ class RedirectEvent extends CommonEvent
     {
         $this->url          = $url;
         $this->lead         = $lead;
-        $this->clickthrough = ClickthroughHelper::decodeArrayFromUrl($ct);
+        $this->clickthrough = $ct;
     }
 
     /**
@@ -45,7 +54,7 @@ class RedirectEvent extends CommonEvent
     }
 
     /**
-     * @return array
+     * @return string
      */
     public function getClickthrough()
     {

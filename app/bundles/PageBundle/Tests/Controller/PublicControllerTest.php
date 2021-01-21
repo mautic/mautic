@@ -74,6 +74,8 @@ class PublicControllerTest extends TestCase
     /** @var PrimaryCompanyHelper */
     private $primaryCompanyHelper;
 
+    private $eventDispatcher;
+
     protected function setUp(): void
     {
         $this->controller           = new PublicController();
@@ -88,6 +90,7 @@ class PublicControllerTest extends TestCase
         $this->leadModel            = $this->createMock(LeadModel::class);
         $this->pageModel            = $this->createMock(PageModel::class);
         $this->primaryCompanyHelper = $this->createMock(PrimaryCompanyHelper::class);
+        $this->eventDispatcher = new EventDispatcher();
 
         $this->controller->setContainer($this->container);
         $this->controller->setRequest($this->request);
@@ -343,7 +346,7 @@ class PublicControllerTest extends TestCase
             ->method('getContactFromRequest')
             ->will($this->returnCallback($getContactFromRequestCallback));
 
-        $this->container->expects($this->exactly(6))
+        $this->container->expects($this->exactly(7))
             ->method('get')
             ->withConsecutive(
                 ['monolog.logger.mautic'],
@@ -351,7 +354,8 @@ class PublicControllerTest extends TestCase
                 ['mautic.helper.ip_lookup'],
                 ['mautic.model.factory'],
                 ['mautic.model.factory'],
-                ['mautic.lead.helper.primary_company']
+                ['mautic.lead.helper.primary_company'],
+                ['event_dispatcher']
                 )
             ->willReturnOnConsecutiveCalls(
                 $this->logger,
@@ -359,7 +363,8 @@ class PublicControllerTest extends TestCase
                 $this->ipLookupHelper,
                 $this->modelFactory,
                 $this->modelFactory,
-                $this->primaryCompanyHelper
+                $this->primaryCompanyHelper,
+                $this->eventDispatcher
         );
 
         $this->request->query->set('ct', $clickTrough);
