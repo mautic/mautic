@@ -119,8 +119,6 @@
         "symfony/var-dumper": "~3.4.0",
         "symfony/browser-kit": "~3.4.0",
         "symfony/dom-crawler": "~3.4.0",
-
-        "liip/functional-test-bundle": "~3.3.0",
         "mautic/transifex": "^4.0",
         "http-interop/http-factory-guzzle": "^1.0",
         "webfactory/exceptions-bundle": "~4.3",
@@ -128,11 +126,10 @@
         "liip/test-fixtures-bundle": "^1.6",
         "phpstan/phpstan": "0.12.25",
         "rector/rector-prefixed": "0.6.13",
-        "theofidry/psysh-bundle": "^v3.5.1",
         "symfony/phpunit-bridge": "~5.1.0",
-        "phpunit/phpunit": "~8.5.0",
-        "phpunit/phpunit-selenium": "~8.0.0",
-        "codeception/codeception": "^4.0"
+        "codeception/codeception": "^4.0",
+        "phpunit/phpunit": "^9.5",
+        "liip/functional-test-bundle": "^4.2"
     },
     "repositories": [
         {
