@@ -90,7 +90,7 @@ class PublicControllerTest extends TestCase
         $this->leadModel            = $this->createMock(LeadModel::class);
         $this->pageModel            = $this->createMock(PageModel::class);
         $this->primaryCompanyHelper = $this->createMock(PrimaryCompanyHelper::class);
-        $this->eventDispatcher = new EventDispatcher();
+        $this->eventDispatcher      = new EventDispatcher();
 
         $this->controller->setContainer($this->container);
         $this->controller->setRequest($this->request);
