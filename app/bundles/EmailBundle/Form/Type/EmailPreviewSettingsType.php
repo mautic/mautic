@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Form\Type;
 
-use Mautic\CoreBundle\Form\Type\LookupType;
+use Mautic\CoreBundle\Form\Type\SelectType;
 use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -33,7 +33,7 @@ class EmailPreviewSettingsType extends AbstractType
 
         $builder->add(
             'contact',
-            LookupType::class,
+            SelectType::class,
             [
                 'attr' => [
                     'onChange'         => $this->onChangeContent,
@@ -71,22 +71,18 @@ class EmailPreviewSettingsType extends AbstractType
             return;
         }
 
-        // Use order no in names to avoid missing choices with the same name
-        $orderNo = 1;
-
         /** @var Email */
         $child = $variants['parent'];
 
         $variantChoices = [
             // The first will be parent one
-            $this->addOrderNoToChoiceName($child->getName(), $orderNo) => $child->getId(),
+            $this->addOrderNoToChoiceName($child, $type) => $child->getId(),
         ];
 
         /** @var Email $child */
         foreach ($variants['children'] as $child) {
             // Add children
-            ++$orderNo;
-            $variantChoices[$this->addOrderNoToChoiceName($child->getName(), $orderNo)] = $child->getId();
+            $variantChoices[$this->addOrderNoToChoiceName($child, $type)] = $child->getId();
         }
 
         $builder->add(
@@ -97,12 +93,24 @@ class EmailPreviewSettingsType extends AbstractType
                 'attr'    => [
                     'onChange' => $this->onChangeContent,
                 ],
+                'placeholder' => 'Choose ...',
             ]
         );
     }
 
-    private function addOrderNoToChoiceName(string $name, int $orderNo): string
+    private function addOrderNoToChoiceName(Email $email, string $type): string
     {
-        return "$name ($orderNo)";
+        $identifier = '';
+
+        switch ($type) {
+            case self::CHOICE_TYPE_TRANSLATION:
+                $identifier = $email->getLanguage();
+                break;
+            case self::CHOICE_TYPE_VARIANT:
+                $identifier = "ID {$email->getId()}";
+                break;
+        }
+
+        return "{$email->getName()} ($identifier)";
     }
 }
