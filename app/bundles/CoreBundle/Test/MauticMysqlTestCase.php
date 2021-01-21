@@ -81,7 +81,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     protected function resetAutoincrement(array $tables): void
     {
-        $prefix     = $this->container->getParameter('mautic.db_table_prefix');
+        $prefix     = self::$container->getParameter('mautic.db_table_prefix');
         $connection = $this->connection;
 
         foreach ($tables as $table) {
@@ -120,7 +120,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             return;
         }
 
-        $sqlDumpFile = $this->container->getParameter('kernel.cache_dir').'/fresh_db.sql';
+        $sqlDumpFile = self::$container->getParameter('kernel.cache_dir').'/fresh_db.sql';
 
         if (!file_exists($sqlDumpFile)) {
             $this->installDatabase();
