@@ -26,7 +26,9 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class ConfigFormTest extends KernelTestCase
 {
-    protected function setUp()
+    protected $container;
+
+    protected function setUp(): void
     {
         self::bootKernel();
     }
@@ -150,7 +152,7 @@ class ConfigFormTest extends KernelTestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
     }

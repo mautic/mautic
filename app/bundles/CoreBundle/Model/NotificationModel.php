@@ -15,6 +15,7 @@ use Debril\RssAtomBundle\Protocol\FeedReader;
 use Debril\RssAtomBundle\Protocol\Parser\FeedContent;
 use Debril\RssAtomBundle\Protocol\Parser\Item;
 use Mautic\CoreBundle\Entity\Notification;
+use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -23,9 +24,6 @@ use Mautic\CoreBundle\Helper\UpdateHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-/**
- * Class NotificationModel.
- */
 class NotificationModel extends FormModel
 {
     /**
@@ -53,9 +51,6 @@ class NotificationModel extends FormModel
      */
     protected $coreParametersHelper;
 
-    /**
-     * NotificationModel constructor.
-     */
     public function __construct(
         PathsHelper $pathsHelper,
         UpdateHelper $updateHelper,
@@ -72,7 +67,7 @@ class NotificationModel extends FormModel
     }
 
     /**
-     * @param $disableUpdates
+     * @param bool $disableUpdates
      */
     public function setDisableUpdates($disableUpdates)
     {
@@ -80,13 +75,11 @@ class NotificationModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return \Mautic\CoreBundle\Entity\NotificationRepository
+     * @return NotificationRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticCoreBundle:Notification');
+        return $this->em->getRepository(Notification::class);
     }
 
     /**

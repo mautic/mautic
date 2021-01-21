@@ -27,7 +27,7 @@ class MauticQueueBundleTest extends TestCase
      */
     private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerBuilder::class);
     }

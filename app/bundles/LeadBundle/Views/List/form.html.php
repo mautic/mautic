@@ -78,6 +78,9 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                             <div class="col-md-6">
                                 <?php echo $view['form']->row($form['alias']); ?>
                             </div>
+                            <div class="col-md-6">
+                                <?php echo $view['form']->row($form['publicName']); ?>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-xs-12">

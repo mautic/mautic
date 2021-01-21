@@ -139,6 +139,20 @@ class ListType extends AbstractType
         );
 
         $builder->add(
+            'publicName',
+            TextType::class,
+            [
+                'label'      => 'mautic.lead.list.form.publicname',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.lead.list.form.publicname.tooltip',
+                ],
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
             'alias',
             TextType::class,
             [

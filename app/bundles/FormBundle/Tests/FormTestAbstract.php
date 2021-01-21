@@ -42,12 +42,14 @@ use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServic
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Templating\EngineInterface;
 
-class FormTestAbstract extends WebTestCase
+class FormTestAbstract extends TestCase
 {
     protected static $mockId   = 123;
     protected static $mockName = 'Mock test name';
@@ -55,9 +57,8 @@ class FormTestAbstract extends WebTestCase
     protected $formRepository;
     protected $leadFieldModel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        self::bootKernel();
         $this->mockTrackingId = hash('sha1', uniqid(mt_rand()));
     }
 
@@ -92,7 +93,7 @@ class FormTestAbstract extends WebTestCase
         $templatingHelperMock->expects($this
             ->any())
             ->method('getTemplating')
-            ->willReturn(self::$container->get('templating'));
+            ->willReturn($this->createMock(EngineInterface::class));
 
         $entityManager->expects($this
             ->any())
@@ -225,7 +226,7 @@ class FormTestAbstract extends WebTestCase
             $uploadFieldValidatorMock,
             $formUploaderMock,
             $deviceTrackingService,
-            new FieldValueTransformer(self::$container->get('router')),
+            new FieldValueTransformer($this->createMock(RouterInterface::class)),
             $dateHelper,
             $contactTracker
         );

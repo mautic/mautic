@@ -37,17 +37,17 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
      */
     private $coreParametersHelper;
 
-    public static function setupBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$oldTimezone = date_default_timezone_get();
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         date_default_timezone_set(self::$oldTimezone);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);

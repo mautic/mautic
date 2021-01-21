@@ -540,6 +540,13 @@ return [
                     'mautic.lead.model.dnc',
                 ],
             ],
+            'mautic.lead.subscriber.segment.filter' => [
+                'class'     => \Mautic\LeadBundle\EventListener\SegmentFiltersSubscriber::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.lead.model.list',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.lead' => [
@@ -689,6 +696,12 @@ return [
                 'class'     => \Mautic\LeadBundle\Form\Type\LeadFieldsType::class,
                 'arguments' => ['mautic.lead.model.field'],
             ],
+            'mautic.form.type.lead_columns' => [
+                'class'     => \Mautic\LeadBundle\Form\Type\ContactColumnsType::class,
+                'arguments' => [
+                    'mautic.lead.columns.dictionary',
+                ],
+            ],
             'mautic.form.type.lead_dashboard_leads_in_time_widget' => [
                 'class' => \Mautic\LeadBundle\Form\Type\DashboardLeadsInTimeWidgetType::class,
             ],
@@ -828,6 +841,14 @@ return [
                     'mautic.campaign.model.campaign',
                     'mautic.helper.cache_storage',
                     '@doctrine.orm.entity_manager',
+                ],
+            ],
+            'mautic.lead.columns.dictionary' => [
+                'class'     => \Mautic\LeadBundle\Services\ContactColumnsDictionary::class,
+                'arguments' => [
+                    'mautic.lead.model.field',
+                    'translator',
+                    'mautic.helper.core_parameters',
                 ],
             ],
         ],
@@ -1029,6 +1050,7 @@ return [
                     'mautic.helper.core_parameters',
                     'mautic.lead.model.lead_segment_service',
                     'mautic.lead.segment.stat.chart.query.factory',
+                    'request_stack',
                 ],
             ],
             'mautic.lead.repository.lead_segment_filter_descriptor' => [
@@ -1301,5 +1323,14 @@ return [
     'parameters' => [
         'parallel_import_limit'               => 1,
         'background_import_if_more_rows_than' => 0,
+        'contact_columns'                     => [
+            '0' => 'name',
+            '1' => 'email',
+            '2' => 'location',
+            '3' => 'stage',
+            '4' => 'points',
+            '5' => 'last_active',
+            '6' => 'id',
+        ],
     ],
 ];
