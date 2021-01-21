@@ -21,7 +21,7 @@ use Symfony\Component\Lock\Store\FlockStore;
 
 abstract class ModeratedCommand extends ContainerAwareCommand
 {
-    const MODE_PID = 'pid';
+    const MODE_PID   = 'pid';
     const MODE_FLOCK = 'flock';
 
     /**
@@ -43,7 +43,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     private $lock;
 
     /**
-     * @var OutputInterface $output
+     * @var OutputInterface
      */
     protected $output;
 
@@ -71,9 +71,6 @@ abstract class ModeratedCommand extends ContainerAwareCommand
             ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Deprecated; use --bypass-locking instead.');
     }
 
-    /**
-     * @return bool
-     */
     protected function checkRunStatus(InputInterface $input, OutputInterface $output, $moderationKey = ''): bool
     {
         // Bypass locking

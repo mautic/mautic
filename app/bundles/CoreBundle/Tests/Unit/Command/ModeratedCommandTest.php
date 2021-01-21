@@ -218,7 +218,7 @@ class ModeratedCommandTest extends TestCase
         $this->assertEquals(1, $finder->count());
 
         // Check the file is locked
-        $file = $this->getFirstFile($finder);
+        $file        = $this->getFirstFile($finder);
         $fileHandler = fopen($file->getPathname(), 'r');
         if (flock($fileHandler, LOCK_EX | LOCK_NB)) {
             $this->fail('file is not locked');
