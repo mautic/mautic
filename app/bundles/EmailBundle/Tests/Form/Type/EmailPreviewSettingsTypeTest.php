@@ -98,7 +98,7 @@ class EmailPreviewSettingsTypeTest extends TestCase
         $translationEmail2->setName('Translation 2');
         $translationEmail2->setLanguage('dz_BT');
 
-        $expectedTranslations = [
+        $expectedTranslationChoices = [
             'Parent - English'                  => 1,
             'Translation 1 - Czech (Czechia)'   => 2,
             'Translation 2 - Dzongkha (Bhutan)' => 3,
@@ -112,13 +112,13 @@ class EmailPreviewSettingsTypeTest extends TestCase
         $variantEmail2->setId(3);
         $variantEmail2->setName('Variant 2');
 
-        $expectedVariants = [
+        $expectedVariantChoices = [
             'Parent - ID 1'    => 1,
             'Variant 1 - ID 2' => 2,
             'Variant 2 - ID 3' => 3,
         ];
 
-        $options = [
+        $formOptions = [
             'emailId'      => $parentEmailId,
             'translations' => [
                 'parent'   => $parentEmail,
@@ -136,15 +136,15 @@ class EmailPreviewSettingsTypeTest extends TestCase
             ],
         ];
 
-        $builder = $this->createMock(FormBuilderInterface::class);
-        $builder->expects(self::exactly(3))
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
+        $formBuilder->expects(self::exactly(3))
             ->method('add')
             ->withConsecutive(
                 [
                     'translation',
                     ChoiceType::class,
                     [
-                        'choices' => $expectedTranslations,
+                        'choices' => $expectedTranslationChoices,
                         'attr'    => [
                             'onChange' => "Mautic.emailPreview.regenerateUrl({$parentEmailId})",
                         ],
@@ -155,7 +155,7 @@ class EmailPreviewSettingsTypeTest extends TestCase
                     'variant',
                     ChoiceType::class,
                     [
-                        'choices' => $expectedVariants,
+                        'choices' => $expectedVariantChoices,
                         'attr'    => [
                             'onChange' => "Mautic.emailPreview.regenerateUrl({$parentEmailId})",
                         ],
@@ -174,6 +174,6 @@ class EmailPreviewSettingsTypeTest extends TestCase
                 ]
             );
 
-        $this->form->buildForm($builder, $options);
+        $this->form->buildForm($formBuilder, $formOptions);
     }
 }
