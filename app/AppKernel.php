@@ -202,8 +202,7 @@ class AppKernel extends Kernel
         if (in_array($this->getEnvironment(), ['dev', 'test'])) {
             $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
             $bundles[] = new Webfactory\Bundle\ExceptionsBundle\WebfactoryExceptionsBundle();
-            // Removed temporarily for https://github.com/mautic/mautic/pull/9602, can be re-added in Mautic 4+
-            // $bundles[] = new Fidry\PsyshBundle\PsyshBundle();
+            $bundles[] = new Fidry\PsyshBundle\PsyshBundle();
         }
 
         if (in_array($this->getEnvironment(), ['test'])) {
