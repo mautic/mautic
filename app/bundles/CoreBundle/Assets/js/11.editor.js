@@ -1,3 +1,4 @@
+Mautic.builderTokensForCkEditor = {};
 Mautic.builderTokens = {};
 Mautic.dynamicContentTokens = {};
 Mautic.builderTokensRequestInProgress = false;
@@ -27,6 +28,38 @@ Mautic.activateGlobalFroalaOptions = function() {
 
     // Set the Froala license key
     mQuery.FroalaEditor.DEFAULTS.key = 'MCHCPd1XQVZFSHSd1C==';
+};
+
+Mautic.activateGlobalCkeditorOptions = function() {
+    Mautic.basicCkeditorOptions = {
+        extraPlugins: [Mautic.MentionLinks],
+        autosave: {
+            save( editor ) {
+                editor.updateSourceElement();
+            }
+        },
+        ckfinder: {
+            uploadUrl: Mautic.imageUploadURL+'?editor=ckeditor'
+        },
+        image: {
+            toolbar: [
+                'imageResize',
+                'imageTextAlternative',
+                'imageStyle:full',
+                'imageStyle:side',
+                'linkImage'
+            ],
+        },
+        mention: {
+            feeds: [
+                {
+                    marker: '{',
+                    feed: Mautic.getFeedItems,
+                    itemRenderer: Mautic.customItemRenderer
+                }
+            ]
+        }
+    };
 };
 
 /**
@@ -156,4 +189,93 @@ Mautic.insertTextInEditor = function (obj, text) {
     ckEditor.model.change( writer => {
         writer.insertText( text, ckEditor.model.document.selection.getFirstPosition() );
     } );
+}
+Mautic.MentionLinks =  function ( editor ) {
+    editor.conversion.for( 'downcast' ).attributeToElement( {
+        model: 'mention',
+        view: ( modelAttributeValue, { writer } ) => {
+            if ( !modelAttributeValue ) {
+                return;
+            }
+            let tokenId = modelAttributeValue.id;
+            let tokenName = modelAttributeValue.name;
+            let tokenNameArr = tokenName.split(':');
+            if (tokenNameArr[0] != undefined && tokenNameArr[0] === 'a')
+            {
+                const obj = writer.createAttributeElement('a', {
+                    href:tokenId,
+                    'data-mention-text-replace': tokenNameArr[1],
+                },{priority: 20, id: modelAttributeValue.uid});
+                return obj;
+            }
+            else
+            {
+                return writer.createAttributeElement('span', {
+                        class: 'atwho-inserted',
+                        'data-fr-verified': true,
+                        'data-mention': modelAttributeValue.id,
+                        'data-atwho-at-query':'{'
+                    },{priority: 20});
+            }
+        },
+        converterPriority: 'high'
+    } );
+}
+
+/*
+ * Customizes the way the list of user suggestions is displayed.
+ */
+Mautic.customItemRenderer = function ( item ) {
+    let tokenId = item.id;
+    let tokenName = item.name;
+    const itemElement = document.createElement( 'span' );
+    const idElement = document.createElement( 'span' );
+    idElement.classList.add( 'custom-item-id' );
+    itemElement.classList.add( 'custom-item' );
+
+    let tokenNameArr = tokenName.split(':');
+    if (tokenNameArr[0] != undefined && tokenNameArr[0] === 'a')
+    {
+        itemElement.textContent =  tokenNameArr[1];
+        idElement.textContent = tokenNameArr[1];
+    }
+    else
+    {
+        itemElement.textContent = tokenName;
+        idElement.textContent = tokenId;
+    }
+    itemElement.appendChild( idElement );
+
+
+
+    return itemElement;
+}
+
+Mautic.CkeditorToken = function(tokens) {
+    Mautic.builderTokensForCkEditor = {};
+    Mautic.configureDynamicContentAtWhoTokens();
+    mQuery.extend(tokens, Mautic.dynamicContentTokens);
+    Mautic.builderTokensForCkEditor = mQuery.map(tokens, function(value, i) {
+        return {'id':i, 'name':value};
+    });
+
+    return;
+}
+Mautic.getFeedItems = function (queryText) {
+    return new Promise( resolve => {
+        setTimeout( () => {
+            const itemsToDisplay = Mautic.builderTokensForCkEditor
+                .filter( isItemMatching )
+                .slice( 0, 5 );
+            resolve( itemsToDisplay );
+        }, 100 );
+    } );
+
+    function isItemMatching( item ) {
+        const searchString = queryText.toLowerCase();
+        return (
+            item.name.toLowerCase().includes( searchString ) ||
+            item.id.toLowerCase().includes( searchString )
+        );
+    }
 }

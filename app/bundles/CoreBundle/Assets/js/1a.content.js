@@ -586,25 +586,13 @@ Mautic.onPageLoad = function (container, response, inModal) {
             }
         }
     });
-
     Mautic.activateGlobalFroalaOptions();
+    Mautic.activateGlobalCkeditorOptions();
     if (mQuery(container + ' textarea.editor').length) {
         mQuery(container + ' textarea.editor').each(function () {
             var textarea = mQuery(this);
 
-            // init AtWho in a froala editor
-            // if (textarea.hasClass('editor-builder-tokens')) {
-            //     textarea.on('froalaEditor.initialized', function (e, editor) {
-            //         Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'), editor);
-            //     });
-            //
-            //     textarea.on('froalaEditor.focus', function (e, editor) {
-            //         Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'), editor);
-            //     });
-            // }
-
-
-            var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'token', 'link', 'imageUpload', 'insertTable'];
+            var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'token', 'link', 'imageUpload', 'mediaEmbed', 'insertTable'];
             var minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
 
             if (textarea.hasClass('editor-email')) {
@@ -631,20 +619,10 @@ Mautic.onPageLoad = function (container, response, inModal) {
 
             if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
                 ClassicEditor
-                    .create( textarea[0], {
-                        toolbar: maxButtons,
-                        autosave: {
-                            save( editor ) {
-                                editor.updateSourceElement();
-                            }
-                        },
-                        ckfinder: {
-                            uploadUrl: Mautic.imageUploadURL+'?editor=ckeditor',
-                        }
-                    } )
+                    .create( textarea[0], mQuery.extend({toolbar: maxButtons}, Mautic.basicCkeditorOptions))
                     .then( editor => {
+                        Mautic.getTokens(textarea.attr('data-token-callback'), Mautic.CkeditorToken);
                         ckEditors.set( textarea[0], editor);
-                        editor.ui.view.editable.element.style.height = '300px';
                         editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
                             Mautic.showChangeThemeWarning = isFocused;
                         } );
@@ -654,20 +632,10 @@ Mautic.onPageLoad = function (container, response, inModal) {
                     } );
             } else {
                 ClassicEditor
-                    .create( textarea[0], {
-                         toolbar: minButtons,
-                        autosave: {
-                            save( editor ) {
-                                editor.updateSourceElement();
-                            },
-                            ckfinder: {
-                                uploadUrl: Mautic.imageUploadURL+'?editor=ckeditor',
-                            }
-                        },
-                    } )
+                    .create( textarea[0], mQuery.extend({toolbar: minButtons}, Mautic.basicCkeditorOptions))
                     .then( editor => {
+                        Mautic.getTokens(textarea.attr('data-token-callback'), Mautic.CkeditorToken);
                         ckEditors.set( textarea[0], editor);
-                        editor.ui.view.editable.element.style.height = '100px';
                     } )
                     .catch( err => {
                         console.error( err.stack );
@@ -675,6 +643,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
             }
         });
     }
+
 
     //prevent auto closing dropdowns for dropdown forms
     if (mQuery(container + ' .dropdown-menu-form').length) {

@@ -3241,14 +3241,14 @@ ul.line-legend li {
   background-color: #f86f54 !important;
   border-color: #f75f40 !important;
 }
-.bg-danger.bg-light-sm,
-.bg-danger .bg-light-sm {
-  background-color: #f9775e !important;
-  border-color: #f75f40 !important;
-}
 .bg-danger.bg-light-md,
 .bg-danger .bg-light-md {
   background-color: #f98068 !important;
+  border-color: #f75f40 !important;
+}
+.bg-danger.bg-light-sm,
+.bg-danger .bg-light-sm {
+  background-color: #f9775e !important;
   border-color: #f75f40 !important;
 }
 .bg-danger.bg-light-lg,
@@ -4760,4 +4760,17 @@ ul.media-list.media-list-feed div.media-object {
 
 #globalSearchDropdown .list-group-item>a{
   padding-top: 10px;
+}
+
+.ck-mentions span.custom-item{
+  color: #000000;
+}
+.ck-mentions span.custom-item.ck-on, .ck-mentions span.custom-item.ck-on span.custom-item-id{
+  color: #ffffff;
+}
+
+.ck-mentions span.custom-item span.custom-item-id{
+  margin-left: 10px;
+  font-size: smaller;
+  color: #cccccc;
 }
