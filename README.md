@@ -1,4 +1,4 @@
-[![codecov](https://codecov.io/gh/mautic/mautic/branch/feature/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
+[![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 
 Mautic Introduction
 ===========
@@ -22,7 +22,7 @@ The GitHub version is recommended for development or testing. Production package
 
 Documentation on how to use Mautic is available at [https://docs.mautic.org](https://docs.mautic.org).
 
-This is a simple 3 step installation process. You'll want to make sure you already have [Composer](http://getcomposer.org) available on your computer as this is a development release and you'll need to use Composer to download the vendor packages.
+This is a simple 3 step installation process. You'll want to make sure you already have [Composer v1](http://getcomposer.org) available on your computer as this is a development release and you'll need to use Composer to download the vendor packages. Note that v2 is not yet supported.
 
 <table width="100%" border="0">
 	<tr>
