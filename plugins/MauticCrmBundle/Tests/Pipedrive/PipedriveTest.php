@@ -131,7 +131,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         $this->em->flush();
 
-        $companyModel = $this->container->get('mautic.lead.model.company');
+        $companyModel = self::$container->get('mautic.lead.model.company');
 
         if ($companies instanceof Company) {
             $companies = [$companies];
@@ -227,7 +227,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
     protected function getIntegrationObject()
     {
         /** @var IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->container->get('mautic.helper.integration');
+        $integrationHelper = self::$container->get('mautic.helper.integration');
 
         /** @var Integration $integration */
         $integration = $integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
