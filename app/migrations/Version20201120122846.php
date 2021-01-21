@@ -30,6 +30,22 @@ final class Version20201120122846 extends PreUpAssertionMigration
             },
             sprintf('Schema already includes %s table', $campaignSummaryTableName)
         );
+
+        $campaignIdFK = $this->getForeignKeyName($campaignSummaryTableName, 'campaign_id');
+        $this->skipAssertion(
+            function (Schema $schema) use ($campaignSummaryTableName, $campaignIdFK) {
+                return $schema->getTable($campaignSummaryTableName)->hasForeignKey($campaignIdFK);
+            },
+            sprintf('Foreign key %s already exists in table %s', $campaignIdFK, $campaignSummaryTableName)
+        );
+
+        $eventIdFK = $this->getForeignKeyName($campaignSummaryTableName, 'event_id');
+        $this->skipAssertion(
+            function (Schema $schema) use ($campaignSummaryTableName, $eventIdFK) {
+                return $schema->getTable($campaignSummaryTableName)->hasForeignKey($eventIdFK);
+            },
+            sprintf('Foreign key %s already exists in table %s', $eventIdFK, $campaignSummaryTableName)
+        );
     }
 
     public function up(Schema $schema): void
@@ -87,5 +103,10 @@ final class Version20201120122846 extends PreUpAssertionMigration
         $column  = $table->getColumn($columnName);
 
         return $column->getUnsigned() ? self::UNSIGNED : self::SIGNED;
+    }
+
+    private function getForeignKeyName(string $tableName, string $column): string
+    {
+        return $this->generatePropertyName($this->generateTableName($tableName), 'fk', [$column]);
     }
 }
