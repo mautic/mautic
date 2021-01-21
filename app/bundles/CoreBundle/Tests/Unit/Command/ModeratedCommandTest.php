@@ -38,7 +38,7 @@ class ModeratedCommandTest extends TestCase
      */
     private $output;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
         $this->input     = $this->createMock(InputInterface::class);

@@ -26,8 +26,6 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class ConfigFormTest extends KernelTestCase
 {
-    protected $container;
-
     protected function setUp(): void
     {
         self::bootKernel();

@@ -41,11 +41,6 @@ abstract class AbstractMauticTestCase extends WebTestCase
     protected $connection;
 
     /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
      * @var Client
      */
     protected $client;
@@ -84,8 +79,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->client->disableReboot();
         $this->client->followRedirects(true);
 
-        $this->container  = $this->client->getContainer();
-        $this->em         = $this->container->get('doctrine')->getManager();
+        $this->em         = self::$container->get('doctrine')->getManager();
         $this->connection = $this->em->getConnection();
 
         /** @var RouterInterface $router */
@@ -112,7 +106,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
      */
     protected function getContainer(): ContainerInterface
     {
-        return $this->container;
+        return self::$container;
     }
 
     /**
