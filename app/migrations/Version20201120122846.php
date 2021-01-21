@@ -32,7 +32,7 @@ final class Version20201120122846 extends AbstractMauticMigration
     {
         $campaignIDX          = $this->generatePropertyName(Summary::TABLE_NAME, 'idx', ['campaign_id']);
         $campaignFK           = $this->generatePropertyName(Summary::TABLE_NAME, 'fk', ['campaign_id']);
-        $eventIDX             = $this->generatePropertyName(Summary::TABLE_NAME, 'idx', ['evemt_id']);
+        $eventIDX             = $this->generatePropertyName(Summary::TABLE_NAME, 'idx', ['event_id']);
         $eventFK              = $this->generatePropertyName(Summary::TABLE_NAME, 'fk', ['event_id']);
         $campaignSummaryTable = $this->generateTableName(Summary::TABLE_NAME);
         $campaignsTable       = $this->generateTableName('campaigns');
