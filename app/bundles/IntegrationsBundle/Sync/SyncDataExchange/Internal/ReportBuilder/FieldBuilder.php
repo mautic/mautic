@@ -73,7 +73,8 @@ class FieldBuilder
         string $field,
         array $mauticObject,
         RequestObjectDAO $requestObject,
-        string $integration
+        string $integration,
+        string $defaultState = ReportFieldDAO::FIELD_CHANGED
     ) {
         $this->mauticObject  = $mauticObject;
         $this->requestObject = $requestObject;
@@ -98,7 +99,7 @@ class FieldBuilder
             return $this->addContactTimelineField($integration, $field);
         }
 
-        return $this->addCustomField($field);
+        return $this->addCustomField($field, $defaultState);
     }
 
     /**
@@ -168,7 +169,7 @@ class FieldBuilder
      *
      * @throws FieldNotFoundException
      */
-    private function addCustomField(string $field)
+    private function addCustomField(string $field, string $defaultState)
     {
         // The rest should be Mautic custom fields and if not, just ignore
         $mauticFields = $this->fieldHelper->getFieldList($this->requestObject->getObject());
@@ -184,7 +185,7 @@ class FieldBuilder
         return new ReportFieldDAO(
             $field,
             $normalizedValue,
-            in_array($field, $requiredFields) ? ReportFieldDAO::FIELD_REQUIRED : ReportFieldDAO::FIELD_UNCHANGED
+            in_array($field, $requiredFields) ? ReportFieldDAO::FIELD_REQUIRED : $defaultState
         );
     }
 }
