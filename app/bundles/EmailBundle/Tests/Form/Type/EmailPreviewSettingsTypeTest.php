@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Form\Type;
 
-use Mautic\CoreBundle\Form\Type\LookupType;
+use Mautic\CoreBundle\Form\Type\SelectType;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\EmailPreviewSettingsType;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -67,10 +67,11 @@ class EmailPreviewSettingsTypeTest extends TestCase
             ->withConsecutive(
                 [
                     'contact',
-                    LookupType::class,
+                    SelectType::class,
                     [
                         'attr' => [
-                            'onChange' => "Mautic.emailPreview.regenerateUrl({$emailId})",
+                            'onChange'         => "Mautic.emailPreview.regenerateUrl({$emailId})",
+                            'data-placeholder' => 'Choose ...',
                         ],
                     ],
                 ]
@@ -85,7 +86,13 @@ class EmailPreviewSettingsTypeTest extends TestCase
         $email   = new Email();
         $email->setId($emailId);
 
-        $expectedTranslations = $expectedVariants = [
+        $expectedTranslations = [
+            1  => 'First (en)',
+            2  => 'Second (cs)',
+            3  => 'Third (it)',
+        ];
+
+        $expectedVariants = [
             1  => 'First (1)',
             2  => 'Second (2)',
             3  => 'Third (3)',
@@ -134,7 +141,7 @@ class EmailPreviewSettingsTypeTest extends TestCase
                 ],
                 [
                     'contact',
-                    LookupType::class,
+                    SelectType::class,
                     [
                         'attr' => [
                             'onChange' => "Mautic.emailPreview.regenerateUrl({$emailId})",
