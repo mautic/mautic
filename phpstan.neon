@@ -18,7 +18,6 @@ parameters:
 		- app/bundles/CoreBundle/Configurator/Configurator.php
 	ignoreErrors:
 		- '#Cannot unset offset#'
-		- '#Undefined variable: \$container#'
 		- '#Undefined variable: \$parameters#'
 		- '#Access to an undefined property Mautic\\AssetBundle\\Controller\\UploadController::\$errorHandler.#' # issue of the oneup/uploader-bundle package
 		- '#Call to an undefined static method Mautic\\IntegrationsBundle\\Bundle\\AbstractPluginBundle::installAllTablesIfMissing\(\).#'

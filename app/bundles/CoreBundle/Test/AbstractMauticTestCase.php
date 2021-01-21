@@ -28,11 +28,6 @@ abstract class AbstractMauticTestCase extends WebTestCase
     protected $em;
 
     /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
      * @var Client
      */
     protected $client;
@@ -61,11 +56,10 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->client->disableReboot();
         $this->client->followRedirects(true);
 
-        $this->container = $this->client->getContainer();
-        $this->em        = $this->container->get('doctrine')->getManager();
+        $this->em = self::$container->get('doctrine')->getManager();
 
         /** @var RouterInterface $router */
-        $router = $this->container->get('router');
+        $router = self::$container->get('router');
         $scheme = $router->getContext()->getScheme();
         $secure = 0 === strcasecmp($scheme, 'https');
 
@@ -126,9 +120,9 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $cookieHelper->expects($this->any())
             ->method('setCookie');
 
-        $this->container->set('mautic.helper.cookie', $cookieHelper);
+        self::$container->set('mautic.helper.cookie', $cookieHelper);
 
-        $this->container->set('session', new Session(new FixedMockFileSessionStorage()));
+        self::$container->set('session', new Session(new FixedMockFileSessionStorage()));
     }
 
     protected function applyMigrations()
@@ -136,7 +130,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $input  = new ArgvInput(['console', 'doctrine:migrations:version', '--add', '--all', '--no-interaction']);
         $output = new BufferedOutput();
 
-        $application = new Application($this->container->get('kernel'));
+        $application = new Application(self::$container->get('kernel'));
         $application->setAutoExit(false);
         $application->run($input, $output);
     }
@@ -180,13 +174,13 @@ abstract class AbstractMauticTestCase extends WebTestCase
     protected function runCommand($name, array $params = [], Command $command = null)
     {
         $params      = array_merge(['command' => $name], $params);
-        $kernel      = $this->container->get('kernel');
+        $kernel      = self::$container->get('kernel');
         $application = new Application($kernel);
         $application->setAutoExit(false);
 
         if ($command) {
             if ($command instanceof ContainerAwareCommand) {
-                $command->setContainer($this->container);
+                $command->setContainer(self::$container);
             }
 
             // Register the command

@@ -43,27 +43,9 @@ class MauticWebTestCase extends WebTestCase
     protected $encoder;
 
     /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
      * @var ReferenceRepository
      */
     public $fixtures;
-
-    protected function getClient(array $options = [], array $server = [])
-    {
-        if (empty($server['PHP_AUTH_USER'])) {
-            $server['PHP_AUTH_USER'] = 'admin';
-            $server['PHP_AUTH_PW']   = 'mautic';
-        }
-        $client = static::createClient($options, $server);
-
-        $client->followRedirects(true);
-
-        return $client;
-    }
 
     protected function getNonAdminClient($user = 'sales', array $options = [], array $server = [])
     {
@@ -208,18 +190,17 @@ class MauticWebTestCase extends WebTestCase
     {
         static::$kernel = static::createKernel();
         static::$kernel->boot();
-        $this->container = static::$kernel->getContainer();
 
         //setup the request stack
         $request      = Request::createFromGlobals();
         $requestStack = new RequestStack();
         $requestStack->push($request);
-        $this->container->set('request_stack', $requestStack);
+        self::$container->set('request_stack', $requestStack);
 
         //setup the entity manager
-        $this->em = $this->container
+        $this->em = self::$container
             ->get('doctrine')->getManager();
-        $this->encoder = $this->container
+        $this->encoder = self::$container
             ->get('security.encoder_factory');
 
         $this->setupDatabaseOnFirstRun();
@@ -235,7 +216,7 @@ class MauticWebTestCase extends WebTestCase
         if ($this->em) {
             $this->em->close();
         }
-        unset($this->em, $this->container, $this->client, $this->encoder);
+        unset($this->em, $this->client, $this->encoder);
     }
 
     /**
@@ -271,7 +252,7 @@ class MauticWebTestCase extends WebTestCase
     protected function getMauticFixtures($returnClassNames = false)
     {
         $fixtures      = [];
-        $mauticBundles = $this->container->getParameter('mautic.bundles');
+        $mauticBundles = self::$container->getParameter('mautic.bundles');
         foreach ($mauticBundles as $bundle) {
             $fixturesDir = $bundle['directory'].'/DataFixtures/ORM';
 

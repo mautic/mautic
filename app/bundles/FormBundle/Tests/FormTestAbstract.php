@@ -52,7 +52,6 @@ class FormTestAbstract extends WebTestCase
     protected static $mockId   = 123;
     protected static $mockName = 'Mock test name';
     protected $mockTrackingId;
-    protected $container;
     protected $formRepository;
     protected $leadFieldModel;
 
@@ -60,7 +59,6 @@ class FormTestAbstract extends WebTestCase
     {
         self::bootKernel();
         $this->mockTrackingId = hash('sha1', uniqid(mt_rand()));
-        $this->container      = self::$kernel->getContainer();
     }
 
     /**
@@ -94,7 +92,7 @@ class FormTestAbstract extends WebTestCase
         $templatingHelperMock->expects($this
             ->any())
             ->method('getTemplating')
-            ->willReturn($this->container->get('templating'));
+            ->willReturn(self::$container->get('templating'));
 
         $entityManager->expects($this
             ->any())
@@ -227,7 +225,7 @@ class FormTestAbstract extends WebTestCase
             $uploadFieldValidatorMock,
             $formUploaderMock,
             $deviceTrackingService,
-            new FieldValueTransformer($this->container->get('router')),
+            new FieldValueTransformer(self::$container->get('router')),
             $dateHelper,
             $contactTracker
         );
