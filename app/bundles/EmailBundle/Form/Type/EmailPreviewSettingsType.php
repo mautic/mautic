@@ -9,6 +9,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailPreviewSettingsType extends AbstractType
@@ -104,13 +105,13 @@ class EmailPreviewSettingsType extends AbstractType
 
         switch ($type) {
             case self::CHOICE_TYPE_TRANSLATION:
-                $identifier = $email->getLanguage();
+                $identifier = Intl::getLocaleBundle()->getLocaleName($email->getLanguage());
                 break;
             case self::CHOICE_TYPE_VARIANT:
                 $identifier = "ID {$email->getId()}";
                 break;
         }
 
-        return "{$email->getName()} ($identifier)";
+        return "{$email->getName()} - $identifier";
     }
 }
