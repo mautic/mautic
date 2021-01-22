@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class EmailPreviewSettingsTypeTest extends TestCase
 {
@@ -20,9 +21,20 @@ class EmailPreviewSettingsTypeTest extends TestCase
      */
     private $form;
 
+    /**
+     * @var MockObject|TranslatorInterface
+     */
+    private $translator;
+
     protected function setUp()
     {
-        $this->form = new EmailPreviewSettingsType();
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->translator
+            ->method('trans')
+            ->with('mautic.core.form.chooseone')
+            ->willReturn('Choose ...');
+
+        $this->form = new EmailPreviewSettingsType($this->translator);
 
         parent::setUp();
     }
@@ -71,8 +83,8 @@ class EmailPreviewSettingsTypeTest extends TestCase
                     [
                         'attr' => [
                             'onChange'         => "Mautic.emailPreview.regenerateUrl({$emailId})",
-                            'data-placeholder' => 'Choose ...',
                         ],
+                        'placeholder' => 'Choose ...',
                     ],
                 ]
             );

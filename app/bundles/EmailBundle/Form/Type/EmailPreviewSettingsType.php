@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class EmailPreviewSettingsType extends AbstractType
 {
@@ -18,9 +19,19 @@ class EmailPreviewSettingsType extends AbstractType
     private const CHOICE_TYPE_VARIANT     = 'variant';
 
     /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
      * @var string
      */
     private $onChangeContent;
+
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -39,7 +50,7 @@ class EmailPreviewSettingsType extends AbstractType
                 'attr' => [
                     'onChange'         => $this->onChangeContent,
                 ],
-                'placeholder' => 'Choose ...',
+                'placeholder' => $this->translator->trans('mautic.core.form.chooseone'),
             ]
         );
     }
@@ -94,7 +105,7 @@ class EmailPreviewSettingsType extends AbstractType
                 'attr'    => [
                     'onChange' => $this->onChangeContent,
                 ],
-                'placeholder' => 'Choose ...',
+                'placeholder' => $this->translator->trans('mautic.core.form.chooseone'),
             ]
         );
     }
