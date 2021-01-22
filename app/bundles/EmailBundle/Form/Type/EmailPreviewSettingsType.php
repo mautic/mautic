@@ -48,7 +48,7 @@ class EmailPreviewSettingsType extends AbstractType
             SelectType::class,
             [
                 'attr' => [
-                    'onChange'         => $this->onChangeContent,
+                    'onChange' => $this->onChangeContent,
                 ],
                 'placeholder' => $this->translator->trans('mautic.core.form.chooseone'),
             ]

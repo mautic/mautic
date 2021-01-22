@@ -82,7 +82,7 @@ class EmailPreviewSettingsTypeTest extends TestCase
                     SelectType::class,
                     [
                         'attr' => [
-                            'onChange'         => "Mautic.emailPreview.regenerateUrl({$emailId})",
+                            'onChange'  => "Mautic.emailPreview.regenerateUrl({$emailId})",
                         ],
                         'placeholder' => 'Choose ...',
                     ],
