@@ -491,10 +491,9 @@ class AssetsHelper
      *
      * @return array
      */
-    public function getCKEditorScripts()
+    private function getCKEditorScripts()
     {
         $base    = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/';
-        $plugins = $base.'plugins/';
 
         return [
             $base.'ckeditor.js?v'.$this->version,
