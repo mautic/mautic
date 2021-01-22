@@ -7,7 +7,7 @@ Mautic.imageUploadURL = mauticBaseUrl + 's/file/upload';
 Mautic.imageManagerDeleteURL = mauticBaseUrl + 's/file/delete';
 
 
-    /**
+/**
  * Activate Froala options
  */
 Mautic.activateGlobalFroalaOptions = function() {
@@ -28,38 +28,6 @@ Mautic.activateGlobalFroalaOptions = function() {
 
     // Set the Froala license key
     mQuery.FroalaEditor.DEFAULTS.key = 'MCHCPd1XQVZFSHSd1C==';
-};
-
-Mautic.activateGlobalCkeditorOptions = function() {
-    Mautic.basicCkeditorOptions = {
-        extraPlugins: [Mautic.MentionLinks, Mautic.InsertDropDown],
-        autosave: {
-            save( editor ) {
-                editor.updateSourceElement();
-            }
-        },
-        ckfinder: {
-            uploadUrl: Mautic.imageUploadURL+'?editor=ckeditor'
-        },
-        image: {
-            toolbar: [
-                'imageResize',
-                'imageTextAlternative',
-                'imageStyle:full',
-                'imageStyle:side',
-                'linkImage'
-            ],
-        },
-        mention: {
-            feeds: [
-                {
-                    marker: '{',
-                    feed: Mautic.getFeedItems,
-                    itemRenderer: Mautic.customItemRenderer
-                }
-            ]
-        }
-    };
 };
 
 /**
@@ -200,7 +168,6 @@ Mautic.MentionLinks =  function ( editor ) {
             return writer.createAttributeElement('span', {
                 class: 'atwho-inserted',
                 'data-fr-verified': true,
-                'data-mention': modelAttributeValue.id,
                 'data-atwho-at-query':'{'
             },{priority: 20});
         },
@@ -231,22 +198,9 @@ Mautic.customItemRenderer = function ( item ) {
         idElement.textContent = tokenId;
     }
     itemElement.appendChild( idElement );
-
-
-
     return itemElement;
 }
 
-Mautic.CkeditorToken = function(tokens) {
-    Mautic.builderTokensForCkEditor = {};
-    Mautic.configureDynamicContentAtWhoTokens();
-    mQuery.extend(tokens, Mautic.dynamicContentTokens);
-    Mautic.builderTokensForCkEditor = mQuery.map(tokens, function(value, i) {
-        return {'id':i, 'name':value};
-    });
-
-    return;
-}
 Mautic.getFeedItems = function (queryText) {
     return new Promise( resolve => {
         setTimeout( () => {
@@ -266,33 +220,49 @@ Mautic.getFeedItems = function (queryText) {
     }
 }
 
-Mautic.InsertDropDown = function ( editor ) {
-    editor.ui.componentFactory.add("InsertDropDown", locale => {
-            // const dropdownView = createDropdown(locale);
-            // dropdownView.buttonView.actionView.set({
-            //     withText: true,
-            //     label: "choose variable",
-            //     tooltip: true
-            // });
-            // const items = new Collection();
-            //
-            // items.add({
-            //     type: "button",
-            //     model: new Model({
-            //         withText: true,
-            //         label: "Foo"
-            //     })
-            // });
-            //
-            // items.add({
-            //     type: "button",
-            //     model: new Model({
-            //         withText: true,
-            //         label: "Bar"
-            //     })
-            // });
-            // addListToDropdown(dropdownView, items);
-            //
-            // return dropdownView;
-        });
+Mautic.getTokensForPlugIn = function(method) {
+    let d = mQuery.Deferred();
+    // OK, let's fetch the tokens.
+    mQuery.ajax({
+        url: mauticAjaxUrl,
+        data: 'action=' + method,
+        success: function (response) {
+            if (typeof response.tokens === 'object') {
+                Mautic.builderTokens = response.tokens;
+                Mautic.configureDynamicContentAtWhoTokens();
+                mQuery.extend(Mautic.builderTokens, Mautic.dynamicContentTokens);
+                Mautic.builderTokensForCkEditor = mQuery.map(Mautic.builderTokens, function(value, i) {
+                    return {'id':i, 'name':value};
+                });
+
+                d.resolve(Mautic.builderTokensForCkEditor);
+
+            }
+        },
+        error: function (request, textStatus, errorThrown) {
+            Mautic.processAjaxError(request, textStatus, errorThrown);
+            d.reject();
+        },
+        complete: function() {
+            Mautic.builderTokensRequestInProgress = false;
+            return d.promise();
+        }
+    });
+    return d.promise();
+};
+
+Mautic.InitCkEditor  = function(textarea, options) {
+    ClassicEditor
+        .create( textarea[0], options)
+        .then( editor => {
+            ckEditors.set( textarea[0], editor);
+            if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
+                editor.editing.view.document.on('change:isFocused', (evt, data, isFocused) => {
+                    Mautic.showChangeThemeWarning = isFocused;
+                });
+            }
+        } )
+        .catch( err => {
+            console.error( err.stack );
+        } );
 }

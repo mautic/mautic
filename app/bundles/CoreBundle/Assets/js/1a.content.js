@@ -587,28 +587,15 @@ Mautic.onPageLoad = function (container, response, inModal) {
         }
     });
     Mautic.activateGlobalFroalaOptions();
-    Mautic.activateGlobalCkeditorOptions();
     if (mQuery(container + ' textarea.editor').length) {
         mQuery(container + ' textarea.editor').each(function () {
             var textarea = mQuery(this);
 
-            var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'token', 'link', 'imageUpload', 'mediaEmbed', 'insertTable'];
+            var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'InsertDropDown', 'removeFormat', 'link', 'imageUpload', 'mediaEmbed', 'insertTable'];
             var minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
 
-            if (textarea.hasClass('editor-email')) {
-                maxButtons = mQuery.grep(maxButtons, function(value) {
-                    return value != 'insertGatedVideo';
-                });
-
-                maxButtons.push('dynamicContent');
-            }
-
-            if (textarea.hasClass('editor-dynamic-content')) {
+            if (textarea.hasClass('editor-dynamic-content') || textarea.hasClass('editor-basic')) {
                 minButtons = ['undo', 'redo', '|',  'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'imageUpload', 'mediaEmbed', 'insertTable'];
-            }
-
-            if (textarea.hasClass('editor-basic')) {
-                minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'imageUpload', 'mediaEmbed', 'insertTable'];
             }
 
             if (ckEditors.has( textarea[0] ))
@@ -617,29 +604,61 @@ Mautic.onPageLoad = function (container, response, inModal) {
                 ckEditors.delete( textarea[0] )
             }
 
+            let ckEditorToolbar = minButtons;
             if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
-                ClassicEditor
-                    .create( textarea[0], mQuery.extend({toolbar: maxButtons}, Mautic.basicCkeditorOptions))
-                    .then( editor => {
-                        Mautic.getTokens(textarea.attr('data-token-callback'), Mautic.CkeditorToken);
-                        ckEditors.set( textarea[0], editor);
-                        editor.editing.view.document.on( 'change:isFocused', ( evt, data, isFocused ) => {
-                            Mautic.showChangeThemeWarning = isFocused;
-                        } );
-                    } )
-                    .catch( err => {
-                        console.error( err.stack );
-                    } );
-            } else {
-                ClassicEditor
-                    .create( textarea[0], mQuery.extend({toolbar: minButtons}, Mautic.basicCkeditorOptions))
-                    .then( editor => {
-                        Mautic.getTokens(textarea.attr('data-token-callback'), Mautic.CkeditorToken);
-                        ckEditors.set( textarea[0], editor);
-                    } )
-                    .catch( err => {
-                        console.error( err.stack );
-                    } );
+                ckEditorToolbar = maxButtons;
+            }
+
+            let ckEditorOption = {toolbar:ckEditorToolbar};
+            mQuery.extend(ckEditorOption, {
+                autosave: {
+                    save( editor ) {
+                        editor.updateSourceElement();
+                    }
+                }
+            });
+
+            if (ckEditorToolbar.indexOf('imageUpload') > -1)
+            {
+                mQuery.extend(ckEditorOption, {
+                    ckfinder: {
+                        uploadUrl: Mautic.imageUploadURL+'?editor=ckeditor'
+                    },
+                    image: {
+                        toolbar: [
+                            'imageResize',
+                            'imageTextAlternative',
+                            'imageStyle:full',
+                            'imageStyle:side',
+                            'linkImage'
+                        ],
+                    }
+                });
+            }
+
+            if (ckEditorToolbar.indexOf('InsertDropDown') > -1)
+            {
+                Mautic.getTokensForPlugIn(textarea.attr('data-token-callback')).done(function(tokens) {
+                    mQuery.extend(ckEditorOption, {
+                        extraPlugins: [Mautic.MentionLinks],
+                        dynamicTokenLabel: 'Insert token',
+                        dynamicToken: tokens,
+                        mention: {
+                            feeds: [
+                                {
+                                    marker: '{',
+                                    feed: Mautic.getFeedItems,
+                                    itemRenderer: Mautic.customItemRenderer
+                                }
+                            ]
+                        }
+                    });
+                    Mautic.InitCkEditor(textarea, ckEditorOption);
+                })
+            }
+            else
+            {
+                Mautic.InitCkEditor(textarea, ckEditorOption);
             }
         });
     }
