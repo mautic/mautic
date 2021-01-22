@@ -32,7 +32,7 @@ Mautic.activateGlobalFroalaOptions = function() {
 
 Mautic.activateGlobalCkeditorOptions = function() {
     Mautic.basicCkeditorOptions = {
-        extraPlugins: [Mautic.MentionLinks],
+        extraPlugins: [Mautic.MentionLinks, Mautic.InsertDropDown],
         autosave: {
             save( editor ) {
                 editor.updateSourceElement();
@@ -197,26 +197,12 @@ Mautic.MentionLinks =  function ( editor ) {
             if ( !modelAttributeValue ) {
                 return;
             }
-            let tokenId = modelAttributeValue.id;
-            let tokenName = modelAttributeValue.name;
-            let tokenNameArr = tokenName.split(':');
-            if (tokenNameArr[0] != undefined && tokenNameArr[0] === 'a')
-            {
-                const obj = writer.createAttributeElement('a', {
-                    href:tokenId,
-                    'data-mention-text-replace': tokenNameArr[1],
-                },{priority: 20, id: modelAttributeValue.uid});
-                return obj;
-            }
-            else
-            {
-                return writer.createAttributeElement('span', {
-                        class: 'atwho-inserted',
-                        'data-fr-verified': true,
-                        'data-mention': modelAttributeValue.id,
-                        'data-atwho-at-query':'{'
-                    },{priority: 20});
-            }
+            return writer.createAttributeElement('span', {
+                class: 'atwho-inserted',
+                'data-fr-verified': true,
+                'data-mention': modelAttributeValue.id,
+                'data-atwho-at-query':'{'
+            },{priority: 20});
         },
         converterPriority: 'high'
     } );
@@ -278,4 +264,35 @@ Mautic.getFeedItems = function (queryText) {
             item.id.toLowerCase().includes( searchString )
         );
     }
+}
+
+Mautic.InsertDropDown = function ( editor ) {
+    editor.ui.componentFactory.add("InsertDropDown", locale => {
+            // const dropdownView = createDropdown(locale);
+            // dropdownView.buttonView.actionView.set({
+            //     withText: true,
+            //     label: "choose variable",
+            //     tooltip: true
+            // });
+            // const items = new Collection();
+            //
+            // items.add({
+            //     type: "button",
+            //     model: new Model({
+            //         withText: true,
+            //         label: "Foo"
+            //     })
+            // });
+            //
+            // items.add({
+            //     type: "button",
+            //     model: new Model({
+            //         withText: true,
+            //         label: "Bar"
+            //     })
+            // });
+            // addListToDropdown(dropdownView, items);
+            //
+            // return dropdownView;
+        });
 }
