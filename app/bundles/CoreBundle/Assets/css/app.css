@@ -4774,3 +4774,10 @@ ul.media-list.media-list-feed div.media-object {
   font-size: smaller;
   color: #cccccc;
 }
+.ck.ck-dropdown__panel {
+  max-height: 180px;
+  overflow-y: auto;
+}
+.ck-editor__editable:not(.ck-editor__nested-editable) {
+  min-height: 200px;
+}
