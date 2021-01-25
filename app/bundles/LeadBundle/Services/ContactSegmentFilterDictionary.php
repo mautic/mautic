@@ -273,6 +273,18 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'field'         => 'date_submitted',
         ];
 
+        $this->translations['first_submission_date'] = [
+            'type'          => BaseFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'leads',
+            'field'         => 'first_submission_date',
+        ];
+
+        $this->translations['last_submission_date'] = [
+            'type'          => BaseFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'leads',
+            'field'         => 'last_submission_date',
+        ];
+
         parent::__construct($this->translations);
     }
 }
