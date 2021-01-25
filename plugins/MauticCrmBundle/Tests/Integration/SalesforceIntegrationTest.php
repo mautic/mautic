@@ -708,6 +708,23 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         }
     }
 
+    public function testAmendLeadDataBeforePush()
+    {
+        $input = ['first', false, 'first|second', 1];
+
+        $output = ['first', false, 'first;second', 1];
+
+        $sf = $this->getSalesforceIntegration();
+        $sf->amendLeadDataBeforePush($input);
+
+        self::assertSame($input, $output);
+        self::assertEquals('string', gettype($output[0]));
+        self::assertEquals('boolean', gettype($output[1]));
+        self::assertEquals('string', gettype($output[2]));
+        self::assertEquals('integer', gettype($output[3]));
+    }
+
+
     /**
      * @param string $name
      * @param int    $max
@@ -1390,11 +1407,11 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 $parts     = explode('-', $subrequest['referenceId']);
 
                 if (3 === count($parts)) {
-                    list($contactId, $sfObject, $id) = $parts;
+                    [$contactId, $sfObject, $id] = $parts;
                 } elseif (2 === count($parts)) {
-                    list($contactId, $sfObject) = $parts;
+                    [$contactId, $sfObject] = $parts;
                 } elseif (4 === count($parts)) {
-                    list($contactId, $sfObject, $empty, $campaignId) = $parts;
+                    [$contactId, $sfObject, $empty, $campaignId] = $parts;
                 }
                 $response[] = [
                     'body' => [
