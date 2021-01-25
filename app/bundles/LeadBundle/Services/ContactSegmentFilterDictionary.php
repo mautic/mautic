@@ -13,9 +13,11 @@ namespace Mautic\LeadBundle\Services;
 
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\FirstSubmissionFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\IntegrationCampaignFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\LastSubmissionFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\SegmentReferenceFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\SessionsFilterQueryBuilder;
 
@@ -245,6 +247,30 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'form_submissions',
             'field'         => 'form_id',
+        ];
+
+        $this->translations['first_submission_form'] = [
+            'type'          => FirstSubmissionFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'form_submissions',
+            'field'         => 'form_id',
+        ];
+
+        $this->translations['last_submission_form'] = [
+            'type'          => LastSubmissionFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'form_submissions',
+            'field'         => 'form_id',
+        ];
+
+        $this->translations['first_submission_date'] = [
+            'type'          => FirstSubmissionFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'form_submissions',
+            'field'         => 'date_submitted',
+        ];
+
+        $this->translations['last_submission_date'] = [
+            'type'          => LastSubmissionFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'form_submissions',
+            'field'         => 'date_submitted',
         ];
 
         parent::__construct($this->translations);
