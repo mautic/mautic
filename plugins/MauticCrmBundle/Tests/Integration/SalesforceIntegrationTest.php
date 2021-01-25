@@ -724,7 +724,6 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         self::assertEquals('integer', gettype($output[3]));
     }
 
-
     /**
      * @param string $name
      * @param int    $max
@@ -1122,9 +1121,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                         return $results;
                     }
 
-                    $results = $this->getLeadsToUpdate($object, $args[3], $max, $specificObject);
-
-                    return $results;
+                    return $this->getLeadsToUpdate($object, $args[3], $max, $specificObject);
                 }
             );
     }
@@ -1307,13 +1304,12 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
      */
     protected function getSalesforceDNCHistory($object, $priority)
     {
-        $records      = [];
         $datePriority = [
             'SF'     => '2017-10-16T00:43:43.000+0000',
             'Mautic' => '2017-10-16T18:43:43.000+0000',
             ];
 
-        $records = [
+        return [
             'totalSize' => 3,
             'done'      => 1,
             'records'   => [
@@ -1341,8 +1337,6 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 ],
             ],
         ];
-
-        return $records;
     }
 
     /**
