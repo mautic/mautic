@@ -24,6 +24,13 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
         return 'mautic.lead.query.builder.foreign.value';
     }
 
+    protected function selectQuery($subQueryBuilder, $filter, $tableAlias)
+    {
+        $subQueryBuilder
+            ->select('NULL')->from($filter->getTable(), $tableAlias)
+            ->andWhere($tableAlias.'.lead_id = l.id');
+    }
+
     /** {@inheritdoc} */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter)
     {
@@ -45,9 +52,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
         $tableAlias = $this->generateRandomParameterName();
 
         $subQueryBuilder = $queryBuilder->getConnection()->createQueryBuilder();
-        $subQueryBuilder
-            ->select('NULL')->from($filter->getTable(), $tableAlias)
-            ->andWhere($tableAlias.'.lead_id = l.id');
+        $this->selectQuery($subQueryBuilder, $filter, $tableAlias);
 
         if (!is_null($filter->getWhere())) {
             $subQueryBuilder->andWhere(str_replace(str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()).'.', $tableAlias.'.', $filter->getWhere()));
