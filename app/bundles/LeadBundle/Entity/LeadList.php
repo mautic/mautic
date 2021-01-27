@@ -227,7 +227,6 @@ class LeadList extends FormEntity
     /**
      * Get publicName.
      *
-     * @return string
      * @return string|null
      */
     public function getPublicName()
