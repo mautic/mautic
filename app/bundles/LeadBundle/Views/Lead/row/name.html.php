@@ -19,7 +19,10 @@
                 ]); ?>
             </div>
         <?php endif; ?>
-        <div><?php echo $view->escape($item->isAnonymous() ? $view['translator']->trans($item->getPrimaryIdentifier()) : $item->getPrimaryIdentifier()); ?></div>
-        <div class="small"><?php echo $view->escape($item->getSecondaryIdentifier()); ?></div>
+        <?php $primaryIdentifier = $view->escape(($item->isAnonymous() ? $view['translator']->trans($item->getPrimaryIdentifier()) : $item->getPrimaryIdentifier())); ?>
+        <div><?php echo $primaryIdentifier; ?></div>
+        <?php if (!array_key_exists('company', $columns) && $primaryIdentifier != $item->getSecondaryIdentifier() && $item->getSecondaryIdentifier()): ?>
+            <div class="small"><?php echo $view->escape($item->getSecondaryIdentifier()); ?></div>
+        <?php endif; ?>
     </a>
 </td>

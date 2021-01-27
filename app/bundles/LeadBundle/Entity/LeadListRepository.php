@@ -278,9 +278,9 @@ class LeadListRepository extends CommonRepository
     /**
      * Get a count of leads that belong to the list.
      *
-     * @param $listIds
+     * @param int|int[] $listIds
      *
-     * @return array
+     * @return array|int
      */
     public function getLeadCount($listIds)
     {
