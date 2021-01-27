@@ -58,11 +58,11 @@ class SummaryRepository extends CommonRepository
             '(campaign_id, event_id, date_triggered, scheduled_count, triggered_count, non_action_path_taken_count, failed_count, log_counts_processed) '.
             'VALUES ('.implode('),(', $values).') '.
             'ON DUPLICATE KEY UPDATE '.
-            'scheduled_count=scheduled_count+VALUES(scheduled_count), '.
-            'triggered_count=triggered_count+VALUES(triggered_count), '.
-            'non_action_path_taken_count=non_action_path_taken_count+VALUES(non_action_path_taken_count), '.
-            'failed_count=failed_count+VALUES(failed_count), '.
-            'log_counts_processed=log_counts_processed+VALUES(log_counts_processed) ';
+            'scheduled_count = scheduled_count + VALUES(scheduled_count), '.
+            'triggered_count = triggered_count + VALUES(triggered_count), '.
+            'non_action_path_taken_count = non_action_path_taken_count + VALUES(non_action_path_taken_count), '.
+            'failed_count = failed_count + VALUES(failed_count), '.
+            'log_counts_processed = VALUES(log_counts_processed);';
 
         $this->getEntityManager()
             ->getConnection()
@@ -151,7 +151,7 @@ class SummaryRepository extends CommonRepository
             '    WHERE (t.date_triggered BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)) '.
             '    GROUP BY campaign_id, event_id, date_triggered) AS `s` '.
             'ON DUPLICATE KEY UPDATE '.
-            'id = LAST_INSERT_ID(id),'.
+            'id = id,'.
             'scheduled_count = scheduled_count + s.scheduled_count_i, '.
             'non_action_path_taken_count = non_action_path_taken_count + s.non_action_path_taken_count_i, '.
             'failed_count = failed_count + s.failed_count_i, '.
