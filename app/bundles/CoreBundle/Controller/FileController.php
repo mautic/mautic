@@ -50,9 +50,9 @@ class FileController extends AjaxController
                 if (in_array($file->getMimeType(), $this->imageMimes)) {
                     $fileName = md5(uniqid()).'.'.$file->guessExtension();
                     $file->move($mediaDir, $fileName);
-                    $this->getSuccessResponse($fileName, $editor);
+                    $this->successfulResponse($fileName, $editor);
                 } else {
-                    $this->getFailureResponse($editor);
+                    $this->failureResponse($editor);
                 }
             }
         }
@@ -148,7 +148,7 @@ class FileController extends AjaxController
             .$this->coreParametersHelper->get('image_path');
     }
 
-    private function getSuccessResponse(string $fileName, string $editor): void
+    private function successfulResponse(string $fileName, string $editor): void
     {
         $filePath = $this->getMediaUrl().'/'.$fileName;
         if (self::EDITOR_CKEDITOR === $editor) {
@@ -159,13 +159,14 @@ class FileController extends AjaxController
         }
     }
 
-    private function getFailureResponse(string $editor): void
+    private function failureResponse(string $editor): void
     {
+        $errorMsg = 'The uploaded image does not have an allowed mime type';
         if (self::EDITOR_CKEDITOR === $editor) {
             $this->response['uploaded']         = false;
-            $this->response['error']['message'] = 'The uploaded image does not have an allowed mime type';
+            $this->response['error']['message'] = $errorMsg;
         } else {
-            $this->response['error'] = 'The uploaded image does not have an allowed mime type';
+            $this->response['error'] = $errorMsg;
         }
     }
 }

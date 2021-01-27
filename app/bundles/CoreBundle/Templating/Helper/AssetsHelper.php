@@ -486,12 +486,7 @@ class AssetsHelper
         return $assets['js'];
     }
 
-    /**
-     * Load Froala JS source files.
-     *
-     * @return array
-     */
-    private function getCKEditorScripts()
+    private function getCKEditorScripts(): array
     {
         $base    = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/';
 

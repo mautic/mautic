@@ -153,12 +153,12 @@ Mautic.configureDynamicContentAtWhoTokens = function() {
 };
 
 Mautic.insertTextInEditor = function (obj, text) {
-    let ckEditor = ckEditors.get( obj[0] );
+    const ckEditor = ckEditors.get( obj[0] );
     ckEditor.model.change( writer => {
         writer.insertText( text, ckEditor.model.document.selection.getFirstPosition() );
     } );
 }
-Mautic.MentionLinks =  function ( editor ) {
+Mautic.MentionLinks =  function (editor) {
     editor.conversion.for( 'downcast' ).attributeToElement( {
         model: 'mention',
         view: ( modelAttributeValue, { writer } ) => {
@@ -178,7 +178,7 @@ Mautic.MentionLinks =  function ( editor ) {
 /*
  * Customizes the way the list of user suggestions is displayed.
  */
-Mautic.customItemRenderer = function ( item ) {
+Mautic.customItemRenderer = function (item) {
     let tokenId = item.id;
     let tokenName = item.name;
     const itemElement = document.createElement( 'span' );
@@ -189,14 +189,10 @@ Mautic.customItemRenderer = function ( item ) {
     let tokenNameArr = tokenName.split(':');
     if (tokenNameArr[0] != undefined && tokenNameArr[0] === 'a')
     {
-        itemElement.textContent =  tokenNameArr[1];
-        idElement.textContent = tokenNameArr[1];
+        tokenId = tokenName =  tokenNameArr[1];
     }
-    else
-    {
-        itemElement.textContent = tokenName;
-        idElement.textContent = tokenId;
-    }
+    itemElement.textContent = tokenName;
+    idElement.textContent = tokenId;
     itemElement.appendChild( idElement );
     return itemElement;
 }
@@ -211,7 +207,7 @@ Mautic.getFeedItems = function (queryText) {
         }, 100 );
     } );
 
-    function isItemMatching( item ) {
+    function isItemMatching(item) {
         const searchString = queryText.toLowerCase();
         return (
             item.name.toLowerCase().includes( searchString ) ||
@@ -221,7 +217,7 @@ Mautic.getFeedItems = function (queryText) {
 }
 
 Mautic.getTokensForPlugIn = function(method) {
-    let d = mQuery.Deferred();
+    const d = mQuery.Deferred();
     // OK, let's fetch the tokens.
     mQuery.ajax({
         url: mauticAjaxUrl,

@@ -4781,3 +4781,7 @@ ul.media-list.media-list-feed div.media-object {
 .ck-editor__editable:not(.ck-editor__nested-editable) {
   min-height: 200px;
 }
+.ck.ck-balloon-panel.ck-balloon-panel_caret_se.ck-balloon-panel_visible
+{
+  z-index: 99999 !important;
+}

@@ -1,4 +1,4 @@
-let ckEditors = new Map();
+const ckEditors = new Map();
 
 /**
  * Takes a given route, retrieves the HTML, and then updates the content
@@ -609,7 +609,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
                 ckEditorToolbar = maxButtons;
             }
 
-            let ckEditorOption = {toolbar:ckEditorToolbar};
+            const ckEditorOption = {toolbar: {items: ckEditorToolbar, shouldNotGroupWhenFull: true}};
             mQuery.extend(ckEditorOption, {
                 autosave: {
                     save( editor ) {
@@ -842,8 +842,10 @@ Mautic.onPageUnload = function (container, response) {
             MauticVars.modalsReset = {};
         }
 
-        if (document.querySelector('.ck-editor__editable')) {
-            document.querySelector('.ck-editor__editable').ckeditorInstance.destroy();
+        if (ckEditors.size > 0) {
+            ckEditors.forEach(function(value, key, map){
+                map.get(key).destroy()
+            })
             ckEditors.clear();
         }
 
