@@ -147,6 +147,21 @@ class AssetsHelperTest extends TestCase
         Assert::assertEquals('/path?v'.$version, $assetHelper->getUrl('/path?v'.$version));
     }
 
+    public function testGetCKEditorScripts(): void
+    {
+        $secretKey   = 'mautic';
+        $version     = 1;
+        $assetHelper = new AssetsHelper($this->createPackagesMock());
+        $assetHelper->setVersion($secretKey, $version);
+        $version = substr(hash('sha1', $secretKey.$version), 0, 8);
+
+        $reflectionObject = new \ReflectionObject($assetHelper);
+        $method           = $reflectionObject->getMethod('getCKEditorScripts');
+        $method->setAccessible(true);
+        $ckEditorScripts = $method->invokeArgs($assetHelper, []);
+        Assert::assertEquals(["app/bundles/CoreBundle/Assets/js/libraries/ckeditor/ckeditor.js?v$version"], $ckEditorScripts);
+    }
+
     /**
      * @return MockObject|Packages
      */
