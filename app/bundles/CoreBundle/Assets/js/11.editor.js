@@ -186,7 +186,7 @@ Mautic.customItemRenderer = function (item) {
     idElement.classList.add( 'custom-item-id' );
     itemElement.classList.add( 'custom-item' );
 
-    let tokenNameArr = tokenName.split(':');
+    const tokenNameArr = tokenName.split(':');
     if (tokenNameArr[0] != undefined && tokenNameArr[0] === 'a')
     {
         tokenId = tokenName =  tokenNameArr[1];
