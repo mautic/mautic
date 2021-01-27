@@ -25,17 +25,16 @@ class ListModelTest extends TestCase
     /**
      * @dataProvider sourceTypeTestDataProvider
      *
-     * @param array       $getLookupResultsReturn
      * @param string|null $sourceType
      */
-    public function testGetSourceLists($getLookupResultsReturn, $sourceType, array $expected)
+    public function testGetSourceLists(array $getLookupResultsReturn, $sourceType, array $expected): void
     {
         $this->prepareMockForTestGetSourcesLists($getLookupResultsReturn);
         $result = $this->fixture->getSourceLists($sourceType);
         $this->assertEquals($expected, $result);
     }
 
-    private function prepareMockForTestGetSourcesLists($getLookupResultsReturn)
+    private function prepareMockForTestGetSourcesLists(array $getLookupResultsReturn): void
     {
         $coreParametersHelper     = $this->getMockBuilder(CoreParametersHelper::class)->disableOriginalConstructor()->getMock();
         $leadSegment              = $this->getMockBuilder(ContactSegmentService::class)->disableOriginalConstructor()->getMock();
@@ -52,7 +51,7 @@ class ListModelTest extends TestCase
         $this->fixture = $mockListModel;
     }
 
-    public function sourceTypeTestDataProvider()
+    public function sourceTypeTestDataProvider(): array
     {
         return [
             [

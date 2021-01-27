@@ -39,7 +39,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     /**
      * Assert there is an option to set the new Category type to 'segment'.
      */
-    public function testSegmentTypeOptionAvailableOnNewCategoryForm()
+    public function testSegmentTypeOptionAvailableOnNewCategoryForm(): void
     {
         $this->client->request(Request::METHOD_GET, '/s/categories/category/new?show_bundle_select=1');
         $clientResponse = $this->client->getResponse();
@@ -54,7 +54,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->assertEquals(1, $xpath->query("//option[@value='segment']")->count());
     }
 
-    public function testAddCategorizedLeadList()
+    public function testAddCategorizedLeadList(): void
     {
         $this->loadFixtures([LoadCategoryData::class]);
         $crawler        = $this->client->request(Request::METHOD_GET, '/s/segments/new');
@@ -87,7 +87,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         );
     }
 
-    public function testRetrieveLeadListsBasedOnCategory()
+    public function testRetrieveLeadListsBasedOnCategory(): void
     {
         $this->loadFixtures(
             [
@@ -315,7 +315,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->fetchAll();
     }
 
-    private function getLeadLists()
+    private function getLeadLists(): array
     {
         return $this->connection->createQueryBuilder()
             ->select('ll.id', 'll.name', 'll.category_id')

@@ -829,18 +829,16 @@ class ListController extends FormController
 
     /**
      * Get the permission base from the model.
-     *
-     * @return string
      */
-    protected function getPermissionBase()
+    protected function getPermissionBase(): string
     {
         return $this->getModel('lead.list')->getPermissionBase();
     }
 
     /**
-     * @return ListModel
+     * Get List Model.
      */
-    protected function getListModel()
+    protected function getListModel(): ListModel
     {
         /** @var ListModel $model */
         $model = $this->getModel('lead.list');
@@ -849,9 +847,9 @@ class ListController extends FormController
     }
 
     /**
-     * @return string
+     * Get Model Name.
      */
-    protected function getModelName()
+    protected function getModelName(): string
     {
         return 'lead.list';
     }
@@ -863,7 +861,7 @@ class ListController extends FormController
      * @param $orderBy
      * @param $orderByDir
      */
-    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = [])
+    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
     {
         $session        = $this->get('session');
         $currentFilters = $session->get('mautic.lead.list.list_filters', []);
@@ -940,10 +938,8 @@ class ListController extends FormController
 
     /**
      * @param $action
-     *
-     * @return array
      */
-    public function getViewArguments(array $args, $action)
+    public function getViewArguments(array $args, $action): array
     {
         switch ($action) {
             case 'index':

@@ -1309,12 +1309,8 @@ class ListModel extends FormModel
 
     /**
      * Get a list of source choices.
-     *
-     * @param string $sourceType
-     *
-     * @return array
      */
-    public function getSourceLists(string $sourceType = null)
+    public function getSourceLists(string $sourceType = null): array
     {
         $choices = [];
         switch ($sourceType) {

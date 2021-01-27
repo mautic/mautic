@@ -201,12 +201,8 @@ class LeadList extends FormEntity
 
     /**
      * Set category.
-     *
-     * @param Category $category
-     *
-     * @return LeadList
      */
-    public function setCategory(Category $category = null)
+    public function setCategory(Category $category = null): LeadList
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -216,10 +212,8 @@ class LeadList extends FormEntity
 
     /**
      * Get category.
-     *
-     * @return Category
      */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
