@@ -151,7 +151,6 @@ class SummaryRepository extends CommonRepository
             '    WHERE (t.date_triggered BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)) '.
             '    GROUP BY campaign_id, event_id, date_triggered) AS `s` '.
             'ON DUPLICATE KEY UPDATE '.
-            'id = id,'.
             'scheduled_count = scheduled_count + s.scheduled_count_i, '.
             'non_action_path_taken_count = non_action_path_taken_count + s.non_action_path_taken_count_i, '.
             'failed_count = failed_count + s.failed_count_i, '.
