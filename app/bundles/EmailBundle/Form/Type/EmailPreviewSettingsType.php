@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Form\Type;
 
-use Mautic\CoreBundle\Form\Type\SelectType;
+use Mautic\CoreBundle\Form\Type\LookupType;
 use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -45,12 +45,21 @@ class EmailPreviewSettingsType extends AbstractType
 
         $builder->add(
             'contact',
-            SelectType::class,
+            LookupType::class,
             [
                 'attr' => [
-                    'onChange' => $this->onChangeContent,
+//                    'onChange'             => $this->onChangeContent,
+                    'data-callback'           => 'activateContactLookupField',
+                    'data-toggle'             => 'field-lookup',
+                    'data-lookup-callback'    => 'updateLookupListFilter',
+//                    'data-action'             => 'lead:getLookupChoiceList',
+                    'data-chosen-lookup'      => 'lead:getLookupChoiceList',
+                    'data-chosen-placeholder' => $this->translator->trans('mautic.core.form.chooseone'),
+//                    'data-target'          => '',
+                    'data-options'            => [
+                        'searchKey' => 'lead.lead',
+                    ],
                 ],
-                'placeholder' => $this->translator->trans('mautic.core.form.chooseone'),
             ]
         );
     }

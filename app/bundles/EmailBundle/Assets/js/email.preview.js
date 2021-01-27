@@ -7,8 +7,7 @@ Mautic.emailPreview = {
 
     init : function() {
         // Activate contact chosen
-        // TODO
-        Mautic.activateChosenSelect(mQuery('#email_preview_settings_contact'));
+//        Mautic.activateContactLookupField();
     },
 
     addUrlParameter  : function(parameterName, value) {
@@ -52,6 +51,19 @@ Mautic.emailPreview = {
         mQuery('#email_preview_url_button').attr('onClick', "window.open('" + previewUrl + "', '_blank');");
     }
 }
+
+Mautic.activateContactLookupField = function(fieldOptions, filterId) {
+
+    let lookupElementId = 'email_preview_settings_contact';
+    let action = mQuery('#'+ lookupElementId).attr('data-chosen-lookup');
+
+    let options = {
+        limit: 20,
+        'searchKey': 'lead.lead',
+    };
+
+    Mautic.activateFieldTypeahead(lookupElementId, filterId, options, action);
+},
 
 mQuery(document).ready(function() {
     Mautic.emailPreview.init();
