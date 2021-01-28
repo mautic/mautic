@@ -450,7 +450,7 @@ class PublicController extends CommonFormController
 
         if ($contactId) {
             // @TODO
-            throw new RuntimeException('Not implemented');
+            throw new \RuntimeException('Not implemented');
         }
 
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
