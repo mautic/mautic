@@ -134,6 +134,9 @@ class SummaryRepository extends CommonRepository
      */
     public function summarize(\DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): int
     {
+        $dateFromTs = $dateFrom->getTimestamp();
+        $dateToTs   = $dateTo->getTimestamp();
+
         $sql = 'INSERT INTO '.MAUTIC_TABLE_PREFIX.'campaign_summary '.
             '(campaign_id, event_id, date_triggered, scheduled_count, non_action_path_taken_count, failed_count, triggered_count, log_counts_processed) '.
             '    SELECT * FROM (SELECT '.
@@ -148,7 +151,7 @@ class SummaryRepository extends CommonRepository
             '    FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log t '.
             '    LEFT JOIN '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log fe '.
             '        ON fe.log_id = t.id '.
-            '    WHERE (t.date_triggered BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)) '.
+            '    WHERE (t.date_triggered BETWEEN FROM_UNIXTIME('.$dateFromTs.') AND FROM_UNIXTIME('.$dateToTs.')) '.
             '    GROUP BY t.campaign_id, t.event_id, date_triggered_i) AS `s` '.
             'ON DUPLICATE KEY UPDATE '.
             'id = last_insert_id(id), '.
@@ -158,14 +161,7 @@ class SummaryRepository extends CommonRepository
             'triggered_count = triggered_count + s.triggered_count_i; ';
 
         $conn = $this->getEntityManager()->getConnection();
-        $stmt = $conn->prepare($sql);
-
-        $dateFromTs = $dateFrom->getTimestamp();
-        $dateToTs   = $dateTo->getTimestamp() - 1;
-        $stmt->bindParam('dateFrom', $dateFromTs, \PDO::PARAM_INT);
-        $stmt->bindParam('dateTo', $dateToTs, \PDO::PARAM_INT);
-
-        $stmt->execute();
+        $conn->query($sql);
 
         return (int) $conn->lastInsertId();
     }

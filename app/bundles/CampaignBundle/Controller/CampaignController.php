@@ -958,8 +958,7 @@ class CampaignController extends AbstractStandardFormController
         $campaignLogCountsProcessed = [];
 
         foreach ($campaignLogCounts as $eventId => $campaignLogCount) {
-            $count                                  = $campaignLogCount[2];
-            $campaignLogCountsProcessed[$eventId][] = $count;
+            $campaignLogCountsProcessed[$eventId][] = $campaignLogCount[2];
             unset($campaignLogCounts[$eventId][2]);
         }
 

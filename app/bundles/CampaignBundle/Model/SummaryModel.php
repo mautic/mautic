@@ -140,11 +140,20 @@ class SummaryModel extends AbstractCommonModel
 
             $interval = new \DateInterval('PT'.$hoursPerBatch.'H');
             $dateFrom = clone $start;
-            $dateTo   = clone $start;
+            $dateTo   = (clone $start)->modify('-1 second');
             do {
-                $dateFrom = $dateFrom->sub($interval);
-                $output->write("\t".$dateFrom->format('Y-m-d H:i:s'));
+                $dateFrom          = $dateFrom->sub($interval);
+                $dateFromFormatted = $dateFrom->format('Y-m-d H:i:s');
+                $dateToFormatted   = $dateTo->format('Y-m-d H:i:s');
+                $output->write("\t".$dateFromFormatted.' - '.$dateToFormatted);
                 $summaryId = $this->getRepository()->summarize($dateFrom, $dateTo);
+
+                $this->logger->debug(
+                    'Processed summary #ID: '.$summaryId.
+                    ' Date from: '.$dateFromFormatted.
+                    ' Date to: '.$dateToFormatted
+                );
+
                 $this->processLogCountsProcessed($summaryId, $dateFrom, $dateTo);
                 $progressBar->advance($hoursPerBatch);
                 $dateTo = $dateTo->sub($interval);
@@ -222,6 +231,10 @@ class SummaryModel extends AbstractCommonModel
 
         $logCountsProcessed = isset($campaignLogCountsProcessed[$eventId]) ? array_sum($campaignLogCountsProcessed[$eventId]) : 0;
         $this->getRepository()->updateLogCountsProcessed($summaryId, $logCountsProcessed);
+        $this->logger->debug(
+            'Updated summary #ID: '.$summaryId.
+            ' log_counts_processed = '.$logCountsProcessed
+        );
     }
 
     /**
@@ -230,12 +243,15 @@ class SummaryModel extends AbstractCommonModel
      */
     private function setSummaryLogCountsProcessed(Summary $summary): void
     {
-        $dateTriggered              = $summary->getDateTriggered();
-        $dateTo                     = (clone $dateTriggered)->modify('+1 hour');
-        $campaignLogCountsProcessed = $this->getLogCountsProcessed($summary, $dateTriggered, $dateTo);
+        $dateFrom = $summary->getDateTriggered();
+        $dateTo   = (clone $dateFrom)->modify('+1 hour -1 second');
+
+        $campaignLogCountsProcessed = $this->getLogCountsProcessed($summary, $dateFrom, $dateTo);
 
         $eventId            = $summary->getEvent()->getId();
-        $logCountsProcessed = isset($campaignLogCountsProcessed[$eventId]) ? array_sum($campaignLogCountsProcessed[$eventId]) : 0;
+        $logCountsProcessed = isset($campaignLogCountsProcessed[$eventId])
+            ? array_sum($campaignLogCountsProcessed[$eventId])
+            : 0;
 
         $summary->setLogCountsProcessed($logCountsProcessed);
     }
