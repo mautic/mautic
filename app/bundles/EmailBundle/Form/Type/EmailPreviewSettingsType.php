@@ -48,11 +48,17 @@ class EmailPreviewSettingsType extends AbstractType
             LookupType::class,
             [
                 'attr' => [
+                    'class'                   => 'form-control',
                     'data-callback'           => 'activateContactLookupField',
                     'data-toggle'             => 'field-lookup',
                     'data-lookup-callback'    => 'updateLookupListFilter',
                     'data-chosen-lookup'      => 'lead:contactList',
-                    'data-chosen-placeholder' => $this->translator->trans('mautic.core.form.chooseone'),
+                    'placeholder'             => $this->translator->trans(
+                        'mautic.lead.list.form.startTyping'
+                    ),
+                    'data-no-record-message'=> $this->translator->trans(
+                        'mautic.core.form.nomatches'
+                    ),
                 ],
             ]
         );

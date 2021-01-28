@@ -751,15 +751,20 @@ class LeadModel extends FormModel
                 $results    = $repository->getUserList($filter, $limit, $start, ['lead' => 'leads']);
                 break;
             case 'contact':
-                $tempResults = $this->getEntities([
+                $fetchResults = $this->getEntities([
                     'start'          => $start,
                     'limit'          => $limit,
                     'filter'         => ['string' => $filter],
                 ]);
 
-                /** @var Lead $result */
-                foreach ($tempResults as $result) {
-                    $results["{$result->getName()} {$result->getLastname()}"] = $result->getId();
+                $results = [];
+
+                /** @var Lead $fetchResult */
+                foreach ($fetchResults as $fetchResult) {
+                    $results[] = [
+                        'value' => "{$fetchResult->getName()} {$fetchResult->getLastname()}",
+                        'id'    => $fetchResult->getId(),
+                    ];
                 }
 
                 break;
