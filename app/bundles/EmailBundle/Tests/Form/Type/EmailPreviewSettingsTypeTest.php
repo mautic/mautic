@@ -78,6 +78,7 @@ class EmailPreviewSettingsTypeTest extends TestCase
                     [
                         'attr' => [
                             'class'                   => 'form-control',
+                            'onChange'                => "Mautic.emailPreview.regenerateUrl({$emailId})",
                             'data-callback'           => 'activateContactLookupField',
                             'data-toggle'             => 'field-lookup',
                             'data-lookup-callback'    => 'updateLookupListFilter',
@@ -184,6 +185,7 @@ class EmailPreviewSettingsTypeTest extends TestCase
                     [
                         'attr' => [
                             'class'                   => 'form-control',
+                            'onChange'                => "Mautic.emailPreview.regenerateUrl({$parentEmailId})",
                             'data-callback'           => 'activateContactLookupField',
                             'data-toggle'             => 'field-lookup',
                             'data-lookup-callback'    => 'updateLookupListFilter',
