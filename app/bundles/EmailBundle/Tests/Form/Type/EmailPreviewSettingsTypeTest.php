@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Form\Type;
 
-use Mautic\CoreBundle\Form\Type\SelectType;
+use Mautic\CoreBundle\Form\Type\LookupType;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\EmailPreviewSettingsType;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -29,12 +29,7 @@ class EmailPreviewSettingsTypeTest extends TestCase
     protected function setUp()
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->translator
-            ->method('trans')
-            ->with('mautic.core.form.chooseone')
-            ->willReturn('Choose ...');
-
-        $this->form = new EmailPreviewSettingsType($this->translator);
+        $this->form       = new EmailPreviewSettingsType($this->translator);
 
         parent::setUp();
     }
@@ -79,12 +74,21 @@ class EmailPreviewSettingsTypeTest extends TestCase
             ->withConsecutive(
                 [
                     'contact',
-                    SelectType::class,
+                    LookupType::class,
                     [
                         'attr' => [
-                            'onChange'  => "Mautic.emailPreview.regenerateUrl({$emailId})",
+                            'class'                   => 'form-control',
+                            'data-callback'           => 'activateContactLookupField',
+                            'data-toggle'             => 'field-lookup',
+                            'data-lookup-callback'    => 'updateLookupListFilter',
+                            'data-chosen-lookup'      => 'lead:contactList',
+                            'placeholder'             => $this->translator->trans(
+                                'mautic.lead.list.form.startTyping'
+                            ),
+                            'data-no-record-message'=> $this->translator->trans(
+                                'mautic.core.form.nomatches'
+                            ),
                         ],
-                        'placeholder' => 'Choose ...',
                     ],
                 ]
             );
@@ -160,7 +164,7 @@ class EmailPreviewSettingsTypeTest extends TestCase
                         'attr'    => [
                             'onChange' => "Mautic.emailPreview.regenerateUrl({$parentEmailId})",
                         ],
-                        'placeholder' => 'Choose ...',
+                        'placeholder' => $this->translator->trans('mautic.core.form.chooseone'),
                     ],
                 ],
                 [
@@ -171,17 +175,26 @@ class EmailPreviewSettingsTypeTest extends TestCase
                         'attr'    => [
                             'onChange' => "Mautic.emailPreview.regenerateUrl({$parentEmailId})",
                         ],
-                        'placeholder' => 'Choose ...',
+                        'placeholder' => $this->translator->trans('mautic.core.form.chooseone'),
                     ],
                 ],
                 [
                     'contact',
-                    SelectType::class,
+                    LookupType::class,
                     [
                         'attr' => [
-                            'onChange' => "Mautic.emailPreview.regenerateUrl({$parentEmailId})",
+                            'class'                   => 'form-control',
+                            'data-callback'           => 'activateContactLookupField',
+                            'data-toggle'             => 'field-lookup',
+                            'data-lookup-callback'    => 'updateLookupListFilter',
+                            'data-chosen-lookup'      => 'lead:contactList',
+                            'placeholder'             => $this->translator->trans(
+                                'mautic.lead.list.form.startTyping'
+                            ),
+                            'data-no-record-message'=> $this->translator->trans(
+                                'mautic.core.form.nomatches'
+                            ),
                         ],
-                        'placeholder' => 'Choose ...',
                     ],
                 ]
             );
