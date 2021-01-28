@@ -20,6 +20,7 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\EventListener\BuilderSubscriber;
 use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Queue\QueueName;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 
@@ -437,21 +438,18 @@ class PublicController extends CommonFormController
      * @return Response
      */
     public function previewAction(
+        Request $request,
         int $objectId,
         string $objectType = null,
         int $translationId = null,
-        int $variantId = null,
-        int $contactId = null
+        int $variantId = null
     ) {
         // Use translation ID as object ID if specified
         $objectId = ($translationId) ?: $objectId;
         // Use A/B variant ID as object ID if specified
         $objectId = ($variantId) ?: $objectId;
 
-        if ($contactId) {
-            // @TODO
-            throw new \RuntimeException('Not implemented');
-        }
+        $contactId = (int) $request->query->get('contactId');
 
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model       = $this->getModel('email');
@@ -512,17 +510,28 @@ class PublicController extends CommonFormController
         // Override tracking_pixel
         $tokens = ['{tracking_pixel}' => ''];
 
-        // Prepare a fake lead
-        /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
-        $fieldModel = $this->getModel('lead.field');
-        $fields     = $fieldModel->getFieldList(false, false);
-        array_walk(
-            $fields,
-            function (&$field) {
-                $field = "[$field]";
-            }
-        );
-        $fields['id'] = 0;
+        // Prepare contact
+        if ($contactId) {
+            // We have one from request parameter
+            /** @var LeadModel $fieldModel */
+            $leadModel   = $this->getModel('lead.lead');
+            $contact     = $leadModel->getEntity($contactId);
+            throw new \RuntimeException('Contact must be array to use in event - try to remove me');
+        } else {
+            // Generate faked one
+            /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
+            $fieldModel = $this->getModel('lead.field');
+            $contact    = $fieldModel->getFieldList(false, false);
+
+            array_walk(
+                $contact,
+                function (&$field) {
+                    $field = "[$field]";
+                }
+            );
+
+            $contact['id'] = 0;
+        }
 
         // Generate and replace tokens
         $event = new EmailSendEvent(
@@ -533,7 +542,7 @@ class PublicController extends CommonFormController
                 'idHash'       => $idHash,
                 'tokens'       => $tokens,
                 'internalSend' => true,
-                'lead'         => $fields,
+                'lead'         => $contact,
             ]
         );
         $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_DISPLAY);
