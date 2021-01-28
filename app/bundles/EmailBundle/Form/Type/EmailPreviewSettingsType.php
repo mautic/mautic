@@ -52,11 +52,11 @@ class EmailPreviewSettingsType extends AbstractType
                     'data-callback'           => 'activateContactLookupField',
                     'data-toggle'             => 'field-lookup',
                     'data-lookup-callback'    => 'updateLookupListFilter',
-                    'data-chosen-lookup'      => 'lead:getLookupChoiceList',
+                    'data-chosen-lookup'      => 'lead:userList',
                     'data-chosen-placeholder' => $this->translator->trans('mautic.core.form.chooseone'),
-                    'data-options'            => [
-                        'searchKey' => 'lead.lead',
-                    ],
+//                    'data-options'            => [
+//                        'searchKey' => 'lead.lead',
+//                    ],
                 ],
             ]
         );
