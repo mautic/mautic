@@ -67,16 +67,7 @@ class AjaxController extends CommonAjaxController
         $model     = $this->getModel('lead.lead');
         $results   = $model->getLookupResults('contact', $filter);
 
-        $dataArray = [];
-        foreach ($results as $r) {
-            $name        = $r['firstName'].' '.$r['lastName'];
-            $dataArray[] = [
-                'label' => $name,
-                'value' => $r['id'],
-            ];
-        }
-
-        return $this->sendJsonResponse($dataArray);
+        return $this->sendJsonResponse($results);
     }
 
     /**
