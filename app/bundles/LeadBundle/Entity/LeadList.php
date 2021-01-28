@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
@@ -36,6 +37,11 @@ class LeadList extends FormEntity
      * @var string|null
      */
     private $publicName;
+
+    /**
+     * @var Category
+     **/
+    private $category;
 
     /**
      * @var string
@@ -86,6 +92,8 @@ class LeadList extends FormEntity
         $builder->createField('publicName', 'string')
             ->columnName('public_name')
             ->build();
+
+        $builder->addCategory();
 
         $builder->addField('filters', 'array');
 
@@ -192,6 +200,27 @@ class LeadList extends FormEntity
     }
 
     /**
+     * Set category.
+     */
+    public function setCategory(Category $category = null): LeadList
+    {
+        $this->isChanged('category', $category);
+        $this->category = $category;
+
+        return $this;
+    }
+
+    /**
+     * Get category.
+     */
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    /**
+     * Get publicName.
+     *
      * @return string|null
      */
     public function getPublicName()
