@@ -39,7 +39,11 @@ class AjaxController extends CommonAjaxController
     protected function userListAction(Request $request)
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
-        $results   = $this->getModel('lead.lead')->getLookupResults('user', $filter);
+
+        /** @var LeadModel $model */
+        $model     = $this->getModel('lead.lead');
+        $results   = $model->getLookupResults('user', $filter);
+
         $dataArray = [];
         foreach ($results as $r) {
             $name        = $r['firstName'].' '.$r['lastName'];

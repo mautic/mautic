@@ -52,6 +52,7 @@ use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Security\Provider\UserProvider;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -741,10 +742,13 @@ class LeadModel extends FormModel
      */
     public function getLookupResults($type, $filter = '', $limit = 10, $start = 0)
     {
-        $results = [];
+        /** @var UserRepository $repository */
+        $repository = $this->em->getRepository('MauticUserBundle:User');
+        $results    = [];
+
         switch ($type) {
             case 'user':
-                $results = $this->em->getRepository('MauticUserBundle:User')->getUserList($filter, $limit, $start, ['lead' => 'leads']);
+                $results = $repository->getUserList($filter, $limit, $start, ['lead' => 'leads']);
                 break;
         }
 
