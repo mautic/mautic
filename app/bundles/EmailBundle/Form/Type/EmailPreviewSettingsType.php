@@ -49,6 +49,7 @@ class EmailPreviewSettingsType extends AbstractType
             [
                 'attr' => [
                     'class'                   => 'form-control',
+                    'onChange'                => "Mautic.emailPreview.regenerateUrl({$emailId})",
                     'data-callback'           => 'activateContactLookupField',
                     'data-toggle'             => 'field-lookup',
                     'data-lookup-callback'    => 'updateLookupListFilter',
