@@ -742,13 +742,26 @@ class LeadModel extends FormModel
      */
     public function getLookupResults($type, $filter = '', $limit = 10, $start = 0)
     {
-        /** @var UserRepository $repository */
-        $repository = $this->em->getRepository('MauticUserBundle:User');
         $results    = [];
 
         switch ($type) {
             case 'user':
-                $results = $repository->getUserList($filter, $limit, $start, ['lead' => 'leads']);
+                /** @var UserRepository $repository */
+                $repository = $this->em->getRepository('MauticUserBundle:User');
+                $results    = $repository->getUserList($filter, $limit, $start, ['lead' => 'leads']);
+                break;
+            case 'contact':
+                $tempResults = $this->getEntities([
+                    'start'          => $start,
+                    'limit'          => $limit,
+                    'filter'         => ['string' => $filter],
+                ]);
+
+                /** @var Lead $result */
+                foreach ($tempResults as $result) {
+                    $results["{$result->getName()} {$result->getLastname()}"] = $result->getId();
+                }
+
                 break;
         }
 

@@ -59,6 +59,29 @@ class AjaxController extends CommonAjaxController
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
+    protected function contactListAction(Request $request)
+    {
+        $filter    = InputHelper::clean($request->query->get('filter'));
+
+        /** @var LeadModel $model */
+        $model     = $this->getModel('lead.lead');
+        $results   = $model->getLookupResults('contact', $filter);
+
+        $dataArray = [];
+        foreach ($results as $r) {
+            $name        = $r['firstName'].' '.$r['lastName'];
+            $dataArray[] = [
+                'label' => $name,
+                'value' => $r['id'],
+            ];
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     protected function getLeadIdsByFieldValueAction(Request $request)
     {
         $field     = InputHelper::clean($request->request->get('field'));
