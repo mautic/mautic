@@ -40,8 +40,8 @@ class EmailPreviewSettingsType extends AbstractType
         $translations          = $options['translations'];
         $variants              = $options['variants'];
 
-        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_TRANSLATION, $translations, $emailId);
-        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_VARIANT, $variants, $emailId);
+        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_TRANSLATION, $translations);
+        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_VARIANT, $variants);
 
         $builder->add(
             'contact',
