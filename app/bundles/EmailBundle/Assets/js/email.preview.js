@@ -5,11 +5,6 @@ Mautic.emailPreview = {
     urlBase : 'email/preview',
     urlParams : {},
 
-    init : function() {
-        // Activate contact chosen
-//        Mautic.activateContactLookupField();
-    },
-
     addUrlParameter  : function(parameterName, value) {
 
         if (value === undefined || value.length === 0) {
@@ -63,8 +58,4 @@ Mautic.activateContactLookupField = function(fieldOptions, filterId) {
     };
 
     Mautic.activateFieldTypeahead(lookupElementId, filterId, options, action);
-},
-
-mQuery(document).ready(function() {
-    Mautic.emailPreview.init();
-});
+};
