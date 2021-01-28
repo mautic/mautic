@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\Controller;
 
-use http\Exception\RuntimeException;
 use LogicException;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
