@@ -241,4 +241,42 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
 
         $this->customFieldColumn->processCreateLeadColumn($leadField);
     }
+
+    public function testUniqueIdentifierColumnCreation(): void
+    {
+        $leadField = new LeadField();
+        // Creating the entity from a form will hydrate this with 0/1 instead of a true/false
+        // Testing that the getter now appropriately returns a bool for the type hinted getSchemaDefinitionNonStatic
+        $leadField->setIsUniqueIdentifier(1);
+        $leadField->setAlias('zip');
+        $leadField->setType('text');
+
+        $this->columnSchemaHelper->expects($this->once())
+            ->method('setName')
+            ->willReturn($this->columnSchemaHelper);
+
+        $this->columnSchemaHelper->expects($this->once())
+            ->method('checkColumnExists')
+            ->willReturn(false);
+
+        $this->schemaDefinition->expects($this->once())
+            ->method('getSchemaDefinitionNonStatic')
+            ->willReturn(['type' => 'string']);
+
+        $this->columnSchemaHelper->expects($this->once())
+            ->method('addColumn');
+
+        $this->columnSchemaHelper->expects($this->once())
+            ->method('executeChanges');
+
+        $this->leadFieldSaver->expects($this->once())
+            ->method('saveLeadFieldEntity')
+            ->with($leadField, true);
+
+        $this->customFieldIndex->expects($this->once())
+            ->method('addIndexOnColumn')
+            ->with($leadField);
+
+        $this->customFieldColumn->processCreateLeadColumn($leadField);
+    }
 }

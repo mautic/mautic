@@ -136,7 +136,7 @@ class CustomFieldColumn
         $schemaDefinition = $this->schemaDefinition->getSchemaDefinitionNonStatic(
             $leadField->getAlias(),
             $leadField->getType(),
-            $leadField->getIsUniqueIdentifier()
+            (bool) $leadField->getIsUniqueIdentifier()
         );
 
         $leadsSchema->addColumn($schemaDefinition);
