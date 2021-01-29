@@ -11,16 +11,20 @@ class Contacts {
         return cy.get('#leadTable>tbody>tr>td>a>div');
     }
 
-    get OptionsDropdownForFirstItem() {
-        return cy.get('#leadTable > tbody > tr > td:nth-child(1) > div > div > button');
-    }
-
     get quickAddButton() {
         return cy.get('.quickadd');
     }
 
+    get getContactPoints() {
+        return cy.get('#leadTable>tbody>tr>td>span[class="label label-default"]');
+    }
+
     waitForContactOpen(){
         return  cy.get('div[class="std-toolbar btn-group"]>a[href*="edit"]').should('be.visible');
+    }
+
+    get alertMessage () {
+        return cy.get('.alert-growl');
     }
 
     get editContact(){
@@ -61,11 +65,55 @@ class Contacts {
     }
 
     get importButton(){
-        return  cy.get('.std-toolbar > .dropdown-menu > :nth-child(2) > a > :nth-child(1) > span');
+        return  cy.get('a[href*="import/new"]');
+    }
+
+    get clickOnCustomObject(){
+        return  cy.get('a[href*="custom-object"]');
+    }
+
+    get clickOnLinkExisting(){
+        return  cy.get('a[href*="filterEntity"]');
+    }
+
+    get clickOnDropdwonForLinkObject(){
+        return  cy.get('table[id*="custom-items-"]>tbody>tr>td>div>div>button');
+    }
+
+    get clickOnLinkObject(){
+        return  cy.get('table[id*="custom-items-"]>tbody>tr>td>div>div>ul>li');
+    }
+
+    get checkNoResultFoundMessage() {
+        return cy.get('div[id*="custom-item-"]>div>h4');
+    }
+
+    get closeThePopUpWindow() {
+        return cy.get('#customItemLookupModal>div>div>div>button');
+    }
+
+    get customObjectTable() {
+        return cy.get('table[id*="custom-items-"]>tbody>tr>td>div>a');
+    }
+
+    get updateContactPoints() {
+        return cy.get('#lead_points');
+    }
+
+    waitTillLinkPopupOpen(){
+        cy.get('#customItemLookupModal-label').should('be.visible');
+    }
+
+    waitForContactCreation(){
+        return  cy.get('div[class="mt-sm points-panel text-center"]>h1').should('be.visible');
     }
 
     waitTillSearchResultGetsDisplayed(){
         cy.get('#leadTable>tbody>tr>td>a').should('not.be.empty');
+    }
+
+    get createdCustomFieldIsDisplayed(){
+        return cy.get('div[id="core"]>div>div>div>div>div>div>label');
     }
 }
 const contact = new Contacts();

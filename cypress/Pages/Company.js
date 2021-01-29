@@ -24,6 +24,14 @@ class Company {
         return  cy.get('#company_companycity');
     }
 
+    get clickCompanyEdit() {
+        return   cy.get('tbody > tr > :nth-child(1) > .input-group > .input-group-btn > .btn');
+    }
+
+    get editCompany() {
+        return   cy.get('#companyTable > tbody > tr:nth-child(1) > td:nth-child(1) > div > div > ul > li:nth-child(1) > a')
+    }
+
     waitforCompanyEditPageOpen(){
         cy.get('#company_companycity').should('be.visible');
     }
@@ -56,18 +64,26 @@ class Company {
         return   cy.get("#company_buttons_save_toolbar");
     }
 
-    get clickCompanyEdit() {
-        return   cy.get('tbody > tr > :nth-child(1) > .input-group > .input-group-btn > .btn');
+    get searchAndClickForFirstElement() {
+        return   cy.get('#companyTable>tbody>tr>td>div>a');
     }
 
-    get editCompany() {
-        return   cy.get('#companyTable > tbody > tr:nth-child(1) > td:nth-child(1) > div > div > ul > li:nth-child(1) > a')
+    get createdCustomFieldIsDisplayed() {
+        return   cy.get('div[id="company-core"]>div>div>div>div>div>div>label');
+    }
+
+    get selectYesForCompanyLabel() {
+        return   cy.get('label[class="btn btn-default  btn-yes"]');
     }
 
     waitTillSearchResultGetsDisplayed(){
         cy.get('#companyTable>tbody>tr>td>a').should('not.be.empty');
     }
-  
+
+    get alertMessage () {
+        return cy.get('.alert-growl');
+    }
+
 }
 const company = new Company();
 module.exports = company;
