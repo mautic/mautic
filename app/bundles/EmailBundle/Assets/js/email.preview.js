@@ -5,9 +5,10 @@ Mautic.emailPreview = {
     urlBase : 'email/preview',
     urlParams : {},
 
-    addUrlParameter  : function(parameterName, value) {
+    addUrlParameter  : function(value, parameterName = 'emailId') {
 
         if (value === undefined || value.length === 0) {
+            // Unset value if needed
             if (this.urlParams.hasOwnProperty(parameterName)) {
                 delete this.urlParams[parameterName];
             }
@@ -18,27 +19,28 @@ Mautic.emailPreview = {
     },
 
     regenerateUrl : function(emailId) {
+
         this.addUrlParameter(
-            'translationId',
-            mQuery('#email_preview_settings_translation').val()
+            mQuery('#email_preview_settings_translation').val(),
         );
 
         this.addUrlParameter(
-            'variantId',
-            mQuery('#email_preview_settings_variant').val()
+            mQuery('#email_preview_settings_variant').val(),
         );
 
         this.addUrlParameter(
-            'contactId',
-            mQuery('#email_preview_settings_contact').val()
+            mQuery('#email_preview_settings_contact').val(),
+            'contactId'
         );
 
-        let previewUrl = mauticBaseUrl + this.urlBase + '/' + emailId;
-        if (Object.keys(this.urlParams).length > 0) {
-            previewUrl = previewUrl + '?' + new URLSearchParams(this.urlParams);
+        if (this.urlParams.hasOwnProperty('emailId')) {
+            emailId = this.urlParams.emailId;
         }
 
-        console.log(this.urlParams.length);
+        let previewUrl = mauticBaseUrl + this.urlBase + '/' + emailId;
+        if (this.urlParams.hasOwnProperty('contactId')) {
+            previewUrl = previewUrl + '?contactId=' + this.urlParams.contactId;
+        }
 
         // Update url in preview input
         mQuery('#email_preview_url').val(previewUrl);
