@@ -24,6 +24,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SummaryModel extends AbstractCommonModel
 {
+    private const BATCH_LIMIT = ('dev' === MAUTIC_ENV) ? 1000 : 2000;
+
     /**
      * @var array
      */
@@ -103,6 +105,7 @@ class SummaryModel extends AbstractCommonModel
     /**
      * Summarize all of history.
      *
+     * @throws \Doctrine\DBAL\Cache\CacheException
      * @throws \Doctrine\DBAL\DBALException
      */
     public function summarize(OutputInterface $output, int $hoursPerBatch = 1, int $maxHours = null, bool $rebuild = false): void
@@ -141,24 +144,20 @@ class SummaryModel extends AbstractCommonModel
             $interval = new \DateInterval('PT'.$hoursPerBatch.'H');
             $dateFrom = clone $start;
             $dateTo   = (clone $start)->modify('-1 second');
+
             do {
                 $dateFrom          = $dateFrom->sub($interval);
                 $dateFromFormatted = $dateFrom->format('Y-m-d H:i:s');
                 $dateToFormatted   = $dateTo->format('Y-m-d H:i:s');
                 $output->write("\t".$dateFromFormatted.' - '.$dateToFormatted);
-                $summaryId = $this->getRepository()->summarize($dateFrom, $dateTo);
-
-                $this->logger->debug(
-                    'Processed summary #ID: '.$summaryId.
-                    ' Date from: '.$dateFromFormatted.
-                    ' Date to: '.$dateToFormatted
-                );
-
-                $this->processLogCountsProcessed($summaryId, $dateFrom, $dateTo);
+                $this->getRepository()->summarize($dateFrom, $dateTo);
                 $progressBar->advance($hoursPerBatch);
                 $dateTo = $dateTo->sub($interval);
             } while ($end < $dateFrom);
+
             $progressBar->finish();
+
+            $this->updateLogCountsProcessed($output);
         }
 
         $output->writeln("\n".'<info>Summary complete</info>');
@@ -185,22 +184,6 @@ class SummaryModel extends AbstractCommonModel
 
     /**
      * @throws \Doctrine\DBAL\Cache\CacheException
-     * @throws \Doctrine\DBAL\DBALException
-     */
-    private function processLogCountsProcessed(int $summaryId, \DateTime $dateFrom, \DateTime $dateTo): void
-    {
-        $summary = $this->getRepository()->find($summaryId);
-
-        if (!$summary instanceof Summary) {
-            return;
-        }
-
-        $campaignLogCountsProcessed = $this->getLogCountsProcessed($summary, $dateFrom, $dateTo);
-        $this->updateLogCountsProcessed($summary, $campaignLogCountsProcessed);
-    }
-
-    /**
-     * @throws \Doctrine\DBAL\Cache\CacheException
      */
     private function getLogCountsProcessed(
         Summary $summary,
@@ -222,29 +205,14 @@ class SummaryModel extends AbstractCommonModel
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
-     */
-    private function updateLogCountsProcessed(Summary $summary, array $campaignLogCountsProcessed): void
-    {
-        $summaryId = $summary->getId();
-        $eventId   = $summary->getEvent()->getId();
-
-        $logCountsProcessed = isset($campaignLogCountsProcessed[$eventId]) ? array_sum($campaignLogCountsProcessed[$eventId]) : 0;
-        $this->getRepository()->updateLogCountsProcessed($summaryId, $logCountsProcessed);
-        $this->logger->debug(
-            'Updated summary #ID: '.$summaryId.
-            ' log_counts_processed = '.$logCountsProcessed
-        );
-    }
-
-    /**
      * @throws \Doctrine\DBAL\Cache\CacheException
      * @throws \Doctrine\DBAL\DBALException
      */
     private function setSummaryLogCountsProcessed(Summary $summary): void
     {
-        $dateFrom = $summary->getDateTriggered();
-        $dateTo   = (clone $dateFrom)->modify('+1 hour -1 second');
+        $dateTimes = $this->getSummaryTriggerDateTimes($summary);
+        $dateFrom  = $dateTimes['dateFrom'];
+        $dateTo    = $dateTimes['dateTo'];
 
         $campaignLogCountsProcessed = $this->getLogCountsProcessed($summary, $dateFrom, $dateTo);
 
@@ -262,5 +230,69 @@ class SummaryModel extends AbstractCommonModel
     private function prepareRebuildSummary(): void
     {
         $this->getRepository()->deleteAll();
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Cache\CacheException
+     */
+    private function updateLogCountsProcessed(OutputInterface $output): void
+    {
+        $logCountsProcessedCount = $this->getRepository()->getLogCountsProcessedCount();
+        $batchLimiters['maxId']  = $logCountsProcessedCount['maxId'];
+        $batchLimiters['minId']  = $logCountsProcessedCount['minId'];
+        $batchLimiters['limit']  = self::BATCH_LIMIT;
+        $count                   = $logCountsProcessedCount['count'];
+        $start                   = 0;
+
+        $output->writeln("\n".'<info>Updating summary for log counts processed</info>');
+        $progressBar = ProgressBarHelper::init($output, $count);
+
+        while ($start < $count) {
+            $updateSummaries   = [];
+            $campaignSummaries = $this->getRepository()->getLogCountsProcessedSummaries($batchLimiters);
+            $minId             = $batchLimiters['minId'];
+            $progress          = 0;
+
+            foreach ($campaignSummaries as $summary) {
+                $summaryId = $summary->getId();
+                $eventId   = $summary->getEvent()->getId();
+
+                $dateTimes = $this->getSummaryTriggerDateTimes($summary);
+                $dateFrom  = $dateTimes['dateFrom'];
+                $dateTo    = $dateTimes['dateTo'];
+
+                $logCounts          = $this->getLogCountsProcessed($summary, $dateFrom, $dateTo);
+                $logCountsProcessed = isset($logCounts[$eventId])
+                    ? array_sum($logCounts[$eventId])
+                    : 0;
+                $summary->setLogCountsProcessed($logCountsProcessed);
+                $updateSummaries[] = $summary;
+
+                if (count($updateSummaries) >= 100) {
+                    $this->getRepository()->updateLogCountsProcessed($updateSummaries);
+                    $updateSummaries = [];
+                }
+
+                $minId = $minId > $summaryId ? $summaryId : $minId;
+                ++$progress;
+            }
+
+            $this->getRepository()->updateLogCountsProcessed($updateSummaries);
+            $start += self::BATCH_LIMIT;
+            $batchLimiters['minId'] = $minId;
+            $progressBar->advance($progress);
+        }
+
+        $progressBar->finish();
+    }
+
+    private function getSummaryTriggerDateTimes(Summary $summary): array
+    {
+        $dateFrom = $summary->getDateTriggered();
+
+        return [
+            'dateFrom' => $dateFrom,
+            'dateTo'   => (clone $dateFrom)->modify('+1 hour -1 second'),
+        ];
     }
 }

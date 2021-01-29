@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\DBAL\FetchMode;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
@@ -132,13 +133,13 @@ class SummaryRepository extends CommonRepository
      *
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function summarize(\DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): int
+    public function summarize(\DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): void
     {
         $dateFromTs = $dateFrom->getTimestamp();
         $dateToTs   = $dateTo->getTimestamp();
 
         $sql = 'INSERT INTO '.MAUTIC_TABLE_PREFIX.'campaign_summary '.
-            '(campaign_id, event_id, date_triggered, scheduled_count, non_action_path_taken_count, failed_count, triggered_count, log_counts_processed) '.
+            '(campaign_id, event_id, date_triggered, scheduled_count, non_action_path_taken_count, failed_count, triggered_count) '.
             '    SELECT * FROM (SELECT '.
             '        t.campaign_id as campaign_id, '.
             '        t.event_id as event_id, '.
@@ -146,8 +147,7 @@ class SummaryRepository extends CommonRepository
             '        SUM(IF(t.is_scheduled = 1 AND t.trigger_date > NOW(), 1, 0)) as scheduled_count_i, '.
             '        SUM(IF(t.is_scheduled = 1 AND t.trigger_date > NOW(), 0, t.non_action_path_taken)) as non_action_path_taken_count_i, '.
             '        SUM(IF((t.is_scheduled = 1 AND t.trigger_date > NOW()) OR t.non_action_path_taken, 0, fe.log_id IS NOT NULL)) as failed_count_i, '.
-            '        SUM(IF((t.is_scheduled = 1 AND t.trigger_date > NOW()) OR t.non_action_path_taken OR fe.log_id IS NOT NULL, 0, 1)) as triggered_count_i, '.
-            '        0'.
+            '        SUM(IF((t.is_scheduled = 1 AND t.trigger_date > NOW()) OR t.non_action_path_taken OR fe.log_id IS NOT NULL, 0, 1)) as triggered_count_i '.
             '    FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log t '.
             '    LEFT JOIN '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log fe '.
             '        ON fe.log_id = t.id '.
@@ -158,25 +158,10 @@ class SummaryRepository extends CommonRepository
             'scheduled_count = scheduled_count + s.scheduled_count_i, '.
             'non_action_path_taken_count = non_action_path_taken_count + s.non_action_path_taken_count_i, '.
             'failed_count = failed_count + s.failed_count_i, '.
-            'triggered_count = triggered_count + s.triggered_count_i; ';
+            'triggered_count = triggered_count + s.triggered_count_i, '.
+            'log_counts_processed = null;';
 
-        $conn = $this->getEntityManager()->getConnection();
-        $conn->query($sql);
-
-        return (int) $conn->lastInsertId();
-    }
-
-    /**
-     * @throws \Doctrine\DBAL\DBALException
-     */
-    public function updateLogCountsProcessed(int $summaryId, int $logCountsProcessed): void
-    {
-        $sql = 'UPDATE '.MAUTIC_TABLE_PREFIX.'campaign_summary SET log_counts_processed = '.$logCountsProcessed.
-            ' WHERE id = '.$summaryId;
-
-        $conn = $this->getEntityManager()->getConnection();
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
+        $this->getEntityManager()->getConnection()->query($sql);
     }
 
     /**
@@ -188,5 +173,40 @@ class SummaryRepository extends CommonRepository
         $conn = $this->getEntityManager()->getConnection();
         $stmt = $conn->prepare($sql);
         $stmt->execute();
+    }
+
+    public function updateLogCountsProcessed(array $updateSummaries): void
+    {
+        foreach ($updateSummaries as $summary) {
+            $this->saveEntity($summary);
+        }
+    }
+
+    public function getLogCountsProcessedCount(): array
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->select('count(cs.id) count, max(cs.id) maxId, min(cs.id) minId')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_summary', 'cs')
+            ->where(
+                $qb->expr()->isNull('cs.log_counts_processed')
+            );
+
+        return $qb->execute()->fetch(FetchMode::ASSOCIATIVE);
+    }
+
+    public function getLogCountsProcessedSummaries(array $batchLimiters): array
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('cs')
+            ->from('MauticCampaignBundle:Summary', 'cs', 'cs.id')
+            ->where(
+                $qb->expr()->isNull('cs.logCountsProcessed'),
+                $qb->expr()->gte('cs.id', ':minId'),
+                $qb->expr()->lte('cs.id', ':maxId')
+            )
+            ->setParameters(['minId' => $batchLimiters['minId'], 'maxId' => $batchLimiters['maxId']])
+            ->setMaxResults($batchLimiters['limit']);
+
+        return $qb->getQuery()->getResult();
     }
 }
