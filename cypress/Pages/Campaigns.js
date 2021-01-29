@@ -66,7 +66,7 @@ class Campaigns {
     }
 
     get firstEmailinTheSearchList(){
-       return cy.get("#campaignevent_properties_email_chosen > div > ul > li.active-result.group-option.highlighted");
+       return cy.get('#campaignevent_properties_email_chosen > div > ul > li.active-result.group-option');
     }
 
     get addEmailButton(){
