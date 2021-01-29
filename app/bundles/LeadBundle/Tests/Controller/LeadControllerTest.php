@@ -6,6 +6,8 @@ use Mautic\CampaignBundle\DataFixtures\ORM\CampaignData;
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData;
+use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -29,7 +31,93 @@ class LeadControllerTest extends MauticMysqlTestCase
             'leads',
             'companies',
             'campaigns',
+            'categories',
+            'lead_lists',
         ]);
+    }
+
+    /**
+     * Assert there is an option to set the new Category type to 'segment'.
+     */
+    public function testSegmentTypeOptionAvailableOnNewCategoryForm(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/categories/category/new?show_bundle_select=1');
+        $clientResponse = $this->client->getResponse();
+
+        $responseContent = json_decode($clientResponse->getContent(), true);
+        $contentDom      = new \DOMDocument();
+        $contentDom->loadHTML($responseContent['newContent']);
+
+        $xpath = new \DOMXPath($contentDom);
+
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertEquals(1, $xpath->query("//option[@value='segment']")->count());
+    }
+
+    public function testAddCategorizedLeadList(): void
+    {
+        $this->loadFixtures([LoadCategoryData::class]);
+        $crawler        = $this->client->request(Request::METHOD_GET, '/s/segments/new');
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+
+        $form    = $crawler->filterXPath('//form[@name="leadlist"]')->form();
+        $form->setValues(
+            [
+                'leadlist[name]'               => 'Segment 1',
+                'leadlist[alias]'              => 'segment-1',
+                'leadlist[isGlobal]'           => '0',
+                'leadlist[isPreferenceCenter]' => '0',
+                'leadlist[isPublished]'        => '1',
+                'leadlist[publicName]'         => 'Segment 1',
+                'leadlist[category]'           => '1',
+            ]
+        );
+        $this->client->submit($form);
+
+        $this->assertEquals(
+            [
+                [
+                    'id'          => '1',
+                    'name'        => 'Segment 1',
+                    'category_id' => '1',
+                ],
+            ],
+            $this->getLeadLists()
+        );
+    }
+
+    public function testRetrieveLeadListsBasedOnCategory(): void
+    {
+        $this->loadFixtures(
+            [
+                LoadCategoryData::class,
+                LoadCategorizedLeadListData::class,
+            ]
+        );
+
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(7, $leadListsTableRows->count());
+
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:1"]');
+        $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
+        $this->assertEquals(4, $leadListsTableRows->count());
+        $firstLeadListLinkTest = trim($leadListsTableRows->first()->filterXPath('//td[2]//div//a')->text());
+        $this->assertEquals('Lead List 1 - Segment Category 1 (lead-list-1)', $firstLeadListLinkTest);
+
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:2"]');
+        $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
+        $this->assertEquals(2, $leadListsTableRows->count());
+
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:2","category:1"]');
+        $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
+        $this->assertEquals(6, $leadListsTableRows->count());
+
+        $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments?filters=["category:4"]');
+        $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
+        $this->assertEquals(0, $leadListsTableRows->count());
     }
 
     public function testContactsAreAddedToThenRemovedFromCampaignsInBatch()
@@ -225,5 +313,25 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->where("cl.campaign_id = {$campaignId}")
             ->execute()
             ->fetchAll();
+    }
+
+    private function getLeadLists(): array
+    {
+        return $this->connection->createQueryBuilder()
+            ->select('ll.id', 'll.name', 'll.category_id')
+            ->from('lead_lists', 'll')
+            ->execute()
+            ->fetchAll();
+    }
+
+    /**
+     * @testdox Ensure correct Preferred Timezone placeholder on add/edit contact page
+     */
+    public function testEnsureCorrectPreferredTimeZonePlaceHolderOnContactPage(): void
+    {
+        $crawler             = $this->client->request('GET', '/s/contacts/new');
+        $elementPlaceholder  = $crawler->filter('#lead_timezone')->filter('select')->attr('data-placeholder');
+        $expectedPlaceholder = $this->container->get('translator')->trans('mautic.lead.field.timezone');
+        $this->assertEquals($expectedPlaceholder, $elementPlaceholder);
     }
 }
