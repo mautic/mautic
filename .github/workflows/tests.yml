@@ -181,6 +181,9 @@ jobs:
         sudo chown -R www-data:www-data /var/www/html
       working-directory: /var/www/html
 
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+
     - name: Cypress run
       uses: cypress-io/github-action@v2
       with:
@@ -211,3 +214,10 @@ jobs:
       with:
         name: cypress-videos
         path: /var/www/html/cypress/videos
+
+    - name: Upload Mautic log files as artifact
+      uses: actions/upload-artifact@v2
+      if: always()
+      with:
+        name: mautic-logs
+        path: /var/www/html/var/logs
