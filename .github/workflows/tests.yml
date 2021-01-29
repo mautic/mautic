@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - staging
+      - features
       - '[0-9]+\.[0-9]+'
   pull_request:
 
@@ -14,7 +15,7 @@ jobs:
 
     strategy:
         matrix:
-          php-versions: ['7.2', '7.3', '7.4']
+          php-versions: ['7.3', '7.4']
           db-types: ['mysql', 'mariadb']
   
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
@@ -40,6 +41,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      # Codecov needs access to previous commits, so we add fetch-depth: 0
+      with:
+        fetch-depth: 0
     
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
@@ -135,6 +139,7 @@ jobs:
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
       with:
+        # Note: if you update the PHP version here, make sure to update libapache-mod-php7.4 below as well!
         php-version: 7.4
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
 
@@ -142,7 +147,7 @@ jobs:
       run: |
         sudo add-apt-repository ppa:ondrej/php -y
         sudo add-apt-repository ppa:ondrej/apache2 -y
-        sudo apt-get install apache2 libapache2-mod-php
+        sudo apt-get install apache2 libapache2-mod-php7.4
         sudo a2enmod rewrite
         sudo cp ./.github/workflows/mautic-apache.conf /etc/apache2/conf-available/mautic.conf
         sudo a2enconf mautic
@@ -207,3 +212,10 @@ jobs:
       with:
         name: cypress-videos
         path: /var/www/html/cypress/videos
+
+    - name: Upload Mautic log files as artifact
+      uses: actions/upload-artifact@v2
+      if: always()
+      with:
+        name: mautic-logs
+        path: /var/www/html/var/logs
