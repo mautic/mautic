@@ -1,6 +1,7 @@
-// Email preview URL builder
-
-Mautic.emailPreview = {
+/**
+ * Email & page preview URL builder
+ */
+Mautic.contentPreviewUrlGenerator = {
 
     urlBase : 'email/preview',
     urlParams : {},

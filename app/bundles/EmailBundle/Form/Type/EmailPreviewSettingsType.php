@@ -36,7 +36,7 @@ class EmailPreviewSettingsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $emailId               = $options['emailId'];
-        $this->onChangeContent = "Mautic.emailPreview.regenerateUrl({$emailId})";
+        $this->onChangeContent = "Mautic.contentPreviewUrlGenerator.regenerateUrl({$emailId})";
         $translations          = $options['translations'];
         $variants              = $options['variants'];
 
@@ -49,7 +49,7 @@ class EmailPreviewSettingsType extends AbstractType
             [
                 'attr' => [
                     'class'                   => 'form-control',
-                    'onChange'                => "Mautic.emailPreview.regenerateUrl({$emailId})",
+                    'onChange'                => $this->onChangeContent,
                     'data-callback'           => 'activateContactLookupField',
                     'data-toggle'             => 'field-lookup',
                     'data-lookup-callback'    => 'updateLookupListFilter',

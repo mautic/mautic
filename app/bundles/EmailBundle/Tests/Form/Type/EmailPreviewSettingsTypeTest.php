@@ -78,7 +78,7 @@ class EmailPreviewSettingsTypeTest extends TestCase
                     [
                         'attr' => [
                             'class'                   => 'form-control',
-                            'onChange'                => "Mautic.emailPreview.regenerateUrl({$emailId})",
+                            'onChange'                => "Mautic.contentPreviewUrlGenerator.regenerateUrl({$emailId})",
                             'data-callback'           => 'activateContactLookupField',
                             'data-toggle'             => 'field-lookup',
                             'data-lookup-callback'    => 'updateLookupListFilter',
@@ -163,7 +163,7 @@ class EmailPreviewSettingsTypeTest extends TestCase
                     [
                         'choices' => $expectedTranslationChoices,
                         'attr'    => [
-                            'onChange' => "Mautic.emailPreview.regenerateUrl({$parentEmailId})",
+                            'onChange' => "Mautic.contentPreviewUrlGenerator.regenerateUrl({$parentEmailId})",
                         ],
                         'placeholder' => $this->translator->trans('mautic.core.form.chooseone'),
                     ],
@@ -174,7 +174,7 @@ class EmailPreviewSettingsTypeTest extends TestCase
                     [
                         'choices' => $expectedVariantChoices,
                         'attr'    => [
-                            'onChange' => "Mautic.emailPreview.regenerateUrl({$parentEmailId})",
+                            'onChange' => "Mautic.contentPreviewUrlGenerator.regenerateUrl({$parentEmailId})",
                         ],
                         'placeholder' => $this->translator->trans('mautic.core.form.chooseone'),
                     ],
@@ -185,7 +185,7 @@ class EmailPreviewSettingsTypeTest extends TestCase
                     [
                         'attr' => [
                             'class'                   => 'form-control',
-                            'onChange'                => "Mautic.emailPreview.regenerateUrl({$parentEmailId})",
+                            'onChange'                => "Mautic.contentPreviewUrlGenerator.regenerateUrl({$parentEmailId})",
                             'data-callback'           => 'activateContactLookupField',
                             'data-toggle'             => 'field-lookup',
                             'data-lookup-callback'    => 'updateLookupListFilter',
