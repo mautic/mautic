@@ -31,6 +31,30 @@ class CustomFields {
         return cy.get('#leadfield_buttons_save_toolbar');
     }
 
+    get selectAllCustomField(){
+        return cy.get('#customcheckbox-one0');
+    }
+
+    get clickOnDropdownToDelete(){
+        return cy.get('#leadFieldTable>thead>tr>th>div>div>button>i');
+    }
+
+    get deleteSelectedCustomField(){
+        return cy.get('#leadFieldTable>thead>tr>th>div>div>ul');
+    }
+
+    get confirmationWindowForDelete(){
+        return cy.get('button[class="btn btn-danger"]');
+    }
+
+    waitTillConfirmationWindowGetsLoaded(){
+        cy.get('button[class="btn btn-danger"]').should('be.visible');
+    }
+
+    get checkNoResultFoundMessage() {
+        return cy.get('#app-content>div>div>div>div>h4');
+    }
+
 }
 const customFields = new CustomFields();
 module.exports = customFields;
