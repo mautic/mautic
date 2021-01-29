@@ -72,7 +72,7 @@ final class Version20201120122846 extends PreUpAssertionMigration
                 triggered_count INT NOT NULL,
                 non_action_path_taken_count INT NOT NULL,
                 failed_count INT NOT NULL,
-                log_counts_processed INT NOT NULL,
+                log_counts_processed INT,
                 INDEX {$campaignIDX} (campaign_id),
                 INDEX {$eventIDX} (event_id),
                 UNIQUE INDEX campaign_event_date_triggered (campaign_id, event_id, date_triggered),
