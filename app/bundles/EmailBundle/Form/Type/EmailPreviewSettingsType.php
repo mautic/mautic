@@ -40,8 +40,8 @@ class EmailPreviewSettingsType extends AbstractType
         $translations          = $options['translations'];
         $variants              = $options['variants'];
 
-        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_TRANSLATION, $translations);
-        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_VARIANT, $variants);
+        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_TRANSLATION, $translations, $emailId);
+        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_VARIANT, $variants, $emailId);
 
         $builder->add(
             'contact',
@@ -87,7 +87,8 @@ class EmailPreviewSettingsType extends AbstractType
     private function addTranslationOrVariantChoicesElement(
         FormBuilderInterface $builder,
         string $type,
-        array $variants
+        array $variants,
+        int $emailId
     ): void {
         if (!count($variants['children'])) {
             return;
@@ -115,7 +116,8 @@ class EmailPreviewSettingsType extends AbstractType
                 'attr'    => [
                     'onChange' => $this->onChangeContent,
                 ],
-                'placeholder' => $this->translator->trans('mautic.core.form.chooseone'),
+                'placeholder'  => $this->translator->trans('mautic.core.form.chooseone'),
+                'data'         => (string) $emailId,
             ]
         );
     }
