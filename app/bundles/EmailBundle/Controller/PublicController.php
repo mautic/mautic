@@ -507,9 +507,10 @@ class PublicController extends CommonFormController
         if ($contactId) {
             // We have one from request parameter
             /** @var LeadModel $fieldModel */
-            $leadModel   = $this->getModel('lead.lead');
-            $contact     = $leadModel->getEntity($contactId);
-            throw new \RuntimeException('Contact must be array to use in event - try to remove me');
+            $leadModel = $this->getModel('lead.lead');
+            /** @var Lead $contact */
+            $contact = $leadModel->getEntity($contactId);
+            $contact = $contact->convertToArray();
         } else {
             // Generate faked one
             /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
