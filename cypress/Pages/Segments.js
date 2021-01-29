@@ -34,7 +34,7 @@ class Segments {
     }
 
     get filterField(){
-        return     cy.get('.active-result')
+        return     cy.get('.active-result');
     }
 
     get editSegment(){
@@ -42,7 +42,7 @@ class Segments {
     }
 
     get filterValue(){
-        return   cy.get('#leadlist_filters_1_filter')
+        return   cy.get('#leadlist_filters_1_filter');
     }
 
     get saveAndCloseButton(){
@@ -78,7 +78,15 @@ class Segments {
     }
 
     get secondFilterTextBox(){
-        return cy.get('#leadlist_filters_1_filter');
+        return cy.get('#leadlist_filters_1_properties_filter');
+    }
+
+    get checkConactsUnderSegment(){
+        return cy.get('a[href*="?search=segment"]');
+    }
+
+    get checkDetailContactsUnderSgemnt(){
+        return cy.get('#leadTable>tbody>tr>td>a>div');
     }
 
     waitforSegmentCreation(){
@@ -87,6 +95,14 @@ class Segments {
 
     waitforSegmentUpdate(){
         cy.get('span[class="tt-u label label-success"]').should('be.visible');
+    }
+
+    waitTillNewSegmentGetsOpen(){
+        cy.get('#leadlist_name').should('be.visible');
+    }
+
+    waitTillFilterOptionGetsLoaded(){
+        cy.get('#leadlist_filters_1_properties_filter').should('be.visible');
     }
 }
 const segment = new Segments();
