@@ -29,8 +29,13 @@ class SendGridApiCallback
     public function processCallbackRequest(Request $request)
     {
         $responseItems = new ResponseItems($request);
+
         foreach ($responseItems as $item) {
-            $this->transportCallback->addFailureByAddress($item->getEmail(), $item->getReason(), $item->getDncReason());
+            if (null != $item->getHashId()) {
+                $this->transportCallback->addFailureByHashId($item->getHashId(), $item->getReason(), $item->getDncReason());
+            } else {
+                $this->transportCallback->addFailureByAddress($item->getEmail(), $item->getReason(), $item->getDncReason());
+            }
         }
     }
 }

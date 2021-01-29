@@ -11,7 +11,7 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\SendGrid;
 
-use SendGrid\Mail;
+use SendGrid\Mail\Mail;
 use SendGrid\Response;
 
 /**
@@ -35,6 +35,7 @@ class SendGridWrapper
      */
     public function send(Mail $mail)
     {
-        return $this->sendGrid->client->mail()->send()->post($mail);
+        //return $this->sendGrid->client->mail()->send()->post($mail);
+        return $this->sendGrid->send($mail);
     }
 }

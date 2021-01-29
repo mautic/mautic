@@ -12,9 +12,7 @@
 namespace Mautic\EmailBundle\Swiftmailer\SendGrid\Mail;
 
 use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
-use SendGrid\Content;
-use SendGrid\Email;
-use SendGrid\Mail;
+use SendGrid\Mail\Mail;
 
 class SendGridMailBase
 {
@@ -33,33 +31,18 @@ class SendGridMailBase
      */
     public function getSendGridMail(\Swift_Mime_SimpleMessage $message)
     {
-        $froms       = $message->getFrom();
-        $from        = new Email(current($froms), key($froms));
-        $subject     = $message->getSubject();
+        /* For 7.9 create Mail instance */
+        $email = new Mail();
 
-        $contentMain   = new Content($this->getContentType($message), $message->getBody());
-        $contentSecond = null;
+        $froms = $message->getFrom();
 
-        // Plain text message must be first if present
-        if ('text/plain' !== $contentMain->getType()) {
-            $plainText = $this->plainTextMessageHelper->getPlainTextFromMessageNotStatic($message);
-            if ($plainText) {
-                $contentSecond = $contentMain;
-                $contentMain   = new Content('text/plain', $plainText);
-            }
-        }
+        $email->setFrom(key($froms), current($froms));
 
-        // Sendgrid class requires to pass an TO email even if we do not have any general one
-        // Pass a dummy email and clear it in the next 2 lines
-        $to                    = 'dummy-email-to-be-deleted@example.com';
-        $mail                  = new Mail($from, $subject, $to, $contentMain);
-        $mail->personalization = [];
+        $subject = $message->getSubject();
+        $email->setSubject($subject);
+        $email->addContent($this->getContentType($message), $message->getBody());
 
-        if ($contentSecond) {
-            $mail->addContent($contentSecond);
-        }
-
-        return $mail;
+        return $email;
     }
 
     /**
