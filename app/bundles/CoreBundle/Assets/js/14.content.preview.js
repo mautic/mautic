@@ -4,43 +4,68 @@
 Mautic.contentPreviewUrlGenerator = {
 
     urlBase : 'email/preview',
-    urlParams : {},
+    lastUsedEmailId : false,
 
-    addUrlParameter  : function(value, parameterName = 'emailId') {
+    /**
+     * @param element mQuery representation
+     * @returns {boolean|string}
+     */
+    getElementValue(element) {
+
+        let value = element.val()
 
         if (value === undefined || value.length === 0) {
-            // Unset value if needed
-            if (this.urlParams.hasOwnProperty(parameterName)) {
-                delete this.urlParams[parameterName];
-            }
-            return;
+            return false;
         }
 
-        this.urlParams[parameterName] = value;
+        return value;
     },
 
-    regenerateUrl : function(emailId) {
+    /**
+     * @param elementId
+     * @returns {boolean|string}
+     */
+    setElementValue(elementId, value) {
 
-        this.addUrlParameter(
-            mQuery('#email_preview_settings_translation').val(),
-        );
+        let element = mQuery(elementId);
 
-        this.addUrlParameter(
-            mQuery('#email_preview_settings_variant').val(),
-        );
+        let hasOption = mQuery(elementId +  ' option[value="' + value + '"]');
 
-        this.addUrlParameter(
-            mQuery('#email_preview_settings_contact').val(),
-            'contactId'
-        );
+        // TODO this check and set is not working
+        if (hasOption.length === 0) {
+            element.val(value);
+        } else {
+            element.val("");
+        }
+    },
 
-        if (this.urlParams.hasOwnProperty('emailId')) {
-            emailId = this.urlParams.emailId;
+    regenerateUrl : function(emailId, changedElement) {
+
+        changedElement = mQuery(changedElement);
+        let elementId  = changedElement.attr('id');
+        let contactId  = false;
+
+        let value = this.getElementValue(changedElement);
+
+        if (elementId === 'email_preview_settings_variant') {
+            this.setElementValue('#email_preview_settings_translation', value);
+        }
+
+        if (elementId === 'email_preview_settings_translation') {
+            this.setElementValue('#email_preview_settings_variant', value);
+        }
+
+        if (elementId === 'email_preview_settings_contact') {
+            contactId = value;
+            emailId = this.lastUsedEmailId;
+        } else if (value !== false) {
+            this.lastUsedEmailId = emailId = value;
         }
 
         let previewUrl = mauticBaseUrl + this.urlBase + '/' + emailId;
-        if (this.urlParams.hasOwnProperty('contactId')) {
-            previewUrl = previewUrl + '?contactId=' + this.urlParams.contactId;
+
+        if (contactId !== false) {
+            previewUrl = previewUrl + '?contactId=' + contactId;
         }
 
         // Update url in preview input
