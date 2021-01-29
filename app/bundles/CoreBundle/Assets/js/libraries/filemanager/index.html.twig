@@ -11,17 +11,29 @@
     <script src="{{ asset("#{prefix}/../../app/bundles/CoreBundle/Assets/js/libraries/filemanager/elfinder/dist/js/elfinder.min.js") }}"></script>
     <script src="{{ asset("#{prefix}/../../app/bundles/CoreBundle/Assets/js/libraries/filemanager/elfinder/dist/js/i18n/elfinder.#{locale}.js") }}"></script>
 <script type="text/javascript" charset="utf-8">
+    var editorType = '';
+    var editor = null;
+
     jQuery().ready(function() {
         var $f = jQuery('.elfinder').elfinder({
             url : '{{path('ef_connect', { 'instance': instance, 'homeFolder': homeFolder } )}}',
             lang : '{{locale}}',
             onlyMimes: {{ onlyMimes|raw }},
-            getFileCallback : function(file, elFinderInstance) {
+            getFileCallback : function(file) {
                 let fileUrl = file.url;
                 if (file.baseUrl == '' && typeof window.opener.mauticImagesPath !== 'undefined') {
                     fileUrl = window.opener.mauticImagesPath+'/'+file.name;
                 }
-                window.opener.document.fileManagerInsertImageCallback('textarea.editor', elFinderInstance.convAbsUrl(fileUrl));
+
+                if (editorType == 'ckeditor')
+                {
+                    window.opener.document.ckEditorInsertImages(editor, fileUrl);
+                }
+                else
+                {
+                    window.opener.document.fileManagerInsertImageCallback('textarea.editor', fileUrl);
+                }
+
                 window.close();
             }
     });

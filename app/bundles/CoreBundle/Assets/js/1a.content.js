@@ -591,11 +591,11 @@ Mautic.onPageLoad = function (container, response, inModal) {
         mQuery(container + ' textarea.editor').each(function () {
             var textarea = mQuery(this);
 
-            var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'InsertDropDown', 'removeFormat', 'link', 'imageUpload', 'mediaEmbed', 'insertTable'];
+            var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'InsertDropDown', 'removeFormat', 'link', 'ckfinder', 'imageUpload', 'mediaEmbed', 'insertTable'];
             var minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
 
             if (textarea.hasClass('editor-dynamic-content') || textarea.hasClass('editor-basic')) {
-                minButtons = ['undo', 'redo', '|',  'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'imageUpload', 'mediaEmbed', 'insertTable'];
+                minButtons = ['undo', 'redo', '|',  'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'ckfinder', 'imageUpload', 'mediaEmbed', 'insertTable'];
             }
 
             if (ckEditors.has( textarea[0] ))

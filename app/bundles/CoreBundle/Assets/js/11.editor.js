@@ -5,6 +5,7 @@ Mautic.builderTokensRequestInProgress = false;
 Mautic.imageManagerLoadURL = mauticBaseUrl + 's/file/list';
 Mautic.imageUploadURL = mauticBaseUrl + 's/file/upload';
 Mautic.imageManagerDeleteURL = mauticBaseUrl + 's/file/delete';
+Mautic.elfinderURL = mauticBaseUrl + 'elfinder';
 
 
 /**
@@ -159,19 +160,37 @@ Mautic.insertTextInEditor = function (obj, text) {
     } );
 }
 Mautic.MentionLinks =  function (editor) {
+
+    editor.conversion.for( 'upcast' ).elementToAttribute( {
+        view: {
+            name: 'span',
+            key: 'data-fr-verified',
+            classes: 'atwho-inserted'
+        },
+        model: {
+            key: 'mention',
+            value: viewItem => editor.plugins.get( 'Mention' ).toMentionAttribute( viewItem )
+        },
+        converterPriority: 'high'
+    } );
+
     editor.conversion.for( 'downcast' ).attributeToElement( {
         model: 'mention',
         view: ( modelAttributeValue, { writer } ) => {
             if ( !modelAttributeValue ) {
                 return;
             }
-            return writer.createAttributeElement('span', {
+
+            return writer.createAttributeElement( 'span', {
                 class: 'atwho-inserted',
-                'data-fr-verified': true,
-                'data-atwho-at-query':'{'
-            },{priority: 20});
+                'data-fr-verified': true
+            }, {
+                priority: 20,
+                id: modelAttributeValue.uid
+            } );
         },
         converterPriority: 'high'
+
     } );
 }
 
@@ -191,6 +210,14 @@ Mautic.customItemRenderer = function (item) {
     {
         tokenId = tokenName =  tokenNameArr[1];
     }
+
+    if (tokenId.match(/dwc=/i)){
+        const tn = tokenId.substr(5, tokenId.length - 6);
+        tokenName = tokenName + ' (' + tn + ')';
+    } else if (tokenId.match(/contactfield=company/i) && !tokenName.match(/company/i)){
+        tokenName = 'Company ' + tokenName;
+    }
+
     itemElement.textContent = tokenName;
     idElement.textContent = tokenId;
     itemElement.appendChild( idElement );
@@ -257,8 +284,44 @@ Mautic.InitCkEditor  = function(textarea, options) {
                     Mautic.showChangeThemeWarning = isFocused;
                 });
             }
+
+            const ckf = editor.commands.get('ckfinder');
+            if (ckf) {
+                ckf.execute = () => {
+                    const width = screen.width * 0.7;
+                    const height = screen.height * 0.7;
+                    const iLeft = (screen.width - width) / 2 ;
+                    const iTop = (screen.height - height) / 2 ;
+                    let sOptions = "toolbar=no,status=no,resizable=yes,dependent=yes" ;
+                    sOptions += ",width=" + width ;
+                    sOptions += ",height=" + height ;
+                    sOptions += ",left=" + iLeft ;
+                    sOptions += ",top=" + iTop ;
+                    const elPopup = window.open( Mautic.elfinderURL, "BrowseWindow", sOptions ) ;
+                    elPopup.addEventListener('load', function(){
+                        elPopup.editorType = "ckeditor";
+                        elPopup.editor = editor;
+                    });
+                };
+            }
         } )
         .catch( err => {
             console.error( err.stack );
         } );
+}
+
+window.document.ckEditorInsertImages = function(editor, imageUrl) {
+    const fileRepo = editor.plugins.get('FileRepository'),
+        ntf = editor.plugins.get('Notification'),
+        i18 = editor.locale.t,
+        imgCmd = editor.commands.get('imageUpload');
+
+    if (!imgCmd.isEnabled) {
+        ntf.showWarning(i18('Could not insert image at the current position.'), {
+            title: i18('Inserting image failed'),
+            namespace: 'ckfinder'
+        });
+        return;
+    }
+    editor.execute('imageInsert', { source: imageUrl });
 }
