@@ -13,9 +13,9 @@ namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid\Mail;
 
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailPersonalization;
-use SendGrid\Email;
-use SendGrid\Mail;
-use SendGrid\Personalization;
+use SendGrid\Mail\EmailAddress as Email;
+use SendGrid\Mail\Mail;
+use SendGrid\Mail\Personalization;
 
 class SendGridMailPersonalizationTest extends \PHPUnit\Framework\TestCase
 {

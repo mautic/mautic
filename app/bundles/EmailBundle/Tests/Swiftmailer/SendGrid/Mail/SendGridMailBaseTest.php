@@ -13,8 +13,8 @@ namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid\Mail;
 
 use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailBase;
-use SendGrid\Content;
-use SendGrid\Email;
+use SendGrid\Mail\Content;
+use SendGrid\Mail\EmailAddress as Email;
 
 class SendGridMailBaseTest extends \PHPUnit\Framework\TestCase
 {

@@ -12,10 +12,10 @@
 namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid\Mail;
 
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailMetadata;
-use SendGrid\BccSettings;
-use SendGrid\Mail;
-use SendGrid\MailSettings;
-use SendGrid\ReplyTo;
+use SendGrid\Mail\BccSettings;
+use SendGrid\Mail\Mail;
+use SendGrid\Mail\MailSettings;
+use SendGrid\Mail\ReplyTo;
 
 class SendGridMailMetadataTest extends \PHPUnit\Framework\TestCase
 {
