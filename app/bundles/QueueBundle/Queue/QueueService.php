@@ -72,11 +72,12 @@ class QueueService
     /**
      * @param string   $queueName
      * @param int|null $messages
+     * @param int|null $timeout
      */
-    public function consumeFromQueue($queueName, $messages = null)
+    public function consumeFromQueue($queueName, $messages = null, $timeout = null)
     {
         $protocol = $this->coreParametersHelper->get('queue_protocol');
-        $event    = new QueueEvent($protocol, $queueName, [], $messages);
+        $event    = new QueueEvent($protocol, $queueName, [], $messages, $timeout);
         $this->eventDispatcher->dispatch(QueueEvents::CONSUME_MESSAGE, $event);
     }
 

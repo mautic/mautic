@@ -12,14 +12,12 @@
 namespace Mautic\PointBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\PointBundle\Entity\Trigger;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class TriggerController.
- */
 class TriggerController extends FormController
 {
     /**
@@ -44,34 +42,33 @@ class TriggerController extends FormController
 
         $this->setListFilters();
 
-        //set limits
-        $limit = $this->get('session')->get('mautic.point.trigger.limit', $this->coreParametersHelper->get('default_pagelimit'));
-        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
+        /** @var PageHelperFactoryInterface $pageHelperFacotry */
+        $pageHelperFacotry = $this->get('mautic.page.helper.factory');
+        $pageHelper        = $pageHelperFacotry->make('mautic.point.trigger', $page);
 
-        $search = $this->request->get('search', $this->get('session')->get('mautic.point.trigger.filter', ''));
-        $this->get('session')->set('mautic.point.trigger.filter', $search);
-
+        $limit      = $pageHelper->getLimit();
+        $start      = $pageHelper->getStart();
+        $search     = $this->request->get('search', $this->get('session')->get('mautic.point.trigger.filter', ''));
         $filter     = ['string' => $search, 'force' => []];
         $orderBy    = $this->get('session')->get('mautic.point.trigger.orderby', 't.name');
         $orderByDir = $this->get('session')->get('mautic.point.trigger.orderbydir', 'ASC');
-
-        $triggers = $this->getModel('point.trigger')->getEntities(
+        $triggers   = $this->getModel('point.trigger')->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
                 'filter'     => $filter,
                 'orderBy'    => $orderBy,
                 'orderByDir' => $orderByDir,
-            ]);
+            ]
+        );
+
+        $this->get('session')->set('mautic.point.trigger.filter', $search);
 
         $count = count($triggers);
         if ($count && $count < ($start + 1)) {
-            $lastPage = (1 === $count) ? 1 : (ceil($count / $limit)) ?: 1;
-            $this->get('session')->set('mautic.point.trigger.page', $lastPage);
+            $lastPage  = $pageHelper->countPage($count);
             $returnUrl = $this->generateUrl('mautic_pointtrigger_index', ['page' => $lastPage]);
+            $pageHelper->rememberPage($lastPage);
 
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
@@ -84,10 +81,7 @@ class TriggerController extends FormController
             ]);
         }
 
-        //set what page currently on so that we can return here after form submission/cancellation
-        $this->get('session')->set('mautic.point.trigger.page', $page);
-
-        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $pageHelper->rememberPage($page);
 
         return $this->delegateView([
             'viewParameters' => [
@@ -96,7 +90,7 @@ class TriggerController extends FormController
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,
-                'tmpl'        => $tmpl,
+                'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
             ],
             'contentTemplate' => 'MauticPointBundle:Trigger:list.html.php',
             'passthroughVars' => [

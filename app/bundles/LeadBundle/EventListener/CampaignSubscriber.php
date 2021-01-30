@@ -34,6 +34,7 @@ use Mautic\LeadBundle\Form\Type\ModifyLeadTagsType;
 use Mautic\LeadBundle\Form\Type\PointActionType;
 use Mautic\LeadBundle\Form\Type\UpdateCompanyActionType;
 use Mautic\LeadBundle\Form\Type\UpdateLeadActionType;
+use Mautic\LeadBundle\Helper\CustomFieldHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -310,7 +311,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $lead = $event->getLead();
+        $lead   = $event->getLead();
 
         $config   = $event->getConfig();
         $fields   = $config['fields'];
@@ -326,7 +327,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         switch (true) {
             case !empty($fieldsToUpdate):
-                $this->leadModel->setFieldValues($lead, $fieldsToUpdate);
+                $this->leadModel->setFieldValues($lead,  CustomFieldHelper::fieldsValuesTransformer($lead->getFields(true), $fieldsToUpdate));
                 // no break
             case !empty($fieldsToEmpty):
                 $this->leadModel->setFieldValues($lead, $fieldsToEmpty, true);
@@ -521,16 +522,19 @@ class CampaignSubscriber implements EventSubscriberInterface
                      * ( to integrate with: recursive campaign (future)).
                      */
                     $result = $this->leadFieldModel->getRepository()->compareDateMonthValue(
-                            $lead->getId(), $event->getConfig()['field'], $triggerDate);
+                        $lead->getId(), $event->getConfig()['field'], $triggerDate);
                 }
             } else {
                 $operators = $this->leadModel->getFilterExpressionFunctions();
+                $field     = $event->getConfig()['field'];
+                $value     = $event->getConfig()['value'];
+                $fields    = $lead->getFields(true);
 
                 $result = $this->leadFieldModel->getRepository()->compareValue(
-                        $lead->getId(),
-                        $event->getConfig()['field'],
-                        $event->getConfig()['value'],
-                        $operators[$event->getConfig()['operator']]['expr']
+                    $lead->getId(),
+                    $field,
+                    CustomFieldHelper::fieldValueTransfomer($fields[$field], $value),
+                    $operators[$event->getConfig()['operator']]['expr']
                 );
             }
         }
@@ -546,9 +550,9 @@ class CampaignSubscriber implements EventSubscriberInterface
     private function compareDateValue(Lead $lead, CampaignExecutionEvent $event, \DateTime $triggerDate)
     {
         return $this->leadFieldModel->getRepository()->compareDateValue(
-                $lead->getId(),
-                $event->getConfig()['field'],
-                $triggerDate->format('Y-m-d')
+            $lead->getId(),
+            $event->getConfig()['field'],
+            $triggerDate->format('Y-m-d')
         );
     }
 }

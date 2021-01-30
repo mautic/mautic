@@ -76,8 +76,19 @@ if ('index' == $tmpl) {
                                         $item->getCreatedBy()
                                     ),
                                 ],
-                                'routeBase' => 'report',
-                                'langVar'   => 'report.report',
+                                'routeBase'     => 'report',
+                                'langVar'       => 'report.report',
+                                'customButtons' => $item->isScheduled() ? [] : [
+                                    [
+                                        'attr' => [
+                                            'data-toggle' => 'ajaxmodal',
+                                            'data-target' => '#AssetPreviewModal',
+                                            'href'        => $view['router']->path('mautic_report_schedule', ['reportId' => $item->getId()]),
+                                        ],
+                                        'btnText'   => $view['translator']->trans('mautic.report.export.and.send'),
+                                        'iconClass' => 'fa fa-send-o',
+                                    ],
+                                ],
                             ]
                         );
                         ?>

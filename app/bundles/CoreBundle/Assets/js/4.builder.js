@@ -219,7 +219,7 @@ Mautic.formatCode = function() {
  */
 Mautic.openMediaManager = function() {
     Mautic.openServerBrowser(
-        mauticBasePath + '/elfinder',
+        mauticBasePath + (mauticEnv === 'dev' ? '/index_dev.php' : '') + '/elfinder',
         screen.width * 0.7,
         screen.height * 0.7
     );
@@ -1241,7 +1241,19 @@ window.document.fileManagerInsertImageCallback = function(selector, url) {
     if (Mautic.isCodeMode()) {
         Mautic.insertTextAtCMCursor(url);
     } else {
-        mQuery(selector).froalaEditor('image.insert', url);
+        if (typeof FroalaEditorForFileManager !== 'underfined') {
+            if (typeof FroalaEditorForFileManagerCurrentImage !== 'undefined') {
+                FroalaEditorForFileManager.image.insert(url, false, {}, FroalaEditorForFileManagerCurrentImage);
+            } else {
+                FroalaEditorForFileManager.image.insert(url);
+            }
+        } else {
+            if (typeof FroalaEditorForFileManagerCurrentImage !== 'undefined') {
+                mQuery(selector).froalaEditor('image.insert', url, false, {}, FroalaEditorForFileManagerCurrentImage);
+            } else {
+                mQuery(selector).froalaEditor('image.insert', url);
+            }
+        }
     }
 };
 
