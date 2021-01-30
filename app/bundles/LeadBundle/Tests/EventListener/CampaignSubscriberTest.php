@@ -39,19 +39,180 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         'companemail' => 'mautic@mauticsecond.com',
     ];
 
+    /**
+     * @var IpLookupHelper|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $mockIpLookupHelper;
+
+    /**
+     * @var LeadModel|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $mockLeadModel;
+
+    /**
+     * @var FieldModel|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $mockLeadFieldModel;
+
+    /**
+     * @var ListModel|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $mockListModel;
+
+    /**
+     * @var CompanyModel|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $mockCompanyModel;
+
+    /**
+     * @var CampaignModel|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $mockCampaignModel;
+
+    /**
+     * @var Company|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $companyEntityFrom;
+
+    protected function setUp(): void
+    {
+        $this->mockIpLookupHelper = $this->createMock(IpLookupHelper::class);
+        $this->mockLeadModel      = $this->createMock(LeadModel::class);
+        $this->mockLeadFieldModel = $this->createMock(FieldModel::class);
+        $this->mockListModel      = $this->createMock(ListModel::class);
+        $this->mockCompanyModel   = $this->createMock(CompanyModel::class);
+        $this->mockCampaignModel  = $this->createMock(CampaignModel::class);
+        $this->companyEntityFrom  = $this->createMock(Company::class);
+    }
+
+    public function testOnCampaignTriggerActionUpdateContact()
+    {
+        $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $mockCoreParametersHelper->method('get')
+            ->with('default_timezone')
+            ->willReturn('UTC');
+
+        $subscriber = new CampaignSubscriber(
+            $this->mockIpLookupHelper,
+            $this->mockLeadModel,
+            $this->mockLeadFieldModel,
+            $this->mockListModel,
+            $this->mockCompanyModel,
+            $this->mockCampaignModel,
+            $mockCoreParametersHelper
+        );
+
+        /** @var LeadModel $leadModel */
+        $lead = new Lead();
+        $lead->setId(99);
+        $fields = [
+            'core' => [
+                'custom_multiselect'  => [
+                    'alias' => 'custom_multiselect',
+                    'label' => 'Custom multiselect',
+                    'type'  => 'multiselect',
+                    'value' => 'second|three',
+                ],
+                'custom_multiselect2' => [
+                    'alias' => 'custom_multiselect2',
+                    'label' => 'Custom multiselect 2',
+                    'type'  => 'multiselect',
+                    'value' => 'second|three',
+                ],
+                'custom_multiselect3' => [
+                    'alias' => 'custom_multiselect3',
+                    'label' => 'Custom multiselect 3',
+                    'type'  => 'multiselect',
+                    'value' => 'second|three',
+                ],
+                'custom_multiselect4' => [
+                    'alias' => 'custom_multiselect4',
+                    'label' => 'Custom multiselect 4',
+                    'type'  => 'multiselect',
+                    'value' => 'second|three',
+                ],
+            ],
+        ];
+
+        $lead->setFields($fields);
+
+        $config = [];
+
+        $config['fields_to_update'][]             = 'custom_multiselect';
+        $config['actions']['custom_multiselect']  = 'add';
+        $config['fields']['custom_multiselect'] = ['first'];
+
+        $config['fields_to_update'][]              = 'custom_multiselect2';
+        $config['actions']['custom_multiselect2']  = 'remove';
+        $config['fields']['custom_multiselect2']= ['second'];
+
+        $config['fields_to_update'][]             = 'custom_multiselect3';
+        $config['actions']['custom_multiselect3'] = 'update';
+        $config['fields']['custom_multiselect3']  = ['first', 'second', 'tree', 'four'];
+
+        $config['fields_to_update'][]             = 'custom_multiselect4';
+        $config['actions']['custom_multiselect4'] = 'empty';
+        $config['fields']['custom_multiselect4']  = [];
+
+        $args = [
+            'lead'            => $lead,
+            'event'           => [
+                'type'       => 'lead.updatelead',
+                'properties' => $config,
+            ],
+            'eventDetails'    => [],
+            'systemTriggered' => true,
+            'eventSettings'   => [],
+        ];
+
+
+        $this->mockLeadModel
+            ->expects(self::at(0))
+            ->method('setFieldValues')
+            ->willReturnCallback(
+                function ($lead, $values) {
+                    $this->assertCount(4, $values['custom_multiselect3']);
+                }
+            );
+
+
+        $this->mockLeadModel
+            ->expects(self::at(1))
+            ->method('setFieldValues')
+            ->willReturnCallback(
+                function ($lead, $values) {
+                    $this->assertCount(0, $values['custom_multiselect4']);
+                }
+            );
+
+        $this->mockLeadModel
+            ->expects(self::at(2))
+            ->method('setFieldValues')
+            ->willReturnCallback(
+                function ($lead, $values) {
+                    $this->assertCount(3, $values['custom_multiselect']);
+                }
+            );
+
+        $this->mockLeadModel
+            ->expects(self::at(3))
+            ->method('setFieldValues')
+            ->willReturnCallback(
+                function ($lead, $values) {
+                    $this->assertCount(1, $values['custom_multiselect2']);
+                }
+            );
+
+        $event = new CampaignExecutionEvent($args, true);
+        $subscriber->onCampaignTriggerActionUpdateLead($event);
+    }
+
+
     public function testOnCampaignTriggerActiononUpdateCompany()
     {
-        $mockIpLookupHelper = $this->createMock(IpLookupHelper::class);
-        $mockLeadModel      = $this->createMock(LeadModel::class);
-        $mockLeadFieldModel = $this->createMock(FieldModel::class);
-        $mockListModel      = $this->createMock(ListModel::class);
-        $mockCompanyModel   = $this->createMock(CompanyModel::class);
-        $mockCampaignModel  = $this->createMock(CampaignModel::class);
-        $companyEntityFrom  = $this->createMock(Company::class);
-
-        $companyEntityFrom->method('getId')
+        $this->companyEntityFrom->method('getId')
             ->willReturn($this->configFrom['id']);
-        $companyEntityFrom->method('getName')
+        $this->companyEntityFrom->method('getName')
             ->willReturn($this->configFrom['companyname']);
 
         $companyEntityTo = $this->createMock(Company::class);
@@ -60,16 +221,16 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $companyEntityTo->method('getName')
             ->willReturn($this->configTo['companyname']);
 
-        $mockCompanyModel->expects($this->once())->method('getEntity')->willReturn($companyEntityFrom);
+        $this->mockCompanyModel->expects($this->once())->method('getEntity')->willReturn($this->companyEntityFrom);
 
-        $mockCompanyModel->expects($this->once())
+        $this->mockCompanyModel->expects($this->once())
             ->method('getEntities')
             ->willReturn([$companyEntityTo]);
 
-        $mockCompanyLeadRepo  = $this->createMock(CompanyLeadRepository::class);
+        $mockCompanyLeadRepo = $this->createMock(CompanyLeadRepository::class);
         $mockCompanyLeadRepo->expects($this->once())->method('getCompaniesByLeadId')->willReturn(null);
 
-        $mockCompanyModel->expects($this->once())
+        $this->mockCompanyModel->expects($this->once())
             ->method('getCompanyLeadRepository')
             ->willReturn($mockCompanyLeadRepo);
 
@@ -79,12 +240,12 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn('UTC');
 
         $subscriber = new CampaignSubscriber(
-            $mockIpLookupHelper,
-            $mockLeadModel,
-            $mockLeadFieldModel,
-            $mockListModel,
-            $mockCompanyModel,
-            $mockCampaignModel,
+            $this->mockIpLookupHelper,
+            $this->mockLeadModel,
+            $this->mockLeadFieldModel,
+            $this->mockListModel,
+            $this->mockCompanyModel,
+            $this->mockCampaignModel,
             $mockCoreParametersHelper
         );
 
@@ -93,15 +254,15 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $lead->setId(99);
         $lead->setPrimaryCompany($this->configFrom);
 
-        $mockLeadModel->expects($this->once())->method('setPrimaryCompany')->willReturnCallback(
+        $this->mockLeadModel->expects($this->once())->method('setPrimaryCompany')->willReturnCallback(
             function () use ($lead) {
                 $lead->setPrimaryCompany($this->configTo);
             }
         );
 
         $args = [
-            'lead'  => $lead,
-            'event' => [
+            'lead'            => $lead,
+            'event'           => [
                 'type'       => 'lead.updatecompany',
                 'properties' => $this->configTo,
             ],
