@@ -566,7 +566,7 @@ $view['slots']->set(
         <div class="pa-sm">
             <?php $tags = $lead->getTags(); ?>
             <?php foreach ($tags as $tag): ?>
-                <h5 class="pull-left mt-xs mr-xs"><span class="label label-success"><?php echo $view->escape($tag->getTag()); ?></span>
+                <h5 class="pull-left mt-xs mr-xs"><span class="label label-success label-tag"><?php echo $view->escape($tag->getTag()); ?></span>
                 </h5>
             <?php endforeach; ?>
             <div class="clearfix"></div>
