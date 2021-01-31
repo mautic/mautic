@@ -108,7 +108,7 @@ return [
                 'arguments' => [
                     'mautic.lead.helper.primary_company',
                     'mautic.asset.helper.token',
-                    'mautic.page.helper.token'
+                    'mautic.page.helper.token',
                 ],
             ],
             'mautic.pagebuilder.subscriber' => [
