@@ -140,11 +140,11 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $config['fields_to_update'][]             = 'custom_multiselect';
         $config['actions']['custom_multiselect']  = 'add';
-        $config['fields']['custom_multiselect'] = ['first'];
+        $config['fields']['custom_multiselect']   = ['first'];
 
         $config['fields_to_update'][]              = 'custom_multiselect2';
         $config['actions']['custom_multiselect2']  = 'remove';
-        $config['fields']['custom_multiselect2']= ['second'];
+        $config['fields']['custom_multiselect2']   = ['second'];
 
         $config['fields_to_update'][]             = 'custom_multiselect3';
         $config['actions']['custom_multiselect3'] = 'update';
@@ -165,7 +165,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
-
         $this->mockLeadModel
             ->expects(self::at(0))
             ->method('setFieldValues')
@@ -174,7 +173,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                     $this->assertCount(4, $values['custom_multiselect3']);
                 }
             );
-
 
         $this->mockLeadModel
             ->expects(self::at(1))
@@ -206,7 +204,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new CampaignExecutionEvent($args, true);
         $subscriber->onCampaignTriggerActionUpdateLead($event);
     }
-
 
     public function testOnCampaignTriggerActiononUpdateCompany()
     {
