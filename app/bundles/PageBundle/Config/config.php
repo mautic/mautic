@@ -103,6 +103,14 @@ return [
                     'mautic.lead.repository.lead',
                 ],
             ],
+            'mautic.page.redirect.subscriber' => [
+                'class'     => \Mautic\PageBundle\EventListener\PageRedirectSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.helper.primary_company',
+                    'mautic.asset.helper.token',
+                    'mautic.page.helper.token'
+                ],
+            ],
             'mautic.pagebuilder.subscriber' => [
                 'class'     => \Mautic\PageBundle\EventListener\BuilderSubscriber::class,
                 'arguments' => [
