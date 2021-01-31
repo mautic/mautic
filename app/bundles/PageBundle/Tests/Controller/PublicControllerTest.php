@@ -346,7 +346,7 @@ class PublicControllerTest extends TestCase
             ->method('getContactFromRequest')
             ->will($this->returnCallback($getContactFromRequestCallback));
 
-        $this->container->expects($this->exactly(7))
+        $this->container->expects($this->exactly(6))
             ->method('get')
             ->withConsecutive(
                 ['monolog.logger.mautic'],
@@ -354,7 +354,6 @@ class PublicControllerTest extends TestCase
                 ['mautic.helper.ip_lookup'],
                 ['mautic.model.factory'],
                 ['mautic.model.factory'],
-                ['mautic.lead.helper.primary_company'],
                 ['event_dispatcher']
                 )
             ->willReturnOnConsecutiveCalls(
@@ -363,7 +362,6 @@ class PublicControllerTest extends TestCase
                 $this->ipLookupHelper,
                 $this->modelFactory,
                 $this->modelFactory,
-                $this->primaryCompanyHelper,
                 $this->eventDispatcher
         );
 
