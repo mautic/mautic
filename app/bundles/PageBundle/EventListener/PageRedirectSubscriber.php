@@ -62,6 +62,7 @@ class PageRedirectSubscriber implements EventSubscriberInterface
         if (!$lead) {
             return;
         }
+
         $url = TokenHelper::findLeadTokens($url, $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead), true);
         $url = $this->replacePageTokenUrl($url);
         $url = $this->replaceAssetTokenUrl($url);
