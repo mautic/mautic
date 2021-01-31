@@ -25,7 +25,7 @@ class PageRedirectSubscriber implements EventSubscriberInterface
     private $primaryCompanyHelper;
 
     /**
-     * @var \Mautic\AssetBundle\Helper\tokenhelper
+     * @var \Mautic\AssetBundle\Helper\TokenHelper
      */
     private $assetTokenHelper;
 
@@ -36,7 +36,7 @@ class PageRedirectSubscriber implements EventSubscriberInterface
 
     public function __construct(
         PrimaryCompanyHelper $primaryCompanyHelper,
-        \Mautic\AssetBundle\Helper\tokenhelper $assetTokenHelper,
+        \Mautic\AssetBundle\Helper\TokenHelper $assetTokenHelper,
         \Mautic\PageBundle\Helper\TokenHelper $pageTokenHelper
     ) {
         $this->primaryCompanyHelper = $primaryCompanyHelper;
