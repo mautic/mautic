@@ -343,12 +343,12 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
 
         if (!empty($fieldsToRemoveValues)) {
-                // update values with diff after remove
-                foreach ($fieldsToRemoveValues as $field => &$fieldToRemoveValue) {
-                    $oldValue           = explode('|', $lead->getFieldValue($field));
-                    $fieldToRemoveValue = array_diff($oldValue, $fieldToRemoveValue);
-                }
-                $this->leadModel->setFieldValues($lead, $fieldsToRemoveValues);
+            // update values with diff after remove
+            foreach ($fieldsToRemoveValues as $field => &$fieldToRemoveValue) {
+                $oldValue           = explode('|', $lead->getFieldValue($field));
+                $fieldToRemoveValue = array_diff($oldValue, $fieldToRemoveValue);
+            }
+            $this->leadModel->setFieldValues($lead, $fieldsToRemoveValues);
         }
 
         if (!empty($lead->getChanges())) {
