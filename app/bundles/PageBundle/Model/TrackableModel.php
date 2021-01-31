@@ -855,7 +855,7 @@ class TrackableModel extends AbstractCommonModel
      */
     private function isSupportedToken($token)
     {
-        return false !== strpos($token, '{contactfield') || false !== strpos($token, '{leadfield') || false !== strpos($token, '{pagelink');
+        return false !== strpos($token, '{contactfield') || false !== strpos($token, '{leadfield') || false !== strpos($token, '{pagelink')|| false !== strpos($token, '{assetlink');
     }
 
     /**
