@@ -14,9 +14,9 @@ namespace Mautic\PageBundle\Controller;
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
-use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\BuilderSectionType;
+use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PageBundle\Entity\Page;
@@ -288,24 +288,30 @@ class PageController extends FormController
         //get related translations
         [$translationParent, $translationChildren] = $activePage->getTranslations();
 
+        $variants = [
+            'parent'             => $parent,
+            'children'           => $children,
+            'properties'         => isset($abTestSettings) ? $abTestSettings['variants'] : null,
+            'criteria'           => $criteria['criteria'],
+            'winnerCriteria'     => isset($abTestSettings) ? $abTestSettings['winnerCriteria'] : null,
+            'configurationError' => isset($abTestSettings) ? $abTestSettings['configurationError'] : null,
+        ];
+
+        $translations = [
+            'parent'   => $translationParent,
+            'children' => $translationChildren,
+        ];
+
         return $this->delegateView([
             'returnUrl' => $this->generateUrl('mautic_page_action', [
                     'objectAction' => 'view',
                     'objectId'     => $activePage->getId(), ]
             ),
             'viewParameters' => [
-                'activePage' => $activePage,
-                'variants'   => [
-                    'parent'     => $parent,
-                    'children'   => $children,
-                    'properties' => $properties,
-                    'criteria'   => $criteria['criteria'],
-                ],
-                'translations' => [
-                    'parent'   => $translationParent,
-                    'children' => $translationChildren,
-                ],
-                'permissions' => $security->isGranted([
+                'activePage'   => $activePage,
+                'variants'     => $variants,
+                'translations' => $translations,
+                'permissions'  => $security->isGranted([
                     'page:pages:viewown',
                     'page:pages:viewother',
                     'page:pages:create',
@@ -330,7 +336,16 @@ class PageController extends FormController
                 'pageUrl'       => $model->generateUrl($activePage, true),
                 'previewUrl'    => $this->generateUrl('mautic_page_preview', ['id' => $objectId], UrlGeneratorInterface::ABSOLUTE_URL),
                 'logs'          => $logs,
-                'dateRangeForm' => $dateRangeForm->createView(),
+                'dateRangeForm' => $dateRangeForm->createView(), 'previewSettingsForm' => $this->createForm(
+                    ContentPreviewSettingsType::class,
+                    null,
+                    [
+                        'type'         => ContentPreviewSettingsType::TYPE_PAGE,
+                        'objectId'     => $activePage->getId(),
+                        'variants'     => $variants,
+                        'translations' => $translations,
+                    ]
+                )->createView(),
             ],
             'contentTemplate' => 'MauticPageBundle:Page:details.html.php',
             'passthroughVars' => [

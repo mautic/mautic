@@ -253,16 +253,40 @@ $view['slots']->set(
                 <div class="panel-title"><?php echo $view['translator']->trans('mautic.page.preview.url'); ?></div>
             </div>
             <div class="panel-body pt-xs">
-                <div class="input-group">
-                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
-                           readonly
-                           value="<?php echo $view->escape($previewUrl); ?>"/>
-                    <span class="input-group-btn">
-                    <button class="btn btn-default btn-nospin"
-                            onclick="window.open('<?php echo $previewUrl; ?>', '_blank');">
-                        <i class="fa fa-external-link"></i>
-                    </button>
-                </span>
+                <?php if (!empty($previewSettingsForm['translation'])) { ?>
+                    <div class="row">
+                        <div class="form-group col-xs-12 ">
+                            <div class="control-label" for=""><?php echo $view['translator']->trans('mautic.email.preview.show.translation'); ?></div>
+                            <?php echo $view['form']->widget($previewSettingsForm['translation']); ?>
+                        </div>
+                    </div>
+                <?php } ?>
+                <?php if (!empty($previewSettingsForm['variant'])) { ?>
+                    <div class="row">
+                        <div class="form-group col-xs-12 ">
+                            <div class="control-label" for=""><?php echo $view['translator']->trans('mautic.email.preview.show.ab.variant'); ?></div>
+                            <?php echo $view['form']->widget($previewSettingsForm['variant']); ?>
+                        </div>
+                    </div>
+                <?php } ?>
+                <div class="row">
+                    <div class="form-group col-xs-12 ">
+                        <div class="control-label" for=""><?php echo $view['translator']->trans('mautic.email.preview.show.contact'); ?></div>
+                        <?php echo $view['form']->widget($previewSettingsForm['contact']); ?>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-group">
+                        <input id="content_preview_url" onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
+                               readonly
+                               value="<?php echo $view->escape($previewUrl); ?>"/>
+                        <span class="input-group-btn">
+                        <button class="btn btn-default btn-nospin"
+                                onclick="window.open('<?php echo $previewUrl; ?>', '_blank');">
+                            <i class="fa fa-external-link"></i>
+                        </button>
+                    </span>
+                    </div>
                 </div>
             </div>
         </div>
