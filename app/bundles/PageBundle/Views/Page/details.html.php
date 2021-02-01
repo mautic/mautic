@@ -276,16 +276,18 @@ $view['slots']->set(
                     </div>
                 </div>
                 <div class="row">
-                    <div class="input-group">
-                        <input id="content_preview_url" onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
-                               readonly
-                               value="<?php echo $view->escape($previewUrl); ?>"/>
-                        <span class="input-group-btn">
-                        <button class="btn btn-default btn-nospin"
-                                onclick="window.open('<?php echo $previewUrl; ?>', '_blank');">
-                            <i class="fa fa-external-link"></i>
-                        </button>
-                    </span>
+                    <div class="form-group col-xs-12 ">
+                        <div class="input-group">
+                            <input id="content_preview_url" onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
+                                   readonly
+                                   value="<?php echo $view->escape($previewUrl); ?>"/>
+                            <span class="input-group-btn">
+                                <button class="btn btn-default btn-nospin"
+                                        onclick="window.open('<?php echo $previewUrl; ?>', '_blank');">
+                                    <i class="fa fa-external-link"></i>
+                                </button>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>

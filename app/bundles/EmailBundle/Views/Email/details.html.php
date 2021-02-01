@@ -351,8 +351,9 @@ if (!$isEmbedded) {
                     </div>
                 </div>
                 <div class="row">
-                    <div class="input-group">
-                        <div class="input-group-addon"><?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $email, 'model' => 'email', 'query' => 'customToggle=publicPreview']); ?></div>
+                    <div class="form-group col-xs-12 ">
+                        <div class="input-group">
+                            <div class="input-group-addon"><?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $email, 'model' => 'email', 'query' => 'customToggle=publicPreview']); ?></div>
                             <input id="content_preview_url" onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
                                readonly
                                value="<?php echo $view->escape($previewUrl); ?>"/>
@@ -361,6 +362,7 @@ if (!$isEmbedded) {
                                     <i class="fa fa-external-link"></i>
                                 </button>
                             </span>
+                        </div>
                     </div>
                 </div>
             </div>
