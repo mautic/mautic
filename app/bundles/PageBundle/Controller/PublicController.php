@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Helper\TokenHelper;
@@ -294,21 +295,32 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @param $pageId
+     * @param $id
      *
      * @return Response|\Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      *
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function previewAction(Request $request, int $pageId, $objectType = null)
+    public function previewAction(Request $request, int $id, $objectType = null)
     {
+        $eventParams = [];
+        $contactId   = (int) $request->query->get('contactId');
+
+        if ($contactId) {
+            /** @var LeadModel $fieldModel */
+            $leadModel = $this->getModel('lead.lead');
+            /** @var Lead $contact */
+            $contact             = $leadModel->getEntity($contactId);
+            $eventParams['lead'] = $contact;
+        }
+
         /** @var PageConfig $pageConfig */
         $pageConfig   = $this->get('mautic.helper.page_config');
         /** @var PageModel $model */
         $model        = $this->getModel('page');
         /** @var Page $page */
-        $page         = $model->getEntity($pageId);
+        $page         = $model->getEntity($id);
 
         if (null === $page) {
             return $this->notFound();
@@ -352,7 +364,7 @@ class PublicController extends CommonFormController
 
         $dispatcher = $this->get('event_dispatcher');
         if ($dispatcher->hasListeners(PageEvents::PAGE_ON_DISPLAY)) {
-            $event = new PageDisplayEvent($content, $page);
+            $event = new PageDisplayEvent($content, $page, $eventParams);
             $dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
             $content = $event->getContent();
         }
