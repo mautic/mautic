@@ -11,21 +11,10 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\SendGrid\Mail;
 
-use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
 use SendGrid\Mail\Mail;
 
 class SendGridMailBase
 {
-    /**
-     * @var PlainTextMessageHelper
-     */
-    private $plainTextMessageHelper;
-
-    public function __construct(PlainTextMessageHelper $plainTextMessageHelper)
-    {
-        $this->plainTextMessageHelper = $plainTextMessageHelper;
-    }
-
     /**
      * @return Mail
      */

@@ -27,7 +27,7 @@ class SendGridMailBaseTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $sendGridMailBase = new SendGridMailBase($plainTextMessageHelper);
+        $sendGridMailBase = new SendGridMailBase();
 
         $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
             ->disableOriginalConstructor()
@@ -91,7 +91,7 @@ class SendGridMailBaseTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $sendGridMailBase = new SendGridMailBase($plainTextMessageHelper);
+        $sendGridMailBase = new SendGridMailBase();
 
         $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
             ->disableOriginalConstructor()
@@ -143,7 +143,7 @@ class SendGridMailBaseTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $sendGridMailBase = new SendGridMailBase($plainTextMessageHelper);
+        $sendGridMailBase = new SendGridMailBase();
 
         $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
             ->disableOriginalConstructor()
