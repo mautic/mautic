@@ -68,8 +68,7 @@ class AjaxController extends CommonAjaxController
         $results   = $model->getLookupResults('contact', $filter);
 
         $results['success'] = 1;
-        // format
-        // {"success":1,"0":{"value":"Admin User","id":1},"ignore_wdt":1}
+
         return $this->sendJsonResponse($results);
     }
 
