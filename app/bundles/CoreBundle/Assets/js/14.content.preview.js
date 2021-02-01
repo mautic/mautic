@@ -5,6 +5,7 @@ Mautic.contentPreviewUrlGenerator = {
 
     urlBase : 'email/preview',
     lastUsedEmailId : false,
+    contactId: false,
 
     /**
      * @param element mQuery representation
@@ -49,7 +50,6 @@ Mautic.contentPreviewUrlGenerator = {
 
         changedElement = mQuery(changedElement);
         let elementId  = changedElement.attr('id');
-        let contactId  = false;
 
         let value = this.getElementValue(changedElement);
 
@@ -62,7 +62,7 @@ Mautic.contentPreviewUrlGenerator = {
         }
 
         if (elementId === 'content_preview_settings_contact') {
-            contactId = value;
+            this.contactId = value;
             emailId = this.lastUsedEmailId;
         } else if (value !== false) {
             this.lastUsedEmailId = emailId = value;
@@ -70,8 +70,8 @@ Mautic.contentPreviewUrlGenerator = {
 
         let previewUrl = mauticBaseUrl + this.urlBase + '/' + emailId;
 
-        if (contactId !== false) {
-            previewUrl = previewUrl + '?contactId=' + contactId;
+        if (this.contactId !== false) {
+            previewUrl = previewUrl + '?contactId=' + this.contactId;
         }
 
         // Update url in preview input
