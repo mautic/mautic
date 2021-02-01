@@ -16,12 +16,12 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Form\Type\BuilderSectionType;
+use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\BatchSendType;
-use Mautic\EmailBundle\Form\Type\EmailPreviewSettingsType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Model\ListModel;
@@ -431,10 +431,11 @@ class EmailController extends FormController
                     )->getContent(),
                     'dateRangeForm'       => $dateRangeForm->createView(),
                     'previewSettingsForm' => $this->createForm(
-                            EmailPreviewSettingsType::class,
+                            ContentPreviewSettingsType::class,
                             null,
                             [
-                                'emailId'      => $email->getId(),
+                                'type'         => ContentPreviewSettingsType::TYPE_EMAIL,
+                                'objectId'     => $email->getId(),
                                 'variants'     => $variants,
                                 'translations' => $translations,
                             ]

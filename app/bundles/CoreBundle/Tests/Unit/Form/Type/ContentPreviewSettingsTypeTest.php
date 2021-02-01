@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\LookupType;
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Form\Type\EmailPreviewSettingsType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -14,10 +14,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class EmailPreviewSettingsTypeTest extends TestCase
+class ContentPreviewSettingsTypeTest extends TestCase
 {
     /**
-     * @var EmailPreviewSettingsType|MockObject
+     * @var ContentPreviewSettingsType|MockObject
      */
     private $form;
 
@@ -29,7 +29,7 @@ class EmailPreviewSettingsTypeTest extends TestCase
     protected function setUp()
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->form       = new EmailPreviewSettingsType($this->translator);
+        $this->form       = new ContentPreviewSettingsType($this->translator);
 
         parent::setUp();
     }
@@ -41,7 +41,8 @@ class EmailPreviewSettingsTypeTest extends TestCase
             ->method('setDefaults')
             ->with(
                 [
-                    'emailId'      => null,
+                    'type'         => null,
+                    'objectId'     => null,
                     'translations' => null,
                     'variants'     => null,
                 ]
@@ -52,15 +53,15 @@ class EmailPreviewSettingsTypeTest extends TestCase
 
     public function testGetBlockPrefix(): void
     {
-        self::assertSame('email_preview_settings', $this->form->getBlockPrefix());
+        self::assertSame('content_preview_settings', $this->form->getBlockPrefix());
     }
 
     public function testBuildFormWithTranslationAndVariantFieldNotAvailable(): void
     {
-        $emailId = 1;
-        $options = [
-            'emailId'      => $emailId,
-            'translations' => [
+        $objectId = 1;
+        $options  = [
+            'objectId'      => $objectId,
+            'translations'  => [
                 'children' => [],
             ],
             'variants'     => [
@@ -78,7 +79,7 @@ class EmailPreviewSettingsTypeTest extends TestCase
                     [
                         'attr' => [
                             'class'                   => 'form-control',
-                            'onChange'                => "Mautic.contentPreviewUrlGenerator.regenerateUrl({$emailId}, this)",
+                            'onChange'                => "Mautic.contentPreviewUrlGenerator.regenerateUrl({$objectId}, this)",
                             'data-callback'           => 'activateContactLookupField',
                             'data-toggle'             => 'field-lookup',
                             'data-lookup-callback'    => 'updateLookupListFilter',
@@ -136,8 +137,8 @@ class EmailPreviewSettingsTypeTest extends TestCase
         ];
 
         $formOptions = [
-            'emailId'      => $parentEmailId,
-            'translations' => [
+            'objectId'      => $parentEmailId,
+            'translations'  => [
                 'parent'   => $parentEmail,
                 'children' => [
                     $translationEmail1,

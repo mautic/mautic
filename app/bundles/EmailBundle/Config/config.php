@@ -535,12 +535,6 @@ return [
                 ],
                 'tag' => 'mautic.email_stat_helper',
             ],
-            'mautic.form.type.email.preview.settings' => [
-                'class'     => \Mautic\EmailBundle\Form\Type\EmailPreviewSettingsType::class,
-                'arguments' => [
-                    'translator',
-                ],
-            ],
         ],
         'models' => [
             'mautic.email.model.email' => [

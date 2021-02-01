@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Mautic\EmailBundle\Form\Type;
+namespace Mautic\CoreBundle\Form\Type;
 
-use Mautic\CoreBundle\Form\Type\LookupType;
 use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -13,8 +12,14 @@ use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class EmailPreviewSettingsType extends AbstractType
+/**
+ * Preview settings form used for pages and emails in detail view page.
+ */
+class ContentPreviewSettingsType extends AbstractType
 {
+    public const TYPE_EMAIL = 'email';
+    public const TYPE_PAGE  = 'page';
+
     private const CHOICE_TYPE_TRANSLATION = 'translation';
     private const CHOICE_TYPE_VARIANT     = 'variant';
 
@@ -35,7 +40,7 @@ class EmailPreviewSettingsType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $emailId               = $options['emailId'];
+        $emailId               = $options['objectId'];
         $this->onChangeContent = "Mautic.contentPreviewUrlGenerator.regenerateUrl({$emailId}, this)";
         $translations          = $options['translations'];
         $variants              = $options['variants'];
@@ -69,7 +74,8 @@ class EmailPreviewSettingsType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'emailId'      => null,
+                'type'         => null,
+                'objectId'     => null,
                 'translations' => null,
                 'variants'     => null,
             ]
@@ -81,7 +87,7 @@ class EmailPreviewSettingsType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'email_preview_settings';
+        return 'content_preview_settings';
     }
 
     private function addTranslationOrVariantChoicesElement(

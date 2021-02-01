@@ -53,15 +53,15 @@ Mautic.contentPreviewUrlGenerator = {
 
         let value = this.getElementValue(changedElement);
 
-        if (elementId === 'email_preview_settings_variant') {
-            this.setElementValue('#email_preview_settings_translation', value);
+        if (elementId === 'content_preview_settings_variant') {
+            this.setElementValue('#content_preview_settings_translation', value);
         }
 
-        if (elementId === 'email_preview_settings_translation') {
-            this.setElementValue('#email_preview_settings_variant', value);
+        if (elementId === 'content_preview_settings_translation') {
+            this.setElementValue('#content_preview_settings_variant', value);
         }
 
-        if (elementId === 'email_preview_settings_contact') {
+        if (elementId === 'content_preview_settings_contact') {
             contactId = value;
             emailId = this.lastUsedEmailId;
         } else if (value !== false) {
@@ -75,15 +75,15 @@ Mautic.contentPreviewUrlGenerator = {
         }
 
         // Update url in preview input
-        mQuery('#email_preview_url').val(previewUrl);
+        mQuery('#content_preview_url').val(previewUrl);
         // Update URL in preview button
-        mQuery('#email_preview_url_button').attr('onClick', "window.open('" + previewUrl + "', '_blank');");
+        mQuery('#content_preview_url_button').attr('onClick', "window.open('" + previewUrl + "', '_blank');");
     }
 }
 
 Mautic.activateContactLookupField = function(fieldOptions, filterId) {
 
-    let lookupElementId = 'email_preview_settings_contact';
+    let lookupElementId = 'content_preview_settings_contact';
     let action = mQuery('#'+ lookupElementId).attr('data-chosen-lookup');
 
     let options = {

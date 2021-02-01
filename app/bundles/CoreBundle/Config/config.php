@@ -181,6 +181,12 @@ return [
             ],
         ],
         'forms' => [
+            'mautic.form.type.email.preview.settings' => [
+                'class'     => \Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
             'mautic.form.type.coreconfig' => [
                 'class'     => \Mautic\CoreBundle\Form\Type\ConfigType::class,
                 'arguments' => [
