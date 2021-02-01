@@ -78,7 +78,7 @@ class EmailPreviewSettingsTypeTest extends TestCase
                     [
                         'attr' => [
                             'class'                   => 'form-control',
-                            'onChange'                => "Mautic.contentPreviewUrlGenerator.regenerateUrl({$emailId})",
+                            'onChange'                => "Mautic.contentPreviewUrlGenerator.regenerateUrl({$emailId}, this)",
                             'data-callback'           => 'activateContactLookupField',
                             'data-toggle'             => 'field-lookup',
                             'data-lookup-callback'    => 'updateLookupListFilter',
@@ -116,9 +116,9 @@ class EmailPreviewSettingsTypeTest extends TestCase
         $translationEmail2->setLanguage('dz_BT');
 
         $expectedTranslationChoices = [
-            'Parent - English'                  => 1,
-            'Translation 1 - Czech (Czechia)'   => 2,
-            'Translation 2 - Dzongkha (Bhutan)' => 3,
+            'Parent - English - ID 1'                  => 1,
+            'Translation 1 - Czech (Czechia) - ID 2'   => 2,
+            'Translation 2 - Dzongkha (Bhutan) - ID 3' => 3,
         ];
 
         $variantEmail1 = new Email();
@@ -163,9 +163,10 @@ class EmailPreviewSettingsTypeTest extends TestCase
                     [
                         'choices' => $expectedTranslationChoices,
                         'attr'    => [
-                            'onChange' => "Mautic.contentPreviewUrlGenerator.regenerateUrl({$parentEmailId})",
+                            'onChange' => "Mautic.contentPreviewUrlGenerator.regenerateUrl({$parentEmailId}, this)",
                         ],
-                        'placeholder' => $this->translator->trans('mautic.core.form.chooseone'),
+                        'placeholder'  => $this->translator->trans('mautic.core.form.chooseone'),
+                        'data'         => (string) $parentEmailId,
                     ],
                 ],
                 [
@@ -174,9 +175,10 @@ class EmailPreviewSettingsTypeTest extends TestCase
                     [
                         'choices' => $expectedVariantChoices,
                         'attr'    => [
-                            'onChange' => "Mautic.contentPreviewUrlGenerator.regenerateUrl({$parentEmailId})",
+                            'onChange' => "Mautic.contentPreviewUrlGenerator.regenerateUrl({$parentEmailId}, this)",
                         ],
-                        'placeholder' => $this->translator->trans('mautic.core.form.chooseone'),
+                        'placeholder'  => $this->translator->trans('mautic.core.form.chooseone'),
+                        'data'         => (string) $parentEmailId,
                     ],
                 ],
                 [
@@ -185,7 +187,7 @@ class EmailPreviewSettingsTypeTest extends TestCase
                     [
                         'attr' => [
                             'class'                   => 'form-control',
-                            'onChange'                => "Mautic.contentPreviewUrlGenerator.regenerateUrl({$parentEmailId})",
+                            'onChange'                => "Mautic.contentPreviewUrlGenerator.regenerateUrl({$parentEmailId}, this)",
                             'data-callback'           => 'activateContactLookupField',
                             'data-toggle'             => 'field-lookup',
                             'data-lookup-callback'    => 'updateLookupListFilter',

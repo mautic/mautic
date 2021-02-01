@@ -128,11 +128,11 @@ class EmailPreviewSettingsType extends AbstractType
 
         if (self::CHOICE_TYPE_TRANSLATION === $type) {
             // Add localised translation name
-            $identifier = Intl::getLocaleBundle()->getLocaleName($email->getLanguage());
+            $identifier .= ' - '.Intl::getLocaleBundle()->getLocaleName($email->getLanguage());
         }
 
         $identifier .= " - ID {$email->getId()}";
 
-        return "{$email->getName()} - $identifier";
+        return "{$email->getName()}{$identifier}";
     }
 }
