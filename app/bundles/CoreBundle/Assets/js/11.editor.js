@@ -274,6 +274,85 @@ Mautic.getTokensForPlugIn = function(method) {
     return d.promise();
 };
 
+Mautic.ConvertFieldToCkeditor  = function(textarea, ckEditorToolbarOptions) {
+    const defaultOptions = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'ckfinder', 'imageUpload', 'mediaEmbed', 'insertTable'];
+    const ckEditorToolbar = typeof ckEditorToolbarOptions != "undefined" && ckEditorToolbarOptions.length > 0 ? ckEditorToolbarOptions : defaultOptions;
+
+    if (ckEditors.has( textarea[0] ))
+    {
+        ckEditors.get( textarea[0] ).destroy();
+        ckEditors.delete( textarea[0] )
+    }
+
+    const ckEditorOption = {
+        toolbar: {
+            items: ckEditorToolbar,
+            shouldNotGroupWhenFull: true
+        },
+        fontFamily: {
+            options: [
+                "default", "Arial, Helvetica, sans-serif", "Courier New, Courier, monospace", "Georgia, serif", "Lucida Sans Unicode, Lucida Grande, sans-serif", "Tahoma, Geneva, sans-serif", "Times New Roman, Times, serif", "Trebuchet MS, Helvetica, sans-serif", "Verdana, Geneva, sans-serif", "Proxima Nova"
+            ],
+            shouldNotGroupWhenFull: true
+        },
+        fontSize: {
+            options: [8, 9, 10, 11, 12, 14, 18, 24, 30, 36, 48],
+            supportAllValues : true
+        }
+    };
+    mQuery.extend(ckEditorOption, {
+        autosave: {
+            save( editor ) {
+                editor.updateSourceElement();
+            }
+        }
+    });
+
+    if (ckEditorToolbar.indexOf('imageUpload') > -1)
+    {
+        mQuery.extend(ckEditorOption, {
+            ckfinder: {
+                uploadUrl: Mautic.imageUploadURL+'?editor=ckeditor'
+            },
+            image: {
+                toolbar: [
+                    'imageResize',
+                    'imageTextAlternative',
+                    'imageStyle:full',
+                    'imageStyle:side',
+                    'linkImage',
+                    'AutoImage'
+                ],
+            }
+        });
+    }
+
+    if (ckEditorToolbar.indexOf('InsertDropDown') > -1)
+    {
+        Mautic.getTokensForPlugIn(textarea.attr('data-token-callback')).done(function(tokens) {
+            mQuery.extend(ckEditorOption, {
+                extraPlugins: [Mautic.MentionLinks],
+                dynamicTokenLabel: 'Insert token',
+                dynamicToken: tokens,
+                mention: {
+                    feeds: [
+                        {
+                            marker: '{',
+                            feed: Mautic.getFeedItems,
+                            itemRenderer: Mautic.customItemRenderer
+                        }
+                    ]
+                }
+            });
+            Mautic.InitCkEditor(textarea, ckEditorOption);
+        })
+    }
+    else
+    {
+        Mautic.InitCkEditor(textarea, ckEditorOption);
+    }
+}
+
 Mautic.InitCkEditor  = function(textarea, options) {
     ClassicEditor
         .create( textarea[0], options)

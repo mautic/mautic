@@ -29,6 +29,11 @@ class AssetGenerationHelper
     private $pathsHelper;
 
     /**
+     * @var CoreParametersHelper
+     */
+    public $coreParametersHelper;
+
+    /**
      * @var string
      */
     private $version;
@@ -40,6 +45,7 @@ class AssetGenerationHelper
     {
         $this->bundleHelper         = $bundleHelper;
         $this->pathsHelper          = $pathsHelper;
+        $this->coreParametersHelper = $coreParametersHelper;
         $this->version              = substr(hash('sha1', $coreParametersHelper->get('secret_key').$version->getVersion()), 0, 8);
     }
 

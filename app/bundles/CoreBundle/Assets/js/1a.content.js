@@ -598,68 +598,13 @@ Mautic.onPageLoad = function (container, response, inModal) {
                 minButtons = ['undo', 'redo', '|',  'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'ckfinder', 'imageUpload', 'mediaEmbed', 'insertTable'];
             }
 
-            if (ckEditors.has( textarea[0] ))
-            {
-                ckEditors.get( textarea[0] ).destroy();
-                ckEditors.delete( textarea[0] )
-            }
-
             let ckEditorToolbar = minButtons;
             if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
                 ckEditorToolbar = maxButtons;
             }
 
-            const ckEditorOption = {toolbar: {items: ckEditorToolbar, shouldNotGroupWhenFull: true}};
-            mQuery.extend(ckEditorOption, {
-                autosave: {
-                    save( editor ) {
-                        editor.updateSourceElement();
-                    }
-                }
-            });
+            Mautic.ConvertFieldToCkeditor(textarea, ckEditorToolbar);
 
-            if (ckEditorToolbar.indexOf('imageUpload') > -1)
-            {
-                mQuery.extend(ckEditorOption, {
-                    ckfinder: {
-                        uploadUrl: Mautic.imageUploadURL+'?editor=ckeditor'
-                    },
-                    image: {
-                        toolbar: [
-                            'imageResize',
-                            'imageTextAlternative',
-                            'imageStyle:full',
-                            'imageStyle:side',
-                            'linkImage'
-                        ],
-                    }
-                });
-            }
-
-            if (ckEditorToolbar.indexOf('InsertDropDown') > -1)
-            {
-                Mautic.getTokensForPlugIn(textarea.attr('data-token-callback')).done(function(tokens) {
-                    mQuery.extend(ckEditorOption, {
-                        extraPlugins: [Mautic.MentionLinks],
-                        dynamicTokenLabel: 'Insert token',
-                        dynamicToken: tokens,
-                        mention: {
-                            feeds: [
-                                {
-                                    marker: '{',
-                                    feed: Mautic.getFeedItems,
-                                    itemRenderer: Mautic.customItemRenderer
-                                }
-                            ]
-                        }
-                    });
-                    Mautic.InitCkEditor(textarea, ckEditorOption);
-                })
-            }
-            else
-            {
-                Mautic.InitCkEditor(textarea, ckEditorOption);
-            }
         });
     }
 

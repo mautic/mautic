@@ -428,8 +428,9 @@ class AssetsHelper
      */
     public function outputSystemStylesheets()
     {
-        $assets = $this->assetHelper->getAssets();
-
+        $assets          = $this->assetHelper->getAssets();
+        $staticMauticUrl = $this->assetHelper->coreParametersHelper->get('static_file_service', 'https://static.mautic.net');
+        $assets['css'][] = $staticMauticUrl.'/Proxima-Nova/0.0.2/Proxima-Nova-font.css?v'.$this->version;
         if (isset($assets['css'])) {
             foreach ($assets['css'] as $url) {
                 echo '<link rel="stylesheet" href="'.$this->getUrl($url).'" data-source="mautic" />'."\n";
