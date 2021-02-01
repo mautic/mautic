@@ -31,13 +31,18 @@ Mautic.contentPreviewUrlGenerator = {
 
         let hasOption = mQuery(elementId +  ' option[value="' + value + '"]');
 
-        // TODO this check and set is not working
-        if (hasOption.length === 0) {
+        if (hasOption.length > 0) {
+            // This value exists in other chosen element
             element.val(value);
         } else {
+            // Value does not exists
             element.val("");
         }
+
+        // Update chosen UI
+        mQuery(element).trigger('chosen:updated');
     },
+
 
     regenerateUrl : function(emailId, changedElement) {
 
