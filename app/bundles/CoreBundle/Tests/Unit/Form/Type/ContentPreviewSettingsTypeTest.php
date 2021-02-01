@@ -79,10 +79,10 @@ class ContentPreviewSettingsTypeTest extends TestCase
                     [
                         'attr' => [
                             'class'                   => 'form-control',
-                            'onChange'                => "Mautic.contentPreviewUrlGenerator.regenerateUrl({$objectId}, this)",
+                            'onChange'                => '',
                             'data-callback'           => 'activateContactLookupField',
                             'data-toggle'             => 'field-lookup',
-                            'data-lookup-callback'    => 'updateLookupListFilter',
+                            'data-lookup-callback'    => 'updateContactLookupListFilter',
                             'data-chosen-lookup'      => 'lead:contactList',
                             'placeholder'             => $this->translator->trans(
                                 'mautic.lead.list.form.startTyping'
@@ -188,10 +188,10 @@ class ContentPreviewSettingsTypeTest extends TestCase
                     [
                         'attr' => [
                             'class'                   => 'form-control',
-                            'onChange'                => "Mautic.contentPreviewUrlGenerator.regenerateUrl({$parentEmailId}, this)",
+                            'onChange'                => '',
                             'data-callback'           => 'activateContactLookupField',
                             'data-toggle'             => 'field-lookup',
-                            'data-lookup-callback'    => 'updateLookupListFilter',
+                            'data-lookup-callback'    => 'updateContactLookupListFilter',
                             'data-chosen-lookup'      => 'lead:contactList',
                             'placeholder'             => $this->translator->trans(
                                 'mautic.lead.list.form.startTyping'
