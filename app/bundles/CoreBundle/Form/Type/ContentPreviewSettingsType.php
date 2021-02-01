@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -40,13 +41,13 @@ class ContentPreviewSettingsType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $emailId               = $options['objectId'];
-        $this->onChangeContent = "Mautic.contentPreviewUrlGenerator.regenerateUrl({$emailId}, this)";
+        $objectId              = $options['objectId'];
+        $this->onChangeContent = "Mautic.contentPreviewUrlGenerator.regenerateUrl({$objectId}, this)";
         $translations          = $options['translations'];
         $variants              = $options['variants'];
 
-        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_TRANSLATION, $translations, $emailId);
-        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_VARIANT, $variants, $emailId);
+        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_TRANSLATION, $translations, $objectId);
+        $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_VARIANT, $variants, $objectId);
 
         $builder->add(
             'contact',
@@ -94,13 +95,13 @@ class ContentPreviewSettingsType extends AbstractType
         FormBuilderInterface $builder,
         string $type,
         array $variants,
-        int $emailId
+        int $objectId
     ): void {
         if (!count($variants['children'])) {
             return;
         }
 
-        /** @var Email */
+        /** @var Email|Page */
         $child = $variants['parent'];
 
         $variantChoices = [
@@ -108,7 +109,7 @@ class ContentPreviewSettingsType extends AbstractType
             $this->addOrderNoToChoiceName($child, $type) => $child->getId(),
         ];
 
-        /** @var Email $child */
+        /** @var Email|Page $child */
         foreach ($variants['children'] as $child) {
             // Add children
             $variantChoices[$this->addOrderNoToChoiceName($child, $type)] = $child->getId();
@@ -123,12 +124,15 @@ class ContentPreviewSettingsType extends AbstractType
                     'onChange' => $this->onChangeContent,
                 ],
                 'placeholder'  => $this->translator->trans('mautic.core.form.chooseone'),
-                'data'         => (string) $emailId,
+                'data'         => (string) $objectId,
             ]
         );
     }
 
-    private function addOrderNoToChoiceName(Email $email, string $type): string
+    /**
+     * @param Email|Page $email
+     */
+    private function addOrderNoToChoiceName(object $email, string $type): string
     {
         $identifier = '';
 
