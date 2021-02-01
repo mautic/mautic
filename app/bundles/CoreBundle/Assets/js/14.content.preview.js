@@ -48,6 +48,10 @@ Mautic.contentPreviewUrlGenerator = {
 
     regenerateUrl : function(emailId, changedElement) {
 
+        if (this.lastUsedEmailId === false) {
+            this.lastUsedEmailId = emailId;
+        }
+
         changedElement = mQuery(changedElement);
         let elementId  = changedElement.attr('id');
 

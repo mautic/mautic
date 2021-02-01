@@ -77,9 +77,6 @@ return [
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::previewAction',
                 'defaults'   => [
                     'objectType'    => null,
-                    'translationId' => null,
-                    'variantId'     => null,
-                    'contactId'     => null,
                 ],
             ],
         ],

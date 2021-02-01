@@ -439,7 +439,7 @@ class PublicController extends CommonFormController
      */
     public function previewAction(
         Request $request,
-        int $objectId,
+        string $objectId,
         string $objectType = null
     ) {
         $contactId = (int) $request->query->get('contactId');
