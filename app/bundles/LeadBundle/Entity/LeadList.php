@@ -20,23 +20,20 @@ use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class LeadList.
- */
 class LeadList extends FormEntity
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $publicName;
 
@@ -46,7 +43,7 @@ class LeadList extends FormEntity
     private $description;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $alias;
 
@@ -70,9 +67,6 @@ class LeadList extends FormEntity
      */
     private $leads;
 
-    /**
-     * Construct.
-     */
     public function __construct()
     {
         $this->leads = new ArrayCollection();
@@ -124,8 +118,6 @@ class LeadList extends FormEntity
 
     /**
      * Prepares the metadata for API usage.
-     *
-     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -150,9 +142,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Get id.
-     *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -160,9 +150,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Set name.
-     *
-     * @param int $name
+     * @param string|null $name
      *
      * @return LeadList
      */
@@ -175,9 +163,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Get name.
-     *
-     * @return int
+     * @return string|null
      */
     public function getName()
     {
@@ -185,9 +171,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Set description.
-     *
-     * @param string $description
+     * @param string|null $description
      *
      * @return LeadList
      */
@@ -200,9 +184,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Get description.
-     *
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -210,9 +192,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Get publicName.
-     *
-     * @return string
+     * @return string|null
      */
     public function getPublicName()
     {
@@ -220,9 +200,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Set publicName.
-     *
-     * @param string $publicName
+     * @param string|null $publicName
      *
      * @return LeadList
      */
@@ -235,8 +213,6 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Set filters.
-     *
      * @return LeadList
      */
     public function setFilters(array $filters)
@@ -248,8 +224,6 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Get filters.
-     *
      * @return array
      */
     public function getFilters()
@@ -262,8 +236,6 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Set isGlobal.
-     *
      * @param bool $isGlobal
      *
      * @return LeadList
@@ -277,8 +249,6 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Get isGlobal.
-     *
      * @return bool
      */
     public function getIsGlobal()
@@ -297,9 +267,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Set alias.
-     *
-     * @param string $alias
+     * @param string|null $alias
      *
      * @return LeadList
      */
@@ -312,9 +280,7 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Get alias.
-     *
-     * @return string
+     * @return string|null
      */
     public function getAlias()
     {
@@ -322,8 +288,6 @@ class LeadList extends FormEntity
     }
 
     /**
-     * Get leads.
-     *
      * @return \Doctrine\Common\Collections\Collection
      */
     public function getLeads()

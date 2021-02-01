@@ -150,3 +150,7 @@ $container->register('security.csrf.token_manager', \Symfony\Component\Security\
     ->addArgument(new Reference('security.csrf.token_generator'))
     ->addArgument(new Reference('security.csrf.token_storage'))
     ->addArgument('test');
+
+// Stub HTTP client to prevent accidental request to third parties
+$container->register('mautic.http.client', \GuzzleHttp\Client::class)
+    ->setFactory('\Mautic\CoreBundle\Test\Guzzle\ClientFactory::stub');
