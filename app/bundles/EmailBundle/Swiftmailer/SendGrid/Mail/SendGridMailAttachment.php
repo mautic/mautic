@@ -13,7 +13,7 @@ namespace Mautic\EmailBundle\Swiftmailer\SendGrid\Mail;
 
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use SendGrid\Attachment;
-use SendGrid\Mail;
+use SendGrid\Mail\Mail;
 
 class SendGridMailAttachment
 {
@@ -30,11 +30,12 @@ class SendGridMailAttachment
             }
             $base64 = base64_encode($fileContent);
 
-            $attachment = new Attachment();
-            $attachment->setContent($base64);
-            $attachment->setType($emailAttachment['contentType']);
-            $attachment->setFilename($emailAttachment['fileName']);
-            $mail->addAttachment($attachment);
+            $mail->addAttachment(
+                $base64,
+                $emailAttachment['contentType'],
+                $emailAttachment['fileName']
+            );
+            /* $mail->addAttachment($attachment);*/
         }
     }
 }

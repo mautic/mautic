@@ -15,7 +15,7 @@ use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailAttachment;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailBase;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailMetadata;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailPersonalization;
-use SendGrid\Mail;
+use SendGrid\Mail\Mail;
 
 class SendGridApiMessage
 {

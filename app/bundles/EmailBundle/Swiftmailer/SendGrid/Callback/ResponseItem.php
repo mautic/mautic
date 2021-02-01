@@ -31,6 +31,11 @@ class ResponseItem
     private $dncReason;
 
     /**
+     * @var string
+     */
+    private $hashId;
+
+    /**
      * @throws ResponseItemException
      */
     public function __construct(array $item)
@@ -41,6 +46,9 @@ class ResponseItem
         $this->email     = $item['email'];
         $this->reason    = !empty($item['reason']) ? $item['reason'] : null;
         $this->dncReason = CallbackEnum::convertEventToDncReason($item['event']);
+        if (isset($item['hashId'])) {
+            $this->hashId = $item['hashId'];
+        }
     }
 
     /**
@@ -65,5 +73,13 @@ class ResponseItem
     public function getDncReason()
     {
         return $this->dncReason;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHashId()
+    {
+        return $this->hashId;
     }
 }

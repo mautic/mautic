@@ -98,7 +98,7 @@
         "php-amqplib/rabbitmq-bundle": "^1.10",
         "simshaun/recurr": "^3.0",
         "ramsey/uuid": "^3.7",
-        "sendgrid/sendgrid": "~6.0",
+        "sendgrid/sendgrid": "^7",
         "noxlogic/ratelimit-bundle": "^1.11",
         "knplabs/knp-menu-bundle": "^2.0",
         "guzzlehttp/oauth-subscriber": "^0.3.0",

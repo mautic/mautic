@@ -17,7 +17,7 @@ use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiFacade;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiMessage;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiResponse;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridWrapper;
-use SendGrid\Mail;
+use SendGrid\Mail\Mail;
 use SendGrid\Response;
 
 class SendGridApiFacadeTest extends \PHPUnit\Framework\TestCase
