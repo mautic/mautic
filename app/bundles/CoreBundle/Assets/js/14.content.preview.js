@@ -22,7 +22,8 @@ Mautic.contentPreviewUrlGenerator = {
     },
 
     /**
-     * @param elementId
+     * @param {string} elementId
+     * @param {string} value
      * @returns {boolean|string}
      */
     setElementValue(elementId, value) {
