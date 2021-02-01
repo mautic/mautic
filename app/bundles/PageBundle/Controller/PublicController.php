@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServic
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Event\TrackingEvent;
+use Mautic\PageBundle\Helper\PageConfig;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\Tracking404Model;
@@ -293,33 +294,38 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @param $id
+     * @param $pageId
      *
      * @return Response|\Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      *
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function previewAction($id)
+    public function previewAction(Request $request, int $pageId, $objectType = null)
     {
-        $model  = $this->getModel('page');
-        $entity = $model->getEntity($id);
+        /** @var PageConfig $pageConfig */
+        $pageConfig   = $this->get('mautic.helper.page_config');
+        /** @var PageModel $model */
+        $model        = $this->getModel('page');
+        /** @var Page $page */
+        $page         = $model->getEntity($pageId);
 
-        if (null === $entity) {
+        if (null === $page) {
             return $this->notFound();
         }
 
         $analytics = $this->factory->getHelper('template.analytics')->getCode();
 
-        $BCcontent = $entity->getContent();
-        $content   = $entity->getCustomHtml();
+        $BCcontent = $page->getContent();
+        $content   = $page->getCustomHtml();
+
         if (empty($content) && !empty($BCcontent)) {
-            $template = $entity->getTemplate();
+            $template = $page->getTemplate();
             //all the checks pass so display the content
             $slots   = $this->factory->getTheme($template)->getSlots('page');
-            $content = $entity->getContent();
+            $content = $page->getContent();
 
-            $this->processSlots($slots, $entity);
+            $this->processSlots($slots, $page);
 
             // Add the GA code to the template assets
             if (!empty($analytics)) {
@@ -333,7 +339,7 @@ class PublicController extends CommonFormController
                 [
                     'slots'    => $slots,
                     'content'  => $content,
-                    'page'     => $entity,
+                    'page'     => $page,
                     'template' => $template,
                     'public'   => true, // @deprecated Remove in 2.0
                 ]
@@ -346,7 +352,7 @@ class PublicController extends CommonFormController
 
         $dispatcher = $this->get('event_dispatcher');
         if ($dispatcher->hasListeners(PageEvents::PAGE_ON_DISPLAY)) {
-            $event = new PageDisplayEvent($content, $entity);
+            $event = new PageDisplayEvent($content, $page);
             $dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
             $content = $event->getContent();
         }
