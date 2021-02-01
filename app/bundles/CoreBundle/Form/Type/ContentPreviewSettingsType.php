@@ -55,10 +55,10 @@ class ContentPreviewSettingsType extends AbstractType
             [
                 'attr' => [
                     'class'                   => 'form-control',
-                    'onChange'                => $this->onChangeContent,
+                    'onChange'                => '', // @todo We need an action deleting value in #content_preview_settings_contact_id when selected contact in form is deleted
                     'data-callback'           => 'activateContactLookupField',
                     'data-toggle'             => 'field-lookup',
-                    'data-lookup-callback'    => 'updateLookupListFilter',
+                    'data-lookup-callback'    => 'updateContactLookupListFilter',
                     'data-chosen-lookup'      => 'lead:contactList',
                     'placeholder'             => $this->translator->trans(
                         'mautic.lead.list.form.startTyping'

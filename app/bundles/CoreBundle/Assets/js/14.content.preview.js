@@ -4,8 +4,12 @@
 Mautic.contentPreviewUrlGenerator = {
 
     urlBase : 'email/preview',
-    lastUsedEmailId : false,
+    lastUsedObjectId : false,
     contactId: false,
+
+    init() {
+        this.lastUsedObjectId = mQuery('#content_preview_settings_object_id').val();
+    },
 
     /**
      * @param element mQuery representation
@@ -50,10 +54,6 @@ Mautic.contentPreviewUrlGenerator = {
 
         this.urlBase = mQuery("#content_preview_url").attr('data-route');
 
-        if (this.lastUsedEmailId === false) {
-            this.lastUsedEmailId = emailId;
-        }
-
         changedElement = mQuery(changedElement);
         let elementId  = changedElement.attr('id');
 
@@ -67,11 +67,11 @@ Mautic.contentPreviewUrlGenerator = {
             this.setElementValue('#content_preview_settings_variant', value);
         }
 
-        if (elementId === 'content_preview_settings_contact') {
+        if (elementId === 'content_preview_settings_contact_id') {
             this.contactId = value;
-            emailId = this.lastUsedEmailId;
+            emailId = this.lastUsedObjectId;
         } else if (value !== false) {
-            this.lastUsedEmailId = emailId = value;
+            this.lastUsedObjectId = emailId = value;
         }
 
         let previewUrl = mauticBaseUrl + this.urlBase + '/' + emailId;
@@ -87,6 +87,23 @@ Mautic.contentPreviewUrlGenerator = {
     }
 }
 
+/**
+ * Used in data-lookup-callback attr of form field in ContentPreviewSettingsType
+ */
+Mautic.updateContactLookupListFilter = function(field, item) {
+    if (item && item.id) {
+        mQuery('#content_preview_settings_contact_id').val(item.id);
+        mQuery(field).val(item.value);
+        Mautic.contentPreviewUrlGenerator.regenerateUrl(
+            item.id,
+            mQuery('#content_preview_settings_contact_id')
+        );
+    }
+};
+
+/**
+ * Used in data-lookup-callback attr of form field in ContentPreviewSettingsType
+ */
 Mautic.activateContactLookupField = function(fieldOptions, filterId) {
 
     let lookupElementId = 'content_preview_settings_contact';
@@ -98,4 +115,5 @@ Mautic.activateContactLookupField = function(fieldOptions, filterId) {
     };
 
     Mautic.activateFieldTypeahead(lookupElementId, filterId, options, action);
+    Mautic.contentPreviewUrlGenerator.init();
 };

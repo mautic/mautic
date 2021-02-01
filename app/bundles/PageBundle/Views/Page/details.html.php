@@ -292,6 +292,8 @@ $view['slots']->set(
                                     <i class="fa fa-external-link"></i>
                                 </button>
                             </span>
+                            <input type="hidden" id="content_preview_settings_object_id" value="<?php echo $activePage->getId(); ?>">
+                            <input type="hidden" id="content_preview_settings_contact_id" value="">
                         </div>
                     </div>
                 </div>
