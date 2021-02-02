@@ -278,7 +278,6 @@ class PublicController extends CommonFormController
             );
 
             $event = new PageDisplayEvent($content, $entity);
-            $event->setLead($this->getModel('lead')->getEntity(2003));
             $this->get('event_dispatcher')->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
             $content = $event->getContent();
 
