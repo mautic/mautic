@@ -117,13 +117,13 @@ class PageControllerTest extends MauticMysqlTestCase
 
         $this->client->request('GET', "{$page->getAlias()}?utm_source=linkedin&utm_medium=social&utm_campaign=mautic&utm_content=".$timestamp);
         $clientResponse = $this->client->getResponse();
-        
+
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), 'page not found');
 
         if (Response::HTTP_OK === $clientResponse->getStatusCode()) {
             $allUtmTags    = $this->em->getRepository(UtmTag::class)->getEntities();
             $this->assertNotCount(0, $allUtmTags);
-            
+
             foreach ($allUtmTags as $utmTag) {
                 $this->assertSame('linkedin', $utmTag->getUtmSource(), 'utm_source does not match');
                 $this->assertSame('social', $utmTag->getUtmMedium(), 'utm_medium does not match');
