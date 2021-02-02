@@ -29,7 +29,7 @@ class PageDisplayEvent extends Event
     /**
      * Preferred lead to be used in listeners.
      *
-     * @var Lead|array|null
+     * @var Lead|null
      */
     private $lead;
 
