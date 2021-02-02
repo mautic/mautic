@@ -314,6 +314,20 @@ class PublicController extends CommonFormController
             /** @var Lead $contact */
             $contact             = $leadModel->getEntity($contactId);
             $eventParams['lead'] = $contact;
+        } else {
+            // Generate faked one
+            /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
+            $fieldModel = $this->getModel('lead.field');
+            $contact    = $fieldModel->getFieldList(false, false);
+
+            array_walk(
+                $contact,
+                function (&$field) {
+                    $field = "[$field]";
+                }
+            );
+
+            $contact['id'] = 0;
         }
 
         /** @var PageConfig $pageConfig */
@@ -381,6 +395,7 @@ class PublicController extends CommonFormController
         $dispatcher = $this->get('event_dispatcher');
         if ($dispatcher->hasListeners(PageEvents::PAGE_ON_DISPLAY)) {
             $event = new PageDisplayEvent($content, $page, $eventParams);
+            $event->setLead($contact);
             $dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
             $content = $event->getContent();
         }
