@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
@@ -330,6 +331,21 @@ class PublicController extends CommonFormController
 
         $BCcontent = $page->getContent();
         $content   = $page->getCustomHtml();
+
+        /** @var CorePermissions $security */
+        $security   = $this->get('mautic.security');
+        if (!$security->isAdmin()) {
+            if (
+                ($page->isPublished())
+                || (!$security->hasEntityAccess(
+                    'email:emails:viewown',
+                    'email:emails:viewother',
+                    $page->getCreatedBy()
+                ))
+            ) {
+                return $this->accessDenied();
+            }
+        }
 
         if (empty($content) && !empty($BCcontent)) {
             $template = $page->getTemplate();

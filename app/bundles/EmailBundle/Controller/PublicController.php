@@ -6,6 +6,7 @@ use LogicException;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -452,16 +453,20 @@ class PublicController extends CommonFormController
             return $this->notFound();
         }
 
-        if (
-            ($this->get('mautic.security')->isAnonymous() && (!$emailEntity->getIsPublished() || !$emailEntity->isPublicPreview()))
-            || (!$this->get('mautic.security')->isAnonymous()
-                && !$this->get('mautic.security')->hasEntityAccess(
+        /** @var CorePermissions $security */
+        $security = $this->get('mautic.security');
+
+        if (!$security->isAdmin()) {
+            if (
+                ($emailEntity->isPublished())
+                || (!$security->hasEntityAccess(
                     'email:emails:viewown',
                     'email:emails:viewother',
                     $emailEntity->getCreatedBy()
                 ))
-        ) {
-            return $this->accessDenied();
+            ) {
+                return $this->accessDenied();
+            }
         }
 
         //bogus ID
@@ -543,7 +548,7 @@ class PublicController extends CommonFormController
 
         $content = $event->getContent(true);
 
-        if ($this->get('mautic.security')->isAnonymous()) {
+        if ($security->isAnonymous()) {
             $content = $this->get('mautic.helper.template.analytics')->addCode($content);
         }
 
