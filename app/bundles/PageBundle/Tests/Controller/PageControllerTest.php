@@ -110,7 +110,7 @@ class PageControllerTest extends MauticMysqlTestCase
     /**
      * Test tracking of a first visit with UTM Tags.
      */
-    public function testLandingPageWithUtmTracking(): void  
+    public function testLandingPageWithUtmTracking(): void
     {
         $timestamp  = \time();
         $page       = $this->createTestPage();
