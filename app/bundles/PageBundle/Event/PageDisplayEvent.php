@@ -96,17 +96,14 @@ class PageDisplayEvent extends Event
     }
 
     /**
-     * @return ?Lead|array
+     * @return ?Lead|null
      */
     public function getLead(): ?Lead
     {
         return $this->lead;
     }
 
-    /**
-     * @param Lead|array $lead
-     */
-    public function setLead($lead): void
+    public function setLead(Lead $lead): void
     {
         $this->lead = $lead;
     }
