@@ -277,6 +277,11 @@ Mautic.getTokensForPlugIn = function(method) {
 Mautic.ConvertFieldToCkeditor  = function(textarea, ckEditorToolbarOptions) {
     const defaultOptions = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'ckfinder', 'imageUpload', 'mediaEmbed', 'insertTable'];
     const ckEditorToolbar = typeof ckEditorToolbarOptions != "undefined" && ckEditorToolbarOptions.length > 0 ? ckEditorToolbarOptions : defaultOptions;
+    let fontFamilyOptions = ["default", "Arial, Helvetica, sans-serif", "Courier New, Courier, monospace", "Georgia, serif", "Lucida Sans Unicode, Lucida Grande, sans-serif", "Tahoma, Geneva, sans-serif", "Times New Roman, Times, serif", "Trebuchet MS, Helvetica, sans-serif", "Verdana, Geneva, sans-serif"];
+    if (Mautic.getAvailableFonts().indexOf('proxima nova') > -1)
+    {
+        fontFamilyOptions.push('Proxima Nova');
+    }
 
     if (ckEditors.has( textarea[0] ))
     {
@@ -290,9 +295,7 @@ Mautic.ConvertFieldToCkeditor  = function(textarea, ckEditorToolbarOptions) {
             shouldNotGroupWhenFull: true
         },
         fontFamily: {
-            options: [
-                "default", "Arial, Helvetica, sans-serif", "Courier New, Courier, monospace", "Georgia, serif", "Lucida Sans Unicode, Lucida Grande, sans-serif", "Tahoma, Geneva, sans-serif", "Times New Roman, Times, serif", "Trebuchet MS, Helvetica, sans-serif", "Verdana, Geneva, sans-serif", "Proxima Nova"
-            ],
+            options: fontFamilyOptions,
             shouldNotGroupWhenFull: true
         },
         fontSize: {
@@ -403,4 +406,21 @@ window.document.ckEditorInsertImages = function(editor, imageUrl) {
         return;
     }
     editor.execute('imageInsert', { source: imageUrl });
+}
+
+Mautic.getAvailableFonts = function() {
+    let { fonts } = document;
+    const iterator = fonts.entries();
+    let arr = [];
+    let done = false;
+
+    while (!done) {
+        const font = iterator.next();
+        if (!font.done) {
+            arr.push((font.value[0].family).toLowerCase());
+        } else {
+            done = font.done;
+        }
+    }
+    return [...new Set(arr)];
 }

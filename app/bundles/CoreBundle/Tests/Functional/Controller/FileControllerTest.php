@@ -18,17 +18,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FileControllerTest extends MauticMysqlTestCase
 {
+    private $uploadedFilePath;
+
     public function testImageUploadSuccess(): void
     {
-        $fileName = '/png-test.png';
-        $tmpFile  = '/tmp-png-test.png';
-        $filePath = $this->getFixurePath();
-        copy($filePath.$fileName, $filePath.$tmpFile);
-        $image = new UploadedFile(
-            $filePath.$tmpFile,
-            $tmpFile,
-            'image/png'
-        );
+        $image = $this->createUploadFile('png-test.png', 'tmp-png-test.png');
         $this->client->request('POST', 's/file/upload?editor=ckeditor', [], ['upload' => $image]);
         $response = $this->client->getResponse();
         Assert::assertSame(Response::HTTP_OK, $response->getStatusCode());
@@ -39,31 +33,43 @@ class FileControllerTest extends MauticMysqlTestCase
         $uploadedFileName = basename($responseData['url']);
         $uploadedImage    = $this->container->getParameter('kernel.project_dir').'/media/images/'.$uploadedFileName;
         Assert::assertTrue(file_exists($uploadedImage));
-        unlink($uploadedImage);
     }
 
     public function testImageUploadFailure(): void
     {
-        $fileName = '/test.json';
-        $tmpFile  = '/tmp-test.json';
-        $filePath = $this->getFixurePath();
-        copy($filePath.$fileName, $filePath.$tmpFile);
-        $image = new UploadedFile(
-            $filePath.$tmpFile,
-            $tmpFile,
-            'image/png'
-        );
+        $image = $this->createUploadFile('test.json', 'tmp-test.json');
+
         $this->client->request('POST', 's/file/upload?editor=ckeditor', [], ['upload' => $image]);
         $response = $this->client->getResponse();
         Assert::assertSame(Response::HTTP_OK, $response->getStatusCode());
         $responseData = json_decode($response->getContent(), true);
         Assert::assertEquals(false, $responseData['uploaded']);
         Assert::assertEquals('The uploaded image does not have an allowed mime type', $responseData['error']['message']);
-        unlink($filePath.$tmpFile);
+    }
+
+    private function createUploadFile(string $fileName, string $tmpFile): UploadedFile
+    {
+        $filePath = $this->getFixurePath();
+        copy($filePath.$fileName, $filePath.$tmpFile);
+        $this->uploadedFilePath = $filePath.$tmpFile;
+        $image                  = new UploadedFile(
+            $filePath.$tmpFile,
+            $tmpFile,
+            'image/png'
+        );
+
+        return $image;
     }
 
     private function getFixurePath(): string
     {
-        return realpath(dirname(__FILE__).'/../../Fixtures/');
+        return realpath(dirname(__FILE__).'/../../Fixtures/').'/';
+    }
+
+    protected function tearDown(): void
+    {
+        if ($this->uploadedFilePath && file_exists($this->uploadedFilePath)) {
+            unlink($this->uploadedFilePath);
+        }
     }
 }
