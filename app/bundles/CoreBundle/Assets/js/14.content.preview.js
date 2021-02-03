@@ -50,7 +50,7 @@ Mautic.contentPreviewUrlGenerator = {
     },
 
 
-    regenerateUrl : function(emailId, changedElement) {
+    regenerateUrl : function(newValue, changedElement) {
 
         this.urlBase = mQuery("#content_preview_url").attr('data-route');
 
@@ -68,17 +68,17 @@ Mautic.contentPreviewUrlGenerator = {
         }
 
         if (elementId === 'content_preview_settings_contact_id') {
-            if (emailId === '') {
+            if (newValue === '') {
                 this.contactId = value = false;
             } else {
                 this.contactId = value;
             }
-            emailId = this.lastUsedObjectId;
+            newValue = this.lastUsedObjectId;
         } else if (value !== false) {
-            this.lastUsedObjectId = emailId = value;
+            this.lastUsedObjectId = newValue = value;
         }
 
-        let previewUrl = mauticBaseUrl + this.urlBase + '/' + emailId;
+        let previewUrl = mauticBaseUrl + this.urlBase + '/' + newValue;
 
         if (this.contactId !== false) {
             previewUrl = previewUrl + '?contactId=' + this.contactId;
