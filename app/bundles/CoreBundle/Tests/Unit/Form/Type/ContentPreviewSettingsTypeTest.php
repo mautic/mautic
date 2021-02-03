@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\LookupType;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -26,10 +27,16 @@ class ContentPreviewSettingsTypeTest extends TestCase
      */
     private $translator;
 
+    /**
+     * @var CorePermissions|MockObject
+     */
+    private $security;
+
     protected function setUp()
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->form       = new ContentPreviewSettingsType($this->translator);
+        $this->security   = $this->createMock(CorePermissions::class);
+        $this->form       = new ContentPreviewSettingsType($this->translator, $this->security);
 
         parent::setUp();
     }
@@ -68,6 +75,91 @@ class ContentPreviewSettingsTypeTest extends TestCase
                 'children' => [],
             ],
         ];
+
+        $builder = $this->createMock(FormBuilderInterface::class);
+        $builder->expects(self::once())
+            ->method('add')
+            ->withConsecutive(
+                $this->getContactFieldDefinition()
+            );
+
+        $this->form->buildForm($builder, $options);
+    }
+
+    public function testBuildFormWithTranslationAndVariantFieldNotAvailableAndNoAccessPermissions(): void
+    {
+        $objectId = 1;
+        $options  = [
+            'objectId'      => $objectId,
+            'translations'  => [
+                'children' => [],
+            ],
+            'variants'     => [
+                'children' => [],
+            ],
+        ];
+
+        $this->security->expects(self::once())
+            ->method('isAdmin')
+            ->willReturn(false);
+        $this->security->expects(self::once())
+            ->method('hasEntityAccess')
+            ->with('lead:leads:viewown', 'lead:leads:viewother')
+            ->willReturn(false);
+
+        $builder = $this->createMock(FormBuilderInterface::class);
+        $this->form->buildForm($builder, $options);
+    }
+
+    public function testBuildFormWithTranslationAndVariantFieldNotAvailableAndAdminPermissions(): void
+    {
+        $objectId = 1;
+        $options  = [
+            'objectId'      => $objectId,
+            'translations'  => [
+                'children' => [],
+            ],
+            'variants'     => [
+                'children' => [],
+            ],
+        ];
+
+        $this->security->expects(self::once())
+            ->method('isAdmin')
+            ->willReturn(true);
+        $this->security->expects(self::never())
+            ->method('hasEntityAccess');
+
+        $builder = $this->createMock(FormBuilderInterface::class);
+        $builder->expects(self::once())
+            ->method('add')
+            ->withConsecutive(
+                $this->getContactFieldDefinition()
+            );
+
+        $this->form->buildForm($builder, $options);
+    }
+
+    public function testBuildFormWithTranslationAndVariantFieldNotAvailableAndEntityPermissions(): void
+    {
+        $objectId = 1;
+        $options  = [
+            'objectId'      => $objectId,
+            'translations'  => [
+                'children' => [],
+            ],
+            'variants'     => [
+                'children' => [],
+            ],
+        ];
+
+        $this->security->expects(self::once())
+            ->method('isAdmin')
+            ->willReturn(false);
+        $this->security->expects(self::once())
+            ->method('hasEntityAccess')
+            ->with('lead:leads:viewown', 'lead:leads:viewother')
+            ->willReturn(false);
 
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects(self::once())

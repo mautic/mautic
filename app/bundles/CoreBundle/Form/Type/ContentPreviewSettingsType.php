@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Form\Type;
 
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\Form\AbstractType;
@@ -30,13 +31,19 @@ class ContentPreviewSettingsType extends AbstractType
     private $translator;
 
     /**
+     * @var CorePermissions
+     */
+    private $security;
+
+    /**
      * @var string
      */
     private $onChangeContent;
 
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator, CorePermissions $security)
     {
         $this->translator = $translator;
+        $this->security   = $security;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -49,25 +56,29 @@ class ContentPreviewSettingsType extends AbstractType
         $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_TRANSLATION, $translations, $objectId);
         $this->addTranslationOrVariantChoicesElement($builder, self::CHOICE_TYPE_VARIANT, $variants, $objectId);
 
-        $builder->add(
-            'contact',
-            LookupType::class,
-            [
-                'attr' => [
-                    'class'                   => 'form-control',
-                    'data-callback'           => 'activateContactLookupField',
-                    'data-toggle'             => 'field-lookup',
-                    'data-lookup-callback'    => 'updateContactLookupListFilter',
-                    'data-chosen-lookup'      => 'lead:contactList',
-                    'placeholder'             => $this->translator->trans(
-                        'mautic.lead.list.form.startTyping'
-                    ),
-                    'data-no-record-message'=> $this->translator->trans(
-                        'mautic.core.form.nomatches'
-                    ),
-                ],
-            ]
-        );
+        if ($this->security->isAdmin()
+            || (!$this->security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother'))
+        ) {
+            $builder->add(
+                'contact',
+                LookupType::class,
+                [
+                    'attr' => [
+                        'class'                => 'form-control',
+                        'data-callback'        => 'activateContactLookupField',
+                        'data-toggle'          => 'field-lookup',
+                        'data-lookup-callback' => 'updateContactLookupListFilter',
+                        'data-chosen-lookup'   => 'lead:contactList',
+                        'placeholder'          => $this->translator->trans(
+                            'mautic.lead.list.form.startTyping'
+                        ),
+                        'data-no-record-message' => $this->translator->trans(
+                            'mautic.core.form.nomatches'
+                        ),
+                    ],
+                ]
+            );
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver)

@@ -185,6 +185,7 @@ return [
                 'class'     => \Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType::class,
                 'arguments' => [
                     'translator',
+                    'mautic.security',
                 ],
             ],
             'mautic.form.type.coreconfig' => [
