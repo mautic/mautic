@@ -11,7 +11,7 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ApiBundle\Tests\Helper;
+namespace Mautic\ApiBundle\Tests\Form\Type;
 
 use Mautic\ApiBundle\Entity\oAuth1\Consumer;
 use Mautic\ApiBundle\Form\Type\ClientType;
