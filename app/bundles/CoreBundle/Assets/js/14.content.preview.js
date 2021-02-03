@@ -103,6 +103,7 @@ Mautic.updateContactLookupListFilter = function(field, item) {
 
 /**
  * Used in data-lookup-callback attr of form field in ContentPreviewSettingsType
+ * Take a look at https://github.com/twitter/typeahead.js/
  */
 Mautic.activateContactLookupField = function(fieldOptions, filterId) {
 
@@ -116,4 +117,12 @@ Mautic.activateContactLookupField = function(fieldOptions, filterId) {
 
     Mautic.activateFieldTypeahead(lookupElementId, filterId, options, action);
     Mautic.contentPreviewUrlGenerator.init();
+
+    mQuery('#content_preview_settings_contact').on("change",function(event) {
+        if (event.target.value === '') {
+            // Delete selected contact ID from URL and hidden input
+            Mautic.contentPreviewUrlGenerator.regenerateUrl('', mQuery('#content_preview_settings_contact_id'));
+        }
+    });
+
 };
