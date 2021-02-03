@@ -55,7 +55,6 @@ class ContentPreviewSettingsType extends AbstractType
             [
                 'attr' => [
                     'class'                   => 'form-control',
-                    'onChange'                => '', // @todo We need an action deleting value in #content_preview_settings_contact_id when selected contact in form is deleted
                     'data-callback'           => 'activateContactLookupField',
                     'data-toggle'             => 'field-lookup',
                     'data-lookup-callback'    => 'updateContactLookupListFilter',

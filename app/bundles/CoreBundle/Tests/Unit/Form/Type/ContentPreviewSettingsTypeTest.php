@@ -79,7 +79,6 @@ class ContentPreviewSettingsTypeTest extends TestCase
                     [
                         'attr' => [
                             'class'                   => 'form-control',
-                            'onChange'                => '',
                             'data-callback'           => 'activateContactLookupField',
                             'data-toggle'             => 'field-lookup',
                             'data-lookup-callback'    => 'updateContactLookupListFilter',
@@ -188,7 +187,6 @@ class ContentPreviewSettingsTypeTest extends TestCase
                     [
                         'attr' => [
                             'class'                   => 'form-control',
-                            'onChange'                => '',
                             'data-callback'           => 'activateContactLookupField',
                             'data-toggle'             => 'field-lookup',
                             'data-lookup-callback'    => 'updateContactLookupListFilter',
