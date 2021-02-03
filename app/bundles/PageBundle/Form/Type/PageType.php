@@ -262,6 +262,28 @@ class PageType extends AbstractType
         );
 
         $builder->add(
+            'headScript',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.page.form.headscript',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'footerScript',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.page.form.footerscript',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
+            ]
+        );
+
+        $builder->add(
           'redirectType',
           RedirectListType::class,
           [
