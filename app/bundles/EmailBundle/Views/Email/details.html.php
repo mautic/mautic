@@ -344,12 +344,14 @@ if (!$isEmbedded) {
                     </div>
                 </div>
                 <?php } ?>
+                <?php if (!empty($previewSettingsForm['contact'])) { ?>
                 <div class="row">
                     <div class="form-group col-xs-12 ">
                         <div class="control-label" for=""><?php echo $view['translator']->trans('mautic.email.preview.show.contact'); ?></div>
                         <?php echo $view['form']->widget($previewSettingsForm['contact']); ?>
                     </div>
                 </div>
+                <?php } ?>
                 <div class="row">
                     <div class="form-group col-xs-12 ">
                         <div class="input-group">
