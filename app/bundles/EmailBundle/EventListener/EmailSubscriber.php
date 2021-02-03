@@ -97,26 +97,29 @@ class EmailSubscriber implements EventSubscriberInterface
         $message    = $event->getMessage();
         $leadIdHash = $message->getLeadIdHash();
 
-        if (isset($leadIdHash)) {
-            $stat = $this->emailModel->getEmailStatus($leadIdHash);
-            if (null !== $stat) {
-                $stat->upRetryCount();
-
-                $retries = $stat->getRetryCount();
-                if ($retries > 3) {
-                    // tried too many times so just fail
-                    $reason = $this->translator->trans('mautic.email.dnc.retries', [
-                        '%subject%' => EmojiHelper::toShort($message->getSubject()),
-                    ]);
-                    $this->emailModel->setDoNotContact($stat, $reason);
-                } else {
-                    // set it to try again
-                    $event->tryAgain();
-                }
-
-                $this->entityManager->persist($stat);
-                $this->entityManager->flush();
-            }
+        if (!isset($message->leadIdHash)) {
+            return;
         }
+
+        $stat = $this->emailModel->getEmailStatus($message->leadIdHash);
+
+        if (!$stat) {
+            return;
+        }
+
+        $stat->upRetryCount();
+
+        if ($stat->getRetryCount() > self::RETRY_COUNT) {
+            //tried too many times so just fail
+            $reason = $this->translator->trans('mautic.email.dnc.retries', [
+                '%subject%' => EmojiHelper::toShort($message->getSubject()),
+            ]);
+            $this->emailModel->setDoNotContact($stat, $reason);
+        } else {
+            //set it to try again
+            $event->tryAgain();
+        }
+
+        $this->emailModel->saveEmailStat($stat);
     }
 }

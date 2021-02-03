@@ -28,6 +28,7 @@ use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\StatsCollectionHelper;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\Model\SendEmailToContact;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Stat\StatHelper;
@@ -136,6 +137,11 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     private \PHPUnit\Framework\MockObject\MockObject $emailRepository;
 
     /**
+     * @var MockObject|EmailStatModel
+     */
+    private $emailStatModel;
+
+    /**
      * @var MockObject|FrequencyRuleRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $frequencyRepository;
@@ -228,7 +234,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->companyModel             = $this->createMock(CompanyModel::class);
         $this->companyRepository        = $this->createMock(CompanyRepository::class);
         $this->dncModel                 = $this->createMock(DoNotContact::class);
-        $this->statHelper               = new StatHelper($this->statRepository);
+        $this->emailStatModel           = $this->createMock(EmailStatModel::class);
+        $this->statHelper               = new StatHelper($this->emailStatModel);
         $this->sendToContactModel       = new SendEmailToContact($this->mailHelper, $this->statHelper, $this->dncModel, $this->translator);
         $this->deviceTrackerMock        = $this->createMock(DeviceTracker::class);
         $this->redirectRepositoryMock   = $this->createMock(RedirectRepository::class);
@@ -259,6 +266,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->doNotContact,
             $this->statsCollectionHelper,
             $this->corePermissions,
+            $this->emailStatModel,
             $this->connection,
             $this->entityManager,
             $this->eventDispatcher,
@@ -268,6 +276,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->createMock(LoggerInterface::class),
             $this->createMock(CoreParametersHelper::class)
         );
+
+        $this->emailStatModel->method('getRepository')->willReturn($this->statRepository);
     }
 
     /**
@@ -670,6 +680,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->doNotContact,
             $this->statsCollectionHelper,
             $this->corePermissions,
+            $this->emailStatModel,
             $this->connection,
             $this->entityManager,
             $this->eventDispatcher,
@@ -717,16 +728,13 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->with($contact)
             ->willReturn($contactDevice);
 
-        $this->entityManager->expects($this->exactly(2))
+        $this->emailStatModel->expects($this->once())
+            ->method('saveEntity')
+            ->with($this->isInstanceOf(Stat::class));
+
+        $this->entityManager->expects($this->once())
             ->method('persist')
             ->withConsecutive(
-                [
-                    $this->callback(function ($statDevice) {
-                        $this->assertInstanceOf(Stat::class, $statDevice);
-
-                        return true;
-                    }),
-                ],
                 [
                     $this->callback(function ($statDevice) use ($stat, $ipAddress) {
                         $this->assertInstanceOf(StatDevice::class, $statDevice);
@@ -738,7 +746,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->entityManager->expects($this->exactly(2))
+        $this->entityManager->expects($this->once())
             ->method('flush');
 
         $this->entityManager->expects($this->exactly(0))
@@ -804,6 +812,9 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->method('getRepository')
             ->with(LeadDevice::class)
             ->willReturn($this->leadDeviceRepository);
+
+        $this->entityManager->expects($this->exactly(2))
+            ->method('flush');
 
         $this->emailModel->hitEmail($stat, $request);
     }

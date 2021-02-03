@@ -112,7 +112,7 @@ return [
                 'arguments' => [
                     'mailer.default_transport',
                     'mautic.message.search.contact',
-                    'mautic.email.repository.stat',
+                    'mautic.email.model.email_stat',
                     'mautic.lead.model.lead',
                     'translator',
                     'monolog.logger.mautic',
@@ -141,7 +141,7 @@ return [
             'mautic.message.processor.replier' => [
                 'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\Reply::class,
                 'arguments' => [
-                    'mautic.email.repository.stat',
+                    'mautic.email.model.email_stat',
                     'mautic.message.search.contact',
                     'mautic.lead.model.lead',
                     'event_dispatcher',
@@ -168,7 +168,7 @@ return [
             'mautic.email.helper.stat' => [
                 'class'     => \Mautic\EmailBundle\Stat\StatHelper::class,
                 'arguments' => [
-                    'mautic.email.repository.stat',
+                    'mautic.email.model.email_stat',
                 ],
             ],
             'mautic.email.helper.stats_collection' => [

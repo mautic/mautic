@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\Copy;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -1729,14 +1730,14 @@ class MailHelper
 
         if (isset($this->copies[$id])) {
             try {
-                $stat->setStoredCopy($this->factory->getEntityManager()->getReference(\Mautic\EmailBundle\Entity\Copy::class, $this->copies[$id]));
+                $stat->setStoredCopy($this->factory->getEntityManager()->getReference(Copy::class, $this->copies[$id]));
             } catch (ORMException) {
                 // keep IDE happy
             }
         }
 
         if ($persist) {
-            $emailModel->getStatRepository()->saveEntity($stat);
+            $emailModel->saveEmailStat($stat);
         }
 
         return $stat;
