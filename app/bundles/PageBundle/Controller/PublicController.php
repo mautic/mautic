@@ -346,7 +346,7 @@ class PublicController extends CommonFormController
 
         if ($contactId && (
                 !$security->isAdmin()
-                || (!$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother'))
+                || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
             )
         ) {
             return $this->accessDenied();
