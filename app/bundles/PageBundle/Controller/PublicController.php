@@ -332,17 +332,16 @@ class PublicController extends CommonFormController
 
         /** @var CorePermissions $security */
         $security   = $this->get('mautic.security');
-        if (!$security->isAdmin()) {
-            if (
-                ($page->isPublished())
+        if (!$security->isAdmin()
+            && (
+                (!$page->isPublished())
                 || (!$security->hasEntityAccess(
                     'email:emails:viewown',
                     'email:emails:viewother',
                     $page->getCreatedBy()
-                ))
-            ) {
-                return $this->accessDenied();
-            }
+                )))
+        ) {
+            return $this->accessDenied();
         }
 
         if (empty($content) && !empty($BCcontent)) {

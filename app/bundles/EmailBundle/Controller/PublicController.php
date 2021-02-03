@@ -456,17 +456,16 @@ class PublicController extends CommonFormController
         /** @var CorePermissions $security */
         $security = $this->get('mautic.security');
 
-        if (!$security->isAdmin()) {
-            if (
-                ($emailEntity->isPublished())
+        if (!$security->isAdmin()
+            && (
+                (!$emailEntity->isPublished())
                 || (!$security->hasEntityAccess(
                     'email:emails:viewown',
                     'email:emails:viewother',
                     $emailEntity->getCreatedBy()
-                ))
-            ) {
-                return $this->accessDenied();
-            }
+            )))
+        ) {
+            return $this->accessDenied();
         }
 
         //bogus ID
