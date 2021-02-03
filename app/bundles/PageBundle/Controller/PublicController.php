@@ -344,6 +344,14 @@ class PublicController extends CommonFormController
             return $this->accessDenied();
         }
 
+        if ($contactId && (
+                !$security->isAdmin()
+                || (!$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother'))
+            )
+        ) {
+            return $this->accessDenied();
+        }
+
         if (empty($content) && !empty($BCcontent)) {
             $template = $page->getTemplate();
             //all the checks pass so display the content
