@@ -13,9 +13,13 @@ declare(strict_types=1);
 
 namespace Mautic\ApiBundle\Tests\Helper;
 
+use Mautic\ApiBundle\Entity\oAuth1\Consumer;
 use Mautic\ApiBundle\Form\Type\ClientType;
+use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\RouterInterface;
@@ -59,6 +63,16 @@ class ClientTypeTest extends TestCase
      */
     private $builder;
 
+    /**
+     * @var Request
+     */
+    private $request;
+
+    /**
+     * @var Consumer
+     */
+    private $consumer;
+
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);
@@ -67,6 +81,16 @@ class ClientTypeTest extends TestCase
         $this->session = $this->createMock(Session::class);
         $this->router = $this->createMock(RouterInterface::class);
         $this->builder = $this->createMock(FormBuilderInterface::class);
+        $this->request = $this->createMock(Request::class);
+        $this->consumer = new Consumer();
+
+        $this->requestStack->expects($this->once())
+            ->method('getCurrentRequest')
+            ->willReturn($this->request);
+
+        $this->request->expects($this->once())
+            ->method('get')
+            ->with('api_mode', null);
 
         $this->clientType = new ClientType(
             $this->requestStack,
@@ -79,6 +103,24 @@ class ClientTypeTest extends TestCase
 
     public function testThatBuildFormCallsEventSubscribers(): void
     {
-        $this->clientType->buildForm($this->builder, []);
+        $options = [
+            'data' => $this->consumer
+        ];
+
+        $this->builder->expects($this->any())
+            ->method('create')
+            ->willReturnSelf();
+
+        $cleanSubscriber = new CleanFormSubscriber([]);
+        $formExitSubscriber = new FormExitSubscriber('api.client', $options);
+
+        $this->builder->expects($this->exactly(2))
+            ->method('addEventSubscriber')
+            ->withConsecutive(
+                [$cleanSubscriber],
+                [$formExitSubscriber]
+            );
+
+        $this->clientType->buildForm($this->builder, $options);
     }
 }
