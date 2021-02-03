@@ -26,7 +26,6 @@ $formId = $form['sessionId']->vars['data'];
 if (!isset($inBuilder)) {
     $inBuilder = false;
 }
-
 ?>
 <?php echo $view['form']->start($form); ?>
 <div class="box-layout">
@@ -202,6 +201,7 @@ if (!isset($inBuilder)) {
             echo $view['form']->row($form['inKioskMode']);
             echo $view['form']->row($form['renderStyle']);
             echo $view['form']->row($form['template']);
+            echo $view['form']->row($form['language']);
             ?>
         </div>
     </div>

@@ -16,6 +16,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\TranslationEntityInterface;
+use Mautic\CoreBundle\Entity\TranslationEntityTrait;
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
+use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -23,13 +27,18 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 /**
  * Class Form.
  */
-class Form extends FormEntity
+class Form extends FormEntity implements TranslationEntityInterface, VariantEntityInterface
 {
+    use TranslationEntityTrait;
+    use VariantEntityTrait;
     /**
      * @var int
      */
     private $id;
-
+    /**
+     * @var string
+     */
+    private $title;
     /**
      * @var string
      */
@@ -161,6 +170,8 @@ class Form extends FormEntity
 
         $builder->addIdColumns();
 
+        $builder->addField('title', 'string');
+
         $builder->addField('alias', 'string');
 
         $builder->addNullableField('formAttributes', 'string', 'form_attr');
@@ -221,10 +232,8 @@ class Form extends FormEntity
 
         $builder->addNullableField('formType', 'string', 'form_type');
 
-        $builder->createField('noIndex', 'boolean')
-            ->columnName('no_index')
-            ->nullable()
-            ->build();
+        self::addTranslationMetadata($builder, self::class);
+        self::addVariantMetadata($builder, self::class);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -335,6 +344,31 @@ class Form extends FormEntity
     }
 
     /**
+     * Set title.
+     *
+     * @param string $title
+     *
+     * @return Form
+     */
+    public function setTitle($title)
+    {
+        $this->isChanged('title', $title);
+        $this->title = $title;
+
+        return $this;
+    }
+
+    /**
+     * Get title.
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
      * Set name.
      *
      * @param string $name
@@ -344,7 +378,7 @@ class Form extends FormEntity
     public function setName($name)
     {
         $this->isChanged('name', $name);
-        $this->name = $name;
+        $this->title = $this->name = $name;
 
         return $this;
     }

@@ -560,6 +560,9 @@ class FormModel extends CommonFormModel
             }
         }
 
+        //define locale
+        $this->translator->setLocale($entity->getLanguage());
+
         $html = $this->templatingHelper->getTemplating()->render(
             $theme.'MauticFormBundle:Builder:form.html.php',
             [
@@ -770,6 +773,9 @@ class FormModel extends CommonFormModel
         if (!empty($theme)) {
             $theme .= '|';
         }
+
+        //define locale
+        $this->translator->setLocale($form->getLanguage());
 
         $script = $this->templatingHelper->getTemplating()->render(
             $theme.'MauticFormBundle:Builder:script.html.php',

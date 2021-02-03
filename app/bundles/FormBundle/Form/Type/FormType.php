@@ -15,6 +15,7 @@ use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\LocaleType;
 use Mautic\CoreBundle\Form\Type\ThemeListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -54,6 +55,21 @@ class FormType extends AbstractType
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
         ]);
+
+        $builder->add(
+            'language',
+            LocaleType::class,
+            [
+                'label'      => 'mautic.core.language',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.form.form.language.help',
+                ],
+                'required'   => true,
+                'empty_data' => '',
+            ]
+        );
 
         $builder->add('formAttributes', TextType::class, [
             'label'      => 'mautic.form.field.form.form_attr',
