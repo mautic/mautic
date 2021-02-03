@@ -73,25 +73,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
         $builder->expects(self::once())
             ->method('add')
             ->withConsecutive(
-                [
-                    'contact',
-                    LookupType::class,
-                    [
-                        'attr' => [
-                            'class'                   => 'form-control',
-                            'data-callback'           => 'activateContactLookupField',
-                            'data-toggle'             => 'field-lookup',
-                            'data-lookup-callback'    => 'updateContactLookupListFilter',
-                            'data-chosen-lookup'      => 'lead:contactList',
-                            'placeholder'             => $this->translator->trans(
-                                'mautic.lead.list.form.startTyping'
-                            ),
-                            'data-no-record-message'=> $this->translator->trans(
-                                'mautic.core.form.nomatches'
-                            ),
-                        ],
-                    ],
-                ]
+                $this->getContactFieldDefinition()
             );
 
         $this->form->buildForm($builder, $options);
@@ -181,27 +163,32 @@ class ContentPreviewSettingsTypeTest extends TestCase
                         'data'         => (string) $parentEmailId,
                     ],
                 ],
-                [
-                    'contact',
-                    LookupType::class,
-                    [
-                        'attr' => [
-                            'class'                   => 'form-control',
-                            'data-callback'           => 'activateContactLookupField',
-                            'data-toggle'             => 'field-lookup',
-                            'data-lookup-callback'    => 'updateContactLookupListFilter',
-                            'data-chosen-lookup'      => 'lead:contactList',
-                            'placeholder'             => $this->translator->trans(
-                                'mautic.lead.list.form.startTyping'
-                            ),
-                            'data-no-record-message'=> $this->translator->trans(
-                                'mautic.core.form.nomatches'
-                            ),
-                        ],
-                    ],
-                ]
+                $this->getContactFieldDefinition()
             );
 
         $this->form->buildForm($formBuilder, $formOptions);
+    }
+
+    private function getContactFieldDefinition(): array
+    {
+        return [
+            'contact',
+                LookupType::class,
+                [
+                    'attr' => [
+                        'class'                   => 'form-control',
+                        'data-callback'           => 'activateContactLookupField',
+                        'data-toggle'             => 'field-lookup',
+                        'data-lookup-callback'    => 'updateContactLookupListFilter',
+                        'data-chosen-lookup'      => 'lead:contactList',
+                        'placeholder'             => $this->translator->trans(
+                            'mautic.lead.list.form.startTyping'
+                        ),
+                        'data-no-record-message'=> $this->translator->trans(
+                            'mautic.core.form.nomatches'
+                        ),
+                    ],
+                ],
+            ];
     }
 }
