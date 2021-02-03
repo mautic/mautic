@@ -68,7 +68,11 @@ Mautic.contentPreviewUrlGenerator = {
         }
 
         if (elementId === 'content_preview_settings_contact_id') {
-            this.contactId = value;
+            if (emailId === '') {
+                this.contactId = value = false;
+            } else {
+                this.contactId = value;
+            }
             emailId = this.lastUsedObjectId;
         } else if (value !== false) {
             this.lastUsedObjectId = emailId = value;
