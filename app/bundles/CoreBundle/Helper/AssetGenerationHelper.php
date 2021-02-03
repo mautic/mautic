@@ -29,11 +29,6 @@ class AssetGenerationHelper
     private $pathsHelper;
 
     /**
-     * @var CoreParametersHelper
-     */
-    public $coreParametersHelper;
-
-    /**
      * @var string
      */
     private $version;
@@ -43,10 +38,9 @@ class AssetGenerationHelper
      */
     public function __construct(CoreParametersHelper $coreParametersHelper, BundleHelper $bundleHelper, PathsHelper $pathsHelper, AppVersion $version)
     {
-        $this->bundleHelper         = $bundleHelper;
-        $this->pathsHelper          = $pathsHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->version              = substr(hash('sha1', $coreParametersHelper->get('secret_key').$version->getVersion()), 0, 8);
+        $this->bundleHelper = $bundleHelper;
+        $this->pathsHelper  = $pathsHelper;
+        $this->version      = substr(hash('sha1', $coreParametersHelper->get('secret_key').$version->getVersion()), 0, 8);
     }
 
     /**

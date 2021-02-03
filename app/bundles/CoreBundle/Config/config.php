@@ -1614,5 +1614,16 @@ return [
         'stats_update_url'          => 'https://updates.mautic.org/stats/send', // set to empty in config file to disable
         'install_source'            => 'Mautic',
         'system_update_url'         => 'https://api.github.com/repos/mautic/mautic/releases',
+        'editor_fonts'              => [
+            'default',
+            'Arial, Helvetica, sans-serif',
+            'Courier New, Courier, monospace',
+            'Georgia, serif',
+            'Lucida Sans Unicode, Lucida Grande, sans-serif',
+            'Tahoma, Geneva, sans-serif',
+            'Times New Roman, Times, serif',
+            'Trebuchet MS, Helvetica, sans-serif',
+            'Verdana, Geneva, sans-serif',
+        ],
     ],
 ];
