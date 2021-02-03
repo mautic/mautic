@@ -76,13 +76,13 @@ class ClientTypeTest extends TestCase
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->validator = $this->createMock(ValidatorInterface::class);
-        $this->session = $this->createMock(Session::class);
-        $this->router = $this->createMock(RouterInterface::class);
-        $this->builder = $this->createMock(FormBuilderInterface::class);
-        $this->request = $this->createMock(Request::class);
-        $this->consumer = new Consumer();
+        $this->translator   = $this->createMock(TranslatorInterface::class);
+        $this->validator    = $this->createMock(ValidatorInterface::class);
+        $this->session      = $this->createMock(Session::class);
+        $this->router       = $this->createMock(RouterInterface::class);
+        $this->builder      = $this->createMock(FormBuilderInterface::class);
+        $this->request      = $this->createMock(Request::class);
+        $this->consumer     = new Consumer();
 
         $this->requestStack->expects($this->once())
             ->method('getCurrentRequest')
@@ -104,14 +104,14 @@ class ClientTypeTest extends TestCase
     public function testThatBuildFormCallsEventSubscribers(): void
     {
         $options = [
-            'data' => $this->consumer
+            'data' => $this->consumer,
         ];
 
         $this->builder->expects($this->any())
             ->method('create')
             ->willReturnSelf();
 
-        $cleanSubscriber = new CleanFormSubscriber([]);
+        $cleanSubscriber    = new CleanFormSubscriber([]);
         $formExitSubscriber = new FormExitSubscriber('api.client', $options);
 
         $this->builder->expects($this->exactly(2))
