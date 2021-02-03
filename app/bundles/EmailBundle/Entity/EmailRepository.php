@@ -9,6 +9,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use PDO;
 
 class EmailRepository extends CommonRepository
 {
@@ -247,6 +248,12 @@ class EmailRepository extends CommonRepository
             ->andWhere(sprintf('l.id NOT IN (%s)', $statQb->getSQL()))
             ->andWhere(sprintf('l.id NOT IN (%s)', $mqQb->getSQL()))
             ->setParameter('false', false, 'boolean');
+
+        $excludedListQb = $this->getExcludedListQuery((int) $emailId);
+
+        if ($excludedListQb) {
+            $q->andWhere(sprintf('l.id NOT IN (%s)', $excludedListQb->getSQL()));
+        }
 
         $q = $this->setMinMaxIds($q, 'l.id', $minContactId, $maxContactId);
 
@@ -619,5 +626,29 @@ class EmailRepository extends CommonRepository
             ->getOneOrNullResult();
 
         return (bool) $result;
+    }
+
+    private function getExcludedListQuery(int $emailId): ?QueryBuilder
+    {
+        $connection = $this->getEntityManager()
+            ->getConnection();
+        $excludedListIds = $connection->createQueryBuilder()
+            ->select('eel.leadlist_id')
+            ->from(MAUTIC_TABLE_PREFIX.'email_list_excluded', 'eel')
+            ->where('eel.email_id = :emailId')
+            ->setParameter('emailId', $emailId)
+            ->execute()
+            ->fetchAll(PDO::FETCH_COLUMN);
+
+        if (!$excludedListIds) {
+            return null;
+        }
+
+        $queryBuilder = $connection->createQueryBuilder();
+        $queryBuilder->select('ll.lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
+            ->where($queryBuilder->expr()->in('ll.leadlist_id', $excludedListIds));
+
+        return $queryBuilder;
     }
 }
