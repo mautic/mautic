@@ -70,5 +70,7 @@ class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
         );
 
         Assert::assertCount(1, $results);
+        Assert::assertSame($integrationEntityId, (int) $results[0]['integration_entity_id']);
+        Assert::assertSame($internalEntityId, (int) $results[0]['internal_entity_id']);
     }
 }
