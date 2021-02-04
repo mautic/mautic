@@ -126,7 +126,9 @@ class SummaryModel extends AbstractCommonModel
             return;
         }
 
-        $end = $end->setTimestamp($end->getTimestamp() - ($end->getTimestamp() % 3600));
+        $end       = $end->setTimestamp($end->getTimestamp() - ($end->getTimestamp() % 3600));
+        $startedAt = new \DateTime();
+        $output->writeln('<comment>Started at: '.$startedAt->format('Y-m-d H:i:s').'</comment>');
 
         if ($end && $end <= $start) {
             if ($rebuild) {
@@ -157,10 +159,11 @@ class SummaryModel extends AbstractCommonModel
 
             $progressBar->finish();
 
+            $output->writeln("\n".'<info>Updating summary for log counts processed</info>');
             $this->updateLogCountsProcessed($output);
         }
 
-        $output->writeln("\n".'<info>Summary complete</info>');
+        $this->outputProcessTime($startedAt, $output);
     }
 
     public function getCampaignLeadEventLogRepository(): LeadEventLogRepository
@@ -244,7 +247,6 @@ class SummaryModel extends AbstractCommonModel
         $count                   = $logCountsProcessedCount['count'];
         $start                   = 0;
 
-        $output->writeln("\n".'<info>Updating summary for log counts processed</info>');
         $progressBar = ProgressBarHelper::init($output, $count);
 
         while ($start < $count) {
@@ -294,5 +296,13 @@ class SummaryModel extends AbstractCommonModel
             'dateFrom' => $dateFrom,
             'dateTo'   => (clone $dateFrom)->modify('+1 hour -1 second'),
         ];
+    }
+
+    private function outputProcessTime(\DateTime $startedAt, OutputInterface $output): void
+    {
+        $endedAt = new \DateTime();
+        $output->writeln("\n".'<comment>Ended at: '.$endedAt->format('Y-m-d H:i:s').'</comment>');
+        $completedInterval = $startedAt->diff($endedAt);
+        $output->writeln('<info>Summary completed in: '.$completedInterval->format('%H:%I:%S').'</info>');
     }
 }
