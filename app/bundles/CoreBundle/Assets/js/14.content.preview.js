@@ -35,7 +35,7 @@ Mautic.contentPreviewUrlGenerator = {
 
         const element = mQuery(elementId);
 
-        let hasOption = mQuery(elementId +  ' option[value="' + value + '"]');
+        const hasOption = mQuery(elementId +  ' option[value="' + value + '"]');
 
         if (hasOption.length > 0) {
             // This value exists in other chosen element
