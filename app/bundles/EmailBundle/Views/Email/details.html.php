@@ -331,7 +331,7 @@ if (!$isEmbedded) {
                 <?php if (!empty($previewSettingsForm['translation'])) { ?>
                 <div class="row">
                     <div class="form-group col-xs-12 ">
-                        <div class="control-label" for=""><?php echo $view['translator']->trans('mautic.email.preview.show.translation'); ?></div>
+                        <div class="control-label"><?php echo $view['translator']->trans('mautic.email.preview.show.translation'); ?></div>
                         <?php echo $view['form']->widget($previewSettingsForm['translation']); ?>
                     </div>
                 </div>
@@ -339,7 +339,7 @@ if (!$isEmbedded) {
                 <?php if (!empty($previewSettingsForm['variant'])) { ?>
                 <div class="row">
                     <div class="form-group col-xs-12 ">
-                        <div class="control-label" for=""><?php echo $view['translator']->trans('mautic.email.preview.show.ab.variant'); ?></div>
+                        <div class="control-label"><?php echo $view['translator']->trans('mautic.email.preview.show.ab.variant'); ?></div>
                         <?php echo $view['form']->widget($previewSettingsForm['variant']); ?>
                     </div>
                 </div>
@@ -347,7 +347,7 @@ if (!$isEmbedded) {
                 <?php if (!empty($previewSettingsForm['contact'])) { ?>
                 <div class="row">
                     <div class="form-group col-xs-12 ">
-                        <div class="control-label" for=""><?php echo $view['translator']->trans('mautic.email.preview.show.contact'); ?></div>
+                        <div class="control-label"><?php echo $view['translator']->trans('mautic.email.preview.show.contact'); ?></div>
                         <?php echo $view['form']->widget($previewSettingsForm['contact']); ?>
                     </div>
                 </div>
