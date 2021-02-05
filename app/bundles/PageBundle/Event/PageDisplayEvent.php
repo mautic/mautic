@@ -96,7 +96,7 @@ class PageDisplayEvent extends Event
     }
 
     /**
-     * @return ?Lead|null
+     * @return ?Lead
      */
     public function getLead(): ?Lead
     {
