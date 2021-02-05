@@ -18,7 +18,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class ContentPreviewSettingsTypeTest extends TestCase
 {
     /**
-     * @var ContentPreviewSettingsType|MockObject
+     * @var ContentPreviewSettingsType
      */
     private $form;
 
