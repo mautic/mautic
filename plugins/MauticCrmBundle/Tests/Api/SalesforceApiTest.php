@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2017 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -13,10 +15,65 @@ namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
+use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 
-class SalesforceApiTest extends \PHPUnit\Framework\TestCase
+class SalesforceApiTest extends TestCase
 {
+    /**
+     * @var SalesforceApi
+     */
+    private $salesforceApi;
+
+    /**
+     * @var CrmAbstractIntegration
+     */
+    private $integration;
+
+    private $cacheStorageHelper;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->integration   = $this->createMock(SalesforceIntegration::class);
+        $this->salesforceApi = new SalesforceApi($this->integration);
+
+        // Let's use an anonymous class to not use deprecated Mautic\CoreBundle\Helper\CacheStorageHelper
+        $this->cacheStorageHelper = new class() {
+            public function get(): void
+            {
+            }
+
+            public function set($name, $data, $expiration = null): void
+            {
+            }
+        };
+
+        $this->integration->expects($this->any())
+            ->method('getCache')
+            ->willReturn($this->cacheStorageHelper);
+    }
+
+    public function testThatGetLeadsMethodReturnsNoResultsIfThereAreNoFields(): void
+    {
+        $query  = ['start' => 1];
+        $object = 'Leads';
+        $this->integration->expects($this->once())
+            ->method('getFieldsForQuery')
+            ->with($object)
+            ->willReturn([]);
+
+        $emptyResult = [
+            'totalSize' => 0,
+            'records'   => [],
+        ];
+        $result = $this->salesforceApi->getLeads($query, $object);
+
+        Assert::assertSame($emptyResult, $result);
+    }
+
     /**
      * @testdox Test that a locked record request is retried up to 3 times
      * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::analyzeResponse()
