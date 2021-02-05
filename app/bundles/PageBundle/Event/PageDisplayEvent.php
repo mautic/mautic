@@ -95,9 +95,6 @@ class PageDisplayEvent extends Event
         $this->params = $params;
     }
 
-    /**
-     * @return ?Lead
-     */
     public function getLead(): ?Lead
     {
         return $this->lead;
