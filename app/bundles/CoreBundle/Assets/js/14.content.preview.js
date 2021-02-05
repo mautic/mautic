@@ -17,7 +17,7 @@ Mautic.contentPreviewUrlGenerator = {
      */
     getElementValue(element) {
 
-        let value = element.val()
+        const value = element.val()
 
         if (value === undefined || value.length === 0) {
             return false;
@@ -33,7 +33,7 @@ Mautic.contentPreviewUrlGenerator = {
      */
     setElementValue(elementId, value) {
 
-        let element = mQuery(elementId);
+        const element = mQuery(elementId);
 
         let hasOption = mQuery(elementId +  ' option[value="' + value + '"]');
 
@@ -54,10 +54,10 @@ Mautic.contentPreviewUrlGenerator = {
 
         this.urlBase = mQuery("#content_preview_url").attr('data-route');
 
-        changedElement = mQuery(changedElement);
-        let elementId  = changedElement.attr('id');
+        changedElement  = mQuery(changedElement);
+        const elementId = changedElement.attr('id');
 
-        let value = this.getElementValue(changedElement);
+        const value = this.getElementValue(changedElement);
 
         if (elementId === 'content_preview_settings_variant') {
             this.setElementValue('#content_preview_settings_translation', value);
@@ -69,7 +69,7 @@ Mautic.contentPreviewUrlGenerator = {
 
         if (elementId === 'content_preview_settings_contact_id') {
             if (newValue === '') {
-                this.contactId = value = false;
+                this.contactId = false;
             } else {
                 this.contactId = value;
             }
@@ -111,10 +111,10 @@ Mautic.updateContactLookupListFilter = function(field, item) {
  */
 Mautic.activateContactLookupField = function(fieldOptions, filterId) {
 
-    let lookupElementId = 'content_preview_settings_contact';
-    let action = mQuery('#'+ lookupElementId).attr('data-chosen-lookup');
+    const lookupElementId = 'content_preview_settings_contact';
+    const action          = mQuery('#'+ lookupElementId).attr('data-chosen-lookup');
 
-    let options = {
+    const options = {
         limit: 20,
         'searchKey': 'lead.lead',
     };
