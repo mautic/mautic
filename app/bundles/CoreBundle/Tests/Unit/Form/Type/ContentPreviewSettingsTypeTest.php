@@ -88,6 +88,16 @@ class ContentPreviewSettingsTypeTest extends TestCase
             ],
         ];
 
+        $this->translator->expects(self::exactly(2))
+            ->method('trans')
+            ->withConsecutive(
+                ['mautic.lead.list.form.startTyping'],
+                ['mautic.core.form.nomatches']
+            )->willReturnOnConsecutiveCalls(
+                'startTyping',
+                'nomatches'
+            );
+
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects(self::once())
             ->method('add')
@@ -142,6 +152,16 @@ class ContentPreviewSettingsTypeTest extends TestCase
         $this->security->expects(self::never())
             ->method('hasEntityAccess');
 
+        $this->translator->expects(self::exactly(2))
+            ->method('trans')
+            ->withConsecutive(
+                ['mautic.lead.list.form.startTyping'],
+                ['mautic.core.form.nomatches']
+            )->willReturnOnConsecutiveCalls(
+                'startTyping',
+                'nomatches'
+            );
+
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects(self::once())
             ->method('add')
@@ -172,6 +192,16 @@ class ContentPreviewSettingsTypeTest extends TestCase
             ->method('hasEntityAccess')
             ->with('lead:leads:viewown', 'lead:leads:viewother')
             ->willReturn(false);
+
+        $this->translator->expects(self::exactly(2))
+            ->method('trans')
+            ->withConsecutive(
+                ['mautic.lead.list.form.startTyping'],
+                ['mautic.core.form.nomatches']
+            )->willReturnOnConsecutiveCalls(
+                'startTyping',
+                'nomatches'
+            );
 
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects(self::once())
@@ -239,6 +269,20 @@ class ContentPreviewSettingsTypeTest extends TestCase
             ],
         ];
 
+        $this->translator->expects(self::exactly(4))
+            ->method('trans')
+            ->withConsecutive(
+                ['mautic.core.form.chooseone'],
+                ['mautic.core.form.chooseone'],
+                ['mautic.lead.list.form.startTyping'],
+                ['mautic.core.form.nomatches']
+            )->willReturnOnConsecutiveCalls(
+                'chooseone',
+                'chooseone',
+                'startTyping',
+                'nomatches'
+            );
+
         $formBuilder = $this->createMock(FormBuilderInterface::class);
         $formBuilder->expects(self::exactly(3))
             ->method('add')
@@ -251,7 +295,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
                         'attr'    => [
                             'onChange' => "Mautic.contentPreviewUrlGenerator.regenerateUrl({$parentEmailId}, this)",
                         ],
-                        'placeholder'  => $this->translator->trans('mautic.core.form.chooseone'),
+                        'placeholder'  => 'chooseone',
                         'data'         => (string) $parentEmailId,
                     ],
                 ],
@@ -263,7 +307,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
                         'attr'    => [
                             'onChange' => "Mautic.contentPreviewUrlGenerator.regenerateUrl({$parentEmailId}, this)",
                         ],
-                        'placeholder'  => $this->translator->trans('mautic.core.form.chooseone'),
+                        'placeholder'  => 'chooseone',
                         'data'         => (string) $parentEmailId,
                     ],
                 ],
@@ -285,12 +329,8 @@ class ContentPreviewSettingsTypeTest extends TestCase
                         'data-toggle'             => 'field-lookup',
                         'data-lookup-callback'    => 'updateContactLookupListFilter',
                         'data-chosen-lookup'      => 'lead:contactList',
-                        'placeholder'             => $this->translator->trans(
-                            'mautic.lead.list.form.startTyping'
-                        ),
-                        'data-no-record-message'=> $this->translator->trans(
-                            'mautic.core.form.nomatches'
-                        ),
+                        'placeholder'             => 'startTyping',
+                        'data-no-record-message'  => 'nomatches',
                     ],
                 ],
             ];
