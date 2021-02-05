@@ -13,7 +13,7 @@ class SwiftMessageServiceTest extends \PHPUnit\Framework\TestCase
      */
     private $translatorInterfaceMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translatorInterfaceMock = $this->createMock(TranslatorInterface::class);
     }

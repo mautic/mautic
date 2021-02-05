@@ -35,7 +35,7 @@ abstract class AbstractStepTest extends TestCase
      */
     protected $output;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->input      = $this->createMock(InputInterface::class);
         $this->output     = $this->createMock(OutputInterface::class);

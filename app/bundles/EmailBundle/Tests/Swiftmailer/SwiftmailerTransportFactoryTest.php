@@ -35,7 +35,7 @@ class SwiftmailerTransportFactoryTest extends TestCase
      */
     private $eventDispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container       = $this->createMock(ContainerInterface::class);
         $this->requestContext  = $this->createMock(RequestContext::class);
