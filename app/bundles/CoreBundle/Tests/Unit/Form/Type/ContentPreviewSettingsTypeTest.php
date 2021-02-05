@@ -32,7 +32,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
      */
     private $security;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->security   = $this->createMock(CorePermissions::class);
@@ -54,6 +54,18 @@ class ContentPreviewSettingsTypeTest extends TestCase
                     'variants'     => null,
                 ]
             );
+
+        $resolver->expects(self::once())
+            ->method('setRequired')
+            ->with(['type', 'objectId']);
+
+        $resolver->expects(self::once())
+            ->method('addAllowedValues')
+            ->with('type', [ContentPreviewSettingsType::TYPE_PAGE, ContentPreviewSettingsType::TYPE_EMAIL]);
+
+        $resolver->expects(self::once())
+            ->method('addAllowedTypes')
+            ->with('objectId', 'int');
 
         $this->form->configureOptions($resolver);
     }

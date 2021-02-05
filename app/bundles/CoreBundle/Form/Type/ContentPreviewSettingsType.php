@@ -35,11 +35,6 @@ class ContentPreviewSettingsType extends AbstractType
      */
     private $security;
 
-    /**
-     * @var string
-     */
-    private $onChangeContent;
-
     public function __construct(TranslatorInterface $translator, CorePermissions $security)
     {
         $this->translator = $translator;
@@ -49,7 +44,6 @@ class ContentPreviewSettingsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $objectId              = $options['objectId'];
-        $this->onChangeContent = "Mautic.contentPreviewUrlGenerator.regenerateUrl({$objectId}, this)";
         $translations          = $options['translations'];
         $variants              = $options['variants'];
 
@@ -81,7 +75,7 @@ class ContentPreviewSettingsType extends AbstractType
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -91,12 +85,13 @@ class ContentPreviewSettingsType extends AbstractType
                 'variants'     => null,
             ]
         );
+
+        $resolver->setRequired(['type', 'objectId']);
+        $resolver->addAllowedValues('type', [self::TYPE_PAGE, self::TYPE_EMAIL]);
+        $resolver->addAllowedTypes('objectId', 'int');
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'content_preview_settings';
     }
@@ -131,7 +126,7 @@ class ContentPreviewSettingsType extends AbstractType
             [
                 'choices' => $variantChoices,
                 'attr'    => [
-                    'onChange' => $this->onChangeContent,
+                    'onChange' => "Mautic.contentPreviewUrlGenerator.regenerateUrl({$objectId}, this)",
                 ],
                 'placeholder'  => $this->translator->trans('mautic.core.form.chooseone'),
                 'data'         => (string) $objectId,
