@@ -39,11 +39,15 @@ class SalesforceApiTest extends TestCase
         parent::setUp();
         $this->integration   = $this->createMock(SalesforceIntegration::class);
         $this->salesforceApi = new SalesforceApi($this->integration);
+    }
 
+    public function testThatGetLeadsMethodReturnsNoResultsIfThereAreNoFields(): void
+    {
         // Let's use an anonymous class to not use deprecated Mautic\CoreBundle\Helper\CacheStorageHelper
         $this->cacheStorageHelper = new class() {
-            public function get(): void
+            public function get(): bool
             {
+                return true;
             }
 
             public function set($name, $data, $expiration = null): void
@@ -54,10 +58,7 @@ class SalesforceApiTest extends TestCase
         $this->integration->expects($this->any())
             ->method('getCache')
             ->willReturn($this->cacheStorageHelper);
-    }
 
-    public function testThatGetLeadsMethodReturnsNoResultsIfThereAreNoFields(): void
-    {
         $query  = ['start' => 1];
         $object = 'Leads';
         $this->integration->expects($this->once())
