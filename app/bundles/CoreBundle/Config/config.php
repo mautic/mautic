@@ -612,6 +612,14 @@ return [
                     'mautic.update.step_provider',
                 ],
             ],
+            'mautic.core.command.maxmind.purge' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\MaxMindDoNotSellPurgeCommand::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.maxmind.doNotSellList',
+                ],
+            ],
         ],
         'other' => [
             'mautic.cache.warmer.middleware' => [
@@ -632,10 +640,16 @@ return [
                 // When removing, remove also the ricardofiorani/guzzle-psr18-adapter dependency.
                 'class' => \RicardoFiorani\GuzzlePsr18Adapter\Client::class,
             ],
+            /* @deprecated to be removed in Mautic 4. Use 'mautic.filesystem' instead. */
             'symfony.filesystem' => [
                 'class' => \Symfony\Component\Filesystem\Filesystem::class,
             ],
-
+            'mautic.filesystem' => [
+                'class' => \Mautic\CoreBundle\Helper\Filesystem::class,
+            ],
+            'symfony.finder' => [
+                'class' => \Symfony\Component\Finder\Finder::class,
+            ],
             // Error handler
             'mautic.core.errorhandler.subscriber' => [
                 'class'     => 'Mautic\CoreBundle\EventListener\ErrorHandlingListener',
@@ -820,12 +834,14 @@ return [
                 ],
             ],
             'mautic.helper.theme' => [
-                'class'     => 'Mautic\CoreBundle\Helper\ThemeHelper',
+                'class'     => \Mautic\CoreBundle\Helper\ThemeHelper::class,
                 'arguments' => [
                     'mautic.helper.paths',
                     'mautic.helper.templating',
                     'translator',
                     'mautic.helper.core_parameters',
+                    'mautic.filesystem',
+                    'symfony.finder',
                 ],
                 'methodCalls' => [
                     'setDefaultTheme' => [
@@ -987,6 +1003,12 @@ return [
                     'request_stack',
                 ],
                 'tag' => 'validator.constraint_validator',
+            ],
+            'mautic.maxmind.doNotSellList' => [
+                'class'     => Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
             ],
             // Logger
             'mautic.monolog.handler' => [

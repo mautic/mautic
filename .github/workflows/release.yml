@@ -220,3 +220,40 @@ jobs:
       with:
         name: update-logs
         path: ./mautic-testing/var/logs/*
+
+  upload-release-asset:
+    name: Upload release asset to m.mautic.org
+    needs: [release, test-fresh-install, test-update-install]
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Get tag name
+      run: echo "MAUTIC_VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+
+    - name: Setup PHP, with composer and extensions
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 7.4
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+
+    - name: Install dependencies
+      working-directory: ./.github/workflows/mautic-asset-upload
+      run: composer install --prefer-dist --no-progress
+
+    - name: Download full installation package from previous step
+      uses: actions/download-artifact@v2
+      with:
+        name: ${{ env.MAUTIC_VERSION }}.zip
+
+    # Category ID is 2 for Mautic release assets on m.mautic.org, that's why you're seeing "2" in the command below
+    - name: Upload release asset ZIP to m.mautic.org
+      run: |
+        php ./.github/workflows/mautic-asset-upload/upload.php \
+        https://m.mautic.org \
+        "${{ secrets.MAUTIC_INSTANCE_USER }}" \
+        "${{ secrets.MAUTIC_INSTANCE_PASSWORD }}" \
+        "${{ env.MAUTIC_VERSION }}" \
+        2 \
+        "${{ github.workspace }}/${{ env.MAUTIC_VERSION }}.zip"

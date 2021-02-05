@@ -462,11 +462,19 @@ class FieldType extends AbstractType
             ]
         );
 
+        $attr = [];
+        if ($options['data']->getColumnIsNotCreated()) {
+            $attr = [
+                'tooltip'  => 'mautic.lead.field.being_created_in_background',
+            ];
+        }
+
         $builder->add(
             'isPublished',
             YesNoButtonGroupType::class,
             [
-                'disabled' => ('email' == $options['data']->getAlias()),
+                'disabled' => $options['data']->disablePublishChange(),
+                'attr'     => $attr,
                 'data'     => ('email' == $options['data']->getAlias()) ? true : $options['data']->getIsPublished(),
             ]
         );
