@@ -1,11 +1,29 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Mautic\MarketplaceBundle\Collection\PackageCollection;
+use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\RouteProvider;
 
 if ('index' === $tmpl) {
     $view->extend('MarketplaceBundle:Package:index.html.php');
 }
+
+$buttons = [];
+
+if ($view['security']->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)) {
+    $buttons[] = [
+        'attr' => [
+            'data-toggle'      => 'confirmation',
+            'data-message'     => $view['translator']->trans('marketplace.install.coming.soon'),
+            'data-cancel-text' => $view['translator']->trans('mautic.core.close'),
+        ],
+        'btnText'   => $view['translator']->trans('mautic.core.theme.install'),
+        'iconClass' => 'fa fa-download',
+    ];
+}
+
 ?>
 <?php if (count($items)): ?>
     <div class="table-responsive">
@@ -26,18 +44,13 @@ if ('index' === $tmpl) {
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        // 'sessionVar' => 'marketplace.package',
-                        // 'orderBy'    => 'name',
                         'text'       => 'mautic.core.name',
-                        // 'default'    => true,
                     ]
                 );
 
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        // 'sessionVar' => 'marketplace.package',
-                        // 'orderBy'    => 'vendor',
                         'text'       => 'marketplace.vendor',
                     ]
                 );
@@ -45,8 +58,6 @@ if ('index' === $tmpl) {
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        // 'sessionVar' => 'marketplace.package',
-                        // 'orderBy'    => 'downloads',
                         'text'       => 'marketplace.downloads',
                     ]
                 );
@@ -54,8 +65,6 @@ if ('index' === $tmpl) {
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        // 'sessionVar' => 'marketplace.package',
-                        // 'orderBy'    => 'favers',
                         'text'       => 'marketplace.favers',
                     ]
                 );
@@ -71,17 +80,7 @@ if ('index' === $tmpl) {
                             'MauticCoreBundle:Helper:list_actions.html.php',
                             [
                                 'item'            => $item,
-                                'customButtons'   => [
-                                    [
-                                        'attr' => [
-                                            'data-toggle'      => 'confirmation',
-                                            'data-message'     => $view['translator']->trans('marketplace.install.coming.soon'),
-                                            'data-cancel-text' => $view['translator']->trans('mautic.core.close'),
-                                        ],
-                                        'btnText'   => $view['translator']->trans('mautic.core.theme.install'),
-                                        'iconClass' => 'fa fa-download',
-                                    ],
-                                ],
+                                'customButtons'   => $buttons,
                             ]
                         ); ?>
                     </td>

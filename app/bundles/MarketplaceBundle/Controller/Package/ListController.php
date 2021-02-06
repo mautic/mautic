@@ -6,6 +6,8 @@ namespace Mautic\MarketplaceBundle\Controller\Package;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\PluginCollector;
 use Mautic\MarketplaceBundle\Service\RouteProvider;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -13,46 +15,48 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ListController extends CommonController
 {
+    /**
+     * @var PluginCollector
+     */
     private $pluginCollector;
+
+    /**
+     * @var RequestStack
+     */
     private $requestStack;
+
+    /**
+     * @var RouteProvider
+     */
     private $routeProvider;
+
+    /**
+     * @var CorePermissions
+     */
+    private $corePermissions;
 
     public function __construct(
         PluginCollector $pluginCollector,
         RequestStack $requestStack,
-        RouteProvider $routeProvider
+        RouteProvider $routeProvider,
+        CorePermissions $corePermissions
     ) {
         $this->pluginCollector = $pluginCollector;
         $this->requestStack    = $requestStack;
         $this->routeProvider   = $routeProvider;
+        $this->corePermissions = $corePermissions;
     }
 
     public function listAction(int $page = 1): Response
     {
-        // @todo implement permissions
-        // try {
-        //     $this->permissionProvider->canViewAtAll();
-        // } catch (ForbiddenException $e) {
-        //     return $this->accessDenied(false, $e->getMessage());
-        // }
+        if (!$this->corePermissions->isGranted(MarketplacePermissions::CAN_VIEW_PACKAGES)) {
+            return $this->accessDenied();
+        }
 
-        $request    = $this->requestStack->getCurrentRequest();
-        $search     = InputHelper::clean($request->get('search', ''));
-        $limit      = (int) $request->get('limit', 30);
-        // $orderBy    = $this->sessionProvider->getOrderBy(CustomObject::TABLE_ALIAS.'.id');
-        // $orderByDir = $this->sessionProvider->getOrderByDir('ASC');
-        $route      = $this->routeProvider->buildListRoute($page);
-
-        // if ($request->query->has('orderby')) {
-        //     $orderBy    = InputHelper::clean($request->query->get('orderby'), true);
-        //     $orderByDir = 'ASC' === $orderByDir ? 'DESC' : 'ASC';
-        //     $this->sessionProvider->setOrderBy($orderBy);
-        //     $this->sessionProvider->setOrderByDir($orderByDir);
-        // }
-
-        // $this->sessionProvider->setPage($page);
-        // $this->sessionProvider->setPageLimit($limit);
-        // $this->sessionProvider->setFilter($search);
+        $request = $this->requestStack->getCurrentRequest();
+        $search  = InputHelper::clean($request->get('search', ''));
+        $limit   = (int) $request->get('limit', 30);
+        $route   = $this->routeProvider->buildListRoute($page);
 
         return $this->delegateView(
             [

@@ -12,7 +12,7 @@ return [
                     'id'        => 'marketplace',
                     'route'     => RouteProvider::ROUTE_LIST,
                     'iconClass' => 'fa-plus',
-                    // 'access'    => 'plugin:marketplace:marketplace:view',
+                    'access'    => 'marketplace:packages:view',
                 ],
             ],
         ],
@@ -42,6 +42,7 @@ return [
                     'marketplace.service.plugin_collector',
                     'request_stack',
                     'marketplace.service.route_provider',
+                    'mautic.security',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -54,6 +55,7 @@ return [
                 'arguments' => [
                     'marketplace.model.package',
                     'marketplace.service.route_provider',
+                    'mautic.security',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -67,6 +69,14 @@ return [
                 'class'     => \Mautic\MarketplaceBundle\Command\ListCommand::class,
                 'tag'       => 'console.command',
                 'arguments' => ['marketplace.service.plugin_collector'],
+            ],
+        ],
+        'permissions' => [
+            'marketplace.permissions' => [
+                'class'     => \Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
             ],
         ],
         'api' => [

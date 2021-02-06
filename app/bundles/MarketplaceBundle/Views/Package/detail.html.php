@@ -1,34 +1,40 @@
-<?php declare(strict_types=1);
+<?php
 
+declare(strict_types=1);
+
+use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\RouteProvider;
 
 $view['slots']->set('headerTitle', $view->escape($packageDetail->getHumanPackageName()));
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
+$buttons = [
+    [
+        'attr' => [
+            'href' => $view['router']->path(RouteProvider::ROUTE_LIST),
+        ],
+        'btnText'   => $view['translator']->trans('mautic.core.form.close'),
+        'iconClass' => 'fa fa-remove',
+    ],
+];
+
+if ($view['security']->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)) {
+    $buttons[] = [
+        'attr' => [
+            'data-toggle'      => 'confirmation',
+            'data-message'     => $view['translator']->trans('marketplace.install.coming.soon'),
+            'data-cancel-text' => $view['translator']->trans('mautic.core.close'),
+        ],
+        'btnText'   => $view['translator']->trans('mautic.core.theme.install'),
+        'iconClass' => 'fa fa-download',
+    ];
+}
+
 $view['slots']->set(
     'actions',
     $view->render(
         'MauticCoreBundle:Helper:page_actions.html.php',
-        [
-            'customButtons' => [
-                [
-                    'attr' => [
-                        'href' => $view['router']->path(RouteProvider::ROUTE_LIST),
-                    ],
-                    'btnText'   => $view['translator']->trans('mautic.core.form.close'),
-                    'iconClass' => 'fa fa-remove',
-                ],
-                [
-                    'attr' => [
-                        'data-toggle'      => 'confirmation',
-                        'data-message'     => $view['translator']->trans('marketplace.install.coming.soon'),
-                        'data-cancel-text' => $view['translator']->trans('mautic.core.close'),
-                    ],
-                    'btnText'   => $view['translator']->trans('mautic.core.theme.install'),
-                    'iconClass' => 'fa fa-download',
-                ],
-            ],
-        ]
+        ['customButtons' => $buttons]
     )
 );
 
