@@ -2,22 +2,10 @@
 
 declare(strict_types=1);
 
+use Mautic\MarketplaceBundle\Service\Config;
 use Mautic\MarketplaceBundle\Service\RouteProvider;
 
 return [
-    'menu' => [
-        'admin' => [
-            'items' => [
-                'marketplace.title' => [
-                    'id'        => 'marketplace',
-                    'route'     => RouteProvider::ROUTE_LIST,
-                    'iconClass' => 'fa-plus',
-                    'access'    => 'marketplace:packages:view',
-                ],
-            ],
-        ],
-    ],
-
     'routes' => [
         'main' => [
             RouteProvider::ROUTE_LIST => [
@@ -33,7 +21,6 @@ return [
             ],
         ],
     ],
-
     'services' => [
         'controllers' => [
             'marketplace.controller.package.list' => [
@@ -43,6 +30,7 @@ return [
                     'request_stack',
                     'marketplace.service.route_provider',
                     'mautic.security',
+                    'marketplace.service.config',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -56,6 +44,7 @@ return [
                     'marketplace.model.package',
                     'marketplace.service.route_provider',
                     'mautic.security',
+                    'marketplace.service.config',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -71,11 +60,20 @@ return [
                 'arguments' => ['marketplace.service.plugin_collector'],
             ],
         ],
+        'events' => [
+            'marketplace.menu.subscriber' => [
+                'class'     => \Mautic\MarketplaceBundle\EventListener\MenuSubscriber::class,
+                'arguments' => [
+                    'marketplace.service.config',
+                ],
+            ],
+        ],
         'permissions' => [
             'marketplace.permissions' => [
                 'class'     => \Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
+                    'marketplace.service.config',
                 ],
             ],
         ],
@@ -103,6 +101,13 @@ return [
                 'class'     => \Mautic\MarketplaceBundle\Service\RouteProvider::class,
                 'arguments' => ['router'],
             ],
+            'marketplace.service.config' => [
+                'class'     => \Mautic\MarketplaceBundle\Service\Config::class,
+                'arguments' => ['mautic.helper.core_parameters'],
+            ],
         ],
+    ],
+    'parameters' => [
+        Config::MARKETPLACE_ENABLED => true,
     ],
 ];

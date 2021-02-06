@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
+use Mautic\MarketplaceBundle\Service\Config;
 use Mautic\MarketplaceBundle\Service\PluginCollector;
 use Mautic\MarketplaceBundle\Service\RouteProvider;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -35,20 +36,31 @@ class ListController extends CommonController
      */
     private $corePermissions;
 
+    /**
+     * @var Config
+     */
+    private $config;
+
     public function __construct(
         PluginCollector $pluginCollector,
         RequestStack $requestStack,
         RouteProvider $routeProvider,
-        CorePermissions $corePermissions
+        CorePermissions $corePermissions,
+        Config $config
     ) {
         $this->pluginCollector = $pluginCollector;
         $this->requestStack    = $requestStack;
         $this->routeProvider   = $routeProvider;
         $this->corePermissions = $corePermissions;
+        $this->config          = $config;
     }
 
     public function listAction(int $page = 1): Response
     {
+        if (!$this->config->marketplaceIsEnabled()) {
+            return $this->notFound();
+        }
+
         if (!$this->corePermissions->isGranted(MarketplacePermissions::CAN_VIEW_PACKAGES)) {
             return $this->accessDenied();
         }

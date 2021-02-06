@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
+use Mautic\MarketplaceBundle\Service\Config;
 use Mautic\MarketplaceBundle\Service\RouteProvider;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -28,18 +29,29 @@ class DetailController extends CommonController
      */
     private $corePermissions;
 
+    /**
+     * @var Config
+     */
+    private $config;
+
     public function __construct(
         PackageModel $packageModel,
         RouteProvider $routeProvider,
-        CorePermissions $corePermissions
+        CorePermissions $corePermissions,
+        Config $config
     ) {
         $this->packageModel    = $packageModel;
         $this->routeProvider   = $routeProvider;
         $this->corePermissions = $corePermissions;
+        $this->config          = $config;
     }
 
     public function ViewAction(string $vendor, string $package): Response
     {
+        if (!$this->config->marketplaceIsEnabled()) {
+            return $this->notFound();
+        }
+
         if (!$this->corePermissions->isGranted(MarketplacePermissions::CAN_VIEW_PACKAGES)) {
             return $this->accessDenied();
         }
