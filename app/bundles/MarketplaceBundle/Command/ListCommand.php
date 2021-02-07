@@ -13,6 +13,11 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class ListCommand extends ContainerAwareCommand
 {
+    public const NAME = 'mautic:marketplace:list';
+
+    /**
+     * @var PluginCollector
+     */
     private $pluginCollector;
 
     public function __construct(PluginCollector $pluginCollector)
@@ -23,7 +28,7 @@ class ListCommand extends ContainerAwareCommand
 
     protected function configure(): void
     {
-        $this->setName('mautic:marketplace:list');
+        $this->setName(self::NAME);
         $this->setDescription('Lists plugins that are available at Packagist.org');
         $this->addOption('page', 'p', InputOption::VALUE_OPTIONAL, 'Page number', 1);
         $this->addOption('limit', 'l', InputOption::VALUE_OPTIONAL, 'Packages per page', 15);
@@ -38,15 +43,16 @@ class ListCommand extends ContainerAwareCommand
         $stopwatch->start('command');
 
         $table = new Table($output);
-        $table->setHeaders(['name', 'description', 'downloads', 'favers']);
+        $table->setHeaders(['name', 'downloads', 'favers']);
 
         $plugins = $this->pluginCollector->collectPackages($input->getOption('page'), $input->getOption('limit'), $input->getOption('filter'));
 
         foreach ($plugins as $plugin) {
-            $color = 'white';
+            $color       = 'white';
+            $delimiter   = "\n    ";
+            $description = $plugin->getDescription() ? $delimiter.wordwrap($plugin->getDescription(), 50, $delimiter) : '';
             $table->addRow([
-                "<fg={$color}>{$plugin->getName()}</>",
-                "<fg={$color}>{$plugin->getDescription()}</>",
+                "<fg={$color}>{$plugin->getName()}{$description}</>",
                 "<fg={$color}>{$plugin->getDownloads()}</>",
                 "<fg={$color}>{$plugin->getFavers()}</>",
             ]);
