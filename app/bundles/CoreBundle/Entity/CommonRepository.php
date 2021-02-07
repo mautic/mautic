@@ -1525,7 +1525,7 @@ class CommonRepository extends EntityRepository
                             break;
                         case 'isEmpty':
                         case 'isNotEmpty':
-                            if ('empty' === $clause['expr']) {
+                            if ('isEmpty' === $clause['expr']) {
                                 $whereClause = $query->expr()->orX(
                                     $query->expr()->eq($column, $query->expr()->literal('')),
                                     $query->expr()->isNull($column)
