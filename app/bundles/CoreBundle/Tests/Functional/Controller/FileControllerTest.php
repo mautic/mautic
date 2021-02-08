@@ -68,7 +68,7 @@ class FileControllerTest extends MauticMysqlTestCase
         return realpath(dirname(__FILE__).'/../../Fixtures/').'/';
     }
 
-    protected function tearDown(): void
+    protected function beforeTearDown(): void
     {
         if ($this->uploadedFilePath && file_exists($this->uploadedFilePath)) {
             unlink($this->uploadedFilePath);
