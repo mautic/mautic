@@ -132,13 +132,34 @@ class CompanyImport extends AbstractImport
             throw new \Exception('Company doesn\'t have integration', Response::HTTP_NOT_FOUND);
         }
 
-        $deletion = new PipedriveDeletion();
-        $deletion
-            ->setObjectType('company')
-            ->setDeletedDate(new \DateTime())
-            ->setIntegrationEntityId($integrationEntity->getId());
+        $integrationSettings = $this->getIntegration()->getIntegrationSettings();
+        $deleteViaCron       = ($integrationSettings->getIsPublished() && !empty($integrationSettings->getFeatureSettings()['cronDelete']));
 
-        $this->em->persist($deletion);
+        if ($deleteViaCron) {
+            $deletion = new PipedriveDeletion();
+            $deletion
+                ->setObjectType('company')
+                ->setDeletedDate(new \DateTime())
+                ->setIntegrationEntityId($integrationEntity->getId());
+
+            $this->em->persist($deletion);
+            $this->em->flush();
+        } else {
+            /** @var Company $company */
+            $company = $this->em->getRepository(Company::class)->findOneById($integrationEntity->getInternalEntityId());
+
+            if (!$company) {
+                throw new \Exception('Company doesn\'t exist', Response::HTTP_NOT_FOUND);
+            }
+
+            // prevent listeners from exporting
+            $company->setEventData('pipedrive.webhook', 1);
+            $this->companyModel->deleteEntity($company);
+
+            if (!empty($company->deletedId)) {
+                $this->em->remove($integrationEntity);
+            }
+        }
     }
 
     /**
@@ -147,13 +168,13 @@ class CompanyImport extends AbstractImport
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Exception
      */
-    public function merge(array $data = [], array $otherData = [])
+    public function merge(array $data = [], $otherId = null)
     {
         if (!$this->getIntegration()->isCompanySupportEnabled()) {
             return false; //feature disabled
         }
 
-        $otherIntegrationEntity = $this->getCompanyIntegrationEntity(['integrationEntityId' => $otherData['id']]);
+        $otherIntegrationEntity = $this->getCompanyIntegrationEntity(['integrationEntityId' => $otherId]);
 
         if (!$otherIntegrationEntity) {
             // Only destination entity exists, so handle it as an update.

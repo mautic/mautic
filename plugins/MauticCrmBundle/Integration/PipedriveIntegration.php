@@ -320,6 +320,22 @@ class PipedriveIntegration extends CrmAbstractIntegration
                     'required'          => false,
                 ]
             );
+
+            $builder->add(
+                'cronDelete',
+                ChoiceType::class,
+                [
+                    'choices' => [
+                        'mautic.pipedrive.add.edit.contact.cron_delete.enabled' => 'enabled',
+                    ],
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.pipedrive.add.edit.contact.cron_delete',
+                    'label_attr'        => ['class' => ''],
+                    'placeholder'       => false,
+                    'required'          => false,
+                ]
+            );
         }
     }
 

@@ -31,14 +31,14 @@ class PipedriveDeletion
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder
-            ->setTable('plugin_crm_pipedrive_deletions')
-            ->addIndex(['deletion_date'], 'deletion_date');
+        $builder->setTable('plugin_crm_pipedrive_deletions');
 
         $builder->addId();
         $builder->addNamedField('objectType', 'string', 'object_type');
         $builder->addNamedField('integrationEntityId', 'integer', 'integration_entity_id');
         $builder->addNamedField('deletedDate', 'datetime', 'deleted_date');
+
+        $builder->addIndex(['deleted_date'], 'deleted_date');
     }
 
     /**
@@ -74,7 +74,8 @@ class PipedriveDeletion
      */
     public function getDeletedDate()
     {
-        return $this->deletedDate;
+        $date = new DateTime();
+        return $date->setTimestamp($this->deletedDate);
     }
 
     /**
@@ -82,7 +83,7 @@ class PipedriveDeletion
      */
     public function setDeletedDate(DateTime $deletedDate)
     {
-        $this->$deletedDate = $deletedDate;
+        $this->deletedDate = $deletedDate->getTimestamp();
 
         return $this;
     }

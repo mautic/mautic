@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use MauticPlugin\MauticCrmBundle\Entity\PipedriveDeletion;
 use Symfony\Component\HttpFoundation\Response;
 
 class LeadImport extends AbstractImport
@@ -35,8 +36,9 @@ class LeadImport extends AbstractImport
     {
         parent::__construct($em);
 
-        $this->leadModel    = $leadModel;
-        $this->companyModel = $companyModel;
+        $this->leadModel     = $leadModel;
+        $this->companyModel  = $companyModel;
+        $this->contactMerger = $contactMerger;
     }
 
     /**
@@ -155,20 +157,34 @@ class LeadImport extends AbstractImport
             throw new \Exception('Lead doesn\'t have integration', Response::HTTP_NOT_FOUND);
         }
 
-        /** @var Lead $lead */
-        $lead = $this->em->getRepository(Lead::class)->findOneById($integrationEntity->getInternalEntityId());
+        $integrationSettings = $this->getIntegration()->getIntegrationSettings();
+        $deleteViaCron       = ($integrationSettings->getIsPublished() && !empty($integrationSettings->getFeatureSettings()['cronDelete']));
 
-        if (!$lead) {
-            throw new \Exception('Lead doesn\'t exists in Mautic', Response::HTTP_NOT_FOUND);
-        }
+        if ($deleteViaCron) {
+            $deletion = new PipedriveDeletion();
+            $deletion
+                ->setObjectType('lead')
+                ->setDeletedDate(new \DateTime())
+                ->setIntegrationEntityId($integrationEntity->getId());
 
-        // prevent listeners from exporting
-        $lead->setEventData('pipedrive.webhook', 1);
+            $this->em->persist($deletion);
+            $this->em->flush();
+        } else {
+            /** @var Lead $lead */
+            $lead = $this->em->getRepository(Lead::class)->findOneById($integrationEntity->getInternalEntityId());
 
-        $this->leadModel->deleteEntity($lead);
+            if (!$lead) {
+                throw new \Exception('Lead doesn\'t exists in Mautic', Response::HTTP_NOT_FOUND);
+            }
 
-        if (!empty($lead->deletedId)) {
-            $this->em->remove($integrationEntity);
+            // prevent listeners from exporting
+            $lead->setEventData('pipedrive.webhook', 1);
+
+            $this->leadModel->deleteEntity($lead);
+
+            if (!empty($lead->deletedId)) {
+                $this->em->remove($integrationEntity);
+            }
         }
     }
 
@@ -179,9 +195,9 @@ class LeadImport extends AbstractImport
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Exception
      */
-    public function merge(array $data = [], array $otherData = [])
+    public function merge(array $data = [], $otherId = null)
     {
-        $otherIntegrationEntity = $this->getLeadIntegrationEntity(['integrationEntityId' => $otherData['id']]);
+        $otherIntegrationEntity = $this->getLeadIntegrationEntity(['integrationEntityId' => $otherId]);
 
         if (!$otherIntegrationEntity) {
             // Only destination entity exists, so handle it as an update.

@@ -5,19 +5,19 @@ namespace MauticPlugin\MauticCrmBundle\Command;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveDeletion;
 use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
-use MauticPlugin\MauticSocialBundle\Entity\Lead;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class ProcessPipedriveDeletions extends ContainerAwareCommand
+class ProcessPipedriveDeletionsCommand extends ContainerAwareCommand
 {
     const PERSON_ENTITY_TYPE       = 'person';
     const LEAD_ENTITY_TYPE         = 'lead';
@@ -57,7 +57,7 @@ class ProcessPipedriveDeletions extends ContainerAwareCommand
         }
 
         $this->em = $container->get('doctrine.orm.default_entity_manager');
-        $query    = $this->em->createQuery('SELECT d FROM MauticPlugin\MauticCrmBundle\Entity\PipedriveDeletion d WHERE d.deleted_date < :olderThan');
+        $query    = $this->em->createQuery('SELECT d FROM MauticPlugin\MauticCrmBundle\Entity\PipedriveDeletion d WHERE d.deletedDate < :olderThan');
         $query->setParameter('olderThan', new \DateTime('-1 minute'));
         $deletions = $query->getResult();
 
@@ -94,7 +94,13 @@ class ProcessPipedriveDeletions extends ContainerAwareCommand
             /** @var ModelFactory $modelFactory */
             $modelFactory = $container->get('mautic.model.factory');
             /** @var CompanyModel|LeadModel $model */
-            $model = $modelFactory->getModel($type);
+            $modelType = $type;
+
+            if ('company' === $modelType) {
+                $modelType = 'lead.company';
+            }
+
+            $model = $modelFactory->getModel($modelType);
             $model->deleteEntity($entity);
 
             if (!empty($entity->deletedId)) {

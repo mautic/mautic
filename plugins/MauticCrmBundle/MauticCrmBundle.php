@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle;
 
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
@@ -23,13 +24,18 @@ class MauticCrmBundle extends PluginBundleBase
         }
     }
 
+    public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null)
+    {
+        self::updatePluginSchema(self::getMetadata($factory->getEntityManager(), true), $installedSchema, $factory);
+    }
+
     /**
      * Fix: plugin installer doesn't find metadata entities for the plugin
      * PluginBundle/Controller/PluginController:410.
      *
      * @return array|null
      */
-    private static function getMetadata(EntityManager $em)
+    private static function getMetadata(EntityManager $em, $update = false)
     {
         $allMetadata   = $em->getMetadataFactory()->getAllMetadata();
         $currentSchema = $em->getConnection()->getSchemaManager()->createSchema();
@@ -44,7 +50,7 @@ class MauticCrmBundle extends PluginBundleBase
 
             $table = $meta->getTableName();
 
-            if ($currentSchema->hasTable($table)) {
+            if (!$update && $currentSchema->hasTable($table)) {
                 continue;
             }
 
