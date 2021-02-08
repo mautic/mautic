@@ -202,7 +202,7 @@ Mautic.initGrapesJS = function (object) {
             editor.BlockManager.get('mj-button').set({
                 content: "<mj-button href=\"https://\">Button</mj-button>",
             });
-            
+
             // Customize GrapesJS -> add close button with save for Mautic
             panelManager = editor.Panels;
             panelManager.addButton('views', [
@@ -358,7 +358,7 @@ Mautic.initGrapesJS = function (object) {
             keymaps.add(shortcut.id, shortcut.keys, shortcut.handler);
         });
 
-        let modalContent = editor.Modal.getContent().querySelector('#dynamic-content-popup');
+        let modalContent = editor.Modal.getContentEl().querySelector('#dynamic-content-popup');
 
         // On modal close -> move editor within Mautic
         if (modalContent !== null) {
