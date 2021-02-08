@@ -169,4 +169,15 @@ class CompanyExport extends AbstractPipedrive
 
         return $pipedriveOwner->getOwnerId();
     }
+
+    public function getOperation(Company $company)
+    {
+        if (!$this->getIntegration()->isCompanySupportEnabled()) {
+            return false; //feature disabled
+        }
+
+        $integrationEntity = $this->getCompanyIntegrationEntity(['internalEntityId' => $company->getId()]);
+
+        return ($integrationEntity) ? 'update' : 'create';
+    }
 }

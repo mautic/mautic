@@ -213,4 +213,19 @@ class LeadExport extends AbstractPipedrive
 
         return $data;
     }
+
+    public function getOperation(Lead $lead)
+    {
+        // stop for anynomouse
+        if ($lead->isAnonymous() || empty($lead->getEmail())) {
+            return false;
+        }
+
+        $leadId            = $lead->getId();
+        /** @var IntegrationEntity $integrationEntity */
+        $integrationEntity = $this->getLeadIntegrationEntity(['internalEntityId' => $leadId]);
+        $personData        = $this->getIntegration()->getApiHelper()->findByEmail($lead->getEmail());
+
+        return ($integrationEntity) && !empty($personData) ? 'update' : 'create';
+    }
 }

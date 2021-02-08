@@ -310,7 +310,8 @@ class PipedriveIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices'     => [
-                        'mautic.pipedrive.add.edit.contact.import.enabled' => 'enabled',
+                        'mautic.pipedrive.add.edit.contact.import.create' => 'create',
+                        'mautic.pipedrive.add.edit.contact.import.update' => 'update',
                     ],
                     'expanded'          => true,
                     'multiple'          => true,
@@ -375,13 +376,12 @@ class PipedriveIntegration extends CrmAbstractIntegration
     /**
      * @return bool
      */
-    public function shouldImportDataToPipedrive()
+    public function shouldImportDataToPipedrive($operation = 'create')
     {
-        if (!$this->getIntegrationSettings()->getIsPublished() || empty($this->getIntegrationSettings()->getFeatureSettings()['import'])) {
-            return false;
-        }
+        $settings = $this->getIntegrationSettings();
+        $features = $settings->getFeatureSettings();
 
-        return true;
+        return $settings->getIsPublished() && !empty($features['import']) && in_array($operation, $features['import'], true);
     }
 
     /**
