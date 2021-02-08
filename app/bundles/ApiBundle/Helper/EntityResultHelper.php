@@ -79,7 +79,7 @@ class EntityResultHelper
     private function getDataForObject($object)
     {
         foreach ($object as $key => $value) {
-            if ($key === 0) {
+            if (0 === $key) {
                 continue;
             }
 
