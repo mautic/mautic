@@ -5,7 +5,8 @@ $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__.'/app/config')
     ->in(__DIR__.'/app/middlewares')
     ->in(__DIR__.'/app/migrations')
-    ->in(__DIR__.'/plugins');
+    ->in(__DIR__.'/plugins')
+    ->in(__DIR__.'/.github/workflows/mautic-asset-upload');
 
 return PhpCsFixer\Config::create()
     ->setRules([

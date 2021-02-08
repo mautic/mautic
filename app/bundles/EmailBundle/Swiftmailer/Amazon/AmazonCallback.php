@@ -73,7 +73,18 @@ class AmazonCallback
 
         $payload = json_decode($request->getContent(), true);
 
-        return $this->processJsonPayload($payload);
+        if (0 !== json_last_error()) {
+            throw new HttpException(400, 'AmazonCallback: Invalid JSON Payload');
+        }
+
+        if (!isset($payload['Type']) && !isset($payload['eventType'])) {
+            throw new HttpException(400, "Key 'Type' not found in payload ");
+        }
+
+        // determine correct key for message type (global or via ConfigurationSet)
+        $type = (array_key_exists('Type', $payload) ? $payload['Type'] : $payload['eventType']);
+
+        return $this->processJsonPayload($payload, $type);
     }
 
     /**
@@ -83,65 +94,37 @@ class AmazonCallback
      *
      * @param array $payload from Amazon SES
      */
-    public function processJsonPayload(array $payload)
+    public function processJsonPayload(array $payload, $type)
     {
-        if (!isset($payload['Type'])) {
-            throw new HttpException(400, "Key 'Type' not found in payload ");
-        }
+        switch ($type) {
+            case 'SubscriptionConfirmation':
 
-        if ('SubscriptionConfirmation' == $payload['Type']) {
-            // Confirm Amazon SNS subscription by calling back the SubscribeURL from the playload
-            try {
-                $response = $this->httpClient->get($payload['SubscribeURL']);
-                if (200 == $response->code) {
-                    $this->logger->info('Callback to SubscribeURL from Amazon SNS successfully');
-
-                    return;
-                }
-
-                $reason = 'HTTP Code '.$response->code.', '.$response->body;
-            } catch (UnexpectedResponseException $e) {
-                $reason = $e->getMessage();
-            }
-
-            $this->logger->error('Callback to SubscribeURL from Amazon SNS failed, reason: '.$reason);
-
-            return;
-        }
-
-        if ('Notification' == $payload['Type']) {
-            $message = json_decode($payload['Message'], true);
-
-            // only deal with hard bounces
-            if ('Bounce' == $message['notificationType'] && 'Permanent' == $message['bounce']['bounceType']) {
-                $emailId = null;
-
-                if (isset($message['mail']['headers'])) {
-                    foreach ($message['mail']['headers'] as $header) {
-                        if ('X-EMAIL-ID' === $header['name']) {
-                            $emailId = $header['value'];
+                    // Confirm Amazon SNS subscription by calling back the SubscribeURL from the playload
+                    try {
+                        $response = $this->httpClient->get($payload['SubscribeURL']);
+                        if (200 == $response->code) {
+                            $this->logger->info('Callback to SubscribeURL from Amazon SNS successfully');
+                            break;
                         }
+
+                        $reason = 'HTTP Code '.$response->code.', '.$response->body;
+                    } catch (UnexpectedResponseException $e) {
+                        $reason = $e->getMessage();
                     }
-                }
 
-                // Get bounced recipients in an array
-                $bouncedRecipients = $message['bounce']['bouncedRecipients'];
-                foreach ($bouncedRecipients as $bouncedRecipient) {
-                    $bounceCode = array_key_exists('diagnosticCode', $bouncedRecipient) ? $bouncedRecipient['diagnosticCode'] : 'unknown';
-                    $this->transportCallback->addFailureByAddress($bouncedRecipient['emailAddress'], $bounceCode, DoNotContact::BOUNCED, $emailId);
-                    $this->logger->debug("Mark email '".$bouncedRecipient['emailAddress']."' as bounced, reason: ".$bounceCode);
-                }
+                    $this->logger->error('Callback to SubscribeURL from Amazon SNS failed, reason: '.$reason);
+            break;
+            case 'Notification':
+                $message = json_decode($payload['Message'], true);
 
-                return;
-            }
-
-            // unsubscribe customer that complain about spam at their mail provider
-            if ('Complaint' == $message['notificationType']) {
-                foreach ($message['complaint']['complainedRecipients'] as $complainedRecipient) {
+                $this->processJsonPayload($message, $message['notificationType']);
+            break;
+            case 'Complaint':
+                foreach ($payload['complaint']['complainedRecipients'] as $complainedRecipient) {
                     $reason = null;
-                    if (isset($message['complaint']['complaintFeedbackType'])) {
+                    if (isset($payload['complaint']['complaintFeedbackType'])) {
                         // http://docs.aws.amazon.com/ses/latest/DeveloperGuide/notification-contents.html#complaint-object
-                        switch ($message['complaint']['complaintFeedbackType']) {
+                        switch ($payload['complaint']['complaintFeedbackType']) {
                             case 'abuse':
                                 $reason = $this->translator->trans('mautic.email.complaint.reason.abuse');
                                 break;
@@ -163,12 +146,34 @@ class AmazonCallback
                     $this->logger->debug("Unsubscribe email '".$complainedRecipient['emailAddress']."'");
                 }
 
-                return;
-            }
-        }
+            break;
+            case 'Bounce':
 
-        $this->logger->warn("Received SES webhook of type '$payload[Type]' but couldn't understand payload");
-        $this->logger->debug('SES webhook payload: '.json_encode($payload));
+                if ('Permanent' == $payload['bounce']['bounceType']) {
+                    $emailId = null;
+
+                    if (isset($payload['mail']['headers'])) {
+                        foreach ($payload['mail']['headers'] as $header) {
+                            if ('X-EMAIL-ID' === $header['name']) {
+                                $emailId = $header['value'];
+                            }
+                        }
+                    }
+
+                    // Get bounced recipients in an array
+                    $bouncedRecipients = $payload['bounce']['bouncedRecipients'];
+                    foreach ($bouncedRecipients as $bouncedRecipient) {
+                        $bounceCode = array_key_exists('diagnosticCode', $bouncedRecipient) ? $bouncedRecipient['diagnosticCode'] : 'unknown';
+                        $this->transportCallback->addFailureByAddress($bouncedRecipient['emailAddress'], $bounceCode, DoNotContact::BOUNCED, $emailId);
+                        $this->logger->debug("Mark email '".$bouncedRecipient['emailAddress']."' as bounced, reason: ".$bounceCode);
+                    }
+                }
+            break;
+            default:
+                $this->logger->warn("Received SES webhook of type '$payload[Type]' but couldn't understand payload");
+                $this->logger->debug('SES webhook payload: '.json_encode($payload));
+            break;
+        }
     }
 
     /**
@@ -181,7 +186,8 @@ class AmazonCallback
         }
 
         $message = $this->getSnsPayload($message->textPlain);
-        if ('Bounce' !== $message['notificationType']) {
+        $typeKey = (array_key_exists('eventType', $message) ? 'eventType' : 'notificationType');
+        if ('Bounce' !== $message[$typeKey]) {
             throw new BounceNotFound();
         }
 
@@ -208,7 +214,8 @@ class AmazonCallback
         }
 
         $message = $this->getSnsPayload($message->textPlain);
-        if ('Complaint' !== $message['notificationType']) {
+        $typeKey = (array_key_exists('eventType', $message) ? 'eventType' : 'notificationType');
+        if ('Complaint' !== $message[$typeKey]) {
             throw new UnsubscriptionNotFound();
         }
 
