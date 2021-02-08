@@ -99,7 +99,6 @@ class LeadSubscriber implements EventSubscriberInterface
                 if ('failed' == $state or 'sent' == $state) { //this is to get the correct column for date dateSent
                     $dateSent = 'sent';
                 }
-                $status=($stat['isFailed']) ? 'Failed' : 'Success';
 
                 $contactId = $stat['lead_id'];
                 unset($stat['lead_id']);
@@ -113,7 +112,6 @@ class LeadSubscriber implements EventSubscriberInterface
                         'extra'      => [
                             'stat'   => $stat,
                             'type'   => $state,
-                            'status' => $status,
                         ],
                         'contentTemplate' => 'MauticSmsBundle:SubscribedEvents\Timeline:index.html.php',
                         'icon'            => ('read' == $state) ? 'fa-message-o' : 'fa-commenting',

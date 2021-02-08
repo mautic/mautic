@@ -47,7 +47,13 @@ if ($item = ((isset($event['extra'])) ? $event['extra']['stat'] : false)):
 <?php else: ?>
 <dl class="dl-horizontal">
     <dt><?php echo $view['translator']->trans('mautic.sms.timeline.status'); ?></dt>
-    <dd><?php echo $view['translator']->trans($event['extra']['status']); ?></dd>
+    <dd>
+        <?php if (!empty($item['is_failed'])): ?>
+            <?php echo $view['translator']->trans('mautic.email.stat.failed'); ?>
+        <?php else: ?>
+            <?php echo $view['translator']->trans('mautic.email.send'); ?>
+        <?php endif; ?>
+    </dd>
     <dt><?php echo $view['translator']->trans('mautic.sms.timeline.type'); ?></dt>
     <dd><?php echo $view['translator']->trans($item['type']); ?></dd>
 </dl>
