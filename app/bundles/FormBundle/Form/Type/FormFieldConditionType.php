@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\FormBundle\Helper\PropertiesAccessor;
 use Mautic\FormBundle\Model\FieldModel;
@@ -41,6 +42,8 @@ class FormFieldConditionType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $builder->addEventSubscriber(new CleanFormSubscriber(['values' => 'clean']));
+
         $choices = [];
         if (!empty($options['parent'])) {
             $fields = $this->fieldModel->getSessionFields($options['formId']);
