@@ -16,63 +16,96 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\CoreBundle\Event\RouteEvent;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Menu\MenuHelper;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
-use Mautic\InstallBundle\Controller\InstallController;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\LoginEvent;
 use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\UserEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class CoreSubscriber.
- */
-class CoreSubscriber extends CommonSubscriber
+class CoreSubscriber implements EventSubscriberInterface
 {
     /**
      * @var BundleHelper
      */
-    protected $bundleHelper;
+    private $bundleHelper;
 
     /**
      * @var MenuHelper
      */
-    protected $menuHelper;
+    private $menuHelper;
 
     /**
      * @var UserHelper
      */
-    protected $userHelper;
+    private $userHelper;
 
     /**
      * @var AssetsHelper
      */
-    protected $assetsHelper;
+    private $assetsHelper;
 
     /**
-     * @var SecurityContext
+     * @var AuthorizationChecker
      */
-    protected $securityContext;
+    private $securityContext;
 
     /**
      * @var UserModel
      */
-    protected $userModel;
+    private $userModel;
 
     /**
      * @var CoreParametersHelper
      */
-    protected $coreParametersHelper;
+    private $coreParametersHelper;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
+     * @var FormRepository
+     */
+    private $formRepository;
+
+    /**
+     * @var MauticFactory
+     */
+    private $factory;
+
+    /**
+     * @var FlashBag
+     */
+    private $flashBag;
 
     public function __construct(
         BundleHelper $bundleHelper,
@@ -80,8 +113,14 @@ class CoreSubscriber extends CommonSubscriber
         UserHelper $userHelper,
         AssetsHelper $assetsHelper,
         CoreParametersHelper $coreParametersHelper,
-        SecurityContext $securityContext,
-        UserModel $userModel
+        AuthorizationChecker $securityContext,
+        UserModel $userModel,
+        EventDispatcherInterface $dispatcher,
+        TranslatorInterface $translator,
+        RequestStack $requestStack,
+        FormRepository $formRepository,
+        MauticFactory $factory,
+        FlashBag $flashBag
     ) {
         $this->bundleHelper         = $bundleHelper;
         $this->menuHelper           = $menuHelper;
@@ -90,6 +129,12 @@ class CoreSubscriber extends CommonSubscriber
         $this->securityContext      = $securityContext;
         $this->userModel            = $userModel;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->dispatcher           = $dispatcher;
+        $this->translator           = $translator;
+        $this->requestStack         = $requestStack;
+        $this->formRepository       = $formRepository;
+        $this->factory              = $factory;
+        $this->flashBag             = $flashBag;
     }
 
     /**
@@ -111,8 +156,6 @@ class CoreSubscriber extends CommonSubscriber
 
     /**
      * Add mauticForms in js script tag for Froala.
-     *
-     * @param FilterControllerEvent $event
      */
     public function onKernelRequestAddGlobalJS(FilterControllerEvent $event)
     {
@@ -120,8 +163,7 @@ class CoreSubscriber extends CommonSubscriber
             return;
         }
 
-        $list = $this->em->getRepository('MauticFormBundle:Form')->getSimpleList();
-
+        $list        = $this->formRepository->getSimpleList();
         $mauticForms = json_encode($list, JSON_FORCE_OBJECT | JSON_PRETTY_PRINT);
 
         $this->assetsHelper->addScriptDeclaration("var mauticForms = {$mauticForms};");
@@ -129,8 +171,6 @@ class CoreSubscriber extends CommonSubscriber
 
     /**
      * Set vars on login.
-     *
-     * @param InteractiveLoginEvent $event
      */
     public function onSecurityInteractiveLogin(InteractiveLoginEvent $event)
     {
@@ -139,7 +179,6 @@ class CoreSubscriber extends CommonSubscriber
         }
 
         $session = $event->getRequest()->getSession();
-
         if ($this->securityContext->isGranted('IS_AUTHENTICATED_FULLY') || $this->securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             $user = $event->getAuthenticationToken()->getUser();
 
@@ -149,21 +188,19 @@ class CoreSubscriber extends CommonSubscriber
             //mark the user as last logged in
             $user = $this->userHelper->getUser();
             if ($user instanceof User) {
-                $this->userModel->setOnlineStatus('online');
-
                 $this->userModel->getRepository()->setLastLogin($user);
 
                 // Set the timezone and locale in session while we have it since Symfony dispatches the onKernelRequest prior to the
                 // firewall setting the known user
                 $tz = $user->getTimezone();
                 if (empty($tz)) {
-                    $tz = $this->params['default_timezone'];
+                    $tz = $this->coreParametersHelper->get('default_timezone');
                 }
                 $session->set('_timezone', $tz);
 
                 $locale = $user->getLocale();
                 if (empty($locale)) {
-                    $locale = $this->params['locale'];
+                    $locale = $this->coreParametersHelper->get('locale');
                 }
                 $session->set('_locale', $locale);
             }
@@ -176,17 +213,10 @@ class CoreSubscriber extends CommonSubscriber
         } else {
             $session->remove('mautic.user');
         }
-
-        //set a couple variables used by filemanager
-        $session->set('mautic.docroot', $event->getRequest()->server->get('DOCUMENT_ROOT'));
-        $session->set('mautic.basepath', $event->getRequest()->getBasePath());
-        $session->set('mautic.imagepath', $this->coreParametersHelper->getParameter('image_path'));
     }
 
     /**
      * Populates namespace, bundle, controller, and action into request to be used throughout application.
-     *
-     * @param FilterControllerEvent $event
      */
     public function onKernelController(FilterControllerEvent $event)
     {
@@ -219,44 +249,14 @@ class CoreSubscriber extends CommonSubscriber
             // and the translator
             $controller[0]->setTranslator($this->translator);
 
+            // and the flash bag
+            $controller[0]->setFlashBag($this->flashBag);
+
             //run any initialize functions
             $controller[0]->initialize($event);
-
-            //update the user's activity marker
-            if (!($controller[0] instanceof InstallController) && !defined('MAUTIC_ACTIVITY_CHECKED') && !defined('MAUTIC_INSTALLER')) {
-                //prevent multiple updates
-                $user = $this->userHelper->getUser();
-                //slight delay to prevent too many updates
-                //note that doctrine will return in current timezone so we do not have to worry about that
-                $delay = new \DateTime();
-                $delay->setTimestamp(strtotime('2 minutes ago'));
-
-                if ($user instanceof User && $user->getLastActive() < $delay && $user->getId()) {
-                    $this->userModel->getRepository()->setLastActive($user);
-                }
-
-                $session = $request->getSession();
-
-                if ($session) {
-                    $delay = new \DateTime();
-                    $delay->setTimestamp(strtotime('15 minutes ago'));
-
-                    $lastOnlineStatusCleanup = $session->get('mautic.online.status.cleanup', $delay);
-
-                    if ($lastOnlineStatusCleanup <= $delay) {
-                        $this->userModel->getRepository()->updateOnlineStatuses();
-                        $session->set('mautic.online.status.cleanup', new \DateTime());
-                    }
-
-                    define('MAUTIC_ACTIVITY_CHECKED', 1);
-                }
-            }
         }
     }
 
-    /**
-     * @param MenuEvent $event
-     */
     public function onBuildMenu(MenuEvent $event)
     {
         $name    = $event->getType();
@@ -274,9 +274,6 @@ class CoreSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param RouteEvent $event
-     */
     public function onBuildRoute(RouteEvent $event)
     {
         $type       = $event->getType();
@@ -373,12 +370,9 @@ class CoreSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param IconEvent $event
-     */
     public function onFetchIcons(IconEvent $event)
     {
-        $session = $this->request->getSession();
+        $session = $this->requestStack->getCurrentRequest()->getSession();
         $icons   = $session->get('mautic.menu.icons', []);
 
         if (empty($icons)) {
@@ -396,7 +390,7 @@ class CoreSubscriber extends CommonSubscriber
                             $id = explode('_', $item['id']);
                             if (isset($id[1])) {
                                 // some bundle names are in plural, create also singular item
-                                if (substr($id[1], -1) == 's') {
+                                if ('s' == substr($id[1], -1)) {
                                     $event->addIcon(rtrim($id[1], 's'), $item['iconClass']);
                                 }
                                 $event->addIcon($id[1], $item['iconClass']);
@@ -405,7 +399,7 @@ class CoreSubscriber extends CommonSubscriber
                     }
                 }
             }
-            unset($bundles, $menuHelper);
+            unset($bundles);
 
             $icons = $event->getIcons();
             $session->set('mautic.menu.icons', $icons);
@@ -415,10 +409,9 @@ class CoreSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param RouteCollection $collection
-     * @param                 $type
-     * @param                 $name
-     * @param                 $details
+     * @param $type
+     * @param $name
+     * @param $details
      */
     private function addRouteToCollection(RouteCollection $collection, $type, $name, $details)
     {
@@ -429,20 +422,20 @@ class CoreSubscriber extends CommonSubscriber
         }
         if (isset($details['format'])) {
             $defaults['_format'] = $details['format'];
-        } elseif ($type == 'api') {
+        } elseif ('api' == $type) {
             $defaults['_format'] = 'json';
         }
         $method = '';
         if (isset($details['method'])) {
             $method = $details['method'];
-        } elseif ($type === 'api') {
+        } elseif ('api' === $type) {
             $method = 'GET';
         }
         // Set requirements
         $requirements = (!empty($details['requirements'])) ? $details['requirements'] : [];
 
         // Set some very commonly used defaults and requirements
-        if (strpos($details['path'], '{page}') !== false) {
+        if (false !== strpos($details['path'], '{page}')) {
             if (!isset($defaults['page'])) {
                 $defaults['page'] = 0;
             }
@@ -450,7 +443,7 @@ class CoreSubscriber extends CommonSubscriber
                 $requirements['page'] = '\d+';
             }
         }
-        if (strpos($details['path'], '{objectId}') !== false) {
+        if (false !== strpos($details['path'], '{objectId}')) {
             if (!isset($defaults['objectId'])) {
                 // Set default to 0 for the "new" actions
                 $defaults['objectId'] = 0;
@@ -460,8 +453,8 @@ class CoreSubscriber extends CommonSubscriber
                 $requirements['objectId'] = '[a-zA-Z0-9_-]+';
             }
         }
-        if ($type == 'api') {
-            if (strpos($details['path'], '{id}') !== false) {
+        if ('api' == $type) {
+            if (false !== strpos($details['path'], '{id}')) {
                 if (!isset($requirements['page'])) {
                     $requirements['id'] = '\d+';
                 }

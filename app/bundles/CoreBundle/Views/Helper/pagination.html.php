@@ -88,7 +88,7 @@ $getAction = function ($page, $active) use ($jsCallback, $jsArguments, $baseUrl,
 
 foreach ($responsiveViewports as $viewport):
 
-    if ($viewport == 'mobile'):
+    if ('mobile' == $viewport):
         $paginationClass   = 'sm';
         $pageClass         = 'pagination-sm';
         $responsiveClass   = 'visible-xs hidden-sm hidden-md hidden-lg';
@@ -117,7 +117,7 @@ foreach ($responsiveViewports as $viewport):
             <ul class="pagination np nm <?php echo $pageClass; ?>">
                 <?php
                 $action = $getAction(1, ($page > 1));
-                $data   = strpos($action, 'javascript:void(0);') !== false ? '' : ' data-toggle="'.$linkType.'" data-target="'.$target.'"'.$menuLink;
+                $data   = false !== strpos($action, 'javascript:void(0);') ? '' : ' data-toggle="'.$linkType.'" data-target="'.$target.'"'.$menuLink;
                 $class  = ($page <= 1) ? ' class="disabled"' : '';
                 ?>
                 <li<?php echo $class; ?>>
@@ -129,7 +129,7 @@ foreach ($responsiveViewports as $viewport):
 
                 <?php
                 $action = $getAction(($page - 1), ($page - 1) >= 1);
-                $data   = strpos($action, 'javascript:void(0);') !== false ? '' : ' data-toggle="'.$linkType.'" data-target="'.$target.'"'.$menuLink;
+                $data   = false !== strpos($action, 'javascript:void(0);') ? '' : ' data-toggle="'.$linkType.'" data-target="'.$target.'"'.$menuLink;
                 $class  = (($page - 1) <= 0) ? ' class="disabled"' : '';
                 ?>
                 <li<?php echo $class; ?>>
@@ -153,7 +153,7 @@ foreach ($responsiveViewports as $viewport):
                     <?php
                     $class  = ($page === (int) $i) ? ' class="active"' : '';
                     $action = $getAction($i, ($page !== (int) $i));
-                    $data   = strpos($action, 'javascript:void(0);') !== false ? '' : ' data-toggle="'.$linkType.'" data-target="'.$target.'"'.$menuLink;
+                    $data   = false !== strpos($action, 'javascript:void(0);') ? '' : ' data-toggle="'.$linkType.'" data-target="'.$target.'"'.$menuLink;
                     ?>
                     <li<?php echo $class; ?>>
                         <a <?php echo $action; ?><?php echo $data.$formExit; ?>>
@@ -164,7 +164,7 @@ foreach ($responsiveViewports as $viewport):
 
                 <?php
                 $action = $getAction(($page + 1), (($page + 1) <= $totalPages));
-                $data   = strpos($action, 'javascript:void(0);') !== false ? '' : ' data-toggle="'.$linkType.'" data-target="'.$target.'"'.$menuLink;
+                $data   = false !== strpos($action, 'javascript:void(0);') ? '' : ' data-toggle="'.$linkType.'" data-target="'.$target.'"'.$menuLink;
                 $class  = (($page + 1) > $totalPages) ? ' class="disabled"' : '';
                 ?>
                 <li<?php echo $class; ?>>
@@ -176,7 +176,7 @@ foreach ($responsiveViewports as $viewport):
 
                 <?php
                 $action = $getAction($totalPages, ($page < $totalPages));
-                $data   = strpos($action, 'javascript:void(0);') !== false ? '' : ' data-toggle="'.$linkType.'" data-target="'.$target.'"'.$menuLink;
+                $data   = false !== strpos($action, 'javascript:void(0);') ? '' : ' data-toggle="'.$linkType.'" data-target="'.$target.'"'.$menuLink;
                 $class  = ($page === $totalPages) ? ' class="disabled"' : '';
                 ?>
                 <li<?php echo $class; ?>>

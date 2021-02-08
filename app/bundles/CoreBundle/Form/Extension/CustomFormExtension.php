@@ -15,6 +15,7 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomFormEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 
@@ -27,25 +28,19 @@ class CustomFormExtension extends AbstractTypeExtension
 
     /**
      * FormTypeCaptchaExtension constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Fetch plugin subscribers/listeners
         if ($this->dispatcher->hasListeners(CoreEvents::ON_FORM_TYPE_BUILD)) {
             $event = $this->dispatcher->dispatch(
                 CoreEvents::ON_FORM_TYPE_BUILD,
-                new CustomFormEvent($builder->getName(), $builder->getType()->getName(), $builder)
+                new CustomFormEvent($builder->getName(), $builder->getType()->getBlockPrefix(), $builder)
             );
 
             if ($listeners = $event->getListeners()) {
@@ -75,6 +70,6 @@ class CustomFormExtension extends AbstractTypeExtension
      */
     public function getExtendedType()
     {
-        return 'form';
+        return FormType::class;
     }
 }

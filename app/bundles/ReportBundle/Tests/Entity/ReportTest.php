@@ -15,7 +15,7 @@ use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Exception\ScheduleNotValidException;
 
-class ReportTest extends \PHPUnit_Framework_TestCase
+class ReportTest extends \PHPUnit\Framework\TestCase
 {
     public function testNotScheduled()
     {
@@ -119,6 +119,28 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(\UnexpectedValueException::class);
         $report->getFilterValue('I need coffee');
+    }
+
+    public function testSetAsScheduledNow()
+    {
+        $email  = 'john@doe.email';
+        $report = new Report();
+        $report->setAsScheduledNow($email);
+
+        $this->assertTrue($report->isScheduled());
+        $this->assertSame($email, $report->getToAddress());
+        $this->assertSame(SchedulerEnum::UNIT_NOW, $report->getScheduleUnit());
+    }
+
+    public function testIsScheduledNowIfNot()
+    {
+        $report = new Report();
+
+        $this->assertFalse($report->isScheduledNow());
+
+        $report->setScheduleUnit(SchedulerEnum::UNIT_NOW);
+
+        $this->assertTrue($report->isScheduledNow());
     }
 
     /**

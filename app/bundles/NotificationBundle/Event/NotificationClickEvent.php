@@ -25,7 +25,6 @@ class NotificationClickEvent extends CommonEvent
     private $notification;
 
     /**
-     * @param Stat $stat
      * @param $request
      */
     public function __construct(Stat $stat, $request)

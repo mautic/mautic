@@ -16,7 +16,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\Helper\ChannelExtractor;
 
-class ChannelExtractorTest extends \PHPUnit_Framework_TestCase
+class ChannelExtractorTest extends \PHPUnit\Framework\TestCase
 {
     public function testChannelIsSet()
     {

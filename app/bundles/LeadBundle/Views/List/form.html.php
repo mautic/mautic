@@ -78,6 +78,9 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                             <div class="col-md-6">
                                 <?php echo $view['form']->row($form['alias']); ?>
                             </div>
+                            <div class="col-md-6">
+                                <?php echo $view['form']->row($form['publicName']); ?>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-xs-12">
@@ -86,6 +89,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                         </div>
                     </div>
                     <div class="tab-pane fade bdr-w-0" id="filters">
+                        <div class="alert alert-info"><p><?php echo $view['translator']->trans('mautic.lead.lead.segment.filter.info'); ?></p></div>
                         <div class="form-group">
                             <div class="available-filters mb-md pl-0 col-md-4" data-prototype="<?php echo $view->escape($view['form']->widget($form['filters']->vars['prototype'])); ?>" data-index="<?php echo $index + 1; ?>">
                                 <select class="chosen form-control" id="available_filters">
@@ -93,12 +97,16 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                     <?php
                                     foreach ($fields as $object => $field):
                                         $header = $object;
-                                        $icon   = ($object == 'company') ? 'building' : 'user';
+                                        $icon   = ('company' == $object) ? 'building' : 'user';
                                     ?>
                                     <optgroup label="<?php echo $view['translator']->trans('mautic.lead.'.$header); ?>">
                                         <?php foreach ($field as $value => $params):
                                             $list      = (!empty($params['properties']['list'])) ? $params['properties']['list'] : [];
-                                            $choices   = \Mautic\LeadBundle\Helper\FormFieldHelper::parseList($list, true, ('boolean' === $params['properties']['type']));
+                                            $choices   = ('boolean' === $params['properties']['type'])
+                                                ?
+                                                \Mautic\LeadBundle\Helper\FormFieldHelper::parseBooleanList($list)
+                                                :
+                                                \Mautic\LeadBundle\Helper\FormFieldHelper::parseList($list);
                                             $list      = json_encode($choices);
                                             $callback  = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : '';
                                             $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';
@@ -125,7 +133,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                 <div class="alert alert-danger has-error">
                                     <?php echo $view['form']->errors($form['filters']); ?>
                                 </div>
-                            <?php endif ?>
+                            <?php endif; ?>
                             <?php echo $view['form']->widget($form['filters']); ?>
                         </div>
                     </div>
@@ -135,6 +143,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
     </div>
     <div class="col-md-3 bg-white height-auto bdr-l">
         <div class="pr-lg pl-lg pt-md pb-md">
+            <?php echo $view['form']->row($form['category']); ?>
             <?php echo $view['form']->row($form['isGlobal']); ?>
             <?php echo $view['form']->row($form['isPreferenceCenter']); ?>
             <?php echo $view['form']->row($form['isPublished']); ?>
@@ -145,19 +154,19 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
 
 <div class="hide" id="templates">
     <?php foreach ($templates as $dataKey => $template): ?>
-        <?php $attr = ($dataKey == 'tags') ? ' data-placeholder="'.$view['translator']->trans('mautic.lead.tags.select_or_create').'" data-no-results-text="'.$view['translator']->trans('mautic.lead.tags.enter_to_create').'" data-allow-add="true" onchange="Mautic.createLeadTag(this)"' : ''; ?>
+        <?php $attr = ('tags' == $dataKey) ? ' data-placeholder="'.$view['translator']->trans('mautic.lead.tags.select_or_create').'" data-no-results-text="'.$view['translator']->trans('mautic.lead.tags.enter_to_create').'" data-allow-add="true" onchange="Mautic.createLeadTag(this)"' : ''; ?>
         <select class="form-control not-chosen <?php echo $template; ?>" name="leadlist[filters][__name__][filter]" id="leadlist_filters___name___filter"<?php echo $attr; ?>>
             <?php
             if (isset($form->vars[$dataKey])):
-                foreach ($form->vars[$dataKey] as $value => $label):
-                    if (is_array($label)):
-                        echo "<optgroup label=\"$value\">\n";
-                        foreach ($label as $optionValue => $optionLabel):
+                foreach ($form->vars[$dataKey] as $label => $value):
+                    if (is_array($value)):
+                        echo "<optgroup label=\"$label\">\n";
+                        foreach ($value as $optionLabel => $optionValue):
                             echo "<option value=\"$optionValue\">$optionLabel</option>\n";
                         endforeach;
                         echo "</optgroup>\n";
                     else:
-                        if ($dataKey == 'lists' && (isset($currentListId) && (int) $value === (int) $currentListId)) {
+                        if ('lists' == $dataKey && (isset($currentListId) && (int) $value === (int) $currentListId)) {
                             continue;
                         }
                         echo "<option value=\"$value\">$label</option>\n";

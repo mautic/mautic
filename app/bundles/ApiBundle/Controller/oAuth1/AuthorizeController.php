@@ -19,14 +19,9 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-/**
- * Class AuthorizeController.
- */
 class AuthorizeController extends Controller
 {
     /**
-     * @param Request $request
-     *
      * @return Response
      *
      * @throws AccessDeniedException
@@ -36,11 +31,9 @@ class AuthorizeController extends Controller
     {
         $oauth_token    = $request->get('oauth_token', null);
         $oauth_callback = $request->get('oauth_callback', null);
-
-        $securityContext = $this->container->get('security.context');
-        $tokenProvider   = $this->container->get('bazinga.oauth.provider.token_provider');
-
-        $user = $securityContext->getToken()->getUser();
+        $tokenStorage   = $this->container->get('security.token_storage');
+        $tokenProvider  = $this->container->get('bazinga.oauth.provider.token_provider');
+        $user           = $tokenStorage->getToken()->getUser();
 
         if (!$user instanceof UserInterface) {
             throw new AccessDeniedException('This user does not have access to this section.');
@@ -50,12 +43,12 @@ class AuthorizeController extends Controller
         $consumer = $token->getConsumer();
 
         $restricted_oauth_callback = $consumer->getCallback();
-        if (!empty($restricted_oauth_callback) && strpos($oauth_callback, $restricted_oauth_callback) !== 0) {
+        if (!empty($restricted_oauth_callback) && 0 !== strpos($oauth_callback, $restricted_oauth_callback)) {
             throw new AccessDeniedException('Callback is not valid.');
         }
 
         if ($token instanceof RequestTokenInterface) {
-            $tokenProvider->setUserForRequestToken($token, $securityContext->getToken()->getUser());
+            $tokenProvider->setUserForRequestToken($token, $tokenStorage->getToken()->getUser());
 
             return new Response($this->container->get('templating')->render('MauticApiBundle:Authorize:oAuth1/authorize.html.php', [
                 'consumer'       => $token->getConsumer(),

@@ -15,6 +15,7 @@ use Debril\RssAtomBundle\Protocol\FeedReader;
 use Debril\RssAtomBundle\Protocol\Parser\FeedContent;
 use Debril\RssAtomBundle\Protocol\Parser\Item;
 use Mautic\CoreBundle\Entity\Notification;
+use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -23,9 +24,6 @@ use Mautic\CoreBundle\Helper\UpdateHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-/**
- * Class NotificationModel.
- */
 class NotificationModel extends FormModel
 {
     /**
@@ -58,14 +56,6 @@ class NotificationModel extends FormModel
      */
     protected $coreParametersHelper;
 
-    /**
-     * NotificationModel constructor.
-     *
-     * @param PathsHelper          $pathsHelper
-     * @param UpdateHelper         $updateHelper
-     * @param FeedReader           $rssReader
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function __construct(
         PathsHelper $pathsHelper,
         UpdateHelper $updateHelper,
@@ -78,16 +68,13 @@ class NotificationModel extends FormModel
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    /**
-     * @param Session $session
-     */
     public function setSession(Session $session)
     {
         $this->session = $session;
     }
 
     /**
-     * @param $disableUpdates
+     * @param bool $disableUpdates
      */
     public function setDisableUpdates($disableUpdates)
     {
@@ -95,13 +82,11 @@ class NotificationModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return \Mautic\CoreBundle\Entity\NotificationRepository
+     * @return NotificationRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticCoreBundle:Notification');
+        return $this->em->getRepository(Notification::class);
     }
 
     /**
@@ -124,11 +109,11 @@ class NotificationModel extends FormModel
         \DateTime $datetime = null,
         User $user = null
     ) {
-        if ($user === null) {
+        if (null === $user) {
             $user = $this->userHelper->getUser();
         }
 
-        if ($user === null || !$user->getId()) {
+        if (null === $user || !$user->getId()) {
             //ensure notifications aren't written for non users
             return;
         }
@@ -140,7 +125,7 @@ class NotificationModel extends FormModel
         $notification->setMessage(EmojiHelper::toHtml(InputHelper::strict_html($message)));
         $notification->setIconClass($iconClass);
         $notification->setUser($user);
-        if ($datetime == null) {
+        if (null == $datetime) {
             $datetime = new \DateTime();
         }
         $notification->setDateAdded($datetime);
@@ -244,7 +229,7 @@ class NotificationModel extends FormModel
      */
     public function updateUpstreamNotifications()
     {
-        $url = $this->coreParametersHelper->getParameter('rss_notification_url');
+        $url = $this->coreParametersHelper->get('rss_notification_url');
 
         if (empty($url)) {
             return;

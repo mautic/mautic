@@ -14,35 +14,24 @@ namespace MauticPlugin\MauticCitrixBundle\Tests\DataFixtures\ORM;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticCitrixBundle\Entity\CitrixEvent;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- * Class LoadPageData.
- */
-class LoadCitrixData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LoadCitrixData extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
-     * @var ContainerInterface
+     * @var EntityManagerInterface
      */
-    private $container;
+    private $entityManager;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->container = $container;
+        $this->entityManager = $entityManager;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
-        $em    = $this->container->get('doctrine')->getManager();
         $today = new \DateTime();
         $email = 'joe.o\'connor@domain.com';
 
@@ -52,8 +41,8 @@ class LoadCitrixData extends AbstractFixture implements OrderedFixtureInterface,
         $lead->setEmail($email);
         $lead->checkAttributionDate();
 
-        $em->persist($lead);
-        $em->flush();
+        $this->entityManager->persist($lead);
+        $this->entityManager->flush();
 
         $this->setReference('lead-citrix', $lead);
 
@@ -67,8 +56,8 @@ class LoadCitrixData extends AbstractFixture implements OrderedFixtureInterface,
         $event->setEventName('sample-webinar_#0000');
         $event->setEventDesc('Sample Webinar');
 
-        $em->persist($event);
-        $em->flush();
+        $this->entityManager->persist($event);
+        $this->entityManager->flush();
 
         $this->setReference('citrix-event', $event);
     }

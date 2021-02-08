@@ -35,10 +35,6 @@ class ReportFileWriter
     }
 
     /**
-     * @param Scheduler           $scheduler
-     * @param ReportDataResult    $reportDataResult
-     * @param ReportExportOptions $reportExportOptions
-     *
      * @throws FileIOException
      */
     public function writeReportData(Scheduler $scheduler, ReportDataResult $reportDataResult, ReportExportOptions $reportExportOptions)
@@ -56,8 +52,6 @@ class ReportFileWriter
     }
 
     /**
-     * @param Scheduler $scheduler
-     *
      * @return string
      *
      * @throws FileIOException
@@ -70,8 +64,6 @@ class ReportFileWriter
     }
 
     /**
-     * @param Scheduler $scheduler
-     *
      * @return string
      */
     private function getFileName(Scheduler $scheduler)

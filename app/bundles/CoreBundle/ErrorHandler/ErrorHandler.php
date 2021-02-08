@@ -26,7 +26,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         public static $handler;
 
         /**
-         * @var
+         * @var string
          */
         private static $environment;
 
@@ -45,9 +45,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         private $logger;
 
-        /**
-         * @var
-         */
         private $mainLogger;
 
         /**
@@ -91,7 +88,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                     $context['trace'] = array_slice($debug, 1, 5);
                 }
 
-                if ($debug[0]['file'] === __FILE__) {
+                if (__FILE__ === $debug[0]['file']) {
                     $file             = $debug[1];
                     $file['function'] = $debug[2]['function'];
                 } else {
@@ -128,7 +125,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         {
             if (!self::$handler) {
                 // Handler has not been created so likely coming in through browser-kit client for tests
-                self::register('prod');
+                self::register();
             }
 
             return self::$handler;
@@ -236,7 +233,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             static $handlingFatal = false;
             $error                = error_get_last();
 
-            if ($error !== null) {
+            if (null !== $error) {
                 $name = $this->getErrorName($error['type']);
                 if ($error && $error['type'] &= E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR) {
                     if (!$handlingFatal) {
@@ -337,7 +334,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param $environment
+         * @param string $environment
          *
          * @return ErrorHandler
          */
@@ -349,16 +346,23 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
             self::$handler = new self();
             self::$handler->setEnvironment($environment);
-            // Log PHP fatal errors
-            register_shutdown_function([self::$handler, 'handleFatal']);
 
-            // Log general PHP errors
-            set_exception_handler([self::$handler, 'handleException']);
-            set_error_handler([self::$handler, 'handleError']);
+            /**
+             * We need PHPUnit to convert notices/warnings/etc. to exceptions, so
+             * we can't use our own ErrorHandler in that case.
+             */
+            if (!defined('IS_PHPUNIT')) {
+                // Log PHP fatal errors
+                register_shutdown_function([self::$handler, 'handleFatal']);
 
-            // Hide errors by default so we can format them
-            self::$handler->setDisplayErrors(('dev' === $environment) ? 1 : 0); //ini_get('display_errors'));
-            ini_set('display_errors', 0);
+                // Log general PHP errors
+                set_exception_handler([self::$handler, 'handleException']);
+                set_error_handler([self::$handler, 'handleError']);
+
+                // Hide errors by default so we can format them
+                self::$handler->setDisplayErrors(('dev' === $environment) ? 1 : 0); //ini_get('display_errors'));
+                ini_set('display_errors', 0);
+            }
 
             return self::$handler;
         }
@@ -376,7 +380,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param mixed $environment
+         * @param string $environment
          *
          * @return ErrorHandler
          */
@@ -449,7 +453,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         private function generateResponse($error, $inline = true, $inTemplate = false)
         {
             // Get a trace
-            if (self::$environment == 'dev') {
+            if ('dev' == self::$environment) {
                 if (empty($error['trace'])) {
                     ob_start();
                     debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
@@ -488,13 +492,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
                         'type'    => null,
                     ],
                 ];
-                // @deprecated 2.6.0 to be removed in 3.0
-                $dataArray['error'] = [
-                    'message' => $error['message'].' (`error` is deprecated as of 2.6.0 and will be removed in 3.0. Use the `errors` array instead.)',
-                    'code'    => 500,
-                ];
 
-                if (self::$environment == 'dev') {
+                if ('dev' == self::$environment) {
                     $dataArray['trace'] = $error['trace'];
                     if (isset($error['context'])) {
                         $dataArray['context'] = $error['context'];
@@ -510,7 +509,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 return json_encode($dataArray);
             }
 
-            if (self::$environment == 'dev' || $this->displayErrors) {
+            if ('dev' == self::$environment || $this->displayErrors) {
                 $error['file'] = str_replace(self::$root, '', $error['file']);
                 $errorMessage  = (isset($error['logMessage'])) ? $error['logMessage'] : $error['message'];
                 $message       = "$errorMessage - in file {$error['file']} - at line {$error['line']}";
@@ -534,8 +533,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 return $exception->getMessage();
             }
 
-            if (self::$environment == 'dev' && !empty($error['previous'])) {
-                $previousContent = '<div><h4>Previous Exceptions</h4>'.$this->generateResponse($error['previous'], true).'</div>';
+            if ('dev' == self::$environment && !empty($error['previous'])) {
+                $previousContent = '<div><h4>Previous Exceptions</h4>'.$this->generateResponse($error['previous']).'</div>';
                 $content         = str_replace('<div id="previous"></div>', $previousContent, $content);
             }
 
@@ -583,7 +582,7 @@ namespace {
         {
             if ('dev' === MAUTIC_ENV) {
                 // Only allowing dev mode just in case uses accidentally left in code
-                if (count($context) === 1 && true === $context[0]) {
+                if (1 === count($context) && true === $context[0]) {
                     ErrorHandler::logDebugEntry($log, $context, true);
                 } else {
                     ErrorHandler::logDebugEntry($log, (empty($context)) ? [] : $context);

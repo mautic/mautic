@@ -13,15 +13,21 @@ namespace MauticPlugin\MauticCloudStorageBundle\Integration;
 
 use Aws\S3\S3Client;
 use Gaufrette\Adapter\AwsS3;
+use Gaufrette\Extras\Resolvable\ResolvableFilesystem;
+use Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver;
+use Gaufrette\Filesystem;
+use MauticPlugin\MauticCloudStorageBundle\Exception\NoFormNeededException;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 
-/**
- * Class AmazonS3Integration.
- */
 class AmazonS3Integration extends CloudStorageIntegration
 {
+    /**
+     * @var ResolvableFilesystem
+     */
+    private $fileSystem;
+
     /**
      * {@inheritdoc}
      */
@@ -82,13 +88,10 @@ class AmazonS3Integration extends CloudStorageIntegration
                 'region',
                 TextType::class,
                 [
-                    'label'       => 'mautic.integration.Amazon.region',
-                    'required'    => false,
-                    'attr'        => [
-                        'class'   => 'form-control',
-                    ],
-                    'data'        => empty($data['region']) ? 'us-east-1' : $data['region'],
-                    'required'    => false,
+                    'label'    => 'mautic.integration.Amazon.region',
+                    'attr'     => ['class'   => 'form-control'],
+                    'data'     => empty($data['region']) ? 'us-east-1' : $data['region'],
+                    'required' => false,
                 ]
             );
         }
@@ -101,7 +104,7 @@ class AmazonS3Integration extends CloudStorageIntegration
      */
     public function getAdapter()
     {
-        if (!$this->adapter) {
+        if (!$this->adapter || !$this->fileSystem) {
             $keys = $this->getDecryptedApiKeys();
 
             $service = new S3Client(
@@ -115,7 +118,12 @@ class AmazonS3Integration extends CloudStorageIntegration
                 ]
             );
 
-            $this->adapter = new AwsS3($service, $keys['bucket']);
+            $this->adapter    = new AwsS3($service, $keys['bucket']);
+            $decorated        = new Filesystem($this->adapter);
+            $this->fileSystem = new ResolvableFilesystem(
+                $decorated,
+                new AwsS3PublicUrlResolver($service, $keys['bucket'])
+            );
         }
 
         return $this->adapter;
@@ -124,8 +132,18 @@ class AmazonS3Integration extends CloudStorageIntegration
     /**
      * {@inheritdoc}
      */
+    public function getForm()
+    {
+        throw new NoFormNeededException();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getPublicUrl($key)
     {
-        return $this->getAdapter()->getUrl($key);
+        $this->getAdapter();
+
+        return $this->fileSystem->resolve($key);
     }
 }

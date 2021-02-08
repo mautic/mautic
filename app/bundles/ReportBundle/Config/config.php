@@ -23,6 +23,13 @@ return [
                     'format' => 'csv',
                 ],
             ],
+            'mautic_report_download' => [
+                'path'       => '/reports/download/{reportId}/{format}',
+                'controller' => 'MauticReportBundle:Report:download',
+                'defaults'   => [
+                    'format' => 'csv',
+                ],
+            ],
             'mautic_report_view' => [
                 'path'       => '/reports/view/{objectId}/{reportPage}',
                 'controller' => 'MauticReportBundle:Report:view',
@@ -42,6 +49,10 @@ return [
                     'scheduleDay'            => '',
                     'scheduleMonthFrequency' => '',
                 ],
+            ],
+            'mautic_report_schedule' => [
+                'path'       => '/reports/schedule/{reportId}/now',
+                'controller' => 'MauticReportBundle:Schedule:now',
             ],
             'mautic_report_action' => [
                 'path'       => '/reports/{objectAction}/{objectId}',
@@ -77,24 +88,26 @@ return [
     'services' => [
         'events' => [
             'mautic.report.configbundle.subscriber' => [
-                'class' => 'Mautic\ReportBundle\EventListener\ConfigSubscriber',
+                'class' => \Mautic\ReportBundle\EventListener\ConfigSubscriber::class,
             ],
             'mautic.report.search.subscriber' => [
-                'class'     => 'Mautic\ReportBundle\EventListener\SearchSubscriber',
+                'class'     => \Mautic\ReportBundle\EventListener\SearchSubscriber::class,
                 'arguments' => [
                     'mautic.helper.user',
                     'mautic.report.model.report',
+                    'mautic.security',
+                    'mautic.helper.templating',
                 ],
             ],
             'mautic.report.report.subscriber' => [
-                'class'     => 'Mautic\ReportBundle\EventListener\ReportSubscriber',
+                'class'     => \Mautic\ReportBundle\EventListener\ReportSubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                 ],
             ],
             'mautic.report.dashboard.subscriber' => [
-                'class'     => 'Mautic\ReportBundle\EventListener\DashboardSubscriber',
+                'class'     => \Mautic\ReportBundle\EventListener\DashboardSubscriber::class,
                 'arguments' => [
                     'mautic.report.model.report',
                     'mautic.security',
@@ -116,46 +129,39 @@ return [
         'forms' => [
             'mautic.form.type.reportconfig' => [
                 'class'     => \Mautic\ReportBundle\Form\Type\ConfigType::class,
-                'alias'     => 'reportconfig',
             ],
             'mautic.form.type.report' => [
                 'class'     => \Mautic\ReportBundle\Form\Type\ReportType::class,
                 'arguments' => [
                     'mautic.report.model.report',
-                    'translator',
                 ],
             ],
             'mautic.form.type.filter_selector' => [
-                'class' => 'Mautic\ReportBundle\Form\Type\FilterSelectorType',
-                'alias' => 'filter_selector',
+                'class' => \Mautic\ReportBundle\Form\Type\FilterSelectorType::class,
             ],
             'mautic.form.type.table_order' => [
-                'class'     => 'Mautic\ReportBundle\Form\Type\TableOrderType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'table_order',
+                'class'     => \Mautic\ReportBundle\Form\Type\TableOrderType::class,
+                'arguments' => [
+                    'translator',
+                ],
             ],
             'mautic.form.type.report_filters' => [
                 'class'     => 'Mautic\ReportBundle\Form\Type\ReportFiltersType',
                 'arguments' => 'mautic.factory',
-                'alias'     => 'report_filters',
             ],
             'mautic.form.type.report_dynamic_filters' => [
                 'class' => 'Mautic\ReportBundle\Form\Type\DynamicFiltersType',
-                'alias' => 'report_dynamicfilters',
             ],
             'mautic.form.type.report_widget' => [
                 'class'     => 'Mautic\ReportBundle\Form\Type\ReportWidgetType',
-                'alias'     => 'report_widget',
                 'arguments' => 'mautic.report.model.report',
             ],
             'mautic.form.type.aggregator' => [
-                'class'     => 'Mautic\ReportBundle\Form\Type\AggregatorType',
-                'alias'     => 'aggregator',
+                'class'     => \Mautic\ReportBundle\Form\Type\AggregatorType::class,
                 'arguments' => 'translator',
             ],
             'mautic.form.type.report.settings' => [
                 'class' => \Mautic\ReportBundle\Form\Type\ReportSettingsType::class,
-                'alias' => 'report_settings',
             ],
         ],
         'helpers' => [
@@ -218,6 +224,15 @@ return [
                 'arguments' => [
                     'mautic.helper.mailer',
                     'mautic.report.model.message_schedule',
+                    'mautic.report.model.file_handler',
+                ],
+            ],
+            'mautic.report.model.file_handler' => [
+                'class'     => \Mautic\ReportBundle\Scheduler\Model\FileHandler::class,
+                'arguments' => [
+                    'mautic.helper.file_path_resolver',
+                    'mautic.helper.file_properties',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.report.model.message_schedule' => [
@@ -290,6 +305,12 @@ return [
                     'translator',
                 ],
                 'tag' => 'console.command',
+            ],
+        ],
+        'fixtures' => [
+            'mautic.report.fixture.report' => [
+                'class' => \Mautic\ReportBundle\DataFixtures\ORM\LoadReportData::class,
+                'tag'   => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
             ],
         ],
     ],

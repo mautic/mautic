@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\LeadBundle\Field\DTO\CustomFieldObject;
 use Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeyword;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -113,6 +114,27 @@ class LeadField extends FormEntity
      */
     private $properties = [];
 
+    /**
+     * The column in lead_fields table was not created yet if this property is true.
+     * Entity cannot be published and we cannot work with it until column is created.
+     *
+     * @var bool
+     */
+    private $columnIsNotCreated = false;
+
+    /**
+     * This property contains an original value for $isPublished.
+     * $isPublished is always set on false if $columnIsNotCreated is true.
+     *
+     * @var bool
+     */
+    private $originalIsPublishedValue = false;
+
+    /**
+     * @var CustomFieldObject
+     */
+    private $customFieldObject;
+
     public function __clone()
     {
         $this->id = null;
@@ -120,9 +142,6 @@ class LeadField extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -190,11 +209,16 @@ class LeadField extends FormEntity
         $builder->createField('properties', 'array')
             ->nullable()
             ->build();
+
+        $builder->createField('columnIsNotCreated', 'boolean')
+            ->columnName('column_is_not_created')
+            ->build();
+
+        $builder->createField('originalIsPublishedValue', 'boolean')
+            ->columnName('original_is_published_value')
+            ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('label', new Assert\NotBlank(
@@ -446,7 +470,7 @@ class LeadField extends FormEntity
     /**
      * Get properties.
      *
-     * @return string
+     * @return array
      */
     public function getProperties()
     {
@@ -476,6 +500,18 @@ class LeadField extends FormEntity
     public function getObject()
     {
         return $this->object;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCustomFieldObject()
+    {
+        if (!$this->customFieldObject) {
+            $this->customFieldObject = new CustomFieldObject($this);
+        }
+
+        return $this->customFieldObject->getObject();
     }
 
     /**
@@ -717,5 +753,39 @@ class LeadField extends FormEntity
     public function identifierWorkaround()
     {
         $this->isUniqueIdentifier = $this->isUniqueIdentifer;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNew()
+    {
+        return $this->getId() ? false : true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getColumnIsNotCreated()
+    {
+        return $this->columnIsNotCreated;
+    }
+
+    public function setColumnIsNotCreated()
+    {
+        $this->columnIsNotCreated       = true;
+        $this->originalIsPublishedValue = $this->getIsPublished();
+        $this->setIsPublished(false);
+    }
+
+    public function setColumnWasCreated()
+    {
+        $this->columnIsNotCreated = false;
+        $this->setIsPublished($this->originalIsPublishedValue);
+    }
+
+    public function disablePublishChange()
+    {
+        return 'email' === $this->getAlias() || $this->getColumnIsNotCreated();
     }
 }

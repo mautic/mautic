@@ -25,7 +25,7 @@ $dismissible       = (!isset($dismissible)) ? true : $dismissible;
 <div class="modal fade<?php echo $containerClass; ?>" id="<?php echo $id; ?>" tabindex="-1" role="dialog" aria-labelledby="<?php echo $id; ?>-label" aria-hidden="true"<?php echo $containerAttr; ?>>
     <div class="modal-dialog<?php echo $size; ?>">
         <div class="modal-content<?php echo $class; ?>">
-            <?php if ($header !== false): ?>
+            <?php if (false !== $header): ?>
             <div class="modal-header">
                 <?php if ($dismissible): ?>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span aria-hidden="true">&times;</span></button>

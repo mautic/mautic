@@ -25,7 +25,13 @@ class UpdateLeadListsCommand extends ModeratedCommand
             ->setName('mautic:segments:update')
             ->setAliases(['mautic:segments:rebuild'])
             ->setDescription('Update contacts in smart segments based on new contact data.')
-            ->addOption('--batch-limit', '-b', InputOption::VALUE_OPTIONAL, 'Set batch size of contacts to process per round. Defaults to 300.', 300)
+            ->addOption(
+                '--batch-limit',
+                '-b',
+                InputOption::VALUE_OPTIONAL,
+                'Set batch size of contacts to process per round. Defaults to 300.',
+                300
+            )
             ->addOption(
                 '--max-contacts',
                 '-m',
@@ -33,7 +39,20 @@ class UpdateLeadListsCommand extends ModeratedCommand
                 'Set max number of contacts to process per segment for this script execution. Defaults to all.',
                 false
             )
-            ->addOption('--list-id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to rebuild. Defaults to all.', false);
+            ->addOption(
+                '--list-id',
+                '-i',
+                InputOption::VALUE_OPTIONAL,
+                'Specific ID to rebuild. Defaults to all.',
+                false
+            )
+            ->addOption(
+                '--timing',
+                '-tm',
+                InputOption::VALUE_OPTIONAL,
+                'Measure timing of build with output to CLI .',
+                false
+            );
 
         parent::configure();
     }
@@ -46,18 +65,23 @@ class UpdateLeadListsCommand extends ModeratedCommand
         /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
         $listModel = $container->get('mautic.lead.model.list');
 
-        $id    = $input->getOption('list-id');
-        $batch = $input->getOption('batch-limit');
-        $max   = $input->getOption('max-contacts');
+        $id                    = $input->getOption('list-id');
+        $batch                 = $input->getOption('batch-limit');
+        $max                   = $input->getOption('max-contacts');
+        $enableTimeMeasurement = (bool) $input->getOption('timing');
 
         if (!$this->checkRunStatus($input, $output, $id)) {
             return 0;
         }
 
+        if ($enableTimeMeasurement) {
+            $startTime = microtime(true);
+        }
+
         if ($id) {
             $list = $listModel->getEntity($id);
 
-            if ($list !== null) {
+            if (null !== $list) {
                 if ($list->isPublished()) {
                     $output->writeln('<info>'.$translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $id]).'</info>');
                     $processed = 0;
@@ -81,7 +105,7 @@ class UpdateLeadListsCommand extends ModeratedCommand
                 ]
             );
 
-            while (($l = $lists->next()) !== false) {
+            while (false !== ($l = $lists->next())) {
                 // Get first item; using reset as the key will be the ID and not 0
                 $l = reset($l);
 
@@ -101,6 +125,11 @@ class UpdateLeadListsCommand extends ModeratedCommand
         }
 
         $this->completeRun();
+
+        if ($enableTimeMeasurement) {
+            $totalTime = round(microtime(true) - $startTime, 2);
+            $output->writeln("Total time: {$totalTime} seconds");
+        }
 
         return 0;
     }
