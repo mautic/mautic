@@ -14,8 +14,9 @@ namespace Mautic\ApiBundle\Tests;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\TestCase;
 
-class EntityResultHelperTest extends \PHPUnit_Framework_TestCase
+class EntityResultHelperTest extends TestCase
 {
     const NEW_TITLE = 'Callback Title';
 
