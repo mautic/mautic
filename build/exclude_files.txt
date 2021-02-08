@@ -26,8 +26,6 @@ bin/security-checker
 bin/simple-phpunit
 build/*
 codeception.yml
-composer.json
-composer.lock
 deleted_files.txt
 index_dev.php
 modified_files.txt

@@ -13,6 +13,8 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
@@ -176,6 +178,43 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame(
             'SELECT * FROM table_a INNER JOIN table_b alias_b ON condition_b INNER JOIN table_c alias_c ON condition_c GROUP BY l.id',
             $queryBuilder->getSQL()
+        );
+    }
+
+    public function testGetContactIdsByEmails(): void
+    {
+        $emails = [
+            'somebody1@anywhere.com',
+            'somebody2@anywhere.com',
+        ];
+
+        $entityManager = $this->createMock(EntityManager::class);
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $repo          = new LeadRepository($entityManager, $classMetadata);
+
+        $query = $this->createMock(AbstractQuery::class);
+        $query->expects(self::once())
+            ->method('setParameter')
+            ->with(':emails', $emails, Connection::PARAM_STR_ARRAY)
+            ->willReturn($query);
+        $query->expects(self::once())
+            ->method('getArrayResult')
+            ->willReturn([
+                0 => [
+                    'id' => '1',
+                ],
+                1 => [
+                    'id' => '2',
+                ],
+            ]);
+
+        $entityManager->expects(self::once())
+            ->method('createQuery')
+            ->willReturn($query);
+
+        self::assertEquals(
+            [1, 2],
+            $repo->getContactIdsByEmails($emails)
         );
     }
 }

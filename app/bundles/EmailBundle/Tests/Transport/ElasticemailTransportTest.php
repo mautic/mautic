@@ -24,7 +24,7 @@ class ElasticemailTransportTest extends \PHPUnit\Framework\TestCase
     private $transportCallback;
     private $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()
