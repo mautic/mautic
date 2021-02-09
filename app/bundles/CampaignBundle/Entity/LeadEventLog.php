@@ -109,6 +109,7 @@ class LeadEventLog implements ChannelInterface
             ->addIndex(['channel', 'channel_id', 'lead_id'], 'campaign_log_channel')
             ->addIndex(['campaign_id', 'event_id', 'date_triggered'], 'campaign_actions')
             ->addIndex(['campaign_id', 'date_triggered', 'event_id', 'non_action_path_taken'], 'campaign_stats')
+            ->addIndex(['trigger_date'], 'campaign_trigger_date_order')
             ->addUniqueConstraint(['event_id', 'lead_id', 'rotation'], 'campaign_rotation');
 
         $builder->addBigIntIdField();
