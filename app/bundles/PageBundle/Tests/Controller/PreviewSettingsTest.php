@@ -60,13 +60,25 @@ class PreviewSettingsTest extends MauticMysqlTestCase
         $this->em->persist($pageVariant);
         $this->em->flush();
 
-        // list landing page
         $crawler = $this->client->request(Request::METHOD_GET, '/s/pages');
-
-        // check added landing page is listed or not
         $this->assertStringContainsString(
             'Preview settings test - main page (page-main)',
             $crawler->filterXPath('//*[@id="pageTable"]/tbody/tr[1]/td[2]/a')->text()
+        );
+
+        $mainPageId = $pageMain->getId();
+        $crawler    = $this->client->request(Request::METHOD_GET, "/s/pages/view/{$mainPageId}");
+        $this->assertStringContainsString(
+            'Show preview for translation',
+            $crawler->filterXPath('//*[@id="app-content"]/div/div[2]/div[2]/div[2]/div[2]/div[1]/div/div[1]')->text()
+        );
+        $this->assertStringContainsString(
+            'Show preview for A/B variant',
+            $crawler->filterXPath('//*[@id="app-content"]/div/div[2]/div[2]/div[2]/div[2]/div[2]/div/div[1]')->text()
+        );
+        $this->assertStringContainsString(
+            'Show preview for contact',
+            $crawler->filterXPath('//*[@id="app-content"]/div/div[2]/div[2]/div[2]/div[2]/div[3]/div/div')->text()
         );
     }
 }
