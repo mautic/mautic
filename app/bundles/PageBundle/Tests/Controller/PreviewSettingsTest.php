@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class PreviewSettingsTest extends MauticMysqlTestCase
 {
-    public function testPreviewSettings(): void
+    public function testPreviewSettingsAllEnabled(): void
     {
         $pageMain = new Page();
         $pageMain->setIsPublished(true);
@@ -32,6 +32,37 @@ class PreviewSettingsTest extends MauticMysqlTestCase
         $pageMain->setCustomHtml('Test Html');
         $pageMain->setLanguage('en');
 
+        $this->em->persist($pageMain);
+        $this->em->flush();
+
+        $mainPageId = $pageMain->getId();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/pages');
+        $this->assertStringContainsString(
+            'Preview settings test - main page (page-main)',
+            $crawler->filterXPath('//*[@id="pageTable"]/tbody/tr[1]/td[2]/a')->text()
+        );
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/pages/view/{$mainPageId}");
+
+        // Translation choice is not visible
+        $this->assertCount(
+            0,
+            $crawler->filterXPath('//*[@id="content_preview_settings_translation"]')
+        );
+
+        // Variant choice is not visible
+        $this->assertCount(
+            0,
+            $crawler->filterXPath('//*[@id="content_preview_settings_variant"]')
+        );
+
+        // Contact lookup is not visible
+        $this->assertCount(
+            1,
+            $crawler->filterXPath('//*[@id="content_preview_settings_contact"]')
+        );
+
         $pageTranslated = new Page();
         $pageTranslated->setIsPublished(true);
         $pageTranslated->setDateAdded(new \DateTime());
@@ -41,6 +72,7 @@ class PreviewSettingsTest extends MauticMysqlTestCase
         $pageTranslated->setCustomHtml('Test Html');
         $pageTranslated->setLanguage('nl_CW');
 
+        // Add translation relationship to main page
         $pageMain->addTranslationChild($pageTranslated);
         $pageTranslated->setTranslationParent($pageMain);
 
@@ -53,6 +85,7 @@ class PreviewSettingsTest extends MauticMysqlTestCase
         $pageVariant->setCustomHtml('Test Html');
         $pageVariant->setLanguage('en');
 
+        // Add variant relationship to main page
         $pageMain->addVariantChild($pageVariant);
 
         $this->em->persist($pageMain);
@@ -60,14 +93,7 @@ class PreviewSettingsTest extends MauticMysqlTestCase
         $this->em->persist($pageVariant);
         $this->em->flush();
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/pages');
-        $this->assertStringContainsString(
-            'Preview settings test - main page (page-main)',
-            $crawler->filterXPath('//*[@id="pageTable"]/tbody/tr[1]/td[2]/a')->text()
-        );
-
-        $mainPageId = $pageMain->getId();
-        $crawler    = $this->client->request(Request::METHOD_GET, "/s/pages/view/{$mainPageId}");
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/pages/view/{$mainPageId}");
 
         // Translation choice is visible
         $this->assertCount(
@@ -81,7 +107,7 @@ class PreviewSettingsTest extends MauticMysqlTestCase
             $crawler->filterXPath('//*[@id="content_preview_settings_variant"]')
         );
 
-        // Contact lookup visible
+        // Contact lookup is visible
         $this->assertCount(
             1,
             $crawler->filterXPath('//*[@id="content_preview_settings_contact"]')
