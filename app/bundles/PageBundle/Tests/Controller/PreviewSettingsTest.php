@@ -38,7 +38,7 @@ class PreviewSettingsTest extends MauticMysqlTestCase
         $mainPageId = $pageMain->getId();
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/pages');
-        $this->assertStringContainsString(
+        self::assertStringContainsString(
             'Preview settings test - main page (page-main)',
             $crawler->filterXPath('//*[@id="pageTable"]/tbody/tr[1]/td[2]/a')->text()
         );
@@ -46,19 +46,19 @@ class PreviewSettingsTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, "/s/pages/view/{$mainPageId}");
 
         // Translation choice is not visible
-        $this->assertCount(
+        self::assertCount(
             0,
             $crawler->filterXPath('//*[@id="content_preview_settings_translation"]')
         );
 
         // Variant choice is not visible
-        $this->assertCount(
+        self::assertCount(
             0,
             $crawler->filterXPath('//*[@id="content_preview_settings_variant"]')
         );
 
         // Contact lookup is not visible
-        $this->assertCount(
+        self::assertCount(
             1,
             $crawler->filterXPath('//*[@id="content_preview_settings_contact"]')
         );
@@ -96,29 +96,29 @@ class PreviewSettingsTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, "/s/pages/view/{$mainPageId}");
 
         // Translation choice is visible
-        $this->assertCount(
+        self::assertCount(
             1,
             $crawler->filterXPath('//*[@id="content_preview_settings_translation"]')
         );
 
-        $this->assertCount(
+        self::assertCount(
             1,
             $crawler->filterXPath('//*[@id="content_preview_settings_translation"]/option[@value="'.$pageTranslated->getId().'"]')
         );
 
         // Variant choice is visible
-        $this->assertCount(
+        self::assertCount(
             1,
             $crawler->filterXPath('//*[@id="content_preview_settings_variant"]')
         );
 
-        $this->assertCount(
+        self::assertCount(
             1,
             $crawler->filterXPath('//*[@id="content_preview_settings_variant"]/option[@value="'.$pageVariant->getId().'"]')
         );
 
         // Contact lookup is visible
-        $this->assertCount(
+        self::assertCount(
             1,
             $crawler->filterXPath('//*[@id="content_preview_settings_contact"]')
         );
@@ -127,7 +127,7 @@ class PreviewSettingsTest extends MauticMysqlTestCase
         $crawler     = $clientSales->request(Request::METHOD_GET, "/s/emails/view/{$mainPageId}");
 
         // Contact lookup is not visible to user without access
-        $this->assertCount(
+        self::assertCount(
             0,
             $crawler->filterXPath('//*[@id="content_preview_settings_contact"]')
         );
