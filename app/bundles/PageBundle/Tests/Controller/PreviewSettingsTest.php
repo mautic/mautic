@@ -68,17 +68,23 @@ class PreviewSettingsTest extends MauticMysqlTestCase
 
         $mainPageId = $pageMain->getId();
         $crawler    = $this->client->request(Request::METHOD_GET, "/s/pages/view/{$mainPageId}");
-        $this->assertStringContainsString(
-            'Show preview for translation',
-            $crawler->filterXPath('//*[@id="app-content"]/div/div[2]/div[2]/div[2]/div[2]/div[1]/div/div[1]')->text()
+
+        // Translation choice is visible
+        $this->assertCount(
+            1,
+            $crawler->filterXPath('//*[@id="content_preview_settings_translation"]')
         );
-        $this->assertStringContainsString(
-            'Show preview for A/B variant',
-            $crawler->filterXPath('//*[@id="app-content"]/div/div[2]/div[2]/div[2]/div[2]/div[2]/div/div[1]')->text()
+
+        // Variant choice is visible
+        $this->assertCount(
+            1,
+            $crawler->filterXPath('//*[@id="content_preview_settings_variant"]')
         );
-        $this->assertStringContainsString(
-            'Show preview for contact',
-            $crawler->filterXPath('//*[@id="app-content"]/div/div[2]/div[2]/div[2]/div[2]/div[3]/div/div')->text()
+
+        // Contact lookup visible
+        $this->assertCount(
+            1,
+            $crawler->filterXPath('//*[@id="content_preview_settings_contact"]')
         );
     }
 }
