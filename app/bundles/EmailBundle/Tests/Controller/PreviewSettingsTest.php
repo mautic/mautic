@@ -17,6 +17,7 @@ namespace Mautic\EmailBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
+use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Component\HttpFoundation\Request;
 
 class PreviewSettingsTest extends MauticMysqlTestCase
@@ -121,6 +122,26 @@ class PreviewSettingsTest extends MauticMysqlTestCase
         $this->assertCount(
             1,
             $crawler->filterXPath('//*[@id="content_preview_settings_contact"]')
+        );
+
+        $client  = $this->createSalesUserCrawler();
+        $crawler = $client->request(Request::METHOD_GET, "/s/emails/view/{$mainPageId}");
+
+        // Contact lookup is not visible to user without access
+        $this->assertCount(
+            0,
+            $crawler->filterXPath('//*[@id="content_preview_settings_contact"]')
+        );
+    }
+
+    private function createSalesUserCrawler(): Client
+    {
+        return self::createClient(
+            $this->clientOptions,
+            [
+                'PHP_AUTH_USER' => 'sales',
+                'PHP_AUTH_PW'   => 'mautic',
+            ]
         );
     }
 }
