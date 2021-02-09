@@ -20,16 +20,15 @@ use Throwable;
 class CouldNotFormatDateTimeException extends Exception
 {
     /**
-     * @param string $message
-     * @param int $code
+     * @param string         $message
+     * @param int            $code
      * @param Throwable|null $previous
      */
     public function __construct(
         $message = 'Can\'t format date object to string',
         $code = 0,
         Throwable $throwable = null
-    )
-    {
+    ) {
         parent::__construct($message, $code, $throwable);
     }
 }

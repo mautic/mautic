@@ -39,10 +39,7 @@ class WidgetDetailEventFactory
     /**
      * WidgetDetailEventFactory constructor.
      *
-     * @param TranslatorInterface  $translator
-     * @param CacheProvider        $cacheProvider
      * @param CorePermissions|null $corePermissions
-     * @param UserHelper           $userHelper
      */
     public function __construct(
         TranslatorInterface $translator,

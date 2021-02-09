@@ -174,6 +174,7 @@ class DashboardModel extends FormModel
      * Generates a translatable description for a dashboard.
      *
      * @return string
+     *
      * @throws \Exception
      */
     public function generateDescription()
@@ -302,7 +303,8 @@ class DashboardModel extends FormModel
      * Create/edit entity.
      *
      * @param object $entity
-     * @param bool $unlock
+     * @param bool   $unlock
+     *
      * @throws \Exception
      */
     public function saveEntity($entity, $unlock = true)
