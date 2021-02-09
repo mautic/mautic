@@ -63,34 +63,34 @@ class PreviewSettingsTest extends MauticMysqlTestCase
             $crawler->filterXPath('//*[@id="content_preview_settings_contact"]')
         );
 
-        $pageTranslated = new Email();
-        $pageTranslated->setIsPublished(true);
-        $pageTranslated->setDateAdded(new \DateTime());
-        $pageTranslated->setName('Preview settings test - NL translation');
-        $pageTranslated->setSubject('page-trans-nl');
-        $pageTranslated->setTemplate('Blank');
-        $pageTranslated->setCustomHtml('Test Html');
-        $pageTranslated->setLanguage('nl_CW');
+        $emailTranslated = new Email();
+        $emailTranslated->setIsPublished(true);
+        $emailTranslated->setDateAdded(new \DateTime());
+        $emailTranslated->setName('Preview settings test - NL translation');
+        $emailTranslated->setSubject('page-trans-nl');
+        $emailTranslated->setTemplate('Blank');
+        $emailTranslated->setCustomHtml('Test Html');
+        $emailTranslated->setLanguage('nl_CW');
 
         // Add translation relationship to main page
-        $emailMain->addTranslationChild($pageTranslated);
-        $pageTranslated->setTranslationParent($emailMain);
+        $emailMain->addTranslationChild($emailTranslated);
+        $emailTranslated->setTranslationParent($emailMain);
 
-        $pageVariant = new Email();
-        $pageVariant->setIsPublished(true);
-        $pageVariant->setDateAdded(new \DateTime());
-        $pageVariant->setName('Preview settings test - B variant');
-        $pageVariant->setSubject('page-variant-b');
-        $pageVariant->setTemplate('Blank');
-        $pageVariant->setCustomHtml('Test Html');
-        $pageVariant->setLanguage('en');
+        $emailVariant = new Email();
+        $emailVariant->setIsPublished(true);
+        $emailVariant->setDateAdded(new \DateTime());
+        $emailVariant->setName('Preview settings test - B variant');
+        $emailVariant->setSubject('page-variant-b');
+        $emailVariant->setTemplate('Blank');
+        $emailVariant->setCustomHtml('Test Html');
+        $emailVariant->setLanguage('en');
 
         // Add variant relationship to main page
-        $emailMain->addVariantChild($pageVariant);
+        $emailMain->addVariantChild($emailVariant);
 
         $this->em->persist($emailMain);
-        $this->em->persist($pageTranslated);
-        $this->em->persist($pageVariant);
+        $this->em->persist($emailTranslated);
+        $this->em->persist($emailVariant);
         $this->em->flush();
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$mainPageId}");
@@ -101,10 +101,20 @@ class PreviewSettingsTest extends MauticMysqlTestCase
             $crawler->filterXPath('//*[@id="content_preview_settings_translation"]')
         );
 
+        $this->assertCount(
+            1,
+            $crawler->filterXPath('//*[@id="content_preview_settings_translation"]/option[@value="'.$emailTranslated->getId().'"]')
+        );
+
         // Variant choice is visible
         $this->assertCount(
             1,
             $crawler->filterXPath('//*[@id="content_preview_settings_variant"]')
+        );
+
+        $this->assertCount(
+            1,
+            $crawler->filterXPath('//*[@id="content_preview_settings_variant"]/option[@value="'.$emailVariant->getId().'"]')
         );
 
         // Contact lookup is visible

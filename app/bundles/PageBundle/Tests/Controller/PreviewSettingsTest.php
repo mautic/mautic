@@ -101,10 +101,20 @@ class PreviewSettingsTest extends MauticMysqlTestCase
             $crawler->filterXPath('//*[@id="content_preview_settings_translation"]')
         );
 
+        $this->assertCount(
+            1,
+            $crawler->filterXPath('//*[@id="content_preview_settings_translation"]/option[@value="'.$pageTranslated->getId().'"]')
+        );
+
         // Variant choice is visible
         $this->assertCount(
             1,
             $crawler->filterXPath('//*[@id="content_preview_settings_variant"]')
+        );
+
+        $this->assertCount(
+            1,
+            $crawler->filterXPath('//*[@id="content_preview_settings_variant"]/option[@value="'.$pageVariant->getId().'"]')
         );
 
         // Contact lookup is visible
