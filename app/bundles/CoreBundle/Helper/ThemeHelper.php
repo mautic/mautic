@@ -85,6 +85,11 @@ class ThemeHelper
     private $finder;
 
     /**
+     * @var bool
+     */
+    private $themesLoadedFromFilesystem = false;
+
+    /**
      * Default themes which cannot be deleted.
      *
      * @var array
@@ -596,8 +601,13 @@ class ThemeHelper
 
     private function loadThemes(string $specificFeature, bool $includeDirs, string $key): void
     {
-        $dir    = $this->pathsHelper->getSystemPath('themes', true);
-        $this->finder->directories()->depth('0')->ignoreDotFiles(true)->in($dir);
+        if (!$this->themesLoadedFromFilesystem) {
+            $this->themesLoadedFromFilesystem = true;
+            // prevent the finder from duplicating directories in its internal state
+            // https://symfony.com/doc/current/components/finder.html#usage
+            $dir = $this->pathsHelper->getSystemPath('themes', true);
+            $this->finder->directories()->depth('0')->ignoreDotFiles(true)->in($dir);
+        }
 
         $this->themes[$key]     = [];
         $this->themesInfo[$key] = [];
