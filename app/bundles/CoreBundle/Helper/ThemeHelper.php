@@ -17,8 +17,6 @@ use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Templating\Helper\ThemeHelper as TemplatingThemeHelper;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
-use Mautic\IntegrationsBundle\Integration\Interfaces\BuilderInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Templating\TemplateReference;
@@ -117,8 +115,7 @@ class ThemeHelper
         Filesystem $filesystem,
         Finder $finder,
         BuilderIntegrationsHelper $builderIntegrationsHelper
-    )
-    {
+    ) {
         $this->pathsHelper               = $pathsHelper;
         $this->templatingHelper          = $templatingHelper;
         $this->translator                = $translator;
