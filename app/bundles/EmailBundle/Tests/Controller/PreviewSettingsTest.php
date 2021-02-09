@@ -123,8 +123,8 @@ class PreviewSettingsTest extends MauticMysqlTestCase
             $crawler->filterXPath('//*[@id="content_preview_settings_contact"]')
         );
 
-        $client  = $this->createSalesUserCrawlerClient();
-        $crawler = $client->request(Request::METHOD_GET, "/s/emails/view/{$mainPageId}");
+        $clientSales = $this->createSalesUserCrawlerClient();
+        $crawler     = $clientSales->request(Request::METHOD_GET, "/s/emails/view/{$mainPageId}");
 
         // Contact lookup is not visible to user without access
         $this->assertCount(
