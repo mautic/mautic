@@ -244,6 +244,7 @@ Mautic.getFeedItems = function (queryText) {
 }
 
 Mautic.getTokensForPlugIn = function(method) {
+    method = typeof method != 'undefined' ? method : 'page:getBuilderTokens';
     const d = mQuery.Deferred();
     // OK, let's fetch the tokens.
     mQuery.ajax({
