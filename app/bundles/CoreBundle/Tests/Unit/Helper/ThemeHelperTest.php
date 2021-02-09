@@ -13,12 +13,14 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Templating\TemplateNameParser;
 use Mautic\CoreBundle\Templating\TemplateReference;
+use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Finder\Finder;
@@ -26,7 +28,7 @@ use Symfony\Component\Templating\DelegatingEngine;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class ThemeHelperTest extends \PHPUnit\Framework\TestCase
+class ThemeHelperTest extends TestCase
 {
     /**
      * @var PathsHelper|MockObject
@@ -49,6 +51,11 @@ class ThemeHelperTest extends \PHPUnit\Framework\TestCase
     private $coreParameterHelper;
 
     /**
+     * @var BuilderIntegrationsHelper|MockObject
+     */
+    private $builderIntegrationsHelper;
+
+    /**
      * @var ThemeHelper
      */
     private $themeHelper;
@@ -63,13 +70,16 @@ class ThemeHelperTest extends \PHPUnit\Framework\TestCase
             ->with('theme_import_allowed_extensions')
             ->willReturn(['json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif']);
 
+        $this->builderIntegrationsHelper = $this->createMock(BuilderIntegrationsHelper::class);
+
         $this->themeHelper = new ThemeHelper(
             $this->pathsHelper,
             $this->templatingHelper,
             $this->translator,
             $this->coreParameterHelper,
             new Filesystem(),
-            new Finder()
+            new Finder(),
+            $this->builderIntegrationsHelper
         );
     }
 

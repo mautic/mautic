@@ -14,8 +14,11 @@ namespace Mautic\CoreBundle\Helper;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileExistsException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
-use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Templating\Helper\ThemeHelper as TemplatingThemeHelper;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
+use Mautic\IntegrationsBundle\Integration\Interfaces\BuilderInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Templating\TemplateReference;
@@ -64,6 +67,26 @@ class ThemeHelper
     private $themeHelpers = [];
 
     /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    /**
+     * @var BuilderIntegrationsHelper
+     */
+    private $builderIntegrationsHelper;
+
+    /**
+     * @var Filesystem
+     */
+    private $filesystem;
+
+    /**
+     * @var Finder
+     */
+    private $finder;
+
+    /**
      * Default themes which cannot be deleted.
      *
      * @var array
@@ -86,35 +109,23 @@ class ThemeHelper
         'vibrant',
     ];
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
-
-    /**
-     * @var Finder
-     */
-    private $finder;
-
     public function __construct(
         PathsHelper $pathsHelper,
         TemplatingHelper $templatingHelper,
         TranslatorInterface $translator,
         CoreParametersHelper $coreParametersHelper,
         Filesystem $filesystem,
-        Finder $finder
-    ) {
-        $this->pathsHelper          = $pathsHelper;
-        $this->templatingHelper     = $templatingHelper;
-        $this->translator           = $translator;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->filesystem           = clone $filesystem;
-        $this->finder               = clone $finder;
+        Finder $finder,
+        BuilderIntegrationsHelper $builderIntegrationsHelper
+    )
+    {
+        $this->pathsHelper               = $pathsHelper;
+        $this->templatingHelper          = $templatingHelper;
+        $this->translator                = $translator;
+        $this->coreParametersHelper      = $coreParametersHelper;
+        $this->builderIntegrationsHelper = $builderIntegrationsHelper;
+        $this->filesystem                = clone $filesystem;
+        $this->finder                    = clone $finder;
     }
 
     /**
@@ -328,42 +339,17 @@ class ThemeHelper
      */
     public function getInstalledThemes($specificFeature = 'all', $extended = false, $ignoreCache = false, $includeDirs = true)
     {
-        if (empty($this->themes[$specificFeature]) || $ignoreCache) {
-            $dir = $this->pathsHelper->getSystemPath('themes', true);
-            $this->finder->directories()->depth('0')->ignoreDotFiles(true)->in($dir);
-
-            $this->themes[$specificFeature]     = [];
-            $this->themesInfo[$specificFeature] = [];
-            foreach ($this->finder as $theme) {
-                if (!$this->filesystem->exists($theme->getRealPath().'/config.json')) {
-                    continue;
-                }
-
-                $config = json_decode($this->filesystem->readFile($theme->getRealPath().'/config.json'), true);
-
-                if ('all' === $specificFeature || (isset($config['features']) && in_array($specificFeature, $config['features']))) {
-                    $this->themes[$specificFeature][$theme->getBasename()]               = $config['name'];
-                    $this->themesInfo[$specificFeature][$theme->getBasename()]           = [];
-                    $this->themesInfo[$specificFeature][$theme->getBasename()]['name']   = $config['name'];
-                    $this->themesInfo[$specificFeature][$theme->getBasename()]['key']    = $theme->getBasename();
-                    $this->themesInfo[$specificFeature][$theme->getBasename()]['config'] = $config;
-
-                    if ($includeDirs) {
-                        $this->themesInfo[$specificFeature][$theme->getBasename()]['dir']            = $theme->getRealPath();
-                        $this->themesInfo[$specificFeature][$theme->getBasename()]['themesLocalDir'] = $this->pathsHelper->getSystemPath(
-                            'themes',
-                            false
-                        );
-                    }
-                }
-            }
+        // Use a concatenated key since $includeDirs changes what's returned ($includeDirs used by API controller to prevent from exposing file paths)
+        $key = $specificFeature.(int) $includeDirs;
+        if (empty($this->themes[$key]) || $ignoreCache) {
+            $this->loadThemes($specificFeature, $includeDirs, $key);
         }
 
         if ($extended) {
-            return $this->themesInfo[$specificFeature];
+            return $this->themesInfo[$key];
         }
 
-        return $this->themes[$specificFeature];
+        return $this->themes[$key];
     }
 
     /**
@@ -544,7 +530,7 @@ class ThemeHelper
      *
      * @return string
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function zip($themeName)
     {
@@ -609,5 +595,67 @@ class ThemeHelper
                 return;
             }
         }
+    }
+
+    private function loadThemes(string $specificFeature, bool $includeDirs, string $key): void
+    {
+        $dir    = $this->pathsHelper->getSystemPath('themes', true);
+        $this->finder->directories()->depth('0')->ignoreDotFiles(true)->in($dir);
+
+        $this->themes[$key]     = [];
+        $this->themesInfo[$key] = [];
+
+        foreach ($this->finder as $theme) {
+            if (!$this->filesystem->exists($theme->getRealPath().'/config.json')) {
+                continue;
+            }
+
+            $config = json_decode($this->filesystem->readFile($theme->getRealPath().'/config.json'), true);
+
+            if (!$this->shouldLoadTheme($config, $specificFeature)) {
+                continue;
+            }
+
+            $this->themes[$key][$theme->getBasename()] = $config['name'];
+
+            $this->themesInfo[$key][$theme->getBasename()]           = [];
+            $this->themesInfo[$key][$theme->getBasename()]['name']   = $config['name'];
+            $this->themesInfo[$key][$theme->getBasename()]['key']    = $theme->getBasename();
+            $this->themesInfo[$key][$theme->getBasename()]['config'] = $config;
+
+            if (!$includeDirs) {
+                continue;
+            }
+
+            $this->themesInfo[$key][$theme->getBasename()]['dir']            = $theme->getRealPath();
+            $this->themesInfo[$key][$theme->getBasename()]['themesLocalDir'] = $this->pathsHelper->getSystemPath('themes');
+        }
+    }
+
+    private function shouldLoadTheme(array $config, string $featureRequested): bool
+    {
+        if ('all' === $featureRequested) {
+            return true;
+        }
+
+        if (!isset($config['features'])) {
+            return false;
+        }
+
+        if (!in_array($featureRequested, $config['features'])) {
+            return false;
+        }
+
+        try {
+            $builder     = $this->builderIntegrationsHelper->getBuilder($featureRequested);
+            $builderName = $builder->getName();
+        } catch (IntegrationNotFoundException $exception) {
+            // Assume legacy builder
+            $builderName = 'legacy';
+        }
+
+        $builderRequested = $config['builder'] ?? 'legacy';
+
+        return $builderName === $builderRequested;
     }
 }

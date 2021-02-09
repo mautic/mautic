@@ -842,6 +842,7 @@ return [
                     'mautic.helper.core_parameters',
                     'mautic.filesystem',
                     'symfony.finder',
+                    'mautic.integrations.helper.builder_integrations',
                 ],
                 'methodCalls' => [
                     'setDefaultTheme' => [
