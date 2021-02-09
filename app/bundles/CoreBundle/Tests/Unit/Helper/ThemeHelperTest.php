@@ -351,7 +351,8 @@ class ThemeHelperTest extends TestCase
                 {
                     return new \ArrayIterator($this->dirs);
                 }
-            }
+            },
+            $this->builderIntegrationsHelper
         );
 
         $themeHelper->copy('origin-template-dir', 'New Theme Name');
@@ -440,7 +441,8 @@ class ThemeHelperTest extends TestCase
                 {
                     return new \ArrayIterator($this->dirs);
                 }
-            }
+            },
+            $this->builderIntegrationsHelper
         );
 
         $themeHelper->copy('origin-template-dir', 'New Theme Name', 'requested-theme-dir');
