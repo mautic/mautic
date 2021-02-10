@@ -381,8 +381,10 @@ class TrackableModel extends AbstractCommonModel
             }
 
             if ($preparedUrl = $this->prepareUrlForTracking($url)) {
-                list($urlKey, $urlValue) = $preparedUrl;
+                [$urlKey, $urlValue]     = $preparedUrl;
                 $trackableUrls[$urlKey]  = $urlValue;
+                // trackable also variants for &amp; in urls
+                $trackableUrls[str_replace('&', '&amp;', $urlKey)]  = str_replace('&', '&amp;', $urlValue);
             }
         }
 
@@ -407,7 +409,7 @@ class TrackableModel extends AbstractCommonModel
 
         foreach ($allUrls as $url) {
             if ($preparedUrl = $this->prepareUrlForTracking($url)) {
-                list($urlKey, $urlValue) = $preparedUrl;
+                [$urlKey, $urlValue]     = $preparedUrl;
                 $trackableUrls[$urlKey]  = $urlValue;
             }
         }
@@ -486,7 +488,7 @@ class TrackableModel extends AbstractCommonModel
             }
 
             // Do not convert contact tokens
-            if (!$this->isContactFieldToken($token)) {
+            if (!$this->isSupportedToken($token)) {
                 $trackableUrl = (!empty($urlParts['query'])) ? $this->contentTokens[$token].'?'.$urlParts['query'] : $this->contentTokens[$token];
                 $trackableKey = $trackableUrl;
 
@@ -543,7 +545,7 @@ class TrackableModel extends AbstractCommonModel
             return false;
         }
 
-        if ($this->isContactFieldToken($token)) {
+        if ($this->isSupportedToken($token)) {
             // Assume it's true as the redirect methods should handle this dynamically
             return true;
         }
@@ -620,7 +622,7 @@ class TrackableModel extends AbstractCommonModel
 
         // Check for tokens in the query
         if (!empty($urlParts['query'])) {
-            list($tokenizedParams, $untokenizedParams) = $this->parseTokenizedQuery($urlParts['query']);
+            [$tokenizedParams, $untokenizedParams] = $this->parseTokenizedQuery($urlParts['query']);
             if ($tokenizedParams) {
                 // Rebuild the query without the tokenized query params for now
                 $urlParts['query'] = $this->httpBuildQuery($untokenizedParams);
@@ -851,9 +853,9 @@ class TrackableModel extends AbstractCommonModel
      *
      * @return bool
      */
-    private function isContactFieldToken($token)
+    private function isSupportedToken($token)
     {
-        return false !== strpos($token, '{contactfield') || false !== strpos($token, '{leadfield');
+        return false !== strpos($token, '{contactfield') || false !== strpos($token, '{leadfield') || false !== strpos($token, '{pagelink') || false !== strpos($token, '{assetlink');
     }
 
     /**

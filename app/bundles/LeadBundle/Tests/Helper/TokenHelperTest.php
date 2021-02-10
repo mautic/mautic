@@ -132,6 +132,25 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([$token => 'Somewhere%26Else'], $tokenList);
     }
 
+    public function testValueInUrlModifierEncoded()
+    {
+        $lead = [
+            'firstname' => 'Bob',
+            'lastname'  => 'Smith',
+            'country'   => 'Somewhere&Else',
+            'companies' => [
+                [
+                    'companyzip' => '77008',
+                ],
+            ],
+        ];
+
+        $token = '{contactfield=country%7Ctrue}';
+
+        $tokenList = TokenHelper::findLeadTokens($token, $lead);
+        $this->assertEquals([$token => 'Somewhere%26Else'], $tokenList);
+    }
+
     public function testGetValueFromTokensWhenSomeValue()
     {
         $token  = '{contactfield=website}';
