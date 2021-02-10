@@ -213,15 +213,4 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
         return $commandTester;
     }
-
-    protected function createSalesUserCrawlerClient(): Client
-    {
-        return self::createClient(
-            $this->clientOptions,
-            [
-                'PHP_AUTH_USER' => 'sales',
-                'PHP_AUTH_PW'   => 'mautic',
-            ]
-        );
-    }
 }

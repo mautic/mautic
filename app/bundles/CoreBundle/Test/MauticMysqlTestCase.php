@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Test;
 
+use Doctrine\DBAL\DBALException;
 use Exception;
 use LogicException;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
@@ -62,11 +63,11 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     protected function tearDown(): void
     {
-        if ($this->useCleanupRollback) {
-            if ($this->connection->isTransactionActive()) {
-                $this->connection->rollback();
-            }
-        } else {
+        if ($this->connection->isTransactionActive()) {
+            $this->connection->rollback();
+        }
+
+        if (!$this->useCleanupRollback) {
             $this->prepareDatabase();
         }
 
@@ -96,7 +97,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      * You should avoid using this method as relying on fixed auto-increment values makes tests more fragile.
      * For example, you should never assume that IDs of first three records are always 1, 2 and 3.
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     protected function resetAutoincrement(array $tables): void
     {

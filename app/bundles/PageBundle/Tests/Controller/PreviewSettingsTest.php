@@ -15,6 +15,7 @@ namespace Mautic\PageBundle\Tests\Controller;
 
 namespace Mautic\PageBundle\Tests\Controller;
 
+use DateTime;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +26,7 @@ class PreviewSettingsTest extends MauticMysqlTestCase
     {
         $pageMain = new Page();
         $pageMain->setIsPublished(true);
-        $pageMain->setDateAdded(new \DateTime());
+        $pageMain->setDateAdded(new DateTime());
         $pageMain->setTitle('Preview settings test - main page');
         $pageMain->setAlias('page-main');
         $pageMain->setTemplate('Blank');
@@ -65,7 +66,7 @@ class PreviewSettingsTest extends MauticMysqlTestCase
 
         $pageTranslated = new Page();
         $pageTranslated->setIsPublished(true);
-        $pageTranslated->setDateAdded(new \DateTime());
+        $pageTranslated->setDateAdded(new DateTime());
         $pageTranslated->setTitle('Preview settings test - NL translation');
         $pageTranslated->setAlias('page-trans-nl');
         $pageTranslated->setTemplate('Blank');
@@ -78,7 +79,7 @@ class PreviewSettingsTest extends MauticMysqlTestCase
 
         $pageVariant = new Page();
         $pageVariant->setIsPublished(true);
-        $pageVariant->setDateAdded(new \DateTime());
+        $pageVariant->setDateAdded(new DateTime());
         $pageVariant->setTitle('Preview settings test - B variant');
         $pageVariant->setAlias('page-variant-b');
         $pageVariant->setTemplate('Blank');
@@ -123,7 +124,7 @@ class PreviewSettingsTest extends MauticMysqlTestCase
             $crawler->filterXPath('//*[@id="content_preview_settings_contact"]')
         );
 
-        $clientSales = $this->createSalesUserCrawlerClient();
+        $clientSales = $this->createAnotherClient('sales');
         $crawler     = $clientSales->request(Request::METHOD_GET, "/s/emails/view/{$mainPageId}");
 
         // Contact lookup is not visible to user without access
