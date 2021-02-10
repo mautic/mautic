@@ -39,10 +39,7 @@ class PreviewSettingsTest extends MauticMysqlTestCase
         $mainPageId = $pageMain->getId();
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/pages');
-        self::assertStringContainsString(
-            'Preview settings test - main page (page-main)',
-            $crawler->filterXPath('//*[@id="pageTable"]/tbody/tr[1]/td[2]/a')->text()
-        );
+        self::assertStringContainsString($pageMain->getTitle(), $crawler->text());
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/pages/view/{$mainPageId}");
 
