@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -162,10 +163,10 @@ class LeadFieldRepository extends CommonRepository
     /**
      * Compare a form result value with defined value for defined lead.
      *
-     * @param int    $lead         ID
-     * @param int    $field        alias
-     * @param string $value        to compare with
-     * @param string $operatorExpr for WHERE clause
+     * @param int          $lead         ID
+     * @param int          $field        alias
+     * @param string|array $value        to compare with
+     * @param string       $operatorExpr for WHERE clause
      *
      * @return bool
      */
@@ -232,27 +233,17 @@ class LeadFieldRepository extends CommonRepository
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
             } elseif ('in' === $operatorExpr || 'notIn' === $operatorExpr) {
-                $value = $q->expr()->literal(
-                    InputHelper::clean($value)
-                );
-
-                $value = trim($value, "'");
-                if ('not' === substr($operatorExpr, 0, 3)) {
-                    $operator = 'NOT REGEXP';
-                } else {
-                    $operator = 'REGEXP';
-                }
+                $property = $this->getPropertyByField($field, $q);
+                $values   = (!is_array($value)) ? [$value] : $value;
 
                 $expr = $q->expr()->andX(
-                    $q->expr()->eq('l.id', ':lead')
-                );
-
-                $expr->add(
-                    $property." $operator '\\\\|?$value\\\\|?'"
+                    $q->expr()->eq('l.id', ':lead'),
+                    ('in' === $operatorExpr ? $q->expr()->in($property, ':values') : $q->expr()->notIn($property, ':values'))
                 );
 
                 $q->where($expr)
-                    ->setParameter('lead', (int) $lead);
+                    ->setParameter('lead', (int) $lead)
+                    ->setParameter('values', $values, Connection::PARAM_STR_ARRAY);
             } else {
                 $expr = $q->expr()->andX(
                     $q->expr()->eq('l.id', ':lead')
