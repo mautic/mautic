@@ -20,7 +20,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\Request;
 
-class PreviewSettingsTest extends MauticMysqlTestCase
+class PreviewSettingsFunctionalTest extends MauticMysqlTestCase
 {
     public function testPreviewSettingsAllEnabled(): void
     {
