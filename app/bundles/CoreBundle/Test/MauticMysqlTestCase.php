@@ -123,16 +123,6 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         );
     }
 
-    protected function createAnonymousClient(): Client
-    {
-        $this->useCleanupRollback = false;
-
-        return self::createClient(
-            $this->clientOptions,
-            []
-        );
-    }
-
     /**
      * Warning: To perform Truncate on tables with foreign keys we have to turn off the foreign keys temporarily.
      * This may lead to corrupted data. Make sure you know what you are doing.
