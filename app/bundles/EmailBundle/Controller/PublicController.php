@@ -473,7 +473,8 @@ class PublicController extends CommonFormController
                 || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
             )
         ) {
-            return $this->accessDenied();
+            // disallow displaying contact information
+            $contactId = null;
         }
 
         //bogus ID
