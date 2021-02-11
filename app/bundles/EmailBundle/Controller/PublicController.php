@@ -456,21 +456,21 @@ class PublicController extends CommonFormController
         /** @var CorePermissions $security */
         $security = $this->get('mautic.security');
 
-        if (!$security->isAdmin()
-            && (
-                (!$emailEntity->isPublished())
-                || (!$security->hasEntityAccess(
+        if (
+            ($security->isAnonymous() && (!$emailEntity->isPublished()))
+            || (!$security->isAnonymous()
+                && !$security->hasEntityAccess(
                     'email:emails:viewown',
                     'email:emails:viewother',
                     $emailEntity->getCreatedBy()
-            )))
+                ))
         ) {
             return $this->accessDenied();
         }
 
         if ($contactId && (
-            !$security->isAdmin()
-            || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
+                !$security->isAdmin()
+                || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother')
             )
         ) {
             return $this->accessDenied();
