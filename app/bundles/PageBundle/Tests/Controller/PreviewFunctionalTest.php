@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PreviewFunctionalTest extends MauticMysqlTestCase
 {
-    public function testPreviewAdmin(): void
+    public function testPreviewPage(): void
     {
         $lead           = $this->createLead();
         $dynamicContent = $this->createDynamicContent($lead);
