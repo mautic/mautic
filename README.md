@@ -39,7 +39,7 @@ sudo php bin/console mautic:plugins:update
 ```
 or directly in Mautic:
 
-head over to the Plugins tab in Mautic:
+Go to the Plugins tab in Mautic:
 » Click on the cogwheel (Settings) on the right hand top corner » Go to Plugins » Click on Update Plugins on the right hand top corner
 
 6. Now activate the Plugin
