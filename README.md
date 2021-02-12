@@ -71,7 +71,7 @@ Use Github issues for reporting and discuss more about this plugin
 
 ## Contribution
 
-Create pull requests and we will review it soon as possible.
+Create Pull Requests and we will review them soon as possible.
 
 ## Dependencies
 
