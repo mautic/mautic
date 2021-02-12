@@ -87,7 +87,7 @@ If you want to update it, the code can be found in the `plugin/GrapesJsBuilderBu
 
 -------------------------------------------------------------------
 
-## Switch back to Legacy-Builder
+## Switching back to the legacy Builder
 
 In case you are not happy with the plugin at the moment, you can easily switch back to the legacy Builder (original Mautic builder). You can do so very quickly:
 1. Go to Mautic Settings » Click the cogwheel on the right-hand top corner 
