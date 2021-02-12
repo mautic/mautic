@@ -44,7 +44,7 @@ head over to the Plugins tab in Mautic:
 
 6. Now activate the plugin.
 
-head over to the Plugins tab in Mautic:
+Head over to the Plugins tab in Mautic:
 »click on the cogwheel (Settings) on the right hand top corner » go to plugins » find the Plugin called "GrapesJs" and click on it » click "yes" in the modal popup » click the "save and close" button
 
 7. Clear Cache again
