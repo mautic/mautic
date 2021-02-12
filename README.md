@@ -83,7 +83,7 @@ This plugin use following GrapesJS plugin:
 - Builder page HTML : https://github.com/artf/grapesjs-preset-webpage
 - Parser CSS : https://github.com/artf/grapesjs-parser-postcss
 
-If you want to update it, codes are in the `plugin/GrapesJsBuilderBundle/Assets/js` folder.
+If you want to update it, the code can be found in the `plugin/GrapesJsBuilderBundle/Assets/js` folder.
 
 -------------------------------------------------------------------
 
