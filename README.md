@@ -53,7 +53,7 @@ sudo cd /path/to/mautic
 sudo php bin/console cache:clear
 ```
 
-Ready to go. Now the GrapesJsBuilder is loaded for E-Mails and Landingpages. 
+Ready to go. Now the GrapesJs Builder is loaded for Emails and Landing pages. 
 
 -------------------------------------------------------------------
 
