@@ -92,7 +92,7 @@ If you want to update it, codes are in the `plugin/GrapesJsBuilderBundle/Assets/
 In case you are not happy with the plugin at the moment, you can easily switch back to the legacy Builder (original Mautic builder). You can do so very quickly:
 1. Go to Mautic settings »click the cogwheel on the right-hand top corner 
 2. Open the Plugins Directory » click on "Plugins" inside the menu
-3. Find the GrapesJs Plugin and click on it » click "No" and then "save and close"
+3. Find the GrapesJs Plugin and click on it » Click "No" and then "Save and Close"
 4. Clear the cache
 
 Mautic unloaded the GrapesJs Plugin and uses the legacy builder again.
