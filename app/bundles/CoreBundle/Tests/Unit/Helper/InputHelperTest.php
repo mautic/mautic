@@ -169,7 +169,7 @@ class InputHelperTest extends TestCase
     /**
      * @dataProvider urlProvider
      */
-    public function testUrlSanitization(string $inputUrl, $outputUrl, bool $ignoreFragment = false): void
+    public function testUrlSanitization(string $inputUrl, string $outputUrl, bool $ignoreFragment = false): void
     {
         $cleanedUrl = InputHelper::url($inputUrl, false, null, null, [], $ignoreFragment);
 
