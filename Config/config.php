@@ -53,6 +53,13 @@ return [
                     'mautic.config_integration',
                 ],
             ],
+            // Tells Mautic what themes it should support when enabled
+            'grapesjsbuilder.integration.builder' => [
+                'class'     => \MauticPlugin\GrapesJsBuilderBundle\Integration\Support\BuilderSupport::class,
+                'tags'      => [
+                    'mautic.builder_integration',
+                ],
+            ],
         ],
         'models'  => [
             'grapesjsbuilder.model' => [
