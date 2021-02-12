@@ -1,6 +1,6 @@
 # GrapesJS Builder with MJML support for Mautic
 
-this Plugin is still Beta! It works great already and we're developing it actively! Please use it and report everything inside the "Issues" here in Github.
+⚠️ This Plugin is still Beta! It works great already and we're developing it actively! Please use it and report everything inside the "Issues" here in Github. ⚠️
 
 ## Installation in Mautic 3.x
 
