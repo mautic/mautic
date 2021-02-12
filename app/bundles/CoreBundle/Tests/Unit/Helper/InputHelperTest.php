@@ -12,8 +12,10 @@
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\InputHelper;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 
-class InputHelperTest extends \PHPUnit\Framework\TestCase
+class InputHelperTest extends TestCase
 {
     /**
      * @testdox The html returns correct values
@@ -162,5 +164,56 @@ class InputHelperTest extends \PHPUnit\Framework\TestCase
         foreach ($tests as $input=>$expected) {
             $this->assertEquals(InputHelper::transliterate($input), $expected);
         }
+    }
+
+    /**
+     * @dataProvider urlProvider
+     */
+    public function testUrlSanitization(string $inputUrl, string $outputUrl, bool $ignoreFragment = false): void
+    {
+        $cleanedUrl = InputHelper::url($inputUrl, false, null, null, [], $ignoreFragment);
+
+        Assert::assertEquals($cleanedUrl, $outputUrl);
+    }
+
+    public function urlProvider(): iterable
+    {
+        // valid URL is reconstructed as expected
+        yield ['https://www.mautic.org/somewhere/something?foo=bar#abc123', 'https://www.mautic.org/somewhere/something?foo=bar#abc123'];
+
+        // non URL is simply cleaned
+        yield ['<img src="hello.png" />', '&#60;imgsrc=&#34;hello.png&#34;/&#62;'];
+
+        // disallowed protocol changed to default
+        yield ['foo://www.mautic.org', 'http://www.mautic.org'];
+
+        // user and password are included
+        yield ['http://user:password@www.mautic.org', 'http://user:password@www.mautic.org'];
+
+        // user and password have tags stripped
+        yield ['http://<img>:<img>@www.mautic.org', 'http://:@www.mautic.org'];
+
+        // host is cleaned (should have the whole url go through ::clean() because it's not recognized as a valid host
+        yield ['http://<img/src="doesnotexist.jpg">', 'http://&#60;img/src=&#34;doesnotexist.jpg&#34;&#62;'];
+
+        // port is included
+        yield ['http://www.mautic.org:8080/path', 'http://www.mautic.org:8080/path'];
+
+        // path has tags stripped
+        yield ['http://www.mautic.org/abc<img/src="doesnotexist.jpg">123', 'http://www.mautic.org/abc123'];
+
+        // query keys are urlencoded
+        yield ['http://www.mautic.org?<foo>=bar', 'http://www.mautic.org?%3Cfoo%3E=bar'];
+
+        // query is urlencoded appropriately
+        yield ['http://www.mautic.org?%3Cfoo%3E=<bar>', 'http://www.mautic.org?%3Cfoo%3E=%3Cbar%3E'];
+
+        // fragment is included and cleaned
+        yield ['http://www.mautic.org#<img/src="doesnotexist.jpg">', 'http://www.mautic.org#'];
+        yield ['http://www.mautic.org#%3Cimg%2Fsrc%3D%22doesnotexist.jpg%22%3E', 'http://www.mautic.org#%3Cimg%2Fsrc%3D%22doesnotexist.jpg%22%3E'];
+        yield ['http://www.mautic.org#abc<img/src="doesnotexist.jpg">123', 'http://www.mautic.org#abc123'];
+
+        // fragment is not included
+        yield ['http://www.mautic.org#abc123', 'http://www.mautic.org', true];
     }
 }

@@ -1,6 +1,6 @@
 | Q                                      | A
 | -------------------------------------- | ---
-| Branch?                                | "features" for features or enhancements / 3.2 for bug fixes <!-- see below -->
+| Branch?                                | "features" for all features, enhancements and bug fixes (until 3.3.0 is released) <!-- see below -->
 | Bug fix?                               | yes/no
 | New feature?                           | yes/no
 | Deprecations?                          | yes/no

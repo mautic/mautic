@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <link href="{{ asset("#{prefix}/../../app/bundles/CoreBundle/Assets/js/libraries/filemanager/jquery-ui/themes/#{theme}/jquery-ui.min.css") }}" rel="stylesheet" type="text/css">
@@ -16,8 +16,12 @@
             url : '{{path('ef_connect', { 'instance': instance, 'homeFolder': homeFolder } )}}',
             lang : '{{locale}}',
             onlyMimes: {{ onlyMimes|raw }},
-            getFileCallback : function(file) {
-                window.opener.document.fileManagerInsertImageCallback('textarea.editor', file.url);
+            getFileCallback : function(file, elFinderInstance) {
+                let fileUrl = file.url;
+                if (file.baseUrl == '' && typeof window.opener.mauticImagesPath !== 'undefined') {
+                    fileUrl = window.opener.mauticImagesPath+'/'+file.name;
+                }
+                window.opener.document.fileManagerInsertImageCallback('textarea.editor', elFinderInstance.convAbsUrl(fileUrl));
                 window.close();
             }
     });
