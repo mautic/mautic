@@ -63,7 +63,7 @@ GrapesJS plugin introduce also support for [MJML](https://mjml.io/) language. Ju
 
 You can use the Webmecanik Blank MJML template to start
 
-[blank_mjml.zip](https://github.com/Webmecanik/plugin-grapesjs-builder/files/4757520/blank_mjml.zip)
+[blank_mjml.zip](https://github.com/mautic/plugin-grapesjs-builder/files/4757520/blank_mjml.zip)
 
 ## Support
 
