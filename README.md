@@ -103,5 +103,5 @@ Mautic unloaded the GrapesJs Plugin and uses the legacy builder again.
 
 We are going to delete the branch for the Mautic 2.x Plugin on February 28th 2021. 
 If you feel the need to develop the existing 2.x branch further, please fork it and develop it on your own repo. 
-Here you is the link to the 2.x Branch with the work done so far: 
+Here is the link to the 2.x Branch with the work done so far: 
 https://github.com/mautic/plugin-grapesjs-builder/tree/master 
