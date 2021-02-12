@@ -59,7 +59,7 @@ Ready to go. Now the GrapesJs Builder is loaded for Emails and Landing pages.
 
 ## MJML support
 
-GrapeJS plugin introduce also support for [MJML](https://mjml.io/) language. Just [create template](https://developer.mautic.org/#themes) as usual and add to template `email.mjml.tpl` file with properly MJML syntax.  
+GrapesJS plugin introduce also support for [MJML](https://mjml.io/) language. Just [create template](https://developer.mautic.org/#themes) as usual and add to template `email.mjml.tpl` file with properly formatted MJML syntax.  
 
 You can use the Webmecanik Blank MJML template to start
 
