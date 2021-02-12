@@ -113,6 +113,7 @@ if (!isset($previewUrl)) {
                                 <?php echo $view['form']->row($form['fromAddress']); ?>
                                 <?php echo $view['form']->row($form['replyToAddress']); ?>
                                 <?php echo $view['form']->row($form['bccAddress']); ?>
+                                <?php echo $view['form']->row($form['preheaderText']); ?>
                                 <?php echo $view['content']->getCustomContent('email.settings.advanced', $mauticTemplateVars); ?>
                                 <div>
                                     <div class="pull-left">

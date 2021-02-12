@@ -261,6 +261,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $builder->addIdColumns();
         $builder->addNullableField('subject', Type::TEXT);
+        $builder->addNullableField('preheaderText', Type::TEXT, 'preheader_text');
         $builder->addNullableField('fromAddress', Type::STRING, 'from_address');
         $builder->addNullableField('fromName', Type::STRING, 'from_name');
         $builder->addNullableField('replyToAddress', Type::STRING, 'reply_to_address');
@@ -437,6 +438,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'replyToAddress',
                     'bccAddress',
                     'utmTags',
+                    'preheaderText',
                     'customHtml',
                     'plainText',
                     'template',
@@ -734,6 +736,27 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function setReplyToAddress($replyToAddress)
     {
         $this->replyToAddress = $replyToAddress;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPreheaderText()
+    {
+        return $this->preheaderText;
+    }
+
+    /**
+     * @param $preheaderText
+     *
+     * @return $this
+     */
+    public function setPreheaderText($preheaderText)
+    {
+        $this->isChanged('preheaderText', $preheaderText);
+        $this->preheaderText = $preheaderText;
 
         return $this;
     }
