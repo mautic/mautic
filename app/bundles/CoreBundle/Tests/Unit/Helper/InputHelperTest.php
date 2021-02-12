@@ -192,7 +192,7 @@ class InputHelperTest extends TestCase
 
         // user and password have tags stripped
         // PHP 7.3.26 changed behavior for this type of URL but in either case, the <img> tag is sanitized
-        $sanitizedUrl = (\version_compare(PHP_VERSION, '7.3.25', '>=')) ?
+        $sanitizedUrl = (\version_compare(PHP_VERSION, '7.3.26', '>=')) ?
             'http://&#60;img&#62;:&#60;img&#62;@www.mautic.org' :
             'http://:@www.mautic.org';
         yield ['http://<img>:<img>@www.mautic.org', $sanitizedUrl];
