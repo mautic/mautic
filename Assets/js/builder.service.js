@@ -1,3 +1,7 @@
+import 'grapesjs/dist/css/grapes.min.css';
+import grapesjs from 'grapesjs';
+import grapesjsmjml from 'grapesjs-mjml';
+
 const textareaHtml = mQuery('textarea.builder-html');
 const textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
 const textareaMjml = mQuery('textarea.builder-mjml');
@@ -142,7 +146,7 @@ function initEmailMjml() {
     storageManager: false,
     assetManager: assetManagerConf,
 
-    plugins: ['grapesjs-mjml', 'grapesjs-parser-postcss', 'grapesjs-preset-mautic'],
+    plugins: [grapesjsmjml, 'grapesjs-parser-postcss', 'grapesjs-preset-mautic'],
     pluginsOpts: {
       'grapesjs-mjml': {},
       'grapesjs-preset-mautic': presetMauticConf,
