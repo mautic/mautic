@@ -484,8 +484,11 @@ class ReportSubscriber implements EventSubscriberInterface
                     break;
 
                 case 'mautic.lead.graph.line.leads':
-                    $chart = new LineChart(null, $options['dateFrom'], $options['dateTo']);
-                    $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_added', 'l');
+                    $chart          = new LineChart(null, $options['dateFrom'], $options['dateTo']);
+                    $parametersKeys = array_keys($queryBuilder->getParameters() ?? []);
+                    $leadListFilter = preg_grep('/leadlistid/', $parametersKeys);
+                    $tablePrefix    = $leadListFilter ? 's' : 'l';
+                    $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_added', $tablePrefix);
                     $leads = $chartQuery->loadAndBuildTimeData($queryBuilder);
                     $chart->setDataset($options['translator']->trans('mautic.lead.all.leads'), $leads);
                     $queryBuilder->andwhere($qb->expr()->isNotNull('l.date_identified'));

@@ -79,7 +79,7 @@ class Metadata
         $this->stability                    = $metadata['stability'];
         $this->minSupportedPHPVersion       = $metadata['minimum_php_version'];
         $this->maxSupportedPHPVersion       = $metadata['maximum_php_version'];
-        $this->showPHPVersionWarningIfUnder = $metadata['show_php_version_warning_if_under'];
+        $this->showPHPVersionWarningIfUnder = empty($metadata['show_php_version_warning_if_under']) ? '' : $metadata['show_php_version_warning_if_under'];
         $this->minSupportedMauticVersion    = $metadata['minimum_mautic_version'];
         $this->announcementUrl              = $metadata['announcement_url'];
 
