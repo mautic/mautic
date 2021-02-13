@@ -191,7 +191,11 @@ class InputHelperTest extends TestCase
         yield ['http://user:password@www.mautic.org', 'http://user:password@www.mautic.org'];
 
         // user and password have tags stripped
-        yield ['http://<img>:<img>@www.mautic.org', 'http://:@www.mautic.org'];
+        // PHP 7.3.26 changed behavior for this type of URL but in either case, the <img> tag is sanitized
+        $sanitizedUrl = (\version_compare(PHP_VERSION, '7.3.26', '>=')) ?
+            'http://&#60;img&#62;:&#60;img&#62;@www.mautic.org' :
+            'http://:@www.mautic.org';
+        yield ['http://<img>:<img>@www.mautic.org', $sanitizedUrl];
 
         // host is cleaned (should have the whole url go through ::clean() because it's not recognized as a valid host
         yield ['http://<img/src="doesnotexist.jpg">', 'http://&#60;img/src=&#34;doesnotexist.jpg&#34;&#62;'];
