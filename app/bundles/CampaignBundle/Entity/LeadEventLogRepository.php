@@ -196,10 +196,6 @@ class LeadEventLogRepository extends CommonRepository
 
         $query->orderBy('ll.trigger_date');
 
-        if (!empty($ipIds)) {
-            $query->orWhere('ll.ip_address IN ('.implode(',', $ipIds).')');
-        }
-
         if (empty($options['canViewOthers']) && isset($this->currentUser)) {
             $query->andWhere('c.created_by = :userId')
                 ->setParameter('userId', $this->currentUser->getId());
