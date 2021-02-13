@@ -18,7 +18,9 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        define('MAUTIC_TABLE_PREFIX', 'test');
+        if (!defined('MAUTIC_TABLE_PREFIX')) {
+            define('MAUTIC_TABLE_PREFIX', 'test');
+        }
     }
 
     public function testCommandDryRun()
@@ -32,9 +34,9 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
         $result = $commandTester->execute(['--dry-run' => true]);
         $output = $commandTester->getDisplay();
 
-        $this->assertContains('Dry run; skipping purge', $output);
-        $this->assertNotContains('No matches found', $output);
-        $this->assertNotContains('Step 2: Purging data...', $output);
+        $this->assertStringContainsString('Dry run; skipping purge', $output);
+        $this->assertStringNotContainsString('No matches found', $output);
+        $this->assertStringNotContainsString('Step 2: Purging data...', $output);
         $this->assertEquals(0, $result);
     }
 
@@ -49,8 +51,8 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
         $result = $commandTester->execute([]);
         $output = $commandTester->getDisplay();
 
-        $this->assertContains('No matches found', $output);
-        $this->assertNotContains('contacts with IPs from Do Not Sell list', $output);
+        $this->assertStringContainsString('No matches found', $output);
+        $this->assertStringNotContainsString('contacts with IPs from Do Not Sell list', $output);
         $this->assertEquals(0, $result);
     }
 
@@ -65,9 +67,9 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
         $result = $commandTester->execute([]);
         $output = $commandTester->getDisplay();
 
-        $this->assertContains('Found 1 contacts with an IP from the Do Not Sell list', $output);
-        $this->assertContains('Step 2: Purging data...', $output);
-        $this->assertNotContains('No matches found', $output);
+        $this->assertStringContainsString('Found 1 contacts with an IP from the Do Not Sell list', $output);
+        $this->assertStringContainsString('Step 2: Purging data...', $output);
+        $this->assertStringNotContainsString('No matches found', $output);
         $this->assertEquals(0, $result);
     }
 

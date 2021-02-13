@@ -12,11 +12,10 @@
 ?>
 <td class="<?php echo $class; ?>">
     <?php
-    if (isset($fields['core'][$column]['value'])) {
-        echo $view->escape($fields['core'][$column]['value']);
-    }
-    if (isset($fields['social'][$column]['value'])) {
-        echo $view->escape($fields['social'][$column]['value']);
+    foreach ($fields as $field) {
+        if (isset($field[$column]['value'])) {
+            echo $view->escape($field[$column]['value']);
+        }
     }
     ?>
 </td>
