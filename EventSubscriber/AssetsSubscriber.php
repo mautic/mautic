@@ -28,20 +28,20 @@ class AssetsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function injectAssets(CustomAssetsEvent $assetsEvent)
-    {
-        if ($this->config->isPublished()) {
-            $assetsEvent->addScript('plugins/GrapesJsBuilderBundle/Assets/library/js/builder.js');
-            $assetsEvent->addScript('plugins/GrapesJsBuilderBundle/Assets/library/js/grapes.min.js');
-            $assetsEvent->addScript('plugins/GrapesJsBuilderBundle/Assets/library/js/grapesjs-preset-newsletter.min.js');
-            $assetsEvent->addScript('plugins/GrapesJsBuilderBundle/Assets/library/js/grapesjs-preset-webpage.min.js');
-            $assetsEvent->addScript('plugins/GrapesJsBuilderBundle/Assets/library/js/grapesjs-mjml.min.js');
-            $assetsEvent->addScript('plugins/GrapesJsBuilderBundle/Assets/library/js/grapesjs-parser-postcss.min.js');
-            $assetsEvent->addScript('plugins/GrapesJsBuilderBundle/Assets/library/js/grapesjs-preset-mautic.min.js');
+    // public function injectAssets(CustomAssetsEvent $assetsEvent)
+    // {
+    //     if ($this->config->isPublished()) {
+    //         $assetsEvent->addScript('plugins/GrapesJsBuilderBundle/dist/builder.js');
+    //         $assetsEvent->addScript('plugins/GrapesJsBuilderBundle/Assets/js/grapes.min.js');
+    //         $assetsEvent->addScript('plugins/GrapesJsBuilderBundle/Assets/js/grapesjs-preset-newsletter.min.js');
+    //         $assetsEvent->addScript('plugins/GrapesJsBuilderBundle/Assets/js/grapesjs-preset-webpage.min.js');
+    //         $assetsEvent->addScript('plugins/GrapesJsBuilderBundle/Assets/js/grapesjs-mjml.min.js');
+    //         $assetsEvent->addScript('plugins/GrapesJsBuilderBundle/Assets/js/grapesjs-parser-postcss.min.js');
+    //         $assetsEvent->addScript('plugins/GrapesJsBuilderBundle/Assets/js/grapesjs-preset-mautic.min.js');
 
-            $assetsEvent->addStylesheet('plugins/GrapesJsBuilderBundle/Assets/library/css/builder.css');
-            $assetsEvent->addStylesheet('plugins/GrapesJsBuilderBundle/Assets/library/css/grapes.min.css');
-            $assetsEvent->addStylesheet('plugins/GrapesJsBuilderBundle/Assets/library/css/grapes-code-editor.min.css');
-        }
-    }
+    //         $assetsEvent->addStylesheet('plugins/GrapesJsBuilderBundle/Assets/css/builder.css');
+    //         $assetsEvent->addStylesheet('plugins/GrapesJsBuilderBundle/Assets/css/grapes.min.css');
+    //         $assetsEvent->addStylesheet('plugins/GrapesJsBuilderBundle/Assets/css/grapes-code-editor.min.css');
+    //     }
+    // }
 }
