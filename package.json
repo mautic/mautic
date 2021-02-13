@@ -4,7 +4,8 @@
   "description": "⚠️ This Plugin is still Beta! It works great already and we're developing it actively! Please use it and report everything inside the \"Issues\" here in Github. ⚠️",
   "main": "index.js",
   "scripts": {
-    "build": "parcel build Assets/js/builder.js"
+    "demo": "parcel Demo/index.html",
+    "build": "parcel build Assets/library/js/builder.js"
   },
   "repository": {
     "type": "git",

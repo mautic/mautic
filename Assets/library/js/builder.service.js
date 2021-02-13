@@ -1,4 +1,4 @@
-import 'grapesjs/dist/css/grapes.min.css';
+import '../../../Demo/node_modules/grapesjs/dist/css/grapes.min.css';
 import grapesjs from 'grapesjs';
 import grapesjsmjml from 'grapesjs-mjml';
 
