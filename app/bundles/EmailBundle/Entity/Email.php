@@ -67,6 +67,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @var string
      */
+    private $preheaderText;
+
+    /**
+     * @var string
+     */
     private $fromAddress;
 
     /**
