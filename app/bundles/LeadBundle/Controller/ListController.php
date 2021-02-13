@@ -30,6 +30,11 @@ class ListController extends FormController
     use EntityContactsTrait;
 
     /**
+     * @var array
+     */
+    protected $listFilters = [];
+
+    /**
      * Generate's default list view.
      *
      * @param int $page
@@ -85,16 +90,7 @@ class ListController extends FormController
             $filter['force'] = "($mine or $global)";
         }
 
-        $items = $model->getEntities(
-            [
-                'start'      => $start,
-                'limit'      => $limit,
-                'filter'     => $filter,
-                'orderBy'    => $orderBy,
-                'orderByDir' => $orderByDir,
-            ]);
-
-        $count = count($items);
+        list($count, $items) = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
 
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
@@ -138,15 +134,19 @@ class ListController extends FormController
             'searchValue' => $search,
         ];
 
-        return $this->delegateView([
-            'viewParameters'  => $parameters,
-            'contentTemplate' => 'MauticLeadBundle:List:list.html.php',
-            'passthroughVars' => [
-                'activeLink'    => '#mautic_segment_index',
-                'route'         => $this->generateUrl('mautic_segment_index', ['page' => $page]),
-                'mauticContent' => 'leadlist',
+        return $this->delegateView(
+            $this->getViewArguments([
+                'viewParameters'  => $parameters,
+                'contentTemplate' => 'MauticLeadBundle:List:list.html.php',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_segment_index',
+                    'route'         => $this->generateUrl('mautic_segment_index', ['page' => $page]),
+                    'mauticContent' => 'leadlist',
+                ],
             ],
-        ]);
+            'index'
+            )
+        );
     }
 
     /**
@@ -825,6 +825,129 @@ class ListController extends FormController
                 'mauticContent' => 'list',
             ],
         ]);
+    }
+
+    /**
+     * Get the permission base from the model.
+     */
+    protected function getPermissionBase(): string
+    {
+        return $this->getModel('lead.list')->getPermissionBase();
+    }
+
+    /**
+     * Get List Model.
+     */
+    protected function getListModel(): ListModel
+    {
+        /** @var ListModel $model */
+        $model = $this->getModel('lead.list');
+
+        return $model;
+    }
+
+    /**
+     * Get Model Name.
+     */
+    protected function getModelName(): string
+    {
+        return 'lead.list';
+    }
+
+    /**
+     * @param $start
+     * @param $limit
+     * @param $filter
+     * @param $orderBy
+     * @param $orderByDir
+     */
+    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
+    {
+        $session        = $this->get('session');
+        $currentFilters = $session->get('mautic.lead.list.list_filters', []);
+        $updatedFilters = $this->request->get('filters', false);
+
+        $sourceLists = $this->getListModel()->getSourceLists();
+        $listFilters = [
+            'filters' => [
+                'placeholder' => $this->get('translator')->trans('mautic.lead.list.filter.placeholder'),
+                'multiple'    => true,
+                'groups'      => [
+                    'mautic.lead.list.source.segment.category' => [
+                        'options' => $sourceLists['categories'],
+                        'prefix'  => 'category',
+                    ],
+                ],
+            ],
+        ];
+
+        if ($updatedFilters) {
+            // Filters have been updated
+
+            // Parse the selected values
+            $newFilters     = [];
+            $updatedFilters = json_decode($updatedFilters, true);
+
+            if ($updatedFilters) {
+                foreach ($updatedFilters as $updatedFilter) {
+                    list($clmn, $fltr) = explode(':', $updatedFilter);
+
+                    $newFilters[$clmn][] = $fltr;
+                }
+
+                $currentFilters = $newFilters;
+            } else {
+                $currentFilters = [];
+            }
+        }
+        $session->set('mautic.lead.list.list_filters', $currentFilters);
+
+        $joinCategories = false;
+        if (!empty($currentFilters)) {
+            $catIds = [];
+            foreach ($currentFilters as $type => $typeFilters) {
+                $listFilters['filters']['groups']['mautic.lead.list.source.segment.'.$type]['values'] = $typeFilters;
+
+                foreach ($typeFilters as $fltr) {
+                    if ('category' == $type) {
+                        $catIds[] = (int) $fltr;
+                    } // else for other group filters
+                }
+            }
+
+            if (!empty($catIds)) {
+                $joinCategories    = true;
+                $filter['force'][] = ['column' => 'cat.id', 'expr' => 'in', 'value' => $catIds];
+            }
+        }
+
+        // Store for customizeViewArguments
+        $this->listFilters = $listFilters;
+
+        return parent::getIndexItems(
+            $start,
+            $limit,
+            $filter,
+            $orderBy,
+            $orderByDir,
+            [
+                'joinCategories' => $joinCategories,
+            ]
+        );
+    }
+
+    /**
+     * @param $action
+     */
+    public function getViewArguments(array $args, $action): array
+    {
+        switch ($action) {
+            case 'index':
+                $args['viewParameters']['filters'] = $this->listFilters;
+                break;
+        }
+
+        return $args;
     }
 
     /**

@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -37,6 +38,11 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
      */
     private $campaignHelper;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface
+     */
+    private $dispatcher;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -44,6 +50,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->contact           = $this->createMock(Lead::class);
         $this->connector         = $this->createMock(Http::class);
         $this->companyModel      = $this->createMock(CompanyModel::class);
+        $this->dispatcher        = $this->createMock(EventDispatcherInterface::class);
         $this->ipCollection      = new ArrayCollection();
         $this->companyRepository = $this->getMockBuilder(CompanyRepository::class)
         ->disableOriginalConstructor()
@@ -56,7 +63,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->companyModel->method('getRepository')
         ->willReturn($this->companyRepository);
 
-        $this->campaignHelper = new CampaignHelper($this->connector, $this->companyModel);
+        $this->campaignHelper = new CampaignHelper($this->connector, $this->companyModel, $this->dispatcher);
 
         $this->ipCollection->add((new IpAddress())->setIpAddress('127.0.0.1'));
         $this->ipCollection->add((new IpAddress())->setIpAddress('127.0.0.2'));

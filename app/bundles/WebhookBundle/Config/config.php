@@ -116,6 +116,7 @@ return [
                 'arguments' => [
                     'mautic.http.connector',
                     'mautic.lead.model.company',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.webhook.http.client' => [
