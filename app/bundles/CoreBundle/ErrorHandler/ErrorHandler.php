@@ -346,16 +346,23 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
             self::$handler = new self();
             self::$handler->setEnvironment($environment);
-            // Log PHP fatal errors
-            register_shutdown_function([self::$handler, 'handleFatal']);
 
-            // Log general PHP errors
-            set_exception_handler([self::$handler, 'handleException']);
-            set_error_handler([self::$handler, 'handleError']);
+            /**
+             * We need PHPUnit to convert notices/warnings/etc. to exceptions, so
+             * we can't use our own ErrorHandler in that case.
+             */
+            if (!defined('IS_PHPUNIT')) {
+                // Log PHP fatal errors
+                register_shutdown_function([self::$handler, 'handleFatal']);
 
-            // Hide errors by default so we can format them
-            self::$handler->setDisplayErrors(('dev' === $environment) ? 1 : 0); //ini_get('display_errors'));
-            ini_set('display_errors', 0);
+                // Log general PHP errors
+                set_exception_handler([self::$handler, 'handleException']);
+                set_error_handler([self::$handler, 'handleError']);
+
+                // Hide errors by default so we can format them
+                self::$handler->setDisplayErrors(('dev' === $environment) ? 1 : 0); //ini_get('display_errors'));
+                ini_set('display_errors', 0);
+            }
 
             return self::$handler;
         }

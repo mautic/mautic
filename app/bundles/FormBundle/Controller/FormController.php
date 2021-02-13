@@ -953,12 +953,6 @@ class FormController extends CommonFormController
             $slotsHelper     = $this->get('templating.helper.slots');
             $analyticsHelper = $this->get('mautic.helper.template.analytics');
 
-            if (!empty($customStylesheets)) {
-                foreach ($customStylesheets as $css) {
-                    $assetsHelper->addStylesheet($css);
-                }
-            }
-
             $slotsHelper->set('pageTitle', $form->getName());
 
             $analytics = $analyticsHelper->getCode();
