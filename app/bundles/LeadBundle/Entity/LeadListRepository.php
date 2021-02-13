@@ -12,19 +12,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\DBAL\Types\DateType;
-use Doctrine\DBAL\Types\FloatType;
-use Doctrine\DBAL\Types\IntegerType;
-use Doctrine\DBAL\Types\TimeType;
-use Mautic\CoreBundle\Doctrine\QueryFormatter\AbstractFormatter;
-use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\CoreBundle\Helper\Serializer;
-use Mautic\LeadBundle\Event\LeadListFilteringEvent;
-use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -127,10 +115,10 @@ class LeadListRepository extends CommonRepository
     /**
      * Get lists for a specific lead.
      *
-     * @param      $lead
-     * @param bool $forList
-     * @param bool $singleArrayHydration
-     * @param bool $isPublic
+     * @param int|Lead[] $lead                 Lead ID or array of Leads
+     * @param bool       $forList
+     * @param bool       $singleArrayHydration
+     * @param bool       $isPublic
      *
      * @return mixed
      */
@@ -278,9 +266,9 @@ class LeadListRepository extends CommonRepository
     /**
      * Get a count of leads that belong to the list.
      *
-     * @param $listIds
+     * @param int|int[] $listIds
      *
-     * @return array
+     * @return array|int
      */
     public function getLeadCount($listIds)
     {
