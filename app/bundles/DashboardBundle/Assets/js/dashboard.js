@@ -1,6 +1,6 @@
 // DashboardBundle
 // Use absolute path to keep dashboard working when app is in subdir
-Mautic.widgetUrl = mauticBasePath + (mauticEnv === 'dev' ? '/index_dev.php' : '') + '/s/dashboard/widget/';
+Mautic.widgetUrl = mauticBasePath + (typeof mauticEnv !== 'undefined' && mauticEnv === 'dev' ? '/index_dev.php' : '') + '/s/dashboard/widget/';
 
 /**
  * @type jQuery DOM element to be replaced with spinner
