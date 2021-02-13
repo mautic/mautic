@@ -13,36 +13,45 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Templating\TemplateNameParser;
 use Mautic\CoreBundle\Templating\TemplateReference;
-use Symfony\Component\Filesystem\Filesystem;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Templating\DelegatingEngine;
+use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class ThemeHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var PathsHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var PathsHelper|MockObject
      */
     private $pathsHelper;
 
     /**
-     * @var TemplatingHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var TemplatingHelper|MockObject
      */
     private $templatingHelper;
 
     /**
-     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var TranslatorInterface|MockObject
      */
     private $translator;
 
     /**
-     * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var CoreParametersHelper|MockObject
      */
     private $coreParameterHelper;
+
+    /**
+     * @var ThemeHelper
+     */
+    private $themeHelper;
 
     protected function setUp(): void
     {
@@ -53,6 +62,15 @@ class ThemeHelperTest extends \PHPUnit\Framework\TestCase
         $this->coreParameterHelper->method('get')
             ->with('theme_import_allowed_extensions')
             ->willReturn(['json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif']);
+
+        $this->themeHelper = new ThemeHelper(
+            $this->pathsHelper,
+            $this->templatingHelper,
+            $this->translator,
+            $this->coreParameterHelper,
+            new Filesystem(),
+            new Finder()
+        );
     }
 
     public function testExceptionThrownWithMissingConfig()
@@ -72,7 +90,7 @@ class ThemeHelperTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $this->getThemeHelper()->install(__DIR__.'/resource/themes/missing-config.zip');
+        $this->themeHelper->install(__DIR__.'/resource/themes/missing-config.zip');
     }
 
     public function testExceptionThrownWithMissingMessage()
@@ -92,7 +110,7 @@ class ThemeHelperTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $this->getThemeHelper()->install(__DIR__.'/resource/themes/missing-message.zip');
+        $this->themeHelper->install(__DIR__.'/resource/themes/missing-message.zip');
     }
 
     public function testExceptionThrownWithMissingFeature()
@@ -112,7 +130,7 @@ class ThemeHelperTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $this->getThemeHelper()->install(__DIR__.'/resource/themes/missing-feature.zip');
+        $this->themeHelper->install(__DIR__.'/resource/themes/missing-feature.zip');
     }
 
     public function testThemeIsInstalled()
@@ -124,7 +142,7 @@ class ThemeHelperTest extends \PHPUnit\Framework\TestCase
             ->with('themes', true)
             ->willReturn(__DIR__.'/resource/themes');
 
-        $this->getThemeHelper()->install(__DIR__.'/resource/themes/good-tmp.zip');
+        $this->themeHelper->install(__DIR__.'/resource/themes/good-tmp.zip');
 
         $this->assertFileExists(__DIR__.'/resource/themes/good-tmp');
 
@@ -176,10 +194,9 @@ class ThemeHelperTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $themeHelper = $this->getThemeHelper();
-        $themeHelper->setDefaultTheme('nature');
+        $this->themeHelper->setDefaultTheme('nature');
 
-        $template = $themeHelper->checkForTwigTemplate(':goldstar:page.html.twig');
+        $template = $this->themeHelper->checkForTwigTemplate(':goldstar:page.html.twig');
         $this->assertEquals(':nature:page.html.twig', $template);
     }
 
@@ -233,20 +250,189 @@ class ThemeHelperTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $themeHelper = $this->getThemeHelper();
-        $themeHelper->setDefaultTheme('nature');
+        $this->themeHelper->setDefaultTheme('nature');
 
-        $template = $themeHelper->checkForTwigTemplate(':goldstar:page.html.twig');
+        $template = $this->themeHelper->checkForTwigTemplate(':goldstar:page.html.twig');
         $this->assertNotEquals(':nature:page.html.twig', $template);
-        $this->assertNotEquals(':goldstar:page.html.twig', $template);
+        $this->assertEquals(':goldstar:page.html.twig', $template);
         $this->assertStringContainsString(':page.html.twig', $template);
     }
 
-    /**
-     * @return ThemeHelper
-     */
-    private function getThemeHelper()
+    public function testCopyWithNoNewDirName(): void
     {
-        return new ThemeHelper($this->pathsHelper, $this->templatingHelper, $this->translator, $this->coreParameterHelper);
+        $themeHelper = new ThemeHelper(
+            new class() extends PathsHelper {
+                public function __construct()
+                {
+                }
+
+                public function getSystemPath($name, $fullPath = false)
+                {
+                    Assert::assertSame('themes', $name);
+
+                    return '/path/to/themes';
+                }
+            },
+            new class() extends TemplatingHelper {
+                public function __construct()
+                {
+                }
+            },
+            new class() extends Translator {
+                public function __construct()
+                {
+                }
+            },
+            new class() extends CoreParametersHelper {
+                public function __construct()
+                {
+                }
+            },
+            new class() extends Filesystem {
+                public function __construct()
+                {
+                }
+
+                public function exists($files)
+                {
+                    if ('/path/to/themes/new-theme-name' === $files) {
+                        return false;
+                    }
+
+                    return true;
+                }
+
+                public function mirror($originDir, $targetDir, ?\Traversable $iterator = null, $options = [])
+                {
+                    Assert::assertSame('/path/to/themes/origin-template-dir', $originDir);
+                    Assert::assertSame('/path/to/themes/new-theme-name', $targetDir);
+                }
+
+                public function readFile(string $filename): string
+                {
+                    Assert::assertStringEndsWith('/config.json', $filename);
+
+                    return '{"name":"Origin Theme"}';
+                }
+
+                public function dumpFile($filename, $content)
+                {
+                    Assert::assertSame('/path/to/themes/new-theme-name/config.json', $filename);
+                    Assert::assertSame('{"name":"New Theme Name"}', $content);
+                }
+            },
+            new class() extends Finder {
+                private $dirs = [];
+
+                public function __construct()
+                {
+                }
+
+                public function in($dirs)
+                {
+                    $this->dirs = [
+                        new \SplFileInfo('origin-template-dir'),
+                    ];
+
+                    return $this;
+                }
+
+                public function getIterator()
+                {
+                    return new \ArrayIterator($this->dirs);
+                }
+            }
+        );
+
+        $themeHelper->copy('origin-template-dir', 'New Theme Name');
+    }
+
+    public function testCopyWithNewDirName(): void
+    {
+        $themeHelper = new ThemeHelper(
+            new class() extends PathsHelper {
+                public function __construct()
+                {
+                }
+
+                public function getSystemPath($name, $fullPath = false)
+                {
+                    Assert::assertSame('themes', $name);
+
+                    return '/path/to/themes';
+                }
+            },
+            new class() extends TemplatingHelper {
+                public function __construct()
+                {
+                }
+            },
+            new class() extends Translator {
+                public function __construct()
+                {
+                }
+            },
+            new class() extends CoreParametersHelper {
+                public function __construct()
+                {
+                }
+            },
+            new class() extends Filesystem {
+                public function __construct()
+                {
+                }
+
+                public function exists($files)
+                {
+                    if ('/path/to/themes/requested-theme-dir' === $files) {
+                        return false;
+                    }
+
+                    return true;
+                }
+
+                public function mirror($originDir, $targetDir, ?\Traversable $iterator = null, $options = [])
+                {
+                    Assert::assertSame('/path/to/themes/origin-template-dir', $originDir);
+                    Assert::assertSame('/path/to/themes/requested-theme-dir', $targetDir);
+                }
+
+                public function readFile(string $filename): string
+                {
+                    Assert::assertStringEndsWith('/config.json', $filename);
+
+                    return '{"name":"Origin Theme"}';
+                }
+
+                public function dumpFile($filename, $content)
+                {
+                    Assert::assertSame('/path/to/themes/requested-theme-dir/config.json', $filename);
+                    Assert::assertSame('{"name":"New Theme Name"}', $content);
+                }
+            },
+            new class() extends Finder {
+                private $dirs = [];
+
+                public function __construct()
+                {
+                }
+
+                public function in($dirs)
+                {
+                    $this->dirs = [
+                        new \SplFileInfo('origin-template-dir'),
+                    ];
+
+                    return $this;
+                }
+
+                public function getIterator()
+                {
+                    return new \ArrayIterator($this->dirs);
+                }
+            }
+        );
+
+        $themeHelper->copy('origin-template-dir', 'New Theme Name', 'requested-theme-dir');
     }
 }
