@@ -17,12 +17,12 @@ setup_mautic() {
 
     tput setaf 2
     printf "All done! Here's some useful information:\n"
-    printf "🔒 The default login is admin/mautic!\n"
+    printf "🔒 The default login is admin/mautic\n"
     printf "🌐 To open the Mautic instance, go to https://${DDEV_HOSTNAME} in your browser.\n"
     printf "🌐 To open PHPMyAdmin for managing the database, go to https://${DDEV_HOSTNAME}:8037 in your browser.\n"
     printf "🌐 To open MailHog for seeing all emails that Mautic sent, go to https://${DDEV_HOSTNAME}:8026 in your browser.\n"
     printf "🚀 Run \"ddev exec composer test\" to run PHPUnit tests.\n"
-    printf "🚀 Run \"ddev exec bin/console COMMAND (like mautic:segments:update) to use the Mautic CLI. For an overview of all available CLI commands, go to https://mau.tc/cli\n"
+    printf "🚀 Run \"ddev exec bin/console COMMAND\" (like mautic:segments:update) to use the Mautic CLI. For an overview of all available CLI commands, go to https://mau.tc/cli\n"
     tput sgr0
 }
 
