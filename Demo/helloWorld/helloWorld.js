@@ -1,15 +1,15 @@
 import 'grapesjs/dist/css/grapes.min.css';
-import grapesJS from 'grapesjs';
-import grapesJSMJML from 'grapesjs-mjml';
+import grapesjs from 'grapesjs';
+import grapesjsmjml from 'grapesjs-mjml';
 
-let editor = grapesJS.init({
+let editor = grapesjs.init({
   fromElement: 1,
   container: '#gjs',
   height: '100%',
   avoidInlineStyle: false,
-  plugins: [grapesJSMJML],
+  plugins: [grapesjsmjml],
   pluginsOpts: {
-    [grapesJSMJML]: {
+    [grapesjsmjml]: {
       // The font imports are included on HTML <head/> when fonts are used on the template
       fonts: {
         Montserrat: 'https://fonts.googleapis.com/css?family=Montserrat',

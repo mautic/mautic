@@ -51,6 +51,9 @@ Mautic.launchBuilder = function (formName) {
  */
 
 Mautic.setListeners = function (editor) {
+  if (!editor) {
+    throw Error('No editor found');
+  }
   editor.on('load', () => {
     const um = editor.UndoManager;
 
@@ -145,6 +148,12 @@ Mautic.initGrapesJS = function (object) {
   Mousetrap.reset();
   let editor;
 
+  const textareaHtml = mQuery('textarea.builder-html');
+  const textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
+  const textareaMjml = mQuery('textarea.builder-mjml');
+  console.warn({ textareaHtml });
+  builder.setTextareas(textareaHtml, textareaAssets, textareaMjml);
+
   if (object === 'page') {
     editor = builder.initPage();
   } else if (object === 'emailform') {
@@ -153,6 +162,8 @@ Mautic.initGrapesJS = function (object) {
     } else {
       editor = builder.initEmailHtml();
     }
+  } else {
+    throw Error(`not supported builder type: ${object}`);
   }
 
   this.setListeners(editor);
@@ -178,6 +189,8 @@ Mautic.setThemeHtml = function (theme) {
         builder.textareaMjml.val(response.templateMjml);
 
         // If MJML template, generate HTML before save
+        console.warn(typeof builder.textareaHtml);
+        console.warn(builder.textareaHtml);
         if (!builder.textareaHtml.val().length && builder.textareaMjml.val().length) {
           builder.mjmlToHtml(builder.textareaMjml, builder.textareaHtml);
         }

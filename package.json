@@ -4,8 +4,9 @@
   "description": "⚠️ This Plugin is still Beta! It works great already and we're developing it actively! Please use it and report everything inside the \"Issues\" here in Github. ⚠️",
   "main": "index.js",
   "scripts": {
-    "demo": "parcel Demo/index.html",
-    "build": "parcel build Assets/library/js/builder.js"
+    "helloWorld": "parcel Demo/helloWorld/index.html",
+    "mautic": "parcel Demo/mautic/index.html",
+    "build": "rm -r dist/ && parcel build Assets/library/js/builder.js"
   },
   "repository": {
     "type": "git",
@@ -18,6 +19,11 @@
   },
   "homepage": "https://github.com/mautic/plugin-grapesjs-builder#readme",
   "devDependencies": {
+    "@babel/cli": "^7.12.16",
+    "@babel/core": "^7.12.16",
+    "@babel/plugin-proposal-class-properties": "^7.12.13",
+    "@babel/plugin-transform-runtime": "^7.12.15",
+    "babel-eslint": "^10.1.0",
     "eslint": "^7.20.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-prettier": "^7.2.0",
