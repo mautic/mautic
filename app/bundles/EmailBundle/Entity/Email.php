@@ -65,6 +65,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $subject;
 
     /**
+     * @var bool
+     */
+    private $useOwnerAsMailer;
+
+    /**
      * @var string
      */
     private $preheaderText;
@@ -271,6 +276,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->addNullableField('fromName', Type::STRING, 'from_name');
         $builder->addNullableField('replyToAddress', Type::STRING, 'reply_to_address');
         $builder->addNullableField('bccAddress', Type::STRING, 'bcc_address');
+        $builder->addNullableField('useOwnerAsMailer', Type::BOOLEAN, 'use_owner_as_mailer');
         $builder->addNullableField('template', Type::STRING);
         $builder->addNullableField('content', Type::TARRAY);
         $builder->addNullableField('utmTags', Type::TARRAY, 'utm_tags');
@@ -442,6 +448,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'fromName',
                     'replyToAddress',
                     'bccAddress',
+                    'useOwnerAsMailer',
                     'utmTags',
                     'preheaderText',
                     'customHtml',
@@ -681,6 +688,26 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     {
         $this->isChanged('subject', $subject);
         $this->subject = $subject;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getUseOwnerAsMailer()
+    {
+        return $this->useOwnerAsMailer;
+    }
+
+    /**
+     * @param bool $useOwnerAsMailer
+     *
+     * @return $this
+     */
+    public function setUseOwnerAsMailer($useOwnerAsMailer)
+    {
+        $this->useOwnerAsMailer = $useOwnerAsMailer;
 
         return $this;
     }
