@@ -16,4 +16,6 @@ composer_version: "1"
 webimage_extra_packages: [php7.4-imap]
 hooks:
   post-start:
+    # Fix line endings on Windows
+    - exec: sed -i -e 's/\r$//' ./.ddev/mautic-setup.sh
     - exec: "./.ddev/mautic-setup.sh"
