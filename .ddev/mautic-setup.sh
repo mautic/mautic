@@ -23,6 +23,7 @@ setup_mautic() {
     printf "🌐 To open MailHog for seeing all emails that Mautic sent, go to https://${DDEV_HOSTNAME}:8026 in your browser.\n"
     printf "🚀 Run \"ddev exec composer test\" to run PHPUnit tests.\n"
     printf "🚀 Run \"ddev exec bin/console COMMAND\" (like mautic:segments:update) to use the Mautic CLI. For an overview of all available CLI commands, go to https://mau.tc/cli\n"
+    printf "🔴 If you want to stop the instance, simply run \"ddev stop\".\n"
     tput sgr0
 }
 
