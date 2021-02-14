@@ -1,17 +1,20 @@
-import '../../../Demo/node_modules/grapesjs/dist/css/grapes.min.css';
 import grapesjs from 'grapesjs';
 import grapesjsmjml from 'grapesjs-mjml';
+import grapesjsnewsletter from 'grapesjs-preset-newsletter';
+import grapesjswebpage from 'grapesjs-preset-webpage';
+import grapesjspostcss from 'grapesjs-parser-postcss';
+import grapesjsmautic from './grapesjs-preset-mautic.min'
 
 export default class BuilderService {
-  static textareaAssets;
-
-  static textareaHtml;
-
-  static textareaMjml;
-
   static assetManagerConf;
 
   static presetMauticConf;
+
+  textareaAssets;
+
+  textareaHtml;
+
+  textareaMjml;
 
   // Redefine Keyboard shortcuts due to unbind won't works with multiple keys.
   static keymapsConf = {
@@ -62,22 +65,41 @@ export default class BuilderService {
   static setTextareas(textareaHtml, textareaAssets, textareaMjml) {
     if (
       !textareaHtml ||
-      !textareaHtml.val() ||
       !textareaAssets ||
-      !textareaAssets.val() ||
       !textareaMjml
     ) {
-      throw Error('Textareas not set');
+      console.debug('not all textareas loaded');
     }
 
     this.textareaHtml = textareaHtml;
-    this.textareaAssets = textareaAssets;
     this.textareaMjml = textareaMjml;
+    this.textareaAssets = textareaAssets;
+  }
+
+  static getHtmlValue(){
+    if ( this.textareaHtml && this.textareaHtml.val() && this.textareaHtml.val().length > 0 ){
+      return this.textareaHtml.val();
+    }
+    return null;
+  }
+
+  static getMjmlValue(){
+    if ( this.textareaMjml && this.textareaMjml.val() && this.textareaMjml.val().length > 0 ){
+      return this.textareaMjml.val();
+    }
+    return null;
+  }
+
+  static getAssetValue(){
+    if ( this.textareaAssets && this.textareaAssets.val() && this.textareaAssets.val().length > 0 ){
+      return this.textareaAssets.val();
+    }
+    return null;
   }
 
   static setAssetManagerConf() {
     this.assetManagerConf = {
-      assets: JSON.parse(this.textareaAssets.val() || null),
+      assets: JSON.parse(this.getAssetValue()),
       noAssets: Mautic.translate('grapesjsbuilder.assetManager.noAssets'),
       upload: this.textareaAssets.data('upload'),
       uploadName: 'files',
@@ -107,7 +129,7 @@ export default class BuilderService {
     // PageBuilder
     // Parse HTML template
     const parser = new DOMParser();
-    const fullHtml = parser.parseFromString(this.textareaHtml.val(), 'text/html');
+    const fullHtml = parser.parseFromString(this.getHtmlValue(), 'text/html');
 
     // Extract body
     const body = fullHtml.body.innerHTML;
@@ -124,12 +146,12 @@ export default class BuilderService {
         clearProperties: true, // Temp fix https://github.com/artf/grapesjs-preset-webpage/issues/27
       },
 
-      plugins: ['gjs-preset-webpage', 'grapesjs-parser-postcss', 'grapesjs-preset-mautic'],
+      plugins: [grapesjswebpage, grapesjspostcss, grapesjsmautic],
       pluginsOpts: {
-        'gjs-preset-webpage': {
+        grapesjswebpage: {
           formsOpts: false,
         },
-        'grapesjs-preset-mautic': this.presetMauticConf,
+        grapesjsmautic: this.presetMauticConf,
       },
       keymaps: this.keymapsConf,
     });
@@ -148,7 +170,7 @@ export default class BuilderService {
           fullHtml.body.innerHTML = `${editor.getHtml()}<style>${editor.getCss({
             avoidProtected: true,
           })}</style>`;
-          this.textareaHtml.val(fullHtml.documentElement.outerHTML);
+          this.getHtmlValue(fullHtml.documentElement.outerHTML);
 
           // Reset HTML
           mQuery('.builder').removeClass('builder-active').addClass('hide');
@@ -169,15 +191,15 @@ export default class BuilderService {
     const editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components: this.textareaMjml.val(),
+      components: this.getMjmlValue(),
       height: '100%',
       storageManager: false,
       assetManager: this.assetManagerConf,
 
-      plugins: [grapesjsmjml, 'grapesjs-parser-postcss', 'grapesjs-preset-mautic'],
+      plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic],
       pluginsOpts: {
         grapesjsmjml: {},
-        'grapesjs-preset-mautic': this.presetMauticConf,
+        grapesjsmautic: this.presetMauticConf,
       },
       keymaps: this.keymapsConf,
     });
@@ -230,7 +252,7 @@ export default class BuilderService {
     // EmailBuilder -> HTML
     // Parse HTML template
     const parser = new DOMParser();
-    const fullHtml = parser.parseFromString(this.textareaHtml.val(), 'text/html');
+    const fullHtml = parser.parseFromString(this.getHtmlValue(), 'text/html');
 
     // Extract body
     const body = fullHtml.body.innerHTML;
@@ -244,10 +266,10 @@ export default class BuilderService {
       storageManager: false,
       assetManager: this.assetManagerConf,
 
-      plugins: ['gjs-preset-newsletter', 'grapesjs-parser-postcss', 'grapesjs-preset-mautic'],
+      plugins: [grapesjsnewsletter, grapesjspostcss, grapesjsmautic],
       pluginsOpts: {
-        'gjs-preset-newsletter': {},
-        'grapesjs-preset-mautic': this.presetMauticConf,
+        grapesjsnewsletter: {},
+        grapesjsmautic: this.presetMauticConf,
       },
       keymaps: this.keymapsConf,
     });
@@ -326,9 +348,9 @@ export default class BuilderService {
       storageManager: false,
       panels: { defaults: [] },
 
-      plugins: ['grapesjs-mjml', 'grapesjs-parser-postcss'],
+      plugins: [grapesjsmjml, grapesjspostcss],
       pluginsOpts: {
-        'grapesjs-mjml': {},
+        grapesjsmjml: {},
       },
     });
 
@@ -358,7 +380,7 @@ export default class BuilderService {
     const builderButton = mQuery('.btn-builder');
     const saveButton = mQuery('.btn-save');
     const applyButton = mQuery('.btn-apply');
-
+    console.warn(this.textareaHtml );
     if (activate) {
       Mautic.activateButtonLoadingIndicator(builderButton);
       Mautic.activateButtonLoadingIndicator(saveButton);

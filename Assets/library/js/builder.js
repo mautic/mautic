@@ -6,6 +6,13 @@ import builder from './builder.service';
  * @param themeField
  */
 Mautic.initSelectTheme = (function (initSelectTheme) {
+  const textareaHtml = mQuery('textarea.builder-html');
+  const textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
+  const textareaMjml = mQuery('textarea.builder-mjml');
+  console.warn('initSelectTheme');
+  console.warn(textareaHtml);
+  builder.setTextareas(textareaHtml, textareaAssets, textareaMjml);
+
   return function (themeField) {
     const builderUrl = mQuery('#builder_url');
     let url;
@@ -183,15 +190,14 @@ Mautic.setThemeHtml = function (theme) {
     data: `template=${theme}`,
     dataType: 'json',
     success(response) {
+      console.debug('got template');
       builder.textareaHtml.val(response.templateHtml);
 
       if (typeof builder.textareaMjml !== 'undefined') {
         builder.textareaMjml.val(response.templateMjml);
 
         // If MJML template, generate HTML before save
-        console.warn(typeof builder.textareaHtml);
-        console.warn(builder.textareaHtml);
-        if (!builder.textareaHtml.val().length && builder.textareaMjml.val().length) {
+        if (!builder.getHtmlValue() && builder.getMjmlValue()) {
           builder.mjmlToHtml(builder.textareaMjml, builder.textareaHtml);
         }
       }
