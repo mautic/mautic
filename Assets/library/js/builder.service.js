@@ -3,7 +3,7 @@ import grapesjsmjml from 'grapesjs-mjml';
 import grapesjsnewsletter from 'grapesjs-preset-newsletter';
 import grapesjswebpage from 'grapesjs-preset-webpage';
 import grapesjspostcss from 'grapesjs-parser-postcss';
-import grapesjsmautic from './grapesjs-preset-mautic.min'
+import grapesjsmautic from './grapesjs-preset-mautic.min';
 
 export default class BuilderService {
   static assetManagerConf;
@@ -63,11 +63,7 @@ export default class BuilderService {
   };
 
   static setTextareas(textareaHtml, textareaAssets, textareaMjml) {
-    if (
-      !textareaHtml ||
-      !textareaAssets ||
-      !textareaMjml
-    ) {
+    if (!textareaHtml || !textareaAssets || !textareaMjml) {
       console.debug('not all textareas loaded');
     }
 
@@ -76,22 +72,22 @@ export default class BuilderService {
     this.textareaAssets = textareaAssets;
   }
 
-  static getHtmlValue(){
-    if ( this.textareaHtml && this.textareaHtml.val() && this.textareaHtml.val().length > 0 ){
+  static getHtmlValue() {
+    if (this.textareaHtml && this.textareaHtml.val() && this.textareaHtml.val().length > 0) {
       return this.textareaHtml.val();
     }
     return null;
   }
 
-  static getMjmlValue(){
-    if ( this.textareaMjml && this.textareaMjml.val() && this.textareaMjml.val().length > 0 ){
+  static getMjmlValue() {
+    if (this.textareaMjml && this.textareaMjml.val() && this.textareaMjml.val().length > 0) {
       return this.textareaMjml.val();
     }
     return null;
   }
 
-  static getAssetValue(){
-    if ( this.textareaAssets && this.textareaAssets.val() && this.textareaAssets.val().length > 0 ){
+  static getAssetValue() {
+    if (this.textareaAssets && this.textareaAssets.val() && this.textareaAssets.val().length > 0) {
       return this.textareaAssets.val();
     }
     return null;
@@ -166,11 +162,11 @@ export default class BuilderService {
         command() {
           Mautic.grapesConvertDynamicContentSlotsToTokens(editor);
 
-          // Update textarea for save
+          // Update textarea for save (part that is different from other modes)
           fullHtml.body.innerHTML = `${editor.getHtml()}<style>${editor.getCss({
             avoidProtected: true,
           })}</style>`;
-          this.getHtmlValue(fullHtml.documentElement.outerHTML);
+          mQuery('textarea.builder-html').val(fullHtml.documentElement.outerHTML);
 
           // Reset HTML
           mQuery('.builder').removeClass('builder-active').addClass('hide');
@@ -228,14 +224,14 @@ export default class BuilderService {
             alert('Errors inside your template. Template will not be saved.');
           }
 
-          // Update textarea for save
+          // Update textarea for save (only individual part)
           if (!code.length) {
-            this.textareaHtml.val(code.html);
-            this.textareaMjml.val(editor.getHtml());
+            mQuery('textarea.builder-html').val(code.html);
+            mQuery('textarea.builder-mjml').val(editor.getHtml());
           }
 
           // Reset HTML
-          mQuery('.builder').removeClass('builder-active').addClass('hide');
+          // mQuery('.builder').removeClass('builder-active').addClass('hide');
           mQuery('html').css('font-size', '');
           mQuery('body').css('overflow-y', '');
 
@@ -293,10 +289,10 @@ export default class BuilderService {
 
           // Update textarea for save
           fullHtml.body.innerHTML = editor.runCommand('gjs-get-inlined-html');
-          this.textareaHtml.val(fullHtml.documentElement.outerHTML);
+          mQuery('textarea.builder-html').val(fullHtml.documentElement.outerHTML);
 
           // Reset HTML
-          mQuery('.builder').removeClass('builder-active').addClass('hide');
+          // mQuery('.builder').removeClass('builder-active').addClass('hide');
           mQuery('html').css('font-size', '');
           mQuery('body').css('overflow-y', '');
 
@@ -305,7 +301,7 @@ export default class BuilderService {
         },
       },
     ]);
-
+    
     return editor;
   }
 
@@ -322,10 +318,13 @@ export default class BuilderService {
       const dynConId = `#emailform_dynamicContent_${attributes['data-param-dec-id']}`;
       const dynConTarget = mQuery(dynConId);
 
-      if (typeof dynConTarget !== 'undefined') {
+      if (dynConTarget) {
         dynConTarget.find('a.remove-item:first').click();
         // remove vertical tab in outside form
-        mQuery('.dynamicContentFilterContainer').find(`a[href=${dynConId}]`).parent().remove();
+        const dynCon = mQuery('.dynamicContentFilterContainer').find(`a[href=${dynConId}]`);
+        if (dynCon && dynCon.parent()) {
+          dynCon.parent().remove();
+        }
       }
     }
   }
@@ -333,18 +332,16 @@ export default class BuilderService {
   /**
    * Init GrapesJS to generate HTML
    *
-   * @param source - Textarea where MJML is stored
-   * @param destination - Textarea where HTML will be stored
+   * @param mjmlTextarea - Textarea where MJML is stored
+   * @param htmlTextarea - Textarea where HTML will be stored
    * @param container - Invisible container to init GrapesJS
    */
-  static mjmlToHtml(source, destination, container) {
-    const containerName = container || '.builder-panel';
-
+  static mjmlToHtml(mjmlTextarea, htmlTextarea, container = '.builder-panel') {
     let code = '';
     const editor = grapesjs.init({
       clearOnRender: true,
-      containerName,
-      components: source.val(),
+      container,
+      components: mjmlTextarea.val(),
       storageManager: false,
       panels: { defaults: [] },
 
@@ -362,9 +359,9 @@ export default class BuilderService {
       alert('Errors inside your template. Template will not be saved.');
     }
 
-    // Set result to destination
+    // Set result to htmlTextarea
     if (!code.length) {
-      destination.val(code.html);
+      htmlTextarea.val(code.html);
     }
 
     // Destroy GrapesJS
@@ -380,7 +377,7 @@ export default class BuilderService {
     const builderButton = mQuery('.btn-builder');
     const saveButton = mQuery('.btn-save');
     const applyButton = mQuery('.btn-apply');
-    console.warn(this.textareaHtml );
+
     if (activate) {
       Mautic.activateButtonLoadingIndicator(builderButton);
       Mautic.activateButtonLoadingIndicator(saveButton);

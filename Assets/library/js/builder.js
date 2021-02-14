@@ -9,8 +9,7 @@ Mautic.initSelectTheme = (function (initSelectTheme) {
   const textareaHtml = mQuery('textarea.builder-html');
   const textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
   const textareaMjml = mQuery('textarea.builder-mjml');
-  console.warn('initSelectTheme');
-  console.warn(textareaHtml);
+
   builder.setTextareas(textareaHtml, textareaAssets, textareaMjml);
 
   return function (themeField) {
@@ -158,7 +157,7 @@ Mautic.initGrapesJS = function (object) {
   const textareaHtml = mQuery('textarea.builder-html');
   const textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
   const textareaMjml = mQuery('textarea.builder-mjml');
-  console.warn({ textareaHtml });
+
   builder.setTextareas(textareaHtml, textareaAssets, textareaMjml);
 
   if (object === 'page') {
@@ -190,15 +189,17 @@ Mautic.setThemeHtml = function (theme) {
     data: `template=${theme}`,
     dataType: 'json',
     success(response) {
-      console.debug('got template');
-      builder.textareaHtml.val(response.templateHtml);
+      const textareaHtml = mQuery('textarea.builder-html');
+      const textareaMjml = mQuery('textarea.builder-mjml');
 
-      if (typeof builder.textareaMjml !== 'undefined') {
-        builder.textareaMjml.val(response.templateMjml);
+      textareaHtml.val(response.templateHtml);
+
+      if (typeof textareaMjml !== 'undefined') {
+        textareaMjml.val(response.templateMjml);
 
         // If MJML template, generate HTML before save
-        if (!builder.getHtmlValue() && builder.getMjmlValue()) {
-          builder.mjmlToHtml(builder.textareaMjml, builder.textareaHtml);
+        if (!textareaHtml.val().length && textareaMjml.val().length) {
+          builder.mjmlToHtml(textareaMjml, textareaHtml);
         }
       }
     },
