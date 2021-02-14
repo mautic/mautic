@@ -44,23 +44,18 @@ class WebhookQueueRepository extends CommonRepository
      */
     public function getQueueCountByWebhookId($id)
     {
-        // if no idea was sent (the hook was deleted) then return a count of 0
+        // if no id was sent (the hook was deleted) then return a count of 0
         if (!$id) {
             return 0;
         }
 
-        $qb    = $this->_em->getConnection()->createQueryBuilder();
-        $count = $qb->select('count('.$this->getTableAlias().'.id) as webhook_count')
+        $qb = $this->_em->getConnection()->createQueryBuilder();
+
+        return (int) $qb->select('count(*) as webhook_count')
             ->from(MAUTIC_TABLE_PREFIX.'webhook_queue', $this->getTableAlias())
             ->where($this->getTableAlias().'.webhook_id = :id')
             ->setParameter('id', $id)
             ->execute()
-            ->fetch();
-
-        if (isset($count['webhook_count'])) {
-            return $count['webhook_count'];
-        }
-
-        return 0;
+            ->fetchColumn();
     }
 }
