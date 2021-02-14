@@ -131,7 +131,7 @@ class IpLookupHelper
     public function getIpAddress($ip = null)
     {
         static $ipAddresses = [];
-        $request = $this->requestStack->getCurrentRequest();
+        $request            = $this->requestStack->getCurrentRequest();
 
         if (null === $ip) {
             $ip = $this->getIpAddressFromRequest();

@@ -66,11 +66,11 @@ class ClientType extends AbstractType
         Session $session,
         RouterInterface $router
     ) {
-        $this->translator = $translator;
-        $this->validator  = $validator;
+        $this->translator   = $translator;
+        $this->validator    = $validator;
         $this->requestStack = $requestStack;
-        $this->session = $session;
-        $this->router     = $router;
+        $this->session      = $session;
+        $this->router       = $router;
     }
 
     /**
@@ -280,7 +280,7 @@ class ClientType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $apiMode = $this->getApiMode();
+        $apiMode   = $this->getApiMode();
         $dataClass = ('oauth2' == $apiMode) ? 'Mautic\ApiBundle\Entity\oAuth2\Client' : 'Mautic\ApiBundle\Entity\oAuth1\Consumer';
         $resolver->setDefaults(
             [
