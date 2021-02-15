@@ -108,7 +108,7 @@ export default class BuilderService {
   }
 
   static setPresetMauticConf() {
-    this.setpresetMauticConf = {
+    this.presetMauticConf = {
       sourceEditBtnLabel: Mautic.translate('grapesjsbuilder.sourceEditBtnLabel'),
       sourceCancelBtnLabel: Mautic.translate('grapesjsbuilder.sourceCancelBtnLabel'),
       sourceEditModalTitle: Mautic.translate('grapesjsbuilder.sourceEditModalTitle'),
@@ -153,31 +153,7 @@ export default class BuilderService {
     });
 
     // Customize GrapesJS -> add close button with save for Mautic
-    const panelManager = editor.Panels;
-    panelManager.addButton('views', [
-      {
-        id: 'close',
-        className: 'fa fa-times-circle',
-        attributes: { title: 'Close' },
-        command() {
-          Mautic.grapesConvertDynamicContentSlotsToTokens(editor);
-
-          // Update textarea for save (part that is different from other modes)
-          fullHtml.body.innerHTML = `${editor.getHtml()}<style>${editor.getCss({
-            avoidProtected: true,
-          })}</style>`;
-          mQuery('textarea.builder-html').val(fullHtml.documentElement.outerHTML);
-
-          // Reset HTML
-          mQuery('.builder').removeClass('builder-active').addClass('hide');
-          mQuery('html').css('font-size', '');
-          mQuery('body').css('overflow-y', '');
-
-          // Destroy GrapesJS
-          editor.destroy();
-        },
-      },
-    ]);
+    this.getCloseButtonPage(editor.Panels, editor);
 
     return editor;
   }
@@ -204,8 +180,48 @@ export default class BuilderService {
       content: '<mj-button href="https://">Button</mj-button>',
     });
 
-    // Customize GrapesJS -> add close button with save for Mautic
-    const panelManager = editor.Panels;
+    this.getCloseButtonMjml(editor.Panels, editor);
+
+    return editor;
+  }
+
+  /**
+   * Customize GrapesJS -> add close button with save for Mautic in the Page Builder Mode
+   */
+  static getCloseButtonPage(panelManager, editor) {
+    const parser = new DOMParser();
+    const fullHtml = parser.parseFromString(this.getHtmlValue(), 'text/html');
+
+    panelManager.addButton('views', [
+      {
+        id: 'close',
+        className: 'fa fa-times-circle',
+        attributes: { title: 'Close' },
+        command() {
+          Mautic.grapesConvertDynamicContentSlotsToTokens(editor);
+
+          // Update textarea for save (part that is different from other modes)
+          fullHtml.body.innerHTML = `${editor.getHtml()}<style>${editor.getCss({
+            avoidProtected: true,
+          })}</style>`;
+          mQuery('textarea.builder-html').val(fullHtml.documentElement.outerHTML);
+
+          // Reset HTML
+          mQuery('.builder').removeClass('builder-active').addClass('hide');
+          mQuery('html').css('font-size', '');
+          mQuery('body').css('overflow-y', '');
+
+          // Destroy GrapesJS
+          editor.destroy();
+        },
+      },
+    ]);
+  }
+
+  /**
+   * Customize GrapesJS -> add close button with save for Mautic
+   */
+  static getCloseButtonMjml(panelManager, editor) {
     panelManager.addButton('views', [
       {
         id: 'close',
@@ -241,7 +257,38 @@ export default class BuilderService {
       },
     ]);
 
-    return editor;
+    return panelManager;
+  }
+
+  /**
+   * Get a custom close button for the Mautic Email mode where the template is HTML
+   */
+  static getCloseButtonHtml(panelManager, editor) {
+    const parser = new DOMParser();
+    const fullHtml = parser.parseFromString(this.getHtmlValue(), 'text/html');
+
+    panelManager.addButton('views', [
+      {
+        id: 'close',
+        className: 'fa fa-times-circle',
+        attributes: { title: 'Close' },
+        command() {
+          Mautic.grapesConvertDynamicContentSlotsToTokens(editor);
+
+          // Update textarea for save
+          fullHtml.body.innerHTML = editor.runCommand('gjs-get-inlined-html');
+          mQuery('textarea.builder-html').val(fullHtml.documentElement.outerHTML);
+
+          // Reset HTML
+          // mQuery('.builder').removeClass('builder-active').addClass('hide');
+          mQuery('html').css('font-size', '');
+          mQuery('body').css('overflow-y', '');
+
+          // Destroy GrapesJS
+          editor.destroy();
+        },
+      },
+    ]);
   }
 
   static initEmailHtml() {
@@ -270,6 +317,7 @@ export default class BuilderService {
       keymaps: this.keymapsConf,
     });
 
+    // add a Mautic custom block Button
     editor.BlockManager.get('button').set({
       content:
         '<a href="#" target="_blank" style="display:inline-block;text-decoration:none;border-color:#4e5d9d;border-width: 10px 20px;border-style:solid; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; background-color: #4e5d9d; display: inline-block;font-size: 16px; color: #ffffff; ">\n' +
@@ -278,30 +326,8 @@ export default class BuilderService {
     });
 
     // Customize GrapesJS -> add close button with save for Mautic
-    const panelManager = editor.Panels;
-    panelManager.addButton('views', [
-      {
-        id: 'close',
-        className: 'fa fa-times-circle',
-        attributes: { title: 'Close' },
-        command() {
-          Mautic.grapesConvertDynamicContentSlotsToTokens(editor);
+    this.getCloseButtonHtml(editor.Panels, editor);
 
-          // Update textarea for save
-          fullHtml.body.innerHTML = editor.runCommand('gjs-get-inlined-html');
-          mQuery('textarea.builder-html').val(fullHtml.documentElement.outerHTML);
-
-          // Reset HTML
-          // mQuery('.builder').removeClass('builder-active').addClass('hide');
-          mQuery('html').css('font-size', '');
-          mQuery('body').css('overflow-y', '');
-
-          // Destroy GrapesJS
-          editor.destroy();
-        },
-      },
-    ]);
-    
     return editor;
   }
 
@@ -366,6 +392,12 @@ export default class BuilderService {
 
     // Destroy GrapesJS
     editor.destroy();
+
+    // try {
+    //   editor.destroy();
+    // } catch (error) {
+    //   console.log(error);
+    // }
   }
 
   /**
