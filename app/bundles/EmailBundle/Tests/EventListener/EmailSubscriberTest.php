@@ -20,7 +20,7 @@ use Mautic\EmailBundle\EventListener\EmailSubscriber;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class EmailSubcriberTest extends \PHPUnit\Framework\TestCase
+class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private $ipLookupHelper;
     private $auditLogModel;
