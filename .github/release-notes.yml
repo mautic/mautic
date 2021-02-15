@@ -1,0 +1,10 @@
+changelog:
+  repository: mautic/plugin-grapesjs-builder
+  sections:
+    - title: "✨ Enhancements"
+      labels: ["enhancement", "feature"]
+    - title: "🐞 Bugs"
+      labels: ["bug", "regression"]
+    - title: ["Contributors"]
+  contributors:
+    title: "💖 Contributors"
