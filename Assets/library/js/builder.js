@@ -159,6 +159,8 @@ Mautic.initGrapesJS = function (object) {
   const textareaMjml = mQuery('textarea.builder-mjml');
 
   builder.setTextareas(textareaHtml, textareaAssets, textareaMjml);
+  builder.setAssetManagerConf();
+  builder.setPresetMauticConf();
 
   if (object === 'page') {
     editor = builder.initPage();
