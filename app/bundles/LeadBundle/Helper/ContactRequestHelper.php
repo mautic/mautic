@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -53,9 +55,9 @@ class ContactRequestHelper
     private $contactTracker;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\Request|null
+     * @var RequestStack
      */
-    private $request;
+    private $requestStack;
 
     /**
      * @var Logger
@@ -90,7 +92,7 @@ class ContactRequestHelper
         $this->contactTracker       = $contactTracker;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->ipLookupHelper       = $ipLookupHelper;
-        $this->request              = $requestStack->getCurrentRequest();
+        $this->requestStack         = $requestStack;
         $this->logger               = $logger;
         $this->eventDispatcher      = $eventDispatcher;
     }
@@ -133,7 +135,7 @@ class ContactRequestHelper
         // Check for a lead requested through clickthrough query parameter
         if (isset($this->queryFields['ct'])) {
             $clickthrough = (is_array($this->queryFields['ct'])) ? $this->queryFields['ct'] : ClickthroughHelper::decodeArrayFromUrl($this->queryFields['ct']);
-        } elseif ($clickthrough = $this->request->get('ct', [])) {
+        } elseif ($clickthrough = $this->requestStack->getCurrentRequest()->get('ct', [])) {
             $clickthrough = ClickthroughHelper::decodeArrayFromUrl($clickthrough);
         }
 
