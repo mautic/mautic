@@ -4,6 +4,8 @@ namespace Mautic\CoreBundle\Helper;
 
 class DateTimeHelper
 {
+    const FORMAT_DB = 'Y-m-d H:i:s';
+
     /**
      * @var string
      */
@@ -39,19 +41,17 @@ class DateTimeHelper
      * @param string                    $fromFormat Format the string is in
      * @param string                    $timezone   Timezone the string is in
      */
-    public function __construct($string = '', $fromFormat = 'Y-m-d H:i:s', $timezone = 'UTC')
+    public function __construct($string = '', $fromFormat = self::FORMAT_DB, $timezone = 'UTC')
     {
         $this->setDateTime($string, $fromFormat, $timezone);
     }
 
     /**
-     * Sets date/time.
-     *
      * @param \DateTimeInterface|string $datetime
      * @param string                    $fromFormat
      * @param string                    $timezone
      */
-    public function setDateTime($datetime = '', $fromFormat = 'Y-m-d H:i:s', $timezone = 'local')
+    public function setDateTime($datetime = '', $fromFormat = self::FORMAT_DB, $timezone = 'local')
     {
         $localTimezone = date_default_timezone_get();
         if ('local' == $timezone) {
@@ -60,7 +60,7 @@ class DateTimeHelper
             $timezone = 'UTC';
         }
 
-        $this->format   = (empty($fromFormat)) ? 'Y-m-d H:i:s' : $fromFormat;
+        $this->format   = (empty($fromFormat)) ? self::FORMAT_DB : $fromFormat;
         $this->timezone = $timezone;
 
         $this->utc   = new \DateTimeZone('UTC');
@@ -152,7 +152,7 @@ class DateTimeHelper
     }
 
     /**
-     * @param null $format
+     * @param string|null $format
      *
      * @return string
      */
