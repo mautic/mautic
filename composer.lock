@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "59bb7172d521486df578f4918ac3ceda",
+    "content-hash": "0ea9431ed5f93790fad74577af8ea8ef",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -5669,7 +5669,10 @@
             "require": {
                 "composer/installers": "~1.0"
             },
-            "type": "mautic-plugin"
+            "type": "mautic-plugin",
+            "extra": {
+                "installer-name": "GrapesJsBuilderBundle"
+            }
         },
         {
             "name": "maxmind-db/reader",
