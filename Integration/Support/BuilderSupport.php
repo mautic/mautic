@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\Integration\Support;
 
-
 use Mautic\IntegrationsBundle\Integration\Interfaces\BuilderInterface;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\GrapesJsBuilderIntegration;
 
