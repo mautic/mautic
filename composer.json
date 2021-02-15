@@ -112,7 +112,9 @@
         "gaufrette/extras": "^0.1.0",
         "gaufrette/aws-s3-adapter": "^0.4.0",
         "phpoffice/phpspreadsheet": "^1.15",
-        "predis/predis": "^1.1"
+        "predis/predis": "^1.1",
+        "composer/installers": "^1.10",
+        "mautic/grapejs-builder": "1.0-RC"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~3.4.0",
@@ -139,7 +141,24 @@
         {
             "type": "git",
             "url": "https://github.com/mautic/intl.git"
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "mautic/grapejs-builder",
+                "version": "1.0-RC",
+                "type": "mautic-plugin",
+                "source": {
+                    "url": "https://github.com/mautic/plugin-grapesjs-builder.git",
+                    "type": "git",
+                    "reference": "1.0-RC"
+                },
+                "require": {
+                    "composer/installers": "~1.0"
+                }
+            }
         }
+
     ],
     "scripts": {
         "auto-scripts": [
@@ -174,6 +193,9 @@
         "symfony-assets-install": "relative",
         "incenteev-parameters": {
             "file": "app/config/parameters.yml"
+        },
+        "installer-paths": {
+            "plugins/{$name}": ["type:mautic-plugin"]
         }
     }
 }
