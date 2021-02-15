@@ -39,8 +39,6 @@ class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->emailModel               = $this->createMock(EmailModel::class);
         $this->entityManager            = $this->createMock(EntityManager::class);
 
-        $this->emailEntity              =  $this->createMock(Email::class);
-
         $this->subscriber =  new EmailSubscriber($this->ipLookupHelper, $this->auditLogModel, $this->emailModel, $this->translator, $this->entityManager);
     }
 
