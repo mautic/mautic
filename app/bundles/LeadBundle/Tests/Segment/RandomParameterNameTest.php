@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 
 class RandomParameterNameTest extends TestCase
 {
-    public function testGenerateRandomParameterNam(): void
+    public function testGenerateRandomParameterName(): void
     {
         $generator = new RandomParameterName();
 
