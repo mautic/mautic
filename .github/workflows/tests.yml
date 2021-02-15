@@ -14,7 +14,7 @@ jobs:
 
     strategy:
         matrix:
-          php-versions: ['7.2', '7.3', '7.4']
+          php-versions: ['7.3', '7.4']
           db-types: ['mysql', 'mariadb']
   
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
@@ -40,6 +40,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      # Codecov needs access to previous commits, so we add fetch-depth: 0
+      with:
+        fetch-depth: 0
     
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2

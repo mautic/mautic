@@ -89,6 +89,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                         </div>
                     </div>
                     <div class="tab-pane fade bdr-w-0" id="filters">
+                        <div class="alert alert-info"><p><?php echo $view['translator']->trans('mautic.lead.lead.segment.filter.info'); ?></p></div>
                         <div class="form-group">
                             <div class="available-filters mb-md pl-0 col-md-4" data-prototype="<?php echo $view->escape($view['form']->widget($form['filters']->vars['prototype'])); ?>" data-index="<?php echo $index + 1; ?>">
                                 <select class="chosen form-control" id="available_filters">
@@ -142,6 +143,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
     </div>
     <div class="col-md-3 bg-white height-auto bdr-l">
         <div class="pr-lg pl-lg pt-md pb-md">
+            <?php echo $view['form']->row($form['category']); ?>
             <?php echo $view['form']->row($form['isGlobal']); ?>
             <?php echo $view['form']->row($form['isPreferenceCenter']); ?>
             <?php echo $view['form']->row($form['isPublished']); ?>

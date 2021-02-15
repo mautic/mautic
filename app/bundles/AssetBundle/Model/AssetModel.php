@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -85,6 +87,11 @@ class AssetModel extends FormModel
     private $contactTracker;
 
     /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
      * AssetModel constructor.
      */
     public function __construct(
@@ -100,7 +107,7 @@ class AssetModel extends FormModel
     ) {
         $this->leadModel              = $leadModel;
         $this->categoryModel          = $categoryModel;
-        $this->request                = $requestStack->getCurrentRequest();
+        $this->requestStack           = $requestStack;
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->deviceCreatorService   = $deviceCreatorService;
         $this->deviceDetectorFactory  = $deviceDetectorFactory;
@@ -165,7 +172,7 @@ class AssetModel extends FormModel
         }
 
         if (null == $request) {
-            $request = $this->request;
+            $request = $this->requestStack->getCurrentRequest();
         }
 
         $download = new Download();
