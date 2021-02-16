@@ -241,6 +241,12 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'field'         => 'asset_id',
         ];
 
+        $this->translations['submission_form'] = [
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'form_submissions',
+            'field'         => 'form_id',
+        ];
+
         parent::__construct($this->translations);
     }
 }
