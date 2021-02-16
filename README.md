@@ -67,6 +67,8 @@ You can use the Blank MJML template provided by Webmecanik Blank MJML as a start
 
 [blank_mjml.zip](https://github.com/mautic/plugin-grapesjs-builder/files/4757520/blank_mjml.zip)
 
+There are [three new email templates](https://github.com/mautic/mautic/pulls?q=is%3Apr+is%3Aopen+mjml) that will ship with Mautic 3.3 and we will soon have some landing page templates as well.
+
 ## Existing Templates
 
 **If you want to use any of your existing themes with the new builder, add the following to your theme's configuration file:**
@@ -75,7 +77,7 @@ You can use the Blank MJML template provided by Webmecanik Blank MJML as a start
 
 ## Support
 
-Use Github issues for reporting and discuss more about this plugin
+Use Github issues for reporting and discuss more about this plugin. Please join #i-builders on Slack if you would like to get involved in supporting, maintaining and improving the builder! Get your Slack invite at [https://mautic.org/slack](https://mautic.org/slack)
 
 ## Contribution
 
