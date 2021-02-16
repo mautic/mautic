@@ -70,6 +70,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                         'orderBy'    => 'l.dateModified',
                         'text'       => 'mautic.lead.import.label.dateModified',
                         'class'      => 'visible-md visible-lg col-leadlist-dateModified',
+                        'default'    => true,
                     ]
                 );
 
