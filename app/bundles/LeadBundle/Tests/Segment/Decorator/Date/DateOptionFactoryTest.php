@@ -235,6 +235,30 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
      */
+    public function testRelativeFirstDayOf()
+    {
+        $filterName = 'first day of previous month';
+
+        $filterDecorator = $this->getFilterDecorator($filterName);
+
+        $this->assertInstanceOf(DateRelativeInterval::class, $filterDecorator);
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
+     */
+    public function testRelativeLastDayOf()
+    {
+        $filterName = 'last day of previous month';
+
+        $filterDecorator = $this->getFilterDecorator($filterName);
+
+        $this->assertInstanceOf(DateRelativeInterval::class, $filterDecorator);
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory::getDateOption
+     */
     public function testDateDefault()
     {
         $filterName = '2018-01-01';
