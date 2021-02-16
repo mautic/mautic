@@ -41,7 +41,6 @@ if ('index' == $tmpl) {
                         'orderBy'    => 'c.name',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-campaign-name',
-                        'default'    => true,
                     ]
                 );
 
@@ -72,6 +71,7 @@ if ('index' == $tmpl) {
                         'orderBy'    => 'c.dateModified',
                         'text'       => 'mautic.lead.import.label.dateModified',
                         'class'      => 'visible-md visible-lg col-campaign-dateModified',
+                        'default'    => true,
                     ]
                 );
 
