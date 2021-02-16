@@ -567,6 +567,24 @@ class SegmentFiltersSubscriber implements EventSubscriberInterface
                 'operators'  => $this->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
             ],
+            'last_submission_form' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.last_submission_form'),
+                'properties' => ['type' => 'forms'],
+                'operators'  => $this->getOperatorsForFieldType('multiselect'),
+                'object'     => 'lead',
+            ],
+            'first_submission_date' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.first_submission_date'),
+                'properties' => ['type' => 'datetime'],
+                'operators'  => $this->getOperatorsForFieldType('default'),
+                'object'     => 'lead',
+            ],
+            'last_submission_date' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.last_submission_date'),
+                'properties' => ['type' => 'datetime'],
+                'operators'  => $this->getOperatorsForFieldType('default'),
+                'object'     => 'lead',
+            ],
         ];
 
         return $choices;
