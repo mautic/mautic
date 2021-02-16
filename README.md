@@ -4,6 +4,8 @@
 
 ## Installation in Mautic 3.x
 
+Note: Since the 3.3 Release Candidate you can jump directly to step 6! :tada:
+
 1. Navigate to the plugins directory of your Mautic installation via SSH/FTP/SFTP
 Here you find the SSH Commands to install the plugin (with FTP simply download and drag'n'drop the folders to the right directory)
 ```
@@ -64,6 +66,12 @@ GrapesJS plugin introduce also support for [MJML](https://mjml.io/) language. Ju
 You can use the Blank MJML template provided by Webmecanik Blank MJML as a starting point.
 
 [blank_mjml.zip](https://github.com/mautic/plugin-grapesjs-builder/files/4757520/blank_mjml.zip)
+
+## Existing Templates
+
+**If you want to use any of your existing themes with the new builder, add the following to your theme's configuration file:**
+
+`"builder": "grapesjsbuilder",`
 
 ## Support
 
