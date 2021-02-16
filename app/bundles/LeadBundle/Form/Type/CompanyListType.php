@@ -30,7 +30,13 @@ class CompanyListType extends AbstractType
                 'modal_route'         => 'mautic_company_action',
                 'modal_header'        => 'mautic.company.new.company',
                 'model'               => 'lead.company',
-                'ajax_lookup_action'  => 'lead:getLookupChoiceList',
+                'ajax_lookup_action'  => function (Options $options) {
+                    $query = [
+                        'limit' => $options['limit'],
+                    ];
+
+                    return 'lead:getLookupChoiceList&'.http_build_query($query);
+                },
                 'repo_lookup_method'  => 'getAjaxSimpleList',
                 'lookup_arguments'    => function (Options $options) {
                     return [
@@ -44,6 +50,7 @@ class CompanyListType extends AbstractType
                 },
                 'multiple'            => true,
                 'main_entity'         => null,
+                'limit'               => 100,
             ]
         );
     }
