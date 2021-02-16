@@ -203,7 +203,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         }
 
         if ($returnParameter) {
-            $string              = ($filter->strict) ? $filter->string : "{$filter->string}%";
+            $string              = ($filter->strict) ? $filter->string : "%{$filter->string}%";
             $parameters[$unique] = $string;
         }
 
