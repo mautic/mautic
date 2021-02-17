@@ -184,7 +184,8 @@ class ContactObjectHelper implements ObjectHelperInterface
                 $changedObject->getIntegration(),
                 $changedObject->getMappedObject(),
                 $changedObject->getMappedObjectId(),
-                $changedObject->getChangeDateTime()
+                $changedObject->getChangeDateTime(),
+                $changedObject->getObjectId()
             );
         }
 
