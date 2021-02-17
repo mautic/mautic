@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class CampaignControllerTest extends MauticMysqlTestCase
 {
