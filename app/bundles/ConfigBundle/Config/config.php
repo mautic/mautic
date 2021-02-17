@@ -61,6 +61,7 @@ return [
                 'class'     => \Mautic\ConfigBundle\Form\Type\ConfigType::class,
                 'arguments' => [
                     'mautic.config.form.restriction_helper',
+                    'mautic.config.form.escape_transformer',
                 ],
             ],
         ],
@@ -96,6 +97,20 @@ return [
                     'mautic.core.model.auditlog',
                 ],
             ],
+            'mautic.config.form.escape_transformer' => [
+                'class'     => \Mautic\ConfigBundle\Form\Type\EscapeTransformer::class,
+                'arguments' => [
+                    '%mautic.config_allowed_parameters%',
+                ],
+            ],
+        ],
+    ],
+
+    'parameters' => [
+        'config_allowed_parameters' => [
+            'kernel.root_dir',
+            'kernel.project_dir',
+            'kernel.logs_dir',
         ],
     ],
 ];
