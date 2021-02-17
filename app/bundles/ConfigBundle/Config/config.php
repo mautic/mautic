@@ -51,8 +51,6 @@ return [
             'mautic.config.subscriber' => [
                 'class'     => \Mautic\ConfigBundle\EventListener\ConfigSubscriber::class,
                 'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'service_container',
                     'mautic.config.config_change_logger',
                 ],
             ],
