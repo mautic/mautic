@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -27,16 +29,16 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class CategoryModel extends FormModel
 {
     /**
-     * @var \Symfony\Component\HttpFoundation\Request|null
+     * @var RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * CategoryModel constructor.
      */
     public function __construct(RequestStack $requestStack)
     {
-        $this->request = $requestStack->getCurrentRequest();
+        $this->requestStack = $requestStack;
     }
 
     public function getRepository()
@@ -52,7 +54,7 @@ class CategoryModel extends FormModel
     public function getPermissionBase($bundle = null)
     {
         if (null === $bundle) {
-            $bundle = $this->request->get('bundle');
+            $bundle = $this->requestStack->getCurrentRequest()->get('bundle');
         }
 
         if ('global' === $bundle || empty($bundle)) {
