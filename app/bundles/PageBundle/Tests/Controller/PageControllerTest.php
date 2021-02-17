@@ -13,6 +13,7 @@ class PageControllerTest extends MauticMysqlTestCase
      * @var string
      */
     private $prefix;
+    private $id;
 
     /**
      * @throws \Exception
@@ -20,7 +21,22 @@ class PageControllerTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->prefix = self::$container->getParameter('mautic.db_table_prefix');
+        $this->prefix = $this->container->getParameter('mautic.db_table_prefix');
+
+        $pageData = [
+            'title'    => 'Test Page',
+            'template' => 'blank',
+        ];
+
+        /** @var PageModel $model */
+        $model = $this->container->get('mautic.page.model.page');
+        $page  = new Page();
+        $page->setTitle($pageData['title'])
+            ->setTemplate($pageData['template']);
+
+        $model->saveEntity($page);
+
+        $this->id = $page->getId();
     }
 
     public function testLandingPageTracking()
@@ -153,5 +169,19 @@ class PageControllerTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $page;
+    }
+
+    /*
+     * Get page's view.
+     */
+    public function testViewActionPage(): void
+    {
+        $this->client->request('GET', '/s/pages/view/'.$this->id);
+        $clientResponse         = $this->client->getResponse();
+        $clientResponseContent  = $clientResponse->getContent();
+        $model                  = $this->container->get('mautic.page.model.page');
+        $page                   = $model->getEntity($this->id);
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertStringContainsString($page->getTitle(), $clientResponseContent, 'The return must contain the title of page');
     }
 }
