@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 class AssetControllerFunctionalTest extends MauticMysqlTestCase
 {
     /**
-     * Filtering should return status code 200.
+     * Index action should return status code 200.
      */
     public function testIndexAction(): void
     {
