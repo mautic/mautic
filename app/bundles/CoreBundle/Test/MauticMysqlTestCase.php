@@ -90,6 +90,21 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     }
 
     /**
+     * Warning: To perform Truncate on tables with foreign keys we have to turn off the foreign keys temporarily.
+     * This may lead to corrupted data. Make sure you know what you are doing.
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    protected function truncateTables(string ...$tables): void
+    {
+        $prefix = $this->container->getParameter('mautic.db_table_prefix');
+
+        foreach ($tables as $table) {
+            $this->connection->query("SET FOREIGN_KEY_CHECKS = 0; TRUNCATE TABLE `{$prefix}{$table}`; SET FOREIGN_KEY_CHECKS = 1;");
+        }
+    }
+
+    /**
      * @param $file
      *
      * @throws Exception
