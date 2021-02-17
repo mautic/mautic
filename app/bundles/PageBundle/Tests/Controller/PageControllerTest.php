@@ -4,7 +4,10 @@ namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData;
+use Mautic\PageBundle\DataFixtures\ORM\LoadPageData;
 use Mautic\PageBundle\Entity\Page;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class PageControllerTest extends MauticMysqlTestCase
@@ -205,5 +208,59 @@ class PageControllerTest extends MauticMysqlTestCase
         $model                  = $this->container->get('mautic.page.model.page');
         $page                   = $model->getEntity($this->id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+    }
+
+    /**
+     * Only tests if an actual CSV file is returned.
+     */
+    public function testCsvIsExportedCorrectly()
+    {
+        $this->loadFixtures([LoadPageCategoryData::class, LoadPageData::class]);
+
+        ob_start();
+        $this->client->request(Request::METHOD_GET, '/s/pages/results/'.$this->id.'/export');
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'text/csv; charset=UTF-8');
+    }
+
+    /**
+     * Only tests if an actual Excel file is returned.
+     */
+    public function testExcelIsExportedCorrectly()
+    {
+        $this->loadFixtures([LoadPageCategoryData::class, LoadPageData::class]);
+
+        ob_start();
+        $this->client->request(Request::METHOD_GET, '/s/pages/results/'.$this->id.'/export/xlsx');
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    }
+
+    /**
+     * Only tests if an actual HTML file is returned.
+     */
+    public function testHTMLIsExportedCorrectly()
+    {
+        $this->loadFixtures([LoadPageCategoryData::class, LoadPageData::class]);
+
+        ob_start();
+        $this->client->request(Request::METHOD_GET, '/s/pages/results/'.$this->id.'/export/html');
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'text/html; charset=UTF-8');
     }
 }
