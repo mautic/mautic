@@ -184,4 +184,26 @@ class PageControllerTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertStringContainsString($page->getTitle(), $clientResponseContent, 'The return must contain the title of page');
     }
+
+    /**
+     * Get landing page's create page.
+     */
+    public function testNewActionPage(): void
+    {
+        $this->client->request('GET', '/s/pages/new/');
+        $clientResponse         = $this->client->getResponse();
+        $clientResponseContent  = $clientResponse->getContent();
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+    }
+
+    /* Get landing page's submissions list */
+    public function testListLandingPageSubmissions(): void
+    {
+        $this->client->request('GET', 's/pages/results/'.$this->id);
+        $clientResponse         = $this->client->getResponse();
+        $clientResponseContent  = $clientResponse->getContent();
+        $model                  = $this->container->get('mautic.page.model.page');
+        $page                   = $model->getEntity($this->id);
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+    }
 }
