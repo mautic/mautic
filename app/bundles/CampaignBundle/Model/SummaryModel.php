@@ -48,6 +48,7 @@ class SummaryModel extends AbstractCommonModel
      * Collapse Event Log entities into insert/update queries for the campaign summary.
      *
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     * @throws \Doctrine\DBAL\Cache\CacheException
      * @throws \Doctrine\DBAL\DBALException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
@@ -62,6 +63,7 @@ class SummaryModel extends AbstractCommonModel
             $campaign  = $log->getCampaign();
             $event     = $log->getEvent();
             $key       = $campaign->getId().'.'.$event->getId().'.'.$timestamp;
+
             if (!isset($this->summaries[$key])) {
                 $dateTriggered = new \DateTime();
                 $dateTriggered->setTimestamp($timestamp);
@@ -83,8 +85,6 @@ class SummaryModel extends AbstractCommonModel
             } elseif ($log->getSystemTriggered()) {
                 $summary->setTriggeredCount($summary->getTriggeredCount() + 1);
             }
-
-            $this->setSummaryLogCountsProcessed($summary);
         }
 
         if (count($this->summaries) >= 100) {
@@ -173,12 +173,14 @@ class SummaryModel extends AbstractCommonModel
 
     /**
      * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     * @throws \Doctrine\DBAL\Cache\CacheException
      * @throws \Doctrine\DBAL\DBALException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function persistSummaries(): void
     {
         if ($this->summaries) {
+            $this->setSummaryLogCountsProcessed();
             $this->getRepository()->saveEntities($this->summaries);
             $this->summaries = [];
             $this->em->clear(Summary::class);
@@ -209,22 +211,24 @@ class SummaryModel extends AbstractCommonModel
 
     /**
      * @throws \Doctrine\DBAL\Cache\CacheException
-     * @throws \Doctrine\DBAL\DBALException
      */
-    private function setSummaryLogCountsProcessed(Summary $summary): void
+    private function setSummaryLogCountsProcessed(): void
     {
-        $dateTimes = $this->getSummaryTriggerDateTimes($summary);
-        $dateFrom  = $dateTimes['dateFrom'];
-        $dateTo    = $dateTimes['dateTo'];
+        foreach ($this->summaries as $key => $summary) {
+            $dateTimes = $this->getSummaryTriggerDateTimes($summary);
+            $dateFrom  = $dateTimes['dateFrom'];
+            $dateTo    = $dateTimes['dateTo'];
 
-        $campaignLogCountsProcessed = $this->getLogCountsProcessed($summary, $dateFrom, $dateTo);
+            $campaignLogCountsProcessed = $this->getLogCountsProcessed($summary, $dateFrom, $dateTo);
 
-        $eventId            = $summary->getEvent()->getId();
-        $logCountsProcessed = isset($campaignLogCountsProcessed[$eventId])
-            ? array_sum($campaignLogCountsProcessed[$eventId])
-            : 0;
+            $eventId            = $summary->getEvent()->getId();
+            $logCountsProcessed = isset($campaignLogCountsProcessed[$eventId])
+                ? array_sum($campaignLogCountsProcessed[$eventId])
+                : 0;
 
-        $summary->setLogCountsProcessed($logCountsProcessed);
+            $summary->setLogCountsProcessed($logCountsProcessed);
+            $this->summaries[$key] = $summary;
+        }
     }
 
     /**
