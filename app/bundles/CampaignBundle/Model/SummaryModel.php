@@ -30,6 +30,8 @@ class SummaryModel extends AbstractCommonModel
 
     /**
      * Collapse Event Log entities into insert/update queries for the campaign summary.
+     *
+     * @throws DBALException
      */
     public function updateSummary(iterable $logs): void
     {
@@ -52,6 +54,10 @@ class SummaryModel extends AbstractCommonModel
                 'dateFrom'   => $dateFrom,
                 'dateTo'     => $dateTo,
             ];
+        }
+
+        if (count($this->logData) >= 100) {
+            $this->persistSummaries();
         }
     }
 
