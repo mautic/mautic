@@ -102,7 +102,7 @@ class SummaryRepository extends CommonRepository
         $dateToTs   = $dateTo->getTimestamp();
 
         $sql = 'INSERT INTO '.MAUTIC_TABLE_PREFIX.'campaign_summary '.
-            ' (campaign_id, event_id, date_triggered, scheduled_count, non_action_path_taken_count,failed_count, triggered_count, log_counts_processed) '.
+            ' (campaign_id, event_id, date_triggered, scheduled_count, non_action_path_taken_count, failed_count, triggered_count, log_counts_processed) '.
             ' SELECT * FROM (SELECT '.
             '       mclel.campaign_id AS campaign_id, '.
             '       mclel.event_id AS event_id, '.
@@ -111,15 +111,15 @@ class SummaryRepository extends CommonRepository
             '       SUM(IF(mclel.is_scheduled = 1 AND mclel.trigger_date > NOW(), 0, mclel.non_action_path_taken)) AS non_action_path_taken_count_i, '.
             '       SUM(IF((mclel.is_scheduled = 1 AND mclel.trigger_date > NOW()) OR mclel.non_action_path_taken, 0, mclefl.log_id IS NOT NULL)) AS failed_count_i, '.
             '       SUM(IF((mclel.is_scheduled = 1 AND mclel.trigger_date > NOW()) OR mclel.non_action_path_taken OR mclefl.log_id IS NOT NULL, 0, 1)) AS triggered_count_i, '.
-            '       (SELECT count(mclel2.lead_id) FROM mautic_campaign_lead_event_log mclel2 '.
-            '           INNER JOIN mautic_campaign_leads mcl ON mcl.campaign_id = mclel2.campaign_id AND mcl.manually_removed = 0 '.
+            '       (SELECT count(mclel2.lead_id) FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log mclel2 '.
+            '           INNER JOIN '.MAUTIC_TABLE_PREFIX.'campaign_leads mcl ON mcl.campaign_id = mclel2.campaign_id AND mcl.manually_removed = 0 '.
             '           AND mclel2.lead_id = mcl.lead_id AND mcl.rotation = mclel2.rotation '.
             '           WHERE mclel2.campaign_id = mclel.campaign_id AND mclel2.event_id = mclel.event_id AND '.
-            '               NOT EXISTS(SELECT NULL FROM mautic_campaign_lead_event_failed_log mclefl2 '.
+            '               NOT EXISTS(SELECT NULL FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log mclefl2 '.
             '               WHERE mclefl2.log_id = mclel2.id AND mclefl2.date_added BETWEEN FROM_UNIXTIME('.$dateFromTs.') AND FROM_UNIXTIME('.$dateToTs.')) AND '.
             '               mclel2.date_triggered BETWEEN FROM_UNIXTIME('.$dateFromTs.') AND FROM_UNIXTIME('.$dateToTs.') '.
-            '       ) AS log_counts_processed '.
-            ' FROM mautic_campaign_lead_event_log mclel LEFT JOIN mautic_campaign_lead_event_failed_log mclefl ON mclefl.log_id = mclel.id '.
+            '       ) AS log_counts_processed_i '.
+            ' FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log mclel LEFT JOIN '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log mclefl ON mclefl.log_id = mclel.id '.
             ' WHERE (mclel.date_triggered BETWEEN FROM_UNIXTIME('.$dateFromTs.') AND FROM_UNIXTIME('.$dateToTs.')) ';
 
         if ($campaignId) {
