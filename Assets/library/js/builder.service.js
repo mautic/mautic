@@ -390,7 +390,7 @@ export default class BuilderService {
       mQuery('html').css('font-size', '');
       mQuery('body').css('overflow-y', '');
 
-      //   // Destroy GrapesJS
+      // Destroy GrapesJS
       this.editor.destroy();
     });
 
