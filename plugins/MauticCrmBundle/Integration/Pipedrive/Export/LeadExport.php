@@ -5,6 +5,7 @@ namespace MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PluginBundle\Entity\IntegrationEntity;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveOwner;
 use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\AbstractPipedrive;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -79,9 +80,9 @@ class LeadExport extends AbstractPipedrive
     {
         $leadId            = $lead->getId();
         $integrationEntity = $this->getLeadIntegrationEntity(['internalEntityId' => $leadId]);
+
         if (!$integrationEntity) {
             // create new contact
-
             return $this->create($lead);
         }
 

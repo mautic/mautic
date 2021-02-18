@@ -280,6 +280,13 @@ return [
                     'mautic_integration.pipedrive.export.company',
                 ],
             ],
+            'mautic_integration.pipedrive.export.activities' => [
+                'class'     => \MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\ActivitiesPipedriveExport::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.lead.model.lead',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.connectwise.campaignaction' => [

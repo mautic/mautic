@@ -11,12 +11,17 @@ class PipedriveApi extends CrmApi
     const ORGANIZATIONS_API_ENDPOINT = 'organizations';
     const PERSONS_API_ENDPOINT       = 'persons';
     const USERS_API_ENDPOINT         = 'users';
+    const ACTIVITY_TYPES             = 'activityTypes';
+    const ACTIVITIES                 = 'activities';
     /**
      * @var TransportInterface
      */
     private $transport;
 
     private $apiFields = [];
+
+    /** @var null|array */
+    private $activities = null;
 
     /**
      * PipedriveApi constructor.
@@ -157,8 +162,7 @@ class PipedriveApi extends CrmApi
             'query' => array_merge($this->getAuthQuery(), $query),
         ];
 
-        $url = sprintf('%s/%s', $this->integration->getApiUrl(), $endpoint);
-
+        $url      = sprintf('%s/%s', $this->integration->getApiUrl(), $endpoint);
         $response = $this->transport->get($url, $params);
 
         return json_decode($response->getBody(), true);
@@ -211,6 +215,97 @@ class PipedriveApi extends CrmApi
             'form_params' => $data,
             'query'       => $this->getAuthQuery(),
         ];
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return array
+     */
+    public function addActivity(array $data)
+    {
+        $params     = $this->getRequestParameters($data);
+        $url        = sprintf('%s/%s', $this->integration->getApiUrl(), self::ACTIVITIES);
+        $response   = $this->transport->post($url, $params);
+
+        return $data = $this->getResponseData($response);
+    }
+
+    /**
+     * @param array $event
+     *
+     * @return bool
+     */
+    public function hasActivityType(array $event)
+    {
+        $activityName = $event['eventType'];
+        $activities   = $this->getActivityTypes();
+        // return If already exists
+        if (isset($activities[$activityName])) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Create activity log on Pipedrive.
+     *
+     * @param array $event
+     *
+     * @return array
+     */
+    public function createActivityType(array $event)
+    {
+        $icon = 'pricetag';
+
+        switch ($event['event']) {
+            case 'email.sent':
+            case 'email.read':
+            case 'email.replied':
+            case 'email.failed':
+                $icon = 'email';
+                break;
+            case 'campaign.event':
+            case 'campaign.event.scheduled':
+                $icon = 'task';
+                break;
+            case 'lead.source.identified':
+            case 'lead.source.created':
+            case 'segment_membership':
+            case 'lead.donotcontact':
+                $icon = 'addressbook';
+                break;
+        }
+
+        $activityName     = $event['eventType'];
+        $data             = [];
+        $data['name']     = $activityName;
+        $data['icon_key'] = $icon;
+        $data['color']    = '4e5e9e';
+
+        $params   = $this->getRequestParameters($data);
+        $url      = sprintf('%s/%s', $this->integration->getApiUrl(), self::ACTIVITY_TYPES);
+        $response = $this->transport->post($url, $params);
+
+        $data = $this->getResponseData($response);
+
+        return $this->activities[$activityName] = $data;
+    }
+
+    /**
+     * @return array
+     */
+    private function getActivityTypes()
+    {
+        if (null !== $this->activities) {
+            return $this->activities;
+        }
+
+        $activities = $this->getDataByEndpoint([], 'activityTypes');
+
+        //return data by name
+        return $this->activities = array_combine(array_column($activities['data'], 'name'), $activities['data']);
     }
 
     /**
