@@ -6,6 +6,7 @@ Mautic.companyOnLoad = function (container, response) {
     }
 }
 Mautic.leadOnLoad = function (container, response) {
+    Mautic.lazyLoadContactListOnSegmentDetail();
     Mautic.addKeyboardShortcut('a', 'Quick add a New Contact', function(e) {
         if(mQuery('a.quickadd').length) {
             mQuery('a.quickadd').click();
@@ -1485,3 +1486,19 @@ Mautic.handleAssetDownloadSearch = function(filterNum, fieldObject, fieldAlias, 
         assetDownloadFilter.trigger('chosen:open.chosen')
     }
 }
+
+Mautic.lazyLoadContactListOnSegmentDetail = function() {
+    let containerId = '#contacts-container';
+    let container = mQuery(containerId);
+
+    // Load the contacts only if the container exists.
+    if (!container.length) {
+        return;
+    }
+
+    let segmentContactUrl = container.data('target-url');
+    mQuery.get(segmentContactUrl, function(response) {
+        response.target = containerId;
+        Mautic.processPageContent(response);
+    });
+};
