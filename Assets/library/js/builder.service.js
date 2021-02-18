@@ -6,9 +6,14 @@ import grapesjspostcss from 'grapesjs-parser-postcss';
 import grapesjsmautic from './grapesjs-preset-mautic.min';
 
 export default class BuilderService {
-  static assetManagerConf;
+  assetManagerConf;
 
-  static presetMauticConf;
+  presetMauticConf;
+
+  editor;
+
+  // components that are on the canvas
+  canvasContent;
 
   textareaAssets;
 
@@ -17,7 +22,7 @@ export default class BuilderService {
   textareaMjml;
 
   // Redefine Keyboard shortcuts due to unbind won't works with multiple keys.
-  static keymapsConf = {
+  keymapsConf = {
     defaults: {
       'core:undoios': {
         keys: '⌘+z',
@@ -62,7 +67,38 @@ export default class BuilderService {
     },
   };
 
-  static setTextareas(textareaHtml, textareaAssets, textareaMjml) {
+  constructor(content) {
+    this.canvasContent = content;
+  }
+
+  initGrapesJS(object) {
+    // disable mautic global shortcuts
+    Mousetrap.reset();
+
+    const textareaHtml = mQuery('textarea.builder-html');
+    const textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
+    const textareaMjml = mQuery('textarea.builder-mjml');
+
+    this.setTextareas(textareaHtml, textareaAssets, textareaMjml);
+    this.setAssetManagerConf();
+    this.setPresetMauticConf();
+
+    if (object === 'page') {
+      this.editor = this.initPage();
+    } else if (object === 'emailform') {
+      if (this.textareaMjml.val().length) {
+        this.editor = this.initEmailMjml();
+      } else {
+        this.editor = this.initEmailHtml();
+      }
+    } else {
+      throw Error(`not supported builder type: ${object}`);
+    }
+
+    this.setListeners(this.editor);
+  }
+
+  setTextareas(textareaHtml, textareaAssets, textareaMjml) {
     if (!textareaHtml || !textareaAssets || !textareaMjml) {
       console.debug('not all textareas loaded');
     }
@@ -72,28 +108,28 @@ export default class BuilderService {
     this.textareaAssets = textareaAssets;
   }
 
-  static getHtmlValue() {
+  getHtmlValue() {
     if (this.textareaHtml && this.textareaHtml.val() && this.textareaHtml.val().length > 0) {
       return this.textareaHtml.val();
     }
     return null;
   }
 
-  static getMjmlValue() {
+  getMjmlValue() {
     if (this.textareaMjml && this.textareaMjml.val() && this.textareaMjml.val().length > 0) {
       return this.textareaMjml.val();
     }
     return null;
   }
 
-  static getAssetValue() {
+  getAssetValue() {
     if (this.textareaAssets && this.textareaAssets.val() && this.textareaAssets.val().length > 0) {
       return this.textareaAssets.val();
     }
     return null;
   }
 
-  static setAssetManagerConf() {
+  setAssetManagerConf() {
     this.assetManagerConf = {
       assets: JSON.parse(this.getAssetValue()),
       noAssets: Mautic.translate('grapesjsbuilder.assetManager.noAssets'),
@@ -107,7 +143,8 @@ export default class BuilderService {
     };
   }
 
-  static setPresetMauticConf() {
+  setPresetMauticConf() {
+    console.log(Mautic);
     this.presetMauticConf = {
       sourceEditBtnLabel: Mautic.translate('grapesjsbuilder.sourceEditBtnLabel'),
       sourceCancelBtnLabel: Mautic.translate('grapesjsbuilder.sourceCancelBtnLabel'),
@@ -121,20 +158,12 @@ export default class BuilderService {
     };
   }
 
-  static initPage() {
-    // PageBuilder
-    // Parse HTML template
-    const parser = new DOMParser();
-    const fullHtml = parser.parseFromString(this.getHtmlValue(), 'text/html');
-
-    // Extract body
-    const body = fullHtml.body.innerHTML;
-
+  initPage() {
     // Launch GrapesJS with body part
-    const editor = grapesjs.init({
+    this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components: body,
+      components: this.canvasContent,
       height: '100%',
       storageManager: false,
       assetManager: this.assetManagerConf,
@@ -153,17 +182,16 @@ export default class BuilderService {
     });
 
     // Customize GrapesJS -> add close button with save for Mautic
-    this.getCloseButtonPage(editor.Panels, editor);
-
-    return editor;
+    return this.getCloseButtonPage();
   }
 
-  static initEmailMjml() {
+  initEmailMjml() {
     // EmailBuilder -> MJML
-    const editor = grapesjs.init({
+
+    this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components: this.getMjmlValue(),
+      components: this.canvasContent,
       height: '100%',
       storageManager: false,
       assetManager: this.assetManagerConf,
@@ -176,32 +204,61 @@ export default class BuilderService {
       keymaps: this.keymapsConf,
     });
 
-    editor.BlockManager.get('mj-button').set({
+    this.editor.BlockManager.get('mj-button').set({
       content: '<mj-button href="https://">Button</mj-button>',
     });
 
-    this.getCloseButtonMjml(editor.Panels, editor);
+    return this.getCloseButtonMjml();
+  }
 
-    return editor;
+  /**
+   * Convert dynamic content slots to tokens
+   *
+   * @param editor
+   */
+  grapesConvertDynamicContentSlotsToTokens() {
+    const dc = this.editor.DomComponents;
+
+    const dynamicContents = dc.getWrapper().find('[data-slot="dynamicContent"]');
+
+    if (dynamicContents.length) {
+      dynamicContents.forEach((dynamicContent) => {
+        const attributes = dynamicContent.getAttributes();
+        const decId = attributes['data-param-dec-id'];
+
+        // If it's not a token -> convert to token
+        if (decId !== '') {
+          const dynConId = `#emailform_dynamicContent_${attributes['data-param-dec-id']}`;
+
+          const dynConTarget = mQuery(dynConId);
+          const dynConName = dynConTarget.find(`${dynConId}_tokenName`).val();
+          const dynConToken = `{dynamiccontent="${dynConName}"}`;
+
+          // Clear id because it's reloaded by Mautic and this prevent slot to be destroyed by GrapesJs destroy event on close.
+          dynamicContent.addAttributes({ 'data-param-dec-id': '' });
+          dynamicContent.set('content', dynConToken);
+        }
+      });
+    }
   }
 
   /**
    * Customize GrapesJS -> add close button with save for Mautic in the Page Builder Mode
    */
-  static getCloseButtonPage(panelManager, editor) {
+  getCloseButtonPage() {
     const parser = new DOMParser();
     const fullHtml = parser.parseFromString(this.getHtmlValue(), 'text/html');
 
-    panelManager.addButton('views', [
+    this.editor.Panels.addButton('views', [
       {
         id: 'close',
         className: 'fa fa-times-circle',
         attributes: { title: 'Close' },
         command() {
-          Mautic.grapesConvertDynamicContentSlotsToTokens(editor);
+          this.grapesConvertDynamicContentSlotsToTokens(this.editor);
 
           // Update textarea for save (part that is different from other modes)
-          fullHtml.body.innerHTML = `${editor.getHtml()}<style>${editor.getCss({
+          fullHtml.body.innerHTML = `${this.editor.getHtml()}<style>${this.editor.getCss({
             avoidProtected: true,
           })}</style>`;
           mQuery('textarea.builder-html').val(fullHtml.documentElement.outerHTML);
@@ -212,7 +269,7 @@ export default class BuilderService {
           mQuery('body').css('overflow-y', '');
 
           // Destroy GrapesJS
-          editor.destroy();
+          this.editor.destroy();
         },
       },
     ]);
@@ -221,20 +278,20 @@ export default class BuilderService {
   /**
    * Customize GrapesJS -> add close button with save for Mautic
    */
-  static getCloseButtonMjml(panelManager, editor) {
-    panelManager.addButton('views', [
+  getCloseButtonMjml() {
+    this.editor.Panels.addButton('views', [
       {
         id: 'close',
         className: 'fa fa-times-circle',
         attributes: { title: 'Close' },
         command() {
-          Mautic.grapesConvertDynamicContentSlotsToTokens(editor);
+          this.grapesConvertDynamicContentSlotsToTokens(this.editor);
 
           let code = '';
 
           // Try catch for mjml parser error
           try {
-            code = editor.runCommand('mjml-get-code');
+            code = this.editor.runCommand('mjml-get-code');
           } catch (error) {
             console.log(error.message);
             alert('Errors inside your template. Template will not be saved.');
@@ -243,7 +300,7 @@ export default class BuilderService {
           // Update textarea for save (only individual part)
           if (!code.length) {
             mQuery('textarea.builder-html').val(code.html);
-            mQuery('textarea.builder-mjml').val(editor.getHtml());
+            mQuery('textarea.builder-mjml').val(this.editor.getHtml());
           }
 
           // Reset HTML
@@ -252,31 +309,31 @@ export default class BuilderService {
           mQuery('body').css('overflow-y', '');
 
           // Destroy GrapesJS
-          editor.destroy();
+          this.editor.destroy();
         },
       },
     ]);
 
-    return panelManager;
+    return this.editor.Panels;
   }
 
   /**
    * Get a custom close button for the Mautic Email mode where the template is HTML
    */
-  static getCloseButtonHtml(panelManager, editor) {
+  getCloseButtonHtml() {
     const parser = new DOMParser();
     const fullHtml = parser.parseFromString(this.getHtmlValue(), 'text/html');
 
-    panelManager.addButton('views', [
+    this.editor.Panels.addButton('views', [
       {
         id: 'close',
         className: 'fa fa-times-circle',
         attributes: { title: 'Close' },
         command() {
-          Mautic.grapesConvertDynamicContentSlotsToTokens(editor);
+          this.grapesConvertDynamicContentSlotsToTokens(this.editor);
 
           // Update textarea for save
-          fullHtml.body.innerHTML = editor.runCommand('gjs-get-inlined-html');
+          fullHtml.body.innerHTML = this.editor.runCommand('gjs-get-inlined-html');
           mQuery('textarea.builder-html').val(fullHtml.documentElement.outerHTML);
 
           // Reset HTML
@@ -285,26 +342,18 @@ export default class BuilderService {
           mQuery('body').css('overflow-y', '');
 
           // Destroy GrapesJS
-          editor.destroy();
+          this.editor.destroy();
         },
       },
     ]);
   }
 
-  static initEmailHtml() {
-    // EmailBuilder -> HTML
-    // Parse HTML template
-    const parser = new DOMParser();
-    const fullHtml = parser.parseFromString(this.getHtmlValue(), 'text/html');
-
-    // Extract body
-    const body = fullHtml.body.innerHTML;
-
+  initEmailHtml() {
     // Launch GrapesJS with body part
-    const editor = grapesjs.init({
+    this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
-      components: body,
+      components: this.canvasContent,
       height: '100%',
       storageManager: false,
       assetManager: this.assetManagerConf,
@@ -318,7 +367,7 @@ export default class BuilderService {
     });
 
     // add a Mautic custom block Button
-    editor.BlockManager.get('button').set({
+    this.editor.BlockManager.get('button').set({
       content:
         '<a href="#" target="_blank" style="display:inline-block;text-decoration:none;border-color:#4e5d9d;border-width: 10px 20px;border-style:solid; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; background-color: #4e5d9d; display: inline-block;font-size: 16px; color: #ffffff; ">\n' +
         'Button\n' +
@@ -326,9 +375,7 @@ export default class BuilderService {
     });
 
     // Customize GrapesJS -> add close button with save for Mautic
-    this.getCloseButtonHtml(editor.Panels, editor);
-
-    return editor;
+    return this.getCloseButtonHtml();
   }
 
   /**
@@ -362,43 +409,47 @@ export default class BuilderService {
    * @param htmlTextarea - Textarea where HTML will be stored
    * @param container - Invisible container to init GrapesJS
    */
-  static mjmlToHtml(mjmlTextarea, htmlTextarea, container = '.builder-panel') {
-    let code = '';
-    const editor = grapesjs.init({
-      clearOnRender: true,
-      container,
-      components: mjmlTextarea.val(),
-      storageManager: false,
-      panels: { defaults: [] },
+  // mjmlToHtml(mjmlTextarea, htmlTextarea, container = '.builder-panel') {
+  //   console.warn(mjmlTextarea);
+  //   console.warn(htmlTextarea);
+  //   console.warn(container);
 
-      plugins: [grapesjsmjml, grapesjspostcss],
-      pluginsOpts: {
-        grapesjsmjml: {},
-      },
-    });
+  //   let code = '';
+  //   this.editor = grapesjs.init({
+  //     clearOnRender: true,
+  //     container,
+  //     components: mjmlTextarea.val(),
+  //     storageManager: false,
+  //     panels: { defaults: [] },
 
-    // Try catch for MJML parser error
-    try {
-      code = editor.runCommand('mjml-get-code');
-    } catch (error) {
-      console.log(error.message);
-      alert('Errors inside your template. Template will not be saved.');
-    }
+  //     plugins: [grapesjsmjml, grapesjspostcss],
+  //     pluginsOpts: {
+  //       grapesjsmjml: {},
+  //     },
+  //   });
+  //   console.log(this.editor);
+  //   // Try catch for MJML parser error
+  //   try {
+  //     code = this.editor.runCommand('mjml-get-code');
+  //   } catch (error) {
+  //     console.log(error.message);
+  //     alert('Errors inside your template. Template will not be saved.');
+  //   }
 
-    // Set result to htmlTextarea
-    if (!code.length) {
-      htmlTextarea.val(code.html);
-    }
+  //   // Set result to htmlTextarea
+  //   if (!code.length) {
+  //     htmlTextarea.val(code.html);
+  //   }
 
-    // Destroy GrapesJS
-    editor.destroy();
+  //   // Destroy GrapesJS
+  //   this.editor.destroy();
 
-    // try {
-    //   editor.destroy();
-    // } catch (error) {
-    //   console.log(error);
-    // }
-  }
+  // try {
+  //   editor.destroy();
+  // } catch (error) {
+  //   console.log(error);
+  // }
+  // }
 
   /**
    * Manage button loading indicator
@@ -423,11 +474,9 @@ export default class BuilderService {
 
   /**
    * Generate assets list from GrapesJs
-   *
-   * @param editor
    */
-  static getAssetsList(editor) {
-    const assetManager = editor.AssetManager;
+  getAssetsList() {
+    const assetManager = this.editor.AssetManager;
     const assets = assetManager.getAll();
     const assetsList = [];
 
@@ -444,53 +493,5 @@ export default class BuilderService {
     });
 
     return assetsList;
-  }
-
-  static manageDynamicContentTokenToSlot(component) {
-    const regex = RegExp(/\{dynamiccontent="(.*)"\}/, 'g');
-
-    const content = component.get('content');
-    const regexEx = regex.exec(content);
-
-    if (regexEx !== null) {
-      const dynConName = regexEx[1];
-      const dynConTabA = mQuery('#dynamicContentTabs a').filter(function () {
-        return mQuery(this).text().trim() === dynConName;
-      });
-
-      if (typeof dynConTabA !== 'undefined' && dynConTabA.length) {
-        // If exist -> fill
-        const dynConTarget = dynConTabA.attr('href');
-        let dynConContent = '';
-
-        if (mQuery(dynConTarget).html()) {
-          const dynConContainer = mQuery(dynConTarget).find(`${dynConTarget}_content`);
-
-          if (dynConContainer.hasClass('editor')) {
-            dynConContent = dynConContainer.froalaEditor('html.get');
-          } else {
-            dynConContent = dynConContainer.html();
-          }
-        }
-
-        if (dynConContent === '') {
-          dynConContent = dynConTabA.text();
-        }
-
-        component.addAttributes({
-          'data-param-dec-id': parseInt(dynConTarget.replace(/[^0-9]/g, ''), 10),
-        });
-        component.set('content', dynConContent);
-      } else {
-        // If doesn't exist -> create
-        const dynConTarget = Mautic.createNewDynamicContentItem(mQuery);
-        const dynConTab = mQuery('#dynamicContentTabs').find(`a[href="${dynConTarget}"]`);
-
-        component.addAttributes({
-          'data-param-dec-id': parseInt(dynConTarget.replace(/[^0-9]/g, ''), 10),
-        });
-        component.set('content', dynConTab.text());
-      }
-    }
   }
 }
