@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -42,12 +43,17 @@ $template  = '<div class="col-md-6">{content}</div>';
                             <?php echo $view['form']->widget($fields['mailer_test_send_button']); ?>
                             <span class="fa fa-spinner fa-spin hide"></span>
                         </div>
-                        <div class="col-md-9 help-block"></div>
+                        <div class="col-md-9 help-block">
+                            <div class="status-msg"></div>
+                            <div class="save-config-msg hide text-danger"><?php echo $view['translator']->trans('mautic.email.config.save_to_test'); ?></div>
+                        </div>
                     </div>
                 </div>
             <?php endif; ?>
+
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_amazon_region', $template); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_amazon_other_region', $template); ?>
             </div>
 
             <div class="row">
@@ -64,6 +70,17 @@ $template  = '<div class="col-md-6">{content}</div>';
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_user', $template); ?>
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_password', $template); ?>
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_api_key', $template); ?>
+            </div>
+
+            <?php if (isset($fields['mailer_transport'])): ?>
+                <div class="row">
+                    <?php echo $view['form']->rowIfExists($fields, 'mailer_mailjet_sandbox', $template); ?>
+                    <?php echo $view['form']->rowIfExists($fields, 'mailer_mailjet_sandbox_default_mail', $template); ?>
+                </div>
+            <?php endif; ?>
+
+            <div class="row">
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_custom_headers', $template); ?>
             </div>
 
             <?php if (isset($fields['mailer_transport'])): ?>
@@ -125,19 +142,43 @@ $template  = '<div class="col-md-6">{content}</div>';
     </div>
     <div class="panel-body">
         <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'unsubscribe_text', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'webview_text', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'default_signature_text', $template); ?>
+        </div>
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'mailer_append_tracking_pixel', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'mailer_convert_embed_images', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'disable_trackable_urls', $template); ?>
+        </div>
+    </div>
+</div>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.email.config.header.unsubscribe'); ?></h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'unsubscribe_text', $template); ?>
         </div>
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'unsubscribe_message', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'resubscribe_message', $template); ?>
         </div>
         <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'default_signature_text', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'unsubscribe_message', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'resubscribe_message', $template); ?>
         </div>
         <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'mailer_append_tracking_pixel', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'mailer_convert_embed_images', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'show_contact_preferences', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'show_contact_segments', $template); ?>
+        </div>
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'show_contact_frequency', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'show_contact_pause_dates', $template); ?>
+        </div>
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'show_contact_categories', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'show_contact_preferred_channels', $template); ?>
         </div>
     </div>
 </div>

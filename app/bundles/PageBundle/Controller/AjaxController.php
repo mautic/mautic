@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -13,6 +14,7 @@ namespace Mautic\PageBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\VariantAjaxControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\PageBundle\Form\Type\AbTestPropertiesType;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -23,8 +25,6 @@ class AjaxController extends CommonAjaxController
     use VariantAjaxControllerTrait;
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function getAbTestFormAction(Request $request)
@@ -32,6 +32,7 @@ class AjaxController extends CommonAjaxController
         return $this->getAbTestForm(
             $request,
             'page',
+            AbTestPropertiesType::class,
             'page_abtest_settings',
             'page',
             'MauticPageBundle:AbTest:form.html.php',
@@ -40,8 +41,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function pageListAction(Request $request)
@@ -61,8 +60,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function setBuilderContentAction(Request $request)
@@ -118,6 +115,6 @@ class AjaxController extends CommonAjaxController
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model = $this->getModel('page');
 
-        return $model->getBuilderComponents(null, ['tokens', 'visualTokens'], $query);
+        return $model->getBuilderComponents(null, ['tokens'], $query);
     }
 }

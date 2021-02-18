@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -18,13 +19,14 @@ use Mautic\LeadBundle\Entity\Lead;
  */
 class LeadUtmTagsEvent extends CommonEvent
 {
+    protected $utmtags;
+
     /**
-     * @param Lead $lead
-     * @param bool $isNew
+     * @param bool $utmTag
      */
-    public function __construct(Lead &$lead, $utmTag)
+    public function __construct(Lead $lead, $utmTag)
     {
-        $this->entity  = &$lead;
+        $this->entity  = $lead;
         $this->utmtags = $utmTag;
     }
 

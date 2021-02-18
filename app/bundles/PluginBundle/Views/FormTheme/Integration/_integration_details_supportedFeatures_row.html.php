@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -32,7 +33,7 @@ $showLabel = (count($builtin) !== count($form->children));
             </div>
             <?php else: ?>
                 <?php $child->isRendered(); ?>
-                <input type="hidden" id="<?php echo $child->vars['id']; ?>" name="<?php echo $child->vars['full_name']; ?>" value="<?php echo $child->vars['value']; ?>" />
+                <input type="hidden" id="<?php echo $child->vars['id']; ?>" name="<?php echo $child->vars['full_name']; ?>" value="<?php echo $view->escape($child->vars['value']); ?>" />
             <?php endif; ?>
         <?php endforeach; ?>
     </div>

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -35,8 +36,6 @@ class AuthenticationContentEvent extends Event
 
     /**
      * AuthenticationContentEvent constructor.
-     *
-     * @param Request $request
      */
     public function __construct(Request $request)
     {

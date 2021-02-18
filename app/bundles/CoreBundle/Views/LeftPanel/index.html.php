@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -69,6 +70,7 @@ $extraMenu = $view['menu']->render('extra');
     <div class="scroll-content slimscroll">
         <!-- start: navigation -->
         <nav class="nav-sidebar">
+            <?php echo $view['content']->getCustomContent('menu.above', $mauticTemplateVars); ?>
             <?php echo $view['menu']->render('main'); ?>
 
             <!-- start: left nav -->

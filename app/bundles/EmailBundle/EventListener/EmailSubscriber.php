@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,46 +11,56 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event as Events;
+use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Model\EmailModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class EmailSubscriber.
- */
-class EmailSubscriber extends CommonSubscriber
+class EmailSubscriber implements EventSubscriberInterface
 {
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
     /**
      * @var IpLookupHelper
      */
-    protected $ipLookupHelper;
+    private $ipLookupHelper;
 
     /**
      * @var EmailModel
      */
-    protected $emailModel;
+    private $emailModel;
 
     /**
-     * EmailSubscriber constructor.
-     *
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     * @param EmailModel     $emailModel
+     * @var TranslatorInterface
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, EmailModel $emailModel)
-    {
+    private $translator;
+
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        AuditLogModel $auditLogModel,
+        EmailModel $emailModel,
+        TranslatorInterface $translator,
+        EntityManager $entityManager
+    ) {
         $this->ipLookupHelper = $ipLookupHelper;
         $this->auditLogModel  = $auditLogModel;
         $this->emailModel     = $emailModel;
+        $this->translator     = $translator;
+        $this->entityManager  = $entityManager;
     }
 
     /**
@@ -58,19 +69,16 @@ class EmailSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            EmailEvents::EMAIL_POST_SAVE   => ['onEmailPostSave', 0],
-            EmailEvents::EMAIL_POST_DELETE => ['onEmailDelete', 0],
-            EmailEvents::EMAIL_FAILED      => ['onEmailFailed', 0],
-            EmailEvents::EMAIL_ON_SEND     => ['onEmailSend', 0],
-            EmailEvents::EMAIL_RESEND      => ['onEmailResend', 0],
-            EmailEvents::EMAIL_PARSE       => ['onEmailParse', 0],
+            EmailEvents::EMAIL_POST_SAVE      => ['onEmailPostSave', 0],
+            EmailEvents::EMAIL_POST_DELETE    => ['onEmailDelete', 0],
+            EmailEvents::EMAIL_FAILED         => ['onEmailFailed', 0],
+            EmailEvents::EMAIL_RESEND         => ['onEmailResend', 0],
+            EmailEvents::ON_TRANSPORT_WEBHOOK => ['onTransportWebhook', -255],
         ];
     }
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param Events\EmailEvent $event
      */
     public function onEmailPostSave(Events\EmailEvent $event)
     {
@@ -90,8 +98,6 @@ class EmailSubscriber extends CommonSubscriber
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param Events\EmailEvent $event
      */
     public function onEmailDelete(Events\EmailEvent $event)
     {
@@ -109,8 +115,6 @@ class EmailSubscriber extends CommonSubscriber
 
     /**
      * Process if an email has failed.
-     *
-     * @param Events\QueueEmailEvent $event
      */
     public function onEmailFailed(Events\QueueEmailEvent $event)
     {
@@ -119,7 +123,7 @@ class EmailSubscriber extends CommonSubscriber
         if (isset($message->leadIdHash)) {
             $stat = $this->emailModel->getEmailStatus($message->leadIdHash);
 
-            if ($stat !== null) {
+            if (null !== $stat) {
                 $reason = $this->translator->trans('mautic.email.dnc.failed', [
                     '%subject%' => EmojiHelper::toShort($message->getSubject()),
                 ]);
@@ -129,27 +133,7 @@ class EmailSubscriber extends CommonSubscriber
     }
 
     /**
-     * Add an unsubscribe email to the List-Unsubscribe header if applicable.
-     *
-     * @param Events\EmailSendEvent $event
-     */
-    public function onEmailSend(Events\EmailSendEvent $event)
-    {
-        $helper = $event->getHelper();
-        if ($helper && $unsubscribeEmail = $helper->generateUnsubscribeEmail()) {
-            $headers          = $event->getTextHeaders();
-            $existing         = (isset($headers['List-Unsubscribe'])) ? $headers['List-Unsubscribe'] : '';
-            $unsubscribeEmail = "<mailto:$unsubscribeEmail>";
-            $updatedHeader    = ($existing) ? $unsubscribeEmail.', '.$existing : $unsubscribeEmail;
-
-            $event->addTextHeader('List-Unsubscribe', $updatedHeader);
-        }
-    }
-
-    /**
      * Process if an email is resent.
-     *
-     * @param Events\QueueEmailEvent $event
      */
     public function onEmailResend(Events\QueueEmailEvent $event)
     {
@@ -157,7 +141,7 @@ class EmailSubscriber extends CommonSubscriber
 
         if (isset($message->leadIdHash)) {
             $stat = $this->emailModel->getEmailStatus($message->leadIdHash);
-            if ($stat !== null) {
+            if (null !== $stat) {
                 $stat->upRetryCount();
 
                 $retries = $stat->getRetryCount();
@@ -172,31 +156,18 @@ class EmailSubscriber extends CommonSubscriber
                     $event->tryAgain();
                 }
 
-                $this->em->persist($stat);
-                $this->em->flush();
+                $this->entityManager->persist($stat);
+                $this->entityManager->flush();
             }
         }
     }
 
     /**
-     * @param Events\ParseEmailEvent $event
+     * This is default handling of email transport webhook requests.
+     * For custom handling (queues) for specific transport use the same listener with priority higher than -255.
      */
-    public function onEmailParse(Events\ParseEmailEvent $event)
+    public function onTransportWebhook(TransportWebhookEvent $event)
     {
-        // Listening for bounce_folder and unsubscribe_folder
-        $isBounce      = $event->isApplicable('EmailBundle', 'bounces');
-        $isUnsubscribe = $event->isApplicable('EmailBundle', 'unsubscribes');
-
-        if ($isBounce || $isUnsubscribe) {
-            // Process the messages
-
-            /** @var \Mautic\EmailBundle\Helper\MessageHelper $messageHelper */
-            $messageHelper = $this->factory->getHelper('message');
-
-            $messages = $event->getMessages();
-            foreach ($messages as $message) {
-                $messageHelper->analyzeMessage($message, $isBounce, $isUnsubscribe);
-            }
-        }
+        $event->getTransport()->processCallbackRequest($event->getRequest());
     }
 }

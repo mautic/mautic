@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -13,7 +14,9 @@ namespace Mautic\FormBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Entity\Page;
 
 /**
  * Class Submission.
@@ -65,9 +68,6 @@ class Submission
      */
     private $results = [];
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -77,7 +77,7 @@ class Submission
             ->addIndex(['tracking_id'], 'form_submission_tracking_search')
             ->addIndex(['date_submitted'], 'form_date_submitted');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('submissions')
@@ -97,7 +97,7 @@ class Submission
             ->columnName('date_submitted')
             ->build();
 
-        $builder->addField('referer', 'string');
+        $builder->addField('referer', 'text');
 
         $builder->createManyToOne('page', 'Mautic\PageBundle\Entity\Page')
             ->addJoinColumn('page_id', 'id', true, false, 'SET NULL')
@@ -119,6 +119,19 @@ class Submission
                     'ipAddress',
                     'form',
                     'lead',
+                    'trackingId',
+                    'dateSubmitted',
+                    'referer',
+                    'page',
+                    'results',
+                ]
+            )
+            ->setGroupPrefix('submissionEvent')
+            ->addProperties(
+                [
+                    'id',
+                    'ipAddress',
+                    'form',
                     'trackingId',
                     'dateSubmitted',
                     'referer',
@@ -190,8 +203,6 @@ class Submission
     /**
      * Set form.
      *
-     * @param Form $form
-     *
      * @return Submission
      */
     public function setForm(Form $form)
@@ -218,7 +229,7 @@ class Submission
      *
      * @return Submission
      */
-    public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress = null)
+    public function setIpAddress(IpAddress $ipAddress = null)
     {
         $this->ipAddress = $ipAddress;
 
@@ -255,6 +266,8 @@ class Submission
     public function setResults($results)
     {
         $this->results = $results;
+
+        return $this;
     }
 
     /**
@@ -264,7 +277,7 @@ class Submission
      *
      * @return Submission
      */
-    public function setPage(\Mautic\PageBundle\Entity\Page $page = null)
+    public function setPage(Page $page = null)
     {
         $this->page = $page;
 
@@ -290,11 +303,13 @@ class Submission
     }
 
     /**
-     * @param mixed $lead
+     * @return $this
      */
-    public function setLead(Lead $lead)
+    public function setLead(Lead $lead = null)
     {
         $this->lead = $lead;
+
+        return $this;
     }
 
     /**
@@ -306,10 +321,41 @@ class Submission
     }
 
     /**
-     * @param mixed $trackingId
+     * @param $trackingId
+     *
+     * @return $this
      */
     public function setTrackingId($trackingId)
     {
         $this->trackingId = $trackingId;
+
+        return  $this;
+    }
+
+    /**
+     * This method is used by standard entity algorithms to check if the current
+     * user has permission to view/edit/delete this item. Provide the form creator for it.
+     *
+     * @return mixed
+     */
+    public function getCreatedBy()
+    {
+        return $this->getForm()->getCreatedBy();
+    }
+
+    /**
+     * @param string $alias
+     *
+     * @return Field|null
+     */
+    public function getFieldByAlias($alias)
+    {
+        foreach ($this->getForm()->getFields() as $field) {
+            if ($field->getAlias() === $alias) {
+                return $field;
+            }
+        }
+
+        return null;
     }
 }

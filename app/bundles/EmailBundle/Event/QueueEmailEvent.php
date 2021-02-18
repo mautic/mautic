@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -27,9 +28,6 @@ class QueueEmailEvent extends Event
      */
     private $retry = false;
 
-    /**
-     * @param \Swift_Message $message
-     */
     public function __construct(\Swift_Message $message)
     {
         $this->message = $message;

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -16,22 +17,39 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
             <thead>
             <tr>
                 <?php
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
-                    'checkall' => 'true',
-                    'target'   => '#themeTable',
-                ]);
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'checkall'        => 'true',
+                        'target'          => '#themeTable',
+                        'langVar'         => 'core.theme',
+                        'routeBase'       => 'themes',
+                        'templateButtons' => [
+                            'delete' => $permissions['core:themes:delete'],
+                        ],
+                    ]
+                );
 
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
-                    'text' => 'mautic.core.title',
-                ]);
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'text' => 'mautic.core.title',
+                    ]
+                );
 
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
-                    'text' => 'mautic.core.author',
-                ]);
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'text' => 'mautic.core.author',
+                    ]
+                );
 
-                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
-                    'text' => 'mautic.core.features',
-                ]);
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'text' => 'mautic.core.features',
+                    ]
+                );
                 ?>
             </tr>
             </thead>
@@ -57,23 +75,29 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                         $previewButton   = $hasThumbnail ? $previewButtonSettings : [];
                         $deleteButton    = ['delete' => $permissions['core:themes:delete']];
                         $templateButtons = !in_array($k, $defaultThemes) ? $deleteButton : [];
-                        echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', [
-                            'item'            => $item,
-                            'templateButtons' => $templateButtons,
-                            'routeBase'       => 'themes',
-                            'langVar'         => 'core.theme',
-                            'customButtons'   => [
-                                [
-                                    'attr' => [
-                                        'href'        => $view['router']->path('mautic_themes_action', ['objectAction' => 'download', 'objectId' => $k]),
-                                        'data-toggle' => '0',
+                        echo $view->render(
+                            'MauticCoreBundle:Helper:list_actions.html.php',
+                            [
+                                'item'            => $item,
+                                'templateButtons' => $templateButtons,
+                                'routeBase'       => 'themes',
+                                'langVar'         => 'core.theme',
+                                'customButtons'   => [
+                                    [
+                                        'attr' => [
+                                            'href' => $view['router']->path(
+                                                'mautic_themes_action',
+                                                ['objectAction' => 'download', 'objectId' => $k]
+                                            ),
+                                            'data-toggle' => '0',
+                                        ],
+                                        'btnText'   => $view['translator']->trans('mautic.core.download'),
+                                        'iconClass' => 'fa fa-download',
                                     ],
-                                    'btnText'   => $view['translator']->trans('mautic.core.download'),
-                                    'iconClass' => 'fa fa-download',
+                                    $previewButton,
                                 ],
-                                $previewButton,
-                            ],
-                        ]);
+                            ]
+                        );
                         ?>
                         <?php if ($hasThumbnail) : ?>
                             <!-- Modal -->
@@ -81,11 +105,12 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                            <h4 class="modal-title" id="<?php echo $k; ?>"><?php echo $item['name']; ?></h4>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span></button>
+                                            <h4 class="modal-title" id="<?php echo $k; ?>"><?php echo $view->escape($item['name']); ?></h4>
                                         </div>
                                         <div class="modal-body">
-                                            <div style="background-image: url(<?php echo $thumbnailUrl ?>);background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 600px"></div>
+                                            <div style="background-image: url(<?php echo $thumbnailUrl; ?>);background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 600px"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -94,26 +119,37 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                     </td>
                     <td>
                         <div>
-                            <?php echo $item['name']; ?> (<?php echo $item['key']; ?>)
+                            <?php echo $view->escape($item['name']); ?> (<?php echo $view->escape($item['key']); ?>)
                         </div>
                     </td>
                     <td>
                         <div>
-                        <?php if (isset($item['config']['authorUrl'])) : ?>
-                            <a href="<?php echo $item['config']['authorUrl']; ?>" target="_blank">
-                                <?php echo $item['config']['author']; ?>
-                            </a>
-                        <?php elseif (isset($item['config']['author'])) : ?>
-                            <?php echo $item['config']['author']; ?>
-                        <?php endif; ?>
+                            <?php if (isset($item['config']['authorUrl'])) : ?>
+                                <a href="<?php echo \Mautic\CoreBundle\Helper\InputHelper::url($item['config']['authorUrl']); ?>" target="_blank">
+                                    <?php echo $view->escape($item['config']['author']); ?>
+                                </a>
+                            <?php elseif (isset($item['config']['author'])) : ?>
+                                <?php echo $view->escape($item['config']['author']); ?>
+                            <?php endif; ?>
                         </div>
                     </td>
                     <td class="visible-md visible-lg">
+                        <?php if (!empty($builders)): ?>
+                        <span class="label label-primary pa-4">
+                            <?php
+                            if (isset($item['config']['builder'])):
+                                echo $builders[$item['config']['builder']];
+                            else:
+                                echo $view['translator']->trans('mautic.core.builder.legacy');
+                            endif;
+                            ?>
+                        </span>
+                        <?php endif; ?>
                         <?php if (!empty($item['config']['features'])) : ?>
                             <?php foreach ($item['config']['features'] as $feature) : ?>
                                 <span style="white-space: nowrap;">
                                     <span class="label label-default pa-4">
-                                        <?php echo $view['translator']->trans('mautic.core.theme.feature.'.$feature); ?>
+                                        <?php echo $view['translator']->trans('mautic.core.theme.feature.'.$view->escape($feature)); ?>
                                     </span>
                                 </span>
                             <?php endforeach; ?>

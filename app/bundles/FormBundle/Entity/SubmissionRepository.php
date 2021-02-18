@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,7 +11,7 @@
 
 namespace Mautic\FormBundle\Entity;
 
-use Doctrine\ORM\Query;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -43,17 +44,20 @@ class SubmissionRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $form = $args['form'];
 
         //DBAL
         if (!isset($args['viewOnlyFields'])) {
-            $args['viewOnlyFields'] = ['button', 'freetext', 'pagebreak', 'captcha'];
+            $args['viewOnlyFields'] = ['button', 'freetext', 'freehtml', 'pagebreak', 'captcha'];
         }
-        $viewOnlyFields = array_map(function ($value) {
-            return '"'.$value.'"';
-        }, $args['viewOnlyFields']);
+        $viewOnlyFields = array_map(
+            function ($value) {
+                return '"'.$value.'"';
+            },
+            $args['viewOnlyFields']
+        );
 
         //Get the list of custom fields
         $fq = $this->_em->getConnection()->createQueryBuilder();
@@ -80,7 +84,7 @@ class SubmissionRepository extends CommonRepository
             ->from($this->getResultsTableName($form->getId(), $form->getAlias()), 'r')
             ->innerJoin('r', MAUTIC_TABLE_PREFIX.'form_submissions', 's', 'r.submission_id = s.id')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'ip_addresses', 'i', 's.ip_id = i.id')
-        ->where('r.form_id = '.$form->getId());
+            ->where('r.form_id = '.$form->getId());
 
         $this->buildWhereClause($dq, $args);
 
@@ -94,58 +98,72 @@ class SubmissionRepository extends CommonRepository
 
         $dq->resetQueryPart('select');
         $fieldAliasSql = (!empty($fieldAliases)) ? ', '.implode(',r.', $fieldAliases) : '';
-        $dq->select('r.submission_id'.$fieldAliasSql);
+        $dq->select('r.submission_id, s.date_submitted as dateSubmitted, s.lead_id as leadId, s.referer, i.ip_address as ipAddress'.$fieldAliasSql);
         $results = $dq->execute()->fetchAll();
 
         //loop over results to put form submission results in something that can be assigned to the entities
-        $values = [];
-
-        foreach ($results as $result) {
+        $values         = [];
+        $flattenResults = !empty($args['flatten_results']);
+        foreach ($results as &$result) {
             $submissionId = $result['submission_id'];
             unset($result['submission_id']);
 
             $values[$submissionId] = [];
             foreach ($result as $k => $r) {
                 if (isset($fields[$k])) {
-                    $values[$submissionId][$k]          = $fields[$k];
-                    $values[$submissionId][$k]['value'] = $r;
+                    if ($flattenResults) {
+                        $values[$submissionId][$k] = $r;
+                    } else {
+                        $values[$submissionId][$k]          = $fields[$k];
+                        $values[$submissionId][$k]['value'] = $r;
+                    }
                 }
             }
+            $result['id']      =     $submissionId;
+            $result['results'] = $values[$submissionId];
         }
 
-        //get an array of IDs for ORM query
-        $ids = array_keys($values);
+        if (empty($args['simpleResults'])) {
+            //get an array of IDs for ORM query
+            $ids = array_keys($values);
 
-        if (count($ids)) {
-            //ORM
+            if (count($ids)) {
+                //ORM
 
-            //build the order by id since the order was applied above
-            //unfortunately, can't use MySQL's FIELD function since we have to be cross-platform
-            $order = '(CASE';
-            foreach ($ids as $count => $id) {
-                $order .= ' WHEN s.id = '.$id.' THEN '.$count;
-                ++$count;
-            }
-            $order .= ' ELSE '.$count.' END) AS HIDDEN ORD';
+                //build the order by id since the order was applied above
+                //unfortunately, can't use MySQL's FIELD function since we have to be cross-platform
+                $order = '(CASE';
+                foreach ($ids as $count => $id) {
+                    $order .= ' WHEN s.id = '.$id.' THEN '.$count;
+                    ++$count;
+                }
+                $order .= ' ELSE '.$count.' END) AS HIDDEN ORD';
 
-            //ORM - generates lead entities
-            $q = $this
-                ->createQueryBuilder('s');
-            $q->select('s, partial l.{id}, p, i,'.$order)
-                ->leftJoin('s.ipAddress', 'i')
-                ->leftJoin('s.page', 'p')
-                ->leftJoin('s.lead', 'l');
+                //ORM - generates lead entities
+                $returnEntities = !empty($args['return_entities']);
+                $leadSelect     = $returnEntities ? 'l' : 'partial l.{id}';
+                $q              = $this
+                    ->createQueryBuilder('s');
+                $q->select('s, p, i,'.$leadSelect.','.$order)
+                    ->leftJoin('s.ipAddress', 'i')
+                    ->leftJoin('s.page', 'p')
+                    ->leftJoin('s.lead', 'l');
 
-            //only pull the submissions as filtered via DBAL
-            $q->where(
-                $q->expr()->in('s.id', ':ids')
-            )->setParameter('ids', $ids);
+                //only pull the submissions as filtered via DBAL
+                $q->where(
+                    $q->expr()->in('s.id', ':ids')
+                )->setParameter('ids', $ids);
 
-            $q->orderBy('ORD', 'ASC');
-            $results = $q->getQuery()->getArrayResult();
+                $q->orderBy('ORD', 'ASC');
+                $results = $returnEntities ? $q->getQuery()->getResult() : $q->getQuery()->getArrayResult();
 
-            foreach ($results as &$r) {
-                $r['results'] = $values[$r['id']];
+                foreach ($results as &$r) {
+                    if ($r instanceof Submission) {
+                        $r->setResults($values[$r->getId()]);
+                    } else {
+                        $r['results'] = $values[$r['id']];
+                    }
+                }
             }
         }
 
@@ -158,12 +176,16 @@ class SubmissionRepository extends CommonRepository
 
     /**
      * {@inheritdoc}
+     *
+     * @param int $id
+     *
+     * @return Submission|null
      */
     public function getEntity($id = 0)
     {
         $entity = parent::getEntity($id);
 
-        if ($entity != null) {
+        if (null != $entity) {
             $form = $entity->getForm();
 
             //use DBAL to get entity fields
@@ -187,7 +209,7 @@ class SubmissionRepository extends CommonRepository
      */
     public function getFilterExpr(&$q, $filter, $parameterName = null)
     {
-        if ($filter['column'] == 's.date_submitted') {
+        if ('s.date_submitted' == $filter['column']) {
             $date       = (new DateTimeHelper($filter['value'], 'Y-m-d'))->toUtcString();
             $date1      = $this->generateRandomParameterName();
             $date2      = $this->generateRandomParameterName();
@@ -216,8 +238,6 @@ class SubmissionRepository extends CommonRepository
     /**
      * Fetch the base submission data from the database.
      *
-     * @param array $options
-     *
      * @return array
      *
      * @throws \Doctrine\ORM\NoResultException
@@ -226,7 +246,7 @@ class SubmissionRepository extends CommonRepository
     public function getSubmissions(array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $query->select('fs.id, f.name, fs.form_id, fs.page_id, fs.date_submitted AS "dateSubmitted"')
+        $query->select('fs.id, f.name, fs.form_id, fs.page_id, fs.date_submitted AS "dateSubmitted", fs.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
             ->leftJoin('fs', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = fs.form_id');
 
@@ -268,9 +288,7 @@ class SubmissionRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
+        return $query->execute()->fetchAll();
     }
 
     /**
@@ -295,9 +313,7 @@ class SubmissionRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
+        return $query->execute()->fetchAll();
     }
 
     public function getSubmissionCountsByPage($pageId, \DateTime $fromDate = null)
@@ -315,15 +331,13 @@ class SubmissionRepository extends CommonRepository
                 ->setParameter('page', (int) $pageId);
         }
 
-        if ($fromDate != null) {
+        if (null != $fromDate) {
             $dh = new DateTimeHelper($fromDate);
             $q->andWhere($q->expr()->gte('s.date_submitted', ':date'))
                 ->setParameter('date', $dh->toUtcString());
         }
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -352,15 +366,13 @@ class SubmissionRepository extends CommonRepository
                 ->setParameter('id', (int) $emailId);
         }
 
-        if ($fromDate != null) {
+        if (null != $fromDate) {
             $dh = new DateTimeHelper($fromDate);
             $q->andWhere($q->expr()->gte('s.date_submitted', ':date'))
                 ->setParameter('date', $dh->toUtcString());
         }
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -411,17 +423,34 @@ class SubmissionRepository extends CommonRepository
     /**
      * Compare a form result value with defined value for defined lead.
      *
-     * @param int    $lead         ID
-     * @param int    $form         ID
-     * @param string $formAlias
-     * @param int    $field        alias
-     * @param string $value        to compare with
-     * @param string $operatorExpr for WHERE clause
+     * @param int         $lead         ID
+     * @param int         $form         ID
+     * @param string      $formAlias
+     * @param int         $field        alias
+     * @param string      $value        to compare with
+     * @param string      $operatorExpr for WHERE clause
+     * @param string|null $type
      *
      * @return bool
      */
-    public function compareValue($lead, $form, $formAlias, $field, $value, $operatorExpr)
+    public function compareValue($lead, $form, $formAlias, $field, $value, $operatorExpr, $type = null)
     {
+        // Modify operator
+        switch ($operatorExpr) {
+            case 'startsWith':
+                $operatorExpr    = 'like';
+                $value           = $value.'%';
+                break;
+            case 'endsWith':
+                $operatorExpr   = 'like';
+                $value          = '%'.$value;
+                break;
+            case 'contains':
+                $operatorExpr   = 'like';
+                $value          = '%'.$value.'%';
+                break;
+        }
+
         //use DBAL to get entity fields
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.id')
@@ -430,17 +459,40 @@ class SubmissionRepository extends CommonRepository
             ->where(
                 $q->expr()->andX(
                     $q->expr()->eq('s.lead_id', ':lead'),
-                    $q->expr()->eq('s.form_id', ':form'),
-                    $q->expr()->$operatorExpr('r.'.$field, ':value')
+                    $q->expr()->eq('s.form_id', ':form')
                 )
             )
             ->setParameter('lead', (int) $lead)
-            ->setParameter('form', (int) $form)
+            ->setParameter('form', (int) $form);
+
+        switch ($type) {
+            case 'boolean':
+            case 'number':
+            $q->andWhere($q->expr()->$operatorExpr('r.'.$field, $value));
+                break;
+            default:
+        $q->andWhere($q->expr()->$operatorExpr('r.'.$field, ':value'))
             ->setParameter('value', $value);
+                break;
+        }
 
         $result = $q->execute()->fetch();
 
         return !empty($result['id']);
+    }
+
+    /**
+     * @param Form $form
+     */
+    public function getSubmissionCounts($form)
+    {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->select('COUNT(fs.id) AS `total`, COUNT(DISTINCT (fs.lead_id)) AS `unique`')
+            ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs');
+        $query->where($query->expr()->eq('fs.form_id', ':id'))
+                ->setParameter('id', $form->getId());
+
+        return $query->execute()->fetch();
     }
 
     /**

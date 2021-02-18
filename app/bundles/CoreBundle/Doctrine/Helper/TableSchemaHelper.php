@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -57,9 +58,7 @@ class TableSchemaHelper
     protected $addTables;
 
     /**
-     * @param Connection         $db
-     * @param                    $prefix
-     * @param ColumnSchemaHelper $columnHelper
+     * @param $prefix
      */
     public function __construct(Connection $db, $prefix, ColumnSchemaHelper $columnHelper)
     {
@@ -67,7 +66,6 @@ class TableSchemaHelper
         $this->sm           = $db->getSchemaManager();
         $this->prefix       = $prefix;
         $this->columnHelper = $columnHelper;
-        $this->schema       = new Schema([], [], $this->sm->createSchemaConfig());
     }
 
     /**
@@ -83,7 +81,7 @@ class TableSchemaHelper
     /**
      * Add an array of tables to db.
      *
-     * @param array $tables
+     * @return $this
      *
      * @throws SchemaException
      */
@@ -103,6 +101,8 @@ class TableSchemaHelper
             $this->addTables[] = $table;
             $this->addTable($table, false);
         }
+
+        return $this;
     }
 
     /**
@@ -127,6 +127,8 @@ class TableSchemaHelper
      * @param $checkExists
      * @param $dropExisting
      *
+     * @return $this
+     *
      * @throws SchemaException
      */
     public function addTable(array $table, $checkExists = true, $dropExisting = false)
@@ -147,7 +149,7 @@ class TableSchemaHelper
         $options = (isset($table['options'])) ? $table['options'] : [];
         $columns = (isset($table['columns'])) ? $table['columns'] : [];
 
-        $newTable = $this->schema->createTable($this->prefix.$table['name']);
+        $newTable = $this->getSchema()->createTable($this->prefix.$table['name']);
 
         if (!empty($columns)) {
             //just to make sure a same name column is not added
@@ -169,20 +171,28 @@ class TableSchemaHelper
 
         if (!empty($options)) {
             foreach ($options as $option => $value) {
-                $func = ($option == 'uniqueIndex' ? 'add' : 'set').ucfirst($option);
+                $func = ('uniqueIndex' == $option ? 'add' : 'set').ucfirst($option);
                 $newTable->$func($value);
             }
         }
+
+        return $this;
     }
 
     /**
-     * @param string $table
+     * @param $table
+     *
+     * @return $this
+     *
+     * @throws SchemaException
      */
     public function deleteTable($table)
     {
         if ($this->checkTableExists($table)) {
             $this->dropTables[] = $table;
         }
+
+        return $this;
     }
 
     /**
@@ -198,7 +208,7 @@ class TableSchemaHelper
             }
         }
 
-        $sql = $this->schema->toSql($platform);
+        $sql = $this->getSchema()->toSql($platform);
 
         if (!empty($sql)) {
             foreach ($sql as $s) {
@@ -232,5 +242,23 @@ class TableSchemaHelper
         }
 
         return false;
+    }
+
+    private function getSchema(): Schema
+    {
+        if ($this->schema) {
+            return $this->schema;
+        }
+
+        if ($this->db instanceof \Doctrine\DBAL\Connections\MasterSlaveConnection) {
+            $params       = $this->db->getParams();
+            $schemaConfig = new \Doctrine\DBAL\Schema\SchemaConfig();
+            $schemaConfig->setName($params['master']['dbname']);
+            $this->schema = new Schema([], [], $schemaConfig);
+        } else {
+            $this->schema = new Schema([], [], $this->sm->createSchemaConfig());
+        }
+
+        return $this->schema;
     }
 }

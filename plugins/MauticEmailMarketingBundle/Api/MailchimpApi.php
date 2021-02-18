@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -14,7 +15,7 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 
 class MailchimpApi extends EmailMarketingApi
 {
-    private $version = '2.0';
+    private $version = '3.0';
 
     /**
      * @param        $endpoint
@@ -30,7 +31,7 @@ class MailchimpApi extends EmailMarketingApi
         if (isset($this->keys['password'])) {
             // Extract the dc from the key
             $parts = explode('-', $this->keys['password']);
-            if (count($parts) !== 2) {
+            if (2 !== count($parts)) {
                 throw new ApiErrorException('Invalid key');
             }
 
@@ -45,14 +46,13 @@ class MailchimpApi extends EmailMarketingApi
 
         $response = $this->integration->makeRequest($url, $parameters, $method, ['encode_parameters' => 'json']);
 
-        if (is_array($response) && !empty($response['status']) && $response['status'] == 'error') {
+        if (is_array($response) && !empty($response['status']) && 'error' == $response['status']) {
             throw new ApiErrorException($response['error']);
         } elseif (is_array($response) && !empty($response['errors'])) {
             $errors = [];
             foreach ($response['errors'] as $error) {
-                $errors[] = $error['error'];
+                $errors[] = $error['message'];
             }
-
             throw new ApiErrorException(implode(' ', $errors));
         } else {
             return $response;
@@ -61,7 +61,7 @@ class MailchimpApi extends EmailMarketingApi
 
     public function getLists()
     {
-        return $this->request('lists/list', ['limit' => 100]);
+        return $this->request('lists', ['limit' => 100]);
     }
 
     /**
@@ -73,7 +73,7 @@ class MailchimpApi extends EmailMarketingApi
      */
     public function getCustomFields($listId)
     {
-        return $this->request('lists/merge-vars', ['id' => [$listId]]);
+        return $this->request('lists/'.$listId.'/merge-fields');
     }
 
     /**
@@ -92,11 +92,13 @@ class MailchimpApi extends EmailMarketingApi
         $emailStruct->email = $email;
 
         $parameters = array_merge($config, [
-            'id'         => $listId,
-            'merge_vars' => $fields,
+            'id' => $listId,
         ]);
-        $parameters['email'] = $emailStruct;
+        if (!empty($fields)) {
+            $parameters = array_merge($parameters, ['merge_fields' => $fields]);
+        }
+        $parameters['email_address'] = $email;
 
-        return $this->request('lists/subscribe', $parameters, 'POST');
+        return $this->request('lists/'.$listId.'/members', $parameters, 'POST');
     }
 }

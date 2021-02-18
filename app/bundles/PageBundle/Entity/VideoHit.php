@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -15,9 +16,6 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class VideoHit.
- */
 class VideoHit
 {
     /**
@@ -95,14 +93,8 @@ class VideoHit
      */
     private $code;
 
-    /**
-     * @var
-     */
     private $referer;
 
-    /**
-     * @var
-     */
     private $url;
 
     /**
@@ -140,9 +132,6 @@ class VideoHit
      */
     private $query = [];
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -577,8 +566,6 @@ class VideoHit
     /**
      * Set ipAddress.
      *
-     * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
-     *
      * @return VideoHit
      */
     public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
@@ -655,8 +642,6 @@ class VideoHit
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return VideoHit
      */
     public function setLead(Lead $lead)
@@ -715,8 +700,6 @@ class VideoHit
     }
 
     /**
-     * @param Redirect $redirect
-     *
      * @return VideoHit
      */
     public function setRedirect(Redirect $redirect)

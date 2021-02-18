@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,33 +11,57 @@
 
 namespace Mautic\PointBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\LeadBundle\Entity\PointsChangeLog;
+use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\PointBundle\Entity\LeadPointLogRepository;
+use Mautic\PointBundle\Entity\LeadTriggerLogRepository;
 use Mautic\PointBundle\Model\TriggerModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class LeadSubscriber.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
     /**
      * @var TriggerModel
      */
-    protected $triggerModel;
+    private $triggerModel;
 
     /**
-     * LeadSubscriber constructor.
-     *
-     * @param TriggerModel $triggerModel
+     * @var TranslatorInterface
      */
-    public function __construct(TriggerModel $triggerModel)
-    {
-        $this->triggerModel = $triggerModel;
+    private $translator;
+
+    /**
+     * @var PointsChangeLogRepository
+     */
+    private $pointsChangeLogRepository;
+
+    /**
+     * @var LeadPointLogRepository
+     */
+    private $leadPointLogRepository;
+
+    /**
+     * @var LeadTriggerLogRepository
+     */
+    private $leadTriggerLogRepository;
+
+    public function __construct(
+        TriggerModel $triggerModel,
+        TranslatorInterface $translator,
+        PointsChangeLogRepository $pointsChangeLogRepository,
+        LeadPointLogRepository $leadPointLogRepository,
+        LeadTriggerLogRepository $leadTriggerLogRepository
+    ) {
+        $this->triggerModel              = $triggerModel;
+        $this->translator                = $translator;
+        $this->pointsChangeLogRepository = $pointsChangeLogRepository;
+        $this->leadPointLogRepository    = $leadPointLogRepository;
+        $this->leadTriggerLogRepository  = $leadTriggerLogRepository;
     }
 
     /**
@@ -54,8 +79,6 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * Trigger applicable events for the lead.
-     *
-     * @param PointsChangeEvent $event
      */
     public function onLeadPointsChange(PointsChangeEvent $event)
     {
@@ -64,8 +87,6 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * Handle point triggers for new leads (including 0 point triggers).
-     *
-     * @param LeadEvent $event
      */
     public function onLeadSave(LeadEvent $event)
     {
@@ -76,8 +97,6 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
@@ -85,16 +104,13 @@ class LeadSubscriber extends CommonSubscriber
         $eventTypeKey  = 'point.gained';
         $eventTypeName = $this->translator->trans('mautic.point.event.gained');
         $event->addEventType($eventTypeKey, $eventTypeName);
+        $event->addSerializerGroup('pointList');
 
         if (!$event->isApplicable($eventTypeKey)) {
             return;
         }
 
-        $lead = $event->getLead();
-
-        /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepository */
-        $logRepository = $this->em->getRepository('MauticLeadBundle:PointsChangeLog');
-        $logs          = $logRepository->getLeadTimelineEvents($lead->getId(), $event->getQueryOptions());
+        $logs = $this->pointsChangeLogRepository->getLeadTimelineEvents($event->getLeadId(), $event->getQueryOptions());
 
         // Add to counter
         $event->addToCounter($eventTypeKey, $logs);
@@ -105,30 +121,29 @@ class LeadSubscriber extends CommonSubscriber
                 $event->addEvent(
                     [
                         'event'      => $eventTypeKey,
+                        'eventId'    => $eventTypeKey.$log['id'],
                         'eventLabel' => $log['eventName'].' / '.$log['delta'],
                         'eventType'  => $eventTypeName,
                         'timestamp'  => $log['dateAdded'],
                         'extra'      => [
                             'log' => $log,
                         ],
-                        'icon' => 'fa-calculator',
+                        'icon'      => 'fa-calculator',
+                        'contactId' => $log['lead_id'],
                     ]
                 );
             }
         }
     }
 
-    /**
-     * @param LeadMergeEvent $event
-     */
     public function onLeadMerge(LeadMergeEvent $event)
     {
-        $this->em->getRepository('MauticPointBundle:LeadPointLog')->updateLead(
+        $this->leadPointLogRepository->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
 
-        $this->em->getRepository('MauticPointBundle:LeadTriggerLog')->updateLead(
+        $this->leadTriggerLogRepository->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );

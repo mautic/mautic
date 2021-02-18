@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -96,7 +97,7 @@ $view['slots']->set(
                                 <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans(
                                             'mautic.asset.filename.'.$location
                                         ); ?></span></td>
-                                <td><?php echo ($location == 'local') ? $activeAsset->getPath()
+                                <td><?php echo ('local' == $location) ? $activeAsset->getPath()
                                         : $activeAsset->getRemotePath(); ?></td>
                             </tr>
                             </tbody>
@@ -150,11 +151,16 @@ $view['slots']->set(
             <!--/ stats -->
         </div>
 
+        <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
+
         <!-- start: tab-content -->
         <div class="tab-content pa-md preview-detail">
             <?php echo $view->render(
                 'MauticAssetBundle:Asset:preview.html.php',
-                ['activeAsset' => $activeAsset, 'assetDownloadUrl' => $assetDownloadUrl]
+                ['activeAsset' => $activeAsset, 'assetDownloadUrl' => $view['router']->url(
+                    'mautic_asset_action',
+                    ['objectAction' => 'preview', 'objectId' => $activeAsset->getId()]
+                )]
             ); ?>
         </div>
         <!--/ end: tab-content -->
@@ -171,7 +177,7 @@ $view['slots']->set(
             <div class="panel-body pt-xs">
                 <div class="input-group">
                     <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
-                           readonly value="<?php echo $assetDownloadUrl; ?>"/>
+                           readonly value="<?php echo $view->escape($assetDownloadUrl); ?>"/>
                 <span class="input-group-btn">
                     <button class="btn btn-default btn-nospin"
                             onclick="window.open('<?php echo $assetDownloadUrl; ?>', '_blank');">
@@ -189,6 +195,6 @@ $view['slots']->set(
         <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]); ?>
     </div>
     <!--/ right section -->
-    <input name="entityId" id="entityId" type="hidden" value="<?php echo $activeAsset->getId(); ?>"/>
+    <input name="entityId" id="entityId" type="hidden" value="<?php echo $view->escape($activeAsset->getId()); ?>"/>
 </div>
 <!--/ end: box layout -->

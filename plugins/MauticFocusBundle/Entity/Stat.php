@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
  *
@@ -12,10 +13,8 @@ namespace MauticPlugin\MauticFocusBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class Stat.
- */
 class Stat
 {
     // Used for querying stats
@@ -48,9 +47,8 @@ class Stat
      */
     private $dateAdded;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
+    private $lead;
+
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -72,6 +70,8 @@ class Stat
         $builder->addNamedField('typeId', 'integer', 'type_id', true);
 
         $builder->addNamedField('dateAdded', 'datetime', 'date_added');
+
+        $builder->addLead(true, 'SET NULL');
     }
 
     /**
@@ -158,6 +158,24 @@ class Stat
     public function setDateAdded($dateAdded)
     {
         $this->dateAdded = $dateAdded;
+
+        return $this;
+    }
+
+    /**
+     * @return Lead
+     */
+    public function getLead()
+    {
+        return $this->lead;
+    }
+
+    /**
+     * @return Stat
+     */
+    public function setLead(Lead $lead)
+    {
+        $this->lead = $lead;
 
         return $this;
     }

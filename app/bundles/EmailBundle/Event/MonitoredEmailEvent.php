@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -30,10 +31,6 @@ class MonitoredEmailEvent extends Event
      */
     private $folders = [];
 
-    /**
-     * @param FormBuilder $builder
-     * @param array       $data
-     */
     public function __construct(FormBuilder $builder, array $data)
     {
         $this->formBuilder = $builder;

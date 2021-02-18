@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -21,20 +22,20 @@ $view['slots']->set(
             'item'            => $item,
             'templateButtons' => [
                 'edit' => $view['security']->hasEntityAccess(
-                    $permissions['plugin:focus:items:editown'],
-                    $permissions['plugin:focus:items:editother'],
+                    $permissions['focus:items:editown'],
+                    $permissions['focus:items:editother'],
                     $item->getCreatedBy()
                 ),
-                'clone'  => $permissions['plugin:focus:items:create'],
+                'clone'  => $permissions['focus:items:create'],
                 'delete' => $view['security']->hasEntityAccess(
-                    $permissions['plugin:focus:items:deleteown'],
-                    $permissions['plugin:focus:items:deleteother'],
+                    $permissions['focus:items:deleteown'],
+                    $permissions['focus:items:deleteother'],
                     $item->getCreatedBy()
                 ),
-                'close' => $view['security']->isGranted('plugin:focus:items:view'),
+                'close' => $view['security']->isGranted('focus:items:view'),
             ],
             'routeBase' => 'focus',
-            'langVar'   => 'mautic.focus',
+            'langVar'   => 'focus',
         ]
     )
 );
@@ -115,6 +116,7 @@ $view['slots']->set(
             </div>
             <!--/ stats -->
 
+            <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
 
             <!-- tabs controls -->
             <?php if (!empty($trackables)): ?>

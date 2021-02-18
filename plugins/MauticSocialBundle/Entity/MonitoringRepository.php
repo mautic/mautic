@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
  *
@@ -13,23 +14,13 @@ namespace MauticPlugin\MauticSocialBundle\Entity;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
-/**
- * Class MonitoringRepository.
- */
 class MonitoringRepository extends CommonRepository
 {
     /**
-     * Get a list of entities.
-     *
      * @param array $args
      *
      * @return Paginator
      */
-    public function getEntities($args = [])
-    {
-        return parent::getEntities($args);
-    }
-
     public function getPublishedEntities($args = [])
     {
         $q    = $this->createQueryBuilder($this->getTableAlias());
@@ -41,8 +32,8 @@ class MonitoringRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /*
-     *
+    /**
+     * @return float|int
      */
     public function getPublishedEntitiesCount()
     {
@@ -55,12 +46,12 @@ class MonitoringRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -73,12 +64,12 @@ class MonitoringRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }

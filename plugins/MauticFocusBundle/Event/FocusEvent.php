@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
  *
@@ -19,7 +20,6 @@ use MauticPlugin\MauticFocusBundle\Entity\Focus;
 class FocusEvent extends CommonEvent
 {
     /**
-     * @param Focus      $focus
      * @param bool|false $isNew
      */
     public function __construct(Focus $focus, $isNew = false)
@@ -40,8 +40,6 @@ class FocusEvent extends CommonEvent
 
     /**
      * Sets the Focus entity.
-     *
-     * @param Focus $focus
      */
     public function setFocus(Focus $focus)
     {

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,16 +11,10 @@
 
 namespace Mautic\PluginBundle\Event;
 
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
-/**
- * Class PluginIntegrationRequestEvent.
- */
 class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
 {
-    /**
-     * @var
-     */
     private $url;
 
     /**
@@ -27,9 +22,6 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
      */
     private $parameters;
 
-    /**
-     * @var
-     */
     private $headers;
 
     /**
@@ -47,23 +39,9 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
      */
     private $authType;
 
-    /**
-     * @var
-     */
     private $response;
 
-    /**
-     * PluginIntegrationRequestEvent constructor.
-     *
-     * @param AbstractIntegration $integration
-     * @param                     $url
-     * @param                     $parameters
-     * @param                     $headers
-     * @param                     $method
-     * @param                     $settings
-     * @param                     $authType
-     */
-    public function __construct(AbstractIntegration $integration, $url, $parameters, $headers, $method, $settings, $authType)
+    public function __construct(UnifiedIntegrationInterface $integration, $url, $parameters, $headers, $method, $settings, $authType)
     {
         $this->integration = $integration;
         $this->url         = $url;
@@ -90,9 +68,6 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
         return $this->parameters;
     }
 
-    /**
-     * @param array $parameters
-     */
     public function setParameters(array $parameters)
     {
         $this->parameters = $parameters;
@@ -131,13 +106,11 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
     }
 
     /**
-     * @param $response
-     *
      * @return mixed
      */
-    public function getResponse($response)
+    public function getResponse()
     {
-        return $response;
+        return $this->response;
     }
 
     /**
@@ -148,9 +121,6 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
         return $this->headers;
     }
 
-    /**
-     * @param array $headers
-     */
     public function setHeaders(array $headers)
     {
         $this->headers = $headers;

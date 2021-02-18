@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,9 +11,11 @@
 
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -25,27 +28,22 @@ class SocialLoginType extends AbstractType
      */
     private $helper;
     private $formModel;
+    private $coreParametersHelper;
 
     /**
      * SocialLoginType constructor.
-     *
-     * @param IntegrationHelper $helper
      */
-    public function __construct(IntegrationHelper $helper, FormModel $form)
+    public function __construct(IntegrationHelper $helper, FormModel $form, CoreParametersHelper $coreParametersHelper)
     {
-        $this->helper    = $helper;
-        $this->formModel = $form;
+        $this->helper               = $helper;
+        $this->formModel            = $form;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $integrations       = '';
         $integrationObjects = $this->helper->getIntegrationObjects(null, 'login_button');
-
         foreach ($integrationObjects as $integrationObject) {
             if ($integrationObject->getIntegrationSettings()->isPublished()) {
                 $model = $this->formModel;
@@ -56,9 +54,17 @@ class SocialLoginType extends AbstractType
 
                 $builder->add(
                     'authUrl_'.$integrationObject->getName(),
-                    'hidden',
+                    HiddenType::class,
                     [
-                        'data' => $model->buildUrl('mautic_integration_auth_postauth', $integration, true, []),
+                        'data' => $model->buildUrl('mautic_integration_auth_user', $integration, true, []),
+                    ]
+                );
+
+                $builder->add(
+                    'buttonImageUrl',
+                    HiddenType::class,
+                    [
+                        'data' => $this->coreParametersHelper->get('site_url').'/'.$this->coreParametersHelper->get('image_path').'/',
                     ]
                 );
             }
@@ -66,7 +72,7 @@ class SocialLoginType extends AbstractType
 
         $builder->add(
             'integrations',
-            'hidden',
+            HiddenType::class,
             [
                 'data' => $integrations,
             ]
@@ -76,7 +82,7 @@ class SocialLoginType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'sociallogin';
     }

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -13,10 +14,10 @@ namespace Mautic\CategoryBundle\Controller;
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 use Mautic\CategoryBundle\Model\CategoryModel;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class CategoryController extends FormController
+class CategoryController extends AbstractFormController
 {
     /**
      * @param        $bundle
@@ -45,35 +46,37 @@ class CategoryController extends FormController
     {
         $session = $this->get('session');
 
-        $search = $this->request->get('search', $session->get('mautic.category.filter', ''));
-        $bundle = $this->request->get('bundle', $session->get('mautic.category.type', ''));
+        $search = $this->request->query->get('search', $session->get('mautic.category.filter', ''));
+        $bundle = $this->request->query->get('bundle', $session->get('mautic.category.type', $bundle));
 
         if ($bundle) {
             $session->set('mautic.category.type', $bundle);
         }
 
         // hack to make pagination work for default list view
-        if ($bundle == 'all') {
+        if ('all' == $bundle) {
             $bundle = 'category';
         }
 
         $session->set('mautic.category.filter', $search);
 
         //set some permissions
-        $permissions = $this->get('mautic.security')->isGranted([
-            $bundle.':categories:view',
-            $bundle.':categories:create',
-            $bundle.':categories:edit',
-            $bundle.':categories:delete',
-        ], 'RETURN_ARRAY');
+        $permissionBase = $this->getModel('category')->getPermissionBase($bundle);
+        $permissions    = $this->get('mautic.security')->isGranted(
+            [
+                $permissionBase.':view',
+                $permissionBase.':create',
+                $permissionBase.':edit',
+                $permissionBase.':delete',
+            ],
+            'RETURN_ARRAY'
+        );
 
-        if (!$permissions[$bundle.':categories:view']) {
+        if (!$permissions[$permissionBase.':view']) {
             return $this->accessDenied();
         }
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
+        $this->setListFilters();
 
         $viewParams = [
             'page'   => $page,
@@ -81,23 +84,23 @@ class CategoryController extends FormController
         ];
 
         //set limits
-        $limit = $session->get('mautic.category.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $limit = $session->get('mautic.category.limit', $this->coreParametersHelper->get('default_pagelimit'));
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
 
-        if ($bundle == 'category') {
-            $bundleFilter = null;
-        } else {
-            $bundleFilter = [
-                'column' => 'c.bundle',
-                'expr'   => 'eq',
-                'value'  => $bundle,
+        $filter = ['string' => $search];
+
+        if ('category' != $bundle) {
+            $filter['force'] = [
+                [
+                    'column' => 'c.bundle',
+                    'expr'   => 'eq',
+                    'value'  => $bundle,
+                ],
             ];
         }
-
-        $filter = ['string' => $search, 'force' => [$bundleFilter]];
 
         $orderBy    = $this->get('session')->get('mautic.category.orderby', 'c.title');
         $orderByDir = $this->get('session')->get('mautic.category.orderbydir', 'DESC');
@@ -115,7 +118,7 @@ class CategoryController extends FormController
         $count = count($entities);
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            if ($count === 1) {
+            if (1 === $count) {
                 $lastPage = 1;
             } else {
                 $lastPage = (ceil($count / $limit)) ?: 1;
@@ -124,15 +127,17 @@ class CategoryController extends FormController
             $session->set('mautic.category.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_category_index', $viewParams);
 
-            return $this->postActionRedirect([
-                'returnUrl'       => $returnUrl,
-                'viewParameters'  => ['page' => $lastPage],
-                'contentTemplate' => 'MauticCategoryBundle:Category:index',
-                'passthroughVars' => [
-                    'activeLink'    => '#mautic_'.$bundle.'category_index',
-                    'mauticContent' => 'category',
-                ],
-            ]);
+            return $this->postActionRedirect(
+                [
+                    'returnUrl'       => $returnUrl,
+                    'viewParameters'  => ['page' => $lastPage],
+                    'contentTemplate' => 'MauticCategoryBundle:Category:index',
+                    'passthroughVars' => [
+                        'activeLink'    => '#mautic_'.$bundle.'category_index',
+                        'mauticContent' => 'category',
+                    ],
+                ]
+            );
         }
 
         $categoryTypes = ['category' => $this->get('translator')->trans('mautic.core.select')];
@@ -149,25 +154,28 @@ class CategoryController extends FormController
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
-        return $this->delegateView([
-            'returnUrl'      => $this->generateUrl('mautic_category_index', $viewParams),
-            'viewParameters' => [
-                'bundle'        => $bundle,
-                'searchValue'   => $search,
-                'items'         => $entities,
-                'page'          => $page,
-                'limit'         => $limit,
-                'permissions'   => $permissions,
-                'tmpl'          => $tmpl,
-                'categoryTypes' => $categoryTypes,
-            ],
-            'contentTemplate' => 'MauticCategoryBundle:Category:list.html.php',
-            'passthroughVars' => [
-                'activeLink'    => '#mautic_'.$bundle.'category_index',
-                'mauticContent' => 'category',
-                'route'         => $this->generateUrl('mautic_category_index', $viewParams),
-            ],
-        ]);
+        return $this->delegateView(
+            [
+                'returnUrl'      => $this->generateUrl('mautic_category_index', $viewParams),
+                'viewParameters' => [
+                    'bundle'         => $bundle,
+                    'permissionBase' => $permissionBase,
+                    'searchValue'    => $search,
+                    'items'          => $entities,
+                    'page'           => $page,
+                    'limit'          => $limit,
+                    'permissions'    => $permissions,
+                    'tmpl'           => $tmpl,
+                    'categoryTypes'  => $categoryTypes,
+                ],
+                'contentTemplate' => 'MauticCategoryBundle:Category:list.html.php',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_'.$bundle.'category_index',
+                    'mauticContent' => 'category',
+                    'route'         => $this->generateUrl('mautic_category_index', $viewParams),
+                ],
+            ]
+        );
     }
 
     /**
@@ -183,11 +191,11 @@ class CategoryController extends FormController
         $success    = $closeModal    = 0;
         $cancelled  = $valid  = false;
         $method     = $this->request->getMethod();
-        $inForm     = ($method == 'POST') ? $this->request->request->get('category_form[inForm]', 0, true) : $this->request->get('inForm', 0);
+        $inForm     = ('POST' == $method) ? $this->request->request->get('category_form')['inForm'] : $this->request->get('inForm', 0);
         $showSelect = $this->request->get('show_bundle_select', false);
 
         //not found
-        if (!$this->get('mautic.security')->isGranted($bundle.':categories:create')) {
+        if (!$this->get('mautic.security')->isGranted($model->getPermissionBase($bundle).':create')) {
             return $this->modalAccessDenied();
         }
         //Create the form
@@ -198,7 +206,7 @@ class CategoryController extends FormController
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['bundle' => $bundle, 'show_bundle_select' => $showSelect]);
         $form['inForm']->setData($inForm);
         ///Check for a submitted form and process it
-        if ($method == 'POST') {
+        if ('POST' == $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -245,7 +253,6 @@ class CategoryController extends FormController
                 ],
             ]);
         } elseif (!empty($valid)) {
-
             //return edit view to prevent duplicates
             return $this->editAction($bundle, $entity->getId(), true);
         } else {
@@ -279,12 +286,12 @@ class CategoryController extends FormController
         $success   = $closeModal   = 0;
         $cancelled = $valid = false;
         $method    = $this->request->getMethod();
-        $inForm    = ($method == 'POST') ? $this->request->request->get('category_form[inForm]', 0, true) : $this->request->get('inForm', 0);
+        $inForm    = ('POST' == $method) ? $this->request->request->get('category_form')['inForm'] : $this->request->get('inForm', 0);
 
         //not found
-        if ($entity === null) {
+        if (null === $entity) {
             $closeModal = true;
-        } elseif (!$this->get('mautic.security')->isGranted($bundle.':categories:view')) {
+        } elseif (!$this->get('mautic.security')->isGranted($model->getPermissionBase($bundle).':view')) {
             return $this->modalAccessDenied();
         } elseif ($model->isLocked($entity)) {
             return $this->modalAccessDenied();
@@ -303,7 +310,7 @@ class CategoryController extends FormController
         $form['inForm']->setData($inForm);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $method == 'POST') {
+        if (!$ignorePost && 'POST' == $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -397,7 +404,7 @@ class CategoryController extends FormController
     /**
      * Deletes the entity.
      *
-     * @param   $objectId
+     * @param $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -422,17 +429,17 @@ class CategoryController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $model  = $this->getModel('category');
             $entity = $model->getEntity($objectId);
 
-            if ($entity === null) {
+            if (null === $entity) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.category.error.notfound',
                     'msgVars' => ['%id%' => $objectId],
                 ];
-            } elseif (!$this->get('mautic.security')->isGranted($bundle.':categories:delete')) {
+            } elseif (!$this->get('mautic.security')->isGranted($model->getPermissionBase($bundle).':delete')) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'category.category');
@@ -485,7 +492,7 @@ class CategoryController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $model     = $this->getModel('category');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];
@@ -494,13 +501,13 @@ class CategoryController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if ($entity === null) {
+                if (null === $entity) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.category.error.notfound',
                         'msgVars' => ['%id%' => $objectId],
                     ];
-                } elseif (!$this->get('mautic.security')->isGranted($bundle.':categories:delete')) {
+                } elseif (!$this->get('mautic.security')->isGranted($model->getPermissionBase($bundle).':delete')) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'category', true);

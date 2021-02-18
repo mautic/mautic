@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -13,11 +14,14 @@ namespace Mautic\NotificationBundle\Model;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Entity\Stat;
 use Mautic\NotificationBundle\Event\NotificationEvent;
+use Mautic\NotificationBundle\Form\Type\MobileNotificationType;
+use Mautic\NotificationBundle\Form\Type\NotificationType;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\EventDispatcher\Event;
@@ -27,7 +31,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  * Class NotificationModel
  * {@inheritdoc}
  */
-class NotificationModel extends FormModel
+class NotificationModel extends FormModel implements AjaxLookupModelInterface
 {
     /**
      * @var TrackableModel
@@ -36,8 +40,6 @@ class NotificationModel extends FormModel
 
     /**
      * NotificationModel constructor.
-     *
-     * @param TrackableModel $pageTrackableModel
      */
     public function __construct(TrackableModel $pageTrackableModel)
     {
@@ -82,7 +84,8 @@ class NotificationModel extends FormModel
     {
         //iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
-        foreach ($entities as $k => $entity) {
+        $i         = 0;
+        foreach ($entities as $entity) {
             $isNew = ($entity->getId()) ? false : true;
 
             //set some defaults
@@ -98,7 +101,7 @@ class NotificationModel extends FormModel
                 $this->dispatchEvent('post_save', $entity, $isNew, $event);
             }
 
-            if ((($k + 1) % $batchSize) === 0) {
+            if (0 === ++$i % $batchSize) {
                 $this->em->flush();
             }
         }
@@ -127,7 +130,9 @@ class NotificationModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('notification', $entity, $options);
+        $type = false !== strpos($action, 'mobile_') ? MobileNotificationType::class : NotificationType::class;
+
+        return $formFactory->create($type, $entity, $options);
     }
 
     /**
@@ -135,11 +140,11 @@ class NotificationModel extends FormModel
      *
      * @param $id
      *
-     * @return null|Notification
+     * @return Notification|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             $entity = new Notification();
         } else {
             $entity = parent::getEntity($id);
@@ -149,17 +154,17 @@ class NotificationModel extends FormModel
     }
 
     /**
-     * @param Notification $notification
-     * @param Lead         $lead
-     * @param string       $source
+     * @param string $source
+     * @param int    $sourceId
      */
-    public function createStatEntry(Notification $notification, Lead $lead, $source = null)
+    public function createStatEntry(Notification $notification, Lead $lead, $source = null, $sourceId = null)
     {
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());
         $stat->setLead($lead);
         $stat->setNotification($notification);
         $stat->setSource($source);
+        $stat->setSourceId($sourceId);
 
         $this->getStatRepository()->saveEntity($stat);
     }
@@ -213,8 +218,6 @@ class NotificationModel extends FormModel
 
     /**
      * Joins the page table and limits created_by to currently logged in user.
-     *
-     * @param QueryBuilder $q
      */
     public function limitQueryToCreator(QueryBuilder &$q)
     {
@@ -226,12 +229,10 @@ class NotificationModel extends FormModel
     /**
      * Get line chart data of hits.
      *
-     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
-     * @param bool      $canViewOthers
+     * @param char   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
+     * @param array  $filter
+     * @param bool   $canViewOthers
      *
      * @return array
      */
@@ -247,7 +248,7 @@ class NotificationModel extends FormModel
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
-        if (!$flag || $flag === 'total_and_unique') {
+        if (!$flag || 'total_and_unique' === $flag) {
             $q = $query->prepareTimeDataQuery('push_notification_stats', 'date_sent', $filter);
 
             if (!$canViewOthers) {
@@ -300,5 +301,57 @@ class NotificationModel extends FormModel
     public function getNotificationClickStats($notificationId)
     {
         return $this->pageTrackableModel->getTrackableList('notification', $notificationId);
+    }
+
+    /**
+     * @param        $type
+     * @param string $filter
+     * @param int    $limit
+     * @param int    $start
+     * @param array  $options
+     *
+     * @return array
+     */
+    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = [])
+    {
+        $results = [];
+        switch ($type) {
+            case 'notification':
+                $entities = $this->getRepository()->getNotificationList(
+                    $filter,
+                    $limit,
+                    $start,
+                    $this->security->isGranted($this->getPermissionBase().':viewother'),
+                    isset($options['notification_type']) ? $options['notification_type'] : null
+                );
+
+                foreach ($entities as $entity) {
+                    $results[$entity['language']][$entity['id']] = $entity['name'];
+                }
+
+                //sort by language
+                ksort($results);
+
+                break;
+            case 'mobile_notification':
+                $entities = $this->getRepository()->getMobileNotificationList(
+                    $filter,
+                    $limit,
+                    $start,
+                    $this->security->isGranted($this->getPermissionBase().':viewother'),
+                    isset($options['notification_type']) ? $options['notification_type'] : null
+                );
+
+                foreach ($entities as $entity) {
+                    $results[$entity['language']][$entity['id']] = $entity['name'];
+                }
+
+                //sort by language
+                ksort($results);
+
+                break;
+        }
+
+        return $results;
     }
 }

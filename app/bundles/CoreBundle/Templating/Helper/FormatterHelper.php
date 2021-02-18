@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,39 +11,41 @@
 
 namespace Mautic\CoreBundle\Templating\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\Serializer;
 use Symfony\Component\Templating\Helper\Helper;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class FormatHelper.
- */
 class FormatterHelper extends Helper
 {
     /**
      * @var DateHelper
      */
     private $dateHelper;
-    private $version;
-
     /**
-     * @param MauticFactory $factory
+     * @var TranslatorInterface
      */
-    public function __construct(MauticFactory $factory)
+    private $translator;
+
+    public function __construct(DateHelper $dateHelper, TranslatorInterface $translator)
     {
-        $this->dateHelper = $factory->getHelper('template.date');
-        $this->version    = $factory->getVersion();
+        $this->dateHelper = $dateHelper;
+        $this->translator = $translator;
     }
 
     /**
      * Format a string.
      *
      * @param $val
-     * @param $type
+     * @param string $type
+     * @param bool   $textOnly
+     * @param int    $round
+     *
+     * @return string
      */
-    public function _($val, $type, $textOnly = false, $round = 1)
+    public function _($val, $type = 'html', $textOnly = false, $round = 1)
     {
-        if (empty($val)) {
+        if (empty($val) && 'bool' !== $type) {
             return $val;
         }
 
@@ -50,21 +53,21 @@ class FormatterHelper extends Helper
             case 'array':
                 if (!is_array($val)) {
                     //assume that it's serialized
-                    $unserialized = unserialize($val);
+                    $unserialized = Serializer::decode($val);
                     if ($unserialized) {
                         $val = $unserialized;
                     }
                 }
 
                 $stringParts = [];
-                foreach ($val as $k => $v) {
+                foreach ($val as $v) {
                     if (is_array($v)) {
                         $stringParts = $this->_($v, 'array', $textOnly, $round + 1);
                     } else {
                         $stringParts[] = $v;
                     }
                 }
-                if ($round === 1) {
+                if (1 === $round) {
                     $string = implode('; ', $stringParts);
                 } else {
                     $string = implode(', ', $stringParts);
@@ -88,6 +91,13 @@ class FormatterHelper extends Helper
             case 'int':
                 $string = (int) $val;
                 break;
+            case 'html':
+                $string = InputHelper::strict_html($val);
+                break;
+            case 'bool':
+                $translate = $val ? 'mautic.core.yes' : 'mautic.core.no';
+                $string    = $this->translator->trans($translate);
+                break;
             default:
                 $string = InputHelper::clean($val);
                 break;
@@ -97,18 +107,78 @@ class FormatterHelper extends Helper
     }
 
     /**
+     * Converts array to string with provided delimiter
+     * Internally, the method uses conversion to json
+     * instead of simple implode to cover multidimensional arrays.
+     *
+     * @param mixed  $array
+     * @param string $delimiter
+     *
      * @return string
      */
-    public function getName()
+    public function arrayToString($array, $delimiter = ', ')
     {
-        return 'formatter';
+        if (is_array($array)) {
+            $replacements = [
+                '{'    => '(',
+                '}'    => ')',
+                '"'    => '',
+                ','    => $delimiter,
+                '[]'   => 'undefined',
+                'null' => 'undefined',
+                ':'    => ' = ',
+            ];
+            $json = json_encode($array);
+
+            return trim(str_replace(array_keys($replacements), array_values($replacements), $json), '()[]');
+        }
+
+        return $array;
+    }
+
+    /**
+     * @param string $delimeter
+     *
+     * @return string
+     */
+    public function simpleArrayToHtml(array $array, $delimeter = '<br />')
+    {
+        $pairs = [];
+        foreach ($array as $key => $value) {
+            $pairs[] = "$key: $value";
+        }
+
+        return implode($delimeter, $pairs);
+    }
+
+    /**
+     * Takes a simple csv list like 1,2,3,4 and returns as an array.
+     *
+     * @param $csv
+     *
+     * @return array
+     */
+    public function simpleCsvToArray($csv, $type = null)
+    {
+        if (!$csv) {
+            return [];
+        }
+
+        return array_map(
+            function ($value) use ($type) {
+                $value = trim($value);
+
+                return $this->_($value, $type);
+            },
+            explode(',', $csv)
+        );
     }
 
     /**
      * @return string
      */
-    public function getVersion()
+    public function getName()
     {
-        return $this->version;
+        return 'formatter';
     }
 }

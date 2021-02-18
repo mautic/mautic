@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,9 +11,6 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-/**
- * Class AbstractRemoteDataLookup.
- */
 abstract class AbstractRemoteDataLookup extends AbstractLookup
 {
     /**

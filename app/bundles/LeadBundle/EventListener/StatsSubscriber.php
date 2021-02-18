@@ -1,0 +1,50 @@
+<?php
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace Mautic\LeadBundle\EventListener;
+
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\EventListener\CommonStatsSubscriber;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\LeadBundle\Entity\CompanyChangeLog;
+use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\FrequencyRule;
+use Mautic\LeadBundle\Entity\LeadCategory;
+use Mautic\LeadBundle\Entity\LeadDevice;
+use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Entity\PointsChangeLog;
+use Mautic\LeadBundle\Entity\StagesChangeLog;
+use Mautic\LeadBundle\Entity\UtmTag;
+
+class StatsSubscriber extends CommonStatsSubscriber
+{
+    public function __construct(CorePermissions $security, EntityManager $entityManager)
+    {
+        parent::__construct($security, $entityManager);
+        $this->addContactRestrictedRepositories(
+            [
+                CompanyChangeLog::class,
+                PointsChangeLog::class,
+                StagesChangeLog::class,
+                CompanyLead::class,
+                LeadCategory::class,
+                LeadDevice::class,
+                LeadEventLog::class,
+                ListLead::class,
+                DoNotContact::class,
+                FrequencyRule::class,
+                UtmTag::class,
+            ]
+        );
+    }
+}

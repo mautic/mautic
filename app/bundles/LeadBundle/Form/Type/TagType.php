@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,57 +11,50 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Form\DataTransformer\TagEntityModelTransformer;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TagType extends AbstractType
 {
     /**
-     * @var
+     * @var EntityManager
      */
-    private $factory;
+    private $em;
 
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
+    public function __construct(EntityManager $em)
     {
-        $this->factory = $factory;
+        $this->em = $em;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['add_transformer']) {
             $transformer = new TagEntityModelTransformer(
-                $this->factory->getEntityManager(),
-                'MauticLeadBundle:Tag',
-                'id',
-                ($options['multiple']),
-                true
+                $this->em,
+                Tag::class,
+                ($options['multiple'])
             );
 
             $builder->addModelTransformer($transformer);
         }
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
                 'label'         => 'mautic.lead.tags',
                 'class'         => 'MauticLeadBundle:Tag',
                 'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('t')
-                        ->orderBy('t.tag', 'ASC');
+                    return $er->createQueryBuilder('t')->orderBy('t.tag', 'ASC');
                 },
-                'property'        => 'tag',
+                'choice_label'    => 'tag',
                 'multiple'        => true,
                 'required'        => false,
                 'disabled'        => false,
@@ -72,7 +66,7 @@ class TagType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'lead_tag';
     }
@@ -82,6 +76,6 @@ class TagType extends AbstractType
      */
     public function getParent()
     {
-        return 'entity';
+        return EntityType::class;
     }
 }

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -17,5 +18,6 @@ echo $view->render(
         'formName'      => (isset($formName)) ? $formName : '',
         'type'          => 'radio',
         'contactFields' => (isset($contactFields)) ? $contactFields : [],
+        'companyFields' => (isset($companyFields)) ? $companyFields : [],
     ]
 );

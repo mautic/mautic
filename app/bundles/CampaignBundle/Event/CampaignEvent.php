@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -19,8 +20,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 class CampaignEvent extends CommonEvent
 {
     /**
-     * @param Campaign $campaign
-     * @param bool     $isNew
+     * @param bool $isNew
      */
     public function __construct(Campaign &$campaign, $isNew = false)
     {
@@ -40,8 +40,6 @@ class CampaignEvent extends CommonEvent
 
     /**
      * Sets the Campaign entity.
-     *
-     * @param Campaign $campaign
      */
     public function setCampaign(Campaign $campaign)
     {

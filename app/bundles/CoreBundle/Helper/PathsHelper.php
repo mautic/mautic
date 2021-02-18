@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\UserBundle\Entity\User;
 
 /**
@@ -20,59 +22,128 @@ class PathsHelper
     /**
      * @var array
      */
-    protected $paths;
+    private $paths;
 
     /**
      * @var string
      */
-    protected $theme;
+    private $theme;
 
     /**
      * @var string
      */
-    protected $imagePath;
+    private $imagePath;
 
     /**
      * @var string
      */
-    protected $dashboardImportDir;
+    private $dashboardImportDir;
 
     /**
      * @var string
      */
-    protected $dashboardUserImportDir;
+    private $dashboardUserImportDir;
 
     /**
      * @var string
      */
-    protected $kernelCacheDir;
+    private $kernelCacheDir;
 
     /**
      * @var string
      */
-    protected $kernelLogsDir;
+    private $kernelLogsDir;
+
+    /**
+     * @var string
+     */
+    private $kernelRootDir;
+
+    /**
+     * @var mixed
+     */
+    private $temporaryDir;
 
     /**
      * @var User
      */
-    protected $user;
+    private $user;
 
     /**
      * PathsHelper constructor.
-     *
-     * @param CoreParametersHelper
-     * @param UserHelper $userHelper
      */
-    public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper)
+    public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, string $cacheDir, string $logsDir, string $rootDir)
     {
         $this->user                   = $userHelper->getUser();
-        $this->paths                  = $coreParametersHelper->getParameter('paths');
-        $this->theme                  = $coreParametersHelper->getParameter('theme');
-        $this->imagePath              = $coreParametersHelper->getParameter('image_path');
-        $this->dashboardImportDir     = $coreParametersHelper->getParameter('dashboard_import_dir');
-        $this->dashboardImportUserDir = $coreParametersHelper->getParameter('dashboard_import_user_dir');
-        $this->kernelCacheDir         = $coreParametersHelper->getParameter('kernel.cache_dir');
-        $this->kernelLogsDir          = $coreParametersHelper->getParameter('kernel.logs_dir');
+        $this->theme                  = $coreParametersHelper->get('theme');
+        $this->imagePath              = $this->removeTrailingSlash($coreParametersHelper->get('image_path'));
+        $this->dashboardImportDir     = $this->removeTrailingSlash($coreParametersHelper->get('dashboard_import_dir'));
+        $this->temporaryDir           = $this->removeTrailingSlash($coreParametersHelper->get('tmp_path'));
+        $this->dashboardUserImportDir = $this->removeTrailingSlash($coreParametersHelper->get('dashboard_import_user_dir'));
+        $this->kernelCacheDir         = $this->removeTrailingSlash($cacheDir);
+        $this->kernelLogsDir          = $this->removeTrailingSlash($logsDir);
+        $this->kernelRootDir          = $this->removeTrailingSlash($rootDir);
+
+        $root  = $rootDir;
+        $paths = [];
+        include $root.'/config/paths_helper.php';
+
+        $this->paths = $paths;
+    }
+
+    public function getLocalConfigurationFile(): string
+    {
+        return ParameterLoader::getLocalConfigFile($this->kernelRootDir);
+    }
+
+    public function getCachePath(): string
+    {
+        return $this->getSystemPath('cache', true);
+    }
+
+    public function getRootPath(): string
+    {
+        return $this->getSystemPath('root', true);
+    }
+
+    public function getTemporaryPath(): string
+    {
+        return $this->getSystemPath('tmp', true);
+    }
+
+    public function getLogsPath(): string
+    {
+        return $this->getSystemPath('logs', true);
+    }
+
+    public function getImagePath(): string
+    {
+        return $this->getSystemPath('images', true);
+    }
+
+    public function getTranslationsPath(): string
+    {
+        return $this->getSystemPath('translations', true);
+    }
+
+    public function getThemesPath(): string
+    {
+        return $this->getSystemPath('themes', true);
+    }
+
+    public function getAssetsPath(): string
+    {
+        return $this->getSystemPath('assets', true);
+    }
+
+    public function getCoreBundlesPath(): string
+    {
+        return $this->getSystemPath('bundles', true);
+    }
+
+    public function getPluginsPath(): string
+    {
+        return $this->getSystemPath('plugins', true);
     }
 
     /**
@@ -88,58 +159,77 @@ class PathsHelper
      */
     public function getSystemPath($name, $fullPath = false)
     {
-        if ($name == 'currentTheme' || $name == 'current_theme') {
-            $path = $this->paths['themes'].'/'.$this->theme;
-        } elseif ($name == 'cache' || $name == 'logs') {
-            //these are absolute regardless as they are configurable
-            return ($name === 'cache') ? $this->kernelCacheDir : $this->kernelLogsDir;
-        } elseif ($name == 'images') {
-            $path = $this->imagePath;
+        switch ($name) {
+            case 'currentTheme':
+            case 'current_theme':
+                $path = $this->paths['themes'].'/'.$this->theme;
+                break;
 
-            if (substr($path, -1) === '/') {
-                $path = substr($path, 0, -1);
-            }
-        } elseif ($name == 'dashboard.user' || $name == 'dashboard.global') {
-            //these are absolute regardless as they are configurable
-            $globalPath = $this->dashboardImportDir;
+            case 'cache':
+                return $this->kernelCacheDir;
+            case 'logs':
+                return $this->kernelLogsDir;
+            case 'temporary':
+            case 'tmp':
+                if (!is_dir($this->temporaryDir) && !file_exists($this->temporaryDir) && is_writable($this->temporaryDir)) {
+                    mkdir($this->temporaryDir, 0777, true);
+                }
 
-            if (substr($globalPath, -1) === '/') {
-                $globalPath = substr($globalPath, 0, -1);
-            }
+                return $this->temporaryDir;
+            case 'images':
+                $path = $this->imagePath;
+                break;
 
-            if ($name == 'dashboard.global') {
-                return $globalPath;
-            }
+            case 'dashboard.user':
+            case 'dashboard.global':
+                //these are absolute regardless as they are configurable
+                $globalPath = $this->dashboardImportDir;
 
-            if (!$userPath = $this->dashboardUserImportDir) {
-                $userPath = $globalPath;
-            } elseif (substr($userPath, -1) === '/') {
-                $userPath = substr($userPath, 0, -1);
-            }
+                if ('dashboard.global' == $name) {
+                    return $globalPath;
+                }
 
-            $userPath .= '/'.$this->user->getId();
+                if (!$userPath = $this->dashboardUserImportDir) {
+                    $userPath = $globalPath;
+                }
 
-            // @todo check is_writable
-            if (!is_dir($userPath) && !file_exists($userPath)) {
-                mkdir($userPath, 0755);
-            }
+                $userPath .= '/'.$this->user->getId();
 
-            return $userPath;
-        } elseif (isset($this->paths[$name])) {
-            $path = $this->paths[$name];
-        } elseif (strpos($name, '_root') !== false) {
-            // Assume system root if one is not set specifically
-            $path = $this->paths['root'];
-        } else {
-            throw new \InvalidArgumentException("$name does not exist.");
+                if (!is_dir($userPath) && !file_exists($userPath) && is_writable($userPath)) {
+                    mkdir($userPath);
+                }
+
+                return $userPath;
+
+            default:
+                if (isset($this->paths[$name])) {
+                    $path = $this->paths[$name];
+                } elseif (false !== strpos($name, '_root')) {
+                    // Assume system root if one is not set specifically
+                    $path = $this->paths['root'];
+                } else {
+                    throw new \InvalidArgumentException("$name does not exist.");
+                }
         }
 
-        if ($fullPath) {
-            $rootPath = (!empty($this->paths[$name.'_root'])) ? $this->paths[$name.'_root'] : $this->paths['root'];
+        if (!$fullPath) {
+            return $path;
+        }
 
+        $rootPath = (!empty($this->paths[$name.'_root'])) ? $this->paths[$name.'_root'] : $this->paths['root'];
+        if (false === strpos($path, $rootPath)) {
             return $rootPath.'/'.$path;
         }
 
         return $path;
+    }
+
+    private function removeTrailingSlash(?string $dir): ?string
+    {
+        if ('/' === substr($dir, -1)) {
+            $dir = substr($dir, 0, -1);
+        }
+
+        return $dir;
     }
 }

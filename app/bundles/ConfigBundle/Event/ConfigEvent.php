@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -11,11 +12,9 @@
 namespace Mautic\ConfigBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-/**
- * Class ConfigEvent.
- */
 class ConfigEvent extends CommonEvent
 {
     /**
@@ -24,12 +23,12 @@ class ConfigEvent extends CommonEvent
     private $preserve = [];
 
     /**
-     * @param array $config
+     * @param array
      */
     private $config;
 
     /**
-     * @param \Symfony\Component\HttpFoundation\ParameterBag $post
+     * @param ParameterBag
      */
     private $post;
 
@@ -39,9 +38,24 @@ class ConfigEvent extends CommonEvent
     private $errors = [];
 
     /**
-     * @param array        $config
-     * @param ParameterBag $post
+     * @var array
      */
+    private $fieldErrors = [];
+
+    /**
+     * Data got from build form before update.
+     *
+     * @var array
+     */
+    private $originalNormData;
+
+    /**
+     * Data got from build form after update.
+     *
+     * @var array
+     */
+    private $normData;
+
     public function __construct(array $config, ParameterBag $post)
     {
         $this->config = $config;
@@ -67,8 +81,7 @@ class ConfigEvent extends CommonEvent
     /**
      * Sets the config array.
      *
-     * @param array $config
-     * @param null  $key
+     * @param null $key
      */
     public function setConfig(array $config, $key = null)
     {
@@ -79,12 +92,7 @@ class ConfigEvent extends CommonEvent
         }
     }
 
-    /**
-     * Returns the POST.
-     *
-     * @return \Symfony\Component\HttpFoundation\ParameterBag
-     */
-    public function getPost()
+    public function getPost(): ParameterBag
     {
         return $this->post;
     }
@@ -118,12 +126,31 @@ class ConfigEvent extends CommonEvent
     /**
      * Set error message.
      *
-     * @param string $message     (untranslated)
-     * @param array  $messageVars for translation
+     * @param string      $message     (untranslated)
+     * @param array       $messageVars for translation
+     * @param string|null $key
+     * @param string|null $field
+     *
+     * @return ConfigEvent
      */
-    public function setError($message, $messageVars = [])
+    public function setError($message, $messageVars = [], $key = null, $field = null)
     {
+        if (!empty($key) && !empty($field)) {
+            if (!isset($this->errors[$key])) {
+                $this->fieldErrors[$key] = [];
+            }
+
+            $this->fieldErrors[$key][$field] = [
+                $message,
+                $messageVars,
+            ];
+
+            return $this;
+        }
+
         $this->errors[$message] = $messageVars;
+
+        return $this;
     }
 
     /**
@@ -134,5 +161,69 @@ class ConfigEvent extends CommonEvent
     public function getErrors()
     {
         return $this->errors;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFieldErrors()
+    {
+        return $this->fieldErrors;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFileContent(UploadedFile $file)
+    {
+        $tmpFile = $file->getRealPath();
+        $content = trim(file_get_contents($tmpFile));
+        @unlink($tmpFile);
+
+        return $content;
+    }
+
+    /**
+     * @param $content
+     *
+     * @return string
+     */
+    public function encodeFileContents($content)
+    {
+        return base64_encode($content);
+    }
+
+    /**
+     * @return array
+     */
+    public function getOriginalNormData()
+    {
+        return $this->originalNormData;
+    }
+
+    /**
+     * @return ConfigEvent
+     */
+    public function setOriginalNormData(array $normData)
+    {
+        $this->originalNormData = $normData;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getNormData()
+    {
+        return $this->normData;
+    }
+
+    /**
+     * @param array $normData
+     */
+    public function setNormData($normData)
+    {
+        $this->normData = $normData;
     }
 }

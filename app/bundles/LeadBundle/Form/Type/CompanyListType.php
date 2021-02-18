@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -14,9 +15,6 @@ use Mautic\CoreBundle\Form\Type\EntityLookupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class CompanyListType.
- */
 class CompanyListType extends AbstractType
 {
     /**
@@ -33,6 +31,7 @@ class CompanyListType extends AbstractType
                 'model'               => 'lead.company',
                 'ajax_lookup_action'  => 'lead:getLookupChoiceList',
                 'multiple'            => true,
+                'main_entity'         => null,
             ]
         );
     }
@@ -48,7 +47,7 @@ class CompanyListType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'company_list';
     }

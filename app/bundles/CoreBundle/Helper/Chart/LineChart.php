@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -77,7 +78,6 @@ class LineChart extends AbstractChart implements ChartInterface
      * Define a dataset by name and data. Method will add the rest.
      *
      * @param string $label
-     * @param array  $data
      *
      * @return $this
      */
@@ -114,14 +114,12 @@ class LineChart extends AbstractChart implements ChartInterface
             $this->labels[] = $date->format($format);
 
             // Special case for months because PHP behaves weird with February
-            if ($this->unit === 'm') {
+            if ('m' === $this->unit) {
                 $date->modify('first day of next month');
             } else {
                 $date->add($oneUnit);
             }
         }
-
-        $this->labels = $this->labels;
     }
 
     /**

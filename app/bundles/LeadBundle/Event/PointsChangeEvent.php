@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -21,10 +22,6 @@ class PointsChangeEvent extends CommonEvent
     protected $old;
     protected $new;
 
-    /**
-     * @param Lead $lead
-     * @param bool $isNew
-     */
     public function __construct(Lead &$lead, $old, $new)
     {
         $this->entity = &$lead;

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -19,7 +20,6 @@ use Mautic\FormBundle\Entity\Form;
 class FormEvent extends CommonEvent
 {
     /**
-     * @param Form $form
      * @param bool $isNew
      */
     public function __construct(Form &$form, $isNew = false)
@@ -40,8 +40,6 @@ class FormEvent extends CommonEvent
 
     /**
      * Sets the Form entity.
-     *
-     * @param Form $form
      */
     public function setForm(Form $form)
     {

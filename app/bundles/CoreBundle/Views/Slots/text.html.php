@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -8,5 +9,4 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-
-Insert text here
+<span><?php echo $view['translator']->trans('mautic.core.slot.label.text.insert'); ?></span>

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,36 +11,40 @@
 
 namespace Mautic\SmsBundle\Form\Type;
 
+use Doctrine\ORM\EntityManager;
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\LeadBundle\Form\Type\LeadListType;
+use Mautic\SmsBundle\Entity\Sms;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\LocaleType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class SmsType.
  */
 class SmsType extends AbstractType
 {
-    private $translator;
-    private $em;
-    private $request;
-
     /**
-     * @param MauticFactory $factory
+     * @var EntityManager
      */
-    public function __construct(MauticFactory $factory)
+    private $em;
+
+    public function __construct(EntityManager $em)
     {
-        $this->translator = $factory->getTranslator();
-        $this->em         = $factory->getEntityManager();
-        $this->request    = $factory->getRequest();
+        $this->em = $em;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html']));
@@ -47,7 +52,7 @@ class SmsType extends AbstractType
 
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.sms.form.internal.name',
                 'label_attr' => ['class' => 'control-label'],
@@ -57,7 +62,7 @@ class SmsType extends AbstractType
 
         $builder->add(
             'description',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.sms.form.internal.description',
                 'label_attr' => ['class' => 'control-label'],
@@ -68,7 +73,7 @@ class SmsType extends AbstractType
 
         $builder->add(
             'message',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.sms.form.message',
                 'label_attr' => ['class' => 'control-label'],
@@ -79,11 +84,31 @@ class SmsType extends AbstractType
             ]
         );
 
-        $builder->add('isPublished', 'yesno_button_group');
+        $builder->add('isPublished', YesNoButtonGroupType::class);
+
+        //add lead lists
+        $transformer = new IdToEntityModelTransformer($this->em, 'MauticLeadBundle:LeadList', 'id', true);
+        $builder->add(
+            $builder->create(
+                'lists',
+                LeadListType::class,
+                [
+                    'label'      => 'mautic.email.form.list',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'        => 'form-control',
+                    ],
+                    'multiple' => true,
+                    'expanded' => false,
+                    'required' => true,
+                ]
+            )
+                ->addModelTransformer($transformer)
+        );
 
         $builder->add(
             'publishUp',
-            'datetime',
+            DateTimeType::class,
             [
                 'widget'     => 'single_text',
                 'label'      => 'mautic.core.form.publishup',
@@ -99,7 +124,7 @@ class SmsType extends AbstractType
 
         $builder->add(
             'publishDown',
-            'datetime',
+            DateTimeType::class,
             [
                 'widget'     => 'single_text',
                 'label'      => 'mautic.core.form.publishdown',
@@ -116,7 +141,7 @@ class SmsType extends AbstractType
         //add category
         $builder->add(
              'category',
-             'category',
+             CategoryListType::class,
              [
                  'bundle' => 'sms',
              ]
@@ -124,7 +149,7 @@ class SmsType extends AbstractType
 
         $builder->add(
             'language',
-            'locale',
+            LocaleType::class,
             [
                 'label'      => 'mautic.core.language',
                 'label_attr' => ['class' => 'control-label'],
@@ -134,20 +159,20 @@ class SmsType extends AbstractType
                 'required' => false,
             ]
         );
-
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('smsType', HiddenType::class);
+        $builder->add('buttons', FormButtonsType::class);
 
         if (!empty($options['update_select'])) {
             $builder->add(
                 'buttons',
-                'form_buttons',
+                FormButtonsType::class,
                 [
                     'apply_text' => false,
                 ]
             );
             $builder->add(
                 'updateSelect',
-                'hidden',
+                HiddenType::class,
                 [
                     'data'   => $options['update_select'],
                     'mapped' => false,
@@ -156,7 +181,7 @@ class SmsType extends AbstractType
         } else {
             $builder->add(
                 'buttons',
-                'form_buttons'
+                FormButtonsType::class
             );
         }
 
@@ -165,24 +190,21 @@ class SmsType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Mautic\SmsBundle\Entity\Sms',
+                'data_class' => Sms::class,
             ]
         );
 
-        $resolver->setOptional(['update_select']);
+        $resolver->setDefined(['update_select']);
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'sms';
     }

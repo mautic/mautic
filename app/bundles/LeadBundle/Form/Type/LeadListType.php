@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,61 +11,61 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class LeadListType.
- */
 class LeadListType extends AbstractType
 {
-    private $model;
-
     /**
-     * @param MauticFactory $factory
+     * @var ListModel
      */
-    public function __construct(MauticFactory $factory)
+    private $segmentModel;
+
+    public function __construct(ListModel $segmentModel)
     {
-        $this->model = $factory->getModel('lead.list');
+        $this->segmentModel = $segmentModel;
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        /** @var \Mautic\LeadBundle\Model\ListModel $model */
-        $model = $this->model;
         $resolver->setDefaults([
-            'choices' => function (Options $options) use ($model) {
-                $lists = (empty($options['global_only'])) ? $model->getUserLists() : $model->getGlobalLists();
+                'choices'           => function (Options $options) {
+                    $lists = (empty($options['global_only'])) ? $this->segmentModel->getUserLists() : $this->segmentModel->getGlobalLists();
+                    $lists = (empty($options['preference_center_only'])) ? $lists : $this->segmentModel->getPreferenceCenterLists();
 
-                $choices = [];
-                foreach ($lists as $l) {
-                    $choices[$l['id']] = $l['name'];
-                }
+                    $choices = [];
+                    foreach ($lists as $l) {
+                        if (empty($options['preference_center_only'])) {
+                            $choices[$l['name']] = $l['id'];
+                        } else {
+                            $choices[empty($l['publicName']) ? $l['name'] : $l['publicName']] = $l['id'];
+                        }
+                    }
 
-                return $choices;
-            },
-            'global_only' => false,
-            'required'    => false,
+                    return $choices;
+                },
+            'global_only'            => false,
+            'preference_center_only' => false,
+            'required'               => false,
         ]);
     }
 
     /**
-     * @return null|string|\Symfony\Component\Form\FormTypeInterface
+     * @return string|FormTypeInterface|null
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'leadlist_choices';
     }

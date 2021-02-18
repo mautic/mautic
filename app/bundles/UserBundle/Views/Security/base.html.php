@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -13,11 +14,11 @@
 <html>
 <head>
     <meta charset="UTF-8" />
-    <title>Mautic</title>
+    <title><?php echo $view['slots']->get('pageTitle', 'Mautic'); ?></title>
     <meta name="robots" content="noindex, nofollow" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="icon" type="image/x-icon" href="<?php echo $view['assets']->getUrl('media/images/favicon.ico') ?>" />
-    <link rel="apple-touch-icon" href="<?php echo $view['assets']->getUrl('media/images/apple-touch-icon.png') ?>" />
+    <link rel="icon" type="image/x-icon" href="<?php echo $view['assets']->getUrl('media/images/favicon.ico'); ?>" />
+    <link rel="apple-touch-icon" href="<?php echo $view['assets']->getUrl('media/images/apple-touch-icon.png'); ?>" />
     <?php $view['assets']->outputSystemStylesheets(); ?>
     <?php echo $view->render('MauticCoreBundle:Default:script.html.php'); ?>
     <?php $view['assets']->outputHeadDeclarations(); ?>

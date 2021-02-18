@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -20,8 +21,6 @@ use Mautic\UserBundle\Entity\User;
 class ClientRepository extends CommonRepository
 {
     /**
-     * @param User $user
-     *
      * @return array
      */
     public function getUserClients(User $user)
@@ -38,7 +37,7 @@ class ClientRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $q = $this
             ->createQueryBuilder('c');
@@ -51,7 +50,7 @@ class ClientRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
             'c.name',

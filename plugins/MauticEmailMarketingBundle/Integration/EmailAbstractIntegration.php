@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -19,6 +20,8 @@ use Symfony\Component\Form\FormBuilder;
  */
 abstract class EmailAbstractIntegration extends AbstractIntegration
 {
+    protected $pushContactLink = false;
+
     /**
      * @return array
      */
@@ -32,14 +35,16 @@ abstract class EmailAbstractIntegration extends AbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        if ($formArea == 'features' || $formArea == 'integration') {
+        if ('features' == $formArea || 'integration' == $formArea) {
             if ($this->isAuthorized()) {
-                $name = strtolower($this->getName());
-                if ($this->factory->serviceExists('mautic.form.type.emailmarketing.'.$name)) {
-                    if ($formArea == 'integration' && isset($data['leadFields']) && empty($data['list_settings']['leadFields'])) {
+                $formType = $this->getFormType();
+
+                if ($formType) {
+                    if ('integration' == $formArea && isset($data['leadFields']) && empty($data['list_settings']['leadFields'])) {
                         $data['list_settings']['leadFields'] = $data['leadFields'];
                     }
-                    $builder->add('list_settings', 'emailmarketing_'.$name, [
+
+                    $builder->add('list_settings', $formType, [
                         'label'     => false,
                         'form_area' => $formArea,
                         'data'      => (isset($data['list_settings'])) ? $data['list_settings'] : [],
@@ -56,6 +61,13 @@ abstract class EmailAbstractIntegration extends AbstractIntegration
     {
         return 'MauticEmailMarketingBundle:FormTheme\EmailMarketing';
     }
+
+    /**
+     * Returns form type.
+     *
+     * @return string|null
+     */
+    abstract public function getFormType();
 
     /**
      * Get the API helper.
@@ -85,7 +97,8 @@ abstract class EmailAbstractIntegration extends AbstractIntegration
         $featureSettings = $this->settings->getFeatureSettings();
 
         if (isset($config['config']['list_settings']['leadFields'])) {
-            $config['config']['leadFields'] = $config['config']['list_settings']['leadFields'];
+            $config['config']['leadFields'] = $this->formatMatchedFields($config['config']['list_settings']['leadFields']);
+
             unset($config['config']['list_settings']['leadFields']);
         }
 

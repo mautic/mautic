@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,42 +11,92 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\EventListener\ChannelTrait;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadDevice;
+use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Entity\LeadEventLogRepository;
+use Mautic\LeadBundle\Entity\LeadNote;
+use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Entity\PointsChangeLog;
+use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event as Events;
+use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ChannelTimelineInterface;
+use Mautic\LeadBundle\Templating\Helper\DncReasonHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class LeadSubscriber.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
     use ChannelTrait;
 
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
     /**
      * @var IpLookupHelper
      */
-    protected $ipLookupHelper;
+    private $ipLookupHelper;
 
     /**
-     * LeadSubscriber constructor.
-     *
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
+     * @var LeadChangeEventDispatcher
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
-    {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
+    private $leadEventDispatcher;
+
+    /**
+     * @var DncReasonHelper
+     */
+    private $dncReasonHelper;
+
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    /**
+     * Whether or not we're running in a test environment.
+     *
+     * @var bool
+     */
+    private $isTest;
+
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        AuditLogModel $auditLogModel,
+        LeadChangeEventDispatcher $eventDispatcher,
+        DncReasonHelper $dncReasonHelper,
+        EntityManager $entityManager,
+        TranslatorInterface $translator,
+        RouterInterface $router,
+        $isTest = false
+    ) {
+        $this->ipLookupHelper      = $ipLookupHelper;
+        $this->auditLogModel       = $auditLogModel;
+        $this->leadEventDispatcher = $eventDispatcher;
+        $this->dncReasonHelper     = $dncReasonHelper;
+        $this->entityManager       = $entityManager;
+        $this->translator          = $translator;
+        $this->router              = $router;
+        $this->isTest              = $isTest;
     }
 
     /**
@@ -56,6 +107,7 @@ class LeadSubscriber extends CommonSubscriber
         return [
             LeadEvents::LEAD_POST_SAVE       => ['onLeadPostSave', 0],
             LeadEvents::LEAD_POST_DELETE     => ['onLeadDelete', 0],
+            LeadEvents::LEAD_PRE_MERGE       => ['preLeadMerge', 0],
             LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
             LeadEvents::FIELD_POST_SAVE      => ['onFieldPostSave', 0],
             LeadEvents::FIELD_POST_DELETE    => ['onFieldDelete', 0],
@@ -67,8 +119,6 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * Add a lead entry to the audit log.
-     *
-     * @param Events\LeadEvent $event
      */
     public function onLeadPostSave(Events\LeadEvent $event)
     {
@@ -79,16 +129,17 @@ class LeadSubscriber extends CommonSubscriber
         $lead = $event->getLead();
 
         if ($details = $event->getChanges()) {
-            // Unset dateLastActive to prevent un-necessary audit log entries
-            unset($details['dateLastActive']);
+            // Unset dateLastActive and dateModified and ipAddress to prevent un-necessary audit log entries
+            unset($details['dateLastActive'], $details['dateModified'], $details['ipAddressList']);
             if (empty($details)) {
                 return;
             }
 
-            $check = base64_encode($lead->getId().serialize($details));
+            $check = base64_encode($lead->getId().md5(json_encode($details)));
             if (!in_array($check, $preventLoop)) {
                 $preventLoop[] = $check;
 
+                // Change entry
                 $log = [
                     'bundle'    => 'lead',
                     'object'    => 'lead',
@@ -99,6 +150,7 @@ class LeadSubscriber extends CommonSubscriber
                 ];
                 $this->auditLogModel->writeToLog($log);
 
+                // Date identified entry
                 if (isset($details['dateIdentified'])) {
                     //log the day lead was identified
                     $log = [
@@ -110,14 +162,9 @@ class LeadSubscriber extends CommonSubscriber
                         'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
                     ];
                     $this->auditLogModel->writeToLog($log);
-
-                    //trigger lead identified event
-                    if (!$lead->imported && $this->dispatcher->hasListeners(LeadEvents::LEAD_IDENTIFIED)) {
-                        $this->dispatcher->dispatch(LeadEvents::LEAD_IDENTIFIED, $event);
-                    }
                 }
 
-                //add if an ip was added
+                // IP added entry
                 if (isset($details['ipAddresses']) && !empty($details['ipAddresses'][1])) {
                     $log = [
                         'bundle'    => 'lead',
@@ -125,31 +172,18 @@ class LeadSubscriber extends CommonSubscriber
                         'objectId'  => $lead->getId(),
                         'action'    => 'ipadded',
                         'details'   => $details['ipAddresses'],
-                        'ipAddress' => $this->request->server->get('REMOTE_ADDR'),
+                        'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
                     ];
                     $this->auditLogModel->writeToLog($log);
                 }
 
-                //trigger the points change event
-                if (!$lead->imported && isset($details['points']) && (int) $details['points'][1] > 0) {
-                    if (!$event->isNew() && $this->dispatcher->hasListeners(LeadEvents::LEAD_POINTS_CHANGE)) {
-                        $pointsEvent = new Events\PointsChangeEvent($lead, $details['points'][0], $details['points'][1]);
-                        $this->dispatcher->dispatch(LeadEvents::LEAD_POINTS_CHANGE, $pointsEvent);
-                    }
-                }
-
-                if (!$lead->imported && isset($details['utmtags'])) {
-                    $utmTagsEvent = new Events\LeadUtmTagsEvent($lead, $details['utmtags']);
-                    $this->dispatcher->dispatch(LeadEvents::LEAD_UTMTAGS_ADD, $utmTagsEvent);
-                }
+                $this->leadEventDispatcher->dispatchEvents($event, $details);
             }
         }
     }
 
     /**
      * Add a lead delete entry to the audit log.
-     *
-     * @param Events\LeadEvent $event
      */
     public function onLeadDelete(Events\LeadEvent $event)
     {
@@ -167,8 +201,6 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * Add a field entry to the audit log.
-     *
-     * @param Events\LeadFieldEvent $event
      */
     public function onFieldPostSave(Events\LeadFieldEvent $event)
     {
@@ -188,8 +220,6 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * Add a field delete entry to the audit log.
-     *
-     * @param Events\LeadFieldEvent $event
      */
     public function onFieldDelete(Events\LeadFieldEvent $event)
     {
@@ -207,8 +237,6 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * Add a note entry to the audit log.
-     *
-     * @param Events\LeadNoteEvent $event
      */
     public function onNotePostSave(Events\LeadNoteEvent $event)
     {
@@ -228,8 +256,6 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * Add a note delete entry to the audit log.
-     *
-     * @param Events\LeadNoteEvent $event
      */
     public function onNoteDelete(Events\LeadNoteEvent $event)
     {
@@ -245,22 +271,32 @@ class LeadSubscriber extends CommonSubscriber
         $this->auditLogModel->writeToLog($log);
     }
 
-    /**
-     * @param Events\LeadMergeEvent $event
-     */
+    public function preLeadMerge(Events\LeadMergeEvent $event)
+    {
+        $this->entityManager->getRepository(LeadEventLog::class)->updateLead(
+            $event->getLoser()->getId(),
+            $event->getVictor()->getId()
+        );
+    }
+
     public function onLeadMerge(Events\LeadMergeEvent $event)
     {
-        $this->em->getRepository('MauticLeadBundle:PointsChangeLog')->updateLead(
+        $this->entityManager->getRepository(PointsChangeLog::class)->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
 
-        $this->em->getRepository('MauticLeadBundle:ListLead')->updateLead(
+        $this->entityManager->getRepository(ListLead::class)->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
 
-        $this->em->getRepository('MauticLeadBundle:LeadNote')->updateLead(
+        $this->entityManager->getRepository(LeadNote::class)->updateLead(
+            $event->getLoser()->getId(),
+            $event->getVictor()->getId()
+        );
+
+        $this->entityManager->getRepository(LeadDevice::class)->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
@@ -278,26 +314,38 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param Events\LeadTimelineEvent $event
      */
     public function onTimelineGenerate(Events\LeadTimelineEvent $event)
     {
         $eventTypes = [
-            'lead.create'       => 'mautic.lead.event.create',
-            'lead.identified'   => 'mautic.lead.event.identified',
-            'lead.ipadded'      => 'mautic.lead.event.ipadded',
             'lead.utmtagsadded' => 'mautic.lead.event.utmtagsadded',
             'lead.donotcontact' => 'mautic.lead.event.donotcontact',
+            'lead.imported'     => 'mautic.lead.event.imported',
         ];
 
+        // Following events takes the event from the lead itself, so not applicable for API
+        // where we are getting events for all leads.
+        if ($event->isForTimeline()) {
+            $eventTypes['lead.create']     = 'mautic.lead.event.create';
+            $eventTypes['lead.identified'] = 'mautic.lead.event.identified';
+            $eventTypes['lead.ipadded']    = 'mautic.lead.event.ipadded';
+            $eventTypes['lead.apiadded']   = 'mautic.lead.event.apiadded';
+        }
+
         $filters = $event->getEventFilters();
+
+        // Temporary measure as the other event types don't have tests yet
+        if ($this->isTest) {
+            $eventTypes = [
+                'lead.apiadded' => 'mautic.lead.event.apiadded',
+            ];
+        }
 
         foreach ($eventTypes as $type => $label) {
             $name = $this->translator->trans($label);
             $event->addEventType($type, $name);
 
-            if (!$event->isApplicable($type) || ($type != 'lead.utmtagsadded' && !empty($filters['search']))) {
+            if (!$event->isApplicable($type) || ('lead.utmtagsadded' != $type && !empty($filters['search']))) {
                 continue;
             }
 
@@ -321,16 +369,23 @@ class LeadSubscriber extends CommonSubscriber
                 case 'lead.donotcontact':
                     $this->addTimelineDoNotContactEntries($event, $type, $name);
                     break;
+
+                case 'lead.imported':
+                    $this->addTimelineImportedEntries($event, $type, $name);
+                    break;
+
+                case 'lead.apiadded':
+                    $this->addTimelineApiCreatedEntries($event, $type, $name);
+                    break;
             }
         }
     }
 
     /**
-     * @param Events\LeadTimelineEvent $event
-     * @param                          $eventTypeKey
-     * @param                          $eventTypeName
+     * @param $eventTypeKey
+     * @param $eventTypeName
      */
-    protected function addTimelineIpAddressEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    private function addTimelineIpAddressEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         $lead = $event->getLead();
         $rows = $this->auditLogModel->getRepository()->getLeadIpLogs($lead, $event->getQueryOptions());
@@ -340,17 +395,17 @@ class LeadSubscriber extends CommonSubscriber
             $event->addToCounter($eventTypeKey, $rows);
 
             // Add the entries to the event array
-            /** @var \Mautic\CoreBundle\Entity\AuditLog $row */
-            $ipAddresses = $lead->getIpAddresses()->toArray();
+            $ipAddresses = ($lead instanceof Lead) ? $lead->getIpAddresses()->toArray() : null;
 
             foreach ($rows['results'] as $row) {
-                if (!isset($ipAddresses[$row['ip_address']])) {
+                if (null !== $ipAddresses && !isset($ipAddresses[$row['ip_address']])) {
                     continue;
                 }
 
                 $event->addEvent(
                     [
                         'event'         => $eventTypeKey,
+                        'eventId'       => $eventTypeKey.$row['id'],
                         'eventLabel'    => $row['ip_address'],
                         'eventType'     => $eventTypeName,
                         'eventPriority' => -1, // Usually an IP is added after another event
@@ -359,6 +414,7 @@ class LeadSubscriber extends CommonSubscriber
                             'ipDetails' => $ipAddresses[$row['ip_address']],
                         ],
                         'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:ipadded.html.php',
+                        'contactId'       => $row['lead_id'],
                     ]
                 );
             }
@@ -368,12 +424,16 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param Events\LeadTimelineEvent $event
-     * @param                          $eventTypeKey
-     * @param                          $eventTypeName
+     * @param $eventTypeKey
+     * @param $eventTypeName
      */
-    protected function addTimelineDateCreatedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    private function addTimelineDateCreatedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
+        // Do nothing if the lead is not set
+        if (!$event->getLead() instanceof Lead) {
+            return;
+        }
+
         $dateAdded = $event->getLead()->getDateAdded();
         if (!$event->isEngagementCount()) {
             $event->addToCounter($eventTypeKey, 1);
@@ -383,6 +443,7 @@ class LeadSubscriber extends CommonSubscriber
                 $event->addEvent(
                     [
                         'event'         => $eventTypeKey,
+                        'eventId'       => $eventTypeKey.$event->getLead()->getId(),
                         'icon'          => 'fa-user-secret',
                         'eventType'     => $eventTypeName,
                         'eventPriority' => -5, // Usually something happened to create the lead so this should display afterward
@@ -396,12 +457,16 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param Events\LeadTimelineEvent $event
-     * @param                          $eventTypeKey
-     * @param                          $eventTypeName
+     * @param $eventTypeKey
+     * @param $eventTypeName
      */
-    protected function addTimelineDateIdentifiedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    private function addTimelineDateIdentifiedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
+        // Do nothing if the lead is not set
+        if (!$event->getLead() instanceof Lead) {
+            return;
+        }
+
         if ($dateIdentified = $event->getLead()->getDateIdentified()) {
             if (!$event->isEngagementCount()) {
                 $event->addToCounter($eventTypeKey, 1);
@@ -411,6 +476,7 @@ class LeadSubscriber extends CommonSubscriber
                     $event->addEvent(
                         [
                             'event'         => $eventTypeKey,
+                            'eventId'       => $eventTypeKey.$event->getLead()->getId(),
                             'icon'          => 'fa-user',
                             'eventType'     => $eventTypeName,
                             'eventPriority' => -4, // A lead is created prior to being identified
@@ -426,25 +492,22 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param Events\LeadTimelineEvent $event
-     * @param                          $eventTypeKey
-     * @param                          $eventTypeName
+     * @param $eventTypeKey
+     * @param $eventTypeName
      */
-    protected function addTimelineUtmEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    private function addTimelineUtmEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
-        $lead    = $event->getLead();
-        $utmTags = $this->em->getRepository('MauticLeadBundle:UtmTag')->getUtmTagsByLead($lead, $event->getQueryOptions());
-
+        $utmRepo = $this->entityManager->getRepository(UtmTag::class);
+        $utmTags = $utmRepo->getUtmTagsByLead($event->getLead(), $event->getQueryOptions());
         // Add to counter
         $event->addToCounter($eventTypeKey, $utmTags);
 
         if (!$event->isEngagementCount()) {
             // Add the logs to the event array
             foreach ($utmTags['results'] as $utmTag) {
-                if (!empty($utmTag['query'])) {
-                    $icon = 'fa-tag';
-                    if (isset($utmTag['utm_medium'])) {
-                        switch (strtolower($utmTag['utm_medium'])) {
+                $icon = 'fa-tag';
+                if (isset($utmTag['utm_medium'])) {
+                    switch (strtolower($utmTag['utm_medium'])) {
                             case 'social':
                             case 'socialmedia':
                                 $icon = 'fa-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'share-alt');
@@ -467,22 +530,22 @@ class LeadSubscriber extends CommonSubscriber
                                 $icon = 'fa-'.((isset($utmTag['utm_source'])) ? strtolower($utmTag['utm_source']) : 'tablet');
                                 break;
                         }
-                    }
-
-                    $event->addEvent(
+                }
+                $event->addEvent(
                         [
                             'event'      => $eventTypeKey,
                             'eventType'  => $eventTypeName,
-                            'eventLabel' => !empty($utmTag['utm_campaign']) ? $utmTag['utm_campaign'] : '',
+                            'eventId'    => $eventTypeKey.$utmTag['id'],
+                            'eventLabel' => !empty($utmTag) ? $utmTag['utm_campaign'] : 'UTM Tags',
                             'timestamp'  => $utmTag['date_added'],
                             'icon'       => $icon,
                             'extra'      => [
                                 'utmtags' => $utmTag,
                             ],
                             'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:utmadded.html.php',
+                            'contactId'       => $utmTag['lead_id'],
                         ]
                     );
-                }
             }
         } else {
             // Purposively not including this in engagements graph as the engagement is counted by the page hit
@@ -490,36 +553,23 @@ class LeadSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param Events\LeadTimelineEvent $event
-     * @param                          $eventTypeKey
-     * @param                          $eventTypeName
+     * @param $eventTypeKey
+     * @param $eventTypeName
      */
-    protected function addTimelineDoNotContactEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    private function addTimelineDoNotContactEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
-        $lead = $event->getLead();
-
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
-        $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
+        $dncRepo = $this->entityManager->getRepository(DoNotContact::class);
 
         /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $entries */
-        $rows = $dncRepo->getTimelineStats($lead->getId(), $event->getQueryOptions());
+        $rows = $dncRepo->getTimelineStats($event->getLeadId(), $event->getQueryOptions());
 
         // Add to counter
         $event->addToCounter($eventTypeKey, $rows);
 
         if (!$event->isEngagementCount()) {
             foreach ($rows['results'] as $row) {
-                switch ($row['reason']) {
-                    case DoNotContact::UNSUBSCRIBED:
-                        $row['reason'] = $this->translator->trans('mautic.lead.event.donotcontact_unsubscribed');
-                        break;
-                    case DoNotContact::BOUNCED:
-                        $row['reason'] = $this->translator->trans('mautic.lead.event.donotcontact_bounced');
-                        break;
-                    case DoNotContact::MANUAL:
-                        $row['reason'] = $this->translator->trans('mautic.lead.event.donotcontact_manual');
-                        break;
-                }
+                $row['reason'] = $this->dncReasonHelper->toText($row['reason']);
 
                 $template = 'MauticLeadBundle:SubscribedEvents\Timeline:donotcontact.html.php';
                 $icon     = 'fa-ban';
@@ -540,19 +590,6 @@ class LeadSubscriber extends CommonSubscriber
                             }
                         }
 
-                        /* @deprecated - BC support to be removed in 3.0 */
-                        // Allow a custom template if applicable
-                        if (method_exists($channelModel, 'getDoNotContactLeadTimelineTemplate')) {
-                            $template = $channelModel->getDoNotContactLeadTimelineTemplate($row);
-                        }
-                        if (method_exists($channelModel, 'getDoNotContactLeadTimelineLabel')) {
-                            $eventTypeName = $channelModel->getDoNotContactLeadTimelineLabel($row);
-                        }
-                        if (method_exists($channelModel, 'getDoNotContactLeadTimelineIcon')) {
-                            $icon = $channelModel->getDoNotContactLeadTimelineIcon($row);
-                        }
-                        /* end deprecation */
-
                         if (!empty($row['channel_id'])) {
                             if ($item = $this->getChannelEntityName($row['channel'], $row['channel_id'], true)) {
                                 $row['itemName']  = $item['name'];
@@ -561,10 +598,12 @@ class LeadSubscriber extends CommonSubscriber
                         }
                     }
                 }
-
+                $contactId = $row['lead_id'];
+                unset($row['lead_id']);
                 $event->addEvent(
                     [
                         'event'      => $eventTypeKey,
+                        'eventId'    => $eventTypeKey.$row['id'],
                         'eventLabel' => (isset($row['itemName'])) ?
                             [
                                 'label' => ucfirst($row['channel']).' / '.$row['itemName'],
@@ -577,9 +616,124 @@ class LeadSubscriber extends CommonSubscriber
                         ],
                         'contentTemplate' => $template,
                         'icon'            => $icon,
+                        'contactId'       => $contactId,
                     ]
                 );
             }
+        }
+    }
+
+    /**
+     * @param $eventTypeKey
+     * @param $eventTypeName
+     */
+    private function addTimelineImportedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    {
+        /** @var LeadEventLogRepository */
+        $eventLogRepo = $this->entityManager->getRepository(LeadEventLog::class);
+        $imports      = $eventLogRepo->getEvents(
+            $event->getLead(),
+            'lead',
+            'import',
+            ['failed', 'inserted', 'updated'],
+            $event->getQueryOptions()
+        );
+
+        // Add to counter
+        $event->addToCounter($eventTypeKey, $imports);
+
+        if (!$event->isEngagementCount()) {
+            // Add the logs to the event array
+            foreach ($imports['results'] as $import) {
+                if (is_string($import['properties'])) {
+                    $import['properties'] = json_decode($import['properties'], true);
+                }
+                $eventLabel = 'N/A';
+                if (!empty($import['properties']['file'])) {
+                    $eventLabel = $import['properties']['file'];
+                } elseif ($import['object_id']) {
+                    $eventLabel = $import['object_id'];
+                }
+                $eventLabel = $this->translator->trans('mautic.lead.import.contact.action.'.$import['action'], ['%name%' => $eventLabel]);
+                $event->addEvent(
+                        [
+                            'event'      => $eventTypeKey,
+                            'eventId'    => $eventTypeKey.$import['id'],
+                            'eventType'  => $eventTypeName,
+                            'eventLabel' => !empty($import['object_id']) ? [
+                                'label' => $eventLabel,
+                                'href'  => $this->router->generate(
+                                    'mautic_import_action',
+                                    [
+                                        'objectAction' => 'view',
+                                        'object'       => 'lead',
+                                        'objectId'     => $import['object_id'],
+                                    ]
+                                ),
+                            ] : $eventLabel,
+                            'timestamp'       => $import['date_added'],
+                            'icon'            => 'fa-download',
+                            'extra'           => $import,
+                            'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:import.html.php',
+                            'contactId'       => $import['lead_id'],
+                        ]
+                    );
+            }
+        } else {
+            // Purposively not including this
+        }
+    }
+
+    /**
+     * @param $eventTypeKey
+     * @param $eventTypeName
+     */
+    private function addTimelineApiCreatedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    {
+        /** @var LeadEventLogRepository */
+        $eventLogRepo    = $this->entityManager->getRepository(LeadEventLog::class);
+        $apiSingleEvents = $eventLogRepo->getEvents(
+            $event->getLead(),
+            'lead',
+            'api-single',
+            null,
+            $event->getQueryOptions()
+        );
+        $apiBatchEvents = $eventLogRepo->getEvents(
+            $event->getLead(),
+            'lead',
+            'api-batch',
+            null,
+            $event->getQueryOptions()
+        );
+
+        // Add to counter
+        $event->addToCounter($eventTypeKey, $apiSingleEvents);
+        $event->addToCounter($eventTypeKey, $apiBatchEvents);
+
+        if (!$event->isEngagementCount()) {
+            $apiEvents = [
+                'total'   => intval($apiSingleEvents['total']) + intval($apiBatchEvents['total']),
+                'results' => array_merge($apiSingleEvents['results'], $apiBatchEvents['results']),
+            ];
+
+            // Add the logs to the event array
+            foreach ($apiEvents['results'] as $apiEvent) {
+                $event->addEvent(
+                    [
+                        'event'      => $eventTypeKey,
+                        'eventId'    => $eventTypeKey.$apiEvent['id'],
+                        'eventType'  => $eventTypeName,
+                        'eventLabel' => $eventTypeName,
+                        'timestamp'  => $apiEvent['date_added'],
+                        'icon'       => 'fa-cogs',
+                        'extra'      => $apiEvent,
+                        'contactId'  => $apiEvent['lead_id'],
+                    ]
+                );
+            }
+        } else {
+            // Purposively not including this
         }
     }
 }

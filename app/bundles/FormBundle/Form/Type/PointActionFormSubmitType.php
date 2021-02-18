@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -23,7 +24,7 @@ class PointActionFormSubmitType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('forms', 'form_list', [
+        $builder->add('forms', FormListType::class, [
             'label'      => 'mautic.form.point.action.forms',
             'label_attr' => ['class' => 'control-label'],
             'required'   => false,
@@ -37,7 +38,7 @@ class PointActionFormSubmitType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'pointaction_formsubmit';
     }

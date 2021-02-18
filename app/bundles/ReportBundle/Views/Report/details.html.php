@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -7,12 +8,18 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+
 $header = $view['translator']->trans(
     'mautic.report.report.header.view',
-    ['%name%' => $view['translator']->trans($report->getName())]
+    ['%name%' => $view->escape($view['translator']->trans($report->getName()))]
 );
 
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
+    $showDynamicFilters  = (true === !empty($report->getSettings()['showDynamicFilters']));
+    $hideDateRangeFilter = (true === !empty($report->getSettings()['hideDateRangeFilter']));
+
     $view->extend('MauticCoreBundle:Default:content.html.php');
     $view['slots']->set('mauticContent', 'report');
 
@@ -48,7 +55,7 @@ if ($tmpl == 'index') {
                 'iconClass' => 'fa fa-file-text-o',
             ];
 
-            if (class_exists('PHPExcel')) {
+            if (class_exists(Spreadsheet::class)) {
                 $buttons[] = [
                     'attr' => [
                         'data-toggle' => 'download',
@@ -90,7 +97,7 @@ if ($tmpl == 'index') {
                 ],
                 'routeBase'         => 'report',
                 'langVar'           => 'report.report',
-                'postCustomButtons' => $buttons,
+                'customButtons'     => $buttons,
             ]
         )
     );
@@ -105,7 +112,7 @@ if ($tmpl == 'index') {
 <!-- report detail header -->
 <?php if ($report->getDescription()): ?>
 <div class="pr-md pl-md pt-lg pb-lg">
-    <div class="text-white dark-sm mb-0"><?php echo $report->getDescription(); ?></div>
+    <div class="text-white dark-sm mb-0"><?php echo $view->escape($report->getDescription()); ?></div>
 </div>
 <?php endif; ?>
 <!--/ report detail header -->
@@ -125,16 +132,16 @@ if ($tmpl == 'index') {
             </div>
         </div>
     </div>
-    <div class="collapse" id="report-filters">
+    <div class="collapse<?php if ($showDynamicFilters): ?> in<?php endif; ?>" id="report-filters">
         <div class="pr-md pl-md pb-md">
             <div class="panel shd-none mb-0 pa-lg">
                 <div class="row">
-                    <div class="col-sm-12 mb-10">
+                    <div class="col-sm-12 mb-10<?php if ($hideDateRangeFilter):?> hide<?php endif; ?>">
                         <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', ['dateRangeForm' => $dateRangeForm]); ?>
                     </div>
                     <?php $view['form']->start($dynamicFilterForm); ?>
                     <?php foreach ($dynamicFilterForm->children as $filter): ?>
-                    <?php if ($filter->vars['block_prefixes'][1] == 'hidden') {
+                    <?php if ('hidden' == $filter->vars['block_prefixes'][1]) {
                         continue;
                     } ?>
                     <div class="col-sm-4">
@@ -154,7 +161,7 @@ if ($tmpl == 'index') {
             <a href="#report-details" class="arrow text-muted collapsed" data-toggle="collapse" aria-expanded="false" aria-controls="report-details">
                 <span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.details'); ?>
             </a>
-            <a href="#report-filters" class="arrow text-muted collapsed" data-toggle="collapse" aria-expanded="false" aria-controls="report-filters">
+            <a href="#report-filters" class="arrow text-muted <?php if (!$showDynamicFilters): ?>collapsed<?php endif; ?>" data-toggle="collapse" aria-expanded="false" aria-controls="report-filters">
                 <span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.filters'); ?>
             </a>
         </div>
@@ -165,11 +172,13 @@ if ($tmpl == 'index') {
 <div class="report-content">
     <?php $view['slots']->output('_content'); ?>
 </div>
-<?php if (!empty($debug)): ?>
+<?php if (!empty($debug) && isset($debug['count_query'])): ?>
 <div class="well">
     <h4>Debug: <?php echo $debug['query_time']; ?></h4>
+    <div><?php echo $debug['count_query']; ?></div>
+    <br />
     <div><?php echo $debug['query']; ?></div>
 </div>
 <?php endif; ?>
 <!--/ end: box layout -->
-<input type="hidden" name="entityId" id="entityId" value="<?php echo $report->getId(); ?>"/>
+<input type="hidden" name="entityId" id="entityId" value="<?php echo $view->escape($report->getId()); ?>"/>

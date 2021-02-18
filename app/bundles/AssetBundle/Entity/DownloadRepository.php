@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -56,18 +57,20 @@ class DownloadRepository extends CommonRepository
     /**
      * Get a lead's page downloads.
      *
-     * @param       $leadId
-     * @param array $options
+     * @param int|null $leadId
      *
      * @return array
      */
-    public function getLeadDownloads($leadId, array $options = [])
+    public function getLeadDownloads($leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('a.id as asset_id, d.date_download as dateDownload, a.title')
+            ->select('a.id as asset_id, d.date_download as dateDownload, a.title, d.id as download_id, d.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'asset_downloads', 'd')
-            ->leftJoin('d', MAUTIC_TABLE_PREFIX.'assets', 'a', 'd.asset_id = a.id')
-            ->where('d.lead_id = '.(int) $leadId);
+            ->leftJoin('d', MAUTIC_TABLE_PREFIX.'assets', 'a', 'd.asset_id = a.id');
+
+        if ($leadId) {
+            $query->where('d.lead_id = '.(int) $leadId);
+        }
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere($query->expr()->like('a.title', $query->expr()->literal('%'.$options['search'].'%')));
@@ -96,9 +99,7 @@ class DownloadRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
+        return $query->execute()->fetchAll();
     }
 
     /**
@@ -121,9 +122,7 @@ class DownloadRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
+        return $query->execute()->fetchAll();
     }
 
     /**
@@ -176,7 +175,7 @@ class DownloadRepository extends CommonRepository
         $q->andWhere('a.source = "page"')
             ->andWhere('a.code = 200');
 
-        if ($fromDate != null) {
+        if (null != $fromDate) {
             $dh = new DateTimeHelper($fromDate);
             $q->andWhere($q->expr()->gte('a.date_download', ':date'))
                 ->setParameter('date', $dh->toUtcString());
@@ -219,7 +218,7 @@ class DownloadRepository extends CommonRepository
 
         $q->andWhere('a.code = 200');
 
-        if ($fromDate != null) {
+        if (null != $fromDate) {
             $dh = new DateTimeHelper($fromDate);
             $q->andWhere($q->expr()->gte('a.date_download', ':date'))
                 ->setParameter('date', $dh->toUtcString());

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
  *
@@ -7,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticFocusBundle:Focus:index.html.php');
 }
 ?>
@@ -21,8 +22,12 @@ if ($tmpl == 'index') {
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'checkall' => 'true',
-                        'target'   => '#focusTable',
+                        'checkall'        => 'true',
+                        'target'          => '#focusTable',
+                        'routeBase'       => 'focus',
+                        'templateButtons' => [
+                            'delete' => $permissions['focus:items:delete'],
+                        ],
                     ]
                 );
 
@@ -90,14 +95,14 @@ if ($tmpl == 'index') {
                                 'item'            => $item,
                                 'templateButtons' => [
                                     'edit' => $view['security']->hasEntityAccess(
-                                        $permissions['plugin:focus:items:editown'],
-                                        $permissions['plugin:focus:items:editother'],
+                                        $permissions['focus:items:editown'],
+                                        $permissions['focus:items:editother'],
                                         $item->getCreatedBy()
                                     ),
-                                    'clone'  => $permissions['plugin:focus:items:create'],
+                                    'clone'  => $permissions['focus:items:create'],
                                     'delete' => $view['security']->hasEntityAccess(
-                                        $permissions['plugin:focus:items:deleteown'],
-                                        $permissions['plugin:focus:items:deleteother'],
+                                        $permissions['focus:items:deleteown'],
+                                        $permissions['focus:items:deleteother'],
                                         $item->getCreatedBy()
                                     ),
                                 ],

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -45,19 +46,17 @@ class AuthController extends FormController
             }
         }
 
-        $state      = $session->get($integration.'_csrf_token', false);
-        $givenState = ($isAjax) ? $this->request->request->get('state') : $this->request->get('state');
-        if ($state && $state !== $givenState) {
-            $session->remove($integration.'_csrf_token');
-            $session->set('mautic.integration.postauth.message', ['mautic.integration.auth.invalid.state', [], 'error']);
+        try {
+            $error = $integrationObject->authCallback();
+        } catch (\InvalidArgumentException $e) {
+            $session->set('mautic.integration.postauth.message', [$e->getMessage(), [], 'error']);
+            $redirectUrl = $this->generateUrl('mautic_integration_auth_postauth', ['integration' => $integration]);
             if ($isAjax) {
-                return new JsonResponse(['url' => $this->generateUrl('mautic_integration_auth_postauth', ['integration' => $integration])]);
+                return new JsonResponse(['url' => $redirectUrl]);
             } else {
-                return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth', ['integration' => $integration]));
+                return new RedirectResponse($redirectUrl);
             }
         }
-
-        $error = $integrationObject->authCallback();
 
         //check for error
         if ($error) {
@@ -104,7 +103,7 @@ class AuthController extends FormController
             $message = $this->translator->trans($postMessage[0], $postMessage[1], 'flashes');
             $session->remove('mautic.integration.postauth.message');
             $type = $postMessage[2];
-            if ($type == 'error') {
+            if ('error' == $type) {
                 $alert = 'danger';
             }
         }
@@ -136,8 +135,6 @@ class AuthController extends FormController
         );
         $oauthUrl = $event->getAuthUrl();
 
-        $response = new RedirectResponse($oauthUrl);
-
-        return $response;
+        return new RedirectResponse($oauthUrl);
     }
 }

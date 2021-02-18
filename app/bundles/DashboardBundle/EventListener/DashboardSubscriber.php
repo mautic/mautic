@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,16 +11,13 @@
 
 namespace Mautic\DashboardBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\Event\WidgetFormEvent;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class DashboardSubscriber.
- */
-class DashboardSubscriber extends CommonSubscriber
+class DashboardSubscriber implements EventSubscriberInterface
 {
     /**
      * Define the name of the bundle/category of the widget(s).
@@ -56,8 +54,6 @@ class DashboardSubscriber extends CommonSubscriber
 
     /**
      * Adds widget new widget types to the list of available widget types.
-     *
-     * @param WidgetTypeListEvent $event
      */
     public function onWidgetListGenerate(WidgetTypeListEvent $event)
     {
@@ -74,8 +70,6 @@ class DashboardSubscriber extends CommonSubscriber
 
     /**
      * Set a widget edit form when needed.
-     *
-     * @param WidgetFormEvent $event
      */
     public function onWidgetFormGenerate(WidgetFormEvent $event)
     {
@@ -87,8 +81,6 @@ class DashboardSubscriber extends CommonSubscriber
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
@@ -96,8 +88,6 @@ class DashboardSubscriber extends CommonSubscriber
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function checkPermissions(WidgetDetailEvent $event)
     {

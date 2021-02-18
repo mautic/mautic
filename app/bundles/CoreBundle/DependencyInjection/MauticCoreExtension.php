@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -14,6 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
@@ -35,6 +37,9 @@ class MauticCoreExtension extends Extension
         // since KNP menus doesn't seem to support a Renderer factory
         $menus = [];
 
+        // Keep track of names used to prevent overwriting any and thus losing functionality
+        $serviceNames = [];
+
         foreach ($bundles as $bundle) {
             if (!empty($bundle['config']['services'])) {
                 $config = $bundle['config']['services'];
@@ -55,12 +60,26 @@ class MauticCoreExtension extends Extension
                         case 'models':
                             $defaultTag = 'mautic.model';
                             break;
+                        case 'permissions':
+                            $defaultTag = 'mautic.permissions';
+                            break;
+                        case 'integrations':
+                            $defaultTag = 'mautic.integration';
+                            break;
+                        case 'command':
+                            $defaultTag = 'console.command';
+                            break;
                         default:
                             $defaultTag = false;
                             break;
                     }
 
                     foreach ($services as $name => $details) {
+                        if (isset($serviceNames[$name])) {
+                            throw new \InvalidArgumentException("$name is already registered");
+                        }
+                        $serviceNames[$name] = true;
+
                         if (!is_array($details)) {
                             // Set parameter
                             $container->setParameter($name, $details);
@@ -68,7 +87,7 @@ class MauticCoreExtension extends Extension
                         }
 
                         // Setup default menu details
-                        if ($type == 'menus') {
+                        if ('menus' == $type) {
                             $details = array_merge(
                                 [
                                     'class'   => 'Knp\Menu\MenuItem',
@@ -85,6 +104,15 @@ class MauticCoreExtension extends Extension
                             // Fix escaped sprintf placeholders
                             $details['serviceAlias'] = str_replace('%%', '%', $details['serviceAlias']);
                             $container->setAlias(sprintf($details['serviceAlias'], $name), $name);
+                        } elseif (isset($details['serviceAliases'])) {
+                            foreach ($details['serviceAliases'] as $alias) {
+                                $alias = str_replace('%%', '%', $alias);
+                                $container->setAlias(sprintf($alias, $name), $name);
+                            }
+                        }
+                        // Alias with class name
+                        if ($name !== $details['class']) {
+                            $container->setAlias($details['class'], $name);
                         }
 
                         // Generate definition arguments
@@ -96,31 +124,7 @@ class MauticCoreExtension extends Extension
                         }
 
                         foreach ($details['arguments'] as $argument) {
-                            if ($argument === '') {
-                                // To be added during compilation
-                                $definitionArguments[] = '';
-                            } elseif (is_array($argument) || is_object($argument)) {
-                                foreach ($argument as $k => &$v) {
-                                    if (strpos($v, '%') === 0) {
-                                        $v = str_replace('%%', '%', $v);
-                                        $v = $container->getParameter(substr($v, 1, -1));
-                                    }
-                                }
-                                $definitionArguments[] = $argument;
-                            } elseif (strpos($argument, '%') === 0) {
-                                // Parameter
-                                $argument              = str_replace('%%', '%', $argument);
-                                $definitionArguments[] = $container->getParameter(substr($argument, 1, -1));
-                            } elseif (is_bool($argument) || strpos($argument, '\\') !== false) {
-                                // Parameter or Class
-                                $definitionArguments[] = $argument;
-                            } elseif (strpos($argument, '"') === 0) {
-                                // String
-                                $definitionArguments[] = substr($argument, 1, -1);
-                            } else {
-                                // Reference
-                                $definitionArguments[] = new Reference($argument);
-                            }
+                            $this->processArgument($argument, $container, $definitionArguments);
                         }
 
                         // Add the service
@@ -146,6 +150,10 @@ class MauticCoreExtension extends Extension
                                 }
 
                                 $definition->addTag($tag, $tagArguments[$k]);
+
+                                if ('mautic.email_transport' === $tag) {
+                                    $container->setAlias(sprintf('swiftmailer.mailer.transport.%s', $name), $name);
+                                }
                             }
                         } else {
                             $tag          = (!empty($details['tag'])) ? $details['tag'] : $defaultTag;
@@ -157,9 +165,13 @@ class MauticCoreExtension extends Extension
                                 }
 
                                 $definition->addTag($tag, $tagArguments);
+
+                                if ('mautic.email_transport' === $tag) {
+                                    $container->setAlias(sprintf('swiftmailer.mailer.transport.%s', $name), $name);
+                                }
                             }
 
-                            if ($type == 'events') {
+                            if ('events' == $type) {
                                 $definition->addTag('mautic.event_subscriber');
                             }
                         }
@@ -197,7 +209,7 @@ class MauticCoreExtension extends Extension
                         // Set scope - Deprecated as of Symfony 2.8 and removed in 3.0
                         if (!empty($details['scope'])) {
                             $definition->setScope($details['scope']);
-                        } elseif ($type == 'templating') {
+                        } elseif ('templating' == $type) {
                             $definition->setScope('request');
                         }
 
@@ -231,12 +243,12 @@ class MauticCoreExtension extends Extension
                              *
                              * Services must always be prefaced with an @ symbol (similar to "normal" config files)
                              */
-                            if (is_string($factory) && strpos($factory, '::') !== false) {
+                            if (is_string($factory) && false !== strpos($factory, '::')) {
                                 $factory = explode('::', $factory, 2);
                             }
 
                             // Check if the first item in the factory array is a service and if so fetch its reference
-                            if (is_array($factory) && strpos($factory[0], '@') === 0) {
+                            if (is_array($factory) && 0 === strpos($factory[0], '@')) {
                                 // Exclude the leading @ character in the service ID
                                 $factory[0] = new Reference(substr($factory[0], 1));
                             }
@@ -249,31 +261,7 @@ class MauticCoreExtension extends Extension
                             foreach ($details['methodCalls'] as $method => $methodArguments) {
                                 $methodCallArguments = [];
                                 foreach ($methodArguments as $argument) {
-                                    if ($argument === '') {
-                                        // To be added during compilation
-                                        $methodCallArguments[] = '';
-                                    } elseif (is_array($argument) || is_object($argument)) {
-                                        foreach ($argument as $k => &$v) {
-                                            if (strpos($v, '%') === 0) {
-                                                $v = str_replace('%%', '%', $v);
-                                                $v = $container->getParameter(substr($v, 1, -1));
-                                            }
-                                        }
-                                        $methodCallArguments[] = $argument;
-                                    } elseif (strpos($argument, '%') === 0) {
-                                        // Parameter
-                                        $argument              = str_replace('%%', '%', $argument);
-                                        $methodCallArguments[] = $container->getParameter(substr($argument, 1, -1));
-                                    } elseif (is_bool($argument) || strpos($argument, '\\') !== false) {
-                                        // Parameter or Class
-                                        $methodCallArguments[] = $argument;
-                                    } elseif (strpos($argument, '"') === 0) {
-                                        // String
-                                        $methodCallArguments[] = substr($argument, 1, -1);
-                                    } else {
-                                        // Reference
-                                        $methodCallArguments[] = new Reference($argument);
-                                    }
+                                    $this->processArgument($argument, $container, $methodCallArguments);
                                 }
 
                                 $definition->addMethodCall($method, $methodCallArguments);
@@ -301,11 +289,10 @@ class MauticCoreExtension extends Extension
 
         foreach ($menus as $alias => $options) {
             $container->setDefinition('mautic.menu_renderer.'.$alias, new Definition(
-                'Mautic\CoreBundle\Menu\MenuRenderer',
+                \Mautic\CoreBundle\Menu\MenuRenderer::class,
                 [
                     new Reference('knp_menu.matcher'),
-                    new Reference('mautic.factory'),
-                    '%kernel.charset%',
+                    new Reference('mautic.helper.templating'),
                     $options,
                 ]
             ))
@@ -317,5 +304,47 @@ class MauticCoreExtension extends Extension
         }
 
         unset($bundles);
+    }
+
+    /**
+     * @param $argument
+     * @param $container
+     * @param $definitionArguments
+     */
+    private function processArgument($argument, $container, &$definitionArguments)
+    {
+        if ('' === $argument) {
+            // To be added during compilation
+            $definitionArguments[] = '';
+        } elseif (is_array($argument) || is_object($argument)) {
+            foreach ($argument as &$v) {
+                if (0 === strpos($v, '%')) {
+                    $v = str_replace('%%', '%', $v);
+                    $v = $container->getParameter(substr($v, 1, -1));
+                }
+            }
+            $definitionArguments[] = $argument;
+        } elseif (0 === strpos($argument, '%')) {
+            // Parameter
+            $argument              = str_replace('%%', '%', $argument);
+            $definitionArguments[] = $container->getParameter(substr($argument, 1, -1));
+        } elseif (is_bool($argument) || false !== strpos($argument, '\\')) {
+            // Parameter or Class
+            $definitionArguments[] = $argument;
+        } elseif (0 === strpos($argument, '"')) {
+            // String
+            $definitionArguments[] = substr($argument, 1, -1);
+        } elseif (0 === strpos($argument, '@=')) {
+            // Expression
+            $argument              = substr($argument, 2);
+            $definitionArguments[] = new Expression($argument);
+        } elseif (0 === strpos($argument, '@')) {
+            // Service
+            $argument              = substr($argument, 1);
+            $definitionArguments[] = new Reference($argument);
+        } else {
+            // Reference
+            $definitionArguments[] = new Reference($argument);
+        }
     }
 }

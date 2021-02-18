@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,27 +11,19 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\CoreBundle\CoreEvents;
-use Mautic\CoreBundle\Entity\MessageQueue;
-use Mautic\CoreBundle\Event\MessageQueueBatchProcessEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\ChannelBundle\ChannelEvents;
+use Mautic\ChannelBundle\Entity\MessageQueue;
+use Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent;
 use Mautic\EmailBundle\Model\EmailModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CalendarSubscriber.
- */
-class MessageQueueSubscriber extends CommonSubscriber
+class MessageQueueSubscriber implements EventSubscriberInterface
 {
     /**
      * @var EmailModel
      */
-    protected $emailModel;
+    private $emailModel;
 
-    /**
-     * MessageQueueSubscriber constructor.
-     *
-     * @param EmailModel $emailModel
-     */
     public function __construct(EmailModel $emailModel)
     {
         $this->emailModel = $emailModel;
@@ -42,14 +35,12 @@ class MessageQueueSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CoreEvents::PROCESS_MESSAGE_QUEUE_BATCH => ['onProcessMessageQueueBatch', 0],
+            ChannelEvents::PROCESS_MESSAGE_QUEUE_BATCH => ['onProcessMessageQueueBatch', 0],
         ];
     }
 
     /**
      * Sends campaign emails.
-     *
-     * @param MessageQueueBatchProcessEvent $event
      */
     public function onProcessMessageQueueBatch(MessageQueueBatchProcessEvent $event)
     {
@@ -68,14 +59,18 @@ class MessageQueueSubscriber extends CommonSubscriber
         ];
 
         /** @var MessageQueue $message */
-        foreach ($messages as $id => $message) {
+        foreach ($messages as $message) {
+            if (!($email && $message->getLead() && $email->isPublished())) {
+                $message->setFailed();
+                continue;
+            }
+
             $contact = $message->getLead()->getProfileFields();
             if (empty($contact['email'])) {
                 // No email so just let this slide
                 $message->setProcessed();
                 $message->setSuccess();
             }
-
             $sendTo[$contact['id']]            = $contact;
             $messagesByContact[$contact['id']] = $message;
         }
@@ -87,12 +82,20 @@ class MessageQueueSubscriber extends CommonSubscriber
             // Let's see who was successful
             foreach ($messagesByContact as $contactId => $message) {
                 // If the message is processed, it was rescheduled by sendEmail
-                if (!$message->isProcessed()) {
-                    $message->setProcessed();
-                    if (empty($errors[$contactId])) {
-                        $message->setSuccess();
-                    }
+                if ($message->isProcessed()) {
+                    continue;
                 }
+
+                $message->setProcessed();
+                if (empty($errors[$contactId])) {
+                    $message->setSuccess();
+                    continue;
+                }
+
+                // Setting it to failed so it could be rescheduled
+                // by MessageQueueModel::processMessageQueue.
+                // We will get job loops otherwise.
+                $message->setFailed();
             }
         }
 

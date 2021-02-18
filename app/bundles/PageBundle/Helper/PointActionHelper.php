@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -39,7 +40,10 @@ class PointActionHelper
             $pageHitId = 0;
         }
 
-        $limitToPages = $action['properties']['pages'];
+        // If no pages are selected, the pages array does not exist
+        if (isset($action['properties']['pages'])) {
+            $limitToPages = $action['properties']['pages'];
+        }
 
         if (!empty($limitToPages) && !in_array($pageHitId, $limitToPages)) {
             //no points change
@@ -69,9 +73,9 @@ class PointActionHelper
 
         $hitRepository = $factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
         $lead          = $eventDetails->getLead();
-        $urlWithSqlWC  = str_replace('*', '%', $url);
+        $urlWithSqlWC  = str_replace('*', '%', $limitToUrl);
 
-        if (isset($action['properties']['first_time']) && $action['properties']['first_time'] === true) {
+        if (isset($action['properties']['first_time']) && true === $action['properties']['first_time']) {
             $hitStats = $hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
             if (isset($hitStats['count']) && $hitStats['count']) {
                 $changePoints['first_time'] = false;
@@ -88,7 +92,7 @@ class PointActionHelper
             }
 
             if (isset($hitStats['sum'])) {
-                if ($now->getTimestamp() - $latestHit->getTimestamp() == $hitStats['sum']) {
+                if ($action['properties']['accumulative_time'] <= $hitStats['sum']) {
                     $changePoints['accumulative_time'] = true;
                 } else {
                     $changePoints['accumulative_time'] = false;
@@ -101,7 +105,7 @@ class PointActionHelper
             if (!isset($hitStats)) {
                 $hitStats = $hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
             }
-            if (isset($hitStats['count']) && $hitStats['count'] === $action['properties']['page_hits']) {
+            if (isset($hitStats['count']) && $hitStats['count'] >= $action['properties']['page_hits']) {
                 $changePoints['page_hits'] = true;
             } else {
                 $changePoints['page_hits'] = false;

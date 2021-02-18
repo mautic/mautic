@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -16,9 +17,7 @@ use Doctrine\DBAL\Schema\Table;
 use Mautic\CoreBundle\Exception\SchemaException;
 
 /**
- * Class ColumnSchemaHelper.
- *
- * Used to manipulate the schema of an existing table
+ * Used to manipulate the schema of an existing table.
  */
 class ColumnSchemaHelper
 {
@@ -52,9 +51,10 @@ class ColumnSchemaHelper
      */
     protected $toTable;
 
+    private $columns;
+
     /**
-     * @param Connection $db
-     * @param string     $prefix
+     * @param string $prefix
      */
     public function __construct(Connection $db, $prefix)
     {
@@ -66,8 +66,12 @@ class ColumnSchemaHelper
     /**
      * Set the table to be manipulated.
      *
-     * @param string $table
-     * @param bool   $addPrefix
+     * @param      $table
+     * @param bool $addPrefix
+     *
+     * @return $this
+     *
+     * @throws SchemaException
      */
     public function setName($table, $addPrefix = true)
     {
@@ -79,6 +83,8 @@ class ColumnSchemaHelper
         //use the to schema to get table details so that changes will be calculated
         $this->fromTable = $this->sm->listTableDetails($this->tableName);
         $this->toTable   = clone $this->fromTable;
+
+        return $this;
     }
 
     /**
@@ -118,8 +124,6 @@ class ColumnSchemaHelper
     /**
      * Add an array of columns to the table.
      *
-     * @param array $columns
-     *
      * @throws SchemaException
      */
     public function addColumns(array $columns)
@@ -148,6 +152,8 @@ class ColumnSchemaHelper
      *                           ['options'] array  (optional) Defining options for column
      * @param bool  $checkExists Check if table exists; pass false if this has already been done
      *
+     * @return $this
+     *
      * @throws SchemaException
      */
     public function addColumn(array $column, $checkExists = true)
@@ -164,18 +170,24 @@ class ColumnSchemaHelper
         $options = (isset($column['options'])) ? $column['options'] : [];
 
         $this->toTable->addColumn($column['name'], $type, $options);
+
+        return $this;
     }
 
     /**
      * Drops a column from table.
      *
      * @param $columnName
+     *
+     * @return $this
      */
     public function dropColumn($columnName)
     {
         if ($this->checkColumnExists($columnName)) {
             $this->toTable->dropColumn($columnName);
         }
+
+        return $this;
     }
 
     /**

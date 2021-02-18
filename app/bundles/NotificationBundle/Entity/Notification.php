@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -63,6 +64,16 @@ class Notification extends FormEntity
     private $message;
 
     /**
+     * @var string
+     */
+    private $button;
+
+    /**
+     * @var array
+     */
+    private $utmTags = [];
+
+    /**
      * @var \DateTime
      */
     private $publishUp;
@@ -102,6 +113,16 @@ class Notification extends FormEntity
      */
     private $notificationType = 'template';
 
+    /**
+     * @var bool
+     */
+    private $mobile = false;
+
+    /**
+     * @var array
+     */
+    private $mobileSettings;
+
     public function __clone()
     {
         $this->id        = null;
@@ -129,9 +150,6 @@ class Notification extends FormEntity
         $this->stats = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -153,6 +171,15 @@ class Notification extends FormEntity
             ->build();
 
         $builder->createField('message', 'text')
+            ->build();
+
+        $builder->createField('button', 'text')
+            ->nullable()
+            ->build();
+
+        $builder->createField('utmTags', 'array')
+            ->columnName('utm_tags')
+            ->nullable()
             ->build();
 
         $builder->createField('notificationType', 'text')
@@ -186,11 +213,12 @@ class Notification extends FormEntity
             ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
+
+        $builder->createField('mobile', 'boolean')->build();
+
+        $builder->createField('mobileSettings', 'array')->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint(
@@ -205,7 +233,7 @@ class Notification extends FormEntity
         $metadata->addConstraint(new Callback([
             'callback' => function (Notification $notification, ExecutionContextInterface $context) {
                 $type = $notification->getNotificationType();
-                if ($type == 'list') {
+                if ('list' == $type) {
                     $validator = $context->getValidator();
                     $violations = $validator->validate(
                         $notification->getLists(),
@@ -251,10 +279,12 @@ class Notification extends FormEntity
                     'url',
                     'language',
                     'category',
+                    'button',
                 ]
             )
             ->addProperties(
                 [
+                    'utmTags',
                     'publishUp',
                     'publishDown',
                     'readCount',
@@ -273,7 +303,7 @@ class Notification extends FormEntity
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
 
-        if ($prop == 'category' || $prop == 'list') {
+        if ('category' == $prop || 'list' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -373,6 +403,20 @@ class Notification extends FormEntity
     /**
      * @return string
      */
+    public function getButton()
+    {
+        return $this->button;
+    }
+
+    public function setButton($button)
+    {
+        $this->isChanged('button', $button);
+        $this->button = $button;
+    }
+
+    /**
+     * @return string
+     */
     public function getMessage()
     {
         return $this->message;
@@ -385,6 +429,25 @@ class Notification extends FormEntity
     {
         $this->isChanged('message', $message);
         $this->message = $message;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUtmTags()
+    {
+        return $this->utmTags;
+    }
+
+    /**
+     * @param array $utmTags
+     */
+    public function setUtmTags($utmTags)
+    {
+        $this->isChanged('utmTags', $utmTags);
+        $this->utmTags = $utmTags;
+
+        return $this;
     }
 
     /**
@@ -518,8 +581,6 @@ class Notification extends FormEntity
     /**
      * Add list.
      *
-     * @param LeadList $list
-     *
      * @return Notification
      */
     public function addList(LeadList $list)
@@ -531,8 +592,6 @@ class Notification extends FormEntity
 
     /**
      * Remove list.
-     *
-     * @param LeadList $list
      */
     public function removeList(LeadList $list)
     {
@@ -562,5 +621,43 @@ class Notification extends FormEntity
     {
         $this->isChanged('notificationType', $notificationType);
         $this->notificationType = $notificationType;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMobile()
+    {
+        return $this->mobile;
+    }
+
+    /**
+     * @param bool $mobile
+     *
+     * @return $this
+     */
+    public function setMobile($mobile)
+    {
+        $this->mobile = $mobile;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMobileSettings()
+    {
+        return $this->mobileSettings;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setMobileSettings(array $mobileSettings)
+    {
+        $this->mobileSettings = $mobileSettings;
+
+        return $this;
     }
 }

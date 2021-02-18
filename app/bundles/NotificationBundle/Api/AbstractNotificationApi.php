@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -12,33 +13,35 @@ namespace Mautic\NotificationBundle\Api;
 
 use Joomla\Http\Http;
 use Joomla\Http\Response;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\PageBundle\Model\TrackableModel;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 
 abstract class AbstractNotificationApi
 {
-    /**
-     * @var string
-     */
-    protected $apiUrl;
-
-    /**
-     * @var MauticFactory
-     */
-    protected $factory;
-
     /**
      * @var Http
      */
     protected $http;
 
     /**
-     * @param MauticFactory $factory
-     * @param Http          $http
+     * @var TrackableModel
      */
-    public function __construct(MauticFactory $factory, Http $http)
+    protected $trackableModel;
+
+    /**
+     * @var IntegrationHelper
+     */
+    protected $integrationHelper;
+
+    /**
+     * AbstractNotificationApi constructor.
+     */
+    public function __construct(Http $http, TrackableModel $trackableModel, IntegrationHelper $integrationHelper)
     {
-        $this->factory = $factory;
-        $this->http    = $http;
+        $this->http              = $http;
+        $this->trackableModel    = $trackableModel;
+        $this->integrationHelper = $integrationHelper;
     }
 
     /**
@@ -50,30 +53,24 @@ abstract class AbstractNotificationApi
     abstract public function send($endpoint, $data);
 
     /**
-     * @param mixed        $id
-     * @param string|array $message
-     * @param string|array $title
+     * @param $id
      *
-     * @return Response
+     * @return mixed
      */
-    abstract public function sendNotification($id, $message, $title = '');
+    abstract public function sendNotification($id, Notification $notification);
 
     /**
      * Convert a non-tracked url to a tracked url.
      *
      * @param string $url
-     * @param array  $clickthrough
      *
      * @return string
      */
-    public function convertToTrackedUrl($url, array $clickthrough = [])
+    public function convertToTrackedUrl($url, array $clickthrough, Notification $notification)
     {
-        /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
-        $trackableModel = $this->factory->getModel('page.trackable');
-
         /* @var \Mautic\PageBundle\Entity\Redirect $redirect */
-        $trackable = $trackableModel->getTrackableByUrl($url, 'notification', $clickthrough['notification']);
+        $trackable = $this->trackableModel->getTrackableByUrl($url, 'notification', $clickthrough['notification']);
 
-        return $trackableModel->generateTrackableUrl($trackable, $clickthrough);
+        return $this->trackableModel->generateTrackableUrl($trackable, $clickthrough, [], $notification->getUtmTags());
     }
 }

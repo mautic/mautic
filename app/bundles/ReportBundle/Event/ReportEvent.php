@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -19,12 +20,11 @@ use Mautic\ReportBundle\Entity\Report;
 class ReportEvent extends CommonEvent
 {
     /**
-     * @param Report $report
-     * @param bool   $isNew
+     * @param bool $isNew
      */
-    public function __construct(Report &$report, $isNew = false)
+    public function __construct(Report $report, $isNew = false)
     {
-        $this->entity = &$report;
+        $this->entity = $report;
         $this->isNew  = $isNew;
     }
 
@@ -40,8 +40,6 @@ class ReportEvent extends CommonEvent
 
     /**
      * Sets the Report entity.
-     *
-     * @param Report $report
      */
     public function setReport(Report $report)
     {

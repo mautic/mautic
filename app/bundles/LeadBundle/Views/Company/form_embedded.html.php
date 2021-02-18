@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -15,7 +16,7 @@
             <?php $step = 1; ?>
             <?php foreach ($groups as $g): ?>
                 <?php if (!empty($fields[$g])): ?>
-                    <li class="<?php if ($step === 1) {
+                    <li class="<?php if (1 === $step) {
     echo 'active';
 } ?>">
                         <a href="#company-<?php echo $g; ?>" class="steps" data-toggle="tab">

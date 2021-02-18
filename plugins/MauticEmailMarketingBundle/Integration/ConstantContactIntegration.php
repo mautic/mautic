@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -9,6 +10,8 @@
  */
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
+
+use MauticPlugin\MauticEmailMarketingBundle\Form\Type\ConstantContactType;
 
 /**
  * Class ConstantContactIntegration.
@@ -108,16 +111,16 @@ class ConstantContactIntegration extends EmailAbstractIntegration
         $leadFields = [];
         foreach ($fields as $f) {
             $leadFields[$f] = [
-                'label'    => $this->factory->getTranslator()->trans('mautic.constantcontact.field.'.$f),
+                'label'    => $this->translator->trans('mautic.constantcontact.field.'.$f),
                 'type'     => 'string',
-                'required' => ($f == 'email') ? true : false,
+                'required' => ('email' == $f) ? true : false,
             ];
         }
 
         $c = 1;
         while ($c <= 15) {
             $leadFields['customfield_'.$c] = [
-                'label'    => $this->factory->getTranslator()->trans('mautic.constantcontact.customfield.'.$f),
+                'label'    => $this->translator->trans('mautic.constantcontact.customfield.'.$f),
                 'type'     => 'string',
                 'required' => false,
             ];
@@ -152,10 +155,10 @@ class ConstantContactIntegration extends EmailAbstractIntegration
                 $addresses    = [];
                 $customfields = [];
                 foreach ($mappedData as $k => $v) {
-                    if (strpos($v, 'address_') === 0) {
+                    if (0 === strpos($v, 'address_')) {
                         $addresses[str_replace('address_', '', $k)] = $v;
                         unset($mappedData[$k]);
-                    } elseif (strpos($v, 'customfield_') === 0) {
+                    } elseif (0 === strpos($v, 'customfield_')) {
                         $key            = str_replace('customfield_', 'CustomField', $k);
                         $customfields[] = [
                             'name'  => $key,
@@ -187,5 +190,15 @@ class ConstantContactIntegration extends EmailAbstractIntegration
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string|null
+     */
+    public function getFormType()
+    {
+        return ConstantContactType::class;
     }
 }

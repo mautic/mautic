@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -13,6 +14,7 @@ namespace Mautic\CategoryBundle\Model;
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Event\CategoryEvent;
+use Mautic\CategoryBundle\Form\Type\CategoryType;
 use Mautic\CoreBundle\Model\FormModel;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -25,18 +27,16 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class CategoryModel extends FormModel
 {
     /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
+     * @var RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * CategoryModel constructor.
-     *
-     * @param RequestStack $requestStack
      */
     public function __construct(RequestStack $requestStack)
     {
-        $this->request = $requestStack->getCurrentRequest();
+        $this->requestStack = $requestStack;
     }
 
     public function getRepository()
@@ -49,9 +49,15 @@ class CategoryModel extends FormModel
         return 'getTitle';
     }
 
-    public function getPermissionBase()
+    public function getPermissionBase($bundle = null)
     {
-        $bundle = $this->request->get('bundle');
+        if (null === $bundle) {
+            $bundle = $this->requestStack->getCurrentRequest()->get('bundle');
+        }
+
+        if ('global' === $bundle || empty($bundle)) {
+            $bundle = 'category';
+        }
 
         return $bundle.':categories';
     }
@@ -59,8 +65,8 @@ class CategoryModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param   $entity
-     * @param   $unlock
+     * @param $entity
+     * @param $unlock
      *
      * @return mixed
      */
@@ -113,7 +119,7 @@ class CategoryModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('category_form', $entity, $options);
+        return $formFactory->create(CategoryType::class, $entity, $options);
     }
 
     /**
@@ -125,13 +131,11 @@ class CategoryModel extends FormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Category();
         }
 
-        $entity = parent::getEntity($id);
-
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
@@ -192,8 +196,13 @@ class CategoryModel extends FormModel
      */
     public function getLookupResults($bundle, $filter = '', $limit = 10)
     {
-        $results = $this->getRepository()->getCategoryList($bundle, $filter, $limit, 0);
+        static $results = [];
 
-        return $results;
+        $key = $bundle.$filter.$limit;
+        if (!isset($results[$key])) {
+            $results[$key] = $this->getRepository()->getCategoryList($bundle, $filter, $limit, 0);
+        }
+
+        return $results[$key];
     }
 }

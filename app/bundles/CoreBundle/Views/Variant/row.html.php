@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -61,7 +62,7 @@ $isCurrent = ($variant->getId() === $activeEntity->getId());
                 </div>
                 <div class="col-xs-11">
                     <?php if ($isWinner): ?>
-                        <div class="mr-xs pull-left" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.ab_test.make_winner'); ?>">
+                        <div class="mr-xs pull-left" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.ab_test.makewinner'); ?>">
                             <a class="btn btn-warning"
                                data-toggle="confirmation"
                                href="<?php echo $view['router']->path(
@@ -79,7 +80,7 @@ $isCurrent = ($variant->getId() === $activeEntity->getId());
                                ); ?>"
                                data-confirm-text="<?php echo $view->escape(
                                    $view['translator']->trans(
-                                       'mautic.core.ab_test.make_winner'
+                                       'mautic.core.ab_test.makewinner'
                                    )
                                ); ?>"
                                data-confirm-callback="executeAction"
@@ -93,7 +94,7 @@ $isCurrent = ($variant->getId() === $activeEntity->getId());
                         </div>
                     <?php endif; ?>
                     <h5 class="fw-sb text-primary">
-                        <a href="<?php echo $actionUrl ?>" data-toggle="ajax">
+                        <a href="<?php echo $actionUrl; ?>" data-toggle="ajax">
                             <?php echo $variant->$nameGetter(); ?>
                         </a>
                         <?php if ($isCurrent) : ?>

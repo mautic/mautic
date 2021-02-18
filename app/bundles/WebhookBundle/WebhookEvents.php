@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   Mautic, Inc
  * @author      Mautic, Inc
  *
@@ -53,6 +54,15 @@ final class WebhookEvents
     const WEBHOOK_POST_DELETE = 'mautic.webhook_post_delete';
 
     /**
+     * The mautic.webhook_kill event is thrown when target is not available.
+     *
+     * The event listener receives a Mautic\WebhookBundle\Event\WebhookEvent instance.
+     *
+     * @var string
+     */
+    const WEBHOOK_KILL = 'mautic.webhook_kill';
+
+    /**
      * The mautic.webhook_queue_on_add event is thrown as the queue entity is created, before it is persisted to the database.
      *
      * The event listener receives a Mautic\WebhookBundle\Event\WebhookQueueEvent instance.
@@ -87,4 +97,23 @@ final class WebhookEvents
      * @var string
      */
     const WEBHOOK_ON_BUILD = 'mautic.webhook_on_build';
+
+    /**
+     * The mautic.webhook.campaign_on_trigger event is dispatched from the mautic:campaign:trigger command.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignTriggerEvent instance.
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.webhook.campaign_on_trigger_action';
+
+    /**
+     * The mautic.webhook_on_request event is fired before request is processed.
+     *
+     * The event listener receives a Mautic\WebhookBundle\Event\WebhookRequestEvent instance.
+     *
+     * @var string
+     */
+    const WEBHOOK_ON_REQUEST = 'mautic.webhook_on_request';
 }

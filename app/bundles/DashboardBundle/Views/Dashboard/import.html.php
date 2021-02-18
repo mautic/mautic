@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -24,9 +25,9 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.dashboard.
                     <div class="list-group">
                         <?php foreach ($dashboards as $dashboard => $config) : ?>
                             <div class="list-group-item mt-md <?php echo ($dashboard == $preview) ? 'active' : ''; ?>">
-                                <h4 class="list-group-item-heading"><?php echo $config['name']; ?></h4>
+                                <h4 class="list-group-item-heading"><?php echo $view->escape($config['name']); ?></h4>
                                 <?php if (!empty($config['description'])):?>
-                                <p class="small"><?php echo $config['description']; ?></p>
+                                <p class="small"><?php echo $view->escape($config['description']); ?></p>
                                 <?php endif; ?>
                                 <p class="list-group-item-text">
                                     <a href="<?php echo $view['router']->path('mautic_dashboard_action', ['objectAction' => 'import', 'preview' => $dashboard]); ?>">
@@ -34,7 +35,7 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.dashboard.
                                     </a>&#183;
                                     <a href="<?php echo $view['router']->path('mautic_dashboard_action', ['objectAction' => 'applyDashboardFile', 'file' => "{$config['type']}.{$dashboard}"]); ?>">
                                         <?php echo $view['translator']->trans('mautic.core.form.apply'); ?>
-                                    </a><?php if ($config['type'] == 'user'): ?>&#183;
+                                    </a><?php if ('user' == $config['type']): ?>&#183;
                                     <a href="<?php echo $view['router']->path('mautic_dashboard_action', ['objectAction' => 'deleteDashboardFile', 'file' => "{$config['type']}.{$dashboard}"]); ?>" data-toggle="confirmation" data-message="<?php echo $view['translator']->trans('mautic.dashboard.delete_layout'); ?>" data-confirm-text="<?php echo $view->escape($view['translator']->trans('mautic.core.form.delete')); ?>" data-confirm-callback="executeAction" data-cancel-text="<?php echo $view->escape($view['translator']->trans('mautic.core.form.cancel')); ?>">
                                         <?php echo $view['translator']->trans('mautic.core.form.delete'); ?>
                                     </a><?php endif; ?>
@@ -74,7 +75,7 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.dashboard.
     <div id="dashboard-widgets" class="dashboard-widgets cards">
         <?php if ($widgets): ?>
             <?php foreach ($widgets as $widget): ?>
-                <div class="card-flex widget" data-widget-id="<?php echo $widget->getId(); ?>" style="width: <?php echo $widget->getHeight() ? $widget->getWidth().'' : '100' ?>%; height: <?php echo $widget->getHeight() ? $widget->getHeight().'px' : '300px' ?>">
+                <div class="card-flex widget" data-widget-id="<?php echo $widget->getId(); ?>" style="width: <?php echo $widget->getHeight() ? $widget->getWidth().'' : '100'; ?>%; height: <?php echo $widget->getHeight() ? $widget->getHeight().'px' : '300px'; ?>">
                     <?php echo $view->render('MauticDashboardBundle:Widget:detail.html.php', ['widget' => $widget]); ?>
                 </div>
             <?php endforeach; ?>

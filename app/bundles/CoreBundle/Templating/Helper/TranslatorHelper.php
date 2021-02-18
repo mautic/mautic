@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,10 +11,13 @@
 
 namespace Mautic\CoreBundle\Templating\Helper;
 
+use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper as BaseHelper;
 
 /**
  * Extended TranslatorHelper.
+ *
+ * @property Translator $translator
  */
 class TranslatorHelper extends BaseHelper
 {
@@ -48,11 +52,14 @@ class TranslatorHelper extends BaseHelper
         return $this->translator->transConditional($preferred, $alternative, $parameters, $domain, $locale);
     }
 
+    /**
+     * @return string
+     */
     public function getJsLang()
     {
         $this->translator->addResource('mautic', null, $this->translator->getLocale(), 'javascript');
 
-        $messages = $this->translator->getMessages();
+        $messages = $this->translator->getCatalogue()->all('javascript');
 
         $oldKeys = [
             'chosenChooseOne'     => $this->trans('mautic.core.form.chooseone'),
@@ -62,7 +69,7 @@ class TranslatorHelper extends BaseHelper
             'popupBlockerMessage' => $this->trans('mautic.core.popupblocked'),
         ];
 
-        $jsLang = array_merge($messages['javascript'], $oldKeys);
+        $jsLang = array_merge($messages, $oldKeys);
 
         return json_encode($jsLang, JSON_PRETTY_PRINT | JSON_FORCE_OBJECT);
     }

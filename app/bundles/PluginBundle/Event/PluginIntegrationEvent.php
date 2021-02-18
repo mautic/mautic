@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -11,19 +12,14 @@
 namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Entity\Integration;
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
 /**
  * Class PluginIntegrationEvent.
  */
 class PluginIntegrationEvent extends AbstractPluginIntegrationEvent
 {
-    /**
-     * PluginIntegrationEvent constructor.
-     *
-     * @param AbstractIntegration $integration
-     */
-    public function __construct(AbstractIntegration $integration)
+    public function __construct(UnifiedIntegrationInterface $integration)
     {
         $this->integration = $integration;
     }
@@ -34,5 +30,10 @@ class PluginIntegrationEvent extends AbstractPluginIntegrationEvent
     public function getEntity()
     {
         return $this->integration->getIntegrationSettings();
+    }
+
+    public function setEntity(Integration $integration)
+    {
+        $this->integration->setIntegrationSettings($integration);
     }
 }

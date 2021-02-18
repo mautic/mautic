@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
  *
@@ -11,6 +12,7 @@
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class ColorType extends AbstractType
@@ -19,7 +21,7 @@ class ColorType extends AbstractType
     {
         $builder->add(
             'primary',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.focus.form.primary_color',
                 'label_attr' => ['class' => 'control-label'],
@@ -34,7 +36,7 @@ class ColorType extends AbstractType
 
         $builder->add(
             'text',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.focus.form.text_color',
                 'label_attr' => ['class' => 'control-label'],
@@ -49,7 +51,7 @@ class ColorType extends AbstractType
 
         $builder->add(
             'button',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.focus.form.button_color',
                 'label_attr' => ['class' => 'control-label'],
@@ -64,7 +66,7 @@ class ColorType extends AbstractType
 
         $builder->add(
             'button_text',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.focus.form.button_text_color',
                 'label_attr' => ['class' => 'control-label'],
@@ -78,7 +80,7 @@ class ColorType extends AbstractType
         );
     }
 
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'focus_color';
     }

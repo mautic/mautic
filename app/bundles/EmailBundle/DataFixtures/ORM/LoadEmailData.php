@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -14,54 +15,42 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\EmailBundle\Entity\Email;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Mautic\EmailBundle\Model\EmailModel;
 
-/**
- * Class LoadEmailData.
- */
-class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
-     * @var ContainerInterface
+     * @var EmailModel
      */
-    private $container;
+    private $emailModel;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
+    public function __construct(EmailModel $emailModel)
     {
-        $this->container = $container;
+        $this->emailModel = $emailModel;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
-        $factory = $this->container->get('mautic.factory');
-        $model   = $factory->getModel('email');
-        $repo    = $model->getRepository();
-        $emails  = CsvHelper::csv_to_array(__DIR__.'/fakeemaildata.csv');
+        $emails = CsvHelper::csv_to_array(__DIR__.'/fakeemaildata.csv');
 
         foreach ($emails as $count => $rows) {
             $email = new Email();
             $email->setDateAdded(new \DateTime());
             $key = $count + 1;
             foreach ($rows as $col => $val) {
-                if ($val != 'NULL') {
+                if ('NULL' != $val) {
                     $setter = 'set'.ucfirst($col);
                     if (in_array($col, ['content', 'variantSettings'])) {
-                        $val = unserialize(stripslashes($val));
+                        $val = Serializer::decode(stripslashes($val));
                     }
                     $email->$setter($val);
                 }
             }
             $email->addList($this->getReference('lead-list'));
 
-            $repo->saveEntity($email);
+            $this->emailModel->getRepository()->saveEntity($email);
             $this->setReference('email-'.$key, $email);
         }
     }

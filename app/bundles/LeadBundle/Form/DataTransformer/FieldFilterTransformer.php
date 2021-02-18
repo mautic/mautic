@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -19,15 +20,23 @@ class FieldFilterTransformer implements DataTransformerInterface
     private $relativeDateStrings;
 
     /**
-     * @param $translator
+     * @var array
      */
-    public function __construct($translator)
+    private $default;
+
+    /**
+     * @param       $translator
+     * @param array $default
+     */
+    public function __construct($translator, $default = [])
     {
         $this->relativeDateStrings = LeadListRepository::getRelativeDateTranslationKeys();
         foreach ($this->relativeDateStrings as &$string) {
             $string = $translator->trans($string);
         }
+        $this->default = $default;
     }
+
     /**
      * From DB format to form format.
      *
@@ -42,7 +51,10 @@ class FieldFilterTransformer implements DataTransformerInterface
         }
 
         foreach ($rawFilters as $k => $f) {
-            if ($f['type'] == 'datetime') {
+            if (!empty($this->default)) {
+                $rawFilters[$k] = array_merge($this->default, $rawFilters[$k]);
+            }
+            if ('datetime' == $f['type']) {
                 if (in_array($f['filter'], $this->relativeDateStrings) or stristr($f['filter'][0], '-') or stristr($f['filter'][0], '+')) {
                     continue;
                 }
@@ -71,7 +83,7 @@ class FieldFilterTransformer implements DataTransformerInterface
         $rawFilters = array_values($rawFilters);
 
         foreach ($rawFilters as $k => $f) {
-            if ($f['type'] == 'datetime') {
+            if ('datetime' == $f['type']) {
                 if (in_array($f['filter'], $this->relativeDateStrings) or stristr($f['filter'][0], '-') or stristr($f['filter'][0], '+')) {
                     continue;
                 }

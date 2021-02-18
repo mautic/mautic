@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,12 +11,13 @@
 
 namespace Mautic\DashboardBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -25,13 +27,13 @@ class WidgetApiController extends CommonApiController
 {
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model            = $this->getModel('dashboard');
         $this->entityClass      = 'Mautic\DashboardBundle\Entity\Widget';
         $this->entityNameOne    = 'widget';
         $this->entityNameMulti  = 'widgets';
-        $this->permissionBase   = 'dashboard:widgets';
         $this->serializerGroups = [];
+
+        parent::initialize($event);
     }
 
     /**
@@ -45,7 +47,7 @@ class WidgetApiController extends CommonApiController
         $event      = new WidgetTypeListEvent();
         $event->setTranslator($this->get('translator'));
         $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE, $event);
-        $view = $this->view(['success' => 1, 'types' => $event->getTypes()], Codes::HTTP_OK);
+        $view = $this->view(['success' => 1, 'types' => $event->getTypes()], Response::HTTP_OK);
 
         return $this->handleView($view);
     }
@@ -64,7 +66,15 @@ class WidgetApiController extends CommonApiController
         $from       = InputHelper::clean($this->request->get('dateFrom', null));
         $to         = InputHelper::clean($this->request->get('dateTo', null));
         $dataFormat = InputHelper::clean($this->request->get('dataFormat', null));
+        $unit       = InputHelper::clean($this->request->get('timeUnit', 'Y'));
+        $dataset    = InputHelper::clean($this->request->get('dataset', []));
         $response   = ['success' => 0];
+
+        try {
+            DateTimeHelper::validateMysqlDateTimeUnit($unit);
+        } catch (\InvalidArgumentException $e) {
+            return $this->returnError($e->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
 
         if ($timezone) {
             $fromDate = new \DateTime($from, new \DateTimeZone($timezone));
@@ -79,19 +89,23 @@ class WidgetApiController extends CommonApiController
             'dateFormat' => InputHelper::clean($this->request->get('dateFormat', null)),
             'dateFrom'   => $fromDate,
             'dateTo'     => $toDate,
-            'limit'      => InputHelper::int($this->request->get('limit', null)),
-            'filter'     => $this->request->get('filter', []),
+            'limit'      => (int) $this->request->get('limit', null),
+            'filter'     => InputHelper::clean($this->request->get('filter', [])),
+            'dataset'    => $dataset,
         ];
 
-        $cacheTimeout = InputHelper::int($this->request->get('cacheTimeout', null));
-        $widgetHeight = InputHelper::int($this->request->get('height', 300));
+        // Merge filters into the root array as well as that's how widget edit forms send them.
+        $params = array_merge($params, $params['filter']);
+
+        $cacheTimeout = (int) $this->request->get('cacheTimeout', 0);
+        $widgetHeight = (int) $this->request->get('height', 300);
 
         $widget = new Widget();
         $widget->setParams($params);
         $widget->setType($type);
         $widget->setHeight($widgetHeight);
 
-        if ($cacheTimeout === null) {
+        if (null !== $cacheTimeout) {
             $widget->setCacheTimeout($cacheTimeout);
         }
 
@@ -102,7 +116,7 @@ class WidgetApiController extends CommonApiController
             return $this->notFound();
         }
 
-        if ($dataFormat == 'raw') {
+        if ('raw' == $dataFormat) {
             if (isset($data['chartData']['labels']) && isset($data['chartData']['datasets'])) {
                 $rawData = [];
                 foreach ($data['chartData']['datasets'] as $dataset) {
@@ -126,7 +140,7 @@ class WidgetApiController extends CommonApiController
         $response['success']        = 1;
         $response['data']           = $data;
 
-        $view = $this->view($response, Codes::HTTP_OK);
+        $view = $this->view($response, Response::HTTP_OK);
 
         return $this->handleView($view);
     }

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -25,8 +26,6 @@ class UserHelper
 
     /**
      * UserHelper constructor.
-     *
-     * @param TokenStorage $tokenStorage
      */
     public function __construct(TokenStorage $tokenStorage)
     {
@@ -43,7 +42,7 @@ class UserHelper
         $user  = null;
         $token = $this->tokenStorage->getToken();
 
-        if ($token !== null) {
+        if (null !== $token) {
             $user = $token->getUser();
         }
 
@@ -52,8 +51,7 @@ class UserHelper
                 return null;
             }
 
-            $user          = new User();
-            $user->isGuest = true;
+            $user = new User(true);
         }
 
         return $user;

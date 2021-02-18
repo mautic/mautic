@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -16,13 +17,28 @@ use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
-use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceCallbackTransport;
+use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\EmailBundle\Swiftmailer\Transport\CallbackTransportInterface;
+use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Event\PageDisplayEvent;
+use Mautic\PageBundle\EventListener\BuilderSubscriber;
+use Mautic\PageBundle\PageEvents;
+use Mautic\QueueBundle\Queue\QueueName;
 use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends CommonFormController
 {
+    use FrequencyRuleTrait;
+
+    /**
+     * @param $idHash
+     *
+     * @return Response
+     */
     public function indexAction($idHash)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
@@ -58,23 +74,13 @@ class PublicController extends CommonFormController
                 $content = '';
             }
 
-            // Add analytics
-            $analytics = $this->factory->getHelper('template.analytics')->getCode();
-
-            // Check for html doc
-            if (strpos($content, '<html>') === false) {
-                $content = "<html>\n<head>{$analytics}</head>\n<body>{$content}</body>\n</html>";
-            } elseif (strpos($content, '<head>') === false) {
-                $content = str_replace('<html>', "<html>\n<head>\n{$analytics}\n</head>", $content);
-            } elseif (!empty($analytics)) {
-                $content = str_replace('</head>', $analytics."\n</head>", $content);
-            }
+            $content = $this->get('mautic.helper.template.analytics')->addCode($content);
 
             // Add subject as title
             if (!empty($subject)) {
-                if (strpos($content, '<title></title>') !== false) {
+                if (false !== strpos($content, '<title></title>')) {
                     $content = str_replace('<title></title>', "<title>$subject</title>", $content);
-                } elseif (strpos($content, '<title>') === false) {
+                } elseif (false === strpos($content, '<title>')) {
                     $content = str_replace('<head>', "<head>\n<title>$subject</title>", $content);
                 }
             }
@@ -82,7 +88,7 @@ class PublicController extends CommonFormController
             return new Response($content);
         }
 
-        $this->notFound();
+        return $this->notFound();
     }
 
     /**
@@ -92,9 +98,18 @@ class PublicController extends CommonFormController
      */
     public function trackingImageAction($idHash)
     {
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model = $this->getModel('email');
-        $model->hitEmail($idHash, $this->request);
+        $queueService = $this->get('mautic.queue.service');
+        if ($queueService->isQueueEnabled()) {
+            $msg = [
+                'request' => $this->request,
+                'idHash'  => $idHash,
+            ];
+            $queueService->publishToQueue(QueueName::EMAIL_HIT, $msg);
+        } else {
+            /** @var EmailModel $model */
+            $model = $this->getModel('email');
+            $model->hitEmail($idHash, $this->request);
+        }
 
         return TrackingPixelHelper::getResponse($this->request);
     }
@@ -114,68 +129,169 @@ class PublicController extends CommonFormController
         $model      = $this->getModel('email');
         $translator = $this->get('translator');
         $stat       = $model->getEmailStatus($idHash);
+        $message    = '';
+        $email      = null;
+        $lead       = null;
+        $template   = null;
+        $session    = $this->get('session');
+
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel = $this->getModel('lead');
 
         if (!empty($stat)) {
-            $email = $stat->getEmail();
-            $lead  = $stat->getLead();
-
-            if ($lead) {
-                // Set the lead as current lead
-                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-                $leadModel = $this->getModel('lead');
-                $leadModel->setCurrentLead($lead);
-            }
-
-            $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
-
-            $message = $this->coreParametersHelper->getParameter('unsubscribe_message');
-            if (!$message) {
-                $message = $translator->trans(
-                    'mautic.email.unsubscribed.success',
-                    [
-                        '%resubscribeUrl%' => '|URL|',
-                        '%email%'          => '|EMAIL|',
-                    ]
-                );
-            }
-            $message = str_replace(
-                [
-                    '|URL|',
-                    '|EMAIL|',
-                ],
-                [
-                    $this->generateUrl('mautic_email_resubscribe', ['idHash' => $idHash]),
-                    $stat->getEmailAddress(),
-                ],
-                $message
-            );
-
-            if ($email !== null) {
+            if ($email = $stat->getEmail()) {
                 $template = $email->getTemplate();
+                if ('mautic_code_mode' === $template) {
+                    // Use system default
+                    $template = null;
+                }
 
                 /** @var \Mautic\FormBundle\Entity\Form $unsubscribeForm */
                 $unsubscribeForm = $email->getUnsubscribeForm();
-
-                if ($unsubscribeForm != null && $unsubscribeForm->isPublished()) {
+                if (null != $unsubscribeForm && $unsubscribeForm->isPublished()) {
                     $formTemplate = $unsubscribeForm->getTemplate();
                     $formModel    = $this->getModel('form');
                     $formContent  = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
                 }
             }
-        } else {
-            $email   = $lead   = false;
-            $message = $translator->trans('mautic.email.stat_record.not_found');
         }
 
         if (empty($template) && empty($formTemplate)) {
-            $template = $this->coreParametersHelper->getParameter('theme');
+            $template = $this->coreParametersHelper->get('theme');
         } elseif (!empty($formTemplate)) {
             $template = $formTemplate;
         }
+
         $theme = $this->factory->getTheme($template);
         if ($theme->getTheme() != $template) {
             $template = $theme->getTheme();
         }
+        $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.php');
+        if (!empty($stat)) {
+            $successSessionName = 'mautic.email.prefscenter.success';
+
+            if ($lead = $stat->getLead()) {
+                // Set the lead as current lead
+                $this->get('mautic.tracker.contact')->setTrackedContact($lead);
+
+                // Set lead lang
+                if ($lead->getPreferredLocale()) {
+                    $translator->setLocale($lead->getPreferredLocale());
+                }
+
+                // Add contact ID to the session name in case more contacts
+                // share the same session/device and the contact is known.
+                $successSessionName .= ".{$lead->getId()}";
+            }
+
+            if (!$this->get('mautic.helper.core_parameters')->get('show_contact_preferences')) {
+                $message = $this->getUnsubscribeMessage($idHash, $model, $stat, $translator);
+            } elseif ($lead) {
+                $action = $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash]);
+
+                $viewParameters = [
+                    'lead'                         => $lead,
+                    'idHash'                       => $idHash,
+                    'showContactFrequency'         => $this->get('mautic.helper.core_parameters')->get('show_contact_frequency'),
+                    'showContactPauseDates'        => $this->get('mautic.helper.core_parameters')->get('show_contact_pause_dates'),
+                    'showContactPreferredChannels' => $this->get('mautic.helper.core_parameters')->get('show_contact_preferred_channels'),
+                    'showContactCategories'        => $this->get('mautic.helper.core_parameters')->get('show_contact_categories'),
+                    'showContactSegments'          => $this->get('mautic.helper.core_parameters')->get('show_contact_segments'),
+                ];
+
+                $form = $this->getFrequencyRuleForm($lead, $viewParameters, $data, true, $action, true);
+                if (true === $form) {
+                    $session->set($successSessionName, 1);
+
+                    return $this->postActionRedirect(
+                        [
+                            'returnUrl'       => $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash]),
+                            'viewParameters'  => $viewParameters,
+                            'contentTemplate' => $contentTemplate,
+                        ]
+                    );
+                }
+
+                $formView = $form->createView();
+                /** @var Page $prefCenter */
+                if ($email && ($prefCenter = $email->getPreferenceCenter()) && ($prefCenter->getIsPreferenceCenter())) {
+                    $html = $prefCenter->getCustomHtml();
+                    // check if tokens are present
+                    $savePrefsPresent = false !== strpos($html, 'data-slot="saveprefsbutton"') ||
+                        false !== strpos($html, BuilderSubscriber::saveprefsRegex);
+                    if ($savePrefsPresent) {
+                        // set custom tag to inject end form
+                        // update show pref center slots by looking for their presence in the html
+                        /** @var \Mautic\CoreBundle\Templating\Helper\FormHelper $formHelper */
+                        $formHelper =$this->get('templating.helper.form');
+                        $params     = array_merge(
+                            $viewParameters,
+                            [
+                                'form'                         => $formView,
+                                'startform'                    => $formHelper->start($formView),
+                                'custom_tag'                   => '<a name="end-'.$formView->vars['id'].'"></a>',
+                                'showContactFrequency'         => false !== strpos($html, 'data-slot="channelfrequency"') || false !== strpos($html, BuilderSubscriber::channelfrequency),
+                                'showContactSegments'          => false !== strpos($html, 'data-slot="segmentlist"') || false !== strpos($html, BuilderSubscriber::segmentListRegex),
+                                'showContactCategories'        => false !== strpos($html, 'data-slot="categorylist"') || false !== strpos($html, BuilderSubscriber::categoryListRegex),
+                                'showContactPreferredChannels' => false !== strpos($html, 'data-slot="preferredchannel"') || false !== strpos($html, BuilderSubscriber::preferredchannel),
+                            ]
+                        );
+                        // Replace tokens in preference center page
+                        $event = new PageDisplayEvent($html, $prefCenter, $params);
+                        $this->get('event_dispatcher')
+                            ->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
+                        $html = $event->getContent();
+                        if (!$session->has($successSessionName)) {
+                            $successMessageDataSlots       = [
+                                'data-slot="successmessage"',
+                                'class="pref-successmessage"',
+                            ];
+                            $successMessageDataSlotsHidden = [];
+                            foreach ($successMessageDataSlots as $successMessageDataSlot) {
+                                $successMessageDataSlotsHidden[] = $successMessageDataSlot.' style=display:none';
+                            }
+                            $html = str_replace(
+                                $successMessageDataSlots,
+                                $successMessageDataSlotsHidden,
+                                $html
+                            );
+                        } else {
+                            $session->remove($successSessionName);
+                        }
+                        $html = preg_replace(
+                            '/'.BuilderSubscriber::identifierToken.'/',
+                            $lead->getPrimaryIdentifier(),
+                            $html
+                        );
+                    } else {
+                        unset($html);
+                    }
+                }
+
+                if (empty($html)) {
+                    $html = $this->get('mautic.helper.templating')->getTemplating()->render(
+                        'MauticEmailBundle:Lead:preference_options.html.php',
+                        array_merge(
+                            $viewParameters,
+                            [
+                                'form'         => $formView,
+                                'currentRoute' => $this->generateUrl(
+                                    'mautic_contact_action',
+                                    [
+                                        'objectAction' => 'contactFrequency',
+                                        'objectId'     => $lead->getId(),
+                                    ]
+                                ),
+                            ]
+                        )
+                    );
+                }
+                $message = $html;
+            }
+        } else {
+            $message = $translator->trans('mautic.email.stat_record.not_found');
+        }
+
         $config = $theme->getConfig();
 
         $viewParams = [
@@ -183,11 +299,7 @@ class PublicController extends CommonFormController
             'lead'     => $lead,
             'template' => $template,
             'message'  => $message,
-            'type'     => 'notice',
-            'name'     => $translator->trans('mautic.email.unsubscribe'),
         ];
-
-        $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.php');
 
         if (!empty($formContent)) {
             $viewParams['content'] = $formContent;
@@ -223,18 +335,23 @@ class PublicController extends CommonFormController
                 // Set the lead as current lead
                 /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
                 $leadModel = $this->getModel('lead');
-                $leadModel->setCurrentLead($lead);
+                $this->get('mautic.tracker.contact')->setTrackedContact($lead);
+
+                // Set lead lang
+                if ($lead->getPreferredLocale()) {
+                    $this->translator->setLocale($lead->getPreferredLocale());
+                }
             }
 
             $model->removeDoNotContact($stat->getEmailAddress());
 
-            $message = $this->coreParametersHelper->getParameter('resubscribe_message');
+            $message = $this->coreParametersHelper->get('resubscribe_message');
             if (!$message) {
                 $message = $this->translator->trans(
                     'mautic.email.resubscribed.success',
                     [
-                        '%unsubscribedUrl%' => '|URL|',
-                        '%email%'           => '|EMAIL|',
+                        '%unsubscribeUrl%' => '|URL|',
+                        '%email%'          => '|EMAIL|',
                     ]
                 );
             }
@@ -254,8 +371,9 @@ class PublicController extends CommonFormController
             $message = $this->translator->trans('mautic.email.stat_record.not_found');
         }
 
-        $template = ($email !== null) ? $email->getTemplate() : $this->coreParametersHelper->getParameter('theme');
-        $theme    = $this->factory->getTheme($template);
+        $template = (null !== $email && 'mautic_code_mode' !== $email->getTemplate()) ? $email->getTemplate() : $this->coreParametersHelper->get('theme');
+
+        $theme = $this->factory->getTheme($template);
 
         if ($theme->getTheme() != $template) {
             $template = $theme->getTheme();
@@ -264,7 +382,7 @@ class PublicController extends CommonFormController
         // Ensure template still exists
         $theme = $this->factory->getTheme($template);
         if (empty($theme) || $theme->getTheme() !== $template) {
-            $template = $this->coreParametersHelper->getParameter('theme');
+            $template = $this->coreParametersHelper->get('theme');
         }
 
         $analytics = $this->factory->getHelper('template.analytics')->getCode();
@@ -298,25 +416,16 @@ class PublicController extends CommonFormController
     {
         ignore_user_abort(true);
 
-        // Use the real transport as the one in Mailer could be SpoolTransport if the system is configured to queue
-        // Can't use swiftmailer.transport.real because it's not set for when queue is disabled
-        $transportParam   = $this->get('mautic.helper.core_parameters')->getParameter(('mailer_transport'));
-        $currentTransport = $this->get('swiftmailer.mailer.transport.'.$transportParam);
+        $realTransport = $this->container->get('swiftmailer.transport.real');
 
-        if ($currentTransport instanceof InterfaceCallbackTransport && $currentTransport->getCallbackPath() == $transport) {
-            $response = $currentTransport->handleCallbackResponse($this->request, $this->factory);
-
-            if (is_array($response)) {
-                /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-                $model = $this->getModel('email');
-
-                $model->processMailerCallback($response);
-            }
-
-            return new Response('success');
+        if (!$realTransport instanceof CallbackTransportInterface || $realTransport->getCallbackPath() !== $transport) {
+            return $this->notFound();
         }
 
-        $this->notFound();
+        $event = new TransportWebhookEvent($realTransport, $this->request);
+        $this->dispatcher->dispatch(EmailEvents::ON_TRANSPORT_WEBHOOK, $event);
+
+        return new Response('success');
     }
 
     /**
@@ -332,8 +441,12 @@ class PublicController extends CommonFormController
         $model       = $this->getModel('email');
         $emailEntity = $model->getEntity($objectId);
 
+        if (null === $emailEntity) {
+            return $this->notFound();
+        }
+
         if (
-            ($this->get('mautic.security')->isAnonymous() && !$emailEntity->isPublished())
+            ($this->get('mautic.security')->isAnonymous() && (!$emailEntity->isPublished() || !$emailEntity->isPublicPreview()))
             || (!$this->get('mautic.security')->isAnonymous()
                 && !$this->get('mautic.security')->hasEntityAccess(
                     'email:emails:viewown',
@@ -411,6 +524,10 @@ class PublicController extends CommonFormController
 
         $content = $event->getContent(true);
 
+        if ($this->get('mautic.security')->isAnonymous()) {
+            $content = $this->get('mautic.helper.template.analytics')->addCode($content);
+        }
+
         return new Response($content);
     }
 
@@ -453,7 +570,7 @@ class PublicController extends CommonFormController
             return;
         }
 
-        if (strpos($query_string, 'r=') === 0) {
+        if (0 === strpos($query_string, 'r=')) {
             $query_string = substr($query_string, strpos($query_string, '?') + 1);
         } // remove route variable
 
@@ -465,6 +582,7 @@ class PublicController extends CommonFormController
 
             return;
         }
+
         // get secret from plugin settings
         $integrationHelper = $this->get('mautic.helper.integration');
         $myIntegration     = $integrationHelper->getIntegrationObject($integration);
@@ -478,7 +596,7 @@ class PublicController extends CommonFormController
 
         // generate signature
         $salt = $keys['secret'];
-        if (strpos($salt, '$1$') === false) {
+        if (false === strpos($salt, '$1$')) {
             $salt = '$1$'.$salt;
         } // add MD5 prefix
         $cr    = crypt(urlencode($query['d']), $salt);
@@ -503,6 +621,10 @@ class PublicController extends CommonFormController
             return;
         }
 
+        if (MAUTIC_ENV === 'dev') {
+            $logger->log('error', $integration.': '.json_encode($query, JSON_PRETTY_PRINT));
+        }
+
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model = $this->getModel('email');
 
@@ -512,11 +634,11 @@ class PublicController extends CommonFormController
 
         foreach ($emails as $email) {
             $lead = $repo->getLeadByEmail($email);
-            if ($lead === null) {
+            if (null === $lead) {
                 $lead = $this->createLead($email, $repo);
             }
 
-            if ($lead === null) {
+            if (null === $lead) {
                 continue;
             } // lead was not created
 
@@ -526,12 +648,14 @@ class PublicController extends CommonFormController
             $stat = $model->getEmailStatus($idHash);
 
             // stat doesn't exist, create one
-            if ($stat === null) {
+            if (null === $stat) {
                 $lead['email'] = $email; // needed for stat
-                $this->addStat($lead, $email, $query, $idHash);
+                $stat          = $this->addStat($lead, $email, $query, $idHash);
             }
 
-            if ($stat || $integration !== 'Outlook') { // Outlook requests the tracking gif on send
+            $stat->setSource('email.client');
+
+            if ($stat || 'Outlook' !== $integration) { // Outlook requests the tracking gif on send
                 $model->hitEmail($idHash, $this->request); // add email event
             }
         }
@@ -557,7 +681,8 @@ class PublicController extends CommonFormController
      */
     private function addStat($lead, $email, $query, $idHash)
     {
-        if ($lead !== null) {
+        if (null !== $lead) {
+            /** @var \Mautic\EmailBundle\Helper\MailHelper $mailer */
             $mailer = $this->get('mautic.helper.mailer');
 
             // To lead
@@ -578,8 +703,11 @@ class PublicController extends CommonFormController
 
             $subject = filter_var($query['subject'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
             $mailer->setSubject($subject);
-            $mailer->createEmailStat();
+
+            return $mailer->createEmailStat();
         }
+
+        return null;
     }
 
     /**
@@ -600,5 +728,41 @@ class PublicController extends CommonFormController
 
         // return entity
         return $repo->getLeadByEmail($email);
+    }
+
+    /**
+     * @param $idHash
+     * @param $model
+     * @param $stat
+     * @param $translator
+     *
+     * @return mixed
+     */
+    public function getUnsubscribeMessage($idHash, $model, $stat, $translator)
+    {
+        $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
+
+        $message = $this->coreParametersHelper->get('unsubscribe_message');
+        if (!$message) {
+            $message = $translator->trans(
+                'mautic.email.unsubscribed.success',
+                [
+                    '%resubscribeUrl%' => '|URL|',
+                    '%email%'          => '|EMAIL|',
+                ]
+            );
+        }
+
+        return str_replace(
+            [
+                '|URL|',
+                '|EMAIL|',
+            ],
+            [
+                $this->generateUrl('mautic_email_resubscribe', ['idHash' => $idHash]),
+                $stat->getEmailAddress(),
+            ],
+            $message
+        );
     }
 }

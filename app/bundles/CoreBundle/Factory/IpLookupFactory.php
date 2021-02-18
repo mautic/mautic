@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -17,7 +18,7 @@ use Psr\Log\LoggerInterface;
 class IpLookupFactory
 {
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     protected $logger;
 
@@ -39,10 +40,7 @@ class IpLookupFactory
     /**
      * IpLookupFactory constructor.
      *
-     * @param array                $lookupServices
-     * @param LoggerInterface|null $logger
-     * @param Http|null            $httpConnector
-     * @param null                 $cacheDir
+     * @param null $cacheDir
      */
     public function __construct(array $lookupServices, LoggerInterface $logger = null, Http $httpConnector = null, $cacheDir = null)
     {
@@ -53,11 +51,10 @@ class IpLookupFactory
     }
 
     /**
-     * @param       $service
-     * @param null  $auth
-     * @param array $ipLookupConfig
+     * @param      $service
+     * @param null $auth
      *
-     * @return null|AbstractLookup
+     * @return AbstractLookup|null
      */
     public function getService($service, $auth = null, array $ipLookupConfig = [])
     {
@@ -73,7 +70,7 @@ class IpLookupFactory
             }
 
             $className = $this->lookupServices[$service]['class'];
-            if (substr($className, 0, 1) !== '\\') {
+            if ('\\' !== substr($className, 0, 1)) {
                 $className = '\\'.$className;
             }
 

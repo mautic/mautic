@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -20,7 +21,7 @@ class StageRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $q = $this
             ->createQueryBuilder($this->getTableAlias())
@@ -94,7 +95,7 @@ class StageRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
             's.name',
@@ -105,7 +106,7 @@ class StageRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }
@@ -198,5 +199,30 @@ class StageRepository extends CommonRepository
         }
 
         return null;
+    }
+
+    /**
+     * @param string|int $value
+     *
+     * @return array
+     */
+    public function findByIdOrName($value)
+    {
+        $qb = $this->_em->createQueryBuilder()
+            ->select('s')
+            ->from(Stage::class, 's');
+
+        if (is_numeric($value)) {
+            // This is numeric value so check id and name
+            $qb->where('s.id = :value');
+        } else {
+            // This is string, no need to check IDs
+            $qb->where('s.name = :value');
+        }
+
+        return $qb
+            ->setParameter('value', $value)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

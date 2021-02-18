@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -11,6 +12,7 @@
 namespace Mautic\FormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -27,8 +29,6 @@ class FormFieldPageBreakType extends AbstractType
 
     /**
      * FormFieldPageBreakType constructor.
-     *
-     * @param TranslatorInterface $translator
      */
     public function __construct(TranslatorInterface $translator)
     {
@@ -42,7 +42,7 @@ class FormFieldPageBreakType extends AbstractType
     {
         $builder->add(
             'next_page_label',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.form.field.form.property_pagebreak_nextpage_label',
                 'label_attr' => ['class' => 'control-label'],
@@ -61,7 +61,7 @@ class FormFieldPageBreakType extends AbstractType
 
         $builder->add(
             'prev_page_label',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.form.field.form.property_pagebreak_prevpage_label',
                 'label_attr' => ['class' => 'control-label'],

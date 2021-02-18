@@ -2,7 +2,9 @@ User-agent: *
 Disallow: /addons/
 Disallow: /plugins/
 Disallow: /app/
-Disallow: /media/
+Disallow: /media/dashboards/
+Disallow: /media/files/
+Disallow: /media/js/mautic-form-src.js
 Disallow: /themes/
 Disallow: /translations/
 Disallow: /vendor/

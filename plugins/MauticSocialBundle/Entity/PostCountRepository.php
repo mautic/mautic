@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
  *
@@ -10,30 +11,15 @@
 
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 
 class PostCountRepository extends CommonRepository
 {
     /**
-     * Get a list of entities.
-     *
-     * @param array $args
-     *
-     * @return Paginator
-     */
-    public function getEntities($args = [])
-    {
-        return parent::getEntities($args);
-    }
-
-    /**
      * Fetch Lead stats for some period of time.
      *
-     * @param int    $quantity of units
-     * @param string $unit     of time php.net/manual/en/class.dateinterval.php#dateinterval.props
-     * @param array  $options
+     * @param array $options
      *
      * @return mixed
      *
@@ -44,20 +30,12 @@ class PostCountRepository extends CommonRepository
     {
         $chartQuery = new ChartQuery($this->getEntityManager()->getConnection(), $dateFrom, $dateTo);
 
-        // Load points for selected period
-        $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('cl.post_count, cl.post_date')
-            ->from(MAUTIC_TABLE_PREFIX.'monitor_post_count', 'cl')
-            ->orderBy('cl.post_date', 'ASC');
-
+        // Load points for selected periods
+        $q = $chartQuery->prepareTimeDataQuery(MAUTIC_TABLE_PREFIX.'monitor_post_count', 'post_date', $options, 'post_count', 'sum');
         if (isset($options['monitor_id'])) {
-            $q->andwhere($q->expr()->eq('cl.monitor_id', (int) $options['monitor_id']));
+            $q->andwhere($q->expr()->eq('t.monitor_id', (int) $options['monitor_id']));
         }
 
-        $chartQuery->applyDateFilters($q, 'post_date', 'cl');
-
-        $postCount = $q->execute()->fetchAll();
-
-        return $postCount;
+        return $chartQuery->loadAndBuildTimeData($q);
     }
 }

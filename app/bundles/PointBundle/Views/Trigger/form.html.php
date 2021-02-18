@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -118,7 +119,7 @@ $view['slots']->set('headerTitle', $header);
 <?php echo $view['form']->end($form); ?>
 
  <?php
-    $view['slots']->append('modal', $this->render('MauticCoreBundle:Helper:modal.html.php', [
+    $view['slots']->append('modal', $view->render('MauticCoreBundle:Helper:modal.html.php', [
         'id'            => 'triggerEventModal',
         'header'        => $view['translator']->trans('mautic.point.trigger.form.modalheader'),
         'footerButtons' => true,

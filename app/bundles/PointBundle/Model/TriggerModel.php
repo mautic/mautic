@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,30 +11,25 @@
 
 namespace Mautic\PointBundle\Model;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Entity\LeadTriggerLog;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Event as Events;
+use Mautic\PointBundle\Form\Type\TriggerType;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class TriggerModel.
- */
 class TriggerModel extends CommonFormModel
 {
-    /**
-     * @deprecated Remove in 2.0
-     *
-     * @var MauticFactory
-     */
-    protected $factory;
+    protected $triggers = [];
 
     /**
      * @var IpLookupHelper
@@ -51,17 +47,29 @@ class TriggerModel extends CommonFormModel
     protected $pointTriggerEventModel;
 
     /**
-     * EventModel constructor.
+     * @deprecated https://github.com/mautic/mautic/issues/8229
      *
-     * @param IpLookupHelper    $ipLookupHelper
-     * @param LeadModel         $leadModel
-     * @param TriggerEventModel $pointTriggerEventModel
+     * @var MauticFactory
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, TriggerEventModel $pointTriggerEventModel)
-    {
+    protected $mauticFactory;
+
+    /**
+     * @var ContactTracker
+     */
+    private $contactTracker;
+
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        LeadModel $leadModel,
+        TriggerEventModel $pointTriggerEventModel,
+        MauticFactory $mauticFactory,
+        ContactTracker $contactTracker
+    ) {
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->leadModel              = $leadModel;
         $this->pointTriggerEventModel = $pointTriggerEventModel;
+        $this->mauticFactory          = $mauticFactory;
+        $this->contactTracker         = $contactTracker;
     }
 
     /**
@@ -71,7 +79,7 @@ class TriggerModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticPointBundle:Trigger');
+        return $this->em->getRepository(Trigger::class);
     }
 
     /**
@@ -81,7 +89,7 @@ class TriggerModel extends CommonFormModel
      */
     public function getEventRepository()
     {
-        return $this->em->getRepository('MauticPointBundle:TriggerEvent');
+        return $this->em->getRepository(TriggerEvent::class);
     }
 
     /**
@@ -102,9 +110,12 @@ class TriggerModel extends CommonFormModel
         if (!$entity instanceof Trigger) {
             throw new MethodNotAllowedHttpException(['Trigger']);
         }
-        $params = (!empty($action)) ? ['action' => $action] : [];
 
-        return $formFactory->create('pointtrigger', $entity, $params);
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
+
+        return $formFactory->create(TriggerType::class, $entity, $options);
     }
 
     /**
@@ -183,7 +194,7 @@ class TriggerModel extends CommonFormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Trigger();
         }
 
@@ -232,8 +243,7 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
-     * @param Trigger $entity
-     * @param array   $sessionEvents
+     * @param array $sessionEvents
      */
     public function setEvents(Trigger $entity, $sessionEvents)
     {
@@ -269,7 +279,7 @@ class TriggerModel extends CommonFormModel
     /**
      * Gets array of custom events from bundles subscribed PointEvents::TRIGGER_ON_BUILD.
      *
-     * @return mixed
+     * @return mixed[]
      */
     public function getEvents()
     {
@@ -305,21 +315,20 @@ class TriggerModel extends CommonFormModel
     /**
      * Triggers a specific event.
      *
-     * @param array $event
-     * @param Lead  $lead
+     * @param array $event triggerEvent converted to array
      * @param bool  $force
      *
      * @return bool Was event triggered
      */
-    public function triggerEvent($event, Lead $lead = null,  $force = false)
+    public function triggerEvent($event, Lead $lead = null, $force = false)
     {
         //only trigger events for anonymous users
         if (!$force && !$this->security->isAnonymous()) {
             return false;
         }
 
-        if ($lead == null) {
-            $lead = $this->leadModel->getCurrentLead();
+        if (null === $lead) {
+            $lead = $this->contactTracker->getContact();
         }
 
         if (!$force) {
@@ -341,42 +350,58 @@ class TriggerModel extends CommonFormModel
         }
 
         $settings = $availableEvents[$eventType];
-        $args     = [
-            'event'   => $event,
-            'lead'    => $lead,
-            'factory' => $this->factory, // WHAT??
-            'config'  => $event['properties'],
+
+        if (isset($settings['callback']) && is_callable($settings['callback'])) {
+            return $this->invokeCallback($event, $lead, $settings);
+        } else {
+            /** @var TriggerEvent $triggerEvent */
+            $triggerEvent = $this->getEventRepository()->find($event['id']);
+
+            $triggerExecutedEvent = new Events\TriggerExecutedEvent($triggerEvent, $lead);
+
+            $this->dispatcher->dispatch($settings['eventName'], $triggerExecutedEvent);
+
+            return $triggerExecutedEvent->getResult();
+        }
+    }
+
+    /**
+     * @param $event
+     *
+     * @return bool
+     */
+    private function invokeCallback($event, Lead $lead, array $settings)
+    {
+        $args = [
+          'event'   => $event,
+          'lead'    => $lead,
+          'factory' => $this->mauticFactory,
+          'config'  => $event['properties'],
         ];
 
-        if (is_callable($settings['callback'])) {
-            if (is_array($settings['callback'])) {
-                $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
-            } elseif (strpos($settings['callback'], '::') !== false) {
-                $parts      = explode('::', $settings['callback']);
-                $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-            } else {
-                $reflection = new \ReflectionMethod(null, $settings['callback']);
-            }
-
-            $pass = [];
-            foreach ($reflection->getParameters() as $param) {
-                if (isset($args[$param->getName()])) {
-                    $pass[] = $args[$param->getName()];
-                } else {
-                    $pass[] = null;
-                }
-            }
-
-            return $reflection->invokeArgs($this, $pass);
+        if (is_array($settings['callback'])) {
+            $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
+        } elseif (false !== strpos($settings['callback'], '::')) {
+            $parts      = explode('::', $settings['callback']);
+            $reflection = new \ReflectionMethod($parts[0], $parts[1]);
+        } else {
+            $reflection = new \ReflectionMethod(null, $settings['callback']);
         }
 
-        return false;
+        $pass = [];
+        foreach ($reflection->getParameters() as $param) {
+            if (isset($args[$param->getName()])) {
+                $pass[] = $args[$param->getName()];
+            } else {
+                $pass[] = null;
+            }
+        }
+
+        return $reflection->invokeArgs($this, $pass);
     }
 
     /**
      * Trigger events for the current lead.
-     *
-     * @param Lead $lead
      */
     public function triggerEvents(Lead $lead)
     {
@@ -426,13 +451,11 @@ class TriggerModel extends CommonFormModel
      */
     public function getColorForLeadPoints($points)
     {
-        static $triggers;
-
-        if (!is_array($triggers)) {
-            $triggers = $this->getRepository()->getTriggerColors();
+        if (!$this->triggers) {
+            $this->triggers = $this->getRepository()->getTriggerColors();
         }
 
-        foreach ($triggers as $trigger) {
+        foreach ($this->triggers as $trigger) {
             if ($points >= $trigger['points']) {
                 return $trigger['color'];
             }

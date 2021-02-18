@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -14,7 +15,8 @@
         <?php echo $view['form']->row($form['subject']); ?>
     </div>
     <div class="col-sm-4">
-        <?php echo $view['form']->row($form['copy_lead']); ?>
+        <?php echo $view['form']->row($form['immediately']); ?>
+        <?php echo $view['form']->row($form['set_replyto']); ?>
     </div>
 </div>
 
@@ -23,6 +25,8 @@
         <?php echo $view['form']->row($form['message']); ?>
     </div>
     <div class="col-sm-4">
+        <?php echo $view['form']->row($form['email_to_owner']); ?>
+        <?php echo $view['form']->row($form['copy_lead']); ?>
         <label class="control-label"><?php echo $view['translator']->trans('mautic.form.action.sendemail.dragfield'); ?></label>
         <div id="formFieldTokens" class="list-group" style="max-height: 250px; overflow-y: auto;">
             <?php foreach ($formFields as $token => $field): ?>
@@ -31,6 +35,8 @@
         </div>
     </div>
 </div>
+<?php echo $view['form']->row($form['templates']); ?>
 <?php echo $view['form']->row($form['to']); ?>
 <?php echo $view['form']->row($form['cc']); ?>
 <?php echo $view['form']->row($form['bcc']); ?>
+

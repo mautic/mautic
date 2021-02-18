@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -21,13 +22,21 @@ return [
             ],
         ],
         'api' => [
-            'mautic_api_getstages' => [
-                'path'       => '/stages',
-                'controller' => 'MauticStageBundle:Api\StageApi:getEntities',
+            'mautic_api_stagesstandard' => [
+                'standard_entity' => true,
+                'name'            => 'stages',
+                'path'            => '/stages',
+                'controller'      => 'MauticStageBundle:Api\StageApi',
             ],
-            'mautic_api_getstage' => [
-                'path'       => '/stages/{id}',
-                'controller' => 'MauticStageBundle:Api\StageApi:getEntity',
+            'mautic_api_stageddcontact' => [
+                'path'       => '/stages/{id}/contact/{contactId}/add',
+                'controller' => 'MauticStageBundle:Api\StageApi:addContact',
+                'method'     => 'POST',
+            ],
+            'mautic_api_stageremovecontact' => [
+                'path'       => '/stages/{id}/contact/{contactId}/remove',
+                'controller' => 'MauticStageBundle:Api\StageApi:removeContact',
+                'method'     => 'POST',
             ],
         ],
     ],
@@ -50,64 +59,77 @@ return [
     'services' => [
         'events' => [
             'mautic.stage.campaignbundle.subscriber' => [
-                'class'     => 'Mautic\StageBundle\EventListener\CampaignSubscriber',
+                'class'     => \Mautic\StageBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.stage.model.stage',
                 ],
             ],
             'mautic.stage.subscriber' => [
-                'class'     => 'Mautic\StageBundle\EventListener\StageSubscriber',
+                'class'     => \Mautic\StageBundle\EventListener\StageSubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                 ],
             ],
             'mautic.stage.leadbundle.subscriber' => [
-                'class' => 'Mautic\StageBundle\EventListener\LeadSubscriber',
+                'class'     => \Mautic\StageBundle\EventListener\LeadSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.repository.stages_lead_log',
+                    'mautic.stage.repository.lead_stage_log',
+                    'translator',
+                    'router',
+                ],
             ],
             'mautic.stage.search.subscriber' => [
-                'class'     => 'Mautic\StageBundle\EventListener\SearchSubscriber',
+                'class'     => \Mautic\StageBundle\EventListener\SearchSubscriber::class,
+                'arguments' => [
+                    'mautic.stage.model.stage',
+                    'mautic.security',
+                    'mautic.helper.templating',
+                ],
+            ],
+            'mautic.stage.dashboard.subscriber' => [
+                'class'     => \Mautic\StageBundle\EventListener\DashboardSubscriber::class,
                 'arguments' => [
                     'mautic.stage.model.stage',
                 ],
             ],
-            'mautic.stage.dashboard.subscriber' => [
-                'class'     => 'Mautic\StageBundle\EventListener\DashboardSubscriber',
+            'mautic.stage.stats.subscriber' => [
+                'class'     => \Mautic\StageBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
-                    'mautic.stage.model.stage',
+                    'mautic.security',
+                    'doctrine.orm.entity_manager',
                 ],
             ],
         ],
         'forms' => [
             'mautic.stage.type.form' => [
-                'class'     => 'Mautic\StageBundle\Form\Type\StageType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'stage',
+                'class'     => \Mautic\StageBundle\Form\Type\StageType::class,
+                'arguments' => [
+                    'mautic.security',
+                ],
             ],
             'mautic.stage.type.action' => [
-                'class'     => 'Mautic\StageBundle\Form\Type\StageActionType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'stageaction',
+                'class' => 'Mautic\StageBundle\Form\Type\StageActionType',
             ],
             'mautic.stage.type.action_list' => [
                 'class'     => 'Mautic\StageBundle\Form\Type\StageActionListType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'stageaction_list',
+                'arguments' => [
+                    'mautic.stage.model.stage',
+                ],
             ],
             'mautic.stage.type.action_change' => [
-                'class'     => 'Mautic\StageBundle\Form\Type\StageActionChangeType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'stageaction_change',
+                'class' => 'Mautic\StageBundle\Form\Type\StageActionChangeType',
             ],
             'mautic.stage.type.stage_list' => [
                 'class'     => 'Mautic\StageBundle\Form\Type\StageListType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'stage_list',
+                'arguments' => [
+                    'mautic.stage.model.stage',
+                ],
             ],
             'mautic.point.type.genericstage_settings' => [
                 'class' => 'Mautic\StageBundle\Form\Type\GenericStageSettingsType',
-                'alias' => 'genericstage_settings',
             ],
         ],
         'models' => [
@@ -116,8 +138,18 @@ return [
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'session',
+                    'mautic.helper.user',
+                ],
+            ],
         ],
-    ],
-],
+        'repositories' => [
+            'mautic.stage.repository.lead_stage_log' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\StageBundle\Entity\LeadStageLog::class,
+                ],
+            ],
+        ],
     ],
 ];

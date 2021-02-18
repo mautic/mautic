@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -15,9 +16,6 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
- * Configurator.
- *
- * @author Marc Weistroff <marc.weistroff@gmail.com>
  * @note   This class is based on Sensio\Bundle\DistributionBundle\Configurator\Configurator
  */
 class Configurator
@@ -50,11 +48,6 @@ class Configurator
      */
     protected $parameters;
 
-    /**
-     * Configurator constructor.
-     *
-     * @param PathsHelper $pathsHelper
-     */
     public function __construct(PathsHelper $pathsHelper)
     {
         $this->filename   = $pathsHelper->getSystemPath('local_config');
@@ -80,8 +73,7 @@ class Configurator
     /**
      * Add a step to the configurator.
      *
-     * @param StepInterface $step
-     * @param int           $priority
+     * @param int $priority
      */
     public function addStep(StepInterface $step, $priority = 0)
     {
@@ -118,7 +110,7 @@ class Configurator
      */
     public function getSteps()
     {
-        if ($this->sortedSteps === []) {
+        if ([] === $this->sortedSteps) {
             $this->sortedSteps = $this->getSortedSteps();
         }
 
@@ -220,7 +212,7 @@ class Configurator
         $string .= "\$parameters = array(\n";
 
         foreach ($this->parameters as $key => $value) {
-            if ($value !== '') {
+            if ('' !== $value) {
                 if (is_string($value)) {
                     $value = "'".addcslashes($value, '\\\'')."'";
                 } elseif (is_bool($value)) {
@@ -235,9 +227,7 @@ class Configurator
             }
         }
 
-        $string .= ");\n";
-
-        return $string;
+        return $string.");\n";
     }
 
     /**
@@ -256,23 +246,22 @@ class Configurator
                 if ($counter === $count) {
                     $string .= str_repeat("\t", $level + 1);
                 }
-                $string .= '"'.$key.'" => ';
+                $string .= '\''.$key.'\' => ';
             }
 
             if (is_array($value)) {
                 $string .= $this->renderArray($value, $level + 1);
             } else {
-                $string .= '"'.addcslashes($value, '\\"').'"';
+                $string .= '\''.addcslashes($value, '\\\'').'\'';
             }
 
             --$counter;
             if ($counter > 0) {
-                $string .= ", \n".str_repeat("\t", $level + 1);
+                $string .= ",\n".str_repeat("\t", $level + 1);
             }
         }
-        $string .= "\n".str_repeat("\t", $level).')';
 
-        return $string;
+        return $string.("\n".str_repeat("\t", $level).')');
     }
 
     /**
@@ -290,7 +279,7 @@ class Configurator
 
         $return = file_put_contents($this->filename, $this->render());
 
-        if ($return === false) {
+        if (false === $return) {
             throw new RuntimeException('An error occurred while attempting to write the config file to the filesystem.');
         }
 

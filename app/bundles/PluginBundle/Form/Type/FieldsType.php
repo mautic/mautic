@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,67 +11,36 @@
 
 namespace Mautic\PluginBundle\Form\Type;
 
-use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class SocialMediaServiceType.
- */
 class FieldsType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
+    use FieldsTypeTrait;
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        foreach ($options['integration_fields'] as $field => $details) {
-            $label = (is_array($details)) ? $details['label'] : $details;
-            $field = InputHelper::alphanum($field, false, '_');
-
-            $builder->add($field, 'choice', [
-                'choices'    => $options['lead_fields'],
-                'label'      => $label,
-                'required'   => (is_array($details) && isset($details['required'])) ? $details['required'] : false,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control', 'data-placeholder' => ' '],
-            ]);
-        }
+        $this->buildFormFields($builder, $options, $options['integration_fields'], $options['mautic_fields'], '', $options['limit'], $options['start']);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(['integration_fields', 'lead_fields']);
-        $resolver->setDefaults(
-            [
-                'special_instructions' => '',
-                'alert_type'           => '',
-                'allow_extra_fields'   => true,
-            ]
-        );
+        $this->configureFieldOptions($resolver, 'lead');
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'integration_fields';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['specialInstructions'] = $options['special_instructions'];
-        $view->vars['alertType']           = $options['alert_type'];
+        $this->buildFieldView($view, $options);
     }
 }

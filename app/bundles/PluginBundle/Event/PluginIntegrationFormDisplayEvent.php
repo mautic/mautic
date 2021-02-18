@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,7 +11,7 @@
 
 namespace Mautic\PluginBundle\Event;
 
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
 /**
  * Class PluginIntegrationFormDisplayEvent.
@@ -22,13 +23,7 @@ class PluginIntegrationFormDisplayEvent extends AbstractPluginIntegrationEvent
      */
     private $settings = [];
 
-    /**
-     * PluginIntegrationAuthCallbackUrlEvent constructor.
-     *
-     * @param AbstractIntegration $integration
-     * @param                     $settings
-     */
-    public function __construct(AbstractIntegration $integration, array $settings)
+    public function __construct(UnifiedIntegrationInterface $integration, array $settings)
     {
         $this->integration = $integration;
         $this->settings    = $settings;
@@ -42,9 +37,6 @@ class PluginIntegrationFormDisplayEvent extends AbstractPluginIntegrationEvent
         return $this->settings;
     }
 
-    /**
-     * @param array $settings
-     */
     public function setSettings(array $settings)
     {
         $this->settings = $settings;

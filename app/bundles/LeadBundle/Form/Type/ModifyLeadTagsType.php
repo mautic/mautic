@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,39 +11,32 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ModifyLeadTagsType extends AbstractType
 {
     /**
-     * @var
+     * @var TranslatorInterface
      */
-    private $factory;
+    private $translator;
 
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
+    public function __construct(TranslatorInterface $translator)
     {
-        $this->factory = $factory;
+        $this->translator = $translator;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
             'add_tags',
-            'lead_tag',
+            TagType::class,
             [
                 'label' => 'mautic.lead.tags.add',
                 'attr'  => [
-                    'data-placeholder'     => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
-                    'data-no-results-text' => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
+                    'data-placeholder'     => $this->translator->trans('mautic.lead.tags.select_or_create'),
+                    'data-no-results-text' => $this->translator->trans('mautic.lead.tags.enter_to_create'),
                     'data-allow-add'       => 'true',
                     'onchange'             => 'Mautic.createLeadTag(this)',
                 ],
@@ -53,12 +47,12 @@ class ModifyLeadTagsType extends AbstractType
 
         $builder->add(
             'remove_tags',
-            'lead_tag',
+            TagType::class,
             [
                 'label' => 'mautic.lead.tags.remove',
                 'attr'  => [
-                    'data-placeholder'     => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
-                    'data-no-results-text' => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
+                    'data-placeholder'     => $this->translator->trans('mautic.lead.tags.select_or_create'),
+                    'data-no-results-text' => $this->translator->trans('mautic.lead.tags.enter_to_create'),
                     'data-allow-add'       => 'true',
                     'onchange'             => 'Mautic.createLeadTag(this)',
                 ],
@@ -71,7 +65,7 @@ class ModifyLeadTagsType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'modify_lead_tags';
     }

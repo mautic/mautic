@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,13 +11,19 @@
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\PluginBundle\Form\Type\FieldsType;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class ConstantContactType.
@@ -24,27 +31,42 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class ConstantContactType extends AbstractType
 {
     /**
-     * @var MauticFactory
+     * @var IntegrationHelper
      */
-    private $factory;
+    private $integrationHelper;
 
-    public function __construct(MauticFactory $factory)
-    {
-        $this->factory = $factory;
-    }
+    /** @var PluginModel */
+    private $pluginModel;
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * @var Session
      */
+    protected $session;
+
+    /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    public function __construct(IntegrationHelper $integrationHelper, PluginModel $pluginModel, Session $session, CoreParametersHelper $coreParametersHelper)
+    {
+        $this->integrationHelper    = $integrationHelper;
+        $this->pluginModel          = $pluginModel;
+        $this->session              = $session;
+        $this->coreParametersHelper = $coreParametersHelper;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
-        $helper = $this->factory->getHelper('integration');
-
         /** @var \MauticPlugin\MauticEmailMarketingBundle\Integration\ConstantContactIntegration $object */
-        $object = $helper->getIntegrationObject('ConstantContact');
+        $object          = $this->integrationHelper->getIntegrationObject('ConstantContact');
+        $integrationName = $object->getName();
+        $session         = $this->session;
+        $limit           = $session->get(
+            'mautic.plugin.'.$integrationName.'.lead.limit',
+            $this->coreParametersHelper->get('default_pagelimit')
+        );
+        $page = $session->get('mautic.plugin.'.$integrationName.'.lead.page', 1);
 
         $api = $object->getApiHelper();
         try {
@@ -61,18 +83,19 @@ class ConstantContactType extends AbstractType
         } catch (\Exception $e) {
             $choices = [];
             $error   = $e->getMessage();
+            $page    = 1;
         }
 
-        $builder->add('list', 'choice', [
-            'choices'  => $choices,
-            'label'    => 'mautic.emailmarketing.list',
-            'required' => false,
-            'attr'     => [
+        $builder->add('list', ChoiceType::class, [
+            'choices'           => array_flip($choices), // Choice type expects labels as keys
+            'label'             => 'mautic.emailmarketing.list',
+            'required'          => false,
+            'attr'              => [
                 'tooltip' => 'mautic.emailmarketing.list.tooltip',
             ],
         ]);
 
-        $builder->add('sendWelcome', 'yesno_button_group', [
+        $builder->add('sendWelcome', YesNoButtonGroupType::class, [
             'label' => 'mautic.emailmarketing.send_welcome',
             'data'  => (!isset($options['data']['sendWelcome'])) ? true : $options['data']['sendWelcome'],
         ]);
@@ -87,19 +110,24 @@ class ConstantContactType extends AbstractType
             });
         }
 
-        if (isset($options['form_area']) && $options['form_area'] == 'integration') {
-            $leadFields = $this->factory->getModel('plugin')->getLeadFields();
+        if (isset($options['form_area']) && 'integration' == $options['form_area']) {
+            $leadFields = $this->pluginModel->getLeadFields();
 
             $fields = $object->getFormLeadFields();
 
             list($specialInstructions, $alertType) = $object->getFormNotes('leadfield_match');
-            $builder->add('leadFields', 'integration_fields', [
+            $builder->add('leadFields', FieldsType::class, [
                 'label'                => 'mautic.integration.leadfield_matches',
                 'required'             => true,
-                'lead_fields'          => $leadFields,
-                'data'                 => isset($options['data']['leadFields']) ? $options['data']['leadFields'] : [],
+                'mautic_fields'        => $leadFields,
+                'integration'          => $object->getName(),
+                'integration_object'   => $object,
+                'limit'                => $limit,
+                'page'                 => $page,
+                'data'                 => isset($options['data']) ? $options['data'] : [],
                 'integration_fields'   => $fields,
                 'special_instructions' => $specialInstructions,
+                'mapped'               => true,
                 'alert_type'           => $alertType,
             ]);
         }
@@ -108,15 +136,15 @@ class ConstantContactType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setOptional(['form_area']);
+        $resolver->setDefined(['form_area']);
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'emailmarketing_constantcontact';
     }

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -26,7 +27,7 @@ class DynamicContentPermissions extends AbstractPermissions
         parent::__construct($params);
 
         $this->addStandardPermissions('categories');
-        $this->addExtendedPermissions('dynamicContents');
+        $this->addExtendedPermissions('dynamiccontents');
     }
 
     /**
@@ -36,18 +37,15 @@ class DynamicContentPermissions extends AbstractPermissions
      */
     public function getName()
     {
-        return 'dynamicContent';
+        return 'dynamiccontent';
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @param FormBuilderInterface $builder
-     * @param array                $options
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $this->addStandardFormFields('dynamicContent', 'categories', $builder, $data);
-        $this->addExtendedFormFields('dynamicContent', 'dynamicContents', $builder, $data);
+        $this->addStandardFormFields('dynamiccontent', 'categories', $builder, $data);
+        $this->addExtendedFormFields('dynamiccontent', 'dynamiccontents', $builder, $data);
     }
 }

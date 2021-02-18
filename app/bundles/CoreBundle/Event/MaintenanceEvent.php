@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -38,6 +39,11 @@ class MaintenanceEvent extends Event
     protected $dryRun = false;
 
     /**
+     * @var bool
+     */
+    protected $gdpr = false;
+
+    /**
      * @var array
      */
     protected $debug = [];
@@ -48,11 +54,12 @@ class MaintenanceEvent extends Event
      * @param int  $daysOld
      * @param bool $dryRun
      */
-    public function __construct($daysOld, $dryRun)
+    public function __construct($daysOld, $dryRun, $gdpr)
     {
         $this->daysOld = (int) $daysOld;
         $this->dryRun  = (bool) $dryRun;
         $this->date    = new \DateTime("$daysOld days ago", new \DateTimeZone('UTC'));
+        $this->gdpr    = (bool) $gdpr;
     }
 
     /**
@@ -119,5 +126,13 @@ class MaintenanceEvent extends Event
     public function getDebug()
     {
         return $this->debug;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isGdpr()
+    {
+        return $this->gdpr;
     }
 }

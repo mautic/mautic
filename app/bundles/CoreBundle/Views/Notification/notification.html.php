@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -11,7 +12,7 @@
 
 <div class="media pt-sm pb-sm pr-md pl-md nm bdr-b notification" id="notification<?php echo $n['id']; ?>">
     <span class="pull-left mt-xs" style="width:36px">
-        <?php if (strpos($n['iconClass'], 'img:') === 0): ?>
+        <?php if (0 === strpos($n['iconClass'], 'img:')): ?>
         <span class="img-wrapper img-rounded">
             <img class="media-object" src="<?php echo substr($n['iconClass'], 4); ?>" />
         </span>
@@ -26,9 +27,9 @@
     <?php endif; ?>
     <div class="media-body">
         <?php if (!empty($n['header'])): ?>
-            <div class="media-heading fw-sb mb-0 text-primary"><?php echo $n['header']; ?></div>
+            <div class="media-heading fw-sb mb-0 text-primary"><?php echo $view['formatter']->_($n['header']); ?></div>
         <?php endif; ?>
-        <div><?php echo $n['message']; ?></div>
+        <div><?php echo $view['formatter']->_($n['message'], 'html'); ?></div>
         <div class="clearfix mt-xs">
             <span class="fa fa-clock-o text-success pull-left mr-xs"></span>
             <span class="fs-10 text-muted pull-left"><?php echo $view['date']->toText($n['dateAdded']); ?></span>

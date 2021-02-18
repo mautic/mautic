@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -11,6 +12,8 @@
 namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -18,39 +21,42 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class ThemeUploadType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('file', 'file', [
-            'attr' => [
-                'accept' => '.zip',
-                'class'  => 'form-control',
-            ],
-        ]);
-        $constraints = [
-            new \Symfony\Component\Validator\Constraints\NotBlank(
-                ['message' => 'mautic.core.value.required']
-            ),
-        ];
-        $builder->add('start', 'submit', [
-            'attr' => [
-                'class'   => 'btn btn-primary',
-                'icon'    => 'fa fa-upload',
-                'onclick' => "mQuery(this).prop('disabled', true); mQuery('form[name=\'theme_upload\']').submit();",
-            ],
-            'label' => 'mautic.core.theme.install',
-        ]);
+        $builder->add(
+            'file',
+            FileType::class,
+            [
+                'attr' => [
+                    'accept'   => '.zip',
+                    'class'    => 'form-control',
+                    'required' => true,
+                ],
+            ]
+        );
+
+        $builder->add(
+            'start',
+            SubmitType::class,
+            [
+                'attr'  => [
+                    'class'   => 'btn btn-primary',
+                    'icon'    => 'fa fa-upload',
+                    'onclick' => "mQuery(this).prop('disabled', true); mQuery('form[name=\'theme_upload\']').submit();",
+                ],
+                'label' => 'mautic.core.theme.install',
+            ]
+        );
+
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
     }
+
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'theme_upload';
     }

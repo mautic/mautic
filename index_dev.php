@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic, NP
  * @author      Mautic
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -9,20 +10,16 @@ define('MAUTIC_ROOT_DIR', __DIR__);
 // Fix for hosts that do not have date.timezone set, it will be reset based on users settings
 date_default_timezone_set('UTC');
 
+require_once __DIR__.'/vendor/autoload.php';
+
+use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
 use Mautic\Middleware\MiddlewareBuilder;
-use Symfony\Component\Debug\Debug;
+use function Stack\run;
 
-$loader = require_once __DIR__.'/vendor/autoload.php';
+if (extension_loaded('apcu') && in_array(@$_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1', '172.17.0.1'])) {
+    @apcu_clear_cache();
+}
 
-/*
- * If you don't want to setup permissions the proper way, just uncomment the following PHP line
- * read http://symfony.com/doc/current/book/installation.html#configuration-and-setup for more information
- */
-//umask(0000);
+ErrorHandler::register('dev');
 
-Debug::enable();
-
-$kernel = new AppKernel('dev', true);
-$kernel->loadClassCache();
-
-Stack\run((new MiddlewareBuilder('dev'))->resolve($kernel));
+run((new MiddlewareBuilder(new AppKernel('dev', true)))->resolve());

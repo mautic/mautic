@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -33,12 +34,20 @@ $results    = $submission->getResults();
 	<dd><?php echo $view['assets']->makeLinks($submission->getReferer()); ?></dd>
 <?php if (is_array($results)) : ?>
 	<?php foreach ($form->getFields() as $field) : ?>
-		<?php if (array_key_exists($field->getAlias(), $results) && $results[$field->getAlias()] != ''
-&& $results[$field->getAlias()] != null
-&& $results[$field->getAlias()] != []
+		<?php if (array_key_exists($field->getAlias(), $results) && '' != $results[$field->getAlias()]
+&& null != $results[$field->getAlias()]
+&& [] != $results[$field->getAlias()]
 ) : ?>
 			<dt><?php echo $field->getLabel(); ?></dt>
-			<dd><?php echo $results[$field->getAlias()]; ?></dd>
+			<dd>
+                <?php if ($field->isFileType()) : ?>
+                <a href="<?php echo $view['router']->path('mautic_form_file_download', ['submissionId' => $submission->getId(), 'field' => $field->getAlias()]); ?>">
+                    <?php echo $results[$field->getAlias()]; ?>
+                </a>
+                <?php else : ?>
+                    <?php echo $results[$field->getAlias()]; ?>
+                <?php endif; ?>
+            </dd>
 		<?php endif; ?>
 	<?php endforeach; ?>
 <?php endif; ?>

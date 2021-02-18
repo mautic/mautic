@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
  *
@@ -11,29 +12,30 @@ $props   = $focus['properties'];
 $color   = \MauticPlugin\MauticFocusBundle\Model\FocusModel::isLightColor($props['colors']['primary']) ? '000000' : 'ffffff';
 $animate = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '';
 ?>
-
 <div class="mautic-focus mf-bar mf-bar-<?php echo $props['bar']['size']; ?> mf-bar-<?php echo $props['bar']['placement']; ?><?php if ($props['bar']['sticky']) {
     echo ' mf-bar-sticky';
 } ?><?php echo $animate; ?>" style="background-color: #<?php echo $props['colors']['primary']; ?>;">
 
     <div class="mf-content">
+        <?php if (in_array($htmlMode, ['editor', 'html'])): ?>
+            <?php echo html_entity_decode($focus[$htmlMode]); ?>
+        <?php else: ?>
         <div class="mf-headline"><?php echo $props['content']['headline']; ?></div>
-        <?php if ($focus['type'] == 'form' && !empty($form)): ?>
-            <?php echo $view->render(
-                'MauticFocusBundle:Builder:form.html.php',
-                ['form' => $form, 'style' => $focus['style'], 'focusId' => $focus['id'], 'preview' => $preview]
-            ); ?>
-        <?php elseif ($focus['type'] == 'link'): ?>
+        <?php if ('form' == $focus['type']): ?>
+            {focus_form}
+        <?php elseif ('link' == $focus['type']): ?>
             <a href="<?php echo (empty($preview)) ? $clickUrl : '#'; ?>" class="mf-link" target="<?php echo ($props['content']['link_new_window'])
                 ? '_new' : '_parent'; ?>">
                 <?php echo $props['content']['link_text']; ?>
             </a>
+            <?php endif; ?>
         <?php endif; ?>
     </div>
 
     <div class="mf-bar-collapse"></div>
 </div>
-<?php if ($props['bar']['allow_hide']): ?>
+<?php
+if ($props['bar']['allow_hide']): ?>
     <div class="mf-copy-to-parent mf-bar-collapser mf-bar-collapser-<?php echo $props['bar']['placement']; ?> mf-bar-collapser-<?php echo $props['bar']['size']; ?><?php if ($props['bar']['sticky']) {
                     echo ' mf-bar-collapser-sticky';
                 } ?> mf-bar-collapser-<?php echo $focus['id']; ?>" style="background-color: #<?php echo $props['colors']['primary']; ?>; color: #<?php echo $props['colors']['text']; ?>;">
@@ -49,10 +51,10 @@ $animate = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '';
         <a class="mf-bar-collapser-icon" href="javascript:void(0)"<?php if (!empty($preview)) {
                     echo ' onclick="Mautic.toggleBarCollapse()"';
                 } ?>>
-            <?php $size          = ($props['bar']['size'] == 'large') ? 40 : 24; ?>
-            <?php $transformSize = ($props['bar']['size'] == 'large') ? 20 : 20; ?>
-            <?php $scale         = ($props['bar']['size'] == 'large') ? 1 : 0.6; ?>
-            <?php $direction     = ($props['bar']['placement'] == 'top') ? '-90' : '90'; ?>
+            <?php $size          = ('large' == $props['bar']['size']) ? 40 : 24; ?>
+            <?php $transformSize = ('large' == $props['bar']['size']) ? 20 : 20; ?>
+            <?php $scale         = ('large' == $props['bar']['size']) ? 1 : 0.6; ?>
+            <?php $direction     = ('top' == $props['bar']['placement']) ? '-90' : '90'; ?>
             <svg style="overflow: hidden;" xmlns="http://www.w3.org/2000/svg" width="<?php echo $size; ?>" version="1.1"
                  height="<?php echo $size; ?>" data-transform-size="<?php echo $transformSize; ?>" data-transform-direction="<?php echo $direction; ?>" data-transform-scale="<?php echo $scale; ?>">
                 <g transform="scale(<?php echo $scale; ?>) rotate(<?php echo $direction; ?> <?php echo $transformSize; ?> <?php echo $transformSize; ?>)">
@@ -78,6 +80,6 @@ $animate = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '';
         </a>
     </div>
 <?php endif; ?>
-<?php if ($props['bar']['push_page'] && $props['bar']['placement'] == 'top'): ?>
+<?php if ($props['bar']['push_page'] && 'top' == $props['bar']['placement']): ?>
     <div class="mf-move-to-parent mf-bar-spacer mf-bar-spacer-<?php echo $props['bar']['size']; ?> mf-bar-spacer-<?php echo $focus['id']; ?>"></div>
 <?php endif; ?>

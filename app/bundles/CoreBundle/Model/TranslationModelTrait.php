@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -24,16 +25,15 @@ trait TranslationModelTrait
     /**
      * Get the entity based on requested translation.
      *
-     *
-     * @param TranslationEntityInterface $entity
-     * @param Lead|array|null            $lead
-     * @param Request|null               $request
+     * @param Lead|array|null $lead
      *
      * @return array[$parentEntity, TranslationEntityInterface $entity]
      */
     public function getTranslatedEntity(TranslationEntityInterface $entity, $lead = null, Request $request = null)
     {
         list($translationParent, $translationChildren) = $entity->getTranslations();
+
+        $leadPreference = $chosenLanguage = null;
 
         if (count($translationChildren)) {
             if ($translationParent) {
@@ -52,7 +52,7 @@ trait TranslationModelTrait
             $translationList = [];
             foreach ($translations as $id => $language) {
                 $core = $this->getTranslationLocaleCore($language);
-                if (!isset($languageList[$core])) {
+                if (!isset($translationList[$core])) {
                     $translationList[$core] = [];
                 }
                 $translationList[$core][$language] = $id;
@@ -76,7 +76,7 @@ trait TranslationModelTrait
                     $browserLanguages = explode(',', $browserLanguages);
                     if (!empty($browserLanguages)) {
                         foreach ($browserLanguages as $language) {
-                            if ($pos = strpos($language, ';q=') !== false) {
+                            if ($pos = false !== strpos($language, ';q=')) {
                                 //remove weights
                                 $language = substr($language, 0, ($pos + 1));
                             }
@@ -91,9 +91,8 @@ trait TranslationModelTrait
                 }
             }
 
-            $matchFound     = false;
-            $preferredCore  = false;
-            $chosenLanguage = null;
+            $matchFound    = false;
+            $preferredCore = false;
             foreach ($languageList as $language) {
                 $core = $this->getTranslationLocaleCore($language);
                 if (isset($translationList[$core])) {
@@ -122,7 +121,7 @@ trait TranslationModelTrait
         }
 
         // Save the preferred language to the lead's profile
-        if (!$leadPreference && $chosenLanguage && $lead instanceof Lead) {
+        if (!$leadPreference && !empty($chosenLanguage) && $lead instanceof Lead) {
             $lead->addUpdatedField('preferred_locale', $chosenLanguage);
         }
 
@@ -132,8 +131,6 @@ trait TranslationModelTrait
 
     /**
      * Run post saving a translation aware entity.
-     *
-     * @param TranslationEntityInterface $entity
      */
     public function postTranslationEntitySave(TranslationEntityInterface $entity)
     {
@@ -150,7 +147,7 @@ trait TranslationModelTrait
      */
     protected function getTranslationLocaleCore($locale)
     {
-        if (strpos($locale, '_') !== false) {
+        if (false !== strpos($locale, '_')) {
             $locale = substr($locale, 0, 2);
         }
 

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,42 +11,60 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Class FilterType.
  */
 class DateRangeType extends AbstractType
 {
-    private $factory;
+    /**
+     * @var SessionInterface
+     */
+    private $session;
 
     /**
-     * @param MauticFactory $factory
+     * @var CoreParametersHelper
      */
-    public function __construct(MauticFactory $factory)
+    private $coreParametersHelper;
+
+    /**
+     * DateRangeType constructor.
+     */
+    public function __construct(SessionInterface $session, CoreParametersHelper $coreParametersHelper)
     {
-        $this->factory = $factory;
+        $this->session              = $session;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $humanFormat = 'M j, Y';
+        $humanFormat     = 'M j, Y';
+        $sessionDateFrom = $this->session->get('mautic.daterange.form.from');
+        $sessionDateTo   = $this->session->get('mautic.daterange.form.to');
+        if (!empty($sessionDateFrom) && !empty($sessionDateTo)) {
+            $defaultFrom = new \DateTime($sessionDateFrom);
+            $defaultTo   = new \DateTime($sessionDateTo);
+        } else {
+            $dateRangeDefault = $this->coreParametersHelper->get('default_daterange_filter', '-1 month');
+            $defaultFrom      = new \DateTime($dateRangeDefault);
+            $defaultTo        = new \DateTime();
+        }
 
         $dateFrom = (empty($options['data']['date_from']))
             ?
-            new \DateTime('-30 days')
+            $defaultFrom
             :
             new \DateTime($options['data']['date_from']);
 
         $builder->add(
             'date_from',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.date.from',
                 'label_attr' => ['class' => 'control-label'],
@@ -57,13 +76,13 @@ class DateRangeType extends AbstractType
 
         $dateTo = (empty($options['data']['date_to']))
             ?
-            new \DateTime()
+            $defaultTo
             :
             new \DateTime($options['data']['date_to']);
 
         $builder->add(
             'date_to',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.date.to',
                 'label_attr' => ['class' => 'control-label'],
@@ -75,7 +94,7 @@ class DateRangeType extends AbstractType
 
         $builder->add(
             'apply',
-            'submit',
+            SubmitType::class,
             [
                 'label' => 'mautic.core.form.apply',
                 'attr'  => ['class' => 'btn btn-default'],
@@ -85,12 +104,15 @@ class DateRangeType extends AbstractType
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
+
+        $this->session->set('mautic.daterange.form.from', $dateFrom->format($humanFormat));
+        $this->session->set('mautic.daterange.form.to', $dateTo->format($humanFormat));
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'daterange';
     }

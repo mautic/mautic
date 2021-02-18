@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -20,8 +21,7 @@ trait VariantMigrationTrait
     /**
      * Add variant parent/child relationship schema.
      *
-     * @param Schema $schema
-     * @param        $tableName
+     * @param $tableName
      */
     protected function addVariantSchema(Schema $schema, $tableName)
     {

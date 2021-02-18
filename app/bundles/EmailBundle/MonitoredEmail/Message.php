@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -28,8 +29,11 @@ class Message
 
     public $to = [];
     public $toString;
-    public $cc      = [];
-    public $replyTo = [];
+    public $cc         = [];
+    public $replyTo    = [];
+    public $inReplyTo  = false;
+    public $returnPath = false;
+    public $references = [];
 
     public $textPlain;
     public $textHtml;
@@ -42,9 +46,6 @@ class Message
     /** @var Attachment[] */
     protected $attachments = [];
 
-    /**
-     * @param Attachment $attachment
-     */
     public function addAttachment(Attachment $attachment)
     {
         $this->attachments[$attachment->id] = $attachment;

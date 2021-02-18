@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,7 +11,9 @@
 
 namespace Mautic\CoreBundle\Menu;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -25,9 +28,9 @@ class MenuHelper
     protected $security;
 
     /**
-     * @var null|Request
+     * @var RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * Stores items that are assigned to another parent outside it's bundle.
@@ -37,83 +40,45 @@ class MenuHelper
     private $orphans = [];
 
     /**
-     * @var array
+     * @var CoreParametersHelper
      */
-    protected $mauticParameters;
+    private $coreParametersHelper;
+
+    /**
+     * @var IntegrationHelper
+     */
+    protected $integrationHelper;
 
     /**
      * MenuHelper constructor.
-     *
-     * @param CorePermissions $security
-     * @param RequestStack    $requestStack
-     * @param array           $mauticParameters
      */
-    public function __construct(CorePermissions $security, RequestStack $requestStack, array $mauticParameters)
+    public function __construct(CorePermissions $security, RequestStack $requestStack, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper)
     {
-        $this->security         = $security;
-        $this->mauticParameters = $mauticParameters;
-        $this->request          = $requestStack->getCurrentRequest();
+        $this->security              = $security;
+        $this->coreParametersHelper  = $coreParametersHelper;
+        $this->requestStack          = $requestStack;
+        $this->integrationHelper     = $integrationHelper;
     }
 
     /**
      * Converts menu config into something KNP menus expects.
      *
-     * @param     $items
-     * @param int $depth
-     * @param int $defaultPriority
+     * @param        $items
+     * @param int    $depth
+     * @param int    $defaultPriority
+     * @param string $type
      */
-    public function createMenuStructure(&$items, $depth = 0, $defaultPriority = 9999)
+    public function createMenuStructure(&$items, $depth = 0, $defaultPriority = 9999, $type = 'main')
     {
         foreach ($items as $k => &$i) {
             if (!is_array($i) || empty($i)) {
                 continue;
             }
 
-            if (isset($i['bundle'])) {
-                // Category shortcut
-                $bundleName = $i['bundle'];
-                $i          = [
-                    'access'          => $bundleName.':categories:view',
-                    'route'           => 'mautic_category_index',
-                    'id'              => 'mautic_'.$bundleName.'category_index',
-                    'routeParameters' => ['bundle' => $bundleName],
-                ];
-            }
-
-            // Check to see if menu is restricted
-            if (isset($i['access'])) {
-                if ($i['access'] == 'admin') {
-                    if (!$this->security->isAdmin()) {
-                        unset($items[$k]);
-                        continue;
-                    }
-                } elseif (!$this->security->isGranted($i['access'], 'MATCH_ONE')) {
-                    unset($items[$k]);
-                    continue;
-                }
-            }
-
-            if (isset($i['checks'])) {
-                $passChecks = true;
-                foreach ($i['checks'] as $checkGroup => $checks) {
-                    foreach ($checks as $name => $value) {
-                        if ($checkGroup == 'parameters') {
-                            if ($this->getParameter($name) != $value) {
-                                $passChecks = false;
-                                break;
-                            }
-                        } elseif ($checkGroup == 'request') {
-                            if ($this->request->get($name) != $value) {
-                                $passChecks = false;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (!$passChecks) {
-                    unset($items[$k]);
-                    continue;
-                }
+            // Remove the item if the checks fail
+            if (false === $this->handleChecks($i)) {
+                unset($items[$k]);
+                continue;
             }
 
             //Set ID to route name
@@ -168,15 +133,19 @@ class MenuHelper
 
             // Determine if this item needs to be listed in a bundle outside it's own
             if (isset($i['parent'])) {
-                if (!isset($this->orphans[$i['parent']])) {
-                    $this->orphans[$i['parent']] = [];
+                if (!isset($this->orphans[$type])) {
+                    $this->orphans[$type] = [];
                 }
 
-                $this->orphans[$i['parent']][$k] = $i;
+                if (!isset($this->orphans[$type][$i['parent']])) {
+                    $this->orphans[$type][$i['parent']] = [];
+                }
+
+                $this->orphans[$type][$i['parent']][$k] = $i;
 
                 unset($items[$k]);
 
-                // Don't set a default priority here as it'll assume that of it's parent
+            // Don't set a default priority here as it'll assume that of it's parent
             } elseif (!isset($i['priority'])) {
                 // Ensure a priority for non-orphans
                 $i['priority'] = $defaultPriority;
@@ -187,12 +156,14 @@ class MenuHelper
     /**
      * Get and reset orphaned menu items.
      *
-     * @return array
+     * @param string $type
+     *
+     * @return mixed
      */
-    public function resetOrphans()
+    public function resetOrphans($type = 'main')
     {
-        $orphans       = $this->orphans;
-        $this->orphans = [];
+        $orphans              = (isset($this->orphans[$type])) ? $this->orphans[$type] : [];
+        $this->orphans[$type] = [];
 
         return $orphans;
     }
@@ -200,16 +171,15 @@ class MenuHelper
     /**
      * Give orphaned menu items a home.
      *
-     * @param array $menuItems
-     * @param bool  $appendOrphans
-     * @param int   $depth
+     * @param bool $appendOrphans
+     * @param int  $depth
      */
-    public function placeOrphans(array &$menuItems, $appendOrphans = false, $depth = 1)
+    public function placeOrphans(array &$menuItems, $appendOrphans = false, $depth = 1, $type = 'main')
     {
         foreach ($menuItems as $key => &$items) {
-            if (isset($this->orphans[$key])) {
+            if (isset($this->orphans[$type]) && isset($this->orphans[$type][$key])) {
                 $priority = (isset($items['priority'])) ? $items['priority'] : 9999;
-                foreach ($this->orphans[$key] as &$orphan) {
+                foreach ($this->orphans[$type][$key] as &$orphan) {
                     if (!isset($orphan['extras'])) {
                         $orphan['extras'] = [];
                     }
@@ -219,23 +189,24 @@ class MenuHelper
                     }
                 }
 
-                $items['children'] = (!isset($items['children']))
+                $items['children'] =
+                    (!isset($items['children']))
                     ?
-                    $this->orphans[$key]
+                    $this->orphans[$type][$key]
                     :
-                    $items['children'] = array_merge($items['children'], $this->orphans[$key]);
-                unset($this->orphans[$key]);
+                    array_merge($items['children'], $this->orphans[$type][$key]);
+                unset($this->orphans[$type][$key]);
             } elseif (isset($items['children'])) {
-                foreach ($items['children'] as $subKey => $subItems) {
-                    $this->placeOrphans($subItems, false, $depth + 1);
+                foreach ($items['children'] as $subItems) {
+                    $this->placeOrphans($subItems, false, $depth + 1, $type);
                 }
             }
         }
 
         // Append orphans that couldn't find a home
-        if ($appendOrphans && count($this->orphans)) {
-            $menuItems     = array_merge($menuItems, $this->orphans);
-            $this->orphans = [];
+        if ($appendOrphans && !empty($this->orphans[$type])) {
+            $menuItems            = array_merge($menuItems, $this->orphans[$type]);
+            $this->orphans[$type] = [];
         }
     }
 
@@ -272,10 +243,115 @@ class MenuHelper
     /**
      * @param $name
      *
-     * @return bool
+     * @return mixed
      */
     protected function getParameter($name)
     {
-        return isset($this->mauticParameters[$name]) ? $this->mauticParameters[$name] : false;
+        return $this->coreParametersHelper->get($name, false);
+    }
+
+    /**
+     * @param string $integrationName
+     *
+     * @return bool
+     */
+    protected function handleIntegrationChecks($integrationName, array $config)
+    {
+        $integration = $this->integrationHelper->getIntegrationObject($integrationName);
+
+        if (!$integration) {
+            return false;
+        }
+
+        $settings = $integration->getIntegrationSettings();
+
+        $passChecks = true;
+
+        foreach ($config as $key => $value) {
+            switch ($key) {
+                case 'enabled':
+                    $passChecks = $settings->getIsPublished() == $value;
+                    break;
+                case 'features':
+                    $supportedFeatures = $settings->getSupportedFeatures();
+
+                    foreach ($value as $featureName) {
+                        if (!in_array($featureName, $supportedFeatures)) {
+                            $passChecks = false;
+                            break;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        return $passChecks;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return bool
+     */
+    protected function handleParametersChecks($name, $value)
+    {
+        return $this->getParameter($name) == $value;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return bool
+     */
+    protected function handleRequestChecks($name, $value)
+    {
+        return $this->requestStack->getCurrentRequest()->get($name) == $value;
+    }
+
+    /**
+     * @param $accessLevel
+     *
+     * @return bool
+     */
+    protected function handleAccessCheck($accessLevel)
+    {
+        switch ($accessLevel) {
+            case 'admin':
+                return $this->security->isAdmin();
+            default:
+                return $this->security->isGranted($accessLevel, 'MATCH_ONE');
+        }
+    }
+
+    /**
+     * Handle access check and other checks for menu items.
+     *
+     * @return bool Returns false if the item fails the access check or any other checks
+     */
+    protected function handleChecks(array $menuItem)
+    {
+        if (isset($menuItem['access']) && false === $this->handleAccessCheck($menuItem['access'])) {
+            return false;
+        }
+
+        if (isset($menuItem['checks']) && is_array($menuItem['checks'])) {
+            foreach ($menuItem['checks'] as $checkGroup => $checkConfig) {
+                $checkMethod = 'handle'.ucfirst($checkGroup).'Checks';
+
+                if (!method_exists($this, $checkMethod)) {
+                    continue;
+                }
+
+                foreach ($checkConfig as $name => $value) {
+                    if (false === $this->$checkMethod($name, $value)) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 }

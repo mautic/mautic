@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,33 +11,53 @@
 
 namespace Mautic\FormBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class PageSubscriber.
- */
-class PageSubscriber extends CommonSubscriber
+class PageSubscriber implements EventSubscriberInterface
 {
     private $formRegex = '{form=(.*?)}';
 
     /**
      * @var FormModel
      */
-    protected $formModel;
+    private $formModel;
+
+    /**
+     * @var BuilderTokenHelperFactory
+     */
+    private $builderTokenHelperFactory;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var CorePermissions
+     */
+    private $security;
 
     /**
      * PageSubscriber constructor.
-     *
-     * @param FormModel $formModel
      */
-    public function __construct(FormModel $formModel)
-    {
-        $this->formModel = $formModel;
+    public function __construct(
+        FormModel $formModel,
+        BuilderTokenHelperFactory $builderTokenHelperFactory,
+        TranslatorInterface $translator,
+        CorePermissions $security
+    ) {
+        $this->formModel                 = $formModel;
+        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
+        $this->translator                = $translator;
+        $this->security                  = $security;
     }
 
     /**
@@ -52,35 +73,25 @@ class PageSubscriber extends CommonSubscriber
 
     /**
      * Add forms to available page tokens.
-     *
-     * @param PageBuilderEvent $event
      */
     public function onPageBuild(PageBuilderEvent $event)
     {
-        $tokenHelper = new BuilderTokenHelper($this->factory, 'form');
-
-        if ($event->tokenSectionsRequested()) {
-            $event->addTokenSection('form.pagetokens', 'mautic.form.forms', $tokenHelper->getTokenContent());
-        }
-
         if ($event->abTestWinnerCriteriaRequested()) {
             //add AB Test Winner Criteria
             $formSubmissions = [
                 'group'    => 'mautic.form.abtest.criteria',
                 'label'    => 'mautic.form.abtest.criteria.submissions',
-                'callback' => '\Mautic\FormBundle\Helper\AbTestHelper::determineSubmissionWinner',
+                'event'    => FormEvents::ON_DETERMINE_SUBMISSION_RATE_WINNER,
             ];
             $event->addAbTestWinnerCriteria('form.submissions', $formSubmissions);
         }
 
         if ($event->tokensRequested($this->formRegex)) {
-            $event->addTokensFromHelper($tokenHelper, $this->formRegex, 'name', 'id', true);
+            $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('form');
+            $event->addTokensFromHelper($tokenHelper, $this->formRegex, 'name');
         }
     }
 
-    /**
-     * @param PageDisplayEvent $event
-     */
     public function onPageDisplay(PageDisplayEvent $event)
     {
         $content = $event->getContent();
@@ -90,9 +101,9 @@ class PageSubscriber extends CommonSubscriber
         preg_match_all($regex, $content, $matches);
 
         if (count($matches[0])) {
-            foreach ($matches[1] as $k => $id) {
+            foreach ($matches[1] as $id) {
                 $form = $this->formModel->getEntity($id);
-                if ($form !== null &&
+                if (null !== $form &&
                     (
                         $form->isPublished(false) ||
                         $this->security->hasEntityAccess(
@@ -110,15 +121,10 @@ class PageSubscriber extends CommonSubscriber
                     $formHtml  = preg_replace('#</form>#', $pageInput.'</form>', $formHtml);
 
                     //pouplate get parameters
-                    //priority populate value order by: query string (parameters) -> with lead
-                    if (!$form->getInKioskMode()) {
-                        $this->formModel->populateValuesWithLead($form, $formHtml);
-                    }
                     $this->formModel->populateValuesWithGetParameters($form, $formHtml);
-
-                    $content = preg_replace('#{form='.$id.'}#', $formHtml, $content);
+                    $content = str_replace('{form='.$id.'}', $formHtml, $content);
                 } else {
-                    $content = preg_replace('#{form='.$id.'}#', '', $content);
+                    $content = str_replace('{form='.$id.'}', '', $content);
                 }
             }
         }

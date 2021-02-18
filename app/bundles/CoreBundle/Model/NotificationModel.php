@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -14,6 +15,7 @@ use Debril\RssAtomBundle\Protocol\FeedReader;
 use Debril\RssAtomBundle\Protocol\Parser\FeedContent;
 use Debril\RssAtomBundle\Protocol\Parser\Item;
 use Mautic\CoreBundle\Entity\Notification;
+use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -22,9 +24,6 @@ use Mautic\CoreBundle\Helper\UpdateHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-/**
- * Class NotificationModel.
- */
 class NotificationModel extends FormModel
 {
     /**
@@ -57,14 +56,6 @@ class NotificationModel extends FormModel
      */
     protected $coreParametersHelper;
 
-    /**
-     * NotificationModel constructor.
-     *
-     * @param PathsHelper          $pathsHelper
-     * @param UpdateHelper         $updateHelper
-     * @param FeedReader           $rssReader
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function __construct(
         PathsHelper $pathsHelper,
         UpdateHelper $updateHelper,
@@ -77,16 +68,13 @@ class NotificationModel extends FormModel
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    /**
-     * @param Session $session
-     */
     public function setSession(Session $session)
     {
         $this->session = $session;
     }
 
     /**
-     * @param $disableUpdates
+     * @param bool $disableUpdates
      */
     public function setDisableUpdates($disableUpdates)
     {
@@ -94,13 +82,11 @@ class NotificationModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return \Mautic\CoreBundle\Entity\NotificationRepository
+     * @return NotificationRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticCoreBundle:Notification');
+        return $this->em->getRepository(Notification::class);
     }
 
     /**
@@ -123,11 +109,11 @@ class NotificationModel extends FormModel
         \DateTime $datetime = null,
         User $user = null
     ) {
-        if ($user === null) {
+        if (null === $user) {
             $user = $this->userHelper->getUser();
         }
 
-        if ($user === null || !$user->getId()) {
+        if (null === $user || !$user->getId()) {
             //ensure notifications aren't written for non users
             return;
         }
@@ -135,15 +121,15 @@ class NotificationModel extends FormModel
         $notification = new Notification();
         $notification->setType($type);
         $notification->setIsRead($isRead);
-        $notification->setHeader(EmojiHelper::toHtml(InputHelper::html($header)));
-        $notification->setMessage(EmojiHelper::toHtml(InputHelper::html($message)));
+        $notification->setHeader(EmojiHelper::toHtml(InputHelper::strict_html($header)));
+        $notification->setMessage(EmojiHelper::toHtml(InputHelper::strict_html($message)));
         $notification->setIconClass($iconClass);
         $notification->setUser($user);
-        if ($datetime == null) {
+        if (null == $datetime) {
             $datetime = new \DateTime();
         }
         $notification->setDateAdded($datetime);
-        $this->saveEntity($notification);
+        $this->saveAndDetachEntity($notification);
     }
 
     /**
@@ -157,32 +143,35 @@ class NotificationModel extends FormModel
     /**
      * Clears a notification for a user.
      *
-     * @param $id Notification to clear; will clear all if empty
+     * @param $id       Notification to clear; will clear all if empty
+     * @param $limit    Maximum number of notifications to clear if $id is empty
      */
-    public function clearNotification($id)
+    public function clearNotification($id, $limit = null)
     {
-        $this->getRepository()->clearNotificationsForUser($this->userHelper->getUser()->getId(), $id);
+        $this->getRepository()->clearNotificationsForUser($this->userHelper->getUser()->getId(), $id, $limit);
     }
 
     /**
      * Get content for notifications.
      *
      * @param null $afterId
+     * @param bool $includeRead
+     * @param int  $limit
      *
      * @return array
      */
-    public function getNotificationContent($afterId = null, $includeRead = false)
+    public function getNotificationContent($afterId = null, $includeRead = false, $limit = null)
     {
-        if ($this->userHelper->getUser()->isGuest) {
+        if ($this->userHelper->getUser()->isGuest()) {
             return [[], false, ''];
         }
 
         $this->updateUpstreamNotifications();
 
-        $userId        = ($this->userHelper->getUser()) ? $this->userHelper->getUser()->getId() : 0;
-        $notifications = $this->getRepository()->getNotifications($userId, $afterId, $includeRead);
-
         $showNewIndicator = false;
+        $userId           = ($this->userHelper->getUser()) ? $this->userHelper->getUser()->getId() : 0;
+
+        $notifications = $this->getRepository()->getNotifications($userId, $afterId, $includeRead, null, $limit);
 
         //determine if the new message indicator should be shown
         foreach ($notifications as $n) {
@@ -240,7 +229,7 @@ class NotificationModel extends FormModel
      */
     public function updateUpstreamNotifications()
     {
-        $url = $this->coreParametersHelper->getParameter('rss_notification_url');
+        $url = $this->coreParametersHelper->get('rss_notification_url');
 
         if (empty($url)) {
             return;

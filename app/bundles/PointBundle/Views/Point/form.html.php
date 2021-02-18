@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -51,6 +52,7 @@ echo $view['form']->start($form);
 			<?php
                 echo $view['form']->row($form['category']);
                 echo $view['form']->row($form['isPublished']);
+                echo $view['form']->row($form['repeatable']);
                 echo $view['form']->row($form['publishUp']);
                 echo $view['form']->row($form['publishDown']);
             ?>

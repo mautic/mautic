@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -24,13 +25,13 @@ class YesNoButtonGroupType extends AbstractType
      */
     public function getParent()
     {
-        return 'button_group';
+        return ButtonGroupType::class;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'yesno_button_group';
     }
@@ -42,30 +43,29 @@ class YesNoButtonGroupType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'choices' => function (Options $options) {
+                'choices'           => function (Options $options) {
                     return [
                         $options['no_label']  => $options['no_value'],
                         $options['yes_label'] => $options['yes_value'],
                     ];
                 },
-                'choices_as_values' => true,
                 'choice_value'      => function ($choiceKey) {
                     if (null === $choiceKey || '' === $choiceKey) {
                         return null;
                     }
 
-                    return (int) $choiceKey;
+                    return (is_string($choiceKey) && !is_numeric($choiceKey)) ? $choiceKey : (int) $choiceKey;
                 },
-                'expanded'    => true,
-                'multiple'    => false,
-                'label_attr'  => ['class' => 'control-label'],
-                'label'       => 'mautic.core.form.published',
-                'empty_value' => false,
-                'required'    => false,
-                'no_label'    => 'mautic.core.form.no',
-                'no_value'    => 0,
-                'yes_label'   => 'mautic.core.form.yes',
-                'yes_value'   => 1,
+                'expanded'          => true,
+                'multiple'          => false,
+                'label_attr'        => ['class' => 'control-label'],
+                'label'             => 'mautic.core.form.published',
+                'placeholder'       => false,
+                'required'          => false,
+                'no_label'          => 'mautic.core.form.no',
+                'no_value'          => 0,
+                'yes_label'         => 'mautic.core.form.yes',
+                'yes_value'         => 1,
             ]
         );
     }

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,9 +11,9 @@
 
 namespace Mautic\PageBundle\Entity;
 
-use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
@@ -27,10 +28,11 @@ class HitRepository extends CommonRepository
      *
      * @param Page|Redirect $page
      * @param string        $trackingId
+     * @param Lead          $lead
      *
      * @return bool
      */
-    public function isUniquePageHit($page, $trackingId)
+    public function isUniquePageHit($page, $trackingId, Lead $lead = null)
     {
         $q  = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q2 = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -38,9 +40,19 @@ class HitRepository extends CommonRepository
         $q2->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h');
 
-        $expr = $q2->expr()->andX(
-            $q2->expr()->eq('h.tracking_id', ':id')
-        );
+        $expr = $q2->expr()->andX();
+
+        // If we know the lead, use that to determine uniqueness
+        if (null !== $lead && $lead->getId()) {
+            $expr->add(
+                $q2->expr()->eq('h.lead_id', $lead->getId())
+            );
+        } else {
+            $expr->add(
+                $q2->expr()->eq('h.tracking_id', ':id')
+            );
+            $q->setParameter('id', $trackingId);
+        }
 
         if ($page instanceof Page) {
             $expr->add(
@@ -55,9 +67,7 @@ class HitRepository extends CommonRepository
         $q2->where($expr);
 
         $q->select('u.is_unique')
-            ->from(sprintf('(SELECT (NOT EXISTS (%s)) is_unique)', $q2->getSQL()), 'u'
-        )
-            ->setParameter('id', $trackingId);
+            ->from(sprintf('(SELECT (NOT EXISTS (%s)) is_unique)', $q2->getSQL()), 'u');
 
         return (bool) $q->execute()->fetchColumn();
     }
@@ -65,19 +75,21 @@ class HitRepository extends CommonRepository
     /**
      * Get a lead's page hits.
      *
-     * @param int   $leadId
-     * @param array $options
+     * @param int|null $leadId
      *
      * @return array
      */
-    public function getLeadHits($leadId, array $options = [])
+    public function getLeadHits($leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $query->select('h.page_id, h.user_agent as userAgent, h.date_hit as dateHit, h.date_left as dateLeft, h.referer, h.source, h.source_id as sourceId, h.url, h.url_title as urlTitle, h.query, ds.client_info as clientInfo, ds.device, ds.device_os_name as deviceOsName, ds.device_brand as deviceBrand, ds.device_model as deviceModel')
+        $query->select('h.id as hitId, h.page_id, h.user_agent as userAgent, h.date_hit as dateHit, h.date_left as dateLeft, h.referer, h.source, h.source_id as sourceId, h.url, h.url_title as urlTitle, h.query, ds.client_info as clientInfo, ds.device, ds.device_os_name as deviceOsName, ds.device_brand as deviceBrand, ds.device_model as deviceModel, h.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
-            ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id')
-            ->where('h.lead_id = '.(int) $leadId);
+            ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id');
+
+        if ($leadId) {
+            $query->where('h.lead_id = '.(int) $leadId);
+        }
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere($query->expr()->like('p.title', $query->expr()->literal('%'.$options['search'].'%')));
@@ -105,7 +117,7 @@ class HitRepository extends CommonRepository
         $query->select('count(distinct(h.trackingId)) as "hitCount"');
         $query->andWhere($query->expr()->eq('h.source', $query->expr()->literal($source)));
 
-        if ($sourceId != null) {
+        if (null != $sourceId) {
             if (is_array($sourceId)) {
                 $query->andWhere($query->expr()->in('h.sourceId', ':sourceIds'))
                     ->setParameter('sourceIds', $sourceId);
@@ -114,7 +126,7 @@ class HitRepository extends CommonRepository
             }
         }
 
-        if ($fromDate != null) {
+        if (null != $fromDate) {
             $query->andwhere($query->expr()->gte('h.dateHit', ':date'))
                 ->setParameter('date', $fromDate);
         }
@@ -146,7 +158,7 @@ class HitRepository extends CommonRepository
             ->where($q->expr()->in('h.email_id', $emailIds))
             ->groupBy('h.email_id');
 
-        if ($fromDate != null) {
+        if (null != $fromDate) {
             $dateHelper = new DateTimeHelper($fromDate);
             $q->andwhere($q->expr()->gte('h.date_hit', ':date'))
                 ->setParameter('date', $dateHelper->toUtcString());
@@ -304,7 +316,7 @@ class HitRepository extends CommonRepository
             $q->expr()->isNull('h.date_left')
         );
 
-        if ($fromDate !== null) {
+        if (null !== $fromDate) {
             //make sure the date is UTC
             $dt = new DateTimeHelper($fromDate, 'Y-m-d H:i:s', 'local');
             $expr->add(
@@ -365,9 +377,6 @@ class HitRepository extends CommonRepository
     /**
      * Get the dwell times for bunch of pages.
      *
-     * @param array $pageIds
-     * @param array $options
-     *
      * @return array
      */
     public function getDwellTimesForPages(array $pageIds, array $options)
@@ -383,7 +392,7 @@ class HitRepository extends CommonRepository
                 )
             );
 
-        if (isset($options['fromDate']) && $options['fromDate'] !== null) {
+        if (isset($options['fromDate']) && null !== $options['fromDate']) {
             //make sure the date is UTC
             $dt = new DateTimeHelper($options['fromDate']);
             $q->andWhere(
@@ -420,7 +429,6 @@ class HitRepository extends CommonRepository
      * Get the dwell times for bunch of URLs.
      *
      * @param string $url
-     * @param array  $options
      *
      * @return array
      */

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,10 +11,13 @@
 
 namespace Mautic\CampaignBundle\Event;
 
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class CampaignDecisionEvent.
+ *
+ * @deprecated 2.13.0; to be removed in 3.0
  */
 class CampaignDecisionEvent extends Event
 {
@@ -24,6 +28,7 @@ class CampaignDecisionEvent extends Event
     protected $eventSettings;
     protected $isRootLevel;
     protected $decisionTriggered = false;
+    protected $logs;
 
     /**
      * @param $lead
@@ -32,8 +37,9 @@ class CampaignDecisionEvent extends Event
      * @param $events
      * @param $eventSettings
      * @param $isRootLevel
+     * @param LeadEventLog[] $logs
      */
-    public function __construct($lead, $decisionType, $decisionEventDetails, $events, $eventSettings, $isRootLevel = false)
+    public function __construct($lead, $decisionType, $decisionEventDetails, $events, $eventSettings, $isRootLevel = false, $logs = [])
     {
         $this->lead                 = $lead;
         $this->decisionType         = $decisionType;
@@ -41,6 +47,7 @@ class CampaignDecisionEvent extends Event
         $this->events               = $events;
         $this->eventSettings        = $eventSettings;
         $this->isRootLevel          = $isRootLevel;
+        $this->logs                 = $logs;
     }
 
     /**
@@ -120,5 +127,13 @@ class CampaignDecisionEvent extends Event
     public function wasDecisionTriggered()
     {
         return $this->decisionTriggered;
+    }
+
+    /**
+     * @return array|LeadEventLog[]
+     */
+    public function getLogs()
+    {
+        return $this->logs;
     }
 }

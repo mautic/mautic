@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   Mautic, Inc
  * @author      Mautic, Inc
  *
@@ -15,11 +16,9 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class EventRepository extends CommonRepository
 {
     /**
-     * Get a list of events with the webhook.
+     * @param $type
      *
-     * @param array $args
-     *
-     * @return Paginator
+     * @return array
      */
     public function getEntitiesByEventType($type)
     {
@@ -28,7 +27,7 @@ class EventRepository extends CommonRepository
             ->leftJoin($alias.'.webhook', 'u');
 
         $q->where(
-            $q->expr()->eq($alias.'.event_type', ':type')
+            $q->expr()->eq($alias.'.eventType', ':type')
         )->setParameter('type', $type);
 
         // only find published webhooks

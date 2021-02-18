@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -119,7 +120,7 @@ final class PointEvents
     /**
      * The mautic.trigger_on_event_execute event is thrown to execute a trigger event.
      *
-     * The event listener receives a Mautic\PointBundle\Event\TriggerEvent instance.
+     * The event listener receives a Mautic\PointBundle\Event\TriggerExecutedEvent instance.
      *
      * @var string
      */

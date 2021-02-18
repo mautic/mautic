@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -8,7 +9,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'campaign');
 
 $header = ($entity->getId()) ?
     $view['translator']->trans('mautic.campaign.menu.edit',
@@ -43,6 +43,7 @@ $view['slots']->set('headerTitle', $header);
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php
             echo $view['form']->row($form['category']);
+            echo $view['form']->row($form['allowRestart']);
             echo $view['form']->row($form['isPublished']);
             echo $view['form']->row($form['publishUp']);
             echo $view['form']->row($form['publishDown']);
@@ -58,4 +59,7 @@ $view['slots']->set('headerTitle', $header);
     'campaignSources' => $campaignSources,
     'eventSettings'   => $eventSettings,
     'canvasSettings'  => $entity->getCanvasSettings(),
-]); ?>
+]);
+
+?>
+

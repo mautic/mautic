@@ -5,13 +5,13 @@
 {% if slotHasContent(['top1', 'top2', 'top1', 'top3']) %}
     <div class="row">
     {% if slotHasContent('top1') %}
-        <div class="col-xs-12 col-sm-4" data-slot-container>{{ slot('top1') }}</div>
+        <div class="col-xs-12 col-sm-4" data-slot-container="1">{{ slot('top1') }}</div>
     {% endif %}
     {% if slotHasContent('top2') %}
-        <div class="col-xs-12 col-sm-4" data-slot-container>{{ slot('top2') }}</div>
+        <div class="col-xs-12 col-sm-4" data-slot-container="1">{{ slot('top2') }}</div>
     {% endif %}
     {% if slotHasContent('top3') %}
-        <div class="col-xs-12 col-sm-4" data-slot-container>{{ slot('top3') }}</div>
+        <div class="col-xs-12 col-sm-4" data-slot-container="1">{{ slot('top3') }}</div>
     {% endif %}
     </div>
 {% endif %}
@@ -22,7 +22,7 @@
         <div class="col-xs-12 col-sm-2">
             {% if slotHasContent('left1') %}
             <div class="row">
-                <div class="col-xs-12" data-slot-container>
+                <div class="col-xs-12" data-slot-container="1">
                     {{ slot('left1') }}
                 </div>
             </div>
@@ -30,7 +30,7 @@
 
             {% if slotHasContent('left2') %}
             <div class="row">
-                <div class="col-xs-12" data-slot-container>
+                <div class="col-xs-12" data-slot-container="1">
                     {{ slot('left2') }}
                 </div>
             </div>
@@ -38,7 +38,7 @@
 
             {% if slotHasContent('left3') %}
             <div class="row">
-                <div class="col-xs-12" data-slot-container>
+                <div class="col-xs-12" data-slot-container="1">
                     {{ slot('left3') }}
                 </div>
             </div>
@@ -47,7 +47,7 @@
         {% endif %}
 
         {% if slotHasContent('main') %}
-        <div class="col-xs-12 col-sm-8" data-slot-container>
+        <div class="col-xs-12 col-sm-8" data-slot-container="1">
             {{ slot('main') }}
         </div>
         {% endif %}
@@ -55,7 +55,7 @@
         {% if slotHasContent(['right3', 'right2', 'right1']) %}
         <div class="col-xs-12 col-sm-2">
             {% if slotHasContent('right1') %}
-            <div class="row" data-slot-container>
+            <div class="row" data-slot-container="1">
                 <div class="col-xs-12">
                     {{ slot('right1') }}
                 </div>
@@ -64,7 +64,7 @@
 
             {% if slotHasContent('right2') %}
             <div class="row">
-                <div class="col-xs-12" data-slot-container>
+                <div class="col-xs-12" data-slot-container="1">
                     {{ slot('right2') }}
                 </div>
             </div>
@@ -72,7 +72,7 @@
 
             {% if slotHasContent('right3') %}
             <div class="row">
-                <div class="col-xs-12" data-slot-container>
+                <div class="col-xs-12" data-slot-container="1">
                     {{ slot('right3') }}
                 </div>
             </div>
@@ -85,25 +85,25 @@
     {% if slotHasContent(['bottom1', 'bottom2', 'bottom3']) %}
     <div class="main-block bg-primary row">
         {% if slotHasContent('bottom1') %}
-        <div class="col-xs-12 col-sm-4" data-slot-container>{{ slot('bottom1') }}</div>
+        <div class="col-xs-12 col-sm-4" data-slot-container="1">{{ slot('bottom1') }}</div>
         {% endif %}
         {% if slotHasContent('bottom2') %}
-        <div class="col-xs-12 col-sm-4" data-slot-container>{{ slot('bottom2') }}</div>
+        <div class="col-xs-12 col-sm-4" data-slot-container="1">{{ slot('bottom2') }}</div>
         {% endif %}
         {% if slotHasContent('bottom3') %}
-        <div class="col-xs-12 col-sm-4" data-slot-container>{{ slot('bottom3') }}</div>
+        <div class="col-xs-12 col-sm-4" data-slot-container="1">{{ slot('bottom3') }}</div>
         {% endif %}
     </div>
     {% endif %}
 
     {% if slotHasContent('footer') %}
     <div class="row">
-        <div class="col-xs-12" data-slot-container>{{ slot('footer') }}</div>
+        <div class="col-xs-12" data-slot-container="1">{{ slot('footer') }}</div>
     </div>
     {% endif %}
     
 </div>
-<div class="copyright text-center" data-slot-container>
+<div class="copyright text-center" data-slot-container="1">
     <div data-slot="text">
         <small>Background <a href="https://flic.kr/p/ppk9JE" alt="Narrow river">photo</a> by Christopher Michel</small>
     </div>

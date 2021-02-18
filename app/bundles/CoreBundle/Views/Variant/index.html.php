@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -13,7 +14,7 @@ if (!isset($nameGetter)) {
 $totalWeight = 0;
 ?>
 <?php if (!empty($variants['properties'])): ?>
-<?php if ($variants['parent']->getVariantStartDate() != null): ?>
+<?php if (null != $variants['parent']->getVariantStartDate()): ?>
 <div class="box-layout mb-lg">
     <div class="col-xs-10 va-m">
         <h4>

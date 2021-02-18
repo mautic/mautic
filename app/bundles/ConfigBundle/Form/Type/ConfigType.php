@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,29 +11,24 @@
 
 namespace Mautic\ConfigBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\ConfigBundle\Form\Helper\RestrictionHelper;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class ConfigType.
- */
 class ConfigType extends AbstractType
 {
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @var RestrictionHelper
      */
-    private $translator;
+    private $restrictionHelper;
 
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
+    public function __construct(RestrictionHelper $restrictionHelper)
     {
-        $this->translator = $factory->getTranslator();
+        $this->restrictionHelper = $restrictionHelper;
     }
 
     /**
@@ -40,44 +36,52 @@ class ConfigType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        // TODO very dirty quick fix for https://github.com/mautic/mautic/issues/8854
+        if (isset($options['data']['apiconfig']['parameters']['api_oauth2_access_token_lifetime'])
+            && 3600 === $options['data']['apiconfig']['parameters']['api_oauth2_access_token_lifetime']
+        ) {
+            $options['data']['apiconfig']['parameters']['api_oauth2_access_token_lifetime'] = 60;
+        }
+
+        if (isset($options['data']['apiconfig']['parameters']['api_oauth2_refresh_token_lifetime'])
+            && 1209600 === $options['data']['apiconfig']['parameters']['api_oauth2_refresh_token_lifetime']
+        ) {
+            $options['data']['apiconfig']['parameters']['api_oauth2_refresh_token_lifetime'] = 14;
+        }
+
         foreach ($options['data'] as $config) {
-            if (isset($config['formAlias']) && isset($config['parameters'])) {
-                $builder->add($config['formAlias'], $config['formAlias'], [
-                    'data' => $config['parameters'],
-                ]);
+            if (isset($config['formAlias']) && !empty($config['parameters'])) {
+                $checkThese = array_intersect(array_keys($config['parameters']), $options['fileFields']);
+                foreach ($checkThese as $checkMe) {
+                    // Unset base64 encoded values
+                    unset($config['parameters'][$checkMe]);
+                }
+                $builder->add(
+                    $config['formAlias'],
+                    $config['formType'],
+                    [
+                        'data' => $config['parameters'],
+                    ]
+                );
             }
         }
 
-        $translator = $this->translator;
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options, $translator) {
-            $form = $event->getForm();
+        $builder->addEventListener(
+            FormEvents::PRE_SET_DATA,
+            function (FormEvent $event) {
+                $form = $event->getForm();
 
-            foreach ($form as $config => $configForm) {
-                foreach ($configForm as $key => $child) {
-                    if (in_array($key, $options['doNotChange'])) {
-                        if ($options['doNotChangeDisplayMode'] == 'mask') {
-                            $fieldOptions = $child->getConfig()->getOptions();
-
-                            $configForm->add($key, 'text', [
-                                'label'    => $fieldOptions['label'],
-                                'required' => false,
-                                'mapped'   => false,
-                                'disabled' => true,
-                                'attr'     => [
-                                    'placeholder' => $translator->trans('mautic.config.restricted'),
-                                    'class'       => 'form-control',
-                                ],
-                                'label_attr' => ['class' => 'control-label'],
-                            ]);
-                        } elseif ($options['doNotChangeDisplayMode'] == 'remove') {
-                            $configForm->remove($key);
-                        }
+                foreach ($form as $configForm) {
+                    foreach ($configForm as $child) {
+                        $this->restrictionHelper->applyRestrictions($child, $configForm);
                     }
                 }
             }
-        });
+        );
 
-        $builder->add('buttons', 'form_buttons',
+        $builder->add(
+            'buttons',
+            FormButtonsType::class,
             [
                 'apply_onclick' => 'Mautic.activateBackdrop()',
                 'save_onclick'  => 'Mautic.activateBackdrop()',
@@ -92,21 +96,17 @@ class ConfigType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'config';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired([
-            'doNotChange',
-            'doNotChangeDisplayMode',
-        ]);
+        $resolver->setDefaults(
+            [
+                'fileFields' => [],
+            ]
+        );
     }
 }

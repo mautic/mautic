@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -65,7 +66,7 @@ class ColorHelper
      */
     public function setHex($hex)
     {
-        if (strlen($hex) === 4) {
+        if (4 === strlen($hex)) {
             $format          = '#%1s%1s%1s';
             list($r, $g, $b) = sscanf($hex, $format);
             $this->red       = hexdec("$r$r");
@@ -124,5 +125,20 @@ class ColorHelper
         $hex .= str_pad(dechex($this->blue), 2, '0', STR_PAD_LEFT);
 
         return $hex;
+    }
+
+    public function getRed(): int
+    {
+        return $this->red;
+    }
+
+    public function getGreen(): int
+    {
+        return $this->green;
+    }
+
+    public function getBlue(): int
+    {
+        return $this->blue;
     }
 }

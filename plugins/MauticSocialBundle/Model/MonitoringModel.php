@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
  *
@@ -13,6 +14,9 @@ namespace MauticPlugin\MauticSocialBundle\Model;
 use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Event as Events;
+use MauticPlugin\MauticSocialBundle\Form\Type\MonitoringType;
+use MauticPlugin\MauticSocialBundle\Form\Type\TwitterHashtagType;
+use MauticPlugin\MauticSocialBundle\Form\Type\TwitterMentionType;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -23,6 +27,17 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class MonitoringModel extends FormModel
 {
+    private $networkTypes = [
+        'twitter_handle' => [
+            'label' => 'mautic.social.monitoring.type.list.twitter.handle',
+            'form'  => TwitterMentionType::class,
+        ],
+        'twitter_hashtag' => [
+            'label' => 'mautic.social.monitoring.type.list.twitter.hashtag',
+            'form'  => TwitterHashtagType::class,
+        ],
+    ];
+
     /**
      * {@inheritdoc}
      *
@@ -45,7 +60,7 @@ class MonitoringModel extends FormModel
             $params['action'] = $action;
         }
 
-        return $formFactory->create('monitoring', $entity, $params);
+        return $formFactory->create(MonitoringType::class, $entity, $params);
     }
 
     /**
@@ -53,17 +68,11 @@ class MonitoringModel extends FormModel
      *
      * @param $id
      *
-     * @return null|object
+     * @return Monitoring|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
-            $entity = new Monitoring();
-        } else {
-            $entity = parent::getEntity($id);
-        }
-
-        return $entity;
+        return $id ? parent::getEntity($id) : new Monitoring();
     }
 
     /**
@@ -147,7 +156,7 @@ class MonitoringModel extends FormModel
      */
     public function getPermissionBase()
     {
-        return 'plugin:mauticSocial:monitoring';
+        return 'mauticSocial:monitoring';
     }
 
     /**
@@ -155,11 +164,21 @@ class MonitoringModel extends FormModel
      */
     public function getNetworkTypes()
     {
-        $types = [
-            'twitter_handle'  => 'mautic.social.monitoring.type.list.twitter.handle',
-            'twitter_hashtag' => 'mautic.social.monitoring.type.list.twitter.hashtag',
-        ];
+        $types = [];
+        foreach ($this->networkTypes as $type => $data) {
+            $types[$type] = $data['label'];
+        }
 
         return $types;
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return |null
+     */
+    public function getFormByType($type)
+    {
+        return array_key_exists($type, $this->networkTypes) ? $this->networkTypes[$type]['form'] : null;
     }
 }

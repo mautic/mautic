@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
  *
@@ -23,7 +24,7 @@ class PostCountModel extends AbstractCommonModel
      *
      * @param $id
      *
-     * @return null|object
+     * @return object|null
      */
     public function getEntity($id = null)
     {

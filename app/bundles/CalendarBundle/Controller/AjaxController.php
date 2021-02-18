@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -22,8 +23,6 @@ class AjaxController extends CommonAjaxController
     /**
      * Generates the calendar data.
      *
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function generateDataAction(Request $request)
@@ -37,6 +36,8 @@ class AjaxController extends CommonAjaxController
         $model  = $this->getModel('calendar');
         $events = $model->getCalendarEvents($dates);
 
+        $this->checkEventPermissions($events);
+
         // Can't use $this->sendJsonResponse, because it converts arrays to objects and Fullcalendar doesn't render events then.
         $response = new Response();
         $response->setContent(json_encode($events));
@@ -47,8 +48,6 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Updates an event on dragging the event around the calendar.
-     *
-     * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -68,37 +67,76 @@ class AjaxController extends CommonAjaxController
         $entity = $event->getEntity();
 
         //not found
-        if ($entity === null) {
+        if (null === $entity) {
             $this->addFlash('mautic.core.error.notfound', 'error');
         } elseif (!$event->hasAccess()) {
             $this->addFlash('mautic.core.error.accessdenied', 'error');
         } elseif ($model->isLocked($entity)) {
-            $this->addFlash('mautic.core.error.locked', [
-                '%name%'      => $entity->getTitle(),
-                '%menu_link%' => 'mautic_'.$source.'_index',
-                '%url%'       => $this->generateUrl('mautic_'.$source.'_action', [
-                    'objectAction' => 'edit',
-                    'objectId'     => $entity->getId(),
-                ]),
-            ]);
-        } elseif ($this->request->getMethod() == 'POST') {
+            $this->addFlash(
+                'mautic.core.error.locked',
+                [
+                    '%name%'      => $entity->getTitle(),
+                    '%menu_link%' => 'mautic_'.$source.'_index',
+                    '%url%'       => $this->generateUrl(
+                        'mautic_'.$source.'_action',
+                        [
+                            'objectAction' => 'edit',
+                            'objectId'     => $entity->getId(),
+                        ]
+                    ),
+                ]
+            );
+        } elseif ('POST' == $this->request->getMethod()) {
             $entity->$setter($dateValue);
             $model->saveEntity($entity);
             $response['success'] = true;
 
-            $this->addFlash('mautic.core.notice.updated', [
-                '%name%'      => $entity->getTitle(),
-                '%menu_link%' => 'mautic_'.$source.'_index',
-                '%url%'       => $this->generateUrl('mautic_'.$source.'_action', [
-                    'objectAction' => 'edit',
-                    'objectId'     => $entity->getId(),
-                ]),
-            ]);
+            $this->addFlash(
+                'mautic.core.notice.updated',
+                [
+                    '%name%'      => $entity->getTitle(),
+                    '%menu_link%' => 'mautic_'.$source.'_index',
+                    '%url%'       => $this->generateUrl(
+                        'mautic_'.$source.'_action',
+                        [
+                            'objectAction' => 'edit',
+                            'objectId'     => $entity->getId(),
+                        ]
+                    ),
+                ]
+            );
         }
 
         //render flashes
         $response['flashes'] = $this->getFlashContent();
 
         return $this->sendJsonResponse($response);
+    }
+
+    /**
+     * @param $events
+     */
+    public function checkEventPermissions(&$events)
+    {
+        $security     = $this->get('mautic.security');
+        $modelFactory = $this->get('mautic.model.factory');
+
+        foreach ($events as $key => $event) {
+            //make sure the user has view access to the entities
+            foreach ($event as $eventKey => $eventValue) {
+                if ('_id' === substr($eventKey, -3)) {
+                    $modelName = substr($eventKey, 0, -3);
+                    if ($modelFactory->hasModel($modelName)) {
+                        $model = $modelFactory->getModel($modelName);
+                        $base  = $model->getPermissionBase();
+                        if (!$security->isGranted([$base.':viewown', $base.':viewother'], 'MATCH_ONE')) {
+                            unset($events[$key]);
+                        }
+                    }
+
+                    break;
+                }
+            }
+        }
     }
 }

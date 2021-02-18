@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -8,13 +9,42 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use Mautic\FormBundle\Event\Service\FieldValueTransformer;
+use Mautic\FormBundle\EventListener\CampaignSubscriber;
+use Mautic\FormBundle\EventListener\DashboardSubscriber;
+use Mautic\FormBundle\EventListener\EmailSubscriber;
+use Mautic\FormBundle\EventListener\FormSubscriber;
+use Mautic\FormBundle\EventListener\FormValidationSubscriber;
+use Mautic\FormBundle\EventListener\LeadSubscriber;
+use Mautic\FormBundle\EventListener\PageSubscriber;
+use Mautic\FormBundle\EventListener\PointSubscriber;
+use Mautic\FormBundle\EventListener\ReportSubscriber;
+use Mautic\FormBundle\EventListener\SearchSubscriber;
+use Mautic\FormBundle\EventListener\StatsSubscriber;
+use Mautic\FormBundle\EventListener\WebhookSubscriber;
+use Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType;
+use Mautic\FormBundle\Form\Type\FieldType;
+use Mautic\FormBundle\Form\Type\FormFieldFileType;
+use Mautic\FormBundle\Form\Type\FormFieldPageBreakType;
+use Mautic\FormBundle\Form\Type\FormFieldTelType;
+use Mautic\FormBundle\Form\Type\FormListType;
+use Mautic\FormBundle\Form\Type\FormType;
+use Mautic\FormBundle\Form\Type\SubmitActionEmailType;
+use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
+use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\FormBundle\Helper\FormUploader;
+use Mautic\FormBundle\Helper\TokenHelper;
+use Mautic\FormBundle\Model\ActionModel;
+use Mautic\FormBundle\Model\FieldModel;
+use Mautic\FormBundle\Model\FormModel;
+use Mautic\FormBundle\Model\SubmissionModel;
+use Mautic\FormBundle\Model\SubmissionResultLoader;
+use Mautic\FormBundle\Validator\Constraint\FileExtensionConstraintValidator;
+use Mautic\FormBundle\Validator\UploadFieldValidator;
+
 return [
     'routes' => [
         'main' => [
-            'mautic_form_pagetoken_index' => [
-                'path'       => '/forms/pagetokens/{page}',
-                'controller' => 'MauticFormBundle:SubscribedEvents\BuilderToken:index',
-            ],
             'mautic_formaction_action' => [
                 'path'       => '/forms/action/{objectAction}/{objectId}',
                 'controller' => 'MauticFormBundle:Action:execute',
@@ -38,9 +68,9 @@ return [
                     'format' => 'csv',
                 ],
             ],
-            'mautic_form_results_delete' => [
-                'path'       => '/forms/results/{formId}/delete/{objectId}',
-                'controller' => 'MauticFormBundle:Result:delete',
+            'mautic_form_results_action' => [
+                'path'       => '/forms/results/{formId}/{objectAction}/{objectId}',
+                'controller' => 'MauticFormBundle:Result:execute',
                 'defaults'   => [
                     'objectId' => 0,
                 ],
@@ -51,16 +81,40 @@ return [
             ],
         ],
         'api' => [
-            'mautic_api_getforms' => [
-                'path'       => '/forms',
-                'controller' => 'MauticFormBundle:Api\FormApi:getEntities',
+            'mautic_api_formstandard' => [
+                'standard_entity' => true,
+                'name'            => 'forms',
+                'path'            => '/forms',
+                'controller'      => 'MauticFormBundle:Api\FormApi',
             ],
-            'mautic_api_getform' => [
-                'path'       => '/forms/{id}',
-                'controller' => 'MauticFormBundle:Api\FormApi:getEntity',
+            'mautic_api_formresults' => [
+                'path'       => '/forms/{formId}/submissions',
+                'controller' => 'MauticFormBundle:Api\SubmissionApi:getEntities',
+            ],
+            'mautic_api_formresult' => [
+                'path'       => '/forms/{formId}/submissions/{submissionId}',
+                'controller' => 'MauticFormBundle:Api\SubmissionApi:getEntity',
+            ],
+            'mautic_api_contactformresults' => [
+                'path'       => '/forms/{formId}/submissions/contact/{contactId}',
+                'controller' => 'MauticFormBundle:Api\SubmissionApi:getEntitiesForContact',
+            ],
+            'mautic_api_formdeletefields' => [
+                'path'       => '/forms/{formId}/fields/delete',
+                'controller' => 'MauticFormBundle:Api\FormApi:deleteFields',
+                'method'     => 'DELETE',
+            ],
+            'mautic_api_formdeleteactions' => [
+                'path'       => '/forms/{formId}/actions/delete',
+                'controller' => 'MauticFormBundle:Api\FormApi:deleteActions',
+                'method'     => 'DELETE',
             ],
         ],
         'public' => [
+            'mautic_form_file_download' => [
+                'path'       => '/forms/results/file/{submissionId}/{field}',
+                'controller' => 'MauticFormBundle:Result:downloadFile',
+            ],
             'mautic_form_postresults' => [
                 'path'       => '/form/submit',
                 'controller' => 'MauticFormBundle:Public:submit',
@@ -110,141 +164,181 @@ return [
 
     'services' => [
         'events' => [
+            'mautic.core.configbundle.subscriber.form' => [
+                'class'     => \Mautic\FormBundle\EventListener\ConfigSubscriber::class,
+            ],
             'mautic.form.subscriber' => [
-                'class'     => 'Mautic\FormBundle\EventListener\FormSubscriber',
+                'class'     => FormSubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                     'mautic.helper.mailer',
+                    'mautic.helper.core_parameters',
+                    'translator',
+                    'router',
+                ],
+            ],
+            'mautic.form.validation.subscriber' => [
+                'class'     => FormValidationSubscriber::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.form.pagebundle.subscriber' => [
-                'class'     => 'Mautic\FormBundle\EventListener\PageSubscriber',
+                'class'     => PageSubscriber::class,
                 'arguments' => [
                     'mautic.form.model.form',
+                    'mautic.helper.token_builder.factory',
+                    'translator',
+                    'mautic.security',
                 ],
             ],
             'mautic.form.pointbundle.subscriber' => [
-                'class'     => 'Mautic\FormBundle\EventListener\PointSubscriber',
+                'class'     => PointSubscriber::class,
                 'arguments' => [
                     'mautic.point.model.point',
                 ],
             ],
             'mautic.form.reportbundle.subscriber' => [
-                'class' => 'Mautic\FormBundle\EventListener\ReportSubscriber',
+                'class'     => ReportSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.company_report_data',
+                    'mautic.form.repository.submission',
+                ],
             ],
             'mautic.form.campaignbundle.subscriber' => [
-                'class'     => 'Mautic\FormBundle\EventListener\CampaignSubscriber',
+                'class'     => CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.form.model.form',
                     'mautic.form.model.submission',
-                    'mautic.campaign.model.event',
+                    'mautic.campaign.executioner.realtime',
                 ],
             ],
-            'mautic.form.calendarbundle.subscriber' => [
-                'class' => 'Mautic\FormBundle\EventListener\CalendarSubscriber',
-            ],
             'mautic.form.leadbundle.subscriber' => [
-                'class'     => 'Mautic\FormBundle\EventListener\LeadSubscriber',
+                'class'     => LeadSubscriber::class,
                 'arguments' => [
                     'mautic.form.model.form',
                     'mautic.page.model.page',
+                    'mautic.form.repository.submission',
+                    'translator',
+                    'router',
                 ],
             ],
             'mautic.form.emailbundle.subscriber' => [
-                'class' => 'Mautic\FormBundle\EventListener\EmailSubscriber',
+                'class' => EmailSubscriber::class,
             ],
             'mautic.form.search.subscriber' => [
-                'class'     => 'Mautic\FormBundle\EventListener\SearchSubscriber',
+                'class'     => SearchSubscriber::class,
                 'arguments' => [
                     'mautic.helper.user',
                     'mautic.form.model.form',
+                    'mautic.security',
+                    'mautic.helper.templating',
                 ],
             ],
             'mautic.form.webhook.subscriber' => [
-                'class' => 'Mautic\FormBundle\EventListener\WebhookSubscriber',
+                'class'     => WebhookSubscriber::class,
+                'arguments' => [
+                    'mautic.webhook.model.webhook',
+                ],
             ],
             'mautic.form.dashboard.subscriber' => [
-                'class'     => 'Mautic\FormBundle\EventListener\DashboardSubscriber',
+                'class'     => DashboardSubscriber::class,
                 'arguments' => [
                     'mautic.form.model.submission',
                     'mautic.form.model.form',
+                    'router',
+                ],
+            ],
+            'mautic.form.stats.subscriber' => [
+                'class'     => StatsSubscriber::class,
+                'arguments' => [
+                    'mautic.security',
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
+            'mautic.form.subscriber.determine_winner' => [
+                'class'     => \Mautic\FormBundle\EventListener\DetermineWinnerSubscriber::class,
+                'arguments' => [
+                    'mautic.form.repository.submission',
+                    'translator',
                 ],
             ],
         ],
         'forms' => [
+            'mautic.form.type.formconfig' => [
+                'class'     => \Mautic\FormBundle\Form\Type\ConfigFormType::class,
+                    'alias' => 'formconfig',
+            ],
             'mautic.form.type.form' => [
-                'class'     => 'Mautic\FormBundle\Form\Type\FormType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'mauticform',
+                'class'     => FormType::class,
+                'arguments' => [
+                    'mautic.security',
+                ],
             ],
             'mautic.form.type.field' => [
-                'class'       => 'Mautic\FormBundle\Form\Type\FieldType',
-                'alias'       => 'formfield',
+                'class'       => FieldType::class,
+                'arguments'   => [
+                    'translator',
+                ],
                 'methodCalls' => [
                     'setFieldModel' => ['mautic.form.model.field'],
                     'setFormModel'  => ['mautic.form.model.form'],
                 ],
             ],
-            'mautic.form.type.action' => [
-                'class' => 'Mautic\FormBundle\Form\Type\ActionType',
-                'alias' => 'formaction',
-            ],
-            'mautic.form.type.field_propertytext' => [
-                'class' => 'Mautic\FormBundle\Form\Type\FormFieldTextType',
-                'alias' => 'formfield_text',
-            ],
-            'mautic.form.type.field_propertyplaceholder' => [
-                'class' => 'Mautic\FormBundle\Form\Type\FormFieldPlaceholderType',
-                'alias' => 'formfield_placeholder',
-            ],
-            'mautic.form.type.field_propertyselect' => [
-                'class' => 'Mautic\FormBundle\Form\Type\FormFieldSelectType',
-                'alias' => 'formfield_select',
-            ],
-            'mautic.form.type.field_propertycaptcha' => [
-                'class' => 'Mautic\FormBundle\Form\Type\FormFieldCaptchaType',
-                'alias' => 'formfield_captcha',
-            ],
-            'muatic.form.type.field_propertypagebreak' => [
-                'class'     => \Mautic\FormBundle\Form\Type\FormFieldPageBreakType::class,
+            'mautic.form.type.field_propertypagebreak' => [
+                'class'     => FormFieldPageBreakType::class,
                 'arguments' => [
                     'translator',
                 ],
             ],
-            'mautic.form.type.field_propertygroup' => [
-                'class' => 'Mautic\FormBundle\Form\Type\FormFieldGroupType',
-                'alias' => 'formfield_group',
+            'mautic.form.type.field_propertytel' => [
+                'class'     => FormFieldTelType::class,
+                'arguments' => [
+                    'translator',
+                ],
             ],
-            'mautic.form.type.pointaction_formsubmit' => [
-                'class' => 'Mautic\FormBundle\Form\Type\PointActionFormSubmitType',
-                'alias' => 'pointaction_formsubmit',
+            'mautic.form.type.field_propertyemail' => [
+                'class'     => \Mautic\FormBundle\Form\Type\FormFieldEmailType::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
+            'mautic.form.type.field_propertyfile' => [
+                'class'     => FormFieldFileType::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'translator',
+                ],
             ],
             'mautic.form.type.form_list' => [
-                'class'     => 'Mautic\FormBundle\Form\Type\FormListType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'form_list',
-            ],
-            'mautic.form.type.campaignevent_formsubmit' => [
-                'class' => 'Mautic\FormBundle\Form\Type\CampaignEventFormSubmitType',
-                'alias' => 'campaignevent_formsubmit',
+                'class'     => FormListType::class,
+                'arguments' => [
+                    'mautic.security',
+                    'mautic.form.model.form',
+                    'mautic.helper.user',
+                ],
             ],
             'mautic.form.type.campaignevent_form_field_value' => [
-                'class'     => 'Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'campaignevent_form_field_value',
+                'class'     => CampaignEventFormFieldValueType::class,
+                'arguments' => [
+                    'mautic.form.model.form',
+                ],
             ],
             'mautic.form.type.form_submitaction_sendemail' => [
-                'class'       => 'Mautic\FormBundle\Form\Type\SubmitActionEmailType',
-                'arguments'   => 'translator',
-                'alias'       => 'form_submitaction_sendemail',
+                'class'       => SubmitActionEmailType::class,
+                'arguments'   => [
+                    'translator',
+                    'mautic.helper.core_parameters',
+                ],
                 'methodCalls' => [
                     'setFieldModel' => ['mautic.form.model.field'],
                     'setFormModel'  => ['mautic.form.model.form'],
                 ],
             ],
             'mautic.form.type.form_submitaction_repost' => [
-                'class'       => \Mautic\FormBundle\Form\Type\SubmitActionRepostType::class,
+                'class'       => SubmitActionRepostType::class,
                 'methodCalls' => [
                     'setFieldModel' => ['mautic.form.model.field'],
                     'setFormModel'  => ['mautic.form.model.form'],
@@ -253,30 +347,32 @@ return [
         ],
         'models' => [
             'mautic.form.model.action' => [
-                'class' => 'Mautic\FormBundle\Model\ActionModel',
+                'class' => ActionModel::class,
             ],
             'mautic.form.model.field' => [
-                'class'     => 'Mautic\FormBundle\Model\FieldModel',
+                'class'     => FieldModel::class,
                 'arguments' => [
                     'mautic.lead.model.field',
                 ],
             ],
             'mautic.form.model.form' => [
-                'class'     => 'Mautic\FormBundle\Model\FormModel',
+                'class'     => FormModel::class,
                 'arguments' => [
                     'request_stack',
                     'mautic.helper.templating',
                     'mautic.helper.theme',
-                    'mautic.schema.helper.factory',
                     'mautic.form.model.action',
                     'mautic.form.model.field',
-                    'mautic.lead.model.lead',
                     'mautic.helper.form.field_helper',
                     'mautic.lead.model.field',
+                    'mautic.form.helper.form_uploader',
+                    'mautic.tracker.contact',
+                    'mautic.schema.helper.column',
+                    'mautic.schema.helper.table',
                 ],
             ],
             'mautic.form.model.submission' => [
-                'class'     => 'Mautic\FormBundle\Model\SubmissionModel',
+                'class'     => SubmissionModel::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.helper.templating',
@@ -284,20 +380,101 @@ return [
                     'mautic.page.model.page',
                     'mautic.lead.model.lead',
                     'mautic.campaign.model.campaign',
+                    'mautic.campaign.membership.manager',
                     'mautic.lead.model.field',
                     'mautic.lead.model.company',
                     'mautic.helper.form.field_helper',
+                    'mautic.form.validator.upload_field_validator',
+                    'mautic.form.helper.form_uploader',
+                    'mautic.lead.service.device_tracking_service',
+                    'mautic.form.service.field.value.transformer',
+                    'mautic.helper.template.date',
+                    'mautic.tracker.contact',
                 ],
+            ],
+            'mautic.form.model.submission_result_loader' => [
+                'class'     => SubmissionResultLoader::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
+        ],
+        'repositories' => [
+            'mautic.form.repository.form' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => \Mautic\FormBundle\Entity\Form::class,
+            ],
+            'mautic.form.repository.submission' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => \Mautic\FormBundle\Entity\Submission::class,
             ],
         ],
         'other' => [
             'mautic.helper.form.field_helper' => [
-                'class'     => \Mautic\FormBundle\Helper\FormFieldHelper::class,
+                'class'     => FormFieldHelper::class,
                 'arguments' => [
                     'translator',
                     'validator',
                 ],
             ],
+            'mautic.form.helper.form_uploader' => [
+                'class'     => FormUploader::class,
+                'arguments' => [
+                    'mautic.helper.file_uploader',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
+            'mautic.form.helper.token' => [
+                'class'     => TokenHelper::class,
+                'arguments' => [
+                    'mautic.form.model.form',
+                    'mautic.security',
+                ],
+            ],
+            'mautic.form.service.field.value.transformer' => [
+                'class'     => FieldValueTransformer::class,
+                'arguments' => [
+                    'router',
+                ],
+            ],
         ],
+        'validator' => [
+            'mautic.form.validator.upload_field_validator' => [
+                'class'     => UploadFieldValidator::class,
+                'arguments' => [
+                    'mautic.core.validator.file_upload',
+                ],
+            ],
+            'mautic.form.validator.constraint.file_extension_constraint_validator' => [
+                'class'     => FileExtensionConstraintValidator::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+                'tags' => [
+                    'name'  => 'validator.constraint_validator',
+                    'alias' => 'file_extension_constraint_validator',
+                ],
+            ],
+        ],
+        'fixtures' => [
+            'mautic.form.fixture.form' => [
+                'class'     => \Mautic\FormBundle\DataFixtures\ORM\LoadFormData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['mautic.form.model.form', 'mautic.form.model.field', 'mautic.form.model.action'],
+            ],
+            'mautic.form.fixture.form_result' => [
+                'class'     => \Mautic\FormBundle\DataFixtures\ORM\LoadFormResultData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['mautic.page.model.page', 'mautic.form.model.submission'],
+            ],
+        ],
+    ],
+
+    'parameters' => [
+        'form_upload_dir'        => '%kernel.root_dir%/../media/files/form',
+        'blacklisted_extensions' => ['php', 'sh'],
+        'do_not_submit_emails'   => [],
     ],
 ];

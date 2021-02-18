@@ -48,14 +48,18 @@ class VtigerApi extends CrmApi
      *
      * @return mixed
      */
-    public function getLeadFields()
+    public function getLeadFields($object)
     {
-        return $this->request('describe', $this->element);
+        if ('company' === $object) {
+            $object = 'Accounts';
+        } else {
+            $object = $this->element;
+        }
+
+        return $this->request('describe', $object);
     }
 
     /**
-     * @param array $data
-     *
      * @return mixed
      */
     public function createLead(array $data)

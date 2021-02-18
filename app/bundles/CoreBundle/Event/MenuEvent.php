@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -13,9 +14,6 @@ namespace Mautic\CoreBundle\Event;
 use Mautic\CoreBundle\Menu\MenuHelper;
 use Symfony\Component\EventDispatcher\Event;
 
-/**
- * Class MenuEvent.
- */
 class MenuEvent extends Event
 {
     /**
@@ -24,22 +22,17 @@ class MenuEvent extends Event
     protected $menuItems = ['children' => []];
 
     /**
-     * @var
+     * @var string
      */
     protected $type;
 
     /**
-     * Menu helper.
-     *
      * @var MenuHelper
      */
     protected $helper;
 
     /**
-     * MenuEvent constructor.
-     *
-     * @param MenuHelper $menuHelper
-     * @param string     $type
+     * @param string $type
      */
     public function __construct(MenuHelper $menuHelper, $type = 'main')
     {
@@ -47,9 +40,6 @@ class MenuEvent extends Event
         $this->type   = $type;
     }
 
-    /**
-     * @param array $menuItems
-     */
     public function setMenuItems(array $menuItems)
     {
         $this->menuItems = $menuItems;
@@ -57,21 +47,18 @@ class MenuEvent extends Event
 
     /**
      * Add items to the menu.
-     *
-     * @param array $menuItems
      */
     public function addMenuItems(array $menuItems)
     {
         $defaultPriority = isset($menuItems['priority']) ? $menuItems['priority'] : 9999;
         $items           = isset($menuItems['items']) ? $menuItems['items'] : $menuItems;
 
-        $isRoot = isset($items['name']) && ($items['name'] == 'root' || $items['name'] == $items['name']);
+        $isRoot = isset($items['name']) && ('root' == $items['name'] || $items['name'] == $items['name']);
         if (!$isRoot) {
-            $this->helper->createMenuStructure($items, 0, $defaultPriority);
+            $this->helper->createMenuStructure($items, 0, $defaultPriority, $this->type);
 
             $this->menuItems['children'] = array_merge_recursive($this->menuItems['children'], $items);
         } else {
-
             //make sure the root does not override the children
             if (isset($this->menuItems['children'])) {
                 if (isset($items['children'])) {
@@ -91,9 +78,9 @@ class MenuEvent extends Event
      */
     public function getMenuItems()
     {
-        $this->helper->placeOrphans($this->menuItems['children'], true);
+        $this->helper->placeOrphans($this->menuItems['children'], true, 1, $this->type);
         $this->helper->sortByPriority($this->menuItems['children']);
-        $this->helper->resetOrphans();
+        $this->helper->resetOrphans($this->type);
 
         return $this->menuItems;
     }

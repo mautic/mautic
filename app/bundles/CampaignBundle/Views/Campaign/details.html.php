@@ -1,14 +1,16 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+
  */
+
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'campaign');
 $view['slots']->set('headerTitle', $campaign->getName());
 
 $view['slots']->set(
@@ -18,10 +20,22 @@ $view['slots']->set(
         [
             'item'            => $campaign,
             'templateButtons' => [
-                'edit'   => $permissions['campaign:campaigns:edit'],
-                'clone'  => $permissions['campaign:campaigns:create'],
-                'delete' => $permissions['campaign:campaigns:delete'],
-                'close'  => $permissions['campaign:campaigns:view'],
+                'edit'   => $view['security']->hasEntityAccess(
+                    $permissions['campaign:campaigns:editown'],
+                    $permissions['campaign:campaigns:editother'],
+                    $campaign->getCreatedBy()
+                ),
+                'clone'    => $permissions['campaign:campaigns:create'],
+                'delete'   => $view['security']->hasEntityAccess(
+                    $permissions['campaign:campaigns:deleteown'],
+                    $permissions['campaign:campaigns:deleteother'],
+                    $campaign->getCreatedBy()
+                ),
+                'close'   => $view['security']->hasEntityAccess(
+                    $permissions['campaign:campaigns:viewown'],
+                    $permissions['campaign:campaigns:viewother'],
+                    $campaign->getCreatedBy()
+                ),
             ],
             'routeBase' => 'campaign',
         ]
@@ -32,11 +46,25 @@ $view['slots']->set(
     $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $campaign])
 );
 
+$campaignId = $campaign->getId();
+
+$preview = trim($view->render('MauticCampaignBundle:Campaign:preview.html.php', [
+    'campaignId'      => $campaignId,
+    'campaign'        => $campaign,
+    'campaignEvents'  => $campaignEvents,
+    'campaignSources' => $campaignSources,
+    'eventSettings'   => $eventSettings,
+    'canvasSettings'  => $campaign->getCanvasSettings(),
+]));
+
 $decisions  = trim($view->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events['decision']]));
 $actions    = trim($view->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events['action']]));
 $conditions = trim($view->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events['condition']]));
 
 switch (true) {
+    case !empty($preview):
+        $firstTab = 'preview';
+        break;
     case !empty($decisions):
         $firstTab = 'decision';
         break;
@@ -105,6 +133,7 @@ switch (true) {
             </div>
             <!--/ campaign detail collapseable toggler -->
 
+            <?php echo $view['content']->getCustomContent('left.section.top', $mauticTemplateVars); ?>
             <!-- some stats -->
             <div class="pa-md">
                 <div class="row">
@@ -136,30 +165,33 @@ switch (true) {
             </div>
             <!--/ stats -->
 
+            <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
+
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
+                <?php if ($preview): ?>
+                     <li class="<?php if ('preview' == $firstTab): echo 'active'; endif; ?>">
+                        <a href="#preview-container" role="tab" data-toggle="tab">
+                            <?php echo $view['translator']->trans('mautic.campaign.preview.header'); ?>
+                        </a>
+                    </li>
+                <?php endif; ?>
                 <?php if ($decisions): ?>
-                    <li class="<?php if ('decision' == $firstTab) {
-                                    echo 'active';
-                                } ?>">
+                    <li class="<?php if ('decision' == $firstTab): echo 'active'; endif; ?>">
                         <a href="#decisions-container" role="tab" data-toggle="tab">
                             <?php echo $view['translator']->trans('mautic.campaign.event.decisions.header'); ?>
                         </a>
                     </li>
                 <?php endif; ?>
                 <?php if ($actions): ?>
-                    <li class="<?php if ('action' == $firstTab) {
-                                    echo 'active';
-                                } ?>">
+                    <li class="<?php if ('action' == $firstTab): echo 'active'; endif; ?>">
                         <a href="#actions-container" role="tab" data-toggle="tab">
                             <?php echo $view['translator']->trans('mautic.campaign.event.actions.header'); ?>
                         </a>
                     </li>
                 <?php endif; ?>
                 <?php if ($conditions): ?>
-                    <li class="<?php if ('condition' == $firstTab) {
-                                    echo 'active';
-                                } ?>">
+                    <li class="<?php if ('condition' == $firstTab): echo 'active'; endif; ?>">
                         <a href="#conditions-container" role="tab" data-toggle="tab">
                             <?php echo $view['translator']->trans('mautic.campaign.event.conditions.header'); ?>
                         </a>
@@ -170,6 +202,7 @@ switch (true) {
                         <?php echo $view['translator']->trans('mautic.lead.leads'); ?>
                     </a>
                 </li>
+                <?php echo $view['content']->getCustomContent('tabs', $mauticTemplateVars); ?>
             </ul>
             <!--/ tabs controls -->
         </div>
@@ -177,24 +210,23 @@ switch (true) {
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
             <!-- #events-container -->
+            <?php if ($preview): ?>
+                <div class="<?php if ('preview' == $firstTab): echo 'active '; endif; ?> tab-pane fade in bdr-w-0" id="preview-container">
+                   <?php echo $preview; ?>
+                </div>
+            <?php endif; ?>
             <?php if ($decisions): ?>
-                <div class="<?php if ('decision' == $firstTab) {
-                                    echo 'active ';
-                                } ?>tab-pane fade in bdr-w-0" id="decisions-container">
+                <div class="<?php if ('decision' == $firstTab): echo 'active '; endif; ?> tab-pane fade in bdr-w-0" id="decisions-container">
                     <?php echo $decisions; ?>
                 </div>
             <?php endif; ?>
             <?php if ($actions): ?>
-                <div class="<?php if ('action' == $firstTab) {
-                                    echo 'active ';
-                                } ?>tab-pane fade in bdr-w-0" id="actions-container">
+                <div class="<?php if ('action' == $firstTab): echo 'active '; endif; ?> tab-pane fade in bdr-w-0" id="actions-container">
                     <?php echo $actions; ?>
                 </div>
             <?php endif; ?>
             <?php if ($conditions): ?>
-                <div class="<?php if ('condition' == $firstTab) {
-                                    echo 'active ';
-                                } ?>tab-pane fade in bdr-w-0" id="conditions-container">
+                <div class="<?php if ('condition' == $firstTab): echo 'active '; endif; ?> tab-pane fade in bdr-w-0" id="conditions-container">
                     <?php echo $conditions; ?>
                 </div>
             <?php endif; ?>
@@ -203,17 +235,19 @@ switch (true) {
                 <?php echo $campaignLeads; ?>
                 <div class="clearfix"></div>
             </div>
+            <?php echo $view['content']->getCustomContent('tabs.content', $mauticTemplateVars); ?>
         </div>
         <!--/ end: tab-content -->
+
+        <?php echo $view['content']->getCustomContent('left.section.bottom', $mauticTemplateVars); ?>
     </div>
     <!--/ left section -->
 
     <!-- right section -->
     <div class="col-md-3 bg-white bdr-l height-auto">
-
-        <!-- recent activity -->
+        <?php echo $view['content']->getCustomContent('right.section.top', $mauticTemplateVars); ?>
         <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]); ?>
-
+        <?php echo $view['content']->getCustomContent('right.section.bottom', $mauticTemplateVars); ?>
     </div>
     <!--/ right section -->
 </div>

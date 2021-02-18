@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -11,6 +12,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
@@ -34,6 +36,11 @@ class Lead
     private $dateAdded;
 
     /**
+     * @var \DateTime
+     */
+    private $dateLastExited;
+
+    /**
      * @var bool
      */
     private $manuallyRemoved = false;
@@ -44,8 +51,10 @@ class Lead
     private $manuallyAdded = false;
 
     /**
-     * @param ORM\ClassMetadata $metadata
+     * @var int
      */
+    private $rotation = 1;
+
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -53,7 +62,8 @@ class Lead
         $builder->setTable('campaign_leads')
             ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\LeadRepository')
             ->addIndex(['date_added'], 'campaign_leads_date_added')
-            ->addIndex(['campaign_id', 'manually_removed', 'date_added', 'lead_id'], 'campaign_leads');
+            ->addIndex(['date_last_exited'], 'campaign_leads_date_exited')
+            ->addIndex(['campaign_id', 'manually_removed', 'lead_id', 'rotation'], 'campaign_leads');
 
         $builder->createManyToOne('campaign', 'Campaign')
             ->isPrimaryKey()
@@ -71,6 +81,36 @@ class Lead
 
         $builder->createField('manuallyAdded', 'boolean')
             ->columnName('manually_added')
+            ->build();
+
+        $builder->addNamedField('dateLastExited', 'datetime', 'date_last_exited', true);
+
+        $builder->addField('rotation', 'integer');
+    }
+
+    /**
+     * Prepares the metadata for API usage.
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('campaignLead')
+            ->addListProperties(
+                [
+                    'dateAdded',
+                    'manuallyRemoved',
+                    'manuallyAdded',
+                    'rotation',
+                    'dateLastExited',
+                ]
+            )
+            ->addProperties(
+                [
+                    'lead',
+                    'campaign',
+                ]
+            )
             ->build();
     }
 
@@ -91,17 +131,14 @@ class Lead
     }
 
     /**
-     * @return mixed
+     * @return \Mautic\LeadBundle\Entity\Lead
      */
     public function getLead()
     {
         return $this->lead;
     }
 
-    /**
-     * @param mixed $lead
-     */
-    public function setLead($lead)
+    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead)
     {
         $this->lead = $lead;
     }
@@ -114,10 +151,7 @@ class Lead
         return $this->campaign;
     }
 
-    /**
-     * @param Campaign $campaign
-     */
-    public function setCampaign($campaign)
+    public function setCampaign(Campaign $campaign)
     {
         $this->campaign = $campaign;
     }
@@ -168,5 +202,54 @@ class Lead
     public function wasManuallyAdded()
     {
         return $this->manuallyAdded;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRotation()
+    {
+        return $this->rotation;
+    }
+
+    /**
+     * @param int $rotation
+     *
+     * @return Lead
+     */
+    public function setRotation($rotation)
+    {
+        $this->rotation = (int) $rotation;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function startNewRotation()
+    {
+        ++$this->rotation;
+        $this->dateAdded = new \DateTime();
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getDateLastExited()
+    {
+        return $this->dateLastExited;
+    }
+
+    /**
+     * @return Lead
+     */
+    public function setDateLastExited(\DateTime $dateLastExited = null)
+    {
+        $this->dateLastExited = $dateLastExited;
+
+        return $this;
     }
 }

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -35,10 +36,7 @@ class ReportDataEvent extends AbstractReportEvent
     /**
      * ReportDataEvent constructor.
      *
-     * @param Report $report
-     * @param array  $data
-     * @param        $totalResults
-     * @param array  $options
+     * @param $totalResults
      */
     public function __construct(Report $report, array $data, $totalResults, array $options)
     {

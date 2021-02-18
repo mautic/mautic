@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -11,6 +12,8 @@
 <html>
     <head>
         <title><?php echo $name; ?></title>
+
+        <?php echo $metaRobots; ?>
 
         <?php echo $view['analytics']->getCode(); ?>
 

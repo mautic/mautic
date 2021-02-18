@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -70,13 +71,15 @@ class LeadDevice
     private $deviceModel;
 
     /**
+     * @var string
+     */
+    private $trackingId;
+
+    /**
      * @var \DateTime
      */
     private $dateAdded;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -92,9 +95,9 @@ class LeadDevice
             ->addIndex(['device_brand'], 'device_brand_search')
             ->addIndex(['device_model'], 'device_model_search');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
-        $builder->addLead(false, 'CASCADE');
+        $builder->addLead(false, 'CASCADE', false);
 
         $builder->addDateAdded();
 
@@ -134,6 +137,12 @@ class LeadDevice
             ->columnName('device_model')
             ->nullable()
             ->build();
+
+        $builder->createField('trackingId', 'string')
+            ->columnName('tracking_id')
+            ->unique()
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -143,12 +152,12 @@ class LeadDevice
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
-        $metadata->setGroupPrefix('stat')
+        $metadata->setGroupPrefix('leadDevice')
             ->addProperties(
                 [
                     'id',
+                    'lead',
                     'clientInfo',
-                    'dateOpened',
                     'device',
                     'deviceBrand',
                     'deviceModel',
@@ -167,6 +176,14 @@ class LeadDevice
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSignature()
+    {
+        return md5(json_encode($this->clientInfo).$this->device.$this->deviceOsName.$this->deviceOsPlatform.$this->deviceBrand.$this->deviceModel);
     }
 
     /**
@@ -209,9 +226,6 @@ class LeadDevice
         return $this->deviceBrand;
     }
 
-    /**
-     * @param mixed $isFailed
-     */
     public function setDeviceBrand($brand)
     {
         $this->deviceBrand = $brand;
@@ -236,13 +250,93 @@ class LeadDevice
     /**
      * @return string
      */
+    public function getDeviceOsName()
+    {
+        return $this->deviceOsName;
+    }
+
+    /**
+     * @param string $deviceOsName
+     *
+     * @return $this
+     */
+    public function setDeviceOsName($deviceOsName)
+    {
+        $this->deviceOsName = $deviceOsName;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeviceOsShortName()
+    {
+        return $this->deviceOsShortName;
+    }
+
+    /**
+     * @param string $deviceOsShortName
+     *
+     * @return $this
+     */
+    public function setDeviceOsShortName($deviceOsShortName)
+    {
+        $this->deviceOsShortName = $deviceOsShortName;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeviceOsVersion()
+    {
+        return $this->deviceOsVersion;
+    }
+
+    /**
+     * @param string $deviceOsVersion
+     *
+     * @return $this
+     */
+    public function setDeviceOsVersion($deviceOsVersion)
+    {
+        $this->deviceOsVersion = $deviceOsVersion;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeviceOsPlatform()
+    {
+        return $this->deviceOsPlatform;
+    }
+
+    /**
+     * @param string $deviceOsPlatform
+     *
+     * @return $this
+     */
+    public function setDeviceOsPlatform($deviceOsPlatform)
+    {
+        $this->deviceOsPlatform = $deviceOsPlatform;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
     public function getDeviceOs()
     {
         return $this->deviceOsName;
     }
 
     /**
-     * @param mixed $deviceOs
+     * @param array $deviceOs
      */
     public function setDeviceOs($deviceOs)
     {
@@ -261,6 +355,26 @@ class LeadDevice
     }
 
     /**
+     * @return string
+     */
+    public function getTrackingId()
+    {
+        return $this->trackingId;
+    }
+
+    /**
+     * @param string $trackingId
+     *
+     * @return self
+     */
+    public function setTrackingId($trackingId)
+    {
+        $this->trackingId = $trackingId;
+
+        return $this;
+    }
+
+    /**
      * @return Lead
      */
     public function getLead()
@@ -269,8 +383,6 @@ class LeadDevice
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return $this
      */
     public function setLead(Lead $lead)
@@ -283,16 +395,16 @@ class LeadDevice
     /**
      * @return mixed
      */
-    public function getDateOpen()
+    public function getDateAdded()
     {
         return $this->dateAdded;
     }
 
     /**
-     * @param mixed $dateOpen
+     * @param mixed $dateAdded
      */
-    public function setDateOpen($dateOpen)
+    public function setDateAdded($dateAdded)
     {
-        $this->dateAdded = $dateOpen;
+        $this->dateAdded = $dateAdded;
     }
 }

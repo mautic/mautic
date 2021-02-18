@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   Mautic, Inc
  * @author      Mautic, Inc
  *
@@ -14,8 +15,8 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 
 class WebhookQueueRepository extends CommonRepository
 {
-    /*
-     * Deletes all the webhook queues by ID
+    /**
+     * Deletes all the webhook queues by ID.
      *
      * @param $idList array of webhookqueue IDs
      */
@@ -25,6 +26,7 @@ class WebhookQueueRepository extends CommonRepository
         if (!count($idList)) {
             return;
         }
+
         $qb = $this->_em->getConnection()->createQueryBuilder();
         $qb->delete(MAUTIC_TABLE_PREFIX.'webhook_queue')
             ->where(
@@ -33,8 +35,8 @@ class WebhookQueueRepository extends CommonRepository
             ->execute();
     }
 
-    /*
-     * Gets a count of the webhook queues filtered by the webhook id
+    /**
+     * Gets a count of the webhook queues filtered by the webhook id.
      *
      * @param $id int (for Webhooks)
      *
@@ -42,16 +44,18 @@ class WebhookQueueRepository extends CommonRepository
      */
     public function getQueueCountByWebhookId($id)
     {
-        // if no idea was sent (the hook was deleted) then return a count of 0
+        // if no id was sent (the hook was deleted) then return a count of 0
         if (!$id) {
             return 0;
         }
-        $qb    = $this->_em->getConnection()->createQueryBuilder();
-        $count = $qb->select('count(id) as webhook_count')
-                 ->from(MAUTIC_TABLE_PREFIX.'webhook_queue', $this->getTableAlias())
-                 ->where('webhook_id = '.$id)
-                 ->execute()->fetch();
 
-        return $count['webhook_count'];
+        $qb = $this->_em->getConnection()->createQueryBuilder();
+
+        return (int) $qb->select('count(*) as webhook_count')
+            ->from(MAUTIC_TABLE_PREFIX.'webhook_queue', $this->getTableAlias())
+            ->where($this->getTableAlias().'.webhook_id = :id')
+            ->setParameter('id', $id)
+            ->execute()
+            ->fetchColumn();
     }
 }

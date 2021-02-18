@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -21,8 +22,6 @@ interface MauticController
 {
     /**
      * Initialize the controller.
-     *
-     * @param FilterControllerEvent $event
      *
      * @return mixed
      */

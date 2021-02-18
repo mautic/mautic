@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,11 +11,9 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
-/**
- * PointsChangeLogRepository.
- */
 class PointsChangeLogRepository extends CommonRepository
 {
     use TimelineTrait;
@@ -22,18 +21,17 @@ class PointsChangeLogRepository extends CommonRepository
     /**
      * Get a lead's point log.
      *
-     * @param int   $leadId
-     * @param array $options
+     * @param int|null $leadId
      *
      * @return array
      */
-    public function getLeadTimelineEvents($leadId, array $options = [])
+    public function getLeadTimelineEvents($leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp')
-            ->select('lp.event_name as eventName, lp.action_name as actionName, lp.date_added as dateAdded, lp.type, lp.delta, lp.id');
+            ->select('lp.event_name as eventName, lp.action_name as actionName, lp.date_added as dateAdded, lp.type, lp.delta, lp.id, lp.lead_id');
 
-        if (null !== $leadId) {
+        if ($leadId) {
             $query->where('lp.lead_id = '.(int) $leadId);
         }
 
@@ -50,71 +48,40 @@ class PointsChangeLogRepository extends CommonRepository
     /**
      * Get table stat data from point log table.
      *
-     * @param QueryBuilder $query
-     *
      * @return array
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostPoints($query, $limit = 10, $offset = 0)
+    public function getMostPoints(QueryBuilder $query, $limit = 10, $offset = 0)
     {
         $query->setMaxResults($limit)
                 ->setFirstResult($offset);
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
+        return $query->execute()->fetchAll();
     }
 
     /**
      * Get table stat data from lead table.
      *
-     * @param QueryBuilder $query
-     *
      * @return array
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostLeads($query, $limit = 10, $offset = 0)
+    public function getMostLeads(QueryBuilder $query, $limit = 10, $offset = 0)
     {
         $query->setMaxResults($limit)
                 ->setFirstResult($offset);
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
-    }
-
-    /**
-     * Count a value in a column.
-     *
-     * @param QueryBuilder $query
-     *
-     * @return array
-     *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    public function countValue($query, $column, $value)
-    {
-        $query->select('count('.$column.') as quantity')
-            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp', 'lp.lead_id = l.id')
-            ->andwhere($query->expr()->eq($column, ':value'))
-            ->setParameter('value', $value);
-
-        $result = $query->execute()->fetch();
-
-        return $result['quantity'];
+        return $query->execute()->fetchAll();
     }
 
     /**
      * Updates lead ID (e.g. after a lead merge).
      *
-     * @param $fromLeadId
-     * @param $toLeadId
+     * @param int $fromLeadId
+     * @param int $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {

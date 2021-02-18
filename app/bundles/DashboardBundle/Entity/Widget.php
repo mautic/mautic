@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,9 +11,11 @@
 
 namespace Mautic\DashboardBundle\Entity;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -93,39 +96,20 @@ class Widget extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->setTable('widgets')
-            ->setCustomRepositoryClass('Mautic\DashboardBundle\Entity\WidgetRepository');
-
+        $builder->setTable('widgets');
+        $builder->setCustomRepositoryClass(WidgetRepository::class);
         $builder->addIdColumns('name', false);
-
-        $builder->addField('type', 'string');
-        $builder->addField('width', 'integer');
-        $builder->addField('height', 'integer');
-
-        $builder->createField('cacheTimeout', 'integer')
-            ->columnName('cache_timeout')
-            ->nullable()
-            ->build();
-
-        $builder->createField('ordering', 'integer')
-            ->nullable()
-            ->build();
-
-        $builder->createField('params', 'array')
-            ->nullable()
-            ->build();
+        $builder->addField('type', Type::STRING);
+        $builder->addField('width', Type::INTEGER);
+        $builder->addField('height', Type::INTEGER);
+        $builder->addNullableField('cacheTimeout', Type::INTEGER, 'cache_timeout');
+        $builder->addNullableField('ordering', Type::INTEGER);
+        $builder->addNullableField('params', Type::TARRAY);
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('type', new NotBlank([
@@ -152,8 +136,8 @@ class Widget extends FormEntity
      */
     public function setName($name)
     {
-        $this->isChanged('name', $name);
-        $this->name = $name;
+        $this->name = InputHelper::string($name);
+        $this->isChanged('name', $this->name);
 
         return $this;
     }
@@ -177,8 +161,8 @@ class Widget extends FormEntity
      */
     public function setType($type)
     {
-        $this->isChanged('type', $type);
-        $this->type = $type;
+        $this->type = InputHelper::string($type);
+        $this->isChanged('type', $this->type);
 
         return $this;
     }
@@ -202,8 +186,8 @@ class Widget extends FormEntity
      */
     public function setWidth($width)
     {
-        $this->isChanged('width', $width);
-        $this->width = $width;
+        $this->width = (int) $width;
+        $this->isChanged('width', $this->width);
 
         return $this;
     }
@@ -227,8 +211,8 @@ class Widget extends FormEntity
      */
     public function setHeight($height)
     {
-        $this->isChanged('height', $height);
-        $this->height = $height;
+        $this->height = (int) $height;
+        $this->isChanged('height', $this->height);
 
         return $this;
     }
@@ -277,8 +261,8 @@ class Widget extends FormEntity
      */
     public function setOrdering($ordering)
     {
-        $this->isChanged('ordering', $ordering);
-        $this->ordering = $ordering;
+        $this->ordering = (int) $ordering;
+        $this->isChanged('ordering', $this->ordering);
 
         return $this;
     }
@@ -305,8 +289,6 @@ class Widget extends FormEntity
 
     /**
      * Set params.
-     *
-     * @param array $params
      *
      * @return Widget
      */
@@ -355,8 +337,6 @@ class Widget extends FormEntity
 
     /**
      * Set template data.
-     *
-     * @param array $templateData
      *
      * @return Widget
      */
@@ -438,5 +418,21 @@ class Widget extends FormEntity
     public function getLoadTime()
     {
         return $this->loadTime;
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return [
+            'name'     => $this->getName(),
+            'width'    => $this->getWidth(),
+            'height'   => $this->getHeight(),
+            'ordering' => $this->getOrdering(),
+            'type'     => $this->getType(),
+            'params'   => $this->getParams(),
+            'template' => $this->getTemplate(),
+        ];
     }
 }

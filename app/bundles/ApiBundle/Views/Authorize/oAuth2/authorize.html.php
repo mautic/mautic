@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -14,10 +15,10 @@ $msg  = (!empty($name)) ? $view['translator']->trans('mautic.api.oauth.clientwit
     $view['translator']->trans('mautic.api.oauth.clientnoname');
 ?>
 <h4 class="mb-lg"><?php echo $msg; ?></h4>
-<form class="form-login text-center" role="form" name="fos_oauth_server_authorize_form" action="<?php echo $view['router']->path('fos_oauth_server_authorize') ?>" method="post">
+<form class="form-login text-center" role="form" name="fos_oauth_server_authorize_form" action="<?php echo $view['router']->path('fos_oauth_server_authorize'); ?>" method="post">
 
-<input type="submit" class="btn btn-primary btn-accept" name="accepted" value="<?php echo $view['translator']->trans('mautic.api.oauth.accept'); ?>" />
-<input type="submit" class="btn btn-danger btn-deny" name="rejected" value="<?php echo $view['translator']->trans('mautic.api.oauth.deny'); ?>" />
+<input type="submit" class="btn btn-primary btn-accept" name="accepted" value="<?php echo $view->escape($view['translator']->trans('mautic.api.oauth.accept')); ?>" />
+<input type="submit" class="btn btn-danger btn-deny" name="rejected" value="<?php echo $view->escape($view['translator']->trans('mautic.api.oauth.deny')); ?>" />
 
 <?php
 echo $view['form']->row($form['client_id']);

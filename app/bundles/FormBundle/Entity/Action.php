@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -13,6 +14,8 @@ namespace Mautic\FormBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * Class Action.
@@ -68,9 +71,6 @@ class Action
         $this->form = null;
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -116,6 +116,14 @@ class Action
                 ]
             )
             ->build();
+    }
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addPropertyConstraint('type', new Assert\NotBlank([
+            'message' => 'mautic.core.name.required',
+            'groups'  => ['action'],
+        ]));
     }
 
     /**
@@ -201,8 +209,6 @@ class Action
 
     /**
      * Set form.
-     *
-     * @param Form $form
      *
      * @return Action
      */

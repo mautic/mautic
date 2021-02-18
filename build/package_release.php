@@ -3,7 +3,7 @@
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
- * @link        http://mautic.org
+ * @see        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -14,9 +14,7 @@
  */
 
 // List of critical migrations
-$criticalMigrations = [
-    '20160225000000',
-];
+$criticalMigrations = [];
 
 $baseDir = __DIR__;
 
@@ -28,7 +26,8 @@ $gitSourceLocation = (isset($args['b'])) ? ' ' : ' tags/';
 require_once dirname(__DIR__).'/vendor/autoload.php';
 require_once dirname(__DIR__).'/app/AppKernel.php';
 
-$appVersion = AppKernel::MAJOR_VERSION.'.'.AppKernel::MINOR_VERSION.'.'.AppKernel::PATCH_VERSION.AppKernel::EXTRA_VERSION;
+$releaseMetadata = \Mautic\CoreBundle\Release\ThisRelease::getMetadata();
+$appVersion      = $releaseMetadata->getVersion();
 
 // Use branch if applicable otherwise a version tag
 $gitSource = (!empty($args['b'])) ? $args['b'] : $appVersion;
@@ -57,25 +56,25 @@ if (!isset($args['repackage'])) {
     passthru($systemGit.' ls-tree -r -t --name-only '.$gitSource, $releaseFiles);
     $releaseFiles = explode("\n", trim(ob_get_clean()));
 
-    if ($result !== 0) {
+    if (0 !== $result) {
         exit;
     }
 
     chdir(__DIR__);
     system('cd '.__DIR__.'/packaging && composer install --no-dev --no-scripts --optimize-autoloader && cd ..', $result);
-    if ($result !== 0) {
+    if (0 !== $result) {
         exit;
     }
 
     // Generate the bootstrap.php.cache file
     system(__DIR__.'/packaging/vendor/sensio/distribution-bundle/Resources/bin/build_bootstrap.php', $result);
-    if ($result !== 0) {
+    if (0 !== $result) {
         exit;
     }
 
     // Compile prod assets
-    system('cd '.__DIR__.'/packaging && php '.__DIR__.'/packaging/app/console mautic:assets:generate -e prod', $result);
-    if ($result !== 0) {
+    system('cd '.__DIR__.'/packaging && php '.__DIR__.'/packaging/bin/console mautic:assets:generate -e prod', $result);
+    if (0 !== $result) {
         exit;
     }
 
@@ -96,24 +95,6 @@ if (!isset($args['repackage'])) {
         'upgrade.php'             => true,
     ];
 
-    // Build an array of paths which we won't ever distro, this is used for the update packages
-    $doNotPackage = [
-        '.github/CONTRIBUTING.md',
-        '.github/ISSUE_TEMPLATE.md',
-        '.github/PULL_REQUEST_TEMPLATE.md',
-        '.gitignore',
-        '.travis.yml',
-        '.php_cs',
-        'app/phpunit.xml.dist',
-        'build',
-        'composer.json',
-        'composer.lock',
-        'Gruntfile.js',
-        'index_dev.php',
-        'package.json',
-        'upgrade.php',
-    ];
-
     // Create a flag to check if the vendors changed
     $vendorsChanged = false;
 
@@ -128,18 +109,11 @@ if (!isset($args['repackage'])) {
             $folderPath     = explode('/', $filename);
             $baseFolderName = $folderPath[0];
 
-            if (!$vendorsChanged && $filename == 'composer.lock') {
+            if (!$vendorsChanged && 'composer.lock' == $filename) {
                 $vendorsChanged = true;
             }
 
-            $doNotPackageFile   = in_array($filename, $doNotPackage);
-            $doNotPackageFolder = in_array($baseFolderName, $doNotPackage);
-
-            if ($doNotPackageFile || $doNotPackageFolder) {
-                continue;
-            }
-
-            if (substr($file, 0, 1) == 'D') {
+            if ('D' == substr($file, 0, 1)) {
                 if (!in_array($filename, $releaseFiles)) {
                     $deletedFiles[$filename] = true;
                 }
@@ -183,7 +157,12 @@ chdir(__DIR__.'/packaging');
 system("rm -f ../packages/{$appVersion}.zip ../packages/{$appVersion}-update.zip");
 
 echo "Packaging Mautic Full Installation\n";
-system('zip -r ../packages/'.$appVersion.'.zip . -x@../excludefiles.txt > /dev/null');
+system('zip -r ../packages/'.$appVersion.'.zip . -x@../exclude_files.txt -x@../exclude_files_full.txt > /dev/null');
 
 echo "Packaging Mautic Update Package\n";
-system('zip -r ../packages/'.$appVersion.'-update.zip -@ < modified_files.txt > /dev/null');
+system('zip -r ../packages/'.$appVersion.'-update.zip -x@../exclude_files.txt -@ < modified_files.txt > /dev/null');
+
+// Write output to file (so that the CI pipeline can add it to the release notes), then output to console
+system('cd ../packages && openssl sha1 '.$appVersion.'.zip > build-sha1-all');
+system('cd ../packages && openssl sha1 '.$appVersion.'-update.zip >> build-sha1-all');
+system('cat ../packages/build-sha1-all');

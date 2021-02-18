@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -50,13 +51,21 @@ EOT
 
         // Minify Mautic Form SDK
         file_put_contents(
-            $pathsHelper->getSystemPath('assets', true).'/js/mautic-form.js',
+            $pathsHelper->getSystemPath('assets', true).'/js/mautic-form-tmp.js',
             \Minify::combine([$pathsHelper->getSystemPath('assets', true).'/js/mautic-form-src.js'])
         );
+        // Fix the MauticSDK loader
+        file_put_contents(
+            $pathsHelper->getSystemPath('assets', true).'/js/mautic-form.js',
+            str_replace("'mautic-form-src.js'", "'mautic-form.js'",
+                file_get_contents($pathsHelper->getSystemPath('assets', true).'/js/mautic-form-tmp.js'))
+        );
+        // Remove temp file.
+        unlink($pathsHelper->getSystemPath('assets', true).'/js/mautic-form-tmp.js');
 
         /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
         $translator = $container->get('translator');
-        $translator->setLocale($container->get('mautic.helper.core_parameters')->getParameter('locale'));
+        $translator->setLocale($container->get('mautic.helper.core_parameters')->get('locale'));
 
         // Update successful
         $output->writeln('<info>'.$translator->trans('mautic.core.command.asset_generate_success').'</info>');

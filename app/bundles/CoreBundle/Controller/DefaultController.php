@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -22,13 +23,11 @@ use Symfony\Component\HttpFoundation\Request;
 class DefaultController extends CommonController
 {
     /**
-     * Generates default index.php.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function indexAction(Request $request)
     {
-        $root = $this->coreParametersHelper->getParameter('webroot');
+        $root = $this->coreParametersHelper->get('webroot');
 
         if (empty($root)) {
             return $this->redirect($this->generateUrl('mautic_dashboard_index'));
@@ -38,7 +37,7 @@ class DefaultController extends CommonController
             $page      = $pageModel->getEntity($root);
 
             if (empty($page)) {
-                $this->notFound();
+                return $this->notFound();
             }
 
             $slug = $pageModel->generateSlug($page);
@@ -74,22 +73,24 @@ class DefaultController extends CommonController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function notificationsAction()
     {
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
         $model = $this->getModel('core.notification');
 
-        list($notifications, $showNewIndicator, $updateMessage) = $model->getNotificationContent();
+        list($notifications, $showNewIndicator, $updateMessage) = $model->getNotificationContent(null, false, 200);
 
-        return $this->delegateView([
-            'contentTemplate' => 'MauticCoreBundle:Notification:notifications.html.php',
-            'viewParameters'  => [
-                'showNewIndicator' => $showNewIndicator,
-                'notifications'    => $notifications,
-                'updateMessage'    => $updateMessage,
-            ],
-        ]);
+        return $this->delegateView(
+            [
+                'contentTemplate' => 'MauticCoreBundle:Notification:notifications.html.php',
+                'viewParameters'  => [
+                    'showNewIndicator' => $showNewIndicator,
+                    'notifications'    => $notifications,
+                    'updateMessage'    => $updateMessage,
+                ],
+            ]
+        );
     }
 }

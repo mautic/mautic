@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -20,14 +21,17 @@ use Mautic\WebhookBundle\Entity\WebhookQueue;
 class WebhookQueueEvent extends CommonEvent
 {
     /**
-     * @param WebhookQueue $webhookQueue
-     * @param Webhook      $webhook
-     * @param bool         $isNew
+     * @var Webhook
      */
-    public function __construct(WebhookQueue &$webhookQueue, Webhook $webhook,  $isNew = false)
+    protected $webhook;
+
+    /**
+     * @param bool $isNew
+     */
+    public function __construct(WebhookQueue $webhookQueue, Webhook $webhook, $isNew = false)
     {
-        $this->entity  = &$webhookQueue;
-        $this->webhook = &$webhook;
+        $this->entity  = $webhookQueue;
+        $this->webhook = $webhook;
         $this->isNew   = $isNew;
     }
 
@@ -38,13 +42,11 @@ class WebhookQueueEvent extends CommonEvent
      */
     public function getWebhookQueue()
     {
-        return $this->getWebhookQueue();
+        return $this->entity;
     }
 
     /**
      * Sets the WebhookQueue entity.
-     *
-     * @param WebhookQueue $webhookQueue
      */
     public function setWebhookQueue(WebhookQueue $webhookQueue)
     {
@@ -58,13 +60,11 @@ class WebhookQueueEvent extends CommonEvent
      */
     public function getWebhook()
     {
-        return $this->getWebhook();
+        return $this->webhook;
     }
 
     /**
      * Sets the Webhook entity.
-     *
-     * @param Webhook $webhook
      */
     public function setWebhook(Webhook $webhook)
     {

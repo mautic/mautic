@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -14,9 +15,6 @@ use Mautic\CoreBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * Class MauticCoreBundle.
- */
 class MauticCoreBundle extends Bundle
 {
     /**
@@ -28,6 +26,7 @@ class MauticCoreBundle extends Bundle
         $container->addCompilerPass(new Compiler\TemplatingPass());
         $container->addCompilerPass(new Compiler\TranslationsPass());
         $container->addCompilerPass(new Compiler\ModelPass());
-        $container->addCompilerPass(new Compiler\EventPass());
+        $container->addCompilerPass(new Compiler\UpdateStepPass());
+        $container->addCompilerPass(new Compiler\PermissionsPass());
     }
 }

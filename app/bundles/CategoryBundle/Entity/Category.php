@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -52,9 +53,6 @@ class Category extends FormEntity
      */
     private $bundle;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -77,14 +75,25 @@ class Category extends FormEntity
             ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
-        $metadata->addPropertyConstraint('title', new NotBlank([
-            'message' => 'mautic.core.title.required',
-        ]));
+        $metadata->addPropertyConstraint(
+            'title',
+            new NotBlank(
+                [
+                    'message' => 'mautic.core.title.required',
+                ]
+            )
+        );
+
+        $metadata->addPropertyConstraint(
+            'bundle',
+            new NotBlank(
+                [
+                    'message' => 'mautic.core.value.required',
+                ]
+            )
+        );
     }
 
     /**
@@ -102,6 +111,7 @@ class Category extends FormEntity
                     'alias',
                     'description',
                     'color',
+                    'bundle',
                 ]
             )
             ->build();

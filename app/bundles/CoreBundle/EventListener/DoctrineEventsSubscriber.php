@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -12,35 +13,37 @@ namespace Mautic\CoreBundle\EventListener;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
+use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
+use Mautic\CoreBundle\Entity\DeprecatedInterface;
 
-/**
- * Class DoctrineEventsSubscriber.
- */
 class DoctrineEventsSubscriber implements EventSubscriber
 {
-    protected $tablePrefix;
+    /**
+     * @var string
+     */
+    private $tablePrefix;
 
     /**
-     * DoctrineEventsSubscriber constructor.
-     *
-     * @param $tablePrefix
+     * @var array
+     */
+    private $deprecatedEntityTables = [];
+
+    /**
+     * @param string $tablePrefix
      */
     public function __construct($tablePrefix)
     {
         $this->tablePrefix = $tablePrefix;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSubscribedEvents()
     {
-        return ['loadClassMetadata'];
+        return [
+            'loadClassMetadata',
+            'postGenerateSchema',
+        ];
     }
 
-    /**
-     * @param LoadClassMetadataEventArgs $args
-     */
     public function loadClassMetadata(LoadClassMetadataEventArgs $args)
     {
         //in the installer
@@ -86,7 +89,7 @@ class DoctrineEventsSubscriber implements EventSubscriber
             );
 
             foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {
-                if ($mapping['type'] == \Doctrine\ORM\Mapping\ClassMetadataInfo::MANY_TO_MANY
+                if (\Doctrine\ORM\Mapping\ClassMetadataInfo::MANY_TO_MANY == $mapping['type']
                     && isset($classMetadata->associationMappings[$fieldName]['joinTable']['name'])
                 ) {
                     $mappedTableName                                                     = $classMetadata->associationMappings[$fieldName]['joinTable']['name'];
@@ -112,6 +115,24 @@ class DoctrineEventsSubscriber implements EventSubscriber
                     );
                     $classMetadata->setIdGenerator($sequenceGenerator);
                 }
+            }
+
+            // Note deprecated entities so they can be removed from the schema before it's generated
+            if ($classMetadata->reflClass->implementsInterface(DeprecatedInterface::class)) {
+                $this->deprecatedEntityTables[] = $classMetadata->getTableName();
+            }
+        }
+    }
+
+    public function postGenerateSchema(GenerateSchemaEventArgs $args)
+    {
+        $schema = $args->getSchema();
+        $tables = $schema->getTables();
+
+        foreach ($tables as $table) {
+            if (in_array($table->getName(), $this->deprecatedEntityTables)) {
+                // remove table from schema
+                $schema->dropTable($table->getName());
             }
         }
     }

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,31 +11,48 @@
 
 namespace Mautic\AssetBundle\EventListener;
 
+use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class AssetBundle.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
     /**
      * @var AssetModel
      */
-    protected $assetModel;
+    private $assetModel;
 
     /**
-     * LeadSubscriber constructor.
-     *
-     * @param AssetModel $assetModel
+     * @var TranslatorInterface
      */
-    public function __construct(AssetModel $assetModel)
-    {
-        $this->assetModel = $assetModel;
+    private $translator;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    /**
+     * @var DownloadRepository
+     */
+    private $downloadRepository;
+
+    public function __construct(
+        AssetModel $assetModel,
+        TranslatorInterface $translator,
+        RouterInterface $router,
+        DownloadRepository $downloadRepository
+    ) {
+        $this->assetModel         = $assetModel;
+        $this->translator         = $translator;
+        $this->router             = $router;
+        $this->downloadRepository = $downloadRepository;
     }
 
     /**
@@ -51,8 +69,6 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
@@ -60,29 +76,26 @@ class LeadSubscriber extends CommonSubscriber
         $eventTypeKey  = 'asset.download';
         $eventTypeName = $this->translator->trans('mautic.asset.event.download');
         $event->addEventType($eventTypeKey, $eventTypeName);
+        $event->addSerializerGroup('assetList');
 
         // Decide if those events are filtered
         if (!$event->isApplicable($eventTypeKey)) {
             return;
         }
 
-        $lead = $event->getLead();
-
-        /** @var \Mautic\AssetBundle\Entity\DownloadRepository $downloadRepository */
-        $downloadRepository = $this->em->getRepository('MauticAssetBundle:Download');
-        $downloads          = $downloadRepository->getLeadDownloads($lead->getId(), $event->getQueryOptions());
+        $downloads = $this->downloadRepository->getLeadDownloads($event->getLeadId(), $event->getQueryOptions());
 
         // Add total number to counter
         $event->addToCounter($eventTypeKey, $downloads);
 
         if (!$event->isEngagementCount()) {
-
             // Add the downloads to the event array
             foreach ($downloads['results'] as $download) {
                 $asset = $this->assetModel->getEntity($download['asset_id']);
                 $event->addEvent(
                     [
                         'event'      => $eventTypeKey,
+                        'eventId'    => $eventTypeKey.$download['download_id'],
                         'eventLabel' => [
                             'label' => $download['title'],
                             'href'  => $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $download['asset_id']]),
@@ -95,15 +108,13 @@ class LeadSubscriber extends CommonSubscriber
                         'timestamp'       => $download['dateDownload'],
                         'icon'            => 'fa-download',
                         'contentTemplate' => 'MauticAssetBundle:SubscribedEvents\Timeline:index.html.php',
+                        'contactId'       => $download['lead_id'],
                     ]
                 );
             }
         }
     }
 
-    /**
-     * @param LeadChangeEvent $event
-     */
     public function onLeadChange(LeadChangeEvent $event)
     {
         $this->assetModel->getDownloadRepository()->updateLeadByTrackingId(
@@ -113,9 +124,6 @@ class LeadSubscriber extends CommonSubscriber
         );
     }
 
-    /**
-     * @param LeadMergeEvent $event
-     */
     public function onLeadMerge(LeadMergeEvent $event)
     {
         $this->assetModel->getDownloadRepository()->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());

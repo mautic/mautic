@@ -137,3 +137,18 @@
     }
   }
 }
+
+.modal .box-layout {
+  > [class*=" col-"],
+  > [class^="col-"] {
+    &.height-auto {
+      &:before {
+        width: auto;
+      }
+    }
+  }
+
+  .bg-auto {
+    background-color: @body-bg !important;
+  }
+}

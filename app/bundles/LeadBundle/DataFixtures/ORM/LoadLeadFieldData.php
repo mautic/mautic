@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -17,6 +18,14 @@ use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
  */
 class LoadLeadFieldData extends LeadFieldData
 {
+    /**
+     * {@inheritdoc}
+     */
+    public static function getGroups(): array
+    {
+        return [];
+    }
+
     /**
      * @return int
      */

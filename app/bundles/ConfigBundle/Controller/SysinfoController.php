@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -11,6 +12,7 @@
 namespace Mautic\ConfigBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Class SysinfoController.
@@ -24,7 +26,7 @@ class SysinfoController extends FormController
      */
     public function indexAction($page = 1)
     {
-        if (!$this->user->isAdmin() || $this->coreParametersHelper->getParameter('sysinfo_disabled')) {
+        if (!$this->user->isAdmin() || $this->coreParametersHelper->get('sysinfo_disabled')) {
             return $this->accessDenied();
         }
 
@@ -32,7 +34,7 @@ class SysinfoController extends FormController
         $model   = $this->getModel('config.sysinfo');
         $phpInfo = $model->getPhpInfo();
         $folders = $model->getFolders();
-        $log     = $model->getLogTail();
+        $log     = $model->getLogTail(40);
 
         return $this->delegateView([
             'viewParameters' => [

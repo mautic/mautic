@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -13,6 +14,7 @@ namespace Mautic\AssetBundle\Event;
 use Gaufrette\Adapter;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
 /**
  * Class RemoteAssetBrowseEvent.
@@ -29,10 +31,7 @@ class RemoteAssetBrowseEvent extends CommonEvent
      */
     private $integration;
 
-    /**
-     * @param AbstractIntegration $integration
-     */
-    public function __construct(AbstractIntegration $integration)
+    public function __construct(UnifiedIntegrationInterface $integration)
     {
         $this->integration = $integration;
     }
@@ -54,8 +53,6 @@ class RemoteAssetBrowseEvent extends CommonEvent
     }
 
     /**
-     * @param Adapter $adapter
-     *
      * @return $this
      */
     public function setAdapter(Adapter $adapter)

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -23,9 +24,6 @@ class AssetLoadEvent extends CommonEvent
      */
     protected $unique;
 
-    /**
-     * @param Download $download
-     */
     public function __construct(Download $download, $isUnique)
     {
         $this->entity = $download;

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -11,40 +12,28 @@
 namespace Mautic\PluginBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\PluginBundle\EventListener\PushToIntegrationTrait;
 
 /**
  * Class EventHelper.
  */
 class EventHelper
 {
+    use PushToIntegrationTrait;
+
     /**
-     * @param               $lead
-     * @param MauticFactory $factory
+     * @param $lead
      */
     public static function pushLead($config, $lead, MauticFactory $factory)
     {
+        $contact = $factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->getEntityWithPrimaryCompany($lead);
+
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper = $factory->getHelper('integration');
 
-        $integration = (!empty($config['integration'])) ? $config['integration'] : null;
-        $feature     = (empty($integration)) ? 'push_lead' : null;
+        static::setStaticIntegrationHelper($integrationHelper);
+        $errors  = [];
 
-        $services = $integrationHelper->getIntegrationObjects($integration, $feature);
-        $success  = false;
-
-        foreach ($services as $name => $s) {
-            $settings = $s->getIntegrationSettings();
-            if (!$settings->isPublished()) {
-                continue;
-            }
-
-            if (method_exists($s, 'pushLead')) {
-                if ($s->pushLead($lead, $config)) {
-                    $success = true;
-                }
-            }
-        }
-
-        return $success;
+        return static::pushIt($config, $contact, $errors);
     }
 }

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -14,53 +15,50 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
-use Mautic\FormBundle\Entity\Field;
-use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
-use Mautic\PageBundle\Entity\Page;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Mautic\FormBundle\Model\SubmissionModel;
+use Mautic\PageBundle\Model\PageModel;
 
-/**
- * Class LoadFormResultData.
- */
-class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
-     * @var ContainerInterface
+     * @var PageModel
      */
-    private $container;
+    private $pageModel;
+
+    /**
+     * @var SubmissionModel
+     */
+    private $submissionModel;
 
     /**
      * {@inheritdoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function __construct(PageModel $pageModel, SubmissionModel $submissionModel)
     {
-        $this->container = $container;
+        $this->pageModel       = $pageModel;
+        $this->submissionModel = $submissionModel;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
-        $factory   = $this->container->get('mautic.factory');
-        $pageModel = $factory->getModel('page.page');
-        $repo      = $factory->getModel('form.submission')->getRepository();
-
-        $fixture       = &$this;
-        $importResults = function ($results) use ($factory, $pageModel, $repo, &$fixture) {
-            foreach ($results as $count => $rows) {
+        $importResults = function ($results) {
+            foreach ($results as $rows) {
                 $submission = new Submission();
                 $submission->setDateSubmitted(new \DateTime());
 
                 foreach ($rows as $col => $val) {
-                    if ($val != 'NULL') {
-                        $setter = 'set'.ucfirst($col);
-                        if (in_array($col, ['form', 'page', 'ipAddress'])) {
-                            $entity = $fixture->getReference($col.'-'.$val);
-                            if ($col == 'page') {
-                                $submission->setReferer($pageModel->generateUrl($entity));
+                    if ('NULL' != $val) {
+                        $setter = 'set'.\ucfirst($col);
+                        if (\in_array($col, ['form', 'page', 'ipAddress', 'lead'])) {
+                            if ('lead' === $col) {
+                                // For some reason the lead must be linked with id - 1
+                                $entity = $this->getReference($col.'-'.($val - 1));
+                            } else {
+                                $entity = $this->getReference($col.'-'.$val);
+                            }
+                            if ('page' == $col) {
+                                $submission->setReferer($this->pageModel->generateUrl($entity));
                             }
                             $submission->$setter($entity);
                             unset($rows[$col]);
@@ -72,14 +70,14 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
                 }
 
                 $submission->setResults($rows);
-                $repo->saveEntity($submission);
+                $this->submissionModel->getRepository()->saveEntity($submission);
             }
         };
 
         $results = CsvHelper::csv_to_array(__DIR__.'/fakeresultdata.csv');
         $importResults($results);
 
-        sleep(2);
+        \sleep(2);
 
         $results2 = CsvHelper::csv_to_array(__DIR__.'/fakeresult2data.csv');
         $importResults($results2);

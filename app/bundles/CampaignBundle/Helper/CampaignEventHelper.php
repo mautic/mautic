@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -11,21 +12,19 @@
 namespace Mautic\CampaignBundle\Helper;
 
 use Mautic\CampaignBundle\Event\CampaignLeadChangeEvent;
-use Mautic\CoreBundle\Factory\MauticFactory;
 
 class CampaignEventHelper
 {
     /**
      * Determine if this campaign applies.
      *
-     * @param $eventDetails
-     * @param $event
+     * @param CampaignLeadChangeEvent $eventDetails
      *
      * @return bool
      */
-    public static function validateLeadChangeTrigger(CampaignLeadChangeEvent $eventDetails = null, $event)
+    public static function validateLeadChangeTrigger(CampaignLeadChangeEvent $eventDetails = null, array $event)
     {
-        if ($eventDetails == null) {
+        if (null == $eventDetails) {
             return true;
         }
 
@@ -39,48 +38,10 @@ class CampaignEventHelper
 
         //check against the selected action (was lead removed or added)
         $func = 'was'.ucfirst($action);
-        if (!$eventDetails->$func()) {
+        if (!method_exists($eventDetails, $func) || !$eventDetails->$func()) {
             return false;
         }
 
         return true;
-    }
-
-    /**
-     * @param MauticFactory $factory
-     * @param               $lead
-     * @param               $event
-     *
-     * @throws \Doctrine\ORM\ORMException
-     */
-    public static function addRemoveLead(MauticFactory $factory, $lead, $event)
-    {
-        /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
-        $campaignModel       = $factory->getModel('campaign');
-        $properties          = $event['properties'];
-        $addToCampaigns      = $properties['addTo'];
-        $removeFromCampaigns = $properties['removeFrom'];
-        $em                  = $factory->getEntityManager();
-        $leadsModified       = false;
-
-        if (!empty($addToCampaigns)) {
-            foreach ($addToCampaigns as $c) {
-                $campaignModel->addLead($em->getReference('MauticCampaignBundle:Campaign', $c), $lead, true);
-            }
-            $leadsModified = true;
-        }
-
-        if (!empty($removeFromCampaigns)) {
-            foreach ($removeFromCampaigns as $c) {
-                if ($c == 'this') {
-                    $c = $event['campaign']['id'];
-                }
-
-                $campaignModel->removeLead($em->getReference('MauticCampaignBundle:Campaign', $c), $lead, true);
-            }
-            $leadsModified = true;
-        }
-
-        return $leadsModified;
     }
 }

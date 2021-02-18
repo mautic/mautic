@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -20,8 +21,6 @@ use Symfony\Component\HttpFoundation\Request;
 class AjaxController extends CommonAjaxController
 {
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function categoryListAction(Request $request)

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,23 +11,20 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
-/**
- * Class AbstractTokenHttpTransport.
- */
-abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport implements \Swift_Transport, InterfaceTokenTransport
+abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport implements \Swift_Transport, TokenTransportInterface
 {
     /**
-     * @var
+     * @var string|null
      */
     private $username;
 
     /**
-     * @var
+     * @var string|null
      */
     private $password;
 
     /**
-     * @var
+     * @var string|null
      */
     private $apiKey;
 
@@ -64,7 +62,7 @@ abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport im
     abstract protected function handlePostResponse($response, $curlInfo);
 
     /**
-     * @param $username
+     * @param string|null $username
      */
     public function setUsername($username)
     {
@@ -72,7 +70,7 @@ abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport im
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getUsername()
     {
@@ -80,7 +78,7 @@ abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport im
     }
 
     /**
-     * @param $password
+     * @param string|null $password
      */
     public function setPassword($password)
     {
@@ -88,7 +86,7 @@ abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport im
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getPassword()
     {
@@ -96,7 +94,7 @@ abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport im
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getApiKey()
     {
@@ -104,7 +102,7 @@ abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport im
     }
 
     /**
-     * @param mixed $apiKey
+     * @param string|null $apiKey
      *
      * @return AbstractTokenHttpTransport
      */
@@ -116,14 +114,13 @@ abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport im
     }
 
     /**
-     * @param \Swift_Mime_Message $message
-     * @param null                $failedRecipients
+     * @param null $failedRecipients
      *
      * @return int
      *
      * @throws \Swift_TransportException
      */
-    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         $this->message = $message;
 

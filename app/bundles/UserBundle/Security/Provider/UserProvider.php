@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -56,13 +57,6 @@ class UserProvider implements UserProviderInterface
      */
     protected $encoder;
 
-    /**
-     * @param UserRepository           $userRepository
-     * @param PermissionRepository     $permissionRepository
-     * @param Session                  $session
-     * @param EventDispatcherInterface $dispatcher
-     * @param EncoderFactory           $encoder
-     */
     public function __construct(
         UserRepository $userRepository,
         PermissionRepository $permissionRepository,
@@ -91,15 +85,9 @@ class UserProvider implements UserProviderInterface
             ->select('u, r')
             ->leftJoin('u.role', 'r')
             ->where('u.username = :username OR u.email = :username')
+            ->andWhere('u.isPublished = :true')
+            ->setParameter('true', true, 'boolean')
             ->setParameter('username', $username);
-
-        if (func_num_args() > 1 && $email = func_get_arg(1)) {
-            // Checking email from an auth plugin
-            $q->orWhere(
-                'u.email = :email'
-            )
-                ->setParameter('email', $email);
-        }
 
         $user = $q->getQuery()->getOneOrNullResult();
 
@@ -127,12 +115,7 @@ class UserProvider implements UserProviderInterface
     {
         $class = get_class($user);
         if (!$this->supportsClass($class)) {
-            throw new UnsupportedUserException(
-                sprintf(
-                    'Instances of "%s" are not supported.',
-                    $class
-                )
-            );
+            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $class));
         }
 
         return $this->loadUserByUsername($user->getUsername());
@@ -150,23 +133,20 @@ class UserProvider implements UserProviderInterface
     /**
      * Create/update user from authentication plugins.
      *
-     * @param User      $user
      * @param bool|true $createIfNotExists
      *
      * @return User
+     *
+     * @throws BadCredentialsException
      */
     public function saveUser(User $user, $createIfNotExists = true)
     {
         $isNew = !$user->getId();
 
         if ($isNew) {
-            // Check if user exists and create one if applicable
-            try {
-                $user = $this->loadUserByUsername($user->getUsername(), $user->getEmail());
-            } catch (UsernameNotFoundException $exception) {
-                if (!$createIfNotExists) {
-                    throw new BadCredentialsException();
-                }
+            $user = $this->findUser($user);
+            if (!$user->getId() && !$createIfNotExists) {
+                throw new BadCredentialsException();
             }
         }
 
@@ -211,6 +191,27 @@ class UserProvider implements UserProviderInterface
 
         if ($this->dispatcher->hasListeners(UserEvents::USER_POST_SAVE)) {
             $this->dispatcher->dispatch(UserEvents::USER_POST_SAVE, $event);
+        }
+
+        return $user;
+    }
+
+    /**
+     * @return User
+     */
+    public function findUser(User $user)
+    {
+        try {
+            // Try by username
+            $user = $this->loadUserByUsername($user->getUsername());
+
+            return $user;
+        } catch (UsernameNotFoundException $exception) {
+            // Try by email
+            try {
+                return $this->loadUserByUsername($user->getEmail());
+            } catch (UsernameNotFoundException $exception) {
+            }
         }
 
         return $user;

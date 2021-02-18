@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -24,7 +25,6 @@ class NotificationClickEvent extends CommonEvent
     private $notification;
 
     /**
-     * @param Stat $stat
      * @param $request
      */
     public function __construct(Stat $stat, $request)

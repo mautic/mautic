@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -40,7 +41,8 @@ $translationContent = $view->render(
 $showTranslations = !empty(trim($translationContent));
 
 // Only show A/B test button if not already a translation of an a/b test
-$allowAbTest = $activePage->isTranslation(true) && $translations['parent']->isVariant() ? false : true;
+$allowAbTest = $activePage->getIsPreferenceCenter() ||
+                    ($activePage->isTranslation(true) && $translations['parent']->isVariant()) ? false : true;
 
 $view['slots']->set(
     'actions',
@@ -101,6 +103,11 @@ $view['slots']->set(
                                 <?php echo $view['translator']->trans('mautic.core.translation_of', ['%parent%' => $translations['parent']->getName()]); ?>
                             </a>
                         </div>
+                        <?php endif; ?>
+                        <?php if ($activePage->getIsPreferenceCenter()): ?>
+                            <div class="small">
+                                <?php echo $view['translator']->trans('mautic.core.icon_tooltip.preference_center'); ?>
+                            </div>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -164,6 +171,8 @@ $view['slots']->set(
             </div>
             <!--/ stats -->
 
+            <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
+
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
                 <?php if ($showVariants): ?>
@@ -220,6 +229,7 @@ $view['slots']->set(
     <!-- right section -->
     <div class="col-md-3 bg-white bdr-l height-auto">
         <!-- preview URL -->
+        <?php if (!$activePage->getIsPreferenceCenter()) : ?>
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-heading">
                 <div class="panel-title"><?php echo $view['translator']->trans('mautic.page.url'); ?></div>
@@ -228,7 +238,7 @@ $view['slots']->set(
                 <div class="input-group">
                     <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
                            readonly
-                           value="<?php echo $pageUrl; ?>"/>
+                           value="<?php echo $view->escape($pageUrl); ?>"/>
                     <span class="input-group-btn">
                         <button class="btn btn-default btn-nospin" onclick="window.open('<?php echo $pageUrl; ?>', '_blank');">
                             <i class="fa fa-external-link"></i>
@@ -237,6 +247,7 @@ $view['slots']->set(
                 </div>
             </div>
         </div>
+        <?php endif; ?>
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-heading">
                 <div class="panel-title"><?php echo $view['translator']->trans('mautic.page.preview.url'); ?></div>
@@ -245,7 +256,7 @@ $view['slots']->set(
                 <div class="input-group">
                     <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
                            readonly
-                           value="<?php echo $previewUrl; ?>"/>
+                           value="<?php echo $view->escape($previewUrl); ?>"/>
                     <span class="input-group-btn">
                     <button class="btn btn-default btn-nospin"
                             onclick="window.open('<?php echo $previewUrl; ?>', '_blank');">

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -24,8 +25,11 @@ class ArrayStringTransformer implements DataTransformerInterface
      */
     public function transform($array)
     {
-        if ($array === null) {
+        if (null === $array) {
             return '';
+        }
+        if (is_string($array)) {
+            return $array;
         }
 
         return implode(',', $array);

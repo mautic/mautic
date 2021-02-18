@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -57,11 +58,9 @@ class DatetimeToStringTransformer implements DataTransformerInterface
             return null;
         }
 
-        $val = \DateTime::createFromFormat(
+        return \DateTime::createFromFormat(
             $this->format,
             $value
         );
-
-        return $val;
     }
 }

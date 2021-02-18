@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -18,18 +19,80 @@ return [
         'forms' => [
             'mautic.form.type.emailmarketing.mailchimp' => [
                 'class'     => 'MauticPlugin\MauticEmailMarketingBundle\Form\Type\MailchimpType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'emailmarketing_mailchimp',
+                'arguments' => ['mautic.helper.integration', 'mautic.plugin.model.plugin', 'session', 'mautic.helper.core_parameters'],
             ],
             'mautic.form.type.emailmarketing.constantcontact' => [
                 'class'     => 'MauticPlugin\MauticEmailMarketingBundle\Form\Type\ConstantContactType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'emailmarketing_constantcontact',
+                'arguments' => ['mautic.helper.integration', 'mautic.plugin.model.plugin', 'session', 'mautic.helper.core_parameters'],
             ],
             'mautic.form.type.emailmarketing.icontact' => [
                 'class'     => 'MauticPlugin\MauticEmailMarketingBundle\Form\Type\IcontactType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'emailmarketing_icontact',
+                'arguments' => ['mautic.helper.integration', 'mautic.plugin.model.plugin', 'session', 'mautic.helper.core_parameters'],
+            ],
+        ],
+        'integrations' => [
+            'mautic.integration.constantcontact' => [
+                'class'     => \MauticPlugin\MauticEmailMarketingBundle\Integration\ConstantContactIntegration::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'mautic.helper.cache_storage',
+                    'doctrine.orm.entity_manager',
+                    'session',
+                    'request_stack',
+                    'router',
+                    'translator',
+                    'logger',
+                    'mautic.helper.encryption',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.company',
+                    'mautic.helper.paths',
+                    'mautic.core.model.notification',
+                    'mautic.lead.model.field',
+                    'mautic.plugin.model.integration_entity',
+                    'mautic.lead.model.dnc',
+                ],
+            ],
+            'mautic.integration.icontact' => [
+                'class'     => \MauticPlugin\MauticEmailMarketingBundle\Integration\IcontactIntegration::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'mautic.helper.cache_storage',
+                    'doctrine.orm.entity_manager',
+                    'session',
+                    'request_stack',
+                    'router',
+                    'translator',
+                    'logger',
+                    'mautic.helper.encryption',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.company',
+                    'mautic.helper.paths',
+                    'mautic.core.model.notification',
+                    'mautic.lead.model.field',
+                    'mautic.plugin.model.integration_entity',
+                    'mautic.lead.model.dnc',
+                ],
+            ],
+            'mautic.integration.mailchimp' => [
+                'class'     => \MauticPlugin\MauticEmailMarketingBundle\Integration\MailchimpIntegration::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'mautic.helper.cache_storage',
+                    'doctrine.orm.entity_manager',
+                    'session',
+                    'request_stack',
+                    'router',
+                    'translator',
+                    'logger',
+                    'mautic.helper.encryption',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.company',
+                    'mautic.helper.paths',
+                    'mautic.core.model.notification',
+                    'mautic.lead.model.field',
+                    'mautic.plugin.model.integration_entity',
+                    'mautic.lead.model.dnc',
+                ],
             ],
         ],
     ],

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -12,9 +13,6 @@ namespace MauticPlugin\MauticCloudStorageBundle;
 
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
 
-/**
- * Class MauticCloudStorageBundle.
- */
 class MauticCloudStorageBundle extends PluginBundleBase
 {
 }

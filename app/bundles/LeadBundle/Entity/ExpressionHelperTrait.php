@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -24,10 +25,10 @@ trait ExpressionHelperTrait
      *
      * @return mixed
      */
-    protected function generateFilterExpression($q, $column, $operator, $parameter, $includeIsNull, CompositeExpression $appendTo = null)
+    public function generateFilterExpression($q, $column, $operator, $parameter, $includeIsNull, CompositeExpression $appendTo = null)
     {
         // in/notIn for dbal will use a raw array
-        if (!is_array($parameter) && strpos($parameter, ':') !== 0) {
+        if (!is_array($parameter) && 0 !== strpos($parameter, ':')) {
             $parameter = ":$parameter";
         }
 

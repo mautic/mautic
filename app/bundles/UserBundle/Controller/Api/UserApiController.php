@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,9 +11,8 @@
 
 namespace Mautic\UserBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
-use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -26,13 +26,13 @@ class UserApiController extends CommonApiController
      */
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model            = $this->getModel('user.user');
         $this->entityClass      = 'Mautic\UserBundle\Entity\User';
         $this->entityNameOne    = 'user';
         $this->entityNameMulti  = 'users';
-        $this->permissionBase   = 'user:users';
         $this->serializerGroups = ['userDetails', 'roleList', 'publishDetails'];
+        $this->dataInputMasks   = ['signature' => 'html'];
+        parent::initialize($event);
     }
 
     /**
@@ -44,26 +44,10 @@ class UserApiController extends CommonApiController
      */
     public function getSelfAction()
     {
-        $currentUser = $this->get('security.context')->getToken()->getUser();
-        $view        = $this->view($currentUser, Codes::HTTP_OK);
+        $currentUser = $this->get('security.token_storage')->getToken()->getUser();
+        $view        = $this->view($currentUser, Response::HTTP_OK);
 
         return $this->handleView($view);
-    }
-
-    /**
-     * Deletes a user.
-     *
-     * @param int $id User ID
-     *
-     * @return Response
-     */
-    public function deleteEntityAction($id)
-    {
-        if (!$this->get('mautic.security')->isGranted('user:users:delete')) {
-            return $this->accessDenied();
-        }
-
-        return parent::deleteEntityAction($id);
     }
 
     /**
@@ -107,9 +91,9 @@ class UserApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        if ($entity === null) {
-            if ($method === 'PATCH' ||
-                ($method === 'PUT' && !$this->get('mautic.security')->isGranted('user:users:create'))
+        if (null === $entity) {
+            if ('PATCH' === $method ||
+                ('PUT' === $method && !$this->get('mautic.security')->isGranted('user:users:create'))
             ) {
                 //PATCH requires that an entity exists or must have create access for PUT
                 return $this->notFound();
@@ -126,7 +110,7 @@ class UserApiController extends CommonApiController
             if (!empty($parameters['plainPassword'])) {
                 unset($parameters['plainPassword']);
             }
-            if ($method == 'PATCH') {
+            if ('PATCH' == $method) {
                 //PATCH will accept a diff so just remove the entities
 
                 //Changing username via API is forbidden
@@ -146,6 +130,25 @@ class UserApiController extends CommonApiController
         }
 
         return $this->processForm($entity, $parameters, $method);
+    }
+
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    {
+        switch ($action) {
+            case 'new':
+                $submittedPassword = null;
+                if (isset($parameters['plainPassword'])) {
+                    if (is_array($parameters['plainPassword']) && isset($parameters['plainPassword']['password'])) {
+                        $submittedPassword = $parameters['plainPassword']['password'];
+                    } else {
+                        $submittedPassword = $parameters['plainPassword'];
+                    }
+                }
+
+                $encoder = $this->get('security.encoder_factory')->getEncoder($entity);
+                $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword, true));
+                break;
+        }
     }
 
     /**
@@ -174,7 +177,7 @@ class UserApiController extends CommonApiController
         }
 
         $return = $this->get('mautic.security')->isGranted($permissions, 'RETURN_ARRAY', $entity);
-        $view   = $this->view($return, Codes::HTTP_OK);
+        $view   = $this->view($return, Response::HTTP_OK);
 
         return $this->handleView($view);
     }
@@ -198,9 +201,9 @@ class UserApiController extends CommonApiController
         $limit  = $this->request->query->get('limit', null);
         $roles  = $this->getModel('user')->getLookupResults('role', $filter, $limit);
 
-        $view    = $this->view($roles, Codes::HTTP_OK);
-        $context = SerializationContext::create()->setGroups(['roleList']);
-        $view->setSerializationContext($context);
+        $view    = $this->view($roles, Response::HTTP_OK);
+        $context = $view->getContext()->setGroups(['roleList']);
+        $view->setContext($context);
 
         return $this->handleView($view);
     }

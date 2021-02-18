@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,6 +11,8 @@
 
 namespace Mautic\UserBundle\Security\Firewall;
 
+use Mautic\UserBundle\Entity\PermissionRepository;
+use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\Authentication\AuthenticationHandler;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
 use Psr\Log\LoggerInterface;
@@ -43,9 +46,6 @@ class AuthenticationListener implements ListenerInterface
      */
     protected $authenticationManager;
 
-    /**
-     * @var
-     */
     protected $providerKey;
 
     /**
@@ -59,12 +59,12 @@ class AuthenticationListener implements ListenerInterface
     protected $dispatcher;
 
     /**
-     * @param AuthenticationHandler          $authenticationHandler
-     * @param TokenStorageInterface          $tokenStorage
-     * @param AuthenticationManagerInterface $authenticationManager
-     * @param LoggerInterface                $logger
-     * @param EventDispatcherInterface       $dispatcher
-     * @param                                $providerKey
+     * @var PermissionRepository
+     */
+    protected $permissionRepository;
+
+    /**
+     * @param $providerKey
      */
     public function __construct(
         AuthenticationHandler $authenticationHandler,
@@ -72,7 +72,8 @@ class AuthenticationListener implements ListenerInterface
         AuthenticationManagerInterface $authenticationManager,
         LoggerInterface $logger,
         EventDispatcherInterface $dispatcher,
-        $providerKey
+        $providerKey,
+        PermissionRepository $permissionRepository
     ) {
         $this->tokenStorage          = $tokenStorage;
         $this->authenticationManager = $authenticationManager;
@@ -80,14 +81,14 @@ class AuthenticationListener implements ListenerInterface
         $this->authenticationHandler = $authenticationHandler;
         $this->logger                = $logger;
         $this->dispatcher            = $dispatcher;
+        $this->permissionRepository  = $permissionRepository;
     }
 
-    /**
-     * @param GetResponseEvent $event
-     */
     public function handle(GetResponseEvent $event)
     {
         if (null !== $this->tokenStorage->getToken()) {
+            $this->setActivePermissionsOnAuthToken();
+
             return;
         }
 
@@ -102,6 +103,8 @@ class AuthenticationListener implements ListenerInterface
 
                 if ($authToken->isAuthenticated()) {
                     $this->tokenStorage->setToken($authToken);
+
+                    $this->setActivePermissionsOnAuthToken();
 
                     if ('api' != $this->providerKey) {
                         $response = $this->onSuccess($request, $authToken, $response);
@@ -122,9 +125,6 @@ class AuthenticationListener implements ListenerInterface
     }
 
     /**
-     * @param Request                 $request
-     * @param AuthenticationException $failed
-     *
      * @return Response
      */
     private function onFailure(Request $request, AuthenticationException $failed)
@@ -143,10 +143,6 @@ class AuthenticationListener implements ListenerInterface
     }
 
     /**
-     * @param Request        $request
-     * @param TokenInterface $token
-     * @param Response|null  $response
-     *
      * @return Response
      */
     private function onSuccess(Request $request, TokenInterface $token, Response $response = null)
@@ -172,5 +168,24 @@ class AuthenticationListener implements ListenerInterface
         }
 
         return $response;
+    }
+
+    /**
+     * Set the active permissions on the current user.
+     */
+    private function setActivePermissionsOnAuthToken()
+    {
+        $token = $this->tokenStorage->getToken();
+        $user  = $token->getUser();
+
+        if (!$user->isAdmin() && empty($user->getActivePermissions())) {
+            $activePermissions = $this->permissionRepository->getPermissionsByRole($user->getRole());
+
+            $user->setActivePermissions($activePermissions);
+        }
+
+        $token->setUser($user);
+
+        $this->tokenStorage->setToken($token);
     }
 }

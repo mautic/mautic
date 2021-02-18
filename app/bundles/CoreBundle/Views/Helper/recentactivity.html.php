@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -19,7 +20,7 @@
             <?php foreach ($logs as $log) : ?>
             <li class="media">
                 <div class="media-object pull-left">
-                <?php if ($log['action'] == 'create') : ?>
+                <?php if ('create' == $log['action']) : ?>
                     <span class="figure featured bg-success"><span class="fa fa-check"></span></span>
                 <?php else: ?>
                     <span class="figure"></span>
@@ -27,7 +28,7 @@
                 </div>
                 <div class="media-body">
                     <?php echo $view['translator']->trans('mautic.core.'.$log['action'].'.by.past.tense'); ?>
-                    <?php if (isset($log['userId']) && $log['userId']) : ?>
+                    <?php if (!empty($log['userId'])) : ?>
                         <a href="<?php echo $view['router']->path('mautic_user_action', ['objectAction' => 'edit', 'objectId' => $log['userId']]); ?>" data-toggle="ajax">
                             <?php echo $log['userName']; ?>
                         </a>

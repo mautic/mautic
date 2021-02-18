@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,16 +11,25 @@
 
 namespace Mautic\PageBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\PageEvents;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
+use Mautic\WebhookBundle\Model\WebhookModel;
 use Mautic\WebhookBundle\WebhookEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class WebhookSubscriber.
- */
-class WebhookSubscriber extends CommonSubscriber
+class WebhookSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var WebhookModel
+     */
+    private $webhookModel;
+
+    public function __construct(WebhookModel $webhookModel)
+    {
+        $this->webhookModel = $webhookModel;
+    }
+
     /**
      * @return array
      */
@@ -27,13 +37,12 @@ class WebhookSubscriber extends CommonSubscriber
     {
         return [
             WebhookEvents::WEBHOOK_ON_BUILD => ['onWebhookBuild', 0],
+            PageEvents::PAGE_ON_HIT         => ['onPageHit', 0],
         ];
     }
 
     /**
      * Add event triggers and actions.
-     *
-     * @param WebhookBuilderEvent $event
      */
     public function onWebhookBuild(WebhookBuilderEvent $event)
     {
@@ -45,5 +54,21 @@ class WebhookSubscriber extends CommonSubscriber
 
         // add it to the list
         $event->addEvent(PageEvents::PAGE_ON_HIT, $pageHit);
+    }
+
+    public function onPageHit(PageHitEvent $event)
+    {
+        $this->webhookModel->queueWebhooksByType(
+            PageEvents::PAGE_ON_HIT,
+            [
+                'hit' => $event->getHit(),
+            ],
+            [
+                'hitDetails',
+                'emailDetails',
+                'pageList',
+                'leadList',
+            ]
+        );
     }
 }

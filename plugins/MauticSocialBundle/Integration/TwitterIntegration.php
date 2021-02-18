@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -11,6 +12,7 @@
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
 use Mautic\CoreBundle\Helper\EmojiHelper;
+use MauticPlugin\MauticSocialBundle\Form\Type\TwitterType;
 
 /**
  * Class TwitterIntegration.
@@ -109,9 +111,11 @@ class TwitterIntegration extends SocialIntegration
         // Prevent SSL issues
         $settings['ssl_verifypeer'] = false;
 
-        if (empty($settings['authorize_session']) && $authType != 'access_token') {
+        if (empty($settings['authorize_session']) && 'access_token' != $authType) {
             // Twitter requires oauth_token_secret to be part of composite key
-            $settings['token_secret'] = $this->keys['oauth_token_secret'];
+            if (isset($this->keys['oauth_token_secret'])) {
+                $settings['token_secret'] = $this->keys['oauth_token_secret'];
+            }
 
             //Twitter also requires double encoding of parameters in building base string
             $settings['double_encode_basestring_parameters'] = true;
@@ -177,8 +181,13 @@ class TwitterIntegration extends SocialIntegration
             $image                = str_replace(['_normal', '_bigger', '_mini'], '', $image);
             $info['profileImage'] = $image;
 
-            $socialCache['profile'] = $info;
+            $socialCache['profile']     = $info;
+            $socialCache['lastRefresh'] = new \DateTime();
+
+            $this->getMauticLead($info, $this->persistNewLead, $socialCache, $identifier);
         }
+
+        return $data;
     }
 
     /**
@@ -213,7 +222,7 @@ class TwitterIntegration extends SocialIntegration
             ];
 
             foreach ($data as $k => $d) {
-                if ($k == 10) {
+                if (10 == $k) {
                     break;
                 }
 
@@ -229,7 +238,7 @@ class TwitterIntegration extends SocialIntegration
                 //images
                 if (isset($d['entities']['media'])) {
                     foreach ($d['entities']['media'] as $m) {
-                        if ($m['type'] == 'photo') {
+                        if ('photo' == $m['type']) {
                             $photo = [
                                 'url' => (isset($m['media_url_https']) ? $m['media_url_https'] : $m['media_url']),
                             ];
@@ -281,7 +290,7 @@ class TwitterIntegration extends SocialIntegration
         if (preg_match('#https?://twitter.com/(.*?)(/.*?|$)#i', $identifier, $match)) {
             //extract the handle
             $identifier = $match[1];
-        } elseif (substr($identifier, 0, 1) == '@') {
+        } elseif ('@' == substr($identifier, 0, 1)) {
             $identifier = substr($identifier, 1);
         }
 
@@ -305,5 +314,13 @@ class TwitterIntegration extends SocialIntegration
         }
 
         return json_decode($data, true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormType()
+    {
+        return TwitterType::class;
     }
 }

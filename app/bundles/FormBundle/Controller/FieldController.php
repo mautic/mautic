@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -12,6 +13,9 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Event\FormBuilderEvent;
+use Mautic\FormBundle\FormEvents;
+use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -31,7 +35,7 @@ class FieldController extends CommonFormController
         $method  = $this->request->getMethod();
         $session = $this->get('session');
 
-        if ($method == 'POST') {
+        if ('POST' == $method) {
             $formField = $this->request->request->get('formfield');
             $fieldType = $formField['type'];
             $formId    = $formField['formId'];
@@ -44,6 +48,8 @@ class FieldController extends CommonFormController
             ];
         }
 
+        $customComponents = $this->getModel('form')->getCustomComponents();
+        $customParams     = (isset($customComponents['fields'][$fieldType])) ? $customComponents['fields'][$fieldType] : false;
         //ajax only for form fields
         if (!$fieldType ||
             !$this->request->isXmlHttpRequest() ||
@@ -61,7 +67,7 @@ class FieldController extends CommonFormController
         }
 
         //Check for a submitted form and process it
-        if ($method == 'POST') {
+        if ('POST' == $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
@@ -86,7 +92,7 @@ class FieldController extends CommonFormController
                     $formField['alias'] = $this->getModel('form.field')->generateAlias($alias, $aliases);
 
                     // Force required for captcha if not a honeypot
-                    if ($formField['type'] == 'captcha') {
+                    if ('captcha' == $formField['type']) {
                         $formField['isRequired'] = !empty($formField['properties']['captcha']);
                     }
 
@@ -140,6 +146,10 @@ class FieldController extends CommonFormController
             $blank     = $entity->convertToArray();
             $formField = array_merge($blank, $formField);
 
+            /** @var FormModel $formModel */
+            $formModel  = $this->getModel('form');
+            $formEntity = $formModel->getEntity($formId);
+
             $passthroughVars['fieldId']   = $keyId;
             $template                     = (!empty($customParams)) ? $customParams['template'] : 'MauticFormBundle:Field:'.$fieldType.'.html.php';
             $passthroughVars['fieldHtml'] = $this->renderView(
@@ -150,7 +160,10 @@ class FieldController extends CommonFormController
                     'field'         => $formField,
                     'id'            => $keyId,
                     'formId'        => $formId,
+                    'formName'      => null === $formEntity ? 'newform' : $formEntity->generateFormName(),
                     'contactFields' => $this->getModel('lead.field')->getFieldListWithProperties(),
+                    'companyFields' => $this->getModel('lead.field')->getFieldListWithProperties('company'),
+                    'inBuilder'     => true,
                 ]
             );
         }
@@ -158,9 +171,8 @@ class FieldController extends CommonFormController
         if ($closeModal) {
             //just close the modal
             $passthroughVars['closeModal'] = 1;
-            $response                      = new JsonResponse($passthroughVars);
 
-            return $response;
+            return new JsonResponse($passthroughVars);
         }
 
         return $this->ajaxAction([
@@ -181,13 +193,14 @@ class FieldController extends CommonFormController
     {
         $session   = $this->get('session');
         $method    = $this->request->getMethod();
-        $formId    = ($method == 'POST') ? $this->request->request->get('formfield[formId]', '', true) : $this->request->query->get('formId');
+        $formfield = $this->request->request->get('formfield', []);
+        $formId    = 'POST' === $method ? ($formfield['formId'] ?? '') : $this->request->query->get('formId');
         $fields    = $session->get('mautic.form.'.$formId.'.fields.modified', []);
         $success   = 0;
-        $valid     = $cancelled     = false;
-        $formField = (array_key_exists($objectId, $fields)) ? $fields[$objectId] : [];
+        $valid     = $cancelled = false;
+        $formField = array_key_exists($objectId, $fields) ? $fields[$objectId] : [];
 
-        if ($formField !== null) {
+        if (null !== $formField) {
             $fieldType = $formField['type'];
 
             //ajax only for form fields
@@ -202,7 +215,7 @@ class FieldController extends CommonFormController
             $form = $this->getFieldForm($formId, $formField);
 
             //Check for a submitted form and process it
-            if ($method == 'POST') {
+            if ('POST' == $method) {
                 if (!$cancelled = $this->isFormCancelled($form)) {
                     if ($valid = $this->isFormValid($form)) {
                         $success = 1;
@@ -217,7 +230,7 @@ class FieldController extends CommonFormController
                         //overwrite with updated data
                         $formField = array_merge($fields[$objectId], $formData);
 
-                        if (strpos($objectId, 'new') !== false) {
+                        if (false !== strpos($objectId, 'new')) {
                             // Get aliases in order to generate update for this one
                             $aliases = [];
                             foreach ($fields as $k => $f) {
@@ -225,11 +238,14 @@ class FieldController extends CommonFormController
                                     $aliases[] = $f['alias'];
                                 }
                             }
-                            $formField['alias'] = $this->getModel('form.field')->generateAlias($formField['label'], $aliases);
+                            $formField['alias'] = $this->getModel('form.field')->generateAlias(
+                                $formField['alias'] ?? $formField['label'],
+                                $aliases
+                            );
                         }
 
                         // Force required for captcha if not a honeypot
-                        if ($formField['type'] == 'captcha') {
+                        if ('captcha' == $formField['type']) {
                             $formField['isRequired'] = !empty($formField['properties']['captcha']);
                         }
 
@@ -248,7 +264,10 @@ class FieldController extends CommonFormController
                 }
             }
 
-            $viewParams = ['type' => $fieldType];
+            $viewParams       = ['type' => $fieldType];
+            $customComponents = $this->getModel('form.form')->getCustomComponents();
+            $customParams     = (isset($customComponents['fields'][$fieldType])) ? $customComponents['fields'][$fieldType] : false;
+
             if ($cancelled || $valid) {
                 $closeModal = true;
             } else {
@@ -273,11 +292,7 @@ class FieldController extends CommonFormController
             ];
 
             $passthroughVars['fieldId'] = $objectId;
-            if (!empty($customParams)) {
-                $template = $customParams['template'];
-            } else {
-                $template = 'MauticFormBundle:Field:'.$fieldType.'.html.php';
-            }
+            $template                   = (!empty($customParams)) ? $customParams['template'] : 'MauticFormBundle:Field:'.$fieldType.'.html.php';
 
             //prevent undefined errors
             $entity    = new Field();
@@ -293,15 +308,16 @@ class FieldController extends CommonFormController
                     'id'            => $objectId,
                     'formId'        => $formId,
                     'contactFields' => $this->getModel('lead.field')->getFieldListWithProperties(),
+                    'companyFields' => $this->getModel('lead.field')->getFieldListWithProperties('company'),
+                    'inBuilder'     => true,
                 ]
             );
 
             if ($closeModal) {
                 //just close the modal
                 $passthroughVars['closeModal'] = 1;
-                $response                      = new JsonResponse($passthroughVars);
 
-                return $response;
+                return new JsonResponse($passthroughVars);
             }
 
             return $this->ajaxAction(
@@ -313,9 +329,7 @@ class FieldController extends CommonFormController
             );
         }
 
-        $response = new JsonResponse(['success' => 0]);
-
-        return $response;
+        return new JsonResponse(['success' => 0]);
     }
 
     /**
@@ -341,11 +355,12 @@ class FieldController extends CommonFormController
 
         $formField = (array_key_exists($objectId, $fields)) ? $fields[$objectId] : null;
 
-        if ($this->request->getMethod() == 'POST' && $formField !== null) {
+        if ('POST' === $this->request->getMethod() && null !== $formField) {
             $usedLeadFields = $session->get('mautic.form.'.$formId.'.fields.leadfields');
 
             // Allow to select the lead field from the delete field again
-            if (!empty($formField['leadField']) && ($unusedLeadField = array_search($formField['leadField'], $usedLeadFields)) !== false) {
+            $unusedLeadField = array_search($formField['leadField'], $usedLeadFields);
+            if (!empty($formField['leadField']) && false !== $unusedLeadField) {
                 unset($usedLeadFields[$unusedLeadField]);
                 $session->set('mautic.form.'.$formId.'.fields.leadfields', $usedLeadFields);
             }
@@ -369,8 +384,7 @@ class FieldController extends CommonFormController
     }
 
     /**
-     * @param       $formId
-     * @param array $formField
+     * @param $formId
      *
      * @return mixed
      */
@@ -389,6 +403,10 @@ class FieldController extends CommonFormController
             ['customParameters' => $customParams]
         );
         $form->get('formId')->setData($formId);
+
+        $event      = new FormBuilderEvent($this->get('translator'));
+        $this->dispatcher->dispatch(FormEvents::FORM_ON_BUILD, $event);
+        $event->addValidatorsToBuilder($form);
 
         return $form;
     }

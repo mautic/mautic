@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
  *
@@ -13,8 +14,8 @@ echo $view->render(
     'MauticFocusBundle:Builder\Modal:index.html.php',
     [
         'focus'    => $focus,
-        'form'     => $form,
         'preview'  => $preview,
         'clickUrl' => $clickUrl,
+        'htmlMode' => $htmlMode,
     ]
 );

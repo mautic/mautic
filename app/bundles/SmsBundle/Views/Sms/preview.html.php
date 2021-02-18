@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,5 +11,5 @@
 /** @var \Mautic\SmsBundle\Entity\Sms $sms */
 ?>
 <blockquote>
-    <p><?=$sms->getMessage()?></p>
+    <p><?=$sms->getMessage(); ?></p>
 </blockquote>

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -12,6 +13,9 @@ namespace Mautic\ReportBundle\Form\DataTransformer;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TimeType;
 
 class ReportFilterDataTransformer implements DataTransformerInterface
 {
@@ -45,7 +49,7 @@ class ReportFilterDataTransformer implements DataTransformerInterface
                 return $filters;
             }
             $type = $this->columns[$f['column']]['type'];
-            if (in_array($type, ['datetime', 'date', 'time'])) {
+            if (in_array($type, ['datetime', 'date', 'time', DateTimeType::class, DateType::class, TimeType::class])) {
                 $dt         = new DateTimeHelper($f['value'], '', 'utc');
                 $f['value'] = $dt->toLocalString();
             }

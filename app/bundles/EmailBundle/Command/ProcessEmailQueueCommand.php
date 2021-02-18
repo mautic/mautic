@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,9 +11,9 @@
 
 namespace Mautic\EmailBundle\Command;
 
+use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\QueueEmailEvent;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -22,7 +23,7 @@ use Symfony\Component\Finder\Finder;
 /**
  * CLI command to process the e-mail queue.
  */
-class ProcessEmailQueueCommand extends ContainerAwareCommand
+class ProcessEmailQueueCommand extends ModeratedCommand
 {
     /**
      * {@inheritdoc}
@@ -37,12 +38,15 @@ class ProcessEmailQueueCommand extends ContainerAwareCommand
             ->addOption('--do-not-clear', null, InputOption::VALUE_NONE, 'By default, failed messages older than the --recover-timeout setting will be attempted one more time then deleted if it fails again.  If this is set, sending of failed messages will continue to be attempted.')
             ->addOption('--recover-timeout', null, InputOption::VALUE_OPTIONAL, 'Sets the amount of time in seconds before attempting to resend failed messages.  Defaults to value set in config.')
             ->addOption('--clear-timeout', null, InputOption::VALUE_OPTIONAL, 'Sets the amount of time in seconds before deleting failed messages.  Defaults to value set in config.')
+            ->addOption('--lock-name', null, InputOption::VALUE_OPTIONAL, 'Set name of lock to run multiple mautic:emails:send command at time')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command is used to process the application's e-mail queue
 
 <info>php %command.full_name%</info>
 EOT
         );
+
+        parent::configure();
     }
 
     /**
@@ -50,21 +54,23 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $options    = $input->getOptions();
-        $env        = (!empty($options['env'])) ? $options['env'] : 'dev';
-        $container  = $this->getContainer();
-        $dispatcher = $container->get('event_dispatcher');
+        $options     = $input->getOptions();
+        $env         = (!empty($options['env'])) ? $options['env'] : 'dev';
+        $container   = $this->getContainer();
+        $dispatcher  = $container->get('event_dispatcher');
+        $skipClear   = $input->getOption('do-not-clear');
+        $quiet       = $input->hasOption('quiet') ? $input->getOption('quiet') : false;
+        $timeout     = $input->getOption('clear-timeout');
+        $queueMode   = $container->get('mautic.helper.core_parameters')->get('mailer_spool_type');
+        $lockName    = $input->getOption('lock-name') ?? '';
 
-        $skipClear = $input->getOption('do-not-clear');
-        $quiet     = $input->getOption('quiet');
-        $timeout   = $input->getOption('clear-timeout');
-
-        $factory   = $container->get('mautic.factory');
-        $queueMode = $factory->getParameter('mailer_spool_type');
-
-        if ($queueMode != 'file') {
+        if ('file' != $queueMode) {
             $output->writeln('Mautic is not set to queue email.');
 
+            return 0;
+        }
+
+        if (!$this->checkRunStatus($input, $output, $lockName)) {
             return 0;
         }
 
@@ -92,14 +98,21 @@ EOT
                         //the file is not old enough to be resent yet
                         continue;
                     }
+                    if (!$handle = @fopen($file, 'r+')) {
+                        continue;
+                    }
+                    if (!flock($handle, LOCK_EX | LOCK_NB)) {
+                        /* This message has just been catched by another process */
+                        continue;
+                    }
 
                     //rename the file so no other process tries to find it
-                    $tmpFilename = str_replace(['.finalretry', '.sending', '.tryagain'], '', $failedFile);
+                    $tmpFilename = str_replace(['.finalretry', '.sending', '.tryagain'], '', $file);
                     $tmpFilename .= '.finalretry';
-                    rename($failedFile, $tmpFilename);
+                    rename($file, $tmpFilename);
 
                     $message = unserialize(file_get_contents($tmpFilename));
-                    if ($message !== false && is_object($message) && get_class($message) === 'Swift_Message') {
+                    if (false !== $message && is_object($message) && 'Swift_Message' === get_class($message)) {
                         $tryAgain = false;
                         if ($dispatcher->hasListeners(EmailEvents::EMAIL_RESEND)) {
                             $event = new QueueEmailEvent($message);
@@ -121,11 +134,12 @@ EOT
                     }
                     if ($tryAgain) {
                         $retryFilename = str_replace('.finalretry', '.tryagain', $tmpFilename);
-                        rename($tmpFilename, $retryFilename);
+                        rename($tmpFilename, $retryFilename, $handle);
                     } else {
                         //delete the file, either because it sent or because it failed
                         unlink($tmpFilename);
                     }
+                    fclose($handle);
                 }
             }
         }
@@ -167,7 +181,9 @@ EOT
         $input      = new ArrayInput($commandArgs);
         $returnCode = $command->run($input, $output);
 
-        if ($returnCode !== 0) {
+        $this->completeRun();
+
+        if (0 !== $returnCode) {
             return $returnCode;
         }
 

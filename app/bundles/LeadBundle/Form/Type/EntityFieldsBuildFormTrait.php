@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,17 +11,38 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\BooleanType;
+use Mautic\CoreBundle\Form\Type\CountryType;
+use Mautic\CoreBundle\Form\Type\LocaleType;
+use Mautic\CoreBundle\Form\Type\LookupType;
+use Mautic\CoreBundle\Form\Type\MultiselectType;
+use Mautic\CoreBundle\Form\Type\RegionType;
+use Mautic\CoreBundle\Form\Type\SelectType;
+use Mautic\CoreBundle\Form\Type\TimezoneType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Exception\FieldNotFoundException;
+use Mautic\LeadBundle\Form\FieldAliasToFqcnMap;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\Validator\Constraints\Length;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 trait EntityFieldsBuildFormTrait
 {
     private function getFormFields(FormBuilderInterface $builder, array $options, $object = 'lead')
     {
-        $fieldValues = [];
-        $isObject    = false;
+        $cleaningRules = [];
+        $fieldValues   = [];
+        $isObject      = false;
         if (!empty($options['data'])) {
             $isObject    = is_object($options['data']);
             $fieldValues = ($isObject) ? $options['data']->getFields() : $options['data'];
@@ -28,7 +50,7 @@ trait EntityFieldsBuildFormTrait
         $mapped = !$isObject;
 
         foreach ($options['fields'] as $field) {
-            if ($field['isPublished'] === false || $field['object'] !== $object) {
+            if (false === $field['isPublished'] || $field['object'] !== $object) {
                 continue;
             }
             $attr       = ['class' => 'form-control'];
@@ -37,6 +59,11 @@ trait EntityFieldsBuildFormTrait
             $required   = ($isObject) ? $field['isRequired'] : false;
             $alias      = $field['alias'];
             $group      = $field['group'];
+
+            try {
+                $type = FieldAliasToFqcnMap::getFqcn($type);
+            } catch (FieldNotFoundException $e) {
+            }
 
             if ($field['isUniqueIdentifer']) {
                 $attr['data-unique-identifier'] = $field['alias'];
@@ -54,15 +81,18 @@ trait EntityFieldsBuildFormTrait
                 $constraints[] = new NotBlank(
                     ['message' => 'mautic.lead.customfield.notblank']
                 );
+            } elseif (!empty($options['ignore_required_constraints'])) {
+                $required            = false;
+                $field['isRequired'] = false;
             }
 
             switch ($type) {
-                case 'number':
-                    if (empty($properties['precision'])) {
-                        $properties['precision'] = null;
+                case NumberType::class:
+                    if (empty($properties['scale'])) {
+                        $properties['scale'] = null;
                     } //ensure default locale is used
                     else {
-                        $properties['precision'] = (int) $properties['precision'];
+                        $properties['scale'] = (int) $properties['scale'];
                     }
 
                     if ('' === $value) {
@@ -81,27 +111,29 @@ trait EntityFieldsBuildFormTrait
                             'data'          => (null !== $value) ? (float) $value : $value,
                             'mapped'        => $mapped,
                             'constraints'   => $constraints,
-                            'precision'     => $properties['precision'],
+                            'scale'         => $properties['scale'],
                             'rounding_mode' => isset($properties['roundmode']) ? (int) $properties['roundmode'] : 0,
                         ]
                     );
                     break;
-                case 'date':
-                case 'datetime':
-                case 'time':
-                    $attr['data-toggle'] = $type;
+                case DateType::class:
+                case DateTimeType::class:
+                case TimeType::class:
                     $opts                = [
                         'required'    => $required,
                         'label'       => $field['label'],
                         'label_attr'  => ['class' => 'control-label'],
-                        'widget'      => 'single_text',
                         'attr'        => $attr,
                         'mapped'      => $mapped,
-                        'input'       => 'string',
-                        'html5'       => false,
                         'constraints' => $constraints,
                     ];
 
+                if (!empty($options['ignore_date_type'])) {
+                    $type = TextType::class;
+                } else {
+                    $opts['html5']  = false;
+                    $opts['input']  = 'string';
+                    $opts['widget'] = 'single_text';
                     if ($value) {
                         try {
                             $dtHelper = new DateTimeHelper($value, null, 'local');
@@ -110,111 +142,140 @@ trait EntityFieldsBuildFormTrait
                             $value = null;
                         }
                     }
-
-                    if ($type == 'datetime') {
-                        $opts['model_timezone'] = 'UTC';
-                        $opts['view_timezone']  = date_default_timezone_get();
-                        $opts['format']         = 'yyyy-MM-dd HH:mm';
-                        $opts['with_seconds']   = false;
+                    if (DateTimeType::class === $type) {
+                        $opts['attr']['data-toggle'] = 'datetime';
+                        $opts['model_timezone']      = 'UTC';
+                        $opts['view_timezone']       = date_default_timezone_get();
+                        $opts['format']              = 'yyyy-MM-dd HH:mm:ss';
+                        $opts['with_seconds']        = true;
 
                         $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d H:i:s') : null;
-                    } elseif ($type == 'date') {
-                        $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d') : null;
+                    } elseif (DateType::class === $type) {
+                        $opts['attr']['data-toggle'] = 'date';
+                        $opts['data']                = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d') : null;
                     } else {
-                        $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('H:i:s') : null;
+                        $opts['attr']['data-toggle'] = 'time';
+                        $opts['model_timezone']      = 'UTC';
+                        // $opts['with_seconds']   = true; // @todo figure out why this cause the contact form to fail.
+                        $opts['view_timezone'] = date_default_timezone_get();
+                        $opts['data']          = (!empty($value)) ? $dtHelper->toLocalString('H:i:s') : null;
                     }
+
+                    $builder->addEventListener(
+                        FormEvents::PRE_SUBMIT,
+                        function (FormEvent $event) use ($alias, $type) {
+                            $data = $event->getData();
+
+                            if (!empty($data[$alias])) {
+                                if (false === ($timestamp = strtotime($data[$alias]))) {
+                                    $timestamp = null;
+                                }
+                                if ($timestamp) {
+                                    $dtHelper = new DateTimeHelper(date('Y-m-d H:i:s', $timestamp), null, 'local');
+                                    switch ($type) {
+                                        case DateTimeType::class:
+                                            $data[$alias] = $dtHelper->toLocalString('Y-m-d H:i:s');
+                                            break;
+                                        case DateType::class:
+                                            $data[$alias] = $dtHelper->toLocalString('Y-m-d');
+                                            break;
+                                        case TimeType::class:
+                                            $data[$alias] = $dtHelper->toLocalString('H:i:s');
+                                            break;
+                                    }
+                                }
+                            }
+                            $event->setData($data);
+                        }
+                    );
+                }
 
                     $builder->add($alias, $type, $opts);
                     break;
-                case 'select':
-                case 'multiselect':
-                case 'boolean':
+                case SelectType::class:
+                case MultiselectType::class:
+                case BooleanType::class:
+                    if (MultiselectType::class === $type) {
+                        $constraints[] = new Length(['max' => 65535]);
+                    }
+
                     $typeProperties = [
                         'required'    => $required,
                         'label'       => $field['label'],
-                        'label_attr'  => ['class' => 'control-label'],
                         'attr'        => $attr,
                         'mapped'      => $mapped,
-                        'multiple'    => false,
                         'constraints' => $constraints,
                     ];
 
-                    $choiceType = 'choice';
                     $emptyValue = '';
-                    if (in_array($type, ['select', 'multiselect']) && !empty($properties['list'])) {
-                        $typeProperties['choices']  = FormFieldHelper::parseList($properties['list']);
-                        $typeProperties['expanded'] = false;
-                        $typeProperties['multiple'] = ('multiselect' === $type);
+                    if (in_array($type, [SelectType::class, MultiselectType::class]) && !empty($properties['list'])) {
+                        $typeProperties['choices']      = array_flip(FormFieldHelper::parseList($properties['list']));
+                        $cleaningRules[$field['alias']] = 'raw';
                     }
-                    if ($type == 'boolean' && !empty($properties['yes']) && !empty($properties['no'])) {
-                        $choiceType                  = 'yesno_button_group';
-                        $typeProperties['expanded']  = true;
+                    if (BooleanType::class === $type && !empty($properties['yes']) && !empty($properties['no'])) {
                         $typeProperties['yes_label'] = $properties['yes'];
                         $typeProperties['no_label']  = $properties['no'];
-                        $typeProperties['attr']      = [];
                         $emptyValue                  = ' x ';
-                        if ($value !== '' && $value !== null) {
+                        if ('' !== $value && null !== $value) {
                             $value = (int) $value;
                         }
                     }
-                    $typeProperties['data']        = $value;
-                    $typeProperties['empty_value'] = $emptyValue;
+
+                    $typeProperties['data']        = MultiselectType::class === $type ? FormFieldHelper::parseList($value) : $value;
+                    $typeProperties['placeholder'] = $emptyValue;
                     $builder->add(
                         $alias,
-                        $choiceType,
+                        $type,
                         $typeProperties
                     );
                     break;
-                case 'country':
-                case 'region':
-                case 'timezone':
-                case 'locale':
-                    switch ($type) {
-                        case 'country':
-                            $choices = FormFieldHelper::getCountryChoices();
-                            break;
-                        case 'region':
-                            $choices = FormFieldHelper::getRegionChoices();
-                            break;
-                        case 'timezone':
-                            $choices = FormFieldHelper::getTimezonesChoices();
-                            break;
-                        case 'locale':
-                            $choices = FormFieldHelper::getLocaleChoices();
-                            break;
-                    }
-
+                case CountryType::class:
+                case RegionType::class:
+                case TimezoneType::class:
+                case LocaleType::class:
                     $builder->add(
                         $alias,
-                        'choice',
+                        $type,
                         [
-                            'choices'    => $choices,
-                            'required'   => $required,
-                            'label'      => $field['label'],
-                            'label_attr' => ['class' => 'control-label'],
-                            'data'       => $value,
-                            'attr'       => [
+                            'required'          => $required,
+                            'label'             => $field['label'],
+                            'data'              => $value,
+                            'attr'              => [
                                 'class'            => 'form-control',
                                 'data-placeholder' => $field['label'],
                             ],
                             'mapped'      => $mapped,
-                            'multiple'    => false,
-                            'expanded'    => false,
                             'constraints' => $constraints,
                         ]
                     );
                     break;
                 default:
-                    if ($type == 'lookup') {
-                        $type                = 'text';
-                        $attr['data-toggle'] = 'field-lookup';
-                        $attr['data-action'] = 'lead:fieldList';
-                        $attr['data-target'] = $alias;
+                    $attr['data-encoding'] = 'raw';
+                    switch ($type) {
+                        case LookupType::class:
+                            $attr['data-target'] = $alias;
+                            if (!empty($properties['list'])) {
+                                $attr['data-options'] = FormFieldHelper::formatList(FormFieldHelper::FORMAT_BAR, array_keys(FormFieldHelper::parseList($properties['list'])));
+                            }
+                            break;
+                        case EmailType::class:
+                            // Enforce a valid email
+                            $attr['data-encoding'] = 'email';
+                            $constraints[]         = new Email(
+                                [
+                                    'message' => 'mautic.core.email.required',
+                                ]
+                            );
+                            break;
+                        case TextType::class:
+                            $constraints[] = new Length(['max' => 191]);
+                            break;
 
-                        if (!empty($properties['list'])) {
-                            $attr['data-options'] = $properties['list'];
-                        }
+                        case MultiselectType::class:
+                            $constraints[] = new Length(['max' => 65535]);
+                            break;
                     }
+
                     $builder->add(
                         $alias,
                         $type,
@@ -231,5 +292,7 @@ trait EntityFieldsBuildFormTrait
                     break;
             }
         }
+
+        return $cleaningRules;
     }
 }

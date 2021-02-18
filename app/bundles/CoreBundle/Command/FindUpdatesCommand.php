@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -48,7 +49,7 @@ EOT
 
         if ($updateData['error']) {
             $output->writeln('<error>'.$translator->trans($updateData['message']).'</error>');
-        } elseif ($updateData['message'] == 'mautic.core.updater.running.latest.version') {
+        } elseif ('mautic.core.updater.running.latest.version' == $updateData['message']) {
             $output->writeln('<info>'.$translator->trans($updateData['message']).'</info>');
         } else {
             $output->writeln($translator->trans($updateData['message'], ['%version%' => $updateData['version'], '%announcement%' => $updateData['announcement']]));

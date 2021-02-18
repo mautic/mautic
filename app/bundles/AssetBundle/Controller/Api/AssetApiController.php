@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -11,6 +12,7 @@
 namespace Mautic\AssetBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -20,31 +22,13 @@ class AssetApiController extends CommonApiController
 {
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model            = $this->getModel('asset');
         $this->entityClass      = 'Mautic\AssetBundle\Entity\Asset';
         $this->entityNameOne    = 'asset';
         $this->entityNameMulti  = 'assets';
-        $this->permissionBase   = 'asset:assets';
         $this->serializerGroups = ['assetDetails', 'categoryList', 'publishDetails'];
-    }
 
-    /**
-     * Obtains a list of assets.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function getEntitiesAction()
-    {
-        if (!$this->security->isGranted('asset:assets:viewother')) {
-            $this->listFilters[] = [
-                'column' => 'a.createdBy',
-                'expr'   => 'eq',
-                'value'  => $this->user->getId(),
-            ];
-        }
-
-        return parent::getEntitiesAction();
+        parent::initialize($event);
     }
 
     /**
@@ -60,5 +44,44 @@ class AssetApiController extends CommonApiController
         $entity->setDownloadUrl(
             $this->model->generateUrl($entity, true)
         );
+    }
+
+    /**
+     * Convert posted parameters into what the form needs in order to successfully bind.
+     *
+     * @param $parameters
+     * @param $entity
+     * @param $action
+     *
+     * @return mixed
+     */
+    protected function prepareParametersForBinding($parameters, $entity, $action)
+    {
+        $assetDir = $this->get('mautic.helper.core_parameters')->get('upload_dir');
+        $entity->setUploadDir($assetDir);
+
+        if (isset($parameters['file'])) {
+            if ('local' === $parameters['storageLocation']) {
+                $entity->setPath($parameters['file']);
+                $entity->setFileInfoFromFile();
+
+                if (null === $entity->loadFile()) {
+                    return $this->returnError('File '.$parameters['file'].' was not found in the asset directory.', Response::HTTP_BAD_REQUEST);
+                }
+            } elseif ('remote' === $parameters['storageLocation']) {
+                $parameters['remotePath'] = $parameters['file'];
+                $entity->setTitle($parameters['title']);
+                $entity->setStorageLocation('remote');
+                $entity->setRemotePath($parameters['remotePath']);
+                $entity->preUpload();
+                $entity->upload();
+            }
+
+            unset($parameters['file']);
+        } elseif ('new' === $action) {
+            return $this->returnError('File of the asset is required.', Response::HTTP_BAD_REQUEST);
+        }
+
+        return $parameters;
     }
 }

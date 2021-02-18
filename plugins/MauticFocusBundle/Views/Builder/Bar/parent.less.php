@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
  *
@@ -12,7 +13,7 @@
 
 .mf-bar-iframe {
     width: 100%;
-    position: fixed;
+    position: static;
     z-index: 20000;
     left: 0;
     right: 0;

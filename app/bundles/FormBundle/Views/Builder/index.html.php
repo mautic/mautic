@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -21,6 +22,17 @@ $header = ($activeForm->getId())
 $view['slots']->set('headerTitle', $header);
 
 $formId = $form['sessionId']->vars['data'];
+
+if (!isset($inBuilder)) {
+    $inBuilder = false;
+}
+
+$fieldsTabError = false;
+if ($view['form']->errors(
+    $form['progressiveProfilingLimit']
+)) {
+    $fieldsTabError = true;
+}
 ?>
 <?php echo $view['form']->start($form); ?>
 <div class="box-layout">
@@ -32,9 +44,16 @@ $formId = $form['sessionId']->vars['data'];
                     <li class="active"><a href="#details-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans(
                                 'mautic.core.details'
                             ); ?></a></li>
-                    <li id="fields-tab"><a href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans(
+                    <li id="fields-tab" class="text-danger"><a class="<?php if ($fieldsTabError) {
+                                echo 'text-danger';
+                            } ?>" href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans(
                                 'mautic.form.tab.fields'
-                            ); ?></a></li>
+                            ); ?>
+                            <?php if ($fieldsTabError): ?>
+                                <i class="fa fa-warning"></i>
+                            <?php endif; ?>
+                        </a>
+                    </li>
                     <li id="actions-tab"><a href="#actions-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans(
                                 'mautic.form.tab.actions'
                             ); ?></a></li>
@@ -46,6 +65,7 @@ $formId = $form['sessionId']->vars['data'];
                             <div class="col-md-6">
                                 <?php
                                 echo $view['form']->row($form['name']);
+                                echo $view['form']->row($form['formAttributes']);
                                 echo $view['form']->row($form['description']);
                                 ?>
                             </div>
@@ -60,29 +80,49 @@ $formId = $form['sessionId']->vars['data'];
                     <div class="tab-pane fade bdr-w-0" id="fields-container">
                         <?php echo $view->render('MauticFormBundle:Builder:style.html.php'); ?>
                         <div id="mauticforms_fields">
-                            <div class="available-fields mb-md">
-                                <p><?php echo $view['translator']->trans('mautic.form.form.addfield'); ?></p>
-                                <div class="dropdown">
-                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-                                        <?php echo $view['translator']->trans('mautic.form.field.add'); ?>
-                                        <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu" role="menu">
-                                        <?php foreach ($fields as $fieldType => $field): ?>
-                                            <li id="field_<?php echo $fieldType; ?>">
-                                                <a class="list-group-item" data-toggle="ajaxmodal" data-target="#formComponentModal" href="<?php echo $view['router']->path(
-                                                    'mautic_formfield_action',
-                                                    ['objectAction' => 'new', 'type' => $fieldType, 'tmpl' => 'field', 'formId' => $formId]
-                                                ); ?>">
-                                                    <div>
-                                                        <?php echo $field; ?>
-                                                    </div>
-                                                </a>
-                                            </li>
+                            <div class="row">
+                                <div class="available-fields mb-md col-sm-4">
+                                    <select class="chosen form-builder-new-component" data-placeholder="<?php echo $view['translator']->trans('mautic.form.form.component.fields'); ?>">
+                                        <option value=""></option>
+                                        <?php foreach ($fields as $field => $fieldType): ?>
+
+                                            <option data-toggle="ajaxmodal"
+                                                    data-target="#formComponentModal"
+                                                    data-href="<?php echo $view['router']->path(
+                                                        'mautic_formfield_action',
+                                                        [
+                                                            'objectAction' => 'new',
+                                                            'type'         => $fieldType,
+                                                            'tmpl'         => 'field',
+                                                            'formId'       => $formId,
+                                                            'inBuilder'    => $inBuilder,
+                                                        ]
+                                                    ); ?>">
+                                                <?php echo $field; ?>
+                                            </option>
                                         <?php endforeach; ?>
-                                    </ul>
+
+                                    </select>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-sm-12 mb-10">
+                                    <?php echo $view['form']->label(
+                                        $form['progressiveProfilingLimit']
+                                    ); ?>
+                                    <div class="ml-5 mr-5" style="display:inline-block;">
+                                        <?php echo $view['form']->widget(
+                                            $form['progressiveProfilingLimit']
+                                        ); ?>
+                                    </div>
+                                    <div class="has-error" style="display:inline-block;">
+                                        <?php echo $view['form']->errors(
+                                            $form['progressiveProfilingLimit']
+                                        ); ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="drop-here">
                             <?php foreach ($formFields as $field): ?>
                                 <?php if (!in_array($field['id'], $deletedFields)) : ?>
                                     <?php if (!empty($field['isCustom'])):
@@ -99,59 +139,58 @@ $formId = $form['sessionId']->vars['data'];
                                             'inForm'        => true,
                                             'id'            => $field['id'],
                                             'formId'        => $formId,
+                                            'formName'      => $activeForm->generateFormName(),
                                             'contactFields' => $contactFields,
+                                            'companyFields' => $companyFields,
+                                            'inBuilder'     => $inBuilder,
                                         ]
                                     ); ?>
                                 <?php endif; ?>
                             <?php endforeach; ?>
+                            </div>
                             <?php if (!count($formFields)): ?>
-                                <div class="alert alert-info" id="form-field-placeholder">
-                                    <p><?php echo $view['translator']->trans('mautic.form.form.addfield'); ?></p>
-                                </div>
+                            <div class="alert alert-info" id="form-field-placeholder">
+                                <p><?php echo $view['translator']->trans('mautic.form.form.addfield'); ?></p>
+                            </div>
                             <?php endif; ?>
                         </div>
                     </div>
                     <div class="tab-pane fade bdr-w-0" id="actions-container">
                         <div id="mauticforms_actions">
-                            <div class="available-actions mb-md">
-                                <p><?php echo $view['translator']->trans('mautic.form.form.addaction'); ?></p>
-                                <div class="dropdown">
-                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-                                        <?php echo $view['translator']->trans('mautic.form.action.add'); ?>
-                                        <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu" role="menu">
-                                        <?php
-                                        foreach ($actions as $group => $groupActions):
-                                            $campaignActionFound = false;
-                                            $actionOptions       = '';
-                                            foreach ($groupActions as $k => $e):
-                                                $actionOptions .= $view->render(
-                                                    'MauticFormBundle:Action:option.html.php',
-                                                    [
-                                                        'action'       => $e,
-                                                        'type'         => $k,
-                                                        'isStandalone' => $activeForm->isStandalone(),
-                                                        'formId'       => $form['sessionId']->vars['data'],
-                                                    ]
-                                                )."\n\n";
+                            <div class="row">
+                                <div class="available-actions mb-md col-sm-4">
+                                    <select class="chosen form-builder-new-component" data-placeholder="<?php echo $view['translator']->trans('mautic.form.form.component.submitactions'); ?>">
+                                        <option value=""></option>
+                                        <?php foreach ($actions as $group => $groupActions): ?>
+                                            <?php
+                                                $campaignActionFound = false;
+                                                $actionOptions       = '';
+                                                foreach ($groupActions as $k => $e):
+                                                    $actionOptions .= $view->render(
+                                                        'MauticFormBundle:Action:option.html.php',
+                                                        [
+                                                            'action'       => $e,
+                                                            'type'         => $k,
+                                                            'isStandalone' => $activeForm->isStandalone(),
+                                                            'formId'       => $form['sessionId']->vars['data'],
+                                                        ]
+                                                    )."\n\n";
                                                 if (!empty($e['allowCampaignForm'])) {
                                                     $campaignActionFound = true;
                                                 }
-                                            endforeach;
+                                                endforeach;
                                             $class = (empty($campaignActionFound)) ? ' action-standalone-only' : '';
                                             if (!$campaignActionFound && !$activeForm->isStandalone()) {
                                                 $class .= ' hide';
                                             }
                                             ?>
-                                            <li role="presentation" class="dropdown-header<?php echo $class; ?>">
-                                                <?php echo $view['translator']->trans($group); ?>
-                                            </li>
+                                            <optgroup class=<?php echo $class; ?> label="<?php echo $view['translator']->trans($group); ?>"></optgroup>
                                             <?php echo $actionOptions; ?>
                                         <?php endforeach; ?>
-                                    </ul>
+                                    </select>
                                 </div>
                             </div>
+                            <div class="drop-here">
                             <?php foreach ($formActions as $action): ?>
                                 <?php if (!in_array($action['id'], $deletedActions)) : ?>
                                     <?php $template = (isset($actionSettings[$action['type']]['template']))
@@ -170,10 +209,11 @@ $formId = $form['sessionId']->vars['data'];
                                     ); ?>
                                 <?php endif; ?>
                             <?php endforeach; ?>
+                            </div>
                             <?php if (!count($formActions)): ?>
-                                <div class="alert alert-info" id="form-action-placeholder">
-                                    <p><?php echo $view['translator']->trans('mautic.form.form.addaction'); ?></p>
-                                </div>
+                            <div class="alert alert-info" id="form-action-placeholder">
+                                <p><?php echo $view['translator']->trans('mautic.form.form.addaction'); ?></p>
+                            </div>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -188,6 +228,7 @@ $formId = $form['sessionId']->vars['data'];
             echo $view['form']->row($form['isPublished']);
             echo $view['form']->row($form['publishUp']);
             echo $view['form']->row($form['publishDown']);
+            echo $view['form']->row($form['noIndex']);
             echo $view['form']->row($form['inKioskMode']);
             echo $view['form']->row($form['renderStyle']);
             echo $view['form']->row($form['template']);
@@ -199,7 +240,7 @@ $formId = $form['sessionId']->vars['data'];
 
 echo $view['form']->end($form);
 
-if ($activeForm->getFormType() === null || !empty($forceTypeSelection)):
+if (null === $activeForm->getFormType() || !empty($forceTypeSelection)):
     echo $view->render(
         'MauticCoreBundle:Helper:form_selecttype.html.php',
         [
@@ -225,7 +266,7 @@ endif;
 
 $view['slots']->append(
     'modal',
-    $this->render(
+    $view->render(
         'MauticCoreBundle:Helper:modal.html.php',
         [
             'id'            => 'formComponentModal',

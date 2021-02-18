@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -15,7 +16,6 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
-use Mautic\CoreBundle\Templating\Helper\ThemeHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -24,8 +24,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Mautic's Factory.
- *
  * @deprecated 2.0 to be removed in 3.0
  */
 class MauticFactory
@@ -35,19 +33,10 @@ class MauticFactory
      */
     private $container;
 
-    /**
-     * @var
-     */
-    private $database = null;
+    private $database;
 
-    /**
-     * @var
-     */
-    private $entityManager = null;
+    private $entityManager;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -92,7 +81,7 @@ class MauticFactory
      *
      * @param bool $nullIfGuest
      *
-     * @return null|User
+     * @return User|null
      */
     public function getUser($nullIfGuest = false)
     {
@@ -119,9 +108,6 @@ class MauticFactory
         return ($this->entityManager) ? $this->entityManager : $this->container->get('doctrine')->getManager();
     }
 
-    /**
-     * @param EntityManager $em
-     */
     public function setEntityManager(EntityManager $em)
     {
         $this->entityManager = $em;
@@ -143,19 +129,6 @@ class MauticFactory
     public function setDatabase($db)
     {
         $this->database = $db;
-    }
-
-    /**
-     * Gets a schema helper for manipulating database schemas.
-     *
-     * @param string $type
-     * @param string $name Object name; i.e. table name
-     *
-     * @return mixed
-     */
-    public function getSchemaHelper($type, $name = null)
-    {
-        return $this->container->get('mautic.schema.helper.factory')->getSchemaHelper($type, $name);
     }
 
     /**
@@ -222,7 +195,6 @@ class MauticFactory
             $request      = Request::createFromGlobals();
             $requestStack = new RequestStack();
             $requestStack->push($request);
-            $this->requestStack = $requestStack;
         }
 
         return $request;
@@ -258,7 +230,7 @@ class MauticFactory
      */
     public function getParameter($id, $default = false)
     {
-        return $this->container->get('mautic.helper.core_parameters')->getParameter($id, $default);
+        return $this->container->get('mautic.helper.core_parameters')->get($id, $default);
     }
 
     /**
@@ -506,5 +478,19 @@ class MauticFactory
     public function serviceExists($service)
     {
         return $this->container->has($service);
+    }
+
+    /**
+     * @param $service
+     *
+     * @return bool
+     */
+    public function get($service)
+    {
+        if ($this->serviceExists($service)) {
+            return $this->container->get($service);
+        }
+
+        return false;
     }
 }

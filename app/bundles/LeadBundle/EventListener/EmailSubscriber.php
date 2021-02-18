@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,29 +11,29 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Helper\TokenHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class EmailSubscriber.
- */
-class EmailSubscriber extends CommonSubscriber
+class EmailSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @deprecated - to be removed in 3.0
-     *
-     * @var string
-     */
-    private static $leadFieldRegex = '{leadfield=(.*?)}';
-
     /**
      * @var string
      */
     private static $contactFieldRegex = '{contactfield=(.*?)}';
+
+    /**
+     * @var string
+     */
+    private $builderTokenHelperFactory;
+
+    public function __construct(BuilderTokenHelperFactory $builderTokenHelperFactory)
+    {
+        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
+    }
 
     /**
      * @return array
@@ -46,65 +47,30 @@ class EmailSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param EmailBuilderEvent $event
-     */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
-        $tokenHelper = new BuilderTokenHelper($this->factory, 'lead.field', 'lead:fields', 'MauticLeadBundle');
-        $tokenHelper->setPermissionSet(['lead:fields:full']);
-
-        if ($event->tokenSectionsRequested()) {
-            //add email tokens
-            $event->addTokenSection(
-                'lead.emailtokens',
-                'mautic.lead.email.header.index',
-                $tokenHelper->getTokenContent(
-                    [
-                        'filter' => [
-                            'force' => [
-                                [
-                                    'column' => 'f.isPublished',
-                                    'expr'   => 'eq',
-                                    'value'  => true,
-                                ],
-                            ],
-                        ],
-                        'orderBy'        => 'f.label',
-                        'orderByDir'     => 'ASC',
-                        'hydration_mode' => 'HYDRATE_ARRAY',
-                    ]
-                ),
-                255
-            );
-        }
-
-        if ($event->tokensRequested(self::$leadFieldRegex)) {
-            $event->addTokensFromHelper($tokenHelper, self::$leadFieldRegex, 'label', 'alias', true);
-        }
+        $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('lead.field', 'lead:fields', 'MauticLeadBundle');
+        // the permissions are for viewing contact data, not for managing contact fields
+        $tokenHelper->setPermissionSet(['lead:leads:viewown', 'lead:leads:viewother']);
 
         if ($event->tokensRequested(self::$contactFieldRegex)) {
-            $event->addTokensFromHelper($tokenHelper, self::$contactFieldRegex, 'label', 'alias', true);
+            $event->addTokensFromHelper($tokenHelper, self::$contactFieldRegex, 'label', 'alias');
         }
     }
 
-    /**
-     * @param EmailSendEvent $event
-     */
     public function onEmailDisplay(EmailSendEvent $event)
     {
         $this->onEmailGenerate($event);
     }
 
-    /**
-     * @param EmailSendEvent $event
-     */
     public function onEmailGenerate(EmailSendEvent $event)
     {
         // Combine all possible content to find tokens across them
         $content = $event->getSubject();
         $content .= $event->getContent();
         $content .= $event->getPlainText();
+        $content .= implode(' ', $event->getTextHeaders());
+
         $lead = $event->getLead();
 
         $tokenList = TokenHelper::findLeadTokens($content, $lead);

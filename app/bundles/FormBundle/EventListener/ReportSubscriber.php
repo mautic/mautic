@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,18 +11,36 @@
 
 namespace Mautic\FormBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\FormBundle\Entity\SubmissionRepository;
+use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ReportSubscriber.
- */
-class ReportSubscriber extends CommonSubscriber
+class ReportSubscriber implements EventSubscriberInterface
 {
+    const CONTEXT_FORMS           = 'forms';
+    const CONTEXT_FORM_SUBMISSION = 'form.submissions';
+
+    /**
+     * @var CompanyReportData
+     */
+    private $companyReportData;
+
+    /**
+     * @var SubmissionRepository
+     */
+    private $submissionRepository;
+
+    public function __construct(CompanyReportData $companyReportData, SubmissionRepository $submissionRepository)
+    {
+        $this->companyReportData    = $companyReportData;
+        $this->submissionRepository = $submissionRepository;
+    }
+
     /**
      * @return array
      */
@@ -36,80 +55,100 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Add available tables and columns to the report builder lookup.
-     *
-     * @param ReportBuilderEvent $event
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        if ($event->checkContext(['forms', 'form.submissions'])) {
-            // Forms
-            $prefix  = 'f.';
-            $columns = [
-                $prefix.'alias' => [
-                    'label' => 'mautic.core.alias',
+        if (!$event->checkContext([self::CONTEXT_FORMS, self::CONTEXT_FORM_SUBMISSION])) {
+            return;
+        }
+
+        // Forms
+        $prefix  = 'f.';
+        $columns = [
+            $prefix.'alias' => [
+                'label' => 'mautic.core.alias',
+                'type'  => 'string',
+            ],
+        ];
+        $columns = array_merge(
+            $columns,
+            $event->getStandardColumns($prefix, [], 'mautic_form_action'),
+            $event->getCategoryColumns()
+        );
+        $data = [
+            'display_name' => 'mautic.form.forms',
+            'columns'      => $columns,
+        ];
+        $event->addTable(self::CONTEXT_FORMS, $data);
+
+        if ($event->checkContext(self::CONTEXT_FORM_SUBMISSION)) {
+            // Form submissions
+            $submissionPrefix  = 'fs.';
+            $pagePrefix        = 'p.';
+            $submissionColumns = [
+                $submissionPrefix.'date_submitted' => [
+                    'label'          => 'mautic.form.report.submit.date_submitted',
+                    'type'           => 'datetime',
+                    'groupByFormula' => 'DATE('.$submissionPrefix.'date_submitted)',
+                ],
+                $submissionPrefix.'referer' => [
+                    'label' => 'mautic.core.referer',
+                    'type'  => 'string',
+                ],
+                $pagePrefix.'id' => [
+                    'label' => 'mautic.form.report.page_id',
+                    'type'  => 'int',
+                    'link'  => 'mautic_page_action',
+                ],
+                $pagePrefix.'title' => [
+                    'label' => 'mautic.form.report.page_name',
                     'type'  => 'string',
                 ],
             ];
-            $columns = array_merge($columns, $event->getStandardColumns($prefix, [], 'mautic_form_action'), $event->getCategoryColumns());
-            $data    = [
-                'display_name' => 'mautic.form.forms',
-                'columns'      => $columns,
-            ];
-            $event->addTable('forms', $data);
-            if ($event->checkContext('form.submissions')) {
-                // Form submissions
-                $submissionPrefix  = 'fs.';
-                $pagePrefix        = 'p.';
-                $submissionColumns = [
-                    $submissionPrefix.'date_submitted' => [
-                        'label' => 'mautic.form.report.submit.date_submitted',
-                        'type'  => 'datetime',
-                    ],
-                    $submissionPrefix.'referer' => [
-                        'label' => 'mautic.core.referer',
-                        'type'  => 'string',
-                    ],
-                    $pagePrefix.'id' => [
-                        'label' => 'mautic.form.report.page_id',
-                        'type'  => 'int',
-                        'link'  => 'mautic_page_action',
-                    ],
-                    $pagePrefix.'name' => [
-                        'label' => 'mautic.form.report.page_name',
-                        'type'  => 'string',
-                    ],
-                ];
-                $data = [
-                    'display_name' => 'mautic.form.report.submission.table',
-                    'columns'      => array_merge($submissionColumns, $columns, $event->getLeadColumns(), $event->getIpColumn()),
-                ];
-                $event->addTable('form.submissions', $data, 'forms');
 
-                // Register graphs
-                $context = 'form.submissions';
-                $event->addGraph($context, 'line', 'mautic.form.graph.line.submissions');
-                $event->addGraph($context, 'table', 'mautic.form.table.top.referrers');
-                $event->addGraph($context, 'table', 'mautic.form.table.most.submitted');
-            }
+            $companyColumns = $this->companyReportData->getCompanyData();
+
+            $formSubmissionColumns = array_merge(
+                $submissionColumns,
+                $columns,
+                $event->getCampaignByChannelColumns(),
+                $event->getLeadColumns(),
+                $event->getIpColumn(),
+                $companyColumns
+            );
+
+            $data = [
+                'display_name' => 'mautic.form.report.submission.table',
+                'columns'      => $formSubmissionColumns,
+            ];
+            $event->addTable(self::CONTEXT_FORM_SUBMISSION, $data, self::CONTEXT_FORMS);
+
+            // Register graphs
+            $context = self::CONTEXT_FORM_SUBMISSION;
+            $event->addGraph($context, 'line', 'mautic.form.graph.line.submissions');
+            $event->addGraph($context, 'table', 'mautic.form.table.top.referrers');
+            $event->addGraph($context, 'table', 'mautic.form.table.most.submitted');
         }
     }
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGeneratorEvent $event
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
+        if (!$event->checkContext([self::CONTEXT_FORMS, self::CONTEXT_FORM_SUBMISSION])) {
+            return;
+        }
+
         $context = $event->getContext();
         $qb      = $event->getQueryBuilder();
 
         switch ($context) {
-            case 'forms':
+            case self::CONTEXT_FORMS:
                 $qb->from(MAUTIC_TABLE_PREFIX.'forms', 'f');
                 $event->addCategoryLeftJoin($qb, 'f');
                 break;
-            case 'form.submissions':
+            case self::CONTEXT_FORM_SUBMISSION:
                 $event->applyDateFilters($qb, 'date_submitted', 'fs');
 
                 $qb->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
@@ -118,6 +157,12 @@ class ReportSubscriber extends CommonSubscriber
                 $event->addCategoryLeftJoin($qb, 'f');
                 $event->addLeadLeftJoin($qb, 'fs');
                 $event->addIpAddressLeftJoin($qb, 'fs');
+                $event->addCampaignByChannelJoin($qb, 'f', 'form');
+
+                if ($this->companyReportData->eventHasCompanyColumns($event)) {
+                    $event->addCompanyLeftJoin($qb);
+                }
+
                 break;
         }
 
@@ -126,19 +171,16 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGraphEvent $event
      */
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
         // Context check, we only want to fire for Lead reports
-        if (!$event->checkContext('form.submissions')) {
+        if (!$event->checkContext(self::CONTEXT_FORM_SUBMISSION)) {
             return;
         }
 
-        $graphs         = $event->getRequestedGraphs();
-        $qb             = $event->getQueryBuilder();
-        $submissionRepo = $this->em->getRepository('MauticFormBundle:Submission');
+        $graphs = $event->getRequestedGraphs();
+        $qb     = $event->getQueryBuilder();
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
@@ -157,12 +199,11 @@ class ReportSubscriber extends CommonSubscriber
 
                     $event->setGraph($g, $data);
                     break;
-                    break;
 
                 case 'mautic.form.table.top.referrers':
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $submissionRepo->getTopReferrers($queryBuilder, $limit, $offset);
+                    $items                  = $this->submissionRepository->getTopReferrers($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -174,7 +215,7 @@ class ReportSubscriber extends CommonSubscriber
                 case 'mautic.form.table.most.submitted':
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $submissionRepo->getMostSubmitted($queryBuilder, $limit, $offset);
+                    $items                  = $this->submissionRepository->getMostSubmitted($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;

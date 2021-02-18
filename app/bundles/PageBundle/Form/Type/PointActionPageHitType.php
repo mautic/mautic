@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -23,7 +24,7 @@ class PointActionPageHitType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('pages', 'page_list', [
+        $builder->add('pages', PageListType::class, [
             'label'      => 'mautic.page.point.action.form.pages',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
@@ -36,7 +37,7 @@ class PointActionPageHitType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'pointaction_pagehit';
     }

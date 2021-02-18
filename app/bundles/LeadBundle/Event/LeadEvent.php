@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -19,7 +20,6 @@ use Mautic\LeadBundle\Entity\Lead;
 class LeadEvent extends CommonEvent
 {
     /**
-     * @param Lead $lead
      * @param bool $isNew
      */
     public function __construct(Lead &$lead, $isNew = false)
@@ -40,8 +40,6 @@ class LeadEvent extends CommonEvent
 
     /**
      * Sets the Lead entity.
-     *
-     * @param Lead $lead
      */
     public function setLead(Lead $lead)
     {

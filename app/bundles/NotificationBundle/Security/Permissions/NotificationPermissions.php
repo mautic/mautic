@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -26,6 +27,7 @@ class NotificationPermissions extends AbstractPermissions
         parent::__construct($params);
         $this->addStandardPermissions('categories');
         $this->addExtendedPermissions('notifications');
+        $this->addExtendedPermissions('mobile_notifications');
     }
 
     /**
@@ -40,13 +42,11 @@ class NotificationPermissions extends AbstractPermissions
 
     /**
      * {@inheritdoc}
-     *
-     * @param FormBuilderInterface $builder
-     * @param array                $options
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
         $this->addStandardFormFields('notification', 'categories', $builder, $data);
         $this->addExtendedFormFields('notification', 'notifications', $builder, $data);
+        $this->addExtendedFormFields('notification', 'mobile_notifications', $builder, $data);
     }
 }

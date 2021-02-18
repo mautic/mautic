@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -35,10 +36,6 @@ class OAuthEventListener
 
     /**
      * OAuthEventListener constructor.
-     *
-     * @param EntityManager       $entityManager
-     * @param CorePermissions     $corePermissions
-     * @param TranslatorInterface $translator
      */
     public function __construct(EntityManager $entityManager, CorePermissions $corePermissions, TranslatorInterface $translator)
     {
@@ -48,8 +45,6 @@ class OAuthEventListener
     }
 
     /**
-     * @param OAuthEvent $event
-     *
      * @throws AccessDeniedException
      */
     public function onPreAuthorizationProcess(OAuthEvent $event)
@@ -66,9 +61,6 @@ class OAuthEventListener
         }
     }
 
-    /**
-     * @param OAuthEvent $event
-     */
     public function onPostAuthorizationProcess(OAuthEvent $event)
     {
         if ($event->isAuthorizedClient()) {
@@ -82,8 +74,6 @@ class OAuthEventListener
     }
 
     /**
-     * @param OAuthEvent $event
-     *
      * @return mixed
      */
     protected function getUser(OAuthEvent $event)

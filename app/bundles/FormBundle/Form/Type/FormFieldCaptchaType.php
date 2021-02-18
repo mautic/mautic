@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -11,6 +12,7 @@
 namespace Mautic\FormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -25,7 +27,7 @@ class FormFieldCaptchaType extends AbstractType
     {
         $builder->add(
             'captcha',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.form.field.form.property_captcha',
                 'label_attr' => ['class' => 'control-label'],
@@ -40,7 +42,7 @@ class FormFieldCaptchaType extends AbstractType
 
         $builder->add(
             'placeholder',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.form.field.form.property_placeholder',
                 'label_attr' => ['class' => 'control-label'],
@@ -51,7 +53,7 @@ class FormFieldCaptchaType extends AbstractType
 
         $builder->add(
             'errorMessage',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.form.field.form.property_captchaerror',
                 'label_attr' => ['class' => 'control-label'],

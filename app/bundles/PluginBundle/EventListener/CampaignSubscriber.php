@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -13,29 +14,13 @@ namespace Mautic\PluginBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\Form\Type\IntegrationsListType;
 use Mautic\PluginBundle\PluginEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
-
-    /**
-     * CampaignSubscriber constructor.
-     *
-     * @param IntegrationHelper $integrationHelper
-     */
-    public function __construct(IntegrationHelper $integrationHelper)
-    {
-        $this->integrationHelper = $integrationHelper;
-    }
+    use PushToIntegrationTrait;
 
     /**
      * {@inheritdoc}
@@ -48,15 +33,12 @@ class CampaignSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $action = [
             'label'       => 'mautic.plugin.actions.push_lead',
             'description' => 'mautic.plugin.actions.tooltip',
-            'formType'    => 'integration_list',
+            'formType'    => IntegrationsListType::class,
             'formTheme'   => 'MauticPluginBundle:FormTheme\Integration',
             'eventName'   => PluginEvents::ON_CAMPAIGN_TRIGGER_ACTION,
         ];
@@ -64,33 +46,25 @@ class CampaignSubscriber extends CommonSubscriber
         $event->addAction('plugin.leadpush', $action);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
-        $config = $event->getConfig();
-        $lead   = $event->getLead();
+        $config                  = $event->getConfig();
+        $config['campaignEvent'] = $event->getEvent();
+        $config['leadEventLog']  = $event->getLogEntry();
+        $lead                    = $event->getLead();
+        $errors                  = [];
+        $success                 = $this->pushToIntegration($config, $lead, $errors);
 
-        $integration = (!empty($config['integration'])) ? $config['integration'] : null;
-        $feature     = (empty($integration)) ? 'push_lead' : null;
-
-        $services = $this->integrationHelper->getIntegrationObjects($integration, $feature);
-        $success  = false;
-
-        foreach ($services as $name => $s) {
-            $settings = $s->getIntegrationSettings();
-            if (!$settings->isPublished()) {
-                continue;
-            }
-
-            if (method_exists($s, 'pushLead')) {
-                if ($s->pushLead($lead, $config)) {
-                    $success = true;
-                }
-            }
+        if (count($errors)) {
+            $log = $event->getLogEntry();
+            $log->appendToMetadata(
+                [
+                    'failed' => 1,
+                    'reason' => implode('<br />', $errors),
+                ]
+            );
         }
 
-        return $event->setResult($success);
+        $event->setResult($success);
     }
 }

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -29,6 +30,7 @@ $view['slots']->set('headerTitle', $header);
                 <div class="col-md-6">
                     <?php echo $view['form']->row($form['name']); ?>
                     <?php echo $view['form']->row($form['description']); ?>
+                    <?php echo $view['form']->row($form['secret']); ?>
                     <?php echo $view['form']->row($form['webhookUrl']); ?>
                     <div class="row">
                         <div class="col-md-5">
@@ -52,6 +54,7 @@ $view['slots']->set('headerTitle', $header);
     <div class="col-md-3 bg-white height-auto bdr-l">
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php echo $view['form']->row($form['category']); ?>
+            <?php echo $view['form']->row($form['eventsOrderbyDir']); ?>
             <?php echo $view['form']->row($form['isPublished']); ?>
         </div>
     </div>

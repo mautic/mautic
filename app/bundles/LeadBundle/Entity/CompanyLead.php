@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -13,9 +14,6 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class CompanyLead.
- */
 class CompanyLead
 {
     /**
@@ -36,26 +34,17 @@ class CompanyLead
     /**
      * @var bool
      */
-    private $manuallyRemoved = false;
+    private $primary = false;
 
-    /**
-     * @var bool
-     */
-    private $manuallyAdded = false;
-
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('companies_leads')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\CompanyLeadRepository');
+            ->setCustomRepositoryClass(CompanyLeadRepository::class);
 
         $builder->createManyToOne('company', 'Company')
             ->isPrimaryKey()
-            ->inversedBy('leads')
             ->addJoinColumn('company_id', 'id', false, false, 'CASCADE')
             ->build();
 
@@ -63,12 +52,9 @@ class CompanyLead
 
         $builder->addDateAdded();
 
-        $builder->createField('manuallyRemoved', 'boolean')
-            ->columnName('manually_removed')
-            ->build();
-
-        $builder->createField('manuallyAdded', 'boolean')
-            ->columnName('manually_added')
+        $builder->createField('primary', 'boolean')
+            ->columnName('is_primary')
+            ->nullable()
             ->build();
     }
 
@@ -129,50 +115,18 @@ class CompanyLead
     }
 
     /**
-     * @return bool
+     * @param bool $primary
      */
-    public function getManuallyRemoved()
+    public function setPrimary($primary)
     {
-        return $this->manuallyRemoved;
-    }
-
-    /**
-     * @param bool $manuallyRemoved
-     */
-    public function setManuallyRemoved($manuallyRemoved)
-    {
-        $this->manuallyRemoved = $manuallyRemoved;
+        $this->primary = $primary;
     }
 
     /**
      * @return bool
      */
-    public function wasManuallyRemoved()
+    public function getPrimary()
     {
-        return $this->manuallyRemoved;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getManuallyAdded()
-    {
-        return $this->manuallyAdded;
-    }
-
-    /**
-     * @param bool $manuallyAdded
-     */
-    public function setManuallyAdded($manuallyAdded)
-    {
-        $this->manuallyAdded = $manuallyAdded;
-    }
-
-    /**
-     * @return bool
-     */
-    public function wasManuallyAdded()
-    {
-        return $this->manuallyAdded;
+        return $this->primary;
     }
 }

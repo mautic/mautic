@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,6 +11,7 @@
 $template       = '<div class="col-md-6">{content}</div>';
 $toggleTemplate = '<div class="col-md-3">{content}</div>';
 $properties     = (isset($form['properties'])) ? $form['properties'] : [];
+$validation     = (isset($form['validation'])) ? $form['validation'] : [];
 
 $showAttributes = isset($form['labelAttributes']) || isset($form['inputAttributes']) || isset($form['containerAttributes']) || isset($properties['labelAttributes']) || isset($form['alias']);
 $showBehavior   = isset($form['showWhenValueExists']) || isset($properties['showWhenValueExists']);
@@ -55,9 +57,7 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
     <div role="tabpanel">
         <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active">
-                <a<?php if ($generalTabError) {
-    echo ' class="text-danger" ';
-} ?> href="#general" aria-controls="general" role="tab" data-toggle="tab">
+                <a<?php if ($generalTabError): echo ' class="text-danger" '; endif; ?> href="#general" aria-controls="general" role="tab" data-toggle="tab">
                     <?php echo $view['translator']->trans('mautic.form.field.section.general'); ?>
                     <?php if ($generalTabError): ?>
                         <i class="fa fa-warning"></i>
@@ -83,9 +83,7 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
 
             <?php if ($showProperties): ?>
             <li role="presentation">
-                <a<?php if ($propertiesTabError) {
-    echo ' class="text-danger" ';
-} ?> href="#properties" aria-controls="properties" role="tab" data-toggle="tab">
+                <a<?php if ($propertiesTabError): echo ' class="text-danger" '; endif; ?> href="#properties" aria-controls="properties" role="tab" data-toggle="tab">
                     <?php echo $view['translator']->trans('mautic.form.field.section.properties'); ?>
                     <?php if ($propertiesTabError): ?>
                         <i class="fa fa-warning"></i>
@@ -128,7 +126,37 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
             <div role="tabpanel" class="tab-pane" id="leadfields">
                 <div class="row">
                     <div class="col-md-6">
-                        <?php echo $view['form']->row($form['leadField']); ?>
+                        <?php $fieldGroups = $form['leadField']->vars['choices'];
+                              $data        = $form['leadField']->vars['data'];
+                        ?>
+                        <select id="formfield_leadField" name="formfield[leadField]" class="form-control" autocomplete="false" style="display: none;">
+                            <option value=""></option>
+                            <?php
+                            foreach ($fieldGroups as $object => $group):
+                            $header = $object;
+                            $icon   = ('company' == $object) ? 'building' : 'user';
+                            ?>
+                            <optgroup label="<?php echo $view['translator']->trans('mautic.lead.'.$header); ?>">
+                                <?php
+                                foreach ($group->choices as $subGroup => $fields):
+                                    foreach ($fields->choices as $field) :
+                                        $attr       = (!empty($field->attr)) ? $field->attr : [];
+                                        $attrString = '';
+                                        foreach ($attr as $k => $v) {
+                                            $attrString .= $k.'="'.preg_replace('/"/', '&quot;', $v).'" ';
+                                        }
+                                        $label = $field->label;
+                                        $value = $field->value;
+                                        ?>
+                                        <option value="<?php echo $view->escape($value); ?>" class="segment-filter <?php echo $icon; ?>" <?php if ($data === $value) {
+                                            echo 'Selected';
+                                        } ?> <?php echo $attrString; ?> ><?php echo $label; ?></option>
+                                    <?php endforeach; ?>
+                                <?php endforeach; ?>
+                            </optgroup>
+                            <?php endforeach; ?>
+                        </select>
+                        <?php unset($form['leadField']); ?>
                     </div>
                 </div>
             </div>
@@ -137,9 +165,40 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
             <?php if (isset($form['isRequired'])): ?>
             <div role="tabpanel" class="tab-pane" id="required">
                     <div class="row">
-                        <?php echo $view['form']->rowIfExists($form, 'validationMessage', $template); ?>
-                        <?php echo $view['form']->rowIfExists($form, 'isRequired', $toggleTemplate); ?>
+                        <?php echo $view['form']->rowIfExists($form, 'isRequired', '<div class="col-md-4">{content}</div>'); ?>
+                        <?php echo $view['form']->rowIfExists($form, 'validationMessage', '<div class="col-md-8">{content}</div>'); ?>
                     </div>
+                <div class="row">
+                    <?php
+                    $i = 0;
+                    foreach ($validation as $name => $property):
+                        if ($form['validation'][$name]->isRendered() || 'labelAttributes' == $name) {
+                            continue;
+                        }
+
+                        if ('hidden' == $form['validation'][$name]->vars['block_prefixes'][1]) :
+                            echo $view['form']->row($form['validation'][$name]);
+                        else:
+                            $col = 8;
+                            if ('choice' == $form['validation'][$name]->vars['block_prefixes'][1]):
+                                $col = 4;
+                                endif;
+                            ?>
+                            <div class="col-md-<?php echo $col; ?>">
+                                <?php echo $view['form']->row($form['validation'][$name]); ?>
+                            </div>
+                            <?php
+                            if (9 == $col) :
+                                $i++;
+                                if (0 == $i % 2) :
+                                    ?>
+                                    <div class="clearfix"></div>
+                                    <?php
+                                endif;
+                            endif;
+                        endif; ?>
+                    <?php endforeach; ?>
+                </div>
             </div>
             <?php endif; ?>
 
@@ -169,20 +228,30 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                 <?php endif; ?>
                 <div class="row">
                     <?php
+                    $i = 0;
                     foreach ($properties as $name => $property):
-                    if ($form['properties'][$name]->isRendered() || $name == 'labelAttributes') {
+                    if ($form['properties'][$name]->isRendered() || 'labelAttributes' == $name) {
                         continue;
                     }
 
-                    if ($form['properties'][$name]->vars['block_prefixes'][1] == 'hidden') :
+                    if ('hidden' == $form['properties'][$name]->vars['block_prefixes'][1]) :
                         echo $view['form']->row($form['properties'][$name]);
                     else:
-                    $col = ($name == 'text') ? 12 : 6;
+                    $col = ('text' == $name) ? 12 : 6;
                     ?>
                     <div class="col-md-<?php echo $col; ?>">
                         <?php echo $view['form']->row($form['properties'][$name]); ?>
                     </div>
-                    <?php endif; ?>
+                    <?php
+                        if (6 == $col) :
+                            $i++;
+                          if (0 == $i % 2) :
+                              ?>
+                            <div class="clearfix"></div>
+                              <?php
+                          endif;
+                        endif;
+                    endif; ?>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -204,9 +273,10 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
             <?php if ($showBehavior): ?>
             <div role="tabpanel" class="tab-pane" id="progressive-profiling">
                 <div class="row">
+                    <?php echo $view['form']->rowIfExists($form, 'alwaysDisplay', $template); ?>
+                    <?php echo $view['form']->rowIfExists($form, 'isAutoFill', $template); ?>
                     <?php echo $view['form']->rowIfExists($form, 'showWhenValueExists', $template); ?>
                     <?php echo $view['form']->rowIfExists($form, 'showAfterXSubmissions', $template); ?>
-                    <?php echo $view['form']->rowIfExists($form, 'isAutoFill', $template); ?>
                 </div>
             </div>
             <?php endif; ?>

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,13 +11,17 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CampaignBundle\Entity\Result\CountResult;
+use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
-/**
- * LeadRepository.
- */
 class LeadRepository extends CommonRepository
 {
+    use ContactLimiterTrait;
+    use SlaveConnectionTrait;
+
     /**
      * Get the details of leads added to a campaign.
      *
@@ -55,26 +60,6 @@ class LeadRepository extends CommonRepository
     /**
      * Get leads for a specific campaign.
      *
-     * @deprecated  2.1.0; Use MauticLeadBundle\Entity\LeadRepository\getEntityContacts() instead
-     *
-     * @param $args
-     *
-     * @return array
-     */
-    public function getLeadsWithFields($args)
-    {
-        return $this->getEntityManager()->getRepository('MauticLeadBundle:Lead')->getEntityContacts(
-            $args,
-            'campaign_leads',
-            isset($args['campaign_id']) ? $args['campaign_id'] : 0,
-            ['manually_removed' => 0],
-            'campaign_id'
-        );
-    }
-
-    /**
-     * Get leads for a specific campaign.
-     *
      * @param      $campaignId
      * @param null $eventId
      *
@@ -96,7 +81,7 @@ class LeadRepository extends CommonRepository
             ->setParameter('false', false, 'boolean')
             ->setParameter('campaign', $campaignId);
 
-        if ($eventId != null) {
+        if (null != $eventId) {
             $dq = $this->getEntityManager()->createQueryBuilder();
             $dq->select('el.id')
                 ->from('MauticCampaignBundle:LeadEventLog', 'ell')
@@ -110,9 +95,7 @@ class LeadRepository extends CommonRepository
                 ->setParameter('eventId', $eventId);
         }
 
-        $result = $q->getQuery()->getResult();
-
-        return $result;
+        return $q->getQuery()->getResult();
     }
 
     /**
@@ -153,5 +136,483 @@ class LeadRepository extends CommonRepository
         } else {
             $q->execute();
         }
+    }
+
+    /**
+     * Check Lead in campaign.
+     *
+     * @param Lead  $lead
+     * @param array $options
+     *
+     * @return bool
+     */
+    public function checkLeadInCampaigns($lead, $options = [])
+    {
+        if (empty($options['campaigns'])) {
+            return false;
+        }
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('l.campaign_id')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l');
+        $q->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('l.lead_id', ':leadId'),
+                    $q->expr()->in('l.campaign_id', $options['campaigns'], \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
+                )
+            );
+
+        if (!empty($options['dataAddedLimit'])) {
+            $q->andWhere($q->expr()
+                ->{$options['expr']}('l.date_added', ':dateAdded'))
+                ->setParameter('dateAdded', $options['dateAdded']);
+        }
+
+        $q->setParameter('leadId', $lead->getId());
+
+        return (bool) $q->execute()->fetchColumn();
+    }
+
+    /**
+     * @param int $campaignId
+     * @param int $decisionId
+     * @param int $parentDecisionId
+     *
+     * @return array
+     */
+    public function getInactiveContacts($campaignId, $decisionId, $parentDecisionId, ContactLimiter $limiter)
+    {
+        // Main query
+        $q = $this->getSlaveConnection($limiter)->createQueryBuilder();
+        $q->select('l.lead_id, l.date_added')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('l.campaign_id', ':campaignId'),
+                    $q->expr()->eq('l.manually_removed', 0)
+                )
+            )
+            // Order by ID so we can query by greater than X contact ID when batching
+            ->orderBy('l.lead_id')
+            ->setMaxResults($limiter->getBatchLimit())
+            ->setParameter('campaignId', (int) $campaignId)
+            ->setParameter('decisionId', (int) $decisionId);
+
+        // Contact IDs
+        $this->updateQueryFromContactLimiter('l', $q, $limiter);
+
+        // Limit to events that have not been executed or scheduled yet
+        $eventQb = $this->getSlaveConnection($limiter)->createQueryBuilder();
+        $eventQb->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
+            ->where(
+                $eventQb->expr()->andX(
+                    $eventQb->expr()->eq('log.event_id', ':decisionId'),
+                    $eventQb->expr()->eq('log.lead_id', 'l.lead_id'),
+                    $eventQb->expr()->eq('log.rotation', 'l.rotation')
+                )
+            );
+        $q->andWhere(
+            sprintf('NOT EXISTS (%s)', $eventQb->getSQL())
+        );
+
+        if ($parentDecisionId) {
+            // Limit to events that have no grandparent or whose grandparent has already been executed
+            $grandparentQb = $this->getSlaveConnection($limiter)->createQueryBuilder();
+            $grandparentQb->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'grandparent_log')
+                ->where(
+                    $grandparentQb->expr()->eq('grandparent_log.event_id', ':grandparentId'),
+                    $grandparentQb->expr()->eq('grandparent_log.lead_id', 'l.lead_id'),
+                    $grandparentQb->expr()->eq('grandparent_log.rotation', 'l.rotation')
+                );
+            $q->setParameter('grandparentId', (int) $parentDecisionId);
+
+            $q->andWhere(
+                sprintf('EXISTS (%s)', $grandparentQb->getSQL())
+            );
+        }
+
+        if ($limiter->hasCampaignLimit() && $limiter->getCampaignLimitRemaining() < $limiter->getBatchLimit()) {
+            $q->setMaxResults($limiter->getCampaignLimitRemaining());
+        }
+
+        $results  = $q->execute()->fetchAll();
+        $contacts = [];
+        foreach ($results as $result) {
+            $contacts[$result['lead_id']] = new \DateTime($result['date_added'], new \DateTimeZone('UTC'));
+        }
+
+        if ($limiter->hasCampaignLimit()) {
+            $limiter->reduceCampaignLimitRemaining(count($contacts));
+        }
+
+        return $contacts;
+    }
+
+    /**
+     * This is approximate because the query that fetches contacts per decision is based on if the grandparent has been executed or not.
+     *
+     * @return int
+     */
+    public function getInactiveContactCount($campaignId, array $decisionIds, ContactLimiter $limiter)
+    {
+        // We have to loop over each decision to get a count or else any contact that has executed any single one of the decision IDs
+        // will not be included potentially resulting in not having the inactive path analyzed
+
+        $totalCount = 0;
+
+        foreach ($decisionIds as $decisionId) {
+            // Main query
+            $q = $this->getSlaveConnection()->createQueryBuilder();
+            $q->select('count(*)')
+                ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l')
+                ->where(
+                    $q->expr()->andX(
+                        $q->expr()->eq('l.campaign_id', ':campaignId'),
+                        $q->expr()->eq('l.manually_removed', 0)
+                    )
+                )
+                // Order by ID so we can query by greater than X contact ID when batching
+                ->orderBy('l.lead_id')
+                ->setParameter('campaignId', (int) $campaignId);
+
+            // Contact IDs
+            $this->updateQueryFromContactLimiter('l', $q, $limiter, true);
+
+            // Limit to events that have not been executed or scheduled yet
+            $eventQb = $this->getSlaveConnection($limiter)->createQueryBuilder();
+            $eventQb->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
+                ->where(
+                    $eventQb->expr()->andX(
+                        $eventQb->expr()->eq('log.event_id', $decisionId),
+                        $eventQb->expr()->eq('log.lead_id', 'l.lead_id'),
+                        $eventQb->expr()->eq('log.rotation', 'l.rotation')
+                    )
+                );
+            $q->andWhere(
+                sprintf('NOT EXISTS (%s)', $eventQb->getSQL())
+            );
+
+            $totalCount += (int) $q->execute()->fetchColumn();
+        }
+
+        return $totalCount;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCampaignMembers(array $contactIds, Campaign $campaign)
+    {
+        $qb = $this->createQueryBuilder('l');
+
+        $qb->where(
+            $qb->expr()->andX(
+                $qb->expr()->eq('l.campaign', ':campaign'),
+                $qb->expr()->in('IDENTITY(l.lead)', ':contactIds')
+            )
+        )
+            ->setParameter('campaign', $campaign)
+            ->setParameter('contactIds', $contactIds, Connection::PARAM_INT_ARRAY);
+
+        $results = $qb->getQuery()->getResult();
+
+        $campaignMembers = [];
+
+        /** @var Lead $result */
+        foreach ($results as $result) {
+            $campaignMembers[$result->getLead()->getId()] = $result;
+        }
+
+        return $campaignMembers;
+    }
+
+    /**
+     * @param $campaignId
+     *
+     * @return array
+     */
+    public function getContactRotations(array $contactIds, $campaignId)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->select('cl.lead_id, cl.rotation')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('cl.campaign_id', ':campaignId'),
+                    $qb->expr()->in('cl.lead_id', ':contactIds')
+                )
+            )
+            ->setParameter('campaignId', (int) $campaignId)
+            ->setParameter('contactIds', $contactIds, Connection::PARAM_INT_ARRAY);
+
+        $results = $qb->execute()->fetchAll();
+
+        $contactRotations = [];
+        foreach ($results as $result) {
+            $contactRotations[$result['lead_id']] = $result['rotation'];
+        }
+
+        return $contactRotations;
+    }
+
+    /**
+     * @param      $campaignId
+     * @param bool $campaignCanBeRestarted
+     *
+     * @return CountResult
+     */
+    public function getCountsForCampaignContactsBySegment($campaignId, ContactLimiter $limiter, $campaignCanBeRestarted = false)
+    {
+        if (!$segments = $this->getCampaignSegments($campaignId)) {
+            return new CountResult(0, 0, 0);
+        }
+
+        $qb = $this->getSlaveConnection($limiter)->createQueryBuilder();
+        $qb->select('min(ll.lead_id) as min_id, max(ll.lead_id) as max_id, count(distinct(ll.lead_id)) as the_count')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('ll.manually_removed', 0),
+                    $qb->expr()->in('ll.leadlist_id', $segments)
+                )
+            );
+
+        $this->updateQueryFromContactLimiter('ll', $qb, $limiter, true);
+        $this->updateQueryWithExistingMembershipExclusion($campaignId, $qb, $campaignCanBeRestarted);
+
+        if (!$campaignCanBeRestarted) {
+            $this->updateQueryWithHistoryExclusion($campaignId, $qb);
+        }
+
+        $result = $qb->execute()->fetch();
+
+        return new CountResult($result['the_count'], $result['min_id'], $result['max_id']);
+    }
+
+    /**
+     * @param      $campaignId
+     * @param bool $campaignCanBeRestarted
+     *
+     * @return array
+     */
+    public function getCampaignContactsBySegments($campaignId, ContactLimiter $limiter, $campaignCanBeRestarted = false)
+    {
+        if (!$segments = $this->getCampaignSegments($campaignId)) {
+            return [];
+        }
+
+        $qb = $this->getSlaveConnection($limiter)->createQueryBuilder();
+        $qb->select('distinct(ll.lead_id) as id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('ll.manually_removed', 0),
+                    $qb->expr()->in('ll.leadlist_id', $segments)
+                )
+            );
+
+        $this->updateQueryFromContactLimiter('ll', $qb, $limiter);
+        $this->updateQueryWithExistingMembershipExclusion($campaignId, $qb, $campaignCanBeRestarted);
+
+        if (!$campaignCanBeRestarted) {
+            $this->updateQueryWithHistoryExclusion($campaignId, $qb);
+        }
+
+        $results = $qb->execute()->fetchAll();
+
+        $contacts = [];
+        foreach ($results as $result) {
+            $contacts[$result['id']] = $result['id'];
+        }
+
+        return $contacts;
+    }
+
+    /**
+     * @param $campaignId
+     *
+     * @return int
+     */
+    public function getCountsForOrphanedContactsBySegments($campaignId, ContactLimiter $limiter)
+    {
+        $segments = $this->getCampaignSegments($campaignId);
+
+        $qb = $this->getSlaveConnection($limiter)->createQueryBuilder();
+        $qb->select('min(cl.lead_id) as min_id, max(cl.lead_id) as max_id, count(cl.lead_id) as the_count')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('cl.campaign_id', (int) $campaignId),
+                    $qb->expr()->eq('cl.manually_removed', 0),
+                    $qb->expr()->eq('cl.manually_added', 0)
+                )
+            );
+
+        $this->updateQueryFromContactLimiter('cl', $qb, $limiter, true);
+        $this->updateQueryWithSegmentMembershipExclusion($segments, $qb);
+
+        $result = $qb->execute()->fetch();
+
+        return new CountResult($result['the_count'], $result['min_id'], $result['max_id']);
+    }
+
+    /**
+     * @param $campaignId
+     *
+     * @return array
+     */
+    public function getOrphanedContacts($campaignId, ContactLimiter $limiter)
+    {
+        $segments = $this->getCampaignSegments($campaignId);
+
+        $qb = $this->getSlaveConnection($limiter)->createQueryBuilder();
+        $qb->select('cl.lead_id as id')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('cl.campaign_id', (int) $campaignId),
+                    $qb->expr()->eq('cl.manually_removed', 0),
+                    $qb->expr()->eq('cl.manually_added', 0)
+                )
+            );
+
+        $this->updateQueryFromContactLimiter('cl', $qb, $limiter, false);
+        $this->updateQueryWithSegmentMembershipExclusion($segments, $qb);
+
+        $results = $qb->execute()->fetchAll();
+
+        $contacts = [];
+        foreach ($results as $result) {
+            $contacts[$result['id']] = $result['id'];
+        }
+
+        return $contacts;
+    }
+
+    /**
+     * Takes an array of contact ID's and increments
+     * their current rotation in a campaign by 1.
+     *
+     * @param int $campaignId
+     *
+     * @return bool
+     */
+    public function incrementCampaignRotationForContacts(array $contactIds, $campaignId)
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $q->update(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+            ->set('cl.rotation', 'cl.rotation + 1')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->in('cl.lead_id', ':contactIds'),
+                    $q->expr()->eq('cl.campaign_id', ':campaignId')
+                )
+            )
+            ->setParameter('contactIds', $contactIds, Connection::PARAM_INT_ARRAY)
+            ->setParameter('campaignId', (int) $campaignId)
+            ->execute();
+    }
+
+    /**
+     * @param $campaignId
+     *
+     * @return array
+     */
+    private function getCampaignSegments($campaignId)
+    {
+        // Get published segments for this campaign
+        $segmentResults = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('cl.leadlist_id')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'cl')
+            ->join('cl', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = cl.leadlist_id and ll.is_published = 1')
+            ->where('cl.campaign_id = '.(int) $campaignId)
+            ->execute()
+            ->fetchAll();
+
+        if (empty($segmentResults)) {
+            // No segments so no contacts
+            return [];
+        }
+
+        $segments = [];
+        foreach ($segmentResults as $result) {
+            $segments[] = $result['leadlist_id'];
+        }
+
+        return $segments;
+    }
+
+    /**
+     * @param $campaignId
+     */
+    private function updateQueryWithExistingMembershipExclusion($campaignId, QueryBuilder $qb, $campaignCanBeRestarted = false)
+    {
+        $membershipConditions = [
+            $qb->expr()->eq('cl.lead_id', 'll.lead_id'),
+            $qb->expr()->eq('cl.campaign_id', (int) $campaignId),
+        ];
+
+        if ($campaignCanBeRestarted) {
+            $membershipConditions[] = $qb->expr()->eq('cl.manually_removed', 0);
+        }
+
+        $subq = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+            ->where(
+                $qb->expr()->andX(...$membershipConditions)
+            );
+
+        $qb->andWhere(
+            sprintf('NOT EXISTS (%s)', $subq->getSQL())
+        );
+    }
+
+    private function updateQueryWithSegmentMembershipExclusion(array $segments, QueryBuilder $qb)
+    {
+        if (0 === count($segments)) {
+            // No segments so nothing to exclude
+            return;
+        }
+
+        $subq = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('ll.lead_id', 'cl.lead_id'),
+                    $qb->expr()->eq('ll.manually_removed', 0),
+                    $qb->expr()->in('ll.leadlist_id', $segments)
+                )
+            );
+
+        $qb->andWhere(
+            sprintf('NOT EXISTS (%s)', $subq->getSQL())
+        );
+    }
+
+    /**
+     * Exclude contacts with any previous campaign history; this is mainly BC for pre 2.14.0 where the membership entry was deleted.
+     *
+     * @param $campaignId
+     */
+    private function updateQueryWithHistoryExclusion($campaignId, QueryBuilder $qb)
+    {
+        $subq = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'el')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('el.lead_id', 'll.lead_id'),
+                    $qb->expr()->eq('el.campaign_id', (int) $campaignId)
+                )
+            );
+
+        $qb->andWhere(
+            sprintf('NOT EXISTS (%s)', $subq->getSQL())
+        );
     }
 }

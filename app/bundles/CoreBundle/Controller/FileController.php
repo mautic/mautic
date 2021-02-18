@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -117,12 +118,12 @@ class FileController extends AjaxController
     {
         $mediaDir = realpath($this->get('mautic.helper.paths')->getSystemPath('images', true));
 
-        if ($mediaDir === false) {
+        if (false === $mediaDir) {
             $this->response['error'] = 'Media dir does not exist';
             $this->statusCode        = Response::HTTP_INTERNAL_SERVER_ERROR;
         }
 
-        if (is_writable($mediaDir) === false) {
+        if (false === is_writable($mediaDir)) {
             $this->response['error'] = 'Media dir is not writable';
             $this->statusCode        = Response::HTTP_INTERNAL_SERVER_ERROR;
         }
@@ -140,6 +141,6 @@ class FileController extends AjaxController
         return $this->request->getScheme().'://'
             .$this->request->getHttpHost()
             .$this->request->getBasePath().'/'
-            .$this->coreParametersHelper->getParameter('image_path');
+            .$this->coreParametersHelper->get('image_path');
     }
 }

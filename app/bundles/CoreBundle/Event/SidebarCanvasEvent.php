@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,11 +11,9 @@
 
 namespace Mautic\CoreBundle\Event;
 
+use Symfony\Bundle\FrameworkBundle\Templating\PhpEngine;
 use Symfony\Component\EventDispatcher\Event;
 
-/**
- * Class SidebarCanvasEvent.
- */
 class SidebarCanvasEvent extends Event
 {
     /**
@@ -33,7 +32,7 @@ class SidebarCanvasEvent extends Event
     private $right = [];
 
     /**
-     * @var
+     * @var PhpEngine
      */
     private $templating;
 
@@ -42,15 +41,13 @@ class SidebarCanvasEvent extends Event
      */
     private $main = [];
 
-    public function __construct($templating)
+    public function __construct(PhpEngine $templating)
     {
         $this->templating = $templating;
     }
 
     /**
      * Insert content into left canvas.
-     *
-     * @param array $sections
      */
     public function pushToLeftCanvas(array $sections)
     {
@@ -59,8 +56,6 @@ class SidebarCanvasEvent extends Event
 
     /**
      * Insert content into right canvas.
-     *
-     * @param array $sections
      */
     public function pushToRightCanvas(array $sections)
     {
@@ -71,8 +66,6 @@ class SidebarCanvasEvent extends Event
      * Insert content into main canvas.
      *
      * Note that header is not allowed for main
-     *
-     * @param array $sections
      */
     public function pushToMainCanvas(array $sections)
     {

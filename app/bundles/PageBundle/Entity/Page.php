@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -25,9 +26,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Page.
- */
 class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface
 {
     use TranslationEntityTrait;
@@ -114,9 +112,17 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     private $category;
 
     /**
+     * @var bool
+     */
+    private $isPreferenceCenter;
+
+    /**
+     * @var bool
+     */
+    private $noIndex;
+
+    /**
      * Used to identify the page for the builder.
-     *
-     * @var
      */
     private $sessionId;
 
@@ -138,9 +144,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $this->variantChildren     = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -194,18 +197,25 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $builder->createField('redirectUrl', 'string')
             ->columnName('redirect_url')
             ->nullable()
-            ->length(100)
+            ->length(2048)
             ->build();
 
         $builder->addCategory();
+
+        $builder->createField('isPreferenceCenter', 'boolean')
+            ->columnName('is_preference_center')
+            ->nullable()
+            ->build();
+
+        $builder->createField('noIndex', 'boolean')
+            ->columnName('no_index')
+            ->nullable()
+            ->build();
 
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('title', new NotBlank([
@@ -282,12 +292,16 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
                     'metaDescription',
                     'redirectType',
                     'redirectUrl',
+                    'isPreferenceCenter',
+                    'noIndex',
                     'variantSettings',
                     'variantStartDate',
                     'variantParent',
                     'variantChildren',
                     'translationParent',
                     'translationChildren',
+                    'template',
+                    'customHtml',
                 ]
             )
             ->setMaxDepth(1, 'variantParent')
@@ -583,6 +597,52 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
+     * Set isPreferenceCenter.
+     *
+     * @param bool $isPreferenceCenter
+     *
+     * @return Page
+     */
+    public function setIsPreferenceCenter($isPreferenceCenter)
+    {
+        $this->isChanged('isPreferenceCenter', $isPreferenceCenter);
+        $this->isPreferenceCenter = $isPreferenceCenter;
+
+        return $this;
+    }
+
+    /**
+     * Get isPreferenceCenter.
+     *
+     * @return bool
+     */
+    public function getIsPreferenceCenter()
+    {
+        return $this->isPreferenceCenter;
+    }
+
+    /**
+     * Set noIndex.
+     *
+     * @param bool $noIndex
+     */
+    public function setNoIndex($noIndex)
+    {
+        $this->isChanged('noIndex', $noIndex);
+        $this->noIndex = $noIndex;
+    }
+
+    /**
+     * Get noIndex.
+     *
+     * @return bool
+     */
+    public function getNoIndex()
+    {
+        return $this->noIndex;
+    }
+
+    /**
      * Set sessionId.
      *
      * @param string $id
@@ -640,7 +700,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
 
-        if ($prop == 'translationParent' || $prop == 'variantParent' || $prop == 'category') {
+        if ('translationParent' == $prop || 'variantParent' == $prop || 'category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {

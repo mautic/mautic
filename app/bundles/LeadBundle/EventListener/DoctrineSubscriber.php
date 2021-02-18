@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -24,12 +25,10 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
     /**
      * @var Logger
      */
-    protected $logger;
+    private $logger;
 
     /**
      * DoctrineSubscriber constructor.
-     *
-     * @param Logger $logger
      */
     public function __construct(Logger $logger)
     {
@@ -46,9 +45,6 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
         ];
     }
 
-    /**
-     * @param GenerateSchemaEventArgs $args
-     */
     public function postGenerateSchema(GenerateSchemaEventArgs $args)
     {
         $schema = $args->getSchema();
@@ -78,13 +74,15 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                 // Email will always be included first
                 $uniqueFields = ('lead' === $object) ? ['email' => 'email'] : ['companyemail' => 'companyemail'];
                 foreach ($fields as $f) {
-                    if ($f['is_unique'] && $f['alias'] != 'email') {
+                    if ($f['is_unique'] && 'email' != $f['alias']) {
                         $uniqueFields[$f['alias']] = $f['alias'];
                     }
-
                     $columnDef = FieldModel::getSchemaDefinition($f['alias'], $f['type'], !empty($f['is_unique']));
 
-                    $table->addColumn($columnDef['name'], $columnDef['type'], $columnDef['options']);
+                    if (!$table->hasColumn($f['alias'])) {
+                        $table->addColumn($columnDef['name'], $columnDef['type'], $columnDef['options']);
+                    }
+
                     if ('text' != $columnDef['type']) {
                         $table->addIndex([$columnDef['name']], MAUTIC_TABLE_PREFIX.$f['alias'].'_search');
                     }
@@ -99,8 +97,6 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
 
                     if (!$type instanceof StringType) {
                         unset($uniqueFields[$name]);
-                    } elseif (isset($uniqueFields[$name])) {
-                        $uniqueFields[$name] = $uniqueFields[$name];
                     }
                 }
 
@@ -113,6 +109,7 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                 switch ($object) {
                     case 'lead':
                         $table->addIndex(['attribution', 'attribution_date'], MAUTIC_TABLE_PREFIX.'contact_attribution');
+                        $table->addIndex(['date_added', 'country'], MAUTIC_TABLE_PREFIX.'date_added_country_index');
                         break;
                     case 'company':
                         $table->addIndex(['companyname', 'companyemail'], MAUTIC_TABLE_PREFIX.'company_filter');
@@ -121,6 +118,9 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                 }
             }
         } catch (\Exception $e) {
+            if (defined('MAUTIC_INSTALLER')) {
+                return;
+            }
             //table doesn't exist or something bad happened so oh well
             $this->logger->addError('SCHEMA ERROR: '.$e->getMessage());
         }

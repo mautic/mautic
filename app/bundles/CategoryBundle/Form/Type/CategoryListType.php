@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,69 +11,82 @@
 
 namespace Mautic\CategoryBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Doctrine\ORM\EntityManager;
+use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\Router;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CategoryListType.
  */
 class CategoryListType extends AbstractType
 {
+    /**
+     * @var EntityManager
+     */
     private $em;
 
+    /**
+     * @var CategoryModel
+     */
     private $model;
 
+    /**
+     * @var TranslatorInterface
+     */
     private $translator;
 
+    /**
+     * @var Router
+     */
     private $router;
 
     /**
-     * @param MauticFactory $factory
+     * CategoryListType constructor.
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(EntityManager $em, TranslatorInterface $translator, CategoryModel $model, Router $router)
     {
-        $this->em         = $factory->getEntityManager();
-        $this->translator = $factory->getTranslator();
-        $this->model      = $factory->getModel('category');
-        $this->router     = $factory->getRouter();
+        $this->em         = $em;
+        $this->translator = $translator;
+        $this->model      = $model;
+        $this->router     = $router;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticCategoryBundle:Category', 'id');
-        $builder->addModelTransformer($transformer);
+        if (true === $options['return_entity']) {
+            $transformer = new IdToEntityModelTransformer($this->em, 'MauticCategoryBundle:Category', 'id');
+            $builder->addModelTransformer($transformer);
+        }
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $model       = $this->model;
-        $createNew   = $this->translator->trans('mautic.category.createnew');
-        $modalHeader = $this->translator->trans('mautic.category.header.new');
-        $router      = $this->router;
         $resolver->setDefaults([
-            'choices' => function (Options $options) use ($model, $createNew, $modalHeader) {
-                $categories = $model->getLookupResults($options['bundle'], '', 0);
+            'choices' => function (Options $options) {
+                $createNew = $this->translator->trans('mautic.category.createnew');
+                $categories = $this->model->getLookupResults($options['bundle'], '', 0);
                 $choices = [];
                 foreach ($categories as $l) {
-                    $choices[$l['id']] = $l['title'];
+                    $choices[$l['title']] = $l['id'];
                 }
-                $choices['new'] = $createNew;
+                $choices[$createNew] = 'new';
 
                 return $choices;
             },
-            'label'       => 'mautic.core.category',
-            'label_attr'  => ['class' => 'control-label'],
-            'multiple'    => false,
-            'empty_value' => 'mautic.core.form.uncategorized',
-            'attr'        => function (Options $options) use ($modalHeader, $router) {
-                $newUrl = $router->generate('mautic_category_action', [
+            'label'             => 'mautic.core.category',
+            'label_attr'        => ['class' => 'control-label'],
+            'multiple'          => false,
+            'placeholder'       => 'mautic.core.form.uncategorized',
+            'attr'              => function (Options $options) {
+                $modalHeader = $this->translator->trans('mautic.category.header.new');
+                $newUrl = $this->router->generate('mautic_category_action', [
                     'objectAction' => 'new',
                     'bundle'       => $options['bundle'],
                     'inForm'       => 1,
@@ -83,7 +97,8 @@ class CategoryListType extends AbstractType
                     'onchange' => "Mautic.loadAjaxModalBySelectValue(this, 'new', '{$newUrl}', '{$modalHeader}');",
                 ];
             },
-            'required' => false,
+            'required'      => false,
+            'return_entity' => true,
         ]);
 
         $resolver->setRequired(['bundle']);
@@ -92,13 +107,16 @@ class CategoryListType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'category';
     }
 
+    /**
+     * @return string
+     */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -17,7 +18,7 @@ foreach ($groups as $key => $group):
     if (isset($fields[$group])):
         $groupFields = $fields[$group];
         if (!empty($groupFields)): ?>
-            <div class="tab-pane fade<?php if ($key === 0) {
+            <div class="tab-pane fade<?php if (0 === $key) {
             echo ' in active';
         } ?> bdr-rds-0 bdr-w-0" id="company-<?php echo $group; ?>">
                 <?php if (empty($embedded)): ?>
@@ -28,17 +29,19 @@ foreach ($groups as $key => $group):
                     </div>
                 <?php endif; ?>
                 <div class="pa-md">
-                    <?php if ($group == 'core'): ?>
+                    <?php if ('core' == $group): ?>
                         <div class="form-group mb-0">
                             <div class="row">
                                 <?php if (isset($form['companyname'])): ?>
                                     <div class="col-sm-<?php echo $halfSize; ?>">
-                                        <?php echo $view['form']->row($form['companyname']); ?>
+                                        <?php echo $view['form']->row($view->escape($form['companyname'])); ?>
                                     </div>
                                 <?php endif; ?>
-                                <div class="col-sm-<?php echo $halfSize; ?>">
-                                    <?php echo $view['form']->row($form['companyemail']); ?>
-                                </div>
+                                <?php if (isset($form['companyemail'])): ?>
+                                    <div class="col-sm-<?php echo $halfSize; ?>">
+                                        <?php echo $view['form']->row($form['companyemail']); ?>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                         <hr class="mnr-md mnl-md">

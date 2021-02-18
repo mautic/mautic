@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -50,8 +51,8 @@ class CopyRepository extends CommonRepository
     }
 
     /**
-     * @param      $string  md5 hash or content
-     * @param null $subject If $string is the content, pass the subject to include it in the hash
+     * @param string $string  md5 hash or content
+     * @param null   $subject If $string is the content, pass the subject to include it in the hash
      *
      * @return array
      */
@@ -63,7 +64,7 @@ class CopyRepository extends CommonRepository
         }
 
         // Assume that $string is already a md5 hash if 32 characters
-        $hash = (strlen($string) !== 32) ? $hash = md5($string) : $string;
+        $hash = (32 !== strlen($string)) ? $hash = md5($string) : $string;
 
         $q = $this->createQueryBuilder($this->getTableAlias());
         $q->where(

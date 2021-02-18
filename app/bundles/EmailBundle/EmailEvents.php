@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -155,14 +156,13 @@ final class EmailEvents
     const EMAIL_RESEND = 'mautic.on_email_resend';
 
     /**
-     * The mautic.email.on_campaign_trigger_action event is fired when the campaign action triggers.
+     * The mautic.email.on_campaign_batch_action event is dispatched when the campaign action triggers.
      *
-     * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     * The event listener receives a Mautic\CampaignBundle\Event\PendingEvent
      *
      * @var string
      */
-    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.email.on_campaign_trigger_action';
+    const ON_CAMPAIGN_BATCH_ACTION = 'mautic.email.on_campaign_batch_action';
 
     /**
      * The mautic.email.on_campaign_trigger_decision event is fired when the campaign action triggers.
@@ -173,4 +173,85 @@ final class EmailEvents
      * @var string
      */
     const ON_CAMPAIGN_TRIGGER_DECISION = 'mautic.email.on_campaign_trigger_decision';
+
+    /**
+     * The mautic.email.on_campaign_trigger_condition event is dispatched when the campaign condition triggers.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_TRIGGER_CONDITION = 'mautic.email.on_campaign_trigger_condition';
+
+    /**
+     * The mautic.email_on_reply event is dispatched when an reply came to an email.
+     *
+     * The event listener receives a
+     * Mautic\EmailBundle\Event\EmailOpenEvent instance.
+     *
+     * @var string
+     */
+    const EMAIL_ON_REPLY = 'mautic.email_on_reply';
+
+    /**
+     * The mautic.email.on_email_validation event is dispatched when an email is validated through the validator.
+     *
+     * The event listener receives a Mautic\EmailBundle\Event\EmailValidationEvent
+     *
+     * @var string
+     */
+    const ON_EMAIL_VALIDATION = 'mautic.email.on_email_validation';
+
+    /**
+     * The mautic.email.on_sent_email_to_user event is dispatched when email is sent to user.
+     *
+     * The event listener receives a
+     * Mautic\PointBundle\Events\TriggerExecutedEvent
+     *
+     * @var string
+     */
+    const ON_SENT_EMAIL_TO_USER = 'mautic.email.on_sent_email_to_user';
+
+    /**
+     * @deprecated 2.13.0; to be removed in 3.0. Listen to ON_CAMPAIGN_BATCH_ACTION instead.
+     *
+     * The mautic.email.on_campaign_trigger_action event is fired when the campaign action triggers.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.email.on_campaign_trigger_action';
+
+    /**
+     * The mautic.email.on_transport_webhook event is fired when an email transport service sends Mautic a webhook request.
+     *
+     * The event listener receives a
+     * Mautic\EmailBundle\Event\TransportWebhookEvent
+     *
+     * @var string
+     */
+    const ON_TRANSPORT_WEBHOOK = 'mautic.email.on_transport_webhook';
+
+    /**
+     * The mautic.email.on_open_rate_winner event is fired when there is a need to determine open rate winner.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundle\Event\DetermineWinnerEvent
+     *
+     * @var string
+     */
+    const ON_DETERMINE_OPEN_RATE_WINNER = 'mautic.email.on_open_rate_winner';
+
+    /**
+     * The mautic.email.on_open_rate_winner event is fired when there is a need to determine clickthrough rate winner.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundles\Event\DetermineWinnerEvent
+     *
+     * @var string
+     */
+    const ON_DETERMINE_CLICKTHROUGH_RATE_WINNER = 'mautic.email.on_clickthrough_rate_winner';
 }

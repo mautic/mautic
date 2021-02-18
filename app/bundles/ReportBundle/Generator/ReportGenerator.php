@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -11,7 +12,9 @@
 namespace Mautic\ReportBundle\Generator;
 
 use Doctrine\DBAL\Connection;
+use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Form\Type\ReportType;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -53,20 +56,20 @@ class ReportGenerator
     private $contentTemplate;
 
     /**
-     * ReportGenerator constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
-     * @param Connection               $db
-     * @param FormFactoryInterface     $formFactory
-     * @param Report                   $entity
-     * @param array                    $options
+     * @var ChannelListHelper
      */
-    public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity, FormFactoryInterface $formFactory = null)
+    private $channelListHelper;
+
+    /**
+     * ReportGenerator constructor.
+     */
+    public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity, ChannelListHelper $channelListHelper, FormFactoryInterface $formFactory = null)
     {
-        $this->db          = $db;
-        $this->dispatcher  = $dispatcher;
-        $this->formFactory = $formFactory;
-        $this->entity      = $entity;
+        $this->db                = $db;
+        $this->dispatcher        = $dispatcher;
+        $this->formFactory       = $formFactory;
+        $this->channelListHelper = $channelListHelper;
+        $this->entity            = $entity;
     }
 
     /**
@@ -90,14 +93,14 @@ class ReportGenerator
     /**
      * Gets form.
      *
-     * @param \Mautic\ReportBundle\Entity\Report $entity  Report Entity
-     * @param array                              $options Parameters set by the caller
+     * @param Report $entity  Report Entity
+     * @param array  $options Parameters set by the caller
      *
-     * @return \Symfony\Component\Form\Form
+     * @return \Symfony\Component\Form\FormInterface
      */
     public function getForm(Report $entity, $options)
     {
-        return $this->formFactory->createBuilder('report', $entity, $options)->getForm();
+        return $this->formFactory->createBuilder(ReportType::class, $entity, $options)->getForm();
     }
 
     /**
@@ -128,11 +131,9 @@ class ReportGenerator
         $reflection = new \ReflectionClass($className);
 
         if (!$reflection->implementsInterface($this->validInterface)) {
-            throw new RuntimeException(
-                sprintf("ReportBuilders have to implement %s, and %s doesn't implement it", $this->validInterface, $className)
-            );
+            throw new RuntimeException(sprintf("ReportBuilders have to implement %s, and %s doesn't implement it", $this->validInterface, $className));
         }
 
-        return $reflection->newInstanceArgs([$this->dispatcher, $this->db, $this->entity]);
+        return $reflection->newInstanceArgs([$this->dispatcher, $this->db, $this->entity, $this->channelListHelper]);
     }
 }

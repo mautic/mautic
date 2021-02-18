@@ -9,6 +9,7 @@ module.exports = function (grunt) {
     require('time-grunt')(grunt);
 
     //grunt.loadNpmTasks('grunt-remove');
+    require('grunt-remove')(grunt);
 
     // Define the configuration for all the tasks
     grunt.initConfig({
@@ -17,6 +18,7 @@ module.exports = function (grunt) {
         mautic: {
             // configurable paths
             bundleAssets: 'app/bundles/**/Assets/css',
+            pluginAssets: 'plugins/**/Assets/css',
             rootAssets: 'media/css'
         },
 
@@ -31,24 +33,24 @@ module.exports = function (grunt) {
         // Compiles less files in bundle's Assets/css root and single level directory to CSS
         less: {
             files: {
-                src: ['<%= mautic.bundleAssets %>/*.less', '<%= mautic.bundleAssets %>/*/*.less', '<%= mautic.bundleAssets %>/../builder/*.less'],
+                src: ['<%= mautic.bundleAssets %>/*.less', '<%= mautic.pluginAssets %>/*.less', '<%= mautic.bundleAssets %>/*/*.less', '<%= mautic.bundleAssets %>/../builder/*.less'],
                 expand: true,
                 rename: function (dest, src) {
                     return dest + src.replace('.less', '.css')
                 },
                 dest: ''
             }
-        }
+        },
 
         // Remove prod's css files to force recompilation
-        /*
         remove: {
             default_options: {
                 trace: true,
-                fileList: ['<%= mautic.rootAssets %>/app.css', '<%= mautic.rootAssets %>/libraries.css']
+                fileList: ['<%= mautic.rootAssets %>/app.css', '<%= mautic.rootAssets %>/libraries.css'],
+                tasks: ['remove'],
+                dest: ''
             }
         }
-        */
     });
 
     grunt.registerTask('compile-less', [

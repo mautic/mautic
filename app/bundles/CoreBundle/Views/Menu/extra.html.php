@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -7,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($item->hasChildren() && $options['depth'] !== 0 && $item->getDisplayChildren()) {
+if ($item->hasChildren() && 0 !== $options['depth'] && $item->getDisplayChildren()) {
     $childrenAttributes = $item->getChildrenAttributes();
     if (!isset($childrenAttributes['class'])) {
         $childrenAttributes['class'] = '';

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -16,9 +17,15 @@
 
     <div class="col-xs-8">
         <h3>
-            <?php echo $bundle->getDescription(); ?>
+            <?php echo $bundle->getPrimaryDescription(); ?>
         </h3>
     </div>
 </div>
 
-
+<?php if ($bundle->hasSecondaryDescription()) : ?>
+<div class="row mt-lg">
+    <div class="col-xs-12">
+        <?php echo $bundle->getSecondaryDescription(); ?>
+    </div>
+</div>
+<?php endif; ?>

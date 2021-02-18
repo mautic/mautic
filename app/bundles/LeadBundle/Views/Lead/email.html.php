@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -7,8 +8,8 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($dnc && $dnc['bounced']) {
-    echo '<div class="alert alert-warning">'.$view['translator']->trans('mautic.lead.do.not.contact_bounced').': '.$dnc['comments'].'</div>';
+if ($dnc && \Mautic\LeadBundle\Entity\DoNotContact::BOUNCED === $dnc->getReason()) {
+    echo '<div class="alert alert-warning">'.$view['translator']->trans('mautic.lead.do.not.contact_bounced').': '.$dnc->getComments().'</div>';
 } else {
     echo $view['form']->start($form);
 

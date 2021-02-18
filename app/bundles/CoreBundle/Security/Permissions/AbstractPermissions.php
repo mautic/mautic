@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Security\Permissions;
 
+use Mautic\UserBundle\Form\Type\PermissionListType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -27,12 +29,18 @@ abstract class AbstractPermissions
      */
     protected $params = [];
 
-    /**
-     * @param array $params
-     */
     public function __construct(array $params)
     {
         $this->params = $params;
+    }
+
+    /**
+     * This method is called before the permissions object is used.
+     * Define permissions with `addExtendedPermissions` here instead of constructor.
+     */
+    public function definePermissions()
+    {
+        // Override this method in the final class
     }
 
     /**
@@ -91,10 +99,6 @@ abstract class AbstractPermissions
 
     /**
      * Builds the bundle's specific form elements for its permissions.
-     *
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     * @param array                $data
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
@@ -111,8 +115,6 @@ abstract class AbstractPermissions
      * Takes an array from PermissionRepository::getPermissionsByRole() and converts the bitwise integers to an array
      * of permission names that can be used in forms, for example.
      *
-     * @param array $permissions
-     *
      * @return mixed
      */
     public function convertBitsToPermissionNames(array $permissions)
@@ -124,7 +126,7 @@ abstract class AbstractPermissions
             $permissionLevels[$bundle] = [];
             if (isset($permissions[$bundle])) {
                 if ($this->isEnabled()) {
-                    foreach ($permissions[$bundle] as $permId => $details) {
+                    foreach ($permissions[$bundle] as $details) {
                         $permName    = $details['name'];
                         $permBitwise = $details['bitwise'];
                         //ensure the permission still exists
@@ -164,7 +166,7 @@ abstract class AbstractPermissions
             if (isset($this->permissions[$name]['view'])) {
                 $level = 'view';
             }
-        } elseif ($level == 'view') {
+        } elseif ('view' == $level) {
             if (isset($this->permissions[$name]['viewown'])) {
                 $level = 'viewown';
             }
@@ -172,7 +174,7 @@ abstract class AbstractPermissions
             if (isset($this->permissions[$name]['edit'])) {
                 $level = 'edit';
             }
-        } elseif ($level == 'edit') {
+        } elseif ('edit' == $level) {
             if (isset($this->permissions[$name]['editown'])) {
                 $level = 'editown';
             }
@@ -180,7 +182,7 @@ abstract class AbstractPermissions
             if (isset($this->permissions[$name]['delete'])) {
                 $level = 'delete';
             }
-        } elseif ($level == 'delete') {
+        } elseif ('delete' == $level) {
             if (isset($this->permissions[$name]['deleteown'])) {
                 $level = 'deleteown';
             }
@@ -188,7 +190,7 @@ abstract class AbstractPermissions
             if (isset($this->permissions[$name]['publish'])) {
                 $level = 'publish';
             }
-        } elseif ($level == 'publish') {
+        } elseif ('publish' == $level) {
             if (isset($this->permissions[$name]['publishown'])) {
                 $level = 'publishown';
             }
@@ -224,9 +226,8 @@ abstract class AbstractPermissions
     }
 
     /**
-     * @param array $permissions
-     * @param       $allPermissions
-     * @param bool  $isSecondRound
+     * @param      $allPermissions
+     * @param bool $isSecondRound
      *
      * @return bool Return true if a second round is required after all other bundles have analyzed it's permissions
      */
@@ -280,8 +281,6 @@ abstract class AbstractPermissions
     /**
      * Generates an array of granted and total permissions.
      *
-     * @param array $data
-     *
      * @return array
      */
     public function getPermissionRatio(array $data)
@@ -293,7 +292,7 @@ abstract class AbstractPermissions
             $totalAvailable += count($perms);
 
             if (in_array('full', $perms)) {
-                if (count($perms) === 1) {
+                if (1 === count($perms)) {
                     //full is the only permission so count as 1
                     if (!empty($data[$level]) && in_array('full', $data[$level])) {
                         ++$totalGranted;
@@ -320,8 +319,6 @@ abstract class AbstractPermissions
 
     /**
      * Gives the bundle an opportunity to change how JavaScript calculates permissions granted.
-     *
-     * @param array $perms
      */
     public function parseForJavascript(array &$perms)
     {
@@ -365,26 +362,41 @@ abstract class AbstractPermissions
     protected function addStandardFormFields($bundle, $level, &$builder, $data, $includePublish = true)
     {
         $choices = [
-            'view'   => 'mautic.core.permissions.view',
-            'edit'   => 'mautic.core.permissions.edit',
-            'create' => 'mautic.core.permissions.create',
-            'delete' => 'mautic.core.permissions.delete',
+            'mautic.core.permissions.view'   => 'view',
+            'mautic.core.permissions.edit'   => 'edit',
+            'mautic.core.permissions.create' => 'create',
+            'mautic.core.permissions.delete' => 'delete',
         ];
 
         if ($includePublish) {
-            $choices['publish'] = 'mautic.core.permissions.publish';
+            $choices['mautic.core.permissions.publish'] = 'publish';
         }
 
-        $choices['full'] = 'mautic.core.permissions.full';
+        $choices['mautic.core.permissions.full'] = 'full';
 
-        $label = ($level == 'categories') ? 'mautic.category.permissions.categories' : "mautic.$bundle.permissions.$level";
-        $builder->add("$bundle:$level", 'permissionlist', [
-            'choices' => $choices,
-            'label'   => $label,
-            'bundle'  => $bundle,
-            'level'   => $level,
-            'data'    => (!empty($data[$level]) ? $data[$level] : []),
-        ]);
+        $label = ('categories' == $level) ? 'mautic.category.permissions.categories' : "mautic.$bundle.permissions.$level";
+        $builder->add(
+            "$bundle:$level",
+            PermissionListType::class,
+            [
+                'choices'           => $choices,
+                'label'             => $label,
+                'bundle'            => $bundle,
+                'level'             => $level,
+                'data'              => (!empty($data[$level]) ? $data[$level] : []),
+            ]
+        );
+    }
+
+    /**
+     * @param string $bundle
+     * @param string $level
+     *
+     * @return string
+     */
+    protected function getLabel($bundle, $level)
+    {
+        return ('categories' === $level) ? 'mautic.category.permissions.categories' : "mautic.{$bundle}.permissions.{$level}";
     }
 
     /**
@@ -416,16 +428,20 @@ abstract class AbstractPermissions
     protected function addManageFormFields($bundle, $level, &$builder, $data)
     {
         $choices = [
-            'manage' => 'mautic.core.permissions.manage',
+            'mautic.core.permissions.manage' => 'manage',
         ];
 
-        $builder->add("$bundle:$level", 'permissionlist', [
-            'choices' => $choices,
-            'label'   => "mautic.$bundle.permissions.$level",
-            'data'    => (!empty($data[$level]) ? $data[$level] : []),
-            'bundle'  => $bundle,
-            'level'   => $level,
-        ]);
+        $builder->add(
+            "$bundle:$level",
+            PermissionListType::class,
+            [
+                'choices'           => $choices,
+                'label'             => "mautic.$bundle.permissions.$level",
+                'data'              => (!empty($data[$level]) ? $data[$level] : []),
+                'bundle'            => $bundle,
+                'level'             => $level,
+            ]
+        );
     }
 
     /**
@@ -471,36 +487,31 @@ abstract class AbstractPermissions
      */
     protected function addExtendedFormFields($bundle, $level, &$builder, $data, $includePublish = true)
     {
-        $choices = $includePublish ?
-            [
-                'viewown'      => 'mautic.core.permissions.viewown',
-                'viewother'    => 'mautic.core.permissions.viewother',
-                'editown'      => 'mautic.core.permissions.editown',
-                'editother'    => 'mautic.core.permissions.editother',
-                'create'       => 'mautic.core.permissions.create',
-                'deleteown'    => 'mautic.core.permissions.deleteown',
-                'deleteother'  => 'mautic.core.permissions.deleteother',
-                'publishown'   => 'mautic.core.permissions.publishown',
-                'publishother' => 'mautic.core.permissions.publishother',
-                'full'         => 'mautic.core.permissions.full',
-            ] :
-            [
-                'viewown'     => 'mautic.core.permissions.viewown',
-                'viewother'   => 'mautic.core.permissions.viewother',
-                'editown'     => 'mautic.core.permissions.editown',
-                'editother'   => 'mautic.core.permissions.editother',
-                'create'      => 'mautic.core.permissions.create',
-                'deleteown'   => 'mautic.core.permissions.deleteown',
-                'deleteother' => 'mautic.core.permissions.deleteother',
-                'full'        => 'mautic.core.permissions.full',
-            ];
+        $choices = [
+            'mautic.core.permissions.viewown'     => 'viewown',
+            'mautic.core.permissions.viewother'   => 'viewother',
+            'mautic.core.permissions.editown'     => 'editown',
+            'mautic.core.permissions.editother'   => 'editother',
+            'mautic.core.permissions.create'      => 'create',
+            'mautic.core.permissions.deleteown'   => 'deleteown',
+            'mautic.core.permissions.deleteother' => 'deleteother',
+            'mautic.core.permissions.full'        => 'full',
+        ];
 
-        $builder->add("$bundle:$level", 'permissionlist', [
-                'choices' => $choices,
-                'label'   => "mautic.$bundle.permissions.$level",
-                'data'    => (!empty($data[$level]) ? $data[$level] : []),
-                'bundle'  => $bundle,
-                'level'   => $level,
+        if ($includePublish) {
+            $choices['mautic.core.permissions.publishown']   = 'publishown';
+            $choices['mautic.core.permissions.publishother'] = 'publishother';
+        }
+
+        $builder->add(
+            "$bundle:$level",
+            PermissionListType::class,
+            [
+                'choices'           => $choices,
+                'label'             => "mautic.$bundle.permissions.$level",
+                'data'              => (!empty($data[$level]) ? $data[$level] : []),
+                'bundle'            => $bundle,
+                'level'             => $level,
             ]
         );
     }

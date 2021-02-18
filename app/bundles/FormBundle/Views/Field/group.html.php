@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -7,12 +8,13 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-use \Mautic\CoreBundle\Helper\InputHelper;
+
+use Mautic\CoreBundle\Helper\InputHelper;
 
 $containerType     = "{$type}grp";
 $defaultInputClass = "{$containerType}-{$type}";
 $ignoreId          = true;
-$ignoreName        = ($type == 'checkbox');
+$ignoreName        = ('checkbox' == $type);
 
 include __DIR__.'/field_helper.php';
 
@@ -20,7 +22,7 @@ $optionLabelAttr = (isset($properties['labelAttributes'])) ? $properties['labelA
 $wrapDiv         = true;
 
 $defaultOptionLabelClass = 'mauticform-'.$containerType.'-label';
-if (stripos($optionLabelAttr, 'class') === false) {
+if (false === stripos($optionLabelAttr, 'class')) {
     $optionLabelAttr .= ' class="'.$defaultOptionLabelClass.'"';
 } else {
     $optionLabelAttr = str_ireplace('class="', 'class="'.$defaultOptionLabelClass.' ', $optionLabelAttr);
@@ -46,14 +48,11 @@ foreach ($list as $listValue => $listLabel):
 
 $id               = $field['alias'].'_'.InputHelper::alphanum(InputHelper::transliterate($listValue)).$counter;
 $checked          = ($field['defaultValue'] === $listValue) ? 'checked="checked"' : '';
-$checkboxBrackets = ($type == 'checkbox') ? '[]' : '';
+$checkboxBrackets = ('checkbox' == $type) ? '[]' : '';
 
 $option = <<<HTML
-
-                    <label id="mauticform_{$containerType}_label_{$id}" for="mauticform_{$containerType}_{$type}_{$id}" {$optionLabelAttr}>
-                        <input {$inputAttr}{$checked} name="mauticform[{$field['alias']}]{$checkboxBrackets}" id="mauticform_{$containerType}_{$type}_{$id}" type="{$type}" value="{$view->escape($listValue)}" />
-                        $listLabel
-                    </label>
+                    <input {$inputAttr}{$checked} name="mauticform[{$field['alias']}]{$checkboxBrackets}" id="mauticform_{$containerType}_{$type}_{$id}" type="{$type}" value="{$view->escape($listValue)}" />
+                    <label id="mauticform_{$containerType}_label_{$id}" for="mauticform_{$containerType}_{$type}_{$id}" {$optionLabelAttr}>$listLabel</label>
 HTML;
 
 if ($wrapDiv):

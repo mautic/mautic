@@ -13,6 +13,9 @@ $container->loadFromExtension('twig', [
     'cache'            => false,
     'debug'            => '%kernel.debug%',
     'strict_variables' => '%kernel.debug%',
+    'paths'            => [
+        '%kernel.root_dir%/bundles' => 'bundles',
+    ],
 ]);
 
 $container->loadFromExtension('framework', [
@@ -33,6 +36,7 @@ $container->loadFromExtension('web_profiler', [
 $container->loadFromExtension('monolog', [
     'channels' => [
         'mautic',
+        'chrome',
     ],
     'handlers' => [
         'main' => [
@@ -58,6 +62,13 @@ $container->loadFromExtension('monolog', [
                 'mautic',
             ],
             'max_files' => 7,
+        ],
+        'chrome' => [
+            'type'     => 'chromephp',
+            'level'    => 'debug',
+            'channels' => [
+                'chrome',
+            ],
         ],
     ],
 ]);

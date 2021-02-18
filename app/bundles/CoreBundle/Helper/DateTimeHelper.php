@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,9 +11,6 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-/**
- * Class DateTimeHelper.
- */
 class DateTimeHelper
 {
     /**
@@ -41,14 +39,14 @@ class DateTimeHelper
     private $local;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $datetime;
 
     /**
-     * @param string $string     Datetime string
-     * @param string $fromFormat Format the string is in
-     * @param string $timezone   Timezone the string is in
+     * @param \DateTimeInterface|string $string
+     * @param string                    $fromFormat Format the string is in
+     * @param string                    $timezone   Timezone the string is in
      */
     public function __construct($string = '', $fromFormat = 'Y-m-d H:i:s', $timezone = 'UTC')
     {
@@ -58,14 +56,15 @@ class DateTimeHelper
     /**
      * Sets date/time.
      *
-     * @param \DateTime|string $datetime
-     * @param string           $fromFormat
-     * @param string           $timezone
+     * @param \DateTimeInterface|string $datetime
+     * @param string                    $fromFormat
+     * @param string                    $timezone
      */
     public function setDateTime($datetime = '', $fromFormat = 'Y-m-d H:i:s', $timezone = 'local')
     {
-        if ($timezone == 'local') {
-            $timezone = date_default_timezone_get();
+        $localTimezone = date_default_timezone_get();
+        if ('local' == $timezone) {
+            $timezone = $localTimezone;
         } elseif (empty($timezone)) {
             $timezone = 'UTC';
         }
@@ -74,15 +73,16 @@ class DateTimeHelper
         $this->timezone = $timezone;
 
         $this->utc   = new \DateTimeZone('UTC');
-        $this->local = new \DateTimeZone(date_default_timezone_get());
+        $this->local = new \DateTimeZone($localTimezone);
 
-        if ($datetime instanceof \DateTime) {
+        if ($datetime instanceof \DateTimeInterface) {
             $this->datetime = $datetime;
+            $this->timezone = $datetime->getTimezone()->getName();
             $this->string   = $this->datetime->format($fromFormat);
         } elseif (empty($datetime)) {
             $this->datetime = new \DateTime('now', new \DateTimeZone($this->timezone));
             $this->string   = $this->datetime->format($fromFormat);
-        } elseif ($fromFormat == null) {
+        } elseif (null == $fromFormat) {
             $this->string   = $datetime;
             $this->datetime = new \DateTime($datetime, new \DateTimeZone($this->timezone));
         } else {
@@ -94,7 +94,7 @@ class DateTimeHelper
                 new \DateTimeZone($this->timezone)
             );
 
-            if ($this->datetime === false) {
+            if (false === $this->datetime) {
                 //the format does not match the string so let's attempt to fix that
                 $this->string   = date($this->format, strtotime($datetime));
                 $this->datetime = \DateTime::createFromFormat(
@@ -113,7 +113,7 @@ class DateTimeHelper
     public function toUtcString($format = null)
     {
         if ($this->datetime) {
-            $utc = ($this->timezone == 'UTC') ? $this->datetime : $this->datetime->setTimezone($this->utc);
+            $utc = ('UTC' == $this->timezone) ? $this->datetime : $this->datetime->setTimezone($this->utc);
             if (empty($format)) {
                 $format = $this->format;
             }
@@ -220,7 +220,7 @@ class DateTimeHelper
      */
     public function getDiff($compare = 'now', $format = null, $resetTime = false)
     {
-        if ($compare == 'now') {
+        if ('now' == $compare) {
             $compare = new \DateTime();
         }
 
@@ -233,7 +233,7 @@ class DateTimeHelper
 
         $interval = $compare->diff($with);
 
-        return ($format == null) ? $interval : $interval->format($format);
+        return (null == $format) ? $interval : $interval->format($format);
     }
 
     /**
@@ -242,7 +242,7 @@ class DateTimeHelper
      * @param            $intervalString
      * @param bool|false $clone          If true, return a new \DateTime rather than update current one
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function add($intervalString, $clone = false)
     {
@@ -264,7 +264,7 @@ class DateTimeHelper
      * @param            $intervalString
      * @param bool|false $clone          If true, return a new \DateTime rather than update current one
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function sub($intervalString, $clone = false)
     {
@@ -281,12 +281,46 @@ class DateTimeHelper
     }
 
     /**
+     * Returns interval based on $interval number and $unit.
+     *
+     * @param int    $interval
+     * @param string $unit
+     *
+     * @return \DateInterval
+     *
+     * @throws \Exception
+     */
+    public function buildInterval($interval, $unit)
+    {
+        $possibleUnits = ['Y', 'M', 'D', 'I', 'H', 'S'];
+        $unit          = strtoupper($unit);
+
+        if (!in_array($unit, $possibleUnits)) {
+            throw new \InvalidArgumentException($unit.' is invalid unit for DateInterval');
+        }
+
+        switch ($unit) {
+            case 'I':
+                $spec = "PT{$interval}M";
+                break;
+            case 'H':
+            case 'S':
+                $spec = "PT{$interval}{$unit}";
+                break;
+            default:
+                $spec = "P{$interval}{$unit}";
+        }
+
+        return new \DateInterval($spec);
+    }
+
+    /**
      * Modify datetime.
      *
      * @param            $string
      * @param bool|false $clone  If true, return a new \DateTime rather than update current one
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function modify($string, $clone = false)
     {
@@ -309,7 +343,7 @@ class DateTimeHelper
      */
     public function getTextDate($interval = null)
     {
-        if ($interval == null) {
+        if (null == $interval) {
             $interval = $this->getDiff('now', null, true);
         }
 
@@ -324,6 +358,49 @@ class DateTimeHelper
                 return 'tomorrow';
             default:
                 return false;
+        }
+    }
+
+    /**
+     * Tries to guess timezone from timezone offset.
+     *
+     * @param int $offset in seconds
+     *
+     * @return string
+     */
+    public function guessTimezoneFromOffset($offset = 0)
+    {
+        // Sanitize input
+        $offset = (int) $offset;
+
+        $timezone = timezone_name_from_abbr('', $offset, false);
+
+        // In case http://bugs.php.net/44780 bug happens
+        if (empty($timezone)) {
+            foreach (timezone_abbreviations_list() as $abbr) {
+                foreach ($abbr as $city) {
+                    if ($city['offset'] == $offset) {
+                        return $city['timezone_id'];
+                    }
+                }
+            }
+        }
+
+        return $timezone;
+    }
+
+    /**
+     * @param string $unit
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function validateMysqlDateTimeUnit($unit)
+    {
+        $possibleUnits   = ['s', 'i', 'H', 'd', 'W', 'm', 'Y'];
+
+        if (!in_array($unit, $possibleUnits, true)) {
+            $possibleUnitsString = implode(', ', $possibleUnits);
+            throw new \InvalidArgumentException("Unit '$unit' is not supported. Use one of these: $possibleUnitsString");
         }
     }
 }

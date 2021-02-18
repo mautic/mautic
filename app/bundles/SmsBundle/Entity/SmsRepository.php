@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -22,23 +23,69 @@ class SmsRepository extends CommonRepository
     /**
      * Get a list of entities.
      *
-     * @param array $args
-     *
      * @return Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $q = $this->_em
             ->createQueryBuilder()
-            ->select('e')
-            ->from('MauticSmsBundle:Sms', 'e', 'e.id');
+            ->select($this->getTableAlias())
+            ->from('MauticSmsBundle:Sms', $this->getTableAlias(), $this->getTableAlias().'.id');
+
         if (empty($args['iterator_mode'])) {
-            $q->leftJoin('e.category', 'c');
+            $q->leftJoin($this->getTableAlias().'.category', 'c');
         }
 
         $args['qb'] = $q;
 
         return parent::getEntities($args);
+    }
+
+    /**
+     * @param null $id
+     *
+     * @return \Doctrine\ORM\Internal\Hydration\IterableResult
+     */
+    public function getPublishedBroadcasts($id = null)
+    {
+        $qb   = $this->createQueryBuilder($this->getTableAlias());
+        $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
+
+        $expr->add(
+            $qb->expr()->eq($this->getTableAlias().'.smsType', $qb->expr()->literal('list'))
+        );
+
+        if (!empty($id)) {
+            $expr->add(
+                $qb->expr()->eq($this->getTableAlias().'.id', (int) $id)
+            );
+        }
+        $qb->where($expr);
+
+        return $qb->getQuery()->iterate();
+    }
+
+    /**
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    public function getSegmentsContactsQuery(int $smsId)
+    {
+        // Main query
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->from('sms_message_list_xref', 'sml')
+            ->join('sml', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = sml.leadlist_id and ll.is_published = 1')
+            ->join('ll', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.leadlist_id = sml.leadlist_id and lll.manually_removed = 0')
+            ->join('lll', MAUTIC_TABLE_PREFIX.'leads', 'l', 'lll.lead_id = l.id')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('sml.sms_id', ':smsId')
+                )
+            )
+            ->setParameter('smsId', $smsId)
+            // Order by ID so we can query by greater than X contact ID when batching
+            ->orderBy('lll.lead_id');
+
+        return $q;
     }
 
     /**
@@ -61,41 +108,23 @@ class SmsRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
+        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        if ($expr) {
+            return [$expr, $parameters];
+        }
+
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $expr            = false;
+        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+
         switch ($command) {
-            case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr            = $q->expr()->eq('e.isPublished', ":$unique");
-                $forceParameters = [$unique => true];
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr            = $q->expr()->eq('e.isPublished', ":$unique");
-                $forceParameters = [$unique => true];
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
-                $expr = $q->expr()->orX(
-                    $q->expr()->isNull('e.category'),
-                    $q->expr()->eq('e.category', $q->expr()->literal(''))
-                );
-                $returnParameter = false;
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                $expr            = $q->expr()->eq('IDENTITY(e.createdBy)', $this->currentUser->getId());
-                $returnParameter = false;
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.category'):
-                $expr           = $q->expr()->like('e.alias', ":$unique");
-                $filter->strict = true;
-                break;
             case $this->translator->trans('mautic.core.searchcommand.lang'):
                 $langUnique      = $this->generateRandomParameterName();
                 $langValue       = $filter->string.'_%';
@@ -107,6 +136,7 @@ class SmsRepository extends CommonRepository
                     $q->expr()->eq('e.language', ":$unique"),
                     $q->expr()->like('e.language', ":$langUnique")
                 );
+                $returnParameter = true;
                 break;
         }
 
@@ -116,9 +146,7 @@ class SmsRepository extends CommonRepository
 
         if (!empty($forceParameters)) {
             $parameters = $forceParameters;
-        } elseif (!$returnParameter) {
-            $parameters = [];
-        } else {
+        } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
             $parameters = ["$unique" => $string];
         }
@@ -131,7 +159,7 @@ class SmsRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return [
+        $commands = [
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.isuncategorized',
@@ -139,6 +167,8 @@ class SmsRepository extends CommonRepository
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.lang',
         ];
+
+        return array_merge($commands, parent::getSearchCommands());
     }
 
     /**
@@ -196,8 +226,14 @@ class SmsRepository extends CommonRepository
         $q->select('partial e.{id, name, language}');
 
         if (!empty($search)) {
-            $q->andWhere($q->expr()->like('e.name', ':search'))
-                ->setParameter('search', "{$search}%");
+            if (is_array($search)) {
+                $search = array_map('intval', $search);
+                $q->andWhere($q->expr()->in('e.id', ':search'))
+                  ->setParameter('search', $search);
+            } else {
+                $q->andWhere($q->expr()->like('e.name', ':search'))
+                  ->setParameter('search', "%{$search}%");
+            }
         }
 
         if (!$viewOther) {

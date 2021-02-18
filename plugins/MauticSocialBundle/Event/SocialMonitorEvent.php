@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
  *
@@ -13,13 +14,10 @@ namespace MauticPlugin\MauticSocialBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
-/**
- * Class SocialMonitorEvent.
- */
 class SocialMonitorEvent extends CommonEvent
 {
     /**
-     * @var
+     * @var string
      */
     protected $integrationName;
 
@@ -39,19 +37,15 @@ class SocialMonitorEvent extends CommonEvent
     protected $leadIds = [];
 
     /**
-     * SocialMonitorEvent constructor.
-     *
-     * @param            $integrationName
-     * @param Monitoring $monitoring
-     * @param array      $leadIds
-     * @param            $newLeadCount
-     * @param            $updatedLeadCount
+     * @param string $integrationName
+     * @param int    $newLeadCount
+     * @param int    $updatedLeadCount
      */
     public function __construct($integrationName, Monitoring $monitoring, array $leadIds, $newLeadCount, $updatedLeadCount)
     {
         $this->integrationName  = $integrationName;
         $this->entity           = $monitoring;
-        $this->leadIds          = $this->leadIds;
+        $this->leadIds          = $leadIds;
         $this->newLeadCount     = (int) $newLeadCount;
         $this->updatedLeadCount = (int) $updatedLeadCount;
     }

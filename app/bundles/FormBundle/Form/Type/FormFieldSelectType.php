@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,7 +11,9 @@
 
 namespace Mautic\FormBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -26,13 +29,13 @@ class FormFieldSelectType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if ($options['field_type'] == 'select') {
+        if ('select' === $options['field_type']) {
             $this->addSortableList($builder, $options);
         }
 
         $builder->add(
-            'empty_value',
-            'text',
+            'placeholder',
+            TextType::class,
             [
                 'label'      => 'mautic.form.field.form.emptyvalue',
                 'label_attr' => ['class' => 'control-label'],
@@ -48,7 +51,7 @@ class FormFieldSelectType extends AbstractType
         }
         $builder->add(
             'multiple',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.form.field.form.multiple',
                 'data'  => $default,
@@ -72,7 +75,7 @@ class FormFieldSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'formfield_select';
     }

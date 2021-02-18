@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -11,12 +12,11 @@
 namespace Mautic\UserBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Valid;
 
-/**
- * Class PermissionsType.
- */
 class PermissionsType extends AbstractType
 {
     /**
@@ -25,11 +25,15 @@ class PermissionsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         foreach ($options['permissionsConfig'] as $bundle => $config) {
-            $builder->add($bundle, 'hidden', [
-                'data'   => 'newbundle',
-                'label'  => false,
-                'mapped' => false,
-            ]);
+            $builder->add(
+                $bundle,
+                HiddenType::class,
+                [
+                    'data'   => 'newbundle',
+                    'label'  => false,
+                    'mapped' => false,
+                ]
+            );
             $config['permissionObject']->buildForm($builder, $options, $config['data']);
         }
 
@@ -41,7 +45,7 @@ class PermissionsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'permissions';
     }
@@ -49,11 +53,11 @@ class PermissionsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'cascade_validation' => true,
-            'permissionsConfig'  => [],
+            'permissionsConfig' => [],
+            'constraints'       => [new Valid()],
         ]);
     }
 }

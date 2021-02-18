@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -20,18 +21,20 @@ use Symfony\Component\HttpFoundation\Request;
 class AjaxController extends CommonAjaxController
 {
     /**
-     * @param Request $request
-     * @param string  $name
+     * @param string $name
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function reorderFieldsAction(Request $request, $name = 'fields')
+    protected function reorderFieldsAction(Request $request, $bundle, $name = 'fields')
     {
+        if ('form' === $name) {
+            $name = 'fields';
+        }
         $dataArray   = ['success' => 0];
         $sessionId   = InputHelper::clean($request->request->get('formId'));
         $sessionName = 'mautic.form.'.$sessionId.'.'.$name.'.modified';
         $session     = $this->get('session');
-        $orderName   = ($name == 'fields') ? 'mauticform' : 'mauticform_action';
+        $orderName   = ('fields' == $name) ? 'mauticform' : 'mauticform_action';
         $order       = InputHelper::clean($request->request->get($orderName));
         $components  = $session->get($sessionName);
 
@@ -45,8 +48,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function reorderActionsAction(Request $request)
@@ -55,26 +56,39 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function updateFormFieldsAction(Request $request)
     {
-        $formId     = InputHelper::int($request->request->get('formId'));
+        $formId     = (int) $request->request->get('formId');
         $dataArray  = ['success' => 0];
         $model      = $this->getModel('form');
         $entity     = $model->getEntity($formId);
-        $formFields = $entity->getFields();
+        $formFields = empty($entity) ? [] : $entity->getFields();
         $fields     = [];
 
         foreach ($formFields as $field) {
-            if ($field->getType() != 'button') {
+            if ('button' != $field->getType()) {
                 $properties = $field->getProperties();
                 $options    = [];
 
                 if (!empty($properties['list']['list'])) {
-                    $options = $properties['list']['list'];
+                    //If the field is a SELECT field then the data gets stored in [list][list]
+                    $optionList = $properties['list']['list'];
+                } elseif (!empty($properties['optionlist']['list'])) {
+                    //If the field is a radio or a checkbox then it will be stored in [optionlist][list]
+                    $optionList = $properties['optionlist']['list'];
+                }
+                if (!empty($optionList)) {
+                    foreach ($optionList as $listItem) {
+                        if (is_array($listItem) && isset($listItem['value']) && isset($listItem['label'])) {
+                            //The select box needs values to be [value] => label format so make sure we have that style then put it in
+                            $options[$listItem['value']] = $listItem['label'];
+                        } elseif (!is_array($listItem)) {
+                            //Keeping for BC
+                            $options[] = $listItem;
+                        }
+                    }
                 }
 
                 $fields[] = [
@@ -84,6 +98,9 @@ class AjaxController extends CommonAjaxController
                     'type'    => $field->getType(),
                     'options' => $options,
                 ];
+
+                // Be sure to not pollute the symbol table.
+                unset($optionList);
             }
         }
 

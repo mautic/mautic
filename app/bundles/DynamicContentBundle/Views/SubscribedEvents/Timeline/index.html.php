@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -9,7 +10,7 @@
  */
 $data = $event['extra']['log']['metadata'];
 
-if (isset($data['failed'])) {
+if (isset($data['failed']) || !isset($data['timeline'])) {
     return;
 }
 ?>

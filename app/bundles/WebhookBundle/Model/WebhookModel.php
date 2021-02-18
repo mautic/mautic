@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,60 +11,145 @@
 
 namespace Mautic\WebhookBundle\Model;
 
+use Doctrine\Common\Collections\Criteria;
 use JMS\Serializer\SerializationContext;
-use JMS\Serializer\Serializer;
-use Joomla\Http\Http;
-use Joomla\Http\Response;
+use JMS\Serializer\SerializerInterface;
+use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\WebhookBundle\Entity\Event;
+use Mautic\WebhookBundle\Entity\EventRepository;
 use Mautic\WebhookBundle\Entity\Log;
+use Mautic\WebhookBundle\Entity\LogRepository;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
+use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
+use Mautic\WebhookBundle\Entity\WebhookRepository;
 use Mautic\WebhookBundle\Event as Events;
 use Mautic\WebhookBundle\Event\WebhookEvent;
+use Mautic\WebhookBundle\Form\Type\WebhookType;
+use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\WebhookEvents;
-use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class ReportModel.
- */
 class WebhookModel extends FormModel
 {
+    /**
+     *  2 possible types of the processing of the webhooks.
+     */
+    const COMMAND_PROCESS   = 'command_process';
+    const IMMEDIATE_PROCESS = 'immediate_process';
+
+    /**
+     * Whet queue mode is turned on.
+     *
+     * @var string
+     */
     protected $queueMode;
-    protected $webhookStart;
+
+    /**
+     * How many entities to add into one queued webhook.
+     *
+     * @var int
+     */
     protected $webhookLimit;
+
+    /**
+     * How long the webhook processing can run in seconds.
+     *
+     * @var int
+     */
+    private $webhookTimeLimit;
+
+    /**
+     * How many responses in 1 row can fail until the webhook disables itself.
+     *
+     * @var int
+     */
+    protected $disableLimit;
+
+    /**
+     * How many seconds will we wait for the response.
+     *
+     * @var int in seconds
+     */
+    protected $webhookTimeout;
+
+    /**
+     * The key is queue ID, the value is the WebhookQueue object.
+     *
+     * @var array
+     */
     protected $webhookQueueIdList = [];
+
+    /**
+     * How many recent log records should be kept.
+     *
+     * @var int
+     */
     protected $logMax;
 
     /**
-     * @var Serializer
+     * @var SerializerInterface
      */
     protected $serializer;
 
     /**
-     * WebhookModel constructor.
+     * Queued events default order by dir
+     * Possible values: ['ASC', 'DESC'].
      *
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param Serializer           $serializer
+     * @var string
      */
-    public function __construct(CoreParametersHelper $coreParametersHelper, Serializer $serializer)
-    {
-        $this->queueMode    = $coreParametersHelper->getParameter('queue_mode');
-        $this->webhookStart = $coreParametersHelper->getParameter('webhook_start');
-        $this->webhookLimit = $coreParametersHelper->getParameter('webhook_limit');
-        $this->serializer   = $serializer;
-        $this->logMax       = $coreParametersHelper->getParameter('webhook_log_max', 10);
+    protected $eventsOrderByDir;
+
+    /**
+     * @var Client
+     */
+    private $httpClient;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
+     * Timestamp when the webhook processing starts.
+     *
+     * @var float
+     */
+    private $startTime;
+
+    public function __construct(
+        CoreParametersHelper $coreParametersHelper,
+        SerializerInterface $serializer,
+        Client $httpClient,
+        EventDispatcherInterface $eventDispatcher
+    ) {
+        $this->setConfigProps($coreParametersHelper);
+        $this->serializer        = $serializer;
+        $this->httpClient        = $httpClient;
+        $this->eventDispatcher   = $eventDispatcher;
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
+     * @param Webhook $entity
+     */
+    public function saveEntity($entity, $unlock = true)
+    {
+        if (null === $entity->getSecret()) {
+            $entity->setSecret(EncryptionHelper::generateKey());
+        }
+
+        parent::saveEntity($entity, $unlock);
+    }
+
+    /**
+     * @param Webhook $entity
+     * @param         $formFactory
+     * @param null    $action
      *
      * @return mixed
      *
@@ -81,15 +167,15 @@ class WebhookModel extends FormModel
 
         $params['events'] = $this->getEvents();
 
-        return $formFactory->create('webhook', $entity, $params);
+        return $formFactory->create(WebhookType::class, $entity, $params);
     }
 
     /**
-     * {@inheritdoc}
+     * @return Webhook|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Webhook();
         }
 
@@ -97,13 +183,11 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return \Mautic\WebhookBundle\Entity\WebhookRepository
+     * @return WebhookRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticWebhookBundle:Webhook');
+        return $this->em->getRepository(Webhook::class);
     }
 
     /**
@@ -126,65 +210,62 @@ class WebhookModel extends FormModel
         return $events;
     }
 
-    /*
-     * Get a list of webhooks by matching events
+    /**
+     * Get a list of webhooks by matching events.
      *
-     * @param $types string of event type
+     * @param string $type string of event type
      *
      * @return array
      */
     public function getEventWebooksByType($type)
     {
-        $results = $this->getEventRepository()->getEntitiesByEventType($type);
-
-        return $results;
+        return $this->getEventRepository()->getEntitiesByEventType($type);
     }
 
-    /*
-     * Takes an array of webhooks and adds them to the webhook queue so they can be processed.abstract
-     *
-     * Optionally returns an array of all the queue IDs created so they can be immediately executed.
-     *
-     * @param $webhooks array of Webhook
-     * @param $payload  Entity
-     * @param $serializationGroups groups for the serializer
-     * @param $returnQueueEntities bool
-     *
-     * @return
+    /**
+     * @param $type
+     * @param $payload
+     * @param $groups
      */
-    public function QueueWebhooks($webhookEvents, $payload, array $serializationGroups = [], $immediatelyExecuteWebhooks = false)
+    public function queueWebhooksByType($type, $payload, array $groups = [])
+    {
+        return $this->queueWebhooks(
+            $this->getEventWebooksByType($type),
+            $payload,
+            $groups
+        );
+    }
+
+    /**
+     * @param $webhookEvents
+     * @param $payload
+     */
+    public function queueWebhooks($webhookEvents, $payload, array $serializationGroups = [])
     {
         if (!count($webhookEvents) || !is_array($webhookEvents)) {
             return;
         }
 
-        $webhookList = [];
-
         /** @var \Mautic\WebhookBundle\Entity\Event $event */
         foreach ($webhookEvents as $event) {
-            $webhook       = $event->getWebhook();
-            $webhookList[] = $webhook;
+            $webhook = $event->getWebhook();
+            $queue   = $this->queueWebhook($webhook, $event, $payload, $serializationGroups);
 
-            $webhook->addQueue($this->queueWebhook($webhook, $event, $payload, $serializationGroups));
-
-            // add the queuelist and save everything
-            $this->saveEntity($webhook);
+            if (self::COMMAND_PROCESS === $this->queueMode) {
+                // Queue to the database to process later
+                $this->getQueueRepository()->saveEntity($queue);
+            } else {
+                // Immediately process
+                $this->processWebhook($webhook, $queue);
+            }
         }
-
-        if ($this->queueMode == 'immediate_process') {
-            $this->processWebhooks($webhookList);
-        }
-
-        return;
     }
 
-    /*
-     * Creates a WebhookQueue entity, sets the date and returns the created entity
+    /**
+     * Creates a WebhookQueue entity, sets the date and returns the created entity.
      *
-     * @param  $webhook Webhook
-     * @param  $eventId the id of th event that added this queue
-     * @param  $payload Entity object
-     * @param  $serializationGroups if the entity has some groups for serialization add them here.
+     * @param $event
+     * @param $payload
      *
      * @return WebhookQueue
      */
@@ -207,128 +288,216 @@ class WebhookModel extends FormModel
         return $queue;
     }
 
-    /*
-     * Execute a list of webhooks to their specified endpoints
+    /**
+     * Execute a list of webhooks to their specified endpoints.
      *
-     * @param array $webhooks
+     * @param array|\Doctrine\ORM\Tools\Pagination\Paginator $webhooks
      */
     public function processWebhooks($webhooks)
     {
+        $this->startTime = microtime(true);
+
         foreach ($webhooks as $webhook) {
             $this->processWebhook($webhook);
         }
     }
 
-    /*
-     * Execute a single webhook post
+    /**
+     * @param WebhookQueue $queue
      *
-     * @param Webhook $webhook
-     * @var   Http    $http
+     * @return bool
      */
-    public function processWebhook(Webhook $webhook)
+    public function processWebhook(Webhook $webhook, WebhookQueue $queue = null)
     {
-        /** @var \Mautic\WebhookBundle\Entity\WebhookQueueRepository $webhookQueueRepo */
-        $webhookQueueRepo = $this->getQueueRepository();
-
-        // instantiate new http class
-        $http = new Http();
-
         // get the webhook payload
-        $payload = ($this->getWebhookPayload($webhook));
+        $payload = $this->getWebhookPayload($webhook, $queue);
 
         // if there wasn't a payload we can stop here
-        if (!count($payload)) {
-            return;
+        if (empty($payload)) {
+            return false;
         }
 
-        // Set up custom headers
-        $headers = ['Content-Type' => 'application/json'];
+        $start = microtime(true);
 
-        /* @var \Mautic\WebhookBundle\Entity\Webhook $webhook */
         try {
-            /** @var \Joomla\Http\Http $http */
-            $response = $http->post($webhook->getWebhookUrl(), json_encode($payload), $headers);
-            $this->addLog($webhook, $response);
+            $response = $this->httpClient->post($webhook->getWebhookUrl(), $payload, $webhook->getSecret());
+
+            // remove successfully processed queues from the Webhook object so they won't get stored again
+            foreach ($this->webhookQueueIdList as $queue) {
+                $webhook->removeQueue($queue);
+            }
+
+            $responseBody = $response->getBody()->getContents();
+            if (!$responseBody) {
+                $responseBody = null; // Save null value to database
+            }
+
+            $responseStatusCode = $response->getStatusCode();
+
+            $this->addLog($webhook, $response->getStatusCode(), (microtime(true) - $start), $responseBody);
+
             // throw an error exception if we don't get a 200 back
-            if ($response->code != 200) {
-                throw new \ErrorException($webhook->getWebhookUrl().' returned '.$response->code);
+            if ($responseStatusCode >= 300 || $responseStatusCode < 200) {
+                // The receiver of the webhook is telling us to stop bothering him with our requests by code 410
+                if (410 === $responseStatusCode) {
+                    $this->killWebhook($webhook, 'mautic.webhook.stopped.reason.410');
+                }
+
+                throw new \ErrorException($webhook->getWebhookUrl().' returned '.$responseStatusCode);
             }
         } catch (\Exception $e) {
+            $message = $e->getMessage();
+
+            if ($this->isSick($webhook)) {
+                $this->killWebhook($webhook);
+                $message .= ' '.$this->translator->trans('mautic.webhook.killed', ['%limit%' => $this->disableLimit]);
+            }
+
             // log any errors but allow the script to keep running
-            $this->logger->addError($e->getMessage());
+            $this->logger->addError($message);
+
+            // log that the request failed to display it to the user
+            $this->addLog($webhook, 'N/A', (microtime(true) - $start), $message);
+
+            return false;
         }
 
-        // delete all the queued items we just processed
-        $webhookQueueRepo->deleteQueuesById($this->webhookQueueIdList);
-        $queueCount = $webhookQueueRepo->getQueueCountByWebhookId($webhook->getId());
-        // reset the array to blank so none of the IDs are repeated
-        $this->webhookQueueIdList = [];
+        // Run this on command as well as immediate send because if switched from queue to immediate
+        // it can have some rows in the queue which will be send in every webhook forever
+        if (!empty($this->webhookQueueIdList)) {
+            /** @var \Mautic\WebhookBundle\Entity\WebhookQueueRepository $webhookQueueRepo */
+            $webhookQueueRepo = $this->getQueueRepository();
 
-        // if there are still items in the queue after processing we re-process
-        // WARNING: this is recursive
-        if ($queueCount > 0) {
-            $this->processWebhook($webhook);
+            // delete all the queued items we just processed
+            $webhookQueueRepo->deleteQueuesById(array_keys($this->webhookQueueIdList));
+            $queueCount = $webhookQueueRepo->getQueueCountByWebhookId($webhook->getId());
+
+            // reset the array to blank so none of the IDs are repeated
+            $this->webhookQueueIdList = [];
+
+            // if there are still items in the queue after processing we re-process
+            // WARNING: this is recursive
+            if ($queueCount > 0 && !$this->isProcessingExpired()) {
+                $this->processWebhook($webhook);
+            }
         }
+
+        return true;
     }
 
-    /*
-     * Add a log for the webhook response and save it
+    /**
+     * Look into the history and check if all the responses we care about had failed.
+     * But let it run for a while after the user modified it. Lets not aggravate the user.
+     *
+     * @return bool
      */
-    public function addLog(Webhook $webhook, Response $response)
+    public function isSick(Webhook $webhook)
     {
-        $this->getLogRepository()->removeOldLogs($webhook->getId(), $this->logMax);
+        // Do not mess with the user will! (at least not now)
+        if ($webhook->wasModifiedRecently()) {
+            return false;
+        }
+
+        $successRadio = $this->getLogRepository()->getSuccessVsErrorStatusCodeRatio($webhook->getId(), $this->disableLimit);
+
+        // If there are no log rows yet, consider it healthy
+        if (null === $successRadio) {
+            return false;
+        }
+
+        return !$successRadio;
+    }
+
+    /**
+     * Unpublish the webhook so it will stop emit the requests
+     * and notify user about it.
+     *
+     * @param string $reason
+     */
+    public function killWebhook(Webhook $webhook, $reason = 'mautic.webhook.stopped.reason')
+    {
+        $webhook->setIsPublished(false);
+        $this->saveEntity($webhook);
+
+        $event = new WebhookEvent($webhook, false, $reason);
+        $this->eventDispatcher->dispatch(WebhookEvents::WEBHOOK_KILL, $event);
+    }
+
+    /**
+     * Add a log for the webhook response HTTP status and save it.
+     *
+     * @param int    $statusCode
+     * @param float  $runtime    in seconds
+     * @param string $note
+     */
+    public function addLog(Webhook $webhook, $statusCode, $runtime, $note = null)
+    {
         $log = new Log();
 
-        $log->setWebhook($webhook);
-        $log->setStatusCode($response->code);
+        if ($webhook->getId()) {
+            $log->setWebhook($webhook);
+            $this->getLogRepository()->removeOldLogs($webhook->getId(), $this->logMax);
+        }
+
+        $log->setNote($note);
+        $log->setRuntime($runtime);
+        $log->setStatusCode($statusCode);
         $log->setDateAdded(new \DateTime());
         $webhook->addLog($log);
 
-        $this->saveEntity($webhook);
+        if ($webhook->getId()) {
+            $this->saveEntity($webhook);
+        }
     }
 
-    /*
-     * Get Qeueue Repository
-     *
+    /**
      * @return WebhookQueueRepository
      */
     public function getQueueRepository()
     {
-        return $this->em->getRepository('MauticWebhookBundle:WebhookQueue');
+        return $this->em->getRepository(WebhookQueue::class);
     }
 
-    /*
-    * Get Event Repository
-    */
+    /**
+     * @return EventRepository
+     */
     public function getEventRepository()
     {
-        return $this->em->getRepository('MauticWebhookBundle:Event');
+        return $this->em->getRepository(Event::class);
     }
 
-    /*
-     * Return the log repo
+    /**
+     * @return LogRepository
      */
     public function getLogRepository()
     {
-        return $this->em->getRepository('MauticWebhookBundle:Log');
+        return $this->em->getRepository(Log::class);
     }
 
-    /*
-     * Get the payload from the webhook
+    /**
+     * Get the payload from the webhook.
      *
-     * @param Webhook $webhook
+     * @param WebhookQueue $queue
      *
      * @return array
      */
-    public function getWebhookPayload($webhook)
+    public function getWebhookPayload(Webhook $webhook, WebhookQueue $queue = null)
     {
-        $queuesArray = $this->getWebhookQueues($webhook);
-        $payload     = [];
+        if ($payload = $webhook->getPayload()) {
+            return $payload;
+        }
 
-        /* @var \Mautic\WebhookBundle\Entity\WebhookQueue $queue */
+        $payload = [];
+
+        if (self::COMMAND_PROCESS === $this->queueMode) {
+            $queuesArray = $this->getWebhookQueues($webhook);
+        } else {
+            $queuesArray = [isset($queue) ? [$queue] : []];
+        }
+
+        /* @var WebhookQueue $queue */
         foreach ($queuesArray as $queues) {
             foreach ($queues as $queue) {
-
                 /** @var \Mautic\WebhookBundle\Entity\Event $event */
                 $event = $queue->getEvent();
                 $type  = $event->getEventType();
@@ -344,34 +513,41 @@ class WebhookModel extends FormModel
                 // its important to decode the payload form the DB as we re-encode it with the
                 $payload[$type][] = $queuePayload;
 
-                $this->webhookQueueIdList[] = $queue->getId();
-                $this->em->clear($queue);
+                // Add to the webhookQueueIdList only if ID exists.
+                // That means if it was stored to DB and not sent via immediate send.
+                if ($queue->getId()) {
+                    $this->webhookQueueIdList[$queue->getId()] = $queue;
+
+                    // Clear the WebhookQueue entity from memory
+                    $this->em->detach($queue);
+                }
             }
         }
 
         return $payload;
     }
 
-    /*
-     * Get the queues and order by date so we get events in chronological order
+    /**
+     * Get the queues and order by date so we get events.
      *
-     * @return array
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function getWebhookQueues(Webhook $webhook)
     {
-        /** @var \Mautic\WebhookBundle\Entity\WebhookQueueRepository $queueRepo */
+        /** @var WebhookQueueRepository $queueRepo */
         $queueRepo = $this->getQueueRepository();
 
-        $queues = $queueRepo->getEntities(
+        return $queueRepo->getEntities(
             [
                 'iterator_mode' => true,
-                'start'         => $this->webhookStart,
+                'start'         => 0,
                 'limit'         => $this->webhookLimit,
-                'orderBy'       => 'e.dateAdded', // e is the default prefix unless you define getTableAlias in your repo class,
+                'orderBy'       => $queueRepo->getTableAlias().'.dateAdded',
+                'orderByDir'    => $this->getEventsOrderbyDir($webhook),
                 'filter'        => [
                     'force' => [
                         [
-                            'column' => 'IDENTITY(e.webhook)',
+                            'column' => 'IDENTITY('.$queueRepo->getTableAlias().'.webhook)',
                             'expr'   => 'eq',
                             'value'  => $webhook->getId(),
                         ],
@@ -379,8 +555,22 @@ class WebhookModel extends FormModel
                 ],
             ]
         );
+    }
 
-        return $queues;
+    /**
+     * Returns either Webhook's orderbyDir or the value from configuration as default.
+     *
+     * @return string
+     */
+    public function getEventsOrderbyDir(Webhook $webhook = null)
+    {
+        // Try to get the value from Webhook
+        if ($webhook && $orderByDir = $webhook->getEventsOrderbyDir()) {
+            return $orderByDir;
+        }
+
+        // Use the global config value if it's not set in the Webhook
+        return $this->eventsOrderByDir;
     }
 
     /**
@@ -430,9 +620,12 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * Serialize Data.
+     * @param       $payload
+     * @param array $groups
+     *
+     * @return mixed|string
      */
-    public function serializeData($payload, $groups = [])
+    public function serializeData($payload, $groups = [], array $customExclusionStrategies = [])
     {
         $context = SerializationContext::create();
         if (!empty($groups)) {
@@ -441,9 +634,12 @@ class WebhookModel extends FormModel
 
         //Only include FormEntity properties for the top level entity and not the associated entities
         $context->addExclusionStrategy(
-        // Can Use this; just adding full namespace to show
-            new \Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy()
+            new PublishDetailsExclusionStrategy()
         );
+
+        foreach ($customExclusionStrategies as $exclusionStrategy) {
+            $context->addExclusionStrategy($exclusionStrategy);
+        }
 
         //include null values
         $context->setSerializeNull(true);
@@ -458,5 +654,27 @@ class WebhookModel extends FormModel
     public function getPermissionBase()
     {
         return 'webhook:webhooks';
+    }
+
+    private function isProcessingExpired(): bool
+    {
+        $currentTime = microtime(true);
+        $runTime     = $currentTime - $this->startTime;
+
+        return $runTime >= $this->webhookTimeLimit;
+    }
+
+    /**
+     * Sets all class properties from CoreParametersHelper.
+     */
+    private function setConfigProps(CoreParametersHelper $coreParametersHelper)
+    {
+        $this->webhookLimit     = (int) $coreParametersHelper->get('webhook_limit', 10);
+        $this->webhookTimeLimit = (int) $coreParametersHelper->get('webhook_time_limit', 600);
+        $this->disableLimit     = (int) $coreParametersHelper->get('webhook_disable_limit', 100);
+        $this->webhookTimeout   = (int) $coreParametersHelper->get('webhook_timeout', 15);
+        $this->logMax           = (int) $coreParametersHelper->get('webhook_log_max', 1000);
+        $this->queueMode        = $coreParametersHelper->get('queue_mode');
+        $this->eventsOrderByDir = $coreParametersHelper->get('events_orderby_dir', Criteria::ASC);
     }
 }

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -13,15 +14,43 @@ namespace Mautic\ConfigBundle\Controller;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\ConfigBundle\Form\Type\ConfigType;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class ConfigController.
- */
 class ConfigController extends FormController
 {
+    /**
+     * Recursively filters the specified array and replaces any UploadedFile instances with their contents
+     * (or NULL if the file cannot be read).
+     *
+     * @see https://github.com/mautic/mautic/issues/7294
+     *
+     * @return array
+     */
+    protected function filterNormDataForLogging(array $data)
+    {
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $value = $this->filterNormDataForLogging($value);
+            }
+
+            if ($value instanceof UploadedFile) {
+                $value = @file_get_contents($value->getFilename());
+            }
+
+            $data[$key] = $value;
+        }
+
+        return $data;
+    }
+
     /**
      * Controller action for editing the application configuration.
      *
@@ -34,94 +63,126 @@ class ConfigController extends FormController
             return $this->accessDenied();
         }
 
-        $event      = new ConfigBuilderEvent($this->factory);
+        $event      = new ConfigBuilderEvent($this->get('mautic.helper.bundle'));
         $dispatcher = $this->get('event_dispatcher');
         $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
-        $formConfigs            = $event->getForms();
-        $formThemes             = $event->getFormThemes();
-        $doNotChange            = $this->coreParametersHelper->getParameter('security.restrictedConfigFields');
-        $doNotChangeDisplayMode = $this->coreParametersHelper->getParameter('security.restrictedConfigFields.displayMode', 'remove');
+        $fileFields  = $event->getFileFields();
+        $formThemes  = $event->getFormThemes();
+        $formConfigs = $this->get('mautic.config.mapper')->bindFormConfigsWithRealValues($event->getForms());
 
-        $this->mergeParamsWithLocal($formConfigs, $doNotChange);
-
-        /* @type \Mautic\ConfigBundle\Model\ConfigModel $model */
-        $model = $this->getModel('config');
+        $this->mergeParamsWithLocal($formConfigs);
 
         // Create the form
         $action = $this->generateUrl('mautic_config_action', ['objectAction' => 'edit']);
-        $form   = $model->createForm($formConfigs, $this->get('form.factory'), [
-            'action'                 => $action,
-            'doNotChange'            => $doNotChange,
-            'doNotChangeDisplayMode' => $doNotChangeDisplayMode,
-        ]);
+        $form   = $this->get('form.factory')->create(
+            ConfigType::class,
+            $formConfigs,
+            [
+                'action'     => $action,
+                'fileFields' => $fileFields,
+            ]
+        );
+
+        $originalNormData = $form->getNormData();
 
         /** @var \Mautic\CoreBundle\Configurator\Configurator $configurator */
         $configurator = $this->get('mautic.configurator');
         $isWritabale  = $configurator->isFileWritable();
+        $openTab      = null;
 
         // Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $isValid = false;
                 if ($isWritabale && $isValid = $this->isFormValid($form)) {
-
                     // Bind request to the form
                     $post     = $this->request->request;
                     $formData = $form->getData();
 
                     // Dispatch pre-save event. Bundles may need to modify some field values like passwords before save
                     $configEvent = new ConfigEvent($formData, $post);
+                    $configEvent
+                        ->setOriginalNormData($originalNormData)
+                        ->setNormData($this->filterNormDataForLogging($form->getNormData()));
                     $dispatcher->dispatch(ConfigEvents::CONFIG_PRE_SAVE, $configEvent);
                     $formValues = $configEvent->getConfig();
 
-                    foreach ($configEvent->getErrors() as $message => $messageVars) {
-                        $this->addFlash($message, $messageVars);
-                    }
+                    $errors      = $configEvent->getErrors();
+                    $fieldErrors = $configEvent->getFieldErrors();
 
-                    // Prevent these from getting overwritten with empty values
-                    $unsetIfEmpty = $configEvent->getPreservedFields();
+                    if ($errors || $fieldErrors) {
+                        foreach ($errors as $message => $messageVars) {
+                            $form->addError(
+                                new FormError($this->translator->trans($message, $messageVars, 'validators'))
+                            );
+                        }
 
-                    // Merge each bundle's updated configuration into the local configuration
-                    foreach ($formValues as $object) {
-                        $checkThese = array_intersect(array_keys($object), $unsetIfEmpty);
-                        foreach ($checkThese as $checkMe) {
-                            if (empty($object[$checkMe])) {
-                                unset($object[$checkMe]);
+                        foreach ($fieldErrors as $key => $fields) {
+                            foreach ($fields as $field => $fieldError) {
+                                $form[$key][$field]->addError(
+                                    new FormError($this->translator->trans($fieldError[0], $fieldError[1], 'validators'))
+                                );
                             }
                         }
+                        $isValid = false;
+                    } else {
+                        // Prevent these from getting overwritten with empty values
+                        $unsetIfEmpty = $configEvent->getPreservedFields();
+                        $unsetIfEmpty = array_merge($unsetIfEmpty, $fileFields);
 
-                        $configurator->mergeParameters($object);
-                    }
+                        // Merge each bundle's updated configuration into the local configuration
+                        foreach ($formValues as $object) {
+                            $checkThese = array_intersect(array_keys($object), $unsetIfEmpty);
+                            foreach ($checkThese as $checkMe) {
+                                if (empty($object[$checkMe])) {
+                                    unset($object[$checkMe]);
+                                }
+                            }
 
-                    try {
-                        // Ensure the config has a secret key
-                        $params = $configurator->getParameters();
-                        if (empty($params['secret_key'])) {
-                            $configurator->mergeParameters(['secret_key' => EncryptionHelper::generateKey()]);
+                            $configurator->mergeParameters($object);
                         }
 
-                        $configurator->write();
+                        try {
+                            // Ensure the config has a secret key
+                            $params = $configurator->getParameters();
+                            if (empty($params['secret_key'])) {
+                                $configurator->mergeParameters(['secret_key' => EncryptionHelper::generateKey()]);
+                            }
 
-                        $this->addFlash('mautic.config.config.notice.updated');
+                            $configurator->write();
+                            $dispatcher->dispatch(ConfigEvents::CONFIG_POST_SAVE, $configEvent);
 
-                        // We must clear the application cache for the updated values to take effect
-                        /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
-                        $cacheHelper = $this->factory->getHelper('cache');
-                        $cacheHelper->clearContainerFile();
-                    } catch (\RuntimeException $exception) {
-                        $this->addFlash('mautic.config.config.error.not.updated', ['%exception%' => $exception->getMessage()], 'error');
+                            $this->addFlash('mautic.config.config.notice.updated');
+
+                            /** @var CacheHelper $cacheHelper */
+                            $cacheHelper = $this->get('mautic.helper.cache');
+                            $cacheHelper->refreshConfig();
+
+                            if ($isValid && !empty($formData['coreconfig']['last_shown_tab'])) {
+                                $openTab = $formData['coreconfig']['last_shown_tab'];
+                            }
+                        } catch (\RuntimeException $exception) {
+                            $this->addFlash('mautic.config.config.error.not.updated', ['%exception%' => $exception->getMessage()], 'error');
+                        }
                     }
                 } elseif (!$isWritabale) {
-                    $form->addError(new FormError(
-                        $this->translator->trans('mautic.config.notwritable')
-                    ));
+                    $form->addError(
+                        new FormError(
+                            $this->translator->trans('mautic.config.notwritable')
+                        )
+                    );
                 }
             }
 
             // If the form is saved or cancelled, redirect back to the dashboard
             if ($cancelled || $isValid) {
                 if (!$cancelled && $this->isFormApplied($form)) {
-                    return $this->delegateRedirect($this->generateUrl('mautic_config_action', ['objectAction' => 'edit']));
+                    $redirectParameters = ['objectAction' => 'edit'];
+                    if ($openTab) {
+                        $redirectParameters['tab'] = $openTab;
+                    }
+
+                    return $this->delegateRedirect($this->generateUrl('mautic_config_action', $redirectParameters));
                 } else {
                     return $this->delegateRedirect($this->generateUrl('mautic_dashboard_index'));
                 }
@@ -130,21 +191,101 @@ class ConfigController extends FormController
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
-        return $this->delegateView([
-            'viewParameters' => [
-                'tmpl'        => $tmpl,
-                'security'    => $this->get('mautic.security'),
-                'form'        => $this->setFormTheme($form, 'MauticConfigBundle:Config:form.html.php', $formThemes),
-                'formConfigs' => $formConfigs,
-                'isWritable'  => $isWritabale,
-            ],
-            'contentTemplate' => 'MauticConfigBundle:Config:form.html.php',
-            'passthroughVars' => [
-                'activeLink'    => '#mautic_config_index',
-                'mauticContent' => 'config',
-                'route'         => $this->generateUrl('mautic_config_action', ['objectAction' => 'edit']),
-            ],
-        ]);
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'tmpl'        => $tmpl,
+                    'security'    => $this->get('mautic.security'),
+                    'form'        => $this->setFormTheme($form, 'MauticConfigBundle:Config:form.html.php', $formThemes),
+                    'formConfigs' => $formConfigs,
+                    'isWritable'  => $isWritabale,
+                ],
+                'contentTemplate' => 'MauticConfigBundle:Config:form.html.php',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_config_index',
+                    'mauticContent' => 'config',
+                    'route'         => $this->generateUrl('mautic_config_action', ['objectAction' => 'edit']),
+                ],
+            ]
+        );
+    }
+
+    /**
+     * @param $objectId
+     *
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function downloadAction($objectId)
+    {
+        //admin only allowed
+        if (!$this->user->isAdmin()) {
+            return $this->accessDenied();
+        }
+
+        $event      = new ConfigBuilderEvent($this->get('mautic.helper.bundle'));
+        $dispatcher = $this->get('event_dispatcher');
+        $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
+
+        // Extract and base64 encode file contents
+        $fileFields = $event->getFileFields();
+
+        if (!in_array($objectId, $fileFields)) {
+            return $this->accessDenied();
+        }
+
+        $content  = $this->get('mautic.helper.core_parameters')->get($objectId);
+        $filename = $this->request->get('filename', $objectId);
+
+        if ($decoded = base64_decode($content)) {
+            $response = new Response($decoded);
+            $response->headers->set('Content-Type', 'application/force-download');
+            $response->headers->set('Content-Type', 'application/octet-stream');
+            $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename);
+            $response->headers->set('Expires', 0);
+            $response->headers->set('Cache-Control', 'must-revalidate');
+            $response->headers->set('Pragma', 'public');
+
+            return $response;
+        }
+
+        return $this->notFound();
+    }
+
+    /**
+     * @param $objectId
+     *
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function removeAction($objectId)
+    {
+        //admin only allowed
+        if (!$this->user->isAdmin()) {
+            return $this->accessDenied();
+        }
+
+        $success    = 0;
+        $event      = new ConfigBuilderEvent($this->get('mautic.helper.bundle'));
+        $dispatcher = $this->get('event_dispatcher');
+        $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
+
+        // Extract and base64 encode file contents
+        $fileFields = $event->getFileFields();
+
+        if (in_array($objectId, $fileFields)) {
+            $configurator = $this->get('mautic.configurator');
+            $configurator->mergeParameters([$objectId => null]);
+            try {
+                $configurator->write();
+
+                /** @var CacheHelper $cacheHelper */
+                $cacheHelper = $this->get('mautic.helper.cache');
+                $cacheHelper->refreshConfig();
+                $success = 1;
+            } catch (\Exception $exception) {
+            }
+        }
+
+        return new JsonResponse(['success' => $success]);
     }
 
     /**
@@ -155,10 +296,14 @@ class ConfigController extends FormController
      *
      * @return array
      */
-    private function mergeParamsWithLocal(&$forms, $doNotChange)
+    private function mergeParamsWithLocal(&$forms)
     {
+        $doNotChange = $this->getParameter('mautic.security.restrictedConfigFields');
+        /** @var PathsHelper $pathsHelper */
+        $pathsHelper     = $this->get('mautic.helper.paths');
+        $localConfigFile = $pathsHelper->getLocalConfigurationFile();
+
         // Import the current local configuration, $parameters is defined in this file
-        $localConfigFile = $this->factory->getLocalConfigFile();
 
         /** @var $parameters */
         include $localConfigFile;
@@ -166,13 +311,12 @@ class ConfigController extends FormController
         $localParams = $parameters;
 
         foreach ($forms as &$form) {
-
             // Merge the bundle params with the local params
             foreach ($form['parameters'] as $key => $value) {
                 if (in_array($key, $doNotChange)) {
                     unset($form['parameters'][$key]);
                 } elseif (array_key_exists($key, $localParams)) {
-                    $form['parameters'][$key] = $localParams[$key];
+                    $form['parameters'][$key] = (is_string($localParams[$key])) ? str_replace('%%', '%', $localParams[$key]) : $localParams[$key];
                 }
             }
         }

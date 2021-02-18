@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -12,12 +13,13 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
+use Mautic\LeadBundle\Form\Type\DashboardLeadsInTimeWidgetType;
+use Mautic\LeadBundle\Form\Type\DashboardLeadsLifetimeWidgetType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class DashboardSubscriber.
- */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
@@ -34,11 +36,11 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     protected $types = [
         'created.leads.in.time' => [
-            'formAlias' => 'lead_dashboard_leads_in_time_widget',
+            'formAlias' => DashboardLeadsInTimeWidgetType::class,
         ],
         'anonymous.vs.identified.leads' => [],
         'lead.lifetime'                 => [
-            'formAlias' => 'lead_dashboard_leads_lifetime_widget',
+            'formAlias' => DashboardLeadsLifetimeWidgetType::class,
         ],
         'map.of.leads'  => [],
         'top.lists'     => [],
@@ -68,28 +70,32 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $leadListModel;
 
     /**
-     * DashboardSubscriber constructor.
-     *
-     * @param LeadModel $leadModel
-     * @param ListModel $leadListModel
+     * @var RouterInterface
      */
-    public function __construct(LeadModel $leadModel, ListModel $leadListModel)
+    protected $router;
+
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    public function __construct(LeadModel $leadModel, ListModel $leadListModel, RouterInterface $router, TranslatorInterface $translator)
     {
         $this->leadModel     = $leadModel;
         $this->leadListModel = $leadListModel;
+        $this->router        = $router;
+        $this->translator    = $translator;
     }
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('form:forms:viewother');
 
-        if ($event->getType() == 'created.leads.in.time') {
+        if ('created.leads.in.time' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -118,7 +124,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             return;
         }
 
-        if ($event->getType() == 'anonymous.vs.identified.leads') {
+        if ('anonymous.vs.identified.leads' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
                 $event->setTemplateData([
@@ -134,7 +140,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             return;
         }
 
-        if ($event->getType() == 'map.of.leads') {
+        if ('map.of.leads' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
                 $event->setTemplateData([
@@ -149,7 +155,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             return;
         }
 
-        if ($event->getType() == 'top.lists') {
+        if ('top.lists' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
 
@@ -166,8 +172,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 // Build table rows with links
                 if ($lists) {
                     foreach ($lists as &$list) {
-                        $listUrl = $this->router->generate('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $list['id']]);
-                        $row     = [
+                        $listUrl    = $this->router->generate('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $list['id']]);
+                        $contactUrl = $this->router->generate('mautic_contact_index', ['search' => 'segment:'.$list['alias']]);
+                        $row        = [
                             [
                                 'value' => $list['name'],
                                 'type'  => 'link',
@@ -175,6 +182,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                             ],
                             [
                                 'value' => $list['leads'],
+                                'type'  => 'link',
+                                'link'  => $contactUrl,
                             ],
                         ];
                         $items[] = $row;
@@ -183,8 +192,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                 $event->setTemplateData([
                     'headItems' => [
-                        $event->getTranslator()->trans('mautic.dashboard.label.title'),
-                        $event->getTranslator()->trans('mautic.lead.leads'),
+                        'mautic.dashboard.label.title',
+                        'mautic.lead.leads',
                     ],
                     'bodyItems' => $items,
                     'raw'       => $lists,
@@ -197,7 +206,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             return;
         }
 
-        if ($event->getType() == 'lead.lifetime') {
+        if ('lead.lifetime' == $event->getType()) {
             $params = $event->getWidget()->getParams();
 
             if (empty($params['limit'])) {
@@ -218,13 +227,22 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $lists = $this->leadListModel->getLifeCycleSegments($maxSegmentsToshow, $params['dateFrom'], $params['dateTo'], $canViewOthers, $params['filter']['flag']);
             $items = [];
 
+            if (empty($lists)) {
+                $lists[] = [
+                    'leads' => 0,
+                    'id'    => 0,
+                    'name'  => $event->getTranslator()->trans('mautic.lead.all.leads'),
+                    'alias' => '',
+                ];
+            }
+
             // Build table rows with links
             if ($lists) {
                 $stages            = [];
                 $deviceGranularity = [];
 
                 foreach ($lists as &$list) {
-                    if ($list['alias'] != '') {
+                    if ('' != $list['alias']) {
                         $listUrl = $this->router->generate('mautic_contact_index', ['search' => 'segment:'.$list['alias']]);
                     } else {
                         $listUrl = $this->router->generate('mautic_contact_index', []);
@@ -252,19 +270,23 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $items['link'][]       = $listUrl;
                     $items['chartItems'][] = $column;
 
-                    $stages[] = $this->leadListModel->getStagesBarChartData($params['timeUnit'],
+                    $stages[] = $this->leadListModel->getStagesBarChartData(
+                        $params['timeUnit'],
                         $params['dateFrom'],
                         $params['dateTo'],
                         $params['dateFormat'],
                         $params['filter'],
-                        $canViewOthers);
+                        $canViewOthers
+                    );
 
-                    $deviceGranularity[] = $this->leadListModel->getDeviceGranularityData($params['timeUnit'],
+                    $deviceGranularity[] = $this->leadListModel->getDeviceGranularityData(
+                        $params['timeUnit'],
                         $params['dateFrom'],
                         $params['dateTo'],
                         $params['dateFormat'],
                         $params['filter'],
-                        $canViewOthers);
+                        $canViewOthers
+                    );
                 }
                 $width = 100 / count($lists);
 
@@ -286,7 +308,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             return;
         }
 
-        if ($event->getType() == 'top.owners') {
+        if ('top.owners' == $event->getType()) {
             if (!$canViewOthers) {
                 $event->setErrorMessage($this->translator->trans('mautic.dashboard.missing.permission', ['%section%' => $this->bundle]));
                 $event->stopPropagation();
@@ -327,8 +349,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                 $event->setTemplateData([
                     'headItems' => [
-                        $event->getTranslator()->trans('mautic.user.account.permissions.editname'),
-                        $event->getTranslator()->trans('mautic.lead.leads'),
+                        'mautic.user.account.permissions.editname',
+                        'mautic.lead.leads',
                     ],
                     'bodyItems' => $items,
                     'raw'       => $owners,
@@ -341,7 +363,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             return;
         }
 
-        if ($event->getType() == 'top.creators') {
+        if ('top.creators' == $event->getType()) {
             if (!$canViewOthers) {
                 $event->setErrorMessage($this->translator->trans('mautic.dashboard.missing.permission', ['%section%' => $this->bundle]));
                 $event->stopPropagation();
@@ -382,8 +404,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                 $event->setTemplateData([
                     'headItems' => [
-                        $event->getTranslator()->trans('mautic.user.account.permissions.editname'),
-                        $event->getTranslator()->trans('mautic.lead.leads'),
+                        'mautic.user.account.permissions.editname',
+                        'mautic.lead.leads',
                     ],
                     'bodyItems' => $items,
                     'raw'       => $creators,
@@ -396,7 +418,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             return;
         }
 
-        if ($event->getType() == 'created.leads') {
+        if ('created.leads' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
 
@@ -410,14 +432,21 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $leads = $this->leadModel->getLeadList($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers, [], ['canViewOthers' => $canViewOthers]);
                 $items = [];
 
+                if (empty($leads)) {
+                    $leads[] = [
+                        'name' => $this->translator->trans('mautic.report.report.noresults'),
+                    ];
+                }
+
                 // Build table rows with links
                 if ($leads) {
                     foreach ($leads as &$lead) {
-                        $leadUrl = $this->router->generate('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $lead['id']]);
+                        $leadUrl = isset($lead['id']) ? $this->router->generate('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $lead['id']]) : '';
+                        $type    = isset($lead['id']) ? 'link' : 'text';
                         $row     = [
                             [
                                 'value' => $lead['name'],
-                                'type'  => 'link',
+                                'type'  => $type,
                                 'link'  => $leadUrl,
                             ],
                         ];
@@ -427,7 +456,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                 $event->setTemplateData([
                     'headItems' => [
-                        $event->getTranslator()->trans('mautic.dashboard.label.title'),
+                        'mautic.dashboard.label.title',
                     ],
                     'bodyItems' => $items,
                     'raw'       => $leads,

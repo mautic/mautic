@@ -1,0 +1,273 @@
+{% extends ":"~template~":base.html.twig" %}
+{% block content %}
+<header data-section-wrapper="1" id="top">
+  <div data-section="1">
+    <div class="container" data-slot-container="1">
+      <div data-slot="text">
+        <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_white.svg')}}">
+      </div>
+    </div>
+  </div>
+</header>
+<section data-section-wrapper="1" class="hero" style="background-color: #00bf9a;">
+  <div data-section="1">
+    <div class="background">
+      <div data-slot-container="1">
+        <div data-slot="text">
+        <img class="background-image" src="{{getAssetUrl('themes/'~template~'/assets/photo_hero-background.jpg')}}">
+        </div>
+      </div>
+    </div>
+    <div class="container" data-slot-container="1">
+      <div data-slot="text">
+        <div class="c12 hero-details">
+          <h1>H1 Header</h1>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula. Etiam sagittis, velit a cursus sollicitudin, enim ex vestibulum felis, ac finibus dui dui ac est.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section data-section-wrapper="1" class="form-section" style="background-color: #f5f5f5;">
+  <div data-section="1">
+    <div class="container" data-slot-container="1">
+      <div data-slot="text">
+        <div class="c12 form-container">
+          <h2>H2 Call-To-Action</h2>
+          <div class="form white">
+            <img src="{{getAssetUrl('themes/'~template~'/assets/img_form-demo.jpg')}}" style="margin: 0 auto;">
+            <!-- PLACE FORM HERE -->
+            <h2>H2 Customers</h2>
+            <div class="c12 customers">
+              <div class="logos">
+                <div class="logo-container">
+                  <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_demo-company-i.svg')}}">
+                </div>
+                <div class="logo-container">
+                  <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_demo-company-ii.svg')}}">
+                </div>
+                <div class="logo-container">
+                  <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_demo-company-iii.svg')}}">
+                </div>
+                <div class="logo-container">
+                  <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_demo-company-iv.svg')}}">
+                </div>
+                <div class="logo-container">
+                  <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_demo-company-v.svg')}}">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section data-section-wrapper="1" class="details" style="background-color: #f5f5f5;">
+  <div data-section="1">
+    <div class="container" data-slot-container="1">
+      <div data-slot="text">
+        <h2>H2 Details</h2>
+        <div class="c3 detail">
+          <p><strong>Detail:</strong> Lorem Ipsum</p>
+        </div>
+        <div class="c3 detail">
+          <p><strong>Detail:</strong> Lorem Ipsum</p>
+        </div>
+        <div class="c3 detail">
+          <p><strong>Detail:</strong> Lorem Ipsum</p>
+        </div>
+        <div class="c3 detail">
+          <p><strong>Detail:</strong> Lorem Ipsum</p>
+        </div>
+        <div class="c3 detail">
+          <p><strong>Detail:</strong> Lorem Ipsum</p>
+        </div>
+        <div class="c3 detail">
+          <p><strong>Detail:</strong> Lorem Ipsum</p>
+        </div>
+        <div class="c3 detail">
+          <p><strong>Detail:</strong> Lorem Ipsum</p>
+        </div>
+        <div class="c3 detail">
+          <p><strong>Detail:</strong> Lorem Ipsum</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section data-section-wrapper="1" class="speakers" style="background-color: #f5f5f5;">
+  <div data-section="1">
+    <div class="container" data-slot-container="1">
+      <div data-slot="text">
+        <h2>H2 Speakers</h2>
+        <div class="speakers-container">
+          <div class="speaker">
+            <div class="speaker-image">
+              <img src="{{getAssetUrl('themes/'~template~'/assets/photo_man.jpg')}}">
+            </div>
+            <div class="speaker-details">
+              <h3>H3 Name</h3>
+              <p>Details about speaker</p>
+              <p>More details about speaker</p>
+            </div>
+          </div>
+          <div class="speaker">
+            <div class="speaker-image">
+              <img src="{{getAssetUrl('themes/'~template~'/assets/photo_man.jpg')}}">
+            </div>
+            <div class="speaker-details">
+              <h3>H3 Name</h3>
+              <p>Details about speaker</p>
+              <p>More details about speaker</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section data-section-wrapper="1" class="grid" style="background-color: #00bf9a;">
+  <div data-section="1">
+    <div class="container" data-slot-container="1">
+      <div data-slot="text">
+        <h2>H2 Grid</h2>
+        <div class="grid-container">
+          <div class="grid-item">
+            <img class="grid-background-image" src="{{getAssetUrl('themes/'~template~'/assets/photo_hero-background.jpg')}}">
+            <img class="icon" src="{{getAssetUrl('themes/'~template~'/assets/icon_grid.svg')}}">
+            <h3>H3 Grid Item</h3>
+            <p>Grid item details</p>
+          </div>
+          <div class="grid-item">
+            <img class="icon" src="{{getAssetUrl('themes/'~template~'/assets/icon_grid.svg')}}">
+            <h3>H3 Grid Item</h3>
+            <p>Grid item details</p>
+          </div>
+        </div>
+        <div class="grid-container">
+          <div class="grid-item">
+            <img class="icon" src="{{getAssetUrl('themes/'~template~'/assets/icon_grid.svg')}}">
+            <h3>H3 Grid Item</h3>
+            <p>Grid item details</p>
+          </div>
+          <div class="grid-item">
+            <img class="icon" src="{{getAssetUrl('themes/'~template~'/assets/icon_grid.svg')}}">
+            <h3>H3 Grid Item</h3>
+            <p>Grid item details</p>
+          </div>
+          <div class="grid-item">
+            <img class="grid-background-image" src="{{getAssetUrl('themes/'~template~'/assets/photo_hero-background.jpg')}}">
+            <img class="icon" src="{{getAssetUrl('themes/'~template~'/assets/icon_grid.svg')}}">
+            <h3>H3 Grid Item</h3>
+            <p>Grid item details</p>
+          </div>
+          <div class="grid-item">
+            <img class="grid-background-image" src="{{getAssetUrl('themes/'~template~'/assets/photo_hero-background.jpg')}}">
+            <img class="icon" src="{{getAssetUrl('themes/'~template~'/assets/icon_grid.svg')}}">
+            <h3>H3 Grid Item</h3>
+            <p>Grid item details</p>
+          </div>
+        </div>
+        <div class="grid-container">
+          <div class="grid-item">
+            <img class="grid-background-image" src="{{getAssetUrl('themes/'~template~'/assets/photo_hero-background.jpg')}}">
+            <img class="icon" src="{{getAssetUrl('themes/'~template~'/assets/icon_grid.svg')}}">
+            <h3>H3 Grid Item</h3>
+            <p>Grid item details</p>
+          </div>
+          <div class="grid-item">
+            <img class="icon" src="{{getAssetUrl('themes/'~template~'/assets/icon_grid.svg')}}">
+            <h3>H3 Grid Item</h3>
+            <p>Grid item details</p>
+          </div>
+          <div class="grid-item">
+            <img class="icon" src="{{getAssetUrl('themes/'~template~'/assets/icon_grid.svg')}}">
+            <h3>H3 Grid Item</h3>
+            <p>Grid item details</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section data-section-wrapper="1" style="background-color: #3f3f45;">
+  <div data-section="1">
+    <div class="container" data-slot-container="1">
+      <div data-slot="text">
+        <h2 class="green">H2 About Company</h2>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula. Etiam sagittis, velit a cursus sollicitudin, enim ex vestibulum felis, ac finibus dui dui ac est.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section data-section-wrapper="1" class="testimonials" style="background-color: #3f3f45;">
+  <div data-slot="text">
+    <div class="container" data-slot-container="1">
+      <div data-slot="text">
+        <div class="testimonials-container">
+          <div class="testimonial">
+            <div class="c12 testimonial-quote">
+              <p>“Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula.”</p>
+            </div>
+            <div class="testimonial-details">
+              <div class="c5">
+                  <div class="speaker-image">
+                      <img src="{{getAssetUrl('themes/'~template~'/assets/photo_man.jpg')}}">
+                  </div>
+              </div>
+              <div class="c7 details">
+                <h3>H3 Name</h3>
+                <p>Details about speaker</p>
+                <p>More details about speaker</p>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial">
+            <div class="c12 testimonial-quote">
+              <p>“Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula.”</p>
+            </div>
+            <div class="testimonial-details">
+              <div class="c5">
+                  <div class="speaker-image">
+                      <img src="{{getAssetUrl('themes/'~template~'/assets/photo_man.jpg')}}">
+                  </div>
+              </div>
+              <div class="c7 details">
+                <h3>H3 Name</h3>
+                <p>Details about speaker</p>
+                <p>More details about speaker</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section data-section-wrapper="1" style="background-color: #00bf9a;" class="thank-you">
+  <div data-section="1">
+    <div class="container" data-slot-container="1">
+      <div data-slot="text">
+        <h1>H1 Thank You</h1>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed metus felis, convallis porta cursus vehicula, iaculis at erat. Suspendisse quis pulvinar ligula. Etiam sagittis, velit a cursus sollicitudin, enim ex vestibulum felis, ac finibus dui dui ac est.</p>
+        <a class="button">Get Your Asset</a>
+      </div>
+    </div>
+  </div>
+</section>
+<footer data-section-wrapper="1" id="bottom">
+  <div data-section="1">
+    <div class="container" data-slot-container="1">
+      <div data-slot="text">
+        <div class="c6 logo-container">
+          <img class="logo" src="{{getAssetUrl('themes/'~template~'/assets/logo_white.svg')}}">
+        </div>
+        <div class="c6">
+          <p class="copyright">&copy; Mautic 2017</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+{% endblock %}

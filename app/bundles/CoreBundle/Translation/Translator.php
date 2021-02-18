@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -50,7 +51,7 @@ class Translator extends BaseTranslator
      */
     protected function loadCatalogue($locale)
     {
-        if ($locale != 'en_US') {
+        if ('en_US' != $locale) {
             // Always force en_US so that it's available for fallback
             $this->addResource('mautic', null, 'en_US', 'messages');
         }

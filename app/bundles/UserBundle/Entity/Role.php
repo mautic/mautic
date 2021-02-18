@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -67,9 +68,6 @@ class Role extends FormEntity
         $this->users       = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -101,9 +99,6 @@ class Role extends FormEntity
             ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
@@ -125,6 +120,7 @@ class Role extends FormEntity
                     'name',
                     'description',
                     'isAdmin',
+                    'rawPermissions',
                 ]
             )
             ->build();
@@ -168,8 +164,6 @@ class Role extends FormEntity
     /**
      * Add permissions.
      *
-     * @param Permission $permissions
-     *
      * @return Role
      */
     public function addPermission(Permission $permissions)
@@ -183,8 +177,6 @@ class Role extends FormEntity
 
     /**
      * Remove permissions.
-     *
-     * @param Permission $permissions
      */
     public function removePermission(Permission $permissions)
     {
@@ -263,8 +255,6 @@ class Role extends FormEntity
 
     /**
      * Simply used to store a readable format of permissions for the changelog.
-     *
-     * @param array $permissions
      */
     public function setRawPermissions(array $permissions)
     {
@@ -285,8 +275,6 @@ class Role extends FormEntity
     /**
      * Add users.
      *
-     * @param User $users
-     *
      * @return Role
      */
     public function addUser(User $users)
@@ -298,8 +286,6 @@ class Role extends FormEntity
 
     /**
      * Remove users.
-     *
-     * @param User $users
      */
     public function removeUser(User $users)
     {

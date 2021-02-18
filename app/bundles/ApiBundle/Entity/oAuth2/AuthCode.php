@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -56,9 +57,6 @@ class AuthCode extends BaseAuthCode
      */
     protected $redirectUri;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -108,8 +106,6 @@ class AuthCode extends BaseAuthCode
 
     /**
      * Set client.
-     *
-     * @param ClientInterface $client
      *
      * @return RefreshToken
      */

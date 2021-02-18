@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -13,9 +14,6 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\Event;
 
-/**
- * Class LeadChangeEvent.
- */
 class LeadChangeEvent extends Event
 {
     /**
@@ -23,9 +21,6 @@ class LeadChangeEvent extends Event
      */
     private $oldLead;
 
-    /**
-     * @var
-     */
     private $oldTrackingId;
 
     /**
@@ -33,16 +28,11 @@ class LeadChangeEvent extends Event
      */
     private $newLead;
 
-    /**
-     * @var
-     */
     private $newTrackingId;
 
     /**
-     * @param Lead $oldLead
-     * @param      $oldTrackingId
-     * @param Lead $newLead
-     * @param      $newTrackingId
+     * @param $oldTrackingId
+     * @param $newTrackingId
      */
     public function __construct(Lead $oldLead, $oldTrackingId, Lead $newLead, $newTrackingId)
     {

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,6 +11,7 @@
 
 namespace Mautic\ReportBundle\Event;
 
+use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\EventDispatcher\Event;
 
 class AbstractReportEvent extends Event

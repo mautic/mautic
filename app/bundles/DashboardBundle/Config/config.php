@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -14,6 +15,10 @@ return [
             'mautic_dashboard_index' => [
                 'path'       => '/dashboard',
                 'controller' => 'MauticDashboardBundle:Dashboard:index',
+            ],
+            'mautic_dashboard_widget' => [
+                'path'       => '/dashboard/widget/{widgetId}',
+                'controller' => 'MauticDashboardBundle:Dashboard:widget',
             ],
             'mautic_dashboard_action' => [
                 'path'       => '/dashboard/{objectAction}/{objectId}',
@@ -44,26 +49,13 @@ return [
         ],
     ],
     'services' => [
-        'events' => [
-            // 'mautic.dashboard.subscriber' => array(
-            //     'class' => 'Mautic\DashboardBundle\EventListener\DashboardSubscriber'
-            // ),
-        ],
         'forms' => [
             'mautic.dashboard.form.type.widget' => [
                 'class'     => 'Mautic\DashboardBundle\Form\Type\WidgetType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'widget',
-            ],
-            'mautic.dashboard.form.uplload' => [
-                'class'     => 'Mautic\DashboardBundle\Form\Type\UploadType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'dashboard_upload',
-            ],
-            'mautic.dashboard.form.filter' => [
-                'class'     => 'Mautic\DashboardBundle\Form\Type\FilterType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'dashboard_filter',
+                'arguments' => [
+                    'event_dispatcher',
+                    'mautic.security',
+                ],
             ],
         ],
         'models' => [
@@ -72,6 +64,17 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.helper.paths',
+                    'symfony.filesystem',
+                ],
+            ],
+        ],
+        'other' => [
+            'mautic.dashboard.widget' => [
+                'class'     => \Mautic\DashboardBundle\Dashboard\Widget::class,
+                'arguments' => [
+                    'mautic.dashboard.model.dashboard',
+                    'mautic.helper.user',
+                    'session',
                 ],
             ],
         ],

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -12,35 +13,44 @@ namespace Mautic\PointBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\Model\TriggerModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class SearchSubscriber.
- */
-class SearchSubscriber extends CommonSubscriber
+class SearchSubscriber implements EventSubscriberInterface
 {
     /**
      * @var PointModel
      */
-    protected $pointModel;
+    private $pointModel;
 
     /**
      * @var TriggerModel
      */
-    protected $pointTriggerModel;
+    private $pointTriggerModel;
 
     /**
-     * SearchSubscriber constructor.
-     *
-     * @param PointModel   $pointModel
-     * @param TriggerModel $pointTriggerModel
+     * @var CorePermissions
      */
-    public function __construct(PointModel $pointModel, TriggerModel $pointTriggerModel)
-    {
+    private $security;
+
+    /**
+     * @var TemplatingHelper
+     */
+    private $templating;
+
+    public function __construct(
+        PointModel $pointModel,
+        TriggerModel $pointTriggerModel,
+        CorePermissions $security,
+        TemplatingHelper $templating
+    ) {
         $this->pointModel        = $pointModel;
         $this->pointTriggerModel = $pointTriggerModel;
+        $this->security          = $security;
+        $this->templating        = $templating;
     }
 
     /**
@@ -54,9 +64,6 @@ class SearchSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param MauticEvents\GlobalSearchEvent $event
-     */
     public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
     {
         if ($this->security->isGranted('point:points:view')) {
@@ -75,7 +82,7 @@ class SearchSubscriber extends CommonSubscriber
                 $pointsResults = [];
                 $canEdit       = $this->security->isGranted('point:points:edit');
                 foreach ($items as $item) {
-                    $pointsResults[] = $this->templating->renderResponse(
+                    $pointsResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticPointBundle:SubscribedEvents\Search:global_point.html.php',
                         [
                             'item'    => $item,
@@ -84,7 +91,7 @@ class SearchSubscriber extends CommonSubscriber
                     )->getContent();
                 }
                 if ($pointCount > 5) {
-                    $pointsResults[] = $this->templating->renderResponse(
+                    $pointsResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticPointBundle:SubscribedEvents\Search:global_point.html.php',
                         [
                             'showMore'     => true,
@@ -114,7 +121,7 @@ class SearchSubscriber extends CommonSubscriber
                 $results = [];
                 $canEdit = $this->security->isGranted('point:triggers:edit');
                 foreach ($items as $item) {
-                    $results[] = $this->templating->renderResponse(
+                    $results[] = $this->templating->getTemplating()->renderResponse(
                         'MauticPointBundle:SubscribedEvents\Search:global_trigger.html.php',
                         [
                             'item'    => $item,
@@ -123,7 +130,7 @@ class SearchSubscriber extends CommonSubscriber
                     )->getContent();
                 }
                 if ($count > 5) {
-                    $results[] = $this->templating->renderResponse(
+                    $results[] = $this->templating->getTemplating()->renderResponse(
                         'MauticPointBundle:SubscribedEvents\Search:global_trigger.html.php',
                         [
                             'showMore'     => true,
@@ -138,9 +145,6 @@ class SearchSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param MauticEvents\CommandListEvent $event
-     */
     public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
         $security = $this->security;

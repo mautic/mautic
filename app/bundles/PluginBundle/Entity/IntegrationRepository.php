@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -21,6 +22,23 @@ class IntegrationRepository extends CommonRepository
     {
         $services = $this->createQueryBuilder('i')
             ->join('i.plugin', 'p')
+            ->getQuery()
+            ->getResult();
+
+        $results = [];
+        foreach ($services as $s) {
+            $results[$s->getName()] = $s;
+        }
+
+        return $results;
+    }
+
+    /**
+     * Get core (no plugin) integrations.
+     */
+    public function getCoreIntegrations()
+    {
+        $services = $this->createQueryBuilder('i')
             ->getQuery()
             ->getResult();
 

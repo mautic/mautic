@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -13,15 +14,18 @@ namespace Mautic\AssetBundle\Controller;
 use Oneup\UploaderBundle\Controller\DropzoneController;
 use Oneup\UploaderBundle\Uploader\Response\EmptyResponse;
 use Symfony\Component\HttpFoundation\File\Exception\UploadException;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 class UploadController extends DropzoneController
 {
     /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     public function upload()
     {
-        $request  = $this->container->get('request');
+        /** @var Request $request */
+        $request  = $this->container->get('request_stack')->getCurrentRequest();
         $response = new EmptyResponse();
         $files    = $this->getFiles($request->files);
 

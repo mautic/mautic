@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -52,6 +53,11 @@ class Stat
     private $dateSent;
 
     /**
+     * @var \DateTime
+     */
+    private $dateRead;
+
+    /**
      * @var bool
      */
     private $isClicked = false;
@@ -101,9 +107,6 @@ class Stat
      */
     private $lastClicked;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -115,7 +118,7 @@ class Stat
             ->addIndex(['tracking_hash'], 'stat_notification_hash_search')
             ->addIndex(['source', 'source_id'], 'stat_notification_source_search');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createManyToOne('notification', 'Notification')
             ->inversedBy('stats')
@@ -132,6 +135,11 @@ class Stat
 
         $builder->createField('dateSent', 'datetime')
             ->columnName('date_sent')
+            ->build();
+
+        $builder->createField('dateRead', 'datetime')
+            ->columnName('date_read')
+            ->nullable()
             ->build();
 
         $builder->createField('isClicked', 'boolean')
@@ -458,8 +466,6 @@ class Stat
     }
 
     /**
-     * @param \DateTime $lastClicked
-     *
      * @return Stat
      */
     public function setLastClicked(\DateTime $lastClicked)
@@ -485,6 +491,26 @@ class Stat
     public function setClickDetails($clickDetails)
     {
         $this->clickDetails = $clickDetails;
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getDateRead()
+    {
+        return $this->dateRead;
+    }
+
+    /**
+     * @param \DateTime $dateRead
+     *
+     * @return Stat
+     */
+    public function setDateRead($dateRead)
+    {
+        $this->dateRead = $dateRead;
 
         return $this;
     }

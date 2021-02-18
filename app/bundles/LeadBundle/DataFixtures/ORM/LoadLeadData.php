@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -13,56 +14,80 @@ namespace Mautic\LeadBundle\DataFixtures\ORM;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\CsvHelper;
+use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Mautic\LeadBundle\Entity\LeadRepository;
 
-/**
- * Class LoadLeadData.
- */
-class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
-     * @var ContainerInterface
+     * @var EntityManagerInterface
      */
-    private $container;
+    private $entityManager;
+
+    /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
 
     /**
      * {@inheritdoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function __construct(EntityManagerInterface $entityManager, CoreParametersHelper $coreParametersHelper)
     {
-        $this->container = $container;
+        $this->entityManager        = $entityManager;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
-        $factory  = $this->container->get('mautic.factory');
-        $leadRepo = $factory->getModel('lead.lead')->getRepository();
-        $today    = new \DateTime();
+        /** @var LeadRepository $leadRepo */
+        $leadRepo        = $this->entityManager->getRepository(Lead::class);
 
+        /** @var CompanyLeadRepository $companyLeadRepo */
+        $companyLeadRepo = $this->entityManager->getRepository(CompanyLead::class);
+
+        $today = new \DateTime();
         $leads = CsvHelper::csv_to_array(__DIR__.'/fakeleaddata.csv');
+
         foreach ($leads as $count => $l) {
             $key  = $count + 1;
             $lead = new Lead();
             $lead->setDateAdded($today);
             $ipAddress = new IpAddress();
-            $ipAddress->setIpAddress($l['ip'], $factory->getSystemParameters());
+            $ipAddress->setIpAddress($l['ip'], $this->coreParametersHelper->get('parameters'));
             $this->setReference('ipAddress-'.$key, $ipAddress);
             unset($l['ip']);
             $lead->addIpAddress($ipAddress);
-            $lead->setOwner($this->getReference('sales-user'));
+
+            if ($this->hasReference('sales-user')) {
+                $lead->setOwner($this->getReference('sales-user'));
+            }
+
             foreach ($l as $col => $val) {
                 $lead->addUpdatedField($col, $val);
             }
+
             $leadRepo->saveEntity($lead);
 
             $this->setReference('lead-'.$count, $lead);
+
+            // Assign to companies in a predictable way
+            $lastCharacter = (int) substr($count, -1, 1);
+            if ($lastCharacter <= 3) {
+                if ($this->hasReference('company-'.$lastCharacter)) {
+                    $companyLead = new CompanyLead();
+                    $companyLead->setLead($lead);
+                    $companyLead->setCompany($this->getReference('company-'.$lastCharacter));
+                    $companyLead->setDateAdded($today);
+                    $companyLeadRepo->saveEntity($companyLead);
+                }
+            }
         }
     }
 

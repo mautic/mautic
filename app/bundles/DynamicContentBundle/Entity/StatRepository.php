@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -22,7 +23,7 @@ class StatRepository extends CommonRepository
     use TimelineTrait;
 
     /**
-     * @param   $dynamicContentId
+     * @param $dynamicContentId
      *
      * @return array
      */
@@ -91,7 +92,7 @@ class StatRepository extends CommonRepository
                 $q->expr()->in('e.dynamic_content_id', $dynamicContentIds)
             );
 
-        if ($fromDate !== null) {
+        if (null !== $fromDate) {
             //make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $q->andWhere(
@@ -100,7 +101,7 @@ class StatRepository extends CommonRepository
         }
         $q->groupBy('e.dynamic_content_id');
 
-        //get a total number of sent emails first
+        //get a total number of sent DC stats first
         $results = $q->execute()->fetchAll();
 
         $counts = [];
@@ -115,22 +116,24 @@ class StatRepository extends CommonRepository
     /**
      * Get a lead's dynamic content stat.
      *
-     * @param int   $leadId
-     * @param array $options
+     * @param int|null $leadId
      *
      * @return array
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadStats($leadId, array $options = [])
+    public function getLeadStats($leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $query->select('dc.id AS dynamic_content_id, s.id, s.date_sent as dateSent, dc.name, s.sent_details as sentDetails')
+        $query->select('dc.id AS dynamic_content_id, s.id, s.date_sent as dateSent, dc.name, s.sent_details as sentDetails, s.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'dynamic_content_stats', 's')
-            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'dynamic_content', 'dc', 'dc.id = s.dynamic_content_id')
-            ->where($query->expr()->eq('s.lead_id', (int) $leadId));
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'dynamic_content', 'dc', 'dc.id = s.dynamic_content_id');
+
+        if ($leadId) {
+            $query->where($query->expr()->eq('s.lead_id', (int) $leadId));
+        }
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(

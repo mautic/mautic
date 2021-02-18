@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -12,7 +13,6 @@ namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\PathsHelper;
 
 /**
@@ -20,11 +20,6 @@ use Mautic\CoreBundle\Helper\PathsHelper;
  */
 class ThemeHelper
 {
-    /**
-     * @var MauticFactory
-     */
-    protected $factory;
-
     /**
      * @var string
      */
@@ -46,8 +41,7 @@ class ThemeHelper
     private $config;
 
     /**
-     * @param PathsHelper $pathsHelper
-     * @param string      $theme
+     * @param string $theme
      *
      * @throws BadConfigurationException
      * @throws FileNotFoundException

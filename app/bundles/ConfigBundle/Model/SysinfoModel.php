@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -12,12 +13,12 @@ namespace Mautic\ConfigBundle\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class SysinfoModel.
  */
-class SysinfoModel extends AbstractCommonModel
+class SysinfoModel
 {
     protected $phpInfo;
     protected $folders;
@@ -33,15 +34,18 @@ class SysinfoModel extends AbstractCommonModel
     protected $coreParametersHelper;
 
     /**
-     * SysinfoModel constructor.
-     *
-     * @param PathsHelper          $pathsHelper
-     * @param CoreParametersHelper $coreParametersHelper
+     * @var TranslatorInterface
      */
-    public function __construct(PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
+    private $translator;
+
+    /**
+     * SysinfoModel constructor.
+     */
+    public function __construct(PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper, TranslatorInterface $translator)
     {
         $this->pathsHelper          = $pathsHelper;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->translator           = $translator;
     }
 
     /**
@@ -95,16 +99,16 @@ class SysinfoModel extends AbstractCommonModel
 
         $importantFolders = [
             $this->pathsHelper->getSystemPath('local_config'),
-            $this->coreParametersHelper->getParameter('cache_path'),
-            $this->coreParametersHelper->getParameter('log_path'),
-            $this->coreParametersHelper->getParameter('upload_dir'),
+            $this->coreParametersHelper->get('cache_path'),
+            $this->coreParametersHelper->get('log_path'),
+            $this->coreParametersHelper->get('upload_dir'),
             $this->pathsHelper->getSystemPath('images', true),
             $this->pathsHelper->getSystemPath('translations', true),
         ];
 
         // Show the spool folder only if the email queue is configured
-        if ($this->coreParametersHelper->getParameter('mailer_spool_type') == 'file') {
-            $importantFolders[] = $this->coreParametersHelper->getParameter('mailer_spool_path');
+        if ('file' == $this->coreParametersHelper->get('mailer_spool_type')) {
+            $importantFolders[] = $this->coreParametersHelper->get('mailer_spool_path');
         }
 
         foreach ($importantFolders as $folder) {
@@ -123,11 +127,11 @@ class SysinfoModel extends AbstractCommonModel
      *
      * @param int $lines
      *
-     * @return array|null
+     * @return string
      */
     public function getLogTail($lines = 10)
     {
-        $log = $this->coreParametersHelper->getParameter('log_path').'/mautic_'.MAUTIC_ENV.'-'.date('Y-m-d').'.php';
+        $log = $this->coreParametersHelper->get('log_path').'/mautic_'.MAUTIC_ENV.'-'.date('Y-m-d').'.php';
 
         if (!file_exists($log)) {
             return null;
@@ -149,12 +153,11 @@ class SysinfoModel extends AbstractCommonModel
     {
         $f      = fopen($filename, 'rb');
         $output = '';
-        $chunk  = '';
 
         fseek($f, -1, SEEK_END);
 
-        if (fread($f, 1) != "\n") {
-            $lines -= 1;
+        if ("\n" != fread($f, 1)) {
+            --$lines;
         }
 
         while (ftell($f) > 0 && $lines >= 0) {

@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -20,15 +21,11 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ProcessWebhookQueuesCommand extends ContainerAwareCommand
 {
-    /** @var \Mautic\CoreBundle\Factory\MauticFactory $factory */
-    protected $factory;
+    public const COMMAND_NAME = 'mautic:webhooks:process';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
-        $this->setName('mautic:webhooks:process')
+        $this->setName(self::COMMAND_NAME)
             ->setDescription('Process queued webhook payloads')
             ->addOption(
                 '--webhook-id',
@@ -39,17 +36,14 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->factory = $this->getContainer()->get('mautic.factory');
-
-        $queueMode = $this->factory->getParameter('queue_mode');
+        /** @var \Mautic\WebhookBundle\Model\WebhookModel $model */
+        $model  = $this->getContainer()->get('mautic.webhook.model.webhook');
+        $params = $this->getContainer()->get('mautic.helper.core_parameters');
 
         // check to make sure we are in queue mode
-        if ($queueMode != 'command_process') {
+        if ($params->getParameter('queue_mode') != $model::COMMAND_PROCESS) {
             $output->writeLn('Webhook Bundle is in immediate process mode. To use the command function change to command mode.');
 
             return 0;
@@ -57,12 +51,9 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
 
         $id = $input->getOption('webhook-id');
 
-        /** @var \Mautic\WebhookBundle\Model\WebhookModel $model */
-        $model = $this->factory->getModel('webhook');
-
         if ($id) {
             $webhook  = $model->getEntity($id);
-            $webhooks = ($webhook !== null && $webhook->isPublished()) ? [$id => $webhook] : [];
+            $webhooks = (null !== $webhook && $webhook->isPublished()) ? [$id => $webhook] : [];
         } else {
             // make sure we only get published webhook entities
             $webhooks = $model->getEntities(
@@ -83,7 +74,7 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
         if (!count($webhooks)) {
             $output->writeln('<error>No published webhooks found. Try again later.</error>');
 
-            return;
+            return 0;
         }
 
         $output->writeLn('<info>Processing Webhooks</info>');
@@ -92,7 +83,13 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
             $model->processWebhooks($webhooks);
         } catch (\Exception $e) {
             $output->writeLn('<error>'.$e->getMessage().'</error>');
+            $output->writeLn('<error>'.$e->getTraceAsString().'</error>');
+
+            return 1;
         }
+
         $output->writeLn('<info>Webhook Processing Complete</info>');
+
+        return 0;
     }
 }

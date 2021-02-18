@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
  *
@@ -19,8 +20,7 @@ use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 class SocialEvent extends CommonEvent
 {
     /**
-     * @param Monitoring $monitoring
-     * @param bool       $isNew
+     * @param bool $isNew
      */
     public function __construct(Monitoring $monitoring, $isNew = false)
     {
@@ -40,8 +40,6 @@ class SocialEvent extends CommonEvent
 
     /**
      * Sets the Monitoring entity.
-     *
-     * @param Monitoring $monitoring
      */
     public function setMonitoring(Monitoring $monitoring)
     {

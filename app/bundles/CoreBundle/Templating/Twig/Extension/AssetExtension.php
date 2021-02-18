@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -23,8 +24,6 @@ class AssetExtension extends Twig_Extension
 
     /**
      * AssetExtension constructor.
-     *
-     * @param AssetsHelper $assetsHelper
      */
     public function __construct(AssetsHelper $assetsHelper)
     {

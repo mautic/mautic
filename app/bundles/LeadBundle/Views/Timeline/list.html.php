@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -7,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if (isset($tmpl) && $tmpl == 'index') {
+if (isset($tmpl) && 'index' == $tmpl) {
     $view->extend('MauticLeadBundle:Timeline:index.html.php');
 }
 
@@ -63,7 +64,7 @@ $baseUrl = $view['router']->path(
         <tbody>
         <?php foreach ($events['events'] as $counter => $event): ?>
             <?php
-            $counter += 1; // prevent 0
+            ++$counter; // prevent 0
             $icon       = (isset($event['icon'])) ? $event['icon'] : 'fa-history';
             $eventLabel = (isset($event['eventLabel'])) ? $event['eventLabel'] : $event['eventType'];
             if (is_array($eventLabel)):
@@ -73,10 +74,10 @@ $baseUrl = $view['router']->path(
 
             $details = '';
             if (isset($event['contentTemplate']) && $view->exists($event['contentTemplate'])):
-                $details = trim($view->render($event['contentTemplate'], ['event' => $event]));
+                $details = trim($view->render($event['contentTemplate'], ['event' => $event, 'lead' => $lead]));
             endif;
 
-            $rowStripe = ($counter % 2 === 0) ? ' timeline-row-highlighted' : '';
+            $rowStripe = (0 === $counter % 2) ? ' timeline-row-highlighted' : '';
             ?>
             <tr class="timeline-row<?php echo $rowStripe; ?><?php if (!empty($event['featured'])) {
                 echo ' timeline-featured';
@@ -85,10 +86,10 @@ $baseUrl = $view['router']->path(
                     <a href="javascript:void(0);" data-activate-details="<?php echo $counter; ?>" class="btn btn-sm btn-nospin btn-default<?php if (empty($details)) {
                 echo ' disabled';
             } ?>" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.lead.timeline.toggle_details'); ?>">
-                        <span class="fa fa-fw <?php echo $icon ?>"></span>
+                        <span class="fa fa-fw <?php echo $icon; ?>"></span>
                     </a>
                 </td>
-                <td class="timeline-name"><span class="ellipsis"><?php echo $eventLabel; ?></span></td>
+                <td class="timeline-name"><?php echo $eventLabel; ?></td>
                 <td class="timeline-type"><?php if (isset($event['eventType'])) {
                 echo $event['eventType'];
             } ?></td>
@@ -97,7 +98,7 @@ $baseUrl = $view['router']->path(
             <?php if (!empty($details)): ?>
                 <tr class="timeline-row<?php echo $rowStripe; ?> timeline-details hide" id="timeline-details-<?php echo $counter; ?>">
                     <td colspan="4">
-                        <?php echo $details ?>
+                        <?php echo $details; ?>
                     </td>
                 </tr>
             <?php endif; ?>
@@ -113,6 +114,7 @@ $baseUrl = $view['router']->path(
         'fixedLimit' => true,
         'baseUrl'    => $baseUrl,
         'target'     => '#timeline-table',
+        'totalItems' => $events['total'],
     ]
 ); ?>
 

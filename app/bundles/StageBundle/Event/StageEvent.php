@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -19,8 +20,7 @@ use Mautic\StageBundle\Entity\Stage;
 class StageEvent extends CommonEvent
 {
     /**
-     * @param Stage $stage
-     * @param bool  $isNew
+     * @param bool $isNew
      */
     public function __construct(Stage &$stage, $isNew = false)
     {
@@ -40,8 +40,6 @@ class StageEvent extends CommonEvent
 
     /**
      * Sets the Stage entity.
-     *
-     * @param Stage $stage
      */
     public function setStage(Stage $stage)
     {

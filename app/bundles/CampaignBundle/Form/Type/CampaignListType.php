@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,69 +11,81 @@
 
 namespace Mautic\CampaignBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CampaignListType.
  */
 class CampaignListType extends AbstractType
 {
+    /**
+     * @var CampaignModel
+     */
     private $model;
 
     /**
-     * @param MauticFactory $factory
+     * @var TranslatorInterface
      */
-    public function __construct(MauticFactory $factory)
+    protected $translator;
+
+    /**
+     * @var bool
+     */
+    private $canViewOther = false;
+
+    public function __construct(CampaignModel $campaignModel, TranslatorInterface $translator, CorePermissions $security)
     {
-        $this->model      = $factory->getModel('campaign');
-        $this->thisString = $factory->getTranslator()->trans('mautic.campaign.form.thiscampaign');
+        $this->model        = $campaignModel;
+        $this->translator   = $translator;
+        $this->canViewOther = $security->isGranted('campaign:campaigns:viewother');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $model = $this->model;
-        $msg   = $this->thisString;
-        $resolver->setDefaults([
-            'choices' => function (Options $options) use ($model, $msg) {
-                $choices = [];
-                $campaigns = $model->getRepository()->getPublishedCampaigns(null, null, true);
-                foreach ($campaigns as $campaign) {
-                    $choices[$campaign['id']] = $campaign['name'];
-                }
+        $resolver->setDefaults(
+            [
+                'choices'      => function (Options $options) {
+                    $choices   = [];
+                    $campaigns = $this->model->getRepository()->getPublishedCampaigns(null, null, true, $this->canViewOther);
+                    foreach ($campaigns as $campaign) {
+                        $choices[$campaign['name']] = $campaign['id'];
+                    }
 
-                //sort by language
-                asort($choices);
+                    //sort by language
+                    ksort($choices);
 
-                if ($options['include_this']) {
-                    $choices = ['this' => $msg] + $choices;
-                }
+                    if ($options['include_this']) {
+                        $choices = [$options['this_translation'] => 'this'] + $choices;
+                    }
 
-                return $choices;
-            },
-            'empty_value'  => false,
-            'expanded'     => false,
-            'multiple'     => true,
-            'required'     => false,
-            'include_this' => false,
-        ]);
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return 'campaign_list';
+                    return $choices;
+                },
+                'placeholder'       => false,
+                'expanded'          => false,
+                'multiple'          => true,
+                'required'          => false,
+                'include_this'      => false,
+                'this_translation'  => 'mautic.campaign.form.thiscampaign',
+            ]
+        );
     }
 
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
+    }
+
+    public function getBlockPrefix()
+    {
+        return 'campaign_list';
     }
 }

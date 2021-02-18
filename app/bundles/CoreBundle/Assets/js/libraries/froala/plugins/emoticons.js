@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -32,7 +32,7 @@
     }
 }(function ($) {
 
-  'use strict';
+  
 
   $.extend($.FE.POPUP_TEMPLATES, {
     emoticons: '[_BUTTONS_][_EMOTICONS_]'
@@ -120,11 +120,11 @@
       if (!$popup) $popup = _initEmoticonsPopup();
 
       if (!$popup.hasClass('fr-active')) {
-        // Colors popup
+        // Emoticons popup.
         editor.popups.refresh('emoticons');
         editor.popups.setContainer('emoticons', editor.$tb);
 
-        // Colors popup left and top position.
+        // Emoticons popup left and top position.
         var left = $btn.offset().left + $btn.outerWidth() / 2;
         var top = $btn.offset().top + (editor.opts.toolbarBottom ? 10 : $btn.outerHeight() - 10);
 
@@ -147,7 +147,7 @@
       var emoticons_buttons = '';
 
       if (editor.opts.toolbarInline) {
-        // Colors buttons.
+        // Emoticons buttons.
         if (editor.opts.emoticonsButtons.length > 0) {
           emoticons_buttons = '<div class="fr-buttons fr-emoticons-buttons">' + editor.button.buildList(editor.opts.emoticonsButtons) + '</div>';
         }
@@ -163,6 +163,8 @@
 
       // Assing tooltips to buttons.
       editor.tooltip.bind($popup, '.fr-emoticon');
+
+      _addAccessibility($popup);
 
       return $popup;
     }
@@ -180,13 +182,132 @@
           emoticons_html += '<br>';
         }
 
-        emoticons_html += '<span class="fr-command fr-emoticon" data-cmd="insertEmoticon" title="' + editor.language.translate(editor.opts.emoticonsSet[i].desc) + '" data-param1="' + editor.opts.emoticonsSet[i].code + '">' + (editor.opts.emoticonsUseImage ? '<img src="' + 'https://cdnjs.cloudflare.com/ajax/libs/emojione/2.0.1/assets/svg/' + editor.opts.emoticonsSet[i].code + '.svg' + '"/>' : '&#x' + editor.opts.emoticonsSet[i].code + ';') + '</span>';
+        emoticons_html += '<span class="fr-command fr-emoticon" tabIndex="-1" data-cmd="insertEmoticon" title="' + editor.language.translate(editor.opts.emoticonsSet[i].desc) + '" role="button" data-param1="' + editor.opts.emoticonsSet[i].code + '">' + (editor.opts.emoticonsUseImage ? '<img src="' + 'https://cdnjs.cloudflare.com/ajax/libs/emojione/2.0.1/assets/svg/' + editor.opts.emoticonsSet[i].code + '.svg' + '"/>' : '&#x' + editor.opts.emoticonsSet[i].code + ';') + '<span class="fr-sr-only">' + editor.language.translate(editor.opts.emoticonsSet[i].desc) + '&nbsp;&nbsp;&nbsp;</span></span>';
       }
 
-      if (editor.opts.emoticonsUseImage) emoticons_html += '<p style="font-size: 12px; text-align: center; padding: 0 5px;">Emoji free by <a href="http://emojione.com/" target="_blank" rel="nofollow">Emoji One</a></p>';
+      if (editor.opts.emoticonsUseImage) emoticons_html += '<p style="font-size: 12px; text-align: center; padding: 0 5px;">Emoji free by <a class="fr-link" tabIndex="-1" href="http://emojione.com/" target="_blank" rel="nofollow" role="link" aria-label="Open Emoji One website.">Emoji One</a></p>';
       emoticons_html += '</div>';
 
       return emoticons_html;
+    }
+
+    /*
+     * Register keyboard events.
+     */
+    function _addAccessibility ($popup) {
+      // Register popup event.
+      editor.events.on('popup.tab', function (e) {
+        var $focused_item = $(e.currentTarget);
+        // Skip if popup is not visible or focus is elsewere.
+        if (!editor.popups.isVisible('emoticons') || !$focused_item.is('span, a')) {
+          return true;
+        }
+
+        var key_code = e.which;
+        var status;
+        var index;
+        var $el;
+
+        // Tabbing.
+        if ($.FE.KEYCODE.TAB == key_code) {
+          // Extremities reached.
+          if (($focused_item.is('span.fr-emoticon') && e.shiftKey) || ($focused_item.is('a') && !e.shiftKey)) {
+            var $tb = $popup.find('.fr-buttons');
+            // Focus back the popup's toolbar if exists.
+            status = !editor.accessibility.focusToolbar($tb, (e.shiftKey ? true : false));
+          }
+
+          if (status !== false) {
+            // Build elements that should be focused next.
+            var $tabElements = $popup.find('span.fr-emoticon:focus:first, span.fr-emoticon:visible:first, a');
+            if ($focused_item.is('span.fr-emoticon')) {
+              $tabElements = $tabElements.not('span.fr-emoticon:not(:focus)');
+            }
+            // Get focused item position.
+            index = $tabElements.index($focused_item);
+
+            // Backwards.
+            if (e.shiftKey) {
+              index = (((index - 1) % $tabElements.length) + $tabElements.length) % $tabElements.length; // Javascript negative modulo bug.
+            // Forward.
+            } else {
+              index = (index + 1) % $tabElements.length;
+            }
+
+            // Find next element to focus.
+            $el = $tabElements.get(index);
+
+            editor.events.disableBlur();
+            $el.focus();
+            status = false;
+          }
+        }
+        // Arrows.
+        else if ($.FE.KEYCODE.ARROW_UP == key_code || $.FE.KEYCODE.ARROW_DOWN == key_code || $.FE.KEYCODE.ARROW_LEFT == key_code || $.FE.KEYCODE.ARROW_RIGHT == key_code) {
+          if ($focused_item.is('span.fr-emoticon')) {
+
+            // Get all current emoticons.
+            var $emoticons = $focused_item.parent().find('span.fr-emoticon');
+
+            // Get focused item position.
+            index = $emoticons.index($focused_item);
+
+            // Get emoticons matrix dimensions.
+            var columns = editor.opts.emoticonsStep;
+            var lines = Math.floor($emoticons.length / columns);
+
+            // Get focused item coordinates.
+            var column = index % columns;
+            var line = Math.floor(index / columns);
+
+            var nextIndex = line * columns + column;
+            var dimension = lines * columns;
+
+            // Calculate next index. Go to the other opposite site of the matrix if there is no next adjacent element.
+            // Up/Down: Traverse matrix lines.
+            // Left/Right: Traverse the matrix as it is a vector.
+            if ($.FE.KEYCODE.ARROW_UP == key_code) {
+              nextIndex = (((nextIndex - columns) % dimension) + dimension) % dimension; // Javascript negative modulo bug.
+            }
+            else if ($.FE.KEYCODE.ARROW_DOWN == key_code) {
+              nextIndex = (nextIndex + columns) % dimension;
+            }
+            else if ($.FE.KEYCODE.ARROW_LEFT == key_code) {
+              nextIndex = (((nextIndex - 1) % dimension) + dimension) % dimension; // Javascript negative modulo bug.
+            }
+            else if ($.FE.KEYCODE.ARROW_RIGHT == key_code) {
+              nextIndex = (nextIndex + 1) % dimension;
+            }
+
+            // Get the next element based on the new index.
+            $el = $($emoticons.get(nextIndex));
+
+            // Focus.
+            editor.events.disableBlur();
+            $el.focus();
+
+            status = false;
+          }
+        }
+        // ENTER or SPACE.
+        else if ($.FE.KEYCODE.ENTER == key_code) {
+          if ($focused_item.is('a')) {
+            $focused_item[0].click();
+          }
+          else {
+            editor.button.exec($focused_item);
+          }
+          status = false;
+        }
+
+        // Prevent propagation.
+        if (status === false) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+
+        return status;
+      }, true);
     }
 
     /*
@@ -210,7 +331,7 @@
      */
     function _init () {
       var setDeletable = function () {
-        var emtcs = editor.$el.get(0).querySelectorAll('.fr-emoticon:not(.fr-deletable)');
+        var emtcs = editor.el.querySelectorAll('.fr-emoticon:not(.fr-deletable)');
         for (var i = 0; i < emtcs.length; i++) {
           emtcs[i].className += ' fr-deletable';
         }
@@ -219,32 +340,21 @@
 
       editor.events.on('html.set', setDeletable);
 
-      // Replace emoticons with unicode.
-      editor.events.on('html.get', function (html) {
-        for (var i = 0; i < editor.opts.emoticonsSet.length; i++) {
-          var em = editor.opts.emoticonsSet[i];
-          var text = $('<div>').html(em.code).text();
-          html = html.split(text).join(em.code);
-        }
-
-        return html;
-      });
-
       var inEmoticon = function () {
         if (!editor.selection.isCollapsed()) return false;
 
         var s_el = editor.selection.element();
         var e_el = editor.selection.endElement();
 
-        if ($(s_el).hasClass('fr-emoticon')) return s_el;
-        if ($(e_el).hasClass('fr-emoticon')) return e_el;
+        if (s_el && editor.node.hasClass(s_el, 'fr-emoticon')) return s_el;
+        if (e_el && editor.node.hasClass(e_el, 'fr-emoticon')) return e_el;
 
         var range = editor.selection.ranges(0);
         var container = range.startContainer;
         if (container.nodeType == Node.ELEMENT_NODE) {
           if (container.childNodes.length > 0 && range.startOffset > 0) {
             var node = container.childNodes[range.startOffset - 1];
-            if ($(node).hasClass('fr-emoticon')) {
+            if (editor.node.hasClass(node, 'fr-emoticon')) {
               return node;
             }
           }
@@ -270,7 +380,7 @@
       });
 
       editor.events.on('keyup', function (e) {
-        var emtcs = editor.$el.get(0).querySelectorAll('.fr-emoticon');
+        var emtcs = editor.el.querySelectorAll('.fr-emoticon');
 
         for (var i = 0; i < emtcs.length; i++) {
           if (typeof emtcs[i].textContent != 'undefined' && emtcs[i].textContent.replace(/\u200B/gi, '').length === 0) {
@@ -278,9 +388,9 @@
           }
         }
 
-        if (!(e.which >= 37 && e.which <= 40)) {
+        if (!(e.which >= $.FE.KEYCODE.ARROW_LEFT && e.which <= $.FE.KEYCODE.ARROW_DOWN)) {
           var el = inEmoticon();
-          if (el && (el.className || '').indexOf('fr-emoticon-img')) {
+          if (editor.node.hasClass(el, 'fr-emoticon-img')) {
             $(el).append($.FE.MARKERS);
             editor.selection.restore();
           }
@@ -310,7 +420,7 @@
         this.emoticons.showEmoticonsPopup();
       }
       else {
-        if (this.$el.find('.fr-marker')) {
+        if (this.$el.find('.fr-marker').length) {
           this.events.disableBlur();
           this.selection.restore();
         }

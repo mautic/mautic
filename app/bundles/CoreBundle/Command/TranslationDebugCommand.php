@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -333,6 +334,5 @@ class PhpFormTranslationExtractor extends PhpExtractor
             '=>',
             self::MESSAGE_TOKEN,
         ],
-
     ];
 }

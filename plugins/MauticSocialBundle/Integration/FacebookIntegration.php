@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -9,6 +10,8 @@
  */
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
+
+use MauticPlugin\MauticSocialBundle\Form\Type\FacebookType;
 
 /**
  * Class FacebookIntegration.
@@ -62,6 +65,14 @@ class FacebookIntegration extends SocialIntegration
     }
 
     /**
+     * @return string
+     */
+    public function getAuthScope()
+    {
+        return 'email';
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param string $data
@@ -77,7 +88,7 @@ class FacebookIntegration extends SocialIntegration
         if (null === $values) {
             parse_str($data, $values);
 
-            $this->factory->getSession()->set($this->getName().'_tokenResponse', $values);
+            $this->session->set($this->getName().'_tokenResponse', $values);
         }
 
         return $values;
@@ -154,7 +165,6 @@ class FacebookIntegration extends SocialIntegration
     {
         return [
             'about'       => ['type' => 'string'],
-            'bio'         => ['type' => 'string'],
             'birthday'    => ['type' => 'string'],
             'email'       => ['type' => 'string'],
             'first_name'  => ['type' => 'string'],
@@ -170,5 +180,13 @@ class FacebookIntegration extends SocialIntegration
             'timezone'    => ['type' => 'string'],
             'website'     => ['type' => 'string'],
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormType()
+    {
+        return FacebookType::class;
     }
 }

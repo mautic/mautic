@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -30,9 +31,6 @@ class ReportGraphEvent extends AbstractReportEvent
 
     /**
      * Constructor.
-     *
-     * @param Report $report
-     * @param array  $graphs
      */
     public function __construct(Report $report, array $graphs, QueryBuilder $queryBuilder)
     {
@@ -122,5 +120,10 @@ class ReportGraphEvent extends AbstractReportEvent
     public function getQueryBuilder()
     {
         return $this->queryBuilder;
+    }
+
+    public function setQueryBuilder(QueryBuilder $queryBuilder)
+    {
+        $this->queryBuilder = $queryBuilder;
     }
 }

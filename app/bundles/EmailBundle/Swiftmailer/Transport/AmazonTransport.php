@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
@@ -10,34 +11,64 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
-use Joomla\Http\Exception\UnexpectedResponseException;
-use Joomla\Http\Http;
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\EmailBundle\MonitoredEmail\Message;
+use Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Class AmazonTransport.
  */
-class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackTransport
+class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportInterface, BounceProcessorInterface, UnsubscriptionProcessorInterface
 {
-    private $httpClient;
+    /**
+     * @var AmazonCallback
+     */
+    private $amazonCallback;
 
     /**
-     * {@inheritdoc}
+     * AmazonTransport constructor.
+     *
+     * @param string $host
+     * @param string $otherHost
+     * @param int    $port
      */
-    public function __construct($host, Http $httpClient)
+    public function __construct($region, $otherRegion, $port, AmazonCallback $amazonCallback)
     {
-        parent::__construct($host, 587, 'tls');
+        $port                 = $port ?: 2587;
+        $host                 = $this->buildHost($region, $otherRegion);
+        $this->amazonCallback = $amazonCallback;
+
+        parent::__construct($host, $port, 'tls');
+
         $this->setAuthMode('login');
-        $this->httpClient = $httpClient;
+    }
+
+    /**
+     * Switch statement used to avoid breaking change.
+     *
+     * @param string $region
+     * @param string $otherRegion
+     *
+     * @return string
+     */
+    public function buildHost($region, $otherRegion)
+    {
+        $sesRegion = ('other' === $region) ? $otherRegion : $region;
+
+        switch ($sesRegion) {
+            case 'email-smtp.eu-west-1.amazonaws.com':
+            case 'email-smtp.us-east-1.amazonaws.com':
+            case 'email-smtp.us-west-2.amazonaws.com':
+                return $sesRegion;
+            default:
+                return 'email-smtp.'.$sesRegion.'.amazonaws.com';
+        }
     }
 
     /**
      * Returns a "transport" string to match the URL path /mailer/{transport}/callback.
      *
-     * @return mixed
+     * @return string
      */
     public function getCallbackPath()
     {
@@ -46,113 +77,19 @@ class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackT
 
     /**
      * Handle bounces & complaints from Amazon.
-     *
-     * @param Request       $request
-     * @param MauticFactory $factory
-     *
-     * @return mixed
      */
-    public function handleCallbackResponse(Request $request, MauticFactory $factory)
+    public function processCallbackRequest(Request $request)
     {
-        $translator = $factory->getTranslator();
-        $logger     = $factory->getLogger();
-        $logger->debug('Receiving webhook from Amazon');
-
-        $payload = json_decode($request->getContent(), true);
-
-        return $this->processJsonPayload($payload, $logger, $translator);
+        $this->amazonCallback->processCallbackRequest($request);
     }
 
-    /**
-     * Process json request from Amazon SES.
-     *
-     * http://docs.aws.amazon.com/ses/latest/DeveloperGuide/best-practices-bounces-complaints.html
-     *
-     * @param array $payload from Amazon SES
-     * @param $logger
-     * @param $translator
-     *
-     * @return array with bounced and unsubscribed email addresses
-     */
-    public function processJsonPayload(array $payload, $logger, $translator)
+    public function processBounce(Message $message)
     {
+        $this->amazonCallback->processBounce($message);
+    }
 
-        // Data structure that Mautic expects to be returned from this callback
-        $rows = [
-            DoNotContact::BOUNCED => [
-                'hashIds' => [],
-                'emails'  => [],
-            ],
-            DoNotContact::UNSUBSCRIBED => [
-                'hashIds' => [],
-                'emails'  => [],
-            ],
-        ];
-
-        if (!isset($payload['Type'])) {
-            throw new HttpException(400, "Key 'Type' not found in payload ");
-        }
-
-        if ($payload['Type'] == 'SubscriptionConfirmation') {
-            // Confirm Amazon SNS subscription by calling back the SubscribeURL from the playload
-            $requestFailed = false;
-            try {
-                $response = $this->httpClient->get($payload['SubscribeURL']);
-                if ($response->code == 200) {
-                    $logger->info('Callback to SubscribeURL from Amazon SNS successfully');
-                } else {
-                    $requestFailed = true;
-                    $reason        = 'HTTP Code '.$response->code.', '.$response->body;
-                }
-            } catch (UnexpectedResponseException $e) {
-                $requestFailed = true;
-                $reason        = $e->getMessage();
-            }
-
-            if ($requestFailed) {
-                $logger->error('Callback to SubscribeURL from Amazon SNS failed, reason: '.$reason);
-            }
-        } elseif ($payload['Type'] == 'Notification') {
-            $message = json_decode($payload['Message'], true);
-
-            // only deal with hard bounces
-            if ($message['notificationType'] == 'Bounce' && $message['bounce']['bounceType'] == 'Permanent') {
-                // Get bounced recipients in an array
-                $bouncedRecipients = $message['bounce']['bouncedRecipients'];
-                foreach ($bouncedRecipients as $bouncedRecipient) {
-                    $rows[DoNotContact::BOUNCED]['emails'][$bouncedRecipient['emailAddress']] = $bouncedRecipient['diagnosticCode'];
-                    $logger->debug("Mark email '".$bouncedRecipient['emailAddress']."' as bounced, reason: ".$bouncedRecipient['diagnosticCode']);
-                }
-            }
-            // unsubscribe customer that complain about spam at their mail provider
-            elseif ($message['notificationType'] == 'Complaint') {
-                foreach ($message['complaint']['complainedRecipients'] as $complainedRecipient) {
-                    $reason = null;
-                    if (isset($message['complaint']['complaintFeedbackType'])) {
-                        // http://docs.aws.amazon.com/ses/latest/DeveloperGuide/notification-contents.html#complaint-object
-                        switch ($message['complaint']['complaintFeedbackType']) {
-                            case 'abuse':
-                                $reason = $translator->trans('mautic.email.complaint.reason.abuse');
-                                break;
-                            case 'fraud':
-                                $reason = $translator->trans('mautic.email.complaint.reason.fraud');
-                                break;
-                            case 'virus':
-                                $reason = $translator->trans('mautic.email.complaint.reason.virus');
-                                break;
-                        }
-                    }
-
-                    if ($reason == null) {
-                        $reason = $translator->trans('mautic.email.complaint.reason.unkown');
-                    }
-
-                    $rows[DoNotContact::UNSUBSCRIBED]['emails'][$complainedRecipient['emailAddress']] = $reason;
-                    $logger->debug("Unsubscribe email '".$complainedRecipient['emailAddress']."'");
-                }
-            }
-        }
-
-        return $rows;
+    public function processUnsubscription(Message $message)
+    {
+        $this->amazonCallback->processUnsubscription($message);
     }
 }
