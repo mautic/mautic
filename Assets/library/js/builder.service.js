@@ -68,20 +68,111 @@ export default class BuilderService {
   };
 
   constructor(content) {
+    console.warn(content);
     this.canvasContent = content;
+  }
+
+  /**
+   * Initialize GrapesJsBuilder
+   *
+   * @param object
+   */
+  setListeners() {
+    if (!this.editor) {
+      throw Error('No editor found');
+    }
+    this.editor.on('load', () => {
+      const um = this.editor.UndoManager;
+
+      Mautic.grapesConvertDynamicContentTokenToSlot(this.editor);
+
+      // Clear stack of undo/redo
+      um.clear();
+    });
+
+    this.editor.on('component:add', (component) => {
+      const type = component.get('type');
+
+      // Create dynamic-content on Mautic side
+      if (type === 'dynamic-content') {
+        manageDynamicContentTokenToSlot(component);
+      }
+    });
+
+    this.editor.on('component:remove', (component) => {
+      const type = component.get('type');
+
+      // Delete dynamic-content on Mautic side
+      if (type === 'dynamic-content') {
+        this.deleteDynamicContentItem(component);
+      }
+    });
+
+    const keymaps = this.editor.Keymaps;
+    let allKeymaps;
+
+    this.editor.on('modal:open', () => {
+      // Save all keyboard shortcuts
+      allKeymaps = { ...keymaps.getAll() };
+
+      // Remove keyboard shortcuts to prevent launch behind popup
+      keymaps.removeAll();
+    });
+
+    this.editor.on('modal:close', () => {
+      const commands = this.editor.Commands;
+      const cmdCodeEdit = 'preset-mautic:code-edit';
+      const cmdDynamicContent = 'preset-mautic:dynamic-content';
+
+      // Launch preset-mautic:code-edit command stop
+      if (commands.isActive(cmdCodeEdit)) {
+        commands.stop(cmdCodeEdit, { editor: this.editor });
+      }
+
+      // Launch preset-mautic:dynamic-content command stop
+      if (commands.isActive(cmdDynamicContent)) {
+        commands.stop(cmdDynamicContent, { editor: this.editor });
+      }
+
+      // ReMap keyboard shortcuts on modal close
+      Object.keys(allKeymaps).map((objectKey) => {
+        const shortcut = allKeymaps[objectKey];
+
+        keymaps.add(shortcut.id, shortcut.keys, shortcut.handler);
+        return keymaps;
+      });
+
+      const modalContent = mQuery('#dynamic-content-popup');
+
+      // On modal close -> move editor within Mautic
+      if (modalContent) {
+        const dynamicContentContainer = mQuery('#dynamicContentContainer');
+        const content = mQuery(modalContent).contents().first();
+
+        dynamicContentContainer.append(content.detach());
+      }
+    });
+
+    this.editor.on('asset:add', () => {
+      // Save assets list in textarea to keep new uploaded files without reload page
+      builder.textareaAssets.val(JSON.stringify(builder.getAssetsList()));
+    });
+
+    this.editor.on('asset:remove', (response) => {
+      // Save assets list in textarea to keep new deleted files without reload page
+      builder.textareaAssets.val(JSON.stringify(builder.getAssetsList()));
+
+      // Delete file on server
+      mQuery.ajax({
+        url: builder.textareaAssets.data('delete'),
+        data: { filename: response.getFilename() },
+      });
+    });
   }
 
   initGrapesJS(object) {
     // disable mautic global shortcuts
     Mousetrap.reset();
-
-    const textareaHtml = mQuery('textarea.builder-html');
-    const textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
-    const textareaMjml = mQuery('textarea.builder-mjml');
-
-    this.setTextareas(textareaHtml, textareaAssets, textareaMjml);
-    this.setAssetManagerConf();
-    this.setPresetMauticConf();
 
     if (object === 'page') {
       this.editor = this.initPage();
@@ -159,6 +250,8 @@ export default class BuilderService {
   }
 
   initPage() {
+    console.warn('this.keymapsConf ');
+    console.warn(this.keymapsConf);
     // Launch GrapesJS with body part
     this.editor = grapesjs.init({
       clearOnRender: true,
@@ -182,7 +275,8 @@ export default class BuilderService {
     });
 
     // Customize GrapesJS -> add close button with save for Mautic
-    return this.getCloseButtonPage();
+    this.getCloseButtonPage();
+    return this.editor;
   }
 
   initEmailMjml() {
@@ -208,7 +302,39 @@ export default class BuilderService {
       content: '<mj-button href="https://">Button</mj-button>',
     });
 
-    return this.getCloseButtonMjml();
+    this.getCloseButtonMjml();
+    return this.editor;
+  }
+
+  initEmailHtml() {
+    // Launch GrapesJS with body part
+    this.editor = grapesjs.init({
+      clearOnRender: true,
+      container: '.builder-panel',
+      components: this.canvasContent,
+      height: '100%',
+      storageManager: false,
+      assetManager: this.assetManagerConf,
+
+      plugins: [grapesjsnewsletter, grapesjspostcss, grapesjsmautic],
+      pluginsOpts: {
+        grapesjsnewsletter: {},
+        grapesjsmautic: this.presetMauticConf,
+      },
+      keymaps: this.keymapsConf,
+    });
+
+    // add a Mautic custom block Button
+    this.editor.BlockManager.get('button').set({
+      content:
+        '<a href="#" target="_blank" style="display:inline-block;text-decoration:none;border-color:#4e5d9d;border-width: 10px 20px;border-style:solid; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; background-color: #4e5d9d; display: inline-block;font-size: 16px; color: #ffffff; ">\n' +
+        'Button\n' +
+        '</a>',
+    });
+
+    // Customize GrapesJS -> add close button with save for Mautic
+    this.getCloseButtonHtml();
+    return this.editor;
   }
 
   /**
@@ -249,28 +375,48 @@ export default class BuilderService {
     const parser = new DOMParser();
     const fullHtml = parser.parseFromString(this.getHtmlValue(), 'text/html');
 
+    const commands = this.editor.Commands;
+    commands.add('mautic:editor:close', (editor) => {
+      this.grapesConvertDynamicContentSlotsToTokens(editor);
+
+      // Update textarea for save (part that is different from other modes)
+      fullHtml.body.innerHTML = `${editor.getHtml()}<style>${editor.getCss({
+        avoidProtected: true,
+      })}</style>`;
+      mQuery('textarea.builder-html').val(fullHtml.documentElement.outerHTML);
+
+      // Reset HTML
+      mQuery('.builder').removeClass('builder-active').addClass('hide');
+      mQuery('html').css('font-size', '');
+      mQuery('body').css('overflow-y', '');
+
+      //   // Destroy GrapesJS
+      this.editor.destroy();
+    });
+
     this.editor.Panels.addButton('views', [
       {
         id: 'close',
         className: 'fa fa-times-circle',
         attributes: { title: 'Close' },
-        command() {
-          this.grapesConvertDynamicContentSlotsToTokens(this.editor);
+        command: 'mautic:editor:close',
+        // command() {
+        //   this.grapesConvertDynamicContentSlotsToTokens(this.editor);
 
-          // Update textarea for save (part that is different from other modes)
-          fullHtml.body.innerHTML = `${this.editor.getHtml()}<style>${this.editor.getCss({
-            avoidProtected: true,
-          })}</style>`;
-          mQuery('textarea.builder-html').val(fullHtml.documentElement.outerHTML);
+        //   // Update textarea for save (part that is different from other modes)
+        //   fullHtml.body.innerHTML = `${this.editor.getHtml()}<style>${this.editor.getCss({
+        //     avoidProtected: true,
+        //   })}</style>`;
+        //   mQuery('textarea.builder-html').val(fullHtml.documentElement.outerHTML);
 
-          // Reset HTML
-          mQuery('.builder').removeClass('builder-active').addClass('hide');
-          mQuery('html').css('font-size', '');
-          mQuery('body').css('overflow-y', '');
+        //   // Reset HTML
+        //   mQuery('.builder').removeClass('builder-active').addClass('hide');
+        //   mQuery('html').css('font-size', '');
+        //   mQuery('body').css('overflow-y', '');
 
-          // Destroy GrapesJS
-          this.editor.destroy();
-        },
+        //   // Destroy GrapesJS
+        //   this.editor.destroy();
+        // },
       },
     ]);
   }
@@ -346,36 +492,6 @@ export default class BuilderService {
         },
       },
     ]);
-  }
-
-  initEmailHtml() {
-    // Launch GrapesJS with body part
-    this.editor = grapesjs.init({
-      clearOnRender: true,
-      container: '.builder-panel',
-      components: this.canvasContent,
-      height: '100%',
-      storageManager: false,
-      assetManager: this.assetManagerConf,
-
-      plugins: [grapesjsnewsletter, grapesjspostcss, grapesjsmautic],
-      pluginsOpts: {
-        grapesjsnewsletter: {},
-        grapesjsmautic: this.presetMauticConf,
-      },
-      keymaps: this.keymapsConf,
-    });
-
-    // add a Mautic custom block Button
-    this.editor.BlockManager.get('button').set({
-      content:
-        '<a href="#" target="_blank" style="display:inline-block;text-decoration:none;border-color:#4e5d9d;border-width: 10px 20px;border-style:solid; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; background-color: #4e5d9d; display: inline-block;font-size: 16px; color: #ffffff; ">\n' +
-        'Button\n' +
-        '</a>',
-    });
-
-    // Customize GrapesJS -> add close button with save for Mautic
-    return this.getCloseButtonHtml();
   }
 
   /**

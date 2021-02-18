@@ -1,15 +1,6 @@
 import BuilderService from './builder.service';
 // import builder from './builder.service';
 
-// Parse HTML template
-const parser = new DOMParser();
-const textareaHtml = mQuery('textarea.builder-html');
-const textareaMjml = mQuery('textarea.builder-mjml');
-const textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
-const fullHtml = parser.parseFromString(textareaHtml.val(), 'text/html');
-
-const builder = new BuilderService(fullHtml.body.innerHTML);
-
 /**
  * Initialize theme selection
  *
@@ -47,6 +38,14 @@ function initSelectThemeGrapesjs(initSelectTheme) {
  * @param actionName
  */
 function launchBuilderGrapesjs(formName) {
+  // Parse HTML template
+  const parser = new DOMParser();
+  const textareaHtml = mQuery('textarea.builder-html');
+  const textareaMjml = mQuery('textarea.builder-mjml');
+  const textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
+  const fullHtml = parser.parseFromString(textareaHtml.val(), 'text/html');
+  const builder = new BuilderService(fullHtml.body.innerHTML);
+
   Mautic.showChangeThemeWarning = true;
 
   // Prepare HTML
@@ -109,104 +108,6 @@ function manageDynamicContentTokenToSlot(component) {
 }
 
 /**
- * Initialize GrapesJsBuilder
- *
- * @param object
- */
-function setListenersGrapesjs() {
-  if (!builder.editor) {
-    throw Error('No editor found');
-  }
-  builder.editor.on('load', () => {
-    const um = builder.editor.UndoManager;
-
-    Mautic.grapesConvertDynamicContentTokenToSlot();
-
-    // Clear stack of undo/redo
-    um.clear();
-  });
-
-  builder.editor.on('component:add', (component) => {
-    const type = component.get('type');
-
-    // Create dynamic-content on Mautic side
-    if (type === 'dynamic-content') {
-      manageDynamicContentTokenToSlot(component);
-    }
-  });
-
-  builder.editor.on('component:remove', (component) => {
-    const type = component.get('type');
-
-    // Delete dynamic-content on Mautic side
-    if (type === 'dynamic-content') {
-      builder.deleteDynamicContentItem(component);
-    }
-  });
-
-  const keymaps = builder.editor.Keymaps;
-  let allKeymaps;
-
-  builder.editor.on('modal:open', () => {
-    // Save all keyboard shortcuts
-    allKeymaps = { ...keymaps.getAll() };
-
-    // Remove keyboard shortcuts to prevent launch behind popup
-    keymaps.removeAll();
-  });
-
-  builder.editor.on('modal:close', () => {
-    const commands = builder.editor.Commands;
-    const cmdCodeEdit = 'preset-mautic:code-edit';
-    const cmdDynamicContent = 'preset-mautic:dynamic-content';
-
-    // Launch preset-mautic:code-edit command stop
-    if (commands.isActive(cmdCodeEdit)) {
-      commands.stop(cmdCodeEdit, { editor: builder.editor });
-    }
-
-    // Launch preset-mautic:dynamic-content command stop
-    if (commands.isActive(cmdDynamicContent)) {
-      commands.stop(cmdDynamicContent, { editor: builder.editor });
-    }
-
-    // ReMap keyboard shortcuts on modal close
-    Object.keys(allKeymaps).map((objectKey) => {
-      const shortcut = allKeymaps[objectKey];
-
-      keymaps.add(shortcut.id, shortcut.keys, shortcut.handler);
-      return keymaps;
-    });
-
-    const modalContent = builder.editor.Modal.getContent().querySelector('#dynamic-content-popup');
-
-    // On modal close -> move editor within Mautic
-    if (modalContent !== null) {
-      const dynamicContentContainer = mQuery('#dynamicContentContainer');
-      const content = mQuery(modalContent).contents().first();
-
-      dynamicContentContainer.append(content.detach());
-    }
-  });
-
-  builder.editor.on('asset:add', () => {
-    // Save assets list in textarea to keep new uploaded files without reload page
-    builder.textareaAssets.val(JSON.stringify(builder.getAssetsList()));
-  });
-
-  builder.editor.on('asset:remove', (response) => {
-    // Save assets list in textarea to keep new deleted files without reload page
-    builder.textareaAssets.val(JSON.stringify(builder.getAssetsList()));
-
-    // Delete file on server
-    mQuery.ajax({
-      url: builder.textareaAssets.data('delete'),
-      data: { filename: response.getFilename() },
-    });
-  });
-}
-
-/**
  * Set theme's HTML
  *
  * @param theme
@@ -245,8 +146,8 @@ Mautic.setThemeHtml = function (theme) {
 /**
  * Convert dynamic content tokens to slot and load content
  */
-function grapesConvertDynamicContentTokenToSlot() {
-  const dc = builder.editor.DomComponents;
+function grapesConvertDynamicContentTokenToSlot(editor) {
+  const dc = editor.DomComponents;
 
   const dynamicContents = dc.getWrapper().find('[data-slot="dynamicContent"]');
 
@@ -258,6 +159,6 @@ function grapesConvertDynamicContentTokenToSlot() {
 }
 
 Mautic.grapesConvertDynamicContentTokenToSlot = grapesConvertDynamicContentTokenToSlot;
-Mautic.setListeners = setListenersGrapesjs;
+// Mautic.setListeners = setListenersGrapesjs;
 Mautic.initSelectTheme = initSelectThemeGrapesjs;
 Mautic.launchBuilder = launchBuilderGrapesjs;
