@@ -11,10 +11,14 @@ function launchBuilderGrapesjs(formName) {
   // Parse HTML template
   const parser = new DOMParser();
   const textareaHtml = mQuery('textarea.builder-html');
-  const textareaMjml = mQuery('textarea.builder-mjml');
   const textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
   const fullHtml = parser.parseFromString(textareaHtml.val(), 'text/html');
-  const builder = new BuilderService(fullHtml.body.innerHTML);
+
+  const canvasContent = fullHtml.body.innerHTML
+    ? fullHtml.body.innerHTML
+    : mQuery('textarea.builder-mjml').val();
+
+  const builder = new BuilderService(canvasContent);
 
   Mautic.showChangeThemeWarning = true;
 
@@ -25,7 +29,6 @@ function launchBuilderGrapesjs(formName) {
   mQuery('.builder').addClass('builder-active').removeClass('hide');
 
   // Initialize GrapesJS
-  console.warn({ formName });
   builder.initGrapesJS(formName);
 }
 
@@ -95,8 +98,9 @@ Mautic.setThemeHtml = function (theme) {
 
       textareaHtml.val(response.templateHtml);
 
-      // if (typeof textareaMjml !== 'undefined') {
-      //   textareaMjml.val(response.templateMjml);
+      if (typeof textareaMjml !== 'undefined') {
+        textareaMjml.val(response.templateMjml);
+      }
 
       // If MJML template, generate HTML before save
       // if (!textareaHtml.val().length && textareaMjml.val().length) {

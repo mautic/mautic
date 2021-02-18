@@ -68,7 +68,9 @@ export default class BuilderService {
   };
 
   constructor(content) {
-    console.warn(content);
+    if (!content) {
+      throw Error('No HTML or MJML content found');
+    }
     this.canvasContent = content;
   }
 
@@ -177,7 +179,7 @@ export default class BuilderService {
     if (object === 'page') {
       this.editor = this.initPage();
     } else if (object === 'emailform') {
-      if (this.textareaMjml.val().length) {
+      if (this.canvasContent && this.canvasContent.indexOf('<mjml>') !== -1) {
         this.editor = this.initEmailMjml();
       } else {
         this.editor = this.initEmailHtml();
@@ -186,19 +188,11 @@ export default class BuilderService {
       throw Error(`not supported builder type: ${object}`);
     }
 
-    this.setListeners(this.editor);
+    this.addMauticCommands();
+    this.setListeners();
   }
 
-  setTextareas(textareaHtml, textareaAssets, textareaMjml) {
-    if (!textareaHtml || !textareaAssets || !textareaMjml) {
-      console.debug('not all textareas loaded');
-    }
-
-    this.textareaHtml = textareaHtml;
-    this.textareaMjml = textareaMjml;
-    this.textareaAssets = textareaAssets;
-  }
-
+  // @todo remove
   getHtmlValue() {
     if (this.textareaHtml && this.textareaHtml.val() && this.textareaHtml.val().length > 0) {
       return this.textareaHtml.val();
@@ -235,7 +229,6 @@ export default class BuilderService {
   }
 
   setPresetMauticConf() {
-    console.log(Mautic);
     this.presetMauticConf = {
       sourceEditBtnLabel: Mautic.translate('grapesjsbuilder.sourceEditBtnLabel'),
       sourceCancelBtnLabel: Mautic.translate('grapesjsbuilder.sourceCancelBtnLabel'),
@@ -250,8 +243,6 @@ export default class BuilderService {
   }
 
   initPage() {
-    console.warn('this.keymapsConf ');
-    console.warn(this.keymapsConf);
     // Launch GrapesJS with body part
     this.editor = grapesjs.init({
       clearOnRender: true,
@@ -369,14 +360,17 @@ export default class BuilderService {
   }
 
   /**
-   * Customize GrapesJS -> add close button with save for Mautic in the Page Builder Mode
+   * Add Mautic specific commands
    */
-  getCloseButtonPage() {
+  addMauticCommands() {
+    if (!this.editor) {
+      throw Error('No editor found');
+    }
     const parser = new DOMParser();
     const fullHtml = parser.parseFromString(this.getHtmlValue(), 'text/html');
-
     const commands = this.editor.Commands;
-    commands.add('mautic:editor:close', (editor) => {
+
+    commands.add('mautic:editor:page:html:close', (editor) => {
       this.grapesConvertDynamicContentSlotsToTokens(editor);
 
       // Update textarea for save (part that is different from other modes)
@@ -394,29 +388,61 @@ export default class BuilderService {
       this.editor.destroy();
     });
 
+    commands.add('mautic:editor:email:html:close', (editor) => {
+      this.grapesConvertDynamicContentSlotsToTokens(this.editor);
+
+      // Update textarea for save
+      fullHtml.body.innerHTML = this.editor.runCommand('gjs-get-inlined-html');
+      mQuery('textarea.builder-html').val(fullHtml.documentElement.outerHTML);
+
+      // Reset HTML
+      // mQuery('.builder').removeClass('builder-active').addClass('hide');
+      mQuery('html').css('font-size', '');
+      mQuery('body').css('overflow-y', '');
+
+      // Destroy GrapesJS
+      editor.destroy();
+    });
+
+    commands.add('mautic:editor:email:mjml:close', (editor) => {
+      this.grapesConvertDynamicContentSlotsToTokens(editor);
+
+      let code = '';
+
+      // Try catch for mjml parser error
+      try {
+        code = this.editor.runCommand('mjml-get-code');
+      } catch (error) {
+        console.log(error.message);
+        alert('Errors inside your template. Template will not be saved.');
+      }
+
+      // Update textarea for save (only individual part)
+      if (!code.length) {
+        mQuery('textarea.builder-html').val(code.html);
+        mQuery('textarea.builder-mjml').val(this.editor.getHtml());
+      }
+
+      // Reset HTML
+      // mQuery('.builder').removeClass('builder-active').addClass('hide');
+      mQuery('html').css('font-size', '');
+      mQuery('body').css('overflow-y', '');
+
+      // Destroy GrapesJS
+      editor.destroy();
+    });
+  }
+
+  /**
+   * Customize GrapesJS -> add close button with save for Mautic in the Page Builder Mode
+   */
+  getCloseButtonPage() {
     this.editor.Panels.addButton('views', [
       {
         id: 'close',
         className: 'fa fa-times-circle',
         attributes: { title: 'Close' },
-        command: 'mautic:editor:close',
-        // command() {
-        //   this.grapesConvertDynamicContentSlotsToTokens(this.editor);
-
-        //   // Update textarea for save (part that is different from other modes)
-        //   fullHtml.body.innerHTML = `${this.editor.getHtml()}<style>${this.editor.getCss({
-        //     avoidProtected: true,
-        //   })}</style>`;
-        //   mQuery('textarea.builder-html').val(fullHtml.documentElement.outerHTML);
-
-        //   // Reset HTML
-        //   mQuery('.builder').removeClass('builder-active').addClass('hide');
-        //   mQuery('html').css('font-size', '');
-        //   mQuery('body').css('overflow-y', '');
-
-        //   // Destroy GrapesJS
-        //   this.editor.destroy();
-        // },
+        command: 'mautic:editor:page:html:close',
       },
     ]);
   }
@@ -430,66 +456,21 @@ export default class BuilderService {
         id: 'close',
         className: 'fa fa-times-circle',
         attributes: { title: 'Close' },
-        command() {
-          this.grapesConvertDynamicContentSlotsToTokens(this.editor);
-
-          let code = '';
-
-          // Try catch for mjml parser error
-          try {
-            code = this.editor.runCommand('mjml-get-code');
-          } catch (error) {
-            console.log(error.message);
-            alert('Errors inside your template. Template will not be saved.');
-          }
-
-          // Update textarea for save (only individual part)
-          if (!code.length) {
-            mQuery('textarea.builder-html').val(code.html);
-            mQuery('textarea.builder-mjml').val(this.editor.getHtml());
-          }
-
-          // Reset HTML
-          // mQuery('.builder').removeClass('builder-active').addClass('hide');
-          mQuery('html').css('font-size', '');
-          mQuery('body').css('overflow-y', '');
-
-          // Destroy GrapesJS
-          this.editor.destroy();
-        },
+        command: 'mautic:editor:email:mjml:close',
       },
     ]);
-
-    return this.editor.Panels;
   }
 
   /**
    * Get a custom close button for the Mautic Email mode where the template is HTML
    */
   getCloseButtonHtml() {
-    const parser = new DOMParser();
-    const fullHtml = parser.parseFromString(this.getHtmlValue(), 'text/html');
-
     this.editor.Panels.addButton('views', [
       {
         id: 'close',
         className: 'fa fa-times-circle',
         attributes: { title: 'Close' },
-        command() {
-          this.grapesConvertDynamicContentSlotsToTokens(this.editor);
-
-          // Update textarea for save
-          fullHtml.body.innerHTML = this.editor.runCommand('gjs-get-inlined-html');
-          mQuery('textarea.builder-html').val(fullHtml.documentElement.outerHTML);
-
-          // Reset HTML
-          // mQuery('.builder').removeClass('builder-active').addClass('hide');
-          mQuery('html').css('font-size', '');
-          mQuery('body').css('overflow-y', '');
-
-          // Destroy GrapesJS
-          this.editor.destroy();
-        },
+        command: 'mautic:editor:email:html:close',
       },
     ]);
   }
