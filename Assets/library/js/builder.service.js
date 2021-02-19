@@ -432,7 +432,7 @@ export default class BuilderService {
   }
 
   static resetHtml(editor) {
-    // mQuery('.builder').removeClass('builder-active').addClass('hide');
+    mQuery('.builder').removeClass('builder-active').addClass('hide');
     mQuery('html').css('font-size', '');
     mQuery('body').css('overflow-y', '');
 
