@@ -84,8 +84,8 @@ class SummaryModel extends AbstractCommonModel
             $start = $this->getRepository()->getOldestTriggeredDate();
         }
 
-        // Start with the last complete hour.
-        $start = $start ?? new DateTime();
+        // Start with the current hour.
+        $start = $start ?? new DateTime('+1 hour');
         $start->setTimestamp($start->getTimestamp() - ($start->getTimestamp() % 3600));
         $end = $this->getCampaignLeadEventLogRepository()->getOldestTriggeredDate();
 
