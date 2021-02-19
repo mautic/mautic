@@ -132,10 +132,11 @@ class SummaryRepository extends CommonRepository
 
         $sql .= ' GROUP BY mclel.campaign_id, mclel.event_id, date_triggered_i) AS `s` '.
             ' ON DUPLICATE KEY UPDATE '.
-            ' scheduled_count = scheduled_count + s.scheduled_count_i, '.
-            ' non_action_path_taken_count = non_action_path_taken_count + s.non_action_path_taken_count_i, '.
-            ' failed_count = failed_count + s.failed_count_i, '.
-            ' triggered_count = triggered_count + s.triggered_count_i;';
+            ' scheduled_count = s.scheduled_count_i, '.
+            ' non_action_path_taken_count = s.non_action_path_taken_count_i, '.
+            ' failed_count = s.failed_count_i, '.
+            ' triggered_count = s.triggered_count_i, '.
+            ' log_counts_processed = s.log_counts_processed_i;';
 
         $this->getEntityManager()->getConnection()->query($sql);
     }
