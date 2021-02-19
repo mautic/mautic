@@ -26,6 +26,7 @@ use Mautic\QueueBundle\Queue\QueueConsumerResults;
 use Mautic\QueueBundle\QueueEvents;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Mautic\PageBundle\Entity\Page;
 
 class PageSubscriber implements EventSubscriberInterface
 {
@@ -212,6 +213,20 @@ class PageSubscriber implements EventSubscriberInterface
         $isRedirect             = !empty($payload['isRedirect']);
         $hit                    = $hitId ? $this->hitRepository->find((int) $hitId) : null;
         $lead                   = $leadId ? $this->contactRepository->find((int) $leadId) : null;
+
+      $redirectRepo = $this->em->getRepository('MauticPageBundle:Redirect');
+
+      $page = NULL;
+      if ($pageId) {
+        $foundPage = $pageRepo->find((int) $pageId);
+
+        if ($foundPage instanceof Page) {
+          $page = $foundPage;
+        }
+        else {
+          $page = $redirectRepo->find((int) $pageId);
+        }
+      }
 
         // On the off chance that the queue contains a message which does not
         // reference a valid Hit or Lead, discard it to avoid clogging the queue.
