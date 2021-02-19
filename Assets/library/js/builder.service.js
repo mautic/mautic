@@ -84,10 +84,8 @@ export default class BuilderService {
       throw Error('No editor found');
     }
 
-    this.editor.on('run:mautic-editor-email-mjml-close:before', (test) => {
-      console.log(this.canvasContent);
+    this.editor.on('run:mautic-editor-email-mjml-close:before', () => {
       mQuery('textarea.builder-html').val(this.canvasContent);
-      console.log('Before `my-command-modal` execution');
     });
 
     this.editor.on('load', () => {
@@ -273,7 +271,7 @@ export default class BuilderService {
     });
 
     // Customize GrapesJS -> add close button with save for Mautic
-    this.getCloseButton('mautic-editor-page-html-close:close');
+    this.getCloseButton('mautic-editor-page-html-close');
     return this.editor;
   }
 
@@ -330,7 +328,7 @@ export default class BuilderService {
     });
 
     // Customize GrapesJS -> add close button with save for Mautic
-    this.getCloseButton('mautic-editor-email-html-close:close');
+    this.getCloseButton('mautic-editor-email-html-close');
     return this.editor;
   }
 
@@ -376,7 +374,7 @@ export default class BuilderService {
     const fullHtml = parser.parseFromString(this.getHtmlValue(), 'text/html');
     const commands = this.editor.Commands;
 
-    commands.add('mautic-editor-page-html-close:close', (editor) => {
+    commands.add('mautic-editor-page-html-close', (editor) => {
       if (!editor) {
         throw new Error('no page-html editor');
       }
@@ -389,31 +387,21 @@ export default class BuilderService {
       mQuery('textarea.builder-html').val(fullHtml.documentElement.outerHTML);
 
       // Reset HTML
-      mQuery('.builder').removeClass('builder-active').addClass('hide');
-      mQuery('html').css('font-size', '');
-      mQuery('body').css('overflow-y', '');
-
-      // Destroy GrapesJS
-      this.editor.destroy();
+      BuilderService.resetHtml(editor);
     });
 
-    commands.add('mautic-editor-email-html-close:close', (editor) => {
+    commands.add('mautic-editor-email-html-close', (editor) => {
       if (!editor) {
         throw new Error('no email-html editor');
       }
-      this.grapesConvertDynamicContentSlotsToTokens(this.editor);
+      this.grapesConvertDynamicContentSlotsToTokens(editor);
 
       // Update textarea for save
-      fullHtml.body.innerHTML = this.editor.runCommand('gjs-get-inlined-html');
+      fullHtml.body.innerHTML = editor.runCommand('gjs-get-inlined-html');
       mQuery('textarea.builder-html').val(fullHtml.documentElement.outerHTML);
 
       // Reset HTML
-      mQuery('.builder').removeClass('builder-active').addClass('hide');
-      mQuery('html').css('font-size', '');
-      mQuery('body').css('overflow-y', '');
-
-      // Destroy GrapesJS
-      editor.destroy();
+      BuilderService.resetHtml(editor);
     });
 
     commands.add('mautic-editor-email-mjml-close', (editor) => {
@@ -432,21 +420,28 @@ export default class BuilderService {
         alert('Errors inside your template. Template will not be saved.');
       }
 
-      // Update textarea for save (only individual part)
+      // Update textarea for save
       if (!code.length) {
         mQuery('textarea.builder-html').val(code.html);
-        mQuery('textarea.builder-mjml').val(this.editor.getHtml());
+        mQuery('textarea.builder-mjml').val(editor.getHtml());
       }
 
       // Reset HTML
-      // mQuery('.builder').removeClass('builder-active').addClass('hide');
-      mQuery('html').css('font-size', '');
-      mQuery('body').css('overflow-y', '');
-
-      // Destroy GrapesJS
-      // @todo throws typeError: Cannot read property 'trigger'
-      editor.destroy();
+      BuilderService.resetHtml(editor);
     });
+  }
+
+  static resetHtml(editor) {
+    // mQuery('.builder').removeClass('builder-active').addClass('hide');
+    mQuery('html').css('font-size', '');
+    mQuery('body').css('overflow-y', '');
+
+    // Destroy GrapesJS
+    // workingn workaround: throws typeError: Cannot read property 'trigger'
+    // since editior is destroyed, command can not be stopped anymore
+    mQuery('.builder-panel').css('display', 'none');
+    setTimeout(() => editor.destroy(), 1000);
+    // editor.destroy();
   }
 
   /**

@@ -26,6 +26,7 @@ function launchBuilderGrapesjs(formName) {
   mQuery('html').css('font-size', '100%');
   mQuery('body').css('overflow-y', 'hidden');
   mQuery('.builder-panel').css('padding', 0);
+  mQuery('.builder-panel').css('display', 'block');
   mQuery('.builder').addClass('builder-active').removeClass('hide');
 
   // Initialize GrapesJS
