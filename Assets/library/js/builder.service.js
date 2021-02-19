@@ -83,6 +83,13 @@ export default class BuilderService {
     if (!this.editor) {
       throw Error('No editor found');
     }
+
+    this.editor.on('run:mautic-editor-email-mjml-close:before', (test) => {
+      console.log(this.canvasContent);
+      mQuery('textarea.builder-html').val(this.canvasContent);
+      console.log('Before `my-command-modal` execution');
+    });
+
     this.editor.on('load', () => {
       const um = this.editor.UndoManager;
 
@@ -97,7 +104,7 @@ export default class BuilderService {
 
       // Create dynamic-content on Mautic side
       if (type === 'dynamic-content') {
-        manageDynamicContentTokenToSlot(component);
+        Mautic.manageDynamicContentTokenToSlot(component);
       }
     });
 
@@ -157,16 +164,16 @@ export default class BuilderService {
 
     this.editor.on('asset:add', () => {
       // Save assets list in textarea to keep new uploaded files without reload page
-      builder.textareaAssets.val(JSON.stringify(builder.getAssetsList()));
+      this.builder.textareaAssets.val(JSON.stringify(this.builder.getAssetsList()));
     });
 
     this.editor.on('asset:remove', (response) => {
       // Save assets list in textarea to keep new deleted files without reload page
-      builder.textareaAssets.val(JSON.stringify(builder.getAssetsList()));
+      this.builder.textareaAssets.val(JSON.stringify(this.builder.getAssetsList()));
 
       // Delete file on server
       mQuery.ajax({
-        url: builder.textareaAssets.data('delete'),
+        url: this.builder.textareaAssets.data('delete'),
         data: { filename: response.getFilename() },
       });
     });
@@ -266,13 +273,12 @@ export default class BuilderService {
     });
 
     // Customize GrapesJS -> add close button with save for Mautic
-    this.getCloseButtonPage();
+    this.getCloseButton('mautic-editor-page-html-close:close');
     return this.editor;
   }
 
   initEmailMjml() {
     // EmailBuilder -> MJML
-
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
@@ -293,7 +299,7 @@ export default class BuilderService {
       content: '<mj-button href="https://">Button</mj-button>',
     });
 
-    this.getCloseButtonMjml();
+    this.getCloseButton('mautic-editor-email-mjml-close');
     return this.editor;
   }
 
@@ -324,7 +330,7 @@ export default class BuilderService {
     });
 
     // Customize GrapesJS -> add close button with save for Mautic
-    this.getCloseButtonHtml();
+    this.getCloseButton('mautic-editor-email-html-close:close');
     return this.editor;
   }
 
@@ -370,7 +376,10 @@ export default class BuilderService {
     const fullHtml = parser.parseFromString(this.getHtmlValue(), 'text/html');
     const commands = this.editor.Commands;
 
-    commands.add('mautic:editor:page:html:close', (editor) => {
+    commands.add('mautic-editor-page-html-close:close', (editor) => {
+      if (!editor) {
+        throw new Error('no page-html editor');
+      }
       this.grapesConvertDynamicContentSlotsToTokens(editor);
 
       // Update textarea for save (part that is different from other modes)
@@ -388,7 +397,10 @@ export default class BuilderService {
       this.editor.destroy();
     });
 
-    commands.add('mautic:editor:email:html:close', (editor) => {
+    commands.add('mautic-editor-email-html-close:close', (editor) => {
+      if (!editor) {
+        throw new Error('no email-html editor');
+      }
       this.grapesConvertDynamicContentSlotsToTokens(this.editor);
 
       // Update textarea for save
@@ -396,7 +408,7 @@ export default class BuilderService {
       mQuery('textarea.builder-html').val(fullHtml.documentElement.outerHTML);
 
       // Reset HTML
-      // mQuery('.builder').removeClass('builder-active').addClass('hide');
+      mQuery('.builder').removeClass('builder-active').addClass('hide');
       mQuery('html').css('font-size', '');
       mQuery('body').css('overflow-y', '');
 
@@ -404,7 +416,10 @@ export default class BuilderService {
       editor.destroy();
     });
 
-    commands.add('mautic:editor:email:mjml:close', (editor) => {
+    commands.add('mautic-editor-email-mjml-close', (editor) => {
+      if (!editor) {
+        throw new Error('no email-mjml editor');
+      }
       this.grapesConvertDynamicContentSlotsToTokens(editor);
 
       let code = '';
@@ -429,48 +444,25 @@ export default class BuilderService {
       mQuery('body').css('overflow-y', '');
 
       // Destroy GrapesJS
+      // @todo throws typeError: Cannot read property 'trigger'
       editor.destroy();
     });
   }
 
   /**
-   * Customize GrapesJS -> add close button with save for Mautic in the Page Builder Mode
+   * Add close button with save for Mautic
    */
-  getCloseButtonPage() {
-    this.editor.Panels.addButton('views', [
-      {
-        id: 'close',
-        className: 'fa fa-times-circle',
-        attributes: { title: 'Close' },
-        command: 'mautic:editor:page:html:close',
-      },
-    ]);
-  }
+  getCloseButton(command) {
+    if (!command) {
+      throw new Error('no close button command');
+    }
 
-  /**
-   * Customize GrapesJS -> add close button with save for Mautic
-   */
-  getCloseButtonMjml() {
     this.editor.Panels.addButton('views', [
       {
         id: 'close',
         className: 'fa fa-times-circle',
         attributes: { title: 'Close' },
-        command: 'mautic:editor:email:mjml:close',
-      },
-    ]);
-  }
-
-  /**
-   * Get a custom close button for the Mautic Email mode where the template is HTML
-   */
-  getCloseButtonHtml() {
-    this.editor.Panels.addButton('views', [
-      {
-        id: 'close',
-        className: 'fa fa-times-circle',
-        attributes: { title: 'Close' },
-        command: 'mautic:editor:email:html:close',
+        command,
       },
     ]);
   }
@@ -498,55 +490,6 @@ export default class BuilderService {
       }
     }
   }
-
-  /**
-   * Init GrapesJS to generate HTML
-   *
-   * @param mjmlTextarea - Textarea where MJML is stored
-   * @param htmlTextarea - Textarea where HTML will be stored
-   * @param container - Invisible container to init GrapesJS
-   */
-  // mjmlToHtml(mjmlTextarea, htmlTextarea, container = '.builder-panel') {
-  //   console.warn(mjmlTextarea);
-  //   console.warn(htmlTextarea);
-  //   console.warn(container);
-
-  //   let code = '';
-  //   this.editor = grapesjs.init({
-  //     clearOnRender: true,
-  //     container,
-  //     components: mjmlTextarea.val(),
-  //     storageManager: false,
-  //     panels: { defaults: [] },
-
-  //     plugins: [grapesjsmjml, grapesjspostcss],
-  //     pluginsOpts: {
-  //       grapesjsmjml: {},
-  //     },
-  //   });
-  //   console.log(this.editor);
-  //   // Try catch for MJML parser error
-  //   try {
-  //     code = this.editor.runCommand('mjml-get-code');
-  //   } catch (error) {
-  //     console.log(error.message);
-  //     alert('Errors inside your template. Template will not be saved.');
-  //   }
-
-  //   // Set result to htmlTextarea
-  //   if (!code.length) {
-  //     htmlTextarea.val(code.html);
-  //   }
-
-  //   // Destroy GrapesJS
-  //   this.editor.destroy();
-
-  // try {
-  //   editor.destroy();
-  // } catch (error) {
-  //   console.log(error);
-  // }
-  // }
 
   /**
    * Manage button loading indicator
