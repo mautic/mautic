@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\EmailBundle\Tests\Command;
+namespace Mautic\EmailBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
