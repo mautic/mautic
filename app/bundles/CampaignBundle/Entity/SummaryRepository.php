@@ -140,15 +140,4 @@ class SummaryRepository extends CommonRepository
 
         $this->getEntityManager()->getConnection()->query($sql);
     }
-
-    /**
-     * @throws DBALException
-     */
-    public function deleteAll(): void
-    {
-        $sql  = 'DELETE FROM '.MAUTIC_TABLE_PREFIX.'campaign_summary';
-        $conn = $this->getEntityManager()->getConnection();
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-    }
 }

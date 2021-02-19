@@ -100,10 +100,6 @@ class SummaryModel extends AbstractCommonModel
         $output->writeln('<comment>Started at: '.$startedAt->format('Y-m-d H:i:s').'</comment>');
 
         if ($end && $end <= $start) {
-            if ($rebuild) {
-                $this->prepareRebuildSummary();
-            }
-
             $hours = ($end->diff($start)->days * 24) + $end->diff($start)->h;
 
             if ($maxHours && $hours > $maxHours) {
@@ -153,14 +149,6 @@ class SummaryModel extends AbstractCommonModel
             $eventId    = $log['eventId'];
             $this->getRepository()->summarize($dateFrom, $dateTo, $campaignId, $eventId);
         }
-    }
-
-    /**
-     * @throws DBALException
-     */
-    private function prepareRebuildSummary(): void
-    {
-        $this->getRepository()->deleteAll();
     }
 
     private function outputProcessTime(DateTime $startedAt, OutputInterface $output): void
