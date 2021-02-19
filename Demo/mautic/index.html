@@ -1,6 +1,31 @@
-<script>
-  let mauticLang = 'de';
+<script type="text/javascript">
+  let mauticLang = 'en';
   let mauticAjaxCsrf = 'test';
+  let htmlBasic =
+    ' <!doctype html> <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office"> <head> <title> </title> <!--[if !mso]><!--> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <!--<![endif]--> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1"> <style type="text/css"> #outlook a { padding:0; } body { margin:0;padding:0;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%; } table, td { border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt; } img { border:0;height:auto;line-height:100%; outline:none;text-decoration:none;-ms-interpolation-mode:bicubic; } p { display:block;margin:13px 0; } </style> <!--[if mso]> <xml> <o:OfficeDocumentSettings> <o:AllowPNG/> <o:PixelsPerInch>96</o:PixelsPerInch> </o:OfficeDocumentSettings> </xml> <![endif]--> <!--[if lte mso 11]> <style type="text/css"> .mj-outlook-group-fix { width:100% !important; } </style> <![endif]--> <!--[if !mso]><!--> <link href="https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700" rel="stylesheet" type="text/css"> <style type="text/css"> @import url(https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700); </style> <!--<![endif]--> <style type="text/css"> @media only screen and (min-width:480px) { .mj-column-per-100 { width:100% !important; max-width: 100%; } } </style> <style type="text/css"> </style> </head> <body style="word-spacing:normal;"> <div style="" > <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]--> <div  style="margin:0px auto;max-width:600px;"> <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;" > <tbody> <tr> <td style="direction:ltr;font-size:0px;padding:20px 0;text-align:center;" > <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:600px;" ><![endif]--> <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;" > <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%" > <tbody> <tr> <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;" > <div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;" >My Company</div> </td> </tr> </tbody> </table> </div> <!--[if mso | IE]></td></tr></table><![endif]--> </td> </tr> </tbody> </table> </div> <!--[if mso | IE]></td></tr></table><![endif]--> </div> </body> </html>';
+  let mjmlbasic =
+    '<mjml><mj-body> <mj-section> <mj-column> <mj-text>My Company</mj-text> </mj-column> </mj-section> </mj-body> </mjml>';
+
+  function launchPageHtml() {
+    mQuery('textarea.builder-mjml').val('');
+    mQuery('textarea.builder-html').val(htmlBasic);
+    Mautic.launchBuilder('page');
+    return false;
+  }
+  function launchEmailHtml() {
+    mQuery('textarea.builder-mjml').val('');
+    mQuery('textarea.builder-html').val(htmlBasic);
+    Mautic.launchBuilder('emailform');
+    return false;
+  }
+  function launchEmailMjml() {
+    mQuery('textarea.builder-html').val('');
+    mQuery('textarea.builder-mjml').val(mjmlbasic);
+
+    Mautic.launchBuilder('emailform');
+
+    return false;
+  }
 </script>
 <script src="http://mtc-idea2.ddev.site/media/js/libraries.js"></script>
 <script src="http://mtc-idea2.ddev.site/media/js/app.js"></script>
@@ -16,14 +41,25 @@
     <div class="builder"></div>
     <!-- <textarea class="builder-html"><html><body><div data-section-wrapper="1"> <center> <table data-section="1" style="width: 600;" width="600" cellpadding="0" cellspacing="0"> <tbody> <tr> <td> <div data-slot-container="1" style="min-height: 30px"> <div data-slot="text"> <br> <h2>Hello there!</h2> <br> We haven't heard from you for a while... <br> <br> <br> </div> </div> </td> </tr> </tbody> </table> </center> </div></body></html></textarea>!-->
     <h1>HTML</h1>
-    <textarea class="builder-html" style="width:100%" rows="20"></textarea>
+    <textarea class="builder-html" style="width: 100%" rows="10"></textarea>
     <h1>MJML</h1>
-    <!--<textarea class="builder-mjml">  <mjml><mj-body> <mj-section> <mj-column> <mj-text>My Company</mj-text> </mj-column> </mj-section> </mj-body> </mjml></textarea>-->
-    <textarea class="builder-mjml" style="width:100%" rows="20"><mjml> <mj-body> <mj-section background-color="#f0f0f0"> <mj-column> <mj-text font-style="italic" font-size="20px" color="#626262"> My Company </mj-text> </mj-column> </mj-section> <mj-section background-url="//1.bp.blogspot.com/-TPrfhxbYpDY/Uh3Refzk02I/AAAAAAAALw8/5sUJ0UUGYuw/s1600/New+York+in+The+1960's+-+70's+(2).jpg" background-size="cover" background-repeat="no-repeat"> <mj-column> <mj-text align="center" color="#fff" font-size="40px" font-family="Helvetica Neue">Slogan here </mj-text> <mj-button background-color="#F63A4D" href="#"> Promotion </mj-button> </mj-column> </mj-section> <mj-section background-color="#fafafa"> <mj-column width="400px"> <mj-text font-style="italic" font-size="20px" font-family="Helvetica Neue" color="#626262">My Awesome Text </mj-text> <mj-text color="#525252"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin rutrum enim eget magna efficitur, eu semper augue semper. Aliquam erat volutpat. Cras id dui lectus. Vestibulum sed finibus lectus, sit amet suscipit nibh. Proin nec commodo purus. Sed eget nulla elit. Nulla aliquet mollis faucibus. </mj-text> <mj-button background-color="#F45E43" href="#">Learn more </mj-button> </mj-column> </mj-section> <mj-section background-color="white"> <mj-column> <mj-image width="200px" src="https://designspell.files.wordpress.com/2012/01/sciolino-paris-bw.jpg"/> </mj-column> <mj-column> <mj-text font-style="italic" font-size="20px" font-family="Helvetica Neue" color="#626262"> Find amazing places </mj-text> <mj-text color="#525252"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin rutrum enim eget magna efficitur, eu semper augue semper. Aliquam erat volutpat. Cras id dui lectus. Vestibulum sed finibus lectus. </mj-text> </mj-column> </mj-section> <mj-section background-color="#fbfbfb"> <mj-column> <mj-image width="100px" src="//191n.mj.am/img/191n/3s/x0l.png"/> </mj-column> <mj-column> <mj-image width="100px" src="//191n.mj.am/img/191n/3s/x01.png"/> </mj-column> <mj-column> <mj-image width="100px" src="//191n.mj.am/img/191n/3s/x0s.png"/> </mj-column> </mj-section> <mj-section background-color="#e7e7e7"> <mj-column> <mj-button href="#">Hello There! </mj-button> <mj-social font-size="15px" icon-size="30px" mode="horizontal"> <mj-social-element name="facebook" href="https://mjml.io/"> Facebook </mj-social-element> <mj-social-element name="google" href="https://mjml.io/"> Google </mj-social-element> <mj-social-element name="twitter" href="https://mjml.io/"> Twitter </mj-social-element> </mj-social> </mj-column> </mj-section> </mj-body> </mjml></textarea>
+    <!--<textarea class="builder-mjml"></textarea>-->
+    <textarea class="builder-mjml" style="width: 100%" rows="10">
+<mjml> <mj-body> <mj-section background-color="#f0f0f0"> <mj-column> <mj-text font-style="italic" font-size="20px" color="#626262"> My Company </mj-text> </mj-column> </mj-section> <mj-section background-url="//1.bp.blogspot.com/-TPrfhxbYpDY/Uh3Refzk02I/AAAAAAAALw8/5sUJ0UUGYuw/s1600/New+York+in+The+1960's+-+70's+(2).jpg" background-size="cover" background-repeat="no-repeat"> <mj-column> <mj-text align="center" color="#fff" font-size="40px" font-family="Helvetica Neue">Slogan here </mj-text> <mj-button background-color="#F63A4D" href="#"> Promotion </mj-button> </mj-column> </mj-section> <mj-section background-color="#fafafa"> <mj-column width="400px"> <mj-text font-style="italic" font-size="20px" font-family="Helvetica Neue" color="#626262">My Awesome Text </mj-text> <mj-text color="#525252"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin rutrum enim eget magna efficitur, eu semper augue semper. Aliquam erat volutpat. Cras id dui lectus. Vestibulum sed finibus lectus, sit amet suscipit nibh. Proin nec commodo purus. Sed eget nulla elit. Nulla aliquet mollis faucibus. </mj-text> <mj-button background-color="#F45E43" href="#">Learn more </mj-button> </mj-column> </mj-section> <mj-section background-color="white"> <mj-column> <mj-image width="200px" src="https://designspell.files.wordpress.com/2012/01/sciolino-paris-bw.jpg"/> </mj-column> <mj-column> <mj-text font-style="italic" font-size="20px" font-family="Helvetica Neue" color="#626262"> Find amazing places </mj-text> <mj-text color="#525252"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin rutrum enim eget magna efficitur, eu semper augue semper. Aliquam erat volutpat. Cras id dui lectus. Vestibulum sed finibus lectus. </mj-text> </mj-column> </mj-section> <mj-section background-color="#fbfbfb"> <mj-column> <mj-image width="100px" src="//191n.mj.am/img/191n/3s/x0l.png"/> </mj-column> <mj-column> <mj-image width="100px" src="//191n.mj.am/img/191n/3s/x01.png"/> </mj-column> <mj-column> <mj-image width="100px" src="//191n.mj.am/img/191n/3s/x0s.png"/> </mj-column> </mj-section> <mj-section background-color="#e7e7e7"> <mj-column> <mj-button href="#">Hello There! </mj-button> <mj-social font-size="15px" icon-size="30px" mode="horizontal"> <mj-social-element name="facebook" href="https://mjml.io/"> Facebook </mj-social-element> <mj-social-element name="google" href="https://mjml.io/"> Google </mj-social-element> <mj-social-element name="twitter" href="https://mjml.io/"> Twitter </mj-social-element> </mj-social> </mj-column> </mj-section> </mj-body> </mjml></textarea
+    >
     <h1>Assets</h1>
-    <textarea id="grapesjsbuilder_assets" style="width:100%" rows="20">[]</textarea><h1>Builder Url</h1>
-    <input type="text" id="builder_url" style="width:100%" value="data/response.template.blank-mjml.json" />
-    <a href="#">Top</a>
-    <script src="mautic.js"></script>
+    <textarea id="grapesjsbuilder_assets" style="width: 100%" rows="4">[]</textarea>
+    <h1>Builder Url</h1>
+    <input
+      type="text"
+      id="builder_url"
+      style="width: 100%"
+      value="data/response.template.blank-mjml.json"
+    />
+    <a href="#" onclick="window.scrollTo(0,0); return false;">Top</a> |
+    <a href="#" onclick="return launchPageHtml();">Launch page</a> |
+    <a href="#" onclick="return launchEmailHtml();">Launch emailform HTML</a>
+    <a href="#" onclick="return launchEmailMjml();">Launch emailform MJML</a>
   </body>
+  <script>launchEmailHtml();</script>
 </html>
