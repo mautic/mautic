@@ -180,6 +180,8 @@ class EmailRepository extends CommonRepository
         $statQb->select('stat.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat');
 
+        $statQb->andWhere($statQb->expr()->isNotNull('stat.lead_id'));
+
         if ($variantIds) {
             if (!in_array($emailId, $variantIds)) {
                 $variantIds[] = (int) $emailId;
