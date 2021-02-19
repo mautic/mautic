@@ -10,9 +10,6 @@ use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
 
-/**
- * Class EmailRepository.
- */
 class EmailRepository extends CommonRepository
 {
     /**
@@ -85,7 +82,7 @@ class EmailRepository extends CommonRepository
     /**
      * Delete DNC row.
      *
-     * @param $id
+     * @param int $id
      */
     public function deleteDoNotEmailEntry($id)
     {
@@ -139,14 +136,15 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param      $emailId
-     * @param null $variantIds
-     * @param null $listIds
-     * @param bool $countOnly
-     * @param null $limit
-     * @param int  $minContactId
-     * @param int  $maxContactId
-     * @param bool $countWithMaxMin
+     * @param int            $emailId
+     * @param int[]|null     $variantIds
+     * @param int[]|null     $listIds
+     * @param bool           $countOnly
+     * @param int|null       $limit
+     * @param int|null       $minContactId
+     * @param int|null       $maxContactId
+     * @param bool           $countWithMaxMin
+     * @param \DateTime|null $maxDate
      *
      * @return QueryBuilder|int|array
      */
@@ -264,14 +262,64 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param      $emailId
-     * @param null $variantIds
-     * @param null $listIds
-     * @param bool $countOnly
-     * @param null $limit
-     * @param int  $minContactId
-     * @param int  $maxContactId
-     * @param bool $countWithMaxMin
+     * @param int        $emailId
+     * @param int        $batchSize
+     * @param \DateTime  $maxDate
+     * @param int[]|null $variantIds
+     * @param int[]|null $listIds
+     *
+     * @return array
+     */
+    public function getEmailPendingLeadsIdRange(
+        $emailId,
+        $batchSize,
+        $maxDate,
+        $variantIds = null,
+        $listIds = null
+    ) {
+        $countOnly = false;
+        $limit     = null;
+
+        $pq = $this->getEmailPendingQuery(
+            $emailId,
+            $variantIds,
+            $listIds,
+            $countOnly,
+            $limit,
+            null,
+            null,
+            false,
+            $maxDate
+        );
+
+        $pq->orderBy('id');
+        $pq->setMaxResults($batchSize);
+
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $q->select('COUNT(l.id) as count, MIN(l.id) as min_id, MAX(l.id) as max_id');
+        $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+        $q->innerJoin('l', '('.$pq->getSQL().')', 's', $q->expr()->eq('l.id', 's.id'));
+        $q->setParameter('false', false, 'boolean');
+
+        if (null !== $maxDate) {
+            $q->setParameter('max_date', $maxDate, \Doctrine\DBAL\Types\Type::DATETIME);
+        }
+
+        $results = $q->execute()->fetch();
+
+        return $results;
+    }
+
+    /**
+     * @param int        $emailId
+     * @param int[]|null $variantIds
+     * @param int[]|null $listIds
+     * @param bool       $countOnly
+     * @param int|null   $limit
+     * @param int|null   $minContactId
+     * @param int|null   $maxContactId
+     * @param bool       $countWithMaxMin
      *
      * @return array|int
      */
@@ -318,13 +366,13 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     * @param bool   $viewOther
-     * @param bool   $topLevel
-     * @param null   $emailType
-     * @param null   $variantParentId
+     * @param string      $search
+     * @param int         $limit
+     * @param int         $start
+     * @param bool        $viewOther
+     * @param bool        $topLevel
+     * @param string|null $emailType
+     * @param int|null    $variantParentId
      *
      * @return array
      */
@@ -389,7 +437,7 @@ class EmailRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
-     * @param                                         $filter
+     * @param object                                  $filter
      *
      * @return array
      */
@@ -403,7 +451,7 @@ class EmailRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
-     * @param                                         $filter
+     * @param object                                  $filter
      *
      * @return array
      */
@@ -486,8 +534,8 @@ class EmailRepository extends CommonRepository
     /**
      * Resets variant_start_date, variant_read_count, variant_sent_count.
      *
-     * @param $relatedIds
-     * @param $date
+     * @param int[]|int $relatedIds
+     * @param string    $date
      */
     public function resetVariants($relatedIds, $date)
     {
@@ -550,7 +598,7 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param null $id
+     * @param int|null $id
      *
      * @return \Doctrine\ORM\Internal\Hydration\IterableResult
      */
