@@ -6,8 +6,8 @@
   "scripts": {
     "helloWorld": "parcel Demo/helloWorld/index.html",
     "mautic": "cp -r Demo/data dist && parcel Demo/mautic/index.html",
-    "build": "rm -r dist/ && parcel build Assets/library/js/builder.js",
-    "build-dev": "rm -r dist/ && NODE_ENV=development parcel build Assets/library/js/builder.js --no-minify"
+    "build": "parcel build Assets/library/js/builder.js --out-dir Assets/library/js/dist",
+    "build-dev": "rm -r dist/ && NODE_ENV=development parcel build Assets/library/js/builder.js --no-minify --out-dir Assets/library/js/dist"
   },
   "repository": {
     "type": "git",
