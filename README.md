@@ -126,3 +126,6 @@ npm run mautic
 ```bash
 npm run build
 ```
+
+## Sources
+[New builder documentation resources](https://docs.google.com/document/d/1gdyojOM-K-Otk2iPo92qennjw3yKvdd6VUjToGzFgC0/edit#heading=h.akyer7a3p06t)

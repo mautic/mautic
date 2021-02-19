@@ -11,7 +11,7 @@ function launchBuilderGrapesjs(formName) {
   // Parse HTML template
   const parser = new DOMParser();
   const textareaHtml = mQuery('textarea.builder-html');
-  const textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
+  // const textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
   const fullHtml = parser.parseFromString(textareaHtml.val(), 'text/html');
 
   const canvasContent = fullHtml.body.innerHTML
@@ -85,7 +85,7 @@ function manageDynamicContentTokenToSlot(component) {
  *
  * @param theme
  */
-Mautic.setThemeHtml = function (theme) {
+function setThemeHtml(theme) {
   BuilderService.setupButtonLoadingIndicator(true);
   // Load template and fill field
   mQuery.ajax({
@@ -115,7 +115,7 @@ Mautic.setThemeHtml = function (theme) {
       BuilderService.setupButtonLoadingIndicator(false);
     },
   });
-};
+}
 
 /**
  * Convert dynamic content tokens to slot and load content
@@ -159,5 +159,5 @@ function initSelectThemeGrapesjs(parentInitSelectTheme) {
 
 Mautic.grapesConvertDynamicContentTokenToSlot = grapesConvertDynamicContentTokenToSlot;
 Mautic.launchBuilder = launchBuilderGrapesjs;
-
 Mautic.initSelectTheme = initSelectThemeGrapesjs(Mautic.initSelectTheme);
+Mautic.setThemeHtml = setThemeHtml;
