@@ -58,7 +58,133 @@ function manageDynamicContentTokenToSlot(component) {
         } else {
           dynConContent = dynConContainer.html();
         }
+<<<<<<< HEAD
       }
+=======
+    };
+
+    if (object === 'page') { // PageBuilder
+        // Parse HTML template
+        let parser = new DOMParser();
+        let fullHtml = parser.parseFromString(textareaHtml.val(), "text/html");
+
+        // Extract body
+        let body = fullHtml.body.innerHTML;
+
+        // Launch GrapesJS with body part
+        editor = grapesjs.init({
+            clearOnRender: true,
+            container: '.builder-panel',
+            components: body,
+            height: '100%',
+            storageManager: false,
+            assetManager: assetManagerConf,
+            styleManager: {
+                clearProperties: true, // Temp fix https://github.com/artf/grapesjs-preset-webpage/issues/27
+            },
+
+            plugins: ['gjs-preset-webpage', 'grapesjs-parser-postcss', 'grapesjs-preset-mautic'],
+            pluginsOpts: {
+                'gjs-preset-webpage': {
+                    'formsOpts': false,
+                },
+                'grapesjs-preset-mautic': presetMauticConf
+            },
+            keymaps: keymapsConf
+        });
+
+        // Customize GrapesJS -> add close button with save for Mautic
+        panelManager = editor.Panels;
+        panelManager.addButton('views', [
+            {
+                id: 'close',
+                className: 'fa fa-times-circle',
+                attributes: {title: 'Close'},
+                command: function () {
+                    Mautic.grapesConvertDynamicContentSlotsToTokens(editor);
+
+                    // Update textarea for save
+                    fullHtml.body.innerHTML = editor.getHtml() + '<style>' + editor.getCss({avoidProtected: true}) + '</style>';
+                    textareaHtml.val(fullHtml.documentElement.outerHTML);
+
+                    // Reset HTML
+                    mQuery('.builder').removeClass('builder-active').addClass('hide');
+                    mQuery('html').css('font-size', '');
+                    mQuery('body').css('overflow-y', '');
+
+                    // Destroy GrapesJS
+                    editor.destroy();
+                }
+            }
+        ]);
+    } else if (object === 'emailform') {
+        let textareaMjml = mQuery('textarea.builder-mjml');
+
+        if (textareaMjml.val().length) { // EmailBuilder -> MJML
+            editor = grapesjs.init({
+                clearOnRender: true,
+                container: '.builder-panel',
+                components: textareaMjml.val(),
+                height: '100%',
+                storageManager: false,
+                assetManager: assetManagerConf,
+
+                plugins: ['grapesjs-mjml', 'grapesjs-parser-postcss', 'grapesjs-preset-mautic'],
+                pluginsOpts: {
+                    'grapesjs-mjml': {},
+                    'grapesjs-preset-mautic': presetMauticConf
+                },
+                keymaps: keymapsConf
+            });
+
+            editor.BlockManager.get('mj-button').set({
+                content: "<mj-button href=\"https://\">Button</mj-button>",
+            });
+
+            // Customize GrapesJS -> add close button with save for Mautic
+            panelManager = editor.Panels;
+            panelManager.addButton('views', [
+                {
+                    id: 'close',
+                    className: 'fa fa-times-circle',
+                    attributes: {title: 'Close'},
+                    command: function () {
+                        Mautic.grapesConvertDynamicContentSlotsToTokens(editor);
+
+                        let code = '';
+
+                        // Try catch for mjml parser error
+                        try {
+                            code = editor.runCommand('mjml-get-code');
+                        } catch(error) {
+                            console.log(error.message);
+                            alert('Errors inside your template. Template will not be saved.');
+                        }
+
+                        // Update textarea for save
+                        if (!code.length) {
+                            textareaHtml.val(code.html);
+                            textareaMjml.val(editor.getHtml());
+                        }
+
+                        // Reset HTML
+                        mQuery('.builder').removeClass('builder-active').addClass('hide');
+                        mQuery('html').css('font-size', '');
+                        mQuery('body').css('overflow-y', '');
+
+                        // Destroy GrapesJS
+                        editor.destroy();
+                    }
+                }
+            ]);
+        } else { // EmailBuilder -> HTML
+            // Parse HTML template
+            let parser = new DOMParser();
+            let fullHtml = parser.parseFromString(textareaHtml.val(), "text/html");
+
+            // Extract body
+            let body = fullHtml.body.innerHTML;
+>>>>>>> mautic3x
 
       if (dynConContent === '') {
         dynConContent = dynConTabA.text();
@@ -78,8 +204,99 @@ function manageDynamicContentTokenToSlot(component) {
       });
       component.set('content', dynConTab.text());
     }
+<<<<<<< HEAD
   }
 }
+=======
+
+    editor.on('load', (response) => {
+        const um = editor.UndoManager;
+
+        Mautic.grapesConvertDynamicContentTokenToSlot(editor);
+
+        // Clear stack of undo/redo
+        um.clear();
+    });
+
+    editor.on('component:add', (component) => {
+        let type = component.get('type');
+
+        // Create dynamic-content on Mautic side
+        if (type === 'dynamic-content') {
+            manageDynamicContentTokenToSlot(component);
+        }
+    });
+
+    editor.on('component:remove', (component) => {
+        let type = component.get('type');
+
+        // Delete dynamic-content on Mautic side
+        if (type === 'dynamic-content') {
+            deleteDynamicContentItem(component);
+        }
+    });
+
+    const keymaps = editor.Keymaps;
+    let allKeymaps;
+
+    editor.on('modal:open', () => {
+        // Save all keyboard shortcuts
+        allKeymaps = Object.assign({}, keymaps.getAll());
+
+        // Remove keyboard shortcuts to prevent launch behind popup
+        keymaps.removeAll();
+    });
+
+    editor.on('modal:close', () => {
+        const commands = editor.Commands;
+        const cmdCodeEdit = 'preset-mautic:code-edit';
+        const cmdDynamicContent = 'preset-mautic:dynamic-content';
+
+        // Launch preset-mautic:code-edit command stop
+        if (commands.isActive(cmdCodeEdit)) {
+            commands.stop(cmdCodeEdit, {editor});
+        }
+
+        // Launch preset-mautic:dynamic-content command stop
+        if (commands.isActive(cmdDynamicContent)) {
+            commands.stop(cmdDynamicContent, {editor});
+        }
+
+        // ReMap keyboard shortcuts on modal close
+        Object.keys(allKeymaps).map(function(objectKey) {
+            let shortcut = allKeymaps[objectKey];
+
+            keymaps.add(shortcut.id, shortcut.keys, shortcut.handler);
+        });
+
+        let modalContent = editor.Modal.getContentEl().querySelector('#dynamic-content-popup');
+
+        // On modal close -> move editor within Mautic
+        if (modalContent !== null) {
+            let dynamicContentContainer = mQuery('#dynamicContentContainer');
+            let content = mQuery(modalContent).contents().first();
+
+            dynamicContentContainer.append(content.detach());
+        }
+    });
+
+    editor.on('asset:add', (response) => {
+        // Save assets list in textarea to keep new uploaded files without reload page
+        textareaAssets.val(JSON.stringify(getAssetsList(editor)));
+    });
+
+    editor.on('asset:remove', (response) => {
+        // Save assets list in textarea to keep new deleted files without reload page
+        textareaAssets.val(JSON.stringify(getAssetsList(editor)));
+
+        // Delete file on server
+        mQuery.ajax({
+            url: textareaAssets.data('delete'),
+            data: {'filename': response.getFilename()}
+        });
+    });
+};
+>>>>>>> mautic3x
 
 /**
  * Set theme's HTML
