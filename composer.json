@@ -114,7 +114,7 @@
         "phpoffice/phpspreadsheet": "^1.15",
         "predis/predis": "^1.1",
         "composer/installers": "^1.10",
-        "mautic/grapejs-builder": "1.0-RC2"
+        "mautic/grapejs-builder": "1.0-RC3"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~3.4.0",
@@ -146,12 +146,12 @@
             "type": "package",
             "package": {
                 "name": "mautic/grapejs-builder",
-                "version": "1.0-RC2",
+                "version": "1.0-RC3",
                 "type": "mautic-plugin",
                 "source": {
                     "url": "https://github.com/mautic/plugin-grapesjs-builder.git",
                     "type": "git",
-                    "reference": "1.0-RC2"
+                    "reference": "1.0-RC3"
                 },
                 "require": {
                     "composer/installers": "~1.0"

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b90238e3ebd0d8c1fce8973848e32a92",
+    "content-hash": "fd0c69cf521d15d3cab9a446ba3087d6",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -5660,11 +5660,11 @@
         },
         {
             "name": "mautic/grapejs-builder",
-            "version": "1.0-RC2",
+            "version": "1.0-RC3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mautic/plugin-grapesjs-builder.git",
-                "reference": "1.0-RC2"
+                "reference": "1.0-RC3"
             },
             "require": {
                 "composer/installers": "~1.0"
@@ -15438,12 +15438,12 @@
             "version": "1.9.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/webmozart/assert.git",
+                "url": "https://github.com/webmozarts/assert.git",
                 "reference": "bafc69caeb4d49c39fd0779086c03a3738cbb389"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozart/assert/zipball/bafc69caeb4d49c39fd0779086c03a3738cbb389",
+                "url": "https://api.github.com/repos/webmozarts/assert/zipball/bafc69caeb4d49c39fd0779086c03a3738cbb389",
                 "reference": "bafc69caeb4d49c39fd0779086c03a3738cbb389",
                 "shasum": ""
             },
