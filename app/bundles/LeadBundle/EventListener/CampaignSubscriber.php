@@ -336,8 +336,9 @@ class CampaignSubscriber implements EventSubscriberInterface
         if (!empty($fieldsToAddValues)) {
             // update values with diff after remove
             foreach ($fieldsToAddValues as $field => &$fieldToAddValue) {
-                $oldValue           = explode('|', $lead->getFieldValue($field));
-                $fieldToAddValue    = array_unique(array_merge($oldValue, $fieldToAddValue));
+                $fieldValue      = $lead->getFieldValue($field);
+                $oldValue        = !empty($fieldValue) ? explode('|', $fieldValue) : [];
+                $fieldToAddValue = array_unique(array_merge($oldValue, $fieldToAddValue));
             }
             $this->leadModel->setFieldValues($lead, $fieldsToAddValues);
         }
