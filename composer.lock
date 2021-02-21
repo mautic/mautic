@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fd0c69cf521d15d3cab9a446ba3087d6",
+    "content-hash": "573b479739891bf79e969509b9c9d411",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -5660,11 +5660,11 @@
         },
         {
             "name": "mautic/grapejs-builder",
-            "version": "1.0-RC3",
+            "version": "1.0-RC4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mautic/plugin-grapesjs-builder.git",
-                "reference": "1.0-RC3"
+                "reference": "1.0-RC4"
             },
             "require": {
                 "composer/installers": "~1.0"
