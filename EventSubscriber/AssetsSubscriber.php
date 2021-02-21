@@ -17,6 +17,11 @@ class AssetsSubscriber implements EventSubscriberInterface
      */
     private $config;
 
+    /**
+     * @var InstallService
+     */
+    private $installer;
+
     public function __construct(Config $config, InstallService $installer)
     {
         $this->config = $config;
