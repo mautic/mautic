@@ -11,9 +11,12 @@
 
 namespace Mautic\FormBundle\Entity;
 
+use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
 
 class Field
@@ -143,6 +146,11 @@ class Field
     /**
      * @var bool
      */
+    private $alwaysDisplay;
+
+    /**
+     * @var bool
+     */
     private $leadFieldNotOverwrite;
 
     /**
@@ -238,6 +246,8 @@ class Field
         $builder->addNullableField('showWhenValueExists', 'boolean', 'show_when_value_exists');
 
         $builder->addNullableField('showAfterXSubmissions', 'integer', 'show_after_x_submissions');
+
+        $builder->addNullableField('alwaysDisplay', Types::BOOLEAN, 'always_display');
     }
 
     /**
@@ -860,7 +870,7 @@ class Field
      *
      * @return bool
      */
-    public function showForContact($submissions = null, Lead $lead = null, Form $form = null)
+    public function showForContact($submissions = null, Lead $lead = null, Form $form = null, DisplayManager $displayManager = null)
     {
         // Always show in the kiosk mode
         if (null !== $form && true === $form->getInKioskMode()) {
@@ -868,11 +878,11 @@ class Field
         }
 
         // Hide the field if there is the submission count limit and hide it until the limit is overcame
-        if ($this->showAfterXSubmissions > 0 && $this->showAfterXSubmissions > count($submissions)) {
+        if (!$this->alwaysDisplay && $this->showAfterXSubmissions > 0 && null !== $submissions && $this->showAfterXSubmissions > count($submissions)) {
             return false;
         }
 
-        if (false === $this->showWhenValueExists) {
+        if (!$this->alwaysDisplay && false === $this->showWhenValueExists) {
             // Hide the field if there is the value condition and if we already know the value for this field
             if ($submissions) {
                 foreach ($submissions as $submission) {
@@ -884,6 +894,12 @@ class Field
 
             // Hide the field if the value is already known from the lead profile
             if (null !== $lead && $this->leadField && !empty($lead->getFieldValue($this->leadField)) && !$this->isAutoFill) {
+                return false;
+            }
+        }
+
+        if ($displayManager && $displayManager->useProgressiveProfilingLimit()) {
+            if (!$displayManager->showForField($this)) {
                 return false;
             }
         }
@@ -905,6 +921,22 @@ class Field
     public function isFileType()
     {
         return 'file' === $this->type;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAlwaysDisplay()
+    {
+        return $this->alwaysDisplay;
+    }
+
+    /**
+     * @param bool $alwaysDisplay
+     */
+    public function setAlwaysDisplay($alwaysDisplay)
+    {
+        $this->alwaysDisplay = $alwaysDisplay;
     }
 
     public function isLeadFieldNotOverwrite(): ?bool
