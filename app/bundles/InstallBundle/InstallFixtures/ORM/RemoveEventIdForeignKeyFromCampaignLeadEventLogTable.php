@@ -19,6 +19,8 @@ class RemoveEventIdForeignKeyFromCampaignLeadEventLogTable extends AbstractFixtu
     private const COLUMN     = ['event_id'];
     private const ORDER      = 8;
 
+    private $container;
+
     public function setContainer(ContainerInterface $container = null): void
     {
         $this->container = $container;
