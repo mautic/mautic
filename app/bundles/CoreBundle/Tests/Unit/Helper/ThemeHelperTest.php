@@ -227,25 +227,18 @@ class ThemeHelperTest extends TestCase
 
         $templating = $this->createMock(DelegatingEngine::class);
 
-        // twig does not exist
-        $templating->expects($this->at(0))
+        $templating->expects($this->exactly(4))
             ->method('exists')
-            ->willReturn(false);
-
-        // php does not exist
-        $templating->expects($this->at(1))
-            ->method('exists')
-            ->willReturn(false);
-
-        // default theme twig does not exist
-        $templating->expects($this->at(2))
-            ->method('exists')
-            ->willReturn(false);
-
-        // next theme exists
-        $templating->expects($this->at(3))
-            ->method('exists')
-            ->willReturn(true);
+            ->willReturnOnConsecutiveCalls(
+                // twig does not exist
+                false,
+                // php does not exist
+                false,
+                // default theme twig does not exist
+                false,
+                // next theme exists
+                true
+            );
 
         $this->templatingHelper->expects($this->once())
             ->method('getTemplating')
@@ -267,7 +260,7 @@ class ThemeHelperTest extends TestCase
 
         $template = $this->themeHelper->checkForTwigTemplate(':goldstar:page.html.twig');
         $this->assertNotEquals(':nature:page.html.twig', $template);
-        $this->assertEquals(':goldstar:page.html.twig', $template);
+        $this->assertNotEquals(':goldstar:page.html.twig', $template);
         $this->assertStringContainsString(':page.html.twig', $template);
     }
 
