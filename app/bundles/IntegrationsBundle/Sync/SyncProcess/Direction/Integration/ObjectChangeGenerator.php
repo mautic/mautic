@@ -115,7 +115,9 @@ class ObjectChangeGenerator
         /** @var FieldMappingDAO[] $fieldMappings */
         $fieldMappings = $objectMapping->getFieldMappings();
         foreach ($fieldMappings as $fieldMappingDAO) {
-            $this->addFieldToObjectChange($fieldMappingDAO);
+            if ($fieldMappingDAO->getSyncDirection() !== ObjectMappingDAO::SYNC_TO_MAUTIC) {
+                $this->addFieldToObjectChange($fieldMappingDAO);
+            }
         }
 
         // Set the change date/time from the object so that we can update last sync date based on this

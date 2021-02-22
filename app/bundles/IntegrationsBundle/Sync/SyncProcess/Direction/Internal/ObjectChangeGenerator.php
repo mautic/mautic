@@ -31,6 +31,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
+use function GuzzleHttp\debug_resource;
 
 class ObjectChangeGenerator
 {
@@ -145,7 +146,9 @@ class ObjectChangeGenerator
         /** @var FieldMappingDAO[] $fieldMappings */
         $fieldMappings = $objectMapping->getFieldMappings();
         foreach ($fieldMappings as $fieldMappingDAO) {
-            $this->addFieldToObjectChange($fieldMappingDAO);
+            if ($fieldMappingDAO->getSyncDirection() !== ObjectMappingDAO::SYNC_TO_INTEGRATION) {
+                $this->addFieldToObjectChange($fieldMappingDAO);
+            }
         }
 
         // Set the change date/time from the object so that we can update last sync date based on this
