@@ -13,6 +13,7 @@ namespace Mautic\FormBundle\Tests\Model;
 
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\SubmissionEvent;
+use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Tests\FormTestAbstract;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -54,5 +55,34 @@ class SubmissionModelTest extends FormTestAbstract
         $token              = '{formfield='.$alias.'}';
         $tokens[$token]     = $formData[$alias];
         $this->assertNotEquals($tokens[$token], $submissionEvent->getTokens()[$token]);
+    }
+
+    public function testGetNotOverwriteFieldsData()
+    {
+        $profileFields = [
+            'email'     => 'test@test.com',
+            'firstname' => 'firstname',
+        ];
+
+        $data = [
+            'email'    => 'test@test.com',
+            'firstname'=> 'change',
+        ];
+
+        $notOverwriteFields = [];
+
+        $submissionModel     = $this->getSubmissionModel();
+        $reflection          = new \ReflectionClass(SubmissionModel::class);
+        $method              = $reflection->getMethod('getNotOverwriteFieldsData');
+        $method->setAccessible(true);
+        $result = $method->invokeArgs($submissionModel, [$profileFields, $data, $notOverwriteFields]);
+        $this->assertSame($data, $result);
+
+        $notOverwriteFields = [
+            'firstname',
+        ];
+
+        $result = $method->invokeArgs($submissionModel, [$profileFields, $data, $notOverwriteFields]);
+        $this->assertSame(['email' => 'test@test.com'], $result);
     }
 }
