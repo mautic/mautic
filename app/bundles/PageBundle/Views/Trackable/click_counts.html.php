@@ -13,16 +13,22 @@
             </thead>
             <tbody>
                 <?php
-                    $totalClicks       = 0;
-                    $totalUniqueClicks = 0;
+                    $clickCounts = array_reduce($trackables, function ($accumulator, $link) {
+                        $accumulator[0] += $link['hits'];
+                        $accumulator[1] += $link['unique_hits'];
+
+                        return $accumulator;
+                    }, [
+                        0,
+                        0,
+                    ]);
+                    [$totalClicks, $totalUniqueClicks] = $clickCounts;
                     foreach ($trackables as $link):
-                        $totalClicks += $link['hits'];
-                        $totalUniqueClicks += $link['unique_hits'];
                         ?>
                         <tr>
                             <td class="long-text"><a href="<?php echo $link['url']; ?>"><?php echo $link['url']; ?></a></td>
                             <td class="text-center"><?php echo $link['hits']; ?></td>
-                            <td class="text-center"><?php echo isset($entity) && 0 !== $entity->getReadCount(true) ? round($link['unique_hits'] / $entity->getReadCount(true) * 100, 2).'%' : '0%'; ?></td>
+                            <td class="text-center"><?php echo isset($entity) && 0 !== $entity->getReadCount(true) ? round($link['unique_hits'] / $totalUniqueClicks * 100, 2).'%' : '0%'; ?></td>
                             <td class="text-center">
                                 <span class="mt-xs label label-primary has-click-event clickable-stat">
                         <?php if (isset($channel) && isset($entity)): ?>
