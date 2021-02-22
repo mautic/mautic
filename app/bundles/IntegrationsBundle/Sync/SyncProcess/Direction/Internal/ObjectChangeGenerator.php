@@ -31,7 +31,6 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
-use function GuzzleHttp\debug_resource;
 
 class ObjectChangeGenerator
 {
