@@ -907,18 +907,11 @@ class Field
         return 'file' === $this->type;
     }
 
-    /**
-     * @return bool
-     */
     public function isLeadFieldNotOverwrite(): bool
     {
         return $this->leadFieldNotOverwrite;
     }
 
-
-    /**
-     * @param bool|null $leadFieldNotOverwrite
-     */
     public function setLeadFieldNotOverwrite(?bool $leadFieldNotOverwrite)
     {
         $this->leadFieldNotOverwrite = $leadFieldNotOverwrite;

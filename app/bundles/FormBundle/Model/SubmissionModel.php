@@ -179,7 +179,7 @@ class SubmissionModel extends CommonFormModel
         $this->fieldValueTransformer  = $fieldValueTransformer;
         $this->dateHelper             = $dateHelper;
         $this->contactTracker         = $contactTracker;
-        $this->primaryCompanyHelper = $primaryCompanyHelper;
+        $this->primaryCompanyHelper   = $primaryCompanyHelper;
     }
 
     /**
@@ -900,7 +900,7 @@ class SubmissionModel extends CommonFormModel
 
             // Get unique identifier fields for the found lead then compare with the lead currently tracked
             $uniqueFieldsFound             = $getData($foundLeadFields, true);
-            [$hasConflict, $conflicts] = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
+            [$hasConflict, $conflicts]     = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
 
             if ($inKioskMode || $hasConflict || !$lead->getId()) {
                 // Use the found lead without merging because there is some sort of conflict with unique identifiers or in kiosk mode and thus should not merge
@@ -999,7 +999,7 @@ class SubmissionModel extends CommonFormModel
             // not overwrite if value exist
             if (!empty($notOverwriteFields)) {
                 $this->logger->debug('FORM: Not overwrite contact\'s company fields to process '.implode(',', $notOverwriteFields));
-                $profileFields = $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead);
+                $profileFields                = $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead);
                 $companyFieldMatches          = $this->getNotOverwriteFieldsData($profileFields, $companyFieldMatches, $notOverwriteFields);
             }
 
@@ -1057,13 +1057,6 @@ class SubmissionModel extends CommonFormModel
         return true;
     }
 
-    /**
-     * @param array $profileFields
-     * @param array $data
-     * @param array $notOverwriteFields
-     *
-     * @return array
-     */
     protected function getNotOverwriteFieldsData(array $profileFields, array $data, array $notOverwriteFields): array
     {
         foreach ($notOverwriteFields as $notOverwriteField) {
@@ -1075,5 +1068,5 @@ class SubmissionModel extends CommonFormModel
         }
 
         return $data;
-}
+    }
 }
