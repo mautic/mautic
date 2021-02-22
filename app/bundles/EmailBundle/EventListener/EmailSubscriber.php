@@ -117,8 +117,9 @@ class EmailSubscriber implements EventSubscriberInterface
                     if (preg_match(self::PREHEADER_HTML_SEARCH_PATTERN, $customHtml, $preheaderMatches)) {
                         $customHtml = str_ireplace($preheaderMatches[0], $preheaderTextElement, $customHtml);
                     } else {
-                        preg_match('/(<body[^\>]*>)/i', $customHtml, $contentMatches);
-                        $customHtml = str_ireplace($contentMatches[0], $contentMatches[0]."\n".$preheaderTextElement, $customHtml);
+                        if (preg_match('/(<body[^\>]*>)/i', $customHtml, $contentMatches)) {
+                            $customHtml = str_ireplace($contentMatches[0], $contentMatches[0]."\n".$preheaderTextElement, $customHtml);
+                        }
                     }
                     $email->setCustomHtml($customHtml);
                     $this->emailModel->saveEntity($email);
