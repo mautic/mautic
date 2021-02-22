@@ -417,7 +417,7 @@ class FieldType extends AbstractType
                 YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.form.field.form.leadFieldNotOverwrite',
-                    'data'  => isset($options['data']['leadFieldNotOverwrite']) ? $options['data']['leadFieldNotOverwrite'] : false,
+                    'data'  => $options['data']['leadFieldNotOverwrite'] ?? false,
                     'attr'  => [
                         'tooltip' => 'mautic.form.field.form.leadFieldNotOverwrite.tooltip',
                     ],
