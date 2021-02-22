@@ -21,6 +21,7 @@ use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Event\QueueConsumerEvent;
 use Mautic\QueueBundle\Queue\QueueConsumerResults;
 use Mautic\QueueBundle\QueueEvents;
+use Mautic\PageBundle\Entity\Page;
 
 /**
  * Class PageSubscriber.
@@ -189,13 +190,13 @@ class PageSubscriber extends CommonSubscriber
         $hitId                  = $payload['hitId'];
         $pageId                 = $payload['pageId'];
         $leadId                 = $payload['leadId'];
-        $isRedirect             = !empty($payload['isRedirect']);
         $hitRepo                = $this->em->getRepository('MauticPageBundle:Hit');
         $pageRepo               = $this->em->getRepository('MauticPageBundle:Page');
         $redirectRepo           = $this->em->getRepository('MauticPageBundle:Redirect');
         $leadRepo               = $this->em->getRepository('MauticLeadBundle:Lead');
         $hit                    = $hitId ? $hitRepo->find((int) $hitId) : null;
         $lead                   = $leadId ? $leadRepo->find((int) $leadId) : null;
+        $page                   = NULL;
 
         // On the off chance that the queue contains a message which does not
         // reference a valid Hit or Lead, discard it to avoid clogging the queue.
@@ -213,10 +214,15 @@ class PageSubscriber extends CommonSubscriber
             return;
         }
 
-        if ($isRedirect) {
-            $page = $pageId ? $redirectRepo->find((int) $pageId) : null;
-        } else {
-            $page = $pageId ? $pageRepo->find((int) $pageId) : null;
+        if ($pageId) {
+            $foundPage = $pageRepo->find((int) $pageId);
+
+            if ($foundPage instanceof Page) {
+                $page = $foundPage;
+            }
+            else {
+                $page = $redirectRepo->find((int) $pageId);
+            }
         }
 
         // Also reject messages when processing causes any other exception.
