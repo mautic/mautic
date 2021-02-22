@@ -968,7 +968,7 @@ class SubmissionModel extends CommonFormModel
 
         // not overwrite if value exist
         if (!empty($notOverwriteFields)) {
-            $this->logger->debug('FORM: Not overwrite contact fields to process '.implode(',', $notOverwriteFields));
+            $this->logger->debug('FORM: Do not overwrite contact fields to process '.implode(',', $notOverwriteFields));
             $profileFields = $lead->getProfileFields();
             $data          = $this->getNotOverwriteFieldsData($profileFields, $data, $notOverwriteFields);
         }
