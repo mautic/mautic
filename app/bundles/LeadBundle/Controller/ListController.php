@@ -948,7 +948,7 @@ class ListController extends FormController
     {
         /** @var Session */
         $session= $this->get('session');
-        $session->set('mautic.campaign.contact.page', $page);
+        $session->set('mautic.segment.contact.page', $page);
 
         $manuallyRemoved = 0;
         $listFilters     = ['manually_removed' => $manuallyRemoved];
