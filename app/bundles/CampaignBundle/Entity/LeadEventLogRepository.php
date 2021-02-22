@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Entity\TimelineTrait;
 
 class LeadEventLogRepository extends CommonRepository
 {
+    const LOG_DELETE_BATCH_SIZE = 5000;
     use TimelineTrait;
     use ContactLimiterTrait;
     use SlaveConnectionTrait;
@@ -596,18 +597,18 @@ SQL;
             ->execute();
     }
 
-    /**
-     * Removes logs by event_id.
-     * It uses batch processing for removing
-     * large quantities of records.
-     *
-     * @param int $eventId
-     */
-    public function removeEventLogs($eventId)
+    public function removeEventLogs(array $eventIds): void
     {
-        $conn = $this->_em->getConnection();
-        $conn->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', [
-            'event_id' => (int) $eventId,
-        ]);
+        $eventIdsStr = implode(',', $eventIds);
+        $sql         = 'DELETE FROM '.MAUTIC_TABLE_PREFIX."campaign_lead_event_log el WHERE el.event_id IN ({$eventIdsStr}) 
+        ORDER BY el.event_id ASC LIMIT ".self::LOG_DELETE_BATCH_SIZE;
+        $conn          = $this->getEntityManager()->getConnection();
+        $deleteEntries = true;
+        while ($deleteEntries) {
+            $deletedRecords = $conn->executeQuery($sql)->rowCount();
+            if (!$deletedRecords) {
+                $deleteEntries = false;
+            }
+        }
     }
 }
