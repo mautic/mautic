@@ -108,12 +108,9 @@ if ('index' == $tmpl) {
                 $hasTranslations            = $item->isTranslation();
                 $type                       = $item->getEmailType();
                 $mauticTemplateVars['item'] = $item;
-                $trackables                 = $model->getEmailClickStats($item->getId());
-                $totalClicks                = array_reduce($trackables, function ($totalClicks, $link) {
-                    $totalClicks += $link['unique_hits'];
+                $emailClicksResult          = $pageRepo->getEmailClickthroughHitCount($item->getId());
+                $emailClicks                = is_array($emailClicksResult) && count($emailClicksResult) > 0 ? $emailClicksResult[$item->getId()] : 0;
 
-                    return $totalClicks;
-                }, 0);
                 ?>
                 <tr>
                     <td>
@@ -256,11 +253,11 @@ if ('index' == $tmpl) {
                         </span>
                         <span class="mt-xs label label-danger"
                               id="clic-counts-<?php echo $item->getId(); ?>">
-                                <?php echo $view['translator']->trans('mautic.email.stat.clickcount', ['%count%' => $totalClicks]); ?>
+                                <?php echo $view['translator']->trans('mautic.email.stat.clickcount', ['%count%' => $emailClicks]); ?>
                         </span>
                         <span class="mt-xs label label-info"
                               id="click-through-rate-<?php echo $item->getId(); ?>">
-                                <?php echo $view['translator']->trans('mautic.email.stat.ctr', ['%count%' => 0 !== $item->getReadCount(true) ? round($totalClicks / $item->getReadCount(true) * 100, 2) : 0]); ?>
+                                <?php echo $view['translator']->trans('mautic.email.stat.ctr', ['%count%' => 0 !== $item->getSentCount(true) ? round($emailClicks / $item->getSentCount(true) * 100, 2) : 0]); ?>
                         </span>
                         <?php echo $view['content']->getCustomContent('email.stats', $mauticTemplateVars); ?>
                         <?php echo $view['content']->getCustomContent('email.stats.below', $mauticTemplateVars); ?>
