@@ -998,7 +998,7 @@ class SubmissionModel extends CommonFormModel
         if (!empty($companyFieldMatches)) {
             // not overwrite if value exist
             if (!empty($notOverwriteFields)) {
-                $this->logger->debug('FORM: Not overwrite contact\'s company fields to process '.implode(',', $notOverwriteFields));
+                $this->logger->debug('FORM: Do not overwrite contact\'s company fields to process '.implode(',', $notOverwriteFields));
                 $profileFields                = $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead);
                 $companyFieldMatches          = $this->getNotOverwriteFieldsData($profileFields, $companyFieldMatches, $notOverwriteFields);
             }
