@@ -907,7 +907,7 @@ class Field
         return 'file' === $this->type;
     }
 
-    public function isLeadFieldNotOverwrite(): bool
+    public function isLeadFieldNotOverwrite(): ?bool
     {
         return $this->leadFieldNotOverwrite;
     }
