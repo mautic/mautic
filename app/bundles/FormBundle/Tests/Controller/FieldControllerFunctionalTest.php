@@ -79,4 +79,58 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
         Assert::assertStringContainsString('<option value="email"  selected="selected">', $payload['newContent']);
     }
+
+    public function testNewCaptchaFieldFormCanBeSaved()
+    {
+        $payload = [
+            'name'        => 'Submission test form',
+            'description' => 'Form created via captcha test',
+            'formType'    => 'standalone',
+            'isPublished' => true,
+            'fields'      => [
+                [
+                    'label'     => 'Email',
+                    'type'      => 'email',
+                    'alias'     => 'email',
+                    'leadField' => 'email',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $formId         = $response['form']['id'];
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $this->client->request(
+            Request::METHOD_POST,
+            '/s/forms/field/new',
+            [
+                'formfield' => [
+                    'formId'     => $formId,
+                    'type'       => 'captcha',
+                    'label'      => 'What is the capital of Czech Republic?',
+                    'properties' => [
+                        'captcha' => 'Prague',
+                    ],
+                    'buttons' => ['save' => true],
+                ],
+            ],
+            [],
+            $this->createAjaxHeaders()
+        );
+
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        $response = json_decode($this->client->getResponse()->getContent(), true);
+
+        Assert::assertSame(1, $response['success']);
+        Assert::assertSame(1, $response['closeModal']);
+    }
 }
