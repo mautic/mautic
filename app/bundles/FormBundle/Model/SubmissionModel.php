@@ -44,6 +44,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
+use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -58,37 +59,90 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SubmissionModel extends CommonFormModel
 {
+    /**
+     * @var IpLookupHelper
+     */
     protected $ipLookupHelper;
 
+    /**
+     * @var TemplatingHelper
+     */
     protected $templatingHelper;
 
+    /**
+     * @var FormModel
+     */
     protected $formModel;
 
+    /**
+     * @var PageModel
+     */
     protected $pageModel;
 
+    /**
+     * @var LeadModel
+     */
     protected $leadModel;
 
+    /**
+     * @var CampaignModel
+     */
     protected $campaignModel;
 
+    /**
+     * @var MembershipManager
+     */
     protected $membershipManager;
 
+    /**
+     * @var LeadFieldModel
+     */
     protected $leadFieldModel;
 
+    /**
+     * @var CompanyModel
+     */
     protected $companyModel;
 
+    /**
+     * @var FormFieldHelper
+     */
     protected $fieldHelper;
 
+    /**
+     * @var UploadFieldValidator
+     */
     private $uploadFieldValidator;
 
+    /**
+     * @var FormUploader
+     */
     private $formUploader;
 
+    /**
+     * @var DeviceTrackingServiceInterface
+     */
     private $deviceTrackingService;
 
+    /**
+     * @var FieldValueTransformer
+     */
     private $fieldValueTransformer;
 
+    /**
+     * @var DateHelper
+     */
     private $dateHelper;
 
+    /**
+     * @var ContactTracker
+     */
     private $contactTracker;
+
+    /**
+     * @var PrimaryCompanyHelper
+     */
+    private $primaryCompanyHelper;
 
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -106,7 +160,8 @@ class SubmissionModel extends CommonFormModel
         DeviceTrackingServiceInterface $deviceTrackingService,
         FieldValueTransformer $fieldValueTransformer,
         DateHelper $dateHelper,
-        ContactTracker $contactTracker
+        ContactTracker $contactTracker,
+        PrimaryCompanyHelper $primaryCompanyHelper
     ) {
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->templatingHelper       = $templatingHelper;
@@ -124,6 +179,7 @@ class SubmissionModel extends CommonFormModel
         $this->fieldValueTransformer  = $fieldValueTransformer;
         $this->dateHelper             = $dateHelper;
         $this->contactTracker         = $contactTracker;
+        $this->primaryCompanyHelper = $primaryCompanyHelper;
     }
 
     /**
@@ -820,7 +876,7 @@ class SubmissionModel extends CommonFormModel
         };
 
         // Get data for the form submission
-        list($data, $uniqueFieldsWithData) = $getData($leadFieldMatches);
+        [$data, $uniqueFieldsWithData] = $getData($leadFieldMatches);
         $this->logger->debug('FORM: Unique fields submitted include '.implode(', ', $uniqueFieldsWithData));
 
         // Check for duplicate lead
@@ -844,7 +900,7 @@ class SubmissionModel extends CommonFormModel
 
             // Get unique identifier fields for the found lead then compare with the lead currently tracked
             $uniqueFieldsFound             = $getData($foundLeadFields, true);
-            list($hasConflict, $conflicts) = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
+            [$hasConflict, $conflicts] = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
 
             if ($inKioskMode || $hasConflict || !$lead->getId()) {
                 // Use the found lead without merging because there is some sort of conflict with unique identifiers or in kiosk mode and thus should not merge
@@ -869,7 +925,7 @@ class SubmissionModel extends CommonFormModel
 
         if (!$inKioskMode) {
             // Check for conflicts with the submitted data and the currently tracked lead
-            list($hasConflict, $conflicts) = $checkForIdentifierConflict($uniqueFieldsWithData, $uniqueFieldsCurrent);
+            [$hasConflict, $conflicts] = $checkForIdentifierConflict($uniqueFieldsWithData, $uniqueFieldsCurrent);
 
             $this->logger->debug(
                 'FORM: Current unique contact fields '.implode(', ', array_keys($uniqueFieldsCurrent)).' = '.implode(', ', $uniqueFieldsCurrent)
@@ -914,13 +970,7 @@ class SubmissionModel extends CommonFormModel
         if (!empty($notOverwriteFields)) {
             $this->logger->debug('FORM: Not overwrite contact fields to process '.implode(',', $notOverwriteFields));
             $profileFields = $lead->getProfileFields();
-            foreach ($notOverwriteFields as $notOverwriteField) {
-                if (isset($data[$notOverwriteField])
-                    && isset($profileFields[$notOverwriteField])
-                    && '' !== $profileFields[$notOverwriteField]) {
-                    unset($data[$notOverwriteField]);
-                }
-            }
+            $data          = $this->getNotOverwriteFieldsData($profileFields, $data, $notOverwriteFields);
         }
         $this->leadModel->setFieldValues($lead, $data, false, true, true);
 
@@ -946,7 +996,14 @@ class SubmissionModel extends CommonFormModel
 
         $companyFieldMatches = $getCompanyData($leadFieldMatches);
         if (!empty($companyFieldMatches)) {
-            list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $lead, $this->companyModel);
+            // not overwrite if value exist
+            if (!empty($notOverwriteFields)) {
+                $this->logger->debug('FORM: Not overwrite contact\'s company fields to process '.implode(',', $notOverwriteFields));
+                $profileFields = $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead);
+                $companyFieldMatches          = $this->getNotOverwriteFieldsData($profileFields, $companyFieldMatches, $notOverwriteFields);
+            }
+
+            [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $lead, $this->companyModel);
             if ($leadAdded) {
                 $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             } elseif ($companyEntity instanceof Company) {
@@ -999,4 +1056,24 @@ class SubmissionModel extends CommonFormModel
 
         return true;
     }
+
+    /**
+     * @param array $profileFields
+     * @param array $data
+     * @param array $notOverwriteFields
+     *
+     * @return array
+     */
+    protected function getNotOverwriteFieldsData(array $profileFields, array $data, array $notOverwriteFields): array
+    {
+        foreach ($notOverwriteFields as $notOverwriteField) {
+            if (isset($data[$notOverwriteField])
+                && isset($profileFields[$notOverwriteField])
+                && '' !== $profileFields[$notOverwriteField]) {
+                unset($data[$notOverwriteField]);
+            }
+        }
+
+        return $data;
+}
 }

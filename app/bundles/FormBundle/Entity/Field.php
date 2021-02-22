@@ -910,15 +910,16 @@ class Field
     /**
      * @return bool
      */
-    public function isLeadFieldNotOverwrite()
+    public function isLeadFieldNotOverwrite(): bool
     {
         return $this->leadFieldNotOverwrite;
     }
 
+
     /**
-     * @param bool $leadFieldNotOverwrite
+     * @param bool|null $leadFieldNotOverwrite
      */
-    public function setLeadFieldNotOverwrite($leadFieldNotOverwrite)
+    public function setLeadFieldNotOverwrite(?bool $leadFieldNotOverwrite)
     {
         $this->leadFieldNotOverwrite = $leadFieldNotOverwrite;
     }
