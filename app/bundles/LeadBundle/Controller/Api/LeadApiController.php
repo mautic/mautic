@@ -468,6 +468,35 @@ class LeadApiController extends CommonApiController
         return $this->handleView($view);
     }
 
+    public function mergeAction($id){
+        $entity = $this->model->getEntity((int) $id);
+
+        if ($entity === null) {
+            return $this->notFound();
+        }
+
+        if (!$this->checkEntityAccess($entity, 'edit')) {
+            return $this->accessDenied();
+        }
+
+        $lead_id_to_merge = (int) $this->request->request->get('lead_to_merge');
+        if($lead_id_to_merge == $id) {
+            return $this->returnError('same_lead_ids', Codes::HTTP_BAD_REQUEST);
+        }
+
+        $mergeLead = $this->model->getEntity($lead_id_to_merge);
+        if ($mergeLead === null) {
+            return $this->returnError('merge_lead_not_found', Codes::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        /** @var ContactMerger $contactMerger */
+        $contactMerger = $this->container->get('mautic.lead.merger');
+        $entity = $contactMerger->merge($entity, $mergeLead, true);
+
+        $view = $this->view([$this->entityNameOne => $entity]);
+        return $this->handleView($view);
+    }
+
     /**
      * Add/Remove a UTM Tagset to/from the contact.
      *

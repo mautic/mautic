@@ -193,11 +193,12 @@ class EmailSendEvent extends CommonEvent
      * Set email content.
      *
      * @param $content
+     * @param bool $ignoreTrackingPixel
      */
-    public function setContent($content)
+    public function setContent($content, $ignoreTrackingPixel= true)
     {
-        if (null !== $this->helper) {
-            $this->helper->setBody($content, 'text/html', null, true);
+        if ($this->helper !== null) {
+            $this->helper->setBody($content, 'text/html', null, $ignoreTrackingPixel);
         } else {
             $this->content = $content;
         }

@@ -166,6 +166,11 @@ return [
                 'controller' => 'MauticLeadBundle:Api\LeadApi:removeDnc',
                 'method'     => 'POST',
             ],
+            'mautic_api_mergecontact' => [
+                'path'       => '/contacts/{id}/merge',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:merge',
+                'method'     => 'POST',
+            ],
             'mautic_api_getcontactevents' => [
                 'path'       => '/contacts/{id}/activity',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getActivity',
@@ -280,6 +285,7 @@ return [
                 'path'            => '/tags',
                 'controller'      => 'MauticLeadBundle:Api\TagApi',
             ],
+
         ],
     ],
     'menu' => [

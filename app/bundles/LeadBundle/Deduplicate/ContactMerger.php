@@ -13,9 +13,11 @@ namespace Mautic\LeadBundle\Deduplicate;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
+use Mautic\LeadBundle\Deduplicate\Exception\ExistingContactException;
 use Mautic\LeadBundle\Deduplicate\Exception\ValueNotMergeableException;
 use Mautic\LeadBundle\Deduplicate\Helper\MergeValueHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\MergeRecord;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
@@ -68,14 +70,22 @@ class ContactMerger
     }
 
     /**
+     * @param Lead $winner
+     * @param Lead $loser
+     * @param boolean $save_tracking
      * @return Lead
      *
      * @throws SameContactException
+     * @throws ExistingContactException
      */
-    public function merge(Lead $winner, Lead $loser)
+    public function merge(Lead $winner, Lead $loser, $save_tracking = false)
     {
         if ($winner->getId() === $loser->getId()) {
             throw new SameContactException();
+        }
+
+        if($loser->getEmail()){
+            throw new ExistingContactException();
         }
 
         $this->logger->debug('CONTACT: ID# '.$loser->getId().' will be merged into ID# '.$winner->getId());
@@ -98,6 +108,9 @@ class ContactMerger
 
         // Dispatch post merge event
         $this->dispatcher->dispatch(LeadEvents::LEAD_POST_MERGE, $event);
+
+        if($save_tracking)
+            $this->mergeTracking($winner, $loser);
 
         // Delete the loser
         $this->leadModel->deleteEntity($loser);
@@ -259,6 +272,24 @@ class ContactMerger
         $this->leadModel->modifyTags($winner, $addTags, null, false);
 
         return $this;
+    }
+
+    /**
+     * @param Lead $winner
+     * @param Lead $loser
+     * @return void
+     *
+     */
+    public function mergeTracking(Lead $winner, Lead $loser){
+        $deviceRepo = $this->leadModel->getDeviceRepository();
+        /** @var LeadDevice $device */
+        $device = $deviceRepo->findOneBy(['lead' => $loser->getId()]);
+        if($device == null)
+            return;
+        $device->setLead($winner);
+        $deviceRepo->saveEntity($device);
+        $deviceRepo->clear();
+        return;
     }
 
     /**
