@@ -198,6 +198,26 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
+     * @param int $mincount
+     * @param bool $publishedOnly
+     * @return array
+     */
+    public function getAllLeadlistCounts($mincount = 0, $publishedOnly = true){
+        $qb = $this->_em->getConnection()->createQueryBuilder();
+
+        $qb->select('lll.leadlist_id, count(*) as cnt')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
+            ->groupBy('lll.leadlist_id')
+            ->having('cnt > :mincount')
+            ->setParameter('mincount', $mincount);
+        if($publishedOnly){
+            $qb->join('lll', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = lll.leadlist_id')
+                ->where($qb->expr()->eq('ll.is_published', 1));
+        }
+        return $qb->execute()->fetchAll();
+    }
+
+    /**
      * Check Lead segments by ids.
      *
      * @param $ids

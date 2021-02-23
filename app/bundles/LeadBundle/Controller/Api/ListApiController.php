@@ -165,6 +165,17 @@ class ListApiController extends CommonApiController
     }
 
     /**
+     * @return Response
+     */
+    public function leadCountsAction(){
+        $minCount = $this->request->request->get('mincount', 0);
+        $model   = $this->getModel('lead.list');
+        $leadCounts = $model->getRepository()->getAllLeadlistCounts($minCount);
+        $view = $this->view(['success' => 1, 'data' => $leadCounts], Response::HTTP_OK);
+        return $this->handleView($view);
+    }
+
+    /**
      * Checks if user has permission to access retrieved entity.
      *
      * @param mixed  $entity
