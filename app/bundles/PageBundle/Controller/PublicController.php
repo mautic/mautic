@@ -290,8 +290,9 @@ class PublicController extends CommonFormController
 
             return new Response($content);
         }
-
-        $model->hitPage($entity, $this->request, 404);
+        if (!$this->get('mautic.helper.core_parameters')->getParameter('disable_tracking_404')) {
+            $model->hitPage($entity, $this->request, 404);
+        }
 
         return $this->notFound();
     }
