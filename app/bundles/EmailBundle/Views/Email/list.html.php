@@ -61,7 +61,7 @@ if ('index' == $tmpl) {
                         'sessionVar' => 'email',
                         'orderBy'    => 'e.dateAdded',
                         'text'       => 'mautic.lead.import.label.dateAdded',
-                        'class'      => 'visible-md visible-lg col-email-dateAdded',
+                        'class'      => 'visible-lg col-email-dateAdded',
                     ]
                 );
                 ?>
@@ -72,7 +72,7 @@ if ('index' == $tmpl) {
                         'sessionVar' => 'email',
                         'orderBy'    => 'e.dateModified',
                         'text'       => 'mautic.lead.import.label.dateModified',
-                        'class'      => 'visible-md visible-lg col-email-dateModified',
+                        'class'      => 'visible-lg col-email-dateModified',
                     ]
                 );
                 ?>
@@ -250,8 +250,8 @@ if ('index' == $tmpl) {
                         <?php echo $view['content']->getCustomContent('email.stats', $mauticTemplateVars); ?>
                         <?php echo $view['content']->getCustomContent('email.stats.below', $mauticTemplateVars); ?>
                     </td>
-                    <td class="visible-md visible-lg"><?php echo $item->getDateAdded() ? $view['date']->toFull($item->getDateAdded()) : ''; ?></td>
-                    <td class="visible-md visible-lg"><?php echo $item->getDateModified() ? $view['date']->toFull($item->getDateModified()) : ''; ?></td>
+                    <td class="visible-lg"><?php echo $item->getDateAdded() ? $view['date']->toFull($item->getDateAdded()) : ''; ?></td>
+                    <td class="visible-lg"><?php echo $item->getDateModified() ? $view['date']->toFull($item->getDateModified()) : ''; ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getCreatedByUser(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
