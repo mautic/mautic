@@ -25,7 +25,17 @@ Redirect 302 . /s
     Allow from all
 </Files>
 
+<Files mailer*>
+    Order Allow,Deny
+    Allow from all
+</Files>
+
 <Files email*>
+    Order Allow,Deny
+    Allow from all
+</Files>
+
+<Files mailer*>
     Order Allow,Deny
     Allow from all
 </Files>
@@ -59,6 +69,12 @@ Redirect 302 . /s
     Order Allow,Deny
     Allow from all
 </Files>
+
+<Files mtc*>
+    Order Allow,Deny
+    Allow from all
+</Files>
+
 
 # Use the front controller as index file. It serves as a fallback solution when
 # every other rewrite/redirect fails (e.g. in an aliased environment without

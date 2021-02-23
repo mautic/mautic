@@ -1,4 +1,4 @@
-<Files ~ "\.(gif|jpe?g|png|css|js|woff|woff2|ttf)$">
+<Files *>
     Order Allow,Deny
     Allow from all
 </Files>
