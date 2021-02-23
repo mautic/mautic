@@ -187,6 +187,9 @@ if ('index' == $tmpl) {
                         <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: <?php echo $color; ?>;"> </span> <span><?php echo $catName; ?></span></span>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getHits(); ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getDateAdded() ? $view['date']->toFull($item->getDateAdded()) : ''; ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getDateModified() ? $view['date']->toFull($item->getDateModified()) : ''; ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getCreatedByUser(); ?></td>
                     <td class="visible-md visible-lg">
                         <a href="<?php echo $view['router']->path(
                             'mautic_page_results',
@@ -200,9 +203,6 @@ if ('index' == $tmpl) {
                             ); ?>
                         </a>
                     </td>
-                    <td class="visible-md visible-lg"><?php echo $item->getDateAdded() ? $item->getDateAdded()->format('Y-m-d H:i:s') : ''; ?></td>
-                    <td class="visible-md visible-lg"><?php echo $item->getDateModified() ? $item->getDateModified()->format('Y-m-d H:i:s') : ''; ?></td>
-                    <td class="visible-md visible-lg"><?php echo $item->getCreatedByUser(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>
