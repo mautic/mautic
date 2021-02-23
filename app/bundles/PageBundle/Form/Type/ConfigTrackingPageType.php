@@ -44,7 +44,7 @@ class ConfigTrackingPageType extends AbstractType
         );
         $builder->add(
             'disable_tracking_404',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.form.disable_tracking_404',
                 'data'  => isset($options['data']['disable_tracking_404']) ? (bool) $options['data']['disable_tracking_404'] : false,
