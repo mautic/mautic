@@ -31,7 +31,7 @@ final class Version20210104171005 extends AbstractMauticMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE {$this->prefix}lead_lists ADD category_id INT UNSIGNED DEFAULT NULL");
+        $this->addSql("ALTER TABLE {$this->prefix}lead_lists ADD category_id INT(11) UNSIGNED DEFAULT NULL");
         $this->addSql("ALTER TABLE {$this->prefix}lead_lists ADD CONSTRAINT FK_6EC1522A12469DE2 FOREIGN KEY (category_id) REFERENCES {$this->prefix}categories (id) ON DELETE SET NULL");
         $this->addSql("CREATE INDEX IDX_6EC1522A12469DE2 ON {$this->prefix}lead_lists (category_id)");
     }
