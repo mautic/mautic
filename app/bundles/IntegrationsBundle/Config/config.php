@@ -177,6 +177,12 @@ return [
                     'mautic.integrations.helper',
                 ],
             ],
+            'mautic.integrations.helper.builder_integrations' => [
+                'class'     => \Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper::class,
+                'arguments' => [
+                    'mautic.integrations.helper',
+                ],
+            ],
             'mautic.integrations.helper.field_validator' => [
                 'class'     => \Mautic\IntegrationsBundle\Helper\FieldValidationHelper::class,
                 'arguments' => [
