@@ -591,4 +591,23 @@ auto}.css-device__image{display:block;margin:0;padding:0;width:100%;height:auto}
 #websiteCanvas{margin:0;padding:0;border:none;overflow:hidden;pointer-events:none;position:absolute;z-index:2;left:-50%;width:320px;height:568px}#websiteScreenshot.mobile
 #websiteCanvas{z-index:0;border:1px
 solid #000}#websiteScreenshot.mobile  #websiteCanvas
+
+/**
+iframe{height:100%;width:320px;border:0}
+
+.mautic-brand {
+    background-image:url('/media/images/mauticlogo.png');
+    background-repeat: no-repeat;
+    background-size:cover;
+}
+
+.mautic-brand svg{
+    display:none;
+}
+
+.app-sidebar.sidebar-left .sidebar-header{
+    background-color: #fda906;
+}
+**/
+
 iframe{height:100%;width:320px;border:0}
