@@ -37,7 +37,7 @@ final class Version20210223174702 extends AbstractMauticMigration
         $table   = $schema->getTable($this->prefix.'lead_lists');
 
         // fk and idx names may be different based on the table name so remove hard coded names in favor of what Doctrine would dynamically generate
-        $oldFkName  = 'FK_6EC1522A12469DE2';
+        $oldFkName = 'FK_6EC1522A12469DE2';
         if ($oldFkName !== $fkName && $table->hasForeignKey($oldFkName)) {
             $this->addSql("ALTER TABLE {$this->prefix}lead_lists DROP FOREIGN KEY $oldFkName");
         }
@@ -49,11 +49,13 @@ final class Version20210223174702 extends AbstractMauticMigration
 
         // Add the new column if it failed for any reason
         if (!$table->hasColumn('category_id')) {
-            $categoryIdColumn = $schema->getTable("{$this->prefix}categories")->getColumn('id');
+            $catTable         = $schema->getTable("{$this->prefix}categories");
+            $categoryIdColumn = $catTable->getColumn('id');
             if ($categoryIdColumn->getUnsigned()) {
                 $this->addSql("ALTER TABLE {$this->prefix}lead_lists ADD category_id INT UNSIGNED DEFAULT NULL");
             } else {
-                $this->addSql("ALTER TABLE {$this->prefix}lead_lists ADD category_id INT DEFAULT NULL");
+                $categoryIdLength = $categoryIdColumn->getLength();
+                $this->addSql("ALTER TABLE {$this->prefix}lead_lists ADD category_id INT($categoryIdLength) DEFAULT NULL");
             }
         }
 
