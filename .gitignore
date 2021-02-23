@@ -16,6 +16,7 @@
 /app/phpunit.xml
 
 /var/bootstrap*
+/var/composer/*
 
 /app/bundles/CoreBundle/Assets/css/app/less/**/*.css
 /app/bundles/CoreBundle/Assets/css/libraries/**/*.css
