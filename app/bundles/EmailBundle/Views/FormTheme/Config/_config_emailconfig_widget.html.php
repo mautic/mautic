@@ -20,6 +20,9 @@ $template  = '<div class="col-md-6">{content}</div>';
         </div>
         <div class="panel-body">
             <div class="row">
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_enable', $template); ?>
+            </div>
+            <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_from_name', $template); ?>
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_from_email', $template); ?>
             </div>
