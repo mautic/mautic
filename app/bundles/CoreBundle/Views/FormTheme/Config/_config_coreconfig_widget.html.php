@@ -121,6 +121,13 @@ $template  = '<div class="col-md-6">{content}</div>';
         </div>
         <?php endif; ?>
         
+        <?php if (isset($fields['force_https'])): ?>
+        <hr class="text-muted" />
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'force_https', $template); ?>
+        </div>
+        <?php endif; ?>
+
         <?php if (isset($fields['max_entity_lock_time'])): ?>
         <hr class="text-muted" />
         <div class="row">
