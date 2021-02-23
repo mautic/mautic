@@ -181,6 +181,10 @@ class PhpEngine extends BasePhpEngine
     {
         defined('MAUTIC_TEMPLATE_EXCEPTION') || define('MAUTIC_TEMPLATE_EXCEPTION', 1);
 
+        if (function_exists('newrelic_notice_error')) {
+            newrelic_notice_error($exception);
+        }
+
         if (defined('MAUTIC_API_REQUEST') && MAUTIC_API_REQUEST) {
             $dataArray = [
                 'errors' => [

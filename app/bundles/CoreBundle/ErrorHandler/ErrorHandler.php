@@ -164,6 +164,10 @@ namespace Mautic\CoreBundle\ErrorHandler {
                         $logLevel = LogLevel::ERROR;
                 }
 
+                if (function_exists('newrelic_notice_error')) {
+                    newrelic_notice_error($level, $message, $file, $line, $context);
+                }
+
                 $message = 'PHP '.$this->getErrorName($level)." - $message";
                 if (LogLevel::DEBUG === $logLevel) {
                     $this->log($logLevel, "$message - in file $file - at line $line", $context);
@@ -186,6 +190,10 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         public function handleException($exception, $returnContent = false, $inTemplate = false)
         {
+            if (function_exists('newrelic_notice_error')) {
+                newrelic_notice_error($exception);
+            }
+
             $inline = $inTemplate;
             if (!$exception instanceof FatalThrowableError && defined('MAUTIC_DELEGATE_VIEW')) {
                 $inline = true;
@@ -234,11 +242,15 @@ namespace Mautic\CoreBundle\ErrorHandler {
             $error                = error_get_last();
 
             if (null !== $error) {
+                if (function_exists('newrelic_notice_error')) {
+                    newrelic_notice_error($error['type'], $error['message'], $error['file'], $error['line']);
+                }
                 $name = $this->getErrorName($error['type']);
                 if ($error && $error['type'] &= E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR) {
                     if (!$handlingFatal) {
                         // Prevent fatal loop
                         $handlingFatal = true;
+
                         $this->log(LogLevel::ERROR, "PHP $name: {$error['message']} - in file {$error['file']} - at line {$error['line']}");
 
                         if (0 === strpos($error['message'], 'Allowed memory') || 0 === strpos($error['message'], 'Out of memory')) {

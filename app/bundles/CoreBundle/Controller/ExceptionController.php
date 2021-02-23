@@ -29,6 +29,11 @@ class ExceptionController extends CommonController
     public function showAction(Request $request, FlattenException $exception, DebugLoggerInterface $logger = null)
     {
         $class          = $exception->getClass();
+
+        if (function_exists('newrelic_notice_error')) {
+            newrelic_notice_error($exception);
+        }
+
         $currentContent = $this->getAndCleanOutputBuffering($request->headers->get('X-Php-Ob-Level', -1));
         $layout         = 'prod' == MAUTIC_ENV ? 'Error' : 'Exception';
         $code           = $exception->getStatusCode();

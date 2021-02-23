@@ -1200,6 +1200,9 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     protected function returnError($msg, $code = Response::HTTP_INTERNAL_SERVER_ERROR, $details = [])
     {
+        if (function_exists('newrelic_notice_error')) {
+            newrelic_notice_error(1, $msg, '', $code, $details);
+        }
         if ($this->get('translator')->hasId($msg, 'flashes')) {
             $msg = $this->get('translator')->trans($msg, [], 'flashes');
         } elseif ($this->get('translator')->hasId($msg, 'messages')) {
