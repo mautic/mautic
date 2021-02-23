@@ -601,7 +601,7 @@ SQL;
     {
         $table_name    = $this->getTableName();
         $eventIdsStr   = implode(',', $eventIds);
-        $sql           = "DELETE FROM {$table_name} el WHERE el.event_id IN ({$eventIdsStr}) ORDER BY el.event_id ASC LIMIT ".self::LOG_DELETE_BATCH_SIZE;
+        $sql           = "DELETE FROM {$table_name} WHERE event_id IN ({$eventIdsStr}) ORDER BY event_id ASC LIMIT ".self::LOG_DELETE_BATCH_SIZE;
         $conn          = $this->getEntityManager()->getConnection();
         $deleteEntries = true;
         while ($deleteEntries) {
