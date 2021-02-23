@@ -49,6 +49,11 @@ class EmailType extends AbstractType
     use DynamicContentTrait;
 
     /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    /**
      * @var TranslatorInterface
      */
     private $translator;
@@ -96,17 +101,20 @@ class EmailType extends AbstractType
         );
 
         $emojiTransformer = new EmojiToShortTransformer();
-        $builder->add(
-            $builder->create(
+        $element = $builder->create(
                 'subject',
                 TextType::class,
-                [
-                    'label'      => 'mautic.email.subject',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => ['class' => 'form-control'],
-                ]
-            )->addModelTransformer($emojiTransformer)
+                      [
+                        'label'      => 'mautic.email.subject',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => ['class' => 'form-control'],
+                      ]
         );
+
+        if($this->coreParametersHelper->get('convert_emojis_to_shortcodes'))
+            $element->addModelTransformer($emojiTransformer);
+
+        $builder->add($element);
 
         $builder->add(
             'fromName',

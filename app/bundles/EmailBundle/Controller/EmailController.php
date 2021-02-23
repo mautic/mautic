@@ -676,9 +676,16 @@ class EmailController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $formData = $this->request->request->get('emailform');
+                print_r(get_class($form->getRequestHandler()));
                 if ($valid = $this->isFormValid($form) && $this->isFormValidForWebinar($formData, $form, $entity)) {
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);
+
+                    $this
+                      ->get('doctrine')
+                      ->getConnection()
+                      ->getConfiguration()
+                      ->setSQLLogger(new \Doctrine\DBAL\Logging\EchoSQLLogger());
 
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());

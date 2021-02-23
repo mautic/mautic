@@ -310,6 +310,21 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+          'convert_emojis_to_shortcodes',
+          YesNoButtonGroupType::class,
+          [
+            'label'      => 'mautic.email.config.mailer.convert.emojis.to.shortcodes',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+              'class'   => 'form-control',
+              'tooltip' => 'mautic.email.config.mailer.convert.emojis.to.shortcodes.tooltip',
+            ],
+            'data'       => empty($options['data']['convert_emojis_to_shortcodes']) ? false : true,
+            'required'   => false,
+          ]
+        );
+
+        $builder->add(
             'mailer_host',
             TextType::class,
             [

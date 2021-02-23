@@ -288,7 +288,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
         $event->addToken('{signature}', EmojiHelper::toHtml($signatureText));
 
-        $event->addToken('{subject}', EmojiHelper::toHtml($event->getSubject()));
+        $event->addToken('{subject}', EmojiHelper::toHtml($event->getSubject(), $this->coreParametersHelper->get('convert_emojis_to_shortcodes')?'short':'emoji'));
     }
 
     /**

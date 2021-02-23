@@ -151,7 +151,10 @@ $template  = '<div class="col-md-6">{content}</div>';
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'mailer_append_tracking_pixel', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'mailer_convert_embed_images', $template); ?>
+        </div>
+        <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'disable_trackable_urls', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'convert_emojis_to_shortcodes', $template); ?>
         </div>
     </div>
 </div>
