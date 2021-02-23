@@ -74,18 +74,12 @@ class ListModel extends FormModel
      */
     private $segmentChartQueryFactory;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    public function __construct(CategoryModel $categoryModel, CoreParametersHelper $coreParametersHelper, ContactSegmentService $leadSegment, SegmentChartQueryFactory $segmentChartQueryFactory, RequestStack $requestStack)
+    public function __construct(CategoryModel $categoryModel, CoreParametersHelper $coreParametersHelper, ContactSegmentService $leadSegment, SegmentChartQueryFactory $segmentChartQueryFactory)
     {
         $this->categoryModel            = $categoryModel;
         $this->coreParametersHelper     = $coreParametersHelper;
         $this->leadSegmentService       = $leadSegment;
         $this->segmentChartQueryFactory = $segmentChartQueryFactory;
-        $this->requestStack             = $requestStack;
     }
 
     /**
