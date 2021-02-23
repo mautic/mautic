@@ -1,0 +1,5 @@
+ServerSignature Off
+Order Allow,Deny
+<FilesMatch "^.+\.png$">
+Allow from all
+</FilesMatch>

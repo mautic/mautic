@@ -92,6 +92,7 @@
 !/plugins/MauticSocialBundle
 !/plugins/MauticZapierBundle
 !/plugins/index.html
+!/plugins/.htaccess
 
 /themes/*
 !/themes/aurora
