@@ -47,15 +47,22 @@ final class Version20210223174702 extends AbstractMauticMigration
             $this->addSql("ALTER TABLE {$this->prefix}lead_lists DROP INDEX $oldIdxName");
         }
 
+        $catTable         = $schema->getTable("{$this->prefix}categories");
+        $categoryIdColumn = $catTable->getColumn('id');
+
         // Add the new column if it failed for any reason
         if (!$table->hasColumn('category_id')) {
-            $catTable         = $schema->getTable("{$this->prefix}categories");
-            $categoryIdColumn = $catTable->getColumn('id');
             if ($categoryIdColumn->getUnsigned()) {
                 $this->addSql("ALTER TABLE {$this->prefix}lead_lists ADD category_id INT UNSIGNED DEFAULT NULL");
             } else {
-                $categoryIdLength = $categoryIdColumn->getLength();
-                $this->addSql("ALTER TABLE {$this->prefix}lead_lists ADD category_id INT($categoryIdLength) DEFAULT NULL");
+                $this->addSql("ALTER TABLE {$this->prefix}lead_lists ADD category_id INT DEFAULT NULL");
+            }
+        } else {
+            // The column was already added by the faulty migration, update it based on the type of the `category`.`id` column
+            if ($categoryIdColumn->getUnsigned()) {
+                $this->addSql("ALTER TABLE {$this->prefix}lead_lists CHANGE category_id category_id INT UNSIGNED DEFAULT NULL");
+            } else {
+                $this->addSql("ALTER TABLE {$this->prefix}lead_lists CHANGE category_id category_id INT DEFAULT NULL");
             }
         }
 
