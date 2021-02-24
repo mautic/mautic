@@ -23,6 +23,7 @@ use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Form\Type\AddToCompanyActionType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadCampaignsType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType;
+use Mautic\LeadBundle\Form\Type\CampaignEventLeadDNCType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadFieldValueType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadOwnerType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadSegmentsType;
@@ -38,6 +39,7 @@ use Mautic\LeadBundle\Helper\CustomFieldHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -47,40 +49,21 @@ class CampaignSubscriber implements EventSubscriberInterface
 {
     const ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
 
-    /**
-     * @var IpLookupHelper
-     */
     private $ipLookupHelper;
 
-    /**
-     * @var LeadModel
-     */
     private $leadModel;
 
-    /**
-     * @var FieldModel
-     */
     private $leadFieldModel;
 
-    /**
-     * @var ListModel
-     */
     private $listModel;
 
-    /**
-     * @var CompanyModel
-     */
     private $companyModel;
 
-    /**
-     * @var CampaignModel
-     */
     private $campaignModel;
 
-    /**
-     * @var CoreParametersHelper
-     */
     private $coreParametersHelper;
+
+    private $doNotContact;
 
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -89,7 +72,8 @@ class CampaignSubscriber implements EventSubscriberInterface
         ListModel $listModel,
         CompanyModel $companyModel,
         CampaignModel $campaignModel,
-        CoreParametersHelper $coreParametersHelper
+        oreParametersHelper $coreParametersHelper,
+        DoNotContact $doNotContact
     ) {
         $this->ipLookupHelper       = $ipLookupHelper;
         $this->leadModel            = $leadModel;
@@ -98,6 +82,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $this->companyModel         = $companyModel;
         $this->campaignModel        = $campaignModel;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->doNotContact         = $doNotContact;
     }
 
     /**
@@ -246,6 +231,15 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
 
         $event->addCondition('lead.campaigns', $trigger);
+
+        $trigger = [
+            'label'       => 'mautic.lead.lead.events.condition_donotcontact',
+            'description' => 'mautic.lead.lead.events.condition_donotcontact_descr',
+            'formType'    => CampaignEventLeadDNCType::class,
+            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        ];
+
+        $event->addCondition('lead.dnc', $trigger);
     }
 
     public function onCampaignTriggerActionChangePoints(CampaignExecutionEvent $event)
@@ -502,6 +496,17 @@ class CampaignSubscriber implements EventSubscriberInterface
                     CustomFieldHelper::fieldValueTransfomer($fields[$field], $value),
                     $operators[$event->getConfig()['operator']]['expr']
                 );
+            }
+        } elseif ($event->checkContext('lead.dnc')) {
+            $condition = $event->getConfig()['condition'] ? 1 : 0;
+            $channels  = $event->getConfig()['channels'];
+            foreach ($channels as $channel) {
+                $isLeadDNC = $this->doNotContact->isContactable($lead, $channel);
+                if (1 === $condition && $isLeadDNC) {
+                    $result = true;
+                } elseif (0 === $condition && !$isLeadDNC) {
+                    $result = true;
+                }
             }
         }
 
