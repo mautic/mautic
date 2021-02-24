@@ -47,11 +47,6 @@ class DashboardModel extends FormModel
     protected $pathsHelper;
 
     /**
-     * @var WidgetDetailEventFactory
-     */
-    private $eventFactory;
-
-    /**
      * @var Filesystem
      */
     private $filesystem;
@@ -59,12 +54,10 @@ class DashboardModel extends FormModel
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         PathsHelper $pathsHelper,
-        WidgetDetailEventFactory $widgetEventFactory,
         Filesystem $filesystem
     ) {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->pathsHelper          = $pathsHelper;
-        $this->eventFactory         = $widgetEventFactory;
         $this->filesystem           = $filesystem;
     }
 

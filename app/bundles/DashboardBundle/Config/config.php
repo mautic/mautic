@@ -64,7 +64,6 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.helper.paths',
-                    'mautic.dashboard.widget_detail.event.factory',
                     'symfony.filesystem',
                 ],
             ],

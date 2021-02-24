@@ -73,7 +73,7 @@ class WidgetDetailEvent extends CommonEvent
 
         $params = $this->getWidget()->getParams();
 
-        foreach (['dateTo', 'dateFrom'] as $key => $dateParameter) {
+        foreach (['dateTo', 'dateFrom'] as $dateParameter) {
             if (isset($params[$dateParameter])) {
                 try {
                     $date       = $this->castDateTimeToString($params[$dateParameter]);
