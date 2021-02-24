@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class DashboardModelTest extends TestCase
+final class DashboardModelTest extends TestCase
 {
     /**
      * @var CoreParametersHelper|MockObject
@@ -34,11 +34,6 @@ class DashboardModelTest extends TestCase
      * @var PathsHelper|MockObject
      */
     private $pathsHelper;
-
-    /**
-     * @var WidgetDetailEventFactory
-     */
-    private $widgetDetailEventFactory;
 
     /**
      * @var MockObject|Session
@@ -61,13 +56,11 @@ class DashboardModelTest extends TestCase
 
         $this->coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
         $this->pathsHelper              = $this->createMock(PathsHelper::class);
-        $this->widgetDetailEventFactory = $this->createMock(WidgetDetailEventFactory::class);
         $this->filesystem               = $this->createMock(Filesystem::class);
 
         $this->model = new DashboardModel(
             $this->coreParametersHelper,
             $this->pathsHelper,
-            $this->widgetDetailEventFactory,
             $this->filesystem
         );
 
