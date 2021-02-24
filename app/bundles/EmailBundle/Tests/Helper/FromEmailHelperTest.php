@@ -29,7 +29,7 @@ class FromEmailHelperTest extends TestCase
      */
     private $leadRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->leadRepository       = $this->createMock(LeadRepository::class);
