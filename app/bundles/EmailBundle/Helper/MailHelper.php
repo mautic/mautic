@@ -308,7 +308,7 @@ class MailHelper
 
         // Set from email
         if (!$isQueueFlush) {
-            $this->setFromForSingleMessage($useOwnerAsMailer);
+            $this->setFromForSingleMessage();
         } // from is set in flushQueue
 
         if (empty($this->message->getReplyTo()) && !empty($this->replyTo)) {
@@ -1958,30 +1958,11 @@ class MailHelper
         $this->fromEmailHelper->setDefaultFromArray($this->systemFrom);
     }
 
-    private function setDefaultReplyTo($systemReplyToEmail = null, $systemFromEmail = null): void
+    private function setFromForSingleMessage()
     {
-        $fromEmail = null;
-        if (is_array($systemFromEmail)) {
-            $fromEmail = key($systemFromEmail);
-        } elseif (!empty($systemFromEmail)) {
-            $fromEmail = $systemFromEmail;
-        }
+        $email = $this->getEmail();
 
-        $this->systemReplyTo = $systemReplyToEmail ?: $fromEmail;
-        $this->replyTo       = $this->systemReplyTo;
-    }
-
-    private function getMessageInstance(): MauticMessage
-    {
-        return new MauticMessage();
-    }
-
-    /**
-     * @param bool $useOwnerAsMailer
-     */
-    private function setFromForSingleMessage($useOwnerAsMailer)
-    {
-        if ($useOwnerAsMailer && $this->lead) {
+        if ($this->lead && $email && $email->getUseOwnerAsMailer()) {
             if (!isset($this->lead['owner_id'])) {
                 $this->lead['owner_id'] = 0;
             }
