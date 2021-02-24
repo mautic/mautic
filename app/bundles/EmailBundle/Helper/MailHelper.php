@@ -1505,13 +1505,8 @@ class MailHelper
      */
     private function getUnsubscribeHeader()
     {
-        if ($this->idHash) {
-            $url = $this->factory->getRouter()->generate('mautic_email_unsubscribe', ['idHash' => $this->idHash], UrlGeneratorInterface::ABSOLUTE_URL);
 
-            return "<$url>";
-        }
-
-        if (!empty($this->queuedRecipients) || !empty($this->lead)) {
+        if (!empty($this->queuedRecipients) || !empty($this->lead) || $this->idHash) {
             return '<{unsubscribe_url}>';
         }
 
