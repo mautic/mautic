@@ -72,7 +72,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         ListModel $listModel,
         CompanyModel $companyModel,
         CampaignModel $campaignModel,
-        oreParametersHelper $coreParametersHelper,
+        CoreParametersHelper $coreParametersHelper,
         DoNotContact $doNotContact
     ) {
         $this->ipLookupHelper       = $ipLookupHelper;
