@@ -1491,7 +1491,7 @@ Mautic.listOnLoad = function(container, response) {
 }
 
 Mautic.lazyLoadContactListOnSegmentDetail = function() {
-    let containerId = '#contacts-container';
+    const containerId = '#contacts-container';
     let container = mQuery(containerId);
 
     // Load the contacts only if the container exists.
