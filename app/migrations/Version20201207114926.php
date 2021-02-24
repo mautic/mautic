@@ -28,6 +28,6 @@ final class Version20201207114926 extends AbstractMauticMigration
     {
         $this->addSql("UPDATE {$this->prefix}lead_fields SET is_unique_identifer = 0 WHERE object = 'company';");
 
-        $this->addSql("UPDATE {$this->prefix}lead_fields SET is_unique_identifer = 1 WHERE object = 'company' and alias in ('companyname', 'companycity', 'companycountry', 'companystate');");
+        $this->addSql("UPDATE {$this->prefix}lead_fields SET is_unique_identifer = 1 WHERE object = 'company' and alias in ('companyname');");
     }
 }
