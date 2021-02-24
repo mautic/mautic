@@ -1492,14 +1492,14 @@ Mautic.listOnLoad = function(container, response) {
 
 Mautic.lazyLoadContactListOnSegmentDetail = function() {
     const containerId = '#contacts-container';
-    let container = mQuery(containerId);
+    const container = mQuery(containerId);
 
     // Load the contacts only if the container exists.
     if (!container.length) {
         return;
     }
 
-    let segmentContactUrl = container.data('target-url');
+    const segmentContactUrl = container.data('target-url');
     mQuery.get(segmentContactUrl, function(response) {
         response.target = containerId;
         Mautic.processPageContent(response);
