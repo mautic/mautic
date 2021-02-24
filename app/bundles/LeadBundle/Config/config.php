@@ -808,6 +808,11 @@ return [
                     'mautic.lead.model.field',
                     'mautic.lead.repository.company',
                 ],
+                'methodCalls' => [
+                    'setUniqueIdentifiersOperator' => [
+                        '%mautic.company_unique_identifiers_operator%',
+                    ],
+                ],
             ],
             'mautic.lead.helper.primary_company' => [
                 'class'     => \Mautic\LeadBundle\Helper\PrimaryCompanyHelper::class,
@@ -1332,6 +1337,6 @@ return [
             '5' => 'last_active',
             '6' => 'id',
         ],
-        'company_unique_identifiers_operator' => \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_AND,
+        'company_unique_identifiers_operator' => \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR,
     ],
 ];

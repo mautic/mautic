@@ -436,7 +436,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         // loop through the fields and
         foreach ($uniqueFieldsWithData as $col => $val) {
-            $q->orWhere("c.$col = :".$col)
+            $q->{$this->getUniqueIdentifiersWherePart()}("c.$col = :".$col)
                 ->setParameter($col, $val);
         }
 
