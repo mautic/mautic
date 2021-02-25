@@ -163,18 +163,19 @@ class UserType extends AbstractType
                 'error_bubbling'  => false,
             ]
         );
-
-        $builder->add(
-            'automaticCredentials',
-            YesNoButtonGroupType::class,
-            [
-                'label' => 'mautic.user.user.form.automaticcredentials',
-                'attr'  => [
-                    'tooltip' => 'mautic.user.user.form.automaticcredentials.descr',
-                ],
-                'data' => false,
-            ]
-        );
+        if (!$existing) {
+            $builder->add(
+                'automaticCredentials',
+                YesNoButtonGroupType::class,
+                [
+                    'label' => 'mautic.user.user.form.automaticcredentials',
+                    'attr'  => [
+                        'tooltip' => 'mautic.user.user.form.automaticcredentials.descr',
+                    ],
+                    'data' => false,
+                ]
+            );
+        }
 
         $builder->add(
             'timezone',
