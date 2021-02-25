@@ -126,11 +126,15 @@ class UserController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 //check to see if the password needs to be rehashed
-                $formUser          = $this->request->request->get('user', []);
-                $submittedPassword = $formUser['plainPassword']['password'] ?? null;
-                $encoder           = $this->get('security.password_encoder');
-                $password          = $model->checkNewPassword($user, $encoder, $submittedPassword);
+                $formUser             = $this->request->request->get('user', []);
+                $automaticCredentials = $formUser['automaticCredentials'];
+                $submittedPassword    = $formUser['plainPassword']['password'] ?? null;
+                if ($automaticCredentials) {
+                    $submittedPassword = uniqid();
+                }
 
+                $encoder   = $this->get('security.password_encoder');
+                $password  = $model->checkNewPassword($user, $encoder, $submittedPassword);
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     $user->setPassword($password);
