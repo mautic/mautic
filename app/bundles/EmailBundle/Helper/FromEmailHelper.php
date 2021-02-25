@@ -13,6 +13,7 @@ namespace Mautic\EmailBundle\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\DTO\AddressDTO;
 use Mautic\EmailBundle\Helper\Exception\OwnerNotFoundException;
 use Mautic\EmailBundle\Helper\Exception\TokenNotFoundOrEmptyException;
@@ -62,7 +63,7 @@ class FromEmailHelper
     /**
      * @return array
      */
-    public function getFromAddressArrayConsideringOwner(array $from, array $contact = null)
+    public function getFromAddressArrayConsideringOwner(array $from, array $contact = null, Email $email = null)
     {
         $address = new AddressDTO($from);
 
@@ -71,7 +72,7 @@ class FromEmailHelper
 
         // Check for token
         if ($address->isEmailTokenized() || $address->isNameTokenized()) {
-            return $this->getEmailArrayFromToken($address, $contact);
+            return $this->getEmailArrayFromToken($address, $contact, $email);
         }
 
         if (!$contact) {
@@ -79,7 +80,7 @@ class FromEmailHelper
         }
 
         try {
-            return $this->getFromEmailArrayAsOwner($contact);
+            return $this->getFromEmailArrayAsOwner($contact, $email);
         } catch (OwnerNotFoundException $exception) {
             return $from;
         }
@@ -110,13 +111,17 @@ class FromEmailHelper
      *
      * @throws OwnerNotFoundException
      */
-    public function getContactOwner($userId)
+    public function getContactOwner($userId, Email $email = null)
     {
         // Reset last owner
         $this->lastOwner = null;
 
-        if (!$this->coreParametersHelper->getParameter('mailer_is_owner')) {
-            throw new OwnerNotFoundException('mailer_is_owner is not enabled');
+        if ($email) {
+            if (!$email->getUseOwnerAsMailer()) {
+                throw new OwnerNotFoundException("mailer_is_owner is not enabled for this email ({$email->getId()})");
+            }
+        } elseif (!$this->coreParametersHelper->get('mailer_is_owner')) {
+            throw new OwnerNotFoundException('mailer_is_owner is not enabled in global configuration');
         }
 
         if (isset($this->owners[$userId])) {
@@ -231,13 +236,13 @@ class FromEmailHelper
      *
      * @throws OwnerNotFoundException
      */
-    private function getFromEmailArrayAsOwner(array $contact)
+    private function getFromEmailArrayAsOwner(array $contact, Email $email = null)
     {
         if (empty($contact['owner_id'])) {
             throw new OwnerNotFoundException();
         }
 
-        $owner      = $this->getContactOwner($contact['owner_id']);
+        $owner      = $this->getContactOwner($contact['owner_id'], $email);
         $ownerEmail = $owner['email'];
         $ownerName  = sprintf('%s %s', $owner['first_name'], $owner['last_name']);
 

@@ -436,7 +436,7 @@ class MailHelper
 
             // Metadata has to be set for each recipient
             foreach ($this->queuedRecipients as $email => $name) {
-                $from    = $this->fromEmailHelper->getFromAddressArrayConsideringOwner($this->from, $this->lead);
+                $from    = $this->fromEmailHelper->getFromAddressArrayConsideringOwner($this->from, $this->lead, $this->email);
                 $fromKey = key($from);
 
                 $tokens                = $this->getTokens();
