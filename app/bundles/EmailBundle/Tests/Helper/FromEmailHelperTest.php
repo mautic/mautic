@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\Exception\OwnerNotFoundException;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -35,10 +36,10 @@ class FromEmailHelperTest extends TestCase
         $this->leadRepository       = $this->createMock(LeadRepository::class);
     }
 
-    public function testOwnerIsReturned()
+    public function testOwnerIsReturnedWhenEmailEntityNotSet()
     {
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('mailer_is_owner')
             ->willReturn(true);
 
@@ -59,6 +60,35 @@ class FromEmailHelperTest extends TestCase
             ->willReturn($user);
 
         $fromEmail = $this->getHelper()->getFromAddressArrayConsideringOwner($defaultFrom, $contact);
+
+        $this->assertEquals(['user@somewhere.com' => 'First Last'], $fromEmail);
+    }
+
+    public function testOwnerIsReturnedWhenEmailEntityIsSet()
+    {
+        $this->coreParametersHelper->expects($this->never())
+            ->method('get');
+
+        $defaultFrom = ['someone@somewhere.com' => 'Someone'];
+        $contact     = ['owner_id' => 1];
+
+        $user = [
+            'id'         => 1,
+            'first_name' => 'First',
+            'last_name'  => 'Last',
+            'email'      => 'user@somewhere.com',
+            'signature'  => 'hello there',
+        ];
+
+        $this->leadRepository->expects($this->once())
+            ->method('getLeadOwner')
+            ->with(1)
+            ->willReturn($user);
+
+        $email = new Email();
+        $email->setUseOwnerAsMailer(true);
+
+        $fromEmail = $this->getHelper()->getFromAddressArrayConsideringOwner($defaultFrom, $contact, $email);
 
         $this->assertEquals(['user@somewhere.com' => 'First Last'], $fromEmail);
     }
