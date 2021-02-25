@@ -1976,7 +1976,7 @@ class MailHelper
         if (!$this->message->getFrom()) {
             $from = $this->fromEmailHelper->getFromAddressArray($this->from, $this->lead);
 
-            $this->setFrom($from, null, null);
+            $this->setFrom($from);
         }
     }
 
