@@ -72,7 +72,7 @@ class FromEmailHelper
 
         // Check for token
         if ($address->isEmailTokenized() || $address->isNameTokenized()) {
-            return $this->getEmailArrayFromToken($address, $contact, $email);
+            return $this->getEmailArrayFromToken($address, $contact, true, $email);
         }
 
         if (!$contact) {
@@ -199,7 +199,7 @@ class FromEmailHelper
      *
      * @return array
      */
-    private function getEmailArrayFromToken(AddressDTO $address, array $contact = null, $asOwner = true)
+    private function getEmailArrayFromToken(AddressDTO $address, array $contact = null, $asOwner = true, Email $email = null)
     {
         try {
             if (!$contact) {
@@ -222,7 +222,7 @@ class FromEmailHelper
         } catch (TokenNotFoundOrEmptyException $exception) {
             if ($contact && $asOwner) {
                 try {
-                    return $this->getFromEmailArrayAsOwner($contact);
+                    return $this->getFromEmailArrayAsOwner($contact, $email);
                 } catch (OwnerNotFoundException $exception) {
                 }
             }
