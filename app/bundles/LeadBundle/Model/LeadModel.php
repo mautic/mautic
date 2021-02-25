@@ -81,9 +81,9 @@ class LeadModel extends FormModel
     const CHANNEL_FEATURE = 'contact_preference';
 
     /**
-     * @var \Symfony\Component\HttpFoundation\Request|null
+     * @var RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * @var CookieHelper
@@ -222,7 +222,7 @@ class LeadModel extends FormModel
         LegacyLeadModel $legacyLeadModel,
         IpAddressModel $ipAddressModel
     ) {
-        $this->request              = $requestStack->getCurrentRequest();
+        $this->requestStack         = $requestStack;
         $this->cookieHelper         = $cookieHelper;
         $this->ipLookupHelper       = $ipLookupHelper;
         $this->pathsHelper          = $pathsHelper;
@@ -919,7 +919,7 @@ class LeadModel extends FormModel
     {
         // @todo Instantiate here until we can remove circular dependency on LeadModel in order to make it a service
         $requestStack = new RequestStack();
-        $requestStack->push($this->request);
+        $requestStack->push($this->requestStack->getCurrentRequest());
         $contactRequestHelper = new ContactRequestHelper(
             $this,
             $this->contactTracker,

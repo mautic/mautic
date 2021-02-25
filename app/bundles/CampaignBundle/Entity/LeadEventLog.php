@@ -96,6 +96,13 @@ class LeadEventLog implements ChannelInterface
      */
     private $failedLog;
 
+    /**
+     * Subscribers can fail log with custom reschedule interval.
+     *
+     * @var \DateInterval|null
+     */
+    private $rescheduleInterval;
+
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -545,5 +552,15 @@ class LeadEventLog implements ChannelInterface
     public function isSuccess()
     {
         return !$this->isFailed();
+    }
+
+    public function setRescheduleInterval(?\DateInterval $interval): void
+    {
+        $this->rescheduleInterval = $interval;
+    }
+
+    public function getRescheduleInterval(): ?\DateInterval
+    {
+        return $this->rescheduleInterval;
     }
 }

@@ -23,10 +23,11 @@ use Mautic\WebhookBundle\Entity\WebhookRepository;
 use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class WebhookModelTest extends \PHPUnit\Framework\TestCase
+class WebhookModelTest extends TestCase
 {
     /**
      * @var MockObject|CoreParametersHelper
@@ -63,6 +64,9 @@ class WebhookModelTest extends \PHPUnit\Framework\TestCase
      */
     private $model;
 
+    /**
+     * @var MockObject|Client
+     */
     private $httpClientMock;
 
     protected function setUp(): void
@@ -102,25 +106,25 @@ class WebhookModelTest extends \PHPUnit\Framework\TestCase
         $this->model->saveEntity($entity);
     }
 
-    public function testGetEventsOrderbyDirWhenSetInWebhook()
+    public function testGetEventsOrderbyDirWhenSetInWebhook(): void
     {
         $webhook = (new Webhook())->setEventsOrderbyDir('DESC');
         $this->assertEquals('DESC', $this->model->getEventsOrderbyDir($webhook));
     }
 
-    public function testGetEventsOrderbyDirWhenNotSetInWebhook()
+    public function testGetEventsOrderbyDirWhenNotSetInWebhook(): void
     {
         $this->parametersHelperMock->method('get')->willReturn('DESC');
         $this->assertEquals('DESC', $this->initModel()->getEventsOrderbyDir());
     }
 
-    public function testGetEventsOrderbyDirWhenWebhookNotProvided()
+    public function testGetEventsOrderbyDirWhenWebhookNotProvided(): void
     {
         $this->parametersHelperMock->method('get')->willReturn('DESC');
         $this->assertEquals('DESC', $this->initModel()->getEventsOrderbyDir());
     }
 
-    public function testGetWebhookPayloadForPayloadInWebhook()
+    public function testGetWebhookPayloadForPayloadInWebhook(): void
     {
         $payload = ['the' => 'payload'];
         $webhook = new Webhook();
@@ -129,7 +133,7 @@ class WebhookModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($payload, $this->model->getWebhookPayload($webhook));
     }
 
-    public function testGetWebhookPayloadForQueueLoadedFromDatabase()
+    public function testGetWebhookPayloadForQueueLoadedFromDatabase(): void
     {
         $queueMock = $this->createMock(WebhookQueue::class);
         $webhook   = new Webhook();
@@ -142,10 +146,14 @@ class WebhookModelTest extends \PHPUnit\Framework\TestCase
 
         $queueRepositoryMock = $this->createMock(WebhookQueueRepository::class);
 
-        $this->parametersHelperMock->expects($this->at(4))
-            ->method('get')
-            ->with('queue_mode')
-            ->willReturn(WebhookModel::COMMAND_PROCESS);
+        $this->parametersHelperMock->method('get')
+            ->willReturnCallback(function ($param) {
+                if ('queue_mode' === $param) {
+                    return WebhookModel::COMMAND_PROCESS;
+                }
+
+                return null;
+            });
 
         $this->entityManagerMock->expects($this->at(0))
             ->method('getRepository')
@@ -172,7 +180,7 @@ class WebhookModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedPayload, $this->initModel()->getWebhookPayload($webhook));
     }
 
-    public function testGetWebhookPayloadForQueueInWebhook()
+    public function testGetWebhookPayloadForQueueInWebhook(): void
     {
         $queue   = new WebhookQueue();
         $webhook = new Webhook();
@@ -182,10 +190,14 @@ class WebhookModelTest extends \PHPUnit\Framework\TestCase
         $queue->setEvent($event);
         $queue->setDateAdded(new \DateTime('2018-04-10T15:04:57+00:00'));
 
-        $this->parametersHelperMock->expects($this->at(4))
-            ->method('get')
-            ->with('queue_mode')
-            ->willReturn(WebhookModel::IMMEDIATE_PROCESS);
+        $this->parametersHelperMock->method('get')
+            ->willReturnCallback(function ($param) {
+                if ('queue_mode' === $param) {
+                    return WebhookModel::IMMEDIATE_PROCESS;
+                }
+
+                return null;
+            });
 
         $expectedPayload = [
             'leads' => [
@@ -199,7 +211,7 @@ class WebhookModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedPayload, $this->initModel()->getWebhookPayload($webhook, $queue));
     }
 
-    private function initModel()
+    private function initModel(): WebhookModel
     {
         $model = new WebhookModel(
             $this->parametersHelperMock,

@@ -271,12 +271,13 @@ class FocusModel extends FormModel
         $formContent = (!empty($form)) ? $this->templating->getTemplating()->render(
             'MauticFocusBundle:Builder:form.html.php',
             [
-                'form'          => $form,
-                'style'         => $focus['style'],
-                'focusId'       => $focus['id'],
-                'preview'       => $isPreview,
-                'contactFields' => $this->leadFieldModel->getFieldListWithProperties(),
-                'companyFields' => $this->leadFieldModel->getFieldListWithProperties('company'),
+                'form'           => $form,
+                'style'          => $focus['style'],
+                'focusId'        => $focus['id'],
+                'preview'        => $isPreview,
+                'contactFields'  => $this->leadFieldModel->getFieldListWithProperties(),
+                'companyFields'  => $this->leadFieldModel->getFieldListWithProperties('company'),
+                'viewOnlyFields' => $this->formModel->getCustomComponents()['viewOnlyFields'],
             ]
         ) : '';
 

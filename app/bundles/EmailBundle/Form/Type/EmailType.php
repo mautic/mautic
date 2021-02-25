@@ -23,6 +23,7 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\ThemeListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Form\Type\FormListType;
 use Mautic\LeadBundle\Form\Type\LeadListType;
@@ -62,14 +63,21 @@ class EmailType extends AbstractType
      */
     private $stageModel;
 
+    /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
     public function __construct(
         TranslatorInterface $translator,
         EntityManager $entityManager,
-        StageModel $stageModel
+        StageModel $stageModel,
+        CoreParametersHelper $coreParametersHelper
     ) {
-        $this->translator = $translator;
-        $this->em         = $entityManager;
-        $this->stageModel = $stageModel;
+        $this->translator           = $translator;
+        $this->em                   = $entityManager;
+        $this->stageModel           = $stageModel;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -156,6 +164,21 @@ class EmailType extends AbstractType
                     'preaddon' => 'fa fa-envelope',
                     'tooltip'  => 'mautic.email.bcc.tooltip',
                 ],
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'useOwnerAsMailer',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.email.use.owner.as.mailer',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.use.owner.as.mailer.tooltip',
+                ],
+                'data'     => (bool) (is_null($options['data']->getUseOwnerAsMailer()) ? $this->coreParametersHelper->get('mailer_is_owner') : $options['data']->getUseOwnerAsMailer()),
                 'required' => false,
             ]
         );

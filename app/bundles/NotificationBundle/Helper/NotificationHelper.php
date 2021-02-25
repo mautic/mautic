@@ -49,9 +49,9 @@ class NotificationHelper
     protected $router;
 
     /**
-     * @var Request
+     * @var RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * @var \Mautic\LeadBundle\Model\DoNotContact
@@ -68,7 +68,7 @@ class NotificationHelper
         $this->coreParametersHelper = $coreParametersHelper;
         $this->integrationHelper    = $integrationHelper;
         $this->router               = $router;
-        $this->request              = $requestStack;
+        $this->requestStack         = $requestStack;
         $this->doNotContact         = $doNotContact;
     }
 
@@ -125,7 +125,7 @@ class NotificationHelper
                 $welcomenotificationText = 'welcomeNotification: { "disable": true },';
             }
 
-            $server        = $this->request->getCurrentRequest()->server;
+            $server        = $this->requestStack->getCurrentRequest()->server;
             $https         = ('https' == parse_url($server->get('HTTP_REFERER'), PHP_URL_SCHEME)) ? true : false;
             $subdomainName = '';
 
@@ -207,8 +207,8 @@ JS;
     private function hasScript()
     {
         $landingPage = true;
-        $server      = $this->request->getCurrentRequest()->server;
-        $cookies     = $this->request->getCurrentRequest()->cookies;
+        $server      = $this->requestStack->getCurrentRequest()->server;
+        $cookies     = $this->requestStack->getCurrentRequest()->cookies;
         // already exist
         if ($cookies->get('mtc_osid')) {
             return false;

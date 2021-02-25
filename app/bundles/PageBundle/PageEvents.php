@@ -147,4 +147,12 @@ final class PageEvents
      * @var string
      */
     const ON_DETERMINE_DWELL_TIME_WINNER = 'mautic.page.on_dwell_time_winner';
+
+    /**
+     * The mautic.page.on_contact_tracked event is dispatched when a contact is tracked via the mt() tracking event.
+     *
+     * The event listener receives a
+     * Mautic\PageBundle\Event\TrackingEvent
+     */
+    const ON_CONTACT_TRACKED = 'mautic.page.on_contact_tracked';
 }

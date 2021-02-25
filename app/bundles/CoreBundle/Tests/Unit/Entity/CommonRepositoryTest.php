@@ -11,6 +11,8 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\Entity;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
@@ -27,6 +29,10 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
      * @var QueryBuilder
      */
     private $qb;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|Connection
+     */
+    private $connectionMock;
 
     /**
      * Sets up objects used in the tests.
@@ -42,8 +48,11 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->repo = new CommonRepository($emMock, $metaMock);
-        $this->qb   = new QueryBuilder($emMock);
+        $this->repo           = new CommonRepository($emMock, $metaMock);
+        $this->qb             = new QueryBuilder($emMock);
+        $this->connectionMock = $this->createMock(Connection::class);
+        $this->connectionMock->method('getExpressionBuilder')
+            ->willReturn(new ExpressionBuilder($this->connectionMock));
     }
 
     /**
@@ -156,6 +165,8 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
      * @param array  $args   added to the method
      *
      * @return mixed result of the method
+     *
+     * @throws \ReflectionException
      */
     private function callProtectedMethod($method, $args)
     {
@@ -164,5 +175,162 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $method->setAccessible(true);
 
         return $method->invokeArgs($this->repo, $args);
+    }
+
+    public function testArgumentCSVArray()
+    {
+        $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
+        $args = [
+            [
+                'col'   => 'l.user_id',
+                'expr'  => 'in',
+                'val'   => '"1","2","3","4"',
+            ],
+        ];
+        $matchArgs = explode(',', $args[0]['val']);
+        array_walk($matchArgs, function (&$element) { $element = trim($element, '"'); });
+
+        $this->callBuildWhereClauseFromArray($qb, $args);
+
+        $this->assertStringStartsWith('l.user_id IN (', (string) $qb->getQueryPart('where'));
+        $parameters = $qb->getParameters();
+        $this->assertEquals($matchArgs, array_shift($parameters));
+
+        $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
+        $args = [
+            [
+                'col'   => 'l.user_id',
+                'expr'  => 'notIn',
+                'val'   => '"1","2","3","4"',
+            ],
+        ];
+        $matchArgs = explode(',', $args[0]['val']);
+        array_walk($matchArgs, function (&$element) { $element = trim($element, '"'); });
+
+        $this->callBuildWhereClauseFromArray($qb, $args);
+
+        $this->assertStringStartsWith('l.user_id NOT IN (', (string) $qb->getQueryPart('where'));
+        $parameters = $qb->getParameters();
+        $this->assertEquals($matchArgs, array_shift($parameters));
+    }
+
+    public function testNoEnquotedArgumentCSVArray()
+    {
+        $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
+        $args = [
+            [
+                'col'   => 'l.user_id',
+                'expr'  => 'in',
+                'val'   => '1,2,3,4',
+            ],
+        ];
+        $matchArgs = explode(',', $args[0]['val']);
+        array_walk($matchArgs, function (&$element) { $element = trim($element, '"'); });
+
+        $this->callBuildWhereClauseFromArray($qb, $args);
+
+        $this->assertStringStartsWith('l.user_id IN (', (string) $qb->getQueryPart('where'));
+
+        $parameters = $qb->getParameters();
+        $this->assertEquals($matchArgs, array_shift($parameters));
+
+        $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
+        $args = [
+            [
+                'col'   => 'l.user_id',
+                'expr'  => 'notIn',
+                'val'   => '1,2,3,4',
+            ],
+        ];
+        $matchArgs = explode(',', $args[0]['val']);
+        array_walk($matchArgs, function (&$element) { $element = trim($element, '"'); });
+
+        $this->callBuildWhereClauseFromArray($qb, $args);
+
+        $this->assertStringStartsWith('l.user_id NOT IN (', (string) $qb->getQueryPart('where'));
+
+        $parameters = $qb->getParameters();
+        $this->assertEquals($matchArgs, array_shift($parameters));
+    }
+
+    public function testNoEnquotedStringArgumentCSVArray()
+    {
+        $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
+        $args = [
+            [
+                'col'   => 'l.firstname',
+                'expr'  => 'in',
+                'val'   => 'jan,alan,don,john',
+            ],
+        ];
+        $matchArgs = explode(',', $args[0]['val']);
+        array_walk($matchArgs, function (&$element) { $element = trim($element, '"'); });
+
+        $this->callBuildWhereClauseFromArray($qb, $args);
+
+        $this->assertStringStartsWith($args[0]['col'].' IN (', (string) $qb->getQueryPart('where'));
+
+        $parameters = $qb->getParameters();
+        $this->assertEquals($matchArgs, array_shift($parameters));
+
+        $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
+        $args = [
+            [
+                'col'   => 'l.firstname',
+                'expr'  => 'notIn',
+                'val'   => 'jan,alan,don,john',
+            ],
+        ];
+        $matchArgs = explode(',', $args[0]['val']);
+        array_walk($matchArgs, function (&$element) { $element = trim($element, '"'); });
+
+        $this->callBuildWhereClauseFromArray($qb, $args);
+
+        $this->assertStringStartsWith($args[0]['col'].' NOT IN (', (string) $qb->getQueryPart('where'));
+
+        $parameters = $qb->getParameters();
+        $this->assertEquals($matchArgs, array_shift($parameters));
+    }
+
+    public function testStringArgumentInterpretedAsSingleValueEnquoted()
+    {
+        $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
+        $args = [
+            [
+                'col'   => 'l.firstname',
+                'expr'  => 'in',
+                'val'   => '"jan,alan,don,john"',
+            ],
+        ];
+
+        $this->callBuildWhereClauseFromArray($qb, $args);
+
+        $this->assertStringStartsWith($args[0]['col'].' = ', (string) $qb->getQueryPart('where'));
+        $parameters = $qb->getParameters();
+        $this->assertEquals(trim($args[0]['val'], '"'), array_shift($parameters));
+
+        $qb   = new \Doctrine\DBAL\Query\QueryBuilder($this->connectionMock);
+        $args = [
+            [
+                'col'   => 'l.firstname',
+                'expr'  => 'notIn',
+                'val'   => '"jan,alan,don,john"',
+            ],
+        ];
+
+        $this->callBuildWhereClauseFromArray($qb, $args);
+
+        $this->assertStringStartsWith($args[0]['col'].' <> ', (string) $qb->getQueryPart('where'));
+        $parameters = $qb->getParameters();
+        $this->assertEquals(trim($args[0]['val'], '"'), array_shift($parameters));
+    }
+
+    private function callBuildWhereClauseFromArray($qb, $args)
+    {
+        $reflection = new \ReflectionClass(CommonRepository::class);
+        $method     = $reflection->getMethod('buildWhereClauseFromArray');
+        $method->setAccessible(true);
+
+        return $method->invokeArgs($this->repo, [$qb, $args]);
     }
 }

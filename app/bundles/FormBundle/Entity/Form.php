@@ -12,6 +12,7 @@
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -129,6 +130,11 @@ class Form extends FormEntity
     private $noIndex;
 
     /**
+     * @var int
+     */
+    private $progressiveProfilingLimit;
+
+    /**
      * This var is used to cache the result once gained from the loop.
      *
      * @var bool
@@ -225,6 +231,8 @@ class Form extends FormEntity
             ->columnName('no_index')
             ->nullable()
             ->build();
+
+        $builder->addNullableField('progressiveProfilingLimit', Type::INTEGER, 'progressive_profiling_limit');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -252,6 +260,12 @@ class Form extends FormEntity
         $metadata->addPropertyConstraint('formType', new Assert\Choice([
             'choices' => ['standalone', 'campaign'],
         ]));
+
+        $metadata->addPropertyConstraint('progressiveProfilingLimit', new Assert\GreaterThan([
+            'value'   => 0,
+            'message' => 'mautic.form.form.progressive_profiling_limit.error',
+            'groups'  => ['progressiveProfilingLimit'],
+        ]));
     }
 
     /**
@@ -268,6 +282,10 @@ class Form extends FormEntity
             $groups[] = 'messageRequired';
         } elseif ('redirect' == $postAction) {
             $groups[] = 'urlRequired';
+        }
+
+        if ('' != $data->getProgressiveProfilingLimit()) {
+            $groups[] = 'progressiveProfilingLimit';
         }
 
         return $groups;
@@ -852,6 +870,12 @@ class Form extends FormEntity
 
         // Progressive profiling must be turned off in the kiosk mode
         if (false === $this->getInKioskMode()) {
+            if ('' != $this->getProgressiveProfilingLimit()) {
+                $this->usesProgressiveProfiling = true;
+
+                return $this->usesProgressiveProfiling;
+            }
+
             // Search for a field with a progressive profiling setting on
             foreach ($this->fields->toArray() as $field) {
                 if (false === $field->getShowWhenValueExists() || $field->getShowAfterXSubmissions() > 0) {
@@ -865,5 +889,30 @@ class Form extends FormEntity
         $this->usesProgressiveProfiling = false;
 
         return $this->usesProgressiveProfiling;
+    }
+
+    /**
+     * @param int $progressiveProfilingLimit
+     *
+     * @return Form
+     */
+    public function setProgressiveProfilingLimit($progressiveProfilingLimit)
+    {
+        $this->isChanged('progressiveProfilingLimit', $progressiveProfilingLimit);
+        $this->progressiveProfilingLimit = $progressiveProfilingLimit;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getProgressiveProfilingLimit()
+    {
+        if (0 === $this->progressiveProfilingLimit) {
+            $this->progressiveProfilingLimit = '';
+        }
+
+        return $this->progressiveProfilingLimit;
     }
 }
