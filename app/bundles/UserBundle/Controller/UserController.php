@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Form\Type\ContactType;
 
 class UserController extends FormController
@@ -129,8 +130,12 @@ class UserController extends FormController
                 $formUser             = $this->request->request->get('user', []);
                 $automaticCredentials = $formUser['automaticCredentials'];
                 $submittedPassword    = $formUser['plainPassword']['password'] ?? null;
+                $sendEmail            = false;
                 if ($automaticCredentials) {
-                    $submittedPassword = uniqid();
+                    $submittedPassword                     = uniqid();
+                    $formUser['plainPassword']['password'] = $submittedPassword;
+                    $formUser['plainPassword']['confirm']  = $submittedPassword;
+                    $sendEmail                             = true;
                 }
 
                 $encoder   = $this->get('security.password_encoder');
@@ -166,7 +171,7 @@ class UserController extends FormController
                             $this->addFlash($message, $messageVars);
                         }
                     }
-
+                    $model->sendCredentialsEmail($formUser['email'], $formUser['username'], $submittedPassword);
                     $this->addFlash('mautic.core.notice.created', [
                         '%name%'      => $user->getName(),
                         '%menu_link%' => 'mautic_user_index',
