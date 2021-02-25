@@ -87,6 +87,13 @@ $view['slots']->set('headerTitle', $header);
 				            <?php echo $view['form']->widget($form['plainPassword'], ['attr' => ['placeholder' => $form['plainPassword']->vars['label']]]); ?>
 				        </div>
 				    </div>
+					<div class="row">
+						<div class="col-xs-12">
+							<div class="form-group col-xs-12">
+								<?php echo $view['form']->row($form['automaticCredentials']); ?>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 			<hr class="mnr-md mnl-md">
