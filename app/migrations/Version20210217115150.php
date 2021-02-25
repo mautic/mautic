@@ -23,20 +23,18 @@ final class Version20210217115150 extends PreUpAssertionMigration
         $this->skipAssertion(function (Schema $schema) {
             $table = $schema->getTable($this->getPrefixedTableName(LeadEventLog::TABLE_NAME));
             if ($table->hasForeignKey($this->getForeignKeyName('event_id')) &&
-                empty($table->getForeignKey($this->getForeignKeyName('event_id'))->onDelete()))
-            {
+                empty($table->getForeignKey($this->getForeignKeyName('event_id'))->onDelete())) {
                 return true;
             }
-            return false;
 
+            return false;
         }, sprintf('On delete cascade already removed for foreign key %s', $this->getForeignKeyName('event_id')));
     }
 
     public function up(Schema $schema): void
     {
         $table = $schema->getTable($this->getPrefixedTableName(LeadEventLog::TABLE_NAME));
-        if ($table->hasForeignKey($this->getForeignKeyName('event_id')))
-        {
+        if ($table->hasForeignKey($this->getForeignKeyName('event_id'))) {
             $table->removeForeignKey($this->getForeignKeyName('event_id'));
         }
 
