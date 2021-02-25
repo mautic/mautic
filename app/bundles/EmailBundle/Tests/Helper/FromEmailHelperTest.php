@@ -691,7 +691,7 @@ class FromEmailHelperTest extends TestCase
     public function testOwnerWithEncodedCharactersInName()
     {
         $this->coreParametersHelper->expects($this->once())
-            ->method('getP')
+            ->method('get')
             ->with('mailer_is_owner')
             ->willReturn(true);
 
