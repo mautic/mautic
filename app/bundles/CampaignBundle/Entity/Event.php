@@ -23,6 +23,8 @@ use Mautic\LeadBundle\Entity\Lead as Contact;
  */
 class Event implements ChannelInterface
 {
+    public const TABLE_NAME = 'campaign_events';
+
     const TYPE_DECISION  = 'decision';
     const TYPE_ACTION    = 'action';
     const TYPE_CONDITION = 'condition';
@@ -184,7 +186,7 @@ class Event implements ChannelInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('campaign_events')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\EventRepository')
             ->addIndex(['type', 'event_type'], 'campaign_event_search')
             ->addIndex(['event_type'], 'campaign_event_type')
@@ -278,8 +280,6 @@ class Event implements ChannelInterface
 
         $builder->createOneToMany('log', 'LeadEventLog')
             ->mappedBy('event')
-            ->cascadePersist()
-            ->cascadeRemove()
             ->fetchExtraLazy()
             ->build();
 

@@ -124,7 +124,7 @@ class LeadEventLog implements ChannelInterface
 
         $builder->createManyToOne('event', 'Event')
             ->inversedBy('log')
-            ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
+            ->addJoinColumn('event_id', 'id', false, false)
             ->build();
 
         $builder->addLead(false, 'CASCADE');

@@ -25,7 +25,7 @@ class DeleteEvent extends \Symfony\Component\EventDispatcher\Event
         $this->eventIds = $eventIds;
     }
 
-    public function getEventIds()
+    public function getEventIds(): array
     {
         return $this->eventIds;
     }

@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
@@ -20,15 +21,31 @@ final class Version20210217115150 extends PreUpAssertionMigration
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(function (Schema $schema) {
-            return !$schema->getTable($this->getPrefixedTableName(LeadEventLog::TABLE_NAME))
-                ->hasForeignKey($this->getForeignKeyName('event_id'));
-        }, sprintf('Foreign key %s already removed', $this->getForeignKeyName('event_id')));
+            $table = $schema->getTable($this->getPrefixedTableName(LeadEventLog::TABLE_NAME));
+            if ($table->hasForeignKey($this->getForeignKeyName('event_id')) &&
+                empty($table->getForeignKey($this->getForeignKeyName('event_id'))->onDelete()))
+            {
+                return true;
+            }
+            return false;
+
+        }, sprintf('On delete cascade already removed for foreign key %s', $this->getForeignKeyName('event_id')));
     }
 
     public function up(Schema $schema): void
     {
-        $schema->getTable($this->getPrefixedTableName(LeadEventLog::TABLE_NAME))
-            ->removeForeignKey($this->getForeignKeyName('event_id'));
+        $table = $schema->getTable($this->getPrefixedTableName(LeadEventLog::TABLE_NAME));
+        if ($table->hasForeignKey($this->getForeignKeyName('event_id')))
+        {
+            $table->removeForeignKey($this->getForeignKeyName('event_id'));
+        }
+
+        $table->addForeignKeyConstraint($this->getPrefixedTableName(Event::TABLE_NAME),
+            ['event_id'],
+            ['id'],
+            [],
+            $this->getForeignKeyName('event_id')
+        );
     }
 
     private function getForeignKeyName(string $column): string
