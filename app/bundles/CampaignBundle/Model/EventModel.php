@@ -11,10 +11,12 @@
 
 namespace Mautic\CampaignBundle\Model;
 
+use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Event\DeleteEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\FormModel;
@@ -100,11 +102,10 @@ class EventModel extends FormModel
             // wipe out any references to these events to prevent restraint violations
             $this->getRepository()->nullEventRelationships($deletedKeys);
 
-            foreach ($deletedEvents as $eventToDelete) {
-                // delete the events
-                $this->getLeadEventLogRepository()->removeEventLogs($eventToDelete);
-                $this->deleteEntities([$eventToDelete]);
-            }
+            $this->dispatcher->dispatch(CampaignEvents::ON_EVENT_DELETE, new DeleteEvent($deletedKeys));
+
+            //$this->getLeadEventLogRepository()->removeEventLogs($eventToDelete);
+            $this->deleteEntities($deletedEvents);
         }
     }
 

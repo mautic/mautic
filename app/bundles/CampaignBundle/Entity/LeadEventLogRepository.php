@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -600,12 +601,11 @@ SQL;
     public function removeEventLogs(array $eventIds): void
     {
         $table_name    = $this->getTableName();
-        $eventIdsStr   = implode(',', $eventIds);
-        $sql           = "DELETE FROM {$table_name} WHERE event_id IN ({$eventIdsStr}) ORDER BY event_id ASC LIMIT ".self::LOG_DELETE_BATCH_SIZE;
+        $sql           = "DELETE FROM {$table_name} WHERE event_id IN (?) ORDER BY event_id ASC LIMIT ".self::LOG_DELETE_BATCH_SIZE;
         $conn          = $this->getEntityManager()->getConnection();
         $deleteEntries = true;
         while ($deleteEntries) {
-            $deletedRecords = $conn->executeQuery($sql)->rowCount();
+            $deletedRecords = $conn->executeQuery($sql, [$eventIds], [Connection::PARAM_INT_ARRAY])->rowCount();
             if (!$deletedRecords) {
                 $deleteEntries = false;
             }

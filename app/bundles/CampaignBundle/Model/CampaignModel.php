@@ -169,8 +169,26 @@ class CampaignModel extends CommonFormModel
     {
         // Null all the event parents for this campaign to avoid database constraints
         $this->getEventRepository()->nullEventParents($entity->getId());
-
+        $eventIds = $this->getCampaignEventIds($entity);
         parent::deleteEntity($entity);
+        if (!empty($eventIds)) {
+            $this->dispatcher->dispatch(CampaignEvents::ON_EVENT_DELETE, new Events\DeleteEvent($eventIds));
+        }
+    }
+
+    private function getCampaignEventIds(Campaign $campaign): array
+    {
+        $eventIds       = [];
+        $campaignEvents = $campaign->getEvents();
+        if (empty($campaignEvents)) {
+            return $eventIds;
+        }
+
+        foreach ($campaignEvents as $event) {
+            $eventIds[] = $event->getId();
+        }
+
+        return $eventIds;
     }
 
     /**
