@@ -329,6 +329,7 @@ class MailHelperTest extends TestCase
         $symfonyMailer = new Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => 'No Body']);
+        $email  = new Email();
         $this->fromEmailHelper->expects($this->exactly(4))
             ->method('getFromAddressArrayConsideringOwner')
             ->willReturnOnConsecutiveCalls(
@@ -337,6 +338,10 @@ class MailHelperTest extends TestCase
                 ['owner2@owner.com'   => null],
                 ['nobody@nowhere.com' => null]
             );
+
+        $email->setUseOwnerAsMailer(true);
+
+        $mailer->setEmail($email);
 
         $mailer->enableQueue();
 
