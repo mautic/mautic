@@ -96,7 +96,7 @@ class FromEmailHelperTest extends TestCase
     public function testTokenizedEmailIsGivenPreference()
     {
         $this->coreParametersHelper->expects($this->never())
-            ->method('getParameter');
+            ->method('get');
 
         $this->leadRepository->expects($this->never())
             ->method('getLeadOwner');
@@ -112,7 +112,7 @@ class FromEmailHelperTest extends TestCase
     public function testDefaultIsReturnedIfOwnerNotSet()
     {
         $this->coreParametersHelper->expects($this->never())
-            ->method('getParameter');
+            ->method('get');
 
         $this->leadRepository->expects($this->never())
             ->method('getLeadOwner');
@@ -128,7 +128,7 @@ class FromEmailHelperTest extends TestCase
     public function testDefaultIsReturnedWhenOwnerNotFound()
     {
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('mailer_is_owner')
             ->willReturn(true);
 
@@ -148,7 +148,7 @@ class FromEmailHelperTest extends TestCase
     public function testTokenizedEmailIsReplacedWithOwnerWhenFieldEmptyAndDefaultNotOverriddenAndMailAsOwnerEnabled()
     {
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('mailer_is_owner')
             ->willReturn(true);
 
@@ -179,7 +179,7 @@ class FromEmailHelperTest extends TestCase
     public function testTokenizedEmailIsReplacedWithSystemDefaultWhenFieldEmptyAndDefaultNotOverriddenAndMailAsOwnerDisabled()
     {
         $this->coreParametersHelper->expects($this->exactly(3))
-            ->method('getParameter')
+            ->method('get')
             ->withConsecutive(
                 ['mailer_is_owner'],
                 ['mailer_from_email'],
@@ -208,7 +208,7 @@ class FromEmailHelperTest extends TestCase
     public function testTokenizedEmailIsReplacedWithOverriddenDefaultWhenFieldEmptyAndMailAsOwnerDisabled()
     {
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('mailer_is_owner')
             ->willReturn(false);
 
@@ -231,7 +231,7 @@ class FromEmailHelperTest extends TestCase
     public function testMultipleCallsReturnAppropriateEmail()
     {
         $this->coreParametersHelper->expects($this->exactly(2))
-            ->method('getParameter')
+            ->method('get')
             ->with('mailer_is_owner')
             ->willReturn(true);
 
@@ -274,7 +274,7 @@ class FromEmailHelperTest extends TestCase
     public function testTokenizedEmailIsReplacedWithContactField()
     {
         $this->coreParametersHelper->expects($this->never())
-            ->method('getParameter');
+            ->method('get');
 
         $this->leadRepository->expects($this->never())
             ->method('getLeadOwner');
@@ -290,7 +290,7 @@ class FromEmailHelperTest extends TestCase
     public function testTokenizedNameIsReplacedWithContactField()
     {
         $this->coreParametersHelper->expects($this->never())
-            ->method('getParameter');
+            ->method('get');
 
         $this->leadRepository->expects($this->never())
             ->method('getLeadOwner');
@@ -308,7 +308,7 @@ class FromEmailHelperTest extends TestCase
     public function testTokenizedFromIsReplacedWithContactField()
     {
         $this->coreParametersHelper->expects($this->never())
-            ->method('getParameter');
+            ->method('get');
 
         $this->leadRepository->expects($this->never())
             ->method('getLeadOwner');
@@ -327,7 +327,7 @@ class FromEmailHelperTest extends TestCase
     public function testTokenizedEmailIsReplacedWithSystemDefaultWhenFieldEmptyAndDefaultNotOverridden()
     {
         $this->coreParametersHelper->expects($this->exactly(2))
-            ->method('getParameter')
+            ->method('get')
             ->withConsecutive(
                 ['mailer_from_email'],
                 ['mailer_from_name']
@@ -354,7 +354,7 @@ class FromEmailHelperTest extends TestCase
     public function testTokenizedNameIsReplacedWithSystemDefaultWhenFieldEmptyAndDefaultNotOverridden()
     {
         $this->coreParametersHelper->expects($this->exactly(2))
-            ->method('getParameter')
+            ->method('get')
             ->withConsecutive(
                 ['mailer_from_email'],
                 ['mailer_from_name']
@@ -382,7 +382,7 @@ class FromEmailHelperTest extends TestCase
     public function testTokenizedEmailIsReplacedWithOverriddenDefaultWhenFieldEmpty()
     {
         $this->coreParametersHelper->expects($this->never())
-            ->method('getParameter');
+            ->method('get');
 
         $this->leadRepository->expects($this->never())
             ->method('getLeadOwner');
@@ -403,7 +403,7 @@ class FromEmailHelperTest extends TestCase
     public function testTokenizedNameIsReplacedWithOverriddenDefaultWhenFieldEmpty()
     {
         $this->coreParametersHelper->expects($this->never())
-            ->method('getParameter');
+            ->method('get');
         $this->leadRepository->expects($this->never())
             ->method('getLeadOwner');
 
@@ -424,7 +424,7 @@ class FromEmailHelperTest extends TestCase
     public function testTokenizedNameIsReplacedWithSystemDefaultWhenFieldEmptyWithoutDefaultBeingOverriden()
     {
         $this->coreParametersHelper->expects($this->exactly(2))
-            ->method('getParameter')
+            ->method('get')
             ->withConsecutive(['mailer_from_email'], ['mailer_from_name'])
             ->willReturnOnConsecutiveCalls('default@somewhere.com', 'Default Name');
 
@@ -447,7 +447,7 @@ class FromEmailHelperTest extends TestCase
     public function testNullContactReturnsDefaultAddress()
     {
         $this->coreParametersHelper->expects($this->never())
-            ->method('getParameter');
+            ->method('get');
         $this->leadRepository->expects($this->never())
             ->method('getLeadOwner');
 
@@ -475,7 +475,7 @@ class FromEmailHelperTest extends TestCase
     public function testContactOwnerIsReturnedWhenMailAsOwnerIsEnabled()
     {
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('mailer_is_owner')
             ->willReturn(true);
 
@@ -502,7 +502,7 @@ class FromEmailHelperTest extends TestCase
         $this->expectException(OwnerNotFoundException::class);
 
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('mailer_is_owner')
             ->willReturn(false);
 
@@ -519,7 +519,7 @@ class FromEmailHelperTest extends TestCase
         $this->expectException(OwnerNotFoundException::class);
 
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('mailer_is_owner')
             ->willReturn(true);
 
@@ -536,7 +536,7 @@ class FromEmailHelperTest extends TestCase
     public function testSignatureOfLastFetchedOwnerReturned()
     {
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('mailer_is_owner')
             ->willReturn(true);
 
@@ -565,7 +565,7 @@ class FromEmailHelperTest extends TestCase
     public function testSignatureHasUserTokensReplaces()
     {
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('mailer_is_owner')
             ->willReturn(true);
 
@@ -594,7 +594,7 @@ class FromEmailHelperTest extends TestCase
     public function testEmptySignatureIsReturnedWhenOwnerIsReset()
     {
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('mailer_is_owner')
             ->willReturn(true);
 
@@ -628,7 +628,7 @@ class FromEmailHelperTest extends TestCase
     public function testEmptySignatureIsReturnedWhenOwnerIsNotFound()
     {
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('mailer_is_owner')
             ->willReturn(true);
 
@@ -649,7 +649,7 @@ class FromEmailHelperTest extends TestCase
     public function testSignatureIsReturnedForAppropriateUser()
     {
         $this->coreParametersHelper->expects($this->exactly(2))
-            ->method('getParameter')
+            ->method('get')
             ->with('mailer_is_owner')
             ->willReturn(true);
 
@@ -691,7 +691,7 @@ class FromEmailHelperTest extends TestCase
     public function testOwnerWithEncodedCharactersInName()
     {
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('getP')
             ->with('mailer_is_owner')
             ->willReturn(true);
 

@@ -186,8 +186,8 @@ class FromEmailHelper
      */
     private function getSystemDefaultFrom()
     {
-        $email = $this->coreParametersHelper->getParameter('mailer_from_email');
-        $name  = $this->coreParametersHelper->getParameter('mailer_from_name');
+        $email = $this->coreParametersHelper->get('mailer_from_email');
+        $name  = $this->coreParametersHelper->get('mailer_from_name');
         $name  = $name ? $name : null;
 
         return new AddressDTO([$email => $name]);
