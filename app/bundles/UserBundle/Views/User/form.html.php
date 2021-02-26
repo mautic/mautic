@@ -91,7 +91,7 @@ $view['slots']->set('headerTitle', $header);
 					<div class="row">
 						<div class="col-xs-12">
 							<div class="form-group col-xs-12">
-								<?php echo $view['form']->row($form['automaticCredentials']); ?>
+								<?php echo $view['form']->row($form['automaticPassword']); ?>
 							</div>
 						</div>
 					</div>

@@ -128,10 +128,10 @@ class UserController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 //check to see if the password needs to be rehashed
                 $formUser             = $this->request->request->get('user', []);
-                $automaticCredentials = $formUser['automaticCredentials'];
+                $automaticPassword    = $formUser['automaticPassword'];
                 $submittedPassword    = $formUser['plainPassword']['password'] ?? null;
                 $sendEmail            = false;
-                if ($automaticCredentials) {
+                if ($automaticPassword) {
                     $submittedPassword                     = uniqid();
                     $sendEmail                             = true;
                 }
