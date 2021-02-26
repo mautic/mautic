@@ -49,14 +49,14 @@ final class DoNotContactSubscriber implements EventSubscriberInterface
 
     public function addDncForLead(DoNotContactAddEvent $doNotContactAddEvent): void
     {
-        if(empty($doNotContactAddEvent->getLead()->getId())) {
+        if (empty($doNotContactAddEvent->getLead()->getId())) {
             $this->doNotContact->createDncRecord(
                 $doNotContactAddEvent->getLead(),
                 $doNotContactAddEvent->getChannel(),
                 $doNotContactAddEvent->getReason(),
                 $doNotContactAddEvent->getComments()
             );
-        }else {
+        } else {
             $this->doNotContact->addDncForContact(
                 $doNotContactAddEvent->getLead()->getId(),
                 $doNotContactAddEvent->getChannel(),
