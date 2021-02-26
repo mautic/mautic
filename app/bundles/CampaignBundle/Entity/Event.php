@@ -280,6 +280,7 @@ class Event implements ChannelInterface
 
         $builder->createOneToMany('log', 'LeadEventLog')
             ->mappedBy('event')
+            ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
 

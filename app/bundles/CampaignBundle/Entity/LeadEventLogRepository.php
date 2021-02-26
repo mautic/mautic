@@ -603,12 +603,7 @@ SQL;
         $table_name    = $this->getTableName();
         $sql           = "DELETE FROM {$table_name} WHERE event_id IN (?) ORDER BY event_id ASC LIMIT ".self::LOG_DELETE_BATCH_SIZE;
         $conn          = $this->getEntityManager()->getConnection();
-        $deleteEntries = true;
-        while ($deleteEntries) {
-            $deletedRecords = $conn->executeQuery($sql, [$eventIds], [Connection::PARAM_INT_ARRAY])->rowCount();
-            if (!$deletedRecords) {
-                $deleteEntries = false;
-            }
+        while ($conn->executeQuery($sql, [$eventIds], [Connection::PARAM_INT_ARRAY])->rowCount()) {
         }
     }
 }

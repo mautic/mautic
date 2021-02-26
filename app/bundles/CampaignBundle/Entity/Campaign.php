@@ -28,6 +28,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 class Campaign extends FormEntity
 {
+    public const TABLE_NAME = 'campaigns';
     /**
      * @var int
      */
@@ -114,7 +115,7 @@ class Campaign extends FormEntity
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('campaigns')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\CampaignRepository');
 
         $builder->addIdColumns();
