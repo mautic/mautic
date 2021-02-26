@@ -133,8 +133,6 @@ class UserController extends FormController
                 $sendEmail            = false;
                 if ($automaticCredentials) {
                     $submittedPassword                     = uniqid();
-                    $formUser['plainPassword']['password'] = $submittedPassword;
-                    $formUser['plainPassword']['confirm']  = $submittedPassword;
                     $sendEmail                             = true;
                 }
 
