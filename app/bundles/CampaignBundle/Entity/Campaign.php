@@ -641,4 +641,18 @@ class Campaign extends FormEntity
                     ->orderBy(['dateAdded' => Criteria::DESC])
         );
     }
+
+    public function getCampaignEventIds(): array
+    {
+        $eventIds       = [];
+        if (empty($this->events)) {
+            return $eventIds;
+        }
+
+        foreach ($this->events as $event) {
+            $eventIds[] = $event->getId();
+        }
+
+        return $eventIds;
+    }
 }
