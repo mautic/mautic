@@ -91,3 +91,7 @@ Mautic.onPermissionChange = function (changedPermission, bundle) {
         mQuery('.' + bundle + '_granted').html(granted);
     }
 };
+
+Mautic.togglePasswordInput = function() {
+    mQuery("#user_plainPassword").toggleClass("hide");
+}
