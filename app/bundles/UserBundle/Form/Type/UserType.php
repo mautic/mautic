@@ -165,12 +165,12 @@ class UserType extends AbstractType
         );
         if (!$existing) {
             $builder->add(
-                'automaticCredentials',
+                'automaticPassword',
                 YesNoButtonGroupType::class,
                 [
-                    'label' => 'mautic.user.user.form.automaticcredentials',
+                    'label' => 'mautic.user.user.form.automaticpassword',
                     'attr'  => [
-                        'tooltip'  => 'mautic.user.user.form.automaticcredentials.descr',
+                        'tooltip'  => 'mautic.user.user.form.automaticpassword.descr',
                         'onchange' => 'Mautic.togglePasswordInput()',
                     ],
                     'data' => false,
