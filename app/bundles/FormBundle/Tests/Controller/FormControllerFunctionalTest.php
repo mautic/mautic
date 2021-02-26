@@ -25,4 +25,15 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
     }
+
+    /**
+     * Get form's create page.
+     */
+    public function testNewActionForm(): void
+    {
+        $this->client->request('GET', '/s/forms/new/');
+        $clientResponse         = $this->client->getResponse();
+        $clientResponseContent  = $clientResponse->getContent();
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+    }
 }
