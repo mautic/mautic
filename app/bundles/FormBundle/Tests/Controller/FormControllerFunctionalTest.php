@@ -3,6 +3,7 @@
 namespace Mautic\FormBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class FormControllerFunctionalTest extends MauticMysqlTestCase
 {
