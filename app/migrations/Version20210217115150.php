@@ -20,15 +20,21 @@ final class Version20210217115150 extends PreUpAssertionMigration
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(function (Schema $schema) {
-            return !$schema->getTable($this->getPrefixedTableName(LeadEventLog::TABLE_NAME))
-                ->hasForeignKey($this->getForeignKeyName('event_id'));
-        }, sprintf('Foreign key %s already removed', $this->getForeignKeyName('event_id')));
+            $table = $schema->getTable($this->getPrefixedTableName(LeadEventLog::TABLE_NAME));
+            return !$table->hasForeignKey($this->getForeignKeyName('event_id'))
+                && !$table->hasForeignKey($this->getForeignKeyName('campaign_id'));
+        }, 'Migration already executed');
     }
 
     public function up(Schema $schema): void
     {
-        $schema->getTable($this->getPrefixedTableName(LeadEventLog::TABLE_NAME))
-            ->removeForeignKey($this->getForeignKeyName('event_id'));
+        $table = $schema->getTable($this->getPrefixedTableName(LeadEventLog::TABLE_NAME));
+        if ($table->hasForeignKey($this->getForeignKeyName('event_id'))) {
+            $table->removeForeignKey($this->getForeignKeyName('event_id'));
+        }
+        if ($table->hasForeignKey($this->getForeignKeyName('campaign_id'))) {
+            $table->removeForeignKey($this->getForeignKeyName('campaign_id'));
+        }
     }
 
     private function getForeignKeyName(string $column): string
