@@ -176,7 +176,7 @@ jobs:
         mkdir -p ./mautic-testing/var/logs
         cp ./.github/ci-files/local.php ./mautic-testing/app/config/local.php
         cd ./mautic-testing
-        php bin/console mautic:install http://localhost
+        php bin/console mautic:install --force http://localhost
 
     - name: Store log artifacts
       if: ${{ always() }}
@@ -225,7 +225,7 @@ jobs:
         mkdir -p ./mautic-testing/var/logs
         cp ./.github/ci-files/local.php ./mautic-testing/app/config/local.php
         cd ./mautic-testing
-        php bin/console mautic:install http://localhost
+        php bin/console mautic:install --force http://localhost
     
     - name: "Download update package artifact ${{ env.MAUTIC_VERSION }}-update.zip"
       uses: actions/download-artifact@v2
