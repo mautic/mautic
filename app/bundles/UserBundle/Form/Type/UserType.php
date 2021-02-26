@@ -170,7 +170,8 @@ class UserType extends AbstractType
                 [
                     'label' => 'mautic.user.user.form.automaticcredentials',
                     'attr'  => [
-                        'tooltip' => 'mautic.user.user.form.automaticcredentials.descr',
+                        'tooltip'  => 'mautic.user.user.form.automaticcredentials.descr',
+                        'onchange' => 'Mautic.togglePasswordInput()',
                     ],
                     'data' => false,
                 ]
