@@ -21,6 +21,7 @@ final class Version20210217115150 extends PreUpAssertionMigration
     {
         $this->skipAssertion(function (Schema $schema) {
             $table = $schema->getTable($this->getPrefixedTableName(LeadEventLog::TABLE_NAME));
+
             return !$table->hasForeignKey($this->getForeignKeyName('event_id'))
                 && !$table->hasForeignKey($this->getForeignKeyName('campaign_id'));
         }, 'Migration already executed');
