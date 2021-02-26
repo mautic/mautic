@@ -9,6 +9,9 @@ Mautic.userOnLoad = function (container) {
             Mautic.activateSearchAutocomplete('list-search', 'user.user');
         }
     }
+    if(mQuery("#user_automaticPassword_1").prop('checked')) {
+        mQuery("#user_plainPassword").toggleClass("hide");
+    }
 };
 
 Mautic.roleOnLoad = function (container, response) {
@@ -92,6 +95,9 @@ Mautic.onPermissionChange = function (changedPermission, bundle) {
     }
 };
 
+/**
+ * Hide password input when automatic password checkbox is flagged
+ */
 Mautic.togglePasswordInput = function() {
     mQuery("#user_plainPassword").toggleClass("hide");
 }
