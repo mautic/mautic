@@ -11,6 +11,8 @@
 
 namespace Mautic\CoreBundle\Command;
 
+use Mautic\CoreBundle\Helper\AssetGenerationHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -42,8 +44,11 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $container   = $this->getContainer();
+
+        /** @var AssetGenerationHelper */
         $assetHelper = $container->get('mautic.helper.assetgeneration');
 
+        /** @var PathsHelper */
         $pathsHelper = $container->get('mautic.helper.paths');
 
         // Combine and minify bundle assets
