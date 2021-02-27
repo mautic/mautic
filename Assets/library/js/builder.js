@@ -18,10 +18,13 @@ function launchBuilderGrapesjs(formName) {
     ? fullHtml.body.innerHTML
     : mQuery('textarea.builder-mjml').val();
 
+  const assets = textareaAssets.val() ? JSON.parse(textareaAssets.val()) : [];
+
   const builder = new BuilderService(
     canvasContent,
-    textareaAssets.val(),
-    textareaAssets.data('upload')
+    assets,
+    textareaAssets.data('upload'),
+    textareaAssets.data('delete')
   );
 
   Mautic.showChangeThemeWarning = true;

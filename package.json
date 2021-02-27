@@ -4,10 +4,10 @@
   "description": "⚠️ This Plugin is still Beta! It works great already and we're developing it actively! Please use it and report everything inside the \"Issues\" here in Github. ⚠️",
   "main": "index.js",
   "scripts": {
-    "helloWorld": "parcel Demo/helloWorld/index.html",
-    "mautic": "cp -r Demo/data dist && parcel Demo/mautic/index.html",
     "build": "parcel build Assets/library/js/builder.js --out-dir Assets/library/js/dist",
-    "build-dev": "rm -r dist/ && NODE_ENV=development parcel build Assets/library/js/builder.js --no-minify --out-dir Assets/library/js/dist"
+    "build-dev": "NODE_ENV=development parcel build Assets/library/js/builder.js --no-minify --out-dir Assets/library/js/dist",
+    "helloWorld": "parcel Demo/helloWorld/index.html",
+    "mautic": "cp -r Demo/data dist && parcel Demo/mautic/index.html"
   },
   "repository": {
     "type": "git",

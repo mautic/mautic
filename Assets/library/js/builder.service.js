@@ -17,17 +17,7 @@ export default class BuilderService {
 
   uploadPath;
 
-  assetManagerConf = {
-    assets: this.assets,
-    noAssets: Mautic.translate('grapesjsbuilder.assetManager.noAssets'),
-    upload: this.uploadPath,
-    uploadName: 'files',
-    multiUpload: true,
-    embedAsBase64: false,
-    openAssetsOnDrop: 1,
-    autoAdd: true,
-    headers: { 'X-CSRF-Token': mauticAjaxCsrf }, // global variable
-  };
+  deletePath;
 
   // Redefine Keyboard shortcuts due to unbind won't works with multiple keys.
   keymapsConf = {
@@ -75,19 +65,23 @@ export default class BuilderService {
     },
   };
 
-  constructor(content, assets, uploadPath) {
+  constructor(content, assets, uploadPath, deletePath) {
     if (!content) {
       throw Error('No HTML or MJML content found');
     }
-    if (!assets) {
-      throw Error('No assets');
-    }
     if (!uploadPath) {
-      throw Error('No uploadPath');
+      throw Error('No uploadPath found');
+    }
+    if (!deletePath) {
+      throw Error('No deletePath found');
+    }
+    if (!assets || !assets[0]) {
+      console.warn('no assets');
     }
     this.canvasContent = content;
     this.assets = assets;
     this.uploadPath = uploadPath;
+    this.deletePath = deletePath;
   }
 
   /**
@@ -176,19 +170,11 @@ export default class BuilderService {
       }
     });
 
-    this.editor.on('asset:add', () => {
-      console.log('test');
-      // Save assets list in textarea to keep new uploaded files without reload page
-      this.textareaAssets.val(JSON.stringify(this.builder.getAssetsList()));
-    });
-
     this.editor.on('asset:remove', (response) => {
-      // Save assets list in textarea to keep new deleted files without reload page
-      this.textareaAssets.val(JSON.stringify(this.builder.getAssetsList()));
 
       // Delete file on server
       mQuery.ajax({
-        url: this.textareaAssets.data('delete'),
+        url: this.deletePath,
         data: { filename: response.getFilename() },
       });
     });
@@ -235,12 +221,11 @@ export default class BuilderService {
       container: '.builder-panel',
       components: this.canvasContent,
       height: '100%',
-      storageManager: false,
-      assetManager: this.assetManagerConf,
+      storageManager: false, // https://grapesjs.com/docs/modules/Storage.html#basic-configuration
+      assetManager: this.getAssetManagerConf(),
       styleManager: {
         clearProperties: true, // Temp fix https://github.com/artf/grapesjs-preset-webpage/issues/27
       },
-
       plugins: [grapesjswebpage, grapesjspostcss, grapesjsmautic],
       pluginsOpts: {
         grapesjswebpage: {
@@ -264,7 +249,7 @@ export default class BuilderService {
       components: this.canvasContent,
       height: '100%',
       storageManager: false,
-      assetManager: this.assetManagerConf,
+      assetManager: this.getAssetManagerConf(),
 
       plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic],
       pluginsOpts: {
@@ -290,7 +275,7 @@ export default class BuilderService {
       components: this.canvasContent,
       height: '100%',
       storageManager: false,
-      assetManager: this.assetManagerConf,
+      assetManager: this.getAssetManagerConf(),
 
       plugins: [grapesjsnewsletter, grapesjspostcss, grapesjsmautic],
       pluginsOpts: {
@@ -486,6 +471,24 @@ export default class BuilderService {
       Mautic.removeButtonLoadingIndicator(saveButton);
       Mautic.removeButtonLoadingIndicator(applyButton);
     }
+  }
+
+  /**
+   * Configure the Asset Manager for all modes
+   * @link https://grapesjs.com/docs/modules/Assets.html#configuration
+   */
+  getAssetManagerConf() {
+    return {
+      assets: this.assets,
+      noAssets: Mautic.translate('grapesjsbuilder.assetManager.noAssets'),
+      upload: this.uploadPath,
+      uploadName: 'files',
+      multiUpload: 1,
+      embedAsBase64: false,
+      openAssetsOnDrop: 1,
+      autoAdd: 1,
+      headers: { 'X-CSRF-Token': mauticAjaxCsrf }, // global variable
+    };
   }
 
   /**
