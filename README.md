@@ -137,5 +137,22 @@ npm run mautic
 npm run build
 ```
 
+## Code Architecture
+
+There is the JS code in the Assets/libarary folder. This handles the bootstrapping and management. 
+
+In addition there is the mautic preset:
+```
+- It's pack of configurable feautres:
+- Add function to edit source code
+- Extend the original image and add a confirm dialog before removing it
+- Option to hide/show Layers Manager
+- Option to enable/disable Import code button
+- Move Settings panel inside Style Manager panel
+- Open Block Manager at launch
+- Replace Rich Text Editor by Froala used in Mautic (add token support)
+- Add Dynamic Content Block for HTML used in Mautic
+```
+
 ## Sources
 [New builder documentation resources](https://docs.google.com/document/d/1gdyojOM-K-Otk2iPo92qennjw3yKvdd6VUjToGzFgC0/edit#heading=h.akyer7a3p06t)

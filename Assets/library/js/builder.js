@@ -40,54 +40,6 @@ function launchBuilderGrapesjs(formName) {
   builder.initGrapesJS(formName);
 }
 
-function manageDynamicContentTokenToSlot(component) {
-  const regex = RegExp(/\{dynamiccontent="(.*)"\}/, 'g');
-
-  const content = component.get('content');
-  const regexEx = regex.exec(content);
-
-  if (regexEx !== null) {
-    const dynConName = regexEx[1];
-    const dynConTabA = mQuery('#dynamicContentTabs a').filter(
-      () => mQuery(this).text().trim() === dynConName
-    );
-
-    if (typeof dynConTabA !== 'undefined' && dynConTabA.length) {
-      // If exist -> fill
-      const dynConTarget = dynConTabA.attr('href');
-      let dynConContent = '';
-
-      if (mQuery(dynConTarget).html()) {
-        const dynConContainer = mQuery(dynConTarget).find(`${dynConTarget}_content`);
-
-        if (dynConContainer.hasClass('editor')) {
-          dynConContent = dynConContainer.froalaEditor('html.get');
-        } else {
-          dynConContent = dynConContainer.html();
-        }
-      }
-
-      if (dynConContent === '') {
-        dynConContent = dynConTabA.text();
-      }
-
-      component.addAttributes({
-        'data-param-dec-id': parseInt(dynConTarget.replace(/[^0-9]/g, ''), 10),
-      });
-      component.set('content', dynConContent);
-    } else {
-      // If doesn't exist -> create
-      const dynConTarget = Mautic.createNewDynamicContentItem(mQuery);
-      const dynConTab = mQuery('#dynamicContentTabs').find(`a[href="${dynConTarget}"]`);
-
-      component.addAttributes({
-        'data-param-dec-id': parseInt(dynConTarget.replace(/[^0-9]/g, ''), 10),
-      });
-      component.set('content', dynConTab.text());
-    }
-  }
-}
-
 /**
  * Set theme's HTML
  *
@@ -126,21 +78,6 @@ function setThemeHtml(theme) {
 }
 
 /**
- * Convert dynamic content tokens to slot and load content
- */
-function grapesConvertDynamicContentTokenToSlot(editor) {
-  const dc = editor.DomComponents;
-
-  const dynamicContents = dc.getWrapper().find('[data-slot="dynamicContent"]');
-
-  if (dynamicContents.length) {
-    dynamicContents.forEach((dynamicContent) => {
-      manageDynamicContentTokenToSlot(dynamicContent);
-    });
-  }
-}
-
-/**
  * Initialize original Mautic theme selection with grapejs specific modifications
  */
 function initSelectThemeGrapesjs(parentInitSelectTheme) {
@@ -165,7 +102,12 @@ function initSelectThemeGrapesjs(parentInitSelectTheme) {
   return childInitSelectTheme;
 }
 
-Mautic.grapesConvertDynamicContentTokenToSlot = grapesConvertDynamicContentTokenToSlot;
+Mautic.grapesConvertDynamicContentTokenToSlot =
+  BuilderService.grapesConvertDynamicContentTokenToSlot;
+Mautic.grapesConvertDynamicContentSlotsToTokens =
+  BuilderService.grapesConvertDynamicContentSlotsToTokens;
+Mautic.manageDynamicContentTokenToSlot =
+  BuilderService.manageDynamicContentTokenToSlot;
 Mautic.launchBuilder = launchBuilderGrapesjs;
 Mautic.initSelectTheme = initSelectThemeGrapesjs(Mautic.initSelectTheme);
 Mautic.setThemeHtml = setThemeHtml;

@@ -3,7 +3,7 @@ import grapesjsmjml from 'grapesjs-mjml';
 import grapesjsnewsletter from 'grapesjs-preset-newsletter';
 import grapesjswebpage from 'grapesjs-preset-webpage';
 import grapesjspostcss from 'grapesjs-parser-postcss';
-import grapesjsmautic from './grapesjs-preset-mautic.min';
+import grapesjsmautic from './grapesjs-preset-mautic';
 
 export default class BuilderService {
   presetMauticConf;
@@ -101,7 +101,7 @@ export default class BuilderService {
     this.editor.on('load', () => {
       const um = this.editor.UndoManager;
 
-      Mautic.grapesConvertDynamicContentTokenToSlot(this.editor);
+      this.constructor.grapesConvertDynamicContentTokenToSlot(this.editor);
 
       // Clear stack of undo/redo
       um.clear();
@@ -109,10 +109,11 @@ export default class BuilderService {
 
     this.editor.on('component:add', (component) => {
       const type = component.get('type');
+      console.warn({ component });
 
       // Create dynamic-content on Mautic side
       if (type === 'dynamic-content') {
-        Mautic.manageDynamicContentTokenToSlot(component);
+        this.constructor.manageDynamicContentTokenToSlot(component);
       }
     });
 
@@ -171,7 +172,6 @@ export default class BuilderService {
     });
 
     this.editor.on('asset:remove', (response) => {
-
       // Delete file on server
       mQuery.ajax({
         url: this.deletePath,
@@ -303,8 +303,8 @@ export default class BuilderService {
    *
    * @param editor
    */
-  grapesConvertDynamicContentSlotsToTokens() {
-    const dc = this.editor.DomComponents;
+  static grapesConvertDynamicContentSlotsToTokens(editor) {
+    const dc = editor.DomComponents;
 
     const dynamicContents = dc.getWrapper().find('[data-slot="dynamicContent"]');
 
@@ -395,6 +395,74 @@ export default class BuilderService {
       // Reset HTML
       BuilderService.resetHtml(editor);
     });
+  }
+
+  static manageDynamicContentTokenToSlot(component) {
+    const regex = RegExp(/\{dynamiccontent="(.*)"\}/, 'g');
+
+    const content = component.get('content');
+    const regexEx = regex.exec(content);
+
+    // abort if component does not contain a dynamic content element
+    if (regexEx === null) {
+      return null;
+    }
+
+    const dynContenName = regexEx[1];
+    const dynContentTabA = mQuery('#dynamicContentTabs a').filter(
+      () => mQuery(this).text().trim() === dynContenName
+    );
+
+    if (typeof dynContentTabA !== 'undefined' && dynContentTabA.length) {
+      // If dynamic content item exists -> fill
+      const dynContentTarget = dynContentTabA.attr('href');
+      let dynConContent = '';
+
+      if (mQuery(dynContentTarget).html()) {
+        const dynConContainer = mQuery(dynContentTarget).find(`${dynContentTarget}_content`);
+
+        if (dynConContainer.hasClass('editor')) {
+          console.warn({ dynConContainer });
+          dynConContent = dynConContainer.froalaEditor('html.get');
+        } else {
+          dynConContent = dynConContainer.html();
+        }
+      }
+
+      if (dynConContent === '') {
+        dynConContent = dynContentTabA.text();
+      }
+
+      component.addAttributes({
+        'data-param-dec-id': parseInt(dynContentTarget.replace(/[^0-9]/g, ''), 10),
+      });
+      component.set('content', dynConContent);
+    } else {
+      // If dynamic content item doesn't exist -> create
+      const dynConTarget = Mautic.createNewDynamicContentItem(mQuery);
+      const dynConTab = mQuery('#dynamicContentTabs').find(`a[href="${dynConTarget}"]`);
+
+      component.addAttributes({
+        'data-param-dec-id': parseInt(dynConTarget.replace(/[^0-9]/g, ''), 10),
+      });
+      component.set('content', dynConTab.text());
+    }
+    return true;
+  }
+
+  /**
+   * Convert dynamic content tokens to slot and load content
+   */
+  static grapesConvertDynamicContentTokenToSlot(editor) {
+    const dc = editor.DomComponents;
+
+    const dynamicContents = dc.getWrapper().find('[data-slot="dynamicContent"]');
+
+    if (dynamicContents.length) {
+      dynamicContents.forEach((dynamicContent) => {
+        Mautic.manageDynamicContentTokenToSlot(dynamicContent);
+      });
+    }
   }
 
   static resetHtml(editor) {
