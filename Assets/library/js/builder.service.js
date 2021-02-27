@@ -6,8 +6,6 @@ import grapesjspostcss from 'grapesjs-parser-postcss';
 import grapesjsmautic from './grapesjs-preset-mautic.min';
 
 export default class BuilderService {
-  assetManagerConf;
-
   presetMauticConf;
 
   editor;
@@ -15,11 +13,21 @@ export default class BuilderService {
   // components that are on the canvas
   canvasContent;
 
-  textareaAssets;
+  assets;
 
-  textareaHtml;
+  uploadPath;
 
-  textareaMjml;
+  assetManagerConf = {
+    assets: this.assets,
+    noAssets: Mautic.translate('grapesjsbuilder.assetManager.noAssets'),
+    upload: this.uploadPath,
+    uploadName: 'files',
+    multiUpload: true,
+    embedAsBase64: false,
+    openAssetsOnDrop: 1,
+    autoAdd: true,
+    headers: { 'X-CSRF-Token': mauticAjaxCsrf }, // global variable
+  };
 
   // Redefine Keyboard shortcuts due to unbind won't works with multiple keys.
   keymapsConf = {
@@ -67,11 +75,19 @@ export default class BuilderService {
     },
   };
 
-  constructor(content) {
+  constructor(content, assets, uploadPath) {
     if (!content) {
       throw Error('No HTML or MJML content found');
     }
+    if (!assets) {
+      throw Error('No assets');
+    }
+    if (!uploadPath) {
+      throw Error('No uploadPath');
+    }
     this.canvasContent = content;
+    this.assets = assets;
+    this.uploadPath = uploadPath;
   }
 
   /**
@@ -161,17 +177,18 @@ export default class BuilderService {
     });
 
     this.editor.on('asset:add', () => {
+      console.log('test');
       // Save assets list in textarea to keep new uploaded files without reload page
-      this.builder.textareaAssets.val(JSON.stringify(this.builder.getAssetsList()));
+      this.textareaAssets.val(JSON.stringify(this.builder.getAssetsList()));
     });
 
     this.editor.on('asset:remove', (response) => {
       // Save assets list in textarea to keep new deleted files without reload page
-      this.builder.textareaAssets.val(JSON.stringify(this.builder.getAssetsList()));
+      this.textareaAssets.val(JSON.stringify(this.builder.getAssetsList()));
 
       // Delete file on server
       mQuery.ajax({
-        url: this.builder.textareaAssets.data('delete'),
+        url: this.textareaAssets.data('delete'),
         data: { filename: response.getFilename() },
       });
     });
@@ -195,42 +212,6 @@ export default class BuilderService {
 
     this.addMauticCommands();
     this.setListeners();
-  }
-
-  // @todo remove
-  getHtmlValue() {
-    if (this.textareaHtml && this.textareaHtml.val() && this.textareaHtml.val().length > 0) {
-      return this.textareaHtml.val();
-    }
-    return null;
-  }
-
-  getMjmlValue() {
-    if (this.textareaMjml && this.textareaMjml.val() && this.textareaMjml.val().length > 0) {
-      return this.textareaMjml.val();
-    }
-    return null;
-  }
-
-  getAssetValue() {
-    if (this.textareaAssets && this.textareaAssets.val() && this.textareaAssets.val().length > 0) {
-      return this.textareaAssets.val();
-    }
-    return null;
-  }
-
-  setAssetManagerConf() {
-    this.assetManagerConf = {
-      assets: JSON.parse(this.getAssetValue()),
-      noAssets: Mautic.translate('grapesjsbuilder.assetManager.noAssets'),
-      upload: this.textareaAssets.data('upload'),
-      uploadName: 'files',
-      multiUpload: true,
-      embedAsBase64: false,
-      openAssetsOnDrop: 1,
-      autoAdd: true,
-      headers: { 'X-CSRF-Token': mauticAjaxCsrf }, // global variable
-    };
   }
 
   setPresetMauticConf() {
@@ -371,7 +352,7 @@ export default class BuilderService {
       throw Error('No editor found');
     }
     const parser = new DOMParser();
-    const fullHtml = parser.parseFromString(this.getHtmlValue(), 'text/html');
+    const fullHtml = parser.parseFromString(this.canvasContent, 'text/html');
     const commands = this.editor.Commands;
 
     commands.add('mautic-editor-page-html-close', (editor) => {

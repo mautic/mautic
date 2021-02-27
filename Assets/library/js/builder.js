@@ -11,14 +11,18 @@ function launchBuilderGrapesjs(formName) {
   // Parse HTML template
   const parser = new DOMParser();
   const textareaHtml = mQuery('textarea.builder-html');
-  // const textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
+  const textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
   const fullHtml = parser.parseFromString(textareaHtml.val(), 'text/html');
 
   const canvasContent = fullHtml.body.innerHTML
     ? fullHtml.body.innerHTML
     : mQuery('textarea.builder-mjml').val();
 
-  const builder = new BuilderService(canvasContent);
+  const builder = new BuilderService(
+    canvasContent,
+    textareaAssets.val(),
+    textareaAssets.data('upload')
+  );
 
   Mautic.showChangeThemeWarning = true;
 
