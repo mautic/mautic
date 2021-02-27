@@ -2,12 +2,11 @@ export default (editor, opts = {}) => {
   const bm = editor.BlockManager;
   const cfg = editor.getConfig();
 
-  let blocks = bm.getAll();
-
+  const blocks = bm.getAll();
   // Add Dynamic Content block only for newsletter
-  if (cfg.plugins.includes('grapesjs-mjml')) {
+  if ('grapesjsmjml' in cfg.pluginsOpts) {
     // Dynamic Content MJML block
-  } else if (cfg.plugins.includes('gjs-preset-newsletter')) {
+  } else if ('grapesjsnewsletter' in cfg.pluginsOpts) {
     bm.add('dynamic-content', {
       label: opts.dynamicContentBlockLabel,
       activate: true,
@@ -42,8 +41,8 @@ export default (editor, opts = {}) => {
   });
 
   /*
-     Custom block inside Sections category
-     */
+   * Custom block inside Sections category
+   */
 
   // MJML columns
   if (typeof bm.get('mj-1-column') !== 'undefined') {
