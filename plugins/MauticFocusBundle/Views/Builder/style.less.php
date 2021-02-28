@@ -43,7 +43,7 @@ ob_start();
     }
 
     .mauticform-pagebreak {
-        width:auto !important;
+        width: auto !important;
     }
 }
 
