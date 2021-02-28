@@ -522,7 +522,7 @@ class FormModel extends CommonFormModel
         });
 
         [$pages, $lastPage] = $this->getPages($fields);
-        $html = $this->templatingHelper->getTemplating()->render(
+        $html               = $this->templatingHelper->getTemplating()->render(
             $theme.'MauticFormBundle:Builder:form.html.php',
             [
                 'fieldSettings'  => $this->getCustomComponents()['fields'],
@@ -553,20 +553,15 @@ class FormModel extends CommonFormModel
         return $html;
     }
 
-    /**
-     * @param array $fields
-     *
-     * @return array
-     */
     public function getPages(array $fields): array
     {
         $pages = ['open' => [], 'close' => []];
 
-        $openFieldId =
+        $openFieldId  =
         $closeFieldId =
-        $previousId =
-        $lastPage = false;
-        $pageCount   = 1;
+        $previousId   =
+        $lastPage     = false;
+        $pageCount    = 1;
 
         foreach ($fields as $fieldId => $field) {
             if ('pagebreak' == $field->getType() && $openFieldId) {

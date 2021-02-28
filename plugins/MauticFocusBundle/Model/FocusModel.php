@@ -268,9 +268,9 @@ class FocusModel extends FormModel
         );
 
         // Form has to be generated outside of the content or else the form src will be converted to clickables
-        $fields = $form ? $form->getFields()->toArray() : [];
+        $fields             = $form ? $form->getFields()->toArray() : [];
         [$pages, $lastPage] = $this->formModel->getPages($fields);
-        $formContent = (!empty($form)) ? $this->templating->getTemplating()->render(
+        $formContent        = (!empty($form)) ? $this->templating->getTemplating()->render(
             'MauticFocusBundle:Builder:form.html.php',
             [
                 'form'           => $form,
