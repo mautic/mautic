@@ -521,45 +521,7 @@ class FormModel extends CommonFormModel
             return ($a->getOrder() < $b->getOrder()) ? -1 : 1;
         });
 
-        $pages = ['open' => [], 'close' => []];
-
-        $openFieldId  =
-        $closeFieldId =
-        $previousId   =
-        $lastPage     = false;
-        $pageCount    = 1;
-
-        foreach ($fields as $fieldId => $field) {
-            if ('pagebreak' == $field->getType() && $openFieldId) {
-                // Open the page
-                $pages['open'][$openFieldId] = $pageCount;
-                $openFieldId                 = false;
-                $lastPage                    = $fieldId;
-
-                // Close the page at the next page break
-                if ($previousId) {
-                    $pages['close'][$previousId] = $pageCount;
-
-                    ++$pageCount;
-                }
-            } else {
-                if (!$openFieldId) {
-                    $openFieldId = $fieldId;
-                }
-            }
-
-            $previousId = $fieldId;
-        }
-
-        if (!empty($pages)) {
-            if ($openFieldId) {
-                $pages['open'][$openFieldId] = $pageCount;
-            }
-            if ($previousId !== $lastPage) {
-                $pages['close'][$previousId] = $pageCount;
-            }
-        }
-
+        [$pages, $lastPage] = $this->getPages($fields);
         $html = $this->templatingHelper->getTemplating()->render(
             $theme.'MauticFormBundle:Builder:form.html.php',
             [

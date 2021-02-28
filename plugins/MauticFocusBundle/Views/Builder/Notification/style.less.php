@@ -56,7 +56,7 @@
         }
     }
 
-    .mauticform-input, .mauticform-row select, .mauticform-button {
+    .mauticform-input, .mauticform-row select, .mauticform-button, .mauticform-pagebreak {
         width: 100%;
         height: 28px;
         margin-bottom: 2px;
