@@ -70,4 +70,6 @@
     * \Mautic\WebhookBundle\Entity\Webhook::addQueue() removed and there is no replacement
     * \Mautic\WebhookBundle\Entity\Webhook::removeQueue() removed and there is no replacement
 
+*   Misc
+    * Second constructor argument of `\Mautic\CoreBundle\Doctrine\Provider\VersionProvider` has been removed as it's no longer necessary.
     

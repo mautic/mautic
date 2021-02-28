@@ -1177,7 +1177,7 @@ return [
         'db_user'                         => '',
         'db_password'                     => '',
         'db_table_prefix'                 => '',
-        'db_server_version'               => '5.7',
+        'db_server_version'               => defined('MAUTIC_DB_NOT_CONFIGURED') ? '5.7' : null,
         'locale'                          => 'en_US',
         'secret_key'                      => 'temp',
         'dev_hosts'                       => [],

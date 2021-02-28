@@ -34,7 +34,9 @@ $container->setParameter('mautic.ip_lookup_services', $bundleMetadataBuilder->ge
 // Load parameters
 include __DIR__.'/parameters.php';
 $container->loadFromExtension('mautic_core');
-$configParameterBag = (new \Mautic\CoreBundle\Loader\ParameterLoader())->getParameterBag();
+$parameterLoader         = new \Mautic\CoreBundle\Loader\ParameterLoader();
+$configParameterBag      = $parameterLoader->getParameterBag();
+$localConfigParameterBag = $parameterLoader->getLocalParameterBag();
 
 // Set template engines
 $engines = ['php', 'twig'];

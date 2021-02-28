@@ -49,6 +49,19 @@ class AppKernel extends Kernel
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', $environment);
         defined('MAUTIC_VERSION') or define('MAUTIC_VERSION', $metadata->getVersion());
 
+        /**
+         * This is required for Doctrine's automatic database detection. When Mautic hasn't been
+         * installed yet, we don't have a database to connect to, causing automatic database platform
+         * detection to fail. We use the MAUTIC_DB_CONFIGURED constant to temporarily set a server_version
+         * if no database settings have been provided yet.
+         */
+        if (!defined('MAUTIC_DB_NOT_CONFIGURED')) {
+            $localConfigFile = ParameterLoader::getLocalConfigFile($this->getRootDir(), false);
+            if (!file_exists($localConfigFile)) {
+                define('MAUTIC_DB_NOT_CONFIGURED', true);
+            }
+        }
+
         parent::__construct($environment, $debug);
     }
 
@@ -324,7 +337,6 @@ class AppKernel extends Kernel
      */
     public function getLocalConfigFile(): string
     {
-        /** @var $paths */
         $root = $this->getRootDir();
 
         return ParameterLoader::getLocalConfigFile($root);
