@@ -106,8 +106,7 @@ Mautic.grapesConvertDynamicContentTokenToSlot =
   BuilderService.grapesConvertDynamicContentTokenToSlot;
 Mautic.grapesConvertDynamicContentSlotsToTokens =
   BuilderService.grapesConvertDynamicContentSlotsToTokens;
-Mautic.manageDynamicContentTokenToSlot =
-  BuilderService.manageDynamicContentTokenToSlot;
+Mautic.manageDynamicContentTokenToSlot = BuilderService.manageDynamicContentTokenToSlot;
 Mautic.launchBuilder = launchBuilderGrapesjs;
 Mautic.initSelectTheme = initSelectThemeGrapesjs(Mautic.initSelectTheme);
 Mautic.setThemeHtml = setThemeHtml;

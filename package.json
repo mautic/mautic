@@ -6,6 +6,8 @@
   "scripts": {
     "build": "parcel build Assets/library/js/builder.js --out-dir Assets/library/js/dist",
     "build-dev": "NODE_ENV=development parcel build Assets/library/js/builder.js --no-minify --out-dir Assets/library/js/dist",
+    "prettier": "node_modules/.bin/prettier -w Assets/library/js/",
+    "prettier-check": "node_modules/.bin/prettier -c Assets/library/js/",
     "helloWorld": "parcel Demo/helloWorld/index.html",
     "mautic": "cp -r Demo/data dist && parcel Demo/mautic/index.html"
   },
