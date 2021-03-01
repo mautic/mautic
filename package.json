@@ -6,6 +6,7 @@
   "scripts": {
     "build": "parcel build Assets/library/js/builder.js --out-dir Assets/library/js/dist",
     "build-dev": "NODE_ENV=development parcel build Assets/library/js/builder.js --no-minify --out-dir Assets/library/js/dist",
+    "lint": "eslint Assets/library/js/",
     "prettier": "node_modules/.bin/prettier -w Assets/library/js/",
     "prettier-check": "node_modules/.bin/prettier -c Assets/library/js/",
     "helloWorld": "parcel Demo/helloWorld/index.html",
@@ -21,6 +22,14 @@
     "url": "https://github.com/mautic/plugin-grapesjs-builder/issues"
   },
   "homepage": "https://github.com/mautic/plugin-grapesjs-builder#readme",
+  "dependencies": {
+    "grapesjs": "^0.16.34",
+    "grapesjs-mjml": "^0.4.1",
+    "grapesjs-parser-postcss": "^0.1.1",
+    "grapesjs-preset-mautic": "^1.0.0",
+    "grapesjs-preset-newsletter": "^0.2.20",
+    "grapesjs-preset-webpage": "^0.1.11"
+  },
   "devDependencies": {
     "@babel/cli": "^7.12.16",
     "@babel/core": "^7.12.16",
@@ -35,12 +44,6 @@
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-react": "^7.22.0",
     "eslint-plugin-react-hooks": "^1.7.0",
-    "grapesjs": "^0.16.34",
-    "grapesjs-mjml": "^0.4.1",
-    "grapesjs-parser-postcss": "^0.1.1",
-    "grapesjs-preset-mautic": "^1.0.0",
-    "grapesjs-preset-newsletter": "^0.2.20",
-    "grapesjs-preset-webpage": "^0.1.11",
     "parcel-bundler": "^1.12.4",
     "prettier": "^2.2.1"
   }
