@@ -145,7 +145,7 @@ class ObjectChangeGenerator
         /** @var FieldMappingDAO[] $fieldMappings */
         $fieldMappings = $objectMapping->getFieldMappings();
         foreach ($fieldMappings as $fieldMappingDAO) {
-            if ($fieldMappingDAO->getSyncDirection() !== ObjectMappingDAO::SYNC_TO_INTEGRATION) {
+            if (ObjectMappingDAO::SYNC_TO_INTEGRATION !== $fieldMappingDAO->getSyncDirection()) {
                 $this->addFieldToObjectChange($fieldMappingDAO);
             }
         }
