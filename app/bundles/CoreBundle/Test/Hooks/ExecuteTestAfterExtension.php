@@ -25,7 +25,7 @@ use PHPUnit\Runner\BeforeTestHook;
  *
  * Example of usage: `MAUTIC_TEST_EXECUTE_TEST_AFTER="Fully\\Qualified\\Class\\NameTest" bin/phpunit`.
  */
-class ExecuteTestAfterExtension implements AfterTestHook, BeforeTestHook
+class ExecuteTestAfterExtension implements AfterTestHook
 {
     public function executeAfterTest(string $test, float $time): void
     {
@@ -46,10 +46,5 @@ class ExecuteTestAfterExtension implements AfterTestHook, BeforeTestHook
 
             exit(sprintf('The previous test was: "%s". Your test errored with: %s', $test, implode(PHP_EOL, $failures)));
         }
-    }
-
-    public function executeBeforeTest(string $test): void
-    {
-        // Without implementing this method the method self::executeAfterTest() is never invoked. There must be a bug in PHPUnit 7.5.20.
     }
 }
