@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "parcel build Assets/library/js/builder.js --out-dir Assets/library/js/dist",
-    "build-dev": "NODE_ENV=development parcel build Assets/library/js/builder.js --no-minify --out-dir Assets/library/js/dist",
+    "build-dev": "NODE_ENV=development parcel build Assets/library/js/builder.js --out-dir Assets/library/js/dist --no-minify ",
     "lint": "eslint Assets/library/js/",
     "prettier": "node_modules/.bin/prettier -w Assets/library/js/",
     "prettier-check": "node_modules/.bin/prettier -c Assets/library/js/",
