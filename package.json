@@ -35,14 +35,13 @@
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-react": "^7.22.0",
     "eslint-plugin-react-hooks": "^1.7.0",
-    "parcel-bundler": "^1.12.4",
-    "prettier": "^2.2.1"
-  },
-  "dependencies": {
     "grapesjs": "^0.16.34",
     "grapesjs-mjml": "^0.4.1",
     "grapesjs-parser-postcss": "^0.1.1",
+    "grapesjs-preset-mautic": "^1.0.0",
     "grapesjs-preset-newsletter": "^0.2.20",
-    "grapesjs-preset-webpage": "^0.1.11"
+    "grapesjs-preset-webpage": "^0.1.11",
+    "parcel-bundler": "^1.12.4",
+    "prettier": "^2.2.1"
   }
 }

@@ -3,7 +3,7 @@ import grapesjsmjml from 'grapesjs-mjml';
 import grapesjsnewsletter from 'grapesjs-preset-newsletter';
 import grapesjswebpage from 'grapesjs-preset-webpage';
 import grapesjspostcss from 'grapesjs-parser-postcss';
-import grapesjsmautic from './grapesjs-preset-mautic';
+import grapesjsmautic from 'grapesjs-preset-mautic/src';
 
 export default class BuilderService {
   presetMauticConf;
@@ -109,7 +109,6 @@ export default class BuilderService {
 
     this.editor.on('component:add', (component) => {
       const type = component.get('type');
-      console.warn({ component });
 
       // Create dynamic-content on Mautic side
       if (type === 'dynamic-content') {
@@ -423,7 +422,6 @@ export default class BuilderService {
         const dynConContainer = mQuery(dynContentTarget).find(`${dynContentTarget}_content`);
 
         if (dynConContainer.hasClass('editor')) {
-          console.warn({ dynConContainer });
           dynConContent = dynConContainer.froalaEditor('html.get');
         } else {
           dynConContent = dynConContainer.html();
