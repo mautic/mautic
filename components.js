@@ -4,9 +4,10 @@ export default (editor, opts = {}) => {
   const defaultModel = defaultType.model;
   const cfg = editor.getConfig();
 
-  if (cfg.plugins.includes('grapesjs-mjml')) {
-    // Dynamic Content MJML component
-  } else if (cfg.plugins.includes('gjs-preset-newsletter')) {
+  // Add Dynamic Content block only for newsletter
+  if ('grapesjsmjml' in cfg.pluginsOpts) {
+    // Dynamic Content MJML block
+  } else if ('grapesjsnewsletter' in cfg.pluginsOpts) {
     // Dynamic Content component
     dc.addType('dynamic-content', {
       model: defaultModel.extend(

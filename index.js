@@ -7,7 +7,7 @@ export default (editor, opts = {}) => {
   const $ = mQuery;
   const am = editor.AssetManager;
 
-  let config = {
+  const config = {
     sourceEdit: 1,
     sourceEditBtnLabel: 'Edit',
     sourceCancelBtnLabel: 'Cancel',

@@ -97,7 +97,7 @@ class CodeEditor {
     let content;
 
     // Check if MJML plugin is on
-    if (cfg.plugins.includes('grapesjs-mjml')) {
+    if ('grapesjsmjml' in cfg.pluginsOpts) {
       content = this.editor.getHtml();
     } else {
       content =
