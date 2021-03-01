@@ -90,9 +90,11 @@ if (!isset($args['repackage'])) {
     // Only add deleted files to our list; new and modified files will be covered by the archive
     $deletedFiles  = [];
     $modifiedFiles = [
-        'deleted_files.txt'       => true,
-        'critical_migrations.txt' => true,
-        'upgrade.php'             => true,
+        'deleted_files.txt'              => true,
+        'critical_migrations.txt'        => true,
+        'upgrade.php'                    => true,
+        // Temp fix for GrapesJs builder
+        'plugins/GrapesJsBuilderBundle/' => true,
     ];
 
     // Create a flag to check if the vendors changed

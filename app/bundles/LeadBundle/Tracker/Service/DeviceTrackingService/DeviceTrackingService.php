@@ -43,9 +43,9 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     private $randomHelper;
 
     /**
-     * @var Request|null
+     * @var RequestStack
      */
-    private $request;
+    private $requestStack;
 
     /**
      * @var LeadDevice
@@ -69,7 +69,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         $this->entityManager        = $entityManager;
         $this->randomHelper         = $randomHelper;
         $this->leadDeviceRepository = $leadDeviceRepository;
-        $this->request              = $requestStack->getCurrentRequest();
+        $this->requestStack         = $requestStack;
         $this->security             = $security;
     }
 
@@ -157,7 +157,9 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
      */
     private function getTrackedIdentifier()
     {
-        if (null === $this->request) {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (null === $request) {
             return null;
         }
 
@@ -168,7 +170,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
 
         $deviceTrackingId = $this->cookieHelper->getCookie('mautic_device_id', null);
         if (null === $deviceTrackingId) {
-            $deviceTrackingId = $this->request->get('mautic_device_id', null);
+            $deviceTrackingId = $request->get('mautic_device_id', null);
         }
 
         return $deviceTrackingId;

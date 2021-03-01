@@ -13,6 +13,7 @@ namespace Mautic\EmailBundle\Tests\Form\Type;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\EmailType;
 use Mautic\StageBundle\Model\StageModel;
@@ -47,18 +48,25 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
      */
     private $form;
 
+    /**
+     * @var CoreParametersHelper|MockObject
+     */
+    private $coreParametersHelper;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->translator    = $this->createMock(TranslatorInterface::class);
-        $this->entityManager = $this->createMock(EntityManager::class);
-        $this->stageModel    = $this->createMock(StageModel::class);
-        $this->formBuilder   = $this->createMock(FormBuilderInterface::class);
-        $this->form          = new EmailType(
+        $this->translator           = $this->createMock(TranslatorInterface::class);
+        $this->entityManager        = $this->createMock(EntityManager::class);
+        $this->stageModel           = $this->createMock(StageModel::class);
+        $this->formBuilder          = $this->createMock(FormBuilderInterface::class);
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->form                 = new EmailType(
             $this->translator,
             $this->entityManager,
-            $this->stageModel
+            $this->stageModel,
+            $this->coreParametersHelper
         );
 
         $this->formBuilder->method('create')->willReturnSelf();
@@ -70,7 +78,7 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
             'data' => new Email(),
         ];
 
-        $this->formBuilder->expects($this->at(46))
+        $this->formBuilder->expects($this->at(47))
             ->method('add')
             ->with(
                 'buttons',
