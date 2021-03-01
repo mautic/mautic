@@ -300,6 +300,7 @@ export default class BuilderService {
 
   /**
    * Convert dynamic content slots to tokens
+   * Used in grapesjs-preset-mautic
    *
    * @param editor
    */
@@ -344,7 +345,7 @@ export default class BuilderService {
       if (!editor) {
         throw new Error('no page-html editor');
       }
-      this.grapesConvertDynamicContentSlotsToTokens(editor);
+      this.constructor.grapesConvertDynamicContentSlotsToTokens(editor);
 
       // Update textarea for save (part that is different from other modes)
       fullHtml.body.innerHTML = `${editor.getHtml()}<style>${editor.getCss({
@@ -360,7 +361,7 @@ export default class BuilderService {
       if (!editor) {
         throw new Error('no email-html editor');
       }
-      this.grapesConvertDynamicContentSlotsToTokens(editor);
+      this.constructor.grapesConvertDynamicContentSlotsToTokens(editor);
 
       // Update textarea for save
       fullHtml.body.innerHTML = editor.runCommand('gjs-get-inlined-html');
@@ -374,7 +375,7 @@ export default class BuilderService {
       if (!editor) {
         throw new Error('no email-mjml editor');
       }
-      this.grapesConvertDynamicContentSlotsToTokens(editor);
+      this.constructor.grapesConvertDynamicContentSlotsToTokens(editor);
 
       let code = '';
 
@@ -452,6 +453,7 @@ export default class BuilderService {
 
   /**
    * Convert dynamic content tokens to slot and load content
+   * Used in grapesjs-preset-mautic
    */
   static grapesConvertDynamicContentTokenToSlot(editor) {
     const dc = editor.DomComponents;
