@@ -19,7 +19,7 @@ class CookieHelper
     const SAME_SITE_VALUE = 'None';
     private $path;
     private $domain;
-    private $secure       = false;
+    private $secure       = true;
     private $httponly     = false;
     private $request;
 
