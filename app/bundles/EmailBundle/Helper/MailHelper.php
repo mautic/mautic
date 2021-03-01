@@ -1505,7 +1505,6 @@ class MailHelper
      */
     private function getUnsubscribeHeader()
     {
-
         if (!empty($this->queuedRecipients) || !empty($this->lead) || $this->idHash) {
             return '<{unsubscribe_url}>';
         }
