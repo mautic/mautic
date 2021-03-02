@@ -69,7 +69,7 @@ return [
                 'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\GrapesJsData::class,
             ],
             'mautic.install.fixture.remove_event_id_foreign_key_from_campaign_lead_event_log' => [
-                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\RemoveEventIdForeignKeyFromCampaignLeadEventLogTable::class,
+                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\RemoveEventAndCampaignForeignKeyFromCampaignLeadEventLogTable::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => [],
             ],
