@@ -185,6 +185,11 @@ class EmailApiController extends CommonApiController
         /** @var MailHelper $mailer */
         $mailer = $this->get('mautic.helper.mailer')->getMailer();
 
+        $mailer->setTo(
+            $lead->getEmail(),
+            sprintf('%s %s', $lead->getFirstname(), $lead->getLastname())
+        );
+
         $params = $this->request->request->all();
 
         $fromEmail = $params['fromEmail'] ?? null;
