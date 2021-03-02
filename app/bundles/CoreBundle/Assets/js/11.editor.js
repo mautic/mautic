@@ -275,6 +275,19 @@ Mautic.getTokensForPlugIn = function(method) {
     return d.promise();
 };
 
+Mautic.getCKEditorFonts = function(fonts) {
+    fonts = Array.isArray(fonts) ? fonts : [];
+    const CKEditorFonts = [];
+
+    for (let i = 0; i < fonts.length; i++) {
+        if ('undefined' != typeof fonts[i].name) {
+            CKEditorFonts.push(fonts[i].name);
+        }
+    }
+
+    return CKEditorFonts;
+}
+
 Mautic.ConvertFieldToCkeditor  = function(textarea, ckEditorToolbarOptions) {
     const defaultOptions = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'ckfinder', 'imageUpload', 'mediaEmbed', 'insertTable'];
     const ckEditorToolbar = typeof ckEditorToolbarOptions != "undefined" && ckEditorToolbarOptions.length > 0 ? ckEditorToolbarOptions : defaultOptions;
@@ -290,7 +303,7 @@ Mautic.ConvertFieldToCkeditor  = function(textarea, ckEditorToolbarOptions) {
             shouldNotGroupWhenFull: true
         },
         fontFamily: {
-            options: mauticEditorFonts,
+            options: Mautic.getCKEditorFonts(mauticEditorFonts),
             shouldNotGroupWhenFull: true
         },
         fontSize: {
