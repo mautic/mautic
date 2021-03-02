@@ -56,9 +56,6 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testStrictHtmlFormatIsRemovingScriptTags()
     {
-        $dateHelper = $this->createMock(DateHelper::class);
-        $translator = $this->createMock(TranslatorInterface::class);
-
         $sample = '<a href="/index_dev.php/s/webhooks/view/31" data-toggle="ajax">test</a> has been stopped because the response HTTP code was 410, which means the reciever doesn\'t want us to send more requests.<script>console.log(\'script is running\');</script><SCRIPT>console.log(\'CAPITAL script is running\');</SCRIPT>';
 
         $expected = '<a href="/index_dev.php/s/webhooks/view/31" data-toggle="ajax">test</a> has been stopped because the response HTTP code was 410, which means the reciever doesn\'t want us to send more requests.console.log(\'script is running\');console.log(\'CAPITAL script is running\');';
@@ -70,14 +67,11 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testBooleanFormat()
     {
-        $dateHelper = $this->createMock(DateHelper::class);
-        $translator = $this->createMock(TranslatorInterface::class);
-
-        $translator->expects($this->at(0))
+        $this->translator->expects($this->at(0))
             ->method('trans')
             ->with('mautic.core.yes')
             ->willReturn('yes');
-        $translator->expects($this->at(1))
+        $this->translator->expects($this->at(1))
             ->method('trans')
             ->with('mautic.core.no')
             ->willReturn('no');
