@@ -38,7 +38,7 @@ class BeanstalkdSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $beanstalkdSubscriber;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->pheanstalkProxy      = $this->createMock(PheanstalkProxy::class);
