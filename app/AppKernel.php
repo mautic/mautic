@@ -156,6 +156,7 @@ class AppKernel extends Kernel
             new Mautic\StageBundle\MauticStageBundle(),
             new Mautic\UserBundle\MauticUserBundle(),
             new Mautic\WebhookBundle\MauticWebhookBundle(),
+            new Mautic\CacheBundle\MauticCacheBundle(),
         ];
 
         $queueProtocol = $this->getParameterLoader()->getLocalParameterBag()->get('queue_protocol', '');
@@ -204,7 +205,8 @@ class AppKernel extends Kernel
             $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
             $bundles[] = new Sensio\Bundle\DistributionBundle\SensioDistributionBundle();
             $bundles[] = new Webfactory\Bundle\ExceptionsBundle\WebfactoryExceptionsBundle();
-            $bundles[] = new Fidry\PsyshBundle\PsyshBundle();
+            // Removed temporarily for https://github.com/mautic/mautic/pull/9602, can be re-added in Mautic 4+
+            // $bundles[] = new Fidry\PsyshBundle\PsyshBundle();
         }
 
         if (in_array($this->getEnvironment(), ['test'])) {

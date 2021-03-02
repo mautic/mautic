@@ -14,10 +14,22 @@ namespace Mautic\EmailBundle\Tests\Controller\Api;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
 use Symfony\Component\HttpFoundation\Response;
 
 class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->loadFixtures([LoadCategoryData::class]);
+    }
+
+    protected function beforeBeginTransaction(): void
+    {
+        $this->resetAutoincrement(['categories']);
+    }
+
     public function testSingleEmailWorkflow()
     {
         // Create a couple of segments first:
@@ -135,11 +147,12 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(404, $response['errors'][0]['code']);
 
         // Delete also testing segments:
-        $this->client->request('DELETE', '/api/segments/batch/delete', [['id' => $segmentAId], ['id' => $segmentBId]]);
+        $this->client->request('DELETE', "/api/segments/batch/delete?ids={$segmentAId},{$segmentBId}", []);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(['lists' => []], $response);
+        // Response should include the two entities that we just deleted
+        $this->assertSame(2, count($response['lists']));
         $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
     }
 

@@ -13,7 +13,9 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\ExpressionBuilder;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
@@ -1036,8 +1038,8 @@ class CommonRepository extends EntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $q
-     * @param object                     $filter
+     * @param DbalQueryBuilder|QueryBuilder $q
+     * @param object                        $filter
      *
      * @return array
      */
@@ -1048,16 +1050,19 @@ class CommonRepository extends EntityRepository
         $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
         $expr            = false;
         $prefix          = $this->getTableAlias();
+        $isDbalQB        = $q instanceof DbalQueryBuilder;
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
             case $this->translator->trans('mautic.core.searchcommand.ispublished', [], null, 'en_US'):
-                $expr            = $q->expr()->eq("$prefix.isPublished", ":$unique");
+                $column          = $isDbalQB ? 'is_published' : 'isPublished';
+                $expr            = $q->expr()->eq("{$prefix}.{$column}", ":{$unique}");
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
             case $this->translator->trans('mautic.core.searchcommand.isunpublished', [], null, 'en_US'):
-                $expr            = $q->expr()->eq("$prefix.isPublished", ":$unique");
+                $column          = $isDbalQB ? 'is_published' : 'isPublished';
+                $expr            = $q->expr()->eq("{$prefix}.{$column}", ":{$unique}");
                 $forceParameters = [$unique => false];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
@@ -1070,7 +1075,8 @@ class CommonRepository extends EntityRepository
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
             case $this->translator->trans('mautic.core.searchcommand.ismine', [], null, 'en_US'):
-                $expr            = $q->expr()->eq("$prefix.createdBy", ":$unique");
+                $column          = $isDbalQB ? 'created_by' : 'createdBy';
+                $expr            = $q->expr()->eq("{$prefix}.{$column}", ":{$unique}");
                 $forceParameters = [$unique => $this->currentUser->getId()];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.category'):
@@ -1093,7 +1099,7 @@ class CommonRepository extends EntityRepository
                 if (false === $catPrefix) {
                     $catPrefix = 'c';
                 }
-                $expr           = $q->expr()->like("{$catPrefix}.alias", ":$unique");
+                $expr           = $q->expr()->like("{$catPrefix}.alias", ":{$unique}");
                 $filter->strict = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ids'):
@@ -1520,7 +1526,7 @@ class CommonRepository extends EntityRepository
                             break;
                         case 'isEmpty':
                         case 'isNotEmpty':
-                            if ('empty' === $clause['expr']) {
+                            if ('isEmpty' === $clause['expr']) {
                                 $whereClause = $query->expr()->orX(
                                     $query->expr()->eq($column, $query->expr()->literal('')),
                                     $query->expr()->isNull($column)
@@ -1534,12 +1540,19 @@ class CommonRepository extends EntityRepository
                             break;
                         case 'in':
                         case 'notIn':
-                            if (!$isOrm) {
-                                $whereClause = $query->expr()->{$clause['expr']}($column, (array) $clause['val']);
-                            } else {
-                                $param       = $this->generateRandomParameterName();
+
+                            $parsed = str_getcsv(html_entity_decode($clause['val']), ',', '"');
+
+                            $param = $this->generateRandomParameterName();
+                            $arg   = count($parsed) > 1 ? $parsed : array_shift($parsed);
+
+                            if (is_array($arg)) {
                                 $whereClause = $query->expr()->{$clause['expr']}($column, ':'.$param);
-                                $query->setParameter($param, $clause['val']);
+                                $query->setParameter($param, $arg, Connection::PARAM_STR_ARRAY);
+                            } else {
+                                $expression  = 'in' === $clause['expr'] ? 'eq' : 'neq';
+                                $whereClause = $query->expr()->{$expression}($column, ':'.$param);
+                                $query->setParameter($param, $arg);
                             }
                             break;
                         default:

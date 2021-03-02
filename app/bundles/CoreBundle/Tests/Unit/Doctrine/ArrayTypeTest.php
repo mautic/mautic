@@ -42,7 +42,7 @@ class ArrayTypeTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractPlatform */
     private $platform;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

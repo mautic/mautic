@@ -308,6 +308,7 @@ return [
                     'translator',
                     'doctrine.orm.entity_manager',
                     'mautic.stage.model.stage',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.form.type.email.utm_tags' => [
@@ -405,16 +406,17 @@ return [
                 'class'        => \Mautic\EmailBundle\Swiftmailer\Transport\AmazonApiTransport::class,
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'arguments'    => [
-                    'monolog.logger.mautic',
+                    'translator',
                     'mautic.transport.amazon.callback',
+                    'monolog.logger.mautic',
                 ],
                 'methodCalls' => [
-                    'setUsername' => ['%mautic.mailer_user%'],
-                    'setPassword' => ['%mautic.mailer_password%'],
-                    'setRegion'   => [
+                    'setRegion' => [
                         '%mautic.mailer_amazon_region%',
                         '%mautic.mailer_amazon_other_region%',
                     ],
+                    'setUsername' => ['%mautic.mailer_user%'],
+                    'setPassword' => ['%mautic.mailer_password%'],
                 ],
             ],
             'mautic.transport.mandrill' => [

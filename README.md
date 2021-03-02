@@ -1,4 +1,4 @@
-[![codecov](https://codecov.io/gh/mautic/mautic/branch/staging/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
+[![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 
 Mautic Introduction
 ===========
@@ -6,12 +6,13 @@ Mautic Introduction
 
 ## Supported Versions
 
-| Branch | Beta Release | Initial Release | Active Support Until | Security Support Until *
+| Branch | RC Release | Initial Release | Active Support Until | Security Support Until *
 |--|--|--|--|--|
 |2.15  | 27 Sep 2019 | 8 Oct 2019 | 8 Oct 2019 | 8 Oct 2019
 |2.16  | 30 Jan 2020 | 13 Feb 2020 | 15 June 2020 | 15 December 2020
 |3.0   | 27 Jan 2020 | 15 June 2020 | 15 June 2021 | 15 December 2021
 |3.1   | 17 Aug 2020 | 24 Aug 2020 | 23 Nov 2020 | 23 May 2021
+|3.2   | 23 Nov 2020 | 30 Nov 2020 | 22 Feb 2021 | 23 Aug 2021
 
 * = Security Support for 2.16 will only be provided for Mautic itself, not for core dependencies that are EOL like Symfony 2.8.
 
@@ -21,7 +22,7 @@ The GitHub version is recommended for development or testing. Production package
 
 Documentation on how to use Mautic is available at [https://docs.mautic.org](https://docs.mautic.org).
 
-This is a simple 3 step installation process. You'll want to make sure you already have [Composer](http://getcomposer.org) available on your computer as this is a development release and you'll need to use Composer to download the vendor packages.
+This is a simple 3 step installation process. You'll want to make sure you already have [Composer v1](http://getcomposer.org) available on your computer as this is a development release and you'll need to use Composer to download the vendor packages. Note that v2 is not yet supported.
 
 <table width="100%" border="0">
 	<tr>
@@ -58,7 +59,7 @@ Installing from source is only recommended if you are comfortable using the comm
 ## Ready to Install from Source and/or Contribute?
 That's fantastic! 
 
-If you want to contribute to Mautic's **code**, please read our [CONTRIBUTING.md](https://github.com/mautic/mautic/blob/staging/.github/CONTRIBUTING.md) or [Contributing Code](https://contribute.mautic.org/contributing-to-mautic/developer) docs. Then, check out the issues with the [L1 label](https://github.com/mautic/mautic/issues?q=is%3Aissue+is%3Aopen+label%3AL1) to get started quickly :rocket:
+If you want to contribute to Mautic's **code**, please read our [CONTRIBUTING.md](https://github.com/mautic/mautic/blob/feature/.github/CONTRIBUTING.md) or [Contributing Code](https://contribute.mautic.org/contributing-to-mautic/developer) docs. Then, check out the issues with the [L1 label](https://github.com/mautic/mautic/issues?q=is%3Aissue+is%3Aopen+label%3AL1) to get started quickly :rocket:
 
 If you want to contribute in **other areas** of Mautic, please read our general [Contributing](https://contribute.mautic.org/contributing-to-mautic) guide.
 
