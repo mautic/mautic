@@ -1,6 +1,6 @@
 <?php
 
-namespace CoreBundle\Test\Templating\Helper;
+namespace Mautic\CoreBundle\Test\Templating\Helper;
 
 use Mautic\CoreBundle\Templating\Helper\TranslatorHelper;
 use PHPUnit\Framework\TestCase;
