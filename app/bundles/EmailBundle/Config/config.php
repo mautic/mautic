@@ -48,6 +48,11 @@ return [
                 'controller' => 'MauticEmailBundle:Api\EmailApi:sendLead',
                 'method'     => 'POST',
             ],
+            'mautic_api_sendcustomcontactemail' => [
+                'path'       => '/emails/contact/{contactId}/send/custom',
+                'controller' => 'MauticEmailBundle:Api\EmailApi:sendCustomEmail',
+                'method'     => 'POST',
+            ],
             'mautic_api_reply' => [
                 'path'       => '/emails/reply/{trackingHash}',
                 'controller' => 'MauticEmailBundle:Api\EmailApi:reply',

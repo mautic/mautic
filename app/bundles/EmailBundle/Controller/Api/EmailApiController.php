@@ -13,8 +13,10 @@ namespace Mautic\EmailBundle\Controller\Api;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\RandomHelper\RandomHelperInterface;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
@@ -85,7 +87,7 @@ class EmailApiController extends CommonApiController
         $lists = $this->request->request->get('lists', null);
         $limit = $this->request->request->get('limit', null);
 
-        list($count, $failed) = $this->model->sendEmailToLists($entity, $lists, $limit);
+        [$count, $failed] = $this->model->sendEmailToLists($entity, $lists, $limit);
 
         $view = $this->view(
             [
@@ -164,6 +166,77 @@ class EmailApiController extends CommonApiController
         }
 
         return $this->notFound();
+    }
+
+    public function sendCustomEmailAction($contactId)
+    {
+        /** @var Lead $lead */
+        $lead = $this->checkLeadAccess($contactId, 'edit');
+        if ($lead instanceof Response) {
+            return $lead;
+        }
+
+        if (!$lead->getEmail()) {
+            return $this->notFound('mautic.contact.error.notfound');
+        }
+
+        $response = ['success' => false];
+
+        /** @var MailHelper $mailer */
+        $mailer = $this->get('mautic.helper.mailer')->getMailer();
+
+        $params = $this->request->request->all();
+
+        $fromEmail = $params['fromEmail'] ?? null;
+
+        if (null === $fromEmail) {
+            return $this->badRequest('mautic.email.error.from.email.required');
+        }
+
+        $mailer->setFrom(
+            $fromEmail,
+            $params['fromName'] ?? null
+        );
+
+        if ($replyToEmail = $params['replyToEmail'] ?? null) {
+            $mailer->setReplyTo(
+                    $replyToEmail,
+                    $params['replyToName'] ?? null
+                );
+        }
+
+        $subject = $params['subject'] ?? null;
+
+        if (null === $subject) {
+            return $this->badRequest('mautic.core.subject.required');
+        }
+
+        $subject = EmojiHelper::toHtml($subject);
+        $mailer->setSubject($subject);
+
+        $content = $params['content'] ?? null;
+
+        if (null === $content) {
+            return $this->badrequest('mautic.email.error.content.required');
+        }
+
+        // Set Content
+        $mailer->setBody($content);
+        $mailer->parsePlainText($content);
+        $mailer->setLead($lead->getProfileFields());
+        $mailer->setIdHash();
+        $mailer->setSource(['api', 0]);
+
+        if ($mailer->send(true, false, false)) {
+            /** @var Stat $stat */
+            $stat                     = $mailer->createEmailStat();
+            $response['trackingHash'] = ($stat && $stat->getTrackingHash()) ? $stat->getTrackingHash() : 0;
+            $response['success']      = true;
+        }
+
+        $view = $this->view($response, Response::HTTP_OK);
+
+        return $this->handleView($view);
     }
 
     /**
