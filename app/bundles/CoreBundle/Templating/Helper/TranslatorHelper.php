@@ -48,7 +48,6 @@ class TranslatorHelper extends BaseHelper
      */
     public function getJsLang()
     {
-        $this->translator->addResource('mautic', null, null, 'javascript');
         $defaultMessages = $this->translator->getCatalogue('en_US')->all('javascript');
         $messages        = $this->translator->getCatalogue()->all('javascript');
 
