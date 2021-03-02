@@ -141,27 +141,71 @@ class AmazonApiTransportTest extends \PHPUnit\Framework\TestCase
         $this->message->method('getBody')->willReturn('Test Body');
         $this->message->method('getAttachments')->willReturn([]);
         $this->message->method('toString')->willReturn('test');
-        $this->amazonMock->append(new Result([
-          'SendQuota' => [
-            'Max24HourSend'  => 1000,
-            'MaxSendRate'    => 160,
-            'SentLast24Hours'=> 0,
-          ],
-          'SendingEnabled' => true,
-        ]));
+    }
 
-        $this->amazonMock->append(new Result([
-          'MessageId' => 'abcd12',
-        ]));
+    public function testAmazonStartInvalidAPIKeys()
+    {
+        $this->amazonTransport->setRegion('');
+        $this->amazonTransport->setUsername('');
+        $this->amazonTransport->setPassword('');
+        $this->expectException(\Swift_TransportException::class);
+        $this->expectExceptionMessage('mautic.email.api_key_required');
+        $this->amazonTransport->start();
+    }
+
+    public function testAmazonStartSendingDisabled()
+    {
+        $this->amazonMock->append(new Result(['SendingEnabled' => false]));
+        $this->expectException(\Swift_TransportException::class);
+        $this->expectExceptionMessage('mautic.email.ses.enabled');
+        $this->amazonTransport->start();
+    }
+
+    public function testAmazonStartProductionDisabled()
+    {
+        $this->amazonMock->append(new Result(['SendingEnabled' => true, 'ProductionAccessEnabled' => false]));
+        $this->expectException(\Swift_TransportException::class);
+        $this->expectExceptionMessage('mautic.email.ses.sandbox');
+        $this->amazonTransport->start();
     }
 
     public function testAmazonStart()
     {
+        $sesResult = new Result(
+            [
+            'SendQuota' => [
+              'Max24HourSend'  => 1000,
+              'MaxSendRate'    => 160,
+              'SentLast24Hours'=> 0,
+            ],
+            'SendingEnabled'          => true,
+            'ProductionAccessEnabled' => true,
+          ]
+        );
+        $this->amazonMock->append($sesResult);
+
         $this->assertNull($this->amazonTransport->start());
     }
 
     public function testAmazonSend()
     {
+        $this->amazonMock->append(new Result(
+            [
+            'SendQuota' => [
+              'Max24HourSend'  => 1000,
+              'MaxSendRate'    => 160,
+              'SentLast24Hours'=> 0,
+            ],
+            'SendingEnabled'          => true,
+            'ProductionAccessEnabled' => true,
+          ]
+        ));
+        $this->amazonMock->append(new Result(
+            [
+                'MessageId' => 'abcd12',
+            ]
+        ));
+
         $sent = $this->amazonTransport->send($this->message);
         $this->assertEquals(1, $sent);
     }

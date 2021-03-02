@@ -176,16 +176,16 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         $this->amazonClient  = $this->createAmazonClient();
 
         $account             = $this->amazonClient->getAccount();
-        $emailQuotaRemaining = $account->get('SendQuota')['Max24HourSend'] - $account->get('SendQuota')['SentLast24Hours'];
 
         if (!$account->get('SendingEnabled')) {
-            $this->logger->error('Your AWS SES is not enabled for sending');
-            throw new \Exception('Your AWS SES is not enabled for sending');
+            $this->throwException($this->translator->trans('mautic.email.ses.enabled'));
         }
 
         if (!$account->get('ProductionAccessEnabled')) {
-            $this->logger->info('Your AWS SES is in sandbox mode, consider moving it to production state');
+            $this->throwException($this->translator->trans('mautic.email.ses.sandbox'));
         }
+
+        $emailQuotaRemaining = $account->get('SendQuota')['Max24HourSend'] - $account->get('SendQuota')['SentLast24Hours'];
 
         if ($emailQuotaRemaining <= 0) {
             $this->logger->error('Your AWS SES quota is currently exceeded, used '.$account->get('SentLast24Hours').' of '.$account->get('Max24HourSend'));
@@ -262,6 +262,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                     }
                 },
                 'rejected' => function (AwsException $reason, $iteratorId) use ($evt) {
+                    dd($reason);
                     $failedRecipients = [];
                     $this->triggerSendError($evt, $failedRecipients, $reason->getAwsErrorMessage());
                 },
