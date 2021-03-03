@@ -24,7 +24,7 @@ class EscapeTransformer implements DataTransformerInterface
 
     public function __construct(array $allowedParameters)
     {
-        $this->allowedParameters = $allowedParameters;
+        $this->allowedParameters = array_filter($allowedParameters);
     }
 
     public function transform($value)
@@ -82,6 +82,10 @@ class EscapeTransformer implements DataTransformerInterface
 
     private function allowParameters(string $escaped): string
     {
+        if (!$this->allowedParameters) {
+            return $escaped;
+        }
+
         $search  = array_map(function (string $value) {
             return "%%{$value}%%";
         }, $this->allowedParameters);
