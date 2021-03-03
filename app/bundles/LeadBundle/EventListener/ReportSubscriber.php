@@ -247,6 +247,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 } else {
                     $event->applyDateFilters($qb, 'date_added', 'l');
                 }
+                $event->addCompanyLeftJoin($qb);
                 break;
 
             case self::CONTEXT_LEAD_POINT_LOG:
@@ -402,9 +403,6 @@ class ReportSubscriber implements EventSubscriberInterface
         $qb           = $event->getQueryBuilder();
         $pointLogRepo = $this->leadModel->getPointLogRepository();
         $companyRepo  = $this->companyModel->getRepository();
-
-        $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'companies_lead', 'l.id = companies_lead.lead_id');
-        $qb->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', 'comp', 'companies_lead.company_id = comp.id');
 
         foreach ($graphs as $g) {
             $queryBuilder = clone $qb;
