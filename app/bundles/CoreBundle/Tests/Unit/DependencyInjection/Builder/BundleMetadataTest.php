@@ -36,10 +36,10 @@ class BundleMetadataTest extends TestCase
         $this->assertSame($metadataArray['symfonyBundleName'], $metadata->getBundleName());
 
         $metadata->setConfig(['foo' => 'bar']);
-        $metadata->addPermissionClass('foo', '\Foo\Bar');
+        $metadata->addPermissionClass('\Foo\Bar');
 
-        $metadataArray['config']                   = ['foo' => 'bar'];
-        $metadataArray['permissionClasses']['foo'] = '\Foo\Bar';
+        $metadataArray['config']                        = ['foo' => 'bar'];
+        $metadataArray['permissionClasses']['\Foo\Bar'] = '\Foo\Bar';
         $this->assertEquals($metadataArray, $metadata->toArray());
     }
 }
