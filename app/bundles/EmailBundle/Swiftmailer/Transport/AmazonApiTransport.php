@@ -376,7 +376,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                 $this->message->setSubject($emailSubject);
                 $this->message->setBody($emailBody);
                 $message_headers= $this->message->getHeaders();
-                if ($message_headers->has('List-Unsubscribe')){
+                if ($message_headers->has('List-Unsubscribe')) {
                     $message_headers->get('List-Unsubscribe')->setValue('<{unsubscribe_url}>');
                 }
                 $this->setPlainTextToMessage($this->message, $emailText);
