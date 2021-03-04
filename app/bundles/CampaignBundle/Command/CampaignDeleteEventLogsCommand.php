@@ -56,8 +56,8 @@ class CampaignDeleteEventLogsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $eventIds = $input->getArgument('campaign_event_ids');
-        $campaignId = (int)$input->getOption('campaign-id');
+        $eventIds   = $input->getArgument('campaign_event_ids');
+        $campaignId = (int) $input->getOption('campaign-id');
         $this->leadEventLogRepository->removeEventLogs($eventIds, $campaignId);
 
         return ExitCode::SUCCESS;

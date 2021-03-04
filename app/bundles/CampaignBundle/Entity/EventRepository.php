@@ -233,10 +233,10 @@ class EventRepository extends CommonRepository
             ->execute();
     }
 
-    public function setEventAsDeleted(array $eventIds) : void
+    public function setEventAsDeleted(array $eventIds): void
     {
         $dateTime = (new \DateTime())->format('Y-m-d H:i:s');
-        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb       = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->update(MAUTIC_TABLE_PREFIX.'campaign_events')
             ->set('deleted', ':deleted')
             ->setParameter('deleted', $dateTime)
@@ -246,10 +246,10 @@ class EventRepository extends CommonRepository
             ->execute();
     }
 
-    public function deleteEvents(array $eventIds) : void
+    public function deleteEvents(array $eventIds): void
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
-        $qb->delete(Event::class,'e')
+        $qb->delete(Event::class, 'e')
             ->where(
                 $qb->expr()->in('e.id', $eventIds)
             )

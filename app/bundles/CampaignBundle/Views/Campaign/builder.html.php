@@ -40,8 +40,7 @@
             endforeach;
 
             foreach ($campaignEvents as $event):
-                if (!empty($event['deleted']))
-                {
+                if (!empty($event['deleted'])) {
                     continue;
                 }
                 $settings = $eventSettings[$event['eventType']][$event['type']];

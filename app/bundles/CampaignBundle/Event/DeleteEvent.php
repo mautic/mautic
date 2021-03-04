@@ -27,7 +27,7 @@ class DeleteEvent extends \Symfony\Component\EventDispatcher\Event
 
     public function __construct(array $eventIds, ?int $campaignId = null)
     {
-        $this->eventIds = $eventIds;
+        $this->eventIds   = $eventIds;
         $this->campaignId = $campaignId;
     }
 

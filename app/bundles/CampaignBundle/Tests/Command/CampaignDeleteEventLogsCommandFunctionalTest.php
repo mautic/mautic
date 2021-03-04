@@ -36,15 +36,7 @@ class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTestCase
 
     public function testWithEventIds(): void
     {
-        $applicationTester = $this->createApplicationTester();
-        $lead              = $this->createLead();
-        $campaign          = $this->createCampaign();
-        $event1            = $this->createEvent('Event 1', $campaign);
-        $event2            = $this->createEvent('Event 2', $campaign);
-        $this->createEventLog($lead, $event1);
-        $this->createEventLog($lead, $event2);
-
-        $exitCode = $applicationTester->run(['command' => CampaignDeleteEventLogsCommand::COMMAND_NAME, 'campaign_event_ids' => [$event1->getId(), $event2->getId()]]);
+        $exitCode = $this->createDataAndRunCommand(false);
         Assert::assertSame(0, $exitCode);
 
         $campaign = $this->em->getRepository(Campaign::class)->findAll();
@@ -56,21 +48,7 @@ class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTestCase
 
     public function testWithEventIdsAndCampaignId(): void
     {
-        $applicationTester = $this->createApplicationTester();
-        $lead              = $this->createLead();
-        $campaign          = $this->createCampaign();
-        $event1            = $this->createEvent('Event 1', $campaign);
-        $event2            = $this->createEvent('Event 2', $campaign);
-        $this->createEventLog($lead, $event1);
-        $this->createEventLog($lead, $event2);
-
-        $exitCode = $applicationTester->run(
-            [
-                'command'       => CampaignDeleteEventLogsCommand::COMMAND_NAME,
-                'campaign_event_ids' => [$event1->getId(), $event2->getId()],
-                '--campaign-id' => $campaign->getId(),
-            ]
-        );
+        $exitCode = $this->createDataAndRunCommand(true);
 
         Assert::assertSame(0, $exitCode);
 
@@ -87,6 +65,26 @@ class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTestCase
         $application->setAutoExit(false);
 
         return new ApplicationTester($application);
+    }
+
+    private function createDataAndRunCommand(bool $deleteCampaign): int
+    {
+        $applicationTester = $this->createApplicationTester();
+        $lead              = $this->createLead();
+        $campaign          = $this->createCampaign();
+        $event1            = $this->createEvent('Event 1', $campaign);
+        $event2            = $this->createEvent('Event 2', $campaign);
+        $this->createEventLog($lead, $event1);
+        $this->createEventLog($lead, $event2);
+
+        $commandData = ['command' => CampaignDeleteEventLogsCommand::COMMAND_NAME, 'campaign_event_ids' => [$event1->getId(), $event2->getId()]];
+        if ($deleteCampaign) {
+            $commandData['--campaign-id'] = $campaign->getId();
+        }
+
+        $exitCode = $applicationTester->run($commandData);
+
+        return $exitCode;
     }
 
     private function createLead(): Lead

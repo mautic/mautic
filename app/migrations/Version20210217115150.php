@@ -12,10 +12,10 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
-use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 use Doctrine\DBAL\Types\Types;
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20210217115150 extends PreUpAssertionMigration
 {
@@ -29,14 +29,12 @@ final class Version20210217115150 extends PreUpAssertionMigration
 
     public function up(Schema $schema): void
     {
-        if (!$schema->getTable($this->getPrefixedTableName(Campaign::TABLE_NAME))->hasColumn('deleted'))
-        {
+        if (!$schema->getTable($this->getPrefixedTableName(Campaign::TABLE_NAME))->hasColumn('deleted')) {
             $schema->getTable($this->getPrefixedTableName(Campaign::TABLE_NAME))
                 ->addColumn('deleted', Types::DATETIME_MUTABLE, ['notnull' => false]);
         }
 
-        if (!$schema->getTable($this->getPrefixedTableName(Event::TABLE_NAME))->hasColumn('deleted'))
-        {
+        if (!$schema->getTable($this->getPrefixedTableName(Event::TABLE_NAME))->hasColumn('deleted')) {
             $schema->getTable($this->getPrefixedTableName(Event::TABLE_NAME))
                 ->addColumn('deleted', Types::DATETIME_MUTABLE, ['notnull' => false]);
         }

@@ -40,11 +40,8 @@ class CampaignEventDeleteSubscriber implements EventSubscriberInterface
         if ($this->campaignConfig->shouldDeleteEventLogInBackground()) {
             return;
         }
-        $eventIds = $event->getEventIds();
+        $eventIds   = $event->getEventIds();
         $campaignId = $event->getCampaignId();
-        if (empty($eventIds)) {
-            return;
-        }
 
         $this->leadEventLogRepository->removeEventLogs($eventIds, $campaignId);
     }

@@ -45,20 +45,20 @@ class CampaignRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    public function setCampaignAsDeleted(int $campaignId) : void
+    public function setCampaignAsDeleted(int $campaignId): void
     {
         $dateTime = (new \DateTime())->format('Y-m-d H:i:s');
 
         $this->getEntityManager()->getConnection()->update(
             MAUTIC_TABLE_PREFIX.'campaign_events',
-            ['deleted'   => $dateTime],
+            ['deleted'     => $dateTime],
             ['campaign_id' => $campaignId]
         );
 
         $this->getEntityManager()->getConnection()->update(
             MAUTIC_TABLE_PREFIX.'campaigns',
             ['deleted'   => $dateTime, 'is_published' => 0],
-            ['id' => $campaignId]
+            ['id'        => $campaignId]
         );
     }
 

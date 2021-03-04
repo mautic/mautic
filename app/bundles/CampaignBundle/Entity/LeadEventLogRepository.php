@@ -607,11 +607,8 @@ SQL;
         }
 
         $this->getEntityManager()->getRepository(Event::class)->deleteEvents($eventIds);
-        if ($campaignId)
-        {
+        if ($campaignId) {
             $this->getEntityManager()->getRepository(Campaign::class)->deleteCampaign($campaignId);
         }
-
-
     }
 }
