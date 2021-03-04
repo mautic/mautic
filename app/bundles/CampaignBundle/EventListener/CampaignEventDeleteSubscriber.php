@@ -41,10 +41,11 @@ class CampaignEventDeleteSubscriber implements EventSubscriberInterface
             return;
         }
         $eventIds = $event->getEventIds();
+        $campaignId = $event->getCampaignId();
         if (empty($eventIds)) {
             return;
         }
 
-        $this->leadEventLogRepository->removeEventLogs($eventIds);
+        $this->leadEventLogRepository->removeEventLogs($eventIds, $campaignId);
     }
 }

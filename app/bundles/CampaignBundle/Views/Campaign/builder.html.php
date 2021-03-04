@@ -40,6 +40,10 @@
             endforeach;
 
             foreach ($campaignEvents as $event):
+                if (!empty($event['deleted']))
+                {
+                    continue;
+                }
                 $settings = $eventSettings[$event['eventType']][$event['type']];
                 $template = isset($settings['template']) ? $settings['template'] : 'MauticCampaignBundle:Event:generic.html.php';
 

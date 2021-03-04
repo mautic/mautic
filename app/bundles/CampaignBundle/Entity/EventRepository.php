@@ -146,7 +146,10 @@ class EventRepository extends CommonRepository
         $q->select('e, IDENTITY(e.parent)')
             ->from('MauticCampaignBundle:Event', 'e', 'e.id')
             ->where(
-                $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId)
+                $q->expr()->andX(
+                    $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId),
+                    $q->expr()->isNull('e.deleted')
+                )
             )
             ->orderBy('e.order', 'ASC');
 
@@ -227,6 +230,30 @@ class EventRepository extends CommonRepository
             ->where(
                 $qb->expr()->in('parent_id', $events)
             )
+            ->execute();
+    }
+
+    public function setEventAsDeleted(array $eventIds) : void
+    {
+        $dateTime = (new \DateTime())->format('Y-m-d H:i:s');
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->update(MAUTIC_TABLE_PREFIX.'campaign_events')
+            ->set('deleted', ':deleted')
+            ->setParameter('deleted', $dateTime)
+            ->where(
+                $qb->expr()->in('id', $eventIds)
+            )
+            ->execute();
+    }
+
+    public function deleteEvents(array $eventIds) : void
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->delete(Event::class,'e')
+            ->where(
+                $qb->expr()->in('e.id', $eventIds)
+            )
+            ->getQuery()
             ->execute();
     }
 

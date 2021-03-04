@@ -55,6 +55,12 @@ class Campaign extends FormEntity
     private $publishDown;
 
     /**
+     * @var \DateTime|null
+     * @Groups({"campaign:read", "campaign:write"})
+     */
+    private $deleted;
+
+    /**
      * @var \Mautic\CategoryBundle\Entity\Category
      **/
     private $category;
@@ -157,6 +163,7 @@ class Campaign extends FormEntity
             ->nullable()
             ->build();
 
+        $builder->addNullableField('deleted', 'datetime');
         $builder->addNamedField('allowRestart', 'integer', 'allow_restart');
     }
 

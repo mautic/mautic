@@ -165,6 +165,12 @@ class Event implements ChannelInterface
      */
     private $changes = [];
 
+    /**
+     * @var \DateTime|null
+     * @Groups({"event:read", "event:write", "campaign:read"})
+     */
+    private $deleted;
+
     public function __construct()
     {
         $this->log      = new ArrayCollection();
@@ -208,6 +214,8 @@ class Event implements ChannelInterface
             ->build();
 
         $builder->addField('properties', 'array');
+
+        $builder->addNullableField('deleted', 'datetime');
 
         $builder->createField('triggerDate', 'datetime')
             ->columnName('trigger_date')
@@ -292,6 +300,11 @@ class Event implements ChannelInterface
             ->columnName('channel_id')
             ->nullable()
             ->build();
+
+        $builder->createField('failedCount', 'integer')
+            ->columnName('failed_count')
+            ->build();
+
     }
 
     /**
@@ -1076,5 +1089,26 @@ class Event implements ChannelInterface
         $this->isChanged('triggerRestrictedDaysOfWeek', $triggerRestrictedDaysOfWeek);
 
         return $this;
+    }
+
+    /**
+     * @return ?int
+     */
+    public function getFailedCount()
+    {
+        return $this->failedCount;
+    }
+
+    public function setDeleted(?\DateTime $deleted): Event
+    {
+        $this->isChanged('deleted', $deleted);
+        $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getDeleted(): ?\DateTime
+    {
+        return $this->deleted;
     }
 }

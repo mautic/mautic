@@ -12,34 +12,33 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
-use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
+use Doctrine\DBAL\Types\Types;
 
 final class Version20210217115150 extends PreUpAssertionMigration
 {
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(function (Schema $schema) {
-            $table = $schema->getTable($this->getPrefixedTableName(LeadEventLog::TABLE_NAME));
-
-            return !$table->hasForeignKey($this->getForeignKeyName('event_id'))
-                && !$table->hasForeignKey($this->getForeignKeyName('campaign_id'));
+            return $schema->getTable($this->getPrefixedTableName(Campaign::TABLE_NAME))->hasColumn('deleted')
+                && $schema->getTable($this->getPrefixedTableName(Event::TABLE_NAME))->hasColumn('deleted');
         }, 'Migration already executed');
     }
 
     public function up(Schema $schema): void
     {
-        $table = $schema->getTable($this->getPrefixedTableName(LeadEventLog::TABLE_NAME));
-        if ($table->hasForeignKey($this->getForeignKeyName('event_id'))) {
-            $table->removeForeignKey($this->getForeignKeyName('event_id'));
+        if (!$schema->getTable($this->getPrefixedTableName(Campaign::TABLE_NAME))->hasColumn('deleted'))
+        {
+            $schema->getTable($this->getPrefixedTableName(Campaign::TABLE_NAME))
+                ->addColumn('deleted', Types::DATETIME_MUTABLE, ['notnull' => false]);
         }
-        if ($table->hasForeignKey($this->getForeignKeyName('campaign_id'))) {
-            $table->removeForeignKey($this->getForeignKeyName('campaign_id'));
-        }
-    }
 
-    private function getForeignKeyName(string $column): string
-    {
-        return $this->generatePropertyName(LeadEventLog::TABLE_NAME, 'fk', [$column]);
+        if (!$schema->getTable($this->getPrefixedTableName(Event::TABLE_NAME))->hasColumn('deleted'))
+        {
+            $schema->getTable($this->getPrefixedTableName(Event::TABLE_NAME))
+                ->addColumn('deleted', Types::DATETIME_MUTABLE, ['notnull' => false]);
+        }
     }
 }
