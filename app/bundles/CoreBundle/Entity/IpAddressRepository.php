@@ -38,15 +38,13 @@ class IpAddressRepository extends CommonRepository
     }
 
     /**
-     * Deletes duplicate IP addresses that are not being used in any other table.
+     * Get IP addresses that are not being used in any other table.
      *
      * @throws DBALException
      */
-    public function deleteUnusedIpAddresses(int $limit): int
+    public function getUnusedIpAddressesIds(int $limit): array
     {
-        $prefix     = MAUTIC_TABLE_PREFIX;
-        $conn       = $this->_em->getConnection();
-        $deleteSize = 10000;
+        $prefix = MAUTIC_TABLE_PREFIX;
 
         $sql = <<<SQL
             SELECT {$prefix}ip_addresses.id FROM {$prefix}ip_addresses
@@ -98,20 +96,20 @@ SQL;
         $params = [':limit' => $limit];
         $types  = [':limit' => PDO::PARAM_INT];
 
-        $ipIds     = $conn->executeQuery($sql, $params, $types)->fetchAll(PDO::FETCH_COLUMN, 0);
-        $idBatches = array_chunk($ipIds, $deleteSize);
-        $count     = 0;
+        return $this->_em->getConnection()->executeQuery($sql, $params, $types)->fetchAll(PDO::FETCH_COLUMN, 0);
+    }
 
-        foreach ($idBatches as $ids) {
-            $ids       = implode(',', $ids);
-            $deleteSql = <<<SQL
+    /**
+     * @throws DBALException
+     */
+    public function deleteUnusedIpAddresses(array $ids): int
+    {
+        $prefix    = MAUTIC_TABLE_PREFIX;
+        $ids       = implode(',', $ids);
+        $deleteSql = <<<SQL
                 DELETE FROM {$prefix}ip_addresses WHERE {$prefix}ip_addresses.id IN ({$ids});
 SQL;
 
-            $count += $conn->executeUpdate($deleteSql);
-            usleep(500);
-        }
-
-        return $count;
+        return $this->_em->getConnection()->executeUpdate($deleteSql);
     }
 }
