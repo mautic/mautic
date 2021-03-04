@@ -11,6 +11,9 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use Doctrine\DBAL\DBALException;
+use PDO;
+
 /**
  * IpAddressRepository.
  */
@@ -37,70 +40,79 @@ class IpAddressRepository extends CommonRepository
     /**
      * Deletes duplicate IP addresses that are not being used in any other table.
      *
-     * @param int $limit
-     *
-     * @return int Number of deleted rows
-     *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
-    public function deleteUnusedIpAddresses($limit)
+    public function deleteUnusedIpAddresses(int $limit): int
     {
-        $prefix = MAUTIC_TABLE_PREFIX;
+        $prefix     = MAUTIC_TABLE_PREFIX;
+        $conn       = $this->_em->getConnection();
+        $deleteSize = 10000;
 
         $sql = <<<SQL
-            DELETE {$prefix}ip_addresses FROM {$prefix}ip_addresses
-            JOIN (
-                SELECT {$prefix}ip_addresses.id FROM {$prefix}ip_addresses
-                    LEFT JOIN {$prefix}asset_downloads 
-                      ON {$prefix}asset_downloads.ip_id = {$prefix}ip_addresses.id 
-                    LEFT JOIN {$prefix}campaign_lead_event_log 
-                      ON {$prefix}campaign_lead_event_log.ip_id = {$prefix}ip_addresses.id 
-                    LEFT JOIN {$prefix}email_stats 
-                      ON {$prefix}email_stats.ip_id = {$prefix}ip_addresses.id
-                    LEFT JOIN {$prefix}email_stats_devices 
-                      ON {$prefix}email_stats_devices.ip_id = {$prefix}ip_addresses.id
-                    LEFT JOIN {$prefix}form_submissions 
-                      ON {$prefix}form_submissions.ip_id = {$prefix}ip_addresses.id 
-                    LEFT JOIN {$prefix}lead_ips_xref 
-                      ON {$prefix}lead_ips_xref.ip_id = {$prefix}ip_addresses.id 
-                    LEFT JOIN {$prefix}lead_points_change_log 
-                      ON {$prefix}lead_points_change_log.ip_id = {$prefix}ip_addresses.id
-                    LEFT JOIN {$prefix}page_hits 
-                      ON {$prefix}page_hits.ip_id = {$prefix}ip_addresses.id
-                    LEFT JOIN {$prefix}point_lead_action_log 
-                      ON {$prefix}point_lead_action_log.ip_id = {$prefix}ip_addresses.id 
-                    LEFT JOIN {$prefix}point_lead_event_log 
-                      ON {$prefix}point_lead_event_log.ip_id = {$prefix}ip_addresses.id 
-                    LEFT JOIN {$prefix}push_notification_stats 
-                      ON {$prefix}push_notification_stats.ip_id = {$prefix}ip_addresses.id 
-                    LEFT JOIN {$prefix}sms_message_stats 
-                      ON {$prefix}sms_message_stats.ip_id = {$prefix}ip_addresses.id 
-                    LEFT JOIN {$prefix}stage_lead_action_log 
-                      ON {$prefix}stage_lead_action_log.ip_id = {$prefix}ip_addresses.id 
-                    LEFT JOIN {$prefix}video_hits 
-                      ON {$prefix}video_hits.ip_id = {$prefix}ip_addresses.id 
-                   WHERE {$prefix}asset_downloads.id IS NULL 
-                     AND {$prefix}campaign_lead_event_log.id IS NULL 
-                     AND {$prefix}email_stats.id IS NULL 
-                     AND {$prefix}email_stats_devices.id IS NULL 
-                     AND {$prefix}form_submissions.id IS NULL 
-                     AND {$prefix}lead_ips_xref.lead_id IS NULL 
-                     AND {$prefix}lead_points_change_log.id IS NULL 
-                     AND {$prefix}page_hits.id IS NULL 
-                     AND {$prefix}point_lead_action_log.point_id IS NULL 
-                     AND {$prefix}point_lead_event_log.event_id IS NULL 
-                     AND {$prefix}push_notification_stats.id IS NULL 
-                     AND {$prefix}sms_message_stats.id IS NULL 
-                     AND {$prefix}stage_lead_action_log.stage_id IS NULL 
-                     AND {$prefix}video_hits.id IS NULL 
-                   LIMIT :limit
-                ) sq
-            ON {$prefix}ip_addresses.id = sq.id;
+            SELECT {$prefix}ip_addresses.id FROM {$prefix}ip_addresses
+                LEFT JOIN {$prefix}asset_downloads
+                    ON {$prefix}asset_downloads.ip_id = {$prefix}ip_addresses.id
+                LEFT JOIN {$prefix}campaign_lead_event_log
+                    ON {$prefix}campaign_lead_event_log.ip_id = {$prefix}ip_addresses.id
+                LEFT JOIN {$prefix}email_stats
+                    ON {$prefix}email_stats.ip_id = {$prefix}ip_addresses.id
+                LEFT JOIN {$prefix}email_stats_devices
+                    ON {$prefix}email_stats_devices.ip_id = {$prefix}ip_addresses.id
+                LEFT JOIN {$prefix}form_submissions
+                    ON {$prefix}form_submissions.ip_id = {$prefix}ip_addresses.id
+                LEFT JOIN {$prefix}lead_ips_xref
+                    ON {$prefix}lead_ips_xref.ip_id = {$prefix}ip_addresses.id
+                LEFT JOIN {$prefix}lead_points_change_log
+                    ON {$prefix}lead_points_change_log.ip_id = {$prefix}ip_addresses.id
+                LEFT JOIN {$prefix}page_hits
+                    ON {$prefix}page_hits.ip_id = {$prefix}ip_addresses.id
+                LEFT JOIN {$prefix}point_lead_action_log
+                    ON {$prefix}point_lead_action_log.ip_id = {$prefix}ip_addresses.id
+                LEFT JOIN {$prefix}point_lead_event_log
+                    ON {$prefix}point_lead_event_log.ip_id = {$prefix}ip_addresses.id
+                LEFT JOIN {$prefix}push_notification_stats
+                    ON {$prefix}push_notification_stats.ip_id = {$prefix}ip_addresses.id
+                LEFT JOIN {$prefix}sms_message_stats
+                    ON {$prefix}sms_message_stats.ip_id = {$prefix}ip_addresses.id
+                LEFT JOIN {$prefix}stage_lead_action_log
+                    ON {$prefix}stage_lead_action_log.ip_id = {$prefix}ip_addresses.id
+                LEFT JOIN {$prefix}video_hits
+                    ON {$prefix}video_hits.ip_id = {$prefix}ip_addresses.id
+            WHERE {$prefix}asset_downloads.id IS NULL
+              AND {$prefix}campaign_lead_event_log.id IS NULL
+              AND {$prefix}email_stats.id IS NULL
+              AND {$prefix}email_stats_devices.id IS NULL
+              AND {$prefix}form_submissions.id IS NULL
+              AND {$prefix}lead_ips_xref.lead_id IS NULL
+              AND {$prefix}lead_points_change_log.id IS NULL
+              AND {$prefix}page_hits.id IS NULL
+              AND {$prefix}point_lead_action_log.point_id IS NULL
+              AND {$prefix}point_lead_event_log.event_id IS NULL
+              AND {$prefix}push_notification_stats.id IS NULL
+              AND {$prefix}sms_message_stats.id IS NULL
+              AND {$prefix}stage_lead_action_log.stage_id IS NULL
+              AND {$prefix}video_hits.id IS NULL
+            LIMIT :limit
 SQL;
-        $params = [':limit' => (int) $limit];
-        $types  = [':limit' => \PDO::PARAM_INT];
-        $stmt   = $this->_em->getConnection()->executeQuery($sql, $params, $types);
 
-        return $stmt->rowCount();
+        $params = [':limit' => $limit];
+        $types  = [':limit' => PDO::PARAM_INT];
+
+        $ipIds     = $conn->executeQuery($sql, $params, $types)->fetchAll(PDO::FETCH_COLUMN, 0);
+        $idBatches = array_chunk($ipIds, $deleteSize);
+        $count     = 0;
+
+        foreach ($idBatches as $ids) {
+            $ids       = implode(',', $ids);
+            $deleteSql = <<<SQL
+                DELETE FROM {$prefix}ip_addresses WHERE {$prefix}ip_addresses.id IN ({$ids});
+SQL;
+            dump($deleteSql);
+
+            $count += $conn->executeUpdate($deleteSql);
+            usleep(500);
+        }
+
+        return $count;
     }
 }
