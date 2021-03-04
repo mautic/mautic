@@ -49,7 +49,7 @@ class RemoveDuplicateIndexData extends AbstractFixture implements OrderedFixture
             $table = $prefix.$table;
 
             foreach ($columns as $columnName) {
-                $indexName = $this->getIndexName($table, $manager);
+                $indexName = $this->getIndexName($table, $columnName, $manager);
 
                 if ($indexName) {
                     $indexHelper->dropIndex($columnName, $indexName)->executeChanges();
@@ -63,9 +63,9 @@ class RemoveDuplicateIndexData extends AbstractFixture implements OrderedFixture
         return 6;
     }
 
-    private function getIndexName(string $table, ObjectManager $manager): ?string
+    private function getIndexName(string $table, string $columnName, ObjectManager $manager): ?string
     {
-        $sql  = "SHOW INDEX FROM {$table} WHERE Key_name <> 'PRIMARY';";
+        $sql  = "SHOW INDEX FROM {$table} WHERE Key_name <> 'PRIMARY' AND Column_name = '{$columnName}'";
         $stmt = $manager->getConnection()->prepare($sql);
         $stmt->execute();
         $result = $stmt->fetch(FetchMode::ASSOCIATIVE);
