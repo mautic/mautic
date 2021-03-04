@@ -107,7 +107,6 @@ SQL;
             $deleteSql = <<<SQL
                 DELETE FROM {$prefix}ip_addresses WHERE {$prefix}ip_addresses.id IN ({$ids});
 SQL;
-            dump($deleteSql);
 
             $count += $conn->executeUpdate($deleteSql);
             usleep(500);
