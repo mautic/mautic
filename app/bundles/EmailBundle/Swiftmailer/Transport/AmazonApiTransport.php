@@ -375,6 +375,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                 // Reset the parts of the email that has tokens
                 $this->message->setSubject($emailSubject);
                 $this->message->setBody($emailBody);
+                $this->message->getHeaders()->get('List-Unsubscribe')->setValue('<{unsubscribe_url}>');
                 $this->setPlainTextToMessage($this->message, $emailText);
                 // Convert the message to array to get the values
                 $tokenizedMessage                                = $this->messageToArray($mauticTokens, $mailData['tokens'], false);
