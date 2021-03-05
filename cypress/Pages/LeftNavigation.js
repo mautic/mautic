@@ -10,11 +10,11 @@ class LeftNavigation {
 
     get componentsSection() {
 
-        return cy.get("#mautic_components_root > span.nav-item-name.text.pull-left");
+        return cy.get("#mautic_components_root");
     }
 
     get formsSubSection(){
-        return cy.get("#mautic_form_index");
+        return cy.get('a[href="/s/forms"]');
     }
 
     get landingPagesSubSection(){
