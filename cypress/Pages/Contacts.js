@@ -166,7 +166,7 @@ class Contacts {
     }
 
     waitForContactCreation(){
-        return  cy.get('div[class="mt-sm points-panel text-center"]>h1').should('be.visible');
+        return  cy.get('.alert > span').should('include.text', 'has been created'); //Community specific
     }
 
     waitTillSearchResultGetsDisplayed(){
