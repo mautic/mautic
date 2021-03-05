@@ -17,7 +17,7 @@ class LandingPages {
     }
 
     get addNewButton() {
-        return cy.get('#toolbar > div.std-toolbar.btn-group > a');
+        return cy.get('a[href*="pages/new"]');
     }
 
     get pageTitle() {
@@ -66,6 +66,10 @@ class LandingPages {
     
     get editLandingPage() {
         return cy.get('a[href*="pages/edit"]');
+    }
+
+    waitTillClickedPageGetsOpen(){
+        cy.get('a[href*="pages/edit"]').should('be.visible');
     }
 
     waitforLandingPageCreation(){
