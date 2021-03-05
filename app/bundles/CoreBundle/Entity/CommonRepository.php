@@ -13,6 +13,7 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\ExpressionBuilder;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\EntityRepository;
@@ -1525,7 +1526,7 @@ class CommonRepository extends EntityRepository
                             break;
                         case 'isEmpty':
                         case 'isNotEmpty':
-                            if ('empty' === $clause['expr']) {
+                            if ('isEmpty' === $clause['expr']) {
                                 $whereClause = $query->expr()->orX(
                                     $query->expr()->eq($column, $query->expr()->literal('')),
                                     $query->expr()->isNull($column)
@@ -1539,12 +1540,19 @@ class CommonRepository extends EntityRepository
                             break;
                         case 'in':
                         case 'notIn':
-                            if (!$isOrm) {
-                                $whereClause = $query->expr()->{$clause['expr']}($column, (array) $clause['val']);
-                            } else {
-                                $param       = $this->generateRandomParameterName();
+
+                            $parsed = str_getcsv(html_entity_decode($clause['val']), ',', '"');
+
+                            $param = $this->generateRandomParameterName();
+                            $arg   = count($parsed) > 1 ? $parsed : array_shift($parsed);
+
+                            if (is_array($arg)) {
                                 $whereClause = $query->expr()->{$clause['expr']}($column, ':'.$param);
-                                $query->setParameter($param, $clause['val']);
+                                $query->setParameter($param, $arg, Connection::PARAM_STR_ARRAY);
+                            } else {
+                                $expression  = 'in' === $clause['expr'] ? 'eq' : 'neq';
+                                $whereClause = $query->expr()->{$expression}($column, ':'.$param);
+                                $query->setParameter($param, $arg);
                             }
                             break;
                         default:

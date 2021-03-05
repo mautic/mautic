@@ -41,9 +41,9 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class FormModel extends CommonFormModel
 {
     /**
-     * @var \Symfony\Component\HttpFoundation\Request|null
+     * @var RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * @var TemplatingHelper
@@ -111,7 +111,7 @@ class FormModel extends CommonFormModel
         ColumnSchemaHelper $columnSchemaHelper,
         TableSchemaHelper $tableSchemaHelper
     ) {
-        $this->request                = $requestStack->getCurrentRequest();
+        $this->requestStack           = $requestStack;
         $this->templatingHelper       = $templatingHelper;
         $this->themeHelper            = $themeHelper;
         $this->formActionModel        = $formActionModel;
@@ -492,7 +492,7 @@ class FormModel extends CommonFormModel
         //generate cached HTML
         $theme       = $entity->getTemplate();
         $submissions = null;
-        $lead        = ($this->request) ? $this->contactTracker->getContact() : null;
+        $lead        = ($this->requestStack->getCurrentRequest()) ? $this->contactTracker->getContact() : null;
         $style       = '';
 
         if (!empty($theme)) {
@@ -563,18 +563,19 @@ class FormModel extends CommonFormModel
         $html = $this->templatingHelper->getTemplating()->render(
             $theme.'MauticFormBundle:Builder:form.html.php',
             [
-                'fieldSettings' => $this->getCustomComponents()['fields'],
-                'fields'        => $fields,
-                'contactFields' => $this->leadFieldModel->getFieldListWithProperties(),
-                'companyFields' => $this->leadFieldModel->getFieldListWithProperties('company'),
-                'form'          => $entity,
-                'theme'         => $theme,
-                'submissions'   => $submissions,
-                'lead'          => $lead,
-                'formPages'     => $pages,
-                'lastFormPage'  => $lastPage,
-                'style'         => $style,
-                'inBuilder'     => false,
+                'fieldSettings'  => $this->getCustomComponents()['fields'],
+                'viewOnlyFields' => $this->getCustomComponents()['viewOnlyFields'],
+                'fields'         => $fields,
+                'contactFields'  => $this->leadFieldModel->getFieldListWithProperties(),
+                'companyFields'  => $this->leadFieldModel->getFieldListWithProperties('company'),
+                'form'           => $entity,
+                'theme'          => $theme,
+                'submissions'    => $submissions,
+                'lead'           => $lead,
+                'formPages'      => $pages,
+                'lastFormPage'   => $lastPage,
+                'style'          => $style,
+                'inBuilder'      => false,
             ]
         );
 
@@ -798,13 +799,14 @@ class FormModel extends CommonFormModel
     public function populateValuesWithGetParameters(Form $form, &$formHtml)
     {
         $formName = $form->generateFormName();
+        $request  = $this->requestStack->getCurrentRequest();
 
         $fields = $form->getFields()->toArray();
         /** @var \Mautic\FormBundle\Entity\Field $f */
         foreach ($fields as $f) {
             $alias = $f->getAlias();
-            if ($this->request->query->has($alias)) {
-                $value = $this->request->query->get($alias);
+            if ($request->query->has($alias)) {
+                $value = $request->query->get($alias);
 
                 $this->fieldHelper->populateField($f, $value, $formName, $formHtml);
             }

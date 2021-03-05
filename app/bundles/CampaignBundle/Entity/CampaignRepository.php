@@ -133,7 +133,7 @@ class CampaignRepository extends CommonRepository
      *
      * @return array
      */
-    public function getPublishedCampaignsByLeadLists($leadLists, $viewOther = false)
+    public function getPublishedCampaignsByLeadLists($leadLists)
     {
         if (!is_array($leadLists)) {
             $leadLists = [(int) $leadLists];
@@ -153,11 +153,6 @@ class CampaignRepository extends CommonRepository
         $q->andWhere(
             $q->expr()->in('ll.leadlist_id', $leadLists)
         );
-
-        if (!$viewOther) {
-            $q->andWhere($q->expr()->eq('c.created_by', ':id'))
-                ->setParameter('id', $this->currentUser->getId());
-        }
 
         $results = $q->execute()->fetchAll();
 
