@@ -30,11 +30,11 @@ class Segments {
     }
 
     get filterSearchBox(){
-        return cy.get('.chosen-search-input');
+        return cy.get('#available_segment_filters_chosen > div > div > input');
     }
 
     get filterField(){
-        return     cy.get('.active-result');
+        return     cy.get('#available_segment_filters_chosen > div > ul > li.active-result.group-option.segment-filter.user');
     }
 
     get editSegment(){
@@ -42,7 +42,7 @@ class Segments {
     }
 
     get filterValue(){
-        return   cy.get('#leadlist_filters_1_filter');
+        return   cy.get('#leadlist_filters_1_properties_filter');
     }
 
     get saveAndCloseButton(){
@@ -70,7 +70,7 @@ class Segments {
     }
 
     get deleteConfirmation(){
-        return cy.get('.modal-body > .btn-danger');
+        return cy.get('.btn-danger');
     }
 
     get leadListFilter(){
@@ -89,6 +89,38 @@ class Segments {
         return cy.get('#leadTable>tbody>tr>td>a>div');
     }
 
+    get filterOperator(){
+        return cy.get('#leadlist_filters_1_operator');
+    }
+
+    get secondFilterOperator(){
+        return cy.get('#leadlist_filters_2_operator');
+    }
+
+    get thirdFilterOperator(){
+        return cy.get('#leadlist_filters_3_operator');
+    }
+
+    get secondFilterProperties(){
+        return cy.get('#leadlist_filters_2_properties_filter');
+    }
+
+    get thirdFilterProperties(){
+        return cy.get('#leadlist_filters_3_properties_filter');
+    }
+
+    get clickOnFourthFilterProperties(){
+        return cy.get('#leadlist_filters_4_properties_filter_chosen>a');
+    }
+
+    get typeFourthFilterInput(){
+        return cy.get('#leadlist_filters_4_properties_filter_chosen>div>div>input');
+    }
+
+    get selectFourthTypedInput(){
+        return cy.get('#leadlist_filters_4_properties_filter_chosen>div>ul>li');
+    }
+
     waitforSegmentCreation(){
         cy.get('#leadListTable>tbody>tr>td>div>a').should('be.visible');
     }
@@ -103,6 +135,18 @@ class Segments {
 
     waitTillFilterOptionGetsLoaded(){
         cy.get('#leadlist_filters_1_properties_filter').should('be.visible');
+    }
+
+    waitTillSecondOperatorFilterGetsLoaded(){
+        cy.get('#leadlist_filters_2_operator').should('be.visible');
+    }
+
+    waitTillThirdOperatorFilterGetsLoaded(){
+        cy.get('#leadlist_filters_3_operator').should('be.visible');
+    }
+
+    waitTillFourthOperatorFilterGetsLoaded(){
+        cy.get('#leadlist_filters_4_operator').should('be.visible');
     }
 }
 const segment = new Segments();
