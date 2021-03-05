@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "Mautic Open Source Distribution",
   "devDependencies": {
-    "cypress": "^5.6.0"
+    "cypress": "^6.6.0",
+    "cypress-file-upload": "^5.0.2"
   }
 }
