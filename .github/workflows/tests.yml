@@ -127,6 +127,7 @@ jobs:
         else
           echo "Invalid command"
           exit 1
+        fi
           
   cypress:
     name: Cypress
