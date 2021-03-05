@@ -119,7 +119,7 @@ class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
     {
         $query = sprintf('SHOW INDEX FROM %s WHERE Key_name <> "PRIMARY" AND Column_name = "%s"', static::TABLE_PREFIX.$table, $column);
 
-        return $this->connection->fetchAssoc($query) > 0;
+        return false !== $this->connection->fetchAssoc($query);
     }
 
     private function getContainerFake(): ContainerInterface
