@@ -2,36 +2,33 @@
 /// <reference types="Cypress" />
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const leftNavigation = require("../../Pages/LeftNavigation");
 const emails = require("../../Pages/Emails");
 const search=require("../../Pages/Search");
 
-context("Emails", () => {
+var testEmailCypress = "TestEmailCypress";
+
+context("Verify that user is able to create and edit email", () => {
+
+  beforeEach("Visit HomePage", () => {
+    cy.visit("s/emails");
+  });
 
   it("Add new Email", () => {
-    leftNavigation.ChannelsSection.click();
-    leftNavigation.EmailsSubSection.click();
     emails.waitforPageLoad();
     emails.addNewButton.click({ force: true });
     emails.waitforEmailSelectorPageGetsLoaded();
     emails.templateEmailSelector.click();
-    cy.wait(2000);
-    emails.emailSubject.type('TestEmailCypress');
-    emails.emailInternalName.type('TestEmailCypress')
+    emails.emailSubject.type(testEmailCypress);
+    emails.emailInternalName.type(testEmailCypress)
     emails.saveEmailButton.click();
     emails.closeButton.click({force: true});
     emails.waitforEmailCreation();
   });
 
   it("Edit newly added email", () => {
-    leftNavigation.ChannelsSection.click();
-    leftNavigation.EmailsSubSection.click();
     emails.waitforPageLoad();
-    search.searchBox.clear();
-    search.searchBox.type("TestEmailCypress");
-    emails.waitTillSearchedElementGetsVisible();
-    cy.wait(2000);
-    emails.searchAndSelectEmail.contains("TestEmailCypress").click();
+    cy.visit('/s/emails?search=' + testEmailCypress)
+    emails.searchAndSelectEmail.contains(testEmailCypress).click();
     emails.waitTillEditMailPageGetsVisible();
     emails.emailEditButton.click();
     emails.waitforSelectedEmailGetsOpen();
@@ -39,17 +36,12 @@ context("Emails", () => {
     emails.emailSubject.type('TestEmail');
     emails.saveEmailButton.click();
     emails.closeButton.click({force: true});
-    emails.waitforEmailUpdate();
+    emails.waitforEmailCreation();
   });
 
   it("Search and delete newly added email", () => {
-    leftNavigation.ChannelsSection.click();
-    leftNavigation.EmailsSubSection.click();
     emails.waitforPageLoad();
-    search.searchBox.clear();
-    search.searchBox.type("TestEmailCypress");
-    emails.waitTillSearchedElementGetsVisible();
-    cy.wait(1000);
+    cy.visit('/s/emails?search=' + testEmailCypress)
     search.selectCheckBoxForFirstItem.click();
     search.OptionsDropdownForFirstItem.click();
     search.deleteButtonForFirstItem.click();
