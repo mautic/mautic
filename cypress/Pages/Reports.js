@@ -69,6 +69,22 @@ class Reports {
         return cy.get('#app-content>div>div>div>div>h4');
     }
 
+    get clickOnDataSource() {
+        return cy.get('#report_source_chosen');
+    }
+
+    get enterAndSelectDataSource() {
+        return cy.get('#report_source_chosen>div>div>input');
+    }
+
+    get selectSearchedDataSource() {
+        return cy.get('#report_source_chosen>div>ul>li').eq(1);
+    }
+
+    waitTillSelectedDataSourceGetsActive(){
+        return cy.get('a[href*="graphs"]').should('be.visible');
+    }
+
 }
 const reports = new Reports();
 module.exports = reports;
