@@ -8,7 +8,7 @@ const search=require("../../Pages/Search");
 
 var emailCategory = "EmailCategory1"
 
-context("Categories", () => {
+context("Verify that user is able to create and delete catagories", () => {
   it("Add new email catagory", () => {
     settings.settingsMenuButton.click({force: true})
     catagory.categoryLink.click({force: true})
