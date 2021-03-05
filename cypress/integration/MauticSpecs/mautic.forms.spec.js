@@ -7,16 +7,16 @@ const form = require("../../Pages/Forms");
 const search=require("../../Pages/Search");
 
 var testFormName= "testForm";
-context("Create Form", () => {
+context("Verify that user is able to create and edit forms", () => {
+
+  beforeEach("Visit HomePage", () => {
+    cy.visit("s/forms");
+  });
 
   it("Create a new form", () => {
-    cy.wait(3000);
-    leftNavigation.componentsSection.click();
-    leftNavigation.formsSubSection.click();
-    cy.wait(2000);
     form.waitforPageLoad();
     form.addNewButton.click();
-    cy.wait(1000);
+    form.waitTillFormOptionsGetsLoaded()
     form.standaloneFormSelector.click();
     cy.wait(1000);
     form.formName.type(testFormName);
@@ -26,14 +26,10 @@ context("Create Form", () => {
     form.fieldTypeDropDown.click();
     form.fieldTypeSearch.type('Text');
     form.firstResultOfFieldTypeSearch.click();
-    cy.wait(2000);
     form.fieldLabel.type("Title");
-    cy.wait(2000);
     form.contactFieldTab.click({force: true});
     form.contactFieldDropdown.click();
-    cy.wait(1000);
     form.contactFieldSearchBox.click().type("Title");
-    cy.wait(1000);
     form.contactFieldSearchFirstResult.click();
     form.addFieldButton.click();
    
@@ -50,23 +46,18 @@ context("Create Form", () => {
   });
 
   it("Edit newly added form", () => {
-    leftNavigation.componentsSection.click();
-    leftNavigation.formsSubSection.click();
-    cy.wait(1000);
-    search.searchForm.clear();
-    search.searchForm.type(testFormName);
-    cy.wait(2000);
+    form.waitforPageLoad();
+    cy.visit('/s/forms?search=' + testFormName)
     form.searchAndSelectFirstItem.contains(testFormName).click();
-    cy.wait(2000);
+    form.waitTillCreatedFormGetsLoaded();
     form.editForm.click();
-    cy.wait(1000);
+    form.waitTillCreatedFormGetsOpen();
 
     form.fieldsTab.click();
     form.fieldTypeDropDown.click();
     form.fieldTypeSearch.type('Text');
     form.firstResultOfFieldTypeSearch.click();
     form.fieldLabel.type("Living city");
-    cy.wait(2000);
     form.contactFieldTab.click();
     form.contactFieldTab.click();
     form.contactFieldDropdown.click();
@@ -78,12 +69,8 @@ context("Create Form", () => {
   });
 
   it("Search and delete newly added form", () => {
-    leftNavigation.componentsSection.click();
-    leftNavigation.formsSubSection.click();
-    cy.wait(1000);
-    search.searchForm.clear();
-    search.searchForm.type(testFormName);
-    cy.wait(2000);
+    form.waitforPageLoad();
+    cy.visit('/s/forms?search=' + testFormName)
     search.selectCheckBoxForFirstItem.click();
     search.OptionsDropdownForFirstItem.click();
     search.deleteButtonForFirstItem.click();
