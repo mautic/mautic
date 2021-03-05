@@ -81,7 +81,7 @@ class Segments {
         return cy.get('#leadlist_filters_1_properties_filter');
     }
 
-    get checkConactsUnderSegment(){
+    get checkContactsUnderSegment(){
         return cy.get('a[href*="?search=segment"]');
     }
 
@@ -134,7 +134,7 @@ class Segments {
     }
 
     waitTillFilterOptionGetsLoaded(){
-        cy.get('#leadlist_filters_1_properties_filter').should('be.visible');
+        cy.get('#leadlist_filters_1_filter').should('be.visible'); //Community specific
     }
 
     waitTillSecondOperatorFilterGetsLoaded(){
