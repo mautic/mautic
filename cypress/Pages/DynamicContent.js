@@ -34,11 +34,10 @@ class DynamicContent {
     }
 
     get typeContent(){
-        return cy.get('div[class="fr-element fr-view"]');
+        return cy.get('div[role="textbox"]');
     }
-
-
 
 }
 const dynamicContent = new DynamicContent();
 module.exports = dynamicContent;
+
