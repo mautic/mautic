@@ -11,7 +11,7 @@
 //
 // -- This is a parent command --
 // Cypress.Commands.add("login", (email, password) => { ... })
-//import 'cypress-file-upload';
+  const cypress_file_upload = require('cypress-file-upload');
 
 Cypress.Commands.add('upload_file', (fileName, fileType = ' ', selector) => {
     cy.get(selector).then(subject => {
@@ -37,7 +37,21 @@ Cypress.Commands.add("login", (email, password) => {
   }
  })
 
- 
+ Cypress.Commands.add("convertToMauticDateFormat", (Date) => {
+  var d = new Date(date),
+      month = '' + (d.getMonth() + 1),
+      day = '' + d.getDate(),
+      year = d.getFullYear();
+
+  if (month.length < 2)
+      month = '0' + month;
+  if (day.length < 2)
+      day = '0' + day;
+
+  return [year, month, day].join('-');
+ })
+
+
 //
 //
 // -- This is a child command --
