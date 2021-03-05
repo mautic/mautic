@@ -41,9 +41,10 @@ class DateBuilder
     public function getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency)
     {
         $entity = new SchedulerEntity($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency);
+        $count  = $entity->isScheduledNow() ? 1 : 10;
 
         try {
-            $recurrences = $this->schedulerBuilder->getNextEvents($entity, 10);
+            $recurrences = $this->schedulerBuilder->getNextEvents($entity, $count);
         } catch (InvalidSchedulerException $e) {
             return [];
         } catch (NotSupportedScheduleTypeException $e) {
