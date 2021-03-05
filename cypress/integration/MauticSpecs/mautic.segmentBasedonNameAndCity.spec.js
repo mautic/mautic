@@ -128,9 +128,9 @@ context("Verify segment membership based on Name ,City and Company", () => {
       cy.visit("s/segments");
       segments.waitForPageLoad();
       cy.visit("/s/segments?search=segment");
-      segments.checkConactsUnderSegment.should("contain", "View 4 Contacts");
-      segments.checkConactsUnderSegment.click();
-      segments.checkDetailContactsUnderSgemnt
+      segments.checkContactsUnderSegment.should("contain", "View 4 Contacts");
+      segments.checkContactsUnderSegment.click();
+      segments.checkDetailContactsUnderSegment
         .should("contain", "Test contact1")
         .should("contain", "Test contact2");
     }

@@ -85,7 +85,7 @@ class Segments {
         return cy.get('a[href*="?search=segment"]');
     }
 
-    get checkDetailContactsUnderSgemnt(){
+    get checkDetailContactsUnderSegment(){
         return cy.get('#leadTable>tbody>tr>td>a>div');
     }
 

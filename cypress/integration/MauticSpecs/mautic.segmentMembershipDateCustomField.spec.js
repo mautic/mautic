@@ -170,7 +170,7 @@ context("Verify segment membership tests with date custom field", () => {
     cy.visit('/s/segments?search=segment')
     segments.checkConactsUnderSegment.should('contain','View 2 Contacts')
     segments.checkConactsUnderSegment.click()
-    segments.checkDetailContactsUnderSgemnt.should('contain',"test1 contact1").should('contain',"test1 contact3");
+    segments.checkDetailContactsUnderSegment.should('contain',"test1 contact1").should('contain',"test1 contact3");
   })
 
   it("Search and delete"+ segmentMembershipWithCustomField1 + "segment", () => {
@@ -225,7 +225,7 @@ context("Verify segment membership tests with date custom field", () => {
     cy.visit('/s/segments?search=segment')
     segments.checkConactsUnderSegment.should('contain','View 1 Contact')
     segments.checkConactsUnderSegment.click()
-    segments.checkDetailContactsUnderSgemnt.should('contain',"test1 contact1");
+    segments.checkDetailContactsUnderSegment.should('contain',"test1 contact1");
   })
 
   it("Search and delete"+ segmentMembershipWithCustomField2 + "segment", () => {

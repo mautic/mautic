@@ -113,7 +113,7 @@ context("Verify that user is able to create segment and test that contacts are g
     cy.visit('/s/segments?search=' + bidarCity)
     segments.checkConactsUnderSegment.should('contain','View 2 Contacts')
     segments.checkConactsUnderSegment.click()
-    segments.checkDetailContactsUnderSgemnt.should('contain',contactOneForBidar).should('contain',contactTwoForBidar);
+    segments.checkDetailContactsUnderSegment.should('contain',contactOneForBidar).should('contain',contactTwoForBidar);
   });
 
   it("Verify that hydrabad city segment has one conatct only", () => {
@@ -121,7 +121,7 @@ context("Verify that user is able to create segment and test that contacts are g
     cy.visit('/s/segments?search=' + hydrabadCity)
     segments.checkConactsUnderSegment.should('contain','View 1 Contact')
     segments.checkConactsUnderSegment.click()
-    segments.checkDetailContactsUnderSgemnt.should('contain',contactOneForHydrbad);
+    segments.checkDetailContactsUnderSegment.should('contain',contactOneForHydrbad);
   });
 
   it("Edit newly added segment", () => {
