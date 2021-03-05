@@ -36,13 +36,7 @@ class Settings {
     }
 
     get webhookSection() {
-    
         return cy.get('#mautic_webhook_root > .nav-item-name')
-    
-   }
-
-   get customObjectsSection(){
-       return cy.get('#mautic_custom_object_list > .nav-item-name');
    }
 
    get pluginsSection(){
