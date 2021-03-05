@@ -12,16 +12,44 @@ class Search {
         return cy.get('.list-checkbox').eq(0);
     }
 
+    get selectParentCheckBox() {
+        return cy.get('#customcheckbox-one0');
+    }
+
+    get checkNoResultFoundMessage() {
+        return cy.get('#app-content>div>div>div>div>h4');
+    }
+
+    get selectTheParentCheckBox() {
+        return cy.get('#customcheckbox-one0');
+    }
+
+    get selectTheParentDropdown() {
+        return cy.get('#leadTable>thead>tr>th>div>div>button');
+    }
+
+    get deleteAllSelected() {
+        return cy.get('a[href*="batchDelete"]');
+    }
+
     get OptionsDropdownForFirstItem() {
         return cy.get('button[class="btn btn-default btn-sm dropdown-toggle btn-nospin"]').eq(0);
     }
 
+    get selectParentsOptionsDropdown() {
+        return cy.get('div[class="input-group input-group-sm"]>div');
+    }
+
     get deleteButtonForFirstItem() {
-        return cy.get('a[href*="delete"]').eq(0);
+        return   cy.get('a[href*="delete"]').eq(0);
+    }
+
+    get selectBatchdeleteButton() {
+        return   cy.get('a[href*="batchDelete"]');
     }
 
     get confirmDeleteButton(){
-        return cy.get('button[class="btn btn-danger"]');
+        return cy.get('button[class="btn btn-danger"]')
     }
 
     get selectAndClickFirstItemsOption(){
