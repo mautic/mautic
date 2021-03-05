@@ -1,7 +1,7 @@
 "use strict";
 class Stages {
     get addNewButton() {
-        return  cy.get('i[class="fa fa-plus"]');
+        return  cy.get('a[href*="stages/new"]');
     }
 
     get stageName() {
