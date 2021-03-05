@@ -3,7 +3,6 @@ class Users {
 
     waitForPageLoad() {
             cy.get('h3.pull-left').should('contain', 'Users');
-            cy.wait(1000);
     }
     get clickOnUsersTab() {
         return cy.get('a[href="/s/users"]');
