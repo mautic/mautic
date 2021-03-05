@@ -2,7 +2,7 @@
 class Configuration {
 
     get clickOnConfigurationSetings() {
-        return   cy.get('#mautic_config_index');
+        return   cy.get('a[href*="config/edit"]');
     }
 
     get clickOnEmailSettings() {
