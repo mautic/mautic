@@ -22,19 +22,19 @@ class Segments {
     }
 
     get filterTab() {
-        return  cy.get('.bg-auto > [data-toggle="tooltip"] > a');
+        return  cy.get('.bg-auto > [data-toggle="tooltip"] > a'); //Community specific
     }
 
     get filterDropDown(){
-        return cy.get('.chosen-single > span')
+        return cy.get('#available_filters_chosen > .chosen-single') //Community specific
     }
 
     get filterSearchBox(){
-        return cy.get('#available_segment_filters_chosen > div > div > input');
+        return cy.get('#available_filters_chosen > div > div > input'); //Community specific
     }
 
     get filterField(){
-        return     cy.get('#available_segment_filters_chosen > div > ul > li.active-result.group-option.segment-filter.user');
+        return     cy.get('.active-result'); //Community specific
     }
 
     get editSegment(){
@@ -42,7 +42,7 @@ class Segments {
     }
 
     get filterValue(){
-        return   cy.get('#leadlist_filters_1_properties_filter');
+        return   cy.get('#leadlist_filters_1_filter'); //Community specific
     }
 
     get saveAndCloseButton(){

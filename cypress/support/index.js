@@ -69,6 +69,7 @@ Cypress.Cookies.defaults({
   segments.addNewButton.click({ force: true });
   segments.segmentName.type("TestSegment");
   segments.filterTab.click();
+  cy.wait(2000);
   segments.filterDropDown.click();
   segments.filterSearchBox.type("First");
   segments.filterField.click();
