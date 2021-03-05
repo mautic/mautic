@@ -40,7 +40,6 @@ class Points {
         return  cy.get('#mautic_pointtrigger_index > span');
     }
 
-    
     get addNewPointsTriggerButton() {
         return  cy.get('div[class="std-toolbar btn-group"]>a');
     }
@@ -126,12 +125,28 @@ class Points {
         return cy.get('#app-content>div>div>div>div>h4');
     }
 
+    get typeEmailName() {
+        return cy.get('#point_properties_emails_chosen>ul>li>input');
+    }
+
+    get selectSearchedEmail() {
+        return cy.get('#point_properties_emails_chosen>div>ul>li').eq(1);
+    }
+
+    get clickOnTextbox() {
+        return cy.get('#point_properties_emails_chosen');
+    }
+
     waitforActionToBeCreated(){
         cy.get('#pointTable>tbody>tr>td>div>a').should('be.visible');
     }
 
     waitforTriggerToBeCreated(){
         cy.get('#triggerTable>tbody>tr>td>div>a').should('be.visible');
+    }
+
+    waitTillSelectEmail(){
+        cy.get('#point_properties_emails_chosen').should('be.visible');
     }
 }
 
