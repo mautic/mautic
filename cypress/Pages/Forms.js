@@ -4,7 +4,7 @@ class Forms {
         cy.get('h3.pull-left').should('contain', 'Forms');
     }
     get addNewButton() {
-        return cy.get('#toolbar > div.std-toolbar.btn-group > a');
+        return cy.get('a[href*="forms/new"]');
     }
 
     get formName() {
@@ -40,7 +40,7 @@ class Forms {
     }
 
     get contactFieldDropdown() {
-        return cy.get('#formfield_leadField_chosen > .chosen-single > div > b');
+        return cy.get('div[class="choice-wrapper"]>div>a[class="chosen-single chosen-default"]>span').eq(1);
     }
 
     get selectFromDropdown() {
@@ -52,7 +52,7 @@ class Forms {
     }
 
     get contactFieldSearchFirstResult(){
-        return cy.get('.active-result').eq(0);
+        return cy.get('div[class="chosen-container chosen-container-single chosen-with-drop chosen-container-active"]>div>ul>li');
     }
 
     get addFieldButton(){
@@ -73,6 +73,18 @@ class Forms {
 
     waitforFormCreation(){
         cy.get('span[class="tt-u label label-success"]').should('be.visible');
+    }
+
+    waitTillFormOptionsGetsLoaded(){
+        cy.get('div[class="modal-body form-select-modal"]').should('be.visible');
+    }
+
+    waitTillCreatedFormGetsLoaded(){
+        cy.get('a[href*="forms/edit"]').should('be.visible');
+    }
+
+    waitTillCreatedFormGetsOpen(){
+        cy.get('#fields-tab').should('be.visible');
     }
 
 }
