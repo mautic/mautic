@@ -127,12 +127,7 @@ jobs:
         else
           echo "Invalid command"
           exit 1
-        fi
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> e3ab56e079a26f1be93b2bfa70f56c790939652f
+          
   cypress:
     name: Cypress
     runs-on: ubuntu-20.04
