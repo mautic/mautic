@@ -1019,6 +1019,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setCustomHtml($customHtml)
     {
+        $this->isChanged('customHtml', $customHtml);
         $this->customHtml = $customHtml;
 
         return $this;
