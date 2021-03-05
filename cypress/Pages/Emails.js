@@ -62,11 +62,7 @@ class Emails{
     }
 
     waitforEmailCreation(){
-        cy.get('.alert > span').should('contain', 'has been created');
-    }
-
-    waitforEmailUpdate(){
-        cy.get('.alert > span').should('contain', 'has been updated');
+        cy.get('span[class="tt-u label label-success"]').should('be.visible');
     }
 
     waitforEmailSelectorPageGetsLoaded(){
@@ -81,8 +77,16 @@ class Emails{
         cy.get('table[class="table table-hover table-striped table-bordered email-list"]>tbody>tr>td>div>a').should('be.visible');
     }
 
+    waitTillCreatedSegmentEmailGetsOpen(){
+        cy.get('canvas[class="chart bar-chart chart-rendered"]').should('be.visible');
+    }
+
     get checkNoResultFoundMessage() {
         return cy.get('#app-content>div>div>div>div>h4');
+    }
+
+    waitTillSegmentEmailPageGetsLoaded(){
+        cy.get('div[class*="text-muted"]').should('be.visible').should('contain', 'All Rights Reserved.');
     }
 
 }
