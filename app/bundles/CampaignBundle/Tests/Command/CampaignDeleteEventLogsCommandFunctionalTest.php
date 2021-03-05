@@ -25,15 +25,6 @@ use Symfony\Component\Console\Tester\ApplicationTester;
 
 class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTestCase
 {
-    public function testWithoutEventIds(): void
-    {
-        $applicationTester = $this->createApplicationTester();
-
-        $exitCode = $applicationTester->run(['command' => CampaignDeleteEventLogsCommand::COMMAND_NAME]);
-        Assert::assertSame(1, $exitCode);
-        Assert::assertStringContainsString('Not enough arguments (missing: "campaign_event_ids")', $applicationTester->getDisplay());
-    }
-
     public function testWithEventIds(): void
     {
         $exitCode = $this->createDataAndRunCommand(false);
@@ -46,7 +37,7 @@ class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTestCase
         Assert::assertCount(0, $eventLogs);
     }
 
-    public function testWithEventIdsAndCampaignId(): void
+    public function testWithCampaignId(): void
     {
         $exitCode = $this->createDataAndRunCommand(true);
 
@@ -67,7 +58,7 @@ class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTestCase
         return new ApplicationTester($application);
     }
 
-    private function createDataAndRunCommand(bool $deleteCampaign): int
+    private function createDataAndRunCommand(bool $usingCampaign): int
     {
         $applicationTester = $this->createApplicationTester();
         $lead              = $this->createLead();
@@ -77,9 +68,11 @@ class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTestCase
         $this->createEventLog($lead, $event1);
         $this->createEventLog($lead, $event2);
 
-        $commandData = ['command' => CampaignDeleteEventLogsCommand::COMMAND_NAME, 'campaign_event_ids' => [$event1->getId(), $event2->getId()]];
-        if ($deleteCampaign) {
+        $commandData = ['command' => CampaignDeleteEventLogsCommand::COMMAND_NAME];
+        if ($usingCampaign) {
             $commandData['--campaign-id'] = $campaign->getId();
+        } else {
+            $commandData['campaign_event_ids'] = [$event1->getId(), $event2->getId()];
         }
 
         $exitCode = $applicationTester->run($commandData);

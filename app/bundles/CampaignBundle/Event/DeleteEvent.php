@@ -16,7 +16,7 @@ namespace Mautic\CampaignBundle\Event;
 class DeleteEvent extends \Symfony\Component\EventDispatcher\Event
 {
     /**
-     * @var int[]
+     * @var int[]|null
      */
     private $eventIds;
 
@@ -25,13 +25,13 @@ class DeleteEvent extends \Symfony\Component\EventDispatcher\Event
      */
     private $campaignId;
 
-    public function __construct(array $eventIds, ?int $campaignId = null)
+    public function __construct(?array $eventIds = null, ?int $campaignId = null)
     {
         $this->eventIds   = $eventIds;
         $this->campaignId = $campaignId;
     }
 
-    public function getEventIds(): array
+    public function getEventIds(): ?array
     {
         return $this->eventIds;
     }

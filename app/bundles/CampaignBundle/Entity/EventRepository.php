@@ -11,6 +11,7 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 class EventRepository extends CommonRepository
@@ -246,14 +247,23 @@ class EventRepository extends CommonRepository
             ->execute();
     }
 
-    public function deleteEvents(array $eventIds): void
+    public function deleteEvents(?array $eventIds = null, ?int $campaignId = null): void
     {
+        if (empty($eventIds) && empty($campaignId)) {
+            return;
+        }
+
         $qb = $this->getEntityManager()->createQueryBuilder();
-        $qb->delete(Event::class, 'e')
-            ->where(
-                $qb->expr()->in('e.id', $eventIds)
-            )
-            ->getQuery()
+        $qb->delete(Event::class, 'e');
+        if (!empty($campaignId)) {
+            $qb->where($qb->expr()->eq('e.campaign', ':campaign_id'))
+            ->setParameter('campaign_id', $campaignId);
+        } else {
+            $qb->where($qb->expr()->in('e.id', ':event_ids'))
+                ->setParameter('event_ids', $eventIds, Connection::PARAM_INT_ARRAY);
+        }
+
+        $qb->getQuery()
             ->execute();
     }
 

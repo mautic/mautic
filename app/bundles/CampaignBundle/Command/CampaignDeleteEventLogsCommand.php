@@ -43,7 +43,7 @@ class CampaignDeleteEventLogsCommand extends Command
             ->setDescription('Delete campaign event logs')
             ->addArgument(
                 'campaign_event_ids',
-                InputArgument::IS_ARRAY | InputArgument::REQUIRED,
+                InputArgument::IS_ARRAY | InputArgument::OPTIONAL,
                 'Campaign event ids to delete event logs.'
             )
             ->addOption(
