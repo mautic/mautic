@@ -28,7 +28,7 @@ class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
     /** @var MessageQueue */
     protected $message;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $lead       = $this->createMock(LeadModel::class);
         $company    = $this->createMock(CompanyModel::class);

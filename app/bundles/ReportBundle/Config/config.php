@@ -23,6 +23,13 @@ return [
                     'format' => 'csv',
                 ],
             ],
+            'mautic_report_download' => [
+                'path'       => '/reports/download/{reportId}/{format}',
+                'controller' => 'MauticReportBundle:Report:download',
+                'defaults'   => [
+                    'format' => 'csv',
+                ],
+            ],
             'mautic_report_view' => [
                 'path'       => '/reports/view/{objectId}/{reportPage}',
                 'controller' => 'MauticReportBundle:Report:view',
@@ -42,6 +49,10 @@ return [
                     'scheduleDay'            => '',
                     'scheduleMonthFrequency' => '',
                 ],
+            ],
+            'mautic_report_schedule' => [
+                'path'       => '/reports/schedule/{reportId}/now',
+                'controller' => 'MauticReportBundle:Schedule:now',
             ],
             'mautic_report_action' => [
                 'path'       => '/reports/{objectAction}/{objectId}',
@@ -213,6 +224,15 @@ return [
                 'arguments' => [
                     'mautic.helper.mailer',
                     'mautic.report.model.message_schedule',
+                    'mautic.report.model.file_handler',
+                ],
+            ],
+            'mautic.report.model.file_handler' => [
+                'class'     => \Mautic\ReportBundle\Scheduler\Model\FileHandler::class,
+                'arguments' => [
+                    'mautic.helper.file_path_resolver',
+                    'mautic.helper.file_properties',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.report.model.message_schedule' => [

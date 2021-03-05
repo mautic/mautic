@@ -14,9 +14,6 @@ namespace Mautic\LeadBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
 
-/**
- * LeadFieldRepository.
- */
 class LeadFieldRepository extends CommonRepository
 {
     /**
@@ -356,6 +353,16 @@ class LeadFieldRepository extends CommonRepository
         $result = $q->execute()->fetch();
 
         return !empty($result['id']);
+    }
+
+    public function getFieldThatIsMissingColumn(): ?LeadField
+    {
+        $qb = $this->createQueryBuilder($this->getTableAlias());
+        $qb->where($qb->expr()->eq("{$this->getTableAlias()}.columnIsNotCreated", 1));
+        $qb->orderBy("{$this->getTableAlias()}.dateAdded", 'ASC');
+        $qb->getMaxResults(1);
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 
     /**

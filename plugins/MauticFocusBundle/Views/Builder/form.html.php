@@ -118,12 +118,13 @@ $formExtra = <<<EXTRA
 EXTRA;
 
 echo $view->render('MauticFormBundle:Builder:form.html.php', [
-        'form'          => $form,
-        'formExtra'     => $formExtra,
-        'action'        => ($preview) ? '#' : null,
-        'suffix'        => '_focus',
-        'contactFields' => $contactFields,
-        'companyFields' => $companyFields,
+        'form'           => $form,
+        'formExtra'      => $formExtra,
+        'action'         => ($preview) ? '#' : null,
+        'suffix'         => '_focus',
+        'contactFields'  => $contactFields,
+        'companyFields'  => $companyFields,
+        'viewOnlyFields' => $viewOnlyFields,
     ]
 );
 ?>

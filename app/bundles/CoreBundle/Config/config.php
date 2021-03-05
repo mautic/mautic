@@ -406,6 +406,13 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
+            'mautic.helper.template.config' => [
+                'class'     => \Mautic\CoreBundle\Templating\Helper\ConfigHelper::class,
+                'alias'     => 'config',
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+            ],
             'mautic.helper.template.mautibot' => [
                 'class' => 'Mautic\CoreBundle\Templating\Helper\MautibotHelper',
                 'alias' => 'mautibot',
@@ -544,6 +551,15 @@ return [
                     'mautic.helper.user',
                 ],
             ],
+            'mautic.helper.maxmind_do_not_sell_download' => [
+                'class'     => \Mautic\CoreBundle\Helper\MaxMindDoNotSellDownloadHelper::class,
+                'arguments' => [
+                    '%mautic.ip_lookup_auth%',
+                    'monolog.logger.mautic',
+                    'mautic.native.connector',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
         ],
         'menus' => [
             'mautic.menu.main' => [
@@ -586,6 +602,14 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.core.command.do_not_sell' => [
+                'class'     => \Mautic\CoreBundle\Command\UpdateDoNotSellListCommand::class,
+                'arguments' => [
+                    'mautic.helper.maxmind_do_not_sell_download',
+                    'translator',
+                ],
+                'tag' => 'console.command',
+            ],
             'mautic.core.command.apply_update' => [
                 'tag'       => 'console.command',
                 'class'     => \Mautic\CoreBundle\Command\ApplyUpdatesCommand::class,
@@ -593,6 +617,14 @@ return [
                     'translator',
                     'mautic.helper.core_parameters',
                     'mautic.update.step_provider',
+                ],
+            ],
+            'mautic.core.command.maxmind.purge' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\MaxMindDoNotSellPurgeCommand::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.maxmind.doNotSellList',
                 ],
             ],
         ],
@@ -615,10 +647,16 @@ return [
                 // When removing, remove also the ricardofiorani/guzzle-psr18-adapter dependency.
                 'class' => \RicardoFiorani\GuzzlePsr18Adapter\Client::class,
             ],
+            /* @deprecated to be removed in Mautic 4. Use 'mautic.filesystem' instead. */
             'symfony.filesystem' => [
                 'class' => \Symfony\Component\Filesystem\Filesystem::class,
             ],
-
+            'mautic.filesystem' => [
+                'class' => \Mautic\CoreBundle\Helper\Filesystem::class,
+            ],
+            'symfony.finder' => [
+                'class' => \Symfony\Component\Finder\Finder::class,
+            ],
             // Error handler
             'mautic.core.errorhandler.subscriber' => [
                 'class'     => 'Mautic\CoreBundle\EventListener\ErrorHandlingListener',
@@ -679,6 +717,13 @@ return [
                     'mautic.helper.core_parameters',
                     '%mautic.bundles%',
                     '%mautic.plugin.bundles%',
+                ],
+            ],
+            'mautic.page.helper.factory' => [
+                'class'     => \Mautic\CoreBundle\Factory\PageHelperFactory::class,
+                'arguments' => [
+                    'session',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.translation.loader' => [
@@ -796,12 +841,15 @@ return [
                 ],
             ],
             'mautic.helper.theme' => [
-                'class'     => 'Mautic\CoreBundle\Helper\ThemeHelper',
+                'class'     => \Mautic\CoreBundle\Helper\ThemeHelper::class,
                 'arguments' => [
                     'mautic.helper.paths',
                     'mautic.helper.templating',
                     'translator',
                     'mautic.helper.core_parameters',
+                    'mautic.filesystem',
+                    'symfony.finder',
+                    'mautic.integrations.helper.builder_integrations',
                 ],
                 'methodCalls' => [
                     'setDefaultTheme' => [
@@ -831,6 +879,12 @@ return [
                     'mautic.http.connector',
                     '%mautic.link_shortener_url%',
                     'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.helper.export' => [
+                'class'     => \Mautic\CoreBundle\Helper\ExportHelper::class,
+                'arguments' => [
+                    'translator',
                 ],
             ],
             // Menu
@@ -893,6 +947,11 @@ return [
                 'factory' => ['Joomla\Http\HttpFactory', 'getHttp'],
             ],
 
+            'mautic.native.connector' => [
+                'class'     => \Symfony\Contracts\HttpClient\HttpClientInterface::class,
+                'factory'   => [Symfony\Component\HttpClient\HttpClient::class, 'create'],
+            ],
+
             'twig.controller.exception.class' => 'Mautic\CoreBundle\Controller\ExceptionController',
 
             // Form extensions
@@ -952,6 +1011,12 @@ return [
                     'request_stack',
                 ],
                 'tag' => 'validator.constraint_validator',
+            ],
+            'mautic.maxmind.doNotSellList' => [
+                'class'     => Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
             ],
             // Logger
             'mautic.monolog.handler' => [
@@ -1121,7 +1186,7 @@ return [
         'db_user'                         => '',
         'db_password'                     => '',
         'db_table_prefix'                 => '',
-        'db_server_version'               => '5.5',
+        'db_server_version'               => '5.7',
         'locale'                          => 'en_US',
         'secret_key'                      => '',
         'dev_hosts'                       => [],
@@ -1546,6 +1611,7 @@ return [
         'cached_data_timeout'       => 10,
         'batch_sleep_time'          => 1,
         'batch_campaign_sleep_time' => false,
+        'transliterate_page_title'  => false,
         'cors_restrict_domains'     => true,
         'cors_valid_domains'        => [],
         'max_entity_lock_time'      => 0,
