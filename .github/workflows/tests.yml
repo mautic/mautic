@@ -130,6 +130,9 @@ jobs:
         fi
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e3ab56e079a26f1be93b2bfa70f56c790939652f
   cypress:
     name: Cypress
     runs-on: ubuntu-20.04
@@ -237,4 +240,3 @@ jobs:
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_MESSAGE: 'The daily GitHub Actions tests in mautic/mautic have failed. Most likely something external has changed, like a PHP version update.'
-
