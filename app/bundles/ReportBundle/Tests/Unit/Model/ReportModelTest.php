@@ -13,124 +13,68 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Unit\Model;
 
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\Submission;
+use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Model\ReportModel;
 use PHPUnit\Framework\Assert;
-use Symfony\Component\Form\FormFactory;
 
 final class ReportModelTest extends MauticMysqlTestCase
 {
-    /**
-     * @var ReportModel
-     */
-    private $reportModel;
-
-    /**
-     * @var string
-     */
-    protected $prefix = '';
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->prefix      = $this->container->getParameter('mautic.db_table_prefix');
-        $this->reportModel = $this->container->get('mautic.report.model.report');
-    }
-
     public function testThatGetReportDataUsesCorrectDataRange(): void
     {
-        $columns = [
-            'fs.date_submitted',
-        ];
+        $report = new Report();
+        $report->setName('Test Report');
+        $report->setSource('form.submissions');
+        $report->setColumns(['fs.date_submitted']);
+        $report->setSettings([]);
 
-        $reportData = [
-            'is_published' => 1,
-            'name'         => 'Test Report',
-            'system'       => 0,
-            'source'       => 'form.submissions',
-            'is_scheduled' => 0,
-            'columns'      => serialize($columns),
-            'filters'      => serialize([]),
-            'table_order'  => serialize([]),
-            'graphs'       => serialize([]),
-            'group_by'     => serialize([]),
-            'aggregators'  => serialize([]),
-            'settings'     => json_encode([
-                'showDynamicFilters'   => 0,
-                'hideDateRangeFilter'  => 0,
-                'showGraphsAboveTable' => 0,
-            ]),
-        ];
+        $form = new Form();
+        $form->setName('Test Form');
+        $form->setAlias('create_a_c');
 
-        $this->connection->insert($this->prefix.'reports', $reportData);
-        $reportId = $this->connection->lastInsertId();
+        $ip = new IpAddress('127.0.0.1');
 
-        $formData = [
-            'is_published' => 1,
-            'name'         => 'Test Form',
-            'alias'        => 'create_a_c',
-            'post_action'  => 'return',
-        ];
+        $this->em->persist($ip);
+        $this->em->persist($report);
+        $this->em->persist($form);
+        $this->em->flush();
 
-        $this->connection->insert($this->prefix.'forms', $formData);
-        $formId = $this->connection->lastInsertId();
-
-        $ipData = [
-            'ip_address' => '127.0.0.1',
-            'ip_details' => 'N;',
-        ];
-
-        $this->connection->insert($this->prefix.'ip_addresses', $ipData);
-        $ipAddressId = $this->connection->lastInsertId();
-
-        $utc = new \DateTimeZone('UTC');
         // I know I can use \DateTimeImmutable, but getReportData expects \DateTime
-        $now        = new \DateTime('now', $utc);
+        $now        = new \DateTime('now', new \DateTimeZone('UTC'));
         $aDayAgo    = (clone $now)->modify('-1 day');
         $twoDaysAgo = (clone $now)->modify('-2 days');
-        $format     = 'Y-m-d H:i:s';
 
-        $formSubmissionsData = [
-            [
-                'form_id'        => $formId,
-                'ip_id'          => $ipAddressId,
-                'date_submitted' => $twoDaysAgo->format($format),
-                'referer'        => 'https://mautic-cloud.local/index_dev.php/test',
-            ],
-            [
-                'form_id'        => $formId,
-                'ip_id'          => $ipAddressId,
-                'date_submitted' => $aDayAgo->format($format),
-                'referer'        => 'https://mautic-cloud.local/index_dev.php/test',
-            ],
-            [
-                'form_id'        => $formId,
-                'ip_id'          => $ipAddressId,
-                'date_submitted' => $now->format($format),
-                'referer'        => 'https://mautic-cloud.local/index_dev.php/test',
-            ],
-        ];
+        $this->em->persist($this->makeSubmission($form, $ip, $twoDaysAgo));
+        $this->em->persist($this->makeSubmission($form, $ip, $aDayAgo));
+        $this->em->persist($this->makeSubmission($form, $ip, $now));
 
-        foreach ($formSubmissionsData as $formSubmissionData) {
-            $this->connection->insert($this->prefix.'form_submissions', $formSubmissionData);
-        }
-
-        /** @var FormFactory $formFactory */
-        $formFactory = $this->container->get('form.factory');
+        $this->em->flush();
 
         /** @var ReportModel $reportModel */
-        $reportModel = $this->container->get('mautic.model.factory')->getModel('report');
-
-        $report = $reportModel->getEntity($reportId);
+        $reportModel = $this->container->get('mautic.report.model.report');
 
         $aDayAgoBeginningOfTheDay = (clone $aDayAgo)->setTime(0, 0, 0);
 
-        $reportData = $this->reportModel->getReportData($report, $formFactory, [
+        $reportData = $reportModel->getReportData($report, null, [
             'dateFrom' => $aDayAgoBeginningOfTheDay,
             'dateTo'   => clone $aDayAgoBeginningOfTheDay,
         ]);
 
         Assert::assertSame(1, $reportData['totalResults']);
         Assert::assertCount(1, $reportData['data']);
+    }
+
+    private function makeSubmission(Form $form, IpAddress $ipAddress, \DateTimeInterface $dateSubmitted): Submission
+    {
+        $submission = new Submission();
+        $submission->setForm($form);
+        $submission->setIpAddress($ipAddress);
+        $submission->setDateSubmitted($dateSubmitted);
+        $submission->setReferer('');
+
+        return $submission;
     }
 }
