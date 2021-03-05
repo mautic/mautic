@@ -80,6 +80,26 @@ class Roles {
         return  cy.get('div[class="pt-md pr-md pl-md pb-md"]>div>div>div>div>label>input').eq(61);
     }
 
+    get contacts_Access_Full() {
+        return  cy.get('div[class="pt-md pr-md pl-md pb-md"]>div>div>div>div>label>input').eq(67);
+    }
+
+    get contacts_Segments_ViewOthers() {
+        return  cy.get('div[class="pt-md pr-md pl-md pb-md"]>div>div>div>div>label>input').eq(68);
+    }
+
+    get contacts_Segments_EditOthers() {
+        return  cy.get('div[class="pt-md pr-md pl-md pb-md"]>div>div>div>div>label>input').eq(69);
+    }
+
+    get contacts_import_View() {
+        return  cy.get('div[class="pt-md pr-md pl-md pb-md"]>div>div>div>div>label>input').eq(73);
+    }
+
+    get contacts_import_Edit() {
+        return  cy.get('div[class="pt-md pr-md pl-md pb-md"]>div>div>div>div>label>input').eq(74);
+    }
+
     get saveAndCloseTab() {
         return  cy.get('#role_buttons_save_toolbar');
     }
