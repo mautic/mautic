@@ -19,52 +19,6 @@ export default class BuilderService {
 
   deletePath;
 
-  // Redefine Keyboard shortcuts due to unbind won't works with multiple keys.
-  keymapsConf = {
-    defaults: {
-      'core:undoios': {
-        keys: '⌘+z',
-        handler: 'core:undo',
-      },
-      'core:redoios': {
-        keys: '⌘+shift+z',
-        handler: 'core:redo',
-      },
-      'core:copyios': {
-        keys: '⌘+c',
-        handler: 'core:copy',
-      },
-      'core:pasteios': {
-        keys: '⌘+v',
-        handler: 'core:paste',
-      },
-      'core:undo': {
-        keys: 'ctrl+z',
-        handler: 'core:undo',
-      },
-      'core:redo': {
-        keys: 'ctrl+shift+z',
-        handler: 'core:redo',
-      },
-      'core:copy': {
-        keys: 'ctrl+c',
-        handler: 'core:copy',
-      },
-      'core:paste': {
-        keys: 'ctrl+v',
-        handler: 'core:paste',
-      },
-      'core:c-deletebackspace': {
-        keys: 'backspace',
-        handler: 'core:component-delete',
-      },
-      'core:c-deletesuppr': {
-        keys: 'delete',
-        handler: 'core:component-delete',
-      },
-    },
-  };
-
   constructor(content, assets, uploadPath, deletePath) {
     if (!content) {
       throw Error('No HTML or MJML content found');
@@ -231,8 +185,7 @@ export default class BuilderService {
           formsOpts: false,
         },
         grapesjsmautic: this.presetMauticConf,
-      },
-      keymaps: this.keymapsConf,
+      }
     });
 
     // Customize GrapesJS -> add close button with save for Mautic
@@ -254,8 +207,7 @@ export default class BuilderService {
       pluginsOpts: {
         grapesjsmjml: {},
         grapesjsmautic: this.presetMauticConf,
-      },
-      keymaps: this.keymapsConf,
+      }
     });
 
     this.editor.BlockManager.get('mj-button').set({
@@ -280,8 +232,7 @@ export default class BuilderService {
       pluginsOpts: {
         grapesjsnewsletter: {},
         grapesjsmautic: this.presetMauticConf,
-      },
-      keymaps: this.keymapsConf,
+      }
     });
 
     // add a Mautic custom block Button
