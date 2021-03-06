@@ -181,11 +181,11 @@ export default class BuilderService {
       },
       plugins: [grapesjswebpage, grapesjspostcss, grapesjsmautic],
       pluginsOpts: {
-        grapesjswebpage: {
+        [grapesjswebpage]: {
           formsOpts: false,
         },
         grapesjsmautic: this.presetMauticConf,
-      }
+      },
     });
 
     // Customize GrapesJS -> add close button with save for Mautic
@@ -207,7 +207,7 @@ export default class BuilderService {
       pluginsOpts: {
         grapesjsmjml: {},
         grapesjsmautic: this.presetMauticConf,
-      }
+      },
     });
 
     this.editor.BlockManager.get('mj-button').set({
@@ -232,7 +232,7 @@ export default class BuilderService {
       pluginsOpts: {
         grapesjsnewsletter: {},
         grapesjsmautic: this.presetMauticConf,
-      }
+      },
     });
 
     // add a Mautic custom block Button
