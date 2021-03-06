@@ -11,10 +11,16 @@ use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\Response;
+use Monolog\Logger;
 
 class GrapesJsController extends CommonController
 {
     const OBJECT_TYPE = ['email', 'page'];
+
+    /**
+     * @var Logger
+     */
+    private $logger;
 
     /**
      * Activate the custom builder.
@@ -29,7 +35,8 @@ class GrapesJsController extends CommonController
         if (!in_array($objectType, self::OBJECT_TYPE)) {
             throw new \Exception('Object not authorized to load custom builder', Response::HTTP_CONFLICT);
         }
-
+        $this->logger     = $this->get('logger');
+        
         /** @var \Mautic\EmailBundle\Model\EmailModel|\Mautic\PageBundle\Model\PageModel $model */
         $model      = $this->getModel($objectType);
         $aclToCheck = 'email:emails:';
@@ -68,6 +75,10 @@ class GrapesJsController extends CommonController
         $slots        = [];
         $type         = 'html';
         $template     = InputHelper::clean($this->request->query->get('template'));
+        if (!$template) {
+            $this->logger->warn('Grapesjs: no template in query');
+            return $this->json(false);
+        }
         $templateName = ':'.$template.':'.$objectType;
         $content      = $entity->getContent();
         /** @var ThemeHelper $themeHelper */
