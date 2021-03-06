@@ -85,6 +85,7 @@ return [
                 'class'     => \MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\AssetsSubscriber::class,
                 'arguments' => [
                     'grapesjsbuilder.config',
+                    'mautic.install.service',
                 ],
             ],
             'grapesjsbuilder.event.email.subscriber' => [

@@ -6,6 +6,7 @@ namespace MauticPlugin\GrapesJsBuilderBundle\EventSubscriber;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomAssetsEvent;
+use Mautic\InstallBundle\Install\InstallService;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -16,9 +17,15 @@ class AssetsSubscriber implements EventSubscriberInterface
      */
     private $config;
 
-    public function __construct(Config $config)
+    /**
+     * @var InstallService
+     */
+    private $installer;
+
+    public function __construct(Config $config, InstallService $installer)
     {
-        $this->config = $config;
+        $this->config    = $config;
+        $this->installer = $installer;
     }
 
     public static function getSubscribedEvents()
@@ -30,6 +37,9 @@ class AssetsSubscriber implements EventSubscriberInterface
 
     public function injectAssets(CustomAssetsEvent $assetsEvent)
     {
+        if (!$this->installer->checkIfInstalled()) {
+            return;
+        }
         if ($this->config->isPublished()) {
             $assetsEvent->addScript('plugins/GrapesJsBuilderBundle/Assets/library/js/dist/builder.js');
 
