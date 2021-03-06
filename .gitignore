@@ -1,4 +1,8 @@
 .*
+!.babelrc
+!.eslintrc
+!.prettierignore
+!.prettierrc
 !.gitignore
 !.htaccess
 !.gitkeep

@@ -9,8 +9,8 @@
     "lint": "eslint Assets/library/js/",
     "prettier": "node_modules/.bin/prettier -w Assets/library/js/",
     "prettier-check": "node_modules/.bin/prettier -c Assets/library/js/",
-    "helloWorld": "parcel Demo/helloWorld/index.html",
-    "mautic": "cp -r Demo/data dist && parcel Demo/mautic/index.html"
+    "run helloWorld": "parcel Demo/helloWorld/index.html",
+    "run mautic": "cp -r Demo/data dist && parcel Demo/mautic/index.html"
   },
   "repository": {
     "type": "git",
@@ -23,8 +23,8 @@
   },
   "homepage": "https://github.com/mautic/plugin-grapesjs-builder#readme",
   "dependencies": {
-    "grapesjs": "^0.16.34",
-    "grapesjs-mjml": "^0.4.1",
+    "grapesjs": "^0.16.44",
+    "grapesjs-mjml": "^0.4.2",
     "grapesjs-parser-postcss": "^0.1.1",
     "grapesjs-preset-mautic": "^1.0.0",
     "grapesjs-preset-newsletter": "^0.2.20",
