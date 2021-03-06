@@ -105,7 +105,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
         if ($event->checkContext([self::CONTEXT_ASSET_DOWNLOAD])) {
             // asset downloads calculate this columns
-            $columns[$prefix.'download_count']['formula'] = 'COUNT(ad.id)';
+            $columns[$prefix.'download_count']['formula']        = 'COUNT(ad.id)';
             $columns[$prefix.'unique_download_count']['formula'] = 'COUNT(DISTINCT ad.lead_id)';
 
             // Downloads
