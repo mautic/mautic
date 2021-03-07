@@ -64,7 +64,7 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
         $this->propertiesAccessor->expects($this->never())
             ->method('getChoices');
 
-        $this->formBuilder->expects($this->at(0))
+        $this->formBuilder->expects($this->at(1))
             ->method('add')
             ->with(
                 'values',
@@ -81,7 +81,7 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->formBuilder->expects($this->at(1))
+        $this->formBuilder->expects($this->at(2))
             ->method('add')
             ->with(
                 'any',
@@ -95,7 +95,7 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->formBuilder->expects($this->at(2))
+        $this->formBuilder->expects($this->at(3))
             ->method('add')
             ->with(
                 'expr',
