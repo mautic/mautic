@@ -139,7 +139,7 @@ final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
             ->with(['some_choice_here' => 'Some choice here'])
             ->willReturn(['some_choice_here' => 'Some choice here']);
 
-        $this->formBuilder->expects($this->at(0))
+        $this->formBuilder->expects($this->at(1))
             ->method('add')
             ->with(
                 'values',
