@@ -74,7 +74,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         ];
         $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", $patchPayload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
 
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
@@ -108,13 +107,13 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame('Victoria', $contact->getState());
 
         // The previous request changes user to anonymous. We have to configure API again.
+        $this->useCleanupRollback = false;
         $this->setUpSymfony(
             [
                 'api_enabled'           => true,
                 'api_enable_basic_auth' => true,
             ]
         );
-
         // Cleanup:
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
         $clientResponse = $this->client->getResponse();
@@ -176,7 +175,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         ];
         $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", $patchPayload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
 
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
@@ -193,7 +191,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // Ensure the submission was created properly.
         $submissions = $this->em->getRepository(Submission::class)->findAll();
-
         Assert::assertCount(1, $submissions);
 
         /** @var Submission $submission */
@@ -209,6 +206,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(null, $contact->getState());
 
         // The previous request changes user to anonymous. We have to configure API again.
+        $this->useCleanupRollback = false;
         $this->setUpSymfony(
             [
                 'api_enabled'           => true,
@@ -277,7 +275,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         ];
         $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", $patchPayload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
 
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
@@ -299,6 +296,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         Assert::assertCount(0, $submissions);
 
         // The previous request changes user to anonymous. We have to configure API again.
+        $this->useCleanupRollback = false;
         $this->setUpSymfony(
             [
                 'api_enabled'           => true,
