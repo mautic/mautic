@@ -35,7 +35,7 @@ context("Verify that user is able to create and delete the contacts", () => {
     contact.lastName.clear().type("Contact");
     contact.SaveButton.click();
     contact.closeButton.click({ force: true });
-    contact.waitForContactCreation();
+    contact.waitForContactUpdate();
   });
 
   it("Search and delete newly added contact", () => {

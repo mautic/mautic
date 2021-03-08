@@ -168,6 +168,10 @@ class Contacts {
         return  cy.get('.alert > span').should('include.text', 'has been created'); //Community specific
     }
 
+    waitForContactUpdate(){
+        return  cy.get('.alert > span').should('include.text', 'has been updated'); //Community specific
+    }
+
     waitTillSearchResultGetsDisplayed(){
         cy.get('#leadTable>tbody>tr>td>a').should('not.be.empty');
     }
