@@ -5,12 +5,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const credentials = require("../../Pages/Credentials");
 const search = require("../../Pages/Search");
 var getHostUrl = Cypress.config().baseUrl
-var appendUrl = "oauth/v2/token"
+var appendUrl = "/oauth/v2/token"
 var bearerToken;
 var apiKey = "";
 var apiSecretValue = "";
-var contactsEndPoint = "api/contacts"
-var createContactEndPoint = "api/contacts/new"
+var contactsEndPoint = "/api/contacts"
+var createContactEndPoint = "/api/contacts/new"
 var count = 0
 var getContactId = ""
 var getCreatedContactId = ""
@@ -119,7 +119,7 @@ context("Verify that user is able to create credentials and update the contact f
   it("Hit PATCH request selected contact endpoint and update country field to India and verify that country field gets updated", function() {
     cy.request({ 
      method:'PATCH',
-     url: getHostUrl + contactsEndPoint + '/' + getContactId + '/edit',
+     url: getHostUrl + contactsEndPoint + '/' + getContactId + 'edit',
      body:
      {
       "country" : "India"
@@ -195,7 +195,7 @@ context("Verify that user is able to create credentials and update the contact f
   it("Delete the created contact and verify that it gets deleted", function() {
     cy.request({ 
      method:'DELETE',
-     url: getHostUrl + contactsEndPoint + '/' + getCreatedContactId + '/delete',
+     url: getHostUrl + contactsEndPoint + '/' + getCreatedContactId + 'delete',
      headers:{
       'Content-Type':'application/json',
       'Connection':'keep-alive',
