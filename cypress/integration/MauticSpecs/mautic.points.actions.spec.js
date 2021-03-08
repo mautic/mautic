@@ -3,6 +3,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const points = require("../../Pages/Points");
+const emails = require("../../Pages/Emails"); // Community Specific
+const search = require("../../Pages/Search"); // Community Specific
+
 
 var testAction = "testAction";
 
@@ -11,16 +14,29 @@ context("Verify that user is able to create and edit points action", () => {
     cy.visit("s/points");
   });
 
+  it("Add a Test Email", () => { // Community Specific
+  cy.visit('s/emails')
+  emails.waitforPageLoad();
+  emails.addNewButton.click({ force: true });
+  emails.waitforEmailSelectorPageGetsLoaded();
+  emails.templateEmailSelector.click();
+  emails.emailSubject.type("Test Email");
+  emails.emailInternalName.type("Test Email");
+  emails.saveEmailButton.click();
+  emails.closeButton.click();
+  emails.waitforEmailCreation();
+  });
+
   it("Add a Action", () => {
     points.waitforActionPageLoad();
     points.addNewActionButton.click();
     points.actionName.type(testAction);
+    points.pointsToBeChanged.clear(); // Community Specific
     points.pointsToBeChanged.type("40");
     points.actionDropDown.click();
     points.opensAnEmailOption.click();
     points.waitTillSelectEmail();
     points.clickOnTextbox.click();
-    points.typeEmailName.type("Test");
     points.selectSearchedEmail.click();
     points.saveAndCloseButton.click();
     points.waitforActionToBeCreated();
@@ -44,5 +60,15 @@ context("Verify that user is able to create and edit points action", () => {
     points.checkNoResultFoundMessage.should("contain", "No Results Found");
   });
 
-  
+  it("Delete a newly added email", () => { // Community Specific
+    cy.visit('s/emails');
+    emails.waitforPageLoad();
+    cy.visit('/s/emails?search=Test')
+    search.selectCheckBoxForFirstItem.click({ force: true });
+    search.OptionsDropdownForFirstItem.click();
+    search.deleteButtonForFirstItem.click();
+    search.confirmDeleteButton.click();
+  });
+
+
 });

@@ -130,7 +130,7 @@ class Points {
     }
 
     get selectSearchedEmail() {
-        return cy.get('#point_properties_emails_chosen>div>ul>li').eq(1);
+        return cy.get('#point_properties_emails_chosen>div>ul>li.active-result.group-option'); // Community Specific
     }
 
     get clickOnTextbox() {
