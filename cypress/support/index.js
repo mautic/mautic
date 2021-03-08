@@ -69,12 +69,13 @@ Cypress.Cookies.defaults({
   segments.addNewButton.click({ force: true });
   segments.segmentName.type("TestSegment");
   segments.filterTab.click();
-  cy.wait(4000);
+  cy.wait(2000); //Community specific
   segments.filterDropDown.click();
   segments.filterSearchBox.type("First");
   segments.filterField.click();
   segments.filterValue.type("testContact");
   segments.saveAndCloseButton.click();
+  cy.wait(1000); //Community specific
   segments.waitforSegmentCreation();
 });
 

@@ -47,7 +47,8 @@ context("Verify campaign membership with update contact action & updating dates 
   it("Add" + " "+dateField1+ " "+ "custom field for contact", () => {
     customFields.waitforPageLoad();
     customFields.addNewButton.click();
-    customFields.fieldLabel.type(dateField1);
+    cy.wait(4000); //Community specific
+    customFields.fieldLabel.type(dateField1, { force: true }); //Community specific
     customFields.ObjectSelectionDropDown.click();
     customFields.ObjectSelector.select("Contact",{force: true});
     customFields.DataTypeSelectionDropDown.click();
@@ -161,7 +162,7 @@ context("Verify campaign membership with update contact action & updating dates 
     segments.filterValue.type(contactFirstName, { force: true })
     segments.saveAndCloseButton.click()
     segments.waitforSegmentCreation()
-    cy.wait(3000) // Added wait to get segment build
+    cy.exec('ddev exec bin/console m:s:r'); //Community specific
   });
 
   it("Add new campaign " + campaignMembershipWithUpdateContactAbsoluteDate, () => {
@@ -172,8 +173,8 @@ context("Verify campaign membership with update contact action & updating dates 
     campaigns.campaignName.type(campaignMembershipWithUpdateContactAbsoluteDate);
     campaigns.launchCampaignBuilderButton.click({ force: true });
     campaigns.sourceSelector.select("Contact segments", { force: true });
-    campaigns.segmentSelectorButton.click();
     campaigns.segmentSelectorButton.type(segmentMembershipWithCustomField)
+    cy.wait(3000); //Community specific
     campaigns.segmentSelector.click();
     campaigns.addSourceCamapignButton.click({ force: true });
     campaigns.addStepButtonBottom.click({ force: true });
@@ -190,22 +191,26 @@ context("Verify campaign membership with update contact action & updating dates 
     search.searchBox.clear();
     search.searchBox.type(campaignMembershipWithUpdateContactAbsoluteDate);
     search.selectCheckBoxForFirstItem.should('exist');
-    cy.wait(5000) // Added wait to get campaign build and apply actions on contacts
+    cy.exec('ddev exec bin/console m:c:r'); //Community specific
+    cy.exec('ddev exec bin/console m:c:t'); //Community specific
   });
 
   it("Verify that in "+ segmentMembershipWithCustomField +" segment contacts date field 1 got updated Only", () => {
     cy.visit("s/segments");
     segments.waitForPageLoad();
-    cy.visit('/s/segments?search=segment')
-    segments.checkConactsUnderSegment.click()
-    contact.waitforPageLoad()
-    contact.contactList.eq(0).click()
-    contact.getContactDetails.click()
-    contact.contactDetailsTab_DateField1Value.should('contain',updatedAbsoluteDate)
-    contact.contactDetailsTab_DateField2Value.should('contain',date2)
-    contact.contactDetailsTab_DateField3Value.should('contain',date3)
-    contact.contactDetailsTab_LastDateActive.should('contain',' ')
-  })
+    cy.visit("/s/segments?search=segment"); //Community specific
+    segments.getSegment.click()
+    cy.wait(1000); //Community specific
+    segments.waitforSegmentPageLoad();
+    segments.getContactInSegment.click();
+    cy.get('.mt-5 > :nth-child(1)').should('be.visible'); //Community specific
+    contact.getContactDetails.click();
+    cy.wait(1000); //Community specific
+    contact.contactDetailsTab_DateField1Value.should('contain',updatedAbsoluteDate);
+    contact.contactDetailsTab_DateField2Value.should('contain',date2);
+    contact.contactDetailsTab_DateField3Value.should('contain',date3);
+    contact.contactDetailsTab_LastDateActive.should('contain',' ');
+  });
 
   it("Add new campaign " + campaignMembershipWithUpdateContactRelativeDate, () => {
     cy.visit("s/campaigns");
@@ -234,22 +239,24 @@ context("Verify campaign membership with update contact action & updating dates 
     search.searchBox.clear();
     search.searchBox.type(campaignMembershipWithUpdateContactRelativeDate);
     search.selectCheckBoxForFirstItem.should('exist');
-    cy.wait(5000) // Added wait to get campaign build and apply actions on contacts
+    cy.exec('ddev exec bin/console m:c:r'); //Community specific
+    cy.exec('ddev exec bin/console m:c:t'); //Community specific
   });
 
   it("Verify that in "+ segmentMembershipWithCustomField +" segment contacts date field 2 and 3 got updated Only", () => {
-    cy.visit("s/segments");
+    cy.visit("/s/segments?search=segment"); //Community specific
     segments.waitForPageLoad();
-    cy.visit('/s/segments?search=segment')
-    segments.checkConactsUnderSegment.click()
-    contact.waitforPageLoad()
-    contact.contactList.eq(0).click()
-    contact.getContactDetails.click()
-    contact.contactDetailsTab_DateField1Value.should('contain',updatedAbsoluteDate)
-    contact.contactDetailsTab_DateField2Value.should('contain',formatDate(updatedRelativeDate.setDate(updatedRelativeDate.getDate() + 2)))
+    segments.getSegment.click()
+    cy.wait(1000); //Community specific
+    segments.getContactInSegment.click(); //Community specific
+    cy.get('.mt-5 > :nth-child(1)').should('be.visible'); //Community specific
+    contact.getContactDetails.click();
+    cy.wait(1000), //Community specific
+    contact.contactDetailsTab_DateField1Value.should('contain',updatedAbsoluteDate);
+    contact.contactDetailsTab_DateField2Value.should('contain',formatDate(updatedRelativeDate.setDate(updatedRelativeDate.getDate() + 2)));
     updatedRelativeDate = myCurrentDate;
-    contact.contactDetailsTab_DateField3Value.should('contain',formatDate(updatedRelativeDate.setDate(updatedRelativeDate.getDate() - 3)))
-    contact.contactDetailsTab_LastDateActive.should('contain',' ')
+    contact.contactDetailsTab_DateField3Value.should('contain',formatDate(updatedRelativeDate.setDate(updatedRelativeDate.getDate() - 3)));
+    contact.contactDetailsTab_LastDateActive.should('contain',' ');
   })
 
   it("Search and delete "+ campaignMembershipWithUpdateContactAbsoluteDate + " Campaign", () => {

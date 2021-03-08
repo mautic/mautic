@@ -141,15 +141,15 @@ class Contacts {
     }
 
     get contactDetailsTab_DateField1Value() {
-        return cy.get('#core>div>div>table>tbody>tr>td').eq(7)
+        return cy.get('#core>.pr-md>.panel>.table>tbody>:nth-child(3)>:nth-child(2)'); //Community specific
     }
 
     get contactDetailsTab_DateField2Value() {
-        return cy.get('#core>div>div>table>tbody>tr>td').eq(5)
+        return cy.get('#core>.pr-md>.panel>.table>tbody>:nth-child(2)>:nth-child(2)'); //Community specific
     }
 
     get contactDetailsTab_DateField3Value() {
-        return cy.get('#core>div>div>table>tbody>tr>td').eq(3)
+        return cy.get('#core>.pr-md>.panel>.table>tbody>:nth-child(1)>:nth-child(2)'); //Community specific
     }
 
     get contactDetailsTab_LastDateActive() {
@@ -157,8 +157,7 @@ class Contacts {
     }
 
     get getContactDetails() {
-        cy.get('div[class="hr-expand nm"]>span>a').should('be.visible');
-        return cy.get('div[class="hr-expand nm"]>span>a');
+        return cy.get('div.hr-expand.nm > span > a'); //Community specific
     }
 
     waitTillLinkPopupOpen(){

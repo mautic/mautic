@@ -5,6 +5,10 @@ class Segments {
         cy.get('h3.pull-left').should('contain', 'Contact Segments');
     }
 
+    waitforSegmentPageLoad(){
+        cy.get('h3.pull-left').should('contain', 'segment'); //Community specific
+    }
+
     waitTillSearchedElementGetsVisible(){
         return cy.get('#leadListTable>tbody>tr>td>div>a').should('be.visible');
     }
@@ -81,8 +85,12 @@ class Segments {
         return cy.get('#leadlist_filters_1_properties_filter');
     }
 
-    get checkContactsUnderSegment(){
-        return cy.get('a[href*="?search=segment"]');
+    get getSegment(){
+        return cy.get('tbody > :nth-child(1) > :nth-child(2) > div > a'); //Community specific
+    }
+
+    get getContactInSegment(){
+        return cy.get(':nth-child(1) > .panel > .box-layout > .col-xs-8 > .panel-body > .fw-sb > a > span'); //Community specific
     }
 
     get checkDetailContactsUnderSegment(){

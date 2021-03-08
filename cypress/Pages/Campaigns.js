@@ -30,11 +30,11 @@ class Campaigns {
     }
 
     get segmentSelector(){
-        return   cy.get('#campaign_leadsource_lists_chosen>div>ul>li').eq(0);
+        return   cy.get('#campaign_leadsource_lists_chosen>div>ul>li').eq(1); //Community specific
     }
 
     get segmentSelectorButton(){
-        return cy.get('.chosen-choices');
+        return cy.get('#campaign_leadsource_lists_chosen > ul > li > input'); //Community specific
     }
 
     get addSourceCamapignButton(){
