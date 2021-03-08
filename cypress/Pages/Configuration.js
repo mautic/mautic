@@ -1,6 +1,14 @@
 "use strict";
 class Configuration {
 
+    get openSettings() {
+        return  cy.get('.navbar-right > :nth-child(2) > a');
+    }
+
+    get goToConfig() {
+        return  cy.get('#mautic_config_index');
+    }
+
     get clickOnConfigurationSetings() {
         return   cy.get('a[href*="config/edit"]');
     }

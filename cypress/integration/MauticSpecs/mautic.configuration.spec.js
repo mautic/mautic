@@ -6,16 +6,18 @@ const configuration = require("../../Pages/Configuration");
 
 context("Verify that user is able to update the configuration settings", () => {
   it("Update Email Settings", () => {
-    cy.visit('s/config/edit');
+    configuration.openSettings.click(); //Community specific
+    configuration.goToConfig.click(); //Community specific
+    cy.wait(35000);
     configuration.waitforPageLoad();
-    configuration.clickOnEmailSettings.click({force: true})
-    configuration.waitforEmailSettingPageLoad()
-    configuration.selectFrquencyForEmail.clear().type('5')
-    configuration.clickFrequencyEach.click()
-    configuration.selectFrequencyForWeek.click()
-    configuration.saveAndCloseEmailSetting.click({force: true})
-    configuration.waitTillUserRedirectedToDashboard()
-    configuration.closeAlert.click()
+    configuration.clickOnEmailSettings.click({force: true});
+    configuration.waitforEmailSettingPageLoad();
+    configuration.selectFrequencyForEmail.clear().type('5');
+    configuration.clickFrequencyEach.click();
+    configuration.selectFrequencyForWeek.click();
+    configuration.saveAndCloseEmailSetting.click({force: true});
+    configuration.waitTillUserRedirectedToDashboard();
+    configuration.closeAlert.click();
   })
 
   });
