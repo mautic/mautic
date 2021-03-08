@@ -22,21 +22,20 @@ final class Version20210217115150 extends PreUpAssertionMigration
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(function (Schema $schema) {
-            return $schema->getTable($this->getPrefixedTableName(Campaign::TABLE_NAME))->hasColumn('deleted')
-                && $schema->getTable($this->getPrefixedTableName(Event::TABLE_NAME))->hasColumn('deleted');
-        }, 'Migration already executed');
+            return $schema->getTable($this->getPrefixedTableName(Campaign::TABLE_NAME))->hasColumn('deleted');
+        }, 'Deleted column already added in '.Campaign::TABLE_NAME);
+
+        $this->skipAssertion(function (Schema $schema) {
+            return $schema->getTable($this->getPrefixedTableName(Event::TABLE_NAME))->hasColumn('deleted');
+        }, 'Deleted column already added in '.Event::TABLE_NAME);
     }
 
     public function up(Schema $schema): void
     {
-        if (!$schema->getTable($this->getPrefixedTableName(Campaign::TABLE_NAME))->hasColumn('deleted')) {
-            $schema->getTable($this->getPrefixedTableName(Campaign::TABLE_NAME))
-                ->addColumn('deleted', Types::DATETIME_MUTABLE, ['notnull' => false]);
-        }
+        $schema->getTable($this->getPrefixedTableName(Campaign::TABLE_NAME))
+            ->addColumn('deleted', Types::DATETIME_MUTABLE, ['notnull' => false]);
 
-        if (!$schema->getTable($this->getPrefixedTableName(Event::TABLE_NAME))->hasColumn('deleted')) {
-            $schema->getTable($this->getPrefixedTableName(Event::TABLE_NAME))
-                ->addColumn('deleted', Types::DATETIME_MUTABLE, ['notnull' => false]);
-        }
+        $schema->getTable($this->getPrefixedTableName(Event::TABLE_NAME))
+            ->addColumn('deleted', Types::DATETIME_MUTABLE, ['notnull' => false]);
     }
 }
