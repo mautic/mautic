@@ -63,15 +63,18 @@ abstract class AbstractMauticTestCase extends WebTestCase
         'PHP_AUTH_PW'   => 'mautic',
     ];
 
+    /**
+     * @var array
+     */
+    protected $configParams = [
+        'api_enabled'                       => true,
+        'api_enable_basic_auth'             => true,
+        'create_custom_field_in_background' => false,
+    ];
+
     protected function setUp(): void
     {
-        $this->setUpSymfony(
-            [
-                'api_enabled'                       => true,
-                'api_enable_basic_auth'             => true,
-                'create_custom_field_in_background' => false,
-            ]
-        );
+        $this->setUpSymfony($this->configParams);
     }
 
     protected function setUpSymfony(array $defaultConfigOptions = []): void
