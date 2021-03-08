@@ -177,9 +177,7 @@ class CalculatorHelper
         $year = $matches[1];
         $week = $matches[2];
 
-        $date = date('Y-m-d 00:00:00', strtotime($year.'W'.$week.'1'));
-
-        return $date;
+        return date('Y-m-d 00:00:00', strtotime($year.'W'.$week.'1'));
     }
 
     /**

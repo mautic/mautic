@@ -202,7 +202,7 @@ class Calculator
         $statDAO = new StatDAO();
         $sum     = 0;
 
-        foreach ($this->statsDAO->getYears() as $thisYear => $stats) {
+        foreach ($this->statsDAO->getYears() as $stats) {
             $sum += $stats->getSum();
         }
 

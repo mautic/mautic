@@ -19,16 +19,10 @@ class WeekStat
     private $count = 0;
 
     /**
-     * @var string
-     */
-    private $week;
-
-    /**
      * @param string $week
      */
     public function __construct($week)
     {
-        $this->week = $week;
     }
 
     /**

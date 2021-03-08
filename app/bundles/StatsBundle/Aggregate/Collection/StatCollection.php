@@ -21,20 +21,9 @@ use Mautic\StatsBundle\Aggregate\Helper\CalculatorHelper;
 class StatCollection
 {
     /**
-     * @var string
-     */
-    private $statName;
-
-    /**
-     * @var int|null
-     */
-    private $itemId;
-
-    /**
      * @var StatsDAO
      */
     private $stats;
-
     /**
      * @var Calculator
      */
@@ -48,8 +37,6 @@ class StatCollection
      */
     public function __construct($statName, $itemId = null)
     {
-        $this->statName = $statName;
-        $this->itemId   = $itemId;
         $this->stats    = new StatsDAO();
     }
 
