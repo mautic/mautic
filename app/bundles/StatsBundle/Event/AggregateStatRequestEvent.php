@@ -53,7 +53,7 @@ class AggregateStatRequestEvent extends Event
         $this->fromDateTime   = $fromDateTime;
         $this->toDateTime     = $toDateTime;
         $this->options        = $eventOptions;
-        $this->statCollection = new StatCollection($statName);
+        $this->statCollection = new StatCollection();
     }
 
     /**

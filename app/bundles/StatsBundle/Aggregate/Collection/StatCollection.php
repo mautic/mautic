@@ -24,20 +24,15 @@ class StatCollection
      * @var StatsDAO
      */
     private $stats;
+
     /**
      * @var Calculator
      */
     private $calculator;
 
-    /**
-     * StatCollection constructor.
-     *
-     * @param string   $statName
-     * @param int|null $itemId
-     */
-    public function __construct($statName, $itemId = null)
+    public function __construct()
     {
-        $this->stats    = new StatsDAO();
+        $this->stats = new StatsDAO();
     }
 
     /**

@@ -19,13 +19,6 @@ class WeekStat
     private $count = 0;
 
     /**
-     * @param string $week
-     */
-    public function __construct($week)
-    {
-    }
-
-    /**
      * @return int
      */
     public function getCount()
@@ -42,7 +35,7 @@ class WeekStat
     }
 
     /**
-     * @param $count
+     * @param int $count
      */
     public function addToCount($count)
     {
