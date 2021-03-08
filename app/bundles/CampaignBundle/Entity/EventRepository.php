@@ -247,23 +247,23 @@ class EventRepository extends CommonRepository
             ->execute();
     }
 
-    public function deleteEvents(?array $eventIds = null, ?int $campaignId = null): void
+    public function deleteEventsByCampaignId(int $campaignId): void
     {
-        if (empty($eventIds) && empty($campaignId)) {
-            return;
-        }
-
         $qb = $this->getEntityManager()->createQueryBuilder();
-        $qb->delete(Event::class, 'e');
-        if (!empty($campaignId)) {
-            $qb->where($qb->expr()->eq('e.campaign', ':campaign_id'))
-            ->setParameter('campaign_id', $campaignId);
-        } else {
-            $qb->where($qb->expr()->in('e.id', ':event_ids'))
-                ->setParameter('event_ids', $eventIds, Connection::PARAM_INT_ARRAY);
-        }
+        $qb->delete(Event::class, 'e')
+            ->where($qb->expr()->eq('e.campaign', ':campaign_id'))
+            ->setParameter('campaign_id', $campaignId)
+            ->getQuery()
+            ->execute();
+    }
 
-        $qb->getQuery()
+    public function deleteEventsByEventsIds(array $eventIds): void
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->delete(Event::class, 'e')
+            ->where($qb->expr()->in('e.id', ':event_ids'))
+            ->setParameter('event_ids', $eventIds, Connection::PARAM_INT_ARRAY)
+            ->getQuery()
             ->execute();
     }
 

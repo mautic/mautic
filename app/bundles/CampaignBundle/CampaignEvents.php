@@ -58,6 +58,15 @@ final class CampaignEvents
     const CAMPAIGN_POST_DELETE = 'mautic.campaign_post_delete';
 
     /**
+     * The mautic.delete_records_on_campaign_delete event is dispatched when a campaign is deleted.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\DeleteCampaign instance.
+     *
+     * @var string
+     */
+    const DELETE_RECORDS_ON_CAMPAIGN_DELETE = 'mautic.delete_records_on_campaign_delete';
+
+    /**
      * The mautic.campaign_on_build event is dispatched before displaying the campaign builder form to allow adding of custom actions.
      *
      * The event listener receives a
@@ -107,13 +116,13 @@ final class CampaignEvents
     const ON_EVENT_EXECUTED = 'mautic.campaign_on_event_executed';
 
     /**
-     * The mautic.campaign_on_event_delete event is dispatched when a campaign event is deleted.
+     * The mautic.delete_records_on_event_delete event is dispatched when a campaign events are deleted.
      *
      * The event listener receives a Mautic\CampaignBundle\Event\DeleteEvent instance.
      *
      * @var string
      */
-    const ON_EVENT_DELETE = 'mautic.campaign_on_event_delete';
+    const DELETE_RECORDS_ON_EVENT_DELETE = 'mautic.delete_records_on_event_delete';
 
     /**
      * The mautic.campaign_on_event_executed_batch event is dispatched when a batch of campaign events are executed.

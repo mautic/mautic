@@ -599,25 +599,7 @@ SQL;
             ->execute();
     }
 
-    public function removeEventLogs(?array $eventIds = null, ?int $campaignId = null): void
-    {
-        if (empty($eventIds) && empty($campaignId)) {
-            return;
-        }
-
-        if (!empty($campaignId)) {
-            $this->removeEventLogByCampaignId($campaignId);
-        } else {
-            $this->removeEventLogByEventIds($eventIds);
-        }
-
-        $this->getEntityManager()->getRepository(Event::class)->deleteEvents($eventIds, $campaignId);
-        if ($campaignId) {
-            $this->getEntityManager()->getRepository(Campaign::class)->deleteCampaign($campaignId);
-        }
-    }
-
-    private function removeEventLogByCampaignId(int $campaignId): void
+    public function removeEventLogsByCampaignId(int $campaignId): void
     {
         $table_name    = $this->getTableName();
         $sql           = "DELETE FROM {$table_name} WHERE campaign_id = (?) LIMIT ".self::LOG_DELETE_BATCH_SIZE;
@@ -626,7 +608,7 @@ SQL;
         }
     }
 
-    private function removeEventLogByEventIds(array $eventIds): void
+    public function removeEventLogs(array $eventIds): void
     {
         $table_name    = $this->getTableName();
         $sql           = "DELETE FROM {$table_name} WHERE event_id IN (?) ORDER BY event_id ASC LIMIT ".self::LOG_DELETE_BATCH_SIZE;
