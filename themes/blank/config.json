@@ -6,5 +6,6 @@
     "page",
     "email",
     "form"
-  ]
+  ],
+  "builder": "grapesjsbuilder"
 }
