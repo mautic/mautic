@@ -74,6 +74,6 @@ class CampaignEventDeleteSubscriber implements EventSubscriberInterface
         }
         $eventIds   = $event->getEventIds();
         $this->leadEventLogRepository->removeEventLogs($eventIds);
-        $this->eventRepository->deleteEventsByEventsIds($eventIds);
+        $this->eventRepository->deleteEventsByEventIds($eventIds);
     }
 }

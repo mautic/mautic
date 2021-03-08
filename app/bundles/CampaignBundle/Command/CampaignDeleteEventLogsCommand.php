@@ -79,7 +79,7 @@ class CampaignDeleteEventLogsCommand extends Command
             $this->campaignRepository->deleteCampaign($campaignId);
         } elseif (!empty($eventIds)) {
             $this->leadEventLogRepository->removeEventLogs($eventIds);
-            $this->eventRepository->deleteEventsByEventsIds($eventIds);
+            $this->eventRepository->deleteEventsByEventIds($eventIds);
         }
 
         return ExitCode::SUCCESS;
