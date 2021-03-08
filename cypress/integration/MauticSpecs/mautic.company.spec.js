@@ -29,7 +29,8 @@ context("Verify that user is able to create and delete company", () => {
     leftNavigation.companySection.click();
     company.waitforPageLoad();
     cy.visit("/s/companies?search=" + companyName);
-    company.searchAndClickForFirstElement.contains(companyName).click();
+    company.clickCompanyEdit.click(); //Community specific
+    company.editCompany.click(); //Community specific
     company.companyCity.type("Pune");
     company.companyZipCode.type("412308");
     company.saveButton.click();
