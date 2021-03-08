@@ -40,7 +40,7 @@ class Forms {
     }
 
     get contactFieldDropdown() {
-        return cy.get('div[class="choice-wrapper"]>div>a[class="chosen-single chosen-default"]>span').eq(1);
+        return cy.get('#formfield_leadField_chosen > .chosen-single'); // Community Specific
     }
 
     get selectFromDropdown() {
@@ -48,11 +48,11 @@ class Forms {
     }
 
     get contactFieldSearchBox() {
-        return cy.get('div[class="chosen-container chosen-container-single chosen-with-drop chosen-container-active"]>div>div>input');
+        return cy.get('#formfield_leadField_chosen>div>div>input'); // Community Specific
     }
 
     get contactFieldSearchFirstResult(){
-        return cy.get('div[class="chosen-container chosen-container-single chosen-with-drop chosen-container-active"]>div>ul>li');
+        return cy.get('#formfield_leadField_chosen>div>ul>li.active-result.group-option.segment-filter.user'); // Community Specific
     }
 
     get addFieldButton(){
