@@ -127,7 +127,7 @@ return [
                 'arguments'   => [
                     'mautic.campaign.repository.lead_event_log',
                     'mautic.helper.campaign_config',
-                    'mautic.campaign.repository.campaign',
+                    'mautic.campaign.model.campaign',
                     'mautic.campaign.repository.event',
                 ],
             ],
@@ -604,7 +604,7 @@ return [
                 'class'     => \Mautic\CampaignBundle\Command\CampaignDeleteEventLogsCommand::class,
                 'arguments' => [
                     'mautic.campaign.repository.lead_event_log',
-                    'mautic.campaign.repository.campaign',
+                    'mautic.campaign.model.campaign',
                     'mautic.campaign.repository.event',
                 ],
                 'tag' => 'console.command',

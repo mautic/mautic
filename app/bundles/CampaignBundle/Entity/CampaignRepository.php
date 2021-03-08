@@ -62,16 +62,6 @@ class CampaignRepository extends CommonRepository
         );
     }
 
-    public function deleteCampaign(int $campaignId): void
-    {
-        $this->getEntityManager()->createQueryBuilder()
-            ->delete(Campaign::class, 'c')
-            ->where('c.id = :campaignId')
-            ->setParameter('campaignId', $campaignId)
-            ->getQuery()
-            ->execute();
-    }
-
     /**
      * Returns a list of all published (and active) campaigns (optionally for a specific lead).
      *

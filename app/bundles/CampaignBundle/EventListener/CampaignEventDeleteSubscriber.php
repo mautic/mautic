@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
-use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Event\DeleteCampaign;
 use Mautic\CampaignBundle\Event\DeleteEvent;
 use Mautic\CampaignBundle\Helper\CampaignConfig;
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignEventDeleteSubscriber implements EventSubscriberInterface
@@ -26,9 +26,9 @@ class CampaignEventDeleteSubscriber implements EventSubscriberInterface
     private $leadEventLogRepository;
 
     /**
-     * @var CampaignRepository
+     * @var CampaignModel
      */
-    private $campaignRepository;
+    private $campaignModel;
 
     /**
      * @var EventRepository
@@ -38,12 +38,12 @@ class CampaignEventDeleteSubscriber implements EventSubscriberInterface
     public function __construct(
         LeadEventLogRepository $leadEventLogRepository,
         CampaignConfig $campaignConfig,
-        CampaignRepository $campaignRepository,
+        CampaignModel $campaignModel,
         EventRepository $eventRepository
     ) {
         $this->campaignConfig             = $campaignConfig;
         $this->leadEventLogRepository     = $leadEventLogRepository;
-        $this->campaignRepository         = $campaignRepository;
+        $this->campaignModel              = $campaignModel;
         $this->eventRepository            = $eventRepository;
     }
 
@@ -64,7 +64,7 @@ class CampaignEventDeleteSubscriber implements EventSubscriberInterface
         $campaignId = $event->getCampaign()->getId();
         $this->leadEventLogRepository->removeEventLogsByCampaignId($campaignId);
         $this->eventRepository->deleteEventsByCampaignId($campaignId);
-        $this->campaignRepository->deleteCampaign($campaignId);
+        $this->campaignModel->deleteCampaign($event->getCampaign());
     }
 
     public function onEventDelete(DeleteEvent $event): void
