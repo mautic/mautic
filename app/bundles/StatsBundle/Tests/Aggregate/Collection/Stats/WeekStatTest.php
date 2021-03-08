@@ -12,8 +12,9 @@
 namespace Mautic\StatsBundle\Tests\Aggregate\Collection\Stats;
 
 use Mautic\StatsBundle\Aggregate\Collection\Stats\WeekStat;
+use PHPUnit\Framework\TestCase;
 
-class WeekStatTest extends \PHPUnit_Framework_TestCase
+class WeekStatTest extends TestCase
 {
     public function testAll()
     {

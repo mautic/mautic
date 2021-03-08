@@ -14,17 +14,18 @@ namespace Mautic\StatsBundle\Tests\Aggregate\Collection;
 use Mautic\StatsBundle\Aggregate\Collector;
 use Mautic\StatsBundle\Event\AggregateStatRequestEvent;
 use Mautic\StatsBundle\StatEvents;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class CollectorTest extends \PHPUnit_Framework_TestCase
+class CollectorTest extends TestCase
 {
     /**
      * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $eventDispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->eventDispatcher = new EventDispatcher();
     }

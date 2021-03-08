@@ -13,15 +13,16 @@ namespace Mautic\StatsBundle\Tests\Aggregate\Collection\Stats;
 
 use Mautic\StatsBundle\Aggregate\Collection\Stats\DayStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\MonthStat;
+use PHPUnit\Framework\TestCase;
 
-class MonthStatTest extends \PHPUnit_Framework_TestCase
+class MonthStatTest extends TestCase
 {
     private $month  = '2019-12';
     private $day    = 11;
     private $monthStat;
     private $dayStat;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->monthStat = new MonthStat($this->month);
         $this->dayStat   = $this->monthStat->getDay($this->day);

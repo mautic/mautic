@@ -15,8 +15,9 @@ use Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\DayStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\MonthStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\YearStat;
+use PHPUnit\Framework\TestCase;
 
-class StatsDAOTest extends \PHPUnit_Framework_TestCase
+class StatsDAOTest extends TestCase
 {
     public function testGetYearsReturnsYears()
     {

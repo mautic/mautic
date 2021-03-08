@@ -13,15 +13,16 @@ namespace Mautic\StatsBundle\Tests\Aggregate\Collection\Stats;
 
 use Mautic\StatsBundle\Aggregate\Collection\Stats\DayStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\HourStat;
+use PHPUnit\Framework\TestCase;
 
-class DayStatTest extends \PHPUnit_Framework_TestCase
+class DayStatTest extends TestCase
 {
     private $day  = '2019-11-07';
     private $hour = 11;
     private $dayStat;
     private $hourStat;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dayStat  = new DayStat($this->day);
         $this->hourStat = $this->dayStat->getHour($this->hour);
