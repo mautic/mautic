@@ -45,10 +45,7 @@ class AggregateStatRequestEvent extends Event
     /**
      * AggregateStatRequestEvent constructor.
      *
-     * @param string             $statName
-     * @param \DateTimeInterface $fromDateTime
-     * @param \DateTimeInterface $toDateTime
-     * @param FetchOptions       $eventOptions
+     * @param string $statName
      */
     public function __construct($statName, \DateTimeInterface $fromDateTime, \DateTimeInterface $toDateTime, FetchOptions $eventOptions)
     {
@@ -118,8 +115,6 @@ class AggregateStatRequestEvent extends Event
     }
 
     /**
-     * @param array $contexts
-     *
      * @return bool
      */
     public function checkContexts(array $contexts)
@@ -134,18 +129,16 @@ class AggregateStatRequestEvent extends Event
      */
     public function checkContextPrefix($prefix)
     {
-        return strpos($this->statName, $prefix) === 0;
+        return 0 === strpos($this->statName, $prefix);
     }
 
     /**
-     * @param array $prefixes
-     *
      * @return bool
      */
     public function checkContextPrefixes(array $prefixes)
     {
         foreach ($prefixes as $string) {
-            if (strpos($this->statName, $string) === 0) {
+            if (0 === strpos($this->statName, $string)) {
                 return true;
             }
         }

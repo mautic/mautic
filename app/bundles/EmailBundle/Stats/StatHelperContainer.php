@@ -18,9 +18,6 @@ class StatHelperContainer
 {
     private $helpers = [];
 
-    /**
-     * @param StatHelperInterface $helper
-     */
     public function addHelper(StatHelperInterface $helper)
     {
         $this->helpers[$helper->getName()] = $helper;

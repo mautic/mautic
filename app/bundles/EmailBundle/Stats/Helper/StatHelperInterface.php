@@ -21,18 +21,7 @@ interface StatHelperInterface
      */
     public function getName();
 
-    /**
-     * @param \DateTime        $fromDateTime
-     * @param \DateTime        $toDateTime
-     * @param EmailStatOptions $options
-     */
     public function fetchStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options);
 
-    /**
-     * @param \DateTime        $fromDateTime
-     * @param \DateTime        $toDateTime
-     * @param EmailStatOptions $options
-     * @param StatCollection   $statCollection
-     */
     public function generateStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options, StatCollection $statCollection);
 }

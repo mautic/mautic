@@ -44,7 +44,7 @@ class UnsubscribedHelper extends AbstractHelper
 
         $q->join('t', MAUTIC_TABLE_PREFIX.'email_stats', 'es', 't.channel_id = es.email_id AND t.channel = "email" AND t.lead_id = es.lead_id');
 
-        if ($options->canViewOthers() === true) {
+        if (true === $options->canViewOthers()) {
             $this->limitQueryToCreator($q, 'es.email_id');
         }
         $this->addCompanyFilter($q, $options->getCompanyId());

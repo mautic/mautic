@@ -29,8 +29,6 @@ class Collector
 
     /**
      * Collector constructor.
-     *
-     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(EventDispatcherInterface $eventDispatcher)
     {
@@ -38,10 +36,7 @@ class Collector
     }
 
     /**
-     * @param string            $statName
-     * @param \DateTime         $fromDateTime
-     * @param \DateTime         $toDateTime
-     * @param FetchOptions|null $fetchOptions
+     * @param string $statName
      *
      * @return StatCollection
      */

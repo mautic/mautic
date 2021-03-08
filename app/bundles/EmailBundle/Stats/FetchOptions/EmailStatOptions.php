@@ -51,8 +51,6 @@ class EmailStatOptions extends FetchOptions
     private $unit;
 
     /**
-     * @param array $ids
-     *
      * @return $this
      */
     public function setEmailIds(array $ids)
@@ -139,8 +137,6 @@ class EmailStatOptions extends FetchOptions
     }
 
     /**
-     * @param array $filters
-     *
      * @return $this
      */
     public function setFilters(array $filters)
