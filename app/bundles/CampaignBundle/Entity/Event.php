@@ -1086,7 +1086,7 @@ class Event implements ChannelInterface
         return $this;
     }
 
-    public function setDeleted(?\DateTime $deleted): Event
+    public function setDeleted(?\DateTimeInterface $deleted): Event
     {
         $this->isChanged('deleted', $deleted);
         $this->deleted = $deleted;
@@ -1094,7 +1094,7 @@ class Event implements ChannelInterface
         return $this;
     }
 
-    public function getDeleted(): ?\DateTime
+    public function getDeleted(): ?\DateTimeInterface
     {
         return $this->deleted;
     }

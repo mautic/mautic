@@ -50,13 +50,13 @@ class CampaignRepository extends CommonRepository
         $dateTime = (new \DateTime())->format('Y-m-d H:i:s');
 
         $this->getEntityManager()->getConnection()->update(
-            MAUTIC_TABLE_PREFIX.'campaign_events',
+            MAUTIC_TABLE_PREFIX.Event::TABLE_NAME,
             ['deleted'     => $dateTime],
             ['campaign_id' => $campaignId]
         );
 
         $this->getEntityManager()->getConnection()->update(
-            MAUTIC_TABLE_PREFIX.'campaigns',
+            MAUTIC_TABLE_PREFIX.Campaign::TABLE_NAME,
             ['deleted'   => $dateTime, 'is_published' => 0],
             ['id'        => $campaignId]
         );

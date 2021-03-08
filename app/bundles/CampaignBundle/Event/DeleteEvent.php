@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Event;
 
-class DeleteEvent extends \Symfony\Component\EventDispatcher\Event
+final class DeleteEvent extends \Symfony\Component\EventDispatcher\Event
 {
     /**
      * @var int[]|null
