@@ -828,7 +828,6 @@ return [
                     'mautic.helper.cache_storage',
                     'mautic.tracker.contact',
                     'mautic.lead.model.dnc',
-                    'mautic.generated.columns.provider',
                     'mautic.email.helper.stats_collection',
                     'mautic.security',
                 ],
