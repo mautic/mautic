@@ -125,8 +125,8 @@ if ($view['form']->errors(
                             <div class="drop-here">
                             <?php foreach ($formFields as $field): ?>
                             <?php if (!is_null($field['parent'])) {
-                                                        continue;
-                                                    }
+                                            continue;
+                                        }
                                 ?>
                                 <?php if (!in_array($field['id'], $deletedFields)) : ?>
                                     <?php if (!empty($field['isCustom'])):
