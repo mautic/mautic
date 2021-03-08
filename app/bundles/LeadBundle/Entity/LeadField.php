@@ -273,7 +273,6 @@ class LeadField extends FormEntity
                     'isShortVisible',
                     'isUniqueIdentifier',
                     'isPubliclyUpdatable',
-                    'charLengthLimit',
                     'properties',
                 ]
             )
