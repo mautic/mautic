@@ -49,6 +49,7 @@ if (!isset($inBuilder)) {
         </div>
 
         <?php if ((isset($field['showWhenValueExists']) && false === $field['showWhenValueExists']) || !empty($field['showAfterXSubmissions'])
+            || (isset($field['alwaysDisplay']) && true === $field['alwaysDisplay'])
             || !empty($field['leadField'])
             || !empty($field['conditions'])
         ): ?>
@@ -94,6 +95,12 @@ if (!isset($inBuilder)) {
             ?>
         </span>
             <?php endif; ?>
+            <?php if (isset($field['alwaysDisplay']) && $field['alwaysDisplay']): ?>
+                <i class="fa fa-eye" aria-hidden="true"></i>
+                <span class="inline-spacer">
+            <?php echo $view['translator']->trans('mautic.form.field.form.always_display'); ?>
+        </span>
+            <?php else: ?>
             <?php if (isset($field['showWhenValueExists']) && false === $field['showWhenValueExists']): ?>
                 <i class="fa fa-eye-slash" aria-hidden="true"></i>
                 <span class="inline-spacer">
@@ -109,6 +116,7 @@ if (!isset($inBuilder)) {
                 ['%count%' => (int) $field['showAfterXSubmissions']]
             ); ?>
         </span>
+                <?php endif; ?>
                 <?php endif; ?>
             </div>
         <?php endif; ?>
