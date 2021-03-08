@@ -16,7 +16,6 @@ namespace Mautic\EmailBundle\Tests\Model;
 use Doctrine\ORM\EntityManager;
 use Mautic\ChannelBundle\Entity\MessageRepository;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
-use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -175,14 +174,13 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     private $emailModel;
 
     /**
-     * @var MockObject|GeneratedColumnsProviderInterface
-     */
-    private $generatedColumnsProvider;
-
-    /**
      * @var MockObject|DoNotContact
      */
     private $doNotContact;
+
+    /**
+     * @var CorePermissions|MockObject
+     */
     private $corePermissions;
 
     /**
@@ -218,7 +216,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->cacheStorageHelperMock   = $this->createMock(CacheStorageHelper::class);
         $this->contactTracker           = $this->createMock(ContactTracker::class);
         $this->doNotContact             = $this->createMock(DoNotContact::class);
-        $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
         $this->statsCollectionHelper    = $this->createMock(StatsCollectionHelper::class);
         $this->corePermissions          = $this->createMock(CorePermissions::class);
 
@@ -238,7 +235,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->cacheStorageHelperMock,
             $this->contactTracker,
             $this->doNotContact,
-            $this->generatedColumnsProvider,
             $this->statsCollectionHelper,
             $this->corePermissions
         );
@@ -620,7 +616,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->cacheStorageHelperMock,
             $this->contactTracker,
             $this->doNotContact,
-            $this->generatedColumnsProvider,
             $this->statsCollectionHelper,
             $this->corePermissions
         );

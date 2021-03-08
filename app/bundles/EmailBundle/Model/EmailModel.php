@@ -148,6 +148,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     private $contactTracker;
 
     /**
+     * @var CorePermissions
+     */
+    private $corePermissions;
+
+    /**
      * @var DNC
      */
     private $doNotContact;
@@ -173,7 +178,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         CacheStorageHelper $cacheStorageHelper,
         ContactTracker $contactTracker,
         DNC $doNotContact,
-        GeneratedColumnsProviderInterface $generatedColumnsProvider,
         StatsCollectionHelper $statsCollectionHelper,
         CorePermissions $corePermissions
     ) {
@@ -192,7 +196,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->cacheStorageHelper       = $cacheStorageHelper;
         $this->contactTracker           = $contactTracker;
         $this->doNotContact             = $doNotContact;
-        $this->generatedColumnsProvider = $generatedColumnsProvider;
         $this->statsCollectionHelper    = $statsCollectionHelper;
         $this->corePermissions          = $corePermissions;
     }
