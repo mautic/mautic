@@ -21,6 +21,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class SubmissionFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     public function testRequiredConditionalFieldIfNotEmpty()
     {
         // Create the test form via API.
