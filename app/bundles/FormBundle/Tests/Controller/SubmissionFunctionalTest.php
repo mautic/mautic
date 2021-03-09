@@ -109,7 +109,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame('Victoria', $contact->getState());
 
         // The previous request changes user to anonymous. We have to configure API again.
-        $this->useCleanupRollback = false;
         $this->setUpSymfony(
             [
                 'api_enabled'           => true,
@@ -208,7 +207,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(null, $contact->getState());
 
         // The previous request changes user to anonymous. We have to configure API again.
-        $this->useCleanupRollback = false;
         $this->setUpSymfony(
             [
                 'api_enabled'           => true,
@@ -298,7 +296,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         Assert::assertCount(0, $submissions);
 
         // The previous request changes user to anonymous. We have to configure API again.
-        $this->useCleanupRollback = false;
         $this->setUpSymfony(
             [
                 'api_enabled'           => true,
