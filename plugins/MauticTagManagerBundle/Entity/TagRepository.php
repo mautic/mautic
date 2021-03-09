@@ -36,6 +36,20 @@ class TagRepository extends BaseTagRepository
         return 'lt';
     }
 
+    public function countOccurrences($tag)
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $q->select('lt.tag')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_tags', 'lt')
+            ->where('lt.tag = :tag')
+            ->setParameter('tag', $tag);
+
+        $result = $q->execute()->fetchAll();
+
+        return count($result);
+    }
+
     /**
      * Get a count of leads that belong to the tag.
      *
