@@ -66,7 +66,7 @@ final class PendingCountTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:getEmailCountStats', ['id' => $email->getId()]);
 
         Assert::assertSame(
-            '{"id":1,"pending":"1 Pending","queued":0,"sentCount":"0 Sent","readCount":"0 Read","readPercent":"0% Read"}',
+            '{"id":'.$email->getId().',"pending":"1 Pending","queued":0,"sentCount":"0 Sent","readCount":"0 Read","readPercent":"0% Read"}',
             $this->client->getResponse()->getContent()
         );
     }
