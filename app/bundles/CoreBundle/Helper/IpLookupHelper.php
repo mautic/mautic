@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -180,7 +178,7 @@ class IpLookupHelper
             $ipAddress->setDoNotTrackList($doNotTrack);
 
             if ($ipAddress->isTrackable() && $request) {
-                $userAgent = $request->headers->get('User-Agent');
+                $userAgent = $request->headers->get('User-Agent', '');
                 foreach ($this->doNotTrackBots as $bot) {
                     if (false !== strpos($userAgent, $bot)) {
                         $doNotTrack[] = $ip;
