@@ -24,7 +24,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class EmailSubscriber implements EventSubscriberInterface
 {
-    const PREHEADER_HTML_ELEMENT_BEFORE = '<span id="preheader-text" style="display:none !important; font-size:0px; line-height:0px; max-height:0px; max-width:0px; opacity:0; overflow:hidden; visibility:hidden; mso-hide:all;">';
+    const PREHEADER_HTML_ELEMENT_BEFORE = '    <span id="preheader-text" style="display:none !important; font-size:0px; line-height:0px; max-height:0px; max-width:0px; opacity:0; overflow:hidden; visibility:hidden; mso-hide:all;">';
     const PREHEADER_HTML_ELEMENT_AFTER  = '</span>';
     const PREHEADER_HTML_SEARCH_PATTERN = '#(<span id="preheader-text"[^\>]*>[^<]+</span>)#i';
 
@@ -73,10 +73,8 @@ class EmailSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            EmailEvents::EMAIL_POST_SAVE      => [
-                ['onEmailPostSave', 0],
-                ['onEmailPostSavePreheaderText', 0],
-            ],
+            EmailEvents::EMAIL_POST_SAVE      => ['onEmailPostSave', 0],
+            EmailEvents::EMAIL_ON_SEND        => ['onEmailSendAddPreheaderText', 0],
             EmailEvents::EMAIL_POST_DELETE    => ['onEmailDelete', 0],
             EmailEvents::EMAIL_FAILED         => ['onEmailFailed', 0],
             EmailEvents::EMAIL_RESEND         => ['onEmailResend', 0],
@@ -106,31 +104,19 @@ class EmailSubscriber implements EventSubscriberInterface
     /**
      * Add preheader text to email body.
      */
-    public function onEmailPostSavePreheaderText(Events\EmailEvent $event)
+    public function onEmailSendAddPreheaderText(Events\EmailSendEvent $event)
     {
         $email = $event->getEmail();
-        if ($details = $event->getChanges()) {
-            if (isset($details['preheaderText']) || isset($details['customHtml'])) {
-                $customHtml = $email->getCustomHtml();
-                if (null !== $email->getPreheaderText() && '' !== $email->getPreheaderText()) {
-                    $preheaderTextElement = self::PREHEADER_HTML_ELEMENT_BEFORE.$email->getPreheaderText().self::PREHEADER_HTML_ELEMENT_AFTER;
-                    if (preg_match(self::PREHEADER_HTML_SEARCH_PATTERN, $customHtml, $preheaderMatches)) {
-                        $customHtml = str_ireplace($preheaderMatches[0], $preheaderTextElement, $customHtml);
-                    } else {
-                        if (preg_match('/(<body[^\>]*>)/i', $customHtml, $contentMatches)) {
-                            $customHtml = str_ireplace($contentMatches[0], $contentMatches[0]."\n".$preheaderTextElement, $customHtml);
-                        }
-                    }
-                    $email->setCustomHtml($customHtml);
-                    $this->emailModel->saveEntity($email);
-                } else {
-                    if (preg_match(self::PREHEADER_HTML_SEARCH_PATTERN, $customHtml, $contentMatches)) {
-                        $customHtml = str_ireplace($contentMatches[0], '', $customHtml);
-                        $email->setCustomHtml($customHtml);
-                        $this->emailModel->saveEntity($email);
-                    }
+
+        $html = $event->getContent();
+        if (null !== $email->getPreheaderText() && '' !== $email->getPreheaderText()) {
+            $preheaderTextElement = self::PREHEADER_HTML_ELEMENT_BEFORE.$email->getPreheaderText().self::PREHEADER_HTML_ELEMENT_AFTER;
+            if (!preg_match(self::PREHEADER_HTML_SEARCH_PATTERN, $html, $preheaderMatches)) {
+                if (preg_match('/(<body[^\>]*>)/i', $html, $contentMatches)) {
+                    $html = str_ireplace($contentMatches[0], $contentMatches[0]."\n".$preheaderTextElement, $html);
                 }
             }
+            $event->setContent($html);
         }
     }
 

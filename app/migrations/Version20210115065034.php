@@ -31,6 +31,6 @@ final class Version20210115065034 extends AbstractMauticMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE {$this->prefix}emails ADD `preheader_text` LONGTEXT NULL AFTER `subject`");
+        $this->addSql("ALTER TABLE {$this->prefix}emails ADD `preheader_text` VARCHAR(100) NULL AFTER `subject`");
     }
 }
