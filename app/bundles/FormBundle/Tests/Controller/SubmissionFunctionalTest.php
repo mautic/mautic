@@ -76,7 +76,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         ];
         $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", $patchPayload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
 
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
@@ -116,7 +115,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
                 'api_enable_basic_auth' => true,
             ]
         );
-
         // Cleanup:
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
         $clientResponse = $this->client->getResponse();
@@ -178,7 +176,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         ];
         $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", $patchPayload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
 
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
@@ -195,7 +192,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // Ensure the submission was created properly.
         $submissions = $this->em->getRepository(Submission::class)->findAll();
-
         Assert::assertCount(1, $submissions);
 
         /** @var Submission $submission */
@@ -279,7 +275,6 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         ];
         $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", $patchPayload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
 
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
