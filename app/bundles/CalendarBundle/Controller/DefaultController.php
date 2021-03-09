@@ -147,7 +147,7 @@ class DefaultController extends FormController
         return $this->delegateView([
             'viewParameters' => [
                 'form'   => $this->setFormTheme($form, $event->getContentTemplate()),
-                'tokens' => $builderComponents[$source.'Tokens'],
+                'tokens' => $builderComponents['tokens'],
                 'entity' => $entity,
                 'model'  => $model,
             ],

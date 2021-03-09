@@ -272,6 +272,7 @@ class PageModel extends FormModel
 
         if (!empty($options['formName'])) {
             $formClass = $options['formName'];
+            unset($options['formName']);
         }
 
         if (!empty($action)) {

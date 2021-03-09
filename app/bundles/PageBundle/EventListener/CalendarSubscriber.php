@@ -17,6 +17,7 @@ use Mautic\CalendarBundle\Event\CalendarGeneratorEvent;
 use Mautic\CalendarBundle\Event\EventGeneratorEvent;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\PageBundle\Form\Type\PagePublishDatesType;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -153,7 +154,7 @@ class CalendarSubscriber implements EventSubscriberInterface
         $event->setModel($this->pageModel);
         $event->setEntity($entity);
         $event->setContentTemplate('MauticPageBundle:SubscribedEvents\Calendar:modal.html.php');
-        $event->setFormName('page_publish_dates');
+        $event->setFormName(PagePublishDatesType::class);
         $event->setAccess($this->security->hasEntityAccess(
             'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()));
     }
