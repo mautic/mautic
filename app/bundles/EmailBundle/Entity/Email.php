@@ -772,9 +772,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
     public function getPreheaderText(): ?string
     {
         return $this->preheaderText;
