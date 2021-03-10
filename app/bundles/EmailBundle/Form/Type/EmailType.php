@@ -543,13 +543,7 @@ class EmailType extends AbstractType
                     'constraints' => [
                         new Assert\Length(
                             [
-                                'min'        => 85,
-                                'minMessage' => 'mautic.email.preheader_text.length',
-                            ]
-                        ),
-                        new Assert\Length(
-                            [
-                                'max'        => 100,
+                                'max'        => 150,
                                 'maxMessage' => 'mautic.email.preheader_text.length',
                             ]
                         ),
