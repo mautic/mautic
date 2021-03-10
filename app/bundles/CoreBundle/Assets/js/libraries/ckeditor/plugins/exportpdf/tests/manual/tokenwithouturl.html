@@ -1,0 +1,19 @@
+<div id="editor">
+	<p>Foo bar</p>
+</div>
+
+<div id="tokenValue" style="word-break:break-all;border:1px solid red;"></div>
+
+<script>
+	exportPdfUtils.initManualTest();
+
+	var editor = CKEDITOR.replace( 'editor', exportPdfUtils.getDefaultConfig( 'manual', {
+		exportPdf_tokenUrl: ''
+	} ) );
+
+	editor.on( 'exportPdf', function( evt ) {
+		var value = CKEDITOR.document.findOne( '#tokenValue' );
+
+		value.setHtml( evt.data.token );
+	}, null, null, 17 );
+</script>

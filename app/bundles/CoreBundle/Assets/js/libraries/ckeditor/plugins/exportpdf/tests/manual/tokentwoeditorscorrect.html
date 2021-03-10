@@ -1,0 +1,38 @@
+<h3>Editor 1</h3>
+<div id="editor1">
+	<p>Foo bar</p>
+</div>
+<div id="tokenValue1" style="word-break:break-all;border:1px solid red;"></div>
+
+<h3>Editor 2</h3>
+<div id="editor2">
+	<p>Foo bar</p>
+</div>
+<div id="tokenValue2" style="word-break:break-all;border:1px solid red;"></div>
+
+<script>
+	exportPdfUtils.initManualTest();
+
+	var editor1 = CKEDITOR.replace( 'editor1', exportPdfUtils.getDefaultConfig( 'manual', { height: 100 } ) ),
+		editor2 = CKEDITOR.replace( 'editor2', exportPdfUtils.getDefaultConfig( 'manual', { height: 100 } ) );
+
+	editor1.on( 'instanceReady', function() {
+		if ( !CKEDITOR.config.exportPdf_tokenUrl ) {
+			bender.ignore();
+		}
+	} );
+
+	editor1.on( 'exportPdf', function( evt ) {
+		var value = CKEDITOR.document.findOne( '#tokenValue1' );
+
+		value.setHtml( evt.data.token );
+		evt.cancel();
+	}, null, null, 17 );
+
+	editor2.on( 'exportPdf', function( evt ) {
+		var value = CKEDITOR.document.findOne( '#tokenValue2' );
+
+		value.setHtml( evt.data.token );
+		evt.cancel();
+	}, null, null, 17 );
+</script>

@@ -1,0 +1,21 @@
+<div id="editor1">
+	<p>Hello world!</p>
+</div>
+
+<div id="editor2">
+	<p>Hello world!</p>
+</div>
+
+<script>
+	exportPdfUtils.initManualTest();
+
+	CKEDITOR.replace( 'editor1', exportPdfUtils.getDefaultConfig( 'manual', {
+		extraPlugins: 'exportpdf',
+		exportPdf_service: 'https://cksource.com'
+	} ) );
+
+	CKEDITOR.replace( 'editor2', exportPdfUtils.getDefaultConfig( 'manual', {
+		removePlugins: 'notification',
+		exportPdf_service: 'https://cksource.com'
+	} ) );
+</script>

@@ -1,0 +1,45 @@
+<div id="editor1">
+	<p>Export to PDF test 1.</p>
+</div>
+
+<div id="editor2">
+	<p>Export to PDF test 2.</p>
+</div>
+
+<script>
+	exportPdfUtils.initManualTest();
+
+	var editor1 = CKEDITOR.replace( 'editor1', exportPdfUtils.getDefaultConfig( 'manual' ) );
+
+	editor1.on( 'exportPdf', function( evt ) {
+		if ( !evt.data.asyncDone ) {
+			setTimeout( function() {
+				evt.data.html = '<p>Content filtered!</p>';
+				evt.data.asyncDone = true;
+
+				editor1.fire( 'exportPdf', evt.data );
+			}, 2000 );
+
+			evt.cancel();
+		} else {
+			delete evt.data.asyncDone;
+		}
+	}, null, null, 1 );
+
+	var editor2 = CKEDITOR.replace( 'editor2', exportPdfUtils.getDefaultConfig( 'manual' ) );
+
+	editor2.on( 'exportPdf', function( evt ) {
+		if ( !evt.data.asyncDone ) {
+			setTimeout( function() {
+				evt.data.html = '<p>Content filtered!</p>';
+				evt.data.asyncDone = true;
+
+				editor2.fire( 'exportPdf', evt.data );
+			}, 2000 );
+
+			evt.cancel();
+		} else {
+			delete evt.data.asyncDone;
+		}
+	}, null, null, 17 );
+</script>

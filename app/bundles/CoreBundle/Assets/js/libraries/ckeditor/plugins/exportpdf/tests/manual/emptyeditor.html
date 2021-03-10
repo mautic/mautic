@@ -1,0 +1,18 @@
+<div id="editor1">
+</div>
+
+<div id="editor2">
+	<p>My content and wrapper will be deleted.</p>
+</div>
+
+<script>
+	exportPdfUtils.initManualTest();
+
+	CKEDITOR.replace( 'editor1', exportPdfUtils.getDefaultConfig( 'manual' ) );
+
+	var editor2 = CKEDITOR.replace( 'editor2', exportPdfUtils.getDefaultConfig( 'manual' ) );
+
+	editor2.on( 'exportPdf', function( evt ) {
+		evt.data.html = '';
+	}, null, null, 16 );
+</script>

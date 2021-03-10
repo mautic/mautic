@@ -1,0 +1,148 @@
+<div id="editor">
+	<h1 style="text-align:center"><img alt="Bilancino Hotel logo" src="https://ckeditor.com/docs/ckeditor4/latest/examples/assets/image/bilancino-logo.png" style="float:right;height:75px;width:75px;" /><span style="font-family:Georgia,serif">The Flavorful Tuscany Meetup</span></h1>
+
+	<h2 style="text-align:center"><span style="font-family:Georgia,serif"><span style="color:#2980b9">Welcome letter</span></span></h2>
+
+	<p>Dear Guest,</p>
+
+	<p>We are delighted to welcome you to the annual <em>Flavorful Tuscany Meetup</em> and hope you will enjoy the programme as well as your stay at the <a href="https://ckeditor.com">Bilancino Hotel</a>.</p>
+
+	<p>Please find attached the full schedule of the event.</p>
+
+	<blockquote>
+	<p>The annual Flavorful Tuscany meetups are always a culinary discovery. You get the best of Tuscan flavors during an intense one-day stay at one of the top hotels of the region. All the sessions are lead by top chefs passionate about their profession. I would certainly recommend to save the date in your calendar for this one!</p>
+
+	<p>Angelina Calvino, food journalist</p>
+	</blockquote>
+
+	<p>Please arrive at the <a href="https://ckeditor.com">Bilancino Hotel</a> reception desk at least <strong>half an hour earlier</strong> to make sure that the registration process goes as smoothly as possible.</p>
+
+	<p>We look forward to welcoming you to the event.</p>
+
+	<p><img alt="Victoria Valc signature" src="https://ckeditor.com/docs/ckeditor4/latest/examples/assets/image/signature.png" style="height:101px;width:180px" /></p>
+
+	<p><span style="font-size:16px"><strong>Victoria Valc</strong></span></p>
+
+	<p><strong>Event Manager<br />
+	Bilancino Hotel</strong></p>
+
+	<p>&nbsp;</p>
+
+	<div style="page-break-after: always"><span style="display:none">&nbsp;</span></div>
+
+	<p>&nbsp;</p>
+
+	<h2 style="text-align:center"><span style="font-family:Georgia,serif"><span style="color:#2980b9">The Flavorful Tuscany Meetup Schedule</span></span></h2>
+
+	<table border="1" cellspacing="0" style="border-collapse:collapse; width:597px">
+		<thead>
+			<tr>
+				<th colspan="2" style="background-color:#999999"><span style="color:#ffffff">Saturday, July 14</span></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td style="background-color:#e6e6e6; text-align:center">9:30 AM - 11:30 AM</td>
+				<td>
+				<p><strong>Americano vs. Brewed - &ldquo;know your coffee&rdquo;</strong> with:&nbsp;</p>
+
+				<ul>
+					<li>Giulia Bianchi</li>
+					<li>Stefano Garau</li>
+					<li>Giuseppe Russo</li>
+				</ul>
+				</td>
+			</tr>
+			<tr>
+				<td style="background-color:#e6e6e6; text-align:center">1:00 PM - 3:00 PM</td>
+				<td>
+				<p><strong>Pappardelle al pomodoro</strong> - live cooking&nbsp;<sup>1</sup></p>
+
+				<p>Incorporate the freshest ingredients&nbsp;<br />
+				with Rita Fresco</p>
+				</td>
+			</tr>
+			<tr>
+				<td style="background-color:#e6e6e6; text-align:center">5:00 PM - 8:00 PM</td>
+				<td>
+				<p><strong>Tuscan vineyards at a glance</strong> - wine-tasting&nbsp;<br />
+				with Frederico Riscoli</p>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<p>&nbsp;</p>
+
+	<p><sup>1</sup>&nbsp;<em><span style="background-color:#98e64c">Registration for the live cooking session is required as seats are limited.</span></em></p>
+
+	<p>&nbsp;</p>
+
+	<hr>
+
+	<h2 style="text-align: center;"><span style="color:#2980b9"><span style="font-family:Georgia,serif">Driving directions from the airport</span></span></h2>
+
+	<ol>
+		<li>Head southeast on R138&nbsp;toward Nassau St.</li>
+		<li>Follow R138 and R148 to Bridgefoot St/R804.
+		<ol>
+			<li>Use the left 2 lanes to turn slightly left onto Lincoln Pl/R138.</li>
+			<li>Turn left onto Westland Row/R118/R138.</li>
+			<li>Use any lane to turn left onto Pearse St/R118/R138/R802.</li>
+			<li>Continue to follow R138/R802.</li>
+		</ol>
+		</li>
+		<li>Turn left onto Burgh Quay/George&#39;s Quay/R105/R138.</li>
+		<li>Continue onto Aston Quay/R148.
+		<ul>
+			<li>Continue to follow R148.</li>
+		</ul>
+		</li>
+		<li>Turn left onto Bridgefoot St/R804.
+		<ul>
+			<li>Continue to follow R804.</li>
+		</ul>
+		</li>
+		<li>After approximately 2 minutes, Bilancino Hotel will be on your left.</li>
+	</ol>
+
+	<p>&nbsp;</p>
+</div>
+
+<div id="preview">
+	<style>
+		#preview iframe {
+			width: 840px;
+			height: 500px;
+		}
+	</style>
+
+	<h2>Document preview (based on send HTML and CSS)</h2>
+</div>
+
+<script>
+	exportPdfUtils.initManualTest();
+
+	var editor = CKEDITOR.replace( 'editor', exportPdfUtils.getDefaultConfig( 'manual', {
+		width: 840,
+		height: 400
+	} ) );
+
+	editor.on( 'exportPdf', function( evt ) {
+		var oldIframe = document.querySelector( '#preview iframe' ),
+			html;
+
+		if ( oldIframe && oldIframe.parentNode ) {
+			oldIframe.parentNode.removeChild( oldIframe );
+		}
+
+		// Align iframe HTML with the one on the endpoint side by adding explicit encoding and DOCTYPE.
+		html = '<!DOCTYPE html><html><head><style>' + evt.data.css + '</style><meta charset="UTF-8"></head><body>' + evt.data.html + '</body></html>';
+
+		var iframe = document.createElement( 'iframe' );
+		document.querySelector( '#preview' ).appendChild( iframe );
+		iframe.contentWindow.document.open();
+		iframe.contentWindow.document.write( html );
+		iframe.contentWindow.document.close();
+	}, null, null, 16 );
+</script>

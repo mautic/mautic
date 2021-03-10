@@ -1,5 +1,3 @@
-const ckEditors = new Map();
-
 /**
  * Takes a given route, retrieves the HTML, and then updates the content
  *
@@ -589,13 +587,12 @@ Mautic.onPageLoad = function (container, response, inModal) {
     Mautic.activateGlobalFroalaOptions();
     if (mQuery(container + ' textarea.editor').length) {
         mQuery(container + ' textarea.editor').each(function () {
-            var textarea = mQuery(this);
-
-            var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'InsertDropDown', 'removeFormat', 'link', 'ckfinder', 'imageUpload', 'mediaEmbed', 'insertTable'];
-            var minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
+            const textarea = mQuery(this);
+            const maxButtons = [[ 'Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'InsertToken', 'Sourcedialog', 'Maximize']]
+            let minButtons = [['Undo', 'Redo', '|', 'Bold', 'Italic', 'Underline']];
 
             if (textarea.hasClass('editor-dynamic-content') || textarea.hasClass('editor-basic')) {
-                minButtons = ['undo', 'redo', '|',  'bold', 'italic', 'underline', 'heading', 'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor', 'alignment', 'numberedList', 'bulletedList', 'blockQuote', 'removeFormat', 'link', 'ckfinder', 'imageUpload', 'mediaEmbed', 'insertTable'];
+                minButtons = [['Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'Sourcedialog', 'Maximize']];
             }
 
             let ckEditorToolbar = minButtons;
@@ -787,11 +784,9 @@ Mautic.onPageUnload = function (container, response) {
             MauticVars.modalsReset = {};
         }
 
-        if (ckEditors.size > 0) {
-            ckEditors.forEach(function(value, key, map){
-                map.get(key).destroy()
-            })
-            ckEditors.clear();
+        for(name in CKEDITOR.instances)
+        {
+            CKEDITOR.instances[name].destroy(true);
         }
 
         //turn off shuffle events

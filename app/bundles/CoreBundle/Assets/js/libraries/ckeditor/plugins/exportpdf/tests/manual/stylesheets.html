@@ -1,0 +1,36 @@
+<h2>Classic Editor</h2>
+<textarea id="editor1">
+	<span class="badge badge-success">Classic Editor</span>
+</textarea>
+
+<h2>Divarea Editor</h2>
+<div id="editor2">
+	<span class="badge badge-success">Divarea Editor</span>
+</div>
+
+<h2>Inline Editor</h2>
+<div id="editor3" contenteditable="true">
+	<span class="badge badge-success">Inline Editor</span>
+</div>
+
+<script>
+	exportPdfUtils.initManualTest();
+
+	CKEDITOR.replace( 'editor1', exportPdfUtils.getDefaultConfig( 'manual', {
+		exportPdf_stylesheets: [ 'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css' ],
+		extraPlugins: 'wysiwygarea,exportpdf',
+		allowedContent: true
+	} ) );
+
+	CKEDITOR.replace( 'editor2', exportPdfUtils.getDefaultConfig( 'manual', {
+		exportPdf_stylesheets: [ 'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css' ],
+		extraPlugins: 'divarea,exportpdf',
+		allowedContent: true
+	} ) );
+
+	CKEDITOR.inline( 'editor3', exportPdfUtils.getDefaultConfig( 'manual', {
+		exportPdf_stylesheets: [ 'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css' ],
+		extraPlugins: 'floatingspace,exportpdf',
+		allowedContent: true
+	} ) );
+</script>

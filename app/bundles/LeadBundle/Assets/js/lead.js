@@ -1220,7 +1220,9 @@ Mautic.getLeadEmailContent = function (el) {
         }
         var idPrefix = id.replace('templates', '');
         var bodyEl = (mQuery('#'+idPrefix+'message').length) ? '#'+idPrefix+'message' : '#'+idPrefix+'body';
-        ckEditors.get( mQuery(bodyEl)[0] ).setData(response.body);
+
+        mQuery(bodyEl).ckeditorGet().setData(response.body);
+
         mQuery(bodyEl).val(response.body);
         mQuery('#'+idPrefix+'subject').val(response.subject);
 
