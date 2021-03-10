@@ -777,11 +777,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->preheaderText;
     }
 
-    /**
-     * @param $preheaderText
-     *
-     * @return $this
-     */
     public function setPreheaderText(?string $preheaderText): Email
     {
         $this->isChanged('preheaderText', $preheaderText);
