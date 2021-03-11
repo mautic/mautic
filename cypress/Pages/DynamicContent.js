@@ -22,19 +22,16 @@ class DynamicContent {
     }
 
     get clickOnFirstSearchedElement(){
-        return cy.get('#dwcTable>tbody>tr>td>a').should('be.visible');
+        return cy.get('#dwcTable>tbody>tr>td:nth-child(2)>a');
+        return cy.wait(2000);
     }
 
     waitTillSearchedElementGetsVisible(){
         return cy.get('#dwcTable>tbody>tr>td>a');
     }
 
-    get editSelectedContent(){
-        return cy.get('a[href*="dwc/edit"]');
-    }
-
     get typeContent(){
-        return cy.get('div[role="textbox"]');
+        return cy.get('.fr-element'); // Community Specific
     }
 
 }

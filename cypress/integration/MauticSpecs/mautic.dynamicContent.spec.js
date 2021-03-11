@@ -25,9 +25,8 @@ context("Verify that user is able to create and edit dynamic content", () => {
   it("Edit newly added dynamic content", () => {
     dynamicContent.waitforPageLoad();
     cy.visit('/s/dwc?search='+ dynamicContentText);
-    dynamicContent.clickOnFirstSearchedElement.contains(dynamicContentText).click();
-    dynamicContent.waitTillDynamicContentCreationFlag();
-    dynamicContent.editSelectedContent.click();
+    dynamicContent.clickOnFirstSearchedElement.click();
+    cy.wait(2000);
     dynamicContent.typeContent.clear();
     dynamicContent.typeContent.type("Test Demo Content");
     search.saveAndCloseButton.click();
