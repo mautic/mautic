@@ -24,8 +24,9 @@ var testContact = "testcontact";
 import "./commands";
 
 Cypress.Cookies.defaults({
-  preserve: [Cypress.env("instanceId"),'_ga','_gid','_gat','mautic_referer_id','mtc_id','mtc_sid','mautic_device_id','device_id','sid','id','success','__Secure-3PAPISID','SAPISID','APISID','__Secure-3PSID','SID','SSID','HSID','NID','1P_JAR','ANID','SIDCC','OTZ'],
-}); // Required to persist cookies
+  // Preserve all cookies, since Mautic's auth cookie has a different, unique name every time.
+  preserve: /.*/
+});
 
 
  before("Perform login", () => {
