@@ -63,14 +63,22 @@ context("Verify that user is able to create trigger and verify that user has rec
   it("Edit previously added contact to point 50 to test the trigger", () => {
     cy.visit('s/contacts');
     contact.waitforPageLoad();
+    contact.addNewButton.click({ force: true });
+    contact.title.type("Mr");
+    contact.firstName.type(testContact);
+    contact.lastName.type("Data");
+    contact.leadEmail.type(testContact +"@mailtest.mautic.com");
+    contact.SaveButton.click();
+    points.waitForContactUpdate();
+    contact.closeButton.click(); // Community Specific
     cy.visit("/s/contacts?search=" + testContact);
     contact.searchAndClickForFirstElement.contains(testContact).click();
     contact.editContact.click();
     contact.waitForContactEditPageOpen();
     contact.updateContactPoints.clear().type("50");
     contact.SaveButton.click();
+    points.waitForContactCreation(); // Community Specific
     contact.closeButton.click({ force: true });
-    contact.waitForContactCreation();
     cy.wait(5000);
   });
 
