@@ -35,8 +35,8 @@ context("Verify that user is able to create and edit email", () => {
     emails.emailSubject.clear();
     emails.emailSubject.type('TestEmail');
     emails.saveEmailButton.click();
-    emails.closeButton.click({force: true});
     emails.waitforEmailCreation();
+    emails.closeButton.click({force: true});
   });
 
   it("Search and delete newly added email", () => {
