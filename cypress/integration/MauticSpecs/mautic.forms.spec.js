@@ -26,6 +26,7 @@ context("Verify that user is able to create and edit forms", () => {
     form.fieldTypeDropDown.click();
     form.fieldTypeSearch.type('Text');
     form.firstResultOfFieldTypeSearch.click();
+    cy.wait(1000); // Community Specific
     form.fieldLabel.type("Title");
     form.contactFieldTab.click({force: true});
     form.contactFieldDropdown.click();
