@@ -37,7 +37,7 @@ class Search {
     }
 
     get selectParentsOptionsDropdown() {
-        return cy.get('div[class="input-group input-group-sm"]>div');
+        return cy.get('thead > tr > th.col-actions > div > div'); // Community specific
     }
 
     get deleteButtonForFirstItem() {
