@@ -1,5 +1,11 @@
 "use strict";
 class Points {
+    waitForContactCreation(){
+        cy.get('.mt-5 > :nth-child(1)').should('contain', 'testcontact'); // Community Specific
+    }
+    waitForContactUpdate(){
+        cy.get('.mt-5 > :nth-child(1)').should('contain', 'testcontact'); // Community Specific
+    }
 
     waitforActionPageLoad (){
         cy.get('h3.pull-left').should('contain', 'Points');
