@@ -30,7 +30,7 @@ class Campaigns {
     }
 
     get segmentSelector(){
-        return   cy.get('#campaign_leadsource_lists_chosen>div>ul>li').eq(1); //Community specific
+        return   cy.get('#campaign_leadsource_lists_chosen>div>ul>li').eq(0); //Community specific
     }
 
     get segmentSelectorButton(){

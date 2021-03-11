@@ -20,6 +20,7 @@ var date3 = "2021-03-04"
 var segmentMembershipWithCustomField = " segment with date field"
 var campaignMembershipWithUpdateContactAbsoluteDate = "campaignMembershipWithUpdateContactAbsoluteDate"
 var campaignMembershipWithUpdateContactRelativeDate = "campaignMembershipWithUpdateContactRelativeDate"
+var cronpath = Cypress.env('cron-path');
 
 var myCurrentDate=new Date();
 var updatedRelativeDate=new Date(myCurrentDate);
@@ -161,8 +162,9 @@ context("Verify campaign membership with update contact action & updating dates 
     segments.filterOperator.select('contains')
     segments.filterValue.type(contactFirstName, { force: true })
     segments.saveAndCloseButton.click()
-    segments.waitforSegmentCreation()
-    cy.exec('ddev exec bin/console m:s:r'); //Community specific
+    segments.waitforSegmentCreation();
+    cy.exec(cronpath + ' m:s:r'); //Community specific
+
   });
 
   it("Add new campaign " + campaignMembershipWithUpdateContactAbsoluteDate, () => {
@@ -191,8 +193,8 @@ context("Verify campaign membership with update contact action & updating dates 
     search.searchBox.clear();
     search.searchBox.type(campaignMembershipWithUpdateContactAbsoluteDate);
     search.selectCheckBoxForFirstItem.should('exist');
-    cy.exec('ddev exec bin/console m:c:r'); //Community specific
-    cy.exec('ddev exec bin/console m:c:t'); //Community specific
+    cy.exec(cronpath + ' m:c:r'); //Community specific
+    cy.exec(cronpath + ' m:c:t'); //Community specific
   });
 
   it("Verify that in "+ segmentMembershipWithCustomField +" segment contacts date field 1 got updated Only", () => {
@@ -239,8 +241,8 @@ context("Verify campaign membership with update contact action & updating dates 
     search.searchBox.clear();
     search.searchBox.type(campaignMembershipWithUpdateContactRelativeDate);
     search.selectCheckBoxForFirstItem.should('exist');
-    cy.exec('ddev exec bin/console m:c:r'); //Community specific
-    cy.exec('ddev exec bin/console m:c:t'); //Community specific
+    cy.exec(cronpath + ' m:c:r'); //Community specific
+    cy.exec(cronpath + ' m:c:t'); //Community specific
   });
 
   it("Verify that in "+ segmentMembershipWithCustomField +" segment contacts date field 2 and 3 got updated Only", () => {
