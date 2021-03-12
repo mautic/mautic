@@ -681,7 +681,7 @@ return [
                     'translator',
                     'monolog.logger.mautic',
                     'mautic.lead.model.dnc',
-                    'mautic.email.repository.email'
+                    'mautic.email.repository.email',
                 ],
             ],
             'mautic.message.processor.replier' => [
@@ -753,6 +753,7 @@ return [
                     'mautic.tracker.contact',
                     'mautic.lead.model.dnc',
                     'mautic.generated.columns.provider',
+                    'mautic.email.repository.email',
                 ],
             ],
             'mautic.email.model.send_email_to_user' => [

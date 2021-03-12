@@ -64,99 +64,42 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     use TranslationModelTrait;
     use BuilderModelTrait;
 
-    /**
-     * @var IpLookupHelper
-     */
     protected $ipLookupHelper;
 
-    /**
-     * @var ThemeHelper
-     */
     protected $themeHelper;
 
-    /**
-     * @var Mailbox
-     */
     protected $mailboxHelper;
 
-    /**
-     * @var MailHelper
-     */
     protected $mailHelper;
 
-    /**
-     * @var LeadModel
-     */
     protected $leadModel;
 
-    /**
-     * @var CompanyModel
-     */
     protected $companyModel;
 
-    /**
-     * @var TrackableModel
-     */
     protected $pageTrackableModel;
 
-    /**
-     * @var UserModel
-     */
     protected $userModel;
 
-    /**
-     * @var MessageQueueModel
-     */
     protected $messageQueueModel;
 
-    /**
-     * @var bool
-     */
     protected $updatingTranslationChildren = false;
 
-    /**
-     * @var array
-     */
     protected $emailSettings = [];
 
-    /**
-     * @var SendEmailToContact
-     */
     protected $sendModel;
 
-    /**
-     * @var DeviceTracker
-     */
     private $deviceTracker;
 
-    /**
-     * @var RedirectRepository
-     */
     private $redirectRepository;
 
-    /**
-     * @var CacheStorageHelper
-     */
     private $cacheStorageHelper;
 
-    /**
-     * @var ContactTracker
-     */
     private $contactTracker;
 
-    /**
-     * @var DNC
-     */
     private $doNotContact;
 
-    /**
-     * @var EmailRepository
-     */
     private $emailRepository;
 
-    /**
-     * @var GeneratedColumnsProviderInterface
-     */
     private $generatedColumnsProvider;
 
     public function __construct(
@@ -431,7 +374,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param $action
      * @param $event
-     * @param $entity
      * @param $isNew
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
