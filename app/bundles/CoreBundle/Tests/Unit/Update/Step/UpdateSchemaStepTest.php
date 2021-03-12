@@ -141,6 +141,10 @@ class UpdateSchemaStepTest extends AbstractStepTest
                 }
             );
 
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturn('');
+
         $this->step->execute($this->progressBar, $this->input, $this->output);
     }
 
@@ -159,6 +163,10 @@ class UpdateSchemaStepTest extends AbstractStepTest
                     }
                 }
             );
+
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturn('');
 
         try {
             $this->step->execute($this->progressBar, $this->input, $this->output);
