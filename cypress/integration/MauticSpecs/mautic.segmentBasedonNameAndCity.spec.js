@@ -7,8 +7,11 @@ const company = require("../../Pages/Company");
 const segments = require("../../Pages/Segments");
 const search = require("../../Pages/Search");
 
-var contactFirstName = "Segment_Test";
+var contactFirstName1 = "Sherlock"; // Community Specific
+var contactFirstName2 = "Poirot"; // Community Specific
 var companyName = "Acquia"
+var cronpath = Cypress.env('cron-path'); // Community Specific
+
 context("Verify segment membership based on Name ,City and Company", () => {
 
   it("Add new Company", () => {
@@ -25,9 +28,9 @@ context("Verify segment membership based on Name ,City and Company", () => {
     contact.waitforPageLoad();
     contact.addNewButton.click({ force: true });
     contact.title.type("Mr");
-    contact.firstName.type(contactFirstName);
+    contact.firstName.type(contactFirstName1); // Community Specific
     contact.lastName.type("contact1");
-    contact.leadEmail.type(contactFirstName + "contact1@mailtest.mautic.com");
+    contact.leadEmail.type(contactFirstName1 + "contact1@mailtest.mautic.com"); // Community Specific
     contact.leadCity.type("Bidar");
     contact.companySearch.type("Acquia");
     contact.companySelector.first().click();
@@ -41,9 +44,9 @@ context("Verify segment membership based on Name ,City and Company", () => {
     contact.waitforPageLoad();
     contact.addNewButton.click({ force: true });
     contact.title.type("Mr");
-    contact.firstName.type(contactFirstName);
+    contact.firstName.type(contactFirstName2); // Community Specific
     contact.lastName.type("contact2");
-    contact.leadEmail.type(contactFirstName + "contact2@mailtest.mautic.com");
+    contact.leadEmail.type(contactFirstName2 + "contact2@mailtest.mautic.com"); // Community Specific
     contact.leadCity.type("Bidar");
     contact.companySearch.type("Acquia");
     contact.companySelector.first().click();
@@ -57,9 +60,9 @@ context("Verify segment membership based on Name ,City and Company", () => {
     contact.waitforPageLoad();
     contact.addNewButton.click({ force: true });
     contact.title.type("Mr");
-    contact.firstName.type(contactFirstName);
+    contact.firstName.type(contactFirstName1); // Community Specific
     contact.lastName.type("contact3");
-    contact.leadEmail.type(contactFirstName + "contact3@mailtest.mautic.com");
+    contact.leadEmail.type(contactFirstName1 + "contact3@mailtest.mautic.com"); // Community Specific
     contact.leadCity.type("Bidar");
     contact.companySearch.type("Acquia");
     contact.companySelector.first().click();
@@ -73,10 +76,10 @@ context("Verify segment membership based on Name ,City and Company", () => {
     contact.waitforPageLoad();
     contact.addNewButton.click({ force: true });
     contact.title.type("Mr");
-    contact.firstName.type(contactFirstName);
+    contact.firstName.type(contactFirstName2); // Community Specific
     contact.lastName.type("contact4");
-    contact.leadEmail.type(contactFirstName + "contact4@mailtest.mautic.com");
-    contact.leadCity.type("Bidar");
+    contact.leadEmail.type(contactFirstName2 + "contact4@mailtest.mautic.com"); // Community Specific
+    contact.leadCity.type("Pune");
     contact.companySearch.type("Acquia");
     contact.companySelector.first().click();
     contact.SaveButton.click();
@@ -92,49 +95,41 @@ context("Verify segment membership based on Name ,City and Company", () => {
       segments.segmentName.type("segmentBasedOnNameCityAndCompany");
       segments.waitTillNewSegmentGetsOpen();
       segments.filterTab.click();
-
       segments.filterDropDown.click();
       segments.filterSearchBox.type("First");
       segments.filterField.click();
       segments.waitTillFilterOptionGetsLoaded();
-      segments.filterOperator.select("contains");
-      cy.wait(1000); // Added wait for page rendering
-      segments.filterValue.type(contactFirstName, { force: true });
+      segments.filterValue.type(contactFirstName1, { force: true }); // Community Specific
 
       segments.filterDropDown.click();
       segments.filterSearchBox.type("City", { force: true });
-      segments.filterField.click({ force: true });
+      segments.filterCityField.click(); // Community Specific
       segments.waitTillSecondOperatorFilterGetsLoaded();
-      segments.secondFilterOperator.select("contains");
-      cy.wait(1000); // Added wait for page rendering
       segments.secondFilterProperties.type("Bidar", { force: true });
 
       segments.filterDropDown.click();
-      segments.filterSearchBox.type("Company");
-      segments.filterField.click({ force: true });
+      segments.filterSearchBox.type("Primary company"); // Community Specific
+      segments.filterField.contains('Primary company').click(); // Community Specific
       segments.waitTillThirdOperatorFilterGetsLoaded();
-      segments.thirdFilterOperator.select("contains");
-      cy.wait(1000); // Added wait for page rendering
       segments.thirdFilterProperties.type("Acquia", { force: true });
-
       segments.saveAndCloseButton.click();
       segments.waitforSegmentCreation();
-      cy.wait(3000); // Added wait for segment building
+      cy.exec(cronpath + ' m:s:r'); //Community specific
     }
   );
 
   it("Verify that segmentMembershipWithNameCityAndCompany segment has two contacts only",
     () => {
-      cy.visit("s/segments");
-      segments.waitForPageLoad();
-      cy.visit("/s/segments?search=segment");
-      segments.checkContactsUnderSegment.should("contain", "View 4 Contacts");
-      segments.checkContactsUnderSegment.click();
-      segments.checkDetailContactsUnderSegment
-        .should("contain", "Test contact1")
-        .should("contain", "Test contact2");
+        cy.visit("s/segments");
+        segments.waitForPageLoad();
+        cy.visit("/s/segments?search=segment");
+        segments.checkContactsUnderSegment.should('contain',"View 2 Contacts"); // Community Specific
+        segments.checkContactsUnderSegment.click();
+        segments.checkDetailContactsUnderSegment
+            .should("contain", contactFirstName1 +" contact1") // Community Specific
+            .should("contain", contactFirstName1 +" contact3"); // Community Specific
     }
-  )
+  );
 
   it("Search and delete segmentMembershipWithCustomField segment", () => {
     cy.visit("s/segments");
@@ -146,10 +141,10 @@ context("Verify segment membership based on Name ,City and Company", () => {
     segments.deleteConfirmation.click();
   })
 
-  it("Search and delete newly added contact", () => {
+  it("Search and delete newly added contacts", () => {
     cy.visit("s/contacts");
     contact.waitforPageLoad();
-    cy.visit("/s/contacts?search=" + contactFirstName);
+    cy.visit("/s/contacts?search=contact"); // Community Specific
     contact.waitTillSearchResultGetsDisplayed();
     search.selectParentCheckBox.click({ force: true });
     search.selectParentsOptionsDropdown.click();

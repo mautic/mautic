@@ -41,6 +41,10 @@ class Segments {
         return     cy.get('.active-result'); //Community specific
     }
 
+    get filterCityField(){
+        return     cy.get('#available_filters_chosen > div > ul > li.active-result.group-option.segment-filter.user'); // Community specific
+    }
+
     get editSegment(){
         return     cy.get('a[href*="/s/segments/edit"]');
     }
@@ -97,6 +101,10 @@ class Segments {
         return cy.get('#leadTable>tbody>tr>td>a>div');
     }
 
+    get clickFilterOperator(){
+        return cy.get('#leadlist_filters > div > div.panel-body > div.col-xs-6.col-sm-3.padding-none');
+    }
+
     get filterOperator(){
         return cy.get('#leadlist_filters_1_operator');
     }
@@ -104,17 +112,20 @@ class Segments {
     get secondFilterOperator(){
         return cy.get('#leadlist_filters_2_operator');
     }
+    get selectContains(){
+        return cy.get('#leadlist_filters_2_operator > option:nth-child(11)');
+    }
 
     get thirdFilterOperator(){
         return cy.get('#leadlist_filters_3_operator');
     }
 
     get secondFilterProperties(){
-        return cy.get('#leadlist_filters_2_properties_filter');
+        return cy.get('#leadlist_filters_2_filter');
     }
 
     get thirdFilterProperties(){
-        return cy.get('#leadlist_filters_3_properties_filter');
+        return cy.get('#leadlist_filters_3_filter');
     }
 
     get clickOnFourthFilterProperties(){
@@ -155,6 +166,10 @@ class Segments {
 
     waitTillFourthOperatorFilterGetsLoaded(){
         cy.get('#leadlist_filters_4_operator').should('be.visible');
+    }
+
+    get checkContactsUnderSegment(){
+        return cy.get('#leadListTable > tbody > tr > td:nth-child(3)');
     }
 }
 const segment = new Segments();
