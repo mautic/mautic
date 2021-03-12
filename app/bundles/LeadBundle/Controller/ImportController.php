@@ -206,6 +206,9 @@ class ImportController extends FormController
                 $importFields  = $session->get('mautic.'.$object.'.import.importfields', []);
                 $companyFields = $fieldModel->getFieldList(false, false, ['isPublished' => true, 'object' => 'company']);
 
+                // Add ID to lead fields to allow matching import contacts by identifier
+                $leadFields['id'] = 'ID';
+
                 try {
                     $form = $this->get('form.factory')->create(
                         LeadImportFieldType::class,
