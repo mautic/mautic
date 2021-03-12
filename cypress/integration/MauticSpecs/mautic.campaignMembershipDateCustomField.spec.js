@@ -80,7 +80,6 @@ context("Verify campaign membership with update contact action & updating dates 
     customFields.DataTypeSelector.select("Date",{force: true})
     customFields.SaveAndCloseButton.click()
     customFields.waitforPageLoad()
-    cy.wait(3000) // Added wait to get custom field published
   });
 
   it("Add new contact for segment membership", () => {

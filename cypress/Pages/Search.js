@@ -45,8 +45,9 @@ class Search {
     }
 
     get selectBatchdeleteButton() {
-        return   cy.get('a[href*="batchDelete"]');
+        return   cy.get('thead > tr > th.col-actions > div > div > ul > li:nth-child(11) > a > span > span'); // Community Specific
     }
+
 
     get confirmDeleteButton(){
         return cy.get('button[class="btn btn-danger"]')
