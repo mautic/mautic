@@ -60,13 +60,13 @@ class SegmentFiltersSubscriber implements EventSubscriberInterface
         $choices =  [
             'date_added' => [
                 'label'      => $this->translator->trans('mautic.core.date.added'),
-                'properties' => ['type' => 'date'],
+                'properties' => ['type' => 'datetime'],
                 'operators'  => $this->listModel->getOperatorsForFieldType('default'),
                 'object'     => 'lead',
             ],
             'date_identified' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.date_identified'),
-                'properties' => ['type' => 'date'],
+                'properties' => ['type' => 'datetime'],
                 'operators'  => $this->listModel->getOperatorsForFieldType('default'),
                 'object'     => 'lead',
             ],
