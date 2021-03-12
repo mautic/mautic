@@ -10,7 +10,8 @@
     "prettier": "node_modules/.bin/prettier -w Assets/library/js/",
     "prettier-check": "node_modules/.bin/prettier -c Assets/library/js/",
     "run helloWorld": "parcel Demo/helloWorld/index.html",
-    "run mautic": "cp -r Demo/data dist && parcel Demo/mautic/index.html"
+    "run mautic": "cp -r Demo/data dist && parcel Demo/mautic/index.html",
+    "update-mautic-preset": "npm uninstall grapesjs-preset-mautic && npm install mautic/grapesjs-preset-mautic#master"
   },
   "repository": {
     "type": "git",
@@ -26,7 +27,7 @@
     "grapesjs": "^0.16.44",
     "grapesjs-mjml": "^0.4.2",
     "grapesjs-parser-postcss": "^0.1.1",
-    "grapesjs-preset-mautic": "^1.0.0",
+    "grapesjs-preset-mautic": "github:mautic/grapesjs-preset-mautic#master",
     "grapesjs-preset-newsletter": "^0.2.20",
     "grapesjs-preset-webpage": "^0.1.11"
   },
