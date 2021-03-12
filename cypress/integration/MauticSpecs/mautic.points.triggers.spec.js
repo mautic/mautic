@@ -27,8 +27,8 @@ context("Verify that user is able to create trigger and verify that user has rec
     emails.emailSubject.type(testTriggerEmail);
     emails.emailInternalName.type(testTriggerEmail)
     emails.saveEmailButton.click();
-    emails.closeButton.click({force: true});
     emails.waitforEmailCreation();
+    emails.closeButton.click({force: true}); // Community Specific
   });
   
   it("Add a Trigger", () => {
