@@ -85,9 +85,9 @@ class PublicController extends CommonFormController
                 $requestUri = $this->request->getRequestUri();
 
                 // Remove query when comparing
-                $query = $this->request->getQueryString();
-                if (!empty($query)) {
-                    $requestUri = str_replace("?{$query}", '', $url);
+                $queryString = $this->request->getQueryString();
+                if (!empty($queryString)) {
+                    $requestUri = str_replace("?{$queryString}", '', $url);
                 }
 
                 // Redirect if they don't match
