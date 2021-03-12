@@ -645,7 +645,10 @@ return [
                 // Client implements \Psr\Http\Client\ClientInterface
                 // @see https://github.com/guzzle/guzzle/pull/2525
                 // When removing, remove also the ricardofiorani/guzzle-psr18-adapter dependency.
-                'class' => \RicardoFiorani\GuzzlePsr18Adapter\Client::class,
+                //
+                // TODO/UPDATE March 12 2021: already removed ricardofiorani dep,
+                // replace Guzzle with Symfony's new HttpClient later
+                'class' => \Symfony\Component\HttpClient\HttpClient::class,
             ],
             /* @deprecated to be removed in Mautic 4. Use 'mautic.filesystem' instead. */
             'symfony.filesystem' => [
@@ -1187,7 +1190,7 @@ return [
         'db_table_prefix'                 => '',
         'db_server_version'               => '5.7',
         'locale'                          => 'en_US',
-        'secret_key'                      => '',
+        'secret_key'                      => 'temp',
         'dev_hosts'                       => [],
         'trusted_hosts'                   => [],
         'trusted_proxies'                 => [],

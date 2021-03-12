@@ -58,6 +58,8 @@
         "symfony/security-acl": "~3.0.0",
         "symfony/polyfill-php73": "^1.13",
         "symfony/polyfill-php74": "^1.13",
+        "symfony/css-selector": "~4.4.0",
+        "symfony/http-client": "~4.4.0",
 
         "sensio/framework-extra-bundle": "~3.0",
 
@@ -99,7 +101,6 @@
         "knplabs/knp-menu-bundle": "^2.0",
         "guzzlehttp/oauth-subscriber": "^0.3.0",
         "helios-ag/fm-elfinder-bundle": "~10.0.0",
-        "ricardofiorani/guzzle-psr18-adapter": "^1.0",
         "leezy/pheanstalk-bundle": "^4.0",
         "tightenco/collect": "^6.13",
         "kamermans/guzzle-oauth2-subscriber": "^1.0",
