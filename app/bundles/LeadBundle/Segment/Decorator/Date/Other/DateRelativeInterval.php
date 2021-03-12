@@ -106,6 +106,7 @@ class DateRelativeInterval implements FilterDecoratorInterface
         if ('like' === $operator || 'notLike' === $operator) {
             $format .= '%';
         }
+
         return $date->toLocalString($format);
     }
 
