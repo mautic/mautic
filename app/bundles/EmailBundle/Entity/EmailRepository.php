@@ -25,6 +25,11 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 class EmailRepository extends CommonRepository
 {
     /**
+     * @var bool
+     */
+    protected $segmentEmailOnceToEmailAddress;
+
+    /**
      * Get an array of do not email emails.
      *
      * @param array $leadIds
@@ -195,10 +200,7 @@ class EmailRepository extends CommonRepository
         // Do not include leads that have already been emailed
         $statQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $statQb->select('null')
-            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat')
-            ->where(
-                $statQb->expr()->eq('stat.lead_id', 'l.id')
-            );
+            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat');
 
         if ($variantIds) {
             if (!in_array($emailId, $variantIds)) {
@@ -210,6 +212,17 @@ class EmailRepository extends CommonRepository
             $statQb->andWhere($statQb->expr()->eq('stat.email_id', (int) $emailId));
             $mqQb->andWhere($mqQb->expr()->eq('mq.channel_id', (int) $emailId));
         }
+
+        if (true === $this->segmentEmailOnceToEmailAddress) {
+            $statQb2 = clone $statQb;
+            $statQb2->innerJoin('stat', MAUTIC_TABLE_PREFIX.'leads', 'ld', 'ld.id = stat.lead_id');
+            $statQb2->andWhere(
+                $statQb->expr()->eq('ld.email', 'l.email')
+            );
+        }
+        $statQb->andWhere(
+            $statQb->expr()->eq('stat.lead_id', 'l.id')
+        );
 
         // Only include those who belong to the associated lead lists
         if (is_null($listIds)) {
@@ -249,12 +262,19 @@ class EmailRepository extends CommonRepository
         // Main query
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         if ($countOnly) {
-            $q->select('count(*) as count');
+            if (true === $this->segmentEmailOnceToEmailAddress) {
+                $q->select('count(DISTINCT l.email) as count');
+            } else {
+                $q->select('count(*) as count');
+            }
             if ($countWithMaxMin) {
                 $q->addSelect('MIN(l.id) as min_id, MAX(l.id) as max_id');
             }
         } else {
             $q->select('l.*');
+            if (true === $this->segmentEmailOnceToEmailAddress) {
+                $q->addGroupBy('l.email');
+            }
         }
 
         $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
@@ -263,6 +283,10 @@ class EmailRepository extends CommonRepository
             ->andWhere(sprintf('NOT EXISTS (%s)', $statQb->getSQL()))
             ->andWhere(sprintf('NOT EXISTS (%s)', $mqQb->getSQL()))
             ->setParameter('false', false, 'boolean');
+
+        if (true === $this->segmentEmailOnceToEmailAddress) {
+            $q->andWhere(sprintf('NOT EXISTS (%s)', $statQb2->getSQL()));
+        }
 
         $q = $this->setMinMaxIds($q, 'l.id', $minContactId, $maxContactId);
 
@@ -428,7 +452,7 @@ class EmailRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter)
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -590,6 +614,11 @@ class EmailRepository extends CommonRepository
         $qb->where($expr);
 
         return $qb->getQuery()->iterate();
+    }
+
+    public function setSegmentEmailOnceToEmailAddress($segmentEmailOnceToEmailAddress)
+    {
+        $this->segmentEmailOnceToEmailAddress = $segmentEmailOnceToEmailAddress;
     }
 
     /**
