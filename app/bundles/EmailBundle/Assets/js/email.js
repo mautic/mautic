@@ -36,7 +36,7 @@ Mautic.emailOnLoad = function (container, response) {
 
         // Get all stats numbers in batches of 10
         while (ids.length > 0) {
-            let batchIds = ids.splice(0, 10);
+            let batchIds = ids.splice(0, 1);
             Mautic.ajaxActionRequest(
                 'email:getEmailCountStats',
                 {ids: batchIds},
