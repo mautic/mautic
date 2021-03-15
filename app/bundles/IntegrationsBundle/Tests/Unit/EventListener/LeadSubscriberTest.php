@@ -277,9 +277,9 @@ class LeadSubscriberTest extends TestCase
         $deletedId       = '5';
         $lead            = new Lead();
         $lead->deletedId = $deletedId;
+        $lead->setEmail('john@doe.email');
 
-        $this->leadEvent->expects($this->exactly(2))
-            ->method('getLead')
+        $this->leadEvent->method('getLead')
             ->willReturn($lead);
 
         $this->fieldChangeRepository->expects($this->once())
@@ -289,6 +289,24 @@ class LeadSubscriberTest extends TestCase
         $this->objectMappingRepository->expects($this->once())
             ->method('deleteEntitiesForObject')
             ->with((int) $deletedId, MauticSyncDataExchange::OBJECT_CONTACT);
+
+        $this->subscriber->onLeadPostDelete($this->leadEvent);
+    }
+
+    public function testOnLeadPostDeleteForAnonymousLeads(): void
+    {
+        $deletedId       = '5';
+        $lead            = new Lead();
+        $lead->deletedId = $deletedId;
+
+        $this->leadEvent->method('getLead')
+            ->willReturn($lead);
+
+        $this->fieldChangeRepository->expects($this->never())
+            ->method('deleteEntitiesForObject');
+
+        $this->objectMappingRepository->expects($this->never())
+            ->method('deleteEntitiesForObject');
 
         $this->subscriber->onLeadPostDelete($this->leadEvent);
     }
