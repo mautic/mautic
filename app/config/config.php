@@ -313,7 +313,7 @@ $container->loadFromExtension('fm_elfinder', [
                 'plugins' => [
                     'Sanitizer' => [
                         'enable'   => true,
-                        'targets'  => [' ','\\', '/', ':', '*', '?', '"', '<', '>', '|'], // target chars
+                        'targets'  => [' ', '\\', '/', ':', '*', '?', '"', '<', '>', '|'], // target chars
                         'replace'  => '-', // replace to this
                     ],
                 ],
