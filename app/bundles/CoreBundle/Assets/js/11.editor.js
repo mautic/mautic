@@ -276,7 +276,7 @@ Mautic.ConvertFieldToCkeditor  = function(textarea, ckEditorToolbarOptions) {
         entities:  false,
         enterMode: CKEDITOR.ENTER_P,
         fillEmptyBlocks: false,
-        font_names: mauticEditorFonts.join(';'),
+        font_names: Mautic.getCKEditorFonts(mauticEditorFonts).join(';'),
         filebrowserBrowseUrl : Mautic.elfinderURL+'?editor=ckeditor',
     };
     if (ckEditorToolbar[0].indexOf('InsertToken') > -1)
