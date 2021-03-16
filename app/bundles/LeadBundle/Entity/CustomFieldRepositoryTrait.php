@@ -373,7 +373,8 @@ trait CustomFieldRepositoryTrait
                 ->where('f.is_published = :published')
                 ->andWhere($fq->expr()->eq('object', ':object'))
                 ->setParameter('published', true, 'boolean')
-                ->setParameter('object', $object);
+                ->setParameter('object', $object)
+                ->addOrderBy('f.field_order', 'asc');
             $results = $fq->execute()->fetchAll();
 
             $fields      = [];
