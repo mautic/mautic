@@ -125,6 +125,15 @@ final class CampaignEvents
     const DELETE_RECORDS_ON_EVENT_DELETE = 'mautic.delete_records_on_event_delete';
 
     /**
+     * The mautic.delete_scheduled_job_on_event_delete event is dispatched when a campaign events are deleted.
+     *
+     * The event listener receives a Mautic\CampaignBundle\Event\DeleteEvent instance.
+     *
+     * @var string
+     */
+    const DELETE_SCHEDULED_JOBS_ON_EVENT_DELETE = 'mautic.delete_scheduled_job_on_event_delete';
+
+    /**
      * The mautic.campaign_on_event_executed_batch event is dispatched when a batch of campaign events are executed.
      *
      * The event listener receives a Mautic\CampaignBundle\Event\ExecutedBatchEvent instance.

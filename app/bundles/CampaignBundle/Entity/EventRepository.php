@@ -138,21 +138,21 @@ class EventRepository extends CommonRepository
 
     /**
      * @param $campaignId
+     * @param bool $includeDeleted
      *
      * @return array
      */
-    public function getCampaignEvents($campaignId)
+    public function getCampaignEvents($campaignId, $ignoreDeleted = true)
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select('e, IDENTITY(e.parent)')
             ->from('MauticCampaignBundle:Event', 'e', 'e.id')
-            ->where(
-                $q->expr()->andX(
-                    $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId),
-                    $q->expr()->isNull('e.deleted')
-                )
-            )
+            ->where($q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId))
             ->orderBy('e.order', 'ASC');
+
+        if ($ignoreDeleted) {
+            $q->andWhere($q->expr()->isNull('e.deleted'));
+        }
 
         $results = $q->getQuery()->getArrayResult();
 
@@ -234,6 +234,16 @@ class EventRepository extends CommonRepository
             ->execute();
     }
 
+    public function deleteEvents(array $eventIds): void
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->delete(Event::class, 'e')
+            ->where($qb->expr()->in('e.id', ':event_ids'))
+            ->setParameter('event_ids', $eventIds, Connection::PARAM_INT_ARRAY)
+            ->getQuery()
+            ->execute();
+    }
+
     public function setEventsAsDeleted(array $eventIds): void
     {
         $dateTime = (new \DateTime())->format('Y-m-d H:i:s');
@@ -244,26 +254,6 @@ class EventRepository extends CommonRepository
             ->where(
                 $qb->expr()->in('id', $eventIds)
             )
-            ->execute();
-    }
-
-    public function deleteEventsByCampaignId(int $campaignId): void
-    {
-        $qb = $this->getEntityManager()->createQueryBuilder();
-        $qb->delete(Event::class, 'e')
-            ->where($qb->expr()->eq('e.campaign', ':campaign_id'))
-            ->setParameter('campaign_id', $campaignId)
-            ->getQuery()
-            ->execute();
-    }
-
-    public function deleteEventsByEventIds(array $eventIds): void
-    {
-        $qb = $this->getEntityManager()->createQueryBuilder();
-        $qb->delete(Event::class, 'e')
-            ->where($qb->expr()->in('e.id', ':event_ids'))
-            ->setParameter('event_ids', $eventIds, Connection::PARAM_INT_ARRAY)
-            ->getQuery()
             ->execute();
     }
 

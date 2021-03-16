@@ -106,6 +106,19 @@ class EventModel extends FormModel
         }
     }
 
+    public function deleteEventsByCampaignId(int $campaignId): void
+    {
+        $eventIds= $this->getRepository()->getCampaignEvents($campaignId, false);
+        $this->getRepository()->deleteEvents($eventIds);
+        $this->dispatcher->dispatch(CampaignEvents::DELETE_SCHEDULED_JOBS_ON_EVENT_DELETE, new DeleteEvent($eventIds));
+    }
+
+    public function deleteEventsByEventIds(array $eventIds): void
+    {
+        $this->getRepository()->deleteEvents($eventIds);
+        $this->dispatcher->dispatch(CampaignEvents::DELETE_SCHEDULED_JOBS_ON_EVENT_DELETE, new DeleteEvent($eventIds));
+    }
+
     /**
      * Get line chart data of campaign events.
      *

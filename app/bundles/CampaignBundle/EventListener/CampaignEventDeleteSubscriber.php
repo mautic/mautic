@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
-use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Event\DeleteCampaign;
 use Mautic\CampaignBundle\Event\DeleteEvent;
 use Mautic\CampaignBundle\Helper\CampaignConfig;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CampaignBundle\Model\EventModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignEventDeleteSubscriber implements EventSubscriberInterface
@@ -31,20 +31,20 @@ class CampaignEventDeleteSubscriber implements EventSubscriberInterface
     private $campaignModel;
 
     /**
-     * @var EventRepository
+     * @var EventModel
      */
-    private $eventRepository;
+    private $eventModel;
 
     public function __construct(
         LeadEventLogRepository $leadEventLogRepository,
         CampaignConfig $campaignConfig,
         CampaignModel $campaignModel,
-        EventRepository $eventRepository
+        EventModel $eventModel
     ) {
-        $this->campaignConfig             = $campaignConfig;
-        $this->leadEventLogRepository     = $leadEventLogRepository;
-        $this->campaignModel              = $campaignModel;
-        $this->eventRepository            = $eventRepository;
+        $this->campaignConfig         = $campaignConfig;
+        $this->leadEventLogRepository = $leadEventLogRepository;
+        $this->campaignModel          = $campaignModel;
+        $this->eventModel             = $eventModel;
     }
 
     public static function getSubscribedEvents(): array
@@ -63,7 +63,7 @@ class CampaignEventDeleteSubscriber implements EventSubscriberInterface
 
         $campaignId = $event->getCampaign()->getId();
         $this->leadEventLogRepository->removeEventLogsByCampaignId($campaignId);
-        $this->eventRepository->deleteEventsByCampaignId($campaignId);
+        $this->eventModel->deleteEventsByCampaignId($campaignId);
         $this->campaignModel->deleteCampaign($event->getCampaign());
     }
 
@@ -74,6 +74,6 @@ class CampaignEventDeleteSubscriber implements EventSubscriberInterface
         }
         $eventIds   = $event->getEventIds();
         $this->leadEventLogRepository->removeEventLogs($eventIds);
-        $this->eventRepository->deleteEventsByEventIds($eventIds);
+        $this->eventModel->deleteEventsByEventIds($eventIds);
     }
 }

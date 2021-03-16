@@ -128,7 +128,7 @@ return [
                     'mautic.campaign.repository.lead_event_log',
                     'mautic.helper.campaign_config',
                     'mautic.campaign.model.campaign',
-                    'mautic.campaign.repository.event',
+                    'mautic.campaign.model.event',
                 ],
             ],
             'mautic.campaign.leadbundle.subscriber'     => [
@@ -605,7 +605,7 @@ return [
                 'arguments' => [
                     'mautic.campaign.repository.lead_event_log',
                     'mautic.campaign.model.campaign',
-                    'mautic.campaign.repository.event',
+                    'mautic.campaign.model.event',
                 ],
                 'tag' => 'console.command',
             ],

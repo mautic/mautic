@@ -11,9 +11,9 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Command;
 
-use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Helper\ExitCode;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -39,15 +39,15 @@ class CampaignDeleteEventLogsCommand extends Command
     private $campaignModel;
 
     /**
-     * @var EventRepository
+     * @var EventModel
      */
-    private $eventRepository;
+    private $eventModel;
 
-    public function __construct(LeadEventLogRepository $leadEventLogRepository, CampaignModel $campaignModel, EventRepository $eventRepository)
+    public function __construct(LeadEventLogRepository $leadEventLogRepository, CampaignModel $campaignModel, EventModel $eventModel)
     {
         $this->leadEventLogRepository = $leadEventLogRepository;
         $this->campaignModel          = $campaignModel;
-        $this->eventRepository        = $eventRepository;
+        $this->eventModel             = $eventModel;
         parent::__construct();
     }
 
@@ -75,12 +75,12 @@ class CampaignDeleteEventLogsCommand extends Command
 
         if (!empty($campaignId)) {
             $this->leadEventLogRepository->removeEventLogsByCampaignId($campaignId);
-            $this->eventRepository->deleteEventsByCampaignId($campaignId);
+            $this->eventModel->deleteEventsByCampaignId($campaignId);
             $campaign = $this->campaignModel->getEntity($campaignId);
             $this->campaignModel->deleteCampaign($campaign);
         } elseif (!empty($eventIds)) {
             $this->leadEventLogRepository->removeEventLogs($eventIds);
-            $this->eventRepository->deleteEventsByEventIds($eventIds);
+            $this->eventModel->deleteEventsByEventIds($eventIds);
         }
 
         return ExitCode::SUCCESS;
