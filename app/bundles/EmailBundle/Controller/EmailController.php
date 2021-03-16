@@ -680,12 +680,6 @@ class EmailController extends FormController
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);
 
-                    $this
-                      ->get('doctrine')
-                      ->getConnection()
-                      ->getConfiguration()
-                      ->setSQLLogger(new \Doctrine\DBAL\Logging\EchoSQLLogger());
-
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
 
