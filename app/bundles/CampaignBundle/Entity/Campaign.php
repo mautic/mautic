@@ -365,7 +365,12 @@ class Campaign extends FormEntity
      */
     public function getRootEvents()
     {
-        $criteria = Criteria::create()->where(Criteria::expr()->isNull('parent'));
+        $criteria = Criteria::create()->where(
+            Criteria::expr()->andX(
+                Criteria::expr()->isNull('parent'),
+                Criteria::expr()->isNull('deleted')
+            )
+        );
         $events   = $this->getEvents()->matching($criteria);
 
         // Doctrine loses the indexBy mapping definition when using matching so we have to manually reset them.
