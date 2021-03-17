@@ -84,7 +84,9 @@ class EventRepository extends CommonRepository
             ->where(
                 $q->expr()->andX(
                     $q->expr()->eq('c.isPublished', 1),
+                    $q->expr()->isNull('c.deleted'),
                     $q->expr()->eq('e.type', ':type'),
+                    $q->expr()->isNull('e.deleted'),
                     $q->expr()->eq('IDENTITY(l.lead)', ':contactId'),
                     $q->expr()->eq('l.manuallyRemoved', 0),
                     $q->expr()->notIn('e.id', $eventQb->getDQL()),

@@ -444,7 +444,9 @@ class LeadEventLogRepository extends CommonRepository
                 $q->expr()->andX(
                     $q->expr()->in('o.id', $ids),
                     $q->expr()->eq('o.isScheduled', 1),
-                    $q->expr()->eq('c.isPublished', 1)
+                    $q->expr()->eq('c.isPublished', 1),
+                    $q->expr()->isNull('c.deleted'),
+                    $q->expr()->isNull('e.deleted')
                 )
             );
 

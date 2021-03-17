@@ -50,8 +50,8 @@ class CampaignEventDeleteSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::DELETE_RECORDS_ON_CAMPAIGN_DELETE => ['onCampaignDelete', 0],
-            CampaignEvents::DELETE_RECORDS_ON_EVENT_DELETE    => ['onEventDelete', 0],
+            CampaignEvents::ON_CAMPAIGN_DELETE => ['onCampaignDelete', 0],
+            CampaignEvents::ON_EVENT_DELETE    => ['onEventDelete', 0],
         ];
     }
 
