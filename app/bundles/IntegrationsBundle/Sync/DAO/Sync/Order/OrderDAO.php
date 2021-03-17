@@ -96,7 +96,7 @@ class OrderDAO
      * @param bool   $isFirstTimeSync
      * @param string $integration
      */
-    public function __construct(\DateTimeInterface $syncDateTime, $isFirstTimeSync, $integration, array $options)
+    public function __construct(\DateTimeInterface $syncDateTime, $isFirstTimeSync, $integration, array $options = [])
     {
         $this->syncDateTime    = $syncDateTime;
         $this->isFirstTimeSync = $isFirstTimeSync;
