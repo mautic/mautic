@@ -88,14 +88,20 @@ class OrderDAO
     private $notifications = [];
 
     /**
+     * @var array
+     */
+    private $options;
+
+    /**
      * @param bool   $isFirstTimeSync
      * @param string $integration
      */
-    public function __construct(\DateTimeInterface $syncDateTime, $isFirstTimeSync, $integration)
+    public function __construct(\DateTimeInterface $syncDateTime, $isFirstTimeSync, $integration, array $options)
     {
         $this->syncDateTime    = $syncDateTime;
         $this->isFirstTimeSync = $isFirstTimeSync;
         $this->integration     = $integration;
+        $this->options         = $options;
     }
 
     /**
@@ -327,5 +333,10 @@ class OrderDAO
     public function getObjectCount(): int
     {
         return $this->objectCounter;
+    }
+
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 }

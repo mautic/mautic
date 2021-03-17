@@ -62,6 +62,11 @@ class InputOptionsDAO
     private $endDateTime;
 
     /**
+     * @var array
+     */
+    private $options;
+
+    /**
      * Example $input:
      * [
      *      'integration' => 'Magento', // required
@@ -90,6 +95,7 @@ class InputOptionsDAO
         $this->endDateTime          = $this->validateDateTime($input, 'end-datetime');
         $this->mauticObjectIds      = $this->validateObjectIds($input, 'mautic-object-id');
         $this->integrationObjectIds = $this->validateObjectIds($input, 'integration-object-id');
+        $this->options              = $this->validateOptions($input);
     }
 
     public function getIntegration(): string
@@ -130,6 +136,11 @@ class InputOptionsDAO
     public function getEndDateTime(): ?\DateTimeInterface
     {
         return $this->endDateTime;
+    }
+
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 
     /**
@@ -193,5 +204,25 @@ class InputOptionsDAO
         }
 
         return $input;
+    }
+
+    private function validateOptions(array $input): array
+    {
+        if (is_array($input['options'] ?? null)) {
+            return $input['options'];
+        }
+
+        $options = [];
+
+        if (is_array($input['option'] ?? null)) {
+            foreach ($input['option'] as $option) {
+                $parsedOption = explode(':', $option);
+                if (2 === count($parsedOption)) {
+                    $options[$parsedOption[0]] = $parsedOption[1];
+                }
+            }
+        }
+
+        return $options;
     }
 }
