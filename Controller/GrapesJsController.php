@@ -10,8 +10,8 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\PageBundle\Entity\Page;
-use Symfony\Component\HttpFoundation\Response;
 use Monolog\Logger;
+use Symfony\Component\HttpFoundation\Response;
 
 class GrapesJsController extends CommonController
 {
@@ -36,7 +36,7 @@ class GrapesJsController extends CommonController
             throw new \Exception('Object not authorized to load custom builder', Response::HTTP_CONFLICT);
         }
         $this->logger     = $this->get('logger');
-        
+
         /** @var \Mautic\EmailBundle\Model\EmailModel|\Mautic\PageBundle\Model\PageModel $model */
         $model      = $this->getModel($objectType);
         $aclToCheck = 'email:emails:';
@@ -77,6 +77,7 @@ class GrapesJsController extends CommonController
         $template     = InputHelper::clean($this->request->query->get('template'));
         if (!$template) {
             $this->logger->warn('Grapesjs: no template in query');
+
             return $this->json(false);
         }
         $templateName = ':'.$template.':'.$objectType;
