@@ -235,8 +235,8 @@ class LeadList extends FormEntity
      */
     public function setIsGlobal($isGlobal)
     {
-        $this->isChanged('isGlobal', $isGlobal);
-        $this->isGlobal = $isGlobal;
+        $this->isChanged('isGlobal', (bool) $isGlobal);
+        $this->isGlobal = (bool) $isGlobal;
 
         return $this;
     }
@@ -322,8 +322,8 @@ class LeadList extends FormEntity
      */
     public function setIsPreferenceCenter($isPreferenceCenter)
     {
-        $this->isChanged('isPreferenceCenter', $isPreferenceCenter);
-        $this->isPreferenceCenter = $isPreferenceCenter;
+        $this->isChanged('isPreferenceCenter', (bool) $isPreferenceCenter);
+        $this->isPreferenceCenter = (bool) $isPreferenceCenter;
     }
 
     /**

@@ -780,8 +780,8 @@ class Form extends FormEntity
      */
     public function setNoIndex($noIndex)
     {
-        $this->isChanged('noIndex', $noIndex);
-        $this->noIndex = $noIndex;
+        $this->isChanged('noIndex', (bool) $noIndex);
+        $this->noIndex = (bool) $noIndex;
     }
 
     /**
