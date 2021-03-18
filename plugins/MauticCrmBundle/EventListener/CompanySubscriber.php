@@ -51,12 +51,18 @@ class CompanySubscriber implements EventSubscriberInterface
 
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
-        $operation         = $this->companyExport->getOperation($company);
-        if (false === $integrationObject || !$integrationObject->shouldImportDataToPipedrive($operation)) {
+
+        if (false === $integrationObject) {
             return;
         }
 
         $this->companyExport->setIntegration($integrationObject);
+        $operation = $this->companyExport->getOperation($company);
+
+        if (!$integrationObject->shouldImportDataToPipedrive($operation)) {
+            return;
+        }
+
         $this->companyExport->pushCompany($company);
     }
 
