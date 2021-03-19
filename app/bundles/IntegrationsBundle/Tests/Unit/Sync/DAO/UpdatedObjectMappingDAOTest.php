@@ -1,6 +1,6 @@
 <?php
 
-namespace IntegrationsBundle\Sync\DAO\Mapping;
+namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\DAO;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use PHPUnit\Framework\TestCase;
