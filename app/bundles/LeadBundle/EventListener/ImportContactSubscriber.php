@@ -21,7 +21,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class ImportContactSubscriber extends EventSubscriberInterface
+class ImportContactSubscriber implements EventSubscriberInterface
 {
     /**
      * @var FieldList
