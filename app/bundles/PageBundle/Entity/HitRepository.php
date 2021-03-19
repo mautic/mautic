@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -138,6 +139,11 @@ class HitRepository extends CommonRepository
      */
     public function getEmailClickthroughHitCount($emailIds, \DateTime $fromDate = null, $code = 200)
     {
+        $cacheStorageHelper = new CacheStorageHelper(CacheStorageHelper::ADAPTOR_FILESYSTEM);
+        $hitsCached         = $cacheStorageHelper->get('emails_list');
+        if ($hitsCached) {
+            return $hitsCached;
+        }
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         if (!is_array($emailIds)) {
@@ -163,6 +169,7 @@ class HitRepository extends CommonRepository
         foreach ($results as $r) {
             $hits[$r['email_id']] = $r['hit_count'];
         }
+        $cacheStorageHelper->set('emails_list', $hits);
 
         return $hits;
     }
