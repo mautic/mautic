@@ -31,14 +31,8 @@ if ($support['data']) {
             <h3 class="text-white dark-sm"><span class="fa fa-bar-chart"></span></h3>
         </div>
     </div>
-    <div class="row">
-        <div class="col-sm-12">
-            <canvas id="abtest-bar-chart" height="300"></canvas>
-        </div>
-    </div>
+    <?php echo $view->render(
+        'MauticCoreBundle:Helper:chart.html.php',
+        ['chartData' => $chart->render(), 'chartType' => 'bar', 'chartHeight' => 300]
+    ); ?>
 </div>
-
-<?php echo $view->render(
-    'MauticCoreBundle:Helper:chart.html.php',
-    ['chartData' => $chart->render(), 'chartType' => 'bar', 'chartHeight' => 300]
-); ?>
