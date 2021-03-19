@@ -21,7 +21,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class ImportCompanySubscriber extends EventSubscriberInterface
+class ImportCompanySubscriber implements EventSubscriberInterface
 {
     /**
      * @var FieldList
