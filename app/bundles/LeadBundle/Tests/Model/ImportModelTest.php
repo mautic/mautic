@@ -19,8 +19,10 @@ use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Exception\ImportDelayedException;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Tests\StandardImportTestHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ImportModelTest extends StandardImportTestHelper
@@ -48,12 +50,20 @@ class ImportModelTest extends StandardImportTestHelper
 
     public function testProcess()
     {
+        /** @var EventDispatcherInterface|MockObject $dispatcher */
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $event      = $this->createMock(ImportProcessEvent::class);
 
         $dispatcher->expects($this->exactly(4))
             ->method('dispatch')
-            ->willReturn($event);
+            ->with(
+                LeadEvents::IMPORT_ON_PROCESS,
+                $this->callback(function (ImportProcessEvent $event) {
+                    // Emulate a subscriber.
+                    $event->setWasMerged(false);
+
+                    return true;
+                })
+            );
 
         $model = $this->initImportModel();
         $model->setDispatcher($dispatcher);
@@ -70,7 +80,6 @@ class ImportModelTest extends StandardImportTestHelper
 
     public function testCheckParallelImportLimitWhenMore()
     {
-        $entity = $this->initImportEntity();
         $model  = $this->getMockBuilder(ImportModel::class)
             ->setMethods(['getParallelImportLimit', 'getRepository'])
             ->disableOriginalConstructor()
@@ -130,7 +139,6 @@ class ImportModelTest extends StandardImportTestHelper
 
     public function testCheckParallelImportLimitWhenLess()
     {
-        $entity = $this->initImportEntity();
         $model  = $this->getMockBuilder(ImportModel::class)
             ->setMethods(['getParallelImportLimit', 'getRepository'])
             ->disableOriginalConstructor()
