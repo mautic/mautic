@@ -69,13 +69,13 @@ $header     = ($complete) ? 'mautic.lead.import.success' : 'mautic.lead.import.d
                 <?php if (!$complete): ?>
                     <div>
                         <a class="btn btn-danger" href="<?php echo $view['router']->path(
-                            'mautic_contact_import_action',
+                            'mautic_import_action',
                             ['objectAction' => 'cancel', 'object' => $object]
                         ); ?>" data-toggle="ajax">
                             <?php echo $view['translator']->trans('mautic.core.form.cancel'); ?>
                         </a>
                         <a class="btn btn-primary" href="<?php echo $view['router']->path(
-                            'mautic_contact_import_action',
+                            'mautic_import_action',
                             ['objectAction' => 'queue', 'object' => $object]
                         ); ?>" data-toggle="ajax">
                             <?php echo $view['translator']->trans('mautic.lead.import.queue.btn'); ?>
