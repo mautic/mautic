@@ -84,7 +84,7 @@ if ($view['security']->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)) 
                             ]
                         ); ?>
                     </td>
-                    <td>
+                    <td class="package-name">
                         <div>
                             <a href="<?php echo $view['router']->path(
                                     RouteProvider::ROUTE_DETAIL,
@@ -102,9 +102,9 @@ if ($view['security']->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)) 
                             </div>
                         <?php endif; ?>
                     </td>
-                    <td><?php echo $view->escape($item->getVendorName()); ?></td>
-                    <td><?php echo $view->escape($item->getDownloads()); ?></td>
-                    <td><?php echo $view->escape($item->getFavers()); ?></td>
+                    <td class="vendor-name"><?php echo $view->escape($item->getVendorName()); ?></td>
+                    <td class="downloads"><?php echo $view->escape($item->getDownloads()); ?></td>
+                    <td class="favers"><?php echo $view->escape($item->getFavers()); ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
