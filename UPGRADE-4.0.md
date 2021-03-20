@@ -12,3 +12,6 @@
     *   codeception/codeception removed
 *   Commands
     * \Mautic\CoreBundle\Command\ModeratedCommand::$lockHandler is now private
+*   Services
+    * `mautic.http.client` has been upgraded from GuzzleHttp 6 to 7
+    * Refactored `mautic.webhook.http.client` to use `mautic.http.client` instead of `mautic.guzzle.client`

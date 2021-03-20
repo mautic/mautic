@@ -2,8 +2,8 @@
 
 namespace Mautic\WebhookBundle\Tests\Functional;
 
+use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
-use Http\Adapter\Guzzle7\Client;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\WebhookBundle\Command\ProcessWebhookQueuesCommand;
 use Mautic\WebhookBundle\Entity\Event;
@@ -13,6 +13,7 @@ use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -41,10 +42,10 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
 
     public function testWebhookWorkflowWithCommandProcess()
     {
-        $httpClient                    = new class() extends Client {
+        $httpClient                    = new class() extends GuzzleClient {
             public $sendRequestCounter = 0;
 
-            public function sendRequest(RequestInterface $request)
+            public function sendRequest(RequestInterface $request): ResponseInterface
             {
                 Assert::assertSame('://whatever.url', $request->getUri()->getPath());
                 $jsonPayload = json_decode($request->getBody()->getContents(), true);
@@ -56,7 +57,7 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
             }
         };
 
-        $this->container->set('mautic.guzzle.client', $httpClient);
+        $this->container->set('mautic.http.client', new GuzzleClient());
 
         /** @var WebhookQueueRepository $webhookQueueRepository */
         $webhookQueueRepository = $this->em->getRepository(WebhookQueue::class);
