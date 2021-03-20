@@ -54,7 +54,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         /** @var DoctrineDataCollector $dbCollector */
         $dbCollector = $profile->getCollector('db');
         $queries     = $dbCollector->getQueries();
-        $prefix      = $this->container->getParameter('mautic.db_table_prefix');
+        $prefix      = self::$container->getParameter('mautic.db_table_prefix');
 
         $dncQueries = array_filter(
             $queries['default'],
@@ -101,7 +101,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         /** @var DoctrineDataCollector $dbCollector */
         $dbCollector = $profile->getCollector('db');
         $queries     = $dbCollector->getQueries();
-        $prefix      = $this->container->getParameter('mautic.db_table_prefix');
+        $prefix      = self::$container->getParameter('mautic.db_table_prefix');
 
         $dncQueries = array_filter(
             $queries['default'],
