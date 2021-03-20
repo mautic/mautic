@@ -34,7 +34,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     protected $moderationTable = [];
     protected $moderationMode;
     protected $runDirectory;
-    protected $lockExpiration = null;
+    protected $lockExpiration;
     protected $lockFile;
 
     /**
