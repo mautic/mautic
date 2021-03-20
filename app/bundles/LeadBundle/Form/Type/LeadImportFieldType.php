@@ -42,12 +42,17 @@ class LeadImportFieldType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $choices = [];
+        foreach ($options['all_fields'] as $optionGroup => $fields) {
+            $choices[$optionGroup] = array_flip($fields);
+        }
+
         foreach ($options['import_fields'] as $field => $label) {
             $builder->add(
                 $field,
                 ChoiceType::class,
                 [
-                    'choices'    => $options['all_fields'],
+                    'choices'    => $choices,
                     'label'      => $label,
                     'required'   => false,
                     'label_attr' => ['class' => 'control-label'],
