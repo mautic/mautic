@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -15,7 +17,7 @@ use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Symfony\Component\EventDispatcher\Event;
 
-class ImportProcessEvent extends Event
+final class ImportProcessEvent extends Event
 {
     /**
      * @var Import
@@ -44,44 +46,30 @@ class ImportProcessEvent extends Event
         $this->rowData  = $rowData;
     }
 
-    /**
-     * @return Import
-     */
-    public function getImport()
+    public function getImport(): Import
     {
         return $this->import;
     }
 
-    /**
-     * @return LeadEventLog
-     */
-    public function getEventLog()
+    public function getEventLog(): LeadEventLog
     {
         return $this->eventLog;
     }
 
-    /**
-     * @return array
-     */
-    public function getRowData()
+    public function getRowData(): array
     {
         return $this->rowData;
     }
 
-    /**
-     * @param bool $wasMerged
-     */
-    public function setWasMerged($wasMerged)
+    public function setWasMerged(bool $wasMerged): void
     {
         $this->wasMerged = $wasMerged;
     }
 
     /**
-     * @return bool
-     *
      * @throws \UnexpectedValueException
      */
-    public function wasMerged()
+    public function wasMerged(): bool
     {
         if (null === $this->wasMerged) {
             throw new \UnexpectedValueException("Import failed as {$this->import->getObject()} object is missing import handler.");
@@ -90,12 +78,7 @@ class ImportProcessEvent extends Event
         return $this->wasMerged;
     }
 
-    /**
-     * @param string $object
-     *
-     * @return bool
-     */
-    public function importIsForObject($object)
+    public function importIsForObject(string $object): bool
     {
         return $this->import->getObject() === $object;
     }

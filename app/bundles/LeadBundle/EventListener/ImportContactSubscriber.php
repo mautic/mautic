@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -21,7 +23,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class ImportContactSubscriber implements EventSubscriberInterface
+final class ImportContactSubscriber implements EventSubscriberInterface
 {
     /**
      * @var FieldList
@@ -48,10 +50,7 @@ class ImportContactSubscriber implements EventSubscriberInterface
         $this->contactModel    = $contactModel;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::IMPORT_ON_INITIALIZE    => 'onImportInit',
@@ -63,7 +62,7 @@ class ImportContactSubscriber implements EventSubscriberInterface
     /**
      * @throws AccessDeniedException
      */
-    public function onImportInit(ImportInitEvent $event)
+    public function onImportInit(ImportInitEvent $event): void
     {
         if ($event->importIsForRouteObject('contacts')) {
             if (!$this->corePermissions->isGranted('lead:imports:create')) {
@@ -78,7 +77,7 @@ class ImportContactSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onFieldMapping(ImportMappingEvent $event)
+    public function onFieldMapping(ImportMappingEvent $event): void
     {
         if ($event->importIsForRouteObject('contacts')) {
             $specialFields = [
@@ -103,7 +102,7 @@ class ImportContactSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onImportProcess(ImportProcessEvent $event)
+    public function onImportProcess(ImportProcessEvent $event): void
     {
         if ($event->importIsForObject('lead')) {
             $import = $event->getImport();

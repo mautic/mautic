@@ -773,10 +773,7 @@ class ImportController extends FormController
         return 'DESC';
     }
 
-    /**
-     * @return ImportInitEvent
-     */
-    private function dispatchImportOnInit()
+    private function dispatchImportOnInit(): ImportInitEvent
     {
         return $this->container->get('event_dispatcher')->dispatch(
             LeadEvents::IMPORT_ON_INITIALIZE,

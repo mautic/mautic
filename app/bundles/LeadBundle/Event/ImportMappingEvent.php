@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -13,7 +15,7 @@ namespace Mautic\LeadBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
-class ImportMappingEvent extends Event
+final class ImportMappingEvent extends Event
 {
     /**
      * @var string
@@ -28,53 +30,37 @@ class ImportMappingEvent extends Event
     /**
      * @var array
      */
-    private $fields;
+    private $fields = [];
 
-    /**
-     * @param string $routeObjectName
-     */
-    public function __construct($routeObjectName)
+    public function __construct(string $routeObjectName)
     {
         $this->routeObjectName = $routeObjectName;
     }
 
-    /**
-     * @return string
-     */
-    public function getRouteObjectName()
+    public function getRouteObjectName(): string
     {
         return $this->routeObjectName;
     }
 
-    /**
-     * @return bool
-     */
-    public function objectIsSupported()
+    public function objectIsSupported(): bool
     {
         return $this->objectSupported;
     }
 
-    public function setFields(array $fields)
+    public function setFields(array $fields): void
     {
         $this->fields = $fields;
     }
 
-    /**
-     * @return array
-     */
-    public function getFields()
+    public function getFields(): array
     {
         return $this->fields;
     }
 
     /**
      * Check if the import is for said route object and notes if the object exist.
-     *
-     * @param string $routeObject
-     *
-     * @return bool
      */
-    public function importIsForRouteObject($routeObject)
+    public function importIsForRouteObject(string $routeObject): bool
     {
         if ($this->getRouteObjectName() === $routeObject) {
             $this->objectSupported = true;
@@ -85,10 +71,7 @@ class ImportMappingEvent extends Event
         return false;
     }
 
-    /**
-     * @param bool $objectSupported
-     */
-    public function setObjectIsSupported($objectSupported)
+    public function setObjectIsSupported(bool $objectSupported): void
     {
         $this->objectSupported = $objectSupported;
     }

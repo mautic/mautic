@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -13,7 +15,7 @@ namespace Mautic\LeadBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
-class ImportInitEvent extends Event
+final class ImportInitEvent extends Event
 {
     /**
      * @var string
@@ -26,19 +28,19 @@ class ImportInitEvent extends Event
     private $objectSupported = false;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $objectSingular;
 
     /**
      * Object name for humans. Will go through translator.
      *
-     * @var string
+     * @var string|null
      */
     private $objectName;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $activeLink;
 
@@ -52,111 +54,71 @@ class ImportInitEvent extends Event
      */
     private $indexRouteParams = [];
 
-    /**
-     * @param string $routeObjectName
-     */
-    public function __construct($routeObjectName)
+    public function __construct(string $routeObjectName)
     {
         $this->routeObjectName = $routeObjectName;
     }
 
-    /**
-     * @return string
-     */
-    public function getRouteObjectName()
+    public function getRouteObjectName(): string
     {
         return $this->routeObjectName;
     }
 
-    /**
-     * @return bool
-     */
-    public function objectIsSupported()
+    public function objectIsSupported(): bool
     {
         return $this->objectSupported;
     }
 
-    /**
-     * @param string $objectSingular
-     */
-    public function setObjectSingular($objectSingular)
+    public function setObjectSingular(?string $objectSingular): void
     {
         $this->objectSingular = $objectSingular;
     }
 
-    /**
-     * @return string
-     */
-    public function getObjectSingular()
+    public function getObjectSingular(): ?string
     {
         return $this->objectSingular;
     }
 
-    /**
-     * @param string $objectName
-     */
-    public function setObjectName($objectName)
+    public function setObjectName(?string $objectName): void
     {
         $this->objectName = $objectName;
     }
 
-    /**
-     * @return string
-     */
-    public function getObjectName()
+    public function getObjectName(): ?string
     {
         return $this->objectName;
     }
 
-    /**
-     * @param string $activeLink
-     */
-    public function setActiveLink($activeLink)
+    public function setActiveLink(?string $activeLink): void
     {
         $this->activeLink = $activeLink;
     }
 
-    /**
-     * @return string
-     */
-    public function getActiveLink()
+    public function getActiveLink(): ?string
     {
         return $this->activeLink;
     }
 
-    /**
-     * @param string $indexRoute
-     */
-    public function setIndexRoute($indexRoute, array $routeParams = [])
+    public function setIndexRoute(?string $indexRoute, array $routeParams = [])
     {
         $this->indexRoute       = $indexRoute;
         $this->indexRouteParams = $routeParams;
     }
 
-    /**
-     * @return string
-     */
-    public function getIndexRoute()
+    public function getIndexRoute(): ?string
     {
         return $this->indexRoute;
     }
 
-    /**
-     * @return array
-     */
-    public function getIndexRouteParams()
+    public function getIndexRouteParams(): array
     {
         return $this->indexRouteParams;
     }
 
     /**
      * Check if the import is for said route object and notes if the object exist.
-     *
-     * @param string $routeObject
-     *
-     * @return bool
      */
-    public function importIsForRouteObject($routeObject)
+    public function importIsForRouteObject(string $routeObject): bool
     {
         if ($this->getRouteObjectName() === $routeObject) {
             $this->objectSupported = true;
@@ -167,10 +129,7 @@ class ImportInitEvent extends Event
         return false;
     }
 
-    /**
-     * @param bool $objectSupported
-     */
-    public function setObjectIsSupported($objectSupported)
+    public function setObjectIsSupported(bool $objectSupported): void
     {
         $this->objectSupported = $objectSupported;
     }

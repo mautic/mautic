@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -21,7 +23,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class ImportCompanySubscriber implements EventSubscriberInterface
+final class ImportCompanySubscriber implements EventSubscriberInterface
 {
     /**
      * @var FieldList
@@ -48,10 +50,7 @@ class ImportCompanySubscriber implements EventSubscriberInterface
         $this->companyModel    = $companyModel;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::IMPORT_ON_INITIALIZE    => ['onImportInit'],
@@ -63,7 +62,7 @@ class ImportCompanySubscriber implements EventSubscriberInterface
     /**
      * @throws AccessDeniedException
      */
-    public function onImportInit(ImportInitEvent $event)
+    public function onImportInit(ImportInitEvent $event): void
     {
         if ($event->importIsForRouteObject('companies')) {
             if (!$this->corePermissions->isGranted('lead:imports:create')) {
@@ -78,7 +77,7 @@ class ImportCompanySubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onFieldMapping(ImportMappingEvent $event)
+    public function onFieldMapping(ImportMappingEvent $event): void
     {
         if ($event->importIsForRouteObject('companies')) {
             $specialFields = [
@@ -95,7 +94,7 @@ class ImportCompanySubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onImportProcess(ImportProcessEvent $event)
+    public function onImportProcess(ImportProcessEvent $event): void
     {
         if ($event->importIsForObject('company')) {
             $merged = $this->companyModel->import(
