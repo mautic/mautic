@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "886574fdeaeb619af5eb10a7b127f91b",
+    "content-hash": "55af20b493a09a1f768db4fc06bdc414",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -6402,7 +6402,7 @@
             ],
             "support": {
                 "issues": "https://github.com/php-amqplib/RabbitMqBundle/issues",
-                "source": "https://github.com/php-amqplib/RabbitMqBundle/tree/master"
+                "source": "https://github.com/php-amqplib/RabbitMqBundle/tree/v1.14.4"
             },
             "time": "2018-05-02T13:12:32+00:00"
         },
