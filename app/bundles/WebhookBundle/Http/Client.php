@@ -12,7 +12,7 @@
 namespace Mautic\WebhookBundle\Http;
 
 use GuzzleHttp\Psr7\Request;
-use Http\Adapter\Guzzle6\Client as GuzzleClient;
+use Http\Adapter\Guzzle7\Client as GuzzleClient;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Psr\Http\Message\ResponseInterface;
 

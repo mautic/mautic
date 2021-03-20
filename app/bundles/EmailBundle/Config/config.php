@@ -634,7 +634,7 @@ return [
                 'class' => \Mautic\EmailBundle\Swiftmailer\Guzzle\ClientFactory::class,
             ],
             'mautic.guzzle.client' => [
-                'class'     => \Http\Adapter\Guzzle6\Client::class,
+                'class'     => \Http\Adapter\Guzzle7\Client::class,
                 'factory'   => ['@mautic.guzzle.client.factory', 'create'],
             ],
             'mautic.helper.mailbox' => [

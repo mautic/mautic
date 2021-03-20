@@ -639,17 +639,6 @@ return [
             'mautic.http.client' => [
                 'class' => GuzzleHttp\Client::class,
             ],
-            'mautic.http.client.psr-18' => [
-                // Warning: Only dev dependency (for TransifexFactory)
-                // Can be replaced with 'mautic.http.client' once the standard Guzzle
-                // Client implements \Psr\Http\Client\ClientInterface
-                // @see https://github.com/guzzle/guzzle/pull/2525
-                // When removing, remove also the ricardofiorani/guzzle-psr18-adapter dependency.
-                //
-                // TODO/UPDATE March 12 2021: already removed ricardofiorani dep,
-                // replace Guzzle with Symfony's new HttpClient later
-                'class' => \Symfony\Component\HttpClient\HttpClient::class,
-            ],
             /* @deprecated to be removed in Mautic 4. Use 'mautic.filesystem' instead. */
             'symfony.filesystem' => [
                 'class' => \Symfony\Component\Filesystem\Filesystem::class,
@@ -780,7 +769,7 @@ return [
             'transifex.factory' => [
                 'class'     => \Mautic\CoreBundle\Factory\TransifexFactory::class,
                 'arguments' => [
-                    'mautic.http.client.psr-18',
+                    'mautic.http.client',
                     'mautic.helper.core_parameters',
                 ],
             ],
