@@ -133,7 +133,8 @@
 
         "symfony/phpunit-bridge": "~5.1.0",
         "phpunit/phpunit": "^9.5",
-        "liip/functional-test-bundle": "^4.2"
+        "liip/functional-test-bundle": "^4.2",
+        "php-http/mock-client": "^1.4"
     },
     "repositories": [
         {
