@@ -58,6 +58,13 @@ class WebhookModel extends FormModel
     protected $webhookLimit;
 
     /**
+     * How long the webhook processing can run in seconds.
+     *
+     * @var int
+     */
+    private $webhookTimeLimit;
+
+    /**
      * How many responses in 1 row can fail until the webhook disables itself.
      *
      * @var int
@@ -107,6 +114,13 @@ class WebhookModel extends FormModel
      * @var EventDispatcherInterface
      */
     private $eventDispatcher;
+
+    /**
+     * Timestamp when the webhook processing starts.
+     *
+     * @var float
+     */
+    private $startTime;
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
@@ -281,6 +295,8 @@ class WebhookModel extends FormModel
      */
     public function processWebhooks($webhooks)
     {
+        $this->startTime = microtime(true);
+
         foreach ($webhooks as $webhook) {
             $this->processWebhook($webhook);
         }
@@ -361,7 +377,7 @@ class WebhookModel extends FormModel
 
             // if there are still items in the queue after processing we re-process
             // WARNING: this is recursive
-            if ($queueCount > 0) {
+            if ($queueCount > 0 && !$this->isProcessingExpired()) {
                 $this->processWebhook($webhook);
             }
         }
@@ -640,12 +656,21 @@ class WebhookModel extends FormModel
         return 'webhook:webhooks';
     }
 
+    private function isProcessingExpired(): bool
+    {
+        $currentTime = microtime(true);
+        $runTime     = $currentTime - $this->startTime;
+
+        return $runTime >= $this->webhookTimeLimit;
+    }
+
     /**
      * Sets all class properties from CoreParametersHelper.
      */
     private function setConfigProps(CoreParametersHelper $coreParametersHelper)
     {
         $this->webhookLimit     = (int) $coreParametersHelper->get('webhook_limit', 10);
+        $this->webhookTimeLimit = (int) $coreParametersHelper->get('webhook_time_limit', 600);
         $this->disableLimit     = (int) $coreParametersHelper->get('webhook_disable_limit', 100);
         $this->webhookTimeout   = (int) $coreParametersHelper->get('webhook_timeout', 15);
         $this->logMax           = (int) $coreParametersHelper->get('webhook_log_max', 1000);
