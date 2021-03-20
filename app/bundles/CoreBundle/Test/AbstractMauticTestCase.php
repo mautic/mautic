@@ -125,39 +125,6 @@ abstract class AbstractMauticTestCase extends WebTestCase
         return $this->traitLoadFixtureFiles($paths, $append, $omName, $registryName, $purgeMode);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected static function getKernelClass()
-    {
-        if (isset($_SERVER['KERNEL_DIR'])) {
-            $dir = $_SERVER['KERNEL_DIR'];
-
-            if (!is_dir($dir)) {
-                $phpUnitDir = static::getPhpUnitXmlDir();
-                if (is_dir("$phpUnitDir/$dir")) {
-                    $dir = "$phpUnitDir/$dir";
-                }
-            }
-        } else {
-            $dir = static::getPhpUnitXmlDir();
-        }
-
-        $finder = new Finder();
-        $finder->name('*TestKernel.php')->depth(0)->in($dir);
-        $results = iterator_to_array($finder);
-        if (!count($results)) {
-            throw new RuntimeException('Either set KERNEL_DIR in your phpunit.xml according to https://symfony.com/doc/current/book/testing.html#your-first-functional-test or override the WebTestCase::createKernel() method.');
-        }
-
-        $file  = current($results);
-        $class = $file->getBasename('.php');
-
-        require_once $file;
-
-        return $class;
-    }
-
     private function mockServices()
     {
         $cookieHelper = $this->getMockBuilder(CookieHelper::class)
