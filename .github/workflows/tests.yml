@@ -84,6 +84,13 @@ jobs:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_MESSAGE: 'The daily GitHub Actions tests in mautic/mautic have failed. Most likely something external has changed, like a PHP version update.'
 
+    - name: Store log artifacts
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: logs-${{ matrix.php-versions }}-${{ matrix.db-types }}
+        path: ./var/logs/*
+
   misc:
     runs-on: ubuntu-latest
 
