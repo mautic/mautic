@@ -123,7 +123,7 @@ return [
                 'class'     => \Mautic\WebhookBundle\Http\Client::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
-                    'mautic.http.client',
+                    'mautic.guzzle.client',
                 ],
             ],
         ],

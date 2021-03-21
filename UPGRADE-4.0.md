@@ -38,4 +38,3 @@
         $this->client = $client;
     }
     ```
-    * Refactored `mautic.webhook.http.client` to use `mautic.http.client` instead of `mautic.guzzle.client`

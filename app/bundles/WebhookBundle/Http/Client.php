@@ -12,8 +12,8 @@
 namespace Mautic\WebhookBundle\Http;
 
 use GuzzleHttp\Psr7\Request;
+use Http\Adapter\Guzzle7\Client as GuzzleClient;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 
 class Client
@@ -24,13 +24,13 @@ class Client
     private $coreParametersHelper;
 
     /**
-     * @var ClientInterface
+     * @var GuzzleClient
      */
     private $httpClient;
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        ClientInterface $httpClient
+        $httpClient
     ) {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->httpClient           = $httpClient;

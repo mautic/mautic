@@ -97,7 +97,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     protected function truncateTables(string ...$tables): void
     {
-        $prefix = self::$container->getParameter('mautic.db_table_prefix');
+        $prefix = MAUTIC_TABLE_PREFIX;
 
         foreach ($tables as $table) {
             $this->connection->query("SET FOREIGN_KEY_CHECKS = 0; TRUNCATE TABLE `{$prefix}{$table}`; SET FOREIGN_KEY_CHECKS = 1;");
