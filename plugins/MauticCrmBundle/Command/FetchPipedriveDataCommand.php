@@ -120,7 +120,7 @@ class FetchPipedriveDataCommand extends ContainerAwareCommand
             }
 
             $this->io->text('Pulled '.$result['processed']);
-            $this->io->note('Using '.memory_get_peak_usage(1) / 1000000 .' megabytes of ram.');
+            $this->io->note('Using '.memory_get_peak_usage(true) / 1000000 .' megabytes of ram.');
 
             if (!$result['more_items_in_collection']) {
                 return;

@@ -27,6 +27,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     public function setUp(): void
     {
         $this->clientOptions = ['debug' => true];
+
+        parent::setUp();
     }
 
     /**
