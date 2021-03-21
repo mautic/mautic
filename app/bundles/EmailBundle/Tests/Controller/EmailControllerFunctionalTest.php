@@ -24,7 +24,10 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 {
-    protected $clientOptions = ['debug' => true];
+    public function setUp(): void
+    {
+        $this->clientOptions = ['debug' => true];
+    }
 
     /**
      * Ensure there is no query for DNC reasons if there are no contacts who received the email

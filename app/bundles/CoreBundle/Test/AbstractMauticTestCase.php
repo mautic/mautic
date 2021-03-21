@@ -10,9 +10,9 @@ use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
 use RuntimeException;
-use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -30,30 +30,11 @@ abstract class AbstractMauticTestCase extends WebTestCase
         loadFixtureFiles as private traitLoadFixtureFiles;
     }
 
-    /**
-     * @var EntityManager
-     */
-    protected $em;
-
-    /**
-     * @var Connection
-     */
-    protected $connection;
-
-    /**
-     * @var Client
-     */
-    protected $client;
-
-    /**
-     * @var array
-     */
-    protected $clientOptions = [];
-
-    /**
-     * @var array
-     */
-    protected $clientServer = [
+    protected EntityManager $em;
+    protected Connection $connection;
+    protected KernelBrowser $client;
+    protected array $clientOptions = [];
+    protected array $clientServer  = [
         'PHP_AUTH_USER' => 'admin',
         'PHP_AUTH_PW'   => 'mautic',
     ];
