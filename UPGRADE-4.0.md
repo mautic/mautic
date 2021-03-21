@@ -13,5 +13,29 @@
 *   Commands
     * \Mautic\CoreBundle\Command\ModeratedCommand::$lockHandler is now private
 *   Services
-    * `mautic.http.client` has been upgraded from GuzzleHttp 6 to 7
+    * `mautic.http.client` has been upgraded from GuzzleHttp 6 to 7. You can now leverage `Psr\Http\Client\ClientInterface` (PSR-18) in your class constructors! Example:
+
+    config.php:
+
+    ```PHP
+    'mautic.demo.class' => [
+        'class'     => DemoClass::class,
+        'arguments' => [
+            'mautic.http.client',
+        ],
+    ],
+    ```
+
+    DemoClass.php
+
+    ```PHP
+    use Psr\Http\Client\ClientInterface;
+    
+    ....
+    public function __construct(
+        ClientInterface $client
+    ) {
+        $this->client = $client;
+    }
+    ```
     * Refactored `mautic.webhook.http.client` to use `mautic.http.client` instead of `mautic.guzzle.client`
