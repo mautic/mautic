@@ -54,12 +54,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         return null;
     }
 
-    /**
-     * @param string $method
-     * @param string $json
-     * @param bool   $addCredential
-     */
-    protected function makeRequest($method, $json, $addCredential = true)
+    protected function makeRequest(string $method, string $json, bool $addCredential = true)
     {
         $headers = !$addCredential ? [] : [
             'PHP_AUTH_USER' => self::WEBHOOK_USER,
