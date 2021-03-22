@@ -77,16 +77,6 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         Assert::assertTrue($this->client->getResponse()->isOk());
 
-        // Check values are unescaped properly in the edit form
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        Assert::assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-
-        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
-        $form          = $buttonCrawler->form();
-        Assert::assertEquals($url, $form['config[coreconfig][link_shortener_url]']->getValue());
-        Assert::assertEquals($trackIps, $form['config[coreconfig][do_not_track_ips]']->getValue());
-        Assert::assertEquals($googleAnalytics, $form['config[pageconfig][google_analytics]']->getValue());
-
         // Check values are escaped properly in the config file
         $configParameters = $this->getConfigParameters();
         Assert::assertArrayHasKey('link_shortener_url', $configParameters);
@@ -103,6 +93,15 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         );
         Assert::assertArrayHasKey('google_analytics', $configParameters);
         Assert::assertSame($this->escape($googleAnalytics), $configParameters['google_analytics']);
+        // Check values are unescaped properly in the edit form
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        Assert::assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $form          = $buttonCrawler->form();
+        Assert::assertEquals($url, $form['config[coreconfig][link_shortener_url]']->getValue());
+        Assert::assertEquals($trackIps, $form['config[coreconfig][do_not_track_ips]']->getValue());
+        Assert::assertEquals($googleAnalytics, $form['config[pageconfig][google_analytics]']->getValue());
     }
 
     private function getConfigPath(): string
