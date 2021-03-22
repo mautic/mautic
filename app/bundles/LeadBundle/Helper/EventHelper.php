@@ -70,25 +70,25 @@ class EventHelper
         }
 
         if (key_exists('utm_content', $query)) {
-            $utmValues->setUtmCampaign($query['utm_content']);
+            $utmValues->setUtmContent($query['utm_content']);
         } elseif (key_exists('utm_content', $queryReferer)) {
             $utmValues->setUtmContent($queryReferer['utm_content']);
         }
 
         if (key_exists('utm_medium', $query)) {
-            $utmValues->setUtmCampaign($query['utm_medium']);
+            $utmValues->setUtmMedium($query['utm_medium']);
         } elseif (key_exists('utm_medium', $queryReferer)) {
             $utmValues->setUtmMedium($queryReferer['utm_medium']);
         }
 
         if (key_exists('utm_source', $query)) {
-            $utmValues->setUtmCampaign($query['utm_source']);
+            $utmValues->setUtmSource($query['utm_source']);
         } elseif (key_exists('utm_source', $queryReferer)) {
             $utmValues->setUtmSource($queryReferer['utm_source']);
         }
 
         if (key_exists('utm_term', $query)) {
-            $utmValues->setUtmCampaign($query['utm_term']);
+            $utmValues->setUtmTerm($query['utm_term']);
         } elseif (key_exists('utm_term', $queryReferer)) {
             $utmValues->setUtmTerm($queryReferer['utm_term']);
         }
