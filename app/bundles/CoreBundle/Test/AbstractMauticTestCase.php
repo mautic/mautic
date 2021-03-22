@@ -81,8 +81,6 @@ abstract class AbstractMauticTestCase extends WebTestCase
     {
         putenv('MAUTIC_CONFIG_PARAMETERS='.json_encode($defaultConfigOptions));
 
-        ErrorHandler::register('prod');
-
         $this->client = static::createClient($this->clientOptions, $this->clientServer);
         $this->client->disableReboot();
         $this->client->followRedirects(true);
