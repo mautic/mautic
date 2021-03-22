@@ -16,7 +16,6 @@ namespace Mautic\ConfigBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -60,7 +59,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         // request config edit page
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        Assert::assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        Assert::assertTrue($this->client->getResponse()->isOk());
 
         // Find save & close button
         $buttonCrawler = $crawler->selectButton('config[buttons][save]');
@@ -74,8 +73,17 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        $this->client->submit($form);
+        $crawler = $this->client->submit($form);
         Assert::assertTrue($this->client->getResponse()->isOk());
+
+        // Check for a flash error
+        $response = $this->client->getResponse()->getContent();
+        $message  = $crawler->filterXPath("//div[@id='flashes']//span")->count()
+            ?
+            $crawler->filterXPath("//div[@id='flashes']//span")->first()->text()
+            :
+            '';
+        Assert::assertStringNotContainsString('Could not save updated configuration:', $response, $message);
 
         // Check values are escaped properly in the config file
         $configParameters = $this->getConfigParameters();
@@ -95,7 +103,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($this->escape($googleAnalytics), $configParameters['google_analytics']);
         // Check values are unescaped properly in the edit form
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        Assert::assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        Assert::assertTrue($this->client->getResponse()->isOk());
 
         $buttonCrawler = $crawler->selectButton('config[buttons][save]');
         $form          = $buttonCrawler->form();
