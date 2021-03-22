@@ -66,6 +66,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $form          = $buttonCrawler->form();
         $form->setValues(
             [
+                'config[coreconfig][site_url]'           => 'https://mautic-community.local', // required
                 'config[coreconfig][link_shortener_url]' => $url,
                 'config[coreconfig][do_not_track_ips]'   => $trackIps,
                 'config[pageconfig][google_analytics]'   => $googleAnalytics,
