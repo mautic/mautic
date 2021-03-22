@@ -37,7 +37,6 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     {
         if (file_exists($this->getConfigPath().'.backup')) {
             rename($this->getConfigPath().'.backup', $this->getConfigPath());
-            unlink($this->getConfigPath().'.backup');
         } else {
             // local.php didn't exist to start with so delete as some test CI use environment variables
             unlink($this->getConfigPath());
