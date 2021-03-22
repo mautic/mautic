@@ -55,7 +55,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
 
         // Find save & close button
-        $buttonCrawler  =  $crawler->selectButton('Save & Close');
+        $buttonCrawler  = $crawler->selectButton('config[buttons][save]');
         $form           = $buttonCrawler->form();
         $form->setValues([
             'config[coreconfig][link_shortener_url]' => $url,
@@ -69,7 +69,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         // Check values are unescaped properly in the edit form
         $crawler        = $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        $buttonCrawler  =  $crawler->selectButton('Save & Close');
+        $buttonCrawler  =  $crawler->selectButton('config[buttons][save]');
         $form           = $buttonCrawler->form();
         Assert::assertEquals($url, $form['config[coreconfig][link_shortener_url]']->getValue());
         Assert::assertEquals($trackIps, $form['config[coreconfig][do_not_track_ips]']->getValue());
