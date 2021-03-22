@@ -14,7 +14,7 @@ use Symfony\Component\Finder\Finder;
 
 class FileManager
 {
-    const GRAPESJS_IMAGES_DIRECTORY = 'grapesjs';
+    const GRAPESJS_IMAGES_DIRECTORY = '';
 
     /**
      * @var FileUploader
@@ -102,7 +102,10 @@ class FileManager
      */
     public function getFullUrl($fileName, $separator = '/')
     {
-        return $this->coreParametersHelper->getParameter('site_url')
+        // if a static_url (CDN) is configured use that, otherwiese use the site url
+        $url = $this->coreParametersHelper->getParameter('static_url') ?? $this->coreParametersHelper->getParameter('site_url');
+
+        return $url
             .$separator
             .$this->getGrapesJsImagesPath(false, $separator)
             .$fileName;
@@ -116,6 +119,7 @@ class FileManager
      */
     private function getGrapesJsImagesPath($fullPath = false, $separator = '/')
     {
+        // $url = rtrim($config->get('static_url'), '/').'/'.$relativeImageFolderPath;
         return $this->pathsHelper->getSystemPath('images', $fullPath)
             .$separator
             .self::GRAPESJS_IMAGES_DIRECTORY
@@ -141,7 +145,7 @@ class FileManager
 
         $finder = new Finder();
         $finder->files()->in($uploadDir);
-       
+
         foreach ($finder as $file) {
             if ($size = @getimagesize($this->getCompleteFilePath($file->getFilename()))) {
                 $files[] = [
