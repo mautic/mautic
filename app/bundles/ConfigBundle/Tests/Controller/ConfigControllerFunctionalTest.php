@@ -16,6 +16,7 @@ namespace Mautic\ConfigBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -53,24 +54,29 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         // request config edit page
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        Assert::assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
         // Find save & close button
-        $buttonCrawler  = $crawler->selectButton('config[buttons][save]');
-        $form           = $buttonCrawler->form();
-        $form->setValues([
-            'config[coreconfig][link_shortener_url]' => $url,
-            'config[coreconfig][do_not_track_ips]'   => $trackIps,
-            'config[pageconfig][google_analytics]'   => $googleAnalytics,
-            'config[leadconfig][contact_columns]'    => ['name', 'email', 'id'],
-        ]);
+        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $form          = $buttonCrawler->form();
+        $form->setValues(
+            [
+                'config[coreconfig][link_shortener_url]' => $url,
+                'config[coreconfig][do_not_track_ips]'   => $trackIps,
+                'config[pageconfig][google_analytics]'   => $googleAnalytics,
+                'config[leadconfig][contact_columns]'    => ['name', 'email', 'id'],
+            ]
+        );
 
         $this->client->submit($form);
         Assert::assertTrue($this->client->getResponse()->isOk());
 
         // Check values are unescaped properly in the edit form
-        $crawler        = $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        $buttonCrawler  =  $crawler->selectButton('config[buttons][save]');
-        $form           = $buttonCrawler->form();
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        Assert::assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $form          = $buttonCrawler->form();
         Assert::assertEquals($url, $form['config[coreconfig][link_shortener_url]']->getValue());
         Assert::assertEquals($trackIps, $form['config[coreconfig][do_not_track_ips]']->getValue());
         Assert::assertEquals($googleAnalytics, $form['config[pageconfig][google_analytics]']->getValue());
@@ -80,12 +86,15 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertArrayHasKey('link_shortener_url', $configParameters);
         Assert::assertSame($this->escape($url), $configParameters['link_shortener_url']);
         Assert::assertArrayHasKey('do_not_track_ips', $configParameters);
-        Assert::assertSame([
-            $this->escape('%ip1%'),
-            $this->escape('%ip2%'),
-            '%kernel.root_dir%',
-            '%kernel.project_dir%',
-        ], $configParameters['do_not_track_ips']);
+        Assert::assertSame(
+            [
+                $this->escape('%ip1%'),
+                $this->escape('%ip2%'),
+                '%kernel.root_dir%',
+                '%kernel.project_dir%',
+            ],
+            $configParameters['do_not_track_ips']
+        );
         Assert::assertArrayHasKey('google_analytics', $configParameters);
         Assert::assertSame($this->escape($googleAnalytics), $configParameters['google_analytics']);
     }
