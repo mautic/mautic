@@ -75,9 +75,8 @@ class EscapeTransformer implements DataTransformerInterface
         }
 
         $escaped = str_replace('%', '%%', $value);
-        $escaped = $this->allowParameters($escaped);
 
-        return $escaped;
+        return $this->allowParameters($escaped);
     }
 
     private function allowParameters(string $escaped): string
