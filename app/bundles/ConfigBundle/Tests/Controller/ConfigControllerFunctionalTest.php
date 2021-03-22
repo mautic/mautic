@@ -28,12 +28,20 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         parent::setUp();
 
-        copy($this->getConfigPath(), $this->getConfigPath().'.backup');
+        if (file_exists($this->getConfigPath())) {
+            copy($this->getConfigPath(), $this->getConfigPath().'.backup');
+        }
     }
 
     protected function tearDown(): void
     {
-        rename($this->getConfigPath().'.backup', $this->getConfigPath());
+        if (file_exists($this->getConfigPath().'.backup')) {
+            rename($this->getConfigPath().'.backup', $this->getConfigPath());
+            unlink($this->getConfigPath().'.backup');
+        } else {
+            // local.php didn't exist to start with so delete as some test CI use environment variables
+            unlink($this->getConfigPath());
+        }
 
         parent::tearDown();
     }
