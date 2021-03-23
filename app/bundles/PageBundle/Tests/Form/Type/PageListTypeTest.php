@@ -23,7 +23,7 @@ class PageListTypeTest extends TestCase
     private $page;
     private $pageModelMock;
 
-    public function setUp()
+    public function setUp(): void
     {
         $corePermissionsHelper = $this->createMock(CorePermissions::class);
         $this->pageModelMock   = $this->createMock(PageModel::class);
