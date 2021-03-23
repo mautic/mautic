@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid\Mail;
 
+use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailMetadata;
 use SendGrid\BccSettings;
 use SendGrid\Mail;
@@ -53,5 +54,65 @@ class SendGridMailMetadataTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame('bcc@example.com', $bccSettings->getEmail());
         $this->assertTrue($bccSettings->getEnable());
+    }
+
+    /**
+     * @dataProvider mauticMessageMetadataProvider
+     */
+    public function testMauticMessageMetadata($metadata)
+    {
+        $sendGridMailMetadata = new SendGridMailMetadata();
+
+        $message = $this->getMockBuilder(MauticMessage::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $message->expects($this->any())
+            ->method('getMetadata')
+            ->with()
+            ->willReturn([$metadata]);
+
+        $mail = new Mail('from', 'subject', 'to', 'content');
+
+        $sendGridMailMetadata->addMetadataToMail($mail, $message);
+
+        $args = $mail->getCustomArgs();
+
+        if (empty($metadata['hashId'])) {
+            $this->assertFalse(isset($args['hashId']));
+        } else {
+            $this->assertSame($metadata['hashId'], $args['hashId']);
+        }
+
+        if (empty($metadata['emailId'])) {
+            $this->assertFalse(isset($args['emailId']));
+        } else {
+            $this->assertSame($metadata['emailId'], $args['emailId']);
+        }
+
+        if (!empty($metadata['source']) && is_array($metadata['source'])) {
+            $this->assertSame($metadata['source'][0], $args['channel']);
+            $this->assertSame($metadata['source'][1], $args['sourceId']);
+        } else {
+            $this->assertFalse(isset($args['channel']));
+            $this->assertFalse(isset($args['sourceId']));
+        }
+    }
+
+    public function mauticMessageMetadataProvider()
+    {
+        return [
+            'complete' => [[
+                'hashId'  => '6059caf4828b8409852053',
+                'emailId' => '1234',
+                'source'  => ['email', '321'],
+            ]],
+            'partial' => [[
+                'hashId'  => '',
+                'emailId' => '5678',
+                'source'  => [],
+            ]],
+            'empty' => [[]],
+        ];
     }
 }
