@@ -197,7 +197,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
 
         // Find save & close button
-        $buttonCrawler  =  $crawler->selectButton('Save & Close');
+        $buttonCrawler  = $crawler->selectButton('config[buttons][save]');
         $form           = $buttonCrawler->form();
 
         // Fetch available option for 404_page field
@@ -207,16 +207,18 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(['', $page1, $page3], $availableOptions);
 
         // page 3 for 404_page
-        $form['config[coreconfig][404_page]']->setValue($page3);
-        $form['config[coreconfig][site_url]']->setValue('https://mautic-cloud.local');
-        $this->client->submit($form);
+        $form->setValues(
+            [
+                'config[coreconfig][site_url]' => 'https://mautic-community.local', // required
+                'config[coreconfig][404_page]' => $page3,
+            ]
+        );
+
+        $crawler = $this->client->submit($form);
         Assert::assertTrue($this->client->getResponse()->isOk());
 
-        // re-create the Symfony client to make config changes applied
-        $this->setUpSymfony();
-
-        // Request not found url page3 page content should be rendered
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/editnotfoundurlblablabla');
-        $this->assertStringContainsString('Page3 Test Html', $crawler->text());
+        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $form          = $buttonCrawler->form();
+        Assert::assertEquals($page3, $form['config[coreconfig][404_page]']->getValue());
     }
 }
