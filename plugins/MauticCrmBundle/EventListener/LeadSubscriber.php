@@ -52,11 +52,11 @@ class LeadSubscriber implements EventSubscriberInterface
         }
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
+        $this->leadExport->setIntegration($integrationObject);
         $operation         = $this->leadExport->getOperation($lead);
         if (false === $integrationObject || !$integrationObject->shouldImportDataToPipedrive($operation)) {
             return;
         }
-        $this->leadExport->setIntegration($integrationObject);
 
         $changes = $lead->getChanges(true);
         if (!empty($changes['dateIdentified'])) {
