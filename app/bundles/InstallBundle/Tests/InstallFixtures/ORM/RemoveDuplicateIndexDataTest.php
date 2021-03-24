@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Mautic\InstallBundle\Tests\InstallFixtures\ORM;
 
-use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\InstallBundle\InstallFixtures\ORM\RemoveDuplicateIndexData;
 use PHPUnit\Framework\Assert;
@@ -78,13 +77,13 @@ class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
 
     private function dropTable(string $table): void
     {
-        $this->connection->exec(sprintf('DROP TABLE IF EXISTS %s%s', static::TABLE_PREFIX, $table));
+        $this->connection->exec(sprintf('DROP TABLE IF EXISTS %s', $table));
     }
 
     private function createTables(): void
     {
         $this->connection->exec('
-            CREATE TABLE IF NOT EXISTS '.static::TABLE_PREFIX.'email_assets_xref
+            CREATE TABLE IF NOT EXISTS email_assets_xref
             (
                 email_id int unsigned not null,
                 asset_id int unsigned not null,
@@ -95,7 +94,7 @@ class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
         ');
 
         $this->connection->exec('
-            CREATE TABLE IF NOT EXISTS '.static::TABLE_PREFIX.'email_list_xref
+            CREATE TABLE IF NOT EXISTS email_list_xref
             (
                 email_id int unsigned not null,
                 leadlist_id int unsigned not null,
@@ -108,7 +107,7 @@ class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
 
     private function hasTableIndexForColumn(string $table, string $column): bool
     {
-        $query = sprintf('SHOW INDEX FROM %s WHERE Key_name <> "PRIMARY" AND Column_name = "%s"', static::TABLE_PREFIX.$table, $column);
+        $query = sprintf('SHOW INDEX FROM %s WHERE Key_name <> "PRIMARY" AND Column_name = "%s"', $table, $column);
 
         return false !== $this->connection->fetchAssoc($query);
     }
@@ -148,10 +147,6 @@ class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
 
             public function getParameter($name)
             {
-                if ('mautic.db_table_prefix' === $name) {
-                    return RemoveDuplicateIndexDataTest::TABLE_PREFIX;
-                }
-
                 return $this->container->getParameter($name);
             }
 
