@@ -44,7 +44,7 @@ class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->container->set('mautic.schema.helper.index', new IndexSchemaHelper($this->connection, static::TABLE_PREFIX));
+        self::$container->set('mautic.schema.helper.index', new IndexSchemaHelper($this->connection, static::TABLE_PREFIX));
 
         $this->fixture = new RemoveDuplicateIndexData();
         $this->fixture->setContainer($this->getContainerFake());
