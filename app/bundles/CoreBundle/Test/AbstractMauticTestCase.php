@@ -105,6 +105,9 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
         $this->em->close();
 
+        // restore exception handler set by Symfony
+        restore_exception_handler();
+
         parent::tearDown();
     }
 
