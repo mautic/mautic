@@ -22,13 +22,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
 {
     /**
-     * A temporary table prefix.
-     *
-     * @var string
-     */
-    public const TABLE_PREFIX = 'tmp_tst_pfx_';
-
-    /**
      * Disable transaction rollback for cleanup as we alter the DB schema within the test.
      *
      * @var bool
@@ -43,8 +36,6 @@ class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        self::$container->set('mautic.schema.helper.index', new IndexSchemaHelper($this->connection, static::TABLE_PREFIX));
 
         $this->fixture = new RemoveDuplicateIndexData();
         $this->fixture->setContainer($this->getContainerFake());
