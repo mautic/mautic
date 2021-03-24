@@ -90,26 +90,16 @@ class UpdateSchemaStepTest extends AbstractStepTest
         /** @var ContainerInterface|MockObject $container */
         $container = $this->createMock(ContainerInterface::class);
         $container->method('get')
-            ->withConsecutive(
-                ['kernel'],
-                ['event_dispatcher'],
-                ['doctrine:migrations:migrate']
-            )
-            ->willReturnOnConsecutiveCalls(
-                $this->kernel,
-                $this->eventDispatcher,
-                $this->migrateCommand
-            );
-
+            ->will($this->returnValueMap([
+                ['kernel', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->kernel],
+                ['event_dispatcher', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->eventDispatcher],
+                ['doctrine:migrations:migrate', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->migrateCommand],
+            ]));
         $container->method('hasParameter')
-            ->withConsecutive(
-                ['console.command.ids'],
-                ['console.lazy_command.ids']
-            )
-            ->willReturnOnConsecutiveCalls(
-                true,
-                false
-            );
+            ->will($this->returnValueMap([
+                ['console.command.ids', true],
+                ['console.laze_command.ids', false],
+            ]));
 
         $container->method('getParameter')
             ->with('console.command.ids')
@@ -127,15 +117,15 @@ class UpdateSchemaStepTest extends AbstractStepTest
     {
         $this->expectException(UpdateFailedException::class);
 
+        $this->migrateCommand->method('run')
+            ->willReturn(1);
+
         $this->eventDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (string $eventName, Event $event) {
+                function (Event $event, string $eventName) {
                     switch ($eventName) {
                         case ConsoleEvents::COMMAND:
                             $event->enableCommand();
-                            break;
-                        case ConsoleEvents::TERMINATE:
-                            $event->setExitCode(1);
                             break;
                     }
                 }
@@ -150,15 +140,15 @@ class UpdateSchemaStepTest extends AbstractStepTest
 
     public function testExceptionNotThrownIfMigrationsWereSuccessful()
     {
+        $this->migrateCommand->method('run')
+            ->willReturn(0);
+
         $this->eventDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (string $eventName, Event $event) {
+                function (Event $event, string $eventName) {
                     switch ($eventName) {
                         case ConsoleEvents::COMMAND:
                             $event->enableCommand();
-                            break;
-                        case ConsoleEvents::TERMINATE:
-                            $event->setExitCode(0);
                             break;
                     }
                 }
