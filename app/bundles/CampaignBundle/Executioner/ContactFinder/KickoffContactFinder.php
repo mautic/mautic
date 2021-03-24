@@ -97,4 +97,9 @@ class KickoffContactFinder
     {
         $this->leadRepository->clear();
     }
+
+    public function unscheduleContacts($contacts, $campaign)
+    {
+        $this->campaignRepository->unscheduleContacts($contacts, $campaign);
+    }
 }
