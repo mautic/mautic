@@ -183,7 +183,7 @@ class PipedriveApi extends CrmApi
 
         $data = $this->getResponseData($response);
 
-        $this->apiFields[$object] = !empty($data) ? $data : [];;
+        $this->apiFields[$object] = !empty($data) ? $data : [];
 
         return $this->apiFields[$object];
     }
