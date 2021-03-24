@@ -637,4 +637,35 @@ class CampaignRepository extends CommonRepository
 
         return $return;
     }
+
+    /**
+     * @param \Doctrine\Common\Collections\ArrayCollection<string, \Mautic\LeadBundle\Entity\Lead> $contacts
+     */
+    public function unscheduleContacts($contacts, Campaign $campaign): void
+    {
+        if ($contacts->isEmpty()) {
+            return;
+        }
+
+        $campaignId = $campaign->getId();
+        $contactIds = implode(',', $contacts->map(fn (\Mautic\LeadBundle\Entity\Lead $contact) => "'".((string) $contact->getId())."'")->toArray());
+
+        $connection = $this->getEntityManager()->getConnection();
+        $qb         = $connection->createQueryBuilder();
+        $qb->update(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log')
+           ->set('is_scheduled', '0')
+           ->where(
+               $qb->expr()->andX(
+                   $qb->expr()->eq('is_scheduled', 1),
+                   $qb->expr()->eq('campaign_id', ':campaignId'),
+                   $qb->expr()->in('lead_id', $contactIds)
+               )
+           )
+           ->setParameters(
+               [
+                   'campaignId' => (int) $campaignId,
+               ]
+           )
+           ->execute();
+    }
 }

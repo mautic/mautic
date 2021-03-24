@@ -97,4 +97,13 @@ class KickoffContactFinder
     {
         $this->leadRepository->clear();
     }
+
+    /**
+     * @param ArrayCollection<string, \Mautic\LeadBundle\Entity\Lead> $contacts
+     * @param \Mautic\CampaignBundle\Entity\Campaign                  $campaign
+     */
+    public function unscheduleContacts(ArrayCollection $contacts, $campaign): void
+    {
+        $this->campaignRepository->unscheduleContacts($contacts, $campaign);
+    }
 }
