@@ -70,7 +70,7 @@ class SendGridMailMetadataTest extends \PHPUnit\Framework\TestCase
         $message->expects($this->any())
             ->method('getMetadata')
             ->with()
-            ->willReturn([$metadata]);
+            ->willReturn($metadata);
 
         $mail = new Mail('from', 'subject', 'to', 'content');
 
@@ -78,21 +78,26 @@ class SendGridMailMetadataTest extends \PHPUnit\Framework\TestCase
 
         $args = $mail->getCustomArgs();
 
-        if (empty($metadata['hashId'])) {
+        // Args come from the first entry in the metadata array. An empty
+        // array is forced here to facilitate making the same assertions on
+        // all of the test cases.
+        $expected = empty($metadata) ? [] : reset($metadata);
+
+        if (empty($expected['hashId'])) {
             $this->assertFalse(isset($args['hashId']));
         } else {
-            $this->assertSame($metadata['hashId'], $args['hashId']);
+            $this->assertSame($expected['hashId'], $args['hashId']);
         }
 
-        if (empty($metadata['emailId'])) {
+        if (empty($expected['emailId'])) {
             $this->assertFalse(isset($args['emailId']));
         } else {
-            $this->assertSame($metadata['emailId'], $args['emailId']);
+            $this->assertSame($expected['emailId'], $args['emailId']);
         }
 
-        if (!empty($metadata['source']) && is_array($metadata['source'])) {
-            $this->assertSame($metadata['source'][0], $args['channel']);
-            $this->assertSame($metadata['source'][1], $args['sourceId']);
+        if (!empty($expected['source']) && is_array($expected['source'])) {
+            $this->assertSame($expected['source'][0], $args['channel']);
+            $this->assertSame($expected['source'][1], $args['sourceId']);
         } else {
             $this->assertFalse(isset($args['channel']));
             $this->assertFalse(isset($args['sourceId']));
@@ -102,17 +107,27 @@ class SendGridMailMetadataTest extends \PHPUnit\Framework\TestCase
     public function mauticMessageMetadataProvider()
     {
         return [
-            'complete' => [[
+            // All four args are populated
+            'complete' => [[[
                 'hashId'  => '6059caf4828b8409852053',
                 'emailId' => '1234',
                 'source'  => ['email', '321'],
-            ]],
-            'partial' => [[
+            ]]],
+
+            // Only emailId is populated because the other two metadata values
+            // are empty.
+            'partial' => [[[
                 'hashId'  => '',
                 'emailId' => '5678',
                 'source'  => [],
-            ]],
-            'empty' => [[]],
+            ]]],
+
+            // The metadata array isn't empty(), but its only entry is.
+            'empty entry' => [[[]]],
+
+            // The metadata array is empty, causing early return from
+            // addMauticMessageMetadataToMail().
+            'empty metadata' => [[]],
         ];
     }
 }
