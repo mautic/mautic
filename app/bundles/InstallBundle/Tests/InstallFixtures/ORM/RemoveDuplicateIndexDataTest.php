@@ -32,8 +32,6 @@ class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
      */
     private $fixture;
 
-    private $hadAssetsXrefTableBeforeTest = false;
-    private $hadListXrefTableBeforeTest   = false;
     protected ContainerInterface $tempContainer;
 
     protected function setUp(): void
@@ -43,23 +41,6 @@ class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
         $this->tempContainer = self::$container;
         $this->fixture       = new RemoveDuplicateIndexData();
         $this->fixture->setContainer($this->getContainerFake());
-    }
-
-    /**
-     * We only want to drop the email_assets_xref and email_list_xref tables
-     * if we created them in this test, otherwise they should stay for other tests.
-     * This prevents errors like "Table 'mautictest.email_list_xref' doesn't exist" in CI.
-     */
-    protected function tearDown(): void
-    {
-        if ($this->hadAssetsXrefTableBeforeTest) {
-            $this->dropTable('email_assets_xref');
-        }
-        if ($this->hadListXrefTableBeforeTest) {
-            $this->dropTable('email_list_xref');
-        }
-
-        parent::tearDown();
     }
 
     public function testGetGroups(): void
@@ -89,14 +70,9 @@ class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
         Assert::assertTrue($this->hasTableIndexForColumn('email_list_xref', 'leadlist_id'));
     }
 
-    private function dropTable(string $table): void
-    {
-        $this->connection->exec(sprintf('DROP TABLE IF EXISTS %s', $table));
-    }
-
     private function createTables(): void
     {
-        $this->hadAssetsXrefTableBeforeTest = ($this->connection->exec('
+        $this->connection->exec('
             CREATE TABLE IF NOT EXISTS email_assets_xref
             (
                 email_id int unsigned not null,
@@ -105,9 +81,9 @@ class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
                 INDEX IDX_asset_id (asset_id),
                 INDEX IDX_email_id (email_id)
             )
-        ') > 0) ? false : true;
+        ');
 
-        $this->hadListXrefTableBeforeTest = ($this->connection->exec('
+        $this->connection->exec('
             CREATE TABLE IF NOT EXISTS email_list_xref
             (
                 email_id int unsigned not null,
@@ -116,7 +92,7 @@ class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
                 INDEX IDX_email_id (email_id),
                 INDEX IDX_leadlist_id (leadlist_id)
             )
-        ') > 0) ? false : true;
+        ');
     }
 
     private function hasTableIndexForColumn(string $table, string $column): bool
