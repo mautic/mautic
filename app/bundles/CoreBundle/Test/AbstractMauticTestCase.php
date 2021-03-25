@@ -6,7 +6,6 @@ use Doctrine\Common\DataFixtures\Executor\AbstractExecutor;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Liip\TestFixturesBundle\Test\FixturesTrait;
-use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
 use RuntimeException;
@@ -97,15 +96,6 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->client->setServerParameter('HTTPS', $secure);
 
         $this->mockServices();
-    }
-
-    protected function tearDown(): void
-    {
-        static::$class = null;
-
-        $this->em->close();
-
-        parent::tearDown();
     }
 
     /**
