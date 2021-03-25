@@ -172,6 +172,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     public function setColumnFormula($column, $formula)
     {
         $this->options['columns'][$column]['formula'] = $formula;
+        $this->options['filters'][$column]['formula'] = $formula;
     }
 
     /**
