@@ -122,7 +122,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->cacheStorageHelperMock,
             $this->contactTracker,
             $this->doNotContact,
-            $this->generatedColumnsProvider
+            $this->generatedColumnsProvider,
+            $this->emailRepository
         );
 
         $this->emailModel->setTranslator($this->translator);
@@ -502,7 +503,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->cacheStorageHelperMock,
             $this->contactTracker,
             $this->doNotContact,
-            $this->generatedColumnsProvider
+            $this->generatedColumnsProvider,
+            $this->emailRepository
         );
 
         $emailModel->setTranslator($this->translator);
