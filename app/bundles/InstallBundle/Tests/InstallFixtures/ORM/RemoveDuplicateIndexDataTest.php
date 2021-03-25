@@ -34,12 +34,14 @@ class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
 
     private $hadAssetsXrefTableBeforeTest = false;
     private $hadListXrefTableBeforeTest   = false;
+    protected ContainerInterface $tempContainer;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->fixture = new RemoveDuplicateIndexData();
+        $this->tempContainer = self::$container;
+        $this->fixture       = new RemoveDuplicateIndexData();
         $this->fixture->setContainer($this->getContainerFake());
     }
 
@@ -126,7 +128,7 @@ class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
 
     private function getContainerFake(): ContainerInterface
     {
-        return new class($this->container) implements ContainerInterface {
+        return new class($this->tempContainer) implements ContainerInterface {
             /**
              * @var ContainerInterface
              */
