@@ -656,8 +656,8 @@ class LeadController extends FormController
                         $objectId,
                         $this->get('mautic.helper.user')->getUser()->getName()
                     ));
-                    $model->saveEntity($lead, $form->get('buttons')->get('save')->isClicked());
                     $model->modifyCompanies($lead, $companies);
+                    $model->saveEntity($lead, $form->get('buttons')->get('save')->isClicked());
 
                     // Upload avatar if applicable
                     $image = $form['preferred_profile_image']->getData();

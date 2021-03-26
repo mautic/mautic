@@ -654,13 +654,9 @@ class ImportController extends FormController
     /**
      * Support non-index pages such as modal forms.
      *
-     * @param string $route
-     * @param array  $parameters
-     * @param int    $referenceType
-     *
      * @return bool|string
      */
-    public function generateUrl($route, $parameters = [], $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+    protected function generateUrl(string $route, array $parameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): string
     {
         if (!isset($parameters['object'])) {
             $parameters['object'] = $this->request->get('object', 'contacts');

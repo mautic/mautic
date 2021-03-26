@@ -23,7 +23,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
         ];
 
         /** @var CompanyModel $model */
-        $model      = $this->container->get('mautic.lead.model.company');
+        $model      = self::$container->get('mautic.lead.model.company');
         $company    = new Company();
         $company->setIsPublished(true)
             ->setName($companyData['name'])
@@ -43,7 +43,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', '/s/companies/view/'.$this->id);
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
-        $model                  = $this->container->get('mautic.lead.model.company');
+        $model                  = self::$container->get('mautic.lead.model.company');
         $company                = $model->getEntity($this->id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertStringContainsString($company->getName(), $clientResponseContent, 'The return must contain the name of company');
@@ -57,7 +57,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', '/s/companies/edit/'.$this->id);
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
-        $model                  = $this->container->get('mautic.lead.model.company');
+        $model                  = self::$container->get('mautic.lead.model.company');
         $company                = $model->getEntity($this->id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertStringContainsString('Edit Company '.$company->getName(), $clientResponseContent, 'The return must contain \'Edit Company\' text');
@@ -69,7 +69,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', 's/company/'.$this->id.'/contacts/');
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
-        $model                  = $this->container->get('mautic.lead.model.company');
+        $model                  = self::$container->get('mautic.lead.model.company');
         $company                = $model->getEntity($this->id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }

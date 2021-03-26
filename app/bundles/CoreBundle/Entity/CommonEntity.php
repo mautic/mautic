@@ -12,6 +12,8 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 class CommonEntity
 {
@@ -24,6 +26,13 @@ class CommonEntity
      * @var array
      */
     protected $pastChanges = [];
+
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setMappedSuperClass();
+    }
 
     /**
      * Wrapper function for isProperty methods.

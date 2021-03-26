@@ -12,7 +12,7 @@ class PipedriveControllerTest extends PipedriveTest
 {
     public function testWithoutIntegration()
     {
-        $this->makeRequest('POST', []);
+        $this->makeRequest('POST', '');
 
         $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
@@ -25,7 +25,7 @@ class PipedriveControllerTest extends PipedriveTest
     {
         $this->installPipedriveIntegration(false);
 
-        $this->makeRequest('POST', []);
+        $this->makeRequest('POST', '');
 
         $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
@@ -38,7 +38,7 @@ class PipedriveControllerTest extends PipedriveTest
     {
         $this->installPipedriveIntegration(true);
 
-        $this->makeRequest('POST', [], false);
+        $this->makeRequest('POST', '', false);
 
         $response = $this->client->getResponse();
 
@@ -49,7 +49,7 @@ class PipedriveControllerTest extends PipedriveTest
     {
         $this->installPipedriveIntegration(true, [], [], [], false);
 
-        $this->makeRequest('POST', []);
+        $this->makeRequest('POST', '');
 
         $response = $this->client->getResponse();
 
