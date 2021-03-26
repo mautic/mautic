@@ -590,4 +590,25 @@ final class LeadEvents
      * @var string
      */
     const ON_CLICKTHROUGH_IDENTIFICATION = 'mautic.clickthrough_contact_identification';
+
+    /**
+     * The mautic.lead_field_pre_add_column event is dispatched before adding a new column to lead_fields table.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Field\Event\AddColumnEvent instance.
+     *
+     * @var string
+     */
+    const LEAD_FIELD_PRE_ADD_COLUMN = 'mautic.lead_field_pre_add_column';
+
+    /**
+     * The mautic.lead_field_pre_add_column_background_job event is dispatched before adding a new column to lead_fields table
+     * in background job.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Field\Event\AddColumnBackgroundEvent instance.
+     *
+     * @var string
+     */
+    const LEAD_FIELD_PRE_ADD_COLUMN_BACKGROUND_JOB = 'mautic.lead_field_pre_add_column_background_job';
 }
