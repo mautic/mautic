@@ -11,7 +11,7 @@ class EmailSendEventTest extends \PHPUnit\Framework\TestCase
      */
     private $emailSendEvent;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->emailSendEvent = new EmailSendEvent();

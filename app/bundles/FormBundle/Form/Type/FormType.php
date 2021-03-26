@@ -23,6 +23,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -126,6 +127,21 @@ class FormType extends AbstractType
             [
                 'label' => 'mautic.form.form.no_index',
                 'data'  => $options['data']->getNoIndex() ? $options['data']->getNoIndex() : false,
+            ]
+        );
+
+        $builder->add(
+            'progressiveProfilingLimit',
+            TextType::class,
+            [
+                'label' => 'mautic.form.form.progressive_profiling_limit.max_fields',
+                'attr'  => [
+                    'style'       => 'width:75px;',
+                    'class'       => 'form-control',
+                    'tooltip'     => 'mautic.form.form.progressive_profiling_limit.max_fields.tooltip',
+                    'placeholder' => 'mautic.form.form.progressive_profiling_limit_unlimited',
+                ],
+                'data'  => $options['data']->getProgressiveProfilingLimit() ? $options['data']->getProgressiveProfilingLimit() : '',
             ]
         );
 

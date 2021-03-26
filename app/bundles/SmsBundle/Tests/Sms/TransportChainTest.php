@@ -10,18 +10,25 @@
 
 namespace Mautic\SmsBundle\Tests\Sms;
 
-use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Exception;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\SmsBundle\Integration\Twilio\TwilioTransport;
 use Mautic\SmsBundle\Sms\TransportChain;
+use Mautic\SmsBundle\Sms\TransportInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use ReflectionClass;
 
-class TransportChainTest extends AbstractMauticTestCase
+class TransportChainTest extends MauticMysqlTestCase
 {
     /**
-     * @var TransportChain
+     * @var TransportChain|MockObject
      */
     private $transportChain;
 
+    /**
+     * @var TransportInterface|MockObject
+     */
     private $twilioTransport;
 
     /**
@@ -37,20 +44,20 @@ class TransportChainTest extends AbstractMauticTestCase
      */
     public function invokeMethod(&$object, $methodName, array $parameters = [])
     {
-        $reflection = new \ReflectionClass(get_class($object));
+        $reflection = new ReflectionClass(get_class($object));
         $method     = $reflection->getMethod($methodName);
         $method->setAccessible(true);
 
         return $method->invokeArgs($object, $parameters);
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->transportChain = new TransportChain(
             'mautic.test.twilio.mock',
-            $this->container->get('mautic.helper.integration')
+            self::$container->get('mautic.helper.integration')
         );
 
         $this->twilioTransport = $this->createMock(TwilioTransport::class);
@@ -64,7 +71,7 @@ class TransportChainTest extends AbstractMauticTestCase
     {
         $count = count($this->transportChain->getTransports());
 
-        $this->transportChain->addTransport('mautic.transport.test', $this->container->get('mautic.sms.twilio.transport'), 'mautic.transport.test', 'Twilio');
+        $this->transportChain->addTransport('mautic.transport.test', self::$container->get('mautic.sms.twilio.transport'), 'mautic.transport.test', 'Twilio');
 
         $this->assertCount($count + 1, $this->transportChain->getTransports());
     }
@@ -80,7 +87,7 @@ class TransportChainTest extends AbstractMauticTestCase
 
         try {
             $this->transportChain->sendSms($lead, 'Yeah');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $message = $e->getMessage();
             $this->assertEquals('Primary SMS transport is not enabled', $message);
         }
