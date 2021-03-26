@@ -129,7 +129,7 @@ class Segments {
     }
 
     get clickOnFourthFilterProperties(){
-        return cy.get('#leadlist_filters_4_properties_filter_chosen>a');
+        return cy.get('#leadlist_filters_4_filter');
     }
 
     get typeFourthFilterInput(){

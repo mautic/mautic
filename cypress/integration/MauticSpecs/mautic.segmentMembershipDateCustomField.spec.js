@@ -13,6 +13,7 @@ var booleanCustomField = "Boolean Custom Field"
 var contactFirstName = "test1"
 var segmentMembershipWithCustomField1 = " segment with custom field and boolean 1"
 var segmentMembershipWithCustomField2 = " segment with custom field and boolean 2"
+var cronpath = Cypress.env('cron-path'); // Community Specific
 
 context("Verify segment membership tests with date custom field", () => {
    
@@ -54,7 +55,6 @@ context("Verify segment membership tests with date custom field", () => {
     customFields.DataTypeSelector.select("Boolean",{force: true});
     customFields.SaveAndCloseButton.click();
     customFields.waitforPageLoad();
-    cy.wait(3000) // Added wait to get custom field published
   })
 
   it("Add new contact for segment membership", () => {
@@ -131,7 +131,6 @@ context("Verify segment membership tests with date custom field", () => {
     segments.filterField.click();
     segments.waitTillFilterOptionGetsLoaded()
     segments.filterOperator.select('contains')
-    cy.wait(1000) // Added wait for page rendering
     segments.filterValue.type(contactFirstName, { force: true });
 
     segments.filterDropDown.click();
@@ -139,7 +138,6 @@ context("Verify segment membership tests with date custom field", () => {
     segments.filterField.click({ force: true });
     segments.waitTillSecondOperatorFilterGetsLoaded()
     segments.secondFilterOperator.select('greater than')
-    cy.wait(1000) // Added wait for page rendering
     segments.secondFilterProperties.type('2021-01-03',{ force: true })
 
     segments.filterDropDown.click();
@@ -147,7 +145,6 @@ context("Verify segment membership tests with date custom field", () => {
     segments.filterField.click({ force: true });
     segments.waitTillThirdOperatorFilterGetsLoaded()
     segments.thirdFilterOperator.select('greater than')
-    cy.wait(1000) // Added wait for page rendering
     segments.thirdFilterProperties.type('2021-01-04',{ force: true })
 
     segments.filterDropDown.click();
@@ -155,13 +152,12 @@ context("Verify segment membership tests with date custom field", () => {
     segments.filterField.click({ force: true });
     segments.waitTillFourthOperatorFilterGetsLoaded()
     segments.clickOnFourthFilterProperties.click({ force: true })
-    cy.wait(1000) // Added wait for page rendering
     segments.typeFourthFilterInput.type('Yes')
     segments.selectFourthTypedInput.click()
 
     segments.saveAndCloseButton.click()
     segments.waitforSegmentCreation()
-    cy.wait(3000) // Added wait for segment building
+    cy.exec(cronpath + ' m:s:r'); //Community specific
   })
 
   it("Verify that"+ segmentMembershipWithCustomField1 +"segment has two contacts only", () => {
