@@ -35,6 +35,8 @@ class DashboardController extends AbstractFormController
      * Generates the default view.
      *
      * @return JsonResponse|Response
+     *
+     * @throws \Exception
      */
     public function indexAction()
     {
@@ -575,6 +577,8 @@ class DashboardController extends AbstractFormController
      * Gets name from request and defaults it to the timestamp if not provided.
      *
      * @return string
+     *
+     * @throws \Exception
      */
     private function getNameFromRequest()
     {

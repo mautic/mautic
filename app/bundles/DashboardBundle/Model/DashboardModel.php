@@ -20,6 +20,7 @@ use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\Form\Type\WidgetType;
+use Mautic\DashboardBundle\Widget\WidgetDetailEventFactory;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -48,11 +49,8 @@ class DashboardModel extends FormModel
     /**
      * @var Filesystem
      */
-    protected $filesystem;
+    private $filesystem;
 
-    /**
-     * DashboardModel constructor.
-     */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         PathsHelper $pathsHelper,
@@ -169,6 +167,8 @@ class DashboardModel extends FormModel
      * Generates a translatable description for a dashboard.
      *
      * @return string
+     *
+     * @throws \Exception
      */
     public function generateDescription()
     {
@@ -254,6 +254,7 @@ class DashboardModel extends FormModel
         $event->setWidget($widget);
         $event->setCacheDir($cacheDir, $this->userHelper->getUser()->getId());
         $event->setSecurity($this->security);
+
         $this->dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE, $event);
     }
 
@@ -298,6 +299,8 @@ class DashboardModel extends FormModel
      *
      * @param object $entity
      * @param bool   $unlock
+     *
+     * @throws \Exception
      */
     public function saveEntity($entity, $unlock = true)
     {
@@ -313,6 +316,8 @@ class DashboardModel extends FormModel
 
     /**
      * Generate default date range filter and time unit.
+     *
+     * @throws \Exception
      */
     public function getDefaultFilter(): array
     {

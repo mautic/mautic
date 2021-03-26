@@ -11,10 +11,12 @@
 
 namespace Mautic\DashboardBundle\Event;
 
+use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Entity\Widget;
+use Mautic\DashboardBundle\Exception\CouldNotFormatDateTimeException;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -22,6 +24,7 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class WidgetDetailEvent extends CommonEvent
 {
+    /** @var Widget */
     protected $widget;
     protected $type;
     protected $template;
@@ -35,21 +38,65 @@ class WidgetDetailEvent extends CommonEvent
     protected $loadTime  = 0;
     protected $translator;
 
+    private $cacheKeyPath = 'dashboard.widget.';
+
     /**
      * @var CorePermissions
      */
     protected $security;
 
-    public function __construct(TranslatorInterface $translator)
+    /**
+     * @var CacheProvider
+     */
+    private $cacheProvider;
+
+    /**
+     * WidgetDetailEvent constructor.
+     */
+    public function __construct(TranslatorInterface $translator, CacheProvider $cacheProvider = null)
     {
-        $this->translator = $translator;
-        $this->startTime  = microtime(true);
+        $this->translator    = $translator;
+        $this->startTime     = microtime(true);
+        $this->cacheProvider = $cacheProvider;
+    }
+
+    /**
+     * Return unique key, uses legacy methods for BC.
+     *
+     * @return string
+     */
+    public function getCacheKey()
+    {
+        $cacheKey = [
+            $this->getUniqueWidgetId(),
+        ];
+
+        $params = $this->getWidget()->getParams();
+
+        foreach (['dateTo', 'dateFrom'] as $dateParameter) {
+            if (isset($params[$dateParameter])) {
+                try {
+                    $date       = $this->castDateTimeToString($params[$dateParameter]);
+                    $cacheKey[] = $date;
+                } catch (CouldNotFormatDateTimeException $e) {
+                }
+            }
+        }
+
+        // If there are no additional parameters we return uniqueWidgetId as a cache key
+        // Otherwise we return hashed $cacheKey value
+        $cacheKey = (1 == count($cacheKey)) ? $this->getUniqueWidgetId() : substr(md5(implode('', $cacheKey)), 0, 16);
+
+        return $this->cacheKeyPath.$cacheKey;
     }
 
     /**
      * Set the cache dir.
      *
+     * @deprecated
+     *
      * @param string $cacheDir
+     * @param null   $uniqueCacheDir
      */
     public function setCacheDir($cacheDir, $uniqueCacheDir = null)
     {
@@ -59,6 +106,8 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Set the cache timeout.
+     *
+     * @deprecated
      *
      * @param string $cacheTimeout
      */
@@ -151,7 +200,9 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Set the widget template data.
+     * @return bool
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function setTemplateData(array $templateData, $skipCache = false)
     {
@@ -159,19 +210,30 @@ class WidgetDetailEvent extends CommonEvent
         $this->widget->setTemplateData($templateData);
         $this->widget->setLoadTime(abs(microtime(true) - $this->startTime));
 
-        // Store the template data to the cache
-        if (!$skipCache && $this->cacheDir && $this->widget->getCacheTimeout() > 0) {
-            $cache = new CacheStorageHelper(CacheStorageHelper::ADAPTOR_FILESYSTEM, $this->uniqueCacheDir, null, $this->cacheDir);
-            // must pass a DateTime object or a int of seconds to expire as 3rd attribute to set().
-            $expireTime = $this->widget->getCacheTimeout() * 60;
-            $cache->set($this->getUniqueWidgetId(), $templateData, (int) $expireTime);
+        if ($this->usesLegacyCache()) {
+            // Store the template data to the cache
+            if (!$skipCache && $this->cacheDir && $this->widget->getCacheTimeout() > 0) {
+                $cache = new CacheStorageHelper($this->cacheDir, $this->uniqueCacheDir);
+
+                return $cache->set($this->getUniqueWidgetId(), $templateData);
+            }
+
+            return false;
         }
+
+        $cItem = $this->cacheProvider->getItem($this->getCacheKey());
+        if ($this->widget->getCacheTimeout()) {
+            $cItem->expiresAfter((int) $this->widget->getCacheTimeout() * 60);  // This is in minutes
+        }
+        $cItem->set($templateData);
+
+        return $this->cacheProvider->save($cItem);
     }
 
     /**
      * Get the widget template data.
      *
-     * @return string $templateData
+     * @return array $templateData
      */
     public function getTemplateData()
     {
@@ -225,28 +287,31 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Checks the cache for the widget data.
-     * If cache exists, it sets the TemplateData.
+     * @return bool
      *
-     * @return string
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function isCached()
     {
-        if (!$this->cacheDir) {
+        if (!$this->cacheDir && $this->usesLegacyCache()) {
             return false;
         }
 
-        $cache = new CacheStorageHelper(CacheStorageHelper::ADAPTOR_FILESYSTEM, $this->uniqueCacheDir, null, $this->cacheDir);
-        $data  = $cache->get($this->getUniqueWidgetId(), $this->cacheTimeout);
+        if ($this->usesLegacyCache()) {
+            $cache = new CacheStorageHelper($this->cacheDir, $this->uniqueCacheDir);
+            $data  = $cache->get($this->getUniqueWidgetId(), $this->cacheTimeout);
 
-        if ($data) {
-            $this->widget->setCached(true);
-            $this->setTemplateData($data, true);
+            if ($data) {
+                $this->widget->setCached(true);
+                $this->setTemplateData($data, true);
 
-            return true;
+                return true;
+            }
+
+            return false;
         }
 
-        return false;
+        return ($this->cacheProvider->getItem($this->getCacheKey()))->isHit();
     }
 
     /**
@@ -296,5 +361,45 @@ class WidgetDetailEvent extends CommonEvent
         }
 
         return $this->security->isGranted($permission);
+    }
+
+    /**
+     * Checks for cache type. This event should be created by factory thus not legacy approach.
+     *
+     * @return bool
+     */
+    private function usesLegacyCache()
+    {
+        return is_null($this->cacheProvider);
+    }
+
+    /**
+     * We need to cast DateTime objects to strings to use them in the cache key.
+     *
+     * @param \DateTimeInterface|mixed $value
+     *
+     * @throws CouldNotFormatDateTimeException
+     *
+     * @return string
+     */
+    private function castDateTimeToString($value)
+    {
+        if ($value instanceof \DateTimeInterface) {
+            // We use RFC 2822 format because it includes timezone
+            $value = $value->format('r');
+            if (false === $value) {
+                throw new CouldNotFormatDateTimeException();
+            }
+
+            return $value;
+        }
+
+        try {
+            $value = (string) $value;
+        } catch (\Exception $e) {
+            throw new CouldNotFormatDateTimeException();
+        }
+
+        return $value;
     }
 }

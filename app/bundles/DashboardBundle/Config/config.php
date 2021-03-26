@@ -77,6 +77,14 @@ return [
                     'session',
                 ],
             ],
+            'mautic.dashboard.widget_detail.event.factory' => [
+                'class'     => \Mautic\DashboardBundle\Widget\WidgetDetailEventFactory::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.cache.provider',
+                    'mautic.helper.user',
+                ],
+            ],
         ],
     ],
     'parameters' => [
