@@ -68,6 +68,10 @@ class RemoveDeletedFilesStepTest extends AbstractStepTest
 
         $step = $this->getStep();
 
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturn('');
+
         $step->execute($this->progressBar, $this->input, $this->output);
 
         $this->assertFileNotExists($resourcePath.'/delete_me.txt');
@@ -85,6 +89,10 @@ class RemoveDeletedFilesStepTest extends AbstractStepTest
             ->willReturn($resourcePath);
 
         $step = $this->getStep();
+
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturn('');
 
         $step->execute($this->progressBar, $this->input, $this->output);
         $this->logger->expects($this->never())
