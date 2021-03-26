@@ -14,12 +14,12 @@ namespace Mautic\SmsBundle\Controller;
 use Mautic\SmsBundle\Callback\HandlerContainer;
 use Mautic\SmsBundle\Exception\CallbackHandlerNotFound;
 use Mautic\SmsBundle\Helper\ReplyHelper;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class ReplyController extends Controller
+class ReplyController extends AbstractController
 {
     /**
      * @var HandlerContainer
