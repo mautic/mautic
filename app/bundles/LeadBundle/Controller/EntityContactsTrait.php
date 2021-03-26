@@ -117,7 +117,7 @@ trait EntityContactsTrait
 
         // Get DNC for the contact
         $dnc = [];
-        if ($dncChannel) {
+        if ($dncChannel && $count > 0) {
             $dnc = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getChannelList(
                 $dncChannel,
                 array_keys($contacts['results'])

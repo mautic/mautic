@@ -14,10 +14,22 @@ namespace Mautic\EmailBundle\Tests\Controller\Api;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
 use Symfony\Component\HttpFoundation\Response;
 
 class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->loadFixtures([LoadCategoryData::class]);
+    }
+
+    protected function beforeBeginTransaction(): void
+    {
+        $this->resetAutoincrement(['categories']);
+    }
+
     public function testSingleEmailWorkflow()
     {
         // Create a couple of segments first:
@@ -162,7 +174,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $trackingHash = 'tracking_hash_123';
 
         /** @var StatRepository $statRepository */
-        $statRepository = $this->container->get('mautic.email.repository.stat');
+        $statRepository = self::$container->get('mautic.email.repository.stat');
 
         // Create a test email stat.
         $stat = new Stat();
