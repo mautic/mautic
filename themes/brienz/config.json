@@ -1,0 +1,9 @@
+{
+  "name": "Brienz",
+  "author": "Friendly Automate",
+  "authorUrl": "https://friendly.is",
+  "builder": "grapesjsbuilder",
+  "features": [
+    "email"
+  ]
+}
