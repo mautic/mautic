@@ -392,12 +392,8 @@ class ResultController extends CommonFormController
 
     /**
      * Set the main form ID as the objectId.
-     *
-     * @param string $route
-     * @param array  $parameters
-     * @param int    $referenceType
      */
-    public function generateUrl($route, $parameters = [], $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+    protected function generateUrl(string $route, array $parameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): string
     {
         $formId = $this->getFormIdFromRequest($parameters);
         switch ($route) {
