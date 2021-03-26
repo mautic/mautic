@@ -57,7 +57,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
      */
     private $security;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cookieHelperMock            = $this->createMock(CookieHelper::class);
         $this->entityManagerMock           = $this->createMock(EntityManagerInterface::class);
@@ -225,11 +225,6 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTrackedDeviceNoRequest()
     {
-        // __construct()
-        $this->requestStackMock->expects($this->at(0))
-            ->method('getCurrentRequest')
-            ->willReturn(null);
-
         $deviceTrackingService = $this->getDeviceTrackingService();
         $this->assertNull($deviceTrackingService->getTrackedDevice());
     }
@@ -408,11 +403,6 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
     {
         $this->leadDeviceRepositoryMock->expects($this->never())
             ->method('getByTrackingId');
-
-        $requestMock = $this->createMock(Request::class);
-        $this->requestStackMock->expects($this->at(0))
-            ->method('getCurrentRequest')
-            ->willReturn($requestMock);
 
         $this->security->expects($this->once())
             ->method('isAnonymous')

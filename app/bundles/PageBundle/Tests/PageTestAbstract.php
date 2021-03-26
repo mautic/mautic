@@ -13,6 +13,7 @@ namespace Mautic\PageBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CookieHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -37,26 +38,24 @@ class PageTestAbstract extends WebTestCase
     protected static $mockId   = 123;
     protected static $mockName = 'Mock test name';
     protected $mockTrackingId;
-    protected $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         self::bootKernel();
         $this->mockTrackingId = hash('sha1', uniqid(mt_rand(), true));
-        $this->container      = self::$kernel->getContainer();
     }
 
     /**
      * @return PageModel
      */
-    protected function getPageModel()
+    protected function getPageModel($transliterationEnabled = true)
     {
         $cookieHelper = $this
             ->getMockBuilder(CookieHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $router = $this->container->get('router');
+        $router = self::$container->get('router');
 
         $ipLookupHelper = $this
             ->getMockBuilder(IpLookupHelper::class)
@@ -105,6 +104,11 @@ class PageTestAbstract extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $coreParametersHelper = $this
+            ->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $hitRepository = $this->createMock(HitRepository::class);
         $userHelper    = $this->createMock(UserHelper::class);
 
@@ -141,6 +145,11 @@ class PageTestAbstract extends WebTestCase
                 )
             );
 
+        $coreParametersHelper->expects($this->any())
+                ->method('get')
+                ->with('transliterate_page_title')
+                ->willReturn($transliterationEnabled);
+
         $deviceTrackerMock = $this->createMock(DeviceTracker::class);
 
         $pageModel = new PageModel(
@@ -153,7 +162,8 @@ class PageTestAbstract extends WebTestCase
             $queueService,
             $companyModel,
             $deviceTrackerMock,
-            $contactTracker
+            $contactTracker,
+            $coreParametersHelper
         );
 
         $pageModel->setDispatcher($dispatcher);

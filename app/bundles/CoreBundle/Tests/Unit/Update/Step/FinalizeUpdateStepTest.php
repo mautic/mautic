@@ -45,7 +45,7 @@ class FinalizeUpdateStepTest extends AbstractStepTest
      */
     private $step;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -120,6 +120,10 @@ class FinalizeUpdateStepTest extends AbstractStepTest
         $this->output->expects($this->once())
             ->method('writeln')
             ->with("\n\n<info>This is an example message</info>");
+
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturn('');
 
         $this->step->execute($this->progressBar, $this->input, $this->output);
 

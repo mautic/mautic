@@ -1,5 +1,12 @@
 <?php
 
+use Mautic\CoreBundle\EventListener\ConsoleErrorListener;
+use Mautic\CoreBundle\EventListener\ConsoleTerminateListener;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
+
+/** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
+
 // Include path settings
 $root = $container->getParameter('kernel.root_dir');
 
@@ -252,41 +259,38 @@ $container->register('mautic.monolog.fulltrace.formatter', 'Monolog\Formatter\Li
     ->addMethodCall('ignoreEmptyContextAndExtra', [true]);
 
 //Register command line logging
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-
 $container->setParameter(
-    'console_exception_listener.class',
-    'Mautic\CoreBundle\EventListener\ConsoleExceptionListener'
+    'console_error_listener.class',
+    ConsoleErrorListener::class
 );
-$definitionConsoleExceptionListener = new Definition(
-    '%console_exception_listener.class%',
+$definitionConsoleErrorListener = new Definition(
+    '%console_error_listener.class%',
     [new Reference('monolog.logger.mautic')]
 );
-$definitionConsoleExceptionListener->addTag(
+$definitionConsoleErrorListener->addTag(
     'kernel.event_listener',
-    ['event' => 'console.exception']
+    ['event' => 'console.error']
 );
 $container->setDefinition(
     'mautic.kernel.listener.command_exception',
-    $definitionConsoleExceptionListener
+    $definitionConsoleErrorListener
 );
 
 $container->setParameter(
     'console_terminate_listener.class',
-    'Mautic\CoreBundle\EventListener\ConsoleTerminateListener'
+    ConsoleTerminateListener::class
 );
-$definitionConsoleExceptionListener = new Definition(
+$definitionConsoleErrorListener = new Definition(
     '%console_terminate_listener.class%',
     [new Reference('monolog.logger.mautic')]
 );
-$definitionConsoleExceptionListener->addTag(
+$definitionConsoleErrorListener->addTag(
     'kernel.event_listener',
     ['event' => 'console.terminate']
 );
 $container->setDefinition(
     'mautic.kernel.listener.command_terminate',
-    $definitionConsoleExceptionListener
+    $definitionConsoleErrorListener
 );
 
 // ElFinder File Manager
@@ -298,7 +302,7 @@ $container->loadFromExtension('fm_elfinder', [
             'editor'          => 'custom',
             'editor_template' => '@bundles/CoreBundle/Assets/js/libraries/filemanager/index.html.twig',
             'fullscreen'      => true,
-            'include_assets'  => true,
+            //'include_assets'  => true,
             'relative_path'   => false,
             'connector'       => [
                 'debug' => '%kernel.debug%',
@@ -318,6 +322,8 @@ $container->loadFromExtension('fm_elfinder', [
                         'upload_deny'   => ['all'],
                         'accepted_name' => '/^[\w\x{0300}-\x{036F}][\w\x{0300}-\x{036F}\s\.\%\-]*$/u', // Supports diacritic symbols
                         'url'           => '%env(resolve:MAUTIC_EL_FINDER_URL)%', // We need to specify URL in case mod_rewrite is disabled
+                        'tmb_path'      => '%env(resolve:MAUTIC_EL_FINDER_PATH)%/.tmb/',
+                        'tmb_url'       => '%env(resolve:MAUTIC_EL_FINDER_URL)%/.tmb/',
                     ],
                 ],
             ],
