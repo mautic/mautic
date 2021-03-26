@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\DBALException;
+use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -50,6 +51,11 @@ class ListModel extends FormModel
     use OperatorListTrait;
 
     /**
+     * @var CategoryModel
+     */
+    protected $categoryModel;
+
+    /**
      * @var CoreParametersHelper
      */
     protected $coreParametersHelper;
@@ -69,8 +75,9 @@ class ListModel extends FormModel
      */
     private $requestStack;
 
-    public function __construct(CoreParametersHelper $coreParametersHelper, ContactSegmentService $leadSegment, SegmentChartQueryFactory $segmentChartQueryFactory, RequestStack $requestStack)
+    public function __construct(CategoryModel $categoryModel, CoreParametersHelper $coreParametersHelper, ContactSegmentService $leadSegment, SegmentChartQueryFactory $segmentChartQueryFactory, RequestStack $requestStack)
     {
+        $this->categoryModel            = $categoryModel;
         $this->coreParametersHelper     = $coreParametersHelper;
         $this->leadSegmentService       = $leadSegment;
         $this->segmentChartQueryFactory = $segmentChartQueryFactory;
@@ -1298,5 +1305,30 @@ class ListModel extends FormModel
         }
 
         return $namesNotToBeDeleted;
+    }
+
+    /**
+     * Get a list of source choices.
+     */
+    public function getSourceLists(string $sourceType = null): array
+    {
+        $choices = [];
+        switch ($sourceType) {
+            case 'categories':
+            case null:
+                $choices['categories'] = [];
+                $categories            = $this->categoryModel->getLookupResults('segment');
+                if ($categories) {
+                    foreach ($categories as $category) {
+                        $choices['categories'][$category['id']] = $category['title'];
+                    }
+                }
+        }
+
+        foreach ($choices as &$typeChoices) {
+            asort($typeChoices);
+        }
+
+        return (null == $sourceType) ? $choices : $choices[$sourceType];
     }
 }

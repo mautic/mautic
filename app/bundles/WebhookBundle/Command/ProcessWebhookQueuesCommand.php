@@ -21,12 +21,11 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ProcessWebhookQueuesCommand extends ContainerAwareCommand
 {
-    /**
-     * {@inheritdoc}
-     */
+    public const COMMAND_NAME = 'mautic:webhooks:process';
+
     protected function configure()
     {
-        $this->setName('mautic:webhooks:process')
+        $this->setName(self::COMMAND_NAME)
             ->setDescription('Process queued webhook payloads')
             ->addOption(
                 '--webhook-id',
@@ -37,9 +36,6 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var \Mautic\WebhookBundle\Model\WebhookModel $model */
@@ -87,6 +83,7 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
             $model->processWebhooks($webhooks);
         } catch (\Exception $e) {
             $output->writeLn('<error>'.$e->getMessage().'</error>');
+            $output->writeLn('<error>'.$e->getTraceAsString().'</error>');
 
             return 1;
         }

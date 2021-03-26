@@ -308,6 +308,7 @@ return [
                     'translator',
                     'doctrine.orm.entity_manager',
                     'mautic.stage.model.stage',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.form.type.email.utm_tags' => [
@@ -632,8 +633,12 @@ return [
             'mautic.guzzle.client.factory' => [
                 'class' => \Mautic\EmailBundle\Swiftmailer\Guzzle\ClientFactory::class,
             ],
+            /**
+             * Needed for Sparkpost integration. Can be removed when this integration is moved to
+             * its own plugin.
+             */
             'mautic.guzzle.client' => [
-                'class'     => \Http\Adapter\Guzzle6\Client::class,
+                'class'     => \Http\Adapter\Guzzle7\Client::class,
                 'factory'   => ['@mautic.guzzle.client.factory', 'create'],
             ],
             'mautic.helper.mailbox' => [
