@@ -369,7 +369,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testNotRelevantContextGenerate()
     {
-        $this->reportBuilderEventMock->method('checkContext')
+        $this->reportGeneratorEventMock->method('checkContext')
             ->withConsecutive(
                 [
                     [
@@ -833,9 +833,9 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider eventDataProvider
      */
-    public function testReportGenerate($event)
+    public function testReportGenerate($context)
     {
-        $this->reportBuilderEventMock->method('checkContext')
+        $this->reportGeneratorEventMock->method('checkContext')
             ->withConsecutive(
                 [
                     [
@@ -851,7 +851,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->reportGeneratorEventMock->expects($this->once())
             ->method('getContext')
-            ->willReturn($event);
+            ->willReturn($context);
 
         $this->reportGeneratorEventMock->expects($this->once())
             ->method('getQueryBuilder')
