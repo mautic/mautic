@@ -29,7 +29,7 @@ class TagControllerTest extends MauticMysqlTestCase
             'tag4',
         ];
 
-        $this->tagModel = $self::container->get('mautic.lead.model.tag');
+        $this->tagModel = self::$container->get('mautic.lead.model.tag');
 
         foreach ($tags as $tagName) {
             $tag = new Tag();
