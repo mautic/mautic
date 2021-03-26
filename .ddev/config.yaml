@@ -1,0 +1,21 @@
+name: mautic
+type: php
+docroot: ""
+php_version: "7.4"
+webserver_type: apache-fpm
+router_http_port: "80"
+router_https_port: "443"
+xdebug_enabled: false
+additional_hostnames: []
+additional_fqdns: []
+mariadb_version: "10.3"
+mysql_version: ""
+provider: default
+use_dns_when_possible: true
+composer_version: "2"
+webimage_extra_packages: [php7.4-imap]
+hooks:
+  post-start:
+    # Fix line endings on Windows
+    - exec: sed -i -e 's/\r$//' ./.ddev/mautic-setup.sh
+    - exec: "./.ddev/mautic-setup.sh"

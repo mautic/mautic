@@ -871,7 +871,14 @@ class PageModel extends FormModel
         }
 
         if ('unique' == $flag || 'total_and_unique' == $flag) {
-            $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', $filter, 'distinct(t.lead_id)');
+            $q = $query->prepareTimeDataQuery(
+                'page_hits',
+                'date_hit',
+                $filter,
+                'distinct(t.lead_id)',
+                true,
+                false
+            );
 
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
