@@ -1,9 +1,9 @@
 {
-  "version": "3.3.0",
-  "stability": "stable",
-  "minimum_php_version": "7.3.0",
-  "maximum_php_version": "7.4.99",
-  "show_php_version_warning_if_under": "7.3.0",
+  "version": "4.0.0-alpha1",
+  "stability": "alpha",
+  "minimum_php_version": "7.4.0",
+  "maximum_php_version": "8.0.99",
+  "show_php_version_warning_if_under": "7.4.0",
   "minimum_mautic_version": "3.1.0",
-  "announcement_url": ""
+  "announcement_url": "https://github.com/mautic/mautic/releases/tag/3.3.2"
 }
