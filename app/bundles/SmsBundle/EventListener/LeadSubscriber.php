@@ -110,8 +110,8 @@ class LeadSubscriber implements EventSubscriberInterface
                         'eventType'  => $eventTypeName,
                         'timestamp'  => $stat['date'.ucfirst($dateSent)],
                         'extra'      => [
-                            'stat' => $stat,
-                            'type' => $state,
+                            'stat'   => $stat,
+                            'type'   => $state,
                         ],
                         'contentTemplate' => 'MauticSmsBundle:SubscribedEvents\Timeline:index.html.php',
                         'icon'            => ('read' == $state) ? 'fa-message-o' : 'fa-commenting',
