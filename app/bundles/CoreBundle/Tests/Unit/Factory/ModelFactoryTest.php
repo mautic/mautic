@@ -29,7 +29,7 @@ class ModelFactoryTest extends TestCase
      */
     private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
         $this->factory   = new ModelFactory($this->container);
@@ -39,7 +39,7 @@ class ModelFactoryTest extends TestCase
     {
         $pointTriggerModel = $this->createMock(TriggerModel::class);
         $modelName         = 'point.triggerEvent';
-        $containerKey      = 'mautic.point.model.triggerevent';
+        $containerKey      = 'mautic.point.model.triggerEvent';
 
         $this->container->expects($this->once())
             ->method('has')

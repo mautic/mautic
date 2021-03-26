@@ -134,6 +134,17 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                         </div>
                     </td>
                     <td class="visible-md visible-lg">
+                        <?php if (!empty($builders)): ?>
+                        <span class="label label-primary pa-4">
+                            <?php
+                            if (isset($item['config']['builder'])):
+                                echo $builders[$item['config']['builder']];
+                            else:
+                                echo $view['translator']->trans('mautic.core.builder.legacy');
+                            endif;
+                            ?>
+                        </span>
+                        <?php endif; ?>
                         <?php if (!empty($item['config']['features'])) : ?>
                             <?php foreach ($item['config']['features'] as $feature) : ?>
                                 <span style="white-space: nowrap;">

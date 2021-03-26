@@ -13,7 +13,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
      *
      * @throws \Exception
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -28,7 +28,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
         /** @var CategoryModel $model */
-        $model      = $this->container->get('mautic.category.model.category');
+        $model      = self::$container->get('mautic.category.model.category');
 
         foreach ($categoriesData as $categoryData) {
             $category = new Category();
