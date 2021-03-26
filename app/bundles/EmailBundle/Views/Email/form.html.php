@@ -129,6 +129,9 @@ if (!isset($previewUrl)) {
                             <div class="col-md-6">
                                 <?php echo $view['form']->row($form['headers']); ?>
                             </div>
+                            <div class="col-md-6">
+                                <?php echo $view['form']->row($form['useOwnerAsMailer']); ?>
+                            </div>
                         </div>
 
                         <br>
