@@ -29,7 +29,7 @@ class FieldModelTest extends MauticMysqlTestCase
 
     public function testSingleContactFieldIsCreatedAndDeleted()
     {
-        $fieldModel = $this->container->get('mautic.lead.model.field');
+        $fieldModel = self::$container->get('mautic.lead.model.field');
 
         $field = new LeadField();
         $field->setName('Test Field')
@@ -45,7 +45,7 @@ class FieldModelTest extends MauticMysqlTestCase
 
     public function testSingleCompanyFieldIsCreatedAndDeleted()
     {
-        $fieldModel = $this->container->get('mautic.lead.model.field');
+        $fieldModel = self::$container->get('mautic.lead.model.field');
 
         $field = new LeadField();
         $field->setName('Test Field')
@@ -61,7 +61,7 @@ class FieldModelTest extends MauticMysqlTestCase
 
     public function testMultipleFieldsAreCreatedAndDeleted()
     {
-        $fieldModel = $this->container->get('mautic.lead.model.field');
+        $fieldModel = self::$container->get('mautic.lead.model.field');
 
         $leadField = new LeadField();
         $leadField->setName('Test Field')
