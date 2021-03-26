@@ -12,16 +12,51 @@
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
 use Mautic\LeadBundle\Entity\CustomFieldRepositoryTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use PHPUnit\Framework\Assert;
 
 class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|EntityManagerInterface
+     */
+    private $entityManager;
+
+    /**
+     * @var MockObject|ClassMetadata
+     */
+    private $classMetadata;
+
+    /**
+     * @var MockObject|Connection
+     */
+    private $connection;
+
+    /**
+     * @var LeadRepository
+     */
+    private $repository;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
+
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->classMetadata = $this->createMock(ClassMetadata::class);
+        $this->connection    = $this->createMock(Connection::class);
+        $this->repository    = new LeadRepository($this->entityManager, $this->classMetadata);
+    }
+
     public function testBooleanWithPrepareDbalFieldsForSave()
     {
         $trait  = $this->getMockForTrait(CustomFieldRepositoryTrait::class);
@@ -47,8 +82,6 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
      */
     public function testBuildQueryForGetLeadsByFieldValue()
     {
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', 'mtc_');
-
         $dbalMock = new DBALMocker($this);
 
         $mock = $this->getMockBuilder(LeadRepository::class)
@@ -114,6 +147,38 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
         ];
 
         $this->assertSame($expected, array_keys($contacts), 'When getting leads with indexing by column, it should match the expected result.');
+    }
+
+    /**
+     * Ensure that we will join each table with the same alias only once.
+     */
+    public function testApplySearchQueryRelationshipJoinOnlyOnce(): void
+    {
+        $queryBuilder = new QueryBuilder($this->connection);
+        $queryBuilder->select('*')->from('table_a');
+        $tableB = [
+            'alias'      => 'alias_b',
+            'from_alias' => 'table_a',
+            'table'      => 'table_b',
+            'condition'  => 'condition_b',
+        ];
+        $tableC = [
+            'alias'      => 'alias_c',
+            'from_alias' => 'table_a',
+            'table'      => 'table_c',
+            'condition'  => 'condition_c',
+        ];
+
+        $this->repository->applySearchQueryRelationship(
+            $queryBuilder,
+            [$tableB, $tableC, $tableB], // Sending 2 table B here.
+            true
+        );
+
+        Assert::assertSame(
+            'SELECT * FROM table_a INNER JOIN table_b alias_b ON condition_b INNER JOIN table_c alias_c ON condition_c GROUP BY l.id',
+            $queryBuilder->getSQL()
+        );
     }
 
     public function testGetContactIdsByEmails(): void
