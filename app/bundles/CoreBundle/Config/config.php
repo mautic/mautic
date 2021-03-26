@@ -639,14 +639,6 @@ return [
             'mautic.http.client' => [
                 'class' => GuzzleHttp\Client::class,
             ],
-            'mautic.http.client.psr-18' => [
-                // Warning: Only dev dependency (for TransifexFactory)
-                // Can be replaced with 'mautic.http.client' once the standard Guzzle
-                // Client implements \Psr\Http\Client\ClientInterface
-                // @see https://github.com/guzzle/guzzle/pull/2525
-                // When removing, remove also the ricardofiorani/guzzle-psr18-adapter dependency.
-                'class' => \RicardoFiorani\GuzzlePsr18Adapter\Client::class,
-            ],
             /* @deprecated to be removed in Mautic 4. Use 'mautic.filesystem' instead. */
             'symfony.filesystem' => [
                 'class' => \Symfony\Component\Filesystem\Filesystem::class,
@@ -777,7 +769,7 @@ return [
             'transifex.factory' => [
                 'class'     => \Mautic\CoreBundle\Factory\TransifexFactory::class,
                 'arguments' => [
-                    'mautic.http.client.psr-18',
+                    'mautic.http.client',
                     'mautic.helper.core_parameters',
                 ],
             ],
@@ -1094,7 +1086,6 @@ return [
                 'arguments' => [
                     'mautic.helper.paths',
                     'mautic.helper.update',
-                    'debril.reader',
                     'mautic.helper.core_parameters',
                 ],
                 'methodCalls' => [
@@ -1188,7 +1179,7 @@ return [
         'db_table_prefix'                 => '',
         'db_server_version'               => '5.7',
         'locale'                          => 'en_US',
-        'secret_key'                      => '',
+        'secret_key'                      => 'temp',
         'dev_hosts'                       => [],
         'trusted_hosts'                   => [],
         'trusted_proxies'                 => [],
