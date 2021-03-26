@@ -26,12 +26,9 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class ConfigFormTest extends KernelTestCase
 {
-    protected $container;
-
     protected function setUp(): void
     {
         self::bootKernel();
-        $this->container = self::$kernel->getContainer();
     }
 
     public function testConfigForm()
@@ -109,8 +106,8 @@ class ConfigFormTest extends KernelTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $registeredPluginBundles = $this->container->getParameter('mautic.plugin.bundles');
-        $mauticPlugins           = $this->container->getParameter('mautic.bundles');
+        $registeredPluginBundles = self::$container->getParameter('mautic.plugin.bundles');
+        $mauticPlugins           = self::$container->getParameter('mautic.bundles');
         $bundleHelper->expects($this->any())->method('getPluginBundles')->willReturn([$registeredPluginBundles]);
 
         $bundleHelper->expects($this->any())->method('getMauticBundles')->willReturn(array_merge($mauticPlugins, $registeredPluginBundles));

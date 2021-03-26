@@ -30,7 +30,8 @@ class TranslationsPass implements CompilerPassInterface
         }
 
         $translator = $container->findDefinition('translator.default');
-        $translator->setClass(Translator::class);
+        $translator->setClass(Translator::class)
+            ->setPublic(true);
 
         if (null === $translator || MAUTIC_ENV === 'prod') {
             return;

@@ -331,7 +331,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     {
         $crawler             = $this->client->request('GET', '/s/contacts/new');
         $elementPlaceholder  = $crawler->filter('#lead_timezone')->filter('select')->attr('data-placeholder');
-        $expectedPlaceholder = $this->container->get('translator')->trans('mautic.lead.field.timezone');
+        $expectedPlaceholder = self::$container->get('translator')->trans('mautic.lead.field.timezone');
         $this->assertEquals($expectedPlaceholder, $elementPlaceholder);
     }
 }

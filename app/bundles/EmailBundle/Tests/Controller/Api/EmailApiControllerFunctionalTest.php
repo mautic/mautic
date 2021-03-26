@@ -174,7 +174,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $trackingHash = 'tracking_hash_123';
 
         /** @var StatRepository $statRepository */
-        $statRepository = $this->container->get('mautic.email.repository.stat');
+        $statRepository = self::$container->get('mautic.email.repository.stat');
 
         // Create a test email stat.
         $stat = new Stat();
