@@ -17,8 +17,8 @@
     },
     "require": {
         "php": ">=7.4.0 <8.1",
-        "ext-zlib": "^7.2",
-        "ext-zip": "^1.15",
+        "ext-zlib": "*",
+        "ext-zip": "*",
         "ext-imap": "*",
         "symfony/console": "~4.4.0",
         "symfony/debug": "~4.4.0",
