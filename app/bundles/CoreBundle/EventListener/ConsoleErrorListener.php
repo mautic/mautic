@@ -12,12 +12,12 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Event\ConsoleExceptionEvent;
+use Symfony\Component\Console\Event\ConsoleErrorEvent;
 
 /**
- * Class ConsoleExceptionListener.
+ * Class ConsoleErrorListener.
  */
-class ConsoleExceptionListener
+class ConsoleErrorListener
 {
     /**
      * @var LoggerInterface
@@ -29,10 +29,10 @@ class ConsoleExceptionListener
         $this->logger = $logger;
     }
 
-    public function onConsoleException(ConsoleExceptionEvent $event)
+    public function onConsoleError(ConsoleErrorEvent $event)
     {
         $command   = $event->getCommand();
-        $exception = $event->getException();
+        $exception = $event->getError();
 
         // Log error with trace
         $trace = (MAUTIC_ENV == 'dev') ? "\n[stack trace]\n".$exception->getTraceAsString() : '';
