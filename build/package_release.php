@@ -90,9 +90,11 @@ if (!isset($args['repackage'])) {
     // Only add deleted files to our list; new and modified files will be covered by the archive
     $deletedFiles  = [];
     $modifiedFiles = [
-        'deleted_files.txt'       => true,
-        'critical_migrations.txt' => true,
-        'upgrade.php'             => true,
+        'deleted_files.txt'              => true,
+        'critical_migrations.txt'        => true,
+        'upgrade.php'                    => true,
+        // Temp fix for GrapesJs builder
+        'plugins/GrapesJsBuilderBundle/' => true,
     ];
 
     // Create a flag to check if the vendors changed
@@ -162,5 +164,7 @@ system('zip -r ../packages/'.$appVersion.'.zip . -x@../exclude_files.txt -x@../e
 echo "Packaging Mautic Update Package\n";
 system('zip -r ../packages/'.$appVersion.'-update.zip -x@../exclude_files.txt -@ < modified_files.txt > /dev/null');
 
-system('openssl sha1 ../packages/'.$appVersion.'.zip');
-system('openssl sha1 ../packages/'.$appVersion.'-update.zip');
+// Write output to file (so that the CI pipeline can add it to the release notes), then output to console
+system('cd ../packages && openssl sha1 '.$appVersion.'.zip > build-sha1-all');
+system('cd ../packages && openssl sha1 '.$appVersion.'-update.zip >> build-sha1-all');
+system('cat ../packages/build-sha1-all');

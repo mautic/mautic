@@ -16,6 +16,10 @@ use Joomla\Http\Http;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\WebhookBundle\Event\WebhookRequestEvent;
+use Mautic\WebhookBundle\WebhookEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CampaignHelper
 {
@@ -25,15 +29,27 @@ class CampaignHelper
     protected $connector;
 
     /**
+     * @var CompanyModel
+     */
+    protected $companyModel;
+
+    /**
      * Cached contact values in format [contact_id => [key1 => val1, key2 => val1]].
      *
      * @var array
      */
     private $contactsValues = [];
 
-    public function __construct(Http $connector)
+    /**
+     * @var EventDispatcher
+     */
+    private $dispatcher;
+
+    public function __construct(Http $connector, $companyModel, EventDispatcherInterface $dispatcher)
     {
-        $this->connector = $connector;
+        $this->connector    = $connector;
+        $this->companyModel = $companyModel;
+        $this->dispatcher   = $dispatcher;
     }
 
     /**
@@ -44,7 +60,17 @@ class CampaignHelper
         $payload = $this->getPayload($config, $contact);
         $headers = $this->getHeaders($config, $contact);
         $url     = rawurldecode(TokenHelper::findLeadTokens($config['url'], $this->getContactValues($contact), true));
-        $this->makeRequest($url, $config['method'], $config['timeout'], $headers, $payload);
+
+        $webhookRequestEvent = new WebhookRequestEvent($contact, $url, $headers, $payload);
+        $this->dispatcher->dispatch(WebhookEvents::WEBHOOK_ON_REQUEST, $webhookRequestEvent);
+
+        $this->makeRequest(
+            $webhookRequestEvent->getUrl(),
+            $config['method'],
+            $config['timeout'],
+            $webhookRequestEvent->getHeaders(),
+            $webhookRequestEvent->getPayload()
+        );
     }
 
     /**
@@ -136,6 +162,7 @@ class CampaignHelper
         if (empty($this->contactsValues[$contact->getId()])) {
             $this->contactsValues[$contact->getId()]              = $contact->getProfileFields();
             $this->contactsValues[$contact->getId()]['ipAddress'] = $this->ipAddressesToCsv($contact->getIpAddresses());
+            $this->contactsValues[$contact->getId()]['companies'] = $this->companyModel->getRepository()->getCompaniesByLeadId($contact->getId());
         }
 
         return $this->contactsValues[$contact->getId()];
