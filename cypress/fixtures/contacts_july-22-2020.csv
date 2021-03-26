@@ -1,4 +1,4 @@
 id,points,last_active,title,firstname,lastname,company,position,email,phone,mobile,address1,address2,city,state,zipcode,timezone,country,fax,preferred_locale,attribution_date,attribution,website,description,say_yes_pls,department,state1,feeling_healthy,facebook,foursquare,instagram,linkedin,skype,twitter
-185,0,,Mr,Test,user1,,,testuser1@mailtest.mautic.com,,,,,,,,,,,,,,,,,,,1,,,,,,
-185,0,,Mr,Test,user2,,,testuser2@mailtest.mautic.com,,,,,,,,,,,,,,,,,,,1,,,,,,
-185,0,,Mr,Test,user3,,,testuser3@mailtest.mautic.com,,,,,,,,,,,,,,,,,,,1,,,,,,
+185,0,,Mr,Test,user1,,,testuser1@mailtest.mautic.org,,,,,,,,,,,,,,,,,,,1,,,,,,
+185,0,,Mr,Test,user2,,,testuser2@mailtest.mautic.org,,,,,,,,,,,,,,,,,,,1,,,,,,
+185,0,,Mr,Test,user3,,,testuser3@mailtest.mautic.org,,,,,,,,,,,,,,,,,,,1,,,,,,
