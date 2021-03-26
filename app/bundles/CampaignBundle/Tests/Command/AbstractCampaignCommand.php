@@ -41,7 +41,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
     /**
      * @throws \Exception
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         // Everything needs to happen anonymously
         $this->defaultClientServer = $this->clientServer;
@@ -50,7 +50,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         parent::setUp();
 
         $this->db     = $this->em->getConnection();
-        $this->prefix = $this->container->getParameter('mautic.db_table_prefix');
+        $this->prefix = self::$container->getParameter('mautic.db_table_prefix');
 
         // Populate contacts
         $this->installDatabaseFixtures([LeadFieldData::class, LoadLeadData::class]);
@@ -59,7 +59,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         $sql = file_get_contents(__DIR__.'/campaign_schema.sql');
 
         // Update table prefix
-        $sql = str_replace('#__', $this->container->getParameter('mautic.db_table_prefix'), $sql);
+        $sql = str_replace('#__', self::$container->getParameter('mautic.db_table_prefix'), $sql);
 
         // Schedule event
         date_default_timezone_set('UTC');
@@ -73,7 +73,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         $this->em->getConnection()->exec($sql);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 

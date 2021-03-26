@@ -32,7 +32,7 @@ class GeneratedColumnSubscriber implements EventSubscriberInterface
 
     public function onGeneratedColumnsBuild(GeneratedColumnsEvent $event): void
     {
-        $sentDate = new GeneratedColumn('email_stats', 'generated_sent_date', 'DATE', 'CONCAT(YEAR(date_sent), "-", LPAD(MONTH(date_sent), 2, "0"), "-", LPAD(DAY(date_sent), 2, "0"))');
+        $sentDate = new GeneratedColumn('email_stats', 'generated_sent_date', 'DATE', "CONCAT(YEAR(date_sent), '-', LPAD(MONTH(date_sent), 2, '0'), '-', LPAD(DAY(date_sent), 2, '0'))");
         $sentDate->addIndexColumn('email_id');
         $sentDate->setOriginalDateColumn('date_sent', 'd');
 

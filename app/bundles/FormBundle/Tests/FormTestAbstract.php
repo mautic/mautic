@@ -57,7 +57,7 @@ class FormTestAbstract extends TestCase
     protected $formRepository;
     protected $leadFieldModel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->mockTrackingId = hash('sha1', uniqid(mt_rand()));
     }

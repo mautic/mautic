@@ -23,7 +23,7 @@ class CommonRepositoryTest extends MauticMysqlTestCase
         $this->client->request('GET', 's/contacts?search=is:mine');
 
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
-        $this->assertContains('is:mine', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('is:mine', $this->client->getResponse()->getContent());
     }
 
     public function testIsMineSearchCommandDoesntCauseExceptionDueToBadDQLForCompanies()
@@ -31,7 +31,7 @@ class CommonRepositoryTest extends MauticMysqlTestCase
         $this->client->request('GET', 's/companies?search=is:mine');
 
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
-        $this->assertContains('is:mine', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('is:mine', $this->client->getResponse()->getContent());
     }
 
     public function testIsPublishedSearchCommandDoesntCauseExceptionDueToBadDQLForEmails()
@@ -39,6 +39,6 @@ class CommonRepositoryTest extends MauticMysqlTestCase
         $this->client->request('GET', 's/emails?search=is:published');
 
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
-        $this->assertContains('is:published', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('is:published', $this->client->getResponse()->getContent());
     }
 }

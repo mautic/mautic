@@ -178,7 +178,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!defined('MAUTIC_TABLE_PREFIX')) {
             define('MAUTIC_TABLE_PREFIX', '');

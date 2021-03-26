@@ -14,10 +14,10 @@ class PageControllerTest extends MauticMysqlTestCase
     /**
      * @throws \Exception
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
-        $this->prefix = $this->container->getParameter('mautic.db_table_prefix');
+        $this->prefix = self::$container->getParameter('mautic.db_table_prefix');
     }
 
     public function testLandingPageTracking()
