@@ -444,17 +444,18 @@ class LeadSubscriberTest extends TestCase
             ->willReturn($enabledIntegrations);
 
         $fieldNames = [];
+        $values     = [];
+        $valueDAOs  = [];
         $i          = 0;
         foreach ($fieldChanges as $fieldName => [$oldValue, $newValue]) {
-            $valueDao = new EncodedValueDAO($objectType, (string) $newValue);
-
-            $this->variableExpresserHelper->expects($this->at($i))
-                ->method('encodeVariable')
-                ->with($newValue)
-                ->willReturn($valueDao);
-
+            $values[]     = [$newValue];
+            $valueDAOs[]  = new EncodedValueDAO($objectType, (string) $newValue);
             $fieldNames[] = $fieldName;
         }
+
+        $this->variableExpresserHelper->method('encodeVariable')
+                ->withConsecutive(...$values)
+                ->willReturn(...$valueDAOs);
 
         $this->fieldChangeRepository->expects($this->once())
             ->method('deleteEntitiesForObjectByColumnName')
