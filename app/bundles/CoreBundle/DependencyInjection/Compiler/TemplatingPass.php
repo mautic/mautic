@@ -48,7 +48,8 @@ class TemplatingPass implements CompilerPassInterface
                 ->addMethodCall('setPathsHelper', [new Reference('mautic.helper.paths')])
                 ->addMethodCall('setAssetHelper', [new Reference('mautic.helper.assetgeneration')])
                 ->addMethodCall('setSiteUrl', ['%mautic.site_url%'])
-                ->addMethodCall('setVersion', ['%mautic.secret_key%', MAUTIC_VERSION]);
+                ->addMethodCall('setVersion', ['%mautic.secret_key%', MAUTIC_VERSION])
+                ->setPublic(true);
         }
 
         if ($container->hasDefinition('templating.engine.php')) {
@@ -61,7 +62,8 @@ class TemplatingPass implements CompilerPassInterface
                 ->addMethodCall(
                     'setRequestStack',
                     [new Reference('request_stack')]
-                );
+                )
+                ->setPublic(true);
         }
 
         if ($container->hasDefinition('debug.templating.engine.php')) {
@@ -74,27 +76,32 @@ class TemplatingPass implements CompilerPassInterface
                 ->addMethodCall(
                     'setRequestStack',
                     [new Reference('request_stack')]
-                );
+                )
+                ->setPublic(true);
         }
 
         if ($container->hasDefinition('templating.helper.slots')) {
             $container->getDefinition('templating.helper.slots')
-                ->setClass(SlotsHelper::class);
+                ->setClass(SlotsHelper::class)
+                ->setPublic(true);
         }
 
         if ($container->hasDefinition('templating.name_parser')) {
             $container->getDefinition('templating.name_parser')
-                ->setClass(TemplateNameParser::class);
+                ->setClass(TemplateNameParser::class)
+                ->setPublic(true);
         }
 
         if ($container->hasDefinition('templating.helper.form')) {
             $container->getDefinition('templating.helper.form')
-                ->setClass(FormHelper::class);
+                ->setClass(FormHelper::class)
+                ->setPublic(true);
         }
 
         if ($container->hasDefinition('templating.helper.translator')) {
             $container->getDefinition('templating.helper.translator')
-                ->setClass(TranslatorHelper::class);
+                ->setClass(TranslatorHelper::class)
+                ->setPublic(true);
         }
     }
 }
