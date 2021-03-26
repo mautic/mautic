@@ -38,13 +38,11 @@ class PageTestAbstract extends WebTestCase
     protected static $mockId   = 123;
     protected static $mockName = 'Mock test name';
     protected $mockTrackingId;
-    protected $container;
 
     protected function setUp(): void
     {
         self::bootKernel();
         $this->mockTrackingId = hash('sha1', uniqid(mt_rand(), true));
-        $this->container      = self::$kernel->getContainer();
     }
 
     /**
@@ -57,7 +55,7 @@ class PageTestAbstract extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $router = $this->container->get('router');
+        $router = self::$container->get('router');
 
         $ipLookupHelper = $this
             ->getMockBuilder(IpLookupHelper::class)
