@@ -606,7 +606,7 @@ class ThemeHelper
             // prevent the finder from duplicating directories in its internal state
             // https://symfony.com/doc/current/components/finder.html#usage
             $dir = $this->pathsHelper->getSystemPath('themes', true);
-            $this->finder->directories()->depth('0')->ignoreDotFiles(true)->in($dir);
+            $this->finder->directories()->depth('0')->ignoreDotFiles(true)->in($dir)->sortByName();
         }
 
         $this->themes[$key]     = [];
