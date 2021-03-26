@@ -45,7 +45,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
     private $formMock;
     private $templatingMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
