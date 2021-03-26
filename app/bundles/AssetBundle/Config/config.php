@@ -62,6 +62,14 @@ return [
     ],
 
     'services' => [
+        'permissions' => [
+            'mautic.asset.permissions' => [
+                'class'     => \Mautic\AssetBundle\Security\Permissions\AssetPermissions::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+            ],
+        ],
         'events' => [
             'mautic.asset.subscriber' => [
                 'class'     => \Mautic\AssetBundle\EventListener\AssetSubscriber::class,
