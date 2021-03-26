@@ -22,7 +22,7 @@ class CitrixModelTest extends MauticMysqlTestCase
         $this->loadFixtures([LoadCitrixData::class]);
 
         /** @var CitrixModel $model */
-        $model = $this->container->get('mautic.citrix.model.citrix');
+        $model = self::$container->get('mautic.citrix.model.citrix');
         $count = $model->countEventsBy('webinar', "joe.o'connor@domain.com", 'registered', ['sample-webinar_#0000']);
         $this->assertEquals(1, $count);
     }

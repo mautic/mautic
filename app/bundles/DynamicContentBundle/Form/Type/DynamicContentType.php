@@ -11,7 +11,7 @@
 
 namespace Mautic\DynamicContentBundle\Form\Type;
 
-use DeviceDetector\Parser\Device\DeviceParserAbstract as DeviceParser;
+use DeviceDetector\Parser\Device\AbstractDeviceParser as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
 use Doctrine\ORM\EntityManager;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;

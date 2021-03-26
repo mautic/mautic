@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Mautic\InstallBundle\Tests\InstallFixtures\ORM;
 
-use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\InstallBundle\InstallFixtures\ORM\RemoveDuplicateIndexData;
 use PHPUnit\Framework\Assert;
@@ -21,13 +20,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
 {
-    /**
-     * A temporary table prefix.
-     *
-     * @var string
-     */
-    public const TABLE_PREFIX = 'tmp_tst_pfx_';
-
     /**
      * Disable transaction rollback for cleanup as we alter the DB schema within the test.
      *
@@ -40,22 +32,15 @@ class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
      */
     private $fixture;
 
+    protected ?ContainerInterface $tempContainer;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->container->set('mautic.schema.helper.index', new IndexSchemaHelper($this->connection, static::TABLE_PREFIX));
-
-        $this->fixture = new RemoveDuplicateIndexData();
+        $this->tempContainer = self::$container;
+        $this->fixture       = new RemoveDuplicateIndexData();
         $this->fixture->setContainer($this->getContainerFake());
-    }
-
-    protected function tearDown(): void
-    {
-        $this->dropTable('email_assets_xref');
-        $this->dropTable('email_list_xref');
-
-        parent::tearDown();
     }
 
     public function testGetGroups(): void
@@ -85,15 +70,10 @@ class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
         Assert::assertTrue($this->hasTableIndexForColumn('email_list_xref', 'leadlist_id'));
     }
 
-    private function dropTable(string $table): void
-    {
-        $this->connection->exec(sprintf('DROP TABLE IF EXISTS %s%s', static::TABLE_PREFIX, $table));
-    }
-
     private function createTables(): void
     {
         $this->connection->exec('
-            CREATE TABLE IF NOT EXISTS '.static::TABLE_PREFIX.'email_assets_xref
+            CREATE TABLE IF NOT EXISTS email_assets_xref
             (
                 email_id int unsigned not null,
                 asset_id int unsigned not null,
@@ -104,7 +84,7 @@ class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
         ');
 
         $this->connection->exec('
-            CREATE TABLE IF NOT EXISTS '.static::TABLE_PREFIX.'email_list_xref
+            CREATE TABLE IF NOT EXISTS email_list_xref
             (
                 email_id int unsigned not null,
                 leadlist_id int unsigned not null,
@@ -117,14 +97,14 @@ class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
 
     private function hasTableIndexForColumn(string $table, string $column): bool
     {
-        $query = sprintf('SHOW INDEX FROM %s WHERE Key_name <> "PRIMARY" AND Column_name = "%s"', static::TABLE_PREFIX.$table, $column);
+        $query = sprintf('SHOW INDEX FROM %s WHERE Key_name <> "PRIMARY" AND Column_name = "%s"', $table, $column);
 
         return false !== $this->connection->fetchAssoc($query);
     }
 
     private function getContainerFake(): ContainerInterface
     {
-        return new class($this->container) implements ContainerInterface {
+        return new class($this->tempContainer) implements ContainerInterface {
             /**
              * @var ContainerInterface
              */
@@ -157,10 +137,6 @@ class RemoveDuplicateIndexDataTest extends MauticMysqlTestCase
 
             public function getParameter($name)
             {
-                if ('mautic.db_table_prefix' === $name) {
-                    return RemoveDuplicateIndexDataTest::TABLE_PREFIX;
-                }
-
                 return $this->container->getParameter($name);
             }
 
