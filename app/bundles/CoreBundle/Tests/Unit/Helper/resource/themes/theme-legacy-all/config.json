@@ -1,0 +1,10 @@
+{
+  "name": "theme-legacy-all",
+  "author": "Test theme",
+  "authorUrl": "https://www.mautic.org",
+  "features": [
+    "page",
+    "email",
+    "form"
+  ]
+}
