@@ -25,7 +25,7 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
 {
     private $formId1   = 1;
     private $formId2   = 2;
-    private $uploadDir = 'path/to/file';
+    private $uploadDir = __DIR__.'/DummyFiles';
 
     /**
      * @testdox Uploader uploads files correctly
@@ -125,19 +125,19 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $fileUploaderMock->expects($this->at(0))
             ->method('upload')
             ->with($path1, $file1Mock)
-            ->willReturn('upload1');
+            ->willReturn('upload1.jpg');
 
         $fileUploaderMock->expects($this->at(1))
             ->method('upload')
             ->with($path2, $file2Mock)
-            ->willReturn('upload2');
+            ->willReturn('upload2.txt');
 
         $formUploader->uploadFiles($filesToUpload, $submission);
 
         $expected = [
             'key'   => 'value',
-            'file1' => 'upload1',
-            'file2' => 'upload2',
+            'file1' => 'upload1.jpg',
+            'file2' => 'upload2.txt',
         ];
 
         $this->assertSame($expected, $submission->getResults());
@@ -241,7 +241,7 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $fileUploaderMock->expects($this->at(0))
             ->method('upload')
             ->with($path1, $file1Mock)
-            ->willReturn('upload1');
+            ->willReturn('upload1.jpg');
 
         $fileUploaderMock->expects($this->at(1))
             ->method('upload')
@@ -250,7 +250,7 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
 
         $fileUploaderMock->expects($this->once())
             ->method('delete')
-            ->with('path/to/file/1/fieldId1/upload1');
+            ->with($this->uploadDir.'/1/fieldId1/upload1.jpg');
 
         $this->expectException(FileUploadException::class);
         $this->expectExceptionMessage('file2');
@@ -259,8 +259,8 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
 
         $expected = [
             'key'   => 'value',
-            'file1' => 'upload1',
-            'file2' => 'upload2',
+            'file1' => 'upload1.jpg',
+            'file2' => 'upload2.txt',
         ];
 
         $this->assertSame($expected, $submission->getResults());
@@ -341,7 +341,7 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
 
         $actual = $formUploader->getCompleteFilePath($fieldMock, 'fileName');
 
-        $this->assertSame('path/to/file/1/fieldId1/fileName', $actual);
+        $this->assertSame($this->uploadDir.'/1/fieldId1/fileName', $actual);
     }
 
     /**
@@ -357,7 +357,7 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
 
         $fileUploaderMock->expects($this->once())
             ->method('delete')
-            ->with('path/to/file/1/fieldId1');
+            ->with($this->uploadDir.'/1/fieldId1');
 
         $coreParametersHelperMock = $this->getMockBuilder(CoreParametersHelper::class)
             ->disableOriginalConstructor()
@@ -408,7 +408,7 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
 
         $fileUploaderMock
             ->method('delete')
-            ->with('path/to/file/1');
+            ->with($this->uploadDir.'/1');
 
         $coreParametersHelperMock = $this->getMockBuilder(CoreParametersHelper::class)
             ->disableOriginalConstructor()

@@ -65,7 +65,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     protected function setUpSymfony(array $defaultConfigOptions = []): void
     {
-        if ($this->useCleanupRollback && $this->client) {
+        if ($this->useCleanupRollback && isset($this->client)) {
             throw new LogicException('You cannot re-create the client when a transaction rollback for cleanup is enabled. Turn it off using $useCleanupRollback property or avoid re-creating a client.');
         }
 
@@ -81,11 +81,26 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     protected function resetAutoincrement(array $tables): void
     {
-        $prefix     = $this->container->getParameter('mautic.db_table_prefix');
+        $prefix     = self::$container->getParameter('mautic.db_table_prefix');
         $connection = $this->connection;
 
         foreach ($tables as $table) {
             $connection->query(sprintf('ALTER TABLE `%s%s` AUTO_INCREMENT=1', $prefix, $table));
+        }
+    }
+
+    /**
+     * Warning: To perform Truncate on tables with foreign keys we have to turn off the foreign keys temporarily.
+     * This may lead to corrupted data. Make sure you know what you are doing.
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    protected function truncateTables(string ...$tables): void
+    {
+        $prefix = MAUTIC_TABLE_PREFIX;
+
+        foreach ($tables as $table) {
+            $this->connection->query("SET FOREIGN_KEY_CHECKS = 0; TRUNCATE TABLE `{$prefix}{$table}`; SET FOREIGN_KEY_CHECKS = 1;");
         }
     }
 
@@ -120,7 +135,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             return;
         }
 
-        $sqlDumpFile = $this->container->getParameter('kernel.cache_dir').'/fresh_db.sql';
+        $sqlDumpFile = self::$container->getParameter('kernel.cache_dir').'/fresh_db.sql';
 
         if (!file_exists($sqlDumpFile)) {
             $this->installDatabase();
