@@ -7,7 +7,8 @@
         "psr-4": {
             "Mautic\\": "app/bundles/",
             "MauticPlugin\\": "plugins/",
-            "Mautic\\Middleware\\": "app/middlewares/"
+            "Mautic\\Middleware\\": "app/middlewares/",
+            "Mautic\\Migrations\\": "app/migrations/"
         },
         "files": [
             "app/AppKernel.php",
@@ -15,7 +16,7 @@
         ]
     },
     "require": {
-        "php": ">=7.2.21 <7.5",
+        "php": ">=7.3 <7.5",
         "ext-zlib": "^7.2",
         "ext-zip": "^1.15",
         "symfony/console": "~3.4.0",
@@ -61,7 +62,7 @@
         "sensio/distribution-bundle": "~5.0",
         "sensio/framework-extra-bundle": "~3.0",
 
-        "doctrine/doctrine-bundle": "~1.11.0",
+        "doctrine/doctrine-bundle": "~1.12.0",
         "doctrine/doctrine-fixtures-bundle": "~3.3.0",
         "doctrine/doctrine-migrations-bundle": "~2.1",
         "doctrine/annotations": "~1.8.0",
@@ -110,27 +111,27 @@
         "bandwidth-throttle/token-bucket": "^2.0",
         "gaufrette/extras": "^0.1.0",
         "gaufrette/aws-s3-adapter": "^0.4.0",
-        "phpoffice/phpspreadsheet": "^1.15"
+        "phpoffice/phpspreadsheet": "^1.15",
+        "predis/predis": "^1.1",
+        "composer/installers": "^1.10",
+        "mautic/grapejs-builder": "1.0-RC4"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~3.4.0",
         "symfony/var-dumper": "~3.4.0",
         "symfony/browser-kit": "~3.4.0",
         "symfony/dom-crawler": "~3.4.0",
-
-        "liip/functional-test-bundle": "~3.3.0",
         "mautic/transifex": "^4.0",
         "http-interop/http-factory-guzzle": "^1.0",
         "webfactory/exceptions-bundle": "~4.3",
         "friendsofphp/php-cs-fixer": "~2.16.1",
         "liip/test-fixtures-bundle": "^1.6",
-        "phpstan/phpstan": "^0.12.3",
+        "phpstan/phpstan": "0.12.25",
         "rector/rector-prefixed": "0.6.13",
-        "theofidry/psysh-bundle": "^v3.5.1",
         "symfony/phpunit-bridge": "~5.1.0",
-        "phpunit/phpunit": "~8.5.0",
-        "phpunit/phpunit-selenium": "~8.0.0",
-        "codeception/codeception": "^4.0"
+        "codeception/codeception": "^4.0",
+        "phpunit/phpunit": "^9.5",
+        "liip/functional-test-bundle": "^4.2"
     },
     "repositories": [
         {
@@ -140,7 +141,27 @@
         {
             "type": "git",
             "url": "https://github.com/mautic/intl.git"
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "mautic/grapejs-builder",
+                "version": "1.0-RC4",
+                "type": "mautic-plugin",
+                "source": {
+                    "url": "https://github.com/mautic/plugin-grapesjs-builder.git",
+                    "type": "git",
+                    "reference": "1.0-RC4"
+                },
+                "require": {
+                    "composer/installers": "~1.0"
+                },
+                "extra": {
+                    "installer-name": "GrapesJsBuilderBundle"
+                }
+            }
         }
+
     ],
     "scripts": {
         "auto-scripts": [
@@ -155,8 +176,8 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "test": "bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
-        "phpstan": "bin/phpstan analyse app/bundles plugins",
+        "test": "bin/phpunit -d memory_limit=4G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
+        "phpstan": "bin/phpstan analyse app/bundles app/migrations plugins",
         "cs": "bin/php-cs-fixer fix -v --dry-run --diff",
         "fixcs": "bin/php-cs-fixer fix -v",
         "rector": "bin/rector process --config rector.yaml"
@@ -175,6 +196,9 @@
         "symfony-assets-install": "relative",
         "incenteev-parameters": {
             "file": "app/config/parameters.yml"
+        },
+        "installer-paths": {
+            "plugins/{$name}": ["type:mautic-plugin"]
         }
     }
 }

@@ -1,54 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!-- http://www.phpunit.de/manual/current/en/appendixes.configuration.html -->
-<phpunit
-    backupGlobals               = "false"
-    backupStaticAttributes      = "false"
-    colors                      = "true"
-    convertErrorsToExceptions   = "true"
-    convertNoticesToExceptions  = "true"
-    convertWarningsToExceptions = "true"
-    processIsolation            = "false"
-    stopOnFailure               = "false"
-    bootstrap                   = "autoload.php" >
-
-    <testsuites>
-        <testsuite name="Project Test Suite">
-            <directory>bundles/*Bundle/Tests</directory>
-        </testsuite>
-        <testsuite name="Plugin tests">
-            <directory>./../plugins/*Bundle/Tests</directory>
-        </testsuite>
-        <testsuite name="Middleware tests">
-            <directory>middlewares/Tests</directory>
-        </testsuite>
-    </testsuites>
-
-    <filter>
-        <whitelist>
-            <directory>bundles</directory>
-            <directory>./../plugins</directory>
-            <directory>middlewares</directory>
-            <exclude>
-                <directory>bundles/*Bundle/Config</directory>
-                <directory>bundles/*Bundle/DataFixtures</directory>
-                <directory>bundles/*Bundle/Tests</directory>
-                <directory>bundles/*Bundle/Translations</directory>
-                <directory>bundles/*Bundle/Views</directory>
-                <directory>./../plugins/*Bundle/Config</directory>
-                <directory>./../plugins/*Bundle/Tests</directory>
-                <directory>./../plugins/*Bundle/Translations</directory>
-                <directory>./../plugins/*Bundle/Views</directory>
-                <directory>middlewares/Tests</directory>
-                <directory>bundles/CoreBundle/Test</directory>
-            </exclude>
-        </whitelist>
-    </filter>
-
-    <php>
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled" />
-        <env name="MAXMIND_LICENSE_KEY" value=""/>
-        <server name="KERNEL_DIR" value="app" />
-        <server name="APP_DEBUG" value="0" />
-    </php>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" backupGlobals="false" backupStaticAttributes="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" stopOnFailure="false" bootstrap="autoload.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage>
+    <include>
+      <directory>bundles</directory>
+      <directory>./../plugins</directory>
+      <directory>middlewares</directory>
+    </include>
+    <exclude>
+      <directory>bundles/*Bundle/Config</directory>
+      <directory>bundles/*Bundle/DataFixtures</directory>
+      <directory>bundles/*Bundle/Tests</directory>
+      <directory>bundles/*Bundle/Translations</directory>
+      <directory>bundles/*Bundle/Views</directory>
+      <directory>./../plugins/*Bundle/Config</directory>
+      <directory>./../plugins/*Bundle/Tests</directory>
+      <directory>./../plugins/*Bundle/Translations</directory>
+      <directory>./../plugins/*Bundle/Views</directory>
+      <directory>middlewares/Tests</directory>
+      <directory>bundles/CoreBundle/Test</directory>
+    </exclude>
+  </coverage>
+  <testsuites>
+    <testsuite name="Project Test Suite">
+      <directory>bundles/*Bundle/Tests</directory>
+    </testsuite>
+    <testsuite name="Plugin tests">
+      <directory>./../plugins/*Bundle/Tests</directory>
+    </testsuite>
+    <testsuite name="Middleware tests">
+      <directory>middlewares/Tests</directory>
+    </testsuite>
+  </testsuites>
+  <php>
+    <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>
+    <env name="MAXMIND_LICENSE_KEY" value=""/>
+    <const name="IS_PHPUNIT" value="true"/>
+    <server name="KERNEL_DIR" value="app"/>
+    <server name="APP_DEBUG" value="0"/>
+  </php>
 </phpunit>
