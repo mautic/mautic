@@ -138,7 +138,6 @@ return [
                     'translator',
                     'doctrine.orm.entity_manager',
                     'router',
-                    'mautic.security',
                 ],
             ],
             'mautic.campaign.calendarbundle.subscriber' => [
@@ -196,6 +195,7 @@ return [
                     'mautic.campaign.repository.event',
                     'mautic.campaign.event_executioner',
                     'translator',
+                    'mautic.campaign.repository.lead',
                 ],
             ],
         ],
