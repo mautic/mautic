@@ -13,6 +13,7 @@ namespace Mautic\ReportBundle\Scheduler\Enum;
 
 class SchedulerEnum
 {
+    const UNIT_NOW     = 'NOW';
     const UNIT_DAILY   = 'DAILY';
     const UNIT_WEEKLY  = 'WEEKLY'; //Defined in report.js too
     const UNIT_MONTHLY = 'MONTHLY'; //Defined in report.js too
@@ -35,6 +36,7 @@ class SchedulerEnum
     public static function getUnitEnumForSelect()
     {
         return [
+            'mautic.report.schedule.unit.now'   => self::UNIT_NOW,
             'mautic.report.schedule.unit.day'   => self::UNIT_DAILY,
             'mautic.report.schedule.unit.week'  => self::UNIT_WEEKLY,
             'mautic.report.schedule.unit.month' => self::UNIT_MONTHLY,

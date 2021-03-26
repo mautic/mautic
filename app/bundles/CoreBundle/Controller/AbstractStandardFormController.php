@@ -30,13 +30,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Support non-index pages such as modal forms.
      *
-     * @param string $route
-     * @param array  $parameters
-     * @param int    $referenceType
-     *
      * @return bool|string
      */
-    public function generateUrl($route, $parameters = [], $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+    protected function generateUrl(string $route, array $parameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): string
     {
         if (false === $route) {
             return false;
@@ -907,7 +903,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            $lastPage = (1 === $count) ? 1 : ((ceil($count / $limit)) ?: 1) ?: 1;
+            $lastPage = (1 === $count) ? 1 : (((ceil($count / $limit)) ?: 1) ?: 1);
 
             $session->set('mautic.'.$this->getSessionBase().'.page', $lastPage);
             $returnUrl = $this->generateUrl($this->getIndexRoute(), ['page' => $lastPage]);

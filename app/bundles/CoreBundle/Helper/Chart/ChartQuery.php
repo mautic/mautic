@@ -13,6 +13,7 @@ namespace Mautic\CoreBundle\Helper\Chart;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 
 /**
  * Methods to get the chart data as native queries to get better performance and work with date/time native SQL queries.
@@ -25,6 +26,11 @@ class ChartQuery extends AbstractChart
      * @var Connection
      */
     protected $connection;
+
+    /**
+     * @var GeneratedColumnsProviderInterface
+     */
+    private $generatedColumnProvider;
 
     /**
      * Match date/time unit to a SQL datetime format
@@ -64,18 +70,23 @@ class ChartQuery extends AbstractChart
     ];
 
     /**
-     * Construct a new ChartQuery object.
+     * Possible values are 'd'/'H'/'i'/'i'/'W'/'m'/'Y'.
      *
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
-     * @param string   $unit
+     * @see \Mautic\CoreBundle\Helper\Chart\DateRangeUnitTrait::getTimeUnitFromDateRange()
+     *
+     * @param string|null $unit
      */
     public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, $unit = null)
     {
         $this->unit       = (null === $unit) ? $this->getTimeUnitFromDateRange($dateFrom, $dateTo) : $unit;
         $this->isTimeUnit = (in_array($this->unit, ['H', 'i', 's']));
-        $this->setDateRange($dateFrom, $dateTo);
         $this->connection = $connection;
+        $this->setDateRange($dateFrom, $dateTo);
+    }
+
+    public function setGeneratedColumnProvider(GeneratedColumnsProviderInterface $generatedColumnProvider)
+    {
+        $this->generatedColumnProvider = $generatedColumnProvider;
     }
 
     /**
@@ -199,13 +210,13 @@ class ChartQuery extends AbstractChart
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function prepareTimeDataQuery($table, $column, $filters = [], $countColumn = '*', $isEnumerable = true)
+    public function prepareTimeDataQuery($table, $column, $filters = [], $countColumn = '*', $isEnumerable = true, bool $useSqlOrder = true)
     {
         // Convert time unitst to the right form for current database platform
         $query = $this->connection->createQueryBuilder();
         $query->from($this->prepareTable($table), 't');
 
-        $this->modifyTimeDataQuery($query, $column, 't', $countColumn, $isEnumerable);
+        $this->modifyTimeDataQuery($query, $column, 't', $countColumn, $isEnumerable, $useSqlOrder);
         $this->applyFilters($query, $filters);
         $this->applyDateFilters($query, $column);
 
@@ -221,12 +232,11 @@ class ChartQuery extends AbstractChart
      * @param string       $countColumn
      * @param bool|string  $isEnumerable true = COUNT, string sum = SUM
      */
-    public function modifyTimeDataQuery(&$query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true)
+    public function modifyTimeDataQuery($query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true, bool $useSqlOrder = true)
     {
-        // Convert time unitst to the right form for current database platform
-        $dbUnit        = $this->translateTimeUnit($this->unit);
+        // Convert time units to the right form for current database platform
         $limit         = $this->countAmountFromDateRange();
-        $dateConstruct = 'DATE_FORMAT('.$tablePrefix.'.'.$column.', \''.$dbUnit.'\')';
+        $dateConstruct = $this->getDateConstruct($tablePrefix, $column);
 
         if (true === $isEnumerable) {
             $count = 'COUNT('.$countColumn.') AS count';
@@ -235,10 +245,14 @@ class ChartQuery extends AbstractChart
         } else {
             $count = $countColumn.' AS count';
         }
-        $query->select($dateConstruct.' AS date, '.$count)
-            ->groupBy($dateConstruct);
 
-        $query->orderBy($dateConstruct, 'ASC')->setMaxResults($limit);
+        $query->select($dateConstruct.' AS date, '.$count);
+        $query->groupBy($dateConstruct);
+        if ($useSqlOrder) {
+            // Some queries needs to avoid this because of query performance
+            $query->orderBy($dateConstruct, 'ASC');
+        }
+        $query->setMaxResults($limit);
     }
 
     /**
@@ -301,6 +315,9 @@ class ChartQuery extends AbstractChart
         $limit         = $this->countAmountFromDateRange();
         $previousDate  = clone $this->dateFrom;
         $utcTz         = new \DateTimeZone('UTC');
+
+        // Do not let hours to mess with date comparisions.
+        $previousDate->setTime(0, 0, 0);
 
         if ('Y' === $this->unit) {
             $previousDate->modify('first day of January');
@@ -566,5 +583,28 @@ class ChartQuery extends AbstractChart
         }
 
         return MAUTIC_TABLE_PREFIX.$table;
+    }
+
+    /**
+     * @param string $tablePrefix
+     * @param string $column
+     */
+    private function getDateConstruct($tablePrefix, $column)
+    {
+        if ($this->generatedColumnProvider) {
+            $generatedColumns = $this->generatedColumnProvider->getGeneratedColumns();
+
+            try {
+                $generatedColumn = $generatedColumns->getForOriginalDateColumnAndUnit($column, $this->unit);
+
+                return $tablePrefix.'.'.$generatedColumn->getColumnName();
+            } catch (\UnexpectedValueException $e) {
+                // Alright. Use the original column then.
+            }
+        }
+
+        $dbUnit = $this->translateTimeUnit($this->unit);
+
+        return 'DATE_FORMAT('.$tablePrefix.'.'.$column.', \''.$dbUnit.'\')';
     }
 }

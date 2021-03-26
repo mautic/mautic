@@ -117,7 +117,7 @@ if ('index' == $tmpl) {
 
                             <a href="<?php echo $view['router']->url(
                                 'mautic_company_action',
-                                ['objectAction' => 'edit', 'objectId' => $item->getId()]
+                                ['objectAction' => 'view', 'objectId' => $item->getId()]
                             ); ?>" data-toggle="ajax">
                                 <?php if (isset($fields['core']['companyname'])) : ?>
                                     <?php echo $view->escape($fields['core']['companyname']['value']); ?>

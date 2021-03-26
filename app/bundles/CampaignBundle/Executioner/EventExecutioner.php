@@ -361,7 +361,7 @@ class EventExecutioner
             );
 
             // Check if we need to schedule this if it is not an inactivity check
-            if (!$isInactive && $this->scheduler->shouldSchedule($executionDate, $this->executionDate)) {
+            if (!$isInactive && $this->scheduler->shouldScheduleEvent($event, $executionDate, $this->executionDate)) {
                 if ($childrenCounter) {
                     $childrenCounter->advanceTotalScheduled($contacts->count());
                 }
