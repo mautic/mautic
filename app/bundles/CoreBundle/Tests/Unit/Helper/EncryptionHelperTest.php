@@ -95,20 +95,20 @@ class EncryptionHelperTest extends \PHPUnit\Framework\TestCase
             ->method('isSupported')
             ->willReturn(false);
 
-        $this->secondaryCipherMock->expects($this->once(0))
+        $this->secondaryCipherMock->expects($this->once())
             ->method('isSupported')
             ->willReturn(true);
 
-        $this->coreParametersHelperMock->expects($this->once(0))
+        $this->coreParametersHelperMock->expects($this->once())
             ->method('get')
             ->with('mautic.secret_key')
             ->willReturn($this->key);
 
-        $this->secondaryCipherMock->expects($this->once(1))
+        $this->secondaryCipherMock->expects($this->once())
             ->method('getRandomInitVector')
             ->willReturn($initVector);
 
-        $this->secondaryCipherMock->expects($this->once(2))
+        $this->secondaryCipherMock->expects($this->once())
             ->method('encrypt')
             ->with(serialize($secretMessage), $this->key, $initVector)
             ->willReturn($encryptedMessage);

@@ -175,7 +175,7 @@ class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
         $contacts           = [5];
         $subscribedChannels = []; // Unsubscribe contact from missing
 
-        $this->contactModelMock->expects($this->once(0))
+        $this->contactModelMock->expects($this->once())
             ->method('getLeadsByIds')
             ->with($contacts)
             ->willReturn([$this->contactMock5]);

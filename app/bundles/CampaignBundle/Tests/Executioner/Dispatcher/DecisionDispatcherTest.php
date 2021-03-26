@@ -42,13 +42,16 @@ class DecisionDispatcherTest extends \PHPUnit\Framework\TestCase
      */
     private $config;
 
-    private DecisionDispatcher $decisionDispatcher;
+    /**
+     * @var DecisionDispatcher
+     */
+    private $decisionDispatcher;
 
     protected function setUp(): void
     {
-        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->legacyDispatcher = $this->createMock(LegacyEventDispatcher::class);
-        $this->config = $this->createMock(DecisionAccessor::class);
+        $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
+        $this->legacyDispatcher   = $this->createMock(LegacyEventDispatcher::class);
+        $this->config             = $this->createMock(DecisionAccessor::class);
         $this->decisionDispatcher = new DecisionDispatcher($this->dispatcher, $this->legacyDispatcher);
     }
 
