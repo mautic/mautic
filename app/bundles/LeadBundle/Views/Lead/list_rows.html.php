@@ -95,6 +95,7 @@
                             'fields'        => $fields,
                             'label'         => $label,
                             'column'        => $column,
+                            'columns'       => $columns,
                             'noContactList' => $noContactList,
                             'class'         => array_search($column, $columsAliases) > 1 ? 'hidden-xs' : '',
                         ]
