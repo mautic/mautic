@@ -287,6 +287,7 @@ context("Verify campaign membership with update contact action & updating dates 
     segments.firstCheckbox.click();
     segments.firstDropDown.click();
     segments.deleteOption.click();
+    cy.wait(2000); //Community Specific
     segments.deleteConfirmation.click();
   });
 
