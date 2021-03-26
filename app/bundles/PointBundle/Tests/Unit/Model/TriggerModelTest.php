@@ -74,7 +74,7 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
      */
     private $contactTracker;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->ipLookupHelper         = $this->createMock(IpLookupHelper::class);
