@@ -174,7 +174,7 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($queryBuilderMock);
 
         $reportGeneratorEventMock->expects($this->at(2))
-            ->method('hasColumn')
+            ->method('usesColumn')
             ->with(['u.first_name', 'u.last_name'])
             ->willReturn(true);
 
