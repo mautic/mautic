@@ -63,10 +63,7 @@ class EmailType extends AbstractType
      */
     private $stageModel;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private CoreParametersHelper $coreParametersHelper;
 
     public function __construct(
         TranslatorInterface $translator,
