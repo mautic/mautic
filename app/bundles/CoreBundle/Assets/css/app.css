@@ -1899,6 +1899,10 @@ ul.dropdown-menu-form {
 label {
   font-weight: 600;
 }
+.label-tag {
+  white-space:normal;
+  text-align: left;
+}
 .control-label.text-left {
   text-align: left;
 }
@@ -4752,4 +4756,8 @@ ul.media-list.media-list-feed div.media-object {
 .ico-sms:before {
   font-family: "FontAwesome";
   content: "\f27b";
+}
+
+#globalSearchDropdown .list-group-item>a{
+  padding-top: 10px;
 }
