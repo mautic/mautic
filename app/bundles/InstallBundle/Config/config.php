@@ -60,6 +60,11 @@ return [
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => [],
             ],
+             'mautic.install.fixture.remove_duplicate_index' => [
+                 'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\RemoveDuplicateIndexData::class,
+                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                 'arguments' => [],
+             ],
         ],
         'forms' => [
             \Mautic\InstallBundle\Configurator\Form\CheckStepType::class => [
@@ -119,6 +124,19 @@ return [
                 'tag'          => 'mautic.configurator.step',
                 'tagArguments' => [
                     'priority' => 2,
+                ],
+            ],
+            'mautic.install.service' => [
+                'class'     => 'Mautic\InstallBundle\Install\InstallService',
+                'arguments' => [
+                    'mautic.configurator',
+                    'mautic.helper.cache',
+                    'mautic.helper.paths',
+                    'doctrine.orm.entity_manager',
+                    'translator',
+                    'kernel',
+                    'validator',
+                    'security.encoder_factory',
                 ],
             ],
         ],

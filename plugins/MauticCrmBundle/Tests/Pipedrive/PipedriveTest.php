@@ -20,7 +20,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
     const WEBHOOK_USER     = 'user';
     const WEBHOOK_PASSWORD = 'pa$$word';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -32,7 +32,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         $_SERVER['REQUEST_URI']     = '/index.php';
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($GLOBALS['requests'], $_SERVER['SERVER_PROTOCOL'], $_SERVER['SERVER_PORT'], $_SERVER['SERVER_NAME']);
 
@@ -54,12 +54,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         return null;
     }
 
-    /**
-     * @param string $method
-     * @param string $json
-     * @param bool   $addCredential
-     */
-    protected function makeRequest($method, $json, $addCredential = true)
+    protected function makeRequest(string $method, string $json, bool $addCredential = true)
     {
         $headers = !$addCredential ? [] : [
             'PHP_AUTH_USER' => self::WEBHOOK_USER,
@@ -131,7 +126,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         $this->em->flush();
 
-        $companyModel = $this->container->get('mautic.lead.model.company');
+        $companyModel = self::$container->get('mautic.lead.model.company');
 
         if ($companies instanceof Company) {
             $companies = [$companies];
@@ -227,7 +222,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
     protected function getIntegrationObject()
     {
         /** @var IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->container->get('mautic.helper.integration');
+        $integrationHelper = self::$container->get('mautic.helper.integration');
 
         /** @var Integration $integration */
         $integration = $integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
