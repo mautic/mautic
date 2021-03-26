@@ -84,9 +84,9 @@ class BundleMetadata
         $this->metadata['config'] = $config;
     }
 
-    public function addPermissionClass(string $name, string $class): void
+    public function addPermissionClass(string $class): void
     {
-        $this->metadata['permissionClasses'][$name] = $class;
+        $this->metadata['permissionClasses'][$class] = $class;
     }
 
     public function toArray(): array

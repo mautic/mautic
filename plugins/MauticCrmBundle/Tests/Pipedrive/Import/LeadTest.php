@@ -163,7 +163,7 @@ class LeadTest extends PipedriveTest
 
     public function testRemoveLeadCompany()
     {
-        $companyModel = $this->container->get('mautic.lead.model.company');
+        $companyModel = self::$container->get('mautic.lead.model.company');
 
         $this->installPipedriveIntegration(
             true,
