@@ -13,7 +13,7 @@ namespace Mautic\ApiBundle\Controller;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
 use Mautic\ApiBundle\ApiEvents;
@@ -43,7 +43,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 /**
  * Class CommonApiController.
  */
-class CommonApiController extends FOSRestController implements MauticController
+class CommonApiController extends AbstractFOSRestController implements MauticController
 {
     use RequestTrait;
     use FormErrorMessagesTrait;
