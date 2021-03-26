@@ -14,15 +14,14 @@ namespace Mautic\CoreBundle\Helper;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class IpLookupHelper
 {
     /**
-     * @var Request|null
+     * @var RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * @var EntityManager
@@ -70,7 +69,7 @@ class IpLookupHelper
         CoreParametersHelper $coreParametersHelper,
         AbstractLookup $ipLookup = null
     ) {
-        $this->request               = $requestStack->getCurrentRequest();
+        $this->requestStack          = $requestStack;
         $this->em                    = $em;
         $this->ipLookup              = $ipLookup;
         $this->doNotTrackIps         = $coreParametersHelper->get('do_not_track_ips');
@@ -87,7 +86,9 @@ class IpLookupHelper
      */
     public function getIpAddressFromRequest()
     {
-        if (null !== $this->request) {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (null !== $request) {
             $ipHolders = [
                 'HTTP_CLIENT_IP',
                 'HTTP_X_FORWARDED_FOR',
@@ -99,8 +100,8 @@ class IpLookupHelper
             ];
 
             foreach ($ipHolders as $key) {
-                if ($this->request->server->get($key)) {
-                    $ip = trim($this->request->server->get($key));
+                if ($request->server->get($key)) {
+                    $ip = trim($request->server->get($key));
 
                     if (false !== strpos($ip, ',')) {
                         $ip = $this->getClientIpFromProxyList($ip);
@@ -128,6 +129,7 @@ class IpLookupHelper
     public function getIpAddress($ip = null)
     {
         static $ipAddresses = [];
+        $request            = $this->requestStack->getCurrentRequest();
 
         if (null === $ip) {
             $ip = $this->getIpAddressFromRequest();
@@ -175,8 +177,8 @@ class IpLookupHelper
 
             $ipAddress->setDoNotTrackList($doNotTrack);
 
-            if ($ipAddress->isTrackable() && $this->request) {
-                $userAgent = $this->request->headers->get('User-Agent');
+            if ($ipAddress->isTrackable() && $request) {
+                $userAgent = $request->headers->get('User-Agent', '');
                 foreach ($this->doNotTrackBots as $bot) {
                     if (false !== strpos($userAgent, $bot)) {
                         $doNotTrack[] = $ip;

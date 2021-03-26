@@ -72,9 +72,9 @@ class ContactTracker
     private $ipLookupHelper;
 
     /**
-     * @var Request
+     * @var RequestStack
      */
-    private $request;
+    private $requestStack;
 
     /**
      * @var CoreParametersHelper
@@ -112,7 +112,7 @@ class ContactTracker
         $this->security               = $security;
         $this->logger                 = $logger;
         $this->ipLookupHelper         = $ipLookupHelper;
-        $this->request                = $requestStack->getCurrentRequest();
+        $this->requestStack           = $requestStack;
         $this->coreParametersHelper   = $coreParametersHelper;
         $this->dispatcher             = $dispatcher;
         $this->leadFieldModel         = $leadFieldModel;
@@ -123,6 +123,8 @@ class ContactTracker
      */
     public function getContact()
     {
+        $request = $this->requestStack->getCurrentRequest();
+
         if ($systemContact = $this->getSystemContact()) {
             return $systemContact;
         } elseif ($this->isUserSession()) {
@@ -134,8 +136,8 @@ class ContactTracker
             $this->generateTrackingCookies();
         }
 
-        if ($this->request) {
-            $this->logger->addDebug('CONTACT: Tracking session for contact ID# '.$this->trackedContact->getId().' through '.$this->request->getMethod().' '.$this->request->getRequestUri());
+        if ($request) {
+            $this->logger->addDebug('CONTACT: Tracking session for contact ID# '.$this->trackedContact->getId().' through '.$request->getMethod().' '.$request->getRequestUri());
         }
 
         // Log last active for the tracked contact
@@ -363,7 +365,7 @@ class ContactTracker
      */
     private function useSystemContact()
     {
-        return $this->isUserSession() || $this->systemContact || defined('IN_MAUTIC_CONSOLE') || null === $this->request;
+        return $this->isUserSession() || $this->systemContact || defined('IN_MAUTIC_CONSOLE') || null === $this->requestStack->getCurrentRequest();
     }
 
     /**
@@ -394,8 +396,9 @@ class ContactTracker
 
     private function generateTrackingCookies()
     {
-        if ($leadId = $this->trackedContact->getId() && null !== $this->request) {
-            $this->deviceTracker->createDeviceFromUserAgent($this->trackedContact, $this->request->server->get('HTTP_USER_AGENT'));
+        $request = $this->requestStack->getCurrentRequest();
+        if ($leadId = $this->trackedContact->getId() && null !== $request) {
+            $this->deviceTracker->createDeviceFromUserAgent($this->trackedContact, $request->server->get('HTTP_USER_AGENT'));
         }
     }
 }
