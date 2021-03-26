@@ -98,7 +98,7 @@ return [
 
     'services' => [
         'controllers' => [
-            'mautic.api' => [
+            'mautic.api.oauth2.authorize_controller' => [
                 'class'     => \Mautic\ApiBundle\Controller\oAuth2\AuthorizeController::class,
                 'arguments' => [
                     'request_stack',
@@ -111,6 +111,13 @@ return [
                     'fos_oauth_server.client_manager.default',
                     'event_dispatcher',
                     'session',
+                ],
+            ],
+            'mautic.api.oauth1.authorize_controller' => [
+                'class'     => \Mautic\ApiBundle\Controller\oAuth1\AuthorizeController::class,
+                'arguments' => [
+                    'bazinga.oauth.provider.token_provider',
+                    'security.token_storage',
                 ],
             ],
         ],
