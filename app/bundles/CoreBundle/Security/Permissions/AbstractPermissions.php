@@ -35,6 +35,15 @@ abstract class AbstractPermissions
     }
 
     /**
+     * This method is called before the permissions object is used.
+     * Define permissions with `addExtendedPermissions` here instead of constructor.
+     */
+    public function definePermissions()
+    {
+        // Override this method in the final class
+    }
+
+    /**
      * Returns bundle's permissions array.
      *
      * @return array
@@ -377,6 +386,17 @@ abstract class AbstractPermissions
                 'data'              => (!empty($data[$level]) ? $data[$level] : []),
             ]
         );
+    }
+
+    /**
+     * @param string $bundle
+     * @param string $level
+     *
+     * @return string
+     */
+    protected function getLabel($bundle, $level)
+    {
+        return ('categories' === $level) ? 'mautic.category.permissions.categories' : "mautic.{$bundle}.permissions.{$level}";
     }
 
     /**
