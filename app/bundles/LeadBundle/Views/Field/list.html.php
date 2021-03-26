@@ -8,6 +8,8 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+/** @var \Mautic\LeadBundle\Entity\LeadField $item */
 if ('index' == $tmpl) {
     $view->extend('MauticLeadBundle:Field:index.html.php');
 }
@@ -64,9 +66,16 @@ if ('index' == $tmpl) {
                     </td>
                     <td>
                     <span class="ellipsis">
-                        <?php echo $view->render(
+                        <?php
+                        $aditionalText = $item->getColumnIsNotCreated() ? ' ('.$view['translator']->trans('mautic.lead.field.being_created_in_background').')' : null;
+                        echo $view->render(
                             'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                            ['item' => $item, 'model' => 'lead.field', 'disableToggle' => ('email' == $item->getAlias())]
+                            [
+                                    'item'           => $item,
+                                    'model'          => 'lead.field',
+                                    'disableToggle'  => $item->disablePublishChange(),
+                                    'aditionalLabel' => $aditionalText,
+                            ]
                         ); ?>
                         <a href="<?php echo $view['router']->path(
                             'mautic_contactfield_action',
