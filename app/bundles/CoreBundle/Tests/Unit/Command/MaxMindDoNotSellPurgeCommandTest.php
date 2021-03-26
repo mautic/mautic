@@ -19,7 +19,7 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         if (!defined('MAUTIC_TABLE_PREFIX')) {
-            define('MAUTIC_TABLE_PREFIX', 'test');
+            define('MAUTIC_TABLE_PREFIX', '');
         }
     }
 
