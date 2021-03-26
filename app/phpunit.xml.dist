@@ -27,6 +27,7 @@
     </testsuite>
     <testsuite name="Plugin tests">
       <directory>./../plugins/*Bundle/Tests</directory>
+      <exclude>./../plugins/MauticCrmBundle/Tests/Pipedrive</exclude>
     </testsuite>
     <testsuite name="Middleware tests">
       <directory>middlewares/Tests</directory>
@@ -35,8 +36,12 @@
   <php>
     <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>
     <env name="MAXMIND_LICENSE_KEY" value=""/>
+    <env name="KERNEL_CLASS" value="AppKernel" />
     <const name="IS_PHPUNIT" value="true"/>
     <server name="KERNEL_DIR" value="app"/>
     <server name="APP_DEBUG" value="0"/>
   </php>
+  <listeners>
+    <listener class="\Mautic\CoreBundle\Test\Listeners\CleanupListener" />
+  </listeners>
 </phpunit>
