@@ -78,7 +78,7 @@ class Segments {
     }
 
     get deleteConfirmation(){
-        return cy.get('.btn-danger');
+        return cy.get('.modal-body > .btn-danger'); //Community specific
     }
 
     get leadListFilter(){
