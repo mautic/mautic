@@ -41,4 +41,7 @@
     <server name="KERNEL_DIR" value="app"/>
     <server name="APP_DEBUG" value="0"/>
   </php>
+  <listeners>
+    <listener class="\Mautic\CoreBundle\Test\Listeners\CleanupListener" />
+  </listeners>
 </phpunit>

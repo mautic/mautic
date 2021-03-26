@@ -6,7 +6,6 @@ use Doctrine\Common\DataFixtures\Executor\AbstractExecutor;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Liip\TestFixturesBundle\Test\FixturesTrait;
-use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
 use RuntimeException;
@@ -30,19 +29,16 @@ abstract class AbstractMauticTestCase extends WebTestCase
         loadFixtureFiles as private traitLoadFixtureFiles;
     }
 
-    protected EntityManager $em;
-    protected Connection $connection;
-    protected KernelBrowser $client;
-    protected array $clientOptions = [];
-    protected array $clientServer  = [
+    protected ?EntityManager $em;
+    protected ?Connection $connection;
+    protected ?KernelBrowser $client;
+    protected ?array $clientOptions = [];
+    protected ?array $clientServer  = [
         'PHP_AUTH_USER' => 'admin',
         'PHP_AUTH_PW'   => 'mautic',
     ];
 
-    /**
-     * @var array
-     */
-    protected $configParams = [
+    protected ?array $configParams = [
         'api_enabled'                       => true,
         'api_enable_basic_auth'             => true,
         'create_custom_field_in_background' => false,
@@ -56,8 +52,6 @@ abstract class AbstractMauticTestCase extends WebTestCase
     protected function setUpSymfony(array $defaultConfigOptions = []): void
     {
         putenv('MAUTIC_CONFIG_PARAMETERS='.json_encode($defaultConfigOptions));
-
-        ErrorHandler::register('prod');
 
         $this->client = static::createClient($this->clientOptions, $this->clientServer);
         $this->client->disableReboot();
@@ -74,15 +68,6 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->client->setServerParameter('HTTPS', $secure);
 
         $this->mockServices();
-    }
-
-    protected function tearDown(): void
-    {
-        static::$class = null;
-
-        $this->em->close();
-
-        parent::tearDown();
     }
 
     /**
