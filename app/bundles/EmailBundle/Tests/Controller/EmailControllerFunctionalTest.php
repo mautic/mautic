@@ -24,7 +24,12 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 {
-    protected $clientOptions = ['debug' => true];
+    public function setUp(): void
+    {
+        $this->clientOptions = ['debug' => true];
+
+        parent::setUp();
+    }
 
     /**
      * Ensure there is no query for DNC reasons if there are no contacts who received the email
@@ -54,7 +59,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         /** @var DoctrineDataCollector $dbCollector */
         $dbCollector = $profile->getCollector('db');
         $queries     = $dbCollector->getQueries();
-        $prefix      = $this->container->getParameter('mautic.db_table_prefix');
+        $prefix      = self::$container->getParameter('mautic.db_table_prefix');
 
         $dncQueries = array_filter(
             $queries['default'],
@@ -101,7 +106,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         /** @var DoctrineDataCollector $dbCollector */
         $dbCollector = $profile->getCollector('db');
         $queries     = $dbCollector->getQueries();
-        $prefix      = $this->container->getParameter('mautic.db_table_prefix');
+        $prefix      = self::$container->getParameter('mautic.db_table_prefix');
 
         $dncQueries = array_filter(
             $queries['default'],

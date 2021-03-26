@@ -18,7 +18,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 final class Version20210104171005 extends AbstractMauticMigration
 {
     /**
-     * @throws SkipMigrationException
+     * @throws SkipMigration
      */
     public function preUp(Schema $schema): void
     {
@@ -31,15 +31,39 @@ final class Version20210104171005 extends AbstractMauticMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE {$this->prefix}lead_lists ADD category_id INT UNSIGNED DEFAULT NULL");
-        $this->addSql("ALTER TABLE {$this->prefix}lead_lists ADD CONSTRAINT FK_6EC1522A12469DE2 FOREIGN KEY (category_id) REFERENCES {$this->prefix}categories (id) ON DELETE SET NULL");
-        $this->addSql("CREATE INDEX IDX_6EC1522A12469DE2 ON {$this->prefix}lead_lists (category_id)");
+        $categoryIdColumn = $schema->getTable("{$this->prefix}categories")->getColumn('id');
+        if ($categoryIdColumn->getUnsigned()) {
+            $this->addSql("ALTER TABLE {$this->prefix}lead_lists ADD category_id INT UNSIGNED DEFAULT NULL");
+        } else {
+            $this->addSql("ALTER TABLE {$this->prefix}lead_lists ADD category_id INT DEFAULT NULL");
+        }
+
+        $fkName  = $this->getFkName();
+        $idxName = $this->getIdxName();
+
+        $this->addSql(
+            "ALTER TABLE {$this->prefix}lead_lists ADD CONSTRAINT $fkName FOREIGN KEY (category_id) REFERENCES {$this->prefix}categories (id) ON DELETE SET NULL"
+        );
+        $this->addSql("CREATE INDEX $idxName ON {$this->prefix}lead_lists (category_id)");
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE {$this->prefix}lead_lists DROP FOREIGN KEY FK_6EC1522A12469DE2");
-        $this->addSql("ALTER TABLE {$this->prefix}lead_lists DROP INDEX IDX_6EC1522A12469DE2");
+        $fkName  = $this->getFkName();
+        $idxName = $this->getIdxName();
+
+        $this->addSql("ALTER TABLE {$this->prefix}lead_lists DROP FOREIGN KEY $fkName");
+        $this->addSql("ALTER TABLE {$this->prefix}lead_lists DROP INDEX $idxName");
         $this->addSql("ALTER TABLE {$this->prefix}lead_lists DROP category_id");
+    }
+
+    private function getFkName(): string
+    {
+        return $this->generatePropertyName('lead_lists', 'fk', ['category_id']);
+    }
+
+    private function getIdxName(): string
+    {
+        return $this->generatePropertyName('lead_lists', 'idx', ['category_id']);
     }
 }

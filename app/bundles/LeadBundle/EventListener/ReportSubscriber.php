@@ -247,6 +247,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 } else {
                     $event->applyDateFilters($qb, 'date_added', 'l');
                 }
+                $event->addCompanyLeftJoin($qb);
                 break;
 
             case self::CONTEXT_LEAD_POINT_LOG:
