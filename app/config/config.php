@@ -206,7 +206,7 @@ $container->loadFromExtension('jms_serializer', [
         'lower_case' => false,
     ],
     'metadata' => [
-        'cache'          => 'none',
+        'cache'          => 'file',
         'auto_detection' => false,
         'directories'    => $bundleMetadataBuilder->getSerializerConfig(),
     ],
