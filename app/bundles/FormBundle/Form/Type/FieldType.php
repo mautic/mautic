@@ -315,7 +315,7 @@ class FieldType extends AbstractType
                 'containerAttributes',
                 TextType::class,
                 [
-                    'label'      => (!empty($containerAttributesText)) ? $containerAttributesText : 'mautic.form.field.form.container_attr',
+                    'label'      => 'mautic.form.field.form.container_attr',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'     => 'form-control',
