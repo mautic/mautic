@@ -166,6 +166,10 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $this->requestMock->method('isXmlHttpRequest')
             ->willReturn(true);
 
+        $this->routerMock->expects($this->any())
+            ->method('generate')
+            ->willReturn('https://some.url');
+
         $this->requestMock->expects($this->at(2))
             ->method('get')
             ->with('name')
