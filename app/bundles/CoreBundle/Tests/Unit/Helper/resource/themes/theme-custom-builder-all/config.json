@@ -1,0 +1,11 @@
+{
+  "name": "theme-custom-builder-all",
+  "author": "Test theme",
+  "authorUrl": "https://www.mautic.org",
+  "features": [
+    "page",
+    "email",
+    "form"
+  ],
+  "builder": "custom"
+}

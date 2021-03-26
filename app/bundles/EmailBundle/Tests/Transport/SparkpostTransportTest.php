@@ -13,7 +13,7 @@ namespace Mautic\EmailBundle\Tests\Transport;
 
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Stream;
-use Http\Adapter\Guzzle6\Client;
+use Http\Mock\Client;
 use Http\Promise\Promise;
 use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;

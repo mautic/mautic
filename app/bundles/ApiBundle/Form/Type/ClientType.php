@@ -43,14 +43,19 @@ class ClientType extends AbstractType
     private $validator;
 
     /**
-     * @var bool|mixed
-     */
-    private $apiMode;
-
-    /**
      * @var RouterInterface
      */
     private $router;
+
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
+     * @var Session
+     */
+    private $session;
 
     public function __construct(
         RequestStack $requestStack,
@@ -59,13 +64,22 @@ class ClientType extends AbstractType
         Session $session,
         RouterInterface $router
     ) {
-        $this->translator = $translator;
-        $this->validator  = $validator;
-        $this->apiMode    = $requestStack->getCurrentRequest()->get(
+        $this->translator   = $translator;
+        $this->validator    = $validator;
+        $this->requestStack = $requestStack;
+        $this->session      = $session;
+        $this->router       = $router;
+    }
+
+    /**
+     * @return bool|mixed
+     */
+    private function getApiMode()
+    {
+        return $this->requestStack->getCurrentRequest()->get(
             'api_mode',
-            $session->get('mautic.client.filter.api_mode', 'oauth1a')
+            $this->session->get('mautic.client.filter.api_mode', 'oauth1a')
         );
-        $this->router     = $router;
     }
 
     /**
@@ -73,6 +87,7 @@ class ClientType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $apiMode = $this->getApiMode();
         $builder->addEventSubscriber(new CleanFormSubscriber([]));
         $builder->addEventSubscriber(new FormExitSubscriber('api.client', $options));
 
@@ -94,7 +109,7 @@ class ClientType extends AbstractType
                     ],
                     'required'          => false,
                     'placeholder'       => false,
-                    'data'              => $this->apiMode,
+                    'data'              => $apiMode,
                 ]
             );
         }
@@ -109,7 +124,7 @@ class ClientType extends AbstractType
             ]
         );
 
-        if ('oauth2' == $this->apiMode) {
+        if ('oauth2' == $apiMode) {
             $arrayStringTransformer = new Transformers\ArrayStringTransformer();
             $builder->add(
                 $builder->create(
@@ -263,7 +278,8 @@ class ClientType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $dataClass = ('oauth2' == $this->apiMode) ? 'Mautic\ApiBundle\Entity\oAuth2\Client' : 'Mautic\ApiBundle\Entity\oAuth1\Consumer';
+        $apiMode   = $this->getApiMode();
+        $dataClass = ('oauth2' == $apiMode) ? 'Mautic\ApiBundle\Entity\oAuth2\Client' : 'Mautic\ApiBundle\Entity\oAuth1\Consumer';
         $resolver->setDefaults(
             [
                 'data_class' => $dataClass,

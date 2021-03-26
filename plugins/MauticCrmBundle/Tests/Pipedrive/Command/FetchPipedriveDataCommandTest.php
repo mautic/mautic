@@ -100,7 +100,7 @@ class FetchPipedriveDataCommandTest extends PipedriveTest
 
     private function executeCommand()
     {
-        $kernel      = $this->container->get('kernel');
+        $kernel      = self::$container->get('kernel');
         $application = new Application($kernel);
         $application->setAutoExit(false);
 

@@ -13,6 +13,8 @@ namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Form\Type\ThemeUploadType;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,7 +41,11 @@ class ThemeController extends FormController
             return $this->accessDenied();
         }
 
+        /** @var ThemeHelper $themeHelper */
         $themeHelper = $this->container->get('mautic.helper.theme');
+        /** @var BuilderIntegrationsHelper $builderIntegrationsHelper */
+        $builderIntegrationsHelper    = $this->container->get('mautic.integrations.helper.builder_integrations');
+
         $dir         = $this->factory->getSystemPath('themes', true);
         $action      = $this->generateUrl('mautic_themes_index');
         $form        = $this->get('form.factory')->create(ThemeUploadType::class, [], ['action' => $action]);
@@ -96,6 +102,7 @@ class ThemeController extends FormController
         return $this->delegateView([
             'viewParameters' => [
                 'items'         => $themeHelper->getInstalledThemes('all', true, true),
+                'builders'      => $builderIntegrationsHelper->getBuilderNames(),
                 'defaultThemes' => $themeHelper->getDefaultThemes(),
                 'form'          => $form->createView(),
                 'permissions'   => $permissions,

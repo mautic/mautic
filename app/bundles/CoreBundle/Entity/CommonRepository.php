@@ -1000,7 +1000,7 @@ class CommonRepository extends EntityRepository
 
         if (!$filter->strict) {
             if (false === strpos($string, '%')) {
-                $string = "$string%";
+                $string = "%$string%";
             }
         }
 
