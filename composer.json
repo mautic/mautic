@@ -61,7 +61,7 @@
         "symfony/css-selector": "~4.4.0",
         "symfony/http-client": "~4.4.0",
 
-        "doctrine/doctrine-bundle": "~1.12.0",
+        "doctrine/doctrine-bundle": "^2.1.1",
         "doctrine/doctrine-fixtures-bundle": "^3.3.2",
         "doctrine/doctrine-migrations-bundle": "~2.1",
         "doctrine/annotations": "^1.10.3",
