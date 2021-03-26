@@ -28,7 +28,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
         /** @var CategoryModel $model */
-        $model      = $this->container->get('mautic.category.model.category');
+        $model      = self::$container->get('mautic.category.model.category');
 
         foreach ($categoriesData as $categoryData) {
             $category = new Category();
