@@ -6,13 +6,12 @@ use Doctrine\Common\DataFixtures\Executor\AbstractExecutor;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Liip\TestFixturesBundle\Test\FixturesTrait;
-use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
 use RuntimeException;
-use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -30,66 +29,39 @@ abstract class AbstractMauticTestCase extends WebTestCase
         loadFixtureFiles as private traitLoadFixtureFiles;
     }
 
-    /**
-     * @var EntityManager
-     */
-    protected $em;
-
-    /**
-     * @var Connection
-     */
-    protected $connection;
-
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * @var Client
-     */
-    protected $client;
-
-    /**
-     * @var array
-     */
-    protected $clientOptions = [];
-
-    /**
-     * @var array
-     */
-    protected $clientServer = [
+    protected ?EntityManager $em;
+    protected ?Connection $connection;
+    protected ?KernelBrowser $client;
+    protected ?array $clientOptions = [];
+    protected ?array $clientServer  = [
         'PHP_AUTH_USER' => 'admin',
         'PHP_AUTH_PW'   => 'mautic',
     ];
 
+    protected ?array $configParams = [
+        'api_enabled'                       => true,
+        'api_enable_basic_auth'             => true,
+        'create_custom_field_in_background' => false,
+    ];
+
     protected function setUp(): void
     {
-        $this->setUpSymfony(
-            [
-                'api_enabled'                       => true,
-                'api_enable_basic_auth'             => true,
-                'create_custom_field_in_background' => false,
-            ]
-        );
+        $this->setUpSymfony($this->configParams);
     }
 
     protected function setUpSymfony(array $defaultConfigOptions = []): void
     {
         putenv('MAUTIC_CONFIG_PARAMETERS='.json_encode($defaultConfigOptions));
 
-        ErrorHandler::register('prod');
-
         $this->client = static::createClient($this->clientOptions, $this->clientServer);
         $this->client->disableReboot();
         $this->client->followRedirects(true);
 
-        $this->container  = $this->client->getContainer();
-        $this->em         = $this->container->get('doctrine')->getManager();
+        $this->em         = self::$container->get('doctrine')->getManager();
         $this->connection = $this->em->getConnection();
 
         /** @var RouterInterface $router */
-        $router = $this->container->get('router');
+        $router = self::$container->get('router');
         $scheme = $router->getContext()->getScheme();
         $secure = 0 === strcasecmp($scheme, 'https');
 
@@ -98,21 +70,12 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->mockServices();
     }
 
-    protected function tearDown(): void
-    {
-        static::$class = null;
-
-        $this->em->close();
-
-        parent::tearDown();
-    }
-
     /**
      * Overrides \Liip\TestFixturesBundle\Test\FixturesTrait::getContainer() method to prevent from having multiple instances of container.
      */
     protected function getContainer(): ContainerInterface
     {
-        return $this->container;
+        return self::$container;
     }
 
     /**
@@ -131,39 +94,6 @@ abstract class AbstractMauticTestCase extends WebTestCase
         return $this->traitLoadFixtureFiles($paths, $append, $omName, $registryName, $purgeMode);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected static function getKernelClass()
-    {
-        if (isset($_SERVER['KERNEL_DIR'])) {
-            $dir = $_SERVER['KERNEL_DIR'];
-
-            if (!is_dir($dir)) {
-                $phpUnitDir = static::getPhpUnitXmlDir();
-                if (is_dir("$phpUnitDir/$dir")) {
-                    $dir = "$phpUnitDir/$dir";
-                }
-            }
-        } else {
-            $dir = static::getPhpUnitXmlDir();
-        }
-
-        $finder = new Finder();
-        $finder->name('*TestKernel.php')->depth(0)->in($dir);
-        $results = iterator_to_array($finder);
-        if (!count($results)) {
-            throw new RuntimeException('Either set KERNEL_DIR in your phpunit.xml according to https://symfony.com/doc/current/book/testing.html#your-first-functional-test or override the WebTestCase::createKernel() method.');
-        }
-
-        $file  = current($results);
-        $class = $file->getBasename('.php');
-
-        require_once $file;
-
-        return $class;
-    }
-
     private function mockServices()
     {
         $cookieHelper = $this->getMockBuilder(CookieHelper::class)
@@ -174,9 +104,9 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $cookieHelper->expects($this->any())
             ->method('setCookie');
 
-        $this->container->set('mautic.helper.cookie', $cookieHelper);
+        self::$container->set('mautic.helper.cookie', $cookieHelper);
 
-        $this->container->set('session', new Session(new FixedMockFileSessionStorage()));
+        self::$container->set('session', new Session(new FixedMockFileSessionStorage()));
     }
 
     protected function applyMigrations()
@@ -184,7 +114,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $input  = new ArgvInput(['console', 'doctrine:migrations:version', '--add', '--all', '--no-interaction']);
         $output = new BufferedOutput();
 
-        $application = new Application($this->container->get('kernel'));
+        $application = new Application(self::$container->get('kernel'));
         $application->setAutoExit(false);
         $application->run($input, $output);
     }
@@ -228,13 +158,13 @@ abstract class AbstractMauticTestCase extends WebTestCase
     protected function runCommand($name, array $params = [], Command $command = null)
     {
         $params      = array_merge(['command' => $name], $params);
-        $kernel      = $this->container->get('kernel');
+        $kernel      = self::$container->get('kernel');
         $application = new Application($kernel);
         $application->setAutoExit(false);
 
         if ($command) {
             if ($command instanceof ContainerAwareCommand) {
-                $command->setContainer($this->container);
+                $command->setContainer(self::$container);
             }
 
             // Register the command
