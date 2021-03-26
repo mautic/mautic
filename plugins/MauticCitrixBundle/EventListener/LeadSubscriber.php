@@ -133,6 +133,10 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     public function onListChoicesGenerate(LeadListFiltersChoicesEvent $event)
     {
+        if (false === strpos($event->getRoute(), 'mautic_segment_action')) {
+            return;
+        }
+
         $activeProducts = [];
         foreach (CitrixProducts::toArray() as $p) {
             if (CitrixHelper::isAuthorized('Goto'.$p)) {
@@ -172,8 +176,8 @@ class LeadSubscriber implements EventSubscriberInterface
                             'list' => $eventNamesWithAny,
                         ],
                         'operators' => [
-                            'in'  => $this->translator->trans('mautic.core.operator.in'),
-                            '!in' => $this->translator->trans('mautic.core.operator.notin'),
+                            $this->translator->trans('mautic.core.operator.in')    => 'in',
+                            $this->translator->trans('mautic.core.operator.notin') => '!in',
                         ],
                     ]
                 );
@@ -189,8 +193,8 @@ class LeadSubscriber implements EventSubscriberInterface
                         'list' => $eventNamesWithAny,
                     ],
                     'operators' => [
-                        'in'  => $this->translator->trans('mautic.core.operator.in'),
-                        '!in' => $this->translator->trans('mautic.core.operator.notin'),
+                        $this->translator->trans('mautic.core.operator.in')    => 'in',
+                        $this->translator->trans('mautic.core.operator.notin') => '!in',
                     ],
                 ]
             );
@@ -205,7 +209,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'list' => $eventNamesWithoutAny,
                     ],
                     'operators' => [
-                        'in' => $this->translator->trans('mautic.core.operator.in'),
+                        $this->translator->trans('mautic.core.operator.in') => 'in',
                     ],
                 ]
             );
@@ -238,6 +242,9 @@ class LeadSubscriber implements EventSubscriberInterface
 
             if (in_array($currentFilter, $eventFilters, true)) {
                 $eventNames = $details['filter'];
+                if (!is_iterable($eventNames)) {
+                    $eventNames = [$eventNames];
+                }
                 $isAnyEvent = in_array('any', $eventNames, true);
                 $eventNames = array_map(function ($v) use ($q) {
                     return $q->expr()->literal($v);

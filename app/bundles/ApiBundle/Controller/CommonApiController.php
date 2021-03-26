@@ -13,11 +13,12 @@ namespace Mautic\ApiBundle\Controller;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\ApiEntityEvent;
+use Mautic\ApiBundle\Helper\BatchIdToEntityHelper;
 use Mautic\ApiBundle\Serializer\Exclusion\ParentChildrenExclusionStrategy;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CategoryBundle\Entity\Category;
@@ -29,6 +30,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Security\Exception\PermissionException;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
@@ -41,7 +43,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 /**
  * Class CommonApiController.
  */
-class CommonApiController extends FOSRestController implements MauticController
+class CommonApiController extends AbstractFOSRestController implements MauticController
 {
     use RequestTrait;
     use FormErrorMessagesTrait;
@@ -486,7 +488,7 @@ class CommonApiController extends FOSRestController implements MauticController
             $columns,
             function (&$column, $key, $prefix) {
                 $column = trim($column);
-                if (false === strpos($column, $prefix)) {
+                if (1 === count(explode('.', $column))) {
                     $column = $prefix.$column;
                 }
             },
@@ -661,6 +663,11 @@ class CommonApiController extends FOSRestController implements MauticController
         $this->translator = $translator;
     }
 
+    public function setFlashBag(FlashBag $flashBag)
+    {
+        // @see \Mautic\CoreBundle\EventListener\CoreSubscriber::onKernelController()
+    }
+
     public function setUser(User $user)
     {
         $this->user = $user;
@@ -768,54 +775,54 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     protected function getBatchEntities($parameters, &$errors, $prepareForSerialization = false, $requestIdColumn = 'id', $model = null, $returnWithOriginalKeys = true)
     {
-        $ids = [];
-        if (isset($parameters['ids'])) {
-            foreach ($parameters['ids'] as $key => $id) {
-                $ids[(int) $id] = $key;
-            }
-        } else {
-            foreach ($parameters as $key => $params) {
-                if (is_array($params) && !isset($params[$requestIdColumn])) {
-                    $this->setBatchError($key, 'mautic.api.call.id_missing', Response::HTTP_BAD_REQUEST, $errors);
-                    continue;
-                }
+        $idHelper = new BatchIdToEntityHelper($parameters, $requestIdColumn);
 
-                $id       = (is_array($params)) ? (int) $params[$requestIdColumn] : (int) $params;
-                $ids[$id] = $key;
-            }
+        if (!$idHelper->hasIds()) {
+            return [];
         }
-        $return = [];
-        if (!empty($ids)) {
-            $model    = ($model) ? $model : $this->model;
-            $entities = $model->getEntities(
-                [
-                    'filter' => [
-                        'force' => [
-                            [
-                                'column' => $model->getRepository()->getTableAlias().'.id',
-                                'expr'   => 'in',
-                                'value'  => array_keys($ids),
-                            ],
+
+        $model    = ($model) ? $model : $this->model;
+        $entities = $model->getEntities(
+            [
+                'filter' => [
+                    'force' => [
+                        [
+                            'column' => $model->getRepository()->getTableAlias().'.id',
+                            'expr'   => 'in',
+                            'value'  => $idHelper->getIds(),
                         ],
                     ],
-                    'ignore_paginator' => true,
-                ]
-            );
+                ],
+                'ignore_paginator' => true,
+            ]
+        );
 
-            [$entities, $total] = $prepareForSerialization
+        [$entities, $total] = $prepareForSerialization
                 ?
                 $this->prepareEntitiesForView($entities)
                 :
                 $this->prepareEntityResultsToArray($entities);
 
-            foreach ($entities as $entity) {
-                if ($returnWithOriginalKeys) {
-                    // Ensure same keys as params
-                    $return[$ids[$entity->getId()]] = $entity;
-                } else {
-                    $return[$entity->getId()] = $entity;
-                }
+        // Set errors
+        if ($idHelper->hasErrors()) {
+            foreach ($idHelper->getErrors() as $key => $error) {
+                $this->setBatchError($key, $error, Response::HTTP_BAD_REQUEST, $errors);
             }
+        }
+
+        // Return the response with matching keys from the request
+        if ($returnWithOriginalKeys) {
+            if ($entities instanceof Paginator) {
+                $entities = $entities->getIterator()->getArrayCopy();
+            }
+
+            return $idHelper->orderByOriginalKey($entities);
+        }
+
+        // Return the response with IDs as keys (default behavior)
+        $return = [];
+        foreach ($entities as $entity) {
+            $return[$entity->getId()] = $entity;
         }
 
         return $return;

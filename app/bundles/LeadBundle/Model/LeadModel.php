@@ -40,6 +40,7 @@ use Mautic\LeadBundle\Entity\LeadCategory;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
@@ -50,6 +51,7 @@ use Mautic\LeadBundle\Event\DoNotContactAddEvent;
 use Mautic\LeadBundle\Event\DoNotContactRemoveEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Form\Type\LeadType;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
@@ -79,9 +81,9 @@ class LeadModel extends FormModel
     const CHANNEL_FEATURE = 'contact_preference';
 
     /**
-     * @var \Symfony\Component\HttpFoundation\Request|null
+     * @var RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * @var CookieHelper
@@ -220,7 +222,7 @@ class LeadModel extends FormModel
         LegacyLeadModel $legacyLeadModel,
         IpAddressModel $ipAddressModel
     ) {
-        $this->request              = $requestStack->getCurrentRequest();
+        $this->requestStack         = $requestStack;
         $this->cookieHelper         = $cookieHelper;
         $this->ipLookupHelper       = $ipLookupHelper;
         $this->pathsHelper          = $pathsHelper;
@@ -241,13 +243,12 @@ class LeadModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return \Mautic\LeadBundle\Entity\LeadRepository
+     * @return LeadRepository
      */
     public function getRepository()
     {
-        $repo = $this->em->getRepository('MauticLeadBundle:Lead');
+        /** @var LeadRepository $repo */
+        $repo = $this->em->getRepository(Lead::class);
         $repo->setDispatcher($this->dispatcher);
 
         if (!$this->repoSetup) {
@@ -353,6 +354,14 @@ class LeadModel extends FormModel
     public function getMergeRecordRepository()
     {
         return $this->em->getRepository('MauticLeadBundle:MergeRecord');
+    }
+
+    /**
+     * @return LeadListRepository
+     */
+    public function getLeadListRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:LeadList');
     }
 
     /**
@@ -576,6 +585,8 @@ class LeadModel extends FormModel
      * @param bool|false $bindWithForm        Send $data through the Lead form and only use valid data (should be used with request data)
      *
      * @return array
+     *
+     * @throws ImportFailedException
      */
     public function setFieldValues(Lead $lead, array $data, $overwriteWithBlank = false, $fetchSocialProfiles = true, $bindWithForm = false)
     {
@@ -598,17 +609,28 @@ class LeadModel extends FormModel
         }
 
         if (isset($data['stage'])) {
-            $stagesChangeLogRepo = $this->getStagesChangeLogRepository();
-            $currentLeadStage    = $stagesChangeLogRepo->getCurrentLeadStage($lead->getId());
+            $stagesChangeLogRepo  = $this->getStagesChangeLogRepository();
+            $currentLeadStageId   = $stagesChangeLogRepo->getCurrentLeadStage($lead->getId());
+            $currentLeadStageName = null;
+            if ($currentLeadStageId) {
+                $currentStage = $this->em->getRepository(Stage::class)->findByIdOrName($currentLeadStageId);
+                if ($currentStage) {
+                    $currentLeadStageName = $currentStage->getName();
+                }
+            }
 
-            $previousId = is_object($data['stage']) ? $data['stage']->getId() : (int) $data['stage'];
-            if ($previousId !== $currentLeadStage) {
-                $stage = $this->em->getRepository('MauticStageBundle:Stage')->find($data['stage']);
-                $lead->stageChangeLogEntry(
-                    $stage,
-                    $stage->getId().':'.$stage->getName(),
-                    $this->translator->trans('mautic.stage.event.changed')
-                );
+            $newLeadStageIdOrName = is_object($data['stage']) ? $data['stage']->getId() : $data['stage'];
+            if ((int) $newLeadStageIdOrName !== $currentLeadStageId && $newLeadStageIdOrName !== $currentLeadStageName) {
+                $newStage = $this->em->getRepository(Stage::class)->findByIdOrName($newLeadStageIdOrName);
+                if ($newStage) {
+                    $lead->stageChangeLogEntry(
+                        $newStage,
+                        $newStage->getId().':'.$newStage->getName(),
+                        $this->translator->trans('mautic.stage.event.changed')
+                    );
+                } else {
+                    throw new ImportFailedException($this->translator->trans('mautic.lead.import.stage.not.exists', ['id' => $newLeadStageIdOrName]));
+                }
             }
         }
 
@@ -644,7 +666,7 @@ class LeadModel extends FormModel
             // Unset stage and owner from the form because it's already been handled
             unset($data['stage'], $data['owner'], $data['tags']);
             // Prepare special fields
-            $this->prepareParametersFromRequest($form, $data, $lead);
+            $this->prepareParametersFromRequest($form, $data, $lead, [], $this->fieldsByGroup);
             // Submit the data
             $form->submit($data);
 
@@ -897,7 +919,7 @@ class LeadModel extends FormModel
     {
         // @todo Instantiate here until we can remove circular dependency on LeadModel in order to make it a service
         $requestStack = new RequestStack();
-        $requestStack->push($this->request);
+        $requestStack->push($this->requestStack->getCurrentRequest());
         $contactRequestHelper = new ContactRequestHelper(
             $this,
             $this->contactTracker,
@@ -2333,7 +2355,7 @@ class LeadModel extends FormModel
         if ($lead->isNewlyCreated() || $lead->wasAnonymous()) {
             // Only store an entry once for created and once for identified, not every time the lead is saved
             $manipulator = $lead->getManipulator();
-            if (null !== $manipulator) {
+            if (null !== $manipulator && !$manipulator->wasLogged()) {
                 $manipulationLog = new LeadEventLog();
                 $manipulationLog->setLead($lead)
                     ->setBundle($manipulator->getBundleName())
@@ -2348,7 +2370,7 @@ class LeadModel extends FormModel
                 $manipulationLog->setProperties(['object_description' => $description]);
 
                 $lead->addEventLog($manipulationLog);
-                $lead->setManipulator(null);
+                $manipulator->setAsLogged();
             }
         }
     }
@@ -2432,5 +2454,10 @@ class LeadModel extends FormModel
     public function mergeLeads(Lead $lead, Lead $lead2, $autoMode = true)
     {
         return $this->legacyLeadModel->mergeLeads($lead, $lead2, $autoMode);
+    }
+
+    public function getAvailableLeadFields(): array
+    {
+        return $this->availableLeadFields;
     }
 }

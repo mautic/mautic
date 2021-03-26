@@ -18,7 +18,6 @@ use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\EventRepository;
 use Mautic\WebhookBundle\Entity\Log;
@@ -33,6 +32,7 @@ use Mautic\WebhookBundle\Form\Type\WebhookType;
 use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class WebhookModel extends FormModel
@@ -56,6 +56,13 @@ class WebhookModel extends FormModel
      * @var int
      */
     protected $webhookLimit;
+
+    /**
+     * How long the webhook processing can run in seconds.
+     *
+     * @var int
+     */
+    private $webhookTimeLimit;
 
     /**
      * How many responses in 1 row can fail until the webhook disables itself.
@@ -91,11 +98,6 @@ class WebhookModel extends FormModel
     protected $serializer;
 
     /**
-     * @var NotificationModel
-     */
-    protected $notificationModel;
-
-    /**
      * Queued events default order by dir
      * Possible values: ['ASC', 'DESC'].
      *
@@ -108,16 +110,28 @@ class WebhookModel extends FormModel
      */
     private $httpClient;
 
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
+     * Timestamp when the webhook processing starts.
+     *
+     * @var float
+     */
+    private $startTime;
+
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         SerializerInterface $serializer,
-        NotificationModel $notificationModel,
-        Client $httpClient
+        Client $httpClient,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->setConfigProps($coreParametersHelper);
         $this->serializer        = $serializer;
-        $this->notificationModel = $notificationModel;
         $this->httpClient        = $httpClient;
+        $this->eventDispatcher   = $eventDispatcher;
     }
 
     /**
@@ -281,6 +295,8 @@ class WebhookModel extends FormModel
      */
     public function processWebhooks($webhooks)
     {
+        $this->startTime = microtime(true);
+
         foreach ($webhooks as $webhook) {
             $this->processWebhook($webhook);
         }
@@ -361,7 +377,7 @@ class WebhookModel extends FormModel
 
             // if there are still items in the queue after processing we re-process
             // WARNING: this is recursive
-            if ($queueCount > 0) {
+            if ($queueCount > 0 && !$this->isProcessingExpired()) {
                 $this->processWebhook($webhook);
             }
         }
@@ -395,30 +411,16 @@ class WebhookModel extends FormModel
     /**
      * Unpublish the webhook so it will stop emit the requests
      * and notify user about it.
+     *
+     * @param string $reason
      */
     public function killWebhook(Webhook $webhook, $reason = 'mautic.webhook.stopped.reason')
     {
         $webhook->setIsPublished(false);
         $this->saveEntity($webhook);
 
-        $this->notificationModel->addNotification(
-            $this->translator->trans(
-                'mautic.webhook.stopped.details',
-                [
-                    '%reason%'  => $this->translator->trans($reason),
-                    '%webhook%' => '<a href="'.$this->router->generate(
-                        'mautic_webhook_action',
-                        ['objectAction' => 'view', 'objectId' => $webhook->getId()]
-                    ).'" data-toggle="ajax">'.$webhook->getName().'</a>',
-                ]
-            ),
-            'error',
-            false,
-            $this->translator->trans('mautic.webhook.stopped'),
-            null,
-            null,
-            $this->em->getReference('MauticUserBundle:User', $webhook->getCreatedBy())
-        );
+        $event = new WebhookEvent($webhook, false, $reason);
+        $this->eventDispatcher->dispatch(WebhookEvents::WEBHOOK_KILL, $event);
     }
 
     /**
@@ -654,12 +656,21 @@ class WebhookModel extends FormModel
         return 'webhook:webhooks';
     }
 
+    private function isProcessingExpired(): bool
+    {
+        $currentTime = microtime(true);
+        $runTime     = $currentTime - $this->startTime;
+
+        return $runTime >= $this->webhookTimeLimit;
+    }
+
     /**
      * Sets all class properties from CoreParametersHelper.
      */
     private function setConfigProps(CoreParametersHelper $coreParametersHelper)
     {
         $this->webhookLimit     = (int) $coreParametersHelper->get('webhook_limit', 10);
+        $this->webhookTimeLimit = (int) $coreParametersHelper->get('webhook_time_limit', 600);
         $this->disableLimit     = (int) $coreParametersHelper->get('webhook_disable_limit', 100);
         $this->webhookTimeout   = (int) $coreParametersHelper->get('webhook_timeout', 15);
         $this->logMax           = (int) $coreParametersHelper->get('webhook_log_max', 1000);
