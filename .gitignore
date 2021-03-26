@@ -3,6 +3,8 @@
 !.gitignore
 !.htaccess
 !.gitkeep
+!.ddev
+.ddev/mautic-preference
 .php_cs.cache
 /.env
 /composer.phar
