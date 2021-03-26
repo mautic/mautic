@@ -64,7 +64,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     private $entityManagerMock;
     private $leadModel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -228,15 +228,11 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $this->setProperty($mockLeadModel, LeadModel::class, 'leadFieldModel', $this->fieldModelMock);
 
-        $this->assertAttributeEquals(
-            [],
-            'availableLeadFields',
-            $mockLeadModel,
-            'The availableLeadFields property should start empty'
-        );
+        // The availableLeadFields property should start empty.
+        $this->assertEquals([], $mockLeadModel->getAvailableLeadFields());
 
         $contact = $mockLeadModel->checkForDuplicateContact(['email' => 'john@doe.com', 'firstname' => 'John']);
-        $this->assertAttributeEquals(['email' => 'Email', 'firstname' => 'First Name'], 'availableLeadFields', $mockLeadModel);
+        $this->assertEquals(['email' => 'Email', 'firstname' => 'First Name'], $mockLeadModel->getAvailableLeadFields());
         $this->assertEquals('john@doe.com', $contact->getEmail());
         $this->assertEquals('John', $contact->getFirstname());
     }
@@ -275,15 +271,11 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $this->setProperty($mockLeadModel, LeadModel::class, 'leadFieldModel', $this->fieldModelMock);
 
-        $this->assertAttributeEquals(
-            [],
-            'availableLeadFields',
-            $mockLeadModel,
-            'The availableLeadFields property should start empty'
-        );
+        // The availableLeadFields property should start empty.
+        $this->assertEquals([], $mockLeadModel->getAvailableLeadFields());
 
         list($contact, $fields) = $mockLeadModel->checkForDuplicateContact(['email' => 'john@doe.com', 'firstname' => 'John'], null, true, true);
-        $this->assertAttributeEquals(['email' => 'Email'], 'availableLeadFields', $mockLeadModel);
+        $this->assertEquals(['email' => 'Email'], $mockLeadModel->getAvailableLeadFields());
         $this->assertEquals('john@doe.com', $contact->getEmail());
         $this->assertNull($contact->getFirstname());
         $this->assertEquals(['email' => 'john@doe.com'], $fields);
@@ -441,7 +433,8 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->once())
             ->method('trans')
-            ->with('mautic.lead.import.stage.not.exists', ['id' => $data['stage']]);
+            ->with('mautic.lead.import.stage.not.exists', ['id' => $data['stage']])
+            ->willReturn('Stage not found');
         $this->leadModel->setTranslator($translator);
 
         $this->expectException(ImportFailedException::class);
