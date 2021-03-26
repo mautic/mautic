@@ -61,10 +61,7 @@ class InputOptionsDAO
      */
     private $endDateTime;
 
-    /**
-     * @var array
-     */
-    private $options;
+    private array $options;
 
     /**
      * Example $input:

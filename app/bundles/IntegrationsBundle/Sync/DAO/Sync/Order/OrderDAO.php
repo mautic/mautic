@@ -87,10 +87,7 @@ class OrderDAO
      */
     private $notifications = [];
 
-    /**
-     * @var array
-     */
-    private $options;
+    private array $options;
 
     /**
      * @param bool   $isFirstTimeSync
