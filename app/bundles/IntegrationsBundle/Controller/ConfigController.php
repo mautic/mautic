@@ -152,7 +152,10 @@ class ConfigController extends AbstractFormController
         }
 
         // Show the form if there are errors
-        if (!$this->form->isValid()) {
+        if (!$this->form->isValid() && (!$this->integrationObject instanceof ConfigFormAuthorizeButtonInterface || $this->integrationObject->isAuthorized())) {
+            // Invalid form data
+            // Integration IS NOT instance of ConfigFormAuthorizeButtonInterface
+            // Integration IS instance of ConfigFormAuthorizeButtonInterface and IS authorized
             return $this->showForm();
         }
 

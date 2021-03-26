@@ -127,6 +127,7 @@ abstract class AbstractChart
      */
     public function setDateRange(\DateTime $dateFrom, \DateTime $dateTo)
     {
+        $this->timezone = $dateFrom->getTimezone();
         $this->dateFrom = clone $dateFrom;
         $this->dateTo   = clone $dateTo;
 
@@ -136,14 +137,17 @@ abstract class AbstractChart
         }
 
         // If today, adjust dateTo to be end of today if unit is not time based or to the current hour if it is
-        $now = new \DateTime();
-        if ($now->format('Y-m-d') == $this->dateTo->format('Y-m-d') && !$this->isTimeUnit) {
-            $this->dateTo = $now;
-        } elseif (!$this->isTimeUnit) {
+        if (!$this->isTimeUnit) {
             $this->dateTo->setTime(23, 59, 59);
+
+            return;
         }
 
-        $this->timezone = $dateFrom->getTimezone();
+        // If time aware and the to date is today, set the stats to the current hour to avoid empty future hours in graphs
+        $now = new \DateTime();
+        if ($now->format('Y-m-d') === $this->dateTo->format('Y-m-d')) {
+            $this->dateTo = $now;
+        }
     }
 
     /**

@@ -22,10 +22,12 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use Mautic\PageBundle\Event\TrackingEvent;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\VideoModel;
 use Mautic\PageBundle\PageEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -99,7 +101,7 @@ class PublicController extends CommonFormController
             }
 
             // Check for variants
-            list($parentVariant, $childrenVariants) = $entity->getVariants();
+            [$parentVariant, $childrenVariants] = $entity->getVariants();
 
             // Is this a variant of another? If so, the parent URL should be used unless a user is logged in and previewing
             if ($parentVariant != $entity && !$userAccess) {
@@ -211,7 +213,7 @@ class PublicController extends CommonFormController
 
                 // Now show the translation for the page or a/b test - only fetch a translation if a slug was not used
                 if ($entity->isTranslation() && empty($entity->languageSlug)) {
-                    list($translationParent, $translatedEntity) = $model->getTranslatedEntity(
+                    [$translationParent, $translatedEntity] = $model->getTranslatedEntity(
                         $entity,
                         $lead,
                         $this->request
@@ -377,7 +379,7 @@ class PublicController extends CommonFormController
      *
      * @throws \Exception
      */
-    public function trackingAction()
+    public function trackingAction(Request $request)
     {
         if (!$this->get('mautic.security')->isAnonymous()) {
             return new JsonResponse(
@@ -403,13 +405,18 @@ class PublicController extends CommonFormController
         $trackingHelper = $this->get('mautic.page.helper.tracking');
         $sessionValue   = $trackingHelper->getSession(true);
 
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = $this->get('event_dispatcher');
+        $event           = new TrackingEvent($lead, $request, $sessionValue);
+        $eventDispatcher->dispatch(PageEvents::ON_CONTACT_TRACKED, $event);
+
         return new JsonResponse(
             [
                 'success'   => 1,
                 'id'        => ($lead) ? $lead->getId() : null,
                 'sid'       => $trackingId,
                 'device_id' => $trackingId,
-                'events'    => $sessionValue,
+                'events'    => $event->getResponse()->all(),
             ]
         );
     }
