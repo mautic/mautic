@@ -12,7 +12,7 @@
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * Class IpLookupHelper.
@@ -20,16 +20,14 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 class UserHelper
 {
     /**
-     * @var TokenStorage
+     * @var TokenStorageInterface
      */
     protected $tokenStorage;
 
     /**
      * UserHelper constructor.
-     *
-     * @param TokenStorage $tokenStorage
      */
-    public function __construct(TokenStorage $tokenStorage)
+    public function __construct(TokenStorageInterface $tokenStorage)
     {
         $this->tokenStorage = $tokenStorage;
     }
@@ -44,7 +42,7 @@ class UserHelper
         $user  = null;
         $token = $this->tokenStorage->getToken();
 
-        if ($token !== null) {
+        if (null !== $token) {
             $user = $token->getUser();
         }
 

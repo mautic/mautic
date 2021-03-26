@@ -43,11 +43,6 @@ class NotificationHelper
 
     /**
      * NotificationHelper constructor.
-     *
-     * @param UserModel           $userModel
-     * @param NotificationModel   $notificationModel
-     * @param TranslatorInterface $translator
-     * @param Router              $router
      */
     public function __construct(UserModel $userModel, NotificationModel $notificationModel, TranslatorInterface $translator, Router $router)
     {
@@ -57,10 +52,6 @@ class NotificationHelper
         $this->router            = $router;
     }
 
-    /**
-     * @param Lead  $contact
-     * @param Event $event
-     */
     public function notifyOfFailure(Lead $contact, Event $event)
     {
         $user = $this->getUser($contact, $event);
@@ -88,9 +79,6 @@ class NotificationHelper
     }
 
     /**
-     * @param Lead  $contact
-     * @param Event $event
-     *
      * @return User
      */
     private function getUser(Lead $contact, Event $event)

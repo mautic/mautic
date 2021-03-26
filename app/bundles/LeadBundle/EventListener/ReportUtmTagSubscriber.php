@@ -11,14 +11,14 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ReportUtmTagSubscriber extends CommonSubscriber
+class ReportUtmTagSubscriber implements EventSubscriberInterface
 {
     const UTM_TAG = 'lead.utmTag';
 
@@ -32,10 +32,6 @@ class ReportUtmTagSubscriber extends CommonSubscriber
      */
     private $companyReportData;
 
-    /**
-     * @param FieldsBuilder     $fieldsBuilder
-     * @param CompanyReportData $companyReportData
-     */
     public function __construct(
         FieldsBuilder $fieldsBuilder,
         CompanyReportData $companyReportData
@@ -57,8 +53,6 @@ class ReportUtmTagSubscriber extends CommonSubscriber
 
     /**
      * Add available tables and columns to the report builder lookup.
-     *
-     * @param ReportBuilderEvent $event
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
@@ -101,8 +95,6 @@ class ReportUtmTagSubscriber extends CommonSubscriber
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGeneratorEvent $event
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
@@ -114,11 +106,11 @@ class ReportUtmTagSubscriber extends CommonSubscriber
         $qb->from(MAUTIC_TABLE_PREFIX.'lead_utmtags', 'utm')
             ->leftJoin('utm', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = utm.lead_id');
 
-        if ($event->hasColumn(['u.first_name', 'u.last_name']) || $event->hasFilter(['u.first_name', 'u.last_name'])) {
+        if ($event->usesColumn(['u.first_name', 'u.last_name'])) {
             $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
         }
 
-        if ($event->hasColumn('i.ip_address') || $event->hasFilter('i.ip_address')) {
+        if ($event->usesColumn('i.ip_address')) {
             $event->addLeadIpAddressLeftJoin($qb);
         }
 

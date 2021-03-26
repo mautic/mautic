@@ -12,6 +12,7 @@
 namespace Mautic\ApiBundle;
 
 use Mautic\ApiBundle\DependencyInjection\Compiler\OAuthPass;
+use Mautic\ApiBundle\DependencyInjection\Compiler\SerializerPass;
 use Mautic\ApiBundle\DependencyInjection\Factory\ApiFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -29,16 +30,9 @@ class MauticApiBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new OAuthPass());
+        $container->addCompilerPass(new SerializerPass());
 
         $extension = $container->getExtension('security');
         $extension->addSecurityListenerFactory(new ApiFactory());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'FOSOAuthServerBundle';
     }
 }

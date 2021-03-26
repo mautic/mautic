@@ -9,13 +9,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Helper;
+namespace Mautic\CoreBundle\Tests\Unit\Templating\Helper;
 
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Symfony\Component\Asset\Packages;
 
-class AssetsHelperTest extends \PHPUnit_Framework_TestCase
+class AssetsHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testAssetContext()
     {
@@ -41,19 +41,19 @@ class AssetsHelperTest extends \PHPUnit_Framework_TestCase
         $assetHelper->addStylesheet('/app.css');
         $head = $assetHelper->getHeadDeclarations();
 
-        $this->assertContains('app.css', $head);
+        $this->assertStringContainsString('app.css', $head);
 
         $assetHelper->setContext(AssetsHelper::CONTEXT_BUILDER)
             ->addStylesheet('/builder.css')
             ->setContext();
 
         $head = $assetHelper->getHeadDeclarations();
-        $this->assertNotContains('builder.css', $head);
+        $this->assertStringNotContainsString('builder.css', $head);
 
         $head = $assetHelper->setContext(AssetsHelper::CONTEXT_BUILDER)
             ->getHeadDeclarations();
-        $this->assertContains('builder.css', $head);
-        $this->assertNotContains('app.css', $head);
+        $this->assertStringContainsString('builder.css', $head);
+        $this->assertStringNotContainsString('app.css', $head);
     }
 
     public function testGetUrlWithAbsolutePath()

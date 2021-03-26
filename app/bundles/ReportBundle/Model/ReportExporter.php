@@ -16,6 +16,7 @@ use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Event\ReportScheduleSendEvent;
 use Mautic\ReportBundle\Exception\FileIOException;
 use Mautic\ReportBundle\ReportEvents;
+use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -61,8 +62,6 @@ class ReportExporter
     }
 
     /**
-     * @param ExportOption $exportOption
-     *
      * @throws FileIOException
      */
     public function processExport(ExportOption $exportOption)
@@ -74,8 +73,6 @@ class ReportExporter
     }
 
     /**
-     * @param Scheduler $scheduler
-     *
      * @throws FileIOException
      */
     private function processReport(Scheduler $scheduler)
@@ -83,19 +80,22 @@ class ReportExporter
         $report = $scheduler->getReport();
 
         if (!is_null($scheduler->getScheduleDate())) {
-            /** @var /DateTime $dateTo */
             $dateTo = clone $scheduler->getScheduleDate();
             $dateTo->setTime(0, 0, 0);
 
             $dateFrom = clone $dateTo;
             switch ($report->getScheduleUnit()) {
-                case 'DAILY':
+                case SchedulerEnum::UNIT_NOW:
+                    $dateFrom->sub(new \DateInterval('P10Y'));
+                    $this->schedulerModel->turnOffScheduler($report);
+                    break;
+                case SchedulerEnum::UNIT_DAILY:
                     $dateFrom->sub(new \DateInterval('P1D'));
                     break;
-                case 'WEEKLY':
+                case SchedulerEnum::UNIT_WEEKLY:
                     $dateFrom->sub(new \DateInterval('P7D'));
                     break;
-                case 'MONTHLY':
+                case SchedulerEnum::UNIT_MONTHLY:
                     $dateFrom->sub(new \DateInterval('P1M'));
                     break;
             }
@@ -104,26 +104,28 @@ class ReportExporter
             $this->reportExportOptions->setDateTo($dateTo->sub(new \DateInterval('PT1S')));
         }
 
-        $this->reportExportOptions->beginExport();
-        while (true) {
-            $data = $this->reportDataAdapter->getReportData($report, $this->reportExportOptions);
+        // just published reports, but schedule continue
+        if ($report->isPublished()) {
+            $this->reportExportOptions->beginExport();
+            while (true) {
+                $data = $this->reportDataAdapter->getReportData($report, $this->reportExportOptions);
 
-            $this->reportFileWriter->writeReportData($scheduler, $data, $this->reportExportOptions);
+                $this->reportFileWriter->writeReportData($scheduler, $data, $this->reportExportOptions);
 
-            $totalResults = $data->getTotalResults();
-            unset($data);
+                $totalResults = $data->getTotalResults();
+                unset($data);
 
-            if ($this->reportExportOptions->getNumberOfProcessedResults() >= $totalResults) {
-                break;
+                if ($this->reportExportOptions->getNumberOfProcessedResults() >= $totalResults) {
+                    break;
+                }
+
+                $this->reportExportOptions->nextBatch();
             }
 
-            $this->reportExportOptions->nextBatch();
+            $file  = $this->reportFileWriter->getFilePath($scheduler);
+            $event = new ReportScheduleSendEvent($scheduler, $file);
+            $this->eventDispatcher->dispatch(ReportEvents::REPORT_SCHEDULE_SEND, $event);
         }
-
-        $file = $this->reportFileWriter->getFilePath($scheduler);
-
-        $event = new ReportScheduleSendEvent($scheduler, $file);
-        $this->eventDispatcher->dispatch(ReportEvents::REPORT_SCHEDULE_SEND, $event);
 
         $this->schedulerModel->reportWasScheduled($report);
     }

@@ -30,7 +30,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class FormFieldHelper extends AbstractFormFieldHelper
 {
     /**
-     * @var ValidatorInterface|\Symfony\Component\Validator\ValidatorInterface
+     * @var ValidatorInterface
      */
     private $validator;
 
@@ -82,8 +82,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     /**
      * FormFieldHelper constructor.
      *
-     * @param TranslatorInterface $translator
-     * @param ValidatorInterface  $validator
+     * @param ValidatorInterface $validator
      */
     public function __construct(TranslatorInterface $translator, ValidatorInterface $validator = null)
     {
@@ -162,7 +161,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                     continue;
                 }
 
-                if ($type == 'captcha') {
+                if ('captcha' == $type) {
                     $captcha = $f->getProperties()['captcha'];
                     if (empty($captcha) && Blank::class !== $constraint) {
                         // Used as a honeypot
@@ -184,7 +183,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                     foreach ($violations as $v) {
                         $transParameters = $v->getParameters();
 
-                        if ($f !== null) {
+                        if (null !== $f) {
                             $transParameters['%label%'] = '&quot;'.$f->getLabel().'&quot;';
                         }
 
@@ -211,6 +210,10 @@ class FormFieldHelper extends AbstractFormFieldHelper
             case 'text':
             case 'email':
             case 'hidden':
+            case 'tel':
+            case 'url':
+            case 'date':
+            case 'datetime':
                 if (preg_match('/<input(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)value="(.*?)"(.*?)\/>/i', $formHtml, $match)) {
                     $replace = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'value="'.$this->sanitizeValue($value).'"'
                         .$match[4].'/>';
@@ -278,7 +281,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         $valueType = gettype($value);
         $value     = str_replace(['"', '>', '<'], ['&quot;', '&gt;', '&lt;'], strip_tags(urldecode($value)));
         // for boolean expect 0 or 1
-        if ($valueType === 'boolean') {
+        if ('boolean' === $valueType) {
             return (int) $value;
         }
 

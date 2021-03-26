@@ -21,7 +21,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class SegmentReportSubscriberTest extends \PHPUnit_Framework_TestCase
+class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testNotRelevantContext()
     {
@@ -184,7 +184,7 @@ class SegmentReportSubscriberTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $reportBuilderEvent->getTables()); //Different order of keys on PHP 5.6.
+        $this->assertSame($expected, $reportBuilderEvent->getTables());
     }
 
     public function testReportGenerate()
@@ -217,7 +217,7 @@ class SegmentReportSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with()
             ->willReturn([]);
 
-        $reportMock->expects($this->exactly(2))
+        $reportMock->expects($this->exactly(1))
             ->method('getFilters')
             ->with()
             ->willReturn([]);

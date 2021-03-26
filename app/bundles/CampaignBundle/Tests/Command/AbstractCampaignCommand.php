@@ -13,6 +13,8 @@ namespace Mautic\CampaignBundle\Tests\Command;
 
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
+use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 
 class AbstractCampaignCommand extends MauticMysqlTestCase
 {
@@ -27,7 +29,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
     protected $db;
 
     /**
-     * @var
+     * @var string
      */
     protected $prefix;
 
@@ -39,7 +41,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
     /**
      * @throws \Exception
      */
-    public function setUp()
+    protected function setUp(): void
     {
         // Everything needs to happen anonymously
         $this->defaultClientServer = $this->clientServer;
@@ -47,17 +49,17 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
 
         parent::setUp();
 
-        $this->db     = $this->container->get('doctrine.dbal.default_connection');
-        $this->prefix = $this->container->getParameter('mautic.db_table_prefix');
+        $this->db     = $this->em->getConnection();
+        $this->prefix = self::$container->getParameter('mautic.db_table_prefix');
 
         // Populate contacts
-        $this->installDatabaseFixtures([dirname(__DIR__).'/../../LeadBundle/DataFixtures/ORM/LoadLeadData.php']);
+        $this->installDatabaseFixtures([LeadFieldData::class, LoadLeadData::class]);
 
         // Campaigns are so complex that we are going to load a SQL file rather than build with entities
         $sql = file_get_contents(__DIR__.'/campaign_schema.sql');
 
         // Update table prefix
-        $sql = str_replace('#__', $this->container->getParameter('mautic.db_table_prefix'), $sql);
+        $sql = str_replace('#__', self::$container->getParameter('mautic.db_table_prefix'), $sql);
 
         // Schedule event
         date_default_timezone_set('UTC');
@@ -68,22 +70,29 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         $this->eventDate->modify('+15 seconds');
         $sql = str_replace('{CONDITION_TIMESTAMP}', $this->eventDate->format('Y-m-d H:i:s'), $sql);
 
-        // Update the schema
-        $tmpFile = $this->container->getParameter('kernel.cache_dir').'/campaign_schema.sql';
-        file_put_contents($tmpFile, $sql);
-        $this->applySqlFromFile($tmpFile);
+        $this->em->getConnection()->exec($sql);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 
         $this->clientServer = $this->defaultClientServer;
     }
 
+    protected function beforeBeginTransaction(): void
+    {
+        $this->resetAutoincrement([
+            'leads',
+            'emails',
+            'lead_tags',
+            'campaigns',
+            'campaign_events',
+            'lead_lists',
+        ]);
+    }
+
     /**
-     * @param array $ids
-     *
      * @return array
      */
     protected function getCampaignEventLogs(array $ids)

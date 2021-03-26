@@ -1,5 +1,5 @@
 <div id="mautic-video-form-embed">
-    <form method="post" action="<?php echo $view['router']->url('mautic_form_postresults', ['formId' => $form->getId()]) ?>">
+    <form method="post" action="<?php echo $view['router']->url('mautic_form_postresults', ['formId' => $form->getId()]); ?>">
         <?php
         /** @var \Mautic\FormBundle\Entity\Field $f */
         foreach ($form->getFields() as $f):

@@ -11,26 +11,34 @@
 
 namespace Mautic\DashboardBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\PhpVersionHelper;
+use Mautic\CoreBundle\Release\ThisRelease;
+use Mautic\DashboardBundle\Dashboard\Widget as WidgetService;
 use Mautic\DashboardBundle\Entity\Widget;
+use Mautic\DashboardBundle\Form\Type\UploadType;
+use Mautic\DashboardBundle\Model\DashboardModel;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-/**
- * Class DashboardController.
- */
-class DashboardController extends FormController
+class DashboardController extends AbstractFormController
 {
     /**
      * Generates the default view.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function indexAction()
     {
-        /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
+        /** @var DashboardModel $model */
         $model   = $this->getModel('dashboard');
         $widgets = $model->getWidgets();
 
@@ -39,42 +47,48 @@ class DashboardController extends FormController
             return $this->applyDashboardFileAction('global.default');
         }
 
-        $humanFormat     = 'M j, Y';
-        $mysqlFormat     = 'Y-m-d';
         $action          = $this->generateUrl('mautic_dashboard_index');
         $dateRangeFilter = $this->request->get('daterange', []);
 
         // Set new date range to the session
-        if ($this->request->isMethod('POST')) {
+        if ($this->request->isMethod(Request::METHOD_POST)) {
             $session = $this->get('session');
             if (!empty($dateRangeFilter['date_from'])) {
                 $from = new \DateTime($dateRangeFilter['date_from']);
-                $session->set('mautic.daterange.form.from', $from->format($mysqlFormat));
+                $session->set('mautic.daterange.form.from', $from->format(WidgetService::FORMAT_MYSQL));
             }
 
             if (!empty($dateRangeFilter['date_to'])) {
                 $to = new \DateTime($dateRangeFilter['date_to']);
-                $session->set('mautic.daterange.form.to', $to->format($mysqlFormat));
+                $session->set('mautic.daterange.form.to', $to->format(WidgetService::FORMAT_MYSQL.' 23:59:59'));
             }
 
             $model->clearDashboardCache();
         }
 
+        // Set new date range to the session, if present in POST
+        $this->get('mautic.dashboard.widget')->setFilter($this->request);
+
         // Load date range from session
         $filter = $model->getDefaultFilter();
 
         // Set the final date range to the form
-        $dateRangeFilter['date_from'] = $filter['dateFrom']->format($humanFormat);
-        $dateRangeFilter['date_to']   = $filter['dateTo']->format($humanFormat);
-        $dateRangeForm                = $this->get('form.factory')->create('daterange', $dateRangeFilter, ['action' => $action]);
+        $dateRangeFilter['date_from'] = $filter['dateFrom']->format(WidgetService::FORMAT_HUMAN);
+        $dateRangeFilter['date_to']   = $filter['dateTo']->format(WidgetService::FORMAT_HUMAN);
+        $dateRangeForm                = $this->get('form.factory')->create(DateRangeType::class, $dateRangeFilter, ['action' => $action]);
 
         $model->populateWidgetsContent($widgets, $filter);
+        $releaseMetadata = ThisRelease::getMetadata();
 
         return $this->delegateView([
             'viewParameters' => [
                 'security'      => $this->get('mautic.security'),
                 'widgets'       => $widgets,
                 'dateRangeForm' => $dateRangeForm->createView(),
+                'phpVersion'    => [
+                    'isOutdated' => version_compare(PHP_VERSION, $releaseMetadata->getShowPHPVersionWarningIfUnder(), 'lt'),
+                    'version'    => PhpVersionHelper::getCurrentSemver(),
+                ],
             ],
             'contentTemplate' => 'MauticDashboardBundle:Dashboard:index.html.php',
             'passthroughVars' => [
@@ -86,9 +100,41 @@ class DashboardController extends FormController
     }
 
     /**
-     * Generate's new dashboard widget and processes post data.
+     * @return JsonResponse|Response
+     */
+    public function widgetAction($widgetId)
+    {
+        if (!$this->request->isXmlHttpRequest()) {
+            throw new NotFoundHttpException('Not found.');
+        }
+
+        /** @var WidgetService $widgetService */
+        $widgetService = $this->get('mautic.dashboard.widget');
+        $widgetService->setFilter($this->request);
+        $widget        = $widgetService->get((int) $widgetId);
+
+        if (!$widget) {
+            throw new NotFoundHttpException('Not found.');
+        }
+
+        $response = $this->render(
+            'MauticDashboardBundle:Dashboard:widget.html.php',
+            ['widget' => $widget]
+        );
+
+        return new JsonResponse([
+            'success'      => 1,
+            'widgetId'     => $widgetId,
+            'widgetHtml'   => $response->getContent(),
+            'widgetWidth'  => $widget->getWidth(),
+            'widgetHeight' => $widget->getHeight(),
+        ]);
+    }
+
+    /**
+     * Generate new dashboard widget and processes post data.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function newAction()
     {
@@ -104,7 +150,7 @@ class DashboardController extends FormController
         $valid      = false;
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ($this->request->isMethod(Request::METHOD_POST)) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $closeModal = true;
@@ -137,9 +183,7 @@ class DashboardController extends FormController
                 $passthroughVars['widgetHeight'] = $widget->getHeight();
             }
 
-            $response = new JsonResponse($passthroughVars);
-
-            return $response;
+            return new JsonResponse($passthroughVars);
         } else {
             return $this->delegateView([
                 'viewParameters' => [
@@ -155,7 +199,7 @@ class DashboardController extends FormController
      *
      * @param $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function editAction($objectId)
     {
@@ -168,7 +212,7 @@ class DashboardController extends FormController
         $closeModal = false;
         $valid      = false;
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ($this->request->isMethod(Request::METHOD_POST)) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $closeModal = true;
@@ -201,9 +245,7 @@ class DashboardController extends FormController
                 $passthroughVars['widgetHeight'] = $widget->getHeight();
             }
 
-            $response = new JsonResponse($passthroughVars);
-
-            return $response;
+            return new JsonResponse($passthroughVars);
         } else {
             return $this->delegateView([
                 'viewParameters' => [
@@ -215,38 +257,29 @@ class DashboardController extends FormController
     }
 
     /**
-     * Deletes the entity.
+     * Deletes entity if exists.
      *
      * @param int $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function deleteAction($objectId)
     {
-        $returnUrl = $this->generateUrl('mautic_dashboard_index');
-        $success   = 0;
-        $flashes   = [];
+        /** @var Request $request */
+        $request = $this->get('request_stack')->getCurrentRequest();
 
-        $postActionVars = [
-            'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'MauticDashboardBundle:Dashboard:index',
-            'passthroughVars' => [
-                'activeLink'    => '#mautic_dashboard_index',
-                'success'       => $success,
-                'mauticContent' => 'dashboard',
-            ],
-        ];
+        if (!$request->isXmlHttpRequest()) {
+            throw new BadRequestHttpException();
+        }
 
-        /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
+        $flashes = [];
+        $success = 0;
+
+        /** @var DashboardModel $model */
         $model  = $this->getModel('dashboard');
         $entity = $model->getEntity($objectId);
-        if ($entity === null) {
-            $flashes[] = [
-                'type'    => 'error',
-                'msg'     => 'mautic.api.client.error.notfound',
-                'msgVars' => ['%id%' => $objectId],
-            ];
-        } else {
+
+        if ($entity) {
             $model->deleteEntity($entity);
             $name      = $entity->getName();
             $flashes[] = [
@@ -257,27 +290,32 @@ class DashboardController extends FormController
                     '%id%'   => $objectId,
                 ],
             ];
+            $success = 1;
+        } else {
+            $flashes[] = [
+                'type'    => 'error',
+                'msg'     => 'mautic.api.client.error.notfound',
+                'msgVars' => ['%id%' => $objectId],
+            ];
         }
 
         return $this->postActionRedirect(
-            array_merge(
-                $postActionVars,
-                [
-                    'flashes' => $flashes,
-                ]
-            )
+            [
+                'success' => $success,
+                'flashes' => $flashes,
+            ]
         );
     }
 
     /**
      * Saves the widgets of current user into a json and stores it for later as a file.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     public function saveAction()
     {
         // Accept only AJAX POST requests because those are check for CSRF tokens
-        if ($this->request->getMethod() !== 'POST' || !$this->request->isXmlHttpRequest()) {
+        if (!$this->request->isMethod(Request::METHOD_POST) || !$this->request->isXmlHttpRequest()) {
             return $this->accessDenied();
         }
 
@@ -316,7 +354,7 @@ class DashboardController extends FormController
     /**
      * Exports the widgets of current user into a json file and downloads it.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     public function exportAction()
     {
@@ -336,7 +374,7 @@ class DashboardController extends FormController
     /**
      * Exports the widgets of current user into a json file.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function deleteDashboardFileAction()
     {
@@ -361,7 +399,7 @@ class DashboardController extends FormController
      *
      * @param null $file
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function applyDashboardFileAction($file = null)
     {
@@ -388,7 +426,7 @@ class DashboardController extends FormController
         }
 
         if ($widgets) {
-            /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
+            /** @var DashboardModel $model */
             $model = $this->getModel('dashboard');
 
             $model->clearDashboardCache();
@@ -412,13 +450,13 @@ class DashboardController extends FormController
     }
 
     /**
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function importAction()
     {
         $preview = $this->request->get('preview');
 
-        /** @var \Mautic\DashboardBundle\Model\DashboardModel $model */
+        /** @var DashboardModel $model */
         $model = $this->getModel('dashboard');
 
         $directories = [
@@ -427,15 +465,15 @@ class DashboardController extends FormController
         ];
 
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'import']);
-        $form   = $this->get('form.factory')->create('dashboard_upload', [], ['action' => $action]);
+        $form   = $this->get('form.factory')->create(UploadType::class, [], ['action' => $action]);
 
-        if ($this->request->getMethod() == 'POST') {
+        if ($this->request->isMethod(Request::METHOD_POST)) {
             if (isset($form) && !$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     $fileData = $form['file']->getData();
                     if (!empty($fileData)) {
                         $extension = pathinfo($fileData->getClientOriginalName(), PATHINFO_EXTENSION);
-                        if ($extension === 'json') {
+                        if ('json' === $extension) {
                             $fileData->move($directories['user'], $fileData->getClientOriginalName());
                         } else {
                             $form->addError(

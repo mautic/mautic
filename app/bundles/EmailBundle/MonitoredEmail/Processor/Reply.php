@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Processor;
 
+use Doctrine\ORM\EntityNotFoundException;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\EmailReply;
 use Mautic\EmailBundle\Entity\Stat;
@@ -21,6 +22,7 @@ use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply\Parser;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -53,42 +55,29 @@ class Reply implements ProcessorInterface
     private $logger;
 
     /**
-     * @var Message
+     * @var ContactTracker
      */
-    private $message;
+    private $contactTracker;
 
-    /**
-     * Reply constructor.
-     *
-     * @param StatRepository           $statRepository
-     * @param ContactFinder            $contactFinder
-     * @param LeadModel                $leadModel
-     * @param EventDispatcherInterface $dispatcher
-     * @param LoggerInterface          $logger
-     */
     public function __construct(
         StatRepository $statRepository,
         ContactFinder $contactFinder,
         LeadModel $leadModel,
         EventDispatcherInterface $dispatcher,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ContactTracker $contactTracker
     ) {
-        $this->statRepo      = $statRepository;
-        $this->contactFinder = $contactFinder;
-        $this->leadModel     = $leadModel;
-        $this->dispatcher    = $dispatcher;
-        $this->logger        = $logger;
+        $this->statRepo         = $statRepository;
+        $this->contactFinder    = $contactFinder;
+        $this->leadModel        = $leadModel;
+        $this->dispatcher       = $dispatcher;
+        $this->logger           = $logger;
+        $this->contactTracker   = $contactTracker;
     }
 
-    /**
-     * @param $mailId
-     * @param $refid
-     */
     public function process(Message $message)
     {
-        $this->message = $message;
-
-        $this->logger->debug('MONITORED EMAIL: Processing message ID '.$this->message->id.' for a reply');
+        $this->logger->debug('MONITORED EMAIL: Processing message ID '.$message->id.' for a reply');
 
         try {
             $parser       = new Parser($message);
@@ -120,33 +109,54 @@ class Reply implements ProcessorInterface
             return;
         }
 
-        $this->createReply($stat);
-
-        if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_REPLY)) {
-            $this->leadModel->setSystemCurrentLead($stat->getLead());
-
-            $event = new EmailReplyEvent($stat);
-            $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_REPLY, $event);
-            unset($event);
-        }
+        $this->createReply($stat, $message->id);
+        $this->dispatchEvent($stat);
 
         $this->statRepo->clear();
         $this->leadModel->clearEntities();
     }
 
     /**
-     * @param Stat $stat
+     * @param string $trackingHash
+     * @param string $messageId
      */
-    protected function createReply(Stat $stat)
+    public function createReplyByHash($trackingHash, $messageId)
+    {
+        /** @var Stat|null $stat */
+        $stat = $this->statRepo->findOneBy(['trackingHash' => $trackingHash]);
+
+        if (null === $stat) {
+            throw new EntityNotFoundException("Email Stat with tracking hash {$trackingHash} was not found");
+        }
+
+        $stat->setIsRead(true);
+
+        if (null === $stat->getDateRead()) {
+            $stat->setDateRead(new \DateTime());
+        }
+
+        $this->createReply($stat, $messageId);
+
+        $contact = $stat->getLead();
+
+        if ($contact) {
+            $this->dispatchEvent($stat);
+        }
+    }
+
+    /**
+     * @param string $messageId
+     */
+    protected function createReply(Stat $stat, $messageId)
     {
         $replies = $stat->getReplies()->filter(
-            function (EmailReply $reply) {
-                return $reply->getMessageId() === $this->message->id;
+            function (EmailReply $reply) use ($messageId) {
+                return $reply->getMessageId() === $messageId;
             }
         );
 
         if (!$replies->count()) {
-            $emailReply = new EmailReply($stat, $this->message->id);
+            $emailReply = new EmailReply($stat, $messageId);
             $stat->addReply($emailReply);
             $this->statRepo->saveEntity($stat);
         }
@@ -162,5 +172,16 @@ class Reply implements ProcessorInterface
     protected function cleanEmail($email)
     {
         return strtolower(preg_replace("/[^a-z0-9\.@]/i", '', $email));
+    }
+
+    private function dispatchEvent(Stat $stat)
+    {
+        if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_REPLY)) {
+            $this->contactTracker->setTrackedContact($stat->getLead());
+
+            $event = new EmailReplyEvent($stat);
+            $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_REPLY, $event);
+            unset($event);
+        }
     }
 }

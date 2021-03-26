@@ -13,7 +13,9 @@ namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\DBAL\DBALException;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\FormError;
 
@@ -29,17 +31,17 @@ class FieldController extends FormController
     public function indexAction($page = 1)
     {
         //set some permissions
-        $permissions = $this->get('mautic.security')->isGranted(['lead:fields:full'], 'RETURN_ARRAY');
+        $permissions = $this->get('mautic.security')->isGranted(['lead:fields:view', 'lead:fields:full'], 'RETURN_ARRAY');
 
         $session = $this->get('session');
 
-        if (!$permissions['lead:fields:full']) {
+        if (!$permissions['lead:fields:view'] && !$permissions['lead:fields:full']) {
             return $this->accessDenied();
         }
 
         $this->setListFilters();
 
-        $limit  = $session->get('mautic.leadfield.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
+        $limit  = $session->get('mautic.leadfield.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $search = $this->request->get('search', $session->get('mautic.leadfield.filter', ''));
         $session->set('mautic.leadfilter.filter', $search);
 
@@ -47,7 +49,7 @@ class FieldController extends FormController
         $orderBy    = $this->get('session')->get('mautic.leadfilter.orderby', 'f.order');
         $orderByDir = $this->get('session')->get('mautic.leadfilter.orderbydir', 'ASC');
 
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -68,7 +70,7 @@ class FieldController extends FormController
 
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            if ($count === 1) {
+            if (1 === $count) {
                 $lastPage = 1;
             } else {
                 $lastPage = (ceil($count / $limit)) ?: 1;
@@ -133,14 +135,14 @@ class FieldController extends FormController
         $form = $model->createForm($field, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $request = $this->request->request->all();
                     if (isset($request['leadfield']['properties'])) {
                         $result = $model->setFieldProperties($field, $request['leadfield']['properties']);
-                        if ($result !== true) {
+                        if (true !== $result) {
                             //set the error
                             $form->get('properties')->addError(
                                 new FormError(
@@ -158,6 +160,12 @@ class FieldController extends FormController
                             $model->saveEntity($field);
                         } catch (DBALException $ee) {
                             $flashMessage = $ee->getMessage();
+                        } catch (AbortColumnCreateException $e) {
+                            $flashMessage = $this->get('translator')->trans('mautic.lead.field.pushed_to_background');
+                        } catch (SchemaException $e) {
+                            $flashMessage = $e->getMessage();
+                            $form['alias']->addError(new FormError($e->getMessage()));
+                            $valid = false;
                         } catch (\Exception $e) {
                             $form['alias']->addError(
                                     new FormError(
@@ -251,7 +259,7 @@ class FieldController extends FormController
             ],
         ];
         //list not found
-        if ($field === null) {
+        if (null === $field) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -272,14 +280,14 @@ class FieldController extends FormController
         $form   = $model->createForm($field, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && 'POST' == $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $request = $this->request->request->all();
                     if (isset($request['leadfield']['properties'])) {
                         $result = $model->setFieldProperties($field, $request['leadfield']['properties']);
-                        if ($result !== true) {
+                        if (true !== $result) {
                             //set the error
                             $form->get('properties')->addError(new FormError(
                                 $this->get('translator')->trans($result, [], 'validators')
@@ -356,7 +364,7 @@ class FieldController extends FormController
         $model  = $this->getModel('lead.field');
         $entity = $model->getEntity($objectId);
 
-        if ($entity != null) {
+        if (null != $entity) {
             if (!$this->get('mautic.security')->isGranted('lead:fields:full')) {
                 return $this->accessDenied();
             }
@@ -375,7 +383,7 @@ class FieldController extends FormController
     /**
      * Delete a field.
      *
-     * @param   $objectId
+     * @param $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -397,12 +405,12 @@ class FieldController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             /** @var FieldModel $model */
             $model = $this->getModel('lead.field');
             $field = $model->getEntity($objectId);
 
-            if ($field === null) {
+            if (null === $field) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.lead.field.error.notfound',
@@ -475,7 +483,7 @@ class FieldController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             /** @var FieldModel $model */
             $model     = $this->getModel('lead.field');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
@@ -485,7 +493,7 @@ class FieldController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if ($entity === null) {
+                if (null === $entity) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.lead.field.error.notfound',

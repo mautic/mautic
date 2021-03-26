@@ -3,7 +3,7 @@
 namespace Mautic\EmailBundle\Swiftmailer\Guzzle;
 
 use GuzzleHttp\ClientInterface;
-use Http\Adapter\Guzzle6\Client;
+use Http\Adapter\Guzzle7\Client;
 
 /**
  * Class ClientFactory.
@@ -11,8 +11,6 @@ use Http\Adapter\Guzzle6\Client;
 final class ClientFactory implements ClientFactoryInterface
 {
     /**
-     * @param ClientInterface|null $client
-     *
      * @return Client
      */
     public function create(ClientInterface $client = null)

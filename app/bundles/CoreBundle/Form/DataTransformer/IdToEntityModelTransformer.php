@@ -42,10 +42,9 @@ class IdToEntityModelTransformer implements DataTransformerInterface
     private $isArray;
 
     /**
-     * @param EntityManager $em
-     * @param string        $repo
-     * @param string        $identifier
-     * @param bool          $isArray
+     * @param string $repo
+     * @param string $identifier
+     * @param bool   $isArray
      */
     public function __construct(EntityManager $em, $repo = '', $identifier = 'id', $isArray = false)
     {
@@ -100,10 +99,7 @@ class IdToEntityModelTransformer implements DataTransformerInterface
             ;
 
             if (null === $entity) {
-                throw new TransformationFailedException(sprintf(
-                    'An entity with a/an '.$this->id.' of "%s" does not exist!',
-                    $id
-                ));
+                throw new TransformationFailedException(sprintf('An entity with a/an '.$this->id.' of "%s" does not exist!', $id));
             }
 
             return $entity;
@@ -130,10 +126,7 @@ class IdToEntityModelTransformer implements DataTransformerInterface
         ]);
 
         if (!count($entities)) {
-            throw new TransformationFailedException(sprintf(
-                'Entities with a/an '.$this->id.' of "%s" does not exist!',
-                $id
-            ));
+            throw new TransformationFailedException(sprintf('Entities with a/an '.$this->id.' of "%s" does not exist!', $id));
         }
 
         return $entities;

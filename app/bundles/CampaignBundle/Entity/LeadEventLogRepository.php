@@ -18,9 +18,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
-/**
- * LeadEventLogRepository.
- */
 class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
@@ -66,7 +63,6 @@ class LeadEventLogRepository extends CommonRepository
      * Get a lead's page event log.
      *
      * @param int|null $leadId
-     * @param array    $options
      *
      * @return array
      */
@@ -200,10 +196,6 @@ class LeadEventLogRepository extends CommonRepository
 
         $query->orderBy('ll.trigger_date');
 
-        if (!empty($ipIds)) {
-            $query->orWhere('ll.ip_address IN ('.implode(',', $ipIds).')');
-        }
-
         if (empty($options['canViewOthers']) && isset($this->currentUser)) {
             $query->andWhere('c.created_by = :userId')
                 ->setParameter('userId', $this->currentUser->getId());
@@ -226,7 +218,7 @@ class LeadEventLogRepository extends CommonRepository
                       ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o');
 
         $join = 'innerJoin';
-        if ($all === true) {
+        if (true === $all) {
             $join = 'leftJoin';
         }
         $q->$join(
@@ -384,9 +376,7 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param int            $eventId
-     * @param \DateTime      $now
-     * @param ContactLimiter $limiter
+     * @param int $eventId
      *
      * @return ArrayCollection
      *
@@ -405,7 +395,7 @@ class LeadEventLogRepository extends CommonRepository
         $q->select('o, e, c')
             ->indexBy('o', 'o.id')
             ->innerJoin('o.event', 'e')
-            ->innerJoin('o.campaign', 'c')
+            ->innerJoin('e.campaign', 'c')
             ->where(
                 $q->expr()->andX(
                     $q->expr()->eq('IDENTITY(o.event)', ':eventId'),
@@ -434,8 +424,6 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param array $ids
-     *
      * @return ArrayCollection
      *
      * @throws \Doctrine\ORM\Query\QueryException
@@ -448,7 +436,7 @@ class LeadEventLogRepository extends CommonRepository
         $q->select('o, e, c')
             ->indexBy('o', 'o.id')
             ->innerJoin('o.event', 'e')
-            ->innerJoin('o.campaign', 'c')
+            ->innerJoin('e.campaign', 'c')
             ->where(
                 $q->expr()->andX(
                     $q->expr()->in('o.id', $ids),
@@ -461,9 +449,7 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param int            $campaignId
-     * @param \DateTime      $date
-     * @param ContactLimiter $limiter
+     * @param int $campaignId
      *
      * @return array
      */
@@ -487,7 +473,7 @@ class LeadEventLogRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'l')
             ->join('l', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'l.campaign_id = c.id')
             ->where($expr)
-            ->setParameter('campaignId', $campaignId)
+            ->setParameter('campaignId', (int) $campaignId)
             ->setParameter('now', $now->format('Y-m-d H:i:s'))
             ->setParameter('true', true, \PDO::PARAM_BOOL)
             ->groupBy('l.event_id')
@@ -504,8 +490,7 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param       $eventId
-     * @param array $contactIds
+     * @param $eventId
      *
      * @return array
      */
@@ -562,7 +547,6 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param Lead   $campaignMember
      * @param string $message
      *
      * @throws \Doctrine\DBAL\DBALException
@@ -613,18 +597,17 @@ SQL;
     }
 
     /**
-     * @deprecated 2.14 to be removed in 3.0
+     * Removes logs by event_id.
+     * It uses batch processing for removing
+     * large quantities of records.
      *
-     * @param $campaignId
-     * @param $leadId
+     * @param int $eventId
      */
-    public function removeScheduledEvents($campaignId, $leadId)
+    public function removeEventLogs($eventId)
     {
         $conn = $this->_em->getConnection();
         $conn->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', [
-            'lead_id'      => (int) $leadId,
-            'campaign_id'  => (int) $campaignId,
-            'is_scheduled' => 1,
+            'event_id' => (int) $eventId,
         ]);
     }
 }

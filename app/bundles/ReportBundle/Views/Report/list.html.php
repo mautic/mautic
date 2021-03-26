@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticReportBundle:Report:index.html.php');
 }
 ?>
@@ -76,8 +76,19 @@ if ($tmpl == 'index') {
                                         $item->getCreatedBy()
                                     ),
                                 ],
-                                'routeBase' => 'report',
-                                'langVar'   => 'report.report',
+                                'routeBase'     => 'report',
+                                'langVar'       => 'report.report',
+                                'customButtons' => $item->isScheduled() ? [] : [
+                                    [
+                                        'attr' => [
+                                            'data-toggle' => 'ajaxmodal',
+                                            'data-target' => '#AssetPreviewModal',
+                                            'href'        => $view['router']->path('mautic_report_schedule', ['reportId' => $item->getId()]),
+                                        ],
+                                        'btnText'   => $view['translator']->trans('mautic.report.export.and.send'),
+                                        'iconClass' => 'fa fa-send-o',
+                                    ],
+                                ],
                             ]
                         );
                         ?>

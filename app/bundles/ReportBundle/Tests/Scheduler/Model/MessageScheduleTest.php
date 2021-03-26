@@ -9,67 +9,96 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ReportBundle\Tests\Model;
+namespace Mautic\ReportBundle\Tests\Scheduler\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileProperties;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Scheduler\Model\MessageSchedule;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class MessageScheduleTest extends \PHPUnit_Framework_TestCase
+class MessageScheduleTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @dataProvider testSendFileProvider
+     * @var MockObject|Router
+     */
+    private $router;
+
+    /**
+     * @var MockObject|FileProperties
+     */
+    private $fileProperties;
+
+    /**
+     * @var MockObject|CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    /**
+     * @var MockObject|TranslatorInterface
+     */
+    private $translatorMock;
+
+    /**
+     * @var Report
+     */
+    private $report;
+
+    /**
+     * @var MessageSchedule
+     */
+    private $messageSchedule;
+
+    protected function setUp(): void
+    {
+        $this->router               = $this->createMock(Router::class);
+        $this->fileProperties       = $this->createMock(FileProperties::class);
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->translatorMock       = $this->createMock(TranslatorInterface::class);
+        $this->report               = new Report();
+        $this->messageSchedule      = new MessageSchedule(
+            $this->translatorMock,
+            $this->fileProperties,
+            $this->coreParametersHelper,
+            $this->router
+        );
+    }
+
+    /**
+     * @dataProvider sendFileProvider
      *
      * @param int $fileSize
      * @param int $limit
      */
     public function testSendFile($fileSize, $limit)
     {
-        $translatorMock = $this->getMockBuilder(TranslatorInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $translatorMock->expects($this->once())
+        $this->translatorMock->expects($this->once())
             ->method('trans')
             ->with('mautic.report.schedule.email.message')
             ->willReturn('Subject');
 
-        $fileProperties = $this->getMockBuilder(FileProperties::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $router = $this->getMockBuilder(Router::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $fileProperties->expects($this->once())
+        $this->fileProperties->expects($this->once())
             ->method('getFileSize')
             ->with('path-to-a-file')
             ->willReturn($fileSize);
 
-        $coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+        $this->coreParametersHelper->expects($this->once())
+            ->method('get')
             ->with('report_export_max_filesize_in_bytes')
             ->willReturn($limit);
 
-        $router->expects($this->never())
-            ->method('generate');
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->with('mautic_report_view')
+            ->willReturn('some/route');
 
-        $messageSchedule = new MessageSchedule($translatorMock, $fileProperties, $coreParametersHelper, $router);
-
-        $report = new Report();
-
-        $messageSchedule->getMessage($report, 'path-to-a-file');
+        $this->messageSchedule->getMessage($this->report, 'path-to-a-file');
     }
 
-    public function testSendFileProvider()
+    public function sendFileProvider()
     {
         return [
             [10, 100],
@@ -80,56 +109,36 @@ class MessageScheduleTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider testDoSendFileProvider
+     * @dataProvider doSendFileProvider
      *
      * @param int $fileSize
      * @param int $limit
      */
     public function testDoSendFile($fileSize, $limit)
     {
-        $translatorMock = $this->getMockBuilder(TranslatorInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $translatorMock->expects($this->once())
+        $this->translatorMock->expects($this->once())
             ->method('trans')
             ->with('mautic.report.schedule.email.message_file_not_attached')
             ->willReturn('Subject');
 
-        $fileProperties = $this->getMockBuilder(FileProperties::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $router = $this->getMockBuilder(Router::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $fileProperties->expects($this->once())
+        $this->fileProperties->expects($this->once())
             ->method('getFileSize')
             ->with('path-to-a-file')
             ->willReturn($fileSize);
 
-        $coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+        $this->coreParametersHelper->expects($this->once())
+            ->method('get')
             ->with('report_export_max_filesize_in_bytes')
             ->willReturn($limit);
 
-        $router->expects($this->once())
+        $this->router->expects($this->once())
             ->method('generate')
             ->with('mautic_report_view');
 
-        $messageSchedule = new MessageSchedule($translatorMock, $fileProperties, $coreParametersHelper, $router);
-
-        $report = new Report();
-
-        $messageSchedule->getMessage($report, 'path-to-a-file');
+        $this->messageSchedule->getMessage($this->report, 'path-to-a-file');
     }
 
-    public function testDoSendFileProvider()
+    public function doSendFileProvider()
     {
         return [
             [100, 10],
@@ -138,84 +147,106 @@ class MessageScheduleTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider testSendFileProvider
+     * @dataProvider sendFileProvider
      *
      * @param int $fileSize
      * @param int $limit
      */
     public function testFileCouldBeSend($fileSize, $limit)
     {
-        $translatorMock = $this->getMockBuilder(TranslatorInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $fileProperties = $this->getMockBuilder(FileProperties::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $router = $this->getMockBuilder(Router::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $fileProperties->expects($this->once())
+        $this->fileProperties->expects($this->once())
             ->method('getFileSize')
             ->with('path-to-a-file')
             ->willReturn($fileSize);
 
-        $coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+        $this->coreParametersHelper->expects($this->once())
+            ->method('get')
             ->with('report_export_max_filesize_in_bytes')
             ->willReturn($limit);
 
-        $messageSchedule = new MessageSchedule($translatorMock, $fileProperties, $coreParametersHelper, $router);
-
-        $result = $messageSchedule->fileCouldBeSend('path-to-a-file');
-
-        $this->assertTrue($result);
+        $this->assertTrue($this->messageSchedule->fileCouldBeSend('path-to-a-file'));
     }
 
     /**
-     * @dataProvider testDoSendFileProvider
+     * @dataProvider doSendFileProvider
      *
      * @param int $fileSize
      * @param int $limit
      */
     public function testFileCouldNotBeSend($fileSize, $limit)
     {
-        $translatorMock = $this->getMockBuilder(TranslatorInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $fileProperties = $this->getMockBuilder(FileProperties::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $router = $this->getMockBuilder(Router::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $fileProperties->expects($this->once())
+        $this->fileProperties->expects($this->once())
             ->method('getFileSize')
             ->with('path-to-a-file')
             ->willReturn($fileSize);
 
-        $coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+        $this->coreParametersHelper->expects($this->once())
+            ->method('get')
             ->with('report_export_max_filesize_in_bytes')
             ->willReturn($limit);
 
-        $messageSchedule = new MessageSchedule($translatorMock, $fileProperties, $coreParametersHelper, $router);
+        $this->assertFalse($this->messageSchedule->fileCouldBeSend('path-to-a-file'));
+    }
 
-        $result = $messageSchedule->fileCouldBeSend('path-to-a-file');
+    public function testGetMessageForAttachedFile()
+    {
+        $report = $this->createMock(Report::class);
 
-        $this->assertFalse($result);
+        $report->expects($this->once())
+            ->method('getId')
+            ->willReturn(33);
+
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->with('mautic_report_view', ['objectId' => 33], UrlGeneratorInterface::ABSOLUTE_URL)
+            ->willReturn('absolute/link');
+
+        $this->translatorMock->expects($this->once())
+            ->method('trans')
+            ->with('mautic.report.schedule.email.message')
+            ->willReturn('The message');
+
+        $this->assertSame('The message', $this->messageSchedule->getMessageForAttachedFile($report));
+    }
+
+    public function testGetMessageForLinkedFile()
+    {
+        $report = $this->createMock(Report::class);
+
+        $report->expects($this->once())
+            ->method('getId')
+            ->willReturn(33);
+
+        $report->expects($this->once())
+            ->method('getName')
+            ->willReturn('Report ABC');
+
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->with('mautic_report_download', ['reportId' => 33], UrlGeneratorInterface::ABSOLUTE_URL)
+            ->willReturn('absolute/link');
+
+        $this->translatorMock->expects($this->once())
+            ->method('trans')
+            ->with('mautic.report.schedule.email.message_file_linked')
+            ->willReturn('The message', ['%report_name%' => 'Report ABC', '%link%' => 'absolute/link']);
+
+        $this->assertSame('The message', $this->messageSchedule->getMessageForLinkedFile($report));
+    }
+
+    public function testGetSubject()
+    {
+        $report = $this->createMock(Report::class);
+
+        $report->expects($this->once())
+            ->method('getName')
+            ->willReturn('Report ABC');
+
+        $this->translatorMock->expects($this->once())
+            ->method('trans')
+            ->with('mautic.report.schedule.email.subject')
+            ->willReturn('The subject');
+
+        $this->assertSame('The subject', $this->messageSchedule->getSubject($report));
     }
 }

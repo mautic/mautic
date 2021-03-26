@@ -53,23 +53,24 @@ class MessageSchedule
     }
 
     /**
-     * @param Report $report
+     * @deprecated 2.15.2 to be removed in 3.0. Use getMessageForAttachedFile or getMessageForLinkedFile
+     *
      * @param string $filePath
      *
      * @return string
      */
     public function getMessage(Report $report, $filePath)
     {
+        $link = $this->router->generate('mautic_report_view', ['objectId' => $report->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+
         if ($this->fileCouldBeSend($filePath)) {
             $date = new \DateTime();
 
             return $this->translator->trans(
                 'mautic.report.schedule.email.message',
-                ['%report_name%' => $report->getName(), '%date%' => $date->format('Y-m-d')]
+                ['%report_name%' => $report->getName(), '%date%' => $date->format('Y-m-d'), '%link%' => $link]
             );
         }
-
-        $link = $this->router->generate('mautic_report_view', ['objectId' => $report->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
         return $this->translator->trans(
             'mautic.report.schedule.email.message_file_not_attached',
@@ -77,9 +78,28 @@ class MessageSchedule
         );
     }
 
+    public function getMessageForAttachedFile(Report $report): string
+    {
+        $link = $this->router->generate('mautic_report_view', ['objectId' => $report->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $date = new \DateTime();
+
+        return $this->translator->trans(
+            'mautic.report.schedule.email.message',
+            ['%report_name%' => $report->getName(), '%date%' => $date->format('Y-m-d'), '%link%' => $link]
+        );
+    }
+
+    public function getMessageForLinkedFile(Report $report): string
+    {
+        $link = $this->router->generate('mautic_report_download', ['reportId' => $report->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        return $this->translator->trans(
+            'mautic.report.schedule.email.message_file_linked',
+            ['%report_name%' => $report->getName(), '%link%' => $link]
+        );
+    }
+
     /**
-     * @param Report $report
-     *
      * @return string
      */
     public function getSubject(Report $report)
@@ -93,6 +113,8 @@ class MessageSchedule
     }
 
     /**
+     * @deprecated 2.16.0 use \Mautic\ReportBundle\Scheduler\Model\FileHandler::fileCanBeAttached instead. To be removed in 3.0.0.
+     *
      * @param string $filePath
      *
      * @return bool
@@ -102,7 +124,7 @@ class MessageSchedule
     public function fileCouldBeSend($filePath)
     {
         $filesize    = $this->fileProperties->getFileSize($filePath);
-        $maxFileSize = $this->coreParametersHelper->getParameter('report_export_max_filesize_in_bytes');
+        $maxFileSize = $this->coreParametersHelper->get('report_export_max_filesize_in_bytes');
 
         return $filesize <= $maxFileSize;
     }

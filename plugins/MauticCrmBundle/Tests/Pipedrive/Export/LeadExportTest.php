@@ -8,6 +8,7 @@ use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
 use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\PipedriveTest;
+use Symfony\Component\HttpFoundation\Request;
 
 class LeadExportTest extends PipedriveTest
 {
@@ -48,18 +49,17 @@ class LeadExportTest extends PipedriveTest
         $this->em->flush();
 
         for ($i = 0; $i < $iterations; ++$i) {
-            $this->client->request(
-                'POST',
-                '/s/contacts/new?qf=1&mauticUserLastActive=1&mauticLastNotificationId=',
-                [
-                    'lead' => [
-                        'firstname' => 'Test'.$i,
-                        'lastname'  => 'User'.$i,
-                        'email'     => 'test'.$i.'@test.pl',
-                        '_token'    => $this->getCsrfToken('lead'),
-                    ],
-                ]
-            );
+            $crawler     = $this->client->request(Request::METHOD_GET, '/s/contacts/new');
+            $formCrawler = $crawler->filter('form[name=lead]');
+            $this->assertSame(1, $formCrawler->count());
+
+            $form = $formCrawler->form();
+            $form->setValues([
+                'lead[firstname]' => 'Test'.$i,
+                'lead[lastname]'  => 'User'.$i,
+                'lead[email]'     => 'test'.$i.'@test.pl',
+            ]);
+            $this->client->submit($form);
         }
 
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
@@ -72,8 +72,6 @@ class LeadExportTest extends PipedriveTest
 
     public function testUpdatePerson()
     {
-        $integrationId = 99;
-
         $this->installPipedriveIntegration(
             true,
             $this->features,
@@ -84,20 +82,20 @@ class LeadExportTest extends PipedriveTest
         );
         $lead = $this->createLead();
 
-        $this->client->request(
-            'POST',
-            '/s/contacts/edit/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
-            [
-                'lead' => [
-                    'firstname' => 'Test',
-                    'lastname'  => 'User',
-                    'email'     => 'test@test.pl',
-                    'points'    => 0,
-                    'phone'     => 123456789,
-                    '_token'    => $this->getCsrfToken('lead'),
-                ],
-            ]
-        );
+        $crawler     = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/'.$lead->getId());
+        $formCrawler = $crawler->filter('form[name=lead]');
+        $this->assertSame(1, $formCrawler->count());
+
+        $form = $formCrawler->form();
+        $form->setValues([
+            'lead[firstname]' => 'Test',
+            'lead[lastname]'  => 'User',
+            'lead[email]'     => 'test@test.pl',
+            'lead[points]'    => 0,
+            'lead[phone]'     => 123456789,
+        ]);
+        $this->client->submit($form);
+
         $requests = $GLOBALS['requests'];
         $request  = $requests['POST/Api/Put/persons'];
 
@@ -130,20 +128,20 @@ class LeadExportTest extends PipedriveTest
         $this->createCompanyIntegrationEntity($integrationCompanyId, $company->getId());
         $this->createCompanyIntegrationEntity($integrationCompany2Id, $company2->getId());
 
-        $this->client->request(
-            'POST',
-            '/s/contacts/edit/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
-            [
-                'lead' => [
-                    'firstname' => 'Test',
-                    'lastname'  => 'User',
-                    'email'     => 'test@test.pl',
-                    'points'    => 0,
-                    'phone'     => 123456789,
-                    '_token'    => $this->getCsrfToken('lead'),
-                ],
-            ]
-        );
+        $crawler     = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/'.$lead->getId());
+        $formCrawler = $crawler->filter('form[name=lead]');
+        $this->assertSame(1, $formCrawler->count());
+
+        $form = $formCrawler->form();
+        $form->setValues([
+            'lead[firstname]'     => 'Test',
+            'lead[lastname]'      => 'User',
+            'lead[email]'         => 'test@test.pl',
+            'lead[points]'        => 0,
+            'lead[phone]'         => 123456789,
+            'lead[companies]'     => [],
+        ]);
+        $this->client->submit($form);
 
         $requests = $GLOBALS['requests'];
         $request  = $requests['PUT/Api/Put/persons/'.$integrationId][1];
@@ -158,7 +156,6 @@ class LeadExportTest extends PipedriveTest
 
     public function testUpdatePersonWithOwner()
     {
-        $integrationId    = 99;
         $pipedriveOwnerId = 55;
 
         $this->installPipedriveIntegration(
@@ -174,21 +171,20 @@ class LeadExportTest extends PipedriveTest
         $lead  = $this->createLead();
         $this->addPipedriveOwner($pipedriveOwnerId, $owner->getEmail());
 
-        $this->client->request(
-            'POST',
-            '/s/contacts/edit/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
-            [
-                'lead' => [
-                    'firstname' => 'Test',
-                    'lastname'  => 'User',
-                    'email'     => 'test@test.pl',
-                    'points'    => 0,
-                    'phone'     => 123456789,
-                    'owner'     => $owner->getId(),
-                    '_token'    => $this->getCsrfToken('lead'),
-                ],
-            ]
-        );
+        $crawler     = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/'.$lead->getId());
+        $formCrawler = $crawler->filter('form[name=lead]');
+        $this->assertSame(1, $formCrawler->count());
+
+        $form = $formCrawler->form();
+        $form->setValues([
+            'lead[firstname]' => 'Test',
+            'lead[lastname]'  => 'User',
+            'lead[email]'     => 'test@test.pl',
+            'lead[points]'    => 0,
+            'lead[phone]'     => 123456789,
+            'lead[owner]'     => $owner->getId(),
+        ]);
+        $this->client->submit($form);
 
         $requests = $GLOBALS['requests'];
         $request  = $requests['POST/Api/Put/persons'][0];
@@ -221,7 +217,7 @@ class LeadExportTest extends PipedriveTest
         $this->addPipedriveOwner($pipedriveOwnerId, $owner->getEmail());
 
         $this->client->request(
-            'POST',
+            Request::METHOD_POST,
             '/s/contacts/delete/'.$lead->getId().'?mauticUserLastActive=1&mauticLastNotificationId=',
             []
         );

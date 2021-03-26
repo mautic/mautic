@@ -13,6 +13,7 @@ namespace Mautic\ConfigBundle\Tests\Form\Helper;
 
 use Mautic\ConfigBundle\Form\Helper\RestrictionHelper;
 use Mautic\ConfigBundle\Form\Type\ConfigType;
+use Mautic\ConfigBundle\Form\Type\EscapeTransformer;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
@@ -22,6 +23,7 @@ use Mautic\EmailBundle\EventListener\ProcessBounceSubscriber;
 use Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber;
 use Mautic\EmailBundle\Form\Type\ConfigMonitoredEmailType;
 use Mautic\EmailBundle\Form\Type\ConfigMonitoredMailboxesType;
+use Mautic\EmailBundle\Form\Type\ConfigType as EmailConfigType;
 use Mautic\EmailBundle\Model\TransportType;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
@@ -43,9 +45,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * Class RestrictionHelperTest.
- *
- * Mocking a representative ConfigForm by leveraging Symfony's TypeTestCase to test RestrictionHelper
+ * Mocking a representative ConfigForm by leveraging Symfony's TypeTestCase to test RestrictionHelper.
  */
 class RestrictionHelperTest extends TypeTestCase
 {
@@ -71,6 +71,7 @@ class RestrictionHelperTest extends TypeTestCase
         'emailconfig' => [
             'bundle'     => 'EmailBundle',
             'formAlias'  => 'emailconfig',
+            'formType'   => EmailConfigType::class,
             'formTheme'  => 'MauticEmailBundle:FormTheme\\Config',
             'parameters' => [
                 'mailer_api_key'               => null,
@@ -88,7 +89,7 @@ class RestrictionHelperTest extends TypeTestCase
                 'mailer_auth_mode'             => null,
                 'mailer_amazon_region'         => 'email-smtp.us-east-1.amazonaws.com',
                 'mailer_spool_type'            => 'memory',
-                'mailer_spool_path'            => '%kernel.root_dir%/spool',
+                'mailer_spool_path'            => '%kernel.root_dir%/../var/spool',
                 'mailer_spool_msg_limit'       => null,
                 'mailer_spool_time_limit'      => null,
                 'mailer_spool_recover_timeout' => 900,
@@ -210,7 +211,7 @@ class RestrictionHelperTest extends TypeTestCase
         /** @var FormInterface $address */
         $address = $form['emailconfig']['monitored_email']['EmailBundle_unsubscribes']['address'];
 
-        $this->assertTrue($address->getConfig()->getOption('read_only'));
+        $this->assertTrue($address->getConfig()->getOption('attr')['readonly']);
         $this->assertTrue($address->getConfig()->getOption('disabled'));
         $this->assertEquals(
             [
@@ -275,6 +276,7 @@ class RestrictionHelperTest extends TypeTestCase
 
         // This is what we're really testing here
         $restrictionHelper = new RestrictionHelper($translator, $this->restrictedFields, $this->displayMode);
+        $escapeTransformer = new EscapeTransformer([]);
 
         return [
             // register the type instances with the PreloadedExtension
@@ -291,7 +293,7 @@ class RestrictionHelperTest extends TypeTestCase
                     new \Mautic\EmailBundle\Form\Type\ConfigType($translator, $transportType),
                     new ConfigMonitoredEmailType($dispatcher),
                     new ConfigMonitoredMailboxesType($imapHelper),
-                    new ConfigType($restrictionHelper),
+                    new ConfigType($restrictionHelper, $escapeTransformer),
                 ],
                 []
             ),

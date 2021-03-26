@@ -35,7 +35,7 @@ class TimelineController extends CommonController
         $this->setListFilters();
 
         $session = $this->get('session');
-        if ($request->getMethod() == 'POST' && $request->request->has('search')) {
+        if ('POST' == $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
                 'includeEvents' => InputHelper::clean($request->request->get('includeEvents', [])),
@@ -82,7 +82,7 @@ class TimelineController extends CommonController
         $this->setListFilters();
 
         $session = $this->get('session');
-        if ($request->getMethod() === 'POST' && $request->request->has('search')) {
+        if ('POST' === $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
                 'includeEvents' => InputHelper::clean($request->request->get('includeEvents', [])),
@@ -146,7 +146,7 @@ class TimelineController extends CommonController
         $this->setListFilters();
 
         $session = $this->get('session');
-        if ($request->getMethod() === 'POST' && $request->request->has('search')) {
+        if ('POST' === $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
                 'includeEvents' => InputHelper::clean($request->request->get('includeEvents', [])),
@@ -211,7 +211,7 @@ class TimelineController extends CommonController
         $this->setListFilters();
 
         $session = $this->get('session');
-        if ($request->getMethod() == 'POST' && $request->request->has('search')) {
+        if ('POST' == $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
                 'includeEvents' => InputHelper::clean($request->request->get('includeEvents', [])),

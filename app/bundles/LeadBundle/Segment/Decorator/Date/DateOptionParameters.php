@@ -41,11 +41,6 @@ class DateOptionParameters
      */
     private $dateTimeHelper;
 
-    /**
-     * @param ContactSegmentFilterCrate $leadSegmentFilterCrate
-     * @param array                     $relativeDateStrings
-     * @param TimezoneResolver          $timezoneResolver
-     */
     public function __construct(
         ContactSegmentFilterCrate $leadSegmentFilterCrate,
         array $relativeDateStrings,
@@ -104,16 +99,13 @@ class DateOptionParameters
     }
 
     /**
-     * @param ContactSegmentFilterCrate $leadSegmentFilterCrate
-     * @param array                     $relativeDateStrings
-     *
      * @return string
      */
     private function parseTimeFrame(ContactSegmentFilterCrate $leadSegmentFilterCrate, array $relativeDateStrings)
     {
         $key = array_search($leadSegmentFilterCrate->getFilter(), $relativeDateStrings, true);
 
-        if ($key === false) {
+        if (false === $key) {
             // Time frame does not match any option from $relativeDateStrings, so return original value
             return $leadSegmentFilterCrate->getFilter();
         }

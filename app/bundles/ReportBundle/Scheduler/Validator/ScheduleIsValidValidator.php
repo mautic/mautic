@@ -21,7 +21,9 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class ScheduleIsValidValidator extends ConstraintValidator
 {
-    /** @var SchedulerBuilder */
+    /**
+     * @var SchedulerBuilder
+     */
     private $schedulerBuilder;
 
     public function __construct(SchedulerBuilder $schedulerBuilder)
@@ -30,8 +32,7 @@ class ScheduleIsValidValidator extends ConstraintValidator
     }
 
     /**
-     * @param Report     $report
-     * @param Constraint $constraint
+     * @param Report $report
      */
     public function validate($report, Constraint $constraint)
     {
@@ -60,7 +61,7 @@ class ScheduleIsValidValidator extends ConstraintValidator
 
                 return;
             } catch (ScheduleNotValidException $e) {
-                $this->addViolation();
+                $this->addReportScheduleNotValidViolation();
             }
         }
         if ($report->isScheduledMonthly()) {
@@ -70,12 +71,12 @@ class ScheduleIsValidValidator extends ConstraintValidator
 
                 return;
             } catch (ScheduleNotValidException $e) {
-                $this->addViolation();
+                $this->addReportScheduleNotValidViolation();
             }
         }
     }
 
-    private function addViolation()
+    private function addReportScheduleNotValidViolation()
     {
         $this->context->buildViolation('mautic.report.schedule.notValid')
             ->atPath('isScheduled')

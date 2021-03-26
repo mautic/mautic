@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\Plugin;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveOwner;
@@ -19,16 +20,21 @@ abstract class PipedriveTest extends MauticMysqlTestCase
     const WEBHOOK_USER     = 'user';
     const WEBHOOK_PASSWORD = 'pa$$word';
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $GLOBALS['requests'] = [];
+        // Simulate request.
+        $GLOBALS['requests']        = [];
+        $_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.1';
+        $_SERVER['SERVER_PORT']     = 80;
+        $_SERVER['SERVER_NAME']     = 'www.example.com';
+        $_SERVER['REQUEST_URI']     = '/index.php';
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
-        unset($GLOBALS['requests']);
+        unset($GLOBALS['requests'], $_SERVER['SERVER_PROTOCOL'], $_SERVER['SERVER_PORT'], $_SERVER['SERVER_NAME']);
 
         parent::tearDown();
     }
@@ -48,12 +54,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         return null;
     }
 
-    /**
-     * @param string $method
-     * @param string $json
-     * @param bool   $addCredential
-     */
-    protected function makeRequest($method, $json, $addCredential = true)
+    protected function makeRequest(string $method, string $json, bool $addCredential = true)
     {
         $headers = !$addCredential ? [] : [
             'PHP_AUTH_USER' => self::WEBHOOK_USER,
@@ -125,7 +126,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         $this->em->flush();
 
-        $companyModel = $this->container->get('mautic.lead.model.company');
+        $companyModel = self::$container->get('mautic.lead.model.company');
 
         if ($companies instanceof Company) {
             $companies = [$companies];
@@ -180,7 +181,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
 
     protected function createLeadIntegrationEntity($integrationEntityId, $internalEntityId)
     {
-        $date = (new DateTimeHelper('-3 years'))->getDateTime();
+        $date = (new DateTimeHelper('2017-05-15 00:00:00'))->getDateTime();
 
         $integrationEntity = new IntegrationEntity();
 
@@ -200,7 +201,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
 
     protected function createCompanyIntegrationEntity($integrationEntityId, $internalEntityId)
     {
-        $date = (new DateTimeHelper('-3 years'))->getDateTime();
+        $date = (new DateTimeHelper('2017-05-15 00:00:00'))->getDateTime();
 
         $integrationEntity = new IntegrationEntity();
 
@@ -220,7 +221,8 @@ abstract class PipedriveTest extends MauticMysqlTestCase
 
     protected function getIntegrationObject()
     {
-        $integrationHelper = $this->container->get('mautic.helper.integration');
+        /** @var IntegrationHelper $integrationHelper */
+        $integrationHelper = self::$container->get('mautic.helper.integration');
 
         /** @var Integration $integration */
         $integration = $integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);

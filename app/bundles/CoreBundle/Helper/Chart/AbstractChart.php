@@ -13,9 +13,6 @@ namespace Mautic\CoreBundle\Helper\Chart;
 
 use Mautic\CoreBundle\Helper\ColorHelper;
 
-/**
- * Class AbstractChart.
- */
 abstract class AbstractChart
 {
     /**
@@ -49,7 +46,7 @@ abstract class AbstractChart
     /**
      * Timezone data is requested to be in.
      *
-     * @var
+     * @var \DateTimeZone
      */
     protected $timezone;
 
@@ -93,10 +90,10 @@ abstract class AbstractChart
         if (!$unit) {
             $unit = $this->unit;
         }
-        $isTime  = in_array($unit, ['H', 'i', 's']) ? 'T' : '';
-        $toUpper = ['d', 'i'];
 
-        if ($unit == 'i') {
+        $isTime = in_array($unit, ['H', 'i', 's']) ? 'T' : '';
+
+        if ('i' == $unit) {
             $unit = 'M';
         }
 
@@ -127,12 +124,10 @@ abstract class AbstractChart
 
     /**
      * Sets the clones of the date range and validates it.
-     *
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
      */
     public function setDateRange(\DateTime $dateFrom, \DateTime $dateTo)
     {
+        $this->timezone = $dateFrom->getTimezone();
         $this->dateFrom = clone $dateFrom;
         $this->dateTo   = clone $dateTo;
 
@@ -142,21 +137,22 @@ abstract class AbstractChart
         }
 
         // If today, adjust dateTo to be end of today if unit is not time based or to the current hour if it is
-        $now = new \DateTime();
-        if ($now->format('Y-m-d') == $this->dateTo->format('Y-m-d') && !$this->isTimeUnit) {
-            $this->dateTo = $now;
-        } elseif (!$this->isTimeUnit) {
+        if (!$this->isTimeUnit) {
             $this->dateTo->setTime(23, 59, 59);
+
+            return;
         }
 
-        $this->timezone = $dateFrom->getTimezone();
+        // If time aware and the to date is today, set the stats to the current hour to avoid empty future hours in graphs
+        $now = new \DateTime();
+        if ($now->format('Y-m-d') === $this->dateTo->format('Y-m-d')) {
+            $this->dateTo = $now;
+        }
     }
 
     /**
      * Modify the date to add one current time unit to it and subtract 1 second.
      * Can be used to get the current day results.
-     *
-     * @param \DateTime $date
      */
     public function addOneUnitMinusOneSec(\DateTime &$date)
     {

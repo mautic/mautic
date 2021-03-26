@@ -110,7 +110,7 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                                             <h4 class="modal-title" id="<?php echo $k; ?>"><?php echo $view->escape($item['name']); ?></h4>
                                         </div>
                                         <div class="modal-body">
-                                            <div style="background-image: url(<?php echo $thumbnailUrl ?>);background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 600px"></div>
+                                            <div style="background-image: url(<?php echo $thumbnailUrl; ?>);background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 600px"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -134,6 +134,17 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                         </div>
                     </td>
                     <td class="visible-md visible-lg">
+                        <?php if (!empty($builders)): ?>
+                        <span class="label label-primary pa-4">
+                            <?php
+                            if (isset($item['config']['builder'])):
+                                echo $builders[$item['config']['builder']];
+                            else:
+                                echo $view['translator']->trans('mautic.core.builder.legacy');
+                            endif;
+                            ?>
+                        </span>
+                        <?php endif; ?>
                         <?php if (!empty($item['config']['features'])) : ?>
                             <?php foreach ($item['config']['features'] as $feature) : ?>
                                 <span style="white-space: nowrap;">

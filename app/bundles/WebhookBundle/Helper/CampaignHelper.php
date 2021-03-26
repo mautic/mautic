@@ -16,6 +16,10 @@ use Joomla\Http\Http;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\WebhookBundle\Event\WebhookRequestEvent;
+use Mautic\WebhookBundle\WebhookEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CampaignHelper
 {
@@ -25,6 +29,11 @@ class CampaignHelper
     protected $connector;
 
     /**
+     * @var CompanyModel
+     */
+    protected $companyModel;
+
+    /**
      * Cached contact values in format [contact_id => [key1 => val1, key2 => val1]].
      *
      * @var array
@@ -32,32 +41,40 @@ class CampaignHelper
     private $contactsValues = [];
 
     /**
-     * @param Http $connector
+     * @var EventDispatcher
      */
-    public function __construct(Http $connector)
+    private $dispatcher;
+
+    public function __construct(Http $connector, $companyModel, EventDispatcherInterface $dispatcher)
     {
-        $this->connector = $connector;
+        $this->connector    = $connector;
+        $this->companyModel = $companyModel;
+        $this->dispatcher   = $dispatcher;
     }
 
     /**
      * Prepares the neccessary data transformations and then makes the HTTP request.
-     *
-     * @param array $config
-     * @param Lead  $contact
      */
     public function fireWebhook(array $config, Lead $contact)
     {
-        // dump($config);die;
         $payload = $this->getPayload($config, $contact);
         $headers = $this->getHeaders($config, $contact);
-        $this->makeRequest($config['url'], $config['method'], $config['timeout'], $headers, $payload);
+        $url     = rawurldecode(TokenHelper::findLeadTokens($config['url'], $this->getContactValues($contact), true));
+
+        $webhookRequestEvent = new WebhookRequestEvent($contact, $url, $headers, $payload);
+        $this->dispatcher->dispatch(WebhookEvents::WEBHOOK_ON_REQUEST, $webhookRequestEvent);
+
+        $this->makeRequest(
+            $webhookRequestEvent->getUrl(),
+            $config['method'],
+            $config['timeout'],
+            $webhookRequestEvent->getHeaders(),
+            $webhookRequestEvent->getPayload()
+        );
     }
 
     /**
      * Gets the payload fields from the config and if there are tokens it translates them to contact values.
-     *
-     * @param array $config
-     * @param Lead  $contact
      *
      * @return array
      */
@@ -71,9 +88,6 @@ class CampaignHelper
 
     /**
      * Gets the payload fields from the config and if there are tokens it translates them to contact values.
-     *
-     * @param array $config
-     * @param Lead  $contact
      *
      * @return array
      */
@@ -89,8 +103,6 @@ class CampaignHelper
      * @param string $url
      * @param string $method
      * @param int    $timeout
-     * @param array  $headers
-     * @param array  $payload
      *
      * @throws \InvalidArgumentException
      * @throws \OutOfRangeException
@@ -105,6 +117,10 @@ class CampaignHelper
             case 'post':
             case 'put':
             case 'patch':
+                $headers = array_change_key_case($headers);
+                if (array_key_exists('content-type', $headers) && 'application/json' == strtolower($headers['content-type'])) {
+                    $payload                 = json_encode($payload);
+                }
                 $response = $this->connector->$method($url, $payload, $headers, $timeout);
                 break;
             case 'delete':
@@ -122,9 +138,6 @@ class CampaignHelper
     /**
      * Translates tokens to values.
      *
-     * @param array $rawTokens
-     * @param Lead  $contact
-     *
      * @return array
      */
     private function getTokenValues(array $rawTokens, Lead $contact)
@@ -133,7 +146,7 @@ class CampaignHelper
         $contactValues = $this->getContactValues($contact);
 
         foreach ($rawTokens as $key => $value) {
-            $values[$key] = urldecode(TokenHelper::findLeadTokens($value, $contactValues, true));
+            $values[$key] = rawurldecode(TokenHelper::findLeadTokens($value, $contactValues, true));
         }
 
         return $values;
@@ -142,8 +155,6 @@ class CampaignHelper
     /**
      * Gets array of contact values.
      *
-     * @param Lead $contact
-     *
      * @return array
      */
     private function getContactValues(Lead $contact)
@@ -151,14 +162,13 @@ class CampaignHelper
         if (empty($this->contactsValues[$contact->getId()])) {
             $this->contactsValues[$contact->getId()]              = $contact->getProfileFields();
             $this->contactsValues[$contact->getId()]['ipAddress'] = $this->ipAddressesToCsv($contact->getIpAddresses());
+            $this->contactsValues[$contact->getId()]['companies'] = $this->companyModel->getRepository()->getCompaniesByLeadId($contact->getId());
         }
 
         return $this->contactsValues[$contact->getId()];
     }
 
     /**
-     * @param Collection $ipAddresses
-     *
      * @return string
      */
     private function ipAddressesToCsv(Collection $ipAddresses)

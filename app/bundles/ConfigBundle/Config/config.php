@@ -49,9 +49,8 @@ return [
     'services' => [
         'events' => [
             'mautic.config.subscriber' => [
-                'class'     => 'Mautic\ConfigBundle\EventListener\ConfigSubscriber',
+                'class'     => \Mautic\ConfigBundle\EventListener\ConfigSubscriber::class,
                 'arguments' => [
-                    'mautic.helper.core_parameters',
                     'mautic.config.config_change_logger',
                 ],
             ],
@@ -59,11 +58,11 @@ return [
 
         'forms' => [
             'mautic.form.type.config' => [
-                'class'     => 'Mautic\ConfigBundle\Form\Type\ConfigType',
+                'class'     => \Mautic\ConfigBundle\Form\Type\ConfigType::class,
                 'arguments' => [
                     'mautic.config.form.restriction_helper',
+                    'mautic.config.form.escape_transformer',
                 ],
-                'alias' => 'config',
             ],
         ],
         'models' => [
@@ -74,10 +73,6 @@ return [
                     'mautic.helper.core_parameters',
                     'translator',
                 ],
-            ],
-            // @deprecated 2.12.0; to be removed in 3.0
-            'mautic.config.model.config' => [
-                'class' => \Mautic\ConfigBundle\Model\ConfigModel::class,
             ],
         ],
         'others' => [
@@ -102,6 +97,20 @@ return [
                     'mautic.core.model.auditlog',
                 ],
             ],
+            'mautic.config.form.escape_transformer' => [
+                'class'     => \Mautic\ConfigBundle\Form\Type\EscapeTransformer::class,
+                'arguments' => [
+                    '%mautic.config_allowed_parameters%',
+                ],
+            ],
+        ],
+    ],
+
+    'parameters' => [
+        'config_allowed_parameters' => [
+            'kernel.root_dir',
+            'kernel.project_dir',
+            'kernel.logs_dir',
         ],
     ],
 ];

@@ -12,7 +12,6 @@
 namespace Mautic\CampaignBundle\Helper;
 
 use Mautic\CampaignBundle\Event\CampaignLeadChangeEvent;
-use Mautic\CoreBundle\Factory\MauticFactory;
 
 class CampaignEventHelper
 {
@@ -20,13 +19,12 @@ class CampaignEventHelper
      * Determine if this campaign applies.
      *
      * @param CampaignLeadChangeEvent $eventDetails
-     * @param array                   $event
      *
      * @return bool
      */
     public static function validateLeadChangeTrigger(CampaignLeadChangeEvent $eventDetails = null, array $event)
     {
-        if ($eventDetails == null) {
+        if (null == $eventDetails) {
             return true;
         }
 
@@ -45,45 +43,5 @@ class CampaignEventHelper
         }
 
         return true;
-    }
-
-    /**
-     * @deprecated to be removed in 3.0
-     *
-     * @param MauticFactory $factory
-     * @param               $lead
-     * @param               $event
-     *
-     * @throws \Doctrine\ORM\ORMException
-     */
-    public static function addRemoveLead(MauticFactory $factory, $lead, $event)
-    {
-        /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
-        $campaignModel       = $factory->getModel('campaign');
-        $properties          = $event['properties'];
-        $addToCampaigns      = $properties['addTo'];
-        $removeFromCampaigns = $properties['removeFrom'];
-        $em                  = $factory->getEntityManager();
-        $leadsModified       = false;
-
-        if (!empty($addToCampaigns)) {
-            foreach ($addToCampaigns as $c) {
-                $campaignModel->addLead($em->getReference('MauticCampaignBundle:Campaign', $c), $lead, true);
-            }
-            $leadsModified = true;
-        }
-
-        if (!empty($removeFromCampaigns)) {
-            foreach ($removeFromCampaigns as $c) {
-                if ($c == 'this') {
-                    $c = $event['campaign']['id'];
-                }
-
-                $campaignModel->removeLead($em->getReference('MauticCampaignBundle:Campaign', $c), $lead, true);
-            }
-            $leadsModified = true;
-        }
-
-        return $leadsModified;
     }
 }

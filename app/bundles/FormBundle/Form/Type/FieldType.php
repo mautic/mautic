@@ -12,10 +12,16 @@
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -33,8 +39,6 @@ class FieldType extends AbstractType
 
     /**
      * FieldType constructor.
-     *
-     * @param TranslatorInterface $translator
      */
     public function __construct(TranslatorInterface $translator)
     {
@@ -151,7 +155,7 @@ class FieldType extends AbstractType
         // Build form fields
         $builder->add(
             'label',
-            'text',
+            TextType::class,
             [
                 'label'       => !empty($labelText) ? $labelText : 'mautic.form.field.form.label',
                 'label_attr'  => ['class' => 'control-label'],
@@ -167,7 +171,7 @@ class FieldType extends AbstractType
         if ($allowCustomAlias) {
             $builder->add(
                 'alias',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.form.field.form.alias',
                     'label_attr' => ['class' => 'control-label'],
@@ -175,7 +179,7 @@ class FieldType extends AbstractType
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.form.field.form.alias.tooltip',
                     ],
-                    'disabled' => (!empty($options['data']['id']) && strpos($options['data']['id'], 'new') === false) ? true : false,
+                    'disabled' => (!empty($options['data']['id']) && false === strpos($options['data']['id'], 'new')) ? true : false,
                     'required' => false,
                 ]
             );
@@ -185,7 +189,7 @@ class FieldType extends AbstractType
             $default = (!isset($options['data']['showLabel'])) ? true : (bool) $options['data']['showLabel'];
             $builder->add(
                 'showLabel',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'label' => (!empty($showLabelText)) ? $showLabelText : 'mautic.form.field.form.showlabel',
                     'data'  => $default,
@@ -196,7 +200,7 @@ class FieldType extends AbstractType
         if ($addDefaultValue) {
             $builder->add(
                 'defaultValue',
-                ($type == 'textarea') ? 'textarea' : 'text',
+                ('textarea' == $type) ? TextareaType::class : TextType::class,
                 [
                     'label'      => 'mautic.core.defaultvalue',
                     'label_attr' => ['class' => 'control-label'],
@@ -209,7 +213,7 @@ class FieldType extends AbstractType
         if ($addHelpMessage) {
             $builder->add(
                 'helpMessage',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.form.field.form.helpmessage',
                     'label_attr' => ['class' => 'control-label'],
@@ -226,7 +230,7 @@ class FieldType extends AbstractType
             $default = (!isset($options['data']['isRequired'])) ? false : (bool) $options['data']['isRequired'];
             $builder->add(
                 'isRequired',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.core.required',
                     'data'  => $default,
@@ -235,7 +239,7 @@ class FieldType extends AbstractType
 
             $builder->add(
                 'validationMessage',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.form.field.form.validationmsg',
                     'label_attr' => ['class' => 'control-label'],
@@ -252,14 +256,14 @@ class FieldType extends AbstractType
         if ($addLabelAttributes) {
             $builder->add(
                 'labelAttributes',
-                'text',
+                TextType::class,
                 [
                     'label'      => (!empty($labelAttributesText)) ? $labelAttributesText : 'mautic.form.field.form.labelattr',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'     => 'form-control',
                         'tooltip'   => 'mautic.form.field.help.attr',
-                        'maxlength' => '255',
+                        'maxlength' => '191',
                     ],
                     'required' => false,
                 ]
@@ -269,14 +273,14 @@ class FieldType extends AbstractType
         if ($addInputAttributes) {
             $builder->add(
                 'inputAttributes',
-                'text',
+                TextType::class,
                 [
                     'label'      => (!empty($inputAttributesText)) ? $inputAttributesText : 'mautic.form.field.form.inputattr',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'     => 'form-control',
                         'tooltip'   => 'mautic.form.field.help.attr',
-                        'maxlength' => '255',
+                        'maxlength' => '191',
                     ],
                     'required' => false,
                 ]
@@ -286,14 +290,14 @@ class FieldType extends AbstractType
         if ($addContainerAttributes) {
             $builder->add(
                 'containerAttributes',
-                'text',
+                TextType::class,
                 [
-                    'label'      => (!empty($containerAttributesText)) ? $containerAttributesText : 'mautic.form.field.form.container_attr',
+                    'label'      => 'mautic.form.field.form.container_attr',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'     => 'form-control',
                         'tooltip'   => 'mautic.form.field.help.container_attr',
-                        'maxlength' => '255',
+                        'maxlength' => '191',
                     ],
                     'required' => false,
                 ]
@@ -301,11 +305,11 @@ class FieldType extends AbstractType
         }
 
         if ($addSaveResult) {
-            $default = (!isset($options['data']['saveResult']) || $options['data']['saveResult'] === null) ? true
+            $default = (!isset($options['data']['saveResult']) || null === $options['data']['saveResult']) ? true
                 : (bool) $options['data']['saveResult'];
             $builder->add(
                 'saveResult',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.form.field.form.saveresult',
                     'data'  => $default,
@@ -317,29 +321,44 @@ class FieldType extends AbstractType
         }
 
         if ($addBehaviorFields) {
-            $default = (!isset($options['data']['showWhenValueExists']) || $options['data']['showWhenValueExists'] === null) ? true
+            $alwaysDisplay = isset($options['data']['alwaysDisplay']) ? $options['data']['alwaysDisplay'] : false;
+            $builder->add(
+                'alwaysDisplay',
+                YesNoButtonGroupType::class,
+                [
+                    'label' => 'mautic.form.field.form.always_display',
+                    'attr'  => [
+                        'tooltip' => 'mautic.form.field.form.always_display.tooltip',
+                    ],
+                    'data'  => $alwaysDisplay,
+                ]
+            );
+
+            $default = (!isset($options['data']['showWhenValueExists']) || null === $options['data']['showWhenValueExists']) ? true
                 : (bool) $options['data']['showWhenValueExists'];
             $builder->add(
                 'showWhenValueExists',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.form.field.form.show.when.value.exists',
                     'data'  => $default,
                     'attr'  => [
-                        'tooltip' => 'mautic.form.field.help.show.when.value.exists',
+                        'tooltip'      => 'mautic.form.field.help.show.when.value.exists',
+                        'data-show-on' => '{"formfield_alwaysDisplay_0": "checked"}',
                     ],
                 ]
             );
 
             $builder->add(
                 'showAfterXSubmissions',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.form.field.form.show.after.x.submissions',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
-                        'class'   => 'form-control',
-                        'tooltip' => 'mautic.form.field.help.show.after.x.submissions',
+                        'class'        => 'form-control',
+                        'tooltip'      => 'mautic.form.field.help.show.after.x.submissions',
+                        'data-show-on' => '{"formfield_alwaysDisplay_0": "checked"}',
                     ],
                     'required' => false,
                 ]
@@ -348,7 +367,7 @@ class FieldType extends AbstractType
             $isAutoFillValue = (!isset($options['data']['isAutoFill'])) ? false : (bool) $options['data']['isAutoFill'];
             $builder->add(
                 'isAutoFill',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.form.field.form.auto_fill',
                     'data'  => $isAutoFillValue,
@@ -384,10 +403,10 @@ class FieldType extends AbstractType
 
             $builder->add(
                 'leadField',
-                'choice',
+                ChoiceType::class,
                 [
-                    'choices'     => $options['leadFields'],
-                    'choice_attr' => function ($val, $key, $index) use ($options) {
+                    'choices'           => $options['leadFields'],
+                    'choice_attr'       => function ($val, $key, $index) use ($options) {
                         $objects = ['lead', 'company'];
                         foreach ($objects as $object) {
                             if (!empty($options['leadFieldProperties'][$object][$val]) && (in_array($options['leadFieldProperties'][$object][$val]['type'], FormFieldHelper::getListTypes()) || !empty($options['leadFieldProperties'][$object][$val]['properties']['list']) || !empty($options['leadFieldProperties'][$object][$val]['properties']['optionlist']))) {
@@ -409,7 +428,7 @@ class FieldType extends AbstractType
             );
         }
 
-        $builder->add('type', 'hidden');
+        $builder->add('type', HiddenType::class);
 
         $update = (!empty($options['data']['id'])) ? true : false;
         if (!empty($update)) {
@@ -422,7 +441,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'buttons',
-            'form_buttons',
+            FormButtonsType::class,
             [
                 'save_text'       => $btnValue,
                 'save_icon'       => $btnIcon,
@@ -433,7 +452,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'formId',
-            'hidden',
+            HiddenType::class,
             [
                 'mapped' => false,
             ]
@@ -450,7 +469,7 @@ class FieldType extends AbstractType
                 case 'country':
                     $builder->add(
                         'properties',
-                        'formfield_select',
+                        FormFieldSelectType::class,
                         [
                             'field_type' => $type,
                             'label'      => false,
@@ -463,7 +482,7 @@ class FieldType extends AbstractType
                 case 'radiogrp':
                     $builder->add(
                         'properties',
-                        'formfield_group',
+                        FormFieldGroupType::class,
                         [
                             'label' => false,
                             'data'  => $propertiesData,
@@ -473,7 +492,7 @@ class FieldType extends AbstractType
                 case 'freetext':
                     $builder->add(
                         'properties',
-                        'formfield_text',
+                        FormFieldTextType::class,
                         [
                             'required' => false,
                             'label'    => false,
@@ -485,7 +504,7 @@ class FieldType extends AbstractType
                 case 'freehtml':
                     $builder->add(
                         'properties',
-                        'formfield_html',
+                        FormFieldHTMLType::class,
                         [
                             'required' => false,
                             'label'    => false,
@@ -502,7 +521,7 @@ class FieldType extends AbstractType
                 case 'tel':
                     $builder->add(
                         'properties',
-                        'formfield_placeholder',
+                        FormFieldPlaceholderType::class,
                         [
                             'label' => false,
                             'data'  => $propertiesData,
@@ -512,7 +531,7 @@ class FieldType extends AbstractType
                 case 'captcha':
                     $builder->add(
                         'properties',
-                        'formfield_captcha',
+                        FormFieldCaptchaType::class,
                         [
                             'label' => false,
                             'data'  => $propertiesData,
@@ -555,7 +574,7 @@ class FieldType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
@@ -563,7 +582,7 @@ class FieldType extends AbstractType
             ]
         );
 
-        $resolver->setOptional(['customParameters', 'leadFieldProperties']);
+        $resolver->setDefined(['customParameters', 'leadFieldProperties']);
 
         $resolver->setRequired(['leadFields']);
     }
@@ -571,7 +590,7 @@ class FieldType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'formfield';
     }

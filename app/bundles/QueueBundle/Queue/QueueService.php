@@ -42,9 +42,6 @@ class QueueService
 
     /**
      * QueueService constructor.
-     *
-     * @param CoreParametersHelper     $coreParametersHelper
-     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger)
     {
@@ -55,7 +52,6 @@ class QueueService
 
     /**
      * @param string $queueName
-     * @param array  $payload
      */
     public function publishToQueue($queueName, array $payload = [])
     {
@@ -67,7 +63,7 @@ class QueueService
         unset($logPayload['request']);
         $this->logger->debug('QUEUE: Queuing job for '.$queueName, $logPayload);
 
-        $protocol                   = $this->coreParametersHelper->getParameter('queue_protocol');
+        $protocol                   = $this->coreParametersHelper->get('queue_protocol');
         $payload['mauticQueueName'] = $queueName;
         $event                      = new QueueEvent($protocol, $queueName, $payload);
         $this->eventDispatcher->dispatch(QueueEvents::PUBLISH_MESSAGE, $event);
@@ -76,17 +72,17 @@ class QueueService
     /**
      * @param string   $queueName
      * @param int|null $messages
+     * @param int|null $timeout
      */
-    public function consumeFromQueue($queueName, $messages = null)
+    public function consumeFromQueue($queueName, $messages = null, $timeout = null)
     {
-        $protocol = $this->coreParametersHelper->getParameter('queue_protocol');
-        $event    = new QueueEvent($protocol, $queueName, [], $messages);
+        $protocol = $this->coreParametersHelper->get('queue_protocol');
+        $event    = new QueueEvent($protocol, $queueName, [], $messages, $timeout);
         $this->eventDispatcher->dispatch(QueueEvents::CONSUME_MESSAGE, $event);
     }
 
     /**
-     * @param      $payload
-     * @param null $jobId
+     * @param $payload
      *
      * @return QueueConsumerEvent
      */
@@ -118,6 +114,6 @@ class QueueService
      */
     public function isQueueEnabled()
     {
-        return $this->coreParametersHelper->getParameter('queue_protocol') != '';
+        return '' != $this->coreParametersHelper->get('queue_protocol');
     }
 }

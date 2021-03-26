@@ -13,30 +13,29 @@ namespace Mautic\UserBundle\DependencyInjection\Firewall\Factory;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
 class PluginFactory implements SecurityFactoryInterface
 {
     /**
-     * @param ContainerBuilder $container
-     * @param                  $id
-     * @param                  $config
-     * @param                  $userProvider
-     * @param                  $defaultEntryPoint
+     * @param $id
+     * @param $config
+     * @param $userProvider
+     * @param $defaultEntryPoint
      *
      * @return array
      */
     public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
     {
         $providerId = 'security.authentication.provider.mautic.'.$id;
-        $container->setDefinition($providerId, new DefinitionDecorator('mautic.user.preauth_authenticator'))
+        $container->setDefinition($providerId, new ChildDefinition('mautic.user.preauth_authenticator'))
             ->replaceArgument(3, new Reference($userProvider))
             ->replaceArgument(4, $id);
 
         $listenerId = 'security.authentication.listener.mautic.'.$id;
-        $container->setDefinition($listenerId, new DefinitionDecorator('mautic.security.authentication_listener'))
+        $container->setDefinition($listenerId, new ChildDefinition('mautic.security.authentication_listener'))
             ->replaceArgument(5, $id);
 
         return [$providerId, $listenerId, $defaultEntryPoint];
@@ -58,9 +57,6 @@ class PluginFactory implements SecurityFactoryInterface
         return 'mautic_plugin_auth';
     }
 
-    /**
-     * @param NodeDefinition $node
-     */
     public function addConfiguration(NodeDefinition $node)
     {
     }

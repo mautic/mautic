@@ -11,16 +11,38 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use Doctrine\DBAL\Connection;
 use Mautic\CalendarBundle\CalendarEvents;
 use Mautic\CalendarBundle\Event\CalendarGeneratorEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class CalendarSubscriber.
- */
-class CalendarSubscriber extends CommonSubscriber
+class CalendarSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var Connection
+     */
+    private $connection;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    public function __construct(Connection $connection, TranslatorInterface $translator, RouterInterface $router)
+    {
+        $this->connection = $connection;
+        $this->translator = $translator;
+        $this->router     = $router;
+    }
+
     /**
      * @return array
      */
@@ -33,8 +55,6 @@ class CalendarSubscriber extends CommonSubscriber
 
     /**
      * Adds events to the calendar.
-     *
-     * @param CalendarGeneratorEvent $event
      */
     public function onCalendarGenerate(CalendarGeneratorEvent $event)
     {
@@ -46,7 +66,7 @@ class CalendarSubscriber extends CommonSubscriber
         $eventTypes['triggered'] = ['dateName' => 'cl.date_triggered'];
         $eventTypes['upcoming']  = ['dateName' => 'cl.trigger_date'];
 
-        $query = $this->em->getConnection()->createQueryBuilder();
+        $query = $this->connection->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'cl')
             ->leftJoin('cl', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'cl.campaign_id = c.id')
             ->leftJoin('cl', MAUTIC_TABLE_PREFIX.'leads', 'l', 'cl.lead_id = l.id')
@@ -64,7 +84,7 @@ class CalendarSubscriber extends CommonSubscriber
                     $query->expr()->gte($eventType['dateName'], ':start'),
                     $query->expr()->lte($eventType['dateName'], ':end')
                 ));
-            if ($eventKey == 'upcoming') {
+            if ('upcoming' == $eventKey) {
                 $query->andWhere($query->expr()->gte($eventType['dateName'], ':now'))
                     ->setParameter('now', $now->toUtcString());
             }

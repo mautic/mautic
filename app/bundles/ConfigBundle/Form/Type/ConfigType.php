@@ -12,15 +12,13 @@
 namespace Mautic\ConfigBundle\Form\Type;
 
 use Mautic\ConfigBundle\Form\Helper\RestrictionHelper;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class ConfigType.
- */
 class ConfigType extends AbstractType
 {
     /**
@@ -29,13 +27,14 @@ class ConfigType extends AbstractType
     private $restrictionHelper;
 
     /**
-     * ConfigType constructor.
-     *
-     * @param RestrictionHelper $restrictionHelper
+     * @var EscapeTransformer
      */
-    public function __construct(RestrictionHelper $restrictionHelper)
+    private $escapeTransformer;
+
+    public function __construct(RestrictionHelper $restrictionHelper, EscapeTransformer $escapeTransformer)
     {
         $this->restrictionHelper = $restrictionHelper;
+        $this->escapeTransformer = $escapeTransformer;
     }
 
     /**
@@ -43,6 +42,19 @@ class ConfigType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        // TODO very dirty quick fix for https://github.com/mautic/mautic/issues/8854
+        if (isset($options['data']['apiconfig']['parameters']['api_oauth2_access_token_lifetime'])
+            && 3600 === $options['data']['apiconfig']['parameters']['api_oauth2_access_token_lifetime']
+        ) {
+            $options['data']['apiconfig']['parameters']['api_oauth2_access_token_lifetime'] = 60;
+        }
+
+        if (isset($options['data']['apiconfig']['parameters']['api_oauth2_refresh_token_lifetime'])
+            && 1209600 === $options['data']['apiconfig']['parameters']['api_oauth2_refresh_token_lifetime']
+        ) {
+            $options['data']['apiconfig']['parameters']['api_oauth2_refresh_token_lifetime'] = 14;
+        }
+
         foreach ($options['data'] as $config) {
             if (isset($config['formAlias']) && !empty($config['parameters'])) {
                 $checkThese = array_intersect(array_keys($config['parameters']), $options['fileFields']);
@@ -52,11 +64,13 @@ class ConfigType extends AbstractType
                 }
                 $builder->add(
                     $config['formAlias'],
-                    $config['formAlias'],
+                    $config['formType'],
                     [
                         'data' => $config['parameters'],
                     ]
                 );
+
+                $this->addTransformers($builder->get($config['formAlias']));
             }
         }
 
@@ -65,7 +79,7 @@ class ConfigType extends AbstractType
             function (FormEvent $event) {
                 $form = $event->getForm();
 
-                foreach ($form as $config => $configForm) {
+                foreach ($form as $configForm) {
                     foreach ($configForm as $child) {
                         $this->restrictionHelper->applyRestrictions($child, $configForm);
                     }
@@ -75,7 +89,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'buttons',
-            'form_buttons',
+            FormButtonsType::class,
             [
                 'apply_onclick' => 'Mautic.activateBackdrop()',
                 'save_onclick'  => 'Mautic.activateBackdrop()',
@@ -90,14 +104,11 @@ class ConfigType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'config';
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -105,5 +116,18 @@ class ConfigType extends AbstractType
                 'fileFields' => [],
             ]
         );
+    }
+
+    private function addTransformers(FormBuilderInterface $builder): void
+    {
+        if (0 === $builder->count()) {
+            $builder->addModelTransformer($this->escapeTransformer);
+
+            return;
+        }
+
+        foreach ($builder as $childBuilder) {
+            $this->addTransformers($childBuilder);
+        }
     }
 }

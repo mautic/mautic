@@ -2,15 +2,16 @@
 
 namespace Mautic\CoreBundle\Test;
 
-use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
-use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Doctrine\Common\DataFixtures\Executor\AbstractExecutor;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Liip\TestFixturesBundle\Test\FixturesTrait;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
-use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
-use Symfony\Bundle\FrameworkBundle\Client;
+use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -19,86 +20,78 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Routing\RouterInterface;
 
 abstract class AbstractMauticTestCase extends WebTestCase
 {
-    /**
-     * @var EntityManager
-     */
-    protected $em;
+    use FixturesTrait {
+        loadFixtures as private traitLoadFixtures;
+        loadFixtureFiles as private traitLoadFixtureFiles;
+    }
 
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * @var Client
-     */
-    protected $client;
-
-    /**
-     * @var array
-     */
-    protected $clientServer = [
+    protected ?EntityManager $em;
+    protected ?Connection $connection;
+    protected ?KernelBrowser $client;
+    protected ?array $clientOptions = [];
+    protected ?array $clientServer  = [
         'PHP_AUTH_USER' => 'admin',
         'PHP_AUTH_PW'   => 'mautic',
     ];
 
-    public function setUp()
-    {
-        \Mautic\CoreBundle\ErrorHandler\ErrorHandler::register('prod');
+    protected ?array $configParams = [
+        'api_enabled'                       => true,
+        'api_enable_basic_auth'             => true,
+        'create_custom_field_in_background' => false,
+    ];
 
-        $this->client = static::createClient([], $this->clientServer);
+    protected function setUp(): void
+    {
+        $this->setUpSymfony($this->configParams);
+    }
+
+    protected function setUpSymfony(array $defaultConfigOptions = []): void
+    {
+        putenv('MAUTIC_CONFIG_PARAMETERS='.json_encode($defaultConfigOptions));
+
+        $this->client = static::createClient($this->clientOptions, $this->clientServer);
         $this->client->disableReboot();
         $this->client->followRedirects(true);
 
-        $this->container = $this->client->getContainer();
-        $this->em        = $this->container->get('doctrine')->getManager();
+        $this->em         = self::$container->get('doctrine')->getManager();
+        $this->connection = $this->em->getConnection();
+
+        /** @var RouterInterface $router */
+        $router = self::$container->get('router');
+        $scheme = $router->getContext()->getScheme();
+        $secure = 0 === strcasecmp($scheme, 'https');
+
+        $this->client->setServerParameter('HTTPS', $secure);
 
         $this->mockServices();
     }
 
-    protected function tearDown()
+    /**
+     * Overrides \Liip\TestFixturesBundle\Test\FixturesTrait::getContainer() method to prevent from having multiple instances of container.
+     */
+    protected function getContainer(): ContainerInterface
     {
-        static::$class = null;
-
-        $this->em->close();
-
-        parent::tearDown();
+        return self::$container;
     }
 
     /**
-     * {@inheritdoc}
+     * Make `$append = true` default so we can avoid unnecessary purges.
      */
-    protected static function getKernelClass()
+    protected function loadFixtures(array $classNames = [], bool $append = true, ?string $omName = null, string $registryName = 'doctrine', ?int $purgeMode = null): ?AbstractExecutor
     {
-        if (isset($_SERVER['KERNEL_DIR'])) {
-            $dir = $_SERVER['KERNEL_DIR'];
+        return $this->traitLoadFixtures($classNames, $append, $omName, $registryName, $purgeMode);
+    }
 
-            if (!is_dir($dir)) {
-                $phpUnitDir = static::getPhpUnitXmlDir();
-                if (is_dir("$phpUnitDir/$dir")) {
-                    $dir = "$phpUnitDir/$dir";
-                }
-            }
-        } else {
-            $dir = static::getPhpUnitXmlDir();
-        }
-
-        $finder = new Finder();
-        $finder->name('*TestKernel.php')->depth(0)->in($dir);
-        $results = iterator_to_array($finder);
-        if (!count($results)) {
-            throw new \RuntimeException('Either set KERNEL_DIR in your phpunit.xml according to https://symfony.com/doc/current/book/testing.html#your-first-functional-test or override the WebTestCase::createKernel() method.');
-        }
-
-        $file  = current($results);
-        $class = $file->getBasename('.php');
-
-        require_once $file;
-
-        return $class;
+    /**
+     * Make `$append = true` default so we can avoid unnecessary purges.
+     */
+    protected function loadFixtureFiles(array $paths = [], bool $append = true, ?string $omName = null, string $registryName = 'doctrine', ?int $purgeMode = null): array
+    {
+        return $this->traitLoadFixtureFiles($paths, $append, $omName, $registryName, $purgeMode);
     }
 
     private function mockServices()
@@ -111,9 +104,9 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $cookieHelper->expects($this->any())
             ->method('setCookie');
 
-        $this->container->set('mautic.helper.cookie', $cookieHelper);
+        self::$container->set('mautic.helper.cookie', $cookieHelper);
 
-        $this->container->set('session', new Session(new FixedMockFileSessionStorage()));
+        self::$container->set('session', new Session(new FixedMockFileSessionStorage()));
     }
 
     protected function applyMigrations()
@@ -121,46 +114,14 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $input  = new ArgvInput(['console', 'doctrine:migrations:version', '--add', '--all', '--no-interaction']);
         $output = new BufferedOutput();
 
-        $application = new Application($this->container->get('kernel'));
+        $application = new Application(self::$container->get('kernel'));
         $application->setAutoExit(false);
         $application->run($input, $output);
     }
 
-    /**
-     * @param array|null $paths
-     */
-    protected function installDatabaseFixtures(array $paths = null)
+    protected function installDatabaseFixtures(array $classNames = [])
     {
-        if (null === $paths) {
-            $paths = [
-                dirname(__DIR__).'/../InstallBundle/InstallFixtures/ORM',
-                // Default user and roles
-                dirname(__DIR__).'/../UserBundle/DataFixtures/ORM',
-            ];
-        }
-
-        $loader = new ContainerAwareLoader($this->container);
-
-        foreach ($paths as $path) {
-            if (is_dir($path)) {
-                $loader->loadFromDirectory($path);
-            } elseif (file_exists($path)) {
-                $loader->loadFromFile($path);
-            }
-        }
-
-        $fixtures = $loader->getFixtures();
-
-        if (!$fixtures) {
-            throw new \InvalidArgumentException(
-                sprintf('Could not find any fixtures to load in: %s', "\n\n- ".implode("\n- ", $paths))
-            );
-        }
-
-        $purger = new ORMPurger($this->em);
-        $purger->setPurgeMode(ORMPurger::PURGE_MODE_DELETE);
-        $executor = new ORMExecutor($this->em, $purger);
-        $executor->execute($fixtures, true);
+        $this->loadFixtures($classNames);
     }
 
     /**
@@ -172,13 +133,23 @@ abstract class AbstractMauticTestCase extends WebTestCase
      */
     protected function getCsrfToken($intention)
     {
-        return $this->client->getContainer()->get('security.csrf.token_manager')->refreshToken($intention);
+        return $this->client->getContainer()->get('security.csrf.token_manager')->refreshToken($intention)->getValue();
     }
 
     /**
-     * @param              $name
-     * @param array        $params
-     * @param Command|null $command
+     * @return string[]
+     */
+    protected function createAjaxHeaders(): array
+    {
+        return [
+            'HTTP_Content-Type'     => 'application/x-www-form-urlencoded; charset=UTF-8',
+            'HTTP_X-Requested-With' => 'XMLHttpRequest',
+            'HTTP_X-CSRF-Token'     => $this->getCsrfToken('mautic_ajax_post'),
+        ];
+    }
+
+    /**
+     * @param $name
      *
      * @return string
      *
@@ -187,13 +158,13 @@ abstract class AbstractMauticTestCase extends WebTestCase
     protected function runCommand($name, array $params = [], Command $command = null)
     {
         $params      = array_merge(['command' => $name], $params);
-        $kernel      = $this->container->get('kernel');
+        $kernel      = self::$container->get('kernel');
         $application = new Application($kernel);
         $application->setAutoExit(false);
 
         if ($command) {
             if ($command instanceof ContainerAwareCommand) {
-                $command->setContainer($this->container);
+                $command->setContainer(self::$container);
             }
 
             // Register the command
