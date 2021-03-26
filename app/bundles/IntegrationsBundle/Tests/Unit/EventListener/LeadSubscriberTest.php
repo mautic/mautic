@@ -101,7 +101,7 @@ class LeadSubscriberTest extends TestCase
     public function testOnLeadPostSaveAnonymousLead(): void
     {
         $lead = $this->createMock(Lead::class);
-        $lead->expects($this->at(0))
+        $lead->expects($this->once())
             ->method('isAnonymous')
             ->willReturn(true);
         $lead->expects($this->never())
@@ -120,7 +120,7 @@ class LeadSubscriberTest extends TestCase
     public function testOnLeadPostSaveLeadObjectSyncNotEnabled(): void
     {
         $lead = $this->createMock(Lead::class);
-        $lead->expects($this->at(0))
+        $lead->expects($this->once())
             ->method('isAnonymous')
             ->willReturn(false);
         $lead->expects($this->never())
@@ -144,10 +144,10 @@ class LeadSubscriberTest extends TestCase
         $companyName = 'Dell';
 
         $lead = $this->createMock(Lead::class);
-        $lead->expects($this->at(0))
+        $lead->expects($this->once())
             ->method('getCompany')
             ->willReturn($companyName);
-        $lead->expects($this->at(0))
+        $lead->expects($this->once())
             ->method('getId')
             ->willReturn($leadId);
 
@@ -163,7 +163,7 @@ class LeadSubscriberTest extends TestCase
         $fieldChanges = [];
 
         $lead = $this->createMock(Lead::class);
-        $lead->expects($this->at(0))
+        $lead->expects($this->once())
             ->method('isAnonymous')
             ->willReturn(false);
         $lead->expects($this->once())
@@ -199,7 +199,7 @@ class LeadSubscriberTest extends TestCase
         $objectType = Lead::class;
 
         $lead = $this->createMock(Lead::class);
-        $lead->expects($this->at(0))
+        $lead->expects($this->once())
             ->method('isAnonymous')
             ->willReturn(false);
         $lead->expects($this->once())
@@ -236,7 +236,7 @@ class LeadSubscriberTest extends TestCase
         $objectType = Lead::class;
 
         $lead = $this->createMock(Lead::class);
-        $lead->expects($this->at(0))
+        $lead->expects($this->once())
             ->method('isAnonymous')
             ->willReturn(false);
         $lead->expects($this->once())
@@ -275,7 +275,7 @@ class LeadSubscriberTest extends TestCase
         $objectType = Lead::class;
 
         $lead = $this->createMock(Lead::class);
-        $lead->expects($this->at(0))
+        $lead->expects($this->once())
             ->method('isAnonymous')
             ->willReturn(false);
         $lead->expects($this->once())
