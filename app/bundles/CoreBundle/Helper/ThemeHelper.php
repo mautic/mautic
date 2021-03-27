@@ -661,8 +661,13 @@ class ThemeHelper
             $builderName = 'legacy';
         }
 
-        $builderRequested = $config['builder'] ?? 'legacy';
+        $builderRequested = $config['builder'] ?? ['legacy'];
 
-        return $builderName === $builderRequested;
+        // is the theme configured to be used with the current builder
+        if (!is_array($builderRequested)) {
+            throw new BadConfigurationException(sprintf('Template %s not configured properly: builder', $config['name']));
+        }
+
+        return in_array($builderName, $builderRequested);
     }
 }
