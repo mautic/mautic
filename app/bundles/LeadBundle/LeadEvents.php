@@ -592,6 +592,16 @@ final class LeadEvents
     const ON_CLICKTHROUGH_IDENTIFICATION = 'mautic.clickthrough_contact_identification';
 
     /**
+     * The mautic.check_for_duplicate_contact event is dispatched when deduplicate for contact is execute
+     * URL.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\CheckForDuplicateContactsEvent instance.
+     *
+     * @var string
+     */
+    const CHECK_FOR_DUPLICATE_CONTACTS_EVENT = 'mautic.check_for_duplicate_contact';
+
+    /**
      * The mautic.lead_field_pre_add_column event is dispatched before adding a new column to lead_fields table.
      *
      * The event listener receives a
