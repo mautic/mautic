@@ -141,12 +141,13 @@ class FileManager
 
         $finder = new Finder();
         $finder->files()->in($uploadDir);
-
+       
         foreach ($finder as $file) {
             if ($size = @getimagesize($this->getCompleteFilePath($file->getFilename()))) {
                 $files[] = [
                     'src'    => $this->getFullUrl($file->getFilename()),
                     'width'  => $size[0],
+                    'type'   => 'image',
                     'height' => $size[1],
                 ];
             } else {

@@ -115,3 +115,49 @@ We are going to delete the branch for the Mautic 2.x Plugin on February 28th 202
 If you feel the need to develop the existing 2.x branch further, please fork it and develop it on your own repo. 
 Here is the link to the 2.x Branch with the work done so far: 
 https://github.com/mautic/plugin-grapesjs-builder/tree/master 
+
+-------------------------------------------------------------------
+
+## Code
+### Setup 
+```bash
+npm install
+```
+
+#### Configure babel, eslint, prettier
+use the template files provided. E.g. .eslintrc.temp
+
+### How to test standalone
+```bash
+npm run start-helloWorld
+or
+npm run start-mautic
+```
+
+In order for start-mautic to work a running ddev container has to be present. 
+If you are on some other development environment you need to update some paths in Demo/mautic/index.html
+
+### How to build for production
+```bash
+npm run build
+```
+
+## Code Architecture
+
+There is the JS code in the Assets/libarary folder. This handles the bootstrapping and management. 
+
+In addition there is the mautic preset. This handles the basic Mautic specific code. The general idea is that this preset repo can be used as a base for various Mautic builder plugins. E.g one where the RTE ediotor is the CKEditor, or where we have some very customer specific functionality.
+```
+- It's a pack of configurable feautures:
+- Adds the function to edit source code
+- Extends the original image and add a confirm dialog before removing it
+- Add the option to hide/show the Layers Manager
+- Add the option to enable/disable the import code button
+- Moves the Settings panel inside Style Manager panel
+- Opens the Block Manager at launch
+- Replace Rich Text Editor by Froala used in Mautic (add token support)
+- Add Dynamic Content Block for HTML used in Mautic
+```
+
+## Sources
+[New builder documentation resources](https://docs.google.com/document/d/1gdyojOM-K-Otk2iPo92qennjw3yKvdd6VUjToGzFgC0/edit#heading=h.akyer7a3p06t)
