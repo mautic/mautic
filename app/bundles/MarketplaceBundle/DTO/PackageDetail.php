@@ -7,104 +7,67 @@ namespace Mautic\MarketplaceBundle\DTO;
 use Mautic\MarketplaceBundle\Collection\MaintainerCollection;
 use Mautic\MarketplaceBundle\Collection\VersionCollection;
 
-class PackageDetail extends Package
+final class PackageDetail
 {
-    private int $githubStars    = 0;
-    private int $githubWatchers = 0;
-    private int $githubForks    = 0;
-    private int $githubOpenIssues;
-    private int $dependents;
-    private int $suggesters;
+    private PackageBase $packageBase;
+    private GitHubInfo $githubInfo;
     private int $monthlyDownloads;
     private int $dailyDownloads;
     private \DateTimeInterface $time;
     private MaintainerCollection $maintainers;
     private VersionCollection $versions;
 
+    public function __construct(
+        PackageBase $packageBase,
+        VersionCollection $versions,
+        MaintainerCollection $maintainers,
+        GitHubInfo $githubInfo,
+        int $monthlyDownloads,
+        int $dailyDownloads,
+        \DateTimeInterface $time
+    ) {
+        $this->packageBase = $packageBase;
+        $this->versions = $versions;
+        $this->maintainers = $maintainers;
+        $this->githubInfo = $githubInfo;
+        $this->monthlyDownloads = $monthlyDownloads;
+        $this->dailyDownloads = $dailyDownloads;
+        $this->time = $time;
+    }
+
     public static function fromArray(array $array)
     {
-        $packageDetail = new self(
-            $array['name'],
-            '',
-            $array['repository'],
-            $array['description'],
-            (int) $array['downloads']['total'],
-            (int) $array['favers']
+        return new self(
+            new PackageBase(
+                $array['name'],
+                '',
+                $array['repository'],
+                $array['description'],
+                (int) $array['downloads']['total'],
+                (int) $array['favers']
+            ),
+            VersionCollection::fromArray($array['versions']),
+            MaintainerCollection::fromArray($array['maintainers']),
+            new GitHubInfo(
+                $array['github_stars'],
+                $array['github_watchers'],
+                $array['github_forks'],
+                $array['github_open_issues']
+            ),
+            $array['downloads']['monthly'],
+            $array['downloads']['daily'],
+            new \DateTimeImmutable($array['time'])
         );
-
-        $packageDetail->setGithubStars($array['github_stars']);
-        $packageDetail->setGithubWatchers($array['github_watchers']);
-        $packageDetail->setGithubForks($array['github_forks']);
-        $packageDetail->setGithubOpenIssues($array['github_open_issues']);
-        $packageDetail->setDependents($array['dependents']);
-        $packageDetail->setSuggesters($array['suggesters']);
-        $packageDetail->setMonthlyDownloads($array['downloads']['monthly']);
-        $packageDetail->setDailyDownloads($array['downloads']['daily']);
-        $packageDetail->setTime(new \DateTimeImmutable($array['time']));
-        $packageDetail->setMaintainers(MaintainerCollection::fromArray($array['maintainers']));
-        $packageDetail->setVersions(VersionCollection::fromArray($array['versions']));
-
-        return $packageDetail;
     }
 
-    public function getGithubStars(): int
+    public function getPackageBase(): PackageBase
     {
-        return $this->githubStars;
+        return $this->packageBase;
     }
 
-    public function setGithubStars(int $githubStars): void
+    public function getGithubInfo(): GitHubInfo
     {
-        $this->githubStars = $githubStars;
-    }
-
-    public function getGithubWatchers(): int
-    {
-        return $this->githubWatchers;
-    }
-
-    public function setGithubWatchers(int $githubWatchers): void
-    {
-        $this->githubWatchers = $githubWatchers;
-    }
-
-    public function getGithubForks(): int
-    {
-        return $this->githubForks;
-    }
-
-    public function setGithubForks(int $githubForks): void
-    {
-        $this->githubForks = $githubForks;
-    }
-
-    public function getGithubOpenIssues(): int
-    {
-        return $this->githubOpenIssues;
-    }
-
-    public function setGithubOpenIssues(int $githubOpenIssues): void
-    {
-        $this->githubOpenIssues = $githubOpenIssues;
-    }
-
-    public function getDependents(): int
-    {
-        return $this->dependents;
-    }
-
-    public function setDependents(int $dependents): void
-    {
-        $this->dependents = $dependents;
-    }
-
-    public function getSuggesters(): int
-    {
-        return $this->suggesters;
-    }
-
-    public function setSuggesters(int $suggesters): void
-    {
-        $this->suggesters = $suggesters;
+        return $this->githubInfo;
     }
 
     public function getMonthlyDownloads(): int
@@ -112,19 +75,9 @@ class PackageDetail extends Package
         return $this->monthlyDownloads;
     }
 
-    public function setMonthlyDownloads(int $monthlyDownloads): void
-    {
-        $this->monthlyDownloads = $monthlyDownloads;
-    }
-
     public function getDailyDownloads(): int
     {
         return $this->dailyDownloads;
-    }
-
-    public function setDailyDownloads(int $dailyDownloads): void
-    {
-        $this->dailyDownloads = $dailyDownloads;
     }
 
     public function getTime(): \DateTimeInterface
@@ -132,28 +85,13 @@ class PackageDetail extends Package
         return $this->time;
     }
 
-    public function setTime(\DateTimeInterface $time): void
-    {
-        $this->time = $time;
-    }
-
     public function getMaintainers(): MaintainerCollection
     {
         return $this->maintainers;
     }
 
-    public function setMaintainers(MaintainerCollection $maintainers): void
-    {
-        $this->maintainers = $maintainers;
-    }
-
     public function getVersions(): VersionCollection
     {
         return $this->versions;
-    }
-
-    public function setVersions(VersionCollection $versions): void
-    {
-        $this->versions = $versions;
     }
 }

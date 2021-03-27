@@ -2,10 +2,14 @@
 
 declare(strict_types=1);
 
+use Mautic\MarketplaceBundle\DTO\PackageDetail;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\RouteProvider;
 
-$view['slots']->set('headerTitle', $view->escape($packageDetail->getHumanPackageName()));
+/** @var PackageDetail $packageDetail */
+$packageDetail = $packageDetail;
+
+$view['slots']->set('headerTitle', $view->escape($packageDetail->getPackageBase()->getHumanPackageName()));
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
 $buttons = [
@@ -51,42 +55,34 @@ try {
         <tr>
             <th><?php echo $view['translator']->trans('mautic.core.name'); ?></th>
             <td>
-                <a href="<?php echo $view->escape($packageDetail->getRepository()); ?>" target="_blank" rel="noopener noreferrer" >
-                    <?php echo $view->escape($packageDetail->getName()); ?>
+                <a href="<?php echo $view->escape($packageDetail->getPackageBase()->getRepository()); ?>" target="_blank" rel="noopener noreferrer" >
+                    <?php echo $view->escape($packageDetail->getPackageBase()->getName()); ?>
                 </a>
             </td>
         </tr>
         <tr>
             <th><?php echo $view['translator']->trans('mautic.core.description'); ?></th>
-            <td><?php echo $view->escape($packageDetail->getDescription()); ?></td>
+            <td><?php echo $view->escape($packageDetail->getPackageBase()->getDescription()); ?></td>
         </tr>
         <tr>
             <th><?php echo $view['translator']->trans('marketplace.package.github.stars'); ?></th>
-            <td><?php echo $view->escape($packageDetail->getGithubStars()); ?></td>
+            <td><?php echo $view->escape($packageDetail->getGithubInfo()->getStars()); ?></td>
         </tr>
         <tr>
             <th><?php echo $view['translator']->trans('marketplace.package.github.watchers'); ?></th>
-            <td><?php echo $view->escape($packageDetail->getGithubWatchers()); ?></td>
+            <td><?php echo $view->escape($packageDetail->getGithubInfo()->getWatchers()); ?></td>
         </tr>
         <tr>
             <th><?php echo $view['translator']->trans('marketplace.package.github.forks'); ?></th>
-            <td><?php echo $view->escape($packageDetail->getGithubForks()); ?></td>
+            <td><?php echo $view->escape($packageDetail->getGithubInfo()->getForks()); ?></td>
         </tr>
         <tr>
             <th><?php echo $view['translator']->trans('marketplace.package.github.open.issues'); ?></th>
-            <td><?php echo $view->escape($packageDetail->getGithubOpenIssues()); ?></td>
-        </tr>
-        <tr>
-            <th><?php echo $view['translator']->trans('marketplace.package.dependents'); ?></th>
-            <td><?php echo $view->escape($packageDetail->getDependents()); ?></td>
-        </tr>
-        <tr>
-            <th><?php echo $view['translator']->trans('marketplace.package.suggesters'); ?></th>
-            <td><?php echo $view->escape($packageDetail->getSuggesters()); ?></td>
+            <td><?php echo $view->escape($packageDetail->getGithubInfo()->getOpenIssues()); ?></td>
         </tr>
         <tr>
             <th><?php echo $view['translator']->trans('marketplace.package.total.downloads'); ?></th>
-            <td><?php echo $view->escape($packageDetail->getDownloads()); ?></td>
+            <td><?php echo $view->escape($packageDetail->getPackageBase()->getDownloads()); ?></td>
         </tr>
         <tr>
             <th><?php echo $view['translator']->trans('marketplace.package.monthly.downloads'); ?></th>

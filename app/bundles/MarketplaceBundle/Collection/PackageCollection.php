@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\Collection;
 
-use Mautic\MarketplaceBundle\DTO\Package;
+use Mautic\MarketplaceBundle\DTO\PackageBase;
 use Mautic\MarketplaceBundle\Exception\RecordNotFoundException;
 
 class PackageCollection implements \Iterator, \Countable, \ArrayAccess
 {
     /**
-     * @var Package[]
+     * @var PackageBase[]
      */
     private array $records;
 
     private int $position = 0;
 
     /**
-     * @param Package[] $records
+     * @param PackageBase[] $records
      */
     public function __construct(array $records = [])
     {
@@ -28,7 +28,7 @@ class PackageCollection implements \Iterator, \Countable, \ArrayAccess
     {
         return new self(
             array_map(
-                fn (array $record) => Package::fromArray($record),
+                fn (array $record) => PackageBase::fromArray($record),
                 $array
             )
         );
@@ -39,7 +39,7 @@ class PackageCollection implements \Iterator, \Countable, \ArrayAccess
         return new self(array_map($callback, $this->records));
     }
 
-    public function add(Package $record): void
+    public function add(PackageBase $record): void
     {
         $this->records[] = $record;
     }
@@ -49,7 +49,7 @@ class PackageCollection implements \Iterator, \Countable, \ArrayAccess
         return new self(array_values(array_filter($this->records, $callback)));
     }
 
-    public function current(): Package
+    public function current(): PackageBase
     {
         return $this->records[$this->position];
     }
@@ -98,7 +98,7 @@ class PackageCollection implements \Iterator, \Countable, \ArrayAccess
         unset($this->records[$offset]);
     }
 
-    public function offsetGet($offset): Package
+    public function offsetGet($offset): PackageBase
     {
         if (isset($this->records[$offset])) {
             return $this->records[$offset];
