@@ -31,9 +31,7 @@ class PackageCollection implements \Iterator, \Countable, \ArrayAccess
     {
         return new self(
             array_map(
-                function (array $record) {
-                    return Package::fromArray($record);
-                },
+                fn (array $record) => Package::fromArray($record),
                 $array
             )
         );

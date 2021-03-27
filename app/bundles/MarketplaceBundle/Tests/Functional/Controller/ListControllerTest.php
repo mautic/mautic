@@ -21,7 +21,7 @@ final class ListControllerTest extends MauticMysqlTestCase
         $response     = new Response(200, [], file_get_contents(__DIR__.'/../../ApiResponse/list.json'));
         $handlerStack = HandlerStack::create(new MockHandler([$response]));
         $handlerStack->push($history);
-        $this->container->set('mautic.http.client', new Client(['handler' => $handlerStack]));
+        self::$container->set('mautic.http.client', new Client(['handler' => $handlerStack]));
 
         $crawler = $this->client->request('GET', 's/marketplace');
 
@@ -36,9 +36,7 @@ final class ListControllerTest extends MauticMysqlTestCase
                 'Mautic do not contact extras bundle',
             ],
             array_map(
-                function (string $dirtyPackageName) {
-                    return trim($dirtyPackageName);
-                },
+                fn (string $dirtyPackageName) => trim($dirtyPackageName),
                 $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])
             )
         );

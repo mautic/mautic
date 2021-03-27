@@ -31,9 +31,7 @@ class MaintainerCollection implements \Iterator, \Countable, \ArrayAccess
     {
         return new self(
             array_map(
-                function (array $record) {
-                    return Maintainer::fromArray($record);
-                },
+                fn (array $record) => Maintainer::fromArray($record),
                 $array
             )
         );
