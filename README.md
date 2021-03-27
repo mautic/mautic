@@ -129,7 +129,9 @@ use the template files provided. E.g. .eslintrc.temp
 
 ### How to test standalone
 ```bash
-npm run mautic
+npm run start-helloWorld
+or
+npm run start-mautic
 ```
 
 ### How to build for production

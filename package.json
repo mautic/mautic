@@ -9,8 +9,8 @@
     "lint": "eslint Assets/library/js/",
     "prettier": "node_modules/.bin/prettier -w Assets/library/js/",
     "prettier-check": "node_modules/.bin/prettier -c Assets/library/js/",
-    "run helloWorld": "parcel Demo/helloWorld/index.html",
-    "run mautic": "cp -r Demo/data dist && parcel Demo/mautic/index.html",
+    "start-helloWorld": "parcel Demo/helloWorld/index.html",
+    "start-mautic": "cp -r Demo/data dist && parcel Demo/mautic/index.html",
     "update-mautic-preset": "npm uninstall grapesjs-preset-mautic && npm install mautic/grapesjs-preset-mautic#master"
   },
   "repository": {
