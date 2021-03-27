@@ -10,7 +10,7 @@ const search = require("../../Pages/Search");
 var testTrigger = "testTrigger";
 var testTriggerEmail = "TestTriggerEmail";
 var testContact = "testcontact";
-var mailtestUrl = "https://mailtest.mautic.com/api/v1/mailbox/";
+var mailtestUrl = Cypress.env('mailtest-path');
 var getMailId;
 
 context("Verify that user is able to create trigger and verify that user has received an email once trigger condition is matched", () => {
@@ -83,7 +83,6 @@ context("Verify that user is able to create trigger and verify that user has rec
   });
 
   it("Verify that user has received the trigger Email", () => {
-    cy.wait(5000);
     cy.request({
       method: "GET",
       url: mailtestUrl + testContact,
