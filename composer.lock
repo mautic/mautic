@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "55875ac7bccbdf1f6e9c1e1bb7433da6",
+    "content-hash": "3251cfcd0f69a9665c6f547f0512eddf",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -3662,62 +3662,6 @@
             "time": "2018-05-26T15:48:53+00:00"
         },
         {
-            "name": "joomla/http",
-            "version": "1.3.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/joomla-framework/http.git",
-                "reference": "128c3d410fd7327fb87839cd3e00ed0be2f71f9d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/joomla-framework/http/zipball/128c3d410fd7327fb87839cd3e00ed0be2f71f9d",
-                "reference": "128c3d410fd7327fb87839cd3e00ed0be2f71f9d",
-                "shasum": ""
-            },
-            "require": {
-                "composer/ca-bundle": "~1.0",
-                "joomla/uri": "~1.0|~2.0",
-                "php": "^5.3.10|~7.0"
-            },
-            "require-dev": {
-                "joomla/coding-standards": "~2.0@alpha",
-                "joomla/test": "~1.0",
-                "phpunit/phpunit": "^4.8.35|^5.4.3|~6.0"
-            },
-            "suggest": {
-                "ext-curl": "To use cURL for HTTP connections",
-                "joomla/registry": "Registry can be used as an alternative to using an array for the package options."
-            },
-            "type": "joomla-package",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Joomla\\Http\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-2.0-or-later"
-            ],
-            "description": "Joomla HTTP Package",
-            "homepage": "https://github.com/joomla-framework/http",
-            "keywords": [
-                "framework",
-                "http",
-                "joomla"
-            ],
-            "support": {
-                "issues": "https://github.com/joomla-framework/http/issues",
-                "source": "https://github.com/joomla-framework/http/tree/1.3.3"
-            },
-            "time": "2019-03-10T15:31:03+00:00"
-        },
-        {
             "name": "joomla/string",
             "version": "1.4.5",
             "source": {
@@ -3796,56 +3740,6 @@
                 }
             ],
             "time": "2020-10-07T08:01:44+00:00"
-        },
-        {
-            "name": "joomla/uri",
-            "version": "1.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/joomla-framework/uri.git",
-                "reference": "848a31dc895a9c8c9d7ea67571d6a4dd634a9dc1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/joomla-framework/uri/zipball/848a31dc895a9c8c9d7ea67571d6a4dd634a9dc1",
-                "reference": "848a31dc895a9c8c9d7ea67571d6a4dd634a9dc1",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^5.3.10|~7.0"
-            },
-            "require-dev": {
-                "joomla/coding-standards": "~2.0@alpha",
-                "joomla/test": "~1.0",
-                "phpunit/phpunit": "^4.8.35|^5.4.3|~6.0"
-            },
-            "type": "joomla-package",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Joomla\\Uri\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-2.0-or-later"
-            ],
-            "description": "Joomla Uri Package",
-            "homepage": "https://github.com/joomla-framework/uri",
-            "keywords": [
-                "framework",
-                "joomla",
-                "uri"
-            ],
-            "support": {
-                "issues": "https://github.com/joomla-framework/uri/issues",
-                "source": "https://github.com/joomla-framework/uri/tree/1.2.0"
-            },
-            "time": "2018-07-01T00:12:15+00:00"
         },
         {
             "name": "kamermans/guzzle-oauth2-subscriber",

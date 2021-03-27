@@ -10,10 +10,12 @@
     *   egeloen/ordered-form-bundle removed
     *   sensio/distribution-bundle removed
     *   codeception/codeception removed
+    *   joomla/http removed
+    *   TODO add additional packages here that were removed
 *   Commands
     * \Mautic\CoreBundle\Command\ModeratedCommand::$lockHandler is now private
 *   Services
-    * `mautic.http.client` has been upgraded from GuzzleHttp 6 to 7. You can now leverage `Psr\Http\Client\ClientInterface` (PSR-18) in your class constructors! Example:
+    * `mautic.http.client` has been upgraded from GuzzleHttp 6 to 7. You can now leverage `Psr\Http\Client\ClientInterface` (PSR-18) or `GuzzleHttp\Client` (more convenience methods) in your class constructors! Example:
 
     config.php:
 
@@ -38,3 +40,9 @@
         $this->client = $client;
     }
     ```
+
+    * `mautic.http.connector` has been removed in favor of `mautic.http.client`. See the example above on how to use it in your class constructors.
+
+*   Plugins
+    * If you extend `AbstractIntegration` and use the method `makeRequest`, including `$options['return_raw']`, you will now get `\Psr\Http\Message\ResponseInterface` as the response type (was `\Joomla\CMS\Http\Response`)
+    * If you're listening on the `Mautic\PluginBundle\PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE` event, `PluginIntegrationRequestEvent->getResponse()` now returns `\Psr\Http\Message\ResponseInterface` as the type (was not explicitly defined)

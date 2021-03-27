@@ -857,18 +857,18 @@ return [
                 ],
             ],
             'mautic.helper.language' => [
-                'class'     => 'Mautic\CoreBundle\Helper\LanguageHelper',
+                'class'     => \Mautic\CoreBundle\Helper\LanguageHelper::class,
                 'arguments' => [
                     'mautic.helper.paths',
                     'monolog.logger.mautic',
                     'mautic.helper.core_parameters',
-                    'mautic.http.connector',
+                    'mautic.http.client',
                 ],
             ],
             'mautic.helper.url' => [
                 'class'     => \Mautic\CoreBundle\Helper\UrlHelper::class,
                 'arguments' => [
-                    'mautic.http.connector',
+                    'mautic.http.client',
                     '%mautic.link_shortener_url%',
                     'monolog.logger.mautic',
                 ],
@@ -915,30 +915,24 @@ return [
             ],
             // IP Lookup
             'mautic.ip_lookup.factory' => [
-                'class'     => 'Mautic\CoreBundle\Factory\IpLookupFactory',
+                'class'     => \Mautic\CoreBundle\Factory\IpLookupFactory::class,
                 'arguments' => [
                     '%mautic.ip_lookup_services%',
                     'monolog.logger.mautic',
-                    'mautic.http.connector',
+                    'mautic.http.client',
                     '%kernel.cache_dir%',
                 ],
             ],
             'mautic.ip_lookup' => [
-                'class'     => 'Mautic\CoreBundle\IpLookup\AbstractLookup', // bogus just to make cache compilation happy
+                'class'     => \Mautic\CoreBundle\IpLookup\AbstractLookup::class, // bogus just to make cache compilation happy
                 'factory'   => ['@mautic.ip_lookup.factory', 'getService'],
                 'arguments' => [
                     '%mautic.ip_lookup_service%',
                     '%mautic.ip_lookup_auth%',
                     '%mautic.ip_lookup_config%',
-                    'mautic.http.connector',
+                    'mautic.http.client',
                 ],
             ],
-            // Other
-            'mautic.http.connector' => [
-                'class'   => 'Joomla\Http\Http',
-                'factory' => ['Joomla\Http\HttpFactory', 'getHttp'],
-            ],
-
             'mautic.native.connector' => [
                 'class'     => \Symfony\Contracts\HttpClient\HttpClientInterface::class,
                 'factory'   => [Symfony\Component\HttpClient\HttpClient::class, 'create'],
