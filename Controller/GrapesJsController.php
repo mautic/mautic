@@ -35,7 +35,7 @@ class GrapesJsController extends CommonController
         if (!in_array($objectType, self::OBJECT_TYPE)) {
             throw new \Exception('Object not authorized to load custom builder', Response::HTTP_CONFLICT);
         }
-        $this->logger     = $this->get('logger');
+        $this->logger     = $this->get('monolog.logger.mautic');
 
         /** @var \Mautic\EmailBundle\Model\EmailModel|\Mautic\PageBundle\Model\PageModel $model */
         $model      = $this->getModel($objectType);
