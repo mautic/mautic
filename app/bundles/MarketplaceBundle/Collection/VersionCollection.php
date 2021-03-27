@@ -44,6 +44,18 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
         $this->records[] = $record;
     }
 
+    public function sortByLatest(): VersionCollection
+    {
+        $records = $this->records;
+
+        usort(
+            $records,
+            fn ($versionA, $versionB) => $versionB->getTime()->getTimestamp() - $versionA->getTime()->getTimestamp()
+        );
+
+        return new self($records);
+    }
+
     public function filter(callable $callback): VersionCollection
     {
         return new self(array_values(array_filter($this->records, $callback)));
