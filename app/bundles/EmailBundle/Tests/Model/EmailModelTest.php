@@ -11,6 +11,9 @@
 
 namespace Mautic\EmailBundle\Tests\Model;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Mautic\ChannelBundle\Entity\MessageRepository;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
@@ -572,5 +575,53 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->emailModel->setDispatcher($this->createMock(EventDispatcher::class));
 
         $this->emailModel->hitEmail($stat, $request);
+    }
+
+    public function testGetBestHours()
+    {
+        $mockConnection   = $this->createMock(Connection::class);
+
+        $queryBuilder      = new QueryBuilder($mockConnection);
+        $mockConnection->method('createQueryBuilder')->willReturn($queryBuilder);
+
+        $platform = $this->createMock(AbstractPlatform::class);
+        $mockConnection->method('getDatabasePlatform')
+            ->willReturn($platform);
+
+        $mockConnection->method('executeQuery')->willReturn(new class() {
+            public function fetchAll()
+            {
+                return [
+                    [
+                        'hour'  => 0,
+                        'count' => 0,
+                    ],
+                    [
+                        'hour'  => 1,
+                        'count' => 4,
+                    ],
+                    [
+                        'hour'  => 2,
+                        'count' => 10,
+                    ],
+                    [
+                        'hour'  => 3,
+                        'count' => 6,
+                    ],
+                ];
+            }
+        });
+
+        $this->entityManager->method('getConnection')->willReturn($mockConnection);
+        $this->emailModel->setEntityManager($this->entityManager);
+
+        $chartData = $this->emailModel->getBestHours(
+            'date_read',
+            new \DateTime(),
+            new \DateTime()
+        );
+
+        $this->assertSame([0, 1, 2, 3], $chartData['labels']);
+        $this->assertSame([0.0, 20.0, 50.0, 30.0], $chartData['datasets'][0]['data']);
     }
 }
