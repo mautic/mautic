@@ -108,4 +108,7 @@ return [
             ],
         ],
     ],
+    'parameters' => [
+        'static_url'             => '', // optional base url for images
+    ],
 ];
