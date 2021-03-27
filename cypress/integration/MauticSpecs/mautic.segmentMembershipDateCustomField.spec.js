@@ -164,8 +164,8 @@ context("Verify segment membership tests with date custom field", () => {
     cy.visit("s/segments");
     segments.waitForPageLoad();
     cy.visit('/s/segments?search=segment')
-    segments.checkConactsUnderSegment.should('contain','View 2 Contacts')
-    segments.checkConactsUnderSegment.click()
+    segments.checkContactsUnderSegment.should('contain','View 2 Contacts')
+    segments.checkContactsUnderSegment.click()
     segments.checkDetailContactsUnderSegment.should('contain',"test1 contact1").should('contain',"test1 contact3");
   })
 
@@ -212,15 +212,15 @@ context("Verify segment membership tests with date custom field", () => {
     segments.thirdFilterProperties.type('2021-01-06',{ force: true })
     segments.saveAndCloseButton.click()
     segments.waitforSegmentCreation()
-    cy.wait(3000) // Added wait for segment building
+    cy.exec(cronpath + ' m:s:r'); //Community specific
   })
 
   it("Verify that"+ segmentMembershipWithCustomField2 +"segment has only one contact only", () => {
     cy.visit("s/segments");
     segments.waitForPageLoad();
     cy.visit('/s/segments?search=segment')
-    segments.checkConactsUnderSegment.should('contain','View 1 Contact')
-    segments.checkConactsUnderSegment.click()
+    segments.checkContactsUnderSegment.should('contain','View 1 Contact'); //Community specific
+    segments.checkContactsUnderSegment.click(); //Community specific
     segments.checkDetailContactsUnderSegment.should('contain',"test1 contact1");
   })
 

@@ -129,15 +129,15 @@ class Segments {
     }
 
     get clickOnFourthFilterProperties(){
-        return cy.get('#leadlist_filters_4_filter');
+        return cy.get('#leadlist_filters_4_filter_chosen > .chosen-single'); //Community specific
     }
 
     get typeFourthFilterInput(){
-        return cy.get('#leadlist_filters_4_properties_filter_chosen>div>div>input');
+        return cy.get('#leadlist_filters_4_filter_chosen > .chosen-drop > .chosen-search > .chosen-search-input'); //Community specific
     }
 
     get selectFourthTypedInput(){
-        return cy.get('#leadlist_filters_4_properties_filter_chosen>div>ul>li');
+        return cy.get('.active-result'); //Community specific
     }
 
     waitforSegmentCreation(){
