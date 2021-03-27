@@ -23,7 +23,7 @@ final class ListCommandTest extends MauticMysqlTestCase
         $response     = new Response(200, [], file_get_contents(__DIR__.'/../../ApiResponse/list.json'));
         $handlerStack = HandlerStack::create(new MockHandler([$response]));
         $handlerStack->push($history);
-        $this->container->set('mautic.http.client', new Client(['handler' => $handlerStack]));
+        self::$container->set('mautic.http.client', new Client(['handler' => $handlerStack]));
 
         $result = $this->runCommand(
             ListCommand::NAME,
