@@ -26,13 +26,13 @@ final class PackageDetail
         int $dailyDownloads,
         \DateTimeInterface $time
     ) {
-        $this->packageBase = $packageBase;
-        $this->versions = $versions;
-        $this->maintainers = $maintainers;
-        $this->githubInfo = $githubInfo;
+        $this->packageBase      = $packageBase;
+        $this->versions         = $versions;
+        $this->maintainers      = $maintainers;
+        $this->githubInfo       = $githubInfo;
         $this->monthlyDownloads = $monthlyDownloads;
-        $this->dailyDownloads = $dailyDownloads;
-        $this->time = $time;
+        $this->dailyDownloads   = $dailyDownloads;
+        $this->time             = $time;
     }
 
     public static function fromArray(array $array)

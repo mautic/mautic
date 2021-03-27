@@ -13,9 +13,9 @@ final class GitHubInfo
 
     public function __construct(int $stars, int $watchers, int $forks, int $openIssues)
     {
-        $this->stars = $stars;
-        $this->watchers = $watchers;
-        $this->forks = $forks;
+        $this->stars      = $stars;
+        $this->watchers   = $watchers;
+        $this->forks      = $forks;
         $this->openIssues = $openIssues;
     }
 
