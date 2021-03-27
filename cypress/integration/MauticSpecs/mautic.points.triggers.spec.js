@@ -67,7 +67,7 @@ context("Verify that user is able to create trigger and verify that user has rec
     contact.title.type("Mr");
     contact.firstName.type(testContact);
     contact.lastName.type("Data");
-    contact.leadEmail.type(testContact +"@mailtest.mautic.com");
+    contact.leadEmail.type(testContact +"@mailtest.mautic.org");
     contact.SaveButton.click();
     points.waitForContactUpdate();
     contact.closeButton.click(); // Community Specific

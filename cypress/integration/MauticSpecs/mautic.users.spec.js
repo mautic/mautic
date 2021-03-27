@@ -7,7 +7,7 @@ const search=require("../../Pages/Search");
 const roles = require("../../Pages/Roles");
 
 var username = "StandardAccount"
-var userEmail = "user@mailtest.mautic.com"
+var userEmail = "user@mailtest.mautic.org"
 var password = "Standard@12345"
 var readRole = "Standard"
 var firstName = "Test"

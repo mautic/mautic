@@ -26,7 +26,7 @@ context("Verify that user is able to create segment and test that contacts are g
     contact.title.type("Mr");
     contact.firstName.type("User1");
     contact.lastName.type("Tester");
-    contact.leadEmail.type("Cypress1@mailtest.mautic.com");
+    contact.leadEmail.type("Cypress1@mailtest.mautic.org");
     contact.leadCity.type('Bidar')
     contact.SaveButton.click();
     contact.closeButton.click({ force: true });
@@ -40,7 +40,7 @@ context("Verify that user is able to create segment and test that contacts are g
     contact.title.type("Mr");
     contact.firstName.type("User2");
     contact.lastName.type("Tester");
-    contact.leadEmail.type("Cypress2@mailtest.mautic.com");
+    contact.leadEmail.type("Cypress2@mailtest.mautic.org");
     contact.leadCity.type('Bidar')
     contact.SaveButton.click();
     contact.closeButton.click({ force: true });
@@ -54,7 +54,7 @@ context("Verify that user is able to create segment and test that contacts are g
     contact.title.type("Mr");
     contact.firstName.type("User3");
     contact.lastName.type("Tester");
-    contact.leadEmail.type("Cypress3@mailtest.mautic.com");
+    contact.leadEmail.type("Cypress3@mailtest.mautic.org");
     contact.leadCity.type('Hydrabad')
     contact.SaveButton.click();
     contact.closeButton.click({ force: true });

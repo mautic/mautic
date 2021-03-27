@@ -30,7 +30,7 @@ context("Verify segment membership based on Name ,City and Company", () => {
     contact.title.type("Mr");
     contact.firstName.type(contactFirstName1); // Community Specific
     contact.lastName.type("contact1");
-    contact.leadEmail.type(contactFirstName1 + "contact1@mailtest.mautic.com"); // Community Specific
+    contact.leadEmail.type(contactFirstName1 + "contact1@mailtest.mautic.org"); // Community Specific
     contact.leadCity.type("Bidar");
     contact.companySearch.type("Acquia");
     contact.companySelector.first().click();
@@ -46,7 +46,7 @@ context("Verify segment membership based on Name ,City and Company", () => {
     contact.title.type("Mr");
     contact.firstName.type(contactFirstName2); // Community Specific
     contact.lastName.type("contact2");
-    contact.leadEmail.type(contactFirstName2 + "contact2@mailtest.mautic.com"); // Community Specific
+    contact.leadEmail.type(contactFirstName2 + "contact2@mailtest.mautic.org"); // Community Specific
     contact.leadCity.type("Bidar");
     contact.companySearch.type("Acquia");
     contact.companySelector.first().click();
@@ -62,7 +62,7 @@ context("Verify segment membership based on Name ,City and Company", () => {
     contact.title.type("Mr");
     contact.firstName.type(contactFirstName1); // Community Specific
     contact.lastName.type("contact3");
-    contact.leadEmail.type(contactFirstName1 + "contact3@mailtest.mautic.com"); // Community Specific
+    contact.leadEmail.type(contactFirstName1 + "contact3@mailtest.mautic.org"); // Community Specific
     contact.leadCity.type("Bidar");
     contact.companySearch.type("Acquia");
     contact.companySelector.first().click();
@@ -78,7 +78,7 @@ context("Verify segment membership based on Name ,City and Company", () => {
     contact.title.type("Mr");
     contact.firstName.type(contactFirstName2); // Community Specific
     contact.lastName.type("contact4");
-    contact.leadEmail.type(contactFirstName2 + "contact4@mailtest.mautic.com"); // Community Specific
+    contact.leadEmail.type(contactFirstName2 + "contact4@mailtest.mautic.org"); // Community Specific
     contact.leadCity.type("Pune");
     contact.companySearch.type("Acquia");
     contact.companySelector.first().click();

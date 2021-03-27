@@ -64,7 +64,7 @@ context("Verify segment membership tests with numeric custom field", () => {
     contact.title.type("Mr");
     contact.firstName.type(contactFirstName);
     contact.lastName.type("contact1");
-    contact.leadEmail.type(contactFirstName + "contact1@mailtest.mautic.com");
+    contact.leadEmail.type(contactFirstName + "contact1@mailtest.mautic.org");
     contact.numericFieldOne.type('-1')
     contact.numericFieldSecond.type('5')
     contact.booleanCustomField_Yes.click()
@@ -80,7 +80,7 @@ context("Verify segment membership tests with numeric custom field", () => {
     contact.title.type("Mr");
     contact.firstName.type(contactFirstName);
     contact.lastName.type("contact2");
-    contact.leadEmail.type(contactFirstName + "contact2@mailtest.mautic.com");
+    contact.leadEmail.type(contactFirstName + "contact2@mailtest.mautic.org");
     contact.numericFieldOne.type('0')
     contact.numericFieldSecond.type('4')
     contact.booleanCustomField_No.click()
@@ -96,7 +96,7 @@ context("Verify segment membership tests with numeric custom field", () => {
     contact.title.type("Mr");
     contact.firstName.type(contactFirstName);
     contact.lastName.type("contact3");
-    contact.leadEmail.type(contactFirstName + "contact3@mailtest.mautic.com");
+    contact.leadEmail.type(contactFirstName + "contact3@mailtest.mautic.org");
     contact.numericFieldOne.type('2')
     contact.numericFieldSecond.type('1')
     contact.booleanCustomField_Yes.click()
@@ -112,7 +112,7 @@ context("Verify segment membership tests with numeric custom field", () => {
     contact.title.type("Mr");
     contact.firstName.type(contactFirstName);
     contact.lastName.type("contact4");
-    contact.leadEmail.type(contactFirstName + "contact4@mailtest.mautic.com");
+    contact.leadEmail.type(contactFirstName + "contact4@mailtest.mautic.org");
     contact.SaveButton.click();
     contact.closeButton.click({ force: true });
     contact.waitForContactCreation();
