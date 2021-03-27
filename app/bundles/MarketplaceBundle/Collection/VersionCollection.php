@@ -61,14 +61,11 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
         return new self(array_values(array_filter($this->records, $callback)));
     }
 
-    public function findLatestVersionPackage(int $stabilityPriority = 0, string $mauticVersion = MAUTIC_VERSION): ?Version
+    public function findLatestVersionPackage(): ?Version
     {
         $latestVersion = null;
 
-        $this->map(function (Version $version) use (&$latestVersion, $mauticVersion, $stabilityPriority) {
-            // @todo check for the right Mautic supported version.
-            // @todo check for the right stability.
-
+        $this->map(function (Version $version) use (&$latestVersion) {
             if (empty($latestVersion)) {
                 $latestVersion = $version;
             }

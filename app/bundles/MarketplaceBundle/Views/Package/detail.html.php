@@ -25,7 +25,7 @@ $buttons = [
 // @todo make the stability configurable
 // @todo make the version configurable
 try {
-    $latestVersion = $packageDetail->getVersions()->findLatestVersionPackage(0);
+    $latestVersion = $packageDetail->getVersions()->findLatestVersionPackage();
 } catch (\Throwable $e) {
     $latestVersionException = $e;
 }

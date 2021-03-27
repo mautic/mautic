@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\MarketplaceBundle\Tests\Functional\Command;
+namespace Mautic\MarketplaceBundle\Tests\Functional\Controller;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;

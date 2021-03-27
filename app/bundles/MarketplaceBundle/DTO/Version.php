@@ -27,7 +27,7 @@ class Version
      */
     private const COMPOSER_RUNTIME_DEPENDENCY = 4;
 
-    public function __construct(string $name, string $version, array $license, \DateTimeInterface $time, string $homepage, string $issues, array $require, array $keywords)
+    public function __construct(string $version, array $license, \DateTimeInterface $time, string $homepage, string $issues, array $require, array $keywords)
     {
         $this->version  = $version;
         $this->license  = $license;
@@ -41,7 +41,6 @@ class Version
     public static function fromArray(array $array): Version
     {
         return new self(
-            $array['name'],
             $array['version'],
             $array['license'],
             new \DateTimeImmutable($array['time']),
