@@ -15,10 +15,7 @@ class ListCommand extends ContainerAwareCommand
 {
     public const NAME = 'mautic:marketplace:list';
 
-    /**
-     * @var PluginCollector
-     */
-    private $pluginCollector;
+    private PluginCollector $pluginCollector;
 
     public function __construct(PluginCollector $pluginCollector)
     {

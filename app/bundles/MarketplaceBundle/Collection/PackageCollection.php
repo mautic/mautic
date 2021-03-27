@@ -12,12 +12,9 @@ class PackageCollection implements \Iterator, \Countable, \ArrayAccess
     /**
      * @var Package[]
      */
-    private $records;
+    private array $records;
 
-    /**
-     * @var int
-     */
-    private $position = 0;
+    private int $position = 0;
 
     /**
      * @param Package[] $records

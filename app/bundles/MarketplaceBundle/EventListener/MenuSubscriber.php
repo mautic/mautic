@@ -13,10 +13,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class MenuSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var Config
-     */
-    private $config;
+    private Config $config;
 
     public function __construct(Config $config)
     {

@@ -6,15 +6,9 @@ namespace Mautic\MarketplaceBundle\DTO;
 
 class Maintainer
 {
-    /**
-     * @var string
-     */
-    private $name;
+    private string $name;
 
-    /**
-     * @var string
-     */
-    private $avatar;
+    private string $avatar;
 
     public function __construct(string $name, string $avatar)
     {

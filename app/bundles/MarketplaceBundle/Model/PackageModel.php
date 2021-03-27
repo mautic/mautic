@@ -9,7 +9,7 @@ use Mautic\MarketplaceBundle\DTO\PackageDetail;
 
 class PackageModel
 {
-    private $connection;
+    private Connection $connection;
 
     public function __construct(Connection $connection)
     {

@@ -12,12 +12,9 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
     /**
      * @var Version[]
      */
-    private $records;
+    private array $records;
 
-    /**
-     * @var int
-     */
-    private $position = 0;
+    private int $position = 0;
 
     /**
      * @param Version[] $records

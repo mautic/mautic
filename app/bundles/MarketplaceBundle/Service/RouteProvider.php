@@ -12,10 +12,7 @@ class RouteProvider
 
     public const ROUTE_DETAIL = 'mautic_marketplace_detail';
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private RouterInterface $router;
 
     public function __construct(RouterInterface $router)
     {

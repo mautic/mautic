@@ -14,25 +14,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DetailController extends CommonController
 {
-    /**
-     * @var PackageModel
-     */
-    private $packageModel;
+    private PackageModel $packageModel;
 
-    /**
-     * @var RouteProvider
-     */
-    private $routeProvider;
+    private RouteProvider $routeProvider;
 
-    /**
-     * @var CorePermissions
-     */
-    private $corePermissions;
+    private CorePermissions $corePermissions;
 
-    /**
-     * @var Config
-     */
-    private $config;
+    private Config $config;
 
     public function __construct(
         PackageModel $packageModel,

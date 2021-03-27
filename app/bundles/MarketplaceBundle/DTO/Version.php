@@ -6,12 +6,12 @@ namespace Mautic\MarketplaceBundle\DTO;
 
 class Version
 {
-    private $license;
-    private $homepage;
-    private $issues;
-    private $time;
-    private $require;
-    private $keywords;
+    private array $license;
+    private string $homepage;
+    private string $issues;
+    private \DateTimeInterface $time;
+    private array $require;
+    private array $keywords;
 
     /**
      * An average time to run composer require some/package takes between 60 and 90 seconds.

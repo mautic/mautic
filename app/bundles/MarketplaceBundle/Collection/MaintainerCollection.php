@@ -12,12 +12,9 @@ class MaintainerCollection implements \Iterator, \Countable, \ArrayAccess
     /**
      * @var Maintainer[]
      */
-    private $records;
+    private array $records;
 
-    /**
-     * @var int
-     */
-    private $position = 0;
+    private int $position = 0;
 
     /**
      * @param Maintainer[] $records

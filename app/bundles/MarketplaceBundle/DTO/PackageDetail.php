@@ -9,17 +9,17 @@ use Mautic\MarketplaceBundle\Collection\VersionCollection;
 
 class PackageDetail extends Package
 {
-    private $githubStars    = 0;
-    private $githubWatchers = 0;
-    private $githubForks    = 0;
-    private $githubOpenIssues;
-    private $dependents;
-    private $suggesters;
-    private $monthlyDownloads;
-    private $dailyDownloads;
-    private $time;
-    private $maintainers;
-    private $versions;
+    private int $githubStars    = 0;
+    private int $githubWatchers = 0;
+    private int $githubForks    = 0;
+    private int $githubOpenIssues;
+    private int $dependents;
+    private int $suggesters;
+    private int $monthlyDownloads;
+    private int $dailyDownloads;
+    private \DateTimeInterface $time;
+    private MaintainerCollection $maintainers;
+    private VersionCollection $versions;
 
     public static function fromArray(array $array)
     {

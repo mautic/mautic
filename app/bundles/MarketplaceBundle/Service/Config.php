@@ -10,10 +10,7 @@ class Config
 {
     public const MARKETPLACE_ENABLED = 'marketplace_enabled';
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private CoreParametersHelper $coreParametersHelper;
 
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {

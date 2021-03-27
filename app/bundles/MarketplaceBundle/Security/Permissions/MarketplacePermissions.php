@@ -16,10 +16,7 @@ class MarketplacePermissions extends AbstractPermissions
     public const CAN_VIEW_PACKAGES    = self::BASE.':'.self::PACKAGES.':view';
     public const CAN_INSTALL_PACKAGES = self::BASE.':'.self::PACKAGES.':create';
 
-    /**
-     * @var Config
-     */
-    private $config;
+    private Config $config;
 
     public function __construct(CoreParametersHelper $coreParametersHelper, Config $config)
     {

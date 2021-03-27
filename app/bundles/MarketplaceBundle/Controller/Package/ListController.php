@@ -16,30 +16,15 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ListController extends CommonController
 {
-    /**
-     * @var PluginCollector
-     */
-    private $pluginCollector;
+    private PluginCollector $pluginCollector;
 
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private RequestStack $requestStack;
 
-    /**
-     * @var RouteProvider
-     */
-    private $routeProvider;
+    private RouteProvider $routeProvider;
 
-    /**
-     * @var CorePermissions
-     */
-    private $corePermissions;
+    private CorePermissions $corePermissions;
 
-    /**
-     * @var Config
-     */
-    private $config;
+    private Config $config;
 
     public function __construct(
         PluginCollector $pluginCollector,

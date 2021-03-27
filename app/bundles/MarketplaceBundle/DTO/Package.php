@@ -6,12 +6,12 @@ namespace Mautic\MarketplaceBundle\DTO;
 
 class Package
 {
-    private $name;
-    private $url;
-    private $repository;
-    private $description;
-    private $downloads;
-    private $favers;
+    private string $name;
+    private string $url;
+    private string $repository;
+    private string $description;
+    private int $downloads;
+    private int $favers;
 
     public function __construct(string $name, string $url, string $repository, string $description, int $downloads, int $favers)
     {

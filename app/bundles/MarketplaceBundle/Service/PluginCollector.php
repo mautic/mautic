@@ -9,15 +9,9 @@ use Mautic\MarketplaceBundle\Collection\PackageCollection;
 
 class PluginCollector
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private Connection $connection;
 
-    /**
-     * @var int
-     */
-    private $total = 0;
+    private int $total = 0;
 
     public function __construct(Connection $connection)
     {
