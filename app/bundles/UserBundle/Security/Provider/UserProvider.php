@@ -172,12 +172,12 @@ class UserProvider implements UserProviderInterface
         if ($plainPassword) {
             // Encode plain text
             $user->setPassword(
-                $this->encoder->encodePassword($plainPassword, $user->getSalt())
+                $this->encoder->encodePassword($user, $plainPassword)
             );
         } elseif (!$password = $user->getPassword()) {
             // Generate and encode a random password
             $user->setPassword(
-                $this->encoder->encodePassword(EncryptionHelper::generateKey(), $user->getSalt())
+                $this->encoder->encodePassword($user, EncryptionHelper::generateKey())
             );
         }
 
