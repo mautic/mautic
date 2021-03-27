@@ -134,6 +134,9 @@ or
 npm run start-mautic
 ```
 
+In order for start-mautic to work a running ddev container has to be present. 
+If you are on some other development environment you need to update some paths in Demo/mautic/index.html
+
 ### How to build for production
 ```bash
 npm run build
@@ -143,15 +146,15 @@ npm run build
 
 There is the JS code in the Assets/libarary folder. This handles the bootstrapping and management. 
 
-In addition there is the mautic preset:
+In addition there is the mautic preset. This handles the basic Mautic specific code. The general idea is that this preset repo can be used as a base for various Mautic builder plugins. E.g one where the RTE ediotor is the CKEditor, or where we have some very customer specific functionality.
 ```
-- It's pack of configurable feautres:
-- Add function to edit source code
-- Extend the original image and add a confirm dialog before removing it
-- Option to hide/show Layers Manager
-- Option to enable/disable Import code button
-- Move Settings panel inside Style Manager panel
-- Open Block Manager at launch
+- It's a pack of configurable feautures:
+- Adds the function to edit source code
+- Extends the original image and add a confirm dialog before removing it
+- Add the option to hide/show the Layers Manager
+- Add the option to enable/disable the import code button
+- Moves the Settings panel inside Style Manager panel
+- Opens the Block Manager at launch
 - Replace Rich Text Editor by Froala used in Mautic (add token support)
 - Add Dynamic Content Block for HTML used in Mautic
 ```
