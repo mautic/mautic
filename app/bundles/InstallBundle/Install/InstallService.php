@@ -515,7 +515,7 @@ class InstallService
         $user->setLastName($data['lastname']);
         $user->setUsername($data['username']);
         $user->setEmail($data['email']);
-        $user->setPassword($encoder->encodePassword($data['password'], $user->getSalt()));
+        $user->setPassword($encoder->encodePassword($user, $data['password']));
 
         $adminRole = null;
         try {
