@@ -33,7 +33,7 @@ class FileControllerTest extends MauticMysqlTestCase
         Assert::arrayHasKey('url');
         Assert::assertNotEmpty($responseData['url']);
         $uploadedFileName = basename($responseData['url']);
-        $uploadedImage    = $this->container->getParameter('kernel.project_dir').'/media/images/'.$uploadedFileName;
+        $uploadedImage    = static::$container->getParameter('kernel.project_dir').'/media/images/'.$uploadedFileName;
         Assert::assertTrue(file_exists($uploadedImage));
     }
 
