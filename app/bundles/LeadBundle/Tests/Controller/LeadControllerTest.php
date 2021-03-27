@@ -12,6 +12,7 @@ use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -333,5 +334,19 @@ class LeadControllerTest extends MauticMysqlTestCase
         $elementPlaceholder  = $crawler->filter('#lead_timezone')->filter('select')->attr('data-placeholder');
         $expectedPlaceholder = self::$container->get('translator')->trans('mautic.lead.field.timezone');
         $this->assertEquals($expectedPlaceholder, $elementPlaceholder);
+    }
+
+    public function testAddContactsErrorMessageForRequiredField()
+    {
+        /** @var FieldModel $fieldModel */
+        $fieldModel     = self::getContainer()->get('mautic.lead.model.field');
+        $firstnameField = $fieldModel->getEntity(2);
+        $firstnameField->setIsRequired(true);
+        $fieldModel->saveEntity($firstnameField);
+
+        $this->client->request('POST', '/api/contacts/new', []);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $this->assertEquals($response['errors'][0]['message'], 'firstname: This field is required.');
     }
 }
