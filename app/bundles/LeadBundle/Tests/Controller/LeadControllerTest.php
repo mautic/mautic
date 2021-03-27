@@ -336,17 +336,24 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->assertEquals($expectedPlaceholder, $elementPlaceholder);
     }
 
-    public function testAddContactsErrorMessageForRequiredField()
+    public function testAddContactsErrorMessage()
     {
         /** @var FieldModel $fieldModel */
         $fieldModel     = self::getContainer()->get('mautic.lead.model.field');
         $firstnameField = $fieldModel->getEntity(2);
         $firstnameField->setIsRequired(true);
-        $fieldModel->saveEntity($firstnameField);
+        $fieldModel->getRepository()->saveEntity($firstnameField);
 
-        $this->client->request('POST', '/api/contacts/new', []);
+        $crawler = $this->client->request('GET', 's/contacts/new/');
+        $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
+        $form->setValues(
+            [
+            ]
+        );
+
+        $this->client->submit($form);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
-        $this->assertEquals($response['errors'][0]['message'], 'firstname: This field is required.');
+
+        $this->assertStringContainsString('firstname: This field is required.', $clientResponse->getContent());
     }
 }
