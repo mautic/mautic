@@ -119,11 +119,9 @@ class FileManager
      */
     private function getGrapesJsImagesPath($fullPath = false, $separator = '/')
     {
-        // $url = rtrim($config->get('static_url'), '/').'/'.$relativeImageFolderPath;
         return $this->pathsHelper->getSystemPath('images', $fullPath)
             .$separator
-            .self::GRAPESJS_IMAGES_DIRECTORY
-            .$separator;
+            .self::GRAPESJS_IMAGES_DIRECTORY;
     }
 
     /**
@@ -133,6 +131,7 @@ class FileManager
     {
         $files      = [];
         $uploadDir  = $this->getUploadDir();
+       
         $fileSystem = new Filesystem();
 
         if (!$fileSystem->exists($uploadDir)) {
@@ -147,15 +146,15 @@ class FileManager
         $finder->files()->in($uploadDir);
 
         foreach ($finder as $file) {
-            if ($size = @getimagesize($this->getCompleteFilePath($file->getFilename()))) {
+            if ($size = @getimagesize($this->getCompleteFilePath($file->getRelativePathname()))) {
                 $files[] = [
-                    'src'    => $this->getFullUrl($file->getFilename()),
+                    'src'    => $this->getFullUrl($file->getRelativePathname()),
                     'width'  => $size[0],
                     'type'   => 'image',
                     'height' => $size[1],
                 ];
             } else {
-                $files[] = $this->getFullUrl($file->getFilename());
+                $files[] = $this->getFullUrl($file->getRelativePathname());
             }
         }
 
