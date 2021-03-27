@@ -16,9 +16,10 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
-        matrix:
-          php-versions: ['7.4', '8.0']
-          db-types: ['mysql', 'mariadb']
+      fail-fast: false
+      matrix:
+        php-versions: ['7.4', '8.0']
+        db-types: ['mysql', 'mariadb']
   
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
 
