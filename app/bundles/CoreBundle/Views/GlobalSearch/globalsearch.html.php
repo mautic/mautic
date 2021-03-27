@@ -10,6 +10,10 @@
  */
 ?>
 
+<?php
+    $view['assets']->addScriptDeclaration("MauticVars.disableSearchUntilEnter = $disableSearchUntilEnter", 'bodyClose');
+?>
+
 <li class="dropdown dropdown-custom" id="globalSearchDropdown">
     <div class="dropdown-menu">
         <div class="panel panel-default">
