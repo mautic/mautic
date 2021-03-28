@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -16,11 +18,19 @@ use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\EventListener\DetermineWinnerSubscriber;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|HitRepository
+     */
     private $hitRepository;
+
+    /**
+     * @var MockObject|TranslatorInterface
+     */
     private $translator;
 
     /**
@@ -88,13 +98,8 @@ class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('hasTranslations')
             ->willReturn(true);
 
-        $transChildren->expects($this->at(0))
-            ->method('getKeys')
-            ->willReturn([2]);
-
-        $transChildren->expects($this->at(1))
-            ->method('getKeys')
-            ->willReturn([4]);
+        $transChildren->method('getKeys')
+            ->willReturnOnConsecutiveCalls([2], [4]);
 
         $parentMock->expects($this->any())
             ->method('getTranslationChildren')
