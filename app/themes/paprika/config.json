@@ -1,9 +1,0 @@
-{
-  "name": "Paprika",
-  "author": "Friendly Automate",
-  "authorUrl": "https://friendly.is",
-  "builder": "grapesjsbuilder",
-  "features": [
-    "email"
-  ]
-}
