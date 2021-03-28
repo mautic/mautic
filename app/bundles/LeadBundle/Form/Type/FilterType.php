@@ -67,11 +67,11 @@ class FilterType extends AbstractType
         );
 
         $formModifier = function (FormEvent $event) use ($fieldChoices) {
-            $data        = $event->getData();
+            $data        = (array) $event->getData();
             $form        = $event->getForm();
-            $fieldAlias  = $data['field'];
+            $fieldAlias  = $data['field'] ?? null;
             $fieldObject = $data['object'] ?? 'behaviors';
-            $field       = $fieldChoices[$fieldObject][$fieldAlias] ?? null;
+            $field       = $fieldAlias ? $fieldChoices[$fieldObject][$fieldAlias] ?? null : null;
             $operators   = $field['operators'] ?? [];
             $operator    = $data['operator'] ?? null;
 
