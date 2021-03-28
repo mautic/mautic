@@ -166,7 +166,11 @@ abstract class AbstractFormController extends CommonController
         //bind request to the form
         $form->handleRequest($this->request);
 
-        return $form->isValid();
+        if ($form->isSubmitted()) {
+            return $form->isValid();
+        }
+
+        return null;
     }
 
     /**
