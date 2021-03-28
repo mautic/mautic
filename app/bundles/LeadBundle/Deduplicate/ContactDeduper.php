@@ -184,8 +184,6 @@ class ContactDeduper
     }
 
     /**
-     * @param array $queryFields
-     *
      * @return array
      *
      * @throws NotHandledDuplicationByPlugin

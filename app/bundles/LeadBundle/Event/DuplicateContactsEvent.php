@@ -27,8 +27,6 @@ class DuplicateContactsEvent extends \Mautic\ChannelBundle\Event\ChannelEvent
 
     /**
      * CheckForDuplicateContactsEvent constructor.
-     *
-     * @param array $fields
      */
     public function __construct(array $fields)
     {
