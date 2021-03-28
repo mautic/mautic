@@ -24,10 +24,9 @@ class DuplicateContactsEventTest extends \PHPUnit\Framework\TestCase
         $event  = new DuplicateContactsEvent($fields);
         $this->assertSame($event->getFields(), $fields);
 
-        $duplicates = ['duplicate1', 'duplicate2' ];
+        $duplicates = ['duplicate1', 'duplicate2'];
         $event->setDuplicates($duplicates);
         $this->assertSame($event->getDuplicates(), $duplicates);
         $this->assertTrue($event->isHandledByPlugin());
-
     }
 }
