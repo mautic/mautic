@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
-use DeviceDetector\Parser\Device\DeviceParserAbstract as DeviceParser;
+use DeviceDetector\Parser\Device\AbstractDeviceParser as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;
