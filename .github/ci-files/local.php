@@ -19,7 +19,6 @@ $parameters = [
     'mailer_host'           => getenv('MAILER_HOST'),
     'mailer_port'           => '465',
     'mailer_user'           => getenv('MAILER_USER'),
-    'mailer_from_name'      => 'GitHub Actions',
     'mailer_from_email'     => getenv('MAILER_USER'),
     'mailer_encryption'     => 'ssl',
     'mailer_auth_mode'      => 'plain',

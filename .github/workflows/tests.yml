@@ -211,7 +211,7 @@ jobs:
 
     - name: Install Mautic
       run: |
-        php bin/console mautic:install --force http://localhost
+        php bin/console mautic:install --force --mailer_from_name="GitHub Actions" http://localhost
         php bin/console cache:warmup --no-interaction --env=prod
         sudo chmod -R 777 /var/www/html
         sudo chown -R www-data:www-data /var/www/html
