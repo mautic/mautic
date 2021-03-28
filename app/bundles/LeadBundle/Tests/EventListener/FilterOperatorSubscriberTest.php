@@ -580,4 +580,232 @@ final class FilterOperatorSubscriberTest extends TestCase
         // Behaviors should not be included
         Assert::assertArrayNotHasKey('behaviors', $choices);
     }
+
+    public function testOnGenerateSegmentFiltersAddCustomFieldsForTextTypesForValueAjaxRequest(): void
+    {
+        // Only displays on segment actions
+        $request = new Request();
+        $request->attributes->set('action', 'loadSegmentFilterForm');
+
+        $event = new LeadListFiltersChoicesEvent([], [], $this->translator, $request);
+
+        $field = new LeadField();
+        $field->setType('text');
+        $field->setLabel('Test Text');
+        $field->setAlias('test_text');
+        $field->setObject('company');
+
+        $this->leadFieldRepository->expects($this->once())
+            ->method('getListablePublishedFields')
+            ->willReturn(new ArrayCollection([$field]));
+
+        $this->typeOperatorProvider->expects($this->once())
+            ->method('getOperatorsForFieldType')
+            ->with('text')
+            ->willReturn(
+                [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ]
+            );
+
+        $this->fieldChoicesProvider->expects($this->once())
+            ->method('getChoicesForField')
+            ->with('text')
+            ->willThrowException(new ChoicesNotFoundException());
+
+        $this->subscriber->onGenerateSegmentFiltersAddCustomFields($event);
+
+        $this->assertSame(
+            [
+                'company' => [
+                    'test_text' => [
+                        'label'      => 'Test Text',
+                        'properties' => [
+                            'type' => 'text',
+                        ],
+                        'object'    => 'company',
+                        'operators' => [
+                            'equals'    => '=',
+                            'not equal' => '!=',
+                        ],
+                    ],
+                ],
+            ],
+            $event->getChoices()
+        );
+    }
+
+    public function testOnGenerateSegmentFiltersAddStaticFieldsForValueAjaxRequest(): void
+    {
+        // Only displays on segment actions
+        $request = new Request();
+        $request->attributes->set('action', 'loadSegmentFilterForm');
+
+        $event = new LeadListFiltersChoicesEvent([], [], $this->translator, $request);
+
+        $this->typeOperatorProvider->expects($this->any())
+            ->method('getOperatorsForFieldType')
+            ->willReturn(
+                [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ]
+            );
+
+        $this->typeOperatorProvider->expects($this->any())
+            ->method('getOperatorsIncluding')
+            ->willReturn(
+                [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ]
+            );
+
+        $this->fieldChoicesProvider->expects($this->any())
+            ->method('getChoicesForField')
+            ->willReturn(
+                [
+                    'Choice A' => 'choice_a',
+                    'Choice B' => 'choice_b',
+                ]
+            );
+
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturnArgument(0);
+
+        $this->subscriber->onGenerateSegmentFiltersAddStaticFields($event);
+
+        $choices = $event->getChoices();
+
+        // Test for some random choices:
+        $this->assertSame(
+            [
+                'label'      => 'mautic.lead.list.filter.date_identified',
+                'properties' => [
+                    'type' => 'date',
+                ],
+                'operators' => [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ],
+                'object' => 'lead',
+            ],
+            $choices['lead']['date_identified']
+        );
+
+        $this->assertSame(
+            [
+                'label'      => 'mautic.lead.list.filter.device_model',
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ],
+                'object' => 'lead',
+            ],
+            $choices['lead']['device_model']
+        );
+
+        $this->assertSame(
+            [
+                'label'      => 'mautic.lead.list.filter.dnc_unsubscribed_manually',
+                'properties' => [
+                    'type' => 'boolean',
+                    'list' => [
+                        'Choice A' => 'choice_a',
+                        'Choice B' => 'choice_b',
+                    ],
+                ],
+                'operators' => [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ],
+                'object' => 'lead',
+            ],
+            $choices['lead']['dnc_unsubscribed_manually']
+        );
+    }
+
+    public function testOnGenerateSegmentFiltersAddBehaviorsForValueAjaxRequest(): void
+    {
+        // Only displays on segment actions
+        $request = new Request();
+        $request->attributes->set('action', 'loadSegmentFilterForm');
+
+        $event = new LeadListFiltersChoicesEvent([], [], $this->translator, $request);
+
+        $this->typeOperatorProvider->expects($this->any())
+            ->method('getOperatorsForFieldType')
+            ->willReturn(
+                [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ]
+            );
+
+        $this->typeOperatorProvider->expects($this->any())
+            ->method('getOperatorsIncluding')
+            ->willReturn(
+                [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ]
+            );
+
+        $this->fieldChoicesProvider->expects($this->any())
+            ->method('getChoicesForField')
+            ->willReturn(
+                [
+                    'Choice A' => 'choice_a',
+                    'Choice B' => 'choice_b',
+                ]
+            );
+
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturnArgument(0);
+
+        $this->subscriber->onGenerateSegmentFiltersAddBehaviors($event);
+
+        $choices = $event->getChoices();
+
+        // Test for some random choices:
+        $this->assertSame(
+            [
+                'label'      => 'mautic.lead.list.filter.lead_email_received',
+                'object'     => 'lead',
+                'properties' => [
+                    'type' => 'lead_email_received',
+                    'list' => [
+                        'Choice A' => 'choice_a',
+                        'Choice B' => 'choice_b',
+                    ],
+                ],
+                'operators' => [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ],
+            ],
+            $choices['behaviors']['lead_email_received']
+        );
+
+        $this->assertSame(
+            [
+                'label'      => 'mautic.lead.list.filter.visited_url_count',
+                'properties' => [
+                    'type' => 'number',
+                ],
+                'operators' => [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ],
+                'object' => 'lead',
+            ],
+            $choices['behaviors']['hit_url_count']
+        );
+    }
 }

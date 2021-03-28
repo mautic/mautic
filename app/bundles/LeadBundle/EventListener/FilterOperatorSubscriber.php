@@ -24,6 +24,7 @@ use Mautic\LeadBundle\Provider\FieldChoicesProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
 
 final class FilterOperatorSubscriber implements EventSubscriberInterface
@@ -124,7 +125,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
     public function onGenerateSegmentFiltersAddStaticFields(LeadListFiltersChoicesEvent $event): void
     {
         // Only show for segments and not dynamic content addressed by https://github.com/mautic/mautic/pull/9260
-        if (0 !== strpos($event->getRoute(), 'mautic_segment_action')) {
+        if (!$this->isForSegmentation($event)) {
             return;
         }
 
@@ -349,7 +350,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
     public function onGenerateSegmentFiltersAddBehaviors(LeadListFiltersChoicesEvent $event)
     {
         // Only show for segments and not dynamic content addressed by https://github.com/mautic/mautic/pull/9260
-        if (0 !== strpos($event->getRoute(), 'mautic_segment_action')) {
+        if (!$this->isForSegmentation($event)) {
             return;
         }
 
@@ -612,5 +613,22 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         foreach ($choices as $alias => $fieldOptions) {
             $event->addChoice('behaviors', $alias, $fieldOptions);
         }
+    }
+
+    private function isForSegmentation(LeadListFiltersChoicesEvent $event): bool
+    {
+        // segment form
+        if ('mautic_segment_action' === $event->getRoute()) {
+            return true;
+        }
+
+        // ajax request to load the filter's value fields
+        $request = $event->getRequest();
+        if ('loadSegmentFilterForm' === $request->attributes->get('action')) {
+            return true;
+        }
+
+        // something else such as dynanmic content
+        return false;
     }
 }
