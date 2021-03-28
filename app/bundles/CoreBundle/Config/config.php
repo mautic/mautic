@@ -369,7 +369,7 @@ return [
                 'class' => \Mautic\CoreBundle\Helper\AppVersion::class,
             ],
             'mautic.helper.template.menu' => [
-                'class'     => 'Mautic\CoreBundle\Templating\Helper\MenuHelper',
+                'class'     => \Mautic\CoreBundle\Templating\Helper\MenuHelper::class,
                 'arguments' => ['knp_menu.helper'],
                 'alias'     => 'menu',
             ],
@@ -905,7 +905,7 @@ return [
                 'alias' => 'mautic',
             ],
             'mautic.menu.builder' => [
-                'class'     => 'Mautic\CoreBundle\Menu\MenuBuilder',
+                'class'     => \Mautic\CoreBundle\Menu\MenuBuilder::class,
                 'arguments' => [
                     'knp_menu.factory',
                     'knp_menu.matcher',
