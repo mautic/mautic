@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -17,7 +19,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testStrictHtmlFormatIsRemovingScriptTags()
+    public function testStrictHtmlFormatIsRemovingScriptTags(): void
     {
         $dateHelper = $this->createMock(DateHelper::class);
         $translator = $this->createMock(TranslatorInterface::class);
@@ -32,19 +34,15 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testBooleanFormat()
+    public function testBooleanFormat(): void
     {
         $dateHelper = $this->createMock(DateHelper::class);
         $translator = $this->createMock(TranslatorInterface::class);
 
-        $translator->expects($this->at(0))
+        $translator->expects($this->exactly(2))
             ->method('trans')
-            ->with('mautic.core.yes')
-            ->willReturn('yes');
-        $translator->expects($this->at(1))
-            ->method('trans')
-            ->with('mautic.core.no')
-            ->willReturn('no');
+            ->withConsecutive(['mautic.core.yes'], ['mautic.core.no'])
+            ->willReturnOnConsecutiveCalls('yes', 'no');
 
         $helper = new FormatterHelper($dateHelper, $translator);
 
