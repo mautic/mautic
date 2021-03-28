@@ -169,8 +169,6 @@ abstract class AbstractFormController extends CommonController
         if ($form->isSubmitted()) {
             return $form->isValid();
         }
-
-        return null;
     }
 
     /**
