@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8fb7a37f1090a10ad2d444d7e6ad3341",
+    "content-hash": "fa7f92703c07553a8629b18a42dca75f",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -2291,17 +2291,11 @@
         },
         {
             "name": "friendsofsymfony/oauth-server-bundle",
-            "version": "1.6.2",
+            "version": "dev-doctrine-fix",
             "source": {
                 "type": "git",
-                "url": "https://github.com/FriendsOfSymfony/FOSOAuthServerBundle.git",
-                "reference": "fcaa25cc49474bdb0db7894f880976fe76ffed23"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSOAuthServerBundle/zipball/fcaa25cc49474bdb0db7894f880976fe76ffed23",
-                "reference": "fcaa25cc49474bdb0db7894f880976fe76ffed23",
-                "shasum": ""
+                "url": "https://github.com/dennisameling/FOSOAuthServerBundle.git",
+                "reference": "605d20721fa2e1925d5ec8329dbac8f7d9a6be0c"
             },
             "require": {
                 "friendsofsymfony/oauth2-php": "~1.1",
@@ -2350,7 +2344,6 @@
                     "/Tests/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2371,11 +2364,7 @@
                 "oauth2",
                 "server"
             ],
-            "support": {
-                "issues": "https://github.com/FriendsOfSymfony/FOSOAuthServerBundle/issues",
-                "source": "https://github.com/FriendsOfSymfony/FOSOAuthServerBundle/tree/1.6"
-            },
-            "time": "2019-01-23T15:23:04+00:00"
+            "time": "2021-03-28T16:46:43+00:00"
         },
         {
             "name": "friendsofsymfony/oauth2-php",
@@ -16542,6 +16531,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "friendsofsymfony/oauth-server-bundle": 20,
         "willdurand/oauth-server-bundle": 20,
         "mautic/grapejs-builder": 5
     },
