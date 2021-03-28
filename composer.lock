@@ -13385,7 +13385,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mautic/BazingaOAuthServerBundle.git",
-                "reference": "a8cc47023dd5400c05b2d66703a2bc6b13ddc13b"
+                "reference": "33ec06bcdb86a9872c36000da3c874ef16e32dd0"
             },
             "require": {
                 "php": ">=7.1",
@@ -13394,7 +13394,8 @@
                 "symfony/security-bundle": "~4.4"
             },
             "require-dev": {
-                "doctrine/doctrine-bundle": "~1.12"
+                "doctrine/doctrine-bundle": "~1.12",
+                "symfony/orm-pack": "^2.1"
             },
             "type": "symfony-bundle",
             "autoload": {
@@ -13417,7 +13418,7 @@
                 "oauth",
                 "server"
             ],
-            "time": "2020-11-14T06:58:02+00:00"
+            "time": "2021-03-28T11:29:04+00:00"
         }
     ],
     "packages-dev": [
