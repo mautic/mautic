@@ -71,7 +71,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
     protected Integration $settings;
     protected array $keys = [];
-    protected CacheStorageHelper $cache;
+    protected ?CacheStorageHelper $cache;
     protected \Doctrine\ORM\EntityManager $em;
     protected ?SessionInterface $session;
     protected ?Request $request;
