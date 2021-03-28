@@ -123,6 +123,11 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 
     public function onGenerateSegmentFiltersAddStaticFields(LeadListFiltersChoicesEvent $event): void
     {
+        // Only show for segments and not dynamic content addressed by https://github.com/mautic/mautic/pull/9260
+        if (0 !== strpos($event->getRoute(), 'mautic_segment_action')) {
+            return;
+        }
+
         $staticFields = [
             'date_added' => [
                 'label'      => $this->translator->trans('mautic.core.date.added'),
@@ -343,6 +348,11 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 
     public function onGenerateSegmentFiltersAddBehaviors(LeadListFiltersChoicesEvent $event)
     {
+        // Only show for segments and not dynamic content addressed by https://github.com/mautic/mautic/pull/9260
+        if (0 !== strpos($event->getRoute(), 'mautic_segment_action')) {
+            return;
+        }
+
         $choices = [
             'lead_asset_download' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_asset_download'),

@@ -23,10 +23,13 @@ use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
 use Mautic\LeadBundle\Provider\FieldChoicesProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\OperatorOptions;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
 
-final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
+final class FilterOperatorSubscriberTest extends TestCase
 {
     /**
      * @var OperatorOptions
@@ -337,7 +340,11 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnGenerateSegmentFiltersAddStaticFields(): void
     {
-        $event = new LeadListFiltersChoicesEvent([], [], $this->translator);
+        // Only displays on segment actions
+        $request = new Request();
+        $request->attributes->set('_route', 'mautic_segment_action');
+
+        $event = new LeadListFiltersChoicesEvent([], [], $this->translator, $request);
 
         $this->typeOperatorProvider->expects($this->any())
             ->method('getOperatorsForFieldType')
@@ -427,7 +434,11 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnGenerateSegmentFiltersAddBehaviors(): void
     {
-        $event = new LeadListFiltersChoicesEvent([], [], $this->translator);
+        // Only displays on segment actions
+        $request = new Request();
+        $request->attributes->set('_route', 'mautic_segment_action');
+
+        $event = new LeadListFiltersChoicesEvent([], [], $this->translator, $request);
 
         $this->typeOperatorProvider->expects($this->any())
             ->method('getOperatorsForFieldType')
@@ -498,5 +509,75 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
             ],
             $choices['behaviors']['hit_url_count']
         );
+    }
+
+    public function testOnlyCustomFieldsAreLoadedForNonSegmentRoutes(): void
+    {
+        $request = new Request();
+        $request->attributes->set('_route', 'mautic_dynamicContent_action');
+
+        $event = new LeadListFiltersChoicesEvent([], [], $this->translator, $request);
+
+        $field = new LeadField();
+        $field->setType('select');
+        $field->setLabel('Test Select');
+        $field->setAlias('test_select');
+        $field->setProperties([
+            'list' => [
+                'one' => 'One',
+                'two' => 'Two',
+            ],
+        ]);
+
+        $this->leadFieldRepository->expects($this->once())
+            ->method('getListablePublishedFields')
+            ->willReturn(new ArrayCollection([$field]));
+
+        $this->typeOperatorProvider->expects($this->any())
+            ->method('getOperatorsForFieldType')
+            ->willReturn(
+                [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ]
+            );
+
+        $this->typeOperatorProvider->expects($this->any())
+            ->method('getOperatorsIncluding')
+            ->willReturn(
+                [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ]
+            );
+
+        $this->fieldChoicesProvider->expects($this->any())
+            ->method('getChoicesForField')
+            ->willReturn(
+                [
+                    'Choice A' => 'choice_a',
+                    'Choice B' => 'choice_b',
+                ]
+            );
+
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturnArgument(0);
+
+        $this->subscriber->onGenerateSegmentFiltersAddCustomFields($event);
+        $this->subscriber->onGenerateSegmentFiltersAddStaticFields($event);
+        $this->subscriber->onGenerateSegmentFiltersAddBehaviors($event);
+
+        $choices = $event->getChoices();
+
+        // Only custom fields should be shown
+        Assert::assertArrayHasKey('lead', $choices);
+        Assert::assertArrayHasKey('test_select', $choices['lead']);
+
+        // Static fields should not be included
+        Assert::assertArrayNotHasKey('utm_source', $choices['lead']);
+
+        // Behaviors should not be included
+        Assert::assertArrayNotHasKey('behaviors', $choices);
     }
 }

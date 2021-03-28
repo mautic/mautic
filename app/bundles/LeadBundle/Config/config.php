@@ -569,13 +569,6 @@ return [
             'mautic.lead.subscriber.segmentOperatorQuery' => [
                 'class'     => \Mautic\LeadBundle\EventListener\SegmentOperatorQuerySubscriber::class,
             ],
-            'mautic.lead.subscriber.segment.filter' => [
-                'class'     => \Mautic\LeadBundle\EventListener\SegmentFiltersSubscriber::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.lead.model.list',
-                ],
-            ],
         ],
         'forms' => [
             'mautic.form.type.lead' => [
