@@ -126,7 +126,7 @@
         "friendsofphp/php-cs-fixer": "~2.17.0",
         "liip/test-fixtures-bundle": "^1.6",
         "phpstan/phpstan": "^0.12.82",
-        "rector/rector-prefixed": "^0.8.56",
+        "rector/rector-prefixed": "^0.9.31",
 
         "symfony/phpunit-bridge": "~5.1.0",
         "phpunit/phpunit": "^9.5",
@@ -174,7 +174,7 @@
         "phpstan": "bin/phpstan analyse app/bundles app/migrations plugins",
         "cs": "bin/php-cs-fixer fix -v --dry-run --diff",
         "fixcs": "bin/php-cs-fixer fix -v",
-        "rector": "bin/rector process --config rector.yaml"
+        "rector": "bin/rector process"
     },
     "config": {
         "bin-dir": "bin",

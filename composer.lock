@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d5ad9bb66617ddd0652e6d9034c68a11",
+    "content-hash": "8fb7a37f1090a10ad2d444d7e6ad3341",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -15016,23 +15016,21 @@
         },
         {
             "name": "rector/rector-prefixed",
-            "version": "0.8.56",
+            "version": "0.9.31",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector-prefixed.git",
-                "reference": "d33f40735fb6a7371b5a106f10edde58ce3a1164"
+                "reference": "cff116f7c19bf898c2d76751c8f01debb3c9c13f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector-prefixed/zipball/d33f40735fb6a7371b5a106f10edde58ce3a1164",
-                "reference": "d33f40735fb6a7371b5a106f10edde58ce3a1164",
+                "url": "https://api.github.com/repos/rectorphp/rector-prefixed/zipball/cff116f7c19bf898c2d76751c8f01debb3c9c13f",
+                "reference": "cff116f7c19bf898c2d76751c8f01debb3c9c13f",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.2.4|^8.0"
-            },
-            "replace": {
-                "rector/rector": "self.version"
+                "php": "^7.3|^8.0",
+                "phpstan/phpstan": "^0.12.64"
             },
             "bin": [
                 "bin/rector"
@@ -15044,9 +15042,9 @@
             ],
             "description": "Prefixed scoped version of rector/rector package",
             "support": {
-                "source": "https://github.com/rectorphp/rector-prefixed/tree/0.8.56"
+                "source": "https://github.com/rectorphp/rector-prefixed/tree/0.9.31"
             },
-            "time": "2020-11-21T01:01:18+00:00"
+            "time": "2021-02-22T12:37:56+00:00"
         },
         {
             "name": "sebastian/cli-parser",
