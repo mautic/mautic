@@ -72,7 +72,7 @@
         "aws/aws-sdk-php": "~3.0",
 
         "friendsofsymfony/rest-bundle": "^3.0.2",
-        "friendsofsymfony/oauth-server-bundle": "dev-master",
+        "friendsofsymfony/oauth-server-bundle": "^1.6",
         "willdurand/oauth-server-bundle": "dev-release-0.0.4",
         "jms/serializer-bundle": "^3.8.0",
         "joomla/filter": "~1.3.5",
