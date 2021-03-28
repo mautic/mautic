@@ -13,6 +13,7 @@ var booleanCustomField = "Boolean Custom Field"
 var contactFirstName = "test1"
 var segmentMembershipWithCustomField1 = " segment with numeric custom field and boolean 1"
 var segmentMembershipWithCustomField2 = " segment with numeric custom field and boolean 2"
+var cronpath = Cypress.env('cron-path'); // Community Specific
 
 context("Verify segment membership tests with numeric custom field", () => {
    
@@ -54,7 +55,6 @@ context("Verify segment membership tests with numeric custom field", () => {
     customFields.DataTypeSelector.select("Boolean",{force: true});
     customFields.SaveAndCloseButton.click();
     customFields.waitforPageLoad();
-    cy.wait(3000) // Added wait to get custom field published
   })
 
   it("Add new contact for segment membership", () => {
@@ -130,7 +130,7 @@ context("Verify segment membership tests with numeric custom field", () => {
     segments.filterSearchBox.type("First");
     segments.filterField.click();
     segments.waitTillFilterOptionGetsLoaded()
-    segments.filterOperator.select('contains')
+    segments.filterOperator.select('contains').should('have.value', 'contains'); //Community specific
     cy.wait(1000) // Added wait for page rendering
     segments.filterValue.type(contactFirstName, { force: true });
 
@@ -138,7 +138,7 @@ context("Verify segment membership tests with numeric custom field", () => {
     segments.filterSearchBox.type(numericField1,{ force: true });
     segments.filterField.click({ force: true });
     segments.waitTillSecondOperatorFilterGetsLoaded()
-    segments.secondFilterOperator.select('greater than')
+    segments.secondFilterOperator.select('greater than').should('have.value', 'gt'); // Community Specific
     cy.wait(1000) // Added wait for page rendering
     segments.secondFilterProperties.type('0',{ force: true })
 
@@ -146,7 +146,7 @@ context("Verify segment membership tests with numeric custom field", () => {
     segments.filterSearchBox.type(numericField2);
     segments.filterField.click({ force: true });
     segments.waitTillThirdOperatorFilterGetsLoaded()
-    segments.thirdFilterOperator.select('greater than')
+    segments.thirdFilterOperator.select('greater than').should('have.value', 'gt'); // Community Specific
     cy.wait(1000) // Added wait for page rendering
     segments.thirdFilterProperties.type('0',{ force: true })
 
@@ -160,15 +160,15 @@ context("Verify segment membership tests with numeric custom field", () => {
 
     segments.saveAndCloseButton.click()
     segments.waitforSegmentCreation()
-    cy.wait(3000) // Added wait for segment building
+    cy.exec(cronpath + ' m:s:r'); //Community specific
   })
 
   it("Verify that"+ segmentMembershipWithCustomField1 +"segment has two contacts only", () => {
     cy.visit("s/segments");
     segments.waitForPageLoad();
     cy.visit('/s/segments?search=segment')
-    segments.checkConactsUnderSegment.should('contain','View 1 Contact')
-    segments.checkConactsUnderSegment.click()
+    segments.checkContactsUnderSegment.should('contain','View 1 Contact'); //Community specific
+    segments.checkContactsUnderSegment.click(); //Community specific
     segments.checkDetailContactsUnderSegment.should('contain',"test1 contact3");
   })
 
@@ -194,15 +194,15 @@ context("Verify segment membership tests with numeric custom field", () => {
     segments.filterSearchBox.type("First");
     segments.filterField.click();
     segments.waitTillFilterOptionGetsLoaded()
-    segments.filterOperator.select('contains')
+    segments.filterOperator.select('contains').should('have.value', 'contains'); // Community Specific
     cy.wait(1000) // Added wait for page rendering
     segments.filterValue.type(contactFirstName, { force: true });
 
     segments.filterDropDown.click();
     segments.filterSearchBox.type(numericField1,{ force: true });
     segments.filterField.click({ force: true });
-    segments.waitTillSecondOperatorFilterGetsLoaded()
-    segments.secondFilterOperator.select('greater than')
+    segments.waitTillSecondOperatorFilterGetsLoaded();
+    segments.secondFilterOperator.select('greater than').should('have.value', 'gt'); // Community Specific
     cy.wait(1000) // Added wait for page rendering
     segments.secondFilterProperties.type('1',{ force: true })
 
@@ -216,16 +216,16 @@ context("Verify segment membership tests with numeric custom field", () => {
 
     segments.saveAndCloseButton.click()
     segments.waitforSegmentCreation()
-    cy.wait(3000) // Added wait for segment building
+    cy.exec(cronpath + ' m:s:r'); //Community specific
   })
 
   it("Verify that"+ segmentMembershipWithCustomField2 +"segment has only one contact only", () => {
     cy.visit("s/segments");
     segments.waitForPageLoad();
     cy.visit('/s/segments?search=segment')
-    segments.checkConactsUnderSegment.should('contain','View 1 Contact')
-    segments.checkConactsUnderSegment.click()
-    segments.checkDetailContactsUnderSegment.should('contain',"test1 contact3");
+    segments.checkContactsUnderSegment.should('contain','View 1 Contact'); //Community specific
+    segments.checkContactsUnderSegment.click(); //Community specific
+    segments.checkDetailContactsUnderSegment.should('contain',"test1 contact3"); //Community specific
   })
 
   it("Search and delete"+ segmentMembershipWithCustomField2 + "segment", () => {
