@@ -1,0 +1,102 @@
+{
+  "name": "Mauve",
+  "onlyForBC": true,
+  "features": [
+    "page",
+    "email",
+    "form"
+  ],
+  "slots": {
+    "page": {
+      "slideshow": {
+        "type": "slideshow",
+        "placeholder": "mautic.page.builder.addcontent"
+      },
+      "page_title": {
+        "type": "text",
+        "placeholder": "mautic.page.builder.addcontent"
+      },
+      "top1_title": {
+        "type": "textarea",
+        "placeholder": "mautic.page.builder.addcontent"
+      },
+      "top1": {
+        "type": "html",
+        "placeholder": "mautic.page.builder.addcontent"
+      },
+      "top2_title": {
+        "type": "textarea",
+        "placeholder": "mautic.page.builder.addcontent"
+      },
+      "top2": {
+        "type": "html",
+        "placeholder": "mautic.page.builder.addcontent"
+      },
+      "top3_title": {
+        "type": "textarea",
+        "placeholder": "mautic.page.builder.addcontent"
+      },
+      "top3": {
+        "type": "html",
+        "placeholder": "mautic.page.builder.addcontent"
+      },
+      "portfolio1": {
+        "type": "html",
+        "placeholder": "mautic.page.builder.addcontent"
+      },
+      "portfolio2": {
+        "type": "html",
+        "placeholder": "mautic.page.builder.addcontent"
+      },
+      "portfolio3": {
+        "type": "html",
+        "placeholder": "mautic.page.builder.addcontent"
+      },
+      "portfolio4": {
+        "type": "html",
+        "placeholder": "mautic.page.builder.addcontent"
+      },
+      "portfolio5": {
+        "type": "html",
+        "placeholder": "mautic.page.builder.addcontent"
+      },
+      "portfolio6": {
+        "type": "html",
+        "placeholder": "mautic.page.builder.addcontent"
+      },
+      "section1_title": {
+        "type": "text",
+        "placeholder": "mautic.page.builder.addcontent"
+      },
+      "section2_title": {
+        "type": "text",
+        "placeholder": "mautic.page.builder.addcontent"
+      },
+      "section2": {
+        "type": "html",
+        "placeholder": "mautic.page.builder.addcontent"
+      },
+      "section2_graphic": {
+        "type": "html",
+        "placeholder": "mautic.page.builder.addcontent"
+      },
+      "cta": {
+        "type": "html",
+        "placeholder": "mautic.page.builder.addcontent"
+      },
+      "cta_button": {
+        "type": "html",
+        "placeholder": "mautic.page.builder.addcontent"
+      },
+      "footer": {
+        "type": "html",
+        "placeholder": "mautic.page.builder.addcontent"
+      }
+    },
+    "email": [
+      "header",
+      "body",
+      "footer"
+    ]
+  }
+}

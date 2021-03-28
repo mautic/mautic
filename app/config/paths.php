@@ -10,7 +10,7 @@
  */
 $paths = [
     //customizable
-    'themes'       => 'themes',
+    'themes'       => 'app/themes',
     'assets'       => 'media',
     'asset_prefix' => '',
     'plugins'      => 'plugins',

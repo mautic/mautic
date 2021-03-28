@@ -1,0 +1,16 @@
+{% extends ":"~template~":base.html.twig" %}
+
+{% block content %}
+    {% if message is defined %}
+        <div class="well text-center">
+            <p>{{ message|raw }}</p>
+        </div>
+    {% endif %}
+
+    <div class="form-container">
+        {% if header is defined %}
+        <h4>{{ header }}</h4>
+        {% endif %}
+        {{ content|raw }}
+    </div>
+{% endblock %}

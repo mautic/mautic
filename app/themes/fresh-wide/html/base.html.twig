@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% if page is defined %}
+        <title>{pagetitle}</title>
+        <meta name="description" content="{pagemetadescription}">
+        <meta charset="UTF-8">
+        {% endif %}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{{ getAssetUrl('themes/'~template~'/css/style.css')}}" type="text/css">
+        <script type="text/javascript" src="{{ getAssetUrl('themes/'~template~'/js/jquery.min.js')}}"></script>
+        <script type="text/javascript" src="{{ getAssetUrl('themes/'~template~'/js/parallax-element.js')}}"></script>
+        <script type="text/javascript" src="{{ getAssetUrl('themes/'~template~'/js/extras.js')}}"></script>
+        {{ outputHeadDeclarations() }}
+    </head>
+    <body id="bodyTag">
+        {{ outputScripts('bodyOpen') }}
+        {% block content %}{% endblock %}
+        {{ outputScripts('bodyClose') }}
+    </body>
+    <script type="text/javascript">
+        if ( $( ".background-image" ).length ) {
+            $('.background-image').parallaxElement({
+                disableMobile: true,
+                defaultSpeed:  -0.2,
+            });
+        }
+    </script>
+</html>

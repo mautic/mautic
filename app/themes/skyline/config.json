@@ -1,0 +1,10 @@
+{
+  "name": "Skyline",
+  "author": "Mautic team based on a theme by Sendwithus",
+  "authorUrl": "https://www.sendwithus.com/resources/templates/skyline",
+  "features": [
+    "page",
+    "email",
+    "form"
+  ]
+}

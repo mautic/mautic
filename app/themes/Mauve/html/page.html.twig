@@ -1,0 +1,167 @@
+{% extends ":Mauve:base.html.twig" %}
+
+{% block content %}
+    <!-- Page Content -->
+    <div class="container">
+        {% if slotHasContent(['page_title', 'top1_title', 'top1', 'top2_title', 'top2', 'top3_title', 'top3']) %}
+        <!-- Marketing Icons Section -->
+        <div class="row">
+            {% if slotHasContent('page_title') %}
+            <div class="col-lg-12">
+                <h1 class="page-header" data-slot-container="1">
+                    {{ slot('page_title') }}
+                </h1>
+            </div>
+            {% endif %}
+            {% if slotHasContent(['top1_title', 'top1']) %}
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    {% if slotHasContent('top1_title') %}
+                    <div class="panel-heading">
+                        <h4 data-slot-container="1">{{ slot('top1_title') }}</h4>
+                    </div>
+                    {% endif %}
+                    {% if slotHasContent('top1') %}
+                    <div class="panel-body" data-slot-container="1">
+                        {{ slot('top1') }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            {% if slotHasContent(['top2_title', 'top2']) %}
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    {% if slotHasContent('top2_title') %}
+                    <div class="panel-heading">
+                        <h4 data-slot-container="1">{{ slot('top2_title') }}</h4>
+                    </div>
+                    {% endif %}
+                    {% if slotHasContent('top2') %}
+                    <div class="panel-body" data-slot-container="1">
+                        {{ slot('top2') }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            {% if slotHasContent(['top3_title', 'top3']) %}
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    {% if slotHasContent('top3_title') %}
+                    <div class="panel-heading">
+                        <h4 data-slot-container="1">{{ slot('top3_title') }}</h4>
+                    </div>
+                    {% endif %}
+                    {% if slotHasContent('top3') %}
+                    <div class="panel-body" data-slot-container="1">
+                        {{ slot('top3') }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <!-- /.row -->
+        {% endif %}
+
+        {% if slotHasContent(['section1_title', 'portfolio1', 'portfolio2', 'portfolio3', 'portfolio4', 'portfolio5', 'portfolio6']) %}
+        <!-- Portfolio Section -->
+        <div class="row">
+            {% if slotHasContent('section1_title') %}
+            <div class="col-lg-12">
+                <h2 class="page-header" data-slot-container="1">{{ slot('section1_title') }}</h2>
+            </div>
+            {% endif %}
+            {% if slotHasContent('portfolio1') %}
+            <div class="col-md-4 col-sm-6" data-slot-container="1">
+                {{ slot('portfolio1') }}
+            </div>
+            {% endif %}
+            {% if slotHasContent('portfolio2') %}
+            <div class="col-md-4 col-sm-6" data-slot-container="1">
+                {{ slot('portfolio2') }}
+            </div>
+            {% endif %}
+            {% if slotHasContent('portfolio3') %}
+            <div class="col-md-4 col-sm-6" data-slot-container="1">
+                {{ slot('portfolio3') }}
+            </div>
+            {% endif %}
+            {% if slotHasContent('portfolio4') %}
+            <div class="col-md-4 col-sm-6" data-slot-container="1">
+                {{ slot('portfolio4') }}
+            </div>
+            {% endif %}
+            {% if slotHasContent('portfolio5') %}
+            <div class="col-md-4 col-sm-6" data-slot-container="1">
+                {{ slot('portfolio5') }}
+            </div>
+            {% endif %}
+            {% if slotHasContent('portfolio6') %}
+            <div class="col-md-4 col-sm-6" data-slot-container="1">
+                {{ slot('portfolio6') }}
+            </div>
+            {% endif %}
+        </div>
+        <!-- /.row -->
+        {% endif %}
+
+        {% if slotHasContent(['section2_title', 'section2', 'section2_graphic']) %}
+        <!-- Features Section -->
+        <div class="row">
+            {% if slotHasContent('section2_title') %}
+            <div class="col-lg-12">
+                <h2 class="page-header" data-slot-container="1">{{ slot('section2_title') }}</h2>
+            </div>
+            {% endif %}
+            {% if slotHasContent('section2') %}
+            <div class="col-md-6" data-slot-container="1">
+                {{ slot('section2') }}
+            </div>
+            {% endif %}
+            {% if slotHasContent('section2_graphic') %}
+            <div class="col-md-6" data-slot-container="1">
+                {{ slot('section2_graphic') }}
+            </div>
+            {% endif %}
+        </div>
+        <!-- /.row -->
+        {% endif %}
+
+        {% if slotHasContent(['cta', 'cta_button']) %}
+        <hr>
+
+        <!-- Call to Action Section -->
+        <div class="well">
+            <div class="row">
+                {% if slotHasContent('cta') %}
+                <div class="col-md-8" data-slot-container="1">
+                    {{ slot('cta') }}
+                </div>
+                {% endif %}
+                {% if slotHasContent('cta_button') %}
+                <div class="col-md-4" data-slot-container="1">
+                    {{ slot('cta_button') }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <hr>
+        {% endif %}
+
+        {% if slotHasContent('footer') %}
+        <!-- Footer -->
+        <footer>
+            <div class="row">
+                <div class="col-lg-12" data-slot-container="1">
+                    {{ slot('footer') }}
+                </div>
+            </div>
+        </footer>
+        {% endif %}
+    </div>
+    <!-- /.container -->
+    {{ slot('builder') }}
+{% endblock %}

@@ -1,0 +1,32 @@
+{
+    "name": "Nature",
+    "onlyForBC": true,
+    "features": [
+        "page",
+        "email",
+        "form"
+    ],
+    "slots": {
+        "page": [
+            "left1",
+            "left2",
+            "left3",
+            "right1",
+            "right2",
+            "right3",
+            "top1",
+            "top2",
+            "top3",
+            "main",
+            "bottom1",
+            "bottom2",
+            "bottom3",
+            "footer"
+        ],
+        "email": [
+            "header",
+            "body",
+            "footer"
+        ]
+    }
+}

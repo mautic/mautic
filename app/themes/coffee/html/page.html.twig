@@ -1,0 +1,109 @@
+{% extends ":coffee:base.html.twig" %}
+
+{% block content %}
+
+{% if slotHasContent(['top1', 'top2', 'top3']) %}
+<div id="header">
+    <div class="container">
+        <div class="row">
+            {% if slotHasContent('top1') %}
+            <div data-slot-container="1" class="col-xs-12 col-sm-4">{{ slot('top1') }}</div>
+            {% endif %}
+            {% if slotHasContent('top2') %}
+            <div data-slot-container="1" class="col-xs-12 col-sm-4">{{ slot('top2') }}</div>
+            {% endif %}
+            {% if slotHasContent('top3') %}
+            <div data-slot-container="1" class="col-xs-12 col-sm-4 pull-right">{{ slot('top3') }}</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if slotHasContent(['left1', 'left2', 'left3', 'right1', 'right2', 'right3']) %}
+<div id="content" class="container">
+    <div class="row">
+        <div class="col-xs-12 col-sm-6">
+            {% if slotHasContent('left1') %}
+            <div class="row">
+                <div data-slot-container="1" class="col-xs-12">
+                    {{ slot('left1') }}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if slotHasContent('left2') %}
+            <div class="row">
+                <div data-slot-container="1" class="col-xs-12">
+                    {{ slot('left2') }}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if slotHasContent('left3') %}
+            <div class="row">
+                <div data-slot-container="1" class="col-xs-12">
+                    {{ slot('left3') }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="col-xs-12 col-sm-6">
+            {% if slotHasContent('right1') %}
+            <div class="row">
+                <div data-slot-container="1" class="col-xs-12">
+                    {{ slot('right1') }}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if slotHasContent('right2') %}
+            <div class="row">
+                <div data-slot-container="1" class="col-xs-12">
+                    {{ slot('right2') }}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if slotHasContent('right3') %}
+            <div class="row">
+                <div data-slot-container="1" class="col-xs-12">
+                    {{ slot('right3') }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if slotHasContent(['bottom1', 'bottom2', 'bottom3']) %}
+<div id="footer">
+    <div class="container">
+        <div class="row">
+            {% if slotHasContent('bottom1') %}
+            <div data-slot-container="1" class="col-xs-12 col-sm-4">{{ slot('bottom1') }}</div>
+            {% endif %}
+            {% if slotHasContent('bottom2') %}
+            <div data-slot-container="1" class="col-xs-12 col-sm-4">{{ slot('bottom2') }}</div>
+            {% endif %}
+            {% if slotHasContent('bottom3') %}
+            <div data-slot-container="1" class="col-xs-12 col-sm-4 pull-right">{{ slot('bottom3') }}</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if slotHasContent('footer') %}
+<div id="copyright">
+    <div class="container">
+        <div class="row">
+            <div data-slot-container="1" class="col-xs-12">{{ slot('footer') }}</div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

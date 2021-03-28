@@ -1,0 +1,47 @@
+body {
+    font-family: Georgia,Helvetica,Arial,sans-serif;
+    background-color: #3F4551;
+    background: url('../images/nature.jpg') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    color: #252525;
+    font-size: 15px;
+    line-height: 1.6;
+}
+body > .container {
+    margin-top: 20px;
+}
+.container {
+    width: 970px;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+}
+.main-block.bg-primary {
+    padding: 20px;
+    margin: 20px auto;
+    background-color: #494949;
+}
+.copyright small {
+    color: #fff;
+    background: rgba(73, 73, 73, 0.75);
+    padding: 2px;
+}
+.copyright small a {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.form-container {
+    margin-top: 50px;
+    width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+}
+
+.mauticform-selectbox, .mauticform-input, .mauticform-textarea {
+    width: 100% !important;
+}

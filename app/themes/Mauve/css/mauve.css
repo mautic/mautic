@@ -1,0 +1,46 @@
+body {
+    background-color: #f8f8f8;
+}
+a, a:hover, a:focus {
+  color: #4e5d9d;
+}
+
+.list-group-item.active a, .well a {
+  color: #fff;
+}
+
+hr {
+  border-top: 1px solid rgba(71, 85, 143, 0.5);
+}
+
+.panel-default {
+  border-color: rgba(71, 85, 143, 0.5);
+  color: #000;
+}
+
+.well, .panel-default>.panel-heading {
+  background-color: #4e5d9d;
+  border-color: rgba(71, 85, 143, 0.5);
+  color: #fff;
+}
+
+h1 {
+  color: #4e5d9d;
+}
+
+.form-container {
+  margin-top: 50px;
+  width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mauticform-selectbox, .mauticform-input, .mauticform-textarea {
+  width: 100% !important;
+  color: #000000;
+}
+
+.mauticform-button {
+  color: #000000;
+}
+

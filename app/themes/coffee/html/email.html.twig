@@ -1,0 +1,30 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="background: #f7f7f7; margin:0">
+        <div style="background-color: #F3F3F3; border-bottom: 2px solid #D3D2D2;">
+            <table style="border-collapse: collapse; width: 600px; min-height: 50px; font-family: Helvetica Neue, Helvetica, Arial, sans-serif; margin: 0 auto;">
+                <tr>
+                    <td data-slot-container="1" style="vertical-align: top; padding: 30px 50px; font-size: 28px; line-height: 1.5em; color: #999999;">
+                        {{ slot('header') }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div style="border-top: 2px solid #E2E2E2;">
+            <table style="border-collapse: collapse; width: 600px; font-family: Helvetica, Arial, sans-serif;font-size: 14px;color: #333333; margin: 0 auto;">
+                <tr>
+                    <td data-slot-container="1" style="vertical-align: top; padding: 30px 50px; font-size: 17px; line-height: 1.7em;">
+                        {{ slot('body') }}
+                    </td>
+                </tr>
+                <tr>
+                    <td data-slot-container="1" style="vertical-align: top; padding: 30px 50px; font-size: 12px; line-height: 1.5em;">
+                        {{ slot('footer') }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </body>
+</html>
