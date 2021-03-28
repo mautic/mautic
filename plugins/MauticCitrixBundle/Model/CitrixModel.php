@@ -179,7 +179,7 @@ class CitrixModel extends FormModel
             return []; // is not a valid citrix product
         }
         $dql = sprintf(
-            "SELECT DISTINCT c.eventName, c.eventDesc FROM MauticCitrixBundle:CitrixEvent c WHERE c.product='%s'",
+            "SELECT DISTINCT c.eventName, c.eventDesc FROM MauticCitrixBundle:CitrixEvent c WHERE c.product='%s' ORDER BY c.eventDate DESC",
             $product
         );
         $query  = $this->em->createQuery($dql);
