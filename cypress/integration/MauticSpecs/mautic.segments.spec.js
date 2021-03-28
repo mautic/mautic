@@ -6,12 +6,14 @@ const segments = require("../../Pages/Segments");
 const contact = require("../../Pages/Contacts");
 const search =require("../../Pages/Search");
 
-var cypressSegment = "CypressSegment"
-var bidarCity = "bidarCitySegment"
-var hydrabadCity = "hydrabadCitySegment"
-var contactOneForBidar = "User1 Tester"
-var contactTwoForBidar = "User2 Tester"
-var contactOneForHydrbad = "User3 Tester"
+var cypressSegment = "CypressSegment";
+var bidarCity = "bidarCitySegment";
+var hydrabadCity = "hydrabadCitySegment";
+var contactOneForBidar = "User1 Tester";
+var contactTwoForBidar = "User2 Tester";
+var contactOneForHydrbad = "User3 Tester";
+var cronpath = Cypress.env('cron-path'); // Community Specific
+
 
 context("Verify that user is able to create segment and test that contacts are getting added as per the selected filter", () => {
 
@@ -75,6 +77,7 @@ context("Verify that user is able to create segment and test that contacts are g
     segments.filterValue.type("Cypress");
     segments.saveAndCloseButton.click();
     segments.waitForPageLoad();
+
   });
 
   it("Add new segment for Bidar city", () => {
@@ -85,7 +88,7 @@ context("Verify that user is able to create segment and test that contacts are g
     segments.filterTab.click();
     segments.filterDropDown.click();
     segments.filterSearchBox.type("City");
-    segments.filterField.click();
+    segments.filterCityField.click();
     segments.waitTillFilterOptionGetsLoaded()
     segments.filterValue.type("Bidar");
     segments.saveAndCloseButton.click();
@@ -100,27 +103,27 @@ context("Verify that user is able to create segment and test that contacts are g
     segments.filterTab.click();
     segments.filterDropDown.click();
     segments.filterSearchBox.type("City");
-    segments.filterField.click();
+    segments.filterCityField.click();
     segments.waitTillFilterOptionGetsLoaded()
     segments.filterValue.type("Hydrabad");
     segments.saveAndCloseButton.click();
     segments.waitForPageLoad()
-    cy.wait(3000);
+    cy.exec(cronpath + ' m:s:r'); //Community specific
   });
 
-  it("Verify that Bidar city segment has two conatcts only", () => {
+  it("Verify that Bidar city segment has two contacts only", () => {
     segments.waitForPageLoad();
     cy.visit('/s/segments?search=' + bidarCity)
-    segments.checkConactsUnderSegment.should('contain','View 2 Contacts')
-    segments.checkConactsUnderSegment.click()
+    segments.checkContactsUnderSegment.should('contain','View 2 Contacts')
+    segments.checkContactsUnderSegment.click()
     segments.checkDetailContactsUnderSegment.should('contain',contactOneForBidar).should('contain',contactTwoForBidar);
   });
 
-  it("Verify that hydrabad city segment has one conatct only", () => {
+  it("Verify that hydrabad city segment has one contact only", () => {
     segments.waitForPageLoad();
     cy.visit('/s/segments?search=' + hydrabadCity)
-    segments.checkConactsUnderSegment.should('contain','View 1 Contact')
-    segments.checkConactsUnderSegment.click()
+    segments.checkContactsUnderSegment.should('contain','View 1 Contact')
+    segments.checkContactsUnderSegment.click()
     segments.checkDetailContactsUnderSegment.should('contain',contactOneForHydrbad);
   });
 
@@ -134,8 +137,8 @@ context("Verify that user is able to create segment and test that contacts are g
     segments.filterDropDown.click();
     segments.filterSearchBox.type("Last name");
     segments.filterField.click();
-    segments.leadListFilter.select("or");
-    segments.secondFilterTextBox.type("Test");
+    segments.leadListFilter.select("or").should('have.value', 'or'); // Community Specific
+    segments.filterValue.type("Test");
     segments.saveAndCloseButton.click();
     segments.waitforSegmentUpdate();
   });
