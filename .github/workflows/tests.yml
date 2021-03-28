@@ -16,7 +16,6 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
-      fail-fast: false
       matrix:
         php-versions: ['7.4']
         db-types: ['mysql', 'mariadb']
