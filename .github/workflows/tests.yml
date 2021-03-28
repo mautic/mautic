@@ -116,7 +116,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: ['PHPSTAN', 'Rector', 'CS Fixer']
+        commands: ['PHPSTAN', 'CS Fixer']
 
     name: ${{ matrix.commands }}
 
