@@ -226,6 +226,9 @@ jobs:
         # Recommended: pass the GitHub token lets this action correctly
         # determine the unique run id necessary to re-run the checks
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        MAILER_PASSWORD: ${{ secrets.MAILER_PASSWORD }}
+        MAILER_HOST: ${{ secrets.MAILER_HOST }}
+        MAILER_USER: ${{ secrets.MAILER_USER }}
 
       # If one or more Cypress tests fail, upload screenshots as artifacts
     - name: Upload Cypress screenshots
