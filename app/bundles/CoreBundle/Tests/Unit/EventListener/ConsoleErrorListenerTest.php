@@ -44,8 +44,6 @@ class ConsoleErrorListenerTest extends \PHPUnit\Framework\TestCase
      */
     public function testConsoleErrorWithNullCommand()
     {
-        define('MAUTIC_ENV', 'dev');
-
         $event = new ConsoleErrorEvent(
             $this->input,
             $this->output,
