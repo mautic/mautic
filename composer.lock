@@ -5499,12 +5499,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mautic/core.git",
-                "reference": "45341cccd19a166f7c9146a55fcaaf3e7a31b79c"
+                "reference": "04b4111445aeb9bbd84167b40b58aa8342f7436f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mautic/core/zipball/45341cccd19a166f7c9146a55fcaaf3e7a31b79c",
-                "reference": "45341cccd19a166f7c9146a55fcaaf3e7a31b79c",
+                "url": "https://api.github.com/repos/mautic/core/zipball/04b4111445aeb9bbd84167b40b58aa8342f7436f",
+                "reference": "04b4111445aeb9bbd84167b40b58aa8342f7436f",
                 "shasum": ""
             },
             "require": {
@@ -5662,7 +5662,7 @@
                         "[project-root]/package.json": "assets/scaffold/files/package.json",
                         "[project-root]/package-lock.json": "assets/scaffold/files/package-lock.json",
                         "[project-root]/bin/console": "assets/scaffold/files/console",
-                        "[project-root]/bin/.htaccess": "assets/scaffold/files/console.htaccess",
+                        "[project-root]/bin/.htaccess": "assets/scaffold/files/deny.htaccess",
                         "[web-root]/.htaccess": "assets/scaffold/files/htaccess",
                         "[web-root]/.gitignore": "assets/scaffold/files/example.gitignore",
                         "[web-root]/index.php": "assets/scaffold/files/index.php",
@@ -5679,7 +5679,8 @@
                         "[web-root]/media/files/.htaccess": "assets/scaffold/media/files/.htaccess",
                         "[web-root]/media/images/.htaccess": "assets/scaffold/media/images/.htaccess",
                         "[web-root]/themes/blank.png": "assets/scaffold/files/blank.png",
-                        "[web-root]/themes/blank-big.png": "assets/scaffold/files/blank-big.png"
+                        "[web-root]/themes/blank-big.png": "assets/scaffold/files/blank-big.png",
+                        "[project-root]/app/.htaccess": "assets/scaffold/files/deny.htaccess"
                     }
                 }
             },
@@ -5704,7 +5705,7 @@
                 "issues": "https://github.com/mautic/core/issues",
                 "source": "https://github.com/mautic/core/tree/4.x"
             },
-            "time": "2021-03-29T22:30:02+00:00"
+            "time": "2021-03-29T22:46:28+00:00"
         },
         {
             "name": "mautic/core-project-message",

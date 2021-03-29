@@ -217,7 +217,7 @@
         "[project-root]/package.json": "assets/scaffold/files/package.json",
         "[project-root]/package-lock.json": "assets/scaffold/files/package-lock.json",
         "[project-root]/bin/console": "assets/scaffold/files/console",
-        "[project-root]/bin/.htaccess": "assets/scaffold/files/console.htaccess",
+        "[project-root]/bin/.htaccess": "assets/scaffold/files/deny.htaccess",
         "[web-root]/.htaccess": "assets/scaffold/files/htaccess",
         "[web-root]/.gitignore": "assets/scaffold/files/example.gitignore",
         "[web-root]/index.php": "assets/scaffold/files/index.php",
@@ -234,7 +234,8 @@
         "[web-root]/media/files/.htaccess": "assets/scaffold/media/files/.htaccess",
         "[web-root]/media/images/.htaccess": "assets/scaffold/media/images/.htaccess",
         "[web-root]/themes/blank.png": "assets/scaffold/files/blank.png",
-        "[web-root]/themes/blank-big.png": "assets/scaffold/files/blank-big.png"
+        "[web-root]/themes/blank-big.png": "assets/scaffold/files/blank-big.png",
+        "[project-root]/app/.htaccess": "assets/scaffold/files/deny.htaccess"
       }
     }
   },
