@@ -992,6 +992,7 @@ return [
                 'class'     => \Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder::class,
                 'arguments' => [
                     'mautic.lead.model.random_parameter_name',
+                    'event_dispatcher',
                 ],
             ],
         ],
