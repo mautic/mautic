@@ -98,9 +98,9 @@ final class ImportCompanySubscriber implements EventSubscriberInterface
     {
         if ($event->importIsForObject('company')) {
             $merged = $this->companyModel->import(
-                $event->getImport()->getMatchedFields(),
-                $event->getRowData(),
-                $event->getImport()->getDefault('owner')
+                $event->import->getMatchedFields(),
+                $event->rowData,
+                $event->import->getDefault('owner')
             );
             $event->setWasMerged((bool) $merged);
             $event->stopPropagation();

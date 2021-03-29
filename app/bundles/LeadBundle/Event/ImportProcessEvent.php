@@ -15,50 +15,20 @@ namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\LeadEventLog;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 final class ImportProcessEvent extends Event
 {
-    /**
-     * @var Import
-     */
-    private $import;
-
-    /**
-     * @var LeadEventLog
-     */
-    private $eventLog;
-
-    /**
-     * @var array
-     */
-    private $rowData;
-
-    /**
-     * @var bool
-     */
-    private $wasMerged;
+    public Import $import;
+    public LeadEventLog $eventLog;
+    public array $rowData;
+    private ?bool $wasMerged = null;
 
     public function __construct(Import $import, LeadEventLog $eventLog, array $rowData)
     {
         $this->import   = $import;
         $this->eventLog = $eventLog;
         $this->rowData  = $rowData;
-    }
-
-    public function getImport(): Import
-    {
-        return $this->import;
-    }
-
-    public function getEventLog(): LeadEventLog
-    {
-        return $this->eventLog;
-    }
-
-    public function getRowData(): array
-    {
-        return $this->rowData;
     }
 
     public function setWasMerged(bool $wasMerged): void
