@@ -570,8 +570,15 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 
     private function isForSegmentation(LeadListFiltersChoicesEvent $event): bool
     {
+        $route = (string) $event->getRoute();
+
         // segment form
-        if ('mautic_segment_action' === $event->getRoute()) {
+        if ('mautic_segment_action' === $route) {
+            return true;
+        }
+
+        // segment API
+        if (0 === strpos($route, 'mautic_api_lists')) {
             return true;
         }
 
