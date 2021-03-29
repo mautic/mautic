@@ -258,6 +258,12 @@ return [
                     '%router.request_context.base_url%',
                 ],
             ],
+            'mautic.core.subscriber.editor_assets' => [
+                'class'       => \Mautic\CoreBundle\EventListener\EditorFontsSubscriber::class,
+                'arguments'   => [
+                    'mautic.helper.core_parameters',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.button_group' => [
@@ -1614,5 +1620,91 @@ return [
         'stats_update_url'          => 'https://updates.mautic.org/stats/send', // set to empty in config file to disable
         'install_source'            => 'Mautic',
         'system_update_url'         => 'https://api.github.com/repos/mautic/mautic/releases',
+        'editor_fonts'              => [
+            [
+                'name' => 'Arial',
+                'font' => 'Arial, Helvetica Neue, Helvetica, sans-serif',
+            ],
+            [
+                'name' => 'Bitter',
+                'font' => 'Bitter, Georgia, Times, Times New Roman, serif',
+                'url'  => 'https://fonts.googleapis.com/css?family=Bitter',
+            ],
+            [
+                'name' => 'Courier New',
+                'font' => 'Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace',
+            ],
+            [
+                'name' => 'Droid Serif',
+                'font' => 'Droid Serif, Georgia, Times, Times New Roman, serif',
+                'url'  => 'https://fonts.googleapis.com/css?family=Droid+Serif',
+            ],
+            [
+                'name' => 'Georgia',
+                'font' => 'Georgia, Times, Times New Roman, serif',
+            ],
+            [
+                'name' => 'Helvetica',
+                'font' => 'Helvetica Neue, Helvetica, Arial, sans-serif',
+            ],
+            [
+                'name' => 'Lato',
+                'font' => 'Lato, Tahoma, Verdana, Segoe, sans-serif',
+                'url'  => 'https://fonts.googleapis.com/css?family=Lato',
+            ],
+            [
+                'name' => 'Lucida Sans Unicode',
+                'font' => 'Lucida Sans Unicode, Lucida Grande, Lucida Sans, Geneva, Verdana, sans-serif',
+            ],
+            [
+                'name' => 'Montserrat',
+                'font' => 'Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif',
+                'url'  => 'https://fonts.googleapis.com/css?family=Montserrat',
+            ],
+            [
+                'name' => 'Open Sans',
+                'font' => 'Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif',
+                'url'  => 'https://fonts.googleapis.com/css?family=Open+Sans',
+            ],
+            [
+                'name' => 'Roboto',
+                'font' => 'Roboto, Tahoma, Verdana, Segoe, sans-serif',
+                'url'  => 'https://fonts.googleapis.com/css?family=Roboto',
+            ],
+            [
+                'name' => 'Source Sans Pro',
+                'font' => 'Source Sans Pro, Tahoma, Verdana, Segoe, sans-serif',
+                'url'  => 'https://fonts.googleapis.com/css?family=Source+Sans+Pro',
+            ],
+            [
+                'name' => 'Tahoma',
+                'font' => 'Tahoma, Geneva, Segoe, sans-serif',
+            ],
+            [
+                'name' => 'Times New Roman',
+                'font' => 'TimesNewRoman, Times New Roman, Times, Beskerville, Georgia, serif',
+            ],
+            [
+                'name' => 'Trebuchet MS',
+                'font' => 'Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif',
+            ],
+            [
+                'name' => 'Ubuntu',
+                'font' => 'Ubuntu, Tahoma, Verdana, Segoe, sans-serif',
+                'url'  => 'https://fonts.googleapis.com/css?family=Ubuntu',
+            ],
+            [
+                'name' => 'Verdana',
+                'font' => 'Verdana, Geneva, sans-serif',
+            ],
+            [
+                'name' => 'ヒラギノ角ゴ Pro W3',
+                'font' => 'ヒラギノ角ゴ Pro W3, Hiragino Kaku Gothic Pro,Osaka, メイリオ, Meiryo, ＭＳ Ｐゴシック, MS PGothic, sans-serif',
+            ],
+            [
+                'name' => 'メイリオ',
+                'font' => 'メイリオ, Meiryo, ＭＳ Ｐゴシック, MS PGothic, ヒラギノ角ゴ Pro W3, Hiragino Kaku Gothic Pro,Osaka, sans-serif',
+            ],
+        ],
     ],
 ];
