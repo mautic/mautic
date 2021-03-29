@@ -17,8 +17,8 @@
     },
     "require": {
         "php": ">=7.4.0 <8.1",
-        "ext-zlib": "^7.2",
-        "ext-zip": "^1.15",
+        "ext-zlib": "*",
+        "ext-zip": "*",
         "ext-imap": "*",
         "symfony/console": "~4.4.0",
         "symfony/debug": "~4.4.0",
@@ -61,25 +61,22 @@
         "symfony/css-selector": "~4.4.0",
         "symfony/http-client": "~4.4.0",
 
-        "sensio/framework-extra-bundle": "~3.0",
-
-        "doctrine/doctrine-bundle": "~1.12.0",
-        "doctrine/doctrine-fixtures-bundle": "~3.3.0",
+        "doctrine/doctrine-bundle": "^2.1.1",
+        "doctrine/doctrine-fixtures-bundle": "^3.3.2",
         "doctrine/doctrine-migrations-bundle": "~2.1",
-        "doctrine/annotations": "~1.8.0",
+        "doctrine/annotations": "^1.10.3",
         "doctrine/data-fixtures": "~1.4.0",
-        "doctrine/orm": "2.7.0",
+        "doctrine/orm": "^2.8.0",
 
         "knplabs/gaufrette": "~0.9.0",
         "aws/aws-sdk-php": "~3.0",
 
-        "friendsofsymfony/rest-bundle": "~2.6.0",
-        "friendsofsymfony/oauth-server-bundle": "~1.6.0",
+        "friendsofsymfony/rest-bundle": "^3.0.2",
+        "friendsofsymfony/oauth-server-bundle": "dev-doctrine-fix",
         "willdurand/oauth-server-bundle": "dev-release-0.0.4",
-        "jms/serializer-bundle": "~3.5.0",
-        "joomla/http": "~1.3.3",
+        "jms/serializer-bundle": "^3.8.0",
         "joomla/filter": "~1.3.5",
-        "oneup/uploader-bundle": "^2.1.5",
+        "oneup/uploader-bundle": "^3.1.0",
         "mrclay/minify": "2.2.0",
         "jbroadway/urlify": "^1.0",
         "geoip2/geoip2": "~2.0",
@@ -93,22 +90,22 @@
         "php-http/guzzle7-adapter": "^1.0",
         "sparkpost/sparkpost": "^2.3",
         "lightsaml/sp-bundle": "~1.2.1",
-        "php-amqplib/rabbitmq-bundle": "^1.10",
+        "php-amqplib/rabbitmq-bundle": "^2.5.1",
         "simshaun/recurr": "^3.0",
         "ramsey/uuid": "^3.7",
         "sendgrid/sendgrid": "~6.0",
         "noxlogic/ratelimit-bundle": "^1.11",
-        "knplabs/knp-menu-bundle": "^2.0",
+        "knplabs/knp-menu-bundle": "^3.0",
         "guzzlehttp/oauth-subscriber": "^0.5.0",
-        "helios-ag/fm-elfinder-bundle": "~10.0.0",
+        "helios-ag/fm-elfinder-bundle": "^10.1",
         "leezy/pheanstalk-bundle": "^4.0",
-        "tightenco/collect": "^6.13",
+        "tightenco/collect": "^8.16.0",
         "kamermans/guzzle-oauth2-subscriber": "^1.0",
         "barryvdh/elfinder-flysystem-driver": "^0.2.1",
         "bandwidth-throttle/token-bucket": "^2.0",
         "gaufrette/extras": "^0.1.0",
         "gaufrette/aws-s3-adapter": "^0.4.0",
-        "theofidry/psysh-bundle": "~4.3.0",
+        "theofidry/psysh-bundle": "~4.4.0",
         "matomo/device-detector": "^4.0",
         "symfony/lock": "^5.1",
         "composer/package-versions-deprecated": "1.11.99.1",
@@ -128,8 +125,8 @@
         "webfactory/exceptions-bundle": "~4.3",
         "friendsofphp/php-cs-fixer": "~2.16.1",
         "liip/test-fixtures-bundle": "^1.6",
-        "phpstan/phpstan": "0.12.25",
-        "rector/rector-prefixed": "0.6.13",
+        "phpstan/phpstan": "^0.12.82",
+        "rector/rector-prefixed": "^0.9.31",
 
         "symfony/phpunit-bridge": "~5.1.0",
         "phpunit/phpunit": "^9.5",
@@ -140,6 +137,10 @@
         {
             "type": "git",
             "url": "https://github.com/mautic/BazingaOAuthServerBundle.git"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/dennisameling/FOSOAuthServerBundle.git"
         },
         {
             "type": "package",
@@ -163,10 +164,10 @@
 
     ],
     "scripts": {
-        "auto-scripts": [
-            "php -r \"if(file_exists('./.git')&&file_exists('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''))){copy('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''),'./.git/hooks/pre-commit');} if(file_exists('./.git')&&file_exists('./build/hooks/post-checkout')){copy('./build/hooks/post-checkout','./.git/hooks/post-checkout');}\"",
-            "php -r \"if(file_exists('./.git/hooks/pre-commit')&&(PHP_OS!='WINNT')){chmod('./.git/hooks/pre-commit',0755);} if(file_exists('./.git/hooks/post-checkout')&&(PHP_OS!='WINNT')){chmod('./.git/hooks/post-checkout',0755);}\""
-        ],
+        "auto-scripts": {
+            "php -r \"if(file_exists('./.git')&&file_exists('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''))){copy('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''),'./.git/hooks/pre-commit');} if(file_exists('./.git')&&file_exists('./build/hooks/post-checkout')){copy('./build/hooks/post-checkout','./.git/hooks/post-checkout');}\"": "script",
+            "php -r \"if(file_exists('./.git/hooks/pre-commit')&&(PHP_OS!='WINNT')){chmod('./.git/hooks/pre-commit',0755);} if(file_exists('./.git/hooks/post-checkout')&&(PHP_OS!='WINNT')){chmod('./.git/hooks/post-checkout',0755);}\"": "script"
+        },
         "post-install-cmd": [
             "@auto-scripts"
         ],
@@ -177,7 +178,7 @@
         "phpstan": "bin/phpstan analyse app/bundles app/migrations plugins",
         "cs": "bin/php-cs-fixer fix -v --dry-run --diff",
         "fixcs": "bin/php-cs-fixer fix -v",
-        "rector": "bin/rector process --config rector.yaml"
+        "rector": "bin/rector process"
     },
     "config": {
         "bin-dir": "bin",
