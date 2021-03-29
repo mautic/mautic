@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\DTO;
 
-class Maintainer
+final class Maintainer
 {
     private string $name;
 

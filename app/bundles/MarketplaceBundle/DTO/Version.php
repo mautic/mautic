@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\DTO;
 
-class Version
+final class Version
 {
     private string $version;
     private array $license;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\DTO;
 
-class PackageBase
+final class PackageBase
 {
     private string $name;
     private string $url;
