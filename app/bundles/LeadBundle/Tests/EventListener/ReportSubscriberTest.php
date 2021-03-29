@@ -28,7 +28,6 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Report\FieldsBuilder;
-use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
@@ -38,7 +37,6 @@ use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\StageBundle\Model\StageModel;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -349,16 +347,19 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testNotRelevantContextBuilder()
     {
-        $this->reportBuilderEventMock->expects($this->at(0))
-            ->method('checkContext')
-            ->with([
-                'leads',
-                'lead.pointlog',
-                'contact.attribution.multi',
-                'contact.attribution.first',
-                'contact.attribution.last',
-                'contact.frequencyrules',
-            ])->willReturn(false);
+        $this->reportBuilderEventMock->method('checkContext')
+            ->withConsecutive(
+                [
+                    [
+                        'leads',
+                        'lead.pointlog',
+                        'contact.attribution.multi',
+                        'contact.attribution.first',
+                        'contact.attribution.last',
+                        'contact.frequencyrules',
+                    ],
+                ]
+            )->willReturn(false);
 
         $this->reportBuilderEventMock->expects($this->never())
             ->method('addTable');
@@ -368,19 +369,22 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testNotRelevantContextGenerate()
     {
-        $this->reportGeneratorEventMock->expects($this->at(0))
-            ->method('checkContext')
-            ->with(['leads',
-            'lead.pointlog',
-            'contact.attribution.multi',
-            'contact.attribution.first',
-            'contact.attribution.last',
-            'contact.frequencyrules',
-            ])->willReturn(false);
-
-        $this->reportGeneratorEventMock->expects($this->at(1))
-            ->method('checkContext')
-            ->with(['companies'])->willReturn(false);
+        $this->reportGeneratorEventMock->method('checkContext')
+            ->withConsecutive(
+                [
+                    [
+                        'leads',
+                        'lead.pointlog',
+                        'contact.attribution.multi',
+                        'contact.attribution.first',
+                        'contact.attribution.last',
+                        'contact.frequencyrules',
+                    ],
+                ],
+                [
+                    ['companies'],
+                ]
+            )->willReturn(false);
 
         $this->reportGeneratorEventMock->expects($this->never())
             ->method('getQueryBuilder');
@@ -829,22 +833,25 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider eventDataProvider
      */
-    public function testReportGenerate($event)
+    public function testReportGenerate($context)
     {
-        $this->reportGeneratorEventMock->expects($this->at(0))
-        ->method('checkContext')
-        ->with(['leads',
-        'lead.pointlog',
-        'contact.attribution.multi',
-        'contact.attribution.first',
-        'contact.attribution.last',
-        'contact.frequencyrules',
-        ])
-        ->willReturn(true);
+        $this->reportGeneratorEventMock->method('checkContext')
+            ->withConsecutive(
+                [
+                    [
+                        'leads',
+                        'lead.pointlog',
+                        'contact.attribution.multi',
+                        'contact.attribution.first',
+                        'contact.attribution.last',
+                        'contact.frequencyrules',
+                    ],
+                ]
+            )->willReturn(true);
 
         $this->reportGeneratorEventMock->expects($this->once())
             ->method('getContext')
-            ->willReturn($event);
+            ->willReturn($context);
 
         $this->reportGeneratorEventMock->expects($this->once())
             ->method('getQueryBuilder')
