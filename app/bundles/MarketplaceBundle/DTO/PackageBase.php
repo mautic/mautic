@@ -6,12 +6,15 @@ namespace Mautic\MarketplaceBundle\DTO;
 
 final class PackageBase
 {
-    private string $name;
-    private string $url;
-    private string $repository;
-    private string $description;
-    private int $downloads;
-    private int $favers;
+    /**
+     * Original name in format "vendor/name".
+     */
+    public string $name;
+    public string $url;
+    public string $repository;
+    public string $description;
+    public int $downloads;
+    public int $favers;
 
     public function __construct(string $name, string $url, string $repository, string $description, int $downloads, int $favers)
     {
@@ -40,11 +43,11 @@ final class PackageBase
      */
     public function getId(): string
     {
-        return $this->getName();
+        return $this->name;
     }
-
+    
     /**
-     * Returns original name in format "vendor/name".
+     * Used in Mautic helpers.
      */
     public function getName(): string
     {
@@ -53,7 +56,7 @@ final class PackageBase
 
     public function getPackageName(): string
     {
-        list(, $packageName) = explode('/', $this->getName());
+        list(, $packageName) = explode('/', $this->name);
 
         return $packageName;
     }
@@ -65,33 +68,8 @@ final class PackageBase
 
     public function getVendorName(): string
     {
-        list($vendor) = explode('/', $this->getName());
+        list($vendor) = explode('/', $this->name);
 
         return $vendor;
-    }
-
-    public function getUrl(): string
-    {
-        return $this->url;
-    }
-
-    public function getRepository(): string
-    {
-        return $this->repository;
-    }
-
-    public function getDescription(): string
-    {
-        return $this->description;
-    }
-
-    public function getDownloads(): int
-    {
-        return $this->downloads;
-    }
-
-    public function getFavers(): int
-    {
-        return $this->favers;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Mautic\MarketplaceBundle\Command;
 
+use Mautic\MarketplaceBundle\DTO\PackageBase;
 use Mautic\MarketplaceBundle\Service\PluginCollector;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
@@ -44,14 +45,15 @@ class ListCommand extends Command
 
         $plugins = $this->pluginCollector->collectPackages($input->getOption('page'), $input->getOption('limit'), $input->getOption('filter'));
 
+        /** @var PackageBase $plugin */
         foreach ($plugins as $plugin) {
             $color       = 'white';
             $delimiter   = "\n    ";
-            $description = $plugin->getDescription() ? $delimiter.wordwrap($plugin->getDescription(), 50, $delimiter) : '';
+            $description = $plugin->description ? $delimiter.wordwrap($plugin->description, 50, $delimiter) : '';
             $table->addRow([
-                "<fg={$color}>{$plugin->getName()}{$description}</>",
-                "<fg={$color}>{$plugin->getDownloads()}</>",
-                "<fg={$color}>{$plugin->getFavers()}</>",
+                "<fg={$color}>{$plugin->name}{$description}</>",
+                "<fg={$color}>{$plugin->downloads}</>",
+                "<fg={$color}>{$plugin->favers}</>",
             ]);
         }
 

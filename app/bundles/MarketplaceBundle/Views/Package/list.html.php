@@ -96,15 +96,15 @@ if ($view['security']->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)) 
                                 <?php echo $view->escape($item->getHumanPackageName()); ?>
                             </a>
                         </div>
-                        <?php if ($item->getDescription()): ?>
+                        <?php if ($item->description): ?>
                             <div class="text-muted mt-4">
-                                <small><?php echo $view->escape($item->getDescription()); ?></small>
+                                <small><?php echo $view->escape($item->description); ?></small>
                             </div>
                         <?php endif; ?>
                     </td>
                     <td class="vendor-name"><?php echo $view->escape($item->getVendorName()); ?></td>
-                    <td class="downloads"><?php echo $view->escape($item->getDownloads()); ?></td>
-                    <td class="favers"><?php echo $view->escape($item->getFavers()); ?></td>
+                    <td class="downloads"><?php echo $view->escape($item->downloads); ?></td>
+                    <td class="favers"><?php echo $view->escape($item->favers); ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

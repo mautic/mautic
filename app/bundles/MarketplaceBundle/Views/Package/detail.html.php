@@ -64,12 +64,12 @@ $view['slots']->set(
 ?>
 
 <div class="col-md-9">
-    <?php if ($packageDetail->getPackageBase()->getDescription()) : ?>
+    <?php if ($packageDetail->getPackageBase()->description) : ?>
     <div class="bg-auto">
         <div class="pr-md pl-md pt-lg pb-lg">
             <div class="box-layout">
                 <div class="col-xs-10">
-                    <div class="text-muted"><?php echo $view->escape($packageDetail->getPackageBase()->getDescription()); ?></div>
+                    <div class="text-muted"><?php echo $view->escape($packageDetail->getPackageBase()->description); ?></div>
                 </div>
             </div>
         </div>
@@ -89,7 +89,7 @@ $view['slots']->set(
                         <?php echo $view->escape($latestVersionException->getMessage()); ?>
                     </div>
                 <?php else : ?>
-                    <a href="<?php echo $view->escape($packageDetail->getPackageBase()->getRepository()); ?>/releases/tag/<?php echo $view->escape($latestVersion->version); ?>" target="_blank" rel="noopener noreferrer" >
+                    <a href="<?php echo $view->escape($packageDetail->getPackageBase()->repository); ?>/releases/tag/<?php echo $view->escape($latestVersion->version); ?>" target="_blank" rel="noopener noreferrer" >
                         <strong><?php echo $view->escape($latestVersion->version); ?></strong>
                     </a>
                 <?php endif; ?>
@@ -135,7 +135,7 @@ $view['slots']->set(
         <?php foreach ($packageDetail->getVersions()->sortByLatest() as $version) : ?>
         <tr>
             <td>
-                <a href="<?php echo $view->escape($packageDetail->getPackageBase()->getRepository()); ?>/releases/tag/<?php echo $view->escape($version->version); ?>" target="_blank" rel="noopener noreferrer" >
+                <a href="<?php echo $view->escape($packageDetail->getPackageBase()->repository); ?>/releases/tag/<?php echo $view->escape($version->version); ?>" target="_blank" rel="noopener noreferrer" >
                     <?php echo $view->escape($version->version); ?>
                 </a>
             </td>
@@ -177,8 +177,8 @@ $view['slots']->set(
         <tr>
             <th><?php echo $view['translator']->trans('marketplace.package.repository'); ?></th>
             <td>
-                <a href="<?php echo $view->escape($packageDetail->getPackageBase()->getRepository()); ?>" target="_blank" rel="noopener noreferrer" >
-                    <?php echo $view->escape($packageDetail->getPackageBase()->getName()); ?>
+                <a href="<?php echo $view->escape($packageDetail->getPackageBase()->repository); ?>" target="_blank" rel="noopener noreferrer" >
+                    <?php echo $view->escape($packageDetail->getPackageBase()->name); ?>
                 </a>
             </td>
         </tr>
@@ -205,14 +205,14 @@ $view['slots']->set(
         <tr>
             <th><?php echo $view['translator']->trans('marketplace.package.repository'); ?></th>
             <td>
-                <a href="<?php echo $view->escape($packageDetail->getPackageBase()->getUrl()); ?>" target="_blank" rel="noopener noreferrer" >
-                    <?php echo $view->escape($packageDetail->getPackageBase()->getName()); ?>
+                <a href="<?php echo $view->escape($packageDetail->getPackageBase()->url); ?>" target="_blank" rel="noopener noreferrer" >
+                    <?php echo $view->escape($packageDetail->getPackageBase()->name); ?>
                 </a>
             </td>
         </tr>
         <tr>
             <th><?php echo $view['translator']->trans('marketplace.package.total.downloads'); ?></th>
-            <td><?php echo $view->escape($packageDetail->getPackageBase()->getDownloads()); ?></td>
+            <td><?php echo $view->escape($packageDetail->getPackageBase()->downloads); ?></td>
         </tr>
         <tr>
             <th><?php echo $view['translator']->trans('marketplace.package.monthly.downloads'); ?></th>
