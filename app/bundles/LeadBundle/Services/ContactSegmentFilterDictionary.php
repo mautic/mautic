@@ -150,6 +150,9 @@ class ContactSegmentFilterDictionary
         $this->filters['dnc_unsubscribed_sms']          = [
             'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
+        $this->filters['dnc_manual_sms']     = [
+            'type' => DoNotContactFilterQueryBuilder::getServiceId(),
+        ];
         $this->filters['leadlist']                      = [
             'type' => SegmentReferenceFilterQueryBuilder::getServiceId(),
         ];
