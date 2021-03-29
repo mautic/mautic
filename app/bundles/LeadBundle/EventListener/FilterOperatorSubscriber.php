@@ -278,6 +278,15 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
             ],
+            'dnc_manual_sms' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed_sms_manually'),
+                'properties' => [
+                    'type' => 'boolean',
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'dnc_manual_sms'),
+                ],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
+                'object'     => 'lead',
+            ],
             'stage' => [
                 'label'      => $this->translator->trans('mautic.lead.lead.field.stage'),
                 'object'     => 'lead',
