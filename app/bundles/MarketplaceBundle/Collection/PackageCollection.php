@@ -39,11 +39,6 @@ class PackageCollection implements \Iterator, \Countable, \ArrayAccess
         return new self(array_map($callback, $this->records));
     }
 
-    public function add(PackageBase $record): void
-    {
-        $this->records[] = $record;
-    }
-
     public function filter(callable $callback): PackageCollection
     {
         return new self(array_values(array_filter($this->records, $callback)));

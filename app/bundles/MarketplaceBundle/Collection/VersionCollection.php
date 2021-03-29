@@ -39,11 +39,6 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
         return new self(array_map($callback, $this->records));
     }
 
-    public function add(Version $record): void
-    {
-        $this->records[] = $record;
-    }
-
     public function sortByLatest(): VersionCollection
     {
         $records = $this->records;
