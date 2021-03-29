@@ -11,6 +11,7 @@
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
@@ -34,16 +35,8 @@ class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
         $filterOperator = $filter->getOperator();
         $filterChannel  = $this->getChannel($filter->getField());
 
-        $filterParameters = $filter->getParameterValue();
-
-        if (is_array($filterParameters)) {
-            $parameters = [];
-            foreach ($filterParameters as $filterParameter) {
-                $parameters[] = $this->generateRandomParameterName();
-            }
-        } else {
-            $parameters = $this->generateRandomParameterName();
-        }
+        $filterParameter = $filter->getParameterValue();
+        $parameter       = $this->generateRandomParameterName();
 
         $tableAlias = $this->generateRandomParameterName();
 
@@ -54,19 +47,26 @@ class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
             $subQb->expr()->eq($tableAlias.'.source', $subQb->expr()->literal($filterChannel))
         );
 
+        $inExpr = OperatorOptions::NOT_EQUAL_TO === $filterOperator ? 'notIn' : 'in';
         if ($this->isDateBased($filter->getField())) {
             $expr->add(
-                $subQb->expr()->$filterOperator($tableAlias.'.date_hit', $filter->getParameterHolder($parameters))
+                $subQb->expr()->$filterOperator($tableAlias.'.date_hit', $filter->getParameterHolder($parameter))
             );
+        } elseif (empty($filterParameter) && in_array($filterOperator, [OperatorOptions::NOT_EQUAL_TO, OperatorOptions::NOT_EMPTY])) {
+            // value != 0
+            $inExpr = 'in';
+        } elseif (empty($filterParameter) && in_array($filterOperator, [OperatorOptions::EQUAL_TO, OperatorOptions::EMPTY])) {
+            // value = 0
+            $inExpr = 'notIn';
         }
 
         $subQb->select($tableAlias.'.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', $tableAlias)
             ->where($expr);
 
-        $queryBuilder->addLogic($queryBuilder->expr()->in('l.id', $subQb->getSQL()), $filter->getGlue());
+        $queryBuilder->addLogic($queryBuilder->expr()->$inExpr('l.id', $subQb->getSQL()), $filter->getGlue());
 
-        $queryBuilder->setParametersPairs($parameters, $filterParameters);
+        $queryBuilder->setParametersPairs($parameter, $filterParameter);
 
         return $queryBuilder;
     }
