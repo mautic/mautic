@@ -184,19 +184,19 @@ $view['slots']->set(
         </tr>
         <tr>
             <th><?php echo $view['translator']->trans('marketplace.package.github.stars'); ?></th>
-            <td><?php echo $view->escape($packageDetail->githubInfo->getStars()); ?></td>
+            <td><?php echo $view->escape($packageDetail->githubInfo->stars); ?></td>
         </tr>
         <tr>
             <th><?php echo $view['translator']->trans('marketplace.package.github.watchers'); ?></th>
-            <td><?php echo $view->escape($packageDetail->githubInfo->getWatchers()); ?></td>
+            <td><?php echo $view->escape($packageDetail->githubInfo->watchers); ?></td>
         </tr>
         <tr>
             <th><?php echo $view['translator']->trans('marketplace.package.github.forks'); ?></th>
-            <td><?php echo $view->escape($packageDetail->githubInfo->getForks()); ?></td>
+            <td><?php echo $view->escape($packageDetail->githubInfo->forks); ?></td>
         </tr>
         <tr>
             <th><?php echo $view['translator']->trans('marketplace.package.github.open.issues'); ?></th>
-            <td><?php echo $view->escape($packageDetail->githubInfo->getOpenIssues()); ?></td>
+            <td><?php echo $view->escape($packageDetail->githubInfo->openIssues); ?></td>
         </tr>
     </table>
 

@@ -45,7 +45,7 @@ final class PackageBase
     {
         return $this->name;
     }
-    
+
     /**
      * Used in Mautic helpers.
      */
