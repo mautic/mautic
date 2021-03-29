@@ -416,7 +416,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer])
-            ->onlyMethods(null)
+            ->onlyMethods([])
             ->getMock();
 
         // Enable queueing
