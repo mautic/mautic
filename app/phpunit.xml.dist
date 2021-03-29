@@ -38,6 +38,7 @@
     <env name="MAXMIND_LICENSE_KEY" value=""/>
     <env name="KERNEL_CLASS" value="AppKernel" />
     <const name="IS_PHPUNIT" value="true"/>
+    <const name="MAUTIC_ENV" value="test"/>
     <server name="KERNEL_DIR" value="app"/>
     <server name="APP_DEBUG" value="0"/>
   </php>
