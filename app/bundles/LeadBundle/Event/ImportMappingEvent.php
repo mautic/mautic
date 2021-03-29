@@ -19,7 +19,7 @@ final class ImportMappingEvent extends Event
 {
     public string $routeObjectName;
     public bool $objectSupported = false;
-    public array $fields = [];
+    public array $fields         = [];
 
     public function __construct(string $routeObjectName)
     {
