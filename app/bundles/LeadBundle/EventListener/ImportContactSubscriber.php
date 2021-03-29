@@ -25,20 +25,9 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 final class ImportContactSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var FieldList
-     */
-    private $fieldList;
-
-    /**
-     * @var CorePermissions
-     */
-    private $corePermissions;
-
-    /**
-     * @var LeadModel
-     */
-    private $contactModel;
+    private FieldList $fieldList;
+    private CorePermissions $corePermissions;
+    private LeadModel $contactModel;
 
     public function __construct(
         FieldList $fieldList,
