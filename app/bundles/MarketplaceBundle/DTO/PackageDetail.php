@@ -9,13 +9,13 @@ use Mautic\MarketplaceBundle\Collection\VersionCollection;
 
 final class PackageDetail
 {
-    private PackageBase $packageBase;
-    private GitHubInfo $githubInfo;
-    private int $monthlyDownloads;
-    private int $dailyDownloads;
-    private \DateTimeInterface $time;
-    private MaintainerCollection $maintainers;
-    private VersionCollection $versions;
+    public PackageBase $packageBase;
+    public GitHubInfo $githubInfo;
+    public int $monthlyDownloads;
+    public int $dailyDownloads;
+    public \DateTimeInterface $time;
+    public MaintainerCollection $maintainers;
+    public VersionCollection $versions;
 
     public function __construct(
         PackageBase $packageBase,
@@ -58,40 +58,5 @@ final class PackageDetail
             $array['downloads']['daily'],
             new \DateTimeImmutable($array['time'])
         );
-    }
-
-    public function getPackageBase(): PackageBase
-    {
-        return $this->packageBase;
-    }
-
-    public function getGithubInfo(): GitHubInfo
-    {
-        return $this->githubInfo;
-    }
-
-    public function getMonthlyDownloads(): int
-    {
-        return $this->monthlyDownloads;
-    }
-
-    public function getDailyDownloads(): int
-    {
-        return $this->dailyDownloads;
-    }
-
-    public function getTime(): \DateTimeInterface
-    {
-        return $this->time;
-    }
-
-    public function getMaintainers(): MaintainerCollection
-    {
-        return $this->maintainers;
-    }
-
-    public function getVersions(): VersionCollection
-    {
-        return $this->versions;
     }
 }
