@@ -33,7 +33,7 @@ try {
 if (isset($latestVersion)) {
     $buttons[] = [
         'attr' => [
-            'href'   => $latestVersion->getIssues(),
+            'href'   => $latestVersion->issues,
             'target' => '_blank',
             'rel'    => 'noopener noreferrer',
         ],
@@ -89,8 +89,8 @@ $view['slots']->set(
                         <?php echo $view->escape($latestVersionException->getMessage()); ?>
                     </div>
                 <?php else : ?>
-                    <a href="<?php echo $view->escape($packageDetail->getPackageBase()->getRepository()); ?>/releases/tag/<?php echo $view->escape($latestVersion->getVersion()); ?>" target="_blank" rel="noopener noreferrer" >
-                        <strong><?php echo $view->escape($latestVersion->getVersion()); ?></strong>
+                    <a href="<?php echo $view->escape($packageDetail->getPackageBase()->getRepository()); ?>/releases/tag/<?php echo $view->escape($latestVersion->version); ?>" target="_blank" rel="noopener noreferrer" >
+                        <strong><?php echo $view->escape($latestVersion->version); ?></strong>
                     </a>
                 <?php endif; ?>
             </td>
@@ -98,26 +98,26 @@ $view['slots']->set(
         <?php if (!empty($latestVersion)) : ?>
         <tr>
             <th><?php echo $view['translator']->trans('marketplace.package.version.release.date'); ?></th>
-            <td title="<?php echo $view['date']->toText($latestVersion->getTime()); ?>">
-                <?php echo $view['date']->toDate($latestVersion->getTime()); ?>
+            <td title="<?php echo $view['date']->toText($latestVersion->time); ?>">
+                <?php echo $view['date']->toDate($latestVersion->time); ?>
             </td>
         </tr>
         <tr>
             <th><?php echo $view['translator']->trans('marketplace.package.license'); ?></th>
-            <td><?php echo $view->escape(implode(', ', $latestVersion->getLicense())); ?></td>
+            <td><?php echo $view->escape(implode(', ', $latestVersion->license)); ?></td>
         </tr>
-        <?php if ($latestVersion->getHomepage()) : ?>
+        <?php if ($latestVersion->homepage) : ?>
         <tr>
             <th><?php echo $view['translator']->trans('marketplace.package.homepage'); ?></th>
-            <td><?php echo $view->escape($latestVersion->getHomepage()); ?></td>
+            <td><?php echo $view->escape($latestVersion->homepage); ?></td>
         </tr>
         <?php endif; ?>
         <tr>
             <th>
                 <?php echo $view['translator']->trans('marketplace.package.required.packages'); ?>
-                (<?php echo count($latestVersion->getRequire()); ?>)
+                (<?php echo count($latestVersion->require); ?>)
             </th>
-            <td><?php echo $view->escape(implode(', ', array_keys($latestVersion->getRequire()))); ?></td>
+            <td><?php echo $view->escape(implode(', ', array_keys($latestVersion->require))); ?></td>
         </tr>
         <?php endif; ?>
     </table>
@@ -135,12 +135,12 @@ $view['slots']->set(
         <?php foreach ($packageDetail->getVersions()->sortByLatest() as $version) : ?>
         <tr>
             <td>
-                <a href="<?php echo $view->escape($packageDetail->getPackageBase()->getRepository()); ?>/releases/tag/<?php echo $view->escape($version->getVersion()); ?>" target="_blank" rel="noopener noreferrer" >
-                    <?php echo $view->escape($version->getVersion()); ?>
+                <a href="<?php echo $view->escape($packageDetail->getPackageBase()->getRepository()); ?>/releases/tag/<?php echo $view->escape($version->version); ?>" target="_blank" rel="noopener noreferrer" >
+                    <?php echo $view->escape($version->version); ?>
                 </a>
             </td>
-            <td title="<?php echo $view['date']->toText($version->getTime()); ?>">
-                <?php echo $view['date']->toDate($version->getTime()); ?>
+            <td title="<?php echo $view['date']->toText($version->time); ?>">
+                <?php echo $view['date']->toDate($version->time); ?>
             </td>
         </tr>
         <?php endforeach; ?>

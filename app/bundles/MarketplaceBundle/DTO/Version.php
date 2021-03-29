@@ -6,13 +6,13 @@ namespace Mautic\MarketplaceBundle\DTO;
 
 final class Version
 {
-    private string $version;
-    private array $license;
-    private string $homepage;
-    private string $issues;
-    private \DateTimeInterface $time;
-    private array $require;
-    private array $keywords;
+    public string $version;
+    public array $license;
+    public string $homepage;
+    public string $issues;
+    public \DateTimeInterface $time;
+    public array $require;
+    public array $keywords;
 
     public function __construct(string $version, array $license, \DateTimeInterface $time, string $homepage, string $issues, array $require, array $keywords)
     {
@@ -36,40 +36,5 @@ final class Version
             (array) $array['require'],
             (array) $array['keywords']
         );
-    }
-
-    public function getVersion(): string
-    {
-        return $this->version;
-    }
-
-    public function getLicense(): array
-    {
-        return $this->license;
-    }
-
-    public function getHomepage(): string
-    {
-        return $this->homepage;
-    }
-
-    public function getIssues(): string
-    {
-        return $this->issues;
-    }
-
-    public function getTime(): \DateTimeInterface
-    {
-        return $this->time;
-    }
-
-    public function getRequire(): array
-    {
-        return $this->require;
-    }
-
-    public function getKeywords(): array
-    {
-        return $this->keywords;
     }
 }
