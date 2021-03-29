@@ -15,9 +15,10 @@ use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\Exception\FilterNotFoundException;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ContactSegmentFilterDictionaryTest extends \PHPUnit_Framework_TestCase
+class ContactSegmentFilterDictionaryTest extends TestCase
 {
     public function testWorkflow()
     {
