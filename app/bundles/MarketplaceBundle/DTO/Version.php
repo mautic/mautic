@@ -6,6 +6,7 @@ namespace Mautic\MarketplaceBundle\DTO;
 
 class Version
 {
+    private string $version;
     private array $license;
     private string $homepage;
     private string $issues;
