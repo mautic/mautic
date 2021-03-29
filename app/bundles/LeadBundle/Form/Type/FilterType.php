@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
 use Symfony\Component\Form\AbstractType;
@@ -71,7 +70,7 @@ class FilterType extends AbstractType
             $form        = $event->getForm();
             $fieldAlias  = $data['field'] ?? null;
             $fieldObject = $data['object'] ?? 'behaviors';
-            $field       = $fieldAlias ? $fieldChoices[$fieldObject][$fieldAlias] ?? null : null;
+            $field       = $fieldAlias ? $fieldChoices[$fieldObject][$fieldAlias] ?? [] : [];
             $operators   = $field['operators'] ?? [];
             $operator    = $data['operator'] ?? null;
 
