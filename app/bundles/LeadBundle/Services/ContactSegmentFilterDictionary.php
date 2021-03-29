@@ -271,7 +271,6 @@ class ContactSegmentFilterDictionary
             'foreign_table' => 'asset_downloads',
             'field'         => 'asset_id',
         ];
-        $this->fetchTranslationsFromSubscribers();
     }
 
     /**
