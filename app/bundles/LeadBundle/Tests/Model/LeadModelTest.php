@@ -422,6 +422,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $mockLeadModel->expects($this->once())->method('saveEntity')->willThrowException(new \Exception());
         $mockLeadModel->expects($this->once())->method('checkForDuplicateContact')->willReturn(new Lead());
+        $mockLeadModel->expects($this->once())->method('setFieldValues');
 
         try {
             $mockLeadModel->import([], [], null, null, null, true, $leadEventLog);
@@ -462,6 +463,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->setProperty($mockLeadModel, LeadModel::class, 'leadFields', [['alias' => 'email', 'type' => 'email', 'defaultValue' => '']]);
 
         $mockLeadModel->expects($this->once())->method('checkForDuplicateContact')->willReturn($lead);
+        $mockLeadModel->expects($this->once())->method('setFieldValues');
 
         try {
             $mockLeadModel->import([], [], null, null, null, true, $leadEventLog);
