@@ -100,7 +100,6 @@ jobs:
       with:
         files: ./coverage.xml
         fail_ci_if_error: true
-        verbose: true
 
     - name: Slack Notification if tests fail
       uses: rtCamp/action-slack-notify@v2
