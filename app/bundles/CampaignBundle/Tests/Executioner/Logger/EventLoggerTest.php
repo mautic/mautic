@@ -74,6 +74,15 @@ class EventLoggerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($logCollection->getValues(), $persistedLogs->getValues());
     }
 
+    public function testHydrateContactRotationsForNewLogs()
+    {
+        $this->leadRepository->expects($this->once())
+        ->method('getContactRotations')
+        ->willReturn([]);
+
+        $this->getLogger()->hydrateContactRotationsForNewLogs([], 1);
+    }
+
     private function getLogger()
     {
         return new EventLogger(
