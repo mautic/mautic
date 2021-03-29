@@ -22,9 +22,9 @@
       "contributions": [
         "code",
         "userTesting"
-      ]
-    }
-  ],
+]
+    },
+    {
   "contributorsPerLine": 7,
   "projectName": "mautic",
   "projectOwner": "mautic",
