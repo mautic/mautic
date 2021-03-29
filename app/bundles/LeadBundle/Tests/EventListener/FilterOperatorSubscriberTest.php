@@ -414,7 +414,7 @@ final class FilterOperatorSubscriberTest extends TestCase
 
         $this->assertSame(
             [
-                'label'      => 'mautic.lead.list.filter.dnc_unsubscribed_manually',
+                'label'      => 'mautic.lead.list.filter.dnc_manual_email',
                 'properties' => [
                     'type' => 'boolean',
                     'list' => [
@@ -428,7 +428,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ],
                 'object' => 'lead',
             ],
-            $choices['lead']['dnc_unsubscribed_manually']
+            $choices['lead']['dnc_manual_email']
         );
     }
 
@@ -712,7 +712,7 @@ final class FilterOperatorSubscriberTest extends TestCase
 
         $this->assertSame(
             [
-                'label'      => 'mautic.lead.list.filter.dnc_unsubscribed_manually',
+                'label'      => 'mautic.lead.list.filter.dnc_manual_email',
                 'properties' => [
                     'type' => 'boolean',
                     'list' => [
@@ -726,7 +726,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ],
                 'object' => 'lead',
             ],
-            $choices['lead']['dnc_unsubscribed_manually']
+            $choices['lead']['dnc_manual_email']
         );
     }
 

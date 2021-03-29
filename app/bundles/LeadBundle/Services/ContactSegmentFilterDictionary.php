@@ -15,7 +15,6 @@ use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\Exception\FilterNotFoundException;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
-use Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
@@ -144,13 +143,10 @@ class ContactSegmentFilterDictionary
         $this->filters['dnc_unsubscribed']              = [
             'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
-        $this->filters['dnc_unsubscribed_manually']     = [
+        $this->filters['dnc_manual_email']     = [
             'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
         $this->filters['dnc_unsubscribed_sms']          = [
-            'type' => DoNotContactFilterQueryBuilder::getServiceId(),
-        ];
-        $this->filters['dnc_unsubscribed_sms_manually'] = [
             'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
         $this->filters['leadlist']                      = [
@@ -233,21 +229,10 @@ class ContactSegmentFilterDictionary
             'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'page_hits',
         ];
-        // Clicked any link from an email ever, kept as email_id for BC
         $this->filters['email_id'] = [
-            'type' => ChannelClickQueryBuilder::getServiceId(),
-        ];
-        // Clicked any link from an email based on time
-        $this->filters['email_clicked_link_date'] = [
-            'type' => ChannelClickQueryBuilder::getServiceId(),
-        ];
-        // Clicked any link from a sms based on time
-        $this->filters['sms_clicked_link'] = [
-            'type' => ChannelClickQueryBuilder::getServiceId(),
-        ];
-        // Clicked any link from a sms based on time
-        $this->filters['sms_clicked_link_date'] = [
-            'type' => ChannelClickQueryBuilder::getServiceId(),
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'page_hits',
+            'foreign_field' => 'email_id',
         ];
         $this->filters['sessions']              = [
             'type' => SessionsFilterQueryBuilder::getServiceId(),

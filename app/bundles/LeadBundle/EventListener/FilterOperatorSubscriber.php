@@ -251,11 +251,11 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
             ],
-            'dnc_unsubscribed_manually' => [
-                'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed_manually'),
+            'dnc_manual_email' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_manual_email'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'dnc_unsubscribed_manually'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'dnc_manual_email'),
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'     => 'lead',
@@ -277,15 +277,6 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
-            ],
-            'dnc_unsubscribed_sms_manually' => [
-                'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed_sms_manually'),
-                'properties' => [
-                    'type' => 'boolean',
-                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'dnc_unsubscribed_sms_manually'),
-                ],
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
-                'object'     => 'lead',
             ],
             'stage' => [
                 'label'      => $this->translator->trans('mautic.lead.lead.field.stage'),
@@ -476,44 +467,6 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
-            ],
-            // Clicked any link from any email relative to time
-            'email_clicked_link_date' => [
-                'label'      => $this->translator->trans('mautic.lead.list.filter.email_clicked_link_date'),
-                'properties' => ['type' => 'datetime'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::NOT_EQUAL_TO,
-                    OperatorOptions::GREATER_THAN,
-                    OperatorOptions::LESS_THAN,
-                    OperatorOptions::GREATER_THAN_OR_EQUAL,
-                    OperatorOptions::LESS_THAN_OR_EQUAL,
-                ]),
-                'object' => 'lead',
-            ],
-            // Clicked any link from any sms
-            'sms_clicked_link' => [
-                'label'      => $this->translator->trans('mautic.lead.list.filter.sms_clicked_link'),
-                'properties' => [
-                    'type' => 'boolean',
-                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'sms_clicked_link'),
-                ],
-                'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
-                'object'    => 'lead',
-            ],
-            // Clicked any link from any sms relative to time
-            'sms_clicked_link_date' => [
-                'label'      => $this->translator->trans('mautic.lead.list.filter.sms_clicked_link_date'),
-                'properties' => ['type' => 'datetime'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::NOT_EQUAL_TO,
-                    OperatorOptions::GREATER_THAN,
-                    OperatorOptions::LESS_THAN,
-                    OperatorOptions::GREATER_THAN_OR_EQUAL,
-                    OperatorOptions::LESS_THAN_OR_EQUAL,
-                ]),
-                'object' => 'lead',
             ],
             'sessions' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.session'),
