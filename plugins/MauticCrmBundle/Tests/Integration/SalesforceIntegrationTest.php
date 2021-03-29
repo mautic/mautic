@@ -1002,7 +1002,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 $integrationEntityModelMock,
                 $this->doNotContact,
             ])
-            ->setMethods($this->sfMockMethods)
+            ->onlyMethods($this->sfMockMethods)
             ->getMock();
 
         $sf->method('makeRequest')

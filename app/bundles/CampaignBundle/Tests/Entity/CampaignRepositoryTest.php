@@ -76,7 +76,7 @@ class CampaignRepositoryTest extends TestCase
 
         $queryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
-            ->setMethods(['select', 'from', 'where', 'setParameter', 'andWhere', 'getQuery'])
+            ->onlyMethods(['select', 'from', 'where', 'setParameter', 'andWhere', 'getQuery'])
             ->getMock();
 
         $this->entityManager
@@ -110,7 +110,7 @@ class CampaignRepositoryTest extends TestCase
 
         $query = $this->getMockBuilder(AbstractQuery::class)
             ->disableOriginalConstructor()
-            ->setMethods(['setHydrationMode', 'getResult'])
+            ->onlyMethods(['setHydrationMode', 'getResult'])
             ->getMockForAbstractClass();
 
         $query->expects(self::once())

@@ -54,7 +54,7 @@ class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->ipCollection      = new ArrayCollection();
         $this->companyRepository = $this->getMockBuilder(CompanyRepository::class)
         ->disableOriginalConstructor()
-        ->setMethods(['getCompaniesByLeadId'])
+        ->onlyMethods(['getCompaniesByLeadId'])
         ->getMock();
 
         $this->companyRepository->method('getCompaniesByLeadId')
