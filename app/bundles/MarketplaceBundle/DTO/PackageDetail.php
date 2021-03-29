@@ -40,7 +40,7 @@ final class PackageDetail
         return new self(
             new PackageBase(
                 $array['name'],
-                '',
+                "https://packagist.org/packages/{$array['name']}",
                 $array['repository'],
                 $array['description'],
                 (int) $array['downloads']['total'],

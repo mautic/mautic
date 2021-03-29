@@ -202,7 +202,14 @@ $view['slots']->set(
 
     <h3 class="pt-lg pb-lg pl-sm"><?php echo $view['translator']->trans('marketplace.package.packagist.info'); ?></h3>
     <table class="table mb-0">
-        
+        <tr>
+            <th><?php echo $view['translator']->trans('marketplace.package.repository'); ?></th>
+            <td>
+                <a href="<?php echo $view->escape($packageDetail->getPackageBase()->getUrl()); ?>" target="_blank" rel="noopener noreferrer" >
+                    <?php echo $view->escape($packageDetail->getPackageBase()->getName()); ?>
+                </a>
+            </td>
+        </tr>
         <tr>
             <th><?php echo $view['translator']->trans('marketplace.package.total.downloads'); ?></th>
             <td><?php echo $view->escape($packageDetail->getPackageBase()->getDownloads()); ?></td>
