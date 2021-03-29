@@ -6,9 +6,8 @@ namespace Mautic\MarketplaceBundle\DTO;
 
 final class Maintainer
 {
-    private string $name;
-
-    private string $avatar;
+    public string $name;
+    public string $avatar;
 
     public function __construct(string $name, string $avatar)
     {
@@ -22,15 +21,5 @@ final class Maintainer
             $array['name'],
             $array['avatar_url']
         );
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function getAvatar(): string
-    {
-        return $this->avatar;
     }
 }

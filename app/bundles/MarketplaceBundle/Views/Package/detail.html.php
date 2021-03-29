@@ -155,17 +155,17 @@ $view['slots']->set(
             <div class="col-xs-3 va-m">
                 <div class="panel-body">
                     <span class="img-wrapper img-rounded">
-                        <img class="img" src="<?php echo $view->escape($maintainer->getAvatar()); ?>">
+                        <img class="img" src="<?php echo $view->escape($maintainer->avatar); ?>">
                     </span>
                 </div>
             </div>
             <div class="col-xs-9 va-t">
                 <div class="panel-body">
                     <h4 class="fw-sb mb-xs ellipsis">
-                        <?php echo $view->escape(ucfirst($maintainer->getName())); ?>
+                        <?php echo $view->escape(ucfirst($maintainer->name)); ?>
                     </h4>
-                    <a href="https://packagist.org/packages/<?php echo $view->escape($maintainer->getName()); ?>" target="_blank" rel="noopener noreferrer">
-                        <?php echo $view['translator']->trans('marketplace.other.packages', ['%name%' => $maintainer->getName()]); ?>
+                    <a href="https://packagist.org/packages/<?php echo $view->escape($maintainer->name); ?>" target="_blank" rel="noopener noreferrer">
+                        <?php echo $view['translator']->trans('marketplace.other.packages', ['%name%' => $maintainer->name]); ?>
                     </a>
                 </div>
             </div>
