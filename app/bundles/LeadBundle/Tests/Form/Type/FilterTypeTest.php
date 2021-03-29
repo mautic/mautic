@@ -61,83 +61,84 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
 
         $this->listModel->expects($this->once())
             ->method('getChoiceFields')
-            ->willReturn([
-                'lead' => [
-                    'address1' => [
-                        'label'      => 'Address Line 1',
-                        'properties' => [
-                            'type' => 'text',
-                        ],
-                        'object'    => 'lead',
-                        'operators' => [
-                            'equals' => 'eq',
+            ->willReturn(
+                [
+                    'lead' => [
+                        'address1' => [
+                            'label'      => 'Address Line 1',
+                            'properties' => [
+                                'type' => 'text',
+                            ],
+                            'object'     => 'lead',
+                            'operators'  => [
+                                'equals' => 'eq',
+                            ],
                         ],
                     ],
-                ],
-            ]);
-
-        // Adding a filter with an existing field:
-        $builder->expects($this->at(1))
-            ->method('addEventListener')
-            ->with(
-                FormEvents::PRE_SET_DATA,
-                $this->callback(
-                    function (callable $formModifier) {
-                        /** @var FormInterface|MockObject $form */
-                        $form = $this->createMock(FormInterface::class);
-                        $data = [
-                            'field'    => 'address1',
-                            'object'   => 'lead',
-                            'operator' => 'eq',
-                        ];
-
-                        $form->expects($this->exactly(2))
-                            ->method('add');
-
-                        $form->expects($this->once())
-                            ->method('get')
-                            ->willReturnSelf();
-
-                        $this->formAdjustmentsProvider->expects($this->once())
-                            ->method('adjustForm');
-
-                        $formModifier(new FormEvent($form, $data));
-
-                        return true;
-                    }
-                )
+                ]
             );
 
-        // Adding a filter with a deleted field:
-        $builder->expects($this->at(2))
+        // Adding a filter with an existing field:
+        $builder->expects($this->exactly(2))
             ->method('addEventListener')
-            ->with(
-                FormEvents::PRE_SUBMIT,
-                $this->callback(
-                    function (callable $formModifier) {
-                        /** @var FormInterface|MockObject $form */
-                        $form = $this->createMock(FormInterface::class);
-                        $data = [
-                            'field'    => 'deleted',
-                            'object'   => 'lead',
-                            'operator' => 'eq',
-                        ];
+            ->withConsecutive(
+                [
+                    FormEvents::PRE_SET_DATA,
+                    $this->callback(
+                        function (callable $formModifier) {
+                            /** @var FormInterface|MockObject $form */
+                            $form = $this->createMock(FormInterface::class);
+                            $data = [
+                                'field'    => 'address1',
+                                'object'   => 'lead',
+                                'operator' => 'eq',
+                            ];
 
-                        $form->expects($this->exactly(2))
-                            ->method('add');
+                            $form->expects($this->exactly(2))
+                                ->method('add');
 
-                        $form->expects($this->never())
-                            ->method('get')
-                            ->willReturnSelf();
+                            $form->expects($this->once())
+                                ->method('get')
+                                ->willReturnSelf();
 
-                        $this->formAdjustmentsProvider->expects($this->never())
-                            ->method('adjustForm');
+                            $this->formAdjustmentsProvider->expects($this->once())
+                                ->method('adjustForm');
 
-                        $formModifier(new FormEvent($form, $data));
+                            $formModifier(new FormEvent($form, $data));
 
-                        return true;
-                    }
-                )
+                            return true;
+                        }
+                    ),
+                ],
+                // Adding a filter with a deleted field:
+                [
+                    FormEvents::PRE_SUBMIT,
+                    $this->callback(
+                        function (callable $formModifier) {
+                            /** @var FormInterface|MockObject $form */
+                            $form = $this->createMock(FormInterface::class);
+                            $data = [
+                                'field'    => 'deleted',
+                                'object'   => 'lead',
+                                'operator' => 'eq',
+                            ];
+
+                            $form->expects($this->exactly(2))
+                                ->method('add');
+
+                            $form->expects($this->never())
+                                ->method('get')
+                                ->willReturnSelf();
+
+                            $this->formAdjustmentsProvider->expects($this->never())
+                                ->method('adjustForm');
+
+                            $formModifier(new FormEvent($form, $data));
+
+                            return true;
+                        }
+                    ),
+                ]
             );
 
         $this->form->buildForm($builder, $options);
@@ -154,80 +155,90 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
 
         $this->listModel->expects($this->once())
             ->method('getChoiceFields')
-            ->willReturn([
-                'lead' => [
-                    'number1' => [
-                        'label'      => 'Number 1',
-                        'properties' => [
-                            'type' => 'number',
-                        ],
-                        'object'    => 'lead',
-                        'operators' => [
-                            'equals' => 'eq',
+            ->willReturn(
+                [
+                    'lead' => [
+                        'number1' => [
+                            'label'      => 'Number 1',
+                            'properties' => [
+                                'type' => 'number',
+                            ],
+                            'object'     => 'lead',
+                            'operators'  => [
+                                'equals' => 'eq',
+                            ],
                         ],
                     ],
-                ],
-            ]);
+                ]
+            );
 
         // Adding a filter with an existing field:
-        $builder->expects($this->at(1))
+        $builder->expects($this->exactly(2))
             ->method('addEventListener')
-            ->with(
-                FormEvents::PRE_SET_DATA,
-                $this->callback(
+            ->withConsecutive(
+                [
+                    FormEvents::PRE_SET_DATA,
+                    $this->callback(
+                        function (callable $formModifier) {
+                            $form = new class() extends Form {
+                                public $addMethodCallCounter = 0;
+
+                                public function __construct()
+                                {
+                                }
+
+                                public function get($name)
+                                {
+                                    Assert::assertSame('properties', $name);
+
+                                    return new class() extends Form {
+                                        public function __construct()
+                                        {
+                                        }
+
+                                        public function setData($modelData)
+                                        {
+                                            Assert::assertSame(
+                                                [
+                                                    'filter'  => '0',
+                                                    'display' => null,
+                                                ],
+                                                $modelData
+                                            );
+                                        }
+                                    };
+                                }
+
+                                public function add($child, $type = null, array $options = [])
+                                {
+                                    ++$this->addMethodCallCounter;
+                                }
+                            };
+
+                            $this->formAdjustmentsProvider->expects($this->once())
+                                ->method('adjustForm');
+
+                            $data = [
+                                'field'    => 'number1',
+                                'object'   => 'lead',
+                                'filter'   => '0',
+                                'operator' => 'eq',
+                            ];
+
+                            $formModifier(new FormEvent($form, $data));
+
+                            Assert::assertSame(2, $form->addMethodCallCounter);
+
+                            return true;
+                        }
+                    ),
+                ],
+                [
+                    FormEvents::PRE_SUBMIT,
                     function (callable $formModifier) {
-                        $form = new class() extends Form {
-                            public $addMethodCallCounter = 0;
-
-                            public function __construct()
-                            {
-                            }
-
-                            public function get($name)
-                            {
-                                Assert::assertSame('properties', $name);
-
-                                return new class() extends Form {
-                                    public function __construct()
-                                    {
-                                    }
-
-                                    public function setData($modelData)
-                                    {
-                                        Assert::assertSame(
-                                            [
-                                                'filter'  => '0',
-                                                'display' => null,
-                                            ],
-                                            $modelData
-                                        );
-                                    }
-                                };
-                            }
-
-                            public function add($child, $type = null, array $options = [])
-                            {
-                                ++$this->addMethodCallCounter;
-                            }
-                        };
-
-                        $this->formAdjustmentsProvider->expects($this->once())
-                            ->method('adjustForm');
-
-                        $data = [
-                            'field'    => 'number1',
-                            'object'   => 'lead',
-                            'filter'   => '0',
-                            'operator' => 'eq',
-                        ];
-
-                        $formModifier(new FormEvent($form, $data));
-
-                        Assert::assertSame(2, $form->addMethodCallCounter);
-
-                        return true;
-                    }
-                )
+                        // don't do anything for this test
+                    },
+                ]
             );
 
         $this->form->buildForm($builder, $options);

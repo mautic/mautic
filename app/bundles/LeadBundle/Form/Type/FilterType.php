@@ -70,7 +70,7 @@ class FilterType extends AbstractType
             $form        = $event->getForm();
             $fieldAlias  = $data['field'] ?? null;
             $fieldObject = $data['object'] ?? 'behaviors';
-            $field       = $fieldAlias ? $fieldChoices[$fieldObject][$fieldAlias] ?? [] : [];
+            $field       = $fieldChoices[$fieldObject][$fieldAlias] ?? null;
             $operators   = $field['operators'] ?? [];
             $operator    = $data['operator'] ?? null;
 
