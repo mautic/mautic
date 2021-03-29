@@ -239,9 +239,6 @@ class ContactSegmentFilterDictionary
         $this->filters['email_clicked_link_date'] = [
             'type' => ChannelClickQueryBuilder::getServiceId(),
         ];
-        $this->filters['email_clicked_date'] = [
-            'type' => ChannelClickQueryBuilder::getServiceId(),
-        ];
         $this->filters['sms_clicked_link'] = [
             'type'  => ChannelClickQueryBuilder::getServiceId(),
         ];
