@@ -24,6 +24,10 @@
       "url": "https://github.com/mautic/BazingaOAuthServerBundle.git"
     },
     {
+      "type": "git",
+      "url": "https://github.com/dennisameling/FOSOAuthServerBundle.git"
+    },
+    {
       "type": "package",
       "package": {
         "name": "mautic/plugin-grapesjs-builder",
@@ -94,7 +98,6 @@
   "conflict": {
     "mautic/core": "*"
   },
-
   "minimum-stability": "dev",
   "prefer-stable": true,
   "scripts": {
@@ -114,8 +117,8 @@
     "phpstan": "bin/phpstan analyse app/bundles app/migrations plugins",
     "cs": "bin/php-cs-fixer fix -v --dry-run --diff",
     "fixcs": "bin/php-cs-fixer fix -v",
-    "rector": "bin/rector process --config rector.yaml",
-    "remove-git-submodules" : "find . -mindepth 2 -type d -name .git | xargs rm -rf"
+    "rector": "bin/rector process",
+    "remove-git-submodules": "find . -mindepth 2 -type d -name .git | xargs rm -rf"
   },
   "config": {
     "bin-dir": "bin",
