@@ -11,10 +11,11 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/2930593?v=4",
       "profile": "https://www.ruthcheesley.co.uk",
       "contributions": [
-      "userTesting"
- ]
-    },
-
+        "userTesting"
+      ]
+    }
+  ],
+      {
       "login": "dennisameling",
       "name": "Dennis Ameling",
       "avatar_url": "https://avatars.githubusercontent.com/u/17739158?v=4",
@@ -22,9 +23,9 @@
       "contributions": [
         "code",
         "userTesting"
-]
-    },
-    {
+      ]
+    }
+  ],
   "contributorsPerLine": 7,
   "projectName": "mautic",
   "projectOwner": "mautic",
