@@ -111,7 +111,7 @@ class CheckStep implements StepInterface
 
         // Allow for the vendor folder to live
         // above the application folder.
-        if (!is_dir(dirname($this->kernelRoot).'/vendor/composer') && !is_dir(dirname($this->kernelRoot).'/../vendor/composer') ) {
+        if (!is_dir(dirname($this->kernelRoot).'/vendor/composer') && !is_dir(dirname($this->kernelRoot).'/../vendor/composer')) {
             $messages[] = 'mautic.install.composer.dependencies';
         }
 

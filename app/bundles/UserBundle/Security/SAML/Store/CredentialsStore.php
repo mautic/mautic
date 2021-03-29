@@ -83,8 +83,8 @@ class CredentialsStore implements CredentialStoreInterface
 
     private function createDefaultCredentials(): X509Credential
     {
-        $reflection = new \ReflectionClass(\Composer\Autoload\ClassLoader::class);
-        $vendorPath = dirname(dirname($reflection->getFileName()));
+        $reflection         = new \ReflectionClass(\Composer\Autoload\ClassLoader::class);
+        $vendorPath         = dirname(dirname($reflection->getFileName()));
         $certificateContent = file_get_contents($vendorPath.'/lightsaml/lightsaml/web/sp/saml.crt');
         $privateKeyContent  = file_get_contents($vendorPath.'/lightsaml/lightsaml/web/sp/saml.key');
         $keyPassword        = '';
