@@ -5499,12 +5499,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mautic/core.git",
-                "reference": "e16a815257b148a61216b44e10666624bb6faa72"
+                "reference": "45341cccd19a166f7c9146a55fcaaf3e7a31b79c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mautic/core/zipball/e16a815257b148a61216b44e10666624bb6faa72",
-                "reference": "e16a815257b148a61216b44e10666624bb6faa72",
+                "url": "https://api.github.com/repos/mautic/core/zipball/45341cccd19a166f7c9146a55fcaaf3e7a31b79c",
+                "reference": "45341cccd19a166f7c9146a55fcaaf3e7a31b79c",
                 "shasum": ""
             },
             "require": {
@@ -5704,7 +5704,7 @@
                 "issues": "https://github.com/mautic/core/issues",
                 "source": "https://github.com/mautic/core/tree/4.x"
             },
-            "time": "2021-03-29T22:09:17+00:00"
+            "time": "2021-03-29T22:30:02+00:00"
         },
         {
             "name": "mautic/core-project-message",
