@@ -13,48 +13,17 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 final class ImportMappingEvent extends Event
 {
-    /**
-     * @var string
-     */
-    private $routeObjectName;
-
-    /**
-     * @var bool
-     */
-    private $objectSupported = false;
-
-    /**
-     * @var array
-     */
-    private $fields = [];
+    public string $routeObjectName;
+    public bool $objectSupported = false;
+    public array $fields = [];
 
     public function __construct(string $routeObjectName)
     {
         $this->routeObjectName = $routeObjectName;
-    }
-
-    public function getRouteObjectName(): string
-    {
-        return $this->routeObjectName;
-    }
-
-    public function objectIsSupported(): bool
-    {
-        return $this->objectSupported;
-    }
-
-    public function setFields(array $fields): void
-    {
-        $this->fields = $fields;
-    }
-
-    public function getFields(): array
-    {
-        return $this->fields;
     }
 
     /**
@@ -62,17 +31,12 @@ final class ImportMappingEvent extends Event
      */
     public function importIsForRouteObject(string $routeObject): bool
     {
-        if ($this->getRouteObjectName() === $routeObject) {
+        if ($this->routeObjectName === $routeObject) {
             $this->objectSupported = true;
 
             return true;
         }
 
         return false;
-    }
-
-    public function setObjectIsSupported(bool $objectSupported): void
-    {
-        $this->objectSupported = $objectSupported;
     }
 }

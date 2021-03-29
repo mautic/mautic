@@ -94,11 +94,11 @@ final class ImportContactSubscriber implements EventSubscriberInterface
                 'ownerusername'  => 'mautic.lead.import.label.ownerusername',
             ];
 
-            $event->setFields([
+            $event->fields = [
                 'mautic.lead.contact'        => $this->fieldList->getFieldList(false, false),
                 'mautic.lead.company'        => $this->fieldList->getFieldList(false, false, ['isPublished' => true, 'object' => 'company']),
                 'mautic.lead.special_fields' => $specialFields,
-            ]);
+            ];
         }
     }
 

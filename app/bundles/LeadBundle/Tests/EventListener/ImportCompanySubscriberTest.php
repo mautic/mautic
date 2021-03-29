@@ -89,7 +89,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
         );
         $event = new ImportMappingEvent('unicorn');
         $subscriber->onFieldMapping($event);
-        Assert::assertFalse($event->objectIsSupported());
+        Assert::assertFalse($event->objectSupported);
     }
 
     public function testOnFieldMapping(): void
@@ -110,7 +110,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
         );
         $event = new ImportMappingEvent('companies');
         $subscriber->onFieldMapping($event);
-        Assert::assertTrue($event->objectIsSupported());
+        Assert::assertTrue($event->objectSupported);
         Assert::assertSame(
             [
                 'mautic.lead.company' => [
@@ -123,7 +123,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
                     'modifiedByUser' => 'mautic.lead.import.label.modifiedByUser',
                 ],
             ],
-            $event->getFields()
+            $event->fields
         );
     }
 
