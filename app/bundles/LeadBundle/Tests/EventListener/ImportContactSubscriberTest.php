@@ -27,7 +27,7 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
         );
         $event = new ImportInitEvent('unicorn');
         $subscriber->onImportInit($event);
-        Assert::assertFalse($event->objectIsSupported());
+        Assert::assertFalse($event->objectSupported);
     }
 
     public function testOnImportInitForContactsObjectWithoutPermissions(): void
@@ -73,11 +73,11 @@ final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
         );
         $event = new ImportInitEvent('contacts');
         $subscriber->onImportInit($event);
-        Assert::assertTrue($event->objectIsSupported());
-        Assert::assertSame('lead', $event->getObjectSingular());
-        Assert::assertSame('mautic.lead.leads', $event->getObjectName());
-        Assert::assertSame('#mautic_contact_index', $event->getActiveLink());
-        Assert::assertSame('mautic_contact_index', $event->getIndexRoute());
+        Assert::assertTrue($event->objectSupported);
+        Assert::assertSame('lead', $event->objectSingular);
+        Assert::assertSame('mautic.lead.leads', $event->objectName);
+        Assert::assertSame('#mautic_contact_index', $event->activeLink);
+        Assert::assertSame('mautic_contact_index', $event->indexRoute);
     }
 
     public function testOnFieldMappingForUnknownObject(): void

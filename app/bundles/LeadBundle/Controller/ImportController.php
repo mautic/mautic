@@ -45,7 +45,7 @@ class ImportController extends FormController
     public function indexAction($page = 1)
     {
         $initEvent = $this->dispatchImportOnInit();
-        $this->get('session')->set('mautic.import.object', $initEvent->getObjectSingular());
+        $this->get('session')->set('mautic.import.object', $initEvent->objectSingular);
 
         return $this->indexStandard($page);
     }
@@ -111,7 +111,7 @@ class ImportController extends FormController
     public function cancelAction($objectId)
     {
         $initEvent   = $this->dispatchImportOnInit();
-        $object      = $initEvent->getObjectSingular();
+        $object      = $initEvent->objectSingular;
         $session     = $this->get('session');
         $fullPath    = $this->getFullCsvPath($object);
         $importModel = $this->getModel($this->getModelName());
@@ -138,7 +138,7 @@ class ImportController extends FormController
     public function queueAction($objectId)
     {
         $initEvent   = $this->dispatchImportOnInit();
-        $object      = $initEvent->getObjectSingular();
+        $object      = $initEvent->objectSingular;
         $session     = $this->get('session');
         $fullPath    = $this->getFullCsvPath($object);
         $importModel = $this->getModel($this->getModelName());
@@ -176,12 +176,12 @@ class ImportController extends FormController
             return $this->accessDenied();
         }
 
-        if (!$initEvent->objectIsSupported()) {
+        if (!$initEvent->objectSupported) {
             return $this->notFound();
         }
 
         $session = $this->get('session');
-        $object  = $initEvent->getObjectSingular();
+        $object  = $initEvent->objectSingular;
 
         $session->set('mautic.import.object', $object);
 
@@ -464,7 +464,7 @@ class ImportController extends FormController
             $contentTemplate = 'MauticLeadBundle:Import:new.html.php';
             $viewParameters  = [
                 'form'       => $form->createView(),
-                'objectName' => $initEvent->getObjectName(),
+                'objectName' => $initEvent->objectName,
             ];
         } else {
             $contentTemplate = 'MauticLeadBundle:Import:progress.html.php';
@@ -473,9 +473,9 @@ class ImportController extends FormController
                 'import'           => $import,
                 'complete'         => $complete,
                 'failedRows'       => $importModel->getFailedRows($import->getId(), $import->getObject()),
-                'objectName'       => $initEvent->getObjectName(),
-                'indexRoute'       => $initEvent->getIndexRoute(),
-                'indexRouteParams' => $initEvent->getIndexRouteParams(),
+                'objectName'       => $initEvent->objectName,
+                'indexRoute'       => $initEvent->indexRoute,
+                'indexRouteParams' => $initEvent->indexRouteParams,
             ];
         }
 
@@ -489,12 +489,12 @@ class ImportController extends FormController
                     'viewParameters'  => $viewParameters,
                     'contentTemplate' => $contentTemplate,
                     'passthroughVars' => [
-                        'activeLink'    => $initEvent->getActiveLink(),
+                        'activeLink'    => $initEvent->activeLink,
                         'mauticContent' => 'leadImport',
                         'route'         => $this->generateUrl(
                             'mautic_import_action',
                             [
-                                'object'       => $initEvent->getRouteObjectName(),
+                                'object'       => $initEvent->routeObjectName,
                                 'objectAction' => 'new',
                             ]
                         ),
@@ -722,7 +722,7 @@ class ImportController extends FormController
     protected function getSessionBase($objectId = null)
     {
         $initEvent = $this->dispatchImportOnInit();
-        $object    = $initEvent->getObjectSingular();
+        $object    = $initEvent->objectSingular;
 
         return $object.'.import'.(($objectId) ? '.'.$objectId : '');
     }

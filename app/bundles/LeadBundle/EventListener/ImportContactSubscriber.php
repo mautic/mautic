@@ -69,9 +69,9 @@ final class ImportContactSubscriber implements EventSubscriberInterface
                 throw new AccessDeniedException('You do not have permission to import contacts');
             }
 
-            $event->setObjectSingular('lead');
-            $event->setObjectName('mautic.lead.leads');
-            $event->setActiveLink('#mautic_contact_index');
+            $event->objectSingular = 'lead';
+            $event->objectName     = 'mautic.lead.leads';
+            $event->activeLink     = '#mautic_contact_index';
             $event->setIndexRoute('mautic_contact_index');
             $event->stopPropagation();
         }

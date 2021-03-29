@@ -69,9 +69,9 @@ final class ImportCompanySubscriber implements EventSubscriberInterface
                 throw new AccessDeniedException('You do not have permission to import companies');
             }
 
-            $event->setObjectSingular('company');
-            $event->setObjectName('mautic.lead.lead.companies');
-            $event->setActiveLink('#mautic_company_index');
+            $event->objectSingular = 'company';
+            $event->objectName     = 'mautic.lead.lead.companies';
+            $event->activeLink     = '#mautic_company_index';
             $event->setIndexRoute('mautic_company_index');
             $event->stopPropagation();
         }
