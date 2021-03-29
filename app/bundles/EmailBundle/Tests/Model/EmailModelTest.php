@@ -16,13 +16,13 @@ namespace Mautic\EmailBundle\Tests\Model;
 use Doctrine\ORM\EntityManager;
 use Mautic\ChannelBundle\Entity\MessageRepository;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
-use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
@@ -30,6 +30,7 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Helper\StatsCollectionHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToContact;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
@@ -173,14 +174,19 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     private $emailModel;
 
     /**
-     * @var MockObject|GeneratedColumnsProviderInterface
-     */
-    private $generatedColumnsProvider;
-
-    /**
      * @var MockObject|DoNotContact
      */
     private $doNotContact;
+
+    /**
+     * @var CorePermissions|MockObject
+     */
+    private $corePermissions;
+
+    /**
+     * @var StatsCollectionHelper|MockObject
+     */
+    private $statsCollectionHelper;
 
     protected function setUp(): void
     {
@@ -210,7 +216,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->cacheStorageHelperMock   = $this->createMock(CacheStorageHelper::class);
         $this->contactTracker           = $this->createMock(ContactTracker::class);
         $this->doNotContact             = $this->createMock(DoNotContact::class);
-        $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
+        $this->statsCollectionHelper    = $this->createMock(StatsCollectionHelper::class);
+        $this->corePermissions          = $this->createMock(CorePermissions::class);
 
         $this->emailModel = new EmailModel(
             $this->ipLookupHelper,
@@ -228,7 +235,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->cacheStorageHelperMock,
             $this->contactTracker,
             $this->doNotContact,
-            $this->generatedColumnsProvider
+            $this->statsCollectionHelper,
+            $this->corePermissions
         );
 
         $this->emailModel->setTranslator($this->translator);
@@ -608,7 +616,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->cacheStorageHelperMock,
             $this->contactTracker,
             $this->doNotContact,
-            $this->generatedColumnsProvider
+            $this->statsCollectionHelper,
+            $this->corePermissions
         );
 
         $emailModel->setTranslator($this->translator);
