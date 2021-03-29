@@ -579,7 +579,7 @@ return [
                 'arguments' => [
                     'translator',
                     'monolog.logger.mautic',
-                    'mautic.http.connector',
+                    'mautic.http.client',
                     'mautic.email.model.transport_callback',
                 ],
             ],
