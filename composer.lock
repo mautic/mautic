@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4c9b17bce810cb85b4b812e3553b866b",
+    "content-hash": "c7546bb97851b5415c9970fd8e63b6b9",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.176.2",
+            "version": "3.176.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "cfd62d9d159df12e8e1fc3c486e0a010a4c39f80"
+                "reference": "a4f0bbeff965f67ca4dbfccfa2865de611f14c30"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/cfd62d9d159df12e8e1fc3c486e0a010a4c39f80",
-                "reference": "cfd62d9d159df12e8e1fc3c486e0a010a4c39f80",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/a4f0bbeff965f67ca4dbfccfa2865de611f14c30",
+                "reference": "a4f0bbeff965f67ca4dbfccfa2865de611f14c30",
                 "shasum": ""
             },
             "require": {
@@ -92,9 +92,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.176.2"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.176.3"
             },
-            "time": "2021-03-26T18:16:22+00:00"
+            "time": "2021-03-29T18:16:38+00:00"
         },
         {
             "name": "bandwidth-throttle/token-bucket",
@@ -360,7 +360,7 @@
         },
         {
             "name": "composer/installers",
-            "version": "1.10",
+            "version": "1.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nickveenhof/installers.git",
@@ -5724,12 +5724,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mautic/core-composer-scaffold.git",
-                "reference": "833fdb5be95db1767b48d2dc572dac4d0691dbcf"
+                "reference": "7a69f6f723cfa974b4423d3089dac2695641e3f3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mautic/core-composer-scaffold/zipball/833fdb5be95db1767b48d2dc572dac4d0691dbcf",
-                "reference": "833fdb5be95db1767b48d2dc572dac4d0691dbcf",
+                "url": "https://api.github.com/repos/mautic/core-composer-scaffold/zipball/7a69f6f723cfa974b4423d3089dac2695641e3f3",
+                "reference": "7a69f6f723cfa974b4423d3089dac2695641e3f3",
                 "shasum": ""
             },
             "require": {
@@ -5765,7 +5765,7 @@
                 "issues": "https://github.com/mautic/core-composer-scaffold/issues",
                 "source": "https://github.com/mautic/core-composer-scaffold/tree/4.x"
             },
-            "time": "2021-03-27T22:07:33+00:00"
+            "time": "2021-03-29T19:13:58+00:00"
         },
         {
             "name": "mautic/core-dev",
@@ -5816,12 +5816,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mautic/core.git",
-                "reference": "8f56da9a824aeabea521ed4a1b5af5eb5f61c9ab"
+                "reference": "7a9c2ce020b1cc64b9af86e74d7dd94797904a94"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mautic/core/zipball/8f56da9a824aeabea521ed4a1b5af5eb5f61c9ab",
-                "reference": "8f56da9a824aeabea521ed4a1b5af5eb5f61c9ab",
+                "url": "https://api.github.com/repos/mautic/core/zipball/7a9c2ce020b1cc64b9af86e74d7dd94797904a94",
+                "reference": "7a9c2ce020b1cc64b9af86e74d7dd94797904a94",
                 "shasum": ""
             },
             "require": {
@@ -5869,6 +5869,24 @@
                 "mautic/plugin-outlook": "main-dev",
                 "mautic/plugin-social": "main-dev",
                 "mautic/plugin-zapier": "main-dev",
+                "mautic/theme-aurora": "dev-main",
+                "mautic/theme-blank": "dev-main",
+                "mautic/theme-blank-grapejs": "dev-main",
+                "mautic/theme-brienz": "dev-main",
+                "mautic/theme-cards": "dev-main",
+                "mautic/theme-confirmme": "dev-main",
+                "mautic/theme-fresh-center": "dev-main",
+                "mautic/theme-fresh-fixed": "dev-main",
+                "mautic/theme-fresh-left": "dev-main",
+                "mautic/theme-fresh-wide": "dev-main",
+                "mautic/theme-goldstar": "dev-main",
+                "mautic/theme-neopolitan": "dev-main",
+                "mautic/theme-oxygen": "dev-main",
+                "mautic/theme-paprika": "dev-main",
+                "mautic/theme-skyline": "dev-main",
+                "mautic/theme-sparse": "dev-main",
+                "mautic/theme-sunday": "dev-main",
+                "mautic/theme-vibrant": "dev-main",
                 "misd/phone-number-bundle": "^1.1",
                 "mrclay/minify": "2.2.0",
                 "noxlogic/ratelimit-bundle": "^1.11",
@@ -5968,7 +5986,7 @@
                         "[project-root]/bin/console": "assets/scaffold/files/console",
                         "[project-root]/bin/.htaccess": "assets/scaffold/files/console.htaccess",
                         "[web-root]/.htaccess": "assets/scaffold/files/htaccess",
-                        "[web-root]/example.gitignore": "assets/scaffold/files/example.gitignore",
+                        "[web-root]/.gitignore": "assets/scaffold/files/example.gitignore",
                         "[web-root]/index.php": "assets/scaffold/files/index.php",
                         "[web-root]/index_dev.php": "assets/scaffold/files/index_dev.php",
                         "[web-root]/offline.php": "assets/scaffold/files/offline.php",
@@ -5981,7 +5999,9 @@
                         "[web-root]/media/dashboards/email-overview.json": "assets/scaffold/media/dashboards/email-overview.json",
                         "[web-root]/media/dashboards/stats-overview.json": "assets/scaffold/media/dashboards/stats-overview.json",
                         "[web-root]/media/files/.htaccess": "assets/scaffold/media/files/.htaccess",
-                        "[web-root]/media/images/.htaccess": "assets/scaffold/media/images/.htaccess"
+                        "[web-root]/media/images/.htaccess": "assets/scaffold/media/images/.htaccess",
+                        "[web-root]/themes/blank.png": "assets/scaffold/files/blank.png",
+                        "[web-root]/themes/blank-big.png": "assets/scaffold/files/blank-big.png"
                     }
                 }
             },
@@ -6006,7 +6026,7 @@
                 "issues": "https://github.com/mautic/core/issues",
                 "source": "https://github.com/mautic/core/tree/4.x"
             },
-            "time": "2021-03-28T09:34:59+00:00"
+            "time": "2021-03-29T19:30:02+00:00"
         },
         {
             "name": "mautic/core-project-message",
@@ -6056,12 +6076,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mautic/core-recommended.git",
-                "reference": "15c3ec1bdc44038787d7d845c87e9f2d15e19dc0"
+                "reference": "f9edd7dad2b993a1067850ad16f30199727a99b8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mautic/core-recommended/zipball/15c3ec1bdc44038787d7d845c87e9f2d15e19dc0",
-                "reference": "15c3ec1bdc44038787d7d845c87e9f2d15e19dc0",
+                "url": "https://api.github.com/repos/mautic/core-recommended/zipball/f9edd7dad2b993a1067850ad16f30199727a99b8",
+                "reference": "f9edd7dad2b993a1067850ad16f30199727a99b8",
                 "shasum": ""
             },
             "require": {
@@ -6110,6 +6130,24 @@
                 "mautic/plugin-outlook": "main-dev",
                 "mautic/plugin-social": "main-dev",
                 "mautic/plugin-zapier": "main-dev",
+                "mautic/theme-aurora": "dev-main",
+                "mautic/theme-blank": "dev-main",
+                "mautic/theme-blank-grapejs": "dev-main",
+                "mautic/theme-brienz": "dev-main",
+                "mautic/theme-cards": "dev-main",
+                "mautic/theme-confirmme": "dev-main",
+                "mautic/theme-fresh-center": "dev-main",
+                "mautic/theme-fresh-fixed": "dev-main",
+                "mautic/theme-fresh-left": "dev-main",
+                "mautic/theme-fresh-wide": "dev-main",
+                "mautic/theme-goldstar": "dev-main",
+                "mautic/theme-neopolitan": "dev-main",
+                "mautic/theme-oxygen": "dev-main",
+                "mautic/theme-paprika": "dev-main",
+                "mautic/theme-skyline": "dev-main",
+                "mautic/theme-sparse": "dev-main",
+                "mautic/theme-sunday": "dev-main",
+                "mautic/theme-vibrant": "dev-main",
                 "misd/phone-number-bundle": "^1.1",
                 "mrclay/minify": "2.2.0",
                 "noxlogic/ratelimit-bundle": "^1.11",
@@ -6182,7 +6220,7 @@
                 "issues": "https://github.com/mautic/core-recommended/issues",
                 "source": "https://github.com/mautic/core-recommended/tree/4.x"
             },
-            "time": "2021-03-28T09:35:21+00:00"
+            "time": "2021-03-29T19:25:35+00:00"
         },
         {
             "name": "mautic/plugin-citrix",
@@ -6595,6 +6633,742 @@
                 "source": "https://github.com/mautic/plugin-zapier/tree/1.0"
             },
             "time": "2021-03-27T20:08:57+00:00"
+        },
+        {
+            "name": "mautic/theme-aurora",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/theme-aurora.git",
+                "reference": "bb7a30039d9655192c8c3959b191e83df57ba553"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/theme-aurora/zipball/bb7a30039d9655192c8c3959b191e83df57ba553",
+                "reference": "bb7a30039d9655192c8c3959b191e83df57ba553",
+                "shasum": ""
+            },
+            "require": {
+                "mautic/core-lib": "^4.0",
+                "php": ">=7.4.0 <8.1"
+            },
+            "default-branch": true,
+            "type": "mautic-theme",
+            "extra": {
+                "install-directory-name": "aurora"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Mautic Aurora Theme",
+            "keywords": [
+                "Mautic",
+                "theme"
+            ],
+            "support": {
+                "issues": "https://github.com/mautic/theme-aurora/issues",
+                "source": "https://github.com/mautic/theme-aurora/tree/main"
+            },
+            "time": "2021-03-29T18:48:41+00:00"
+        },
+        {
+            "name": "mautic/theme-blank",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/theme-blank.git",
+                "reference": "43196b813942e73e30f74e4ebd485c4a4b0abce5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/theme-blank/zipball/43196b813942e73e30f74e4ebd485c4a4b0abce5",
+                "reference": "43196b813942e73e30f74e4ebd485c4a4b0abce5",
+                "shasum": ""
+            },
+            "require": {
+                "mautic/core-lib": "^4.0",
+                "php": ">=7.4.0 <8.1"
+            },
+            "default-branch": true,
+            "type": "mautic-theme",
+            "extra": {
+                "install-directory-name": "blank"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Mautic Blank Theme",
+            "keywords": [
+                "Mautic",
+                "theme"
+            ],
+            "support": {
+                "issues": "https://github.com/mautic/theme-blank/issues",
+                "source": "https://github.com/mautic/theme-blank/tree/main"
+            },
+            "time": "2021-03-29T18:48:53+00:00"
+        },
+        {
+            "name": "mautic/theme-blank-grapejs",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/theme-blank-grapejs.git",
+                "reference": "9283aeb09f41388c05367e4d4b68ceb902be9f0a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/theme-blank-grapejs/zipball/9283aeb09f41388c05367e4d4b68ceb902be9f0a",
+                "reference": "9283aeb09f41388c05367e4d4b68ceb902be9f0a",
+                "shasum": ""
+            },
+            "require": {
+                "mautic/core-lib": "^4.0",
+                "php": ">=7.4.0 <8.1"
+            },
+            "default-branch": true,
+            "type": "mautic-theme",
+            "extra": {
+                "install-directory-name": "blank-grapejs"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Mautic Blank Grapejs Theme",
+            "keywords": [
+                "Mautic",
+                "integration",
+                "plugin"
+            ],
+            "support": {
+                "issues": "https://github.com/mautic/theme-blank-grapejs/issues",
+                "source": "https://github.com/mautic/theme-blank-grapejs/tree/main"
+            },
+            "time": "2021-03-29T18:49:19+00:00"
+        },
+        {
+            "name": "mautic/theme-brienz",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/theme-brienz.git",
+                "reference": "2b05ddedfa30da76901a8297d849097b2d3cceec"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/theme-brienz/zipball/2b05ddedfa30da76901a8297d849097b2d3cceec",
+                "reference": "2b05ddedfa30da76901a8297d849097b2d3cceec",
+                "shasum": ""
+            },
+            "require": {
+                "mautic/core-lib": "^4.0",
+                "php": ">=7.4.0 <8.1"
+            },
+            "default-branch": true,
+            "type": "mautic-theme",
+            "extra": {
+                "install-directory-name": "brienz"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Mautic Brienz Theme",
+            "keywords": [
+                "Mautic",
+                "theme"
+            ],
+            "support": {
+                "issues": "https://github.com/mautic/theme-brienz/issues",
+                "source": "https://github.com/mautic/theme-brienz/tree/main"
+            },
+            "time": "2021-03-29T18:49:31+00:00"
+        },
+        {
+            "name": "mautic/theme-cards",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/theme-cards.git",
+                "reference": "43485a43720564e8f98edcd3786c14edbec8c3f9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/theme-cards/zipball/43485a43720564e8f98edcd3786c14edbec8c3f9",
+                "reference": "43485a43720564e8f98edcd3786c14edbec8c3f9",
+                "shasum": ""
+            },
+            "require": {
+                "mautic/core-lib": "^4.0",
+                "php": ">=7.4.0 <8.1"
+            },
+            "default-branch": true,
+            "type": "mautic-theme",
+            "extra": {
+                "install-directory-name": "cards"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Mautic Cards Theme",
+            "keywords": [
+                "Mautic",
+                "theme"
+            ],
+            "support": {
+                "issues": "https://github.com/mautic/theme-cards/issues",
+                "source": "https://github.com/mautic/theme-cards/tree/main"
+            },
+            "time": "2021-03-29T18:49:44+00:00"
+        },
+        {
+            "name": "mautic/theme-coffee",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/theme-coffee.git",
+                "reference": "6b4fa463442c655aa32a6726bf312a97f6a91914"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/theme-coffee/zipball/6b4fa463442c655aa32a6726bf312a97f6a91914",
+                "reference": "6b4fa463442c655aa32a6726bf312a97f6a91914",
+                "shasum": ""
+            },
+            "require": {
+                "mautic/core-lib": "^4.0",
+                "php": ">=7.4.0 <8.1"
+            },
+            "default-branch": true,
+            "type": "mautic-theme",
+            "extra": {
+                "install-directory-name": "coffee"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Mautic Coffee Theme",
+            "keywords": [
+                "Mautic",
+                "theme"
+            ],
+            "support": {
+                "issues": "https://github.com/mautic/theme-coffee/issues",
+                "source": "https://github.com/mautic/theme-coffee/tree/main"
+            },
+            "time": "2021-03-29T18:50:00+00:00"
+        },
+        {
+            "name": "mautic/theme-confirmme",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/theme-confirmme.git",
+                "reference": "86a2c68d82d254f37f4483d6ff41dc9228b3af40"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/theme-confirmme/zipball/86a2c68d82d254f37f4483d6ff41dc9228b3af40",
+                "reference": "86a2c68d82d254f37f4483d6ff41dc9228b3af40",
+                "shasum": ""
+            },
+            "require": {
+                "mautic/core-lib": "^4.0",
+                "php": ">=7.4.0 <8.1"
+            },
+            "default-branch": true,
+            "type": "mautic-theme",
+            "extra": {
+                "install-directory-name": "confirmme"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Mautic Confirmme Theme",
+            "keywords": [
+                "Mautic",
+                "theme"
+            ],
+            "support": {
+                "issues": "https://github.com/mautic/theme-confirmme/issues",
+                "source": "https://github.com/mautic/theme-confirmme/tree/main"
+            },
+            "time": "2021-03-29T18:52:39+00:00"
+        },
+        {
+            "name": "mautic/theme-fresh-center",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/theme-fresh-center.git",
+                "reference": "6231b9bbbe09ca0d4cbb04953fed22e8594b0922"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/theme-fresh-center/zipball/6231b9bbbe09ca0d4cbb04953fed22e8594b0922",
+                "reference": "6231b9bbbe09ca0d4cbb04953fed22e8594b0922",
+                "shasum": ""
+            },
+            "require": {
+                "mautic/core-lib": "^4.0",
+                "php": ">=7.4.0 <8.1"
+            },
+            "default-branch": true,
+            "type": "mautic-theme",
+            "extra": {
+                "install-directory-name": "fresh-center"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Mautic Fresh Center Theme",
+            "keywords": [
+                "Mautic",
+                "theme"
+            ],
+            "support": {
+                "issues": "https://github.com/mautic/theme-fresh-center/issues",
+                "source": "https://github.com/mautic/theme-fresh-center/tree/main"
+            },
+            "time": "2021-03-29T18:54:50+00:00"
+        },
+        {
+            "name": "mautic/theme-fresh-fixed",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/theme-fresh-fixed.git",
+                "reference": "2c43d82a29aef39bcbb7cbc65296aac5e5795156"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/theme-fresh-fixed/zipball/2c43d82a29aef39bcbb7cbc65296aac5e5795156",
+                "reference": "2c43d82a29aef39bcbb7cbc65296aac5e5795156",
+                "shasum": ""
+            },
+            "require": {
+                "mautic/core-lib": "^4.0",
+                "php": ">=7.4.0 <8.1"
+            },
+            "default-branch": true,
+            "type": "mautic-theme",
+            "extra": {
+                "install-directory-name": "fresh-fixed"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Mautic Fresh Fixed Theme",
+            "keywords": [
+                "Mautic",
+                "theme"
+            ],
+            "support": {
+                "issues": "https://github.com/mautic/theme-fresh-fixed/issues",
+                "source": "https://github.com/mautic/theme-fresh-fixed/tree/main"
+            },
+            "time": "2021-03-29T19:56:17+00:00"
+        },
+        {
+            "name": "mautic/theme-fresh-left",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/theme-fresh-left.git",
+                "reference": "8aa260e7437ba08194071ec458089ed50cb3f9e7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/theme-fresh-left/zipball/8aa260e7437ba08194071ec458089ed50cb3f9e7",
+                "reference": "8aa260e7437ba08194071ec458089ed50cb3f9e7",
+                "shasum": ""
+            },
+            "require": {
+                "mautic/core-lib": "^4.0",
+                "php": ">=7.4.0 <8.1"
+            },
+            "default-branch": true,
+            "type": "mautic-theme",
+            "extra": {
+                "install-directory-name": "fresh-left"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Mautic Fresh Left Theme",
+            "keywords": [
+                "Mautic",
+                "theme"
+            ],
+            "support": {
+                "issues": "https://github.com/mautic/theme-fresh-left/issues",
+                "source": "https://github.com/mautic/theme-fresh-left/tree/main"
+            },
+            "time": "2021-03-29T18:55:24+00:00"
+        },
+        {
+            "name": "mautic/theme-fresh-wide",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/theme-fresh-wide.git",
+                "reference": "c9a98ccfec998b0d909d7b63a664c3734f312be2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/theme-fresh-wide/zipball/c9a98ccfec998b0d909d7b63a664c3734f312be2",
+                "reference": "c9a98ccfec998b0d909d7b63a664c3734f312be2",
+                "shasum": ""
+            },
+            "require": {
+                "mautic/core-lib": "^4.0",
+                "php": ">=7.4.0 <8.1"
+            },
+            "default-branch": true,
+            "type": "mautic-theme",
+            "extra": {
+                "install-directory-name": "fresh-wide"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Mautic Fresh Wide Theme",
+            "keywords": [
+                "Mautic",
+                "theme"
+            ],
+            "support": {
+                "issues": "https://github.com/mautic/theme-fresh-wide/issues",
+                "source": "https://github.com/mautic/theme-fresh-wide/tree/main"
+            },
+            "time": "2021-03-29T19:56:38+00:00"
+        },
+        {
+            "name": "mautic/theme-goldstar",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/theme-goldstar.git",
+                "reference": "842693c62a3fb528ceeb4b3381a150cefe26c20e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/theme-goldstar/zipball/842693c62a3fb528ceeb4b3381a150cefe26c20e",
+                "reference": "842693c62a3fb528ceeb4b3381a150cefe26c20e",
+                "shasum": ""
+            },
+            "require": {
+                "mautic/core-lib": "^4.0",
+                "php": ">=7.4.0 <8.1"
+            },
+            "default-branch": true,
+            "type": "mautic-theme",
+            "extra": {
+                "install-directory-name": "goldstar"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Mautic Goldstar Theme",
+            "keywords": [
+                "Mautic",
+                "theme"
+            ],
+            "support": {
+                "issues": "https://github.com/mautic/theme-goldstar/issues",
+                "source": "https://github.com/mautic/theme-goldstar/tree/main"
+            },
+            "time": "2021-03-29T19:56:57+00:00"
+        },
+        {
+            "name": "mautic/theme-mauve",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/theme-mauve.git",
+                "reference": "c07362ad529bd4cb20bf73d0b9e2999611f2ce15"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/theme-mauve/zipball/c07362ad529bd4cb20bf73d0b9e2999611f2ce15",
+                "reference": "c07362ad529bd4cb20bf73d0b9e2999611f2ce15",
+                "shasum": ""
+            },
+            "require": {
+                "mautic/core-lib": "^4.0",
+                "php": ">=7.4.0 <8.1"
+            },
+            "default-branch": true,
+            "type": "mautic-theme",
+            "extra": {
+                "install-directory-name": "mauve"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Mautic Mauve Theme",
+            "keywords": [
+                "Mautic",
+                "theme"
+            ],
+            "support": {
+                "issues": "https://github.com/mautic/theme-mauve/issues",
+                "source": "https://github.com/mautic/theme-mauve/tree/main"
+            },
+            "time": "2021-03-29T18:48:18+00:00"
+        },
+        {
+            "name": "mautic/theme-nature",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/theme-nature.git",
+                "reference": "e85d315f50cd62a781d666325bb79f75da4de5a9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/theme-nature/zipball/e85d315f50cd62a781d666325bb79f75da4de5a9",
+                "reference": "e85d315f50cd62a781d666325bb79f75da4de5a9",
+                "shasum": ""
+            },
+            "require": {
+                "mautic/core-lib": "^4.0",
+                "php": ">=7.4.0 <8.1"
+            },
+            "default-branch": true,
+            "type": "mautic-theme",
+            "extra": {
+                "install-directory-name": "nature"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Mautic Nature Theme",
+            "keywords": [
+                "Mautic",
+                "theme"
+            ],
+            "support": {
+                "issues": "https://github.com/mautic/theme-nature/issues",
+                "source": "https://github.com/mautic/theme-nature/tree/main"
+            },
+            "time": "2021-03-29T19:57:11+00:00"
+        },
+        {
+            "name": "mautic/theme-neopolitan",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/theme-neopolitan.git",
+                "reference": "cbfb2099295013c1c1c4fc088d71b6363786a680"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/theme-neopolitan/zipball/cbfb2099295013c1c1c4fc088d71b6363786a680",
+                "reference": "cbfb2099295013c1c1c4fc088d71b6363786a680",
+                "shasum": ""
+            },
+            "require": {
+                "mautic/core-lib": "^4.0",
+                "php": ">=7.4.0 <8.1"
+            },
+            "default-branch": true,
+            "type": "mautic-theme",
+            "extra": {
+                "install-directory-name": "neopolitan"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Mautic Neopolitan Theme",
+            "keywords": [
+                "Mautic",
+                "theme"
+            ],
+            "support": {
+                "issues": "https://github.com/mautic/theme-neopolitan/issues",
+                "source": "https://github.com/mautic/theme-neopolitan/tree/main"
+            },
+            "time": "2021-03-29T18:57:02+00:00"
+        },
+        {
+            "name": "mautic/theme-oxygen",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/theme-oxygen.git",
+                "reference": "2109d6e9805c82267309f02578b928e63963b3ee"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/theme-oxygen/zipball/2109d6e9805c82267309f02578b928e63963b3ee",
+                "reference": "2109d6e9805c82267309f02578b928e63963b3ee",
+                "shasum": ""
+            },
+            "require": {
+                "mautic/core-lib": "^4.0",
+                "php": ">=7.4.0 <8.1"
+            },
+            "default-branch": true,
+            "type": "mautic-theme",
+            "extra": {
+                "install-directory-name": "oxygen"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Mautic Oxygen Theme",
+            "keywords": [
+                "Mautic",
+                "theme"
+            ],
+            "support": {
+                "issues": "https://github.com/mautic/theme-oxygen/issues",
+                "source": "https://github.com/mautic/theme-oxygen/tree/main"
+            },
+            "time": "2021-03-29T18:57:14+00:00"
+        },
+        {
+            "name": "mautic/theme-paprika",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/theme-paprika.git",
+                "reference": "2ba0a3c39e7b2a1e1882ea332d3cfbadd63389c6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/theme-paprika/zipball/2ba0a3c39e7b2a1e1882ea332d3cfbadd63389c6",
+                "reference": "2ba0a3c39e7b2a1e1882ea332d3cfbadd63389c6",
+                "shasum": ""
+            },
+            "require": {
+                "mautic/core-lib": "^4.0",
+                "php": ">=7.4.0 <8.1"
+            },
+            "default-branch": true,
+            "type": "mautic-theme",
+            "extra": {
+                "install-directory-name": "paprika"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Mautic Paprika Theme",
+            "keywords": [
+                "Mautic",
+                "theme"
+            ],
+            "support": {
+                "issues": "https://github.com/mautic/theme-paprika/issues",
+                "source": "https://github.com/mautic/theme-paprika/tree/main"
+            },
+            "time": "2021-03-29T18:57:28+00:00"
+        },
+        {
+            "name": "mautic/theme-skyline",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/theme-skyline.git",
+                "reference": "e3b093e564ad7d09306fa3e85d42176e698bc65e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/theme-skyline/zipball/e3b093e564ad7d09306fa3e85d42176e698bc65e",
+                "reference": "e3b093e564ad7d09306fa3e85d42176e698bc65e",
+                "shasum": ""
+            },
+            "require": {
+                "mautic/core-lib": "^4.0",
+                "php": ">=7.4.0 <8.1"
+            },
+            "default-branch": true,
+            "type": "mautic-theme",
+            "extra": {
+                "install-directory-name": "skyline"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Mautic Skyline Theme",
+            "keywords": [
+                "Mautic",
+                "theme"
+            ],
+            "support": {
+                "issues": "https://github.com/mautic/theme-skyline/issues",
+                "source": "https://github.com/mautic/theme-skyline/tree/main"
+            },
+            "time": "2021-03-29T18:57:44+00:00"
+        },
+        {
+            "name": "mautic/theme-sparse",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/theme-sparse.git",
+                "reference": "0f12cd2c66a51415196fd9f6774158f34a423d4b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/theme-sparse/zipball/0f12cd2c66a51415196fd9f6774158f34a423d4b",
+                "reference": "0f12cd2c66a51415196fd9f6774158f34a423d4b",
+                "shasum": ""
+            },
+            "require": {
+                "mautic/core-lib": "^4.0",
+                "php": ">=7.4.0 <8.1"
+            },
+            "default-branch": true,
+            "type": "mautic-theme",
+            "extra": {
+                "install-directory-name": "sparse"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Mautic Sparse Theme",
+            "keywords": [
+                "Mautic",
+                "theme"
+            ],
+            "support": {
+                "issues": "https://github.com/mautic/theme-sparse/issues",
+                "source": "https://github.com/mautic/theme-sparse/tree/main"
+            },
+            "time": "2021-03-29T18:57:58+00:00"
+        },
+        {
+            "name": "mautic/theme-sunday",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/theme-sunday.git",
+                "reference": "85c3123e36cde3299c86498e98f15e1b3e2f914b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/theme-sunday/zipball/85c3123e36cde3299c86498e98f15e1b3e2f914b",
+                "reference": "85c3123e36cde3299c86498e98f15e1b3e2f914b",
+                "shasum": ""
+            },
+            "require": {
+                "mautic/core-lib": "^4.0",
+                "php": ">=7.4.0 <8.1"
+            },
+            "default-branch": true,
+            "type": "mautic-theme",
+            "extra": {
+                "install-directory-name": "sunday"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Mautic Sunday Theme",
+            "keywords": [
+                "Mautic",
+                "theme"
+            ],
+            "support": {
+                "issues": "https://github.com/mautic/theme-sunday/issues",
+                "source": "https://github.com/mautic/theme-sunday/tree/main"
+            },
+            "time": "2021-03-29T18:58:11+00:00"
+        },
+        {
+            "name": "mautic/theme-vibrant",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/theme-vibrant.git",
+                "reference": "bf1725f9240977f0aa9cc5f398cbbec5bb3188a2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/theme-vibrant/zipball/bf1725f9240977f0aa9cc5f398cbbec5bb3188a2",
+                "reference": "bf1725f9240977f0aa9cc5f398cbbec5bb3188a2",
+                "shasum": ""
+            },
+            "require": {
+                "mautic/core-lib": "^4.0",
+                "php": ">=7.4.0 <8.1"
+            },
+            "default-branch": true,
+            "type": "mautic-theme",
+            "extra": {
+                "install-directory-name": "vibrant"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Mautic Vibrant Theme",
+            "keywords": [
+                "Mautic",
+                "theme"
+            ],
+            "support": {
+                "issues": "https://github.com/mautic/theme-vibrant/issues",
+                "source": "https://github.com/mautic/theme-vibrant/tree/main"
+            },
+            "time": "2021-03-29T18:58:30+00:00"
         },
         {
             "name": "mautic/transifex",
@@ -11782,16 +12556,16 @@
         },
         {
             "name": "symfony/cache",
-            "version": "v4.4.20",
+            "version": "v4.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/cache.git",
-                "reference": "8fa248b0105d962ac279ae973dee2a32ae009dee"
+                "reference": "b7ff54be3f3eb1ce09643692f0c309b1b27bc992"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/cache/zipball/8fa248b0105d962ac279ae973dee2a32ae009dee",
-                "reference": "8fa248b0105d962ac279ae973dee2a32ae009dee",
+                "url": "https://api.github.com/repos/symfony/cache/zipball/b7ff54be3f3eb1ce09643692f0c309b1b27bc992",
+                "reference": "b7ff54be3f3eb1ce09643692f0c309b1b27bc992",
                 "shasum": ""
             },
             "require": {
@@ -11855,7 +12629,7 @@
                 "psr6"
             ],
             "support": {
-                "source": "https://github.com/symfony/cache/tree/v4.4.20"
+                "source": "https://github.com/symfony/cache/tree/v4.4.21"
             },
             "funding": [
                 {
@@ -11871,7 +12645,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-25T23:52:11+00:00"
+            "time": "2021-03-14T19:28:18+00:00"
         },
         {
             "name": "symfony/cache-contracts",
@@ -12030,16 +12804,16 @@
         },
         {
             "name": "symfony/console",
-            "version": "v4.4.20",
+            "version": "v4.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "c98349bda966c70d6c08b4cd8658377c94166492"
+                "reference": "1ba4560dbbb9fcf5ae28b61f71f49c678086cf23"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/c98349bda966c70d6c08b4cd8658377c94166492",
-                "reference": "c98349bda966c70d6c08b4cd8658377c94166492",
+                "url": "https://api.github.com/repos/symfony/console/zipball/1ba4560dbbb9fcf5ae28b61f71f49c678086cf23",
+                "reference": "1ba4560dbbb9fcf5ae28b61f71f49c678086cf23",
                 "shasum": ""
             },
             "require": {
@@ -12099,7 +12873,7 @@
             "description": "Eases the creation of beautiful and testable command line interfaces",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/console/tree/v4.4.20"
+                "source": "https://github.com/symfony/console/tree/v4.4.21"
             },
             "funding": [
                 {
@@ -12115,7 +12889,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-22T18:44:15+00:00"
+            "time": "2021-03-26T09:23:24+00:00"
         },
         {
             "name": "symfony/css-selector",
@@ -12253,16 +13027,16 @@
         },
         {
             "name": "symfony/dependency-injection",
-            "version": "v4.4.20",
+            "version": "v4.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dependency-injection.git",
-                "reference": "4b3e341ce4436df9a9abc2914cb120b4d41796d7"
+                "reference": "b5f97557faa48ead4671bc311cfca423d476e93e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/4b3e341ce4436df9a9abc2914cb120b4d41796d7",
-                "reference": "4b3e341ce4436df9a9abc2914cb120b4d41796d7",
+                "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/b5f97557faa48ead4671bc311cfca423d476e93e",
+                "reference": "b5f97557faa48ead4671bc311cfca423d476e93e",
                 "shasum": ""
             },
             "require": {
@@ -12318,7 +13092,7 @@
             "description": "Allows you to standardize and centralize the way objects are constructed in your application",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/dependency-injection/tree/v4.4.20"
+                "source": "https://github.com/symfony/dependency-injection/tree/v4.4.21"
             },
             "funding": [
                 {
@@ -12334,7 +13108,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-03-03T12:11:09+00:00"
+            "time": "2021-03-05T18:16:26+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -12405,16 +13179,16 @@
         },
         {
             "name": "symfony/doctrine-bridge",
-            "version": "v4.4.20",
+            "version": "v4.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/doctrine-bridge.git",
-                "reference": "4ac8549aa5edb33f650a7c0cc293f233b6fe9f1f"
+                "reference": "e643bddb38277b4a1c2973d1489768c6e6c0db80"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/doctrine-bridge/zipball/4ac8549aa5edb33f650a7c0cc293f233b6fe9f1f",
-                "reference": "4ac8549aa5edb33f650a7c0cc293f233b6fe9f1f",
+                "url": "https://api.github.com/repos/symfony/doctrine-bridge/zipball/e643bddb38277b4a1c2973d1489768c6e6c0db80",
+                "reference": "e643bddb38277b4a1c2973d1489768c6e6c0db80",
                 "shasum": ""
             },
             "require": {
@@ -12491,7 +13265,7 @@
             "description": "Provides integration for Doctrine with various Symfony components",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/doctrine-bridge/tree/v4.4.20"
+                "source": "https://github.com/symfony/doctrine-bridge/tree/v4.4.21"
             },
             "funding": [
                 {
@@ -12507,7 +13281,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-18T22:27:55+00:00"
+            "time": "2021-03-09T16:20:30+00:00"
         },
         {
             "name": "symfony/dom-crawler",
@@ -12653,16 +13427,16 @@
         },
         {
             "name": "symfony/error-handler",
-            "version": "v4.4.20",
+            "version": "v4.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/error-handler.git",
-                "reference": "a191550d46b73a527b9d244f185fef439d41cf15"
+                "reference": "48e81a375525872e788c2418430f54150d935810"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/error-handler/zipball/a191550d46b73a527b9d244f185fef439d41cf15",
-                "reference": "a191550d46b73a527b9d244f185fef439d41cf15",
+                "url": "https://api.github.com/repos/symfony/error-handler/zipball/48e81a375525872e788c2418430f54150d935810",
+                "reference": "48e81a375525872e788c2418430f54150d935810",
                 "shasum": ""
             },
             "require": {
@@ -12702,7 +13476,7 @@
             "description": "Provides tools to manage errors and ease debugging PHP code",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/error-handler/tree/v4.4.20"
+                "source": "https://github.com/symfony/error-handler/tree/v4.4.21"
             },
             "funding": [
                 {
@@ -12718,7 +13492,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-11T08:19:35+00:00"
+            "time": "2021-03-08T10:28:40+00:00"
         },
         {
             "name": "symfony/event-dispatcher",
@@ -12947,16 +13721,16 @@
         },
         {
             "name": "symfony/filesystem",
-            "version": "v4.4.20",
+            "version": "v4.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/filesystem.git",
-                "reference": "715e7a531bdae109a828f9e91629e5b3b2926beb"
+                "reference": "940826c465be2690c9fae91b2793481e5cbd6834"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/filesystem/zipball/715e7a531bdae109a828f9e91629e5b3b2926beb",
-                "reference": "715e7a531bdae109a828f9e91629e5b3b2926beb",
+                "url": "https://api.github.com/repos/symfony/filesystem/zipball/940826c465be2690c9fae91b2793481e5cbd6834",
+                "reference": "940826c465be2690c9fae91b2793481e5cbd6834",
                 "shasum": ""
             },
             "require": {
@@ -12989,7 +13763,7 @@
             "description": "Provides basic utilities for the filesystem",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/filesystem/tree/v4.4.20"
+                "source": "https://github.com/symfony/filesystem/tree/v4.4.21"
             },
             "funding": [
                 {
@@ -13005,7 +13779,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-11T19:34:41+00:00"
+            "time": "2021-03-28T09:59:32+00:00"
         },
         {
             "name": "symfony/finder",
@@ -13070,16 +13844,16 @@
         },
         {
             "name": "symfony/form",
-            "version": "v4.4.20",
+            "version": "v4.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/form.git",
-                "reference": "25a65942f1245f0e85510ddeb62ad84dacadc338"
+                "reference": "9ced5b787916fb8a64819d63a4bcf7ddda46791c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/form/zipball/25a65942f1245f0e85510ddeb62ad84dacadc338",
-                "reference": "25a65942f1245f0e85510ddeb62ad84dacadc338",
+                "url": "https://api.github.com/repos/symfony/form/zipball/9ced5b787916fb8a64819d63a4bcf7ddda46791c",
+                "reference": "9ced5b787916fb8a64819d63a4bcf7ddda46791c",
                 "shasum": ""
             },
             "require": {
@@ -13147,7 +13921,7 @@
             "description": "Allows to easily create, process and reuse HTML forms",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/form/tree/v4.4.20"
+                "source": "https://github.com/symfony/form/tree/v4.4.21"
             },
             "funding": [
                 {
@@ -13163,20 +13937,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-03-03T17:05:48+00:00"
+            "time": "2021-03-28T08:05:52+00:00"
         },
         {
             "name": "symfony/framework-bundle",
-            "version": "v4.4.20",
+            "version": "v4.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/framework-bundle.git",
-                "reference": "5b5aefc0542e2b42f6f3b9b90d6ef2ff75fee19a"
+                "reference": "fc72fbb0f9a69d2eb5d94cc8c231176265db680a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/framework-bundle/zipball/5b5aefc0542e2b42f6f3b9b90d6ef2ff75fee19a",
-                "reference": "5b5aefc0542e2b42f6f3b9b90d6ef2ff75fee19a",
+                "url": "https://api.github.com/repos/symfony/framework-bundle/zipball/fc72fbb0f9a69d2eb5d94cc8c231176265db680a",
+                "reference": "fc72fbb0f9a69d2eb5d94cc8c231176265db680a",
                 "shasum": ""
             },
             "require": {
@@ -13200,7 +13974,7 @@
                 "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
                 "symfony/asset": "<3.4",
                 "symfony/browser-kit": "<4.3",
-                "symfony/console": "<4.3",
+                "symfony/console": "<4.4.21",
                 "symfony/dom-crawler": "<4.3",
                 "symfony/dotenv": "<4.3.6",
                 "symfony/form": "<4.3.5",
@@ -13228,7 +14002,7 @@
                 "phpdocumentor/reflection-docblock": "^3.0|^4.0|^5.0",
                 "symfony/asset": "^3.4|^4.0|^5.0",
                 "symfony/browser-kit": "^4.3|^5.0",
-                "symfony/console": "^4.3.4|^5.0",
+                "symfony/console": "^4.4.21|^5.0",
                 "symfony/css-selector": "^3.4|^4.0|^5.0",
                 "symfony/dom-crawler": "^4.3|^5.0",
                 "symfony/dotenv": "^4.3.6|^5.0",
@@ -13292,7 +14066,7 @@
             "description": "Provides a tight integration between Symfony components and the Symfony full-stack framework",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/framework-bundle/tree/v4.4.20"
+                "source": "https://github.com/symfony/framework-bundle/tree/v4.4.21"
             },
             "funding": [
                 {
@@ -13308,20 +14082,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-22T15:36:50+00:00"
+            "time": "2021-03-18T09:22:03+00:00"
         },
         {
             "name": "symfony/http-client",
-            "version": "v4.4.20",
+            "version": "v4.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-client.git",
-                "reference": "67c5af7489b3c2eea771abd973243f5c58f5fb40"
+                "reference": "911177e186b82e5b9a9f41c13af53699b6745657"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-client/zipball/67c5af7489b3c2eea771abd973243f5c58f5fb40",
-                "reference": "67c5af7489b3c2eea771abd973243f5c58f5fb40",
+                "url": "https://api.github.com/repos/symfony/http-client/zipball/911177e186b82e5b9a9f41c13af53699b6745657",
+                "reference": "911177e186b82e5b9a9f41c13af53699b6745657",
                 "shasum": ""
             },
             "require": {
@@ -13372,7 +14146,7 @@
             "description": "Provides powerful methods to fetch HTTP resources synchronously or asynchronously",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/http-client/tree/v4.4.20"
+                "source": "https://github.com/symfony/http-client/tree/v4.4.21"
             },
             "funding": [
                 {
@@ -13388,7 +14162,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-25T18:06:45+00:00"
+            "time": "2021-03-25T17:52:07+00:00"
         },
         {
             "name": "symfony/http-client-contracts",
@@ -13539,16 +14313,16 @@
         },
         {
             "name": "symfony/http-kernel",
-            "version": "v4.4.20",
+            "version": "v4.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-kernel.git",
-                "reference": "4f36548465489f293b05406f1770492f6efb8adb"
+                "reference": "0248214120d00c5f44f1cd5d9ad65f0b38459333"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-kernel/zipball/4f36548465489f293b05406f1770492f6efb8adb",
-                "reference": "4f36548465489f293b05406f1770492f6efb8adb",
+                "url": "https://api.github.com/repos/symfony/http-kernel/zipball/0248214120d00c5f44f1cd5d9ad65f0b38459333",
+                "reference": "0248214120d00c5f44f1cd5d9ad65f0b38459333",
                 "shasum": ""
             },
             "require": {
@@ -13623,7 +14397,7 @@
             "description": "Provides a structured process for converting a Request into a Response",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/http-kernel/tree/v4.4.20"
+                "source": "https://github.com/symfony/http-kernel/tree/v4.4.21"
             },
             "funding": [
                 {
@@ -13639,26 +14413,26 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-03-04T18:00:27+00:00"
+            "time": "2021-03-29T05:11:04+00:00"
         },
         {
             "name": "symfony/inflector",
-            "version": "v5.2.4",
+            "version": "v5.2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/inflector.git",
-                "reference": "4c285002228d0e27480e5eee871f4e3f0a05a4eb"
+                "reference": "156df300f1420851a1e184facf3c436a9cd36d02"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/inflector/zipball/4c285002228d0e27480e5eee871f4e3f0a05a4eb",
-                "reference": "4c285002228d0e27480e5eee871f4e3f0a05a4eb",
+                "url": "https://api.github.com/repos/symfony/inflector/zipball/156df300f1420851a1e184facf3c436a9cd36d02",
+                "reference": "156df300f1420851a1e184facf3c436a9cd36d02",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2.5",
                 "symfony/deprecation-contracts": "^2.1",
-                "symfony/string": "~5.1.10|^5.2.1"
+                "symfony/string": "^5.2.6"
             },
             "type": "library",
             "autoload": {
@@ -13694,7 +14468,7 @@
                 "words"
             ],
             "support": {
-                "source": "https://github.com/symfony/inflector/tree/v5.2.4"
+                "source": "https://github.com/symfony/inflector/tree/v5.2.6"
             },
             "funding": [
                 {
@@ -13710,7 +14484,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-01-10T16:29:19+00:00"
+            "time": "2021-03-17T20:31:43+00:00"
         },
         {
             "name": "symfony/intl",
@@ -13801,16 +14575,16 @@
         },
         {
             "name": "symfony/lock",
-            "version": "v5.2.4",
+            "version": "v5.2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/lock.git",
-                "reference": "9e8feb3141406dfc98ca57771fc00873b6f4b60e"
+                "reference": "b7d5a102834472f1f8fd40f09977a97496b8a23e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/lock/zipball/9e8feb3141406dfc98ca57771fc00873b6f4b60e",
-                "reference": "9e8feb3141406dfc98ca57771fc00873b6f4b60e",
+                "url": "https://api.github.com/repos/symfony/lock/zipball/b7d5a102834472f1f8fd40f09977a97496b8a23e",
+                "reference": "b7d5a102834472f1f8fd40f09977a97496b8a23e",
                 "shasum": ""
             },
             "require": {
@@ -13861,7 +14635,7 @@
                 "semaphore"
             ],
             "support": {
-                "source": "https://github.com/symfony/lock/tree/v5.2.4"
+                "source": "https://github.com/symfony/lock/tree/v5.2.6"
             },
             "funding": [
                 {
@@ -13877,20 +14651,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-15T18:55:04+00:00"
+            "time": "2021-03-28T09:42:18+00:00"
         },
         {
             "name": "symfony/mime",
-            "version": "v5.2.5",
+            "version": "v5.2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/mime.git",
-                "reference": "554ba128f1955038b45db5e1fa7e93bfc683b139"
+                "reference": "1b2092244374cbe48ae733673f2ca0818b37197b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/mime/zipball/554ba128f1955038b45db5e1fa7e93bfc683b139",
-                "reference": "554ba128f1955038b45db5e1fa7e93bfc683b139",
+                "url": "https://api.github.com/repos/symfony/mime/zipball/1b2092244374cbe48ae733673f2ca0818b37197b",
+                "reference": "1b2092244374cbe48ae733673f2ca0818b37197b",
                 "shasum": ""
             },
             "require": {
@@ -13944,7 +14718,7 @@
                 "mime-type"
             ],
             "support": {
-                "source": "https://github.com/symfony/mime/tree/v5.2.5"
+                "source": "https://github.com/symfony/mime/tree/v5.2.6"
             },
             "funding": [
                 {
@@ -13960,20 +14734,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-03-07T16:08:20+00:00"
+            "time": "2021-03-12T13:18:39+00:00"
         },
         {
             "name": "symfony/monolog-bridge",
-            "version": "v4.4.20",
+            "version": "v4.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/monolog-bridge.git",
-                "reference": "47343492b1841db765de8d55b4b5ccaa1c96edd3"
+                "reference": "3741314b95e8d0c11a485dce562898f5f67f455c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/monolog-bridge/zipball/47343492b1841db765de8d55b4b5ccaa1c96edd3",
-                "reference": "47343492b1841db765de8d55b4b5ccaa1c96edd3",
+                "url": "https://api.github.com/repos/symfony/monolog-bridge/zipball/3741314b95e8d0c11a485dce562898f5f67f455c",
+                "reference": "3741314b95e8d0c11a485dce562898f5f67f455c",
                 "shasum": ""
             },
             "require": {
@@ -14023,7 +14797,7 @@
             "description": "Provides integration for Monolog with various Symfony components",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/monolog-bridge/tree/v4.4.20"
+                "source": "https://github.com/symfony/monolog-bridge/tree/v4.4.21"
             },
             "funding": [
                 {
@@ -14039,7 +14813,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-01-27T09:09:26+00:00"
+            "time": "2021-03-05T17:58:50+00:00"
         },
         {
             "name": "symfony/monolog-bundle",
@@ -15451,16 +16225,16 @@
         },
         {
             "name": "symfony/security",
-            "version": "v4.4.20",
+            "version": "v4.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/security.git",
-                "reference": "437e049370164d33d0ba7cf0e5963fba1a96d131"
+                "reference": "5a96313ce9628180e66f62b38f6f3899cf7f2669"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/security/zipball/437e049370164d33d0ba7cf0e5963fba1a96d131",
-                "reference": "437e049370164d33d0ba7cf0e5963fba1a96d131",
+                "url": "https://api.github.com/repos/symfony/security/zipball/5a96313ce9628180e66f62b38f6f3899cf7f2669",
+                "reference": "5a96313ce9628180e66f62b38f6f3899cf7f2669",
                 "shasum": ""
             },
             "require": {
@@ -15482,7 +16256,7 @@
                 "symfony/security-http": "self.version"
             },
             "require-dev": {
-                "psr/container": "^1.0",
+                "psr/container": "^1.0|^2.0",
                 "psr/log": "~1.0",
                 "symfony/expression-language": "^3.4|^4.0|^5.0",
                 "symfony/finder": "^3.4|^4.0|^5.0",
@@ -15530,7 +16304,7 @@
             "description": "Provides a complete security system for your web application",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/security/tree/v4.4.20"
+                "source": "https://github.com/symfony/security/tree/v4.4.21"
             },
             "funding": [
                 {
@@ -15546,7 +16320,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-03-03T16:55:00+00:00"
+            "time": "2021-03-12T01:21:32+00:00"
         },
         {
             "name": "symfony/security-acl",
@@ -15615,16 +16389,16 @@
         },
         {
             "name": "symfony/security-bundle",
-            "version": "v4.4.20",
+            "version": "v4.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/security-bundle.git",
-                "reference": "55a84ceb5f68e2dc836708e51f1ce1e5f7cecb7b"
+                "reference": "607dcdb60ef74d63fbeb86549c52075f040ae4cc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/security-bundle/zipball/55a84ceb5f68e2dc836708e51f1ce1e5f7cecb7b",
-                "reference": "55a84ceb5f68e2dc836708e51f1ce1e5f7cecb7b",
+                "url": "https://api.github.com/repos/symfony/security-bundle/zipball/607dcdb60ef74d63fbeb86549c52075f040ae4cc",
+                "reference": "607dcdb60ef74d63fbeb86549c52075f040ae4cc",
                 "shasum": ""
             },
             "require": {
@@ -15690,7 +16464,7 @@
             "description": "Provides a tight integration of the Security component into the Symfony full-stack framework",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/security-bundle/tree/v4.4.20"
+                "source": "https://github.com/symfony/security-bundle/tree/v4.4.21"
             },
             "funding": [
                 {
@@ -15706,7 +16480,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-04T11:13:36+00:00"
+            "time": "2021-03-22T08:54:48+00:00"
         },
         {
             "name": "symfony/service-contracts",
@@ -15851,16 +16625,16 @@
         },
         {
             "name": "symfony/string",
-            "version": "v5.2.4",
+            "version": "v5.2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/string.git",
-                "reference": "4e78d7d47061fa183639927ec40d607973699609"
+                "reference": "ad0bd91bce2054103f5eaa18ebeba8d3bc2a0572"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/string/zipball/4e78d7d47061fa183639927ec40d607973699609",
-                "reference": "4e78d7d47061fa183639927ec40d607973699609",
+                "url": "https://api.github.com/repos/symfony/string/zipball/ad0bd91bce2054103f5eaa18ebeba8d3bc2a0572",
+                "reference": "ad0bd91bce2054103f5eaa18ebeba8d3bc2a0572",
                 "shasum": ""
             },
             "require": {
@@ -15914,7 +16688,7 @@
                 "utf8"
             ],
             "support": {
-                "source": "https://github.com/symfony/string/tree/v5.2.4"
+                "source": "https://github.com/symfony/string/tree/v5.2.6"
             },
             "funding": [
                 {
@@ -15930,7 +16704,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-16T10:20:28+00:00"
+            "time": "2021-03-17T17:12:15+00:00"
         },
         {
             "name": "symfony/swiftmailer-bundle",
@@ -16082,16 +16856,16 @@
         },
         {
             "name": "symfony/translation",
-            "version": "v4.4.20",
+            "version": "v4.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/translation.git",
-                "reference": "2271b6d577018a7dea75a9162a08ac84f8234deb"
+                "reference": "eb8f5428cc3b40d6dffe303b195b084f1c5fbd14"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/translation/zipball/2271b6d577018a7dea75a9162a08ac84f8234deb",
-                "reference": "2271b6d577018a7dea75a9162a08ac84f8234deb",
+                "url": "https://api.github.com/repos/symfony/translation/zipball/eb8f5428cc3b40d6dffe303b195b084f1c5fbd14",
+                "reference": "eb8f5428cc3b40d6dffe303b195b084f1c5fbd14",
                 "shasum": ""
             },
             "require": {
@@ -16150,7 +16924,7 @@
             "description": "Provides tools to internationalize your application",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/translation/tree/v4.4.20"
+                "source": "https://github.com/symfony/translation/tree/v4.4.21"
             },
             "funding": [
                 {
@@ -16166,7 +16940,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-26T13:53:48+00:00"
+            "time": "2021-03-23T16:25:01+00:00"
         },
         {
             "name": "symfony/translation-contracts",
@@ -16248,16 +17022,16 @@
         },
         {
             "name": "symfony/twig-bridge",
-            "version": "v4.4.20",
+            "version": "v4.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/twig-bridge.git",
-                "reference": "e18a7f7b7062ef9ff92b9286955c5c8f9ce1f4e9"
+                "reference": "f5d0492a38c5325d9c322d406dbe95bc26fc530d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/twig-bridge/zipball/e18a7f7b7062ef9ff92b9286955c5c8f9ce1f4e9",
-                "reference": "e18a7f7b7062ef9ff92b9286955c5c8f9ce1f4e9",
+                "url": "https://api.github.com/repos/symfony/twig-bridge/zipball/f5d0492a38c5325d9c322d406dbe95bc26fc530d",
+                "reference": "f5d0492a38c5325d9c322d406dbe95bc26fc530d",
                 "shasum": ""
             },
             "require": {
@@ -16273,7 +17047,7 @@
                 "symfony/workflow": "<4.3"
             },
             "require-dev": {
-                "egulias/email-validator": "^2.1.10",
+                "egulias/email-validator": "^2.1.10|^3",
                 "symfony/asset": "^3.4|^4.0|^5.0",
                 "symfony/console": "^3.4|^4.0|^5.0",
                 "symfony/dependency-injection": "^3.4|^4.0|^5.0",
@@ -16297,9 +17071,9 @@
                 "symfony/web-link": "^4.4|^5.0",
                 "symfony/workflow": "^4.3|^5.0",
                 "symfony/yaml": "^3.4|^4.0|^5.0",
-                "twig/cssinliner-extra": "^2.12",
-                "twig/inky-extra": "^2.12",
-                "twig/markdown-extra": "^2.12"
+                "twig/cssinliner-extra": "^2.12|^3",
+                "twig/inky-extra": "^2.12|^3",
+                "twig/markdown-extra": "^2.12|^3"
             },
             "suggest": {
                 "symfony/asset": "For using the AssetExtension",
@@ -16344,7 +17118,7 @@
             "description": "Provides integration for Twig with various Symfony components",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/twig-bridge/tree/v4.4.20"
+                "source": "https://github.com/symfony/twig-bridge/tree/v4.4.21"
             },
             "funding": [
                 {
@@ -16360,7 +17134,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-25T11:27:58+00:00"
+            "time": "2021-03-16T08:08:39+00:00"
         },
         {
             "name": "symfony/twig-bundle",
@@ -16451,16 +17225,16 @@
         },
         {
             "name": "symfony/validator",
-            "version": "v4.4.20",
+            "version": "v4.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/validator.git",
-                "reference": "08c3add0462f22f00b856c0d0361cf51897d51aa"
+                "reference": "c00da06b82b8591548f52b4d6aad0faa0985843e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/validator/zipball/08c3add0462f22f00b856c0d0361cf51897d51aa",
-                "reference": "08c3add0462f22f00b856c0d0361cf51897d51aa",
+                "url": "https://api.github.com/repos/symfony/validator/zipball/c00da06b82b8591548f52b4d6aad0faa0985843e",
+                "reference": "c00da06b82b8591548f52b4d6aad0faa0985843e",
                 "shasum": ""
             },
             "require": {
@@ -16481,7 +17255,7 @@
             "require-dev": {
                 "doctrine/annotations": "^1.10.4",
                 "doctrine/cache": "~1.0",
-                "egulias/email-validator": "^2.1.10",
+                "egulias/email-validator": "^2.1.10|^3",
                 "symfony/cache": "^3.4|^4.0|^5.0",
                 "symfony/config": "^3.4|^4.0|^5.0",
                 "symfony/dependency-injection": "^3.4|^4.0|^5.0",
@@ -16536,7 +17310,7 @@
             "description": "Provides tools to validate values",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/validator/tree/v4.4.20"
+                "source": "https://github.com/symfony/validator/tree/v4.4.21"
             },
             "funding": [
                 {
@@ -16552,20 +17326,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-03-03T22:57:07+00:00"
+            "time": "2021-03-23T11:25:54+00:00"
         },
         {
             "name": "symfony/var-dumper",
-            "version": "v4.4.20",
+            "version": "v4.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/var-dumper.git",
-                "reference": "a1eab2f69906dc83c5ddba4632180260d0ab4f7f"
+                "reference": "0da0e174f728996f5d5072d6a9f0a42259dbc806"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/a1eab2f69906dc83c5ddba4632180260d0ab4f7f",
-                "reference": "a1eab2f69906dc83c5ddba4632180260d0ab4f7f",
+                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/0da0e174f728996f5d5072d6a9f0a42259dbc806",
+                "reference": "0da0e174f728996f5d5072d6a9f0a42259dbc806",
                 "shasum": ""
             },
             "require": {
@@ -16625,7 +17399,7 @@
                 "dump"
             ],
             "support": {
-                "source": "https://github.com/symfony/var-dumper/tree/v4.4.20"
+                "source": "https://github.com/symfony/var-dumper/tree/v4.4.21"
             },
             "funding": [
                 {
@@ -16641,7 +17415,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-01-27T09:09:26+00:00"
+            "time": "2021-03-27T19:49:03+00:00"
         },
         {
             "name": "symfony/var-exporter",
@@ -16718,16 +17492,16 @@
         },
         {
             "name": "symfony/web-profiler-bundle",
-            "version": "v4.4.20",
+            "version": "v4.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/web-profiler-bundle.git",
-                "reference": "2a5eeaa950e5702738437c6c8f442eca46ffc0c5"
+                "reference": "bd848a0c0f3e7229e329adeea10e8945f70cb4c9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/web-profiler-bundle/zipball/2a5eeaa950e5702738437c6c8f442eca46ffc0c5",
-                "reference": "2a5eeaa950e5702738437c6c8f442eca46ffc0c5",
+                "url": "https://api.github.com/repos/symfony/web-profiler-bundle/zipball/bd848a0c0f3e7229e329adeea10e8945f70cb4c9",
+                "reference": "bd848a0c0f3e7229e329adeea10e8945f70cb4c9",
                 "shasum": ""
             },
             "require": {
@@ -16776,7 +17550,7 @@
             "description": "Provides a development tool that gives detailed information about the execution of any request",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/web-profiler-bundle/tree/v4.4.20"
+                "source": "https://github.com/symfony/web-profiler-bundle/tree/v4.4.21"
             },
             "funding": [
                 {
@@ -16792,20 +17566,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-01-28T19:07:50+00:00"
+            "time": "2021-03-15T15:12:10+00:00"
         },
         {
             "name": "symfony/yaml",
-            "version": "v4.4.20",
+            "version": "v4.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "29e61305e1c79d25f71060903982ead8f533e267"
+                "reference": "3871c720871029f008928244e56cf43497da7e9d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/29e61305e1c79d25f71060903982ead8f533e267",
-                "reference": "29e61305e1c79d25f71060903982ead8f533e267",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/3871c720871029f008928244e56cf43497da7e9d",
+                "reference": "3871c720871029f008928244e56cf43497da7e9d",
                 "shasum": ""
             },
             "require": {
@@ -16847,7 +17621,7 @@
             "description": "Loads and dumps YAML files",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/yaml/tree/v4.4.20"
+                "source": "https://github.com/symfony/yaml/tree/v4.4.21"
             },
             "funding": [
                 {
@@ -16863,7 +17637,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-22T15:36:50+00:00"
+            "time": "2021-03-05T17:58:50+00:00"
         },
         {
             "name": "theofidry/psysh-bundle",
@@ -17542,9 +18316,13 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "mautic/core-composer-scaffold": 20,
+        "mautic/core-dev": 20,
         "mautic/core-project-message": 20,
         "mautic/core-recommended": 20,
-        "mautic/core-dev": 20
+        "mautic/theme-coffee": 20,
+        "mautic/theme-fresh-fixed": 20,
+        "mautic/theme-mauve": 20,
+        "mautic/theme-nature": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

@@ -120,7 +120,25 @@
     "mautic/plugin-gmail": "main-dev",
     "mautic/plugin-outlook": "main-dev",
     "mautic/plugin-social": "main-dev",
-    "mautic/plugin-zapier": "main-dev"
+    "mautic/plugin-zapier": "main-dev",
+    "mautic/theme-aurora": "dev-main",
+    "mautic/theme-blank": "dev-main",
+    "mautic/theme-blank-grapejs": "dev-main",
+    "mautic/theme-brienz": "dev-main",
+    "mautic/theme-cards": "dev-main",
+    "mautic/theme-confirmme": "dev-main",
+    "mautic/theme-fresh-center": "dev-main",
+    "mautic/theme-fresh-fixed": "dev-main",
+    "mautic/theme-fresh-left": "dev-main",
+    "mautic/theme-fresh-wide": "dev-main",
+    "mautic/theme-goldstar": "dev-main",
+    "mautic/theme-neopolitan": "dev-main",
+    "mautic/theme-oxygen": "dev-main",
+    "mautic/theme-paprika": "dev-main",
+    "mautic/theme-skyline": "dev-main",
+    "mautic/theme-sparse": "dev-main",
+    "mautic/theme-sunday": "dev-main",
+    "mautic/theme-vibrant": "dev-main"
   },
   "require-dev": {
     "symfony/web-profiler-bundle": "~4.4.0",
@@ -202,7 +220,7 @@
         "[project-root]/bin/console": "assets/scaffold/files/console",
         "[project-root]/bin/.htaccess": "assets/scaffold/files/console.htaccess",
         "[web-root]/.htaccess": "assets/scaffold/files/htaccess",
-        "[web-root]/example.gitignore": "assets/scaffold/files/example.gitignore",
+        "[web-root]/.gitignore": "assets/scaffold/files/example.gitignore",
         "[web-root]/index.php": "assets/scaffold/files/index.php",
         "[web-root]/index_dev.php": "assets/scaffold/files/index_dev.php",
         "[web-root]/offline.php": "assets/scaffold/files/offline.php",
@@ -215,7 +233,9 @@
         "[web-root]/media/dashboards/email-overview.json": "assets/scaffold/media/dashboards/email-overview.json",
         "[web-root]/media/dashboards/stats-overview.json": "assets/scaffold/media/dashboards/stats-overview.json",
         "[web-root]/media/files/.htaccess": "assets/scaffold/media/files/.htaccess",
-        "[web-root]/media/images/.htaccess": "assets/scaffold/media/images/.htaccess"
+        "[web-root]/media/images/.htaccess": "assets/scaffold/media/images/.htaccess",
+        "[web-root]/themes/blank.png": "assets/scaffold/files/blank.png",
+        "[web-root]/themes/blank-big.png": "assets/scaffold/files/blank-big.png"
       }
     }
   },
