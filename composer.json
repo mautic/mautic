@@ -137,6 +137,15 @@
       "themes/{$name}": [
         "type:mautic-theme"
       ]
+    },
+    "symfony-app-dir": "app",
+    "symfony-bin-dir": "bin",
+    "symfony-web-dir": "../",
+    "symfony-var-dir": "var",
+    "symfony-tests-dir": "tests",
+    "symfony-assets-install": "relative",
+    "incenteev-parameters": {
+      "file": "app/config/parameters.yml"
     }
   }
 }

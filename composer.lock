@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bf84c0920f55d766890f21cbb66c5654",
+    "content-hash": "1d72d3ed730a8b068d58f441e4c6ec59",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -5499,12 +5499,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mautic/core.git",
-                "reference": "8a83456582e7afb5a41d9bf1ffa255df8d5aced6"
+                "reference": "e16a815257b148a61216b44e10666624bb6faa72"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mautic/core/zipball/8a83456582e7afb5a41d9bf1ffa255df8d5aced6",
-                "reference": "8a83456582e7afb5a41d9bf1ffa255df8d5aced6",
+                "url": "https://api.github.com/repos/mautic/core/zipball/e16a815257b148a61216b44e10666624bb6faa72",
+                "reference": "e16a815257b148a61216b44e10666624bb6faa72",
                 "shasum": ""
             },
             "require": {
@@ -5656,10 +5656,6 @@
                         "[project-root]/.php_cs": "assets/scaffold/files/.php_cs",
                         "[project-root]/codeception.yml": "assets/scaffold/files/codeception.yml",
                         "[project-root]/codecov.yml": "assets/scaffold/files/codecov.yml",
-                        "[project-root]/LICENSE.txt": "assets/scaffold/files/LICENSE.txt",
-                        "[project-root]/SECURITY.md": "assets/scaffold/files/SECURITY.md",
-                        "[project-root]/UPGRADE-3.0.md": "assets/scaffold/files/UPGRADE-3.0.md",
-                        "[project-root]/README.md": "assets/scaffold/files/mautic.README.md",
                         "[project-root]/rector.php": "assets/scaffold/files/rector.php",
                         "[project-root]/Gruntfile.js": "assets/scaffold/files/Gruntfile.js",
                         "[project-root]/phpstan.neon": "assets/scaffold/files/phpstan.neon",
@@ -5708,7 +5704,7 @@
                 "issues": "https://github.com/mautic/core/issues",
                 "source": "https://github.com/mautic/core/tree/4.x"
             },
-            "time": "2021-03-29T21:20:24+00:00"
+            "time": "2021-03-29T22:09:17+00:00"
         },
         {
             "name": "mautic/core-project-message",
@@ -17511,16 +17507,16 @@
         },
         {
             "name": "tightenco/collect",
-            "version": "v8.19.0",
+            "version": "v8.34.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tighten/collect.git",
-                "reference": "0c0243a0dc0b66f54d0ec409f36cd9889665b132"
+                "reference": "b069783ab0c547bb894ebcf8e7f6024bb401f9d2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tighten/collect/zipball/0c0243a0dc0b66f54d0ec409f36cd9889665b132",
-                "reference": "0c0243a0dc0b66f54d0ec409f36cd9889665b132",
+                "url": "https://api.github.com/repos/tighten/collect/zipball/b069783ab0c547bb894ebcf8e7f6024bb401f9d2",
+                "reference": "b069783ab0c547bb894ebcf8e7f6024bb401f9d2",
                 "shasum": ""
             },
             "require": {
@@ -17559,9 +17555,9 @@
             ],
             "support": {
                 "issues": "https://github.com/tighten/collect/issues",
-                "source": "https://github.com/tighten/collect/tree/v8.19.0"
+                "source": "https://github.com/tighten/collect/tree/v8.34.0"
             },
-            "time": "2020-12-19T00:06:29+00:00"
+            "time": "2021-03-29T21:29:00+00:00"
         },
         {
             "name": "twig/twig",
