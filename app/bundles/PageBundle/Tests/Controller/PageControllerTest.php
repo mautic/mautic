@@ -32,7 +32,7 @@ class PageControllerTest extends MauticMysqlTestCase
         ];
 
         /** @var PageModel $model */
-        $model = $this->container->get('mautic.page.model.page');
+        $model = self::$container->get('mautic.page.model.page');
         $page  = new Page();
         $page->setTitle($pageData['title'])
             ->setTemplate($pageData['template']);
@@ -182,7 +182,7 @@ class PageControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', '/s/pages/view/'.$this->id);
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
-        $model                  = $this->container->get('mautic.page.model.page');
+        $model                  = self::$container->get('mautic.page.model.page');
         $page                   = $model->getEntity($this->id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertStringContainsString($page->getTitle(), $clientResponseContent, 'The return must contain the title of page');
@@ -205,7 +205,7 @@ class PageControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', 's/pages/results/'.$this->id);
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
-        $model                  = $this->container->get('mautic.page.model.page');
+        $model                  = self::$container->get('mautic.page.model.page');
         $page                   = $model->getEntity($this->id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
