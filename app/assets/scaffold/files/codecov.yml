@@ -1,0 +1,13 @@
+comment:
+    layout: "reach, diff, flags, files"
+    behavior: default
+    require_changes: true
+
+coverage:
+  status:
+    patch:
+      default:
+        # PRs against files that have 0% coverage can remain
+        # at 0% coverage, as long as the project's total
+        # coverage (e.g. 36%) doesn't decrease.
+        target: 0%
