@@ -204,7 +204,7 @@ class OrderDAO
             $objectChangeDAO->getObject(),
             $objectChangeDAO->getObjectId(),
             $objectModifiedDate,
-            $objectChangeDAO->getObjectId()
+            $objectChangeDAO->getMappedObjectId()
         );
     }
 
