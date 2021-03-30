@@ -1,0 +1,15 @@
+{
+  "name": "mautic/theme-fresh-fixed",
+  "description": "Mautic Fresh Fixed Theme",
+  "type": "mautic-theme",
+  "version": "1.0",
+  "keywords": ["mautic","theme"],
+  "extra": {
+    "install-directory-name": "fresh-fixed"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=7.4.0 <8.1",
+    "mautic/core-lib": "^4.0"
+  }
+}
