@@ -11,7 +11,8 @@
     "mautic/core-recommended": "4.x-dev",
     "mautic/theme-coffee": "dev-main",
     "mautic/theme-mauve": "dev-main",
-    "mautic/theme-nature": "dev-main"
+    "mautic/theme-nature": "dev-main",
+    "symfony/framework-bundle": "4.4.20"
   },
   "autoload": {
     "psr-4": {
