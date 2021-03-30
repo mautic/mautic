@@ -85,12 +85,12 @@ class AuthenticationListenerTest extends TestCase
             ->method('getToken')
             ->willReturn($token);
 
-        $this->entityManager->expects($this->at(0))
+        $this->entityManager
             ->method('getRepository')
             ->with(AccessToken::class)
             ->willReturn($this->objectRepository);
 
-        $this->objectRepository->expects($this->at(0))
+        $this->objectRepository
             ->method('findOneBy')
             ->with(['token' => $token])
             ->willReturn($this->accessToken);
