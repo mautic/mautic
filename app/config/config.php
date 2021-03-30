@@ -183,6 +183,7 @@ $container->loadFromExtension('oneup_uploader', [
 //FOS Rest for API
 $container->loadFromExtension('fos_rest', [
     'routing_loader' => false,
+    'body_listener'  => true,
     'view'           => [
         'formats' => [
             'json' => true,
