@@ -5537,12 +5537,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mautic/core.git",
-                "reference": "53f9831db5a41903fbc351cc8b73c227cb282ebb"
+                "reference": "0b4c45a3bf92047baab3dbe996f24a1378aa959e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mautic/core/zipball/53f9831db5a41903fbc351cc8b73c227cb282ebb",
-                "reference": "53f9831db5a41903fbc351cc8b73c227cb282ebb",
+                "url": "https://api.github.com/repos/mautic/core/zipball/0b4c45a3bf92047baab3dbe996f24a1378aa959e",
+                "reference": "0b4c45a3bf92047baab3dbe996f24a1378aa959e",
                 "shasum": ""
             },
             "require": {
@@ -5691,12 +5691,7 @@
                 "mautic-scaffold": {
                     "file-mapping": {
                         "[project-root]/.env.dist": "assets/scaffold/files/.env.dist",
-                        "[project-root]/.php_cs": "assets/scaffold/files/.php_cs",
-                        "[project-root]/codeception.yml": "assets/scaffold/files/codeception.yml",
-                        "[project-root]/codecov.yml": "assets/scaffold/files/codecov.yml",
-                        "[project-root]/rector.php": "assets/scaffold/files/rector.php",
                         "[project-root]/Gruntfile.js": "assets/scaffold/files/Gruntfile.js",
-                        "[project-root]/phpstan.neon": "assets/scaffold/files/phpstan.neon",
                         "[project-root]/package.json": "assets/scaffold/files/package.json",
                         "[project-root]/package-lock.json": "assets/scaffold/files/package-lock.json",
                         "[project-root]/bin/console": "assets/scaffold/files/console",
@@ -5743,7 +5738,7 @@
                 "issues": "https://github.com/mautic/core/issues",
                 "source": "https://github.com/mautic/core/tree/4.x"
             },
-            "time": "2021-03-30T13:39:04+00:00"
+            "time": "2021-03-30T14:09:24+00:00"
         },
         {
             "name": "mautic/core-project-message",
