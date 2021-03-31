@@ -247,7 +247,6 @@ class ReportSubscriber implements EventSubscriberInterface
                 } else {
                     $event->applyDateFilters($qb, 'date_added', 'l');
                 }
-                $event->addCompanyLeftJoin($qb);
                 break;
 
             case self::CONTEXT_LEAD_POINT_LOG:
@@ -378,7 +377,9 @@ class ReportSubscriber implements EventSubscriberInterface
                 break;
         }
 
-        if (!$event->checkContext(self::CONTEXT_COMPANIES) && $this->companyReportData->eventHasCompanyColumns($event)) {
+        if (!$event->checkContext(self::CONTEXT_COMPANIES) &&
+            ($this->companyReportData->eventHasCompanyColumns($event) or $this->companyReportData->eventHasCompanyFilters($event))
+        ) {
             $event->addCompanyLeftJoin($qb);
         }
 

@@ -73,6 +73,21 @@ class CompanyReportData
     }
 
     /**
+     * @return bool
+     */
+    public function eventHasCompanyFilters(ReportGeneratorEvent $event)
+    {
+        $companyColumns = $this->getCompanyData();
+        foreach ($companyColumns as $key => $column) {
+            if ($event->hasFilter($key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @return array
      */
     private function getCompanyColumns()
