@@ -351,6 +351,8 @@ class PageController extends FormController
     }
 
     /**
+     * Generates a "Contacts Grid" containing only identified leads.
+     *
      * @param int $objectId
      * @param int $page
      *
@@ -365,7 +367,11 @@ class PageController extends FormController
             'page',
             'page_hits',
             null,
-            'page_id'
+            'page_id',
+            [[
+                'col'  => 'l.date_identified',
+                'expr' => 'isNotNull',
+            ]]
         );
     }
 
