@@ -40,7 +40,9 @@ class ConnectwiseApi extends CrmApi
             $url,
             $parameters,
             $method,
-            ['encode_parameters' => 'json', 'cw-app-id' => $this->integration->getCompanyCookieKey()]
+            ['encode_parameters' => 'json', 'cw-app-id' => $this->integration->getCompanyCookieKey(), 'headers' => [
+                'clientid' => $this->integration->getConnectwiseClientId(),
+            ]]
         );
 
         $errors = [];

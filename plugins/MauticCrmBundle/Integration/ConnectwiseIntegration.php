@@ -58,6 +58,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             'password'  => 'mautic.connectwise.form.privatekey',
             'site'      => 'mautic.connectwise.form.site',
             'appcookie' => 'mautic.connectwise.form.cookie',
+            'clientid'  => 'mautic.connectwise.form.clientid',
         ];
     }
 
@@ -139,6 +140,16 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     public function getAuthLoginUrl()
     {
         return $this->router->generate('mautic_integration_auth_callback', ['integration' => $this->getName()]);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getConnectwiseClientId()
+    {
+        return $this->keys['clientid'];
     }
 
     /**
@@ -324,15 +335,16 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 );
 
                 $builder->add(
-                        'campaign_task',
-                        IntegrationCampaignsTaskType::class,
-                        [
-                            'label' => false,
-                            'attr'  => [
-                                'data-hide-on' => '{"campaignevent_properties_config_push_activities_0":"checked"}',
-                            ],
-                            'data' => (isset($data['campaign_task'])) ? $data['campaign_task'] : [],
-                        ]);
+                    'campaign_task',
+                    IntegrationCampaignsTaskType::class,
+                    [
+                        'label' => false,
+                        'attr'  => [
+                            'data-hide-on' => '{"campaignevent_properties_config_push_activities_0":"checked"}',
+                        ],
+                        'data' => (isset($data['campaign_task'])) ? $data['campaign_task'] : [],
+                    ]
+                );
             }
         }
     }
@@ -484,7 +496,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         try {
             while ($records = ('Contact' == $object)
                 ? $this->getApiHelper()->getContacts($params, $page)
-                : $this->getApiHelper()->getCompanies($params, $page)) {
+                : $this->getApiHelper()->getCompanies($params, $page)
+            ) {
                 $mauticReferenceObject = ('Contact' == $object) ? 'lead' : 'company';
                 foreach ($records as $record) {
                     if (is_array($record)) {
@@ -770,7 +783,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                             }
                             if (!$keyExists) {
                                 $type = [
-                                    'type' => ['id' => $keyItem + 1, 'name' => $item], ];
+                                    'type' => ['id' => $keyItem + 1, 'name' => $item],
+                                ];
                                 $values = array_merge(['value' => $this->cleanPushData($fields[$mauticKey]['value'])], $defaultValue);
 
                                 $communicationItems[] = array_merge($type, $values);
