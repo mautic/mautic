@@ -65,21 +65,18 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
 
         switch ($filterOperator) {
             case 'empty':
-                $expression = new CompositeExpression(CompositeExpression::TYPE_OR,
-                    [
-                        $queryBuilder->expr()->isNull('l.'.$filter->getField()),
-                        $queryBuilder->expr()->eq('l.'.$filter->getField(), $queryBuilder->expr()->literal('')),
-                    ]
-                );
+                $parts = [$queryBuilder->expr()->isNull('l.'.$filter->getField())];
+                if (!$filter->isColumnTypeDate()) {
+                    $parts[] = $queryBuilder->expr()->eq('l.'.$filter->getField(), $queryBuilder->expr()->literal(''));
+                }
+                $expression = new CompositeExpression(CompositeExpression::TYPE_OR, $parts);
                 break;
             case 'notEmpty':
-                $expression = new CompositeExpression(CompositeExpression::TYPE_AND,
-                    [
-                        $queryBuilder->expr()->isNotNull('l.'.$filter->getField()),
-                        $queryBuilder->expr()->neq('l.'.$filter->getField(), $queryBuilder->expr()->literal('')),
-                    ]
-                );
-
+                $parts = [$queryBuilder->expr()->isNotNull('l.'.$filter->getField())];
+                if (!$filter->isColumnTypeDate()) {
+                    $parts[] = $queryBuilder->expr()->neq('l.'.$filter->getField(), $queryBuilder->expr()->literal(''));
+                }
+                $expression = new CompositeExpression(CompositeExpression::TYPE_AND, $parts);
                 break;
             case 'neq':
                 $expression = $queryBuilder->expr()->orX(
