@@ -96,7 +96,7 @@ class DateRelativeInterval implements FilterDecoratorInterface
         $date->modify($this->originalValue);
 
         $operator = $this->getOperator($contactSegmentFilterCrate);
-        $format   = 'Y-m-d';
+        $format   = $this->dateOptionParameters->hasTimePart() ? 'Y-m-d H:i:s' : 'Y-m-d';
         if ('like' === $operator || 'notLike' === $operator) {
             $format .= '%';
         }

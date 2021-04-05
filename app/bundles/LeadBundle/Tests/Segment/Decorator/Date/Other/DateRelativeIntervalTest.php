@@ -109,6 +109,32 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getParameterValue
      */
+    public function testGetParameterValueMinusHourWithGreaterOperator()
+    {
+        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $timezoneResolver = $this->createMock(TimezoneResolver::class);
+
+        $date = new DateTimeHelper('2018-03-02', null, 'local');
+
+        $timezoneResolver->method('getDefaultDate')
+            ->with()
+            ->willReturn($date);
+
+        $filter = [
+            'operator' => '>',
+            'type' => 'datetime',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
+
+        $filterDecorator = new DateRelativeInterval($dateDecorator, '-1 hour', $dateOptionParameters);
+
+        $this->assertEquals('2018-03-01 23:00:00', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getParameterValue
+     */
     public function testGetParameterValueMinusMonthWithNotEqualOperator()
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
