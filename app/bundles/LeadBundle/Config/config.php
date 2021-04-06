@@ -464,6 +464,7 @@ return [
                     'translator',
                     'mautic.security',
                     'mautic.helper.templating',
+                    'mautic.sms.repository.sms',
                 ],
             ],
             'mautic.webhook.subscriber' => [
