@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\EventListener\SearchSubscriber;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\SmsBundle\Entity\SmsRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -43,6 +44,7 @@ class SearchSubscriberTest extends TestCase
         $translator        = $this->createMock(TranslatorInterface::class);
         $security          = $this->createMock(CorePermissions::class);
         $templating        = $this->createMock(TemplatingHelper::class);
+        $smsRepository     = $this->createMock(SmsRepository::class);
 
         $contactRepository->method('applySearchQueryRelationship')
             ->willReturnCallback(
@@ -99,7 +101,8 @@ class SearchSubscriberTest extends TestCase
             $emailRepository,
             $translator,
             $security,
-            $templating
+            $templating,
+            $smsRepository
         );
 
         $dispatcher = new EventDispatcher();
