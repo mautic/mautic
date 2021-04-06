@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
@@ -79,6 +80,11 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
     private \PHPUnit\Framework\MockObject\MockObject|CompanyLeadRepository $companyLeadRepositoryMock;
+    
+    /**
+     * @var MockObject&LeadListRepository
+     */
+    private MockObject $segmentRepository;
 
     private \Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber $subscriber;
     /**
@@ -103,6 +109,7 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->contactTracker            = $this->createMock(ContactTracker::class);
         $this->companyModel              = $this->createMock(CompanyModel::class);
         $this->companyLeadRepositoryMock = $this->createMock(CompanyLeadRepository::class);
+        $this->segmentRepository         = $this->createMock(LeadListRepository::class);
         $this->subscriber                = new DynamicContentSubscriber(
             $this->trackableModel,
             $this->pageTokenHelper,
@@ -114,7 +121,8 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->dynamicContentModel,
             $this->security,
             $this->contactTracker,
-            $this->companyModel
+            $this->companyModel,
+            $this->segmentRepository
         );
     }
 

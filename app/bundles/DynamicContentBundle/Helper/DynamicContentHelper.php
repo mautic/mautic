@@ -10,6 +10,7 @@ use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -18,11 +19,22 @@ class DynamicContentHelper
 {
     use MatchFilterForLeadTrait;
 
+    /**
+     * @const DYNAMIC_CONTENT_REGEX
+     */
+    const DYNAMIC_CONTENT_REGEX = '/{(dynamiccontent)=(\w+)(?:\/}|}(?:([^{]*(?:{(?!\/\1})[^{]*)*){\/\1})?)/is';
+
+    /**
+     * @const DYNAMIC_WEB_CONTENT_REGEX
+     */
+    const DYNAMIC_WEB_CONTENT_REGEX = '/{dwc=(.*?)}/';
+
     public function __construct(
         protected DynamicContentModel $dynamicContentModel,
         protected RealTimeExecutioner $realTimeExecutioner,
         protected EventDispatcherInterface $dispatcher,
-        protected LeadModel $leadModel
+        protected LeadModel $leadModel,
+        private LeadListRepository $segmentRepository
     ) {
     }
 

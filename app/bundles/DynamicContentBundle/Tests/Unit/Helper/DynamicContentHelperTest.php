@@ -12,6 +12,7 @@ use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -41,17 +42,24 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
 
     private \Mautic\DynamicContentBundle\Helper\DynamicContentHelper $helper;
 
+    /**
+     * @var LeadListRepository
+     */
+    private $segmentRepository;
+
     protected function setUp(): void
     {
         $this->mockModel           = $this->createMock(DynamicContentModel::class);
         $this->realTimeExecutioner = $this->createMock(RealTimeExecutioner::class);
         $this->mockDispatcher      = $this->createMock(EventDispatcher::class);
         $this->leadModel           = $this->createMock(LeadModel::class);
+        $this->segmentRepository   = $this->createMock(LeadListRepository::class);
         $this->helper              = new DynamicContentHelper(
             $this->mockModel,
             $this->realTimeExecutioner,
             $this->mockDispatcher,
-            $this->leadModel
+            $this->leadModel,
+            $this->segmentRepository
         );
     }
 

@@ -66,6 +66,7 @@ return [
                     'mautic.campaign.executioner.realtime',
                     'event_dispatcher',
                     'mautic.lead.model.lead',
+                    'mautic.lead.repository.lead_list',
                 ],
             ],
         ],
