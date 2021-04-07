@@ -378,7 +378,7 @@ class ImportModel extends FormModel
 
             if ($errorMessage) {
                 if (!$this->em->isOpen()) {
-                    // Something bad has happened if the entity manager is closed.
+                    // Something bad must have happened if the entity manager is closed.
                     // We will not be able to save any entities.
                     throw new ORMException($errorMessage);
                 }
