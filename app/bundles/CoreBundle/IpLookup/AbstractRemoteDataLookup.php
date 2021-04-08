@@ -59,10 +59,17 @@ abstract class AbstractRemoteDataLookup extends AbstractLookup
 
         try {
             $response = ('post' == $this->method) ?
-                $this->connector->post($url, $this->getParameters(), $this->getHeaders(), 10) :
-                $this->connector->get($url, $this->getHeaders(), 10);
+                $this->client->post($url, [
+                    \GuzzleHttp\RequestOptions::BODY    => $this->getParameters(),
+                    \GuzzleHttp\RequestOptions::HEADERS => $this->getHeaders(),
+                    \GuzzleHttp\RequestOptions::TIMEOUT => 10,
+                ]) :
+                $this->client->get($url, [
+                    \GuzzleHttp\RequestOptions::HEADERS => $this->getHeaders(),
+                    \GuzzleHttp\RequestOptions::TIMEOUT => 10,
+                ]);
 
-            $this->parseResponse($response->body);
+            $this->parseResponse($response->getBody());
         } catch (\Exception $exception) {
             if ($this->logger) {
                 $this->logger->warning('IP LOOKUP: '.$exception->getMessage());
