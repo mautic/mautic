@@ -377,15 +377,15 @@ class ImportModel extends FormModel
             }
 
             if ($errorMessage) {
-                if (!$this->em->isOpen()) {
+                $import->increaseIgnoredCount();
+                $this->logDebug('Line '.$lineNumber.' error: '.$errorMessage, $import);
+                if ($this->em->isOpen()) {
                     // Something bad must have happened if the entity manager is closed.
                     // We will not be able to save any entities.
-                    $this->logDebug('Line '.$lineNumber.' error: '.$errorMessage, $import);
                     throw new ORMException($errorMessage);
                 }
-                $import->increaseIgnoredCount();
+                // This should be called only if the entity manager is open
                 $this->logImportRowError($eventLog, $errorMessage);
-                $this->logDebug('Line '.$lineNumber.' error: '.$errorMessage, $import);
             } else {
                 $this->leadEventLogRepo->saveEntity($eventLog);
             }
