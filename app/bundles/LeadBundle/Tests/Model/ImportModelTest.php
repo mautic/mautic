@@ -112,7 +112,6 @@ class ImportModelTest extends StandardImportTestHelper
 
     public function testCheckParallelImportLimitWhenEqual(): void
     {
-        $entity = $this->initImportEntity();
         $model  = $this->getMockBuilder(ImportModel::class)
             ->onlyMethods(['getParallelImportLimit', 'getRepository'])
             ->disableOriginalConstructor()
@@ -403,5 +402,32 @@ class ImportModelTest extends StandardImportTestHelper
         @unlink(self::$csvPath);
 
         self::$csvPath = $oldCsv;
+    }
+
+    public function testItLogsDBErrorIfTheEntityManagerIsClosed(): void
+    {
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $entityManager = $this->getEntityManagerMock();
+
+        $entityManager->expects($this->any())
+            ->method('isOpen')
+            ->willReturn(false);
+
+        $this->expectException(ORMException::class);
+        $dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->willThrowException(new ORMException('Some DB error'));
+
+        $importModel = $this->initImportModel();
+        $importModel->setDispatcher($dispatcher);
+        $import = $this->initImportEntity();
+        $importModel->setEntityManager($entityManager);
+        $import->start();
+        $importModel->process($import, new Progress());
+        $import->end();
+
+        Assert::assertSame(0, $import->getInsertedCount());
+        Assert::assertSame(1, $import->getIgnoredCount());
+        Assert::assertSame(Import::FAILED, $import->getStatus());
     }
 }
