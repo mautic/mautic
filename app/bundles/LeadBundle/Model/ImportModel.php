@@ -377,6 +377,7 @@ class ImportModel extends FormModel
             }
 
             if ($errorMessage) {
+                // Log the error first
                 $import->increaseIgnoredCount();
                 $this->logDebug('Line '.$lineNumber.' error: '.$errorMessage, $import);
                 if (!$this->em->isOpen()) {
