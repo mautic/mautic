@@ -411,7 +411,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             'city'                   => ['type' => 'string', 'required' => false],
             'state'                  => ['type' => 'string', 'required' => false],
             'zip'                    => ['type' => 'string', 'required' => false],
-            'country'                => ['type' => 'string', 'required' => false],
+            'country'                => ['type' => 'ref', 'required' => false, 'value' => 'name'],
             'inactiveFlag'           => ['type' => 'string', 'required' => false],
             'securityIdentifier'     => ['type' => 'string', 'required' => false],
             'managerContactId'       => ['type' => 'string', 'required' => false],
