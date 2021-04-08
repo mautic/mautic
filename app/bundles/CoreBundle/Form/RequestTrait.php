@@ -222,11 +222,6 @@ trait RequestTrait
             case 'email':
                 $fieldData[$leadField['alias']] = InputHelper::email($fieldData[$leadField['alias']]);
                 break;
-            case 'country':
-                if (is_array($fieldData[$leadField['alias']]) && isset($fieldData[$leadField['alias']]['name'])) {
-                    $fieldData[$leadField['alias']] = $fieldData[$leadField['alias']]['name'];
-                }
-                break;
         }
     }
 }
