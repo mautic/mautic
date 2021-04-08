@@ -148,6 +148,10 @@ abstract class StandardImportTestHelper extends CommonMocks
                 )
             );
 
+        $entityManager->expects($this->any())
+            ->method('isOpen')
+            ->willReturn(true);
+
         $leadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
             ->getMock();
