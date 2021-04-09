@@ -307,7 +307,7 @@ context("Verify campaign membership with update contact action & updating dates 
     contact.waitforPageLoad();
     cy.visit('/s/contacts?search=' + contactFirstName);
     contact.waitTillSearchResultGetsDisplayed();
-    search.selectParentCheckBox.click({ force: true });
+    search.selectParentCheckBox.click();
     search.selectParentsOptionsDropdown.click();
     search.selectBatchdeleteButton.click();
     search.confirmDeleteButton.click();
