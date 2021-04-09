@@ -34,6 +34,10 @@ class DynamicContent {
         return cy.get('.fr-element'); // Community Specific
     }
 
+    get editDynamicContent(){
+        return cy.get('#toolbar > div.std-toolbar.btn-group > a:nth-child(1)'); // Community Specific
+    }
+
 }
 const dynamicContent = new DynamicContent();
 module.exports = dynamicContent;

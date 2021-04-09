@@ -26,7 +26,9 @@ context("Verify that user is able to create and edit dynamic content", () => {
     dynamicContent.waitforPageLoad();
     cy.visit('/s/dwc?search='+ dynamicContentText);
     dynamicContent.clickOnFirstSearchedElement.click();
-    cy.wait(2000);
+    cy.wait(1000);
+    dynamicContent.editDynamicContent.click(); // Community Specific
+    cy.wait(2000); // Community Specific
     dynamicContent.typeContent.clear();
     dynamicContent.typeContent.type("Test Demo Content");
     search.saveAndCloseButton.click();
