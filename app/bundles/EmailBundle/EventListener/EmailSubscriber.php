@@ -109,7 +109,7 @@ class EmailSubscriber implements EventSubscriberInterface
         $email = $event->getEmail();
 
         $html = $event->getContent();
-        if (null !== $email->getPreheaderText() && '' !== $email->getPreheaderText()) {
+        if (null !== $email && null !== $email->getPreheaderText() && '' !== $email->getPreheaderText()) {
             $preheaderTextElement = self::PREHEADER_HTML_ELEMENT_BEFORE.$email->getPreheaderText().self::PREHEADER_HTML_ELEMENT_AFTER;
             if (!preg_match(self::PREHEADER_HTML_SEARCH_PATTERN, $html, $preheaderMatches)) {
                 if (preg_match('/(<body[^\>]*>)/i', $html, $contentMatches)) {
