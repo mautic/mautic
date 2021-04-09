@@ -387,7 +387,7 @@ class ImportModelTest extends StandardImportTestHelper
     public function testItLogsDBErrorIfTheEntityManagerIsClosed(): void
     {
         $this->generateSmallCSV();
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher    = $this->createMock(EventDispatcherInterface::class);
         $entityManager = $this->getEntityManagerMock();
 
         $entityManager->expects($this->any())
