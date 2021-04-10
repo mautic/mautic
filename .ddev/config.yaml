@@ -1,4 +1,4 @@
-name: mtc-adiwegs
+name: mautic
 type: php
 docroot: ""
 php_version: "7.4"
