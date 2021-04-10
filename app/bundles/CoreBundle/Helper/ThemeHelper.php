@@ -665,7 +665,7 @@ class ThemeHelper
 
         // is the theme configured to be used with the current builder
         if (!is_array($builderRequested)) {
-            throw new BadConfigurationException(sprintf('Template %s not configured properly: builder', $config['name']));
+            throw new BadConfigurationException(sprintf('Theme %s not configured properly: builder', $config['name']));
         }
 
         return in_array($builderName, $builderRequested);
