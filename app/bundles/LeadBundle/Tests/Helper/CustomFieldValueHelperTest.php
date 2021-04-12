@@ -77,4 +77,70 @@ class CustomFieldValueHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Option 1 yes', $normalizedFields['core']['test']['normalizedValue']);
         $this->assertEquals('option 4', $normalizedFields['core']['test2']['normalizedValue']);
     }
+
+    public function testAnonimizationFields()
+    {
+        $fields = [
+            'core' => [
+                'firstname' => [
+                    'id'       => 2,
+                    'label'    => 'First Name',
+                    'alias'    => 'firstname',
+                    'type'     => 'text',
+                    'group'    => 'core',
+                    'object'   => 'lead',
+                    'is_fixed' => 1,
+                    'value'    => 'John',
+                ],
+                'lastname' => [
+                    'id'       => 3,
+                    'label'    => 'Last Name',
+                    'alias'    => 'lastname',
+                    'type'     => 'text',
+                    'group'    => 'core',
+                    'object'   => 'lead',
+                    'is_fixed' => 1,
+                    'value'    => 'Doe',
+                ],
+                'email' => [
+                    'id'              => 6,
+                    'label'           => 'Email',
+                    'alias'           => 'email',
+                    'type'            => 'email',
+                    'group'           => 'core',
+                    'object'          => 'lead',
+                    'is_fixed'        => '1',
+                    'properties'      => 'a:0:{}',
+                    'default_value'   => '',
+                    'value'           => 'john+1023@mautic.org',
+                    'normalizedValue' => 'john+1023@mautic.org',
+                ],
+            ],
+            'professional' => [
+                'userip' => [
+                    'id'              => '55',
+                    'label'           => 'User IP',
+                    'alias'           => 'userip',
+                    'type'            => 'text',
+                    'group'           => 'professional',
+                    'object'          => 'lead',
+                    'is_fixed'        => '0',
+                    'properties'      => 'a:0:{}',
+                    'default_value'   => null,
+                    'value'           => '161.3.189.71',
+                    'normalizedValue' => '161.3.189.71',
+                ],
+            ],
+        ];
+
+        $expected = [
+            'firstname' => '*',
+            'lastname'  => '*',
+            'userip'    => '*',
+            'email'     => '*@mautic.org',
+        ];
+
+        $result = CustomFieldValueHelper::anonimizationFields($fields);
+        $this->assertEquals($expected, $result);
+    }
 }
