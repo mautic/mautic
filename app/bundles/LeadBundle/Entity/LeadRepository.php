@@ -14,7 +14,7 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\DriverException;
-use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Doctrine\DBAL\FetchMode;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -769,23 +769,17 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                             'alias'      => 'list_lead',
                             'condition'  => 'l.id = list_lead.lead_id',
                         ],
-                        [
-                            'from_alias' => 'list_lead',
-                            'table'      => 'lead_lists',
-                            'alias'      => 'list',
-                            'condition'  => 'list_lead.leadlist_id = list.id',
-                        ],
                     ],
                     $innerJoinTables,
-                    $this->generateFilterExpression($q, 'list.alias', $eqExpr, $unique, ($filter->not) ? true : null,
-                        // orX for filter->not either manuall removed or is null
+                    $this->generateFilterExpression($q, 'list_lead.leadlist_id', $filter->not ? 'notIn' : 'in', $unique, (bool) $filter->not,
+                        // orX for filter->not either manual removed or is null
                         $q->expr()->$xExpr(
                             $q->expr()->$eqExpr('list_lead.manually_removed', 0)
                         )
                     )
                 );
                 $filter->strict  = true;
-                $returnParameter = true;
+                $q->setParameter($unique, $this->getListIdsByAlias($string) ?: [0], Connection::PARAM_INT_ARRAY);
 
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ip'):
@@ -1309,5 +1303,18 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         unset($fields['points']);
 
         $this->defaultPrepareDbalFieldsForSave($fields);
+    }
+
+    private function getListIdsByAlias(string $alias): array
+    {
+        return $this->getEntityManager()
+            ->getConnection()
+            ->createQueryBuilder()
+            ->select('list.id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists', 'list')
+            ->where('list.alias = :alias')
+            ->setParameter('alias', $alias)
+            ->execute()
+            ->fetchAll(FetchMode::COLUMN);
     }
 }
