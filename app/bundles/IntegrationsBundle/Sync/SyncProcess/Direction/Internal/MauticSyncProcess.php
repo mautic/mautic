@@ -130,7 +130,7 @@ class MauticSyncProcess
      */
     public function getSyncOrder(ReportDAO $syncReport)
     {
-        $syncOrder = new OrderDAO($this->syncDateHelper->getSyncDateTime(), $this->inputOptionsDAO->isFirstTimeSync(), $this->mappingManualDAO->getIntegration());
+        $syncOrder = new OrderDAO($this->syncDateHelper->getSyncDateTime(), $this->inputOptionsDAO->isFirstTimeSync(), $this->mappingManualDAO->getIntegration(), $this->inputOptionsDAO->getOptions());
 
         $integrationObjectsNames = $this->mappingManualDAO->getIntegrationObjectNames();
         foreach ($integrationObjectsNames as $integrationObjectName) {

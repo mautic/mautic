@@ -16,9 +16,9 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
-        matrix:
-          php-versions: ['7.4']
-          db-types: ['mysql', 'mariadb']
+      matrix:
+        php-versions: ['7.4']
+        db-types: ['mysql', 'mariadb']
   
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
 
@@ -80,7 +80,6 @@ jobs:
 
         if [[ "${{ matrix.php-versions }}" == "7.4" ]] && [[ "${{ matrix.db-types }}" == "mysql" ]]; then
           composer test -- --coverage-clover=coverage.xml
-          bash <(curl -s https://codecov.io/bash)
         else
           composer test
         fi
@@ -94,6 +93,13 @@ jobs:
         export DB_PORT=${!DB_PORT_STRING}
 
         composer test -- plugins/MauticCrmBundle/Tests/Pipedrive
+
+    - name: Upload coverage report
+      if: ${{ matrix.php-versions == '7.4' && matrix.db-types == 'mysql' }}
+      uses: codecov/codecov-action@v1
+      with:
+        files: ./coverage.xml
+        fail_ci_if_error: true
 
     - name: Slack Notification if tests fail
       uses: rtCamp/action-slack-notify@v2
@@ -115,7 +121,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: ['PHPSTAN', 'Rector', 'CS Fixer']
+        commands: ['PHPSTAN', 'CS Fixer']
 
     name: ${{ matrix.commands }}
 
