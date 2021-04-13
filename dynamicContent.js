@@ -10,13 +10,13 @@ class DynamicContent {
   buildCodePopup() {
     const cfg = this.editor.getConfig();
 
-    let codePopup = document.createElement('div');
-    let content = document.createElement('div');
+    const codePopup = document.createElement('div');
+    const content = document.createElement('div');
     content.setAttribute('id', 'dynamic-content-popup');
-    let btnEdit = document.createElement('button');
+    const btnEdit = document.createElement('button');
 
     btnEdit.innerHTML = this.opts.dynamicContentBtnLabel;
-    btnEdit.className = cfg.stylePrefix + 'btn-prim ' + cfg.stylePrefix + 'btn-dynamic-content';
+    btnEdit.className = `${cfg.stylePrefix}btn-prim ${cfg.stylePrefix}btn-dynamic-content`;
     btnEdit.onclick = this.updateCode.bind(this);
 
     codePopup.appendChild(content);
@@ -42,15 +42,15 @@ class DynamicContent {
 
   // Load Dynamic Content editor from Mautic and append to popup
   updatePopupContents(component) {
-    let self = this;
-    let popupContent = this.codePopup.querySelector('#dynamic-content-popup');
-    let attributes = component.getAttributes();
-    let focusForm = mQuery('#emailform_dynamicContent_' + attributes['data-param-dec-id']);
+    const self = this;
+    const popupContent = this.codePopup.querySelector('#dynamic-content-popup');
+    const attributes = component.getAttributes();
+    const focusForm = mQuery(`#emailform_dynamicContent_${attributes['data-param-dec-id']}`);
 
     // Remove Mautic Froala and reload one with custom setting
     focusForm.find('textarea.editor').each(function () {
-      var buttons = self.opts.dynamicContentFroalaButtons;
-      var froalaOptions = {
+      const buttons = self.opts.dynamicContentFroalaButtons;
+      const froalaOptions = {
         toolbarButtons: buttons,
         toolbarButtonsMD: buttons,
         toolbarButtonsSM: buttons,
