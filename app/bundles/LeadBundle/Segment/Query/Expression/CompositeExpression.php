@@ -29,7 +29,7 @@ namespace Mautic\LeadBundle\Segment\Query\Expression;
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  * @author Jan Kozak <galvani78@gmail.com>
  */
-class CompositeExpression implements \Countable
+class CompositeExpression extends \Doctrine\DBAL\Query\Expression\CompositeExpression implements \Countable
 {
     /**
      * Constant that represents an AND composite expression.

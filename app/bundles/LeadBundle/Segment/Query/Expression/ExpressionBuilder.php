@@ -31,7 +31,7 @@ use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
  * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
-class ExpressionBuilder
+class ExpressionBuilder extends \Doctrine\DBAL\Query\Expression\ExpressionBuilder
 {
     const EQ      = '=';
     const NEQ     = '<>';
