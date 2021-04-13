@@ -155,7 +155,7 @@ class WebhookModelTest extends TestCase
                 return null;
             });
 
-        $this->entityManagerMock->expects($this->at(0))
+        $this->entityManagerMock->expects($this->once())
             ->method('getRepository')
             ->with(WebhookQueue::class)
             ->willReturn($queueRepositoryMock);
