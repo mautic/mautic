@@ -21,6 +21,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -557,7 +558,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     {
         $alias = $this->getTableAlias();
 
-        return $this->getEntityManager()->getConnection()->createQueryBuilder()
+        return (new SegmentQueryBuilder($this->getEntityManager()->getConnection()))
             ->from(MAUTIC_TABLE_PREFIX.'leads', $alias)
             ->leftJoin($alias, MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = '.$alias.'.owner_id');
     }
@@ -778,6 +779,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                         )
                     )
                 );
+                $from = $q->getQueryPart('from')[0];
+                $q->resetQueryPart('from');
+                $q->add('from', ['hint' => 'USE INDEX FOR JOIN (`PRIMARY`)'] + $from, true);
+
                 $filter->strict  = true;
                 $q->setParameter($unique, $this->getListIdsByAlias($string) ?: [0], Connection::PARAM_INT_ARRAY);
 
